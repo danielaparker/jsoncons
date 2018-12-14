@@ -47,19 +47,40 @@ public:
         bool has_cbor_tag = false;
         uint8_t cbor_tag = 0;
 
-        if (get_major_type((uint8_t)source_.peek()) == cbor_major_type::semantic_tag)
+        cbor_major_type major_type;
+        uint8_t info;
+
+        int c = source_.peek();
+        switch (c)
         {
-            has_cbor_tag = true;
-            uint8_t c{};
-            if (source_.get(c) == 0)
-            {
+            case Source::traits_type::eof():
                 ec = cbor_errc::unexpected_eof;
                 return;
-            }
-            cbor_tag = get_additional_information_value(c);
+            default:
+                major_type = get_major_type((uint8_t)c);
+                info = get_additional_information_value((uint8_t)c);
+                break;
         }
 
-        switch (get_major_type((uint8_t)source_.peek()))
+        if (major_type == cbor_major_type::semantic_tag)
+        {
+            has_cbor_tag = true;
+            cbor_tag = info;
+            source_.ignore(1);
+            c = source_.peek();
+            switch (c)
+            {
+                case Source::traits_type::eof():
+                    ec = cbor_errc::unexpected_eof;
+                    return;
+                default:
+                    major_type = get_major_type((uint8_t)c);
+                    info = get_additional_information_value((uint8_t)c);
+                    break;
+            }
+        }
+
+        switch (major_type)
         {
             case cbor_major_type::unsigned_integer:
             {
@@ -175,8 +196,6 @@ public:
             }
             case cbor_major_type::array:
             {
-                size_t info = get_additional_information_value((uint8_t)source_.peek());
-
                 semantic_tag_type tag = semantic_tag_type::none;
                 if (has_cbor_tag)
                 {
@@ -210,17 +229,25 @@ public:
                             ++nesting_depth_;
                             handler_.begin_array(tag, *this, ec);
                             source_.ignore(1);
-                            while (source_.peek() != 0xff)
+                            bool done = false;
+                            while (!done)
                             {
-                                read(ec);
-                                if (ec)
+                                int test = source_.peek();
+                                switch (test)
                                 {
-                                    return;
-                                }
-                                if (source_.eof())
-                                {
-                                    ec = cbor_errc::unexpected_eof;
-                                    return;
+                                    case Source::traits_type::eof():
+                                        ec = cbor_errc::unexpected_eof;
+                                        return;
+                                    case 0xff:
+                                        done = true;
+                                        break;
+                                    default:
+                                        read(ec);
+                                        if (ec)
+                                        {
+                                            return;
+                                        }
+                                        break;
                                 }
                             }
                             source_.ignore(1);
@@ -255,7 +282,6 @@ public:
             }
             case cbor_major_type::map:
             {
-                size_t info = get_additional_information_value((uint8_t)source_.peek());
                 switch (info)
                 {
                     case additional_info::indefinite_length: 
@@ -263,17 +289,30 @@ public:
                         ++nesting_depth_;
                         handler_.begin_object(semantic_tag_type::none, *this, ec);
                         source_.ignore(1);
-                        while (source_.peek() != 0xff)
+                        bool done = false;
+                        while (!done)
                         {
-                            read_name(ec);
-                            if (ec)
+                            int test = source_.peek();
+                            switch (test)
                             {
-                                return;
-                            }
-                            read(ec);
-                            if (ec)
-                            {
-                                return;
+                                case Source::traits_type::eof():
+                                    ec = cbor_errc::unexpected_eof;
+                                    return;
+                                case 0xff:
+                                    done = true;
+                                    break;
+                                default:
+                                    read_name(ec);
+                                    if (ec)
+                                    {
+                                        return;
+                                    }
+                                    read(ec);
+                                    if (ec)
+                                    {
+                                        return;
+                                    }
+                                    break;
                             }
                         }
                         source_.ignore(1);
@@ -316,7 +355,6 @@ public:
             }
             case cbor_major_type::simple:
             {
-                size_t info = get_additional_information_value((uint8_t)source_.peek());
                 switch (info)
                 {
                     case 0x14:
