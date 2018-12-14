@@ -22,7 +22,7 @@
 
 namespace jsoncons { namespace msgpack {
 
-enum class msgpack_structure_type {object, indefinite_length_object, array, indefinite_length_array};
+enum class msgpack_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template<class CharT,class Result=jsoncons::binary_stream_result>
 class basic_msgpack_serializer final : public basic_json_content_handler<CharT>
@@ -36,12 +36,18 @@ public:
 private:
     struct stack_item
     {
-        msgpack_structure_type type_;
+        msgpack_container_type type_;
+        size_t length_;
         size_t count_;
 
-        stack_item(msgpack_structure_type type)
-           : type_(type), count_(0)
+        stack_item(msgpack_container_type type, size_t length = 0)
+           : type_(type), length_(length), count_(0)
         {
+        }
+
+        size_t length() const
+        {
+            return length_;
         }
 
         size_t count() const
@@ -51,12 +57,12 @@ private:
 
         bool is_object() const
         {
-            return type_ == msgpack_structure_type::object || type_ == msgpack_structure_type::indefinite_length_object;
+            return type_ == msgpack_container_type::object || type_ == msgpack_container_type::indefinite_length_object;
         }
 
         bool is_indefinite_length() const
         {
-            return type_ == msgpack_structure_type::indefinite_length_array || type_ == msgpack_structure_type::indefinite_length_object;
+            return type_ == msgpack_container_type::indefinite_length_array || type_ == msgpack_container_type::indefinite_length_object;
         }
 
     };
@@ -99,7 +105,7 @@ private:
 
     bool do_begin_object(size_t length, semantic_tag_type, const serializing_context&, std::error_code&) override
     {
-        stack_.push_back(stack_item(msgpack_structure_type::object));
+        stack_.push_back(stack_item(msgpack_container_type::object, length));
 
         if (length <= 15)
         {
@@ -127,9 +133,21 @@ private:
         return true;
     }
 
-    bool do_end_object(const serializing_context&, std::error_code&) override
+    bool do_end_object(const serializing_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+
+        if (stack_.back().count() < stack_.back().length())
+        {
+            ec = msgpack_errc::too_few_items;
+            return false;
+        }
+        else if (stack_.back().count() > stack_.back().length())
+        {
+            ec = msgpack_errc::too_many_items;
+            return false;
+        }
+
         stack_.pop_back();
         end_value();
         return true;
@@ -143,7 +161,7 @@ private:
 
     bool do_begin_array(size_t length, semantic_tag_type, const serializing_context&, std::error_code&) override
     {
-        stack_.push_back(stack_item(msgpack_structure_type::array));
+        stack_.push_back(stack_item(msgpack_container_type::array, length));
         if (length <= 15)
         {
             // fixarray
@@ -164,17 +182,33 @@ private:
         return true;
     }
 
-    bool do_end_array(const serializing_context&, std::error_code&) override
+    bool do_end_array(const serializing_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+
+        if (stack_.back().count() < stack_.back().length())
+        {
+            ec = msgpack_errc::too_few_items;
+            return false;
+        }
+        else if (stack_.back().count() > stack_.back().length())
+        {
+            ec = msgpack_errc::too_many_items;
+            return false;
+        }
+
         stack_.pop_back();
         end_value();
         return true;
     }
 
-    bool do_name(const string_view_type& name, const serializing_context& context, std::error_code& ec) override
+    bool do_name(const string_view_type& name, const serializing_context&, std::error_code& ec) override
     {
-        do_string_value(name, semantic_tag_type::none, context, ec);
+        write_string_value(name, ec);
+        if (ec)
+        {
+            return false;
+        }
         return true;
     }
 
@@ -186,7 +220,18 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type, const serializing_context&, std::error_code&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    {
+        write_string_value(sv, ec);
+        if (ec)
+        {
+            return false;
+        }
+        end_value();
+        return true;
+    }
+
+    void write_string_value(const string_view_type& sv, std::error_code& ec) 
     {
         std::basic_string<uint8_t> target;
         auto result = unicons::convert(
@@ -194,7 +239,8 @@ private:
             unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
+            ec = msgpack_errc::invalid_utf8_text_string;
+            return;
         }
 
         const size_t length = target.length();
@@ -226,9 +272,6 @@ private:
         {
             result_.push_back(c);
         }
-
-        end_value();
-        return true;
     }
 
     bool do_byte_string_value(const byte_string_view& b, 

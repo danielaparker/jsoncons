@@ -21,7 +21,9 @@ enum class ubjson_errc
     length_cannot_be_negative,
     length_must_be_integer,
     unknown_type,
-    invalid_utf8_text_string
+    invalid_utf8_text_string,
+    too_many_items,
+    too_few_items
 };
 
 class ubjson_error_category_impl
@@ -48,6 +50,10 @@ public:
                 return "Length must be a integer numeric type (int8, uint8, int16, int32, int64)";
             case ubjson_errc::invalid_utf8_text_string:
                 return "Illegal UTF-8 encoding in text string";
+            case ubjson_errc::too_many_items:
+                return "Too many items were added to a UBJSON object or array of known length";
+            case ubjson_errc::too_few_items:
+                return "Too few items were added to a UBJSON object or array of known length";
             default:
                 return "Unknown UBJSON parser error";
         }

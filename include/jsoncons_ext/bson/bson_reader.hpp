@@ -51,12 +51,12 @@ public:
 
         handler_.begin_object(semantic_tag_type::none, *this, ec);
         ++nesting_depth_;
-        parse_e_list(bson_structure_type::document, ec);
+        parse_e_list(bson_container_type::document, ec);
         handler_.end_object(*this, ec);
         --nesting_depth_;
     }
 
-    void parse_e_list(bson_structure_type type, std::error_code& ec)
+    void parse_e_list(bson_container_type type, std::error_code& ec)
     {
         uint8_t t{};
         while (source_.get(t) > 0 && t != 0x00)
@@ -68,7 +68,7 @@ public:
                 s.push_back(c);
             }
 
-            if (type == bson_structure_type::document)
+            if (type == bson_container_type::document)
             {
                 auto result = unicons::validate(s.begin(),s.end());
                 if (result.ec != unicons::conv_errc())
@@ -151,7 +151,7 @@ public:
 
                 handler_.begin_array(semantic_tag_type::none, *this, ec);
                 ++nesting_depth_;
-                parse_e_list(bson_structure_type::document, ec);
+                parse_e_list(bson_container_type::document, ec);
                 handler_.end_array(*this, ec);
                 --nesting_depth_;
                 break;

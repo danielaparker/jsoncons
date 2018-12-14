@@ -184,11 +184,11 @@ public:
     typedef typename basic_json_options<CharT>::string_type string_type;
 
 private:
-    enum class structure_type {object, array};
+    enum class container_type {object, array};
 
     class serialization_context
     {
-        structure_type type_;
+        container_type type_;
         size_t count_;
         line_split_kind line_splits_;
         bool indent_before_;
@@ -196,7 +196,7 @@ private:
         size_t begin_pos_;
         size_t data_pos_;
     public:
-        serialization_context(structure_type type, line_split_kind split_lines, bool indent_once,
+        serialization_context(container_type type, line_split_kind split_lines, bool indent_once,
                               size_t begin_pos, size_t data_pos)
            : type_(type), count_(0), line_splits_(split_lines), indent_before_(indent_once), new_line_after_(false),
              begin_pos_(begin_pos), data_pos_(data_pos)
@@ -240,12 +240,12 @@ private:
 
         bool is_object() const
         {
-            return type_ == structure_type::object;
+            return type_ == container_type::object;
         }
 
         bool is_array() const
         {
-            return type_ == structure_type::array;
+            return type_ == container_type::array;
         }
 
         bool is_same_line() const
@@ -434,7 +434,7 @@ private:
                     default: // multi_line
                         break;
                 }
-                stack_.emplace_back(structure_type::object,object_object_line_splits_, false,
+                stack_.emplace_back(container_type::object,object_object_line_splits_, false,
                                     column_, column_+open_object_brace_str_.length());
             }
             else // array
@@ -457,13 +457,13 @@ private:
                         new_line();
                         break;
                 }
-                stack_.emplace_back(structure_type::object,array_object_line_splits_, false,
+                stack_.emplace_back(container_type::object,array_object_line_splits_, false,
                                     column_, column_+open_object_brace_str_.length());
             }
         }
         else 
         {
-            stack_.emplace_back(structure_type::object, line_split_kind::multi_line, false,
+            stack_.emplace_back(container_type::object, line_split_kind::multi_line, false,
                                 column_, column_+open_object_brace_str_.length());
         }
         indent();
@@ -503,17 +503,17 @@ private:
                 switch (object_array_line_splits_)
                 {
                     case line_split_kind::same_line:
-                        stack_.emplace_back(structure_type::array,object_array_line_splits_,false,
+                        stack_.emplace_back(container_type::array,object_array_line_splits_,false,
                                             column_, column_ + open_array_bracket_str_.length());
                         break;
                     case line_split_kind::new_line:
                     {
-                        stack_.emplace_back(structure_type::array,object_array_line_splits_,true,
+                        stack_.emplace_back(container_type::array,object_array_line_splits_,true,
                                             column_, column_+open_array_bracket_str_.length());
                         break;
                     }
                     default: // multi_line
-                        stack_.emplace_back(structure_type::array,object_array_line_splits_,true,
+                        stack_.emplace_back(container_type::array,object_array_line_splits_,true,
                                             column_, column_+open_array_bracket_str_.length());
                         break;
                 }
@@ -528,19 +528,19 @@ private:
                         stack_.back().new_line_after(true);
                         new_line();
                     }
-                    stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
+                    stack_.emplace_back(container_type::array,array_array_line_splits_, false,
                                         column_, column_+open_array_bracket_str_.length());
                     break;
                 case line_split_kind::new_line:
                     stack_.back().new_line_after(true);
                     new_line();
-                    stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
+                    stack_.emplace_back(container_type::array,array_array_line_splits_, false,
                                         column_, column_+open_array_bracket_str_.length());
                     break;
                 default: // multi_line
                     stack_.back().new_line_after(true);
                     new_line();
-                    stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
+                    stack_.emplace_back(container_type::array,array_array_line_splits_, false,
                                         column_, column_+open_array_bracket_str_.length());
                     //new_line();
                     break;
@@ -549,7 +549,7 @@ private:
         }
         else 
         {
-            stack_.emplace_back(structure_type::array, line_split_kind::multi_line, false,
+            stack_.emplace_back(container_type::array, line_split_kind::multi_line, false,
                                 column_, column_+open_array_bracket_str_.length());
         }
         indent();
@@ -998,14 +998,14 @@ public:
     typedef typename basic_json_options<CharT>::string_type string_type;
 
 private:
-    enum class structure_type {object, array};
+    enum class container_type {object, array};
 
     class serialization_context
     {
-        structure_type type_;
+        container_type type_;
         size_t count_;
     public:
-        serialization_context(structure_type type)
+        serialization_context(container_type type)
            : type_(type), count_(0)
         {
         }
@@ -1022,7 +1022,7 @@ private:
 
         bool is_array() const
         {
-            return type_ == structure_type::array;
+            return type_ == container_type::array;
         }
     };
 
@@ -1095,7 +1095,7 @@ private:
             writer_.push_back(',');
         }
 
-        stack_.emplace_back(structure_type::object);
+        stack_.emplace_back(container_type::object);
         writer_.push_back('{');
         return true;
     }
@@ -1120,7 +1120,7 @@ private:
         {
             writer_.push_back(',');
         }
-        stack_.emplace_back(structure_type::array);
+        stack_.emplace_back(container_type::array);
         writer_.push_back('[');
         return true;
     }

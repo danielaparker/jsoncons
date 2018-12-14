@@ -71,7 +71,7 @@ TEST_CASE("serialize array to cbor")
     {
         std::cout << e.what() << std::endl;
     }
-} 
+}
 
 TEST_CASE("test_serialize_indefinite_length_array")
 {
@@ -97,7 +97,6 @@ TEST_CASE("test_serialize_indefinite_length_array")
         std::cout << e.what() << std::endl;
     }
 } 
-
 TEST_CASE("test_serialize_bignum")
 {
     std::vector<uint8_t> v;
@@ -206,7 +205,8 @@ TEST_CASE("test_serialize_negative_bignum3")
         std::cout << e.what() << std::endl;
     }
 } 
-TEST_CASE("test_serialize_decimal")
+
+TEST_CASE("serialize big_decimal to cbor")
 {
     SECTION("-1 184467440737095516160")
     {
@@ -274,3 +274,79 @@ TEST_CASE("test_serialize_decimal")
     }
 } 
 
+TEST_CASE("Too many and too few items in CBOR map or array")
+{
+    bool result;
+    std::error_code ec{};
+    std::vector<uint8_t> v;
+    cbor_buffer_serializer serializer(v);
+
+    SECTION("Too many items in array")
+    {
+        serializer.begin_array(3);
+        serializer.bool_value(true);
+        serializer.bool_value(false);
+        serializer.null_value();
+        serializer.begin_array(2);
+        serializer.string_value("cat");
+        serializer.string_value("feline");
+        serializer.end_array();
+        result = serializer.end_array(null_serializing_context(), ec);
+        CHECK(ec == cbor_errc::too_many_items);
+        CHECK_FALSE(result);
+        serializer.flush();
+    }
+    SECTION("Too few items in array")
+    {
+        serializer.begin_array(5);
+        serializer.bool_value(true);
+        serializer.bool_value(false);
+        serializer.null_value();
+        serializer.begin_array(2);
+        serializer.string_value("cat");
+        serializer.string_value("feline");
+        serializer.end_array();
+        result = serializer.end_array(null_serializing_context(), ec);
+        CHECK(ec == cbor_errc::too_few_items);
+        CHECK_FALSE(result);
+        serializer.flush();
+    }
+    SECTION("Too many items in map")
+    {
+        serializer.begin_object(3);
+        serializer.name("a");
+        serializer.bool_value(true);
+        serializer.name("b");
+        serializer.bool_value(false);
+        serializer.name("c");
+        serializer.null_value();
+        serializer.name("d");
+        serializer.begin_array(2);
+        serializer.string_value("cat");
+        serializer.string_value("feline");
+        serializer.end_array();
+        result = serializer.end_array(null_serializing_context(), ec);
+        CHECK(ec == cbor_errc::too_many_items);
+        CHECK_FALSE(result);
+        serializer.flush();
+    }
+    SECTION("Too few items in map")
+    {
+        serializer.begin_object(5);
+        serializer.name("a");
+        serializer.bool_value(true);
+        serializer.name("b");
+        serializer.bool_value(false);
+        serializer.name("c");
+        serializer.null_value();
+        serializer.name("d");
+        serializer.begin_array(2);
+        serializer.string_value("cat");
+        serializer.string_value("feline");
+        serializer.end_array();
+        result = serializer.end_array(null_serializing_context(), ec);
+        CHECK(ec == cbor_errc::too_few_items);
+        CHECK_FALSE(result);
+        serializer.flush();
+    }
+}

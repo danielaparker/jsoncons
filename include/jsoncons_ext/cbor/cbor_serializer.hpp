@@ -20,7 +20,7 @@
 
 namespace jsoncons { namespace cbor {
 
-enum class cbor_structure_type {object, indefinite_length_object, array, indefinite_length_array};
+enum class cbor_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template<class CharT,class Result=jsoncons::binary_stream_result>
 class basic_cbor_serializer final : public basic_json_content_handler<CharT>
@@ -35,12 +35,18 @@ public:
 private:
     struct stack_item
     {
-        cbor_structure_type type_;
+        cbor_container_type type_;
+        size_t length_;
         size_t count_;
 
-        stack_item(cbor_structure_type type)
-           : type_(type), count_(0)
+        stack_item(cbor_container_type type, size_t length = 0)
+           : type_(type), length_(length), count_(0)
         {
+        }
+
+        size_t length() const
+        {
+            return length_;
         }
 
         size_t count() const
@@ -50,12 +56,12 @@ private:
 
         bool is_object() const
         {
-            return type_ == cbor_structure_type::object || type_ == cbor_structure_type::indefinite_length_object;
+            return type_ == cbor_container_type::object || type_ == cbor_container_type::indefinite_length_object;
         }
 
         bool is_indefinite_length() const
         {
-            return type_ == cbor_structure_type::indefinite_length_array || type_ == cbor_structure_type::indefinite_length_object;
+            return type_ == cbor_container_type::indefinite_length_array || type_ == cbor_container_type::indefinite_length_object;
         }
 
     };
@@ -92,7 +98,7 @@ private:
 
     bool do_begin_object(semantic_tag_type, const serializing_context&, std::error_code&) override
     {
-        stack_.push_back(stack_item(cbor_structure_type::indefinite_length_object));
+        stack_.push_back(stack_item(cbor_container_type::indefinite_length_object));
         
         result_.push_back(0xbf);
         return true;
@@ -100,7 +106,7 @@ private:
 
     bool do_begin_object(size_t length, semantic_tag_type, const serializing_context&, std::error_code&) override
     {
-        stack_.push_back(stack_item(cbor_structure_type::object));
+        stack_.push_back(stack_item(cbor_container_type::object, length));
 
         if (length <= 0x17)
         {
@@ -139,22 +145,36 @@ private:
         return true;
     }
 
-    bool do_end_object(const serializing_context&, std::error_code&) override
+    bool do_end_object(const serializing_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
         {
             result_.push_back(0xff);
         }
-        stack_.pop_back();
+        else
+        {
+            if (stack_.back().count() < stack_.back().length())
+            {
+                ec = cbor_errc::too_few_items;
+                return false;
+            }
+            if (stack_.back().count() > stack_.back().length())
+            {
+                ec = cbor_errc::too_many_items;
+                return false;
+            }
+        }
 
+        stack_.pop_back();
         end_value();
+
         return true;
     }
 
     bool do_begin_array(semantic_tag_type, const serializing_context&, std::error_code&) override
     {
-        stack_.push_back(stack_item(cbor_structure_type::indefinite_length_array));
+        stack_.push_back(stack_item(cbor_container_type::indefinite_length_array));
         result_.push_back(0x9f);
         return true;
     }
@@ -165,7 +185,7 @@ private:
         {
             result_.push_back(0xc5);
         }
-        stack_.push_back(stack_item(cbor_structure_type::array));
+        stack_.push_back(stack_item(cbor_container_type::array, length));
         if (length <= 0x17)
         {
             jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x80 + length), 
@@ -202,21 +222,37 @@ private:
         return true;
     }
 
-    bool do_end_array(const serializing_context&, std::error_code&) override
+    bool do_end_array(const serializing_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+
         if (stack_.back().is_indefinite_length())
         {
             result_.push_back(0xff);
         }
+        else
+        {
+            if (stack_.back().count() < stack_.back().length())
+            {
+                ec = cbor_errc::too_few_items;
+                return false;
+            }
+            if (stack_.back().count() > stack_.back().length())
+            {
+                ec = cbor_errc::too_many_items;
+                return false;
+            }
+        }
+
         stack_.pop_back();
         end_value();
+
         return true;
     }
 
     bool do_name(const string_view_type& name, const serializing_context& context, std::error_code& ec) override
     {
-        do_string_value(name, semantic_tag_type::none, context, ec);
+        write_string_value(name, ec);
         return true;
     }
 
@@ -461,6 +497,7 @@ private:
         else
         {
             write_bignum_value(s, ec);
+            end_value();
         }
         do_end_array(context, ec);
     }
@@ -491,7 +528,6 @@ private:
                 break;
             }
         }
-
         end_value();
         return true;
     }

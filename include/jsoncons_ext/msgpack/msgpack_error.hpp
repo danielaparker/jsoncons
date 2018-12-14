@@ -19,7 +19,9 @@ enum class msgpack_errc
     source_error,
     invalid_utf8_text_string,
     array_length_required,
-    object_length_required
+    object_length_required,
+    too_many_items,
+    too_few_items
 };
 
 class msgpack_error_category_impl
@@ -44,6 +46,10 @@ public:
                 return "MessagePack serializer requires array length";
             case msgpack_errc::object_length_required:
                 return "MessagePack serializer requires object length";
+            case msgpack_errc::too_many_items:
+                return "Too many items were added to a MessagePack object or array";
+            case msgpack_errc::too_few_items:
+                return "Too few items were added to a MessagePack object or array";
             default:
                 return "Unknown MessagePack parser error";
         }

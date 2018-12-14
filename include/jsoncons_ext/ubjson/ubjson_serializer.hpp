@@ -21,7 +21,7 @@
 
 namespace jsoncons { namespace ubjson {
 
-enum class ubjson_structure_type {object, indefinite_length_object, array, indefinite_length_array};
+enum class ubjson_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template<class CharT,class Result=jsoncons::binary_stream_result>
 class basic_ubjson_serializer final : public basic_json_content_handler<CharT>
@@ -36,12 +36,18 @@ public:
 private:
     struct stack_item
     {
-        ubjson_structure_type type_;
+        ubjson_container_type type_;
+        size_t length_;
         size_t count_;
 
-        stack_item(ubjson_structure_type type)
-           : type_(type), count_(0)
+        stack_item(ubjson_container_type type, size_t length = 0)
+           : type_(type), length_(length), count_(0)
         {
+        }
+
+        size_t length() const
+        {
+            return length_;
         }
 
         size_t count() const
@@ -51,12 +57,12 @@ private:
 
         bool is_object() const
         {
-            return type_ == ubjson_structure_type::object || type_ == ubjson_structure_type::indefinite_length_object;
+            return type_ == ubjson_container_type::object || type_ == ubjson_container_type::indefinite_length_object;
         }
 
         bool is_indefinite_length() const
         {
-            return type_ == ubjson_structure_type::indefinite_length_array || type_ == ubjson_structure_type::indefinite_length_object;
+            return type_ == ubjson_container_type::indefinite_length_array || type_ == ubjson_container_type::indefinite_length_object;
         }
 
     };
@@ -93,7 +99,7 @@ private:
 
     bool do_begin_object(semantic_tag_type, const serializing_context&, std::error_code&) override
     {
-        stack_.push_back(stack_item(ubjson_structure_type::indefinite_length_object));
+        stack_.push_back(stack_item(ubjson_container_type::indefinite_length_object));
         result_.push_back(ubjson_format::start_object_marker);
 
         return true;
@@ -101,7 +107,7 @@ private:
 
     bool do_begin_object(size_t length, semantic_tag_type, const serializing_context&, std::error_code&) override
     {
-        stack_.push_back(stack_item(ubjson_structure_type::object));
+        stack_.push_back(stack_item(ubjson_container_type::object, length));
         result_.push_back(ubjson_format::start_object_marker);
         result_.push_back(ubjson_format::count_marker);
         put_length(length);
@@ -109,12 +115,25 @@ private:
         return true;
     }
 
-    bool do_end_object(const serializing_context&, std::error_code&) override
+    bool do_end_object(const serializing_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
         {
             result_.push_back(ubjson_format::end_object_marker);
+        }
+        else
+        {
+            if (stack_.back().count() < stack_.back().length())
+            {
+                ec = ubjson_errc::too_few_items;
+                return false;
+            }
+            if (stack_.back().count() > stack_.back().length())
+            {
+                ec = ubjson_errc::too_many_items;
+                return false;
+            }
         }
         stack_.pop_back();
         end_value();
@@ -123,7 +142,7 @@ private:
 
     bool do_begin_array(semantic_tag_type, const serializing_context&, std::error_code&) override
     {
-        stack_.push_back(stack_item(ubjson_structure_type::indefinite_length_array));
+        stack_.push_back(stack_item(ubjson_container_type::indefinite_length_array));
         result_.push_back(ubjson_format::start_array_marker);
 
         return true;
@@ -131,7 +150,7 @@ private:
 
     bool do_begin_array(size_t length, semantic_tag_type, const serializing_context&, std::error_code&) override
     {
-        stack_.push_back(stack_item(ubjson_structure_type::array));
+        stack_.push_back(stack_item(ubjson_container_type::array, length));
         result_.push_back(ubjson_format::start_array_marker);
         result_.push_back(ubjson_format::count_marker);
         put_length(length);
@@ -139,12 +158,25 @@ private:
         return true;
     }
 
-    bool do_end_array(const serializing_context&, std::error_code&) override
+    bool do_end_array(const serializing_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
         {
             result_.push_back(ubjson_format::end_array_marker);
+        }
+        else
+        {
+            if (stack_.back().count() < stack_.back().length())
+            {
+                ec = ubjson_errc::too_few_items;
+                return false;
+            }
+            if (stack_.back().count() > stack_.back().length())
+            {
+                ec = ubjson_errc::too_many_items;
+                return false;
+            }
         }
         stack_.pop_back();
         end_value();
@@ -153,7 +185,23 @@ private:
 
     bool do_name(const string_view_type& name, const serializing_context& context, std::error_code& ec) override
     {
-        do_string_value(name, semantic_tag_type::none, context, ec);
+        result_.push_back(ubjson_format::string_type);
+        std::basic_string<uint8_t> target;
+        auto result = unicons::convert(
+            name.begin(), name.end(), std::back_inserter(target), 
+            unicons::conv_flags::strict);
+        if (result.ec != unicons::conv_errc())
+        {
+            ec = ubjson_errc::invalid_utf8_text_string;
+            return false;
+        }
+
+        put_length(target.length());
+
+        for (auto c : target)
+        {
+            result_.push_back(c);
+        }
         return true;
     }
 

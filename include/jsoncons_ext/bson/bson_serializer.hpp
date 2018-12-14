@@ -33,12 +33,12 @@ public:
 private:
     struct stack_item
     {
-        bson_structure_type type_;
+        bson_container_type type_;
         size_t offset_;
         size_t name_offset_;
         size_t index_;
 
-        stack_item(bson_structure_type type, size_t offset)
+        stack_item(bson_container_type type, size_t offset)
            : type_(type), offset_(offset), name_offset_(0), index_(0)
         {
         }
@@ -65,7 +65,7 @@ private:
 
         bool is_object() const
         {
-            return type_ == bson_structure_type::document;
+            return type_ == bson_container_type::document;
         }
 
 
@@ -109,7 +109,7 @@ private:
         {
             before_value(bson_format::document_cd);
         }
-        stack_.emplace_back(bson_structure_type::document, buffer_.size());
+        stack_.emplace_back(bson_container_type::document, buffer_.size());
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
 
         return true;
@@ -141,7 +141,7 @@ private:
         {
             before_value(bson_format::array_cd);
         }
-        stack_.emplace_back(bson_structure_type::array, buffer_.size());
+        stack_.emplace_back(bson_container_type::array, buffer_.size());
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
         return true;
     }

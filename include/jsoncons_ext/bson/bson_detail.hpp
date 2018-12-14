@@ -37,7 +37,7 @@ namespace bson_format
     const uint8_t max_key_cd = 0x7f;
 }
 
-enum class bson_structure_type {document, array};
+enum class bson_container_type {document, array};
 
 }}
 
