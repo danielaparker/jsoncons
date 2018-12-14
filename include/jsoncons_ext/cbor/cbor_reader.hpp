@@ -49,7 +49,6 @@ public:
 
         cbor_major_type major_type;
         uint8_t info;
-
         int c = source_.peek();
         switch (c)
         {
@@ -412,7 +411,18 @@ public:
 private:
     void read_name(std::error_code& ec)
     {
-        switch (get_major_type((uint8_t)source_.peek()))
+        cbor_major_type major_type;
+        int c = source_.peek();
+        switch (c)
+        {
+            case Source::traits_type::eof():
+                ec = cbor_errc::unexpected_eof;
+                return;
+            default:
+                major_type = get_major_type((uint8_t)c);
+                break;
+        }
+        switch (major_type)
         {
             case cbor_major_type::text_string:
             {

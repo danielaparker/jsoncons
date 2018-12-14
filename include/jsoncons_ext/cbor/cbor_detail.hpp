@@ -179,15 +179,28 @@ size_t get_length(Source& source, std::error_code& ec)
                 case cbor_major_type::array:
                 {
                     length = 0;
-                    while (source.peek() != 0xff)
+                    bool done = false;
+                    while (!done)
                     {
-                        walk(source, ec);
-                        if (ec)
+                        int test = source.peek();
+                        switch (test)
                         {
-                            ec = cbor_errc::unexpected_eof;
-                            return 0;
+                            case Source::traits_type::eof():
+                                ec = cbor_errc::unexpected_eof;
+                                return length;
+                            case 0xff:
+                                done = true;
+                                break;
+                            default:
+                                walk(source, ec);
+                                if (ec)
+                                {
+                                    ec = cbor_errc::unexpected_eof;
+                                    return 0;
+                                }
+                                ++length;
+                                break;
                         }
-                        ++length;
                     }
                     source.ignore(1);
                     break;
@@ -195,19 +208,29 @@ size_t get_length(Source& source, std::error_code& ec)
                 case cbor_major_type::map:
                 {
                     length = 0;
-                    while (source.peek() != 0xff)
+                    bool done = false;
+                    while (!done)
                     {
-                        walk(source, ec);
-                        if (ec)
+                        int test = source.peek();
+                        switch (test)
                         {
-                            return 0;
+                            case Source::traits_type::eof():
+                                ec = cbor_errc::unexpected_eof;
+                                return length;
+                            case 0xff:
+                                done = true;
+                                break;
+                            default:
+                                walk(source, ec);
+                                if (ec)
+                                {
+                                    return 0;
+                                }
+                                walk(source, ec);
+                                if (ec) return 0;
+                                ++length;
+                                break;
                         }
-                        walk(source, ec);
-                        if (ec)
-                        {
-                            return 0;
-                        }
-                        ++length;
                     }
                     source.ignore(1);
                     break;
@@ -216,14 +239,27 @@ size_t get_length(Source& source, std::error_code& ec)
                 case cbor_major_type::byte_string:
                 {
                     length = 0;
-                    while (source.peek() != 0xff)
+                    bool done = false;
+                    while (!done)
                     {
-                        size_t len = jsoncons::cbor::detail::get_length(source, ec);
-                        if (ec)
+                        int test = source.peek();
+                        switch (test)
                         {
-                            return 0;
+                        case Source::traits_type::eof():
+                            ec = cbor_errc::unexpected_eof;
+                            return length;
+                        case 0xff:
+                            done = true;
+                            break;
+                        default:
+                            size_t len = jsoncons::cbor::detail::get_length(source, ec);
+                            if (ec)
+                            {
+                                return 0;
+                            }
+                            length += len;
+                            break;
                         }
-                        length += len;
                     }
                     source.ignore(1);
                     break;
