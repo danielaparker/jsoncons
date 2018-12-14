@@ -121,6 +121,49 @@ public:
 
     void read(std::error_code& ec)
     {
+        try
+        {
+            read_internal(ec);
+        }
+        catch (const serialization_error& e)
+        {
+            ec = e.code();
+        }
+    }
+
+    bool eof() const
+    {
+        return eof_;
+    }
+
+    size_t buffer_length() const
+    {
+        return buffer_length_;
+    }
+
+    void buffer_length(size_t length)
+    {
+        buffer_length_ = length;
+        buffer_.reserve(buffer_length_);
+    }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+
+    size_t buffer_capacity() const
+    {
+        return buffer_length_;
+    }
+
+    void buffer_capacity(size_t length)
+    {
+        buffer_length_ = length;
+        buffer_.reserve(buffer_length_);
+    }
+#endif
+private:
+
+    void read_internal(std::error_code& ec)
+    {
         if (source_.is_error())
         {
             ec = csv_errc::source_error;
@@ -158,35 +201,6 @@ public:
         }
     }
 
-    bool eof() const
-    {
-        return eof_;
-    }
-
-    size_t buffer_length() const
-    {
-        return buffer_length_;
-    }
-
-    void buffer_length(size_t length)
-    {
-        buffer_length_ = length;
-        buffer_.reserve(buffer_length_);
-    }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-    size_t buffer_capacity() const
-    {
-        return buffer_length_;
-    }
-
-    void buffer_capacity(size_t length)
-    {
-        buffer_length_ = length;
-        buffer_.reserve(buffer_length_);
-    }
-#endif
 };
 
 template <class Json>

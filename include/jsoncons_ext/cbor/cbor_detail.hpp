@@ -829,12 +829,25 @@ void walk(Source& source, std::error_code& ec)
             if (info == additional_info::indefinite_length)
             {
                 source.ignore(1);
-                while (source.peek() != 0xff)
+                bool done = false;
+                while (!done)
                 {
-                    walk(source, ec);
-                    if (ec)
+                    int test = source.peek();
+                    switch (test)
                     {
-                        return;
+                        case Source::traits_type::eof():
+                            ec = cbor_errc::unexpected_eof;
+                            return;
+                        case 0xff:
+                            done = true;
+                            break;
+                        default:
+                            walk(source, ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            break;
                     }
                 }
                 source.ignore(1);

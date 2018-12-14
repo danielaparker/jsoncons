@@ -35,28 +35,46 @@ public:
 
     void read(std::error_code& ec)
     {
-        if (source_.is_error())
+        try
         {
-            ec = bson_errc::source_error;
-            return;
-        }   
-        uint8_t buf[sizeof(int32_t)]; 
-        if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
-        {
-            ec = bson_errc::unexpected_eof;
-            return;
-        }
-        const uint8_t* endp;
-        /* auto len = */jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
+            if (source_.is_error())
+            {
+                ec = bson_errc::source_error;
+                return;
+            }   
+            uint8_t buf[sizeof(int32_t)]; 
+            if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
+            {
+                ec = bson_errc::unexpected_eof;
+                return;
+            }
+            const uint8_t* endp;
+            /* auto len = */jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
 
-        handler_.begin_object(semantic_tag_type::none, *this);
-        ++nesting_depth_;
-        parse_e_list(bson_container_type::document, ec);
-        handler_.end_object(*this);
-        --nesting_depth_;
+            handler_.begin_object(semantic_tag_type::none, *this);
+            ++nesting_depth_;
+            read_e_list(bson_container_type::document, ec);
+            handler_.end_object(*this);
+            --nesting_depth_;
+        }
+        catch (const serialization_error& e)
+        {
+            ec = e.code();
+        }
     }
 
-    void parse_e_list(bson_container_type type, std::error_code& ec)
+    size_t line_number() const override
+    {
+        return 0;
+    }
+
+    size_t column_number() const override
+    {
+        return source_.position();
+    }
+private:
+
+    void read_e_list(bson_container_type type, std::error_code& ec)
     {
         uint8_t t{};
         while (source_.get(t) > 0 && t != 0x00)
@@ -78,11 +96,11 @@ public:
                 }
                 handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
             }
-            parse_some(t, ec);
+            read_internal(t, ec);
         }
     }
 
-    void parse_some(uint8_t type, std::error_code& ec)
+    void read_internal(uint8_t type, std::error_code& ec)
     {
         switch (type)
         {
@@ -151,7 +169,7 @@ public:
 
                 handler_.begin_array(semantic_tag_type::none, *this);
                 ++nesting_depth_;
-                parse_e_list(bson_container_type::document, ec);
+                read_e_list(bson_container_type::document, ec);
                 handler_.end_array(*this);
                 --nesting_depth_;
                 break;
@@ -238,19 +256,8 @@ public:
                 break;
             }
         }
-        
-    }
 
-    size_t line_number() const override
-    {
-        return 0;
     }
-
-    size_t column_number() const override
-    {
-        return source_.position();
-    }
-private:
 };
 
 typedef basic_bson_reader<jsoncons::binary_stream_source> bson_reader;

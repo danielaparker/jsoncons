@@ -275,79 +275,58 @@ public:
         }
     }
 
-    void read_buffer(std::error_code& ec)
-    {
-        buffer_.clear();
-        buffer_.resize(buffer_length_);
-        size_t count = source_.read(buffer_.data(), buffer_length_);
-        buffer_.resize(static_cast<size_t>(count));
-        if (buffer_.size() == 0)
-        {
-            eof_ = true;
-        }
-        else if (begin_)
-        {
-            auto result = unicons::skip_bom(buffer_.begin(), buffer_.end());
-            if (result.ec != unicons::encoding_errc())
-            {
-                ec = result.ec;
-                return;
-            }
-            size_t offset = result.it - buffer_.begin();
-            parser_.update(buffer_.data()+offset,buffer_.size()-offset);
-            begin_ = false;
-        }
-        else
-        {
-            parser_.update(buffer_.data(),buffer_.size());
-        }
-    }
-
     void read_next(std::error_code& ec)
     {
-        if (source_.is_error())
+        try
         {
-            ec = json_errc::source_error;
-            return;
-        }        
-        parser_.reset();
-        while (!parser_.finished())
-        {
-            if (parser_.source_exhausted())
+            if (source_.is_error())
             {
-                if (!source_.eof())
+                ec = json_errc::source_error;
+                return;
+            }        
+            parser_.reset();
+            while (!parser_.finished())
+            {
+                if (parser_.source_exhausted())
                 {
-                    read_buffer(ec);
-                    if (ec) return;
+                    if (!source_.eof())
+                    {
+                        read_buffer(ec);
+                        if (ec) return;
+                    }
+                    else
+                    {
+                        eof_ = true;
+                    }
+                }
+                parser_.parse_some(handler_, ec);
+                if (ec) return;
+            }
+            
+            while (!eof_)
+            {
+                parser_.skip_whitespace();
+                if (parser_.source_exhausted())
+                {
+                    if (!source_.eof())
+                    {
+                        read_buffer(ec);
+                        if (ec) return;
+                    }
+                    else
+                    {
+                        eof_ = true;
+                    }
                 }
                 else
                 {
-                    eof_ = true;
+                    break;
                 }
             }
-            parser_.parse_some(handler_, ec);
-            if (ec) return;
         }
-        
-        while (!eof_)
+        catch (const serialization_error& e)
         {
-            parser_.skip_whitespace();
-            if (parser_.source_exhausted())
-            {
-                if (!source_.eof())
-                {
-                    read_buffer(ec);
-                    if (ec) return;
-                }
-                else
-                {
-                    eof_ = true;
-                }
-            }
-            else
-            {
-                break;
-            }
+            ec = e.code();
         }
     }
 
@@ -373,38 +352,45 @@ public:
 
     void check_done(std::error_code& ec)
     {
-        if (source_.is_error())
+        try
         {
-            ec = json_errc::source_error;
-            return;
-        }   
-        if (eof_)
-        {
-            parser_.check_done(ec);
-            if (ec) return;
-        }
-        else
-        {
-            while (!eof_)
+            if (source_.is_error())
             {
-                if (parser_.source_exhausted())
+                ec = json_errc::source_error;
+                return;
+            }   
+            if (eof_)
+            {
+                parser_.check_done(ec);
+                if (ec) return;
+            }
+            else
+            {
+                while (!eof_)
                 {
-                    if (!source_.eof())
+                    if (parser_.source_exhausted())
                     {
-                        read_buffer(ec);     
+                        if (!source_.eof())
+                        {
+                            read_buffer(ec);     
+                            if (ec) return;
+                        }
+                        else
+                        {
+                            eof_ = true;
+                        }
+                    }
+                    if (!eof_)
+                    {
+                        parser_.check_done(ec);
                         if (ec) return;
                     }
-                    else
-                    {
-                        eof_ = true;
-                    }
-                }
-                if (!eof_)
-                {
-                    parser_.check_done(ec);
-                    if (ec) return;
                 }
             }
+        }
+        catch (const serialization_error& e)
+        {
+            ec = e.code();
         }
     }
 
@@ -452,6 +438,34 @@ public:
 #endif
 
 private:
+
+    void read_buffer(std::error_code& ec)
+    {
+        buffer_.clear();
+        buffer_.resize(buffer_length_);
+        size_t count = source_.read(buffer_.data(), buffer_length_);
+        buffer_.resize(static_cast<size_t>(count));
+        if (buffer_.size() == 0)
+        {
+            eof_ = true;
+        }
+        else if (begin_)
+        {
+            auto result = unicons::skip_bom(buffer_.begin(), buffer_.end());
+            if (result.ec != unicons::encoding_errc())
+            {
+                ec = result.ec;
+                return;
+            }
+            size_t offset = result.it - buffer_.begin();
+            parser_.update(buffer_.data()+offset,buffer_.size()-offset);
+            begin_ = false;
+        }
+        else
+        {
+            parser_.update(buffer_.data(),buffer_.size());
+        }
+    }
 };
 
 typedef basic_json_reader<char,jsoncons::text_stream_source<char>> json_reader;

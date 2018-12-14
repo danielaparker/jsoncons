@@ -36,6 +36,29 @@ public:
 
     void read(std::error_code& ec)
     {
+        try
+        {
+            read_internal(ec);
+        }
+        catch (const serialization_error& e)
+        {
+            ec = e.code();
+        }
+    }
+
+    size_t line_number() const override
+    {
+        return 0;
+    }
+
+    size_t column_number() const override
+    {
+        return source_.position();
+    }
+private:
+
+    void read_internal(std::error_code& ec)
+    {
         if (source_.is_error())
         {
             ec = msgpack_errc::source_error;
@@ -580,16 +603,6 @@ public:
         }
     }
 
-    size_t line_number() const override
-    {
-        return 0;
-    }
-
-    size_t column_number() const override
-    {
-        return source_.position();
-    }
-private:
     void parse_name(std::error_code& ec)
     {
         uint8_t type{};
