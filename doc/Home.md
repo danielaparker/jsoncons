@@ -26,11 +26,15 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 [json_serializer](ref/json_serializer.md)  
 [json_options](ref/json_options.md)  
 
+[wjson_serializer](ref/wjson_serializer.md)  
+[wjson_options](ref/wjson_options.md)  
+
 [json_filter](ref/json_filter.md)  
 [rename_object_member_filter](ref/rename_object_member_filter.md)  
 
-[wjson_serializer](ref/wjson_serializer.md)  
-[wjson_options](ref/wjson_options.md)  
+[staj_reader](ref/staj_reader.md)  
+[staj_object_iterator](ref/staj_object_iterator.md)  
+[staj_array_iterator](ref/staj_array_iterator.md)  
 
 ### Extensions
 
@@ -40,11 +44,15 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 #### [jsonpath](ref/jsonpath/jsonpath.md)
 
-#### [csv](ref/csv/csv.md)
+#### [cbor](doc/ref/cbor/cbor.md)
 
 #### [msgpack](ref/msgpack/msgpack.md)
 
-#### [Concise Binary Object Representation](ref/cbor/cbor.md)
+#### [ubjson](doc/ref/ubjson/ubjson.md)
+
+#### [msgpack](ref/msgpack/msgpack.md)
+
+#### [bson](doc/ref/bson/bson.md)
 
 ### Tutorials
 

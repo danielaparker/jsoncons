@@ -251,7 +251,7 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const serializing_context& context, std::error_code& ec) override
+    bool do_name(const string_view_type& name, const serializing_context&, std::error_code& ec) override
     {
         write_string(name, ec);
         if (ec)
