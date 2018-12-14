@@ -345,7 +345,7 @@ public:
 
 struct binary_traits
 {
-    static int eof() 
+    static constexpr int eof() 
     {
         return std::char_traits<char>::eof();
     }
