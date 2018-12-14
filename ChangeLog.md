@@ -8,8 +8,9 @@ Bug fixes:
 
 - Fixed compile issue with `j = json::make_array()` (also in 0.113.2)
 
-Breaking changes to jsoncons semantic tag type names:
+Breaking changes to jsoncons semantic tag type names: 
 
+- semantic_tag_type::bignum to semantic_tag_type::big_integer
 - semantic_tag_type::decimal_fraction to semantic_tag_type::big_decimal
 - semantic_tag_type::epoch_time to semantic_tag_type::timestamp
 
