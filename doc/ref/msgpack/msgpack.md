@@ -2,9 +2,11 @@
 
 The msgpack extension implements decode from and encode to the [MessagePack](http://msgpack.org/index.html) data format.
 
+[decode_msgpack](decode_msgpack.md)
+
 [encode_msgpack](encode_msgpack.md)
 
-[decode_msgpack](decode_msgpack.md)
+[msgpack_serializer](msgpack_serializer.md)
 
 ### Examples
 

@@ -32,7 +32,6 @@ class basic_ubjson_serializer final : public basic_json_content_handler<CharT>
 public:
     using typename basic_json_content_handler<CharT>::string_view_type;
     typedef Result result_type;
-    typedef typename Result::output_type output_type;
 
 private:
     struct stack_item
@@ -74,8 +73,8 @@ private:
     basic_ubjson_serializer(const basic_ubjson_serializer&) = delete;
     basic_ubjson_serializer& operator=(const basic_ubjson_serializer&) = delete;
 public:
-    basic_ubjson_serializer(output_type& os)
-       : result_(os)
+    basic_ubjson_serializer(result_type result)
+       : result_(std::move(result))
     {
     }
 
@@ -428,8 +427,10 @@ private:
 };
 
 typedef basic_ubjson_serializer<char,jsoncons::binary_stream_result> ubjson_serializer;
-
 typedef basic_ubjson_serializer<char,jsoncons::buffer_result> ubjson_buffer_serializer;
+
+typedef basic_ubjson_serializer<wchar_t,jsoncons::binary_stream_result> wubjson_serializer;
+typedef basic_ubjson_serializer<wchar_t,jsoncons::buffer_result> wubjson_buffer_serializer;
 
 }}
 #endif

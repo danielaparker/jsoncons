@@ -9,6 +9,8 @@ on a view (`cbor_view`) of a packed CBOR value for iterating over and accessing 
 
 [encode_cbor](encode_cbor.md)
 
+[cbor_serializer](cbor_serializer.md)
+
 [cbor_view](cbor_view.md)
 
 ### Examples

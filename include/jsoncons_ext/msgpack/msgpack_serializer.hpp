@@ -29,9 +29,9 @@ class basic_msgpack_serializer final : public basic_json_content_handler<CharT>
 {
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
+    typedef CharT char_type;
     using typename basic_json_content_handler<CharT>::string_view_type;
     typedef Result result_type;
-    typedef typename Result::output_type output_type;
 
 private:
     struct stack_item
@@ -73,8 +73,8 @@ private:
     basic_msgpack_serializer(const basic_msgpack_serializer&) = delete;
     basic_msgpack_serializer& operator=(const basic_msgpack_serializer&) = delete;
 public:
-    basic_msgpack_serializer(output_type& os)
-       : result_(os)
+    explicit basic_msgpack_serializer(result_type result)
+       : result_(std::move(result))
     {
     }
 
@@ -448,8 +448,10 @@ private:
 };
 
 typedef basic_msgpack_serializer<char,jsoncons::binary_stream_result> msgpack_serializer;
-
 typedef basic_msgpack_serializer<char,jsoncons::buffer_result> msgpack_buffer_serializer;
+
+typedef basic_msgpack_serializer<wchar_t,jsoncons::binary_stream_result> wmsgpack_serializer;
+typedef basic_msgpack_serializer<wchar_t,jsoncons::buffer_result> wmsgpack_buffer_serializer;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 typedef basic_msgpack_serializer<char,jsoncons::buffer_result> msgpack_bytes_serializer;
