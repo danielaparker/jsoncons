@@ -1,33 +1,125 @@
-### jsoncons::json_serializer
+### jsoncons::basic_json_serializer
 
 ```c++
-typedef basic_json_serializer<char> json_serializer
-```
-Implements [json_content_handler](json_content_handler.md) and supports compressed or pretty serialization. The `json_serializer` class is an instantiation of the `basic_json_serializer` class template that uses `char` as the character type. 
+template<
+    class CharT,
+    class Result>
+> basic_json_serializer : public jsoncons::basic_json_content_handler<CharT>
 
-`json_serializer` is noncopyable and nonmoveable.
+template<
+    class CharT,
+    class Result>
+> basic_json_compressed_serializer : public jsoncons::basic_json_content_handler<CharT>
+```
+
+`basic_json_serializer` and `basic_json_compressed_serializer` are noncopyable and nonmoveable.
 
 #### Header
 
-    #include <jsoncons/json_serializer.hpp>
+    #include <jsoncons_ext/json/json_serializer.hpp>
 
-### Implemented interfaces
+Four specializations for common character types and result types are defined
+for the pretty print and compressed serializers:
 
-[json_content_handler](json_content_handler.md)
+Type                       |Definition
+---------------------------|------------------------------
+json_serializer            |basic_json_serializer<char,jsoncons::text_stream_result<char>>
+json_string_serializer     |basic_json_serializer<char,jsoncons::string_result<std::string>>
+wjson_serializer           |basic_json_serializer<wchar_t,jsoncons::text_stream_result<wchar_t>>
+wjson_string_serializer    |basic_json_serializer<wchar_t,jsoncons::string_result<std::wstring>>
+json_compressed_serializer            |basic_json_compressed_serializer<char,jsoncons::text_stream_result<char>>
+json_compressed_string_serializer     |basic_json_compressed_serializer<char,jsoncons::string_result<std::string>>
+wjson_compressed_serializer           |basic_json_compressed_serializer<wchar_t,jsoncons::text_stream_result<wchar_t>>
+wjson_compressed_string_serializer    |basic_json_compressed_serializer<wchar_t,jsoncons::string_result<std::wstring>>
+
+#### Member types
+
+Type                       |Definition
+---------------------------|------------------------------
+char_type                  |CharT
+result_type                |Result
+string_view_type           |
 
 #### Constructors
 
-    json_serializer(std::ostream& os)
-Constructs a new serializer that writes to the specified output stream.
-You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
-
-    json_serializer(std::ostream& os, const json_write_options& options)
-Constructs a new serializer that writes to the specified output stream using the specified [json_write_options](json_write_options.md).
-You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
+    explicit basic_json_serializer(result_type result)
+Constructs a new serializer that writes to the specified result.
 
 #### Destructor
 
-    virtual ~json_serializer()
+    virtual ~basic_json_serializer()
+
+### Inherited from [basic_json_content_handler](../json_content_handler.md)
+
+#### Member functions
+
+    bool begin_object(semantic_tag_type tag=semantic_tag_type::none,
+                      const serializing_context& context=null_serializing_context()); 
+
+    bool begin_object(size_t length, 
+                      semantic_tag_type tag=semantic_tag_type::none,
+                      const serializing_context& context=null_serializing_context()); 
+
+    bool end_object(const serializing_context& context = null_serializing_context())
+
+    bool begin_array(semantic_tag_type tag=semantic_tag_type::none,
+                     const serializing_context& context=null_serializing_context()); 
+
+    bool begin_array(semantic_tag_type tag=semantic_tag_type::none,
+                     const serializing_context& context=null_serializing_context()); 
+
+    bool end_array(const serializing_context& context=null_serializing_context()); 
+
+    bool name(const string_view_type& name, 
+              const serializing_context& context=null_serializing_context()); 
+
+    bool string_value(const string_view_type& value, 
+                      semantic_tag_type tag = semantic_tag_type::none, 
+                      const serializing_context& context=null_serializing_context()); ;
+
+    bool byte_string_value(const byte_string_view& b, 
+                           byte_string_chars_format encoding_hint = byte_string_chars_format::none,
+                           semantic_tag_type tag=semantic_tag_type::none, 
+                           const serializing_context& context=null_serializing_context()); 
+
+    bool byte_string_value(const uint8_t* p, size_t size, 
+                           byte_string_chars_format encoding_hint = byte_string_chars_format::none,
+                           semantic_tag_type tag=semantic_tag_type::none, 
+                           const serializing_context& context=null_serializing_context()); 
+
+    bool big_integer_value(const string_view_type& s, 
+                           const serializing_context& context=null_serializing_context());  
+
+    bool big_decimal_value(const string_view_type& s, 
+                           const serializing_context& context=null_serializing_context());  
+
+    bool date_time_value(const string_view_type& s, 
+                         const serializing_context& context=null_serializing_context());  
+
+    bool timestamp_value(int64_t val, 
+                         const serializing_context& context=null_serializing_context());  
+
+    bool int64_value(int64_t value, 
+                     semantic_tag_type tag = semantic_tag_type::none, 
+                     const serializing_context& context=null_serializing_context()); ;
+
+    bool uint64_value(uint64_t value, 
+                      semantic_tag_type tag = semantic_tag_type::none, 
+                      const serializing_context& context=null_serializing_context()); 
+
+    bool double_value(double value, 
+                      const floating_point_options& fmt = floating_point_options(), 
+                      semantic_tag_type tag = semantic_tag_type::none, 
+                      const serializing_context& context=null_serializing_context()); 
+
+    bool bool_value(bool value, 
+                    semantic_tag_type tag = semantic_tag_type::none,
+                    const serializing_context& context=null_serializing_context());  
+
+    bool null_value(semantic_tag_type tag = semantic_tag_type::none,
+                    const serializing_context& context=null_serializing_context());  
+
+    void flush()
 
 ### Examples
 

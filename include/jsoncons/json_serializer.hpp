@@ -25,7 +25,7 @@ namespace jsoncons { namespace detail {
 template <class CharT, class Result>
 size_t escape_string(const CharT* s, size_t length,
                      bool escape_all_non_ascii, bool escape_solidus,
-                     Result& writer)
+                     Result& result)
 {
     size_t count = 0;
     const CharT* begin = s;
@@ -36,45 +36,45 @@ size_t escape_string(const CharT* s, size_t length,
         switch (c)
         {
         case '\\':
-            writer.push_back('\\');
-            writer.push_back('\\');
+            result.push_back('\\');
+            result.push_back('\\');
             count += 2;
             break;
         case '"':
-            writer.push_back('\\');
-            writer.push_back('\"');
+            result.push_back('\\');
+            result.push_back('\"');
             count += 2;
             break;
         case '\b':
-            writer.push_back('\\');
-            writer.push_back('b');
+            result.push_back('\\');
+            result.push_back('b');
             count += 2;
             break;
         case '\f':
-            writer.push_back('\\');
-            writer.push_back('f');
+            result.push_back('\\');
+            result.push_back('f');
             count += 2;
             break;
         case '\n':
-            writer.push_back('\\');
-            writer.push_back('n');
+            result.push_back('\\');
+            result.push_back('n');
             count += 2;
             break;
         case '\r':
-            writer.push_back('\\');
-            writer.push_back('r');
+            result.push_back('\\');
+            result.push_back('r');
             count += 2;
             break;
         case '\t':
-            writer.push_back('\\');
-            writer.push_back('t');
+            result.push_back('\\');
+            result.push_back('t');
             count += 2;
             break;
         default:
             if (escape_solidus && c == '/')
             {
-                writer.push_back('\\');
-                writer.push_back('/');
+                result.push_back('\\');
+                result.push_back('/');
                 count += 2;
             }
             else if (is_control_character(c) || escape_all_non_ascii)
@@ -95,40 +95,40 @@ size_t escape_string(const CharT* s, size_t length,
                         uint32_t first = (cp >> 10) + 0xD800;
                         uint32_t second = ((cp & 0x03FF) + 0xDC00);
 
-                        writer.push_back('\\');
-                        writer.push_back('u');
-                        writer.push_back(to_hex_character(first >> 12 & 0x000F));
-                        writer.push_back(to_hex_character(first >> 8 & 0x000F));
-                        writer.push_back(to_hex_character(first >> 4 & 0x000F));
-                        writer.push_back(to_hex_character(first & 0x000F));
-                        writer.push_back('\\');
-                        writer.push_back('u');
-                        writer.push_back(to_hex_character(second >> 12 & 0x000F));
-                        writer.push_back(to_hex_character(second >> 8 & 0x000F));
-                        writer.push_back(to_hex_character(second >> 4 & 0x000F));
-                        writer.push_back(to_hex_character(second & 0x000F));
+                        result.push_back('\\');
+                        result.push_back('u');
+                        result.push_back(to_hex_character(first >> 12 & 0x000F));
+                        result.push_back(to_hex_character(first >> 8 & 0x000F));
+                        result.push_back(to_hex_character(first >> 4 & 0x000F));
+                        result.push_back(to_hex_character(first & 0x000F));
+                        result.push_back('\\');
+                        result.push_back('u');
+                        result.push_back(to_hex_character(second >> 12 & 0x000F));
+                        result.push_back(to_hex_character(second >> 8 & 0x000F));
+                        result.push_back(to_hex_character(second >> 4 & 0x000F));
+                        result.push_back(to_hex_character(second & 0x000F));
                         count += 12;
                     }
                     else
                     {
-                        writer.push_back('\\');
-                        writer.push_back('u');
-                        writer.push_back(to_hex_character(cp >> 12 & 0x000F));
-                        writer.push_back(to_hex_character(cp >> 8 & 0x000F));
-                        writer.push_back(to_hex_character(cp >> 4 & 0x000F));
-                        writer.push_back(to_hex_character(cp & 0x000F));
+                        result.push_back('\\');
+                        result.push_back('u');
+                        result.push_back(to_hex_character(cp >> 12 & 0x000F));
+                        result.push_back(to_hex_character(cp >> 8 & 0x000F));
+                        result.push_back(to_hex_character(cp >> 4 & 0x000F));
+                        result.push_back(to_hex_character(cp & 0x000F));
                         count += 6;
                     }
                 }
                 else
                 {
-                    writer.push_back(c);
+                    result.push_back(c);
                     ++count;
                 }
             }
             else
             {
-                writer.push_back(c);
+                result.push_back(c);
                 ++count;
             }
             break;
@@ -177,9 +177,9 @@ template<class CharT,class Result=jsoncons::text_stream_result<CharT>>
 class basic_json_serializer final : public basic_json_content_handler<CharT>
 {
 public:
+    typedef CharT char_type;
     using typename basic_json_content_handler<CharT>::string_view_type;
     typedef Result result_type;
-    typedef typename Result::output_type output_type;
     typedef typename basic_json_options<CharT>::string_type string_type;
 
 private:
@@ -287,7 +287,7 @@ private:
     jsoncons::detail::print_double fp_;
     size_t line_length_limit_;
     std::basic_string<CharT> new_line_chars_;
-    Result writer_;
+    Result result_;
 
     std::vector<serialization_context> stack_;
     int indent_amount_;
@@ -303,12 +303,12 @@ private:
     basic_json_serializer(const basic_json_serializer&) = delete;
     basic_json_serializer& operator=(const basic_json_serializer&) = delete;
 public:
-    basic_json_serializer(output_type& os)
-        : basic_json_serializer(os, basic_json_options<CharT>())
+    basic_json_serializer(result_type result)
+        : basic_json_serializer(std::move(result), basic_json_options<CharT>())
     {
     }
 
-    basic_json_serializer(output_type& os, 
+    basic_json_serializer(result_type result, 
                           const basic_json_write_options<CharT>& options)
        : indent_size_(options.indent_size()),
          nan_to_num_(options.nan_to_num()),
@@ -330,7 +330,7 @@ public:
                                     0)),
          line_length_limit_(options.line_length_limit()),
          new_line_chars_(options.new_line_chars()),
-         writer_(os), 
+         result_(std::move(result)), 
          indent_amount_(0), 
          column_(0)
     {
@@ -390,7 +390,7 @@ public:
     {
         try
         {
-            writer_.flush();
+            result_.flush();
         }
         catch (...)
         {
@@ -401,14 +401,14 @@ private:
     // Implementing methods
     void do_flush() override
     {
-        writer_.flush();
+        result_.flush();
     }
 
     bool do_begin_object(semantic_tag_type, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.insert(comma_str_.data(),comma_str_.length());
+            result_.insert(comma_str_.data(),comma_str_.length());
             column_ += comma_str_.length();
         }
 
@@ -467,7 +467,7 @@ private:
         }
         indent();
         
-        writer_.insert(open_object_brace_str_.data(), open_object_brace_str_.length());
+        result_.insert(open_object_brace_str_.data(), open_object_brace_str_.length());
         column_ += open_object_brace_str_.length();
         return true;
     }
@@ -481,7 +481,7 @@ private:
             new_line();
         }
         stack_.pop_back();
-        writer_.insert(close_object_brace_str_.data(), close_object_brace_str_.length());
+        result_.insert(close_object_brace_str_.data(), close_object_brace_str_.length());
         column_ += close_object_brace_str_.length();
 
         end_value();
@@ -492,7 +492,7 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.insert(comma_str_.data(),comma_str_.length());
+            result_.insert(comma_str_.data(),comma_str_.length());
             column_ += comma_str_.length();
         }
         if (!stack_.empty())
@@ -552,7 +552,7 @@ private:
                                 column_, column_+open_array_bracket_str_.length());
         }
         indent();
-        writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
+        result_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
         column_ += open_array_bracket_str_.length();
         return true;
     }
@@ -566,7 +566,7 @@ private:
             new_line();
         }
         stack_.pop_back();
-        writer_.insert(close_array_bracket_str_.data(), close_array_bracket_str_.length());
+        result_.insert(close_array_bracket_str_.data(), close_array_bracket_str_.length());
         column_ += close_array_bracket_str_.length();
         end_value();
         return true;
@@ -577,7 +577,7 @@ private:
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().count() > 0)
         {
-            writer_.insert(comma_str_.data(),comma_str_.length());
+            result_.insert(comma_str_.data(),comma_str_.length());
             column_ += comma_str_.length();
         }
 
@@ -596,10 +596,10 @@ private:
         {
             stack_.back().set_position(column_);
         }
-        writer_.push_back('\"');
-        size_t length = jsoncons::detail::escape_string(name.data(), name.length(),escape_all_non_ascii_,escape_solidus_,writer_);
-        writer_.push_back('\"');
-        writer_.insert(colon_str_.data(),colon_str_.length());
+        result_.push_back('\"');
+        size_t length = jsoncons::detail::escape_string(name.data(), name.length(),escape_all_non_ascii_,escape_solidus_,result_);
+        result_.push_back('\"');
+        result_.insert(colon_str_.data(),colon_str_.length());
         column_ += (length+2+colon_str_.length());
         return true;
     }
@@ -618,7 +618,7 @@ private:
             }
         }
 
-        writer_.insert(jsoncons::detail::null_literal<CharT>().data(), 
+        result_.insert(jsoncons::detail::null_literal<CharT>().data(), 
                        jsoncons::detail::null_literal<CharT>().size());
         column_ += jsoncons::detail::null_literal<CharT>().size();
 
@@ -647,9 +647,9 @@ private:
                 break;
             default:
             {
-                writer_.push_back('\"');
-                size_t length = jsoncons::detail::escape_string(sv.data(), sv.length(),escape_all_non_ascii_,escape_solidus_,writer_);
-                writer_.push_back('\"');
+                result_.push_back('\"');
+                size_t length = jsoncons::detail::escape_string(sv.data(), sv.length(),escape_all_non_ascii_,escape_solidus_,result_);
+                result_.push_back('\"');
                 column_ += (length+2);
                 break;
             }
@@ -683,25 +683,25 @@ private:
         {
             case byte_string_chars_format::base16:
             {
-                writer_.push_back('\"');
-                size_t length = encode_base16(b.data(),b.length(),writer_);
-                writer_.push_back('\"');
+                result_.push_back('\"');
+                size_t length = encode_base16(b.data(),b.length(),result_);
+                result_.push_back('\"');
                 column_ += (length + 2);
                 break;
             }
             case byte_string_chars_format::base64:
             {
-                writer_.push_back('\"');
-                size_t length = encode_base64(b.data(), b.length(), writer_);
-                writer_.push_back('\"');
+                result_.push_back('\"');
+                size_t length = encode_base64(b.data(), b.length(), result_);
+                result_.push_back('\"');
                 column_ += (length + 2);
                 break;
             }
             case byte_string_chars_format::base64url:
             {
-                writer_.push_back('\"');
-                size_t length = encode_base64url(b.data(),b.length(),writer_);
-                writer_.push_back('\"');
+                result_.push_back('\"');
+                size_t length = encode_base64url(b.data(),b.length(),result_);
+                result_.push_back('\"');
                 column_ += (length + 2);
                 break;
             }
@@ -736,7 +736,7 @@ private:
         {
             if (!nan_to_num_.empty())
             {
-                writer_.insert(nan_to_num_.data(), nan_to_num_.length());
+                result_.insert(nan_to_num_.data(), nan_to_num_.length());
                 column_ += nan_to_num_.length();
             }
             else if (!nan_to_str_.empty())
@@ -745,7 +745,7 @@ private:
             }
             else
             {
-                writer_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
+                result_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
                 column_ += jsoncons::detail::null_literal<CharT>().length();
             }
         }
@@ -753,7 +753,7 @@ private:
         {
             if (!inf_to_num_.empty())
             {
-                writer_.insert(inf_to_num_.data(), inf_to_num_.length());
+                result_.insert(inf_to_num_.data(), inf_to_num_.length());
                 column_ += inf_to_num_.length();
             }
             else if (!inf_to_str_.empty())
@@ -762,7 +762,7 @@ private:
             }
             else
             {
-                writer_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
+                result_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
                 column_ += jsoncons::detail::null_literal<CharT>().length();
             }
         }
@@ -770,7 +770,7 @@ private:
         {
             if (!neginf_to_num_.empty())
             {
-                writer_.insert(neginf_to_num_.data(), neginf_to_num_.length());
+                result_.insert(neginf_to_num_.data(), neginf_to_num_.length());
                 column_ += neginf_to_num_.length();
             }
             else if (!neginf_to_str_.empty())
@@ -779,13 +779,13 @@ private:
             }
             else
             {
-                writer_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
+                result_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
                 column_ += jsoncons::detail::null_literal<CharT>().length();
             }
         }
         else
         {
-            size_t length = fp_(value, fmt, writer_);
+            size_t length = fp_(value, fmt, result_);
             column_ += length;
         }
 
@@ -808,7 +808,7 @@ private:
                 break_line();
             }
         }
-        size_t length = jsoncons::detail::print_integer(value, writer_);
+        size_t length = jsoncons::detail::print_integer(value, result_);
         column_ += length;
         end_value();
         return true;
@@ -829,7 +829,7 @@ private:
                 break_line();
             }
         }
-        size_t length = jsoncons::detail::print_uinteger(value, writer_);
+        size_t length = jsoncons::detail::print_uinteger(value, result_);
         column_ += length;
         end_value();
         return true;
@@ -851,12 +851,12 @@ private:
 
         if (value)
         {
-            writer_.insert(jsoncons::detail::true_literal<CharT>().data(), jsoncons::detail::true_literal<CharT>().length());
+            result_.insert(jsoncons::detail::true_literal<CharT>().data(), jsoncons::detail::true_literal<CharT>().length());
             column_ += jsoncons::detail::true_literal<CharT>().length();
         }
         else
         {
-            writer_.insert(jsoncons::detail::false_literal<CharT>().data(), jsoncons::detail::false_literal<CharT>().length());
+            result_.insert(jsoncons::detail::false_literal<CharT>().data(), jsoncons::detail::false_literal<CharT>().length());
             column_ += jsoncons::detail::false_literal<CharT>().length();
         }
 
@@ -870,7 +870,7 @@ private:
         {
             if (stack_.back().count() > 0)
             {
-                writer_.insert(comma_str_.data(),comma_str_.length());
+                result_.insert(comma_str_.data(),comma_str_.length());
                 column_ += comma_str_.length();
             }
             if (stack_.back().is_multi_line() || stack_.back().is_indent_once())
@@ -887,7 +887,7 @@ private:
         {
             case bignum_chars_format::integer:
             {
-                writer_.insert(sv.data(),sv.size());
+                result_.insert(sv.data(),sv.size());
                 column_ += sv.size();
                 break;
             }
@@ -898,14 +898,14 @@ private:
                 std::vector<uint8_t> v;
                 n.dump(signum, v);
 
-                writer_.push_back('\"');
+                result_.push_back('\"');
                 if (signum == -1)
                 {
-                    writer_.push_back('~');
+                    result_.push_back('~');
                     ++column_;
                 }
-                size_t length = encode_base64(v.data(), v.size(), writer_);
-                writer_.push_back('\"');
+                size_t length = encode_base64(v.data(), v.size(), result_);
+                result_.push_back('\"');
                 column_ += (length+2);
                 break;
             }
@@ -916,22 +916,22 @@ private:
                 std::vector<uint8_t> v;
                 n.dump(signum, v);
 
-                writer_.push_back('\"');
+                result_.push_back('\"');
                 if (signum == -1)
                 {
-                    writer_.push_back('~');
+                    result_.push_back('~');
                     ++column_;
                 }
-                size_t length = encode_base64url(v.data(), v.size(), writer_);
-                writer_.push_back('\"');
+                size_t length = encode_base64url(v.data(), v.size(), result_);
+                result_.push_back('\"');
                 column_ += (length+2);
                 break;
             }
             default:
             {
-                writer_.push_back('\"');
-                writer_.insert(sv.data(),sv.size());
-                writer_.push_back('\"');
+                result_.push_back('\"');
+                result_.insert(sv.data(),sv.size());
+                result_.push_back('\"');
                 column_ += (sv.size() + 2);
                 break;
             }
@@ -958,20 +958,20 @@ private:
 
     void new_line()
     {
-        writer_.insert(new_line_chars_.data(),new_line_chars_.length());
+        result_.insert(new_line_chars_.data(),new_line_chars_.length());
         for (int i = 0; i < indent_amount_; ++i)
         {
-            writer_.push_back(' ');
+            result_.push_back(' ');
         }
         column_ = indent_amount_;
     }
 
     void new_line(size_t len)
     {
-        writer_.insert(new_line_chars_.data(),new_line_chars_.length());
+        result_.insert(new_line_chars_.data(),new_line_chars_.length());
         for (size_t i = 0; i < len; ++i)
         {
-            writer_.push_back(' ');
+            result_.push_back(' ');
         }
         column_ = len;
     }
@@ -987,9 +987,9 @@ template<class CharT,class Result=jsoncons::text_stream_result<CharT>>
 class basic_json_compressed_serializer final : public basic_json_content_handler<CharT>
 {
 public:
+    typedef CharT char_type;
     using typename basic_json_content_handler<CharT>::string_view_type;
     typedef Result result_type;
-    typedef typename Result::output_type output_type;
     typedef typename basic_json_options<CharT>::string_type string_type;
 
 private:
@@ -1034,19 +1034,19 @@ private:
 
     std::vector<serialization_context> stack_;
     jsoncons::detail::print_double fp_;
-    Result writer_;
+    Result result_;
 
     // Noncopyable and nonmoveable
     basic_json_compressed_serializer(const basic_json_compressed_serializer&) = delete;
     basic_json_compressed_serializer& operator=(const basic_json_compressed_serializer&) = delete;
 public:
-    basic_json_compressed_serializer(output_type& os)
-        : basic_json_compressed_serializer(os, basic_json_options<CharT>())
+    basic_json_compressed_serializer(result_type result)
+        : basic_json_compressed_serializer(std::move(result), basic_json_options<CharT>())
     {
     }
 
-    basic_json_compressed_serializer(output_type& os, 
-                          const basic_json_write_options<CharT>& options)
+    basic_json_compressed_serializer(result_type result, 
+                                     const basic_json_write_options<CharT>& options)
        : nan_to_num_(options.nan_to_num()),
          inf_to_num_(options.inf_to_num()),
          neginf_to_num_(options.neginf_to_num()),
@@ -1060,7 +1060,7 @@ public:
          fp_(floating_point_options(options.floating_point_format(), 
                                     options.precision(),
                                     0)),
-         writer_(os)
+         result_(std::move(result))
     {
     }
 
@@ -1068,7 +1068,7 @@ public:
     {
         try
         {
-            writer_.flush();
+            result_.flush();
         }
         catch (...)
         {
@@ -1080,18 +1080,18 @@ private:
     // Implementing methods
     void do_flush() override
     {
-        writer_.flush();
+        result_.flush();
     }
 
     bool do_begin_object(semantic_tag_type, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
+            result_.push_back(',');
         }
 
         stack_.emplace_back(container_type::object);
-        writer_.push_back('{');
+        result_.push_back('{');
         return true;
     }
 
@@ -1099,7 +1099,7 @@ private:
     {
         JSONCONS_ASSERT(!stack_.empty());
         stack_.pop_back();
-        writer_.push_back('}');
+        result_.push_back('}');
 
         if (!stack_.empty())
         {
@@ -1113,10 +1113,10 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
+            result_.push_back(',');
         }
         stack_.emplace_back(container_type::array);
-        writer_.push_back('[');
+        result_.push_back('[');
         return true;
     }
 
@@ -1124,7 +1124,7 @@ private:
     {
         JSONCONS_ASSERT(!stack_.empty());
         stack_.pop_back();
-        writer_.push_back(']');
+        result_.push_back(']');
         if (!stack_.empty())
         {
             stack_.back().increment_count();
@@ -1136,13 +1136,13 @@ private:
     {
         if (!stack_.empty() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
+            result_.push_back(',');
         }
 
-        writer_.push_back('\"');
-        jsoncons::detail::escape_string(name.data(), name.length(),escape_all_non_ascii_,escape_solidus_,writer_);
-        writer_.push_back('\"');
-        writer_.push_back(':');
+        result_.push_back('\"');
+        jsoncons::detail::escape_string(name.data(), name.length(),escape_all_non_ascii_,escape_solidus_,result_);
+        result_.push_back('\"');
+        result_.push_back(':');
         return true;
     }
 
@@ -1150,10 +1150,10 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
+            result_.push_back(',');
         }
 
-        writer_.insert(jsoncons::detail::null_literal<CharT>().data(), 
+        result_.insert(jsoncons::detail::null_literal<CharT>().data(), 
                       jsoncons::detail::null_literal<CharT>().size());
 
         if (!stack_.empty())
@@ -1169,7 +1169,7 @@ private:
         {
             case bignum_chars_format::integer:
             {
-                writer_.insert(sv.data(),sv.size());
+                result_.insert(sv.data(),sv.size());
                 break;
             }
             case bignum_chars_format::base64:
@@ -1179,13 +1179,13 @@ private:
                 std::vector<uint8_t> v;
                 n.dump(signum, v);
 
-                writer_.push_back('\"');
+                result_.push_back('\"');
                 if (signum == -1)
                 {
-                    writer_.push_back('~');
+                    result_.push_back('~');
                 }
-                encode_base64(v.data(), v.size(), writer_);
-                writer_.push_back('\"');
+                encode_base64(v.data(), v.size(), result_);
+                result_.push_back('\"');
                 break;
             }
             case bignum_chars_format::base64url:
@@ -1195,20 +1195,20 @@ private:
                 std::vector<uint8_t> v;
                 n.dump(signum, v);
 
-                writer_.push_back('\"');
+                result_.push_back('\"');
                 if (signum == -1)
                 {
-                    writer_.push_back('~');
+                    result_.push_back('~');
                 }
-                encode_base64url(v.data(), v.size(), writer_);
-                writer_.push_back('\"');
+                encode_base64url(v.data(), v.size(), result_);
+                result_.push_back('\"');
                 break;
             }
             default:
             {
-                writer_.push_back('\"');
-                writer_.insert(sv.data(),sv.size());
-                writer_.push_back('\"');
+                result_.push_back('\"');
+                result_.insert(sv.data(),sv.size());
+                result_.push_back('\"');
                 break;
             }
         }
@@ -1218,7 +1218,7 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
+            result_.push_back(',');
         }
 
         switch (tag)
@@ -1228,9 +1228,9 @@ private:
                 break;
             default:
             {
-                writer_.push_back('\"');
-                jsoncons::detail::escape_string(sv.data(), sv.length(),escape_all_non_ascii_,escape_solidus_,writer_);
-                writer_.push_back('\"');
+                result_.push_back('\"');
+                jsoncons::detail::escape_string(sv.data(), sv.length(),escape_all_non_ascii_,escape_solidus_,result_);
+                result_.push_back('\"');
                 break;
             }
         }
@@ -1249,7 +1249,7 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
+            result_.push_back(',');
         }
 
         byte_string_chars_format format = jsoncons::detail::resolve_byte_string_chars_format(byte_string_format_, 
@@ -1259,23 +1259,23 @@ private:
         {
             case byte_string_chars_format::base16:
             {
-                writer_.push_back('\"');
-                encode_base16(b.data(),b.length(),writer_);
-                writer_.push_back('\"');
+                result_.push_back('\"');
+                encode_base16(b.data(),b.length(),result_);
+                result_.push_back('\"');
                 break;
             }
             case byte_string_chars_format::base64:
             {
-                writer_.push_back('\"');
-                encode_base64(b.data(), b.length(), writer_);
-                writer_.push_back('\"');
+                result_.push_back('\"');
+                encode_base64(b.data(), b.length(), result_);
+                result_.push_back('\"');
                 break;
             }
             case byte_string_chars_format::base64url:
             {
-                writer_.push_back('\"');
-                encode_base64url(b.data(),b.length(),writer_);
-                writer_.push_back('\"');
+                result_.push_back('\"');
+                encode_base64url(b.data(),b.length(),result_);
+                result_.push_back('\"');
                 break;
             }
             default:
@@ -1298,14 +1298,14 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
+            result_.push_back(',');
         }
 
         if ((std::isnan)(value))
         {
             if (!nan_to_num_.empty())
             {
-                writer_.insert(nan_to_num_.data(), nan_to_num_.length());
+                result_.insert(nan_to_num_.data(), nan_to_num_.length());
             }
             else if (!nan_to_str_.empty())
             {
@@ -1313,14 +1313,14 @@ private:
             }
             else
             {
-                writer_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
+                result_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
             }
         }
         else if (value == std::numeric_limits<double>::infinity())
         {
             if (!inf_to_num_.empty())
             {
-                writer_.insert(inf_to_num_.data(), inf_to_num_.length());
+                result_.insert(inf_to_num_.data(), inf_to_num_.length());
             }
             else if (!inf_to_str_.empty())
             {
@@ -1328,14 +1328,14 @@ private:
             }
             else
             {
-                writer_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
+                result_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
             }
         }
         else if (!(std::isfinite)(value))
         {
             if (!neginf_to_num_.empty())
             {
-                writer_.insert(neginf_to_num_.data(), neginf_to_num_.length());
+                result_.insert(neginf_to_num_.data(), neginf_to_num_.length());
             }
             else if (!neginf_to_str_.empty())
             {
@@ -1343,12 +1343,12 @@ private:
             }
             else
             {
-                writer_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
+                result_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
             }
         }
         else
         {
-            fp_(value, fmt, writer_);
+            fp_(value, fmt, result_);
         }
 
         if (!stack_.empty())
@@ -1364,9 +1364,9 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
+            result_.push_back(',');
         }
-        jsoncons::detail::print_integer(value, writer_);
+        jsoncons::detail::print_integer(value, result_);
         if (!stack_.empty())
         {
             stack_.back().increment_count();
@@ -1380,9 +1380,9 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
+            result_.push_back(',');
         }
-        jsoncons::detail::print_uinteger(value, writer_);
+        jsoncons::detail::print_uinteger(value, result_);
         if (!stack_.empty())
         {
             stack_.back().increment_count();
@@ -1394,17 +1394,17 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
+            result_.push_back(',');
         }
 
         if (value)
         {
-            writer_.insert(jsoncons::detail::true_literal<CharT>().data(),
+            result_.insert(jsoncons::detail::true_literal<CharT>().data(),
                            jsoncons::detail::true_literal<CharT>().length());
         }
         else
         {
-            writer_.insert(jsoncons::detail::false_literal<CharT>().data(),
+            result_.insert(jsoncons::detail::false_literal<CharT>().data(),
                            jsoncons::detail::false_literal<CharT>().length());
         }
 

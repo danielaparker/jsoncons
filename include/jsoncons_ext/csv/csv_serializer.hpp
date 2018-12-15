@@ -26,14 +26,15 @@ template<class CharT,class Result=jsoncons::text_stream_result<CharT>,class Allo
 class basic_csv_serializer final : public basic_json_content_handler<CharT>
 {
 public:
-    typedef typename Result::output_type output_type;
+    typedef CharT char_type;
+    using typename basic_json_content_handler<CharT>::string_view_type;
+    typedef Result result_type;
 
     typedef Allocator allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
     typedef std::basic_string<CharT, std::char_traits<CharT>, char_allocator_type> string_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
 
-    using typename basic_json_content_handler<CharT>::string_view_type                      ;
 private:
     struct stack_item
     {
@@ -50,7 +51,7 @@ private:
         size_t count_;
         string_type name_;
     };
-    Result writer_;
+    Result result_;
     basic_csv_options<CharT,Allocator> parameters_;
     std::vector<stack_item> stack_;
     jsoncons::detail::print_double fp_;
@@ -63,15 +64,15 @@ private:
     basic_csv_serializer(const basic_csv_serializer&) = delete;
     basic_csv_serializer& operator=(const basic_csv_serializer&) = delete;
 public:
-    basic_csv_serializer(output_type& os)
-       : basic_csv_serializer(os, basic_csv_options<CharT,Allocator>())
+    basic_csv_serializer(result_type result)
+       : basic_csv_serializer(std::move(result), basic_csv_options<CharT,Allocator>())
     {
     }
 
-    basic_csv_serializer(output_type& os,
+    basic_csv_serializer(result_type result,
                          const basic_csv_options<CharT,Allocator>& options)
        :
-       writer_(os),
+       result_(std::move(result)),
        parameters_(options),
        stack_(),
        fp_(floating_point_options(options.floating_point_format(), 
@@ -85,7 +86,7 @@ public:
     {
         try
         {
-            writer_.flush();
+            result_.flush();
         }
         catch (...)
         {
@@ -98,7 +99,7 @@ private:
     void escape_string(const CharT* s,
                        size_t length,
                        CharT quote_char, CharT quote_escape_char,
-                       AnyWriter& writer)
+                       AnyWriter& result)
     {
         const CharT* begin = s;
         const CharT* end = s + length;
@@ -107,19 +108,19 @@ private:
             CharT c = *it;
             if (c == quote_char)
             {
-                writer.push_back(quote_escape_char); 
-                writer.push_back(quote_char);
+                result.push_back(quote_escape_char); 
+                result.push_back(quote_char);
             }
             else
             {
-                writer.push_back(c);
+                result.push_back(c);
             }
         }
     }
 
     void do_flush() override
     {
-        writer_.flush();
+        result_.flush();
     }
 
     bool do_begin_object(semantic_tag_type, const serializing_context&) override
@@ -138,28 +139,28 @@ private:
                 {
                     if (i > 0)
                     {
-                        writer_.push_back(parameters_.field_delimiter());
+                        result_.push_back(parameters_.field_delimiter());
                     }
-                    writer_.insert(column_names_[i].data(),
+                    result_.insert(column_names_[i].data(),
                                   column_names_[i].length());
                 }
-                writer_.insert(parameters_.line_delimiter().data(),
+                result_.insert(parameters_.line_delimiter().data(),
                               parameters_.line_delimiter().length());
             }
             for (size_t i = 0; i < column_names_.size(); ++i)
             {
                 if (i > 0)
                 {
-                    writer_.push_back(parameters_.field_delimiter());
+                    result_.push_back(parameters_.field_delimiter());
                 }
                 auto it = buffered_line_.find(column_names_[i]);
                 if (it != buffered_line_.end())
                 {
-                    writer_.insert(it->second.data(),it->second.length());
+                    result_.insert(it->second.data(),it->second.length());
                     it->second.clear();
                 }
             }
-            writer_.insert(parameters_.line_delimiter().data(), parameters_.line_delimiter().length());
+            result_.insert(parameters_.line_delimiter().data(), parameters_.line_delimiter().length());
         }
         stack_.pop_back();
 
@@ -178,13 +179,13 @@ private:
                 {
                     if (i > 0)
                     {
-                        writer_.push_back(parameters_.field_delimiter());
+                        result_.push_back(parameters_.field_delimiter());
                     }
-                    writer_.insert(column_names_[i].data(),column_names_[i].length());
+                    result_.insert(column_names_[i].data(),column_names_[i].length());
                 }
                 if (column_names_.size() > 0)
                 {
-                    writer_.insert(parameters_.line_delimiter().data(),
+                    result_.insert(parameters_.line_delimiter().data(),
                                   parameters_.line_delimiter().length());
                 }
             }
@@ -196,7 +197,7 @@ private:
     {
         if (stack_.size() == 2)
         {
-            writer_.insert(parameters_.line_delimiter().data(),
+            result_.insert(parameters_.line_delimiter().data(),
                           parameters_.line_delimiter().length());
         }
         stack_.pop_back();
@@ -220,7 +221,7 @@ private:
     }
 
     template <class AnyWriter>
-    bool string_value(const CharT* s, size_t length, AnyWriter& writer)
+    bool string_value(const CharT* s, size_t length, AnyWriter& result)
     {
         bool quote = false;
         if (parameters_.quote_style() == quote_style_type::all || parameters_.quote_style() == quote_style_type::nonnumeric ||
@@ -228,12 +229,12 @@ private:
             (std::char_traits<CharT>::find(s, length, parameters_.field_delimiter()) != nullptr || std::char_traits<CharT>::find(s, length, parameters_.quote_char()) != nullptr)))
         {
             quote = true;
-            writer.push_back(parameters_.quote_char());
+            result.push_back(parameters_.quote_char());
         }
-        escape_string(s, length, parameters_.quote_char(), parameters_.quote_escape_char(), writer);
+        escape_string(s, length, parameters_.quote_char(), parameters_.quote_escape_char(), result);
         if (quote)
         {
-            writer.push_back(parameters_.quote_char());
+            result.push_back(parameters_.quote_char());
         }
 
         return true;
@@ -257,7 +258,7 @@ private:
             }
             else
             {
-                accept_null_value(writer_);
+                accept_null_value(result_);
             }
         }
         return true;
@@ -281,7 +282,7 @@ private:
             }
             else
             {
-                value(sv,writer_);
+                value(sv,result_);
             }
         }
         return true;
@@ -345,7 +346,7 @@ private:
             }
             else
             {
-                value(val, fmt, writer_);
+                value(val, fmt, result_);
             }
         }
         return true;
@@ -371,7 +372,7 @@ private:
             }
             else
             {
-                value(val,writer_);
+                value(val,result_);
             }
         }
         return true;
@@ -397,7 +398,7 @@ private:
             }
             else
             {
-                value(val,writer_);
+                value(val,result_);
             }
         }
         return true;
@@ -421,40 +422,40 @@ private:
             }
             else
             {
-                value(val,writer_);
+                value(val,result_);
             }
         }
         return true;
     }
 
     template <class AnyWriter>
-    void value(const string_view_type& value, AnyWriter& writer)
+    void value(const string_view_type& value, AnyWriter& result)
     {
-        begin_value(writer);
-        string_value(value.data(),value.length(),writer);
+        begin_value(result);
+        string_value(value.data(),value.length(),result);
         end_value();
     }
 
     template <class AnyWriter>
-    void value(double val, const floating_point_options& fmt, AnyWriter& writer)
+    void value(double val, const floating_point_options& fmt, AnyWriter& result)
     {
-        begin_value(writer);
+        begin_value(result);
 
         if ((std::isnan)(val))
         {
-            writer.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
+            result.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
         }
         else if (val == std::numeric_limits<double>::infinity())
         {
-            writer.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
+            result.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
         }
         else if (!(std::isfinite)(val))
         {
-            writer.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
+            result.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
         }
         else
         {
-            fp_(val, fmt ,writer);
+            fp_(val, fmt ,result);
         }
 
         end_value();
@@ -462,42 +463,42 @@ private:
     }
 
     template <class AnyWriter>
-    void value(int64_t val, AnyWriter& writer)
+    void value(int64_t val, AnyWriter& result)
     {
-        begin_value(writer);
+        begin_value(result);
 
         std::basic_ostringstream<CharT> ss;
         ss << val;
-        writer.insert(ss.str().data(),ss.str().length());
+        result.insert(ss.str().data(),ss.str().length());
 
         end_value();
     }
 
     template <class AnyWriter>
-    void value(uint64_t val, AnyWriter& writer)
+    void value(uint64_t val, AnyWriter& result)
     {
-        begin_value(writer);
+        begin_value(result);
 
         std::basic_ostringstream<CharT> ss;
         ss << val;
-        writer.insert(ss.str().data(),ss.str().length());
+        result.insert(ss.str().data(),ss.str().length());
 
         end_value();
     }
 
     template <class AnyWriter>
-    void value(bool val, AnyWriter& writer) 
+    void value(bool val, AnyWriter& result) 
     {
-        begin_value(writer);
+        begin_value(result);
 
         if (val)
         {
-            writer.insert(jsoncons::detail::true_literal<CharT>().data(),
+            result.insert(jsoncons::detail::true_literal<CharT>().data(),
                          jsoncons::detail::true_literal<CharT>().length());
         }
         else
         {
-            writer.insert(jsoncons::detail::false_literal<CharT>().data(),
+            result.insert(jsoncons::detail::false_literal<CharT>().data(),
                          jsoncons::detail::false_literal<CharT>().length());
         }
 
@@ -505,23 +506,23 @@ private:
     }
 
     template <class AnyWriter>
-    bool accept_null_value(AnyWriter& writer) 
+    bool accept_null_value(AnyWriter& result) 
     {
-        begin_value(writer);
-        writer.insert(jsoncons::detail::null_literal<CharT>().data(), 
+        begin_value(result);
+        result.insert(jsoncons::detail::null_literal<CharT>().data(), 
                      jsoncons::detail::null_literal<CharT>().length());
         end_value();
         return true;
     }
 
     template <class AnyWriter>
-    void begin_value(AnyWriter& writer)
+    void begin_value(AnyWriter& result)
     {
         if (!stack_.empty())
         {
             if (!stack_.back().is_object_ && stack_.back().count_ > 0)
             {
-                writer.push_back(parameters_.field_delimiter());
+                result.push_back(parameters_.field_delimiter());
             }
         }
     }
