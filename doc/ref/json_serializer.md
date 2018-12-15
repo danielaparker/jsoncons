@@ -16,10 +16,10 @@ template<
 
 #### Header
 
-    #include <jsoncons_ext/json/json_serializer.hpp>
+    #include <jsoncons/json_serializer.hpp>
 
 Four specializations for common character types and result types are defined
-for the pretty print and compressed serializers:
+for both the pretty print and compressed serializers:
 
 Type                       |Definition
 ---------------------------|------------------------------
@@ -43,7 +43,12 @@ string_view_type           |
 #### Constructors
 
     explicit basic_json_serializer(result_type result)
-Constructs a new serializer that writes to the specified result.
+Constructs a new serializer that is associated with the output adaptor `result`.
+
+    basic_json_serializer(result_type result, 
+                          const basic_json_write_options<CharT>& options)
+Constructs a new serializer that is associated with the output adaptor `result` 
+and uses the specified [json options](json_options.md). 
 
 #### Destructor
 
