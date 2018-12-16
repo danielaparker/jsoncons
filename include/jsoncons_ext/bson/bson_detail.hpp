@@ -18,7 +18,7 @@ namespace jsoncons { namespace bson {
 namespace bson_format
 {
     const uint8_t double_cd = 0x01;
-    const uint8_t string_cd = 0x02;
+    const uint8_t string_cd = 0x02; // UTF-8 string
     const uint8_t document_cd = 0x03;
     const uint8_t array_cd = 0x04;
     const uint8_t binary_cd = 0x05;
