@@ -8,6 +8,7 @@
 #endif
 #include <jsoncons/json.hpp>
 #include <fstream>
+#include <iomanip>
 
 using namespace jsoncons;
 

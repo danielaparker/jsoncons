@@ -231,6 +231,20 @@ private:
                 handler_.int64_value(val, semantic_tag_type::none, *this);
                 break;
             }
+
+            case bson_format::datetime_cd: 
+            {
+                uint8_t buf[sizeof(int64_t)]; 
+                if (source_.read(buf, sizeof(int64_t)) != sizeof(int64_t))
+                {
+                    ec = bson_errc::unexpected_eof;
+                    return;
+                }
+                const uint8_t* endp;
+                auto val = jsoncons::detail::from_little_endian<int64_t>(buf, buf+sizeof(int64_t),&endp);
+                handler_.int64_value(val, semantic_tag_type::timestamp, *this);
+                break;
+            }
             case bson_format::binary_cd: 
             {
                 uint8_t buf[sizeof(int32_t)]; 

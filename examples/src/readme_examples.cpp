@@ -1,12 +1,13 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <string>
-#include <vector>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/csv/csv_serializer.hpp>
+#include <string>
+#include <vector>
+#include <iomanip>
 
 namespace readme
 {

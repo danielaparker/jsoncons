@@ -242,10 +242,17 @@ private:
     }
 
     bool do_int64_value(int64_t val, 
-                        semantic_tag_type, 
+                        semantic_tag_type tag, 
                         const serializing_context&) override
     {
-        before_value(bson_format::int64_cd);
+        if (tag == semantic_tag_type::timestamp)
+        {
+            before_value(bson_format::datetime_cd);
+        }
+        else
+        {
+            before_value(bson_format::int64_cd);
+        }
         if (val >= (std::numeric_limits<int32_t>::lowest)() && val <= (std::numeric_limits<int32_t>::max)())
         {
             jsoncons::detail::to_little_endian(static_cast<uint32_t>(val),std::back_inserter(buffer_));
@@ -263,10 +270,17 @@ private:
     }
 
     bool do_uint64_value(uint64_t val, 
-                         semantic_tag_type, 
+                         semantic_tag_type tag, 
                          const serializing_context&) override
     {
-        before_value(bson_format::int64_cd);
+        if (tag == semantic_tag_type::timestamp)
+        {
+            before_value(bson_format::datetime_cd);
+        }
+        else
+        {
+            before_value(bson_format::int64_cd);
+        }
         if (val <= (std::numeric_limits<int32_t>::max)())
         {
             jsoncons::detail::to_little_endian(static_cast<uint32_t>(val),std::back_inserter(buffer_));

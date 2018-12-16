@@ -35,6 +35,7 @@ void byte_string_examples();
 void pull_parser_examples();
 void data_model_examples();
 void staj_iterator_examples();
+void bson_examples();
 
 void comment_example()
 {
@@ -491,7 +492,7 @@ int main()
     try
     {
         std::cout << "jsoncons version: " << version() << std::endl;
-
+/*
         object_range_based_for_loop();
 
         basics_examples();
@@ -564,6 +565,8 @@ int main()
         cbor_examples();
 
         readme_examples();
+*/
+        bson_examples();
     }
     catch (const std::exception& e)
     {

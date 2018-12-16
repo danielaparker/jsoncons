@@ -30,7 +30,7 @@ namespace bson_format
     const uint8_t javascript_cd = 0x0d;
     const uint8_t javascript_with_scope_cd = 0x0f;
     const uint8_t int32_cd = 0x10;
-    const uint8_t timestamp_cd = 0x11; // uint64
+    const uint8_t timestamp_cd = 0x11; // MongoDB internal Timestamp, uint64
     const uint8_t int64_cd = 0x12;
     const uint8_t decimal128_cd = 0x13;
     const uint8_t min_key_cd = 0xff;

@@ -3,6 +3,7 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
+#include <iomanip>
 
 using namespace jsoncons;
 
@@ -77,8 +78,7 @@ void data_model_example2()
     std::cout << "(1)\n";
     for (auto c : bytes)
     {
-        std::cout << std::hex << std::noshowbase << std::setprecision(2) << std::setw(2)
-                  << std::setfill('0') << static_cast<int>(c);
+        std::cout << std::hex << std::noshowbase << std::setfill('0') << static_cast<int>(c);
     }
     std::cout << "\n\n";
 
