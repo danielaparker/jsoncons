@@ -139,8 +139,12 @@ private:
 template<class CharT,class Source,class Allocator=std::allocator<char>>
 class basic_json_reader 
 {
+public:
     typedef CharT char_type;
+    typedef Source source_type;
+    typedef basic_string_view<CharT> string_view_type;
     typedef Allocator allocator_type;
+private
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
 
     static const size_t default_max_buffer_length = 16384;
@@ -152,7 +156,7 @@ class basic_json_reader
 
     basic_json_parser<CharT,Allocator> parser_;
 
-    Source source_;
+    source_type source_;
     bool eof_;
     std::vector<CharT,char_allocator_type> buffer_;
     size_t buffer_length_;
@@ -163,17 +167,15 @@ class basic_json_reader
     basic_json_reader& operator=(const basic_json_reader&) = delete;
 
 public:
-    typedef basic_string_view<CharT> string_view_type;
-
-    explicit basic_json_reader(Source source)
+    explicit basic_json_reader(source_type source)
         : basic_json_reader(std::move(source),
                             default_content_handler_,
-                            basic_json_options<CharT>(),
+                            basic_json_read_options<CharT>(),
                             default_err_handler_)
     {
     }
 
-    basic_json_reader(Source source, 
+    basic_json_reader(source_type source, 
                       const basic_json_read_options<CharT>& options)
         : basic_json_reader(std::move(source),
                             default_content_handler_,
@@ -182,45 +184,16 @@ public:
     {
     }
 
-    basic_json_reader(Source source,
+    basic_json_reader(source_type source,
                       parse_error_handler& err_handler)
         : basic_json_reader(std::move(source),
                             default_content_handler_,
-                            basic_json_options<CharT>(),
+                            basic_json_read_options<CharT>(),
                             err_handler)
     {
     }
 
-    basic_json_reader(Source source, 
-                      basic_json_content_handler<CharT>& handler)
-        : basic_json_reader(std::move(source),
-                            handler,
-                            basic_json_options<CharT>(),
-                            default_err_handler_)
-    {
-    }
-
-    basic_json_reader(Source source, 
-                      basic_json_content_handler<CharT>& handler,
-                      const basic_json_read_options<CharT>& options)
-        : basic_json_reader(std::move(source),
-                            handler,
-                            options,
-                            default_err_handler_)
-    {
-    }
-
-    basic_json_reader(Source source,
-                      basic_json_content_handler<CharT>& handler,
-                      parse_error_handler& err_handler)
-        : basic_json_reader(std::move(source),
-                            handler,
-                            basic_json_options<CharT>(),
-                            err_handler)
-    {
-    }
-
-    basic_json_reader(Source source, 
+    basic_json_reader(source_type source, 
                       const basic_json_read_options<CharT>& options,
                       parse_error_handler& err_handler)
         : basic_json_reader(std::move(source),
@@ -230,7 +203,36 @@ public:
     {
     }
 
-    basic_json_reader(Source source,
+    basic_json_reader(source_type source, 
+                      basic_json_content_handler<CharT>& handler)
+        : basic_json_reader(std::move(source),
+                            handler,
+                            basic_json_read_options<CharT>(),
+                            default_err_handler_)
+    {
+    }
+
+    basic_json_reader(source_type source, 
+                      basic_json_content_handler<CharT>& handler,
+                      const basic_json_read_options<CharT>& options)
+        : basic_json_reader(std::move(source),
+                            handler,
+                            options,
+                            default_err_handler_)
+    {
+    }
+
+    basic_json_reader(source_type source,
+                      basic_json_content_handler<CharT>& handler,
+                      parse_error_handler& err_handler)
+        : basic_json_reader(std::move(source),
+                            handler,
+                            basic_json_read_options<CharT>(),
+                            err_handler)
+    {
+    }
+
+    basic_json_reader(source_type source,
                       basic_json_content_handler<CharT>& handler, 
                       const basic_json_read_options<CharT>& options,
                       parse_error_handler& err_handler)
