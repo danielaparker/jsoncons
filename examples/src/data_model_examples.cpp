@@ -78,7 +78,8 @@ void data_model_example2()
     std::cout << "(1)\n";
     for (auto c : bytes)
     {
-        std::cout << std::hex << std::noshowbase << std::setfill('0') << static_cast<int>(c);
+        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
+                  << std::noshowbase << std::setfill('0') << static_cast<int>(c);
     }
     std::cout << "\n\n";
 

@@ -11,6 +11,7 @@
 #include <utility>
 #include <ctime>
 #include <limits>
+#include <iomanip>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
@@ -45,7 +46,8 @@ void check_decode_ubjson(const std::vector<uint8_t>& expected, const std::vector
             std::cout << "Different " << i << "\n"; 
             for (size_t k = 0; k < expected.size(); ++k)
             {
-                std::cout << std::hex << (int)expected[k] << " " << std::hex << (int)result[k] << std::endl;
+                std::cout << std::hex << std::setprecision(2) << std::setw(2) 
+                          << std::noshowbase << std::setfill('0') << static_cast<int>(result[k]);
             }
         }
         REQUIRE(result[i] == expected[i]);

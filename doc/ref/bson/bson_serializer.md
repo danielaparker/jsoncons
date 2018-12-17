@@ -116,6 +116,10 @@ Constructs a new serializer that writes to the specified result.
 #### Serialize to BSON
 
 ```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/bson/bson.hpp>
+#include <iomanip>
+
 int main()
 {
     std::vector<uint8_t> buffer;

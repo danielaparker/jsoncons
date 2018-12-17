@@ -565,8 +565,11 @@ int main()
         cbor_examples();
 
         readme_examples();
-*/
+ 
         bson_examples();
+*/
+
+        cbor_examples();
     }
     catch (const std::exception& e)
     {
