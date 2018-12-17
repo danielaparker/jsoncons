@@ -144,7 +144,7 @@ public:
     typedef Source source_type;
     typedef basic_string_view<CharT> string_view_type;
     typedef Allocator allocator_type;
-private
+private:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
 
     static const size_t default_max_buffer_length = 16384;
