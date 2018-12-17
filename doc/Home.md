@@ -44,15 +44,15 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 #### [jsonpath](ref/jsonpath/jsonpath.md)
 
-#### [cbor](doc/ref/cbor/cbor.md)
+#### [cbor](ref/doc/ref/cbor/cbor.md)
 
 #### [msgpack](ref/msgpack/msgpack.md)
 
-#### [ubjson](doc/ref/ubjson/ubjson.md)
+#### [ubjson](ref/doc/ref/ubjson/ubjson.md)
 
 #### [msgpack](ref/msgpack/msgpack.md)
 
-#### [bson](doc/ref/bson/bson.md)
+#### [bson](ref/doc/ref/bson/bson.md)
 
 ### Tutorials
 
