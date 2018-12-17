@@ -492,7 +492,7 @@ int main()
     try
     {
         std::cout << "jsoncons version: " << version() << std::endl;
-/*
+
         object_range_based_for_loop();
 
         basics_examples();
@@ -567,7 +567,6 @@ int main()
         readme_examples();
  
         bson_examples();
-*/
 
         cbor_examples();
     }
