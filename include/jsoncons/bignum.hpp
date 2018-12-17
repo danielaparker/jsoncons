@@ -12,12 +12,13 @@
 #include <iostream>
 #include <climits>
 #include <limits> // std::numeric_limits
-#include <algorithm>
+#include <algorithm> // std::max, std::min, std::reverse
 #include <string> // std::string
 #include <cstring> // std::memcpy
 #include <cmath> // std::fmod
 #include <memory> // std::allocator
 #include <initializer_list> // std::initializer_list
+#include <type_traits> // std::enable_if
 
 namespace jsoncons {
 

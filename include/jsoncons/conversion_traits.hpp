@@ -10,8 +10,8 @@
 #include <string>
 #include <tuple>
 #include <array>
-#include <type_traits>
 #include <memory>
+#include <type_traits> // std::enable_if
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/basic_json.hpp>

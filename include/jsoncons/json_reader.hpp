@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include <system_error>
 #include <ios>
+#include <utility> // std::move
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>

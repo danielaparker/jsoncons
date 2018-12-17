@@ -9,8 +9,10 @@
 
 #include <string>
 #include <vector>
+#include <type_traits> // std::true_type
 #include <memory> // std::allocator
 #include <iterator> // std::make_move_iterator
+#include <utility> // std::move
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
 

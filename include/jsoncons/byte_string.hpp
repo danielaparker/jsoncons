@@ -9,17 +9,13 @@
 
 #include <sstream>
 #include <vector>
-#include <istream>
 #include <ostream>
 #include <cmath>
-#include <cstdarg>
-#include <type_traits>
-#include <algorithm>
 #include <memory> // std::allocator
 #include <iterator>
 #include <exception>
-#include <array>
 #include <initializer_list>
+#include <utility> // std::move
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
 #if !defined(JSONCONS_NO_TO_CHARS)

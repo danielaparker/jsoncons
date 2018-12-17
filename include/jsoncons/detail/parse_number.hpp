@@ -10,11 +10,9 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <cstdarg>
 #include <locale>
 #include <limits> // std::numeric_limits
-#include <type_traits>
-#include <algorithm>
+#include <type_traits> // std::enable_if
 #include <exception>
 #include <jsoncons/config/jsoncons_config.hpp>
 

@@ -11,6 +11,8 @@
 #include <sstream>
 #include <vector>
 #include <memory>
+#include <utility> // std::move
+#include <type_traits> // std::enable_if, std::true_type
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
 

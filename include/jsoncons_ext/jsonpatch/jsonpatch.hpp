@@ -10,8 +10,9 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include <istream>
 #include <memory>
+#include <algorithm> // std::min
+#include <utility> // std::move
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch_error.hpp>

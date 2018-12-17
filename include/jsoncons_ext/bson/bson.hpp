@@ -9,8 +9,9 @@
 
 #include <string>
 #include <vector>
-#include <istream>
 #include <memory>
+#include <type_traits> // std::enable_if
+#include <istream> // std::basic_istream
 #include <jsoncons/json.hpp>
 #include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons_ext/bson/bson_serializer.hpp>

@@ -10,9 +10,8 @@
 #include <iostream>
 #include <string>
 #include <tuple>
-#include <array>
-#include <type_traits>
 #include <memory>
+#include <istream> // std::basic_istream
 #include <jsoncons/conversion_traits.hpp>
 #include <jsoncons/json_staj_reader.hpp>
 

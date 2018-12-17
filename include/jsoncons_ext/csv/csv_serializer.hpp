@@ -11,6 +11,7 @@
 #include <sstream>
 #include <vector>
 #include <ostream>
+#include <utility> // std::move
 #include <unordered_map> // std::unordered_map
 #include <memory> // std::allocator
 #include <limits> // std::numeric_limits

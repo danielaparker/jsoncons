@@ -9,10 +9,10 @@
 
 #include <string>
 #include <vector>
-#include <istream>
 #include <memory> // std::allocator
 #include <limits> // std::numeric_limits
 #include <iterator>
+#include <type_traits> // std::enable_if
 #include <jsoncons/json.hpp>
 #include <jsoncons/pretty_print.hpp>
 #include <jsoncons/config/binary_detail.hpp>

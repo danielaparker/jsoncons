@@ -10,16 +10,14 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <istream>
 #include <ostream>
 #include <cmath>
-#include <cstdarg>
-#include <type_traits>
-#include <algorithm>
+#include <algorithm> // std::find, std::min, std::reverse
 #include <memory>
 #include <iterator>
 #include <exception>
-#include <array>
+#include <stdexcept>
+#include <istream> // std::basic_istream
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_exception.hpp>
@@ -754,8 +752,6 @@ std::string string_to_hex(const std::string& input)
     return output;
 }
 
-#include <algorithm>
-#include <stdexcept>
 
 // json_literals
 

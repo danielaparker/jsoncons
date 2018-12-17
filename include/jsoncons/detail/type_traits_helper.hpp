@@ -10,9 +10,7 @@
 #include <stdexcept>
 #include <string>
 #include <cmath>
-#include <cstdarg>
-#include <type_traits>
-#include <algorithm>
+#include <type_traits> // std::enable_if, std::true_type
 #include <memory>
 #include <iterator> // std::iterator_traits
 #include <exception>

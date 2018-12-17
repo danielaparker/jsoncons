@@ -10,10 +10,12 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <jsoncons/json.hpp>
+#include <type_traits> // std::is_const
 #include <limits> // std::numeric_limits
-#include "jsonpath_filter.hpp"
-#include "jsonpath_error.hpp"
+#include <utility> // std::move
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath_filter.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 
 namespace jsoncons { namespace jsonpath {
 

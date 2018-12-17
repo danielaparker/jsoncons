@@ -12,9 +12,6 @@
 #include <vector>
 #include <ostream>
 #include <cmath>
-#include <cstdarg>
-#include <type_traits>
-#include <algorithm>
 #include <exception>
 #include <memory> // std::addressof
 #include <cstring> // std::memcpy

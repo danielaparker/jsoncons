@@ -10,10 +10,8 @@
 #include <stdexcept>
 #include <string>
 #include <cmath>
-#include <cstdarg>
 #include <locale>
 #include <limits> // std::numeric_limits
-#include <algorithm>
 #include <exception>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/parse_number.hpp>

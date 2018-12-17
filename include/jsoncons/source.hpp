@@ -13,8 +13,8 @@
 #include <istream>
 #include <memory> // std::addressof
 #include <cstring> // std::memcpy
-#include <algorithm>
 #include <exception>
+#include <type_traits> // std::enable_if
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 

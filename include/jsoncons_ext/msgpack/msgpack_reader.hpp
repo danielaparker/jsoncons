@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <utility> // std::move
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_content_handler.hpp>

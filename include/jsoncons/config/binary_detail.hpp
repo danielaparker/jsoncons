@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <cstring> // std::memcpy
 #include <memory>
+#include <type_traits> // std::enable_if
 
 #if defined(__apple_build_version__) && ((__clang_major__ < 8) || ((__clang_major__ == 8) && (__clang_minor__ < 1)))
 #define APPLE_MISSING_INTRINSICS 1

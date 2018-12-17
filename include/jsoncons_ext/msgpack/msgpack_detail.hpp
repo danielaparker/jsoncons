@@ -8,7 +8,6 @@
 #define JSONCONS_MSGPACK_MSGPACK_DETAIL_HPP
 
 #include <string>
-#include <vector>
 #include <memory>
 #include <jsoncons/config/binary_detail.hpp>
 

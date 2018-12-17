@@ -12,11 +12,13 @@
 #include <deque>
 #include <exception>
 #include <cstring>
-#include <algorithm>
+#include <algorithm> // std::sort, std::stable_sort, std::lower_bound, std::unique
 #include <utility>
 #include <initializer_list>
 #include <iterator> // std::iterator_traits
 #include <memory> // std::allocator
+#include <utility> // std::move
+#include <type_traits> // std::enable_if
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_type_traits.hpp>

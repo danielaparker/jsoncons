@@ -14,9 +14,9 @@
 #include <exception>
 #include <cstring>
 #include <utility>
-#include <algorithm>
+#include <algorithm> // std::swap
 #include <limits> // std::numeric_limits
-#include <type_traits>
+#include <type_traits> // std::enable_if
 #include <iterator> // std::iterator_traits, std::input_iterator_tag
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/bignum.hpp>

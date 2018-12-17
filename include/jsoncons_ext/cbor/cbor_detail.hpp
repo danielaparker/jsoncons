@@ -12,6 +12,7 @@
 #include <memory>
 #include <iterator> // std::forward_iterator_tag
 #include <limits> // std::numeric_limits
+#include <utility> // std::move
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_detail.hpp>

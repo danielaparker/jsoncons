@@ -10,7 +10,6 @@
 #include <stdexcept>
 #include <string>
 #include <cmath>
-#include <cstdarg>
 #include <exception>
 
 // Uncomment the following line to suppress deprecated names (recommended for new code)

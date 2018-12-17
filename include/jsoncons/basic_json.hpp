@@ -16,7 +16,11 @@
 #include <memory> // std::allocator
 #include <typeinfo>
 #include <cstring> // std::memcpy
+#include <algorithm> // std::swap
 #include <initializer_list> // std::initializer_list
+#include <utility> // std::move
+#include <type_traits> // std::enable_if
+#include <istream> // std::basic_istream
 #include <jsoncons/json_fwd.hpp>
 #include <jsoncons/config/version.hpp>
 #include <jsoncons/json_exception.hpp>
