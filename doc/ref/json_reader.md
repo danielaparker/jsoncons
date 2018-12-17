@@ -144,10 +144,9 @@ Override (2) sets `ec` to a [json_errc](jsoncons::json_errc.md) if there are any
 #### Parsing JSON text with exceptions
 ```
 std::string input = R"({"field1"{}})";    
-std::istringstream is(input);
 
 json_decoder<json> decoder;
-json_reader reader(is,decoder);
+json_string_reader reader(is,decoder);
 
 try
 {
