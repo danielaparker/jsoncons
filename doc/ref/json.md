@@ -48,7 +48,7 @@ Member type                         |Definition
     <td>Makes a multidimensional json array.</td> 
   </tr>
   <tr>
-    <td><a>const json& null()</a></td>
+    <td><a>constexpr const json& null()</a></td>
     <td>Returns a null value</td> 
   </tr>
 </table>

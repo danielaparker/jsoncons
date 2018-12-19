@@ -2483,7 +2483,7 @@ public:
         return val;
     }
 
-    static const basic_json& null()
+    static constexpr const basic_json& null()
     {
         static basic_json a_null = basic_json(null_type(), semantic_tag_type::none);
         return a_null;

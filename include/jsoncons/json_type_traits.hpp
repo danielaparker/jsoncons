@@ -30,9 +30,9 @@ namespace jsoncons {
 template <class Json, class T, class Enable=void>
 struct json_type_traits
 {
-    static const bool is_compatible = false;
+    static constexpr bool is_compatible = false;
 
-    static bool is(const Json&)
+    static constexpr bool is(const Json&)
     {
         return false;
     }
