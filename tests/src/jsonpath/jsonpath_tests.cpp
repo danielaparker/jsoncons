@@ -1162,6 +1162,30 @@ TEST_CASE("test_min")
     CHECK(result == expected);
 }
 
+TEST_CASE("test_sum_filter_func")
+{
+    std::string path = "$.store.book[?(@.price > sum($.store.book[*].price) / 4)].title"; // unexpected exception if '$.store.book.length' instead '4'
+
+    json expected = json::parse(R"(
+["The Lord of the Rings"]
+    )");
+
+    json result = json_query(store,path);
+    CHECK(result == expected);
+}
+
+TEST_CASE("test_mult_func")
+{
+    std::string path = "$.store.bicycle[?(479373 < mult($..price) && mult($..price) < 479374)].color";
+
+    json expected = json::parse(R"(
+["red"]
+    )");
+
+    json result = json_query(store,path);
+    CHECK(result == expected);
+}
+
 TEST_CASE("test_ws1")
 {
     json result = json_query(store,"$..book[ ?(( @.price > 8 ) && (@.price < 12)) ].author");
