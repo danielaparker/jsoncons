@@ -94,13 +94,6 @@ struct is_compatible_object_type<Json,T,
     !is_incompatible<Json,typename T::mapped_type>::value
 >::type> : std::true_type {};
 
-// is_std_array
-template<class T>
-struct is_std_array : std::false_type {};
-
-template<class E, size_t N>
-struct is_std_array<std::array<E, N>> : std::true_type {};
-
 template <class Json, class T>
 class json_array_input_iterator
 {
@@ -516,8 +509,7 @@ struct json_type_traits<Json, std::vector<bool>::reference>
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<jsoncons::detail::is_compatible_array_type<Json,T>::value && 
-                                                !jsoncons::detail::is_std_array<T>::value>::type>
+                        typename std::enable_if<jsoncons::detail::is_compatible_array_type<Json,T>::value>::type>
 {
     typedef typename std::iterator_traits<typename T::iterator>::value_type element_type;
     typedef typename Json::allocator_type allocator_type;
