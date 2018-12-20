@@ -223,7 +223,7 @@ private:
     string_source& operator=(const string_source&) = delete;
 public:
     string_source(string_source&& val) 
-        : data(nullptr), input_ptr_(nullptr), input_end_(nullptr), eof_(true)
+        : data_(nullptr), input_ptr_(nullptr), input_end_(nullptr), eof_(true)
     {
         std::swap(data_,val.data_);
         std::swap(input_ptr_,val.input_ptr_);
