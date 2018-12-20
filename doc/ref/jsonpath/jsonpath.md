@@ -19,11 +19,11 @@ Stefan Goessner's javascript implemention returns `false` in case of no match, b
 
 Unlike XML, the root of a JSON text is usually an anonymous object or array, so JSONPath identifies the outermost level of the text with the symbol $.
 
-JSONPath expressions can use the dot–notation
+JSONPath expressions can use the dot-notation
 
     $.store.book.0.title
 
-or the bracket–notation 
+or the bracket-notation 
 
 
     $[store][book][0][title]
@@ -94,12 +94,15 @@ Precedence|Operator|Associativity
 
 #### Aggregate Functions
 
-Functions can be called inside filter expressions. The input to an aggregate function is the value of a JSONPath expression.
+Functions can be called __*only inside filter expressions*__. The input to an aggregate function is the value of a JSONPath expression.
+There are not much use cases for aggregation functions like `mult()` inside filter expressions but still they could be used, here are examples:
 
 Function|Description|Result|Example
 ----------|--------|-------|---
-min()|Provides the minimum value of an array of numbers|double|$.store.book[?(@.price < max($.store.book[*].price))].title
-max()|Provides the maximum value of an array of numbers|double|$.store.book[?(@.price > min($.store.book[*].price))].title
+`min(...)`|Provides the minimum value of an array of numbers|`double`|`$.store.book[?(@.price < max($.store.book[*].price))].title`
+`max(...)`|Provides the maximum value of an array of numbers|`double`|`$.store.book[?(@.price > min($.store.book[*].price))].title`
+`sum(...)`|Provides the sum value of an array of numbers|`double`|`$.store.book[?(@.price > sum($.store.book[*].price) / 4)].title`
+`mult(...)`|Provides the multiplication value of an array of numbers|`double`|`$.store.book[?(479373 < mult($..price) && mult($..price) < 479374)].title`
 
 ### Examples
 

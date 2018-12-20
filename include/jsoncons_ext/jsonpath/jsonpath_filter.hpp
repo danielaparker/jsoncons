@@ -35,6 +35,8 @@ JSONCONS_DEFINE_LITERAL(ampamp_literal,"&&")
 JSONCONS_DEFINE_LITERAL(pipepipe_literal,"||")
 JSONCONS_DEFINE_LITERAL(max_literal,"max")
 JSONCONS_DEFINE_LITERAL(min_literal,"min")
+JSONCONS_DEFINE_LITERAL(sum_literal,"sum")
+JSONCONS_DEFINE_LITERAL(mult_literal,"mult")
 
 template<class Json>
 struct PathConstructor
@@ -1098,6 +1100,38 @@ class jsonpath_filter_parser
                               {
                                   v = x;
                               }
+                          }
+                          return v;
+                      }
+                }
+            },
+            {
+                sum_literal<char_type>(),{1,true,true,[](const term<Json>& term)
+                      {
+                          Json a = term.evaluate_single_node();
+
+                          double v = 0.0;
+                          for (const auto& elem : a.array_range())
+                          {
+                              v += elem.template as<double>();
+                          }
+                          return v;
+                      }
+                }
+            },
+            {
+                mult_literal<char_type>(),{1,true,true,[](const term<Json>& term)
+                      {
+                          Json a = term.evaluate_single_node();
+
+                          double v = 0.0;
+                          for (const auto& elem : a.array_range())
+                          {
+                              double x = elem.template as<double>();
+                              v == 0.0 && x != 0.0
+                              ? (v = x)
+                              : (v *= x);
+
                           }
                           return v;
                       }
