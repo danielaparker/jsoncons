@@ -59,7 +59,6 @@ void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
         std::cout << expected.to_string() << std::endl;
     }
 }
-
 TEST_CASE("test_cbor_parsing")
 {
     // unsigned integer
@@ -173,7 +172,6 @@ TEST_CASE("test_cbor_parsing")
                        0x5f,0xff},
                       json::array{json(byte_string()),json(byte_string())});
     }
-
     SECTION("arrays with indefinite length")
     {
         //check_parse_cbor({0x9f,0xff},json::array());
@@ -195,6 +193,7 @@ TEST_CASE("test_cbor_parsing")
                       json::parse("[1, [2, 3], [4, 5]]"));
 
     }
+
     // big float
     check_parse_cbor({0xc5, // Tag 5 
                      0x82, // Array of length 2
@@ -208,7 +207,6 @@ TEST_CASE("test_cbor_parsing")
         check_parse_cbor({0xa1,0x62,'o','c',0x81,'\0'}, json::parse("{\"oc\": [0]}"));
         //check_parse_cbor({0xa1,0x62,'o','c',0x84,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
     }
-
     SECTION("maps with indefinite length")
     {
         check_parse_cbor({0xbf,0xff},json::object());
@@ -223,7 +221,6 @@ TEST_CASE("test_cbor_parsing")
                            0x21,                   // -2
                                0xff},              // "break"
                       json::parse("{\"Fun\": true, \"Amt\": -2}"));
-
         check_parse_cbor({0xbf,                       // Start indefinite-length map
                            0x21,                   // First key, -2
                            0xf5,                   // First value, true
@@ -232,7 +229,6 @@ TEST_CASE("test_cbor_parsing")
                                0xff},              // "break"
                       json::parse("{\"-2\": true, \"true\": -2}"));
     }
-
 
     SECTION("maps with non-string keys")
     {

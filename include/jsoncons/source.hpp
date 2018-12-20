@@ -222,7 +222,14 @@ private:
     string_source(const string_source&) = delete;
     string_source& operator=(const string_source&) = delete;
 public:
-    string_source(string_source&&) = default;
+    string_source(string_source&& val) 
+        : data(nullptr), input_ptr_(nullptr), input_end_(nullptr), eof_(true)
+    {
+        std::swap(data_,val.data_);
+        std::swap(input_ptr_,val.input_ptr_);
+        std::swap(input_end_,val.input_end_);
+        std::swap(eof_,val.eof_);
+    }
 
     string_source(const string_view_type& s)
         : data_(s.data()), input_ptr_(s.data()), input_end_(s.data()+s.size()), eof_(s.size() == 0)
@@ -239,7 +246,13 @@ public:
     {
     }
 
-    string_source& operator=(string_source&&) = default;
+    string_source& operator=(string_source&& val)
+    {
+        std::swap(data_,val.data_);
+        std::swap(input_ptr_,val.input_ptr_);
+        std::swap(input_end_,val.input_end_);
+        std::swap(eof_,val.eof_);
+    }
 
     bool eof() const
     {

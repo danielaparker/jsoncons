@@ -204,20 +204,27 @@ public:
     typedef typename StringT::value_type value_type;
     typedef StringT output_type;
 private:
-    output_type& s_;
+    output_type* s_;
 
     // Noncopyable
     string_result(const string_result&) = delete;
     string_result& operator=(const string_result&) = delete;
 public:
-    string_result(string_result&&) = default;
+    string_result(string_result&& val)
+        : s_(nullptr)
+    {
+        std::swap(s_,val.s_);
+    }
 
     string_result(output_type& s)
-        : s_(s)
+        : s_(std::addressof(s))
     {
     }
 
-    string_result& operator=(string_result&&) = default;
+    string_result& operator=(string_result&& val)
+    {
+        std::swap(s_, val.s_);
+    }
 
     void flush()
     {
@@ -225,12 +232,12 @@ public:
 
     void insert(const value_type* s, size_t length)
     {
-        s_.append(s,length);
+        s_->append(s,length);
     }
 
     void push_back(value_type ch)
     {
-        s_.push_back(ch);
+        s_->push_back(ch);
     }
 };
 
