@@ -66,14 +66,14 @@ public:
 
        : basic_csv_reader(std::move(source), 
                           handler, 
-                          basic_csv_options<CharT,Allocator>(), 
+                          basic_csv_options<CharT>(), 
                           default_err_handler_)
     {
     }
 
     basic_csv_reader(Source source,
                      basic_json_content_handler<CharT>& handler,
-                     const basic_csv_options<CharT,Allocator>& options)
+                     const basic_csv_options<CharT>& options)
 
         : basic_csv_reader(std::move(source), 
                            handler, 
@@ -87,14 +87,14 @@ public:
                      parse_error_handler& err_handler)
         : basic_csv_reader(std::move(source), 
                            handler, 
-                           basic_csv_options<CharT,Allocator>(), 
+                           basic_csv_options<CharT>(), 
                            err_handler)
     {
     }
 
     basic_csv_reader(Source source,
                      basic_json_content_handler<CharT>& handler,
-                     basic_csv_options<CharT,Allocator> options,
+                     const basic_csv_options<CharT>& options,
                      parse_error_handler& err_handler)
        :
          parser_(handler, options, err_handler),
@@ -216,8 +216,8 @@ Json decode_csv(typename Json::string_view_type s)
     return decoder.get_result();
 }
 
-template <class Json,class Allocator>
-Json decode_csv(typename Json::string_view_type s, const basic_csv_options<typename Json::char_type,Allocator>& options)
+template <class Json,class Allocator=std::allocator<char>>
+Json decode_csv(typename Json::string_view_type s, const basic_csv_options<typename Json::char_type>& options)
 {
     typedef typename Json::char_type char_type;
 
@@ -240,8 +240,8 @@ Json decode_csv(std::basic_istream<typename Json::char_type>& is)
     return decoder.get_result();
 }
 
-template <class Json,class Allocator>
-Json decode_csv(std::basic_istream<typename Json::char_type>& is, const basic_csv_options<typename Json::char_type,Allocator>& options)
+template <class Json,class Allocator = std::allocator<char>>
+Json decode_csv(std::basic_istream<typename Json::char_type>& is, const basic_csv_options<typename Json::char_type>& options)
 {
     typedef typename Json::char_type char_type;
 

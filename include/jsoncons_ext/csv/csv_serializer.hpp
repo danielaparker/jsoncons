@@ -53,7 +53,7 @@ private:
         string_type name_;
     };
     Result result_;
-    basic_csv_options<CharT,Allocator> parameters_;
+    basic_csv_options<CharT> parameters_;
     std::vector<stack_item> stack_;
     jsoncons::detail::print_double fp_;
     std::vector<string_type,string_allocator_type> column_names_;
@@ -66,12 +66,12 @@ private:
     basic_csv_serializer& operator=(const basic_csv_serializer&) = delete;
 public:
     basic_csv_serializer(result_type result)
-       : basic_csv_serializer(std::move(result), basic_csv_options<CharT,Allocator>())
+       : basic_csv_serializer(std::move(result), basic_csv_options<CharT>())
     {
     }
 
     basic_csv_serializer(result_type result,
-                         const basic_csv_options<CharT,Allocator>& options)
+                         const basic_csv_options<CharT>& options)
        :
        result_(std::move(result)),
        parameters_(options),
@@ -553,16 +553,16 @@ void encode_csv(const Json& j, std::basic_string<typename Json::char_type>& s)
     j.dump(serializer);
 }
 
-template <class Json,class Allocator>
-void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os, const basic_csv_options<typename Json::char_type,Allocator>& options)
+template <class Json,class Allocator=std::allocator<char>>
+void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os, const basic_csv_options<typename Json::char_type>& options)
 {
     typedef typename Json::char_type char_type;
     basic_csv_serializer<char_type,jsoncons::text_stream_result<char_type>,Allocator> serializer(os,options);
     j.dump(serializer);
 }
 
-template <class Json,class Allocator>
-void encode_csv(const Json& j, std::basic_string<typename Json::char_type>& s, const basic_csv_options<typename Json::char_type,Allocator>& options)
+template <class Json,class Allocator=std::allocator<char>>
+void encode_csv(const Json& j, std::basic_string<typename Json::char_type>& s, const basic_csv_options<typename Json::char_type>& options)
 {
     typedef typename Json::char_type char_type;
     basic_csv_serializer<char_type,jsoncons::string_result<std::basic_string<typename Json::char_type>>,Allocator> serializer(s,options);

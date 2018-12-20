@@ -12,7 +12,6 @@
 #include <unordered_map> // std::unordered_map
 #include <limits> // std::numeric_limits
 #include <cwchar>
-#include <memory> // std::allocator
 
 namespace jsoncons { namespace csv {
 
@@ -62,15 +61,11 @@ struct csv_type_info
     size_t rep_count;
 };
 
-template <class CharT,class Allocator=std::allocator<CharT>>
+template <class CharT>
 class basic_csv_options
 {
     typedef CharT char_type;
-    typedef Allocator allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
-    typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<csv_type_info> csv_type_info_allocator_type;
+    typedef std::basic_string<CharT> string_type;
 
     chars_format floating_point_format_;
     uint8_t precision_;
@@ -95,9 +90,9 @@ class basic_csv_options
     string_type line_delimiter_;
     bool infer_types_;
 
-    std::vector<string_type,string_allocator_type> column_names_;
-    std::vector<csv_type_info,csv_type_info_allocator_type> column_types_;
-    std::vector<string_type,string_allocator_type> column_defaults_;
+    std::vector<string_type> column_names_;
+    std::vector<csv_type_info> column_types_;
+    std::vector<string_type> column_defaults_;
 public:
     static const size_t default_indent = 4;
 
@@ -277,25 +272,25 @@ public:
         return *this;
     }
 
-    std::vector<string_type,string_allocator_type> column_names() const
+    std::vector<string_type> column_names() const
     {
         return column_names_;
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    basic_csv_options& column_names(const std::vector<string_type,string_allocator_type>& value)
+    basic_csv_options& column_names(const std::vector<string_type>& value)
     {
         column_names_ = value;
         return *this;
     }
 
-    basic_csv_options& column_defaults(const std::vector<string_type,string_allocator_type>& value)
+    basic_csv_options& column_defaults(const std::vector<string_type>& value)
     {
         column_defaults_ = value;
         return *this;
     }
 
-    basic_csv_options& column_types(const std::vector<string_type,string_allocator_type>& value)
+    basic_csv_options& column_types(const std::vector<string_type>& value)
     {
         if (value.size() > 0)
         {
@@ -329,7 +324,7 @@ public:
         return *this;
     }
 
-    std::vector<csv_type_info,csv_type_info_allocator_type> column_types() const
+    std::vector<csv_type_info> column_types() const
     {
         return column_types_;
     }
@@ -340,7 +335,7 @@ public:
         return *this;
     }
 
-    std::vector<string_type,string_allocator_type> column_defaults() const
+    std::vector<string_type> column_defaults() const
     {
         return column_defaults_;
     }
@@ -462,9 +457,9 @@ public:
         return *this;
     }
 
-    static std::vector<string_type,string_allocator_type> parse_column_names(const string_type& names)
+    static std::vector<string_type> parse_column_names(const string_type& names)
     {
-        std::vector<string_type,string_allocator_type> column_names;
+        std::vector<string_type> column_names;
 
         column_state state = column_state::sequence;
         string_type buffer;
@@ -515,11 +510,9 @@ public:
         return column_names;
     }
 
-    static std::vector<csv_type_info,csv_type_info_allocator_type> parse_column_types(const string_type& types)
+    static std::vector<csv_type_info> parse_column_types(const string_type& types)
     {
-        typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,csv_column_type>> pair_allocator_type;
-
-        const std::unordered_map<string_type,csv_column_type, std::hash<string_type>,std::equal_to<string_type>,pair_allocator_type> type_dictionary =
+        const std::unordered_map<string_type,csv_column_type, std::hash<string_type>,std::equal_to<string_type>> type_dictionary =
         {
 
             {detail::string_literal<char_type>(),csv_column_type::string_t},
@@ -528,7 +521,7 @@ public:
             {detail::boolean_literal<char_type>(),csv_column_type::boolean_t}
         };
 
-        std::vector<csv_type_info,csv_type_info_allocator_type> column_types;
+        std::vector<csv_type_info> column_types;
 
         column_state state = column_state::sequence;
         int depth = 0;
