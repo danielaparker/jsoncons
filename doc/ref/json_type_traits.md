@@ -1,6 +1,6 @@
 ### jsoncons::json_type_traits
 
-`json_type_traits` defines a compile time template based interface that `json` objects use to access and modify values.
+`json_type_traits` defines a compile time template based interface for accessing and modifying `basic_json` values.
 
 #### Header
 ```c++
