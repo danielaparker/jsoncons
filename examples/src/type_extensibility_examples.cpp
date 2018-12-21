@@ -102,7 +102,7 @@ struct json_type_traits<Json, own_vector> {
         {
             std::string s(item.key());
             v.push_back(std::strtol(s.c_str(),nullptr,10));
-            v.push_back(item.value().as<int64_t>());
+            v.push_back(item.value().template as<int64_t>());
         }
         return v;
     }
