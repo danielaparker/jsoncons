@@ -19,6 +19,13 @@
 
 namespace jsoncons { namespace jsonpath {
 
+// Should be library version after C++14
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args)
+{
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
 enum class result_type {value,path};
 
 template<class Json>
@@ -281,7 +288,7 @@ private:
                 }
                 else if (name_ == length_literal() && val.size() > 0)
                 {
-                    auto temp = std::make_unique<Json>(val.size());
+                    auto temp = make_unique<Json>(val.size());
                     nodes.emplace_back(PathCons()(path, name_), temp.get());
                     temp_json_values.push_back(std::move(temp));
                 }
@@ -296,7 +303,7 @@ private:
                     auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), index);
                     if (sequence.length() > 0)
                     {
-                        auto temp = std::make_unique<Json>(sequence.begin(),sequence.length());
+                        auto temp = make_unique<Json>(sequence.begin(),sequence.length());
                         nodes.emplace_back(PathCons()(path, index), temp.get());
                         temp_json_values.push_back(std::move(temp));
                     }
@@ -304,7 +311,7 @@ private:
                 else if (name_ == length_literal() && sv.size() > 0)
                 {
                     size_t count = unicons::u32_length(sv.begin(),sv.end());
-                    auto temp = std::make_unique<Json>(count);
+                    auto temp = make_unique<Json>(count);
                     nodes.emplace_back(PathCons()(path,name_),temp.get());
                     temp_json_values.push_back(std::move(temp));
                 }
@@ -716,7 +723,7 @@ public:
                         auto result = parser.parse(root, p_,end_input_,&p_, temp_json_values);
                         line_ = parser.line();
                         column_ = parser.column();
-                        selectors_.push_back(std::make_unique<expr_selector>(result));
+                        selectors_.push_back(make_unique<expr_selector>(result));
                         state_ = path_state::expect_comma_or_right_bracket;
                     }
                     break;
@@ -726,7 +733,7 @@ public:
                         auto result = parser.parse(root,p_,end_input_,&p_, temp_json_values);
                         line_ = parser.line();
                         column_ = parser.column();
-                        selectors_.push_back(std::make_unique<filter_selector>(result));
+                        selectors_.push_back(make_unique<filter_selector>(result));
                         state_ = path_state::expect_comma_or_right_bracket;
                     }
                     break;                   
@@ -774,12 +781,12 @@ public:
                     state_ = path_state::left_bracket_end;
                     break;
                 case ',':
-                    selectors_.push_back(std::make_unique<name_selector>(buffer_,positive_start_));
+                    selectors_.push_back(make_unique<name_selector>(buffer_,positive_start_));
                     buffer_.clear();
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(std::make_unique<name_selector>(buffer_,positive_start_));
+                    selectors_.push_back(make_unique<name_selector>(buffer_,positive_start_));
                     buffer_.clear();
                     apply_selectors(temp_json_values);
                     state_ = path_state::expect_dot_or_left_bracket;
@@ -808,11 +815,11 @@ public:
                     state_ = path_state::left_bracket_end2;
                     break;
                 case ',':
-                    selectors_.push_back(std::make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(std::make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     apply_selectors(temp_json_values);
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
@@ -832,11 +839,11 @@ public:
                     end_ = end_*10 + static_cast<size_t>(*p_-'0');
                     break;
                 case ',':
-                    selectors_.push_back(std::make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(std::make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     apply_selectors(temp_json_values);
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
@@ -856,11 +863,11 @@ public:
                     state_ = path_state::left_bracket_step2;
                     break;
                 case ',':
-                    selectors_.push_back(std::make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(std::make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     apply_selectors(temp_json_values);
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
@@ -875,11 +882,11 @@ public:
                     step_ = step_*10 + static_cast<size_t>(*p_-'0');
                     break;
                 case ',':
-                    selectors_.push_back(std::make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(std::make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     apply_selectors(temp_json_values);
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
@@ -929,7 +936,7 @@ public:
                 switch (*p_)
                 {
                 case '\'':
-                    selectors_.push_back(std::make_unique<name_selector>(buffer_,positive_start_));
+                    selectors_.push_back(make_unique<name_selector>(buffer_,positive_start_));
                     buffer_.clear();
                     state_ = path_state::expect_comma_or_right_bracket;
                     break;
@@ -953,7 +960,7 @@ public:
                 switch (*p_)
                 {
                 case '\"':
-                    selectors_.push_back(std::make_unique<name_selector>(buffer_,positive_start_));
+                    selectors_.push_back(make_unique<name_selector>(buffer_,positive_start_));
                     buffer_.clear();
                     state_ = path_state::expect_comma_or_right_bracket;
                     break;
@@ -1074,7 +1081,7 @@ public:
             }
             else if (name == length_literal() && val.size() > 0)
             {
-                auto temp = std::make_unique<Json>(val.size());
+                auto temp = make_unique<Json>(val.size());
                 nodes_.emplace_back(PathCons()(path,name),temp.get());
                 temp_json_values.emplace_back(std::move(temp));
             }
@@ -1098,7 +1105,7 @@ public:
                 auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), pos);
                 if (sequence.length() > 0)
                 {
-                    auto temp = std::make_unique<Json>(sequence.begin(),sequence.length());
+                    auto temp = make_unique<Json>(sequence.begin(),sequence.length());
                     nodes_.emplace_back(PathCons()(path,pos),temp.get());
                     temp_json_values.push_back(std::move(temp));
                 }
@@ -1106,7 +1113,7 @@ public:
             else if (name == length_literal() && sv.size() > 0)
             {
                 size_t count = unicons::u32_length(sv.begin(),sv.end());
-                auto temp = std::make_unique<Json>(count);
+                auto temp = make_unique<Json>(count);
                 nodes_.emplace_back(PathCons()(path,name),temp.get());
                 temp_json_values.push_back(std::move(temp));
             }
