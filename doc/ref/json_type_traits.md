@@ -45,7 +45,7 @@ For these situations `jsoncons` provides the traits class
 template <class T>
 struct is_json_type_traits_impl : public false_type {};
 ```
-which inherits from [false_type](http://www.cplusplus.com/reference/type_traits/false_type/)
+which inherits from [false_type](http://www.cplusplus.com/reference/type_traits/false_type/).
 This traits class may be specialized for a user-defined type with a [true_type](http://www.cplusplus.com/reference/type_traits/true_type/) value to
 inform the `jsoncons` library that the type is already specialized.  
 
