@@ -34,6 +34,8 @@ struct is_json_type_traits_impl : public std::false_type
 template <class Json, class T, class Enable=void>
 struct json_type_traits
 {
+    typedef typename Json::allocator_type allocator_type;
+
     static constexpr bool is_compatible = false;
 
     static constexpr bool is(const Json&)
@@ -46,7 +48,7 @@ struct json_type_traits
         static_assert("as not implemented");
     }
 
-    static Json to_json(const T&, allocator_type allocator=allocator_type())
+    static Json to_json(const T&, allocator_type = allocator_type())
     {
         static_assert("to_json not implemented");
     }

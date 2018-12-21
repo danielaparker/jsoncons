@@ -27,7 +27,7 @@ struct json_type_traits
         static_assert("as not implemented");
     }
 
-    static Json to_json(const T&, allocator_type allocator=allocator_type())
+    static Json to_json(const T&, allocator_type = allocator_type())
     {
         static_assert("to_json not implemented");
     }
