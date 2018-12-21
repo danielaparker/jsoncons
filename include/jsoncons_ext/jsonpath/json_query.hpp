@@ -122,6 +122,8 @@ enum class path_state
     left_bracket_step,
     left_bracket_step2,
     expect_comma_or_right_bracket,
+    function_name,
+    function_argument,
     dot
 };
 
@@ -538,10 +540,10 @@ public:
             case path_state::start: 
                 switch (*p_)
                 {
-                case ' ':case '\t':
-                    break;
-                case '$':
-                case '@':
+                    case ' ':case '\t':
+                        break;
+                    case '$':
+                    case '@':
                     {
                         string_type s;
                         s.push_back('$');
@@ -550,13 +552,55 @@ public:
                         stack_.push_back(v);
 
                         state_ = path_state::expect_dot_or_left_bracket;
+                        break;
                     }
-                    break;
-                default:
-                    err_handler_->fatal_error(jsonpath_parser_errc::expected_root, *this);
-                    ec = jsonpath_parser_errc::expected_root;
+                    default:
+                    {
+                        //err_handler_->fatal_error(jsonpath_parser_errc::expected_root, *this);
+                        //ec = jsonpath_parser_errc::expected_root;
+                        buffer_.clear();
+                        state_ = path_state::function_name;
+                        break;
+                    }
+
                     return;
                 };
+                ++p_;
+                ++column_;
+                break;
+            case path_state::function_name:
+                switch (*p_)
+                {
+                    case '(':
+                        buffer_.clear();
+                        state_ = path_state::function_argument;
+                        break;
+                    default:
+                        buffer_.push_back(*p_);
+                        break;
+                }
+                ++p_;
+                ++column_;
+                break;
+            case path_state::function_argument:
+                switch (*p_)
+                {
+                case ')':
+                {
+                    jsonpath_evaluator<Json, JsonReference, PathCons> evaluator;
+                    evaluator.evaluate(root, buffer_.data(), buffer_.length());
+
+                    for (auto& j : evaluator.stack_)
+                    {
+                        stack_.push_back(j);
+                    }
+                    state_ = path_state::expect_dot_or_left_bracket;
+                    break;
+                }
+                default:
+                    buffer_.push_back(*p_);
+                    break;
+                }
                 ++p_;
                 ++column_;
                 break;
