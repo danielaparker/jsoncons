@@ -39,7 +39,7 @@ You can interact with a new type using `is<T>`, `as<T>`, construction and assign
 If you try to specialize `json_type_traits` for a type that is already
 specialized in the jsoncons library, for example, a custom container 
 type that satisfies the conditions for a sequence container, you 
-may see a compile error "more than one partial specialization matches the template argument list".  
+may see a compile error "more than one partial specialization matches the template argument list".
 For these situations `jsoncons` provides the traits class
 ```c++
 template <class T>
