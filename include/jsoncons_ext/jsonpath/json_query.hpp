@@ -569,11 +569,11 @@ public:
                         switch (*p_)
                         {
                             case '.':
-                            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                            case '[':
                                 err_handler_->fatal_error(jsonpath_errc::expected_root, *this);
                                 ec = jsonpath_errc::expected_root;
-                                break;
-                            default: // might be function
+                                return;
+                            default: // might be function, validate name later
                                 state_ = path_state::function_name;
                                 function_name.push_back(*p_);
                                 break;
