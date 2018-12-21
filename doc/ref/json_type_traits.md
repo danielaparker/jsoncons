@@ -22,15 +22,9 @@ struct json_type_traits
         return false;
     }
 
-    static T as(const Json&)
-    {
-        static_assert("as not implemented");
-    }
+    static T as(const Json&);
 
-    static Json to_json(const T&, allocator_type = allocator_type())
-    {
-        static_assert("to_json not implemented");
-    }
+    static Json to_json(const T&, allocator_type = allocator_type());
 };
 ```
 

@@ -5,7 +5,9 @@ New features
 
 - bson UTC datetime associated with jsoncons `semantic_tag_type::timestamp`
 
-- 
+- New traits class `is_json_type_traits_impl` that addresses issues 
+  [#133](https://github.com/danielaparker/jsoncons/issues/133) and 
+  [#115](https://github.com/danielaparker/jsoncons/issues/115) (duplicates)
 
 v0.114.0
 --------

@@ -31,6 +31,10 @@ struct is_json_type_traits_impl : public std::false_type
 
 // json_type_traits
 
+template<typename T>
+struct unimplemented : std::false_type
+{};
+
 template <class Json, class T, class Enable=void>
 struct json_type_traits
 {
@@ -45,12 +49,12 @@ struct json_type_traits
 
     static T as(const Json&)
     {
-        static_assert("as not implemented");
+        static_assert(unimplemented<T>::value, "as not implemented");
     }
 
     static Json to_json(const T&, allocator_type = allocator_type())
     {
-        static_assert("to_json not implemented");
+        static_assert(unimplemented<T>::value, "to_json not implemented");
     }
 };
 
