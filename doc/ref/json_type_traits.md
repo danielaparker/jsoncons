@@ -5,7 +5,9 @@
 #### Header
 ```c++
 #include <jsoncons/json_type_traits.hpp>
+```
 
+```c++
 template <class Json, class T, class Enable=void>
 struct json_type_traits
 {
