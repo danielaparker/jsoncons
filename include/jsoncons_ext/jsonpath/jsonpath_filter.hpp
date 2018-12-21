@@ -139,7 +139,7 @@ public:
 
     virtual ~term() {}
 
-    virtual void initialize(const Json&, std::vector<std::unique_ptr<Json>>& temp_json_values)
+    virtual void initialize(const Json&, std::vector<std::unique_ptr<Json>>&)
     {
     }
     virtual bool accept_single_node() const
