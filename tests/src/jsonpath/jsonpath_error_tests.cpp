@@ -82,28 +82,28 @@ void test_error_code(const json& root, const std::string& path, std::error_code 
 TEST_CASE("test_root_error")
 {
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "..*", jsonpath_parser_errc::expected_root,1,1);
+    test_error_code(root, "..*", jsonpath_errc::expected_root,1,1);
 }
 
 TEST_CASE("test_right_bracket_error")
 {
 
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "$['store']['book'[*]", jsonpath_parser_errc::expected_right_bracket,1,18);
+    test_error_code(root, "$['store']['book'[*]", jsonpath_errc::expected_right_bracket,1,18);
 }
 
 TEST_CASE("test_dot_dot_dot")
 {
 
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "$.store...price", jsonpath_parser_errc::expected_name,1,10);
+    test_error_code(root, "$.store...price", jsonpath_errc::expected_name,1,10);
 }
 
 TEST_CASE("test_dot_star_name")
 {
 
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "$.store.*price", jsonpath_parser_errc::expected_separator,1,10);
+    test_error_code(root, "$.store.*price", jsonpath_errc::expected_separator,1,10);
 }
 
 TEST_CASE("test_filter_error")

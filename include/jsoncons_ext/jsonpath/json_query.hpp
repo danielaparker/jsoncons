@@ -24,16 +24,17 @@ enum class result_type {value,path};
 template<class Json>
 Json json_query(const Json& root, const typename Json::string_view_type& path, result_type result_t = result_type::value)
 {
+    std::vector<std::unique_ptr<Json>> temp_json_values;
     if (result_t == result_type::value)
     {
         jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
-        evaluator.evaluate(root,path.data(),path.length());
+        evaluator.evaluate(root,path.data(),path.length(),temp_json_values);
         return evaluator.get_values();
     }
     else
     {
         jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
-        evaluator.evaluate(root,path.data(),path.length());
+        evaluator.evaluate(root,path.data(),path.length(), temp_json_values);
         return evaluator.get_normalized_paths();
     }
 }
@@ -41,8 +42,9 @@ Json json_query(const Json& root, const typename Json::string_view_type& path, r
 template<class Json, class T>
 void json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
 {
+    std::vector<std::unique_ptr<Json>> temp_json_values;
     jsoncons::jsonpath::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
-    evaluator.evaluate(root,path.data(),path.length());
+    evaluator.evaluate(root,path.data(),path.length(),temp_json_values);
     evaluator.replace(std::forward<T>(new_value));
 }
 
@@ -172,7 +174,7 @@ private:
         {
         }
         virtual void select(node_type& node, const string_type& path, reference val,
-                            node_set& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) = 0;
+                            node_set& nodes, std::vector<std::unique_ptr<Json>>& temp_json_values) = 0;
     };
 
     class expr_selector final : public selector
@@ -186,9 +188,9 @@ private:
         }
 
         void select(node_type& node, const string_type& path, reference val, 
-                    node_set& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) override
+                    node_set& nodes, std::vector<std::unique_ptr<Json>>& temp_json_values) override
         {
-            auto index = result_.eval(val);
+            auto index = result_.eval(val, temp_json_values);
             if (index.template is<size_t>())
             {
                 size_t start = index.template as<size_t>();
@@ -216,14 +218,15 @@ private:
         }
 
         void select(node_type& node, const string_type& path, reference val, 
-                    node_set& nodes, std::vector<std::shared_ptr<Json>>&) override
+                    node_set& nodes, 
+                    std::vector<std::unique_ptr<Json>>& temp_json_values) override
         {
             if (val.is_array())
             {
                 node.skip_contained_object =true;
                 for (size_t i = 0; i < val.size(); ++i)
                 {
-                    if (result_.exists(val[i]))
+                    if (result_.exists(val[i], temp_json_values))
                     {
                         nodes.emplace_back(PathCons()(path,i),std::addressof(val[i]));
                     }
@@ -233,7 +236,7 @@ private:
             {
                 if (!node.skip_contained_object)
                 {
-                    if (result_.exists(val))
+                    if (result_.exists(val, temp_json_values))
                     {
                         nodes.emplace_back(path, std::addressof(val));
                     }
@@ -259,7 +262,7 @@ private:
 
         void select(node_type&, const string_type& path, reference val,
                     node_set& nodes,
-                    std::vector<std::shared_ptr<Json>>& temp_json_values) override
+                    std::vector<std::unique_ptr<Json>>& temp_json_values) override
         {
             if (val.is_object() && val.contains(name_))
             {
@@ -278,9 +281,9 @@ private:
                 }
                 else if (name_ == length_literal() && val.size() > 0)
                 {
-                    auto temp = std::make_shared<Json>(val.size());
-                    temp_json_values.push_back(temp);
-                    nodes.emplace_back(PathCons()(path,name_),temp.get());
+                    auto temp = std::make_unique<Json>(val.size());
+                    nodes.emplace_back(PathCons()(path, name_), temp.get());
+                    temp_json_values.push_back(std::move(temp));
                 }
             }
             else if (val.is_string())
@@ -293,17 +296,17 @@ private:
                     auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), index);
                     if (sequence.length() > 0)
                     {
-                        auto temp = std::make_shared<Json>(sequence.begin(),sequence.length());
-                        temp_json_values.push_back(temp);
-                        nodes.emplace_back(PathCons()(path,index),temp.get());
+                        auto temp = std::make_unique<Json>(sequence.begin(),sequence.length());
+                        nodes.emplace_back(PathCons()(path, index), temp.get());
+                        temp_json_values.push_back(std::move(temp));
                     }
                 }
                 else if (name_ == length_literal() && sv.size() > 0)
                 {
                     size_t count = unicons::u32_length(sv.begin(),sv.end());
-                    auto temp = std::make_shared<Json>(count);
-                    temp_json_values.push_back(temp);
+                    auto temp = std::make_unique<Json>(count);
                     nodes.emplace_back(PathCons()(path,name_),temp.get());
+                    temp_json_values.push_back(std::move(temp));
                 }
             }
         }
@@ -332,7 +335,7 @@ private:
 
         void select(node_type&, const string_type& path, reference val,
                     node_set& nodes,
-                    std::vector<std::shared_ptr<Json>>&) override
+                    std::vector<std::unique_ptr<Json>>&) override
         {
             if (positive_step_)
             {
@@ -410,13 +413,12 @@ private:
     bool recursive_descent_;
     node_set nodes_;
     std::vector<node_set> stack_;
-    std::vector<std::shared_ptr<Json>> temp_json_values_;
     size_t line_;
     size_t column_;
     const char_type* begin_input_;
     const char_type* end_input_;
     const char_type* p_;
-    std::vector<std::shared_ptr<selector>> selectors_;
+    std::vector<std::unique_ptr<selector>> selectors_;
 
 public:
     jsonpath_evaluator()
@@ -473,21 +475,20 @@ public:
         }
     }
 
-    void evaluate(reference root, const string_view_type& path)
+    void evaluate(reference root, const string_view_type& path, std::vector<std::unique_ptr<Json>>& temp_json_values)
     {
-        evaluate(root,path.data(),path.length());
+        evaluate(root,path.data(),path.length(), temp_json_values);
     }
-    void evaluate(reference root, const char_type* path)
+    void evaluate(reference root, const char_type* path, std::vector<std::unique_ptr<Json>>& temp_json_values)
     {
-        evaluate(root,path,char_traits_type::length(path));
+        evaluate(root,path,char_traits_type::length(path), temp_json_values);
     }
 
-    void evaluate(reference root, 
-                  const char_type* path, 
-                  size_t length)
+    void evaluate(reference root, const char_type* path, size_t length, 
+                  std::vector<std::unique_ptr<Json>>& temp_json_values)
     {
         std::error_code ec;
-        evaluate(root, path, length, ec);
+        evaluate(root, path, length, temp_json_values, ec);
         if (ec)
         {
             throw serialization_error(ec,line_,column_);
@@ -497,8 +498,10 @@ public:
     void evaluate(reference root, 
                   const char_type* path, 
                   size_t length,
+                  std::vector<std::unique_ptr<Json>>& temp_json_values,
                   std::error_code& ec)
     {
+        string_type function_name;
         path_state pre_line_break_state = path_state::start;
 
         begin_input_ = path;
@@ -556,10 +559,18 @@ public:
                     }
                     default:
                     {
-                        //err_handler_->fatal_error(jsonpath_parser_errc::expected_root, *this);
-                        //ec = jsonpath_parser_errc::expected_root;
-                        buffer_.clear();
-                        state_ = path_state::function_name;
+                        switch (*p_)
+                        {
+                            case '.':
+                            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                                err_handler_->fatal_error(jsonpath_errc::expected_root, *this);
+                                ec = jsonpath_errc::expected_root;
+                                break;
+                            default: // might be function
+                                state_ = path_state::function_name;
+                                function_name.push_back(*p_);
+                                break;
+                        }
                         break;
                     }
 
@@ -572,11 +583,10 @@ public:
                 switch (*p_)
                 {
                     case '(':
-                        buffer_.clear();
                         state_ = path_state::function_argument;
                         break;
                     default:
-                        buffer_.push_back(*p_);
+                        function_name.push_back(*p_);
                         break;
                 }
                 ++p_;
@@ -588,11 +598,22 @@ public:
                 case ')':
                 {
                     jsonpath_evaluator<Json, JsonReference, PathCons> evaluator;
-                    evaluator.evaluate(root, buffer_.data(), buffer_.length());
+                    evaluator.evaluate(root, buffer_.data(), buffer_.length(), temp_json_values);
 
-                    for (auto& j : evaluator.stack_)
+                    //std::cout << function_name << "\n";
+                    //std::cout << buffer_ << "\n";
+                    // Here you can lookup the function name
+                    // If there is no such function, it's an error
+                    // err_handler_->fatal_error(jsonpath_errc::expected_root, *this);
+                    // ec = jsonpath_errc::invalid_function_name;
+                    // return
+
+                    // identity function
+                    for (node_set& ns : evaluator.stack_)
                     {
-                        stack_.push_back(j);
+                        // ns.val_ptr is a pointer to a Json value in the result set
+                        // So you can call functions ns.val_ptr->is_double() etc.
+                        stack_.push_back(ns);
                     }
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
@@ -622,8 +643,8 @@ public:
                 switch (*p_)
                 {
                 case '.':
-                    err_handler_->fatal_error(jsonpath_parser_errc::expected_name, *this);
-                    ec = jsonpath_parser_errc::expected_name;
+                    err_handler_->fatal_error(jsonpath_errc::expected_name, *this);
+                    ec = jsonpath_errc::expected_name;
                     return;
                 case '*':
                     end_all();
@@ -655,8 +676,8 @@ public:
                     state_ = path_state::left_bracket;
                     break;
                 default:
-                    err_handler_->fatal_error(jsonpath_parser_errc::expected_separator, *this);
-                    ec = jsonpath_parser_errc::expected_separator;
+                    err_handler_->fatal_error(jsonpath_errc::expected_separator, *this);
+                    ec = jsonpath_errc::expected_separator;
                     return;
                 };
                 ++p_;
@@ -669,14 +690,14 @@ public:
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    apply_selectors();
+                    apply_selectors(temp_json_values);
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 case ' ':case '\t':
                     break;
                 default:
-                    err_handler_->fatal_error(jsonpath_parser_errc::expected_right_bracket, *this);
-                    ec = jsonpath_parser_errc::expected_right_bracket;
+                    err_handler_->fatal_error(jsonpath_errc::expected_right_bracket, *this);
+                    ec = jsonpath_errc::expected_right_bracket;
                     return;
                 }
                 ++p_;
@@ -692,20 +713,20 @@ public:
                 case '(':
                     {
                         jsonpath_filter_parser<Json> parser(line_,column_);
-                        auto result = parser.parse(root, p_,end_input_,&p_);
+                        auto result = parser.parse(root, p_,end_input_,&p_, temp_json_values);
                         line_ = parser.line();
                         column_ = parser.column();
-                        selectors_.push_back(std::make_shared<expr_selector>(result));
+                        selectors_.push_back(std::make_unique<expr_selector>(result));
                         state_ = path_state::expect_comma_or_right_bracket;
                     }
                     break;
                 case '?':
                     {
                         jsonpath_filter_parser<Json> parser(line_,column_);
-                        auto result = parser.parse(root,p_,end_input_,&p_);
+                        auto result = parser.parse(root,p_,end_input_,&p_, temp_json_values);
                         line_ = parser.line();
                         column_ = parser.column();
-                        selectors_.push_back(std::make_shared<filter_selector>(result));
+                        selectors_.push_back(std::make_unique<filter_selector>(result));
                         state_ = path_state::expect_comma_or_right_bracket;
                     }
                     break;                   
@@ -746,21 +767,21 @@ public:
                 case ':':
                     if (!try_string_to_index(buffer_.data(), buffer_.size(), &start_, &positive_start_))
                     {
-                        err_handler_->fatal_error(jsonpath_parser_errc::expected_index, *this);
-                        ec = jsonpath_parser_errc::expected_index;
+                        err_handler_->fatal_error(jsonpath_errc::expected_index, *this);
+                        ec = jsonpath_errc::expected_index;
                         return;
                     }
                     state_ = path_state::left_bracket_end;
                     break;
                 case ',':
-                    selectors_.push_back(std::make_shared<name_selector>(buffer_,positive_start_));
+                    selectors_.push_back(std::make_unique<name_selector>(buffer_,positive_start_));
                     buffer_.clear();
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(std::make_shared<name_selector>(buffer_,positive_start_));
+                    selectors_.push_back(std::make_unique<name_selector>(buffer_,positive_start_));
                     buffer_.clear();
-                    apply_selectors();
+                    apply_selectors(temp_json_values);
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 default:
@@ -787,12 +808,12 @@ public:
                     state_ = path_state::left_bracket_end2;
                     break;
                 case ',':
-                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(std::make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
-                    apply_selectors();
+                    selectors_.push_back(std::make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    apply_selectors(temp_json_values);
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 }
@@ -811,12 +832,12 @@ public:
                     end_ = end_*10 + static_cast<size_t>(*p_-'0');
                     break;
                 case ',':
-                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(std::make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
-                    apply_selectors();
+                    selectors_.push_back(std::make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    apply_selectors(temp_json_values);
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 }
@@ -835,12 +856,12 @@ public:
                     state_ = path_state::left_bracket_step2;
                     break;
                 case ',':
-                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(std::make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
-                    apply_selectors();
+                    selectors_.push_back(std::make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    apply_selectors(temp_json_values);
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 }
@@ -854,12 +875,12 @@ public:
                     step_ = step_*10 + static_cast<size_t>(*p_-'0');
                     break;
                 case ',':
-                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(std::make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
-                    apply_selectors();
+                    selectors_.push_back(std::make_unique<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    apply_selectors(temp_json_values);
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 }
@@ -870,29 +891,29 @@ public:
                 switch (*p_)
                 {
                 case '[':
-                    apply_unquoted_string(buffer_);
+                    apply_unquoted_string(buffer_, temp_json_values);
                     transfer_nodes();
                     start_ = 0;
                     state_ = path_state::left_bracket;
                     break;
                 case '.':
-                    apply_unquoted_string(buffer_);
+                    apply_unquoted_string(buffer_, temp_json_values);
                     transfer_nodes();
                     state_ = path_state::dot;
                     break;
                 case ' ':case '\t':
-                    apply_unquoted_string(buffer_);
+                    apply_unquoted_string(buffer_, temp_json_values);
                     transfer_nodes();
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 case '\r':
-                    apply_unquoted_string(buffer_);
+                    apply_unquoted_string(buffer_, temp_json_values);
                     transfer_nodes();
                     pre_line_break_state = path_state::expect_dot_or_left_bracket;
                     state_= path_state::cr;
                     break;
                 case '\n':
-                    apply_unquoted_string(buffer_);
+                    apply_unquoted_string(buffer_, temp_json_values);
                     transfer_nodes();
                     pre_line_break_state = path_state::expect_dot_or_left_bracket;
                     state_= path_state::lf;
@@ -908,7 +929,7 @@ public:
                 switch (*p_)
                 {
                 case '\'':
-                    selectors_.push_back(std::make_shared<name_selector>(buffer_,positive_start_));
+                    selectors_.push_back(std::make_unique<name_selector>(buffer_,positive_start_));
                     buffer_.clear();
                     state_ = path_state::expect_comma_or_right_bracket;
                     break;
@@ -932,7 +953,7 @@ public:
                 switch (*p_)
                 {
                 case '\"':
-                    selectors_.push_back(std::make_shared<name_selector>(buffer_,positive_start_));
+                    selectors_.push_back(std::make_unique<name_selector>(buffer_,positive_start_));
                     buffer_.clear();
                     state_ = path_state::expect_comma_or_right_bracket;
                     break;
@@ -962,7 +983,7 @@ public:
         {
         case path_state::unquoted_name: 
             {
-                apply_unquoted_string(buffer_);
+                apply_unquoted_string(buffer_, temp_json_values);
                 transfer_nodes();
             }
             break;
@@ -1009,19 +1030,19 @@ public:
         start_ = 0;
     }
 
-    void apply_unquoted_string(const string_view_type& name)
+    void apply_unquoted_string(const string_view_type& name, std::vector<std::unique_ptr<Json>>& temp_json_values)
     {
         if (name.length() > 0)
         {
             for (size_t i = 0; i < stack_.back().size(); ++i)
             {
-                apply_unquoted_string(stack_.back()[i].path, *(stack_.back()[i].val_ptr), name);
+                apply_unquoted_string(stack_.back()[i].path, *(stack_.back()[i].val_ptr), name, temp_json_values);
             }
         }
         buffer_.clear();
     }
 
-    void apply_unquoted_string(const string_type& path, reference val, const string_view_type& name)
+    void apply_unquoted_string(const string_type& path, reference val, const string_view_type& name, std::vector<std::unique_ptr<Json>>& temp_json_values)
     {
         if (val.is_object())
         {
@@ -1035,7 +1056,7 @@ public:
                 {
                     if (it->value().is_object() || it->value().is_array())
                     {
-                        apply_unquoted_string(path, it->value(), name);
+                        apply_unquoted_string(path, it->value(), name, temp_json_values);
                     }
                 }
             }
@@ -1053,9 +1074,9 @@ public:
             }
             else if (name == length_literal() && val.size() > 0)
             {
-                auto temp = std::make_shared<Json>(val.size());
-                temp_json_values_.push_back(temp);
+                auto temp = std::make_unique<Json>(val.size());
                 nodes_.emplace_back(PathCons()(path,name),temp.get());
+                temp_json_values.emplace_back(std::move(temp));
             }
             if (recursive_descent_)
             {
@@ -1063,7 +1084,7 @@ public:
                 {
                     if (it->is_object() || it->is_array())
                     {
-                        apply_unquoted_string(path, *it, name);
+                        apply_unquoted_string(path, *it, name, temp_json_values);
                     }
                 }
             }
@@ -1077,40 +1098,41 @@ public:
                 auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), pos);
                 if (sequence.length() > 0)
                 {
-                    auto temp = std::make_shared<Json>(sequence.begin(),sequence.length());
-                    temp_json_values_.push_back(temp);
+                    auto temp = std::make_unique<Json>(sequence.begin(),sequence.length());
                     nodes_.emplace_back(PathCons()(path,pos),temp.get());
+                    temp_json_values.push_back(std::move(temp));
                 }
             }
             else if (name == length_literal() && sv.size() > 0)
             {
                 size_t count = unicons::u32_length(sv.begin(),sv.end());
-                auto temp = std::make_shared<Json>(count);
-                temp_json_values_.push_back(temp);
+                auto temp = std::make_unique<Json>(count);
                 nodes_.emplace_back(PathCons()(path,name),temp.get());
+                temp_json_values.push_back(std::move(temp));
             }
         }
     }
 
-    void apply_selectors()
+    void apply_selectors(std::vector<std::unique_ptr<Json>>& temp_json_values)
     {
         if (selectors_.size() > 0)
         {
             for (size_t i = 0; i < stack_.back().size(); ++i)
             {
                 node_type& node = stack_.back()[i];
-                apply_selectors(node, node.path, *(node.val_ptr));
+                apply_selectors(node, node.path, *(node.val_ptr), temp_json_values);
             }
             selectors_.clear();
         }
         transfer_nodes();
     }
 
-    void apply_selectors(node_type& node, const string_type& path, reference val)
+    void apply_selectors(node_type& node, const string_type& path, reference val,
+                         std::vector<std::unique_ptr<Json>>& temp_json_values)
     {
         for (const auto& selector : selectors_)
         {
-            selector->select(node, path, val, nodes_, temp_json_values_);
+            selector->select(node, path, val, nodes_, temp_json_values);
         }
         if (recursive_descent_)
         {
@@ -1120,7 +1142,7 @@ public:
                 {
                     if (nvp.value().is_object() || nvp.value().is_array())
                     {                        
-                        apply_selectors(node,PathCons()(path,nvp.key()),nvp.value());
+                        apply_selectors(node,PathCons()(path,nvp.key()),nvp.value(), temp_json_values);
                     }
                 }
             }
@@ -1130,7 +1152,7 @@ public:
                 {
                     if (elem.is_object() || elem.is_array())
                     {
-                        apply_selectors(node,path, elem);
+                        apply_selectors(node,path, elem, temp_json_values);
                     }
                 }
             }

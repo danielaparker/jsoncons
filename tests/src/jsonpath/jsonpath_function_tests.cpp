@@ -62,7 +62,18 @@ TEST_CASE("jsonpath function tests")
     SECTION("identity function")
     {
         json result = json_query(store,"myfunc($.store.book)[0]");
-        std::cout << pretty_print(result) << "\n";
+        //std::cout << pretty_print(result) << "\n";
+
+        json expected = json::parse(R"(
+        {
+            "author": "Nigel Rees",
+            "category": "reference",
+            "price": 8.95,
+            "title": "Sayings of the Century"
+        })");
+
+        REQUIRE(result.size() == 1);
+        CHECK(result[0] == expected);
     }
 }
 

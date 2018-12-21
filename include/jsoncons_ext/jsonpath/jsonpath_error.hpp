@@ -12,7 +12,7 @@
 
 namespace jsoncons { namespace jsonpath {
 
-enum class jsonpath_parser_errc 
+enum class jsonpath_errc 
 {
     ok = 0,
     expected_root = 1,
@@ -27,7 +27,8 @@ enum class jsonpath_parser_errc
     invalid_filter_expected_primary = 10,
     expected_index = 11,
     expected_left_bracket_token = 12,
-    unexpected_operator = 13
+    unexpected_operator = 13,
+    invalid_function_name = 14
 };
 
 class jsonpath_error_category_impl
@@ -40,32 +41,34 @@ public:
     }
     std::string message(int ev) const override
     {
-        switch (static_cast<jsonpath_parser_errc>(ev))
+        switch (static_cast<jsonpath_errc>(ev))
         {
-        case jsonpath_parser_errc::expected_root:
+        case jsonpath_errc::expected_root:
             return "Expected $";
-        case jsonpath_parser_errc::expected_right_bracket:
+        case jsonpath_errc::expected_right_bracket:
             return "Expected ]";
-        case jsonpath_parser_errc::expected_name:
+        case jsonpath_errc::expected_name:
             return "Expected a name following a dot";
-        case jsonpath_parser_errc::expected_index:
+        case jsonpath_errc::expected_index:
             return "Expected index";
-        case jsonpath_parser_errc::expected_separator:
+        case jsonpath_errc::expected_separator:
             return "Expected dot or left bracket separator";
-        case jsonpath_parser_errc::invalid_filter:
+        case jsonpath_errc::invalid_filter:
             return "Invalid path filter";
-        case jsonpath_parser_errc::invalid_filter_expected_slash:
+        case jsonpath_errc::invalid_filter_expected_slash:
             return "Invalid path filter, expected '/'";
-        case jsonpath_parser_errc::invalid_filter_unbalanced_paren:
+        case jsonpath_errc::invalid_filter_unbalanced_paren:
             return "Invalid path filter, unbalanced parenthesis";
-        case jsonpath_parser_errc::invalid_filter_unsupported_operator:
+        case jsonpath_errc::invalid_filter_unsupported_operator:
             return "Unsupported operator";
-        case jsonpath_parser_errc::invalid_filter_expected_right_brace:
+        case jsonpath_errc::invalid_filter_expected_right_brace:
             return "Invalid path filter, expected right brace }";
-        case jsonpath_parser_errc::invalid_filter_expected_primary:
+        case jsonpath_errc::invalid_filter_expected_primary:
             return "Invalid path filter, expected primary expression.";
-        case jsonpath_parser_errc::expected_left_bracket_token:
+        case jsonpath_errc::expected_left_bracket_token:
             return "Expected ?,',\",0-9,*";
+        case jsonpath_errc::invalid_function_name:
+            return "Invalid function name";
         default:
             return "Unknown jsonpath parser error";
         }
@@ -80,7 +83,7 @@ const std::error_category& jsonpath_error_category()
 }
 
 inline 
-std::error_code make_error_code(jsonpath_parser_errc result)
+std::error_code make_error_code(jsonpath_errc result)
 {
     return std::error_code(static_cast<int>(result),jsonpath_error_category());
 }
@@ -89,7 +92,7 @@ std::error_code make_error_code(jsonpath_parser_errc result)
 
 namespace std {
     template<>
-    struct is_error_code_enum<jsoncons::jsonpath::jsonpath_parser_errc> : public true_type
+    struct is_error_code_enum<jsoncons::jsonpath::jsonpath_errc> : public true_type
     {
     };
 }
