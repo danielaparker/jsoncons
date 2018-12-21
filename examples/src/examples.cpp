@@ -518,8 +518,6 @@ int main()
 
         parse_error_example();
 
-        type_extensibility_examples();
-
         type_extensibility_examples2();
 
         json_filter_examples();
@@ -569,6 +567,8 @@ int main()
         bson_examples();
 
         cbor_examples();
+
+        type_extensibility_examples();
     }
     catch (const std::exception& e)
     {

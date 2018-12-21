@@ -327,4 +327,47 @@ TEST_CASE("test_from_stl_container")
     CHECK(true == j_ummap.find("three")->value().as<bool>());
 }
 
+//own vector will always be of an even length 
+struct own_vector : std::vector<int64_t> { using  std::vector<int64_t>::vector; };
 
+namespace jsoncons {
+template<class Json>
+struct json_type_traits<Json, own_vector> {
+	static bool is(const Json& j) noexcept
+    { 
+        return j.is_object() && j.size() % 2 == 0;
+    }
+	static own_vector as(const Json& j)
+    {   
+        own_vector v;
+        for (auto& item : j.object_range())
+        {
+            std::string s(item.key());
+            v.push_back(std::strtol(s.c_str(),nullptr,10));
+            v.push_back(item.value().as<int64_t>());
+        }
+        return v;
+    }
+	static Json to_json(const own_vector& val){
+		Json j;
+		for(size_t i=0;i<val.size();i+=2){
+			j[std::to_string(val[i])] = val[i + 1];
+		}
+		return j;
+	}
+};
+
+template <> 
+struct is_json_type_traits_impl<own_vector> : public std::true_type 
+{}; 
+} // jsoncons
+
+TEST_CASE("own_vector json_type_traits")
+{
+    json j = json::object{ {"1",2},{"3",4} };
+    REQUIRE(j.is<own_vector>());
+    auto v = j.as<own_vector>();
+    REQUIRE(v.size() == 4);
+    json j2 = v;
+    CHECK(j2 == j);
+}

@@ -1,12 +1,11 @@
 // Copyright 2016 Daniel Parker
 // Distributed under Boost license
 
+#include <cassert>
 #include <string>
 #include <vector>
 #include <list>
 #include <jsoncons/json.hpp>
-
-using namespace jsoncons;
 
 struct book
 {
@@ -44,11 +43,11 @@ namespace jsoncons
             return j;
         }
     };
-};
+} // jsoncons
 
-void type_extensibility_examples()
+void book_extensibility_example()
 {
-    std::cout << "\nType extensibility examples\n\n";
+    using jsoncons::json;
 
     book book1{"Haruki Murakami", "Kafka on the Shore", 25.17};
 
@@ -83,7 +82,63 @@ void type_extensibility_examples()
                   << b.title << ", " 
                   << b.price << std::endl;
     }
+}
+
+//own vector will always be of an even length 
+struct own_vector : std::vector<int64_t> { using  std::vector<int64_t>::vector; };
+
+namespace jsoncons {
+
+template<class Json>
+struct json_type_traits<Json, own_vector> {
+	static bool is(const Json& j) noexcept
+    { 
+        return j.is_object() && j.size() % 2 == 0;
+    }
+	static own_vector as(const Json& j)
+    {   
+        own_vector v;
+        for (auto& item : j.object_range())
+        {
+            std::string s(item.key());
+            v.push_back(std::strtol(s.c_str(),nullptr,10));
+            v.push_back(item.value().as<int64_t>());
+        }
+        return v;
+    }
+	static Json to_json(const own_vector& val){
+		Json j;
+		for(size_t i=0;i<val.size();i+=2){
+			j[std::to_string(val[i])] = val[i + 1];
+		}
+		return j;
+	}
+};
+
+template <> 
+struct is_json_type_traits_impl<own_vector> : public std::true_type 
+{}; 
+} // jsoncons
+
+void own_vector_extensibility_example()
+{
+    using jsoncons::json;
+
+    json j = json::object{ {"1",2},{"3",4} };
+    assert(j.is<own_vector>());
+    auto v = j.as<own_vector>();
+    json j2 = v;
+
+    std::cout << j2 << "\n";
+}
+
+void type_extensibility_examples()
+{
+    std::cout << "\nType extensibility examples\n\n";
+
+    book_extensibility_example();
+
+    own_vector_extensibility_example();
 
     std::cout << std::endl;
 }
-

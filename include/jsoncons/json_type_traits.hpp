@@ -25,6 +25,10 @@
 
 namespace jsoncons {
 
+template <class T>
+struct is_json_type_traits_impl : public std::false_type
+{};
+
 // json_type_traits
 
 template <class Json, class T, class Enable=void>
@@ -35,6 +39,16 @@ struct json_type_traits
     static constexpr bool is(const Json&)
     {
         return false;
+    }
+
+    static T as(const Json&)
+    {
+        static_assert("as not implemented");
+    }
+
+    static Json to_json(const T&, allocator_type allocator=allocator_type())
+    {
+        static_assert("to_json not implemented");
     }
 };
 
@@ -509,7 +523,7 @@ struct json_type_traits<Json, std::vector<bool>::reference>
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<jsoncons::detail::is_compatible_array_type<Json,T>::value>::type>
+                        typename std::enable_if<!is_json_type_traits_impl<T>::value && jsoncons::detail::is_compatible_array_type<Json,T>::value>::type>
 {
     typedef typename std::iterator_traits<typename T::iterator>::value_type element_type;
     typedef typename Json::allocator_type allocator_type;
@@ -605,7 +619,7 @@ struct json_type_traits<Json, T,
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<jsoncons::detail::is_compatible_string_type<Json,T>::value>::type>
+                        typename std::enable_if<!is_json_type_traits_impl<T>::value && jsoncons::detail::is_compatible_string_type<Json,T>::value>::type>
 {
     typedef typename Json::allocator_type allocator_type;
 
@@ -632,7 +646,7 @@ struct json_type_traits<Json, T,
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<jsoncons::detail::is_compatible_string_view_type<Json,T>::value>::type>
+                        typename std::enable_if<!is_json_type_traits_impl<T>::value && jsoncons::detail::is_compatible_string_view_type<Json,T>::value>::type>
 {
     typedef typename Json::allocator_type allocator_type;
 
@@ -659,7 +673,7 @@ struct json_type_traits<Json, T,
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<jsoncons::detail::is_compatible_object_type<Json,T>::value>::type
+                        typename std::enable_if<!is_json_type_traits_impl<T>::value && jsoncons::detail::is_compatible_object_type<Json,T>::value>::type
 >
 {
     typedef typename T::mapped_type mapped_type;
