@@ -7,6 +7,8 @@
 #include <jsoncons/json_type_traits.hpp>
 ```
 
+The default definition provided by the `jsoncons` library is
+
 ```c++
 template <class Json, class T, class Enable=void>
 struct json_type_traits
