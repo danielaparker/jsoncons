@@ -709,7 +709,7 @@ public:
         std::vector<std::unique_ptr<Json>>& temp_json_values) override
     {
         jsonpath_evaluator<Json,const Json&,VoidPathConstructor<Json>> evaluator;
-        evaluator.evaluate(context_node,path_,temp_json_values);
+        evaluator.evaluate(context_node, path_, temp_json_values);
         nodes_ = evaluator.get_values();
     }
 
@@ -1023,7 +1023,7 @@ public:
     {
         try
         {
-            auto t = evaluate(context_node,tokens_, temp_json_values);
+            auto t = evaluate(context_node, tokens_, temp_json_values);
 
             return t.operand().evaluate_single_node();
 
@@ -1368,7 +1368,7 @@ public:
                                 {
                                     // path, parse against root, get value
                                     jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
-                                    evaluator.evaluate(root,buffer.data(),buffer.length(), temp_json_values);
+                                    evaluator.evaluate(root, buffer, temp_json_values);
                                     auto result = evaluator.get_values();
                                     add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(result)));
                                 }

@@ -35,13 +35,13 @@ Json json_query(const Json& root, const typename Json::string_view_type& path, r
     if (result_t == result_type::value)
     {
         jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
-        evaluator.evaluate(root,path.data(),path.length(),temp_json_values);
+        evaluator.evaluate(root, path, temp_json_values);
         return evaluator.get_values();
     }
     else
     {
         jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
-        evaluator.evaluate(root,path.data(),path.length(), temp_json_values);
+        evaluator.evaluate(root, path, temp_json_values);
         return evaluator.get_normalized_paths();
     }
 }
@@ -51,7 +51,7 @@ void json_replace(Json& root, const typename Json::string_view_type& path, T&& n
 {
     std::vector<std::unique_ptr<Json>> temp_json_values;
     jsoncons::jsonpath::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
-    evaluator.evaluate(root,path.data(),path.length(),temp_json_values);
+    evaluator.evaluate(root, path, temp_json_values);
     evaluator.replace(std::forward<T>(new_value));
 }
 
@@ -484,22 +484,20 @@ public:
 
     void evaluate(reference root, const string_view_type& path, std::vector<std::unique_ptr<Json>>& temp_json_values)
     {
-        evaluate(root,path.data(),path.length(), temp_json_values);
-    }
-    void evaluate(reference root, const char_type* path, std::vector<std::unique_ptr<Json>>& temp_json_values)
-    {
-        evaluate(root,path,char_traits_type::length(path), temp_json_values);
-    }
-
-    void evaluate(reference root, const char_type* path, size_t length, 
-                  std::vector<std::unique_ptr<Json>>& temp_json_values)
-    {
         std::error_code ec;
-        evaluate(root, path, length, temp_json_values, ec);
+        evaluate(root, path.data(), path.length(), temp_json_values, ec);
         if (ec)
         {
-            throw serialization_error(ec,line_,column_);
+            throw serialization_error(ec, line_, column_);
         }
+    }
+
+    void evaluate(reference root, 
+                  const string_view_type& path, 
+                  std::vector<std::unique_ptr<Json>>& temp_json_values, 
+                  std::error_code& ec)
+    {
+        evaluate(root, path.data(), path.length(), temp_json_values, ec);
     }
 
     void evaluate(reference root, 
@@ -605,7 +603,11 @@ public:
                 case ')':
                 {
                     jsonpath_evaluator<Json, JsonReference, PathCons> evaluator;
-                    evaluator.evaluate(root, buffer_.data(), buffer_.length(), temp_json_values);
+                    evaluator.evaluate(root, buffer_, temp_json_values, ec);
+                    if (ec)
+                    {
+                        return;
+                    }
 
                     //std::cout << function_name << "\n";
                     //std::cout << buffer_ << "\n";
