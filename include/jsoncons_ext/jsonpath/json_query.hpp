@@ -674,7 +674,7 @@ public:
                     case '@':
                     {
                         string_type s;
-                        s.push_back('$');
+                        s.push_back(*p_);
                         node_set v;
                         v.emplace_back(std::move(s),std::addressof(root));
                         stack_.push_back(v);
@@ -737,11 +737,11 @@ public:
                     }
                     auto result = it->second(evaluator.get_pointers(), temp_json_values);
                     string_type s;
-                    s.push_back('$');
+                    s.push_back(*p_);
                     node_set v;
                     for (size_t i = 0; i < result.size(); ++i)
                     {
-                        v.emplace_back(PathCons()("$",i),result[i]);
+                        v.emplace_back(PathCons()(s,i),result[i]);
                     }
                     stack_.push_back(v);
 
