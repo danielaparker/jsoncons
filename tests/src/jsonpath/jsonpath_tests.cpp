@@ -457,7 +457,7 @@ TEST_CASE("test_jsonpath_book_isbn")
         bool has_isbn = books[i].contains("isbn");
         if (has_isbn)
         {
-            json result = json_query(books[i],"@.isbn");
+            json result = json_query(books[i],"$.isbn");
             json expected = json::array();
             expected.push_back(books[i]["isbn"]);
             CHECK(result == expected);
@@ -478,7 +478,7 @@ TEST_CASE("test_jsonpath_book_empty_isbn")
         bool has_isbn = books[i].contains("isbn");
         if (has_isbn)
         {
-            json result = json_query(books[i],"@.isbn");
+            json result = json_query(books[i],"$.isbn");
             json expected = json::array();
             expected.push_back(books[i]["isbn"]);
             CHECK(result == expected);
@@ -527,7 +527,7 @@ TEST_CASE("test_jsonpath_book_category")
 {
     json root = json::parse(jsonpath_fixture::book_text());
 
-    json result = json_query(root,"@.category");
+    json result = json_query(root,"$.category");
 
     CHECK(1 == result.size());
     CHECK("reference" == result[0].as<std::string>());
