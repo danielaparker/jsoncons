@@ -425,11 +425,7 @@ private:
                 count_literal<char_type>(),[](const std::vector<pointer>& nodes)
                       {
                           uint64_t count = 0;
-                          for (auto& node : nodes)
-                          {
-                              ++count;
-                          }
-                          return Json(count);
+                          return Json(nodes.size());
                       }
             },
             {
