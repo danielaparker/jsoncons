@@ -19,7 +19,6 @@
 
 namespace jsoncons { namespace jsonpath {
 
-JSONCONS_DEFINE_LITERAL(count_literal,"count")
 JSONCONS_DEFINE_LITERAL(max_literal,"max")
 JSONCONS_DEFINE_LITERAL(min_literal,"min")
 JSONCONS_DEFINE_LITERAL(sum_literal,"sum")
@@ -421,13 +420,6 @@ private:
 
         const function_dictionary functions_ =
         {
-            {
-                count_literal<char_type>(),[](const std::vector<pointer>& nodes)
-                      {
-                          uint64_t count = 0;
-                          return Json(nodes.size());
-                      }
-            },
             {
                 max_literal<char_type>(),[](const std::vector<pointer>& nodes)
                       {

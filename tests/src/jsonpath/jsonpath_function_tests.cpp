@@ -59,16 +59,6 @@ TEST_CASE("jsonpath function tests")
     }
     )");
 
-    SECTION("count")
-    {
-        json result = json_query(store,"count($.store.book[*])");
-
-        uint64_t expected = 4;
-
-        REQUIRE(result.size() == 1);
-        CHECK(result[0].as<uint64_t>() == expected);
-    }
-
     SECTION("sum")
     {
         json result = json_query(store,"sum($.store.book[*].price)");

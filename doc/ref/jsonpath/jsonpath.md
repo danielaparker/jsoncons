@@ -98,7 +98,6 @@ The input to a JSONPath function is a JSONPath expression. The output is a JSON 
 
 Function|Description|Result|Example
 ----------|--------|-------|---
-`count`|Provides the number of elements in an array|`uint64_t`|`count($.store.book[*])`
 `max`|Provides the maximum value of an array of numbers|`double`|`max($.store.book[*].price)`
 `min`|Provides the minimum value of an array of numbers|`double`|`min($.store.book[*].price)`
 `sum`|Provides the sum value of an array of numbers|`double`|`$.store.book[?(@.price > sum($.store.book[*].price) / 4)].title`
