@@ -148,6 +148,7 @@ private:
     typedef typename Json::string_view_type string_view_type;
     typedef JsonReference reference;
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
+
     struct node_type
     {
         node_type() = default;
@@ -406,6 +407,105 @@ private:
         }
     };
 
+    class function_table
+    {
+        typedef std::function<std::vector<pointer>(const std::vector<pointer>&,
+                                                   std::vector<std::unique_ptr<Json>>&)> function_type;
+        typedef std::map<string_type,function_type> function_dictionary;
+
+        const function_dictionary functions_ =
+        {
+            {
+                max_literal<char_type>(),[](const std::vector<pointer>& nodes,
+                                            std::vector<std::unique_ptr<Json>>& temp_json_values)
+                      {
+                          std::vector<pointer> result;
+                          double v = std::numeric_limits<double>::lowest();
+                          for (auto& node : nodes)
+                          {
+                              double x = node->template as<double>();
+                              if (x > v)
+                              {
+                                  v = x;
+                              }
+                          }
+                          auto temp = make_unique_ptr<Json>(v);
+                          result.push_back(temp.get());
+                          temp_json_values.push_back(std::move(temp));
+
+                          return result;
+                      }
+            },
+            {
+                min_literal<char_type>(),[](const std::vector<pointer>& nodes,
+                                            std::vector<std::unique_ptr<Json>>& temp_json_values) 
+                      {
+                          std::vector<pointer> result;
+                          double v = (std::numeric_limits<double>::max)(); 
+                          for (const auto& node : nodes)
+                          {
+                              double x = node->template as<double>();
+                              if (x < v)
+                              {
+                                  v = x;
+                              }
+                          }
+                          auto temp = make_unique_ptr<Json>(v);
+                          result.push_back(temp.get());
+                          temp_json_values.push_back(std::move(temp));
+                          return result;
+                      }
+            },
+            {
+                sum_literal<char_type>(),[](const std::vector<pointer>& nodes,
+                                            std::vector<std::unique_ptr<Json>>& temp_json_values)
+                      {
+                          std::vector<pointer> result;
+                          double v = 0.0;
+                          for (const auto& node : nodes)
+                          {
+                              v += node->template as<double>();
+                          }
+                          auto temp = make_unique_ptr<Json>(v);
+                          result.push_back(temp.get());
+                          temp_json_values.push_back(std::move(temp));
+                          return result;
+                      }
+            },
+            {
+                mult_literal<char_type>(),[](const std::vector<pointer>& nodes,
+                                             std::vector<std::unique_ptr<Json>>& temp_json_values)
+                      {
+                          std::vector<pointer> result;
+                          double v = 0.0;
+                          for (const auto& node : nodes)
+                          {
+                              double x = node->template as<double>();
+                              v == 0.0 && x != 0.0
+                              ? (v = x)
+                              : (v *= x);
+
+                          }
+                          auto temp = make_unique_ptr<Json>(v);
+                          result.push_back(temp.get());
+                          temp_json_values.push_back(std::move(temp));
+                          return result;
+                      }
+            }
+        };
+    public:
+
+        typename function_dictionary::const_iterator find(const string_type& key) const
+        {
+            return functions_.find(key);
+        }
+        typename function_dictionary::const_iterator end() const
+        {
+            return functions_.end();
+        }
+    };
+    function_table functions_;
+
     default_parse_error_handler default_err_handler_;
     parse_error_handler *err_handler_;
     path_state state_;
@@ -451,6 +551,21 @@ public:
             for (const auto& p : stack_.back())
             {
                 result.push_back(*(p.val_ptr));
+            }
+        }
+        return result;
+    }
+
+    std::vector<pointer> get_pointers() const
+    {
+        std::vector<pointer> result;
+
+        if (stack_.size() > 0)
+        {
+            result.reserve(stack_.back().size());
+            for (const auto& p : stack_.back())
+            {
+                result.push_back(p.val_ptr);
             }
         }
         return result;
@@ -609,21 +724,22 @@ public:
                         return;
                     }
 
-                    //std::cout << function_name << "\n";
-                    //std::cout << buffer_ << "\n";
-                    // Here you can lookup the function name
-                    // If there is no such function, it's an error
-                    // err_handler_->fatal_error(jsonpath_errc::expected_root, *this);
-                    // ec = jsonpath_errc::invalid_function_name;
-                    // return
-
-                    // identity function
-                    for (node_set& ns : evaluator.stack_)
+                    auto it = functions_.find(function_name);
+                    if (it == functions_.end())
                     {
-                        // ns.val_ptr is a pointer to a Json value in the result set
-                        // So you can call functions ns.val_ptr->is_double() etc.
-                        stack_.push_back(ns);
+                        ec = jsonpath_errc::invalid_filter_unsupported_operator;
+                        return;
                     }
+                    auto result = it->second(evaluator.get_pointers(), temp_json_values);
+                    string_type s;
+                    s.push_back('$');
+                    node_set v;
+                    for (size_t i = 0; i < result.size(); ++i)
+                    {
+                        v.emplace_back(PathCons()("$",i),result[i]);
+                    }
+                    stack_.push_back(v);
+
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 }

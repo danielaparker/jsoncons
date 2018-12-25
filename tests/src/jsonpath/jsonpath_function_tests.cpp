@@ -59,21 +59,44 @@ TEST_CASE("jsonpath function tests")
     }
     )");
 
-    SECTION("identity function")
+    SECTION("sum")
     {
-        json result = json_query(store,"myfunc($.store.book)[0]");
-        //std::cout << pretty_print(result) << "\n";
+        json result = json_query(store,"sum($.store.book[*].price)");
 
-        json expected = json::parse(R"(
-        {
-            "author": "Nigel Rees",
-            "category": "reference",
-            "price": 8.95,
-            "title": "Sayings of the Century"
-        })");
+        double expected = 53.92;
 
         REQUIRE(result.size() == 1);
-        CHECK(result[0] == expected);
+        CHECK(result[0].as<double>() == Approx(expected).epsilon(0.000001));
+    }
+
+    SECTION("mult")
+    {
+        json result = json_query(store,"mult($.store.book[*].price)");
+
+        double expected = 24028.731766049998;
+
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<double>() == Approx(expected).epsilon(0.000001));
+    }
+
+    SECTION("min")
+    {
+        json result = json_query(store,"min($.store.book[*].price)");
+
+        double expected = 8.95;
+
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<double>() == Approx(expected).epsilon(0.000001));
+    }
+
+    SECTION("max")
+    {
+        json result = json_query(store,"max($.store.book[*].price)");
+
+        double expected = 22.99;
+
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<double>() == Approx(expected).epsilon(0.000001));
     }
 }
 
