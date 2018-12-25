@@ -170,7 +170,8 @@ size_t get_length(Source& source, std::error_code& ec)
                 ec = cbor_errc::unexpected_eof;
                 return 0;
             }
-            length = jsoncons::detail::from_big_endian<uint64_t>(buf,buf+sizeof(buf),&endp);
+            // Silence vs warning about conversion of uint64_t to size_t for x86 builds
+            length = (size_t)jsoncons::detail::from_big_endian<uint64_t>(buf,buf+sizeof(buf),&endp);
             break;
         }
         case additional_info::indefinite_length: 

@@ -114,8 +114,8 @@ struct conversion_traits<std::array<T,N>>
     template <class CharT>
     static std::array<T, N> decode(basic_staj_reader<CharT>& reader, std::error_code& ec)
     {
-        
         std::array<T,N> v;
+        v.fill(T{});
         basic_staj_array_iterator<CharT,value_type> end;
         basic_staj_array_iterator<CharT,value_type> it(reader, ec);
 
