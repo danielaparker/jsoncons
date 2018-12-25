@@ -482,7 +482,6 @@ TEST_CASE("test_jsonpath_filter_uni")
     auto result1 = res.eval(parent, temp_json_values);
 
     //std::cout << (int)result1.data_type() << std::endl;
-    std::cout << "result1=" << result1 << std::endl;
     CHECK(result1 == json(0));
 
     CHECK(json(0) == result1);

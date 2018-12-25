@@ -274,7 +274,6 @@ class token
     token_type type_;
     size_t precedence_level_;
     bool is_right_associative_;
-    bool is_aggregate_;
     std::shared_ptr<term<Json>> operand_ptr_;
     std::function<Json(const term<Json>&)> unary_operator_;
     std::function<Json(const term<Json>&, const term<Json>&)> operator_;
@@ -293,11 +292,11 @@ public:
     }
 
     token(token_type type)
-        : type_(type),precedence_level_(0),is_right_associative_(false),is_aggregate_(false)
+        : type_(type),precedence_level_(0),is_right_associative_(false)
     {
     }
     token(token_type type, std::shared_ptr<term<Json>> term_ptr)
-        : type_(type),precedence_level_(0),is_right_associative_(false),is_aggregate_(false),operand_ptr_(term_ptr)
+        : type_(type),precedence_level_(0),is_right_associative_(false),operand_ptr_(term_ptr)
     {
     }
     token(size_t precedence_level, 
@@ -306,7 +305,6 @@ public:
         : type_(token_type::unary_operator), 
           precedence_level_(precedence_level), 
           is_right_associative_(is_right_associative),
-          is_aggregate_(false), 
           unary_operator_(unary_operator)
     {
     }
@@ -314,16 +312,13 @@ public:
         : type_(token_type::binary_operator), 
           precedence_level_(properties.precedence_level), 
           is_right_associative_(properties.is_right_associative),
-          is_aggregate_(false), 
           operator_(properties.op)
     {
     }
 
     token(const token& t) = default;
-    //token(token&& t) = default;
 
     token<Json>& operator=(const token<Json>& val) = default;
-    //token<Json>& operator=(token<Json>&& val) = default;
 
     bool is_operator() const
     {
@@ -363,11 +358,6 @@ public:
     bool is_right_associative() const
     {
         return is_right_associative_;
-    }
-
-    bool is_aggregate() const
-    {
-        return is_aggregate_;
     }
 
     const term<Json>& operand()
@@ -522,9 +512,12 @@ class value_term final : public term<Json>
 {
     Json value_;
 public:
-    template <class T>
-    value_term(const T& val)
+    value_term(const Json& val)
         : value_(val)
+    {
+    }
+    value_term(Json&& val)
+        : value_(std::move(val))
     {
     }
 
@@ -964,7 +957,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens, std:
             auto rhs = stack.back();
             stack.pop_back();
             Json val = t(rhs.operand());
-            stack.push_back(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(val)));
+            stack.push_back(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
         }
         else if (t.is_binary_operator())
         {
@@ -973,7 +966,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens, std:
             auto lhs = stack.back();
             stack.pop_back();
             Json val = t(lhs.operand(), rhs.operand());
-            stack.push_back(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(val)));
+            stack.push_back(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
         }
     }
     if (stack.size() != 1)
@@ -1290,7 +1283,7 @@ public:
                                 if (result.size() > 0)
                                 {
                                     add_token(token<Json>(token_type::operand,
-                                                          std::make_shared<value_term<Json>>(result[0])) // revisit this value_term
+                                                          std::make_shared<value_term<Json>>(std::move(result[0]))) // revisit this value_term
                                               );
                                 }
                             }
@@ -1369,7 +1362,7 @@ public:
                             try
                             {
                                 auto val = Json::parse(buffer);
-                                add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(val)));
+                                add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
                             }
                             catch (const serialization_error& e)
                             {
@@ -1404,7 +1397,7 @@ public:
                                 try
                                 {
                                     auto val = Json::parse(buffer);
-                                    add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(val)));
+                                    add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
                                 }
                                 catch (const serialization_error& e)
                                 {
@@ -1424,7 +1417,7 @@ public:
                             try
                             {
                                 auto val = Json::parse(buffer);
-                                add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(val)));
+                                add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
                             }
                             catch (const serialization_error& e)
                             {
@@ -1472,7 +1465,7 @@ public:
                             try
                             {
                                 auto val = Json::parse(buffer);
-                                add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(val)));
+                                add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
                             }
                             catch (const serialization_error& e)
                             {
@@ -1506,19 +1499,16 @@ public:
                         break;
                     case '\"':
                         buffer.push_back(*p);
-                        //if (buffer.length() > 0)
+                        try
                         {
-                            try
-                            {
-                                auto val = Json::parse(buffer);
-                                add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(val)));
-                            }
-                            catch (const serialization_error& e)
-                            {
-                                throw serialization_error(e.code(),line_,column_);
-                            }
-                            buffer.clear();
+                            auto val = Json::parse(buffer);
+                            add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
                         }
+                        catch (const serialization_error& e)
+                        {
+                            throw serialization_error(e.code(),line_,column_);
+                        }
+                        buffer.clear();
                         state = filter_state::expect_path_or_value_or_unary_op;
                         break;
 
