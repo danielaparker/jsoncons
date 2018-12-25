@@ -414,17 +414,14 @@ private:
 
     class function_table
     {
-        typedef std::function<std::vector<pointer>(const std::vector<pointer>&,
-                                                   std::vector<std::unique_ptr<Json>>&)> function_type;
+        typedef std::function<Json(const std::vector<pointer>&)> function_type;
         typedef std::map<string_type,function_type> function_dictionary;
 
         const function_dictionary functions_ =
         {
             {
-                max_literal<char_type>(),[](const std::vector<pointer>& nodes,
-                                            std::vector<std::unique_ptr<Json>>& temp_json_values)
+                max_literal<char_type>(),[](const std::vector<pointer>& nodes)
                       {
-                          std::vector<pointer> result;
                           double v = std::numeric_limits<double>::lowest();
                           for (auto& node : nodes)
                           {
@@ -434,16 +431,11 @@ private:
                                   v = x;
                               }
                           }
-                          auto temp = make_unique_ptr<Json>(v);
-                          result.push_back(temp.get());
-                          temp_json_values.push_back(std::move(temp));
-
-                          return result;
+                          return Json(v);
                       }
             },
             {
-                min_literal<char_type>(),[](const std::vector<pointer>& nodes,
-                                            std::vector<std::unique_ptr<Json>>& temp_json_values) 
+                min_literal<char_type>(),[](const std::vector<pointer>& nodes) 
                       {
                           std::vector<pointer> result;
                           double v = (std::numeric_limits<double>::max)(); 
@@ -455,15 +447,11 @@ private:
                                   v = x;
                               }
                           }
-                          auto temp = make_unique_ptr<Json>(v);
-                          result.push_back(temp.get());
-                          temp_json_values.push_back(std::move(temp));
-                          return result;
+                          return Json(v);
                       }
             },
             {
-                sum_literal<char_type>(),[](const std::vector<pointer>& nodes,
-                                            std::vector<std::unique_ptr<Json>>& temp_json_values)
+                sum_literal<char_type>(),[](const std::vector<pointer>& nodes)
                       {
                           std::vector<pointer> result;
                           double v = 0.0;
@@ -471,15 +459,11 @@ private:
                           {
                               v += node->template as<double>();
                           }
-                          auto temp = make_unique_ptr<Json>(v);
-                          result.push_back(temp.get());
-                          temp_json_values.push_back(std::move(temp));
-                          return result;
+                          return Json(v);
                       }
             },
             {
-                mult_literal<char_type>(),[](const std::vector<pointer>& nodes,
-                                             std::vector<std::unique_ptr<Json>>& temp_json_values)
+                mult_literal<char_type>(),[](const std::vector<pointer>& nodes)
                       {
                           std::vector<pointer> result;
                           double v = 0.0;
@@ -491,10 +475,7 @@ private:
                               : (v *= x);
 
                           }
-                          auto temp = make_unique_ptr<Json>(v);
-                          result.push_back(temp.get());
-                          temp_json_values.push_back(std::move(temp));
-                          return result;
+                          return Json(v);
                       }
             }
         };
@@ -735,14 +716,14 @@ public:
                         ec = jsonpath_errc::invalid_filter_unsupported_operator;
                         return;
                     }
-                    auto result = it->second(evaluator.get_pointers(), temp_json_values);
+                    auto result = it->second(evaluator.get_pointers());
+
                     string_type s;
-                    s.push_back(*p_);
+                    s.push_back('$');
                     node_set v;
-                    for (size_t i = 0; i < result.size(); ++i)
-                    {
-                        v.emplace_back(PathCons()(s,i),result[i]);
-                    }
+                    auto temp = make_unique_ptr<Json>(std::move(result));
+                    v.emplace_back(std::move(s),temp.get());
+                    temp_json_values.push_back(std::move(temp));
                     stack_.push_back(v);
 
                     state_ = path_state::expect_dot_or_left_bracket;
