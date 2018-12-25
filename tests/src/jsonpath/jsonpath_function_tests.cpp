@@ -98,6 +98,19 @@ TEST_CASE("jsonpath function tests")
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<double>() == Approx(expected).epsilon(0.000001));
     }
+
+    SECTION("max in filter")
+    {
+        std::string path = "$.store.book[?(@.price < max($.store.book[*].price))].title";
+
+        json expected = json::parse(R"(
+    ["Sayings of the Century","Sword of Honour","Moby Dick"]
+        )");
+
+        json result = json_query(store,path);
+
+        CHECK(result == expected);
+    }
 }
 
 

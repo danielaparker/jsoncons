@@ -33,10 +33,6 @@ JSONCONS_DEFINE_LITERAL(eq_literal,"==")
 JSONCONS_DEFINE_LITERAL(ne_literal,"!=")
 JSONCONS_DEFINE_LITERAL(ampamp_literal,"&&")
 JSONCONS_DEFINE_LITERAL(pipepipe_literal,"||")
-JSONCONS_DEFINE_LITERAL(max_literal,"max")
-JSONCONS_DEFINE_LITERAL(min_literal,"min")
-JSONCONS_DEFINE_LITERAL(sum_literal,"sum")
-JSONCONS_DEFINE_LITERAL(mult_literal,"mult")
 
 template<class Json>
 struct PathConstructor
@@ -118,6 +114,7 @@ enum class filter_state
     value,
     oper,
     function_argument,
+    function_path_argument,
     done
 };
 
@@ -272,17 +269,6 @@ struct operator_properties
 };
 
 template <class Json>
-struct function_properties
-{
-    typedef std::function<Json(const term<Json>&)> function_type;
-
-    size_t precedence_level;
-    bool is_right_associative;
-    bool is_aggregate;
-    function_type op;
-};
-
-template <class Json>
 class token
 {
     token_type type_;
@@ -332,14 +318,7 @@ public:
           operator_(properties.op)
     {
     }
-    token(const function_properties<Json>& properties)
-        : type_(token_type::unary_operator), 
-          precedence_level_(properties.precedence_level), 
-          is_right_associative_(properties.is_right_associative), 
-          is_aggregate_(properties.is_aggregate),
-          unary_operator_(properties.op)
-    {
-    }
+
     token(const token& t) = default;
     //token(token&& t) = default;
 
@@ -1064,94 +1043,6 @@ class jsonpath_filter_parser
 
     static const operator_properties<Json> op_properties_[];
 
-    class function_table
-    {
-        typedef std::map<string_type,function_properties<Json>> function_dictionary;
-
-        const function_dictionary functions_ =
-        {
-            {
-                max_literal<char_type>(),{1,true,true,[](const term<Json>& term)
-                      {
-                          Json a = term.evaluate_single_node();
-
-                          double v = std::numeric_limits<double>::lowest();
-                          for (const auto& elem : a.array_range())
-                          {
-                              double x = elem.template as<double>();
-                              if (x > v)
-                              {
-                                  v = x;
-                              }
-                          }
-                          return v;
-                      }
-                }
-            },
-            {
-                min_literal<char_type>(),{1,true,true,[](const term<Json>& term) 
-                      {
-                          Json a = term.evaluate_single_node();
-
-                          double v = (std::numeric_limits<double>::max)(); 
-                          for (const auto& elem : a.array_range())
-                          {
-                              double x = elem.template as<double>();
-                              if (x < v)
-                              {
-                                  v = x;
-                              }
-                          }
-                          return v;
-                      }
-                }
-            },
-            {
-                sum_literal<char_type>(),{1,true,true,[](const term<Json>& term)
-                      {
-                          Json a = term.evaluate_single_node();
-
-                          double v = 0.0;
-                          for (const auto& elem : a.array_range())
-                          {
-                              v += elem.template as<double>();
-                          }
-                          return v;
-                      }
-                }
-            },
-            {
-                mult_literal<char_type>(),{1,true,true,[](const term<Json>& term)
-                      {
-                          Json a = term.evaluate_single_node();
-
-                          double v = 0.0;
-                          for (const auto& elem : a.array_range())
-                          {
-                              double x = elem.template as<double>();
-                              v == 0.0 && x != 0.0
-                              ? (v = x)
-                              : (v *= x);
-
-                          }
-                          return v;
-                      }
-                }
-            }
-        };
-
-    public:
-
-        typename function_dictionary::const_iterator find(const string_type& key) const
-        {
-            return functions_.find(key);
-        }
-        typename function_dictionary::const_iterator end() const
-        {
-            return functions_.end();
-        }
-    };
-
     class binary_operator_table
     {
         typedef std::map<string_type,operator_properties<Json>> binary_operator_map;
@@ -1184,7 +1075,6 @@ class jsonpath_filter_parser
         }
     };
 
-    function_table functions_;
     binary_operator_table binary_operators_;
 
 public:
@@ -1359,27 +1249,54 @@ public:
                         break;
                     case ' ':case '\t':
                         break;
+
+                        case '$':
+                            buffer.push_back(*p);
+                            state = filter_state::function_path_argument;
+                            break;
+                    default: 
+                        throw serialization_error(jsonpath_errc::invalid_function_argument,line_,column_);
+                        break;
+                    }
+                    ++p;
+                    ++column_;
+                }
+                break;
+
+                case filter_state::function_path_argument:
+                {
+                    switch (*p)
+                    {
+                    case '\r':
+                        push_state(state);
+                        state = filter_state::cr;
+                        break;
+                    case '\n':
+                        push_state(state);
+                        state = filter_state::lf;
+                        break;
+                    case ' ':case '\t':
+                        break;
                     case ')':
+                        buffer.push_back(*p);
                         if (buffer.length() > 0)
                         {
-                            if (operator_stack_.back().is_aggregate())
+                            try
                             {
-                                try
+                                // path, parse against root, get value
+                                jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
+                                evaluator.evaluate(root, buffer, temp_json_values);
+                                auto result = evaluator.get_values();
+                                if (result.size() > 0)
                                 {
-                                    // path, parse against root, get value
-                                    jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
-                                    evaluator.evaluate(root, buffer, temp_json_values);
-                                    auto result = evaluator.get_values();
-                                    add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(result)));
-                                }
-                                catch (const serialization_error& e)
-                                {
-                                    throw serialization_error(e.code(),line_,column_);
+                                    add_token(token<Json>(token_type::operand,
+                                                          std::make_shared<value_term<Json>>(result[0])) // revisit this value_term
+                                              );
                                 }
                             }
-                            else
+                            catch (const serialization_error& e)
                             {
-                                add_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
+                                throw serialization_error(e.code(),line_,column_);
                             }
                             buffer.clear();
                             state = filter_state::expect_oper_or_right_round_bracket;
@@ -1391,8 +1308,8 @@ public:
                     }
                     ++p;
                     ++column_;
+                    break;
                 }
-                break;
             case filter_state::oper:
                 switch (*p)
                 {
@@ -1446,7 +1363,7 @@ public:
                 {
                     switch (*p)
                     {
-                    case ' ':case '\t':
+                        case ' ':case '\t':
                         if (buffer.length() > 0)
                         {
                             try
@@ -1465,14 +1382,8 @@ public:
                         break; 
                     case '(':
                     {
-                        auto it = functions_.find(buffer);
-                        if (it == functions_.end())
-                        {
-                            throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator,line_,column_);
-                        }
-                        add_token(token<Json>(it->second));
                         state = filter_state::function_argument;
-                        buffer.clear();
+                        buffer.push_back(*p);
                         ++p;
                         ++column_;
                         break;
@@ -1652,7 +1563,7 @@ public:
                     ++column_;
                     break;
                 }
-                case '@':
+                    case '@':
                     buffer.push_back(*p);
                     state = filter_state::path;
                     ++p;

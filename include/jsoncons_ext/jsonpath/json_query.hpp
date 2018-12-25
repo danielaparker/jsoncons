@@ -19,6 +19,11 @@
 
 namespace jsoncons { namespace jsonpath {
 
+JSONCONS_DEFINE_LITERAL(max_literal,"max")
+JSONCONS_DEFINE_LITERAL(min_literal,"min")
+JSONCONS_DEFINE_LITERAL(sum_literal,"sum")
+JSONCONS_DEFINE_LITERAL(mult_literal,"mult")
+
 // std::make_unique not available until C++14
 template<typename T, typename... Args>
 std::unique_ptr<T> make_unique_ptr(Args&&... args)

@@ -28,7 +28,8 @@ enum class jsonpath_errc
     expected_index = 11,
     expected_left_bracket_token = 12,
     unexpected_operator = 13,
-    invalid_function_name = 14
+    invalid_function_name = 14,
+    invalid_function_argument = 15
 };
 
 class jsonpath_error_category_impl
