@@ -39,13 +39,13 @@ Json json_query(const Json& root, const typename Json::string_view_type& path, r
     std::vector<std::unique_ptr<Json>> temp_json_values;
     if (result_t == result_type::value)
     {
-        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
+        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>,'$'> evaluator;
         evaluator.evaluate(root, path, temp_json_values);
         return evaluator.get_values();
     }
     else
     {
-        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
+        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>,'$'> evaluator;
         evaluator.evaluate(root, path, temp_json_values);
         return evaluator.get_normalized_paths();
     }
@@ -55,7 +55,7 @@ template<class Json, class T>
 void json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
 {
     std::vector<std::unique_ptr<Json>> temp_json_values;
-    jsoncons::jsonpath::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
+    jsoncons::jsonpath::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>,'$'> evaluator;
     evaluator.evaluate(root, path, temp_json_values);
     evaluator.replace(std::forward<T>(new_value));
 }
@@ -142,8 +142,9 @@ enum class path_state
 };
 
 template<class Json,
-         class JsonReference=const Json&,
-         class PathCons=PathConstructor<Json>>
+         class JsonReference,
+         class PathCons,
+         char PathStart>
 class jsonpath_evaluator : private serializing_context
 {
 private:
@@ -651,8 +652,7 @@ public:
                 {
                     case ' ':case '\t':
                         break;
-                    case '$':
-                    case '@':
+                    case PathStart:
                     {
                         string_type s;
                         s.push_back(*p_);
@@ -703,7 +703,7 @@ public:
                 {
                 case ')':
                 {
-                    jsonpath_evaluator<Json, JsonReference, PathCons> evaluator;
+                    jsonpath_evaluator<Json,JsonReference,PathCons,'$'> evaluator;
                     evaluator.evaluate(root, buffer_, temp_json_values, ec);
                     if (ec)
                     {
@@ -719,7 +719,7 @@ public:
                     auto result = it->second(evaluator.get_pointers());
 
                     string_type s;
-                    s.push_back('$');
+                    s.push_back(PathStart);
                     node_set v;
                     auto temp = make_unique_ptr<Json>(std::move(result));
                     v.emplace_back(std::move(s),temp.get());

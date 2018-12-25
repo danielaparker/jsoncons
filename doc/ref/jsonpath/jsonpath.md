@@ -92,9 +92,9 @@ Precedence|Operator|Associativity
 7 |`&&`             |Left 
 8 |<code>&#124;&#124;</code>             |Left 
 
-#### Functions
+#### JSONPath Functions
 
-The input to a function is a JSONPath expression. The output is a JSON value.
+The input to a JSONPath function is a JSONPath expression. The output is a JSON value.
 
 Function|Description|Result|Example
 ----------|--------|-------|---
