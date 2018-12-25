@@ -92,15 +92,14 @@ Precedence|Operator|Associativity
 7 |`&&`             |Left 
 8 |<code>&#124;&#124;</code>             |Left 
 
-#### Aggregate Functions
+#### Functions
 
-Functions can be called __*only inside filter expressions*__. The input to an aggregate function is the value of a JSONPath expression.
-There are not much use cases for aggregation functions like `mult()` inside filter expressions but still they could be used, here are examples:
+The input to a function is a JSONPath expression. The output is a JSON value.
 
 Function|Description|Result|Example
 ----------|--------|-------|---
-`min(...)`|Provides the minimum value of an array of numbers|`double`|`$.store.book[?(@.price < max($.store.book[*].price))].title`
-`max(...)`|Provides the maximum value of an array of numbers|`double`|`$.store.book[?(@.price > min($.store.book[*].price))].title`
+`max(...)`|Provides the maximum value of an array of numbers|`double`|`max($.store.book[*].price)`
+`min(...)`|Provides the minimum value of an array of numbers|`double`|`min($.store.book[*].price)`
 `sum(...)`|Provides the sum value of an array of numbers|`double`|`$.store.book[?(@.price > sum($.store.book[*].price) / 4)].title`
 `mult(...)`|Provides the multiplication value of an array of numbers|`double`|`$.store.book[?(479373 < mult($..price) && mult($..price) < 479374)].title`
 
