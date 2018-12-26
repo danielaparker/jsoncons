@@ -61,12 +61,26 @@ TEST_CASE("jsonpath function tests")
 
     SECTION("sum")
     {
-        json result = json_query(store,"sum($.store.book[*].price)");
+        json result = json_query(store,"count($.store.book[*])");
 
-        double expected = 53.92;
+        size_t expected = 4;
 
         REQUIRE(result.size() == 1);
+        CHECK(result[0].as<size_t>() == expected);
+    }
+
+    SECTION("sum")
+    {
+        json result = json_query(store,"sum($.store.book[*].price)");
+        double expected = 53.92;
+        REQUIRE(result.size() == 1);
         CHECK(result[0].as<double>() == Approx(expected).epsilon(0.000001));
+
+        json result2 = json_query(store,"$.store.book[?(@.price > sum($.store.book[*].price) / count($.store.book[*]))].title");
+        std::cout << "result2: " << result2 << "\n";
+        std::string expected2 = "The Lord of the Rings";
+        REQUIRE(result2.size() == 1);
+        CHECK(result2[0].as<std::string>() == expected2);
     }
 
     SECTION("avg")

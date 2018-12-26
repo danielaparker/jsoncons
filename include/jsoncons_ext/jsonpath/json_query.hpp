@@ -24,8 +24,9 @@ JSONCONS_DEFINE_LITERAL(max_literal,"max")
 JSONCONS_DEFINE_LITERAL(min_literal,"min")
 JSONCONS_DEFINE_LITERAL(sum_literal,"sum")
 JSONCONS_DEFINE_LITERAL(mult_literal,"mult")
+JSONCONS_DEFINE_LITERAL(count_literal,"count")
 
-// std::make_unique not available until C++14
+// work around for std::make_unique not being available until C++14
 template<typename T, typename... Args>
 std::unique_ptr<T> make_unique_ptr(Args&&... args)
 {
@@ -466,7 +467,6 @@ private:
             {
                 sum_literal<char_type>(),[](const std::vector<pointer>& nodes)
                       {
-                          std::vector<pointer> result;
                           double v = 0.0;
                           for (const auto& node : nodes)
                           {
@@ -476,9 +476,19 @@ private:
                       }
             },
             {
+                count_literal<char_type>(),[](const std::vector<pointer>& nodes)
+                      {
+                          size_t count = 0;
+                          while (count < nodes.size())
+                          {
+                              ++count;
+                          }
+                          return Json(count);
+                      }
+            },
+            {
                 mult_literal<char_type>(),[](const std::vector<pointer>& nodes)
                       {
-                          std::vector<pointer> result;
                           double v = 0.0;
                           for (const auto& node : nodes)
                           {
