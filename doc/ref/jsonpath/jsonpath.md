@@ -103,7 +103,7 @@ Function|Description|Result|Example
 `count`|Returns the number of items in an array|`double`|`count($.store.book[*])`
 `sum`|Returns the sum value of an array of numbers|`double`|`$.store.book[?(@.price > sum($.store.book[*].price) / count($.store.book[*]))].title`
 `avg`|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.store.book[?(@.price > avg($.store.book[*].price))].title`
-`mult`|Returns the multiplication value of an array of numbers|`double`|`$.store.book[?(479373 < mult($..price) && mult($..price) < 479374)].title`
+`prod`|Returns the product of the elements in an array of numbers.|`double`|`$.store.book[?(479373 < prod($..price) && prod($..price) < 479374)].title`
 
 ### Examples
 

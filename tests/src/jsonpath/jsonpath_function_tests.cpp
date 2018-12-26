@@ -93,9 +93,9 @@ TEST_CASE("jsonpath function tests")
         CHECK(result[0].as<double>() == Approx(expected).epsilon(0.000001));
     }
 
-    SECTION("mult")
+    SECTION("prod")
     {
-        json result = json_query(store,"mult($.store.book[*].price)");
+        json result = json_query(store,"prod($.store.book[*].price)");
 
         double expected = 24028.731766049998;
 

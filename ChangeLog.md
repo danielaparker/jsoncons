@@ -9,8 +9,10 @@ New features
   [#133](https://github.com/danielaparker/jsoncons/issues/133) and 
   [#115](https://github.com/danielaparker/jsoncons/issues/115) (duplicates)
 
-- jsonpath functions on JSONPath expressions are no longer restricted to
-  filter expressions
+- Following a proposal from soberich, jsonpath functions on JSONPath expressions 
+  are no longer restricted to filter expressions.
+
+- New jsonpath functions `sum`, `count`, `avg`, and `prod` have been added.
 
 v0.114.0
 --------

@@ -1174,9 +1174,9 @@ TEST_CASE("test_sum_filter_func")
     CHECK(result == expected);
 }
 
-TEST_CASE("test_mult_func")
+TEST_CASE("test_prod_func")
 {
-    std::string path = "$.store.bicycle[?(479373 < mult($..price) && mult($..price) < 479374)].color";
+    std::string path = "$.store.bicycle[?(479373 < prod($..price) && prod($..price) < 479374)].color";
 
     json expected = json::parse(R"(
 ["red"]

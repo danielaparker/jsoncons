@@ -23,7 +23,7 @@ JSONCONS_DEFINE_LITERAL(avg_literal,"avg")
 JSONCONS_DEFINE_LITERAL(max_literal,"max")
 JSONCONS_DEFINE_LITERAL(min_literal,"min")
 JSONCONS_DEFINE_LITERAL(sum_literal,"sum")
-JSONCONS_DEFINE_LITERAL(mult_literal,"mult")
+JSONCONS_DEFINE_LITERAL(prod_literal,"prod")
 JSONCONS_DEFINE_LITERAL(count_literal,"count")
 
 // work around for std::make_unique not being available until C++14
@@ -487,7 +487,7 @@ private:
                       }
             },
             {
-                mult_literal<char_type>(),[](const std::vector<pointer>& nodes)
+                prod_literal<char_type>(),[](const std::vector<pointer>& nodes)
                       {
                           double v = 0.0;
                           for (const auto& node : nodes)
