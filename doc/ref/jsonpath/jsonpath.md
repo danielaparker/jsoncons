@@ -100,7 +100,7 @@ Function|Description|Result|Example
 ----------|--------|-------|---
 `max`|Returns the maximum value of an array of numbers|`double`|`max($.store.book[*].price)`
 `min`|Returns the minimum value of an array of numbers|`double`|`min($.store.book[*].price)`
-`count`|Returns the number of items in an array|`double`|`count($.store.book[*])`
+`count`|Returns the number of items in an array|`uint64_t`|`count($.store.book[*])`
 `sum`|Returns the sum value of an array of numbers|`double`|`$.store.book[?(@.price > sum($.store.book[*].price) / count($.store.book[*]))].title`
 `avg`|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.store.book[?(@.price > avg($.store.book[*].price))].title`
 `prod`|Returns the product of the elements in an array of numbers.|`double`|`$.store.book[?(479373 < prod($..price) && prod($..price) < 479374)].title`
