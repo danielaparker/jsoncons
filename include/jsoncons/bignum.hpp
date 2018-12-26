@@ -11,6 +11,7 @@
 #include <vector> // std::vector
 #include <iostream>
 #include <climits>
+#include <cassert> // assert
 #include <limits> // std::numeric_limits
 #include <algorithm> // std::max, std::min, std::reverse
 #include <string> // std::string
@@ -64,14 +65,14 @@ private:
     using typename basic_bignum_base<Allocator>::byte_allocator_type;
     using basic_bignum_base<Allocator>::allocator;
 
-    static const uint64_t max_basic_type;
-    static const uint64_t basic_type_bits;  // Number of bits
-    static const uint64_t basic_type_halfBits;
+    static constexpr uint64_t max_basic_type = (std::numeric_limits<uint64_t>::max)();
+    static constexpr uint64_t basic_type_bits = sizeof(uint64_t) * 8;  // Number of bits
+    static constexpr uint64_t basic_type_halfBits = basic_type_bits/2;
 
-    static const uint16_t word_length; // Use multiples of word_length words
-    static const uint64_t r_mask;
-    static const uint64_t l_mask;
-    static const uint64_t l_bit;
+    static constexpr uint16_t word_length = 4; // Use multiples of word_length words
+    static constexpr uint64_t r_mask = (uint64_t(1) << basic_type_halfBits) - 1;
+    static constexpr uint64_t l_mask = max_basic_type - r_mask;
+    static constexpr uint64_t l_bit = max_basic_type - (max_basic_type >> 1);
 
     union
     {
@@ -333,6 +334,39 @@ public:
         {
             allocator().deallocate(data_, capacity_);
         }
+    }
+
+    void times_power_of_ten(int exponent) 
+    {
+       constexpr uint16_t k_five1 = 5;
+       constexpr uint16_t k_five2 = k_five1 * 5;
+       constexpr uint16_t k_five3 = k_five2 * 5;
+       constexpr uint16_t k_five4 = k_five3 * 5;
+       constexpr uint16_t k_five5 = k_five4 * 5;
+       constexpr uint16_t k_five6 = k_five5 * 5;
+       constexpr uint32_t k_five7 = k_five6 * 5;
+       constexpr uint32_t k_five8 = k_five7 * 5;
+       constexpr uint32_t k_five9 = k_five8 * 5;
+       constexpr uint32_t k_five10 = k_five9 * 5;
+       constexpr uint32_t k_five11 = k_five10 * 5;
+       constexpr uint32_t k_five12 = k_five11 * 5;
+       constexpr uint32_t k_five13 = k_five12 * 5;
+       constexpr uint32_t k_five1_to_12[] = {k_five1, k_five2, k_five3, k_five4, k_five5, k_five6,
+                                             k_five7, k_five8, k_five9, k_five10, k_five11, k_five12};
+
+       assert(exponent >= 0);
+       if (exponent == 0) return;
+       int remaining_exponent = exponent;
+       while (remaining_exponent >= 13) 
+       {
+          *this *= k_five13;
+          remaining_exponent -= 13;
+       }
+       if (remaining_exponent > 0) 
+       {
+          *this *= (k_five1_to_12[remaining_exponent - 1]);
+       }
+       *this << exponent;
     }
 
     template <typename CharT>
@@ -1462,21 +1496,6 @@ public:
         }
     }
 };  
-
-template <class Allocator>
-const uint64_t basic_bignum<Allocator>::max_basic_type = (std::numeric_limits<uint64_t>::max)();
-template <class Allocator>
-const uint64_t basic_bignum<Allocator>::basic_type_bits = sizeof(uint64_t) * 8;  // Number of bits
-template <class Allocator>
-const uint64_t basic_bignum<Allocator>::basic_type_halfBits = basic_bignum<Allocator>::basic_type_bits/2;
-template <class Allocator>
-const uint16_t basic_bignum<Allocator>::word_length = 4; // Use multiples of word_length words
-template <class Allocator>
-const uint64_t basic_bignum<Allocator>::r_mask = (uint64_t(1) << basic_bignum<Allocator>::basic_type_halfBits) - 1;
-template <class Allocator>
-const uint64_t basic_bignum<Allocator>::l_mask = basic_bignum<Allocator>::max_basic_type - basic_bignum<Allocator>::r_mask;
-template <class Allocator>
-const uint64_t basic_bignum<Allocator>::l_bit = basic_bignum<Allocator>::max_basic_type - (basic_bignum<Allocator>::max_basic_type >> 1);
 
 typedef basic_bignum<std::allocator<uint8_t>> bignum;
 
