@@ -19,6 +19,7 @@
 
 namespace jsoncons { namespace jsonpath {
 
+JSONCONS_DEFINE_LITERAL(avg_literal,"avg")
 JSONCONS_DEFINE_LITERAL(max_literal,"max")
 JSONCONS_DEFINE_LITERAL(min_literal,"min")
 JSONCONS_DEFINE_LITERAL(sum_literal,"sum")
@@ -449,6 +450,17 @@ private:
                               }
                           }
                           return Json(v);
+                      }
+            },
+            {
+                avg_literal<char_type>(),[](const std::vector<pointer>& nodes)
+                      {
+                          double v = 0.0;
+                          for (const auto& node : nodes)
+                          {
+                              v += node->template as<double>();
+                          }
+                          return nodes.size() > 0 ? Json(v/nodes.size()) : Json::null();
                       }
             },
             {

@@ -69,6 +69,16 @@ TEST_CASE("jsonpath function tests")
         CHECK(result[0].as<double>() == Approx(expected).epsilon(0.000001));
     }
 
+    SECTION("avg")
+    {
+        json result = json_query(store,"avg($.store.book[*].price)");
+
+        double expected = 13.48;
+
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<double>() == Approx(expected).epsilon(0.000001));
+    }
+
     SECTION("mult")
     {
         json result = json_query(store,"mult($.store.book[*].price)");
