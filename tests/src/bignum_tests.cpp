@@ -140,7 +140,7 @@ TEST_CASE("test_conversion_0")
     json j(x);
 
     bignum y = j.as<bignum>();
-    CHECK(x == y);
+    CHECK(bool(x == y));
 
     std::string s;
     y.dump(s);
