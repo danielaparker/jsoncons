@@ -197,3 +197,23 @@ TEST_CASE("test_traits3")
     CHECK(s == "-18446744073709551617");
 }
 
+TEST_CASE("test shift")
+{
+    bignum n(1);
+    SECTION("n << 100")
+    {
+        bignum x = n << 100;
+        std::string s;
+        x.dump(s);
+        CHECK(s == "1267650600228229401496703205376");
+    }
+    SECTION("n << 100, += 1")
+    {
+        bignum x = n << 100;
+        x += 1;
+        std::string s;
+        x.dump(s);
+        CHECK(s == "1267650600228229401496703205377");
+    }
+}
+

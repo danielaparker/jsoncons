@@ -11,6 +11,7 @@
 #include <vector> // std::vector
 #include <iostream>
 #include <climits>
+#include <ios> // std::hex
 #include <cassert> // assert
 #include <limits> // std::numeric_limits
 #include <algorithm> // std::max, std::min, std::reverse
@@ -334,71 +335,6 @@ public:
         {
             allocator().deallocate(data_, capacity_);
         }
-    }
-
-    void times_power_of_ten(int exponent) 
-    {
-       constexpr uint16_t k_five1 = 5;
-       constexpr uint16_t k_five2 = k_five1 * 5;
-       constexpr uint16_t k_five3 = k_five2 * 5;
-       constexpr uint16_t k_five4 = k_five3 * 5;
-       constexpr uint16_t k_five5 = k_five4 * 5;
-       constexpr uint16_t k_five6 = k_five5 * 5;
-       constexpr uint32_t k_five7 = k_five6 * 5;
-       constexpr uint32_t k_five8 = k_five7 * 5;
-       constexpr uint32_t k_five9 = k_five8 * 5;
-       constexpr uint32_t k_five10 = k_five9 * 5;
-       constexpr uint32_t k_five11 = k_five10 * 5;
-       constexpr uint32_t k_five12 = k_five11 * 5;
-       constexpr uint32_t k_five13 = k_five12 * 5;
-       constexpr uint32_t k_five1_to_12[] = {k_five1, k_five2, k_five3, k_five4, k_five5, k_five6,
-                                             k_five7, k_five8, k_five9, k_five10, k_five11, k_five12};
-
-       assert(exponent >= 0);
-       if (exponent == 0) return;
-       int remaining_exponent = exponent;
-       while (remaining_exponent >= 13) 
-       {
-          *this *= k_five13;
-          remaining_exponent -= 13;
-       }
-       if (remaining_exponent > 0) 
-       {
-          *this *= (k_five1_to_12[remaining_exponent - 1]);
-       }
-       *this << exponent;
-    }
-
-    template <typename CharT>
-    void initialize(const CharT* data, size_t length)
-    {
-        bool neg = false;
-
-        const CharT* end = data+length;
-        while (data != end && isspace(*data))
-        {
-            ++data;
-            --length;
-        }
-
-        if ( *data == '-' )
-        {
-            neg = true;
-            data++;
-            --length;
-        }
-
-        basic_bignum<Allocator> v = 0;
-        for (size_t i = 0; i < length; i++)
-        {
-            v = (v * 10) + (uint64_t)(data[i] - '0');
-        }
-
-        if ( neg )
-        {
-            v.neg_ = true;
-        }
-        initialize( v );
     }
 
     size_t capacity() const { return dynamic_ ? capacity_ : 2; }
@@ -1120,7 +1056,6 @@ public:
     {
         std::string s; 
         v.dump(s);
-
         os << s;
 
         return os;
@@ -1155,7 +1090,7 @@ public:
         }
         return neg_ ? -code : code;
     }
-
+private:
     void DDproduct( basic_type A, basic_type B,
                     basic_type& hi, basic_type& lo ) const
     // Multiplying two digits: (hi, lo) = A * B
@@ -1495,7 +1430,84 @@ public:
             memset( data_+len_old, 0, (length_ - len_old)*sizeof(basic_type) );
         }
     }
-};  
+
+    template <typename CharT>
+    void initialize(const CharT* data, size_t length)
+    {
+        bool neg = false;
+
+        const CharT* end = data+length;
+        while (data != end && isspace(*data))
+        {
+            ++data;
+            --length;
+        }
+
+        if ( *data == '-' )
+        {
+            neg = true;
+            data++;
+            --length;
+        }
+
+        basic_bignum<Allocator> v = 0;
+        for (size_t i = 0; i < length; i++)
+        {
+            v = (v * 10) + (uint64_t)(data[i] - '0');
+        }
+
+        if ( neg )
+        {
+            v.neg_ = true;
+        }
+        initialize( v );
+    }
+
+    template <class Iterator>
+    uint64_t read_uint64(Iterator start, Iterator last) 
+    {
+       uint64_t result = 0;
+       for (Iterator it = start; it != last; ++it) {
+          int digit = *it - '0';
+          assert(0 <= digit && digit <= 9);
+          result = result * 10 + digit;
+       }
+       return result;
+    }
+
+    void times_power_of_ten(int exponent) 
+    {
+       constexpr uint16_t k_five1 = 5;
+       constexpr uint16_t k_five2 = k_five1 * 5;
+       constexpr uint16_t k_five3 = k_five2 * 5;
+       constexpr uint16_t k_five4 = k_five3 * 5;
+       constexpr uint16_t k_five5 = k_five4 * 5;
+       constexpr uint16_t k_five6 = k_five5 * 5;
+       constexpr uint32_t k_five7 = k_five6 * 5;
+       constexpr uint32_t k_five8 = k_five7 * 5;
+       constexpr uint32_t k_five9 = k_five8 * 5;
+       constexpr uint32_t k_five10 = k_five9 * 5;
+       constexpr uint32_t k_five11 = k_five10 * 5;
+       constexpr uint32_t k_five12 = k_five11 * 5;
+       constexpr uint32_t k_five13 = k_five12 * 5;
+       constexpr uint32_t k_five1_to_12[] = {k_five1, k_five2, k_five3, k_five4, k_five5, k_five6,
+                                             k_five7, k_five8, k_five9, k_five10, k_five11, k_five12};
+
+       assert(exponent >= 0);
+       if (exponent == 0) return;
+       int remaining_exponent = exponent;
+       while (remaining_exponent >= 13) 
+       {
+          *this *= k_five13;
+          remaining_exponent -= 13;
+       }
+       if (remaining_exponent > 0) 
+       {
+          *this *= (k_five1_to_12[remaining_exponent - 1]);
+       }
+       *this << exponent;
+    }
+};
 
 typedef basic_bignum<std::allocator<uint8_t>> bignum;
 
