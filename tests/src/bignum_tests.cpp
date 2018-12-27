@@ -155,7 +155,7 @@ TEST_CASE("test_traits1")
     json j(x);
 
     bignum y = j.as<bignum>();
-    CHECK(x == y);
+    CHECK(bool(x == y));
 
     std::string s;
     y.dump(s);
@@ -170,7 +170,7 @@ TEST_CASE("test_traits2")
     json j(x);
 
     bignum y = j.as<bignum>();
-    CHECK(x == y);
+    CHECK(bool(x == y));
 
     std::string s;
     y.dump(s);
@@ -196,7 +196,7 @@ TEST_CASE("test_traits3")
     json j(x);
 
     bignum y = j.as<bignum>();
-    CHECK(x == y);
+    CHECK(bool(x == y));
 
     std::string s;
     y.dump(s);
