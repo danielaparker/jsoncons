@@ -124,11 +124,12 @@ TEST_CASE("test_multiplication")
     bignum a( "8888888888888888888888888888888" );
 
     bignum z = 2*x;
-    CHECK( z == a );
+    bool test = z == a;
+    CHECK(test);
 
     z = x*2;
 
-    bool test = z == a;
+    test = z == a;
     CHECK(test);
 }
 
