@@ -33,9 +33,9 @@ The default line length limit is 120
     json_options()
 Constructs an `json_options` with default values. 
 
-#### Accessors and modifiers
+#### Modifiers
 
-    json_options& indent(size_ value)
+    json_options& indent(size_t value)
 The indent size, the default is 4.
 
     json_options & spaces_around_colon(spaces_option value)
