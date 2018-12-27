@@ -11,7 +11,6 @@
 #include <vector> // std::vector
 #include <iostream>
 #include <climits>
-#include <ios> // std::hex
 #include <cassert> // assert
 #include <limits> // std::numeric_limits
 #include <algorithm> // std::max, std::min, std::reverse
@@ -1052,9 +1051,10 @@ public:
         return x < q ? x : q;
     }
 
-    friend std::ostream& operator<<( std::ostream& os, const basic_bignum<Allocator>& v )
+    template <class CharT, class Traits>
+    friend std::basic_ostream<CharT,Traits>& operator<<( std::basic_ostream<CharT,Traits>& os, const basic_bignum<Allocator>& v )
     {
-        std::string s; 
+        std::basic_string<CharT,Traits> s; 
         v.dump(s);
         os << s;
 
@@ -1090,6 +1090,7 @@ public:
         }
         return neg_ ? -code : code;
     }
+
 private:
     void DDproduct( basic_type A, basic_type B,
                     basic_type& hi, basic_type& lo ) const
@@ -1461,51 +1462,6 @@ private:
             v.neg_ = true;
         }
         initialize( v );
-    }
-
-    template <class Iterator>
-    uint64_t read_uint64(Iterator start, Iterator last) 
-    {
-       uint64_t result = 0;
-       for (Iterator it = start; it != last; ++it) {
-          int digit = *it - '0';
-          assert(0 <= digit && digit <= 9);
-          result = result * 10 + digit;
-       }
-       return result;
-    }
-
-    void times_power_of_ten(int exponent) 
-    {
-       constexpr uint16_t k_five1 = 5;
-       constexpr uint16_t k_five2 = k_five1 * 5;
-       constexpr uint16_t k_five3 = k_five2 * 5;
-       constexpr uint16_t k_five4 = k_five3 * 5;
-       constexpr uint16_t k_five5 = k_five4 * 5;
-       constexpr uint16_t k_five6 = k_five5 * 5;
-       constexpr uint32_t k_five7 = k_five6 * 5;
-       constexpr uint32_t k_five8 = k_five7 * 5;
-       constexpr uint32_t k_five9 = k_five8 * 5;
-       constexpr uint32_t k_five10 = k_five9 * 5;
-       constexpr uint32_t k_five11 = k_five10 * 5;
-       constexpr uint32_t k_five12 = k_five11 * 5;
-       constexpr uint32_t k_five13 = k_five12 * 5;
-       constexpr uint32_t k_five1_to_12[] = {k_five1, k_five2, k_five3, k_five4, k_five5, k_five6,
-                                             k_five7, k_five8, k_five9, k_five10, k_five11, k_five12};
-
-       assert(exponent >= 0);
-       if (exponent == 0) return;
-       int remaining_exponent = exponent;
-       while (remaining_exponent >= 13) 
-       {
-          *this *= k_five13;
-          remaining_exponent -= 13;
-       }
-       if (remaining_exponent > 0) 
-       {
-          *this *= (k_five1_to_12[remaining_exponent - 1]);
-       }
-       *this << exponent;
     }
 };
 

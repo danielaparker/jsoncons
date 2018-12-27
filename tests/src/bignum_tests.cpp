@@ -197,11 +197,19 @@ TEST_CASE("test_traits3")
     CHECK(s == "-18446744073709551617");
 }
 
-TEST_CASE("test shift")
+TEST_CASE("test shift left")
 {
-    bignum n(1);
+    SECTION("n << 1")
+    {
+        bignum n("1");
+        bignum x = n << 1;
+        std::string s;
+        x.dump(s);
+        CHECK(s == "2");
+    }
     SECTION("n << 100")
     {
+        bignum n(1);
         bignum x = n << 100;
         std::string s;
         x.dump(s);
@@ -209,11 +217,53 @@ TEST_CASE("test shift")
     }
     SECTION("n << 100, += 1")
     {
+        bignum n(1);
         bignum x = n << 100;
         x += 1;
         std::string s;
         x.dump(s);
         CHECK(s == "1267650600228229401496703205377");
+    }
+}
+
+TEST_CASE("times 10")
+{
+    SECTION("1")
+    {
+        bignum n("1234");
+        bignum m = n * 10;
+        std::string s;
+        m.dump(s);
+        CHECK(s == "12340");
+    }
+    SECTION("31")
+    {
+        std::string expected("1234");
+        bignum n(expected);
+
+        for (size_t i = 0; i < 31; ++i)
+        {
+            n *= (uint64_t)10;
+            expected.push_back('0');
+        }
+        std::string s;
+        n.dump(s);
+        CHECK(s == expected);
+        //std::cout << "x31: " << s << "\n";
+    }
+    SECTION("32")
+    {
+        std::string expected("1234");
+        bignum n(expected);
+        for (size_t i = 0; i < 32; ++i)
+        {
+            n *= (uint64_t)10;
+            expected.push_back('0');
+        }
+        std::string s;
+        n.dump(s);
+        CHECK(s == expected);
+        //std::cout << "x31: " << s << "\n";
     }
 }
 
