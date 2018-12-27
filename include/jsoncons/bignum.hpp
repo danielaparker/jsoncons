@@ -1051,10 +1051,10 @@ public:
         return x < q ? x : q;
     }
 
-    template <class CharT, class Traits>
-    friend std::basic_ostream<CharT,Traits>& operator<<( std::basic_ostream<CharT,Traits>& os, const basic_bignum<Allocator>& v )
+    template <class CharT>
+    friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_bignum<Allocator>& v)
     {
-        std::basic_string<CharT,Traits> s; 
+        std::basic_string<CharT> s; 
         v.dump(s);
         os << s;
 
