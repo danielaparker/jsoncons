@@ -271,12 +271,21 @@ private:
     };
 
     size_t indent_size_;
+
+    bool is_nan_to_num_;
+    bool is_inf_to_num_;
+    bool is_neginf_to_num_;
+    bool is_nan_to_str_;
+    bool is_inf_to_str_;
+    bool is_neginf_to_str_;
+
     std::basic_string<CharT> nan_to_num_;
     std::basic_string<CharT> inf_to_num_;
     std::basic_string<CharT> neginf_to_num_;
     std::basic_string<CharT> nan_to_str_;
     std::basic_string<CharT> inf_to_str_;
     std::basic_string<CharT> neginf_to_str_;
+
     bool escape_all_non_ascii_;
     bool escape_solidus_;
     byte_string_chars_format byte_string_format_;
@@ -312,6 +321,12 @@ public:
     basic_json_serializer(result_type result, 
                           const basic_json_write_options<CharT>& options)
        : indent_size_(options.indent_size()),
+         is_nan_to_num_(options.is_nan_to_num()),
+         is_inf_to_num_(options.is_inf_to_num()),
+         is_neginf_to_num_(options.is_neginf_to_num()),
+         is_nan_to_str_(options.is_nan_to_str()),
+         is_inf_to_str_(options.is_inf_to_str()),
+         is_neginf_to_str_(options.is_neginf_to_str()),
          nan_to_num_(options.nan_to_num()),
          inf_to_num_(options.inf_to_num()),
          neginf_to_num_(options.neginf_to_num()),
@@ -735,12 +750,12 @@ private:
 
         if ((std::isnan)(value))
         {
-            if (!nan_to_num_.empty())
+            if (is_nan_to_num_)
             {
                 result_.insert(nan_to_num_.data(), nan_to_num_.length());
                 column_ += nan_to_num_.length();
             }
-            else if (!nan_to_str_.empty())
+            else if (is_nan_to_str_)
             {
                 do_string_value(nan_to_str_, semantic_tag_type::none, context);
             }
@@ -752,12 +767,12 @@ private:
         }
         else if (value == std::numeric_limits<double>::infinity())
         {
-            if (!inf_to_num_.empty())
+            if (is_inf_to_num_)
             {
                 result_.insert(inf_to_num_.data(), inf_to_num_.length());
                 column_ += inf_to_num_.length();
             }
-            else if (!inf_to_str_.empty())
+            else if (is_inf_to_str_)
             {
                 do_string_value(inf_to_str_, semantic_tag_type::none, context);
             }
@@ -769,12 +784,12 @@ private:
         }
         else if (!(std::isfinite)(value))
         {
-            if (!neginf_to_num_.empty())
+            if (is_neginf_to_num_)
             {
                 result_.insert(neginf_to_num_.data(), neginf_to_num_.length());
                 column_ += neginf_to_num_.length();
             }
-            else if (!neginf_to_str_.empty())
+            else if (is_neginf_to_str_)
             {
                 do_string_value(neginf_to_str_, semantic_tag_type::none, context);
             }
@@ -1022,6 +1037,13 @@ private:
         }
     };
 
+    bool is_nan_to_num_;
+    bool is_inf_to_num_;
+    bool is_neginf_to_num_;
+    bool is_nan_to_str_;
+    bool is_inf_to_str_;
+    bool is_neginf_to_str_;
+
     std::basic_string<CharT> nan_to_num_;
     std::basic_string<CharT> inf_to_num_;
     std::basic_string<CharT> neginf_to_num_;
@@ -1048,7 +1070,13 @@ public:
 
     basic_json_compressed_serializer(result_type result, 
                                      const basic_json_write_options<CharT>& options)
-       : nan_to_num_(options.nan_to_num()),
+       : is_nan_to_num_(options.is_nan_to_num()),
+         is_inf_to_num_(options.is_inf_to_num()),
+         is_neginf_to_num_(options.is_neginf_to_num()),
+         is_nan_to_str_(options.is_nan_to_str()),
+         is_inf_to_str_(options.is_inf_to_str()),
+         is_neginf_to_str_(options.is_neginf_to_str()),
+         nan_to_num_(options.nan_to_num()),
          inf_to_num_(options.inf_to_num()),
          neginf_to_num_(options.neginf_to_num()),
          nan_to_str_(options.nan_to_str()),
@@ -1304,11 +1332,11 @@ private:
 
         if ((std::isnan)(value))
         {
-            if (!nan_to_num_.empty())
+            if (is_nan_to_num_)
             {
                 result_.insert(nan_to_num_.data(), nan_to_num_.length());
             }
-            else if (!nan_to_str_.empty())
+            else if (is_nan_to_str_)
             {
                 do_string_value(nan_to_str_, semantic_tag_type::none, context);
             }
@@ -1319,11 +1347,11 @@ private:
         }
         else if (value == std::numeric_limits<double>::infinity())
         {
-            if (!inf_to_num_.empty())
+            if (is_inf_to_num_)
             {
                 result_.insert(inf_to_num_.data(), inf_to_num_.length());
             }
-            else if (!inf_to_str_.empty())
+            else if (is_inf_to_str_)
             {
                 do_string_value(inf_to_str_, semantic_tag_type::none, context);
             }
@@ -1334,11 +1362,11 @@ private:
         }
         else if (!(std::isfinite)(value))
         {
-            if (!neginf_to_num_.empty())
+            if (is_neginf_to_num_)
             {
                 result_.insert(neginf_to_num_.data(), neginf_to_num_.length());
             }
-            else if (!neginf_to_str_.empty())
+            else if (is_neginf_to_str_)
             {
                 do_string_value(neginf_to_str_, semantic_tag_type::none, context);
             }

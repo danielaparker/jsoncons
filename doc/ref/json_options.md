@@ -87,37 +87,54 @@ Escape all non-ascii characters. The default is `false`.
     json_options& escape_solidus(bool value)
 Escape the solidus ('/') character. The default is `false`.
 
-    const std::string& nan_to_num() const 
-    const std::string& nan_to_str() const 
-Replace `NaN` with a number (if `nan_to_num()` returns a non-empty string)
-or a string (if `nan_to_str()` returns a non-empty string.) If both
-are empty, replace `NaN` with `null`.
+    bool is_nan_to_num() const override; // (1)
+    const std::string& nan_to_num() const; // (2) 
+    json_options& nan_to_num(const std::string& value); // (3)
+(1) indicates number replacement for `NaN` when serializing. Defaults to `false`.
+(2) returns a number replacement for `NaN`
+(3) sets a number replacement for `NaN`
 
-    json_options& nan_to_num(const std::string& value)
-    json_options& nan_to_str(const std::string& value)
-NaN string replacement. 
+    bool is_inf_to_num() const override; // (1)
+    const std::string& inf_to_num() const; // (2) 
+    json_options& inf_to_num(const std::string& value); // (3)
+(1) indicates a number replacement for `Infinity` when serializing. Defaults to `false`.
+(2) returns a number replacement for `Infinity`
+(3) sets a number replacement for `Infinity`
 
-    const std::string& inf_to_num() const 
-    const std::string& inf_to_str() const 
-Replace positive infinity with a number (if `inf_to_num()` returns a non-empty string)
-or a string (if `inf_to_str()` returns a non-empty string.) If both
-are empty, replace positive infinity with `null`.
+    bool is_neginf_to_num() const override; // (1)
+    const std::string& neginf_to_num() const; // (2) 
+    json_options& neginf_to_num(const std::string& value); // (3)
+(1) indicates a number replacement for `Negative Infinity` when serializing. Defaults to `is_inf_to_num()`.
+(2) returns a number replacement for `Negative Infinity`
+(3) sets a number replacement for `Negative Infinity`
 
-    json_options& inf_to_num(const std::string& value)
-    json_options& inf_to_str(const std::string& value)
-Positive infinity string replacement. 
+    bool is_nan_to_str() const override; // (1)
+    bool is_str_to_nan() const override; // (2)
+    const std::string& nan_to_str() const; //(3)
+    json_options& nan_to_str(const std::string& value, bool is_str_to_nan = true); // (4)
+(1) indicates string replacement for `NaN` when serializing. Defaults to `false`.
+(2) indicates `NaN` replacement for string when parsing. Defaults to `false`.
+(3) returns a string replacement for `NaN`
+(4) sets a string replacement for `NaN`
 
-    const std::string& neginf_to_num() const 
-    const std::string& neginf_to_str() const 
-Replace negative infinity with a number (if `neginf_to_num()` returns a non-empty string)
-or a string (if `neginf_to_str()` returns a non-empty string.) If both
-are empty, replace negative infinity with `null`.
+    bool is_inf_to_str() const override; // (1)
+    bool is_str_to_inf() const override; // (2)
+    const std::string& inf_to_str() const; //(3)
+    json_options& inf_to_str(const std::string& value, bool is_str_to_inf = true); // (4)
+(1) indicates string replacement for `Infinity` when serializing. Defaults to `false`.
+(2) indicates `Infinity` replacement for string when parsing. Defaults to `false`.
+(3) returns a string replacement for `Infinity`
+(4) sets a string replacement for `Infinity`
 
-    json_options& neginf_to_num(const std::string& value)
-    json_options& neginf_to_str(const std::string& value)
-Negative infinity string replacement. Defaults to `-` followed by
-`inf_to_num()` if `inf_to_num()` is not empty, or `-` followed by
-`inf_to_str()` if `inf_to_str()` is not empty, otherwise empty.  
+    bool is_neginf_to_str() const override; // (1)
+    bool is_str_to_neginf() const override; // (2)
+    const std::string& neginf_to_str() const; //(3)
+    json_options& neginf_to_str(const std::string& value, bool is_str_to_neginf = true); // (4)
+(1) indicates string replacement for `Negative Infinity` when serializing. Defaults to `is_inf_to_str()`.
+(2) indicates `Negative Infinity` replacement for string when parsing. Defaults to `is_str_to_inf()`.
+(3) returns a string replacement for `Negative Infinity` if one has been set, otherwise `-` followed by
+`inf_to_num()`.
+(4) sets a string replacement for `Negative Infinity`
 
     std::string new_line_chars() const
     serializing_options& new_line_chars(const std::string& value)

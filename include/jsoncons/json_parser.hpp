@@ -36,6 +36,9 @@ class replacement_filter : public basic_json_filter<CharT>
     typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
     typedef typename basic_json_options<CharT>::string_type string_type;
 
+    bool is_str_to_nan_;
+    bool is_str_to_inf_;
+    bool is_str_to_neginf_;
     string_type nan_to_str_;
     string_type inf_to_str_;
     string_type neginf_to_str_;
@@ -44,10 +47,16 @@ public:
     replacement_filter() = delete;
 
     replacement_filter(basic_json_content_handler<CharT>& handler,     
+                       bool is_str_to_nan,
+                       bool is_str_to_inf,
+                       bool is_str_to_neginf,     
                        const string_type& nan_to_str,
                        const string_type& inf_to_str,
                        const string_type& neginf_to_str)
         : basic_json_filter<CharT>(handler), 
+          is_str_to_nan_(is_str_to_nan),
+          is_str_to_inf_(is_str_to_inf),
+          is_str_to_neginf_(is_str_to_neginf), 
           nan_to_str_(nan_to_str),
           inf_to_str_(inf_to_str),
           neginf_to_str_(neginf_to_str)
@@ -60,15 +69,15 @@ public:
     {
         if (tag == semantic_tag_type::none)
         {
-            if (!nan_to_str_.empty() && s == nan_to_str_)
+            if (is_str_to_nan_ && s == nan_to_str_)
             {
                 return this->destination_handler().double_value(std::nan(""), floating_point_options(), tag, context);
             }
-            else if (!inf_to_str_.empty() && s == inf_to_str_)
+            else if (is_str_to_inf_ && s == inf_to_str_)
             {
                 return this->destination_handler().double_value(std::numeric_limits<double>::infinity(), floating_point_options(), tag, context);
             }
-            else if (!neginf_to_str_.empty() && s == neginf_to_str_)
+            else if (is_str_to_neginf_ && s == neginf_to_str_)
             {
                 return this->destination_handler().double_value(-std::numeric_limits<double>::infinity(), floating_point_options(), tag, context);
             }
@@ -155,6 +164,9 @@ class basic_json_parser : private serializing_context
     default_parse_error_handler default_err_handler_;
 
     parse_error_handler& err_handler_;
+    bool is_str_to_nan_;
+    bool is_str_to_inf_;
+    bool is_str_to_neginf_;
     string_type nan_to_str_;
     string_type inf_to_str_;
     string_type neginf_to_str_;
@@ -203,6 +215,9 @@ public:
     basic_json_parser(const basic_json_read_options<CharT>& options,
                       parse_error_handler& err_handler)
        : err_handler_(err_handler),
+         is_str_to_nan_(options.is_str_to_nan()),
+         is_str_to_inf_(options.is_str_to_inf()),
+         is_str_to_neginf_(options.is_str_to_neginf()),
          nan_to_str_(options.nan_to_str()),
          inf_to_str_(options.inf_to_str()),
          neginf_to_str_(options.neginf_to_str()),
@@ -542,12 +557,15 @@ public:
 
     void parse_some(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
-        if (!nan_to_str_.empty() || !inf_to_str_.empty() || !neginf_to_str_.empty())
+        if (is_str_to_nan_ || is_str_to_inf_ || is_str_to_neginf_)
         {
             jsoncons::detail::replacement_filter<CharT> h(handler,
-                nan_to_str_,
-                inf_to_str_,
-                neginf_to_str_);
+                                                          is_str_to_nan_,
+                                                          is_str_to_inf_,
+                                                          is_str_to_neginf_,
+                                                          nan_to_str_,
+                                                          inf_to_str_,
+                                                          neginf_to_str_);
             parse_some_(h, ec);
         }
         else

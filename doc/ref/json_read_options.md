@@ -21,11 +21,20 @@ An abstract class that defines accessors for JSON deserialization options. The `
 
 #### Accessors
 
+    virtual bool is_str_to_nan() const = 0;
+Indicates `NaN` replacement for string when parsing.
+
     virtual std::string nan_to_str() const = 0;
 When parsing JSON text, replace string with a `NaN` (if `nan_to_str()` returns a non-empty string.)
 
+    virtual bool is_str_to_inf() const = 0;
+Indicates `Infinity` replacement for string when parsing.
+
     virtual const std::string& inf_to_str() const = 0; 
 When parsing JSON text, replace string with infinity (if `inf_to_str()` returns a non-empty string.)
+
+    virtual bool is_str_to_neginf() const = 0;
+Indicates `Negative Infinity` replacement for string when parsing.
 
     virtual const std::string& neginf_to_str() const = 0; 
 When parsing JSON text, replace string with minus infinity (if `neginf_to_str()` returns a non-empty string.)
