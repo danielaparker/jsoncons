@@ -42,7 +42,8 @@ TEST_CASE("bignums are equal")
     bignum x(s);
     bignum y(s);
 
-    CHECK(x == y);
+    bool test = x == y;
+    CHECK(test);
 }
 
 TEST_CASE("test_negative_bignum")
@@ -101,7 +102,9 @@ TEST_CASE("test_logical_operations")
     bignum y( "888888888888888888" );
 
     bignum z = x & y;
-    CHECK( z == x );
+
+    bool test = z == x;
+    CHECK(test);
 }
 
 TEST_CASE("test_addition")
@@ -111,7 +114,8 @@ TEST_CASE("test_addition")
     bignum a( "8888888888888888888888888888888" );
 
     bignum z = x + y;
-    CHECK( z == a );
+    bool test = z == a;
+    CHECK(test);
 }
 
 TEST_CASE("test_multiplication")
@@ -123,7 +127,9 @@ TEST_CASE("test_multiplication")
     CHECK( z == a );
 
     z = x*2;
-    CHECK( z == a );
+
+    bool test = z == a;
+    CHECK(test);
 }
 
 TEST_CASE("test_conversion_0")
