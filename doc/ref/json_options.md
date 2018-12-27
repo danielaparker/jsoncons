@@ -35,131 +35,85 @@ Constructs an `json_options` with default values.
 
 #### Accessors and modifiers
 
-    size_t  indent_size() const
     json_options& indent(size_ value)
 The indent size, the default is 4.
 
-    spaces_option spaces_around_colon() const override
     json_options & spaces_around_colon(spaces_option value)
 Indicates [space option](spaces_option.md) for name separator (`:`). Default
 is space after.
 
-    spaces_option spaces_around_comma() const override
     json_options & spaces_around_comma(spaces_option value)
 Indicates [space option](spaces_option.md) for array value and object name/value pair separators (`,`). Default
 is space after.
 
-    bool pad_inside_object_braces() const override
     json_options & pad_inside_object_braces(bool value)
 Default is `false`
 
-    bool pad_inside_array_brackets() const override
     json_options & pad_inside_array_brackets(bool value)
 Default is `false`
 
-    chars_format floating_point_format() const 
     json_options& floating_point_format(chars_format value)
 Overrides [floating point format](chars_format.md) when serializing json.
 The default, for a floating point value that was previously decoded from json text, is to preserve the original format when serializing.
 The default, for a floating point value that was directly inserted into a json value, to serialize with [chars_format::general](chars_format.md). 
 
-    bignum_chars_format bignum_format() const 
     json_options& bignum_format(bignum_chars_format value)
 Overrides [bignum format](bignum_chars_format.md) when serializing json.
 The default is [bignum_chars_format::base10](bignum_chars_format.md). 
 
-    byte_string_chars_format byte_string_format() const 
     json_options& byte_string_format(byte_string_chars_format value)
 Overrides [byte string format](byte_string_chars_format.md) when serializing json.
 The default is [byte_string_chars_format::base64url](byte_string_chars_format.md). 
 
-    uint8_t precision() const 
     json_options& precision(uint8_t value)
 Overrides floating point precision when serializing json. 
 The default, for a floating point value that was previously decoded from json text, is to preserve the original precision. 
 The fefault, for a floating point value that was directly inserted into a json value, to serialize with shortest representation. 
 
-    bool escape_all_non_ascii() const
     json_options& escape_all_non_ascii(bool value)
 Escape all non-ascii characters. The default is `false`.
 
-    bool escape_solidus() const
     json_options& escape_solidus(bool value)
 Escape the solidus ('/') character. The default is `false`.
 
-    bool is_nan_to_num() const override; // (1)
-    const std::string& nan_to_num() const; // (2) 
-    json_options& nan_to_num(const std::string& value); // (3)
-(1) indicates number replacement for `NaN` when serializing. Defaults to `false`.
-(2) returns a number replacement for `NaN`
-(3) sets a number replacement for `NaN`
+    json_options& nan_to_num(const std::string& value); 
+Sets a number replacement for `NaN` when writing JSON
 
-    bool is_inf_to_num() const override; // (1)
-    const std::string& inf_to_num() const; // (2) 
-    json_options& inf_to_num(const std::string& value); // (3)
-(1) indicates a number replacement for `Infinity` when serializing. Defaults to `false`.
-(2) returns a number replacement for `Infinity`
-(3) sets a number replacement for `Infinity`
+    json_options& inf_to_num(const std::string& value); 
+Sets a number replacement for `Infinity` when writing JSON
 
-    bool is_neginf_to_num() const override; // (1)
-    const std::string& neginf_to_num() const; // (2) 
-    json_options& neginf_to_num(const std::string& value); // (3)
-(1) indicates a number replacement for `Negative Infinity` when serializing. Defaults to `is_inf_to_num()`.
-(2) returns a number replacement for `Negative Infinity`
-(3) sets a number replacement for `Negative Infinity`
+    json_options& neginf_to_num(const std::string& value); 
+Sets a number replacement for `Negative Infinity` when writing JSON
 
-    bool is_nan_to_str() const override; // (1)
-    bool is_str_to_nan() const override; // (2)
-    const std::string& nan_to_str() const; //(3)
-    json_options& nan_to_str(const std::string& value, bool is_str_to_nan = true); // (4)
-(1) indicates string replacement for `NaN` when serializing. Defaults to `false`.
-(2) indicates `NaN` replacement for string when parsing. Defaults to `false`.
-(3) returns a string replacement for `NaN`
-(4) sets a string replacement for `NaN`
+    json_options& nan_to_str(const std::string& value, bool is_str_to_nan = true); 
+Sets a string replacement for `NaN` when writing JSON, and indicate whether it is also
+to be used when reading JSON.
 
-    bool is_inf_to_str() const override; // (1)
-    bool is_str_to_inf() const override; // (2)
-    const std::string& inf_to_str() const; //(3)
-    json_options& inf_to_str(const std::string& value, bool is_str_to_inf = true); // (4)
-(1) indicates string replacement for `Infinity` when serializing. Defaults to `false`.
-(2) indicates `Infinity` replacement for string when parsing. Defaults to `false`.
-(3) returns a string replacement for `Infinity`
-(4) sets a string replacement for `Infinity`
+    json_options& inf_to_str(const std::string& value, bool is_str_to_inf = true); 
+Sets a string replacement for infinity when writing JSON, and indicate whether it is also
+to be used when reading JSON.
 
-    bool is_neginf_to_str() const override; // (1)
-    bool is_str_to_neginf() const override; // (2)
-    const std::string& neginf_to_str() const; //(3)
     json_options& neginf_to_str(const std::string& value, bool is_str_to_neginf = true); // (4)
-(1) indicates string replacement for `Negative Infinity` when serializing. Defaults to `is_inf_to_str()`.
-(2) indicates `Negative Infinity` replacement for string when parsing. Defaults to `is_str_to_inf()`.
-(3) returns a string replacement for `Negative Infinity` if one has been set, otherwise `-` followed by
-`inf_to_num()`.
-(4) sets a string replacement for `Negative Infinity`
+Sets a string replacement for negative infinity when writing JSON, and indicate whether it is also
+to be used when reading JSON.
 
-    std::string new_line_chars() const
     serializing_options& new_line_chars(const std::string& value)
 Defaults to "\n"
 
-    size_t line_length_limit() const
     json_options & line_length_limit(size_t value)
 
-    size_t max_nesting_depth() const
     void max_nesting_depth(size_t depth)
 The maximum nesting depth allowed when parsing JSON. By default `jsoncons` can read a `JSON` text of arbitrarily large depth.
 
-    line_split_kind object_object_line_splits() const;
     json_options& object_object_line_splits(line_split_kind value)
 For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
 
-    line_split_kind array_object_line_splits() const;
     json_options& array_object_line_splits(line_split_kind value)
 For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
 
-    line_split_kind object_array_line_splits() const;
     json_options& object_array_line_splits(line_split_kind value)
 For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::same_line](line_split_kind.md).
 
-    line_split_kind array_array_line_splits() const;
     json_options& array_array_line_splits(line_split_kind value)
 For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind.md).
 

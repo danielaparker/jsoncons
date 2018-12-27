@@ -560,7 +560,7 @@ public:
         }
     }
 
-    basic_json_options<CharT>& neginf_to_str(const std::basic_string<CharT>& value, bool is_neginf_to_str_ = true) 
+    basic_json_options<CharT>& neginf_to_str(const std::basic_string<CharT>& value, bool is_neginf_to_str = true) 
     {
         is_neginf_to_str_ = true;
         is_neginf_to_str_ = is_neginf_to_str;

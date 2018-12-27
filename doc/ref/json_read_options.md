@@ -25,19 +25,19 @@ An abstract class that defines accessors for JSON deserialization options. The `
 Indicates `NaN` replacement for string when parsing.
 
     virtual std::string nan_to_str() const = 0;
-When parsing JSON text, replace string with a `NaN` (if `nan_to_str()` returns a non-empty string.)
+When parsing JSON text, replace string with a `NaN` if `is_nan_to_str()` returns `true`.
 
     virtual bool is_str_to_inf() const = 0;
 Indicates `Infinity` replacement for string when parsing.
 
     virtual const std::string& inf_to_str() const = 0; 
-When parsing JSON text, replace string with infinity (if `inf_to_str()` returns a non-empty string.)
+When parsing JSON text, replace string with infinity if `is_inf_to_str()` returns `true`.
 
     virtual bool is_str_to_neginf() const = 0;
 Indicates `Negative Infinity` replacement for string when parsing.
 
     virtual const std::string& neginf_to_str() const = 0; 
-When parsing JSON text, replace string with minus infinity (if `neginf_to_str()` returns a non-empty string.)
+When parsing JSON text, replace string with minus infinity if `is_neginf_to_str()` returns true.
 
     virtual size_t max_nesting_depth() = 0;
  Maximum nesting depth when parsing JSON.
