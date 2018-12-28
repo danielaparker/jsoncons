@@ -137,7 +137,7 @@ public:
 
     virtual ~term() {}
 
-    virtual void initialize(const Json&, std::vector<std::unique_ptr<Json>>&)
+    virtual void initialize(const Json&)
     {
     }
     virtual bool accept_single_node() const
@@ -372,11 +372,11 @@ public:
         return *operand_ptr_;
     }
 
-    void initialize(const Json& context_node, std::vector<std::unique_ptr<Json>>& temp_json_values)
+    void initialize(const Json& context_node)
     {
         if (operand_ptr_.get() != nullptr)
         {
-            operand_ptr_->initialize(context_node, temp_json_values);
+            operand_ptr_->initialize(context_node);
         }
     }
 };
@@ -683,11 +683,10 @@ public:
     {
     }
 
-    void initialize(const Json& context_node,
-        std::vector<std::unique_ptr<Json>>& temp_json_values) override
+    void initialize(const Json& context_node) override
     {
         jsonpath_evaluator<Json,const Json&,VoidPathConstructor<Json>,'@'> evaluator;
-        evaluator.evaluate(context_node, path_, temp_json_values);
+        evaluator.evaluate(context_node, path_);
         nodes_ = evaluator.get_values();
     }
 
@@ -945,11 +944,11 @@ public:
 };
 
 template <class Json>
-token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens, std::vector<std::unique_ptr<Json>>& temp_json_values)
+token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
 {
     for (auto it= tokens.begin(); it != tokens.end(); ++it)
     {
-        it->initialize(context, temp_json_values);
+        it->initialize(context);
     }
     std::vector<token<Json>> stack;
     for (auto t : tokens)
@@ -997,11 +996,11 @@ public:
     {
     }
 
-    Json eval(const Json& context_node, std::vector<std::unique_ptr<Json>>& temp_json_values)
+    Json eval(const Json& context_node)
     {
         try
         {
-            auto t = evaluate(context_node, tokens_, temp_json_values);
+            auto t = evaluate(context_node, tokens_);
 
             return t.operand().evaluate_single_node();
 
@@ -1012,11 +1011,11 @@ public:
         }
     }
 
-    bool exists(const Json& context_node, std::vector<std::unique_ptr<Json>>& temp_json_values)
+    bool exists(const Json& context_node)
     {
         try
         {
-            auto t = evaluate(context_node,tokens_,temp_json_values);
+            auto t = evaluate(context_node,tokens_);
             return t.operand().accept_single_node();
         }
         catch (const serialization_error& e)
@@ -1096,10 +1095,9 @@ public:
         return column_;
     }
 
-    jsonpath_filter_expr<Json> parse(const Json& root, const char_type* p, size_t length, const char_type** end_ptr,
-                                     std::vector<std::unique_ptr<Json>>& temp_json_values)
+    jsonpath_filter_expr<Json> parse(const Json& root, const char_type* p, size_t length, const char_type** end_ptr)
     {
-        return parse(root, p,p+length, end_ptr, temp_json_values);
+        return parse(root, p,p+length, end_ptr);
     }
 
     void push_state(filter_state state)
@@ -1177,8 +1175,7 @@ public:
         }
     }
 
-    jsonpath_filter_expr<Json> parse(const Json& root, const char_type* p, const char_type* end_expr, const char_type** end_ptr,
-        std::vector<std::unique_ptr<Json>>& temp_json_values)
+    jsonpath_filter_expr<Json> parse(const Json& root, const char_type* p, const char_type* end_expr, const char_type** end_ptr)
     {
         output_stack_.clear();
         operator_stack_.clear();
@@ -1290,7 +1287,7 @@ public:
                             {
                                 // path, parse against root, get value
                                 jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>,'$'> evaluator;
-                                evaluator.evaluate(root, buffer, temp_json_values);
+                                evaluator.evaluate(root, buffer);
                                 auto result = evaluator.get_values();
                                 if (result.size() > 0)
                                 {
