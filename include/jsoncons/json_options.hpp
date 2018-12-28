@@ -101,6 +101,8 @@ public:
     virtual bool is_str_to_neginf() const = 0;
 
     virtual std::basic_string<CharT> neginf_to_str() const = 0;
+
+    virtual bool decimal_fraction_to_str() const = 0;
 };
 
 template <class CharT>
@@ -224,6 +226,8 @@ private:
     std::basic_string<CharT> nan_to_str_;
     std::basic_string<CharT> inf_to_str_;
     std::basic_string<CharT> neginf_to_str_;
+
+    bool decimal_fraction_to_str_;
 public:
     static const size_t indent_size_default = 4;
     static const size_t line_length_limit_default = 120;
@@ -261,7 +265,8 @@ public:
           is_neginf_to_str_(false),
           is_str_to_nan_(false),
           is_str_to_inf_(false),
-          is_str_to_neginf_(false)
+          is_str_to_neginf_(false),
+          decimal_fraction_to_str_(false)
     {
         new_line_chars_.push_back('\n');
     }
@@ -566,6 +571,17 @@ public:
         is_neginf_to_str_ = is_neginf_to_str;
         neginf_to_num_.clear();
         neginf_to_str_ = value;
+        return *this;
+    }
+
+    bool decimal_fraction_to_str() const override
+    {
+        return decimal_fraction_to_str_;
+    }
+
+    basic_json_options<CharT>& decimal_fraction_to_str(bool value) 
+    {
+        decimal_fraction_to_str_ = value;
         return *this;
     }
 
