@@ -232,7 +232,7 @@ private:
         {
         }
 
-        void select(jsonpath_evaluator& evaluator,
+        void select(jsonpath_evaluator&,
                     node_type& node, const string_type& path, reference val, 
                     node_set& nodes) override
         {
@@ -345,7 +345,7 @@ private:
         {
         }
 
-        void select(jsonpath_evaluator& evaluator,
+        void select(jsonpath_evaluator&,
                     node_type&, const string_type& path, reference val,
                     node_set& nodes) override
         {
