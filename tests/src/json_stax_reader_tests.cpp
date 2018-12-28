@@ -125,7 +125,7 @@ TEST_CASE("json_staj_reader string_value as bignum test")
     CHECK(reader.current().event_type() == staj_event_type::string_value);
     CHECK(s == reader.current().as<std::string>());
     bignum c = reader.current().as<bignum>();
-    CHECK(bignum("-18446744073709551617") == c);
+    CHECK(bool(bignum("-18446744073709551617") == c));
     reader.next();
     CHECK(reader.done());
 }
@@ -141,7 +141,7 @@ TEST_CASE("json_staj_reader big_integer_value as bignum")
     CHECK(reader.current().event_type() == staj_event_type::string_value);
     CHECK(reader.current().semantic_tag() == semantic_tag_type::big_integer);
     bignum c = reader.current().as<bignum>();
-    CHECK(bignum(s) == c);
+    CHECK(bool(bignum(s) == c));
     reader.next();
     CHECK(reader.done());
 }
