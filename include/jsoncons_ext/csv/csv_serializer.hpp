@@ -290,10 +290,25 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              byte_string_chars_format encoding_hint,
-                              semantic_tag_type, 
+                              semantic_tag_type tag, 
                               const serializing_context& context) override
     {
+        byte_string_chars_format encoding_hint;
+        switch (tag)
+        {
+            case semantic_tag_type::base16:
+                encoding_hint = byte_string_chars_format::base16;
+                break;
+            case semantic_tag_type::base64:
+                encoding_hint = byte_string_chars_format::base64;
+                break;
+            case semantic_tag_type::base64url:
+                encoding_hint = byte_string_chars_format::base64url;
+                break;
+            default:
+                encoding_hint = byte_string_chars_format::none;
+                break;
+        }
         byte_string_chars_format format = jsoncons::detail::resolve_byte_string_chars_format(encoding_hint,byte_string_chars_format::none,byte_string_chars_format::base64url);
 
         std::basic_string<CharT> s;

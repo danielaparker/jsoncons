@@ -170,27 +170,27 @@ private:
                             }
                         case 0x15:
                             {
-                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::base64url, semantic_tag_type::none, *this);
+                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag_type::base64url, *this);
                                 break;
                             }
                         case 0x16:
                             {
-                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::base64, semantic_tag_type::none, *this);
+                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag_type::base64, *this);
                                 break;
                             }
                         case 0x17:
                             {
-                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::base16, semantic_tag_type::none, *this);
+                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag_type::base16, *this);
                                 break;
                             }
                         default:
-                            handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::none, semantic_tag_type::none, *this);
+                            handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag_type::none, *this);
                             break;
                     }
                 }
                 else
                 {
-                    handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::none, semantic_tag_type::none, *this);
+                    handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag_type::none, *this);
                 }
                 break;
             }

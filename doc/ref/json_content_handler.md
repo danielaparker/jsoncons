@@ -74,7 +74,6 @@ Returns `true` if the producer should continue streaming events, `false` otherwi
 Throws a [serialization_error](serialization_error.md) to indicate an error. 
 
     bool byte_string_value(const byte_string_view& b, 
-                           byte_string_chars_format encoding_hint = byte_string_chars_format::none,
                            semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context()); 
 Writes a byte string value. Contextual information including
@@ -83,7 +82,6 @@ Returns `true` if the producer should continue streaming events, `false` otherwi
 Throws a [serialization_error](serialization_error.md) to indicate an error. 
 
     bool byte_string_value(const uint8_t* p, size_t size, 
-                           byte_string_chars_format encoding_hint = byte_string_chars_format::none,
                            semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context()); 
 Writes a byte string value. Contextual information including
@@ -221,7 +219,6 @@ Returns `true` if the producer should continue streaming events, `false` otherwi
 Sets `ec` to indicate an error.
 
     virtual bool do_byte_string_value(const byte_string_view& b, 
-                                      byte_string_chars_format encoding_hint,
                                       semantic_tag_type tag,
                                       const serializing_context& context) = 0;
 Handles a byte string value. Contextual information including

@@ -438,7 +438,6 @@ public:
             typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<byte_string_storage_type> string_holder_allocator_type;
             typedef typename std::allocator_traits<string_holder_allocator_type>::pointer pointer;
 
-            byte_string_chars_format encoding_hint_;
             pointer ptr_;
 
             template <typename... Args>
@@ -460,35 +459,28 @@ public:
 
             byte_string_data(semantic_tag_type semantic_type, 
                              const uint8_t* data, size_t length, 
-                             byte_string_chars_format encoding_hint,
                              const Allocator& a)
-                : data_base(structure_tag_type::byte_string_tag, semantic_type),
-                  encoding_hint_(encoding_hint)
+                : data_base(structure_tag_type::byte_string_tag, semantic_type)
             {
                 create(string_holder_allocator_type(a), data, data+length, a);
             }
 
             byte_string_data(const byte_string_data& val)
-                : data_base(val.type()), encoding_hint_(val.encoding_hint()) 
+                : data_base(val.type())
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             byte_string_data(byte_string_data&& val)
-                : data_base(val.type()), encoding_hint_(val.encoding_hint()), ptr_(nullptr)
+                : data_base(val.type()), ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
             byte_string_data(const byte_string_data& val, const Allocator& a)
-                : data_base(val.type()), encoding_hint_(val.encoding_hint())
+                : data_base(val.type())
             { 
                 create(string_holder_allocator_type(a), *(val.ptr_), a);
-            }
-
-            byte_string_chars_format encoding_hint() const
-            {
-                return encoding_hint_;
             }
 
             ~byte_string_data()
@@ -747,14 +739,14 @@ public:
             }
         }
 
-        variant(const byte_string_view& bs, byte_string_chars_format encoding_hint, semantic_tag_type tag)
+        variant(const byte_string_view& bs, semantic_tag_type tag)
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.length(), encoding_hint, byte_allocator_type());
+            new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.length(), byte_allocator_type());
         }
 
-        variant(const byte_string_view& bs, byte_string_chars_format encoding_hint, semantic_tag_type tag, const Allocator& allocator)
+        variant(const byte_string_view& bs, semantic_tag_type tag, const Allocator& allocator)
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.length(), encoding_hint, allocator);
+            new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.length(), allocator);
         }
 
         variant(const basic_bignum<byte_allocator_type>& n)
@@ -2648,17 +2640,15 @@ public:
     }
 
     explicit basic_json(const byte_string_view& bs, 
-                        byte_string_chars_format encoding_hint = byte_string_chars_format::none,
                         semantic_tag_type tag = semantic_tag_type::none)
-        : var_(bs, encoding_hint, tag)
+        : var_(bs, tag)
     {
     }
 
     basic_json(const byte_string_view& bs, 
-               byte_string_chars_format encoding_hint,
                semantic_tag_type tag, 
                const Allocator& allocator)
-        : var_(bs, encoding_hint, tag, allocator)
+        : var_(bs, tag, allocator)
     {
     }
 
@@ -4502,7 +4492,7 @@ private:
                 break;
             case structure_tag_type::byte_string_tag:
                 handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length(), 
-                                          var_.byte_string_data_cast()->encoding_hint(), var_.semantic_tag());
+                                          var_.semantic_tag());
                 break;
             case structure_tag_type::double_tag:
                 handler.double_value(var_.double_data_cast()->value(), 

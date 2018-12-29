@@ -36,11 +36,9 @@ json(const char* val); // (15)
 json(const char* val, const allocator_type& allocator); // (16)
 
 json(const byte_string_view& bs,
-     byte_string_chars_format encoding_hint = byte_string_chars_format::none,
      semantic_tag_type tag = semantic_tag_type::none); // (17)
 
 json(const byte_string_view& bs, 
-     byte_string_chars_format encoding_hint = byte_string_chars_format::none,
      semantic_tag_type tag = semantic_tag_type::none, 
      const allocator_type& allocator); // (18)
 

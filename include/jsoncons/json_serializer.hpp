@@ -676,8 +676,7 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              byte_string_chars_format encoding_hint,
-                              semantic_tag_type,
+                              semantic_tag_type tag,
                               const serializing_context&) override
     {
         if (!stack_.empty()) 
@@ -692,9 +691,26 @@ private:
             }
         }
 
+        byte_string_chars_format encoding_hint;
+        switch (tag)
+        {
+            case semantic_tag_type::base16:
+                encoding_hint = byte_string_chars_format::base16;
+                break;
+            case semantic_tag_type::base64:
+                encoding_hint = byte_string_chars_format::base64;
+                break;
+            case semantic_tag_type::base64url:
+                encoding_hint = byte_string_chars_format::base64url;
+                break;
+            default:
+                encoding_hint = byte_string_chars_format::none;
+                break;
+        }
+
         byte_string_chars_format format = jsoncons::detail::resolve_byte_string_chars_format(byte_string_format_, 
-                                                                                   encoding_hint, 
-                                                                                   byte_string_chars_format::base64url);
+                                                                                             encoding_hint, 
+                                                                                             byte_string_chars_format::base64url);
         switch (format)
         {
             case byte_string_chars_format::base16:
@@ -1272,13 +1288,29 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              byte_string_chars_format encoding_hint,
-                              semantic_tag_type,
+                              semantic_tag_type tag,
                               const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
             result_.push_back(',');
+        }
+
+        byte_string_chars_format encoding_hint;
+        switch (tag)
+        {
+            case semantic_tag_type::base16:
+                encoding_hint = byte_string_chars_format::base16;
+                break;
+            case semantic_tag_type::base64:
+                encoding_hint = byte_string_chars_format::base64;
+                break;
+            case semantic_tag_type::base64url:
+                encoding_hint = byte_string_chars_format::base64url;
+                break;
+            default:
+                encoding_hint = byte_string_chars_format::none;
+                break;
         }
 
         byte_string_chars_format format = jsoncons::detail::resolve_byte_string_chars_format(byte_string_format_, 

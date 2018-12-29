@@ -18,7 +18,7 @@ void serialize_to_cbor_buffer()
     writer.string_value("cat");
     writer.byte_string_value(byte_string({'p','u','r','r'}));
     writer.byte_string_value(byte_string({'h','i','s','s'}),
-                             byte_string_chars_format::base64); // suggested conversion to base64
+                             semantic_tag_type::base64); // suggested conversion to base64
     writer.int64_value(1431027667, semantic_tag_type::timestamp);
     writer.end_array();
     writer.flush();
@@ -182,7 +182,7 @@ void encode_cbor_byte_string()
 void encode_byte_string_with_encoding_hint()
 {
     // construct byte string value
-     json j1(byte_string("Hello"), byte_string_chars_format::base64);
+     json j1(byte_string("Hello"), semantic_tag_type::base64);
 
     std::vector<uint8_t> buf;
     cbor::encode_cbor(j1, buf);
