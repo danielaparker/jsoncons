@@ -2639,6 +2639,32 @@ public:
     {
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+
+    basic_json(const byte_string_view& bs, 
+                        byte_string_chars_format encoding_hint,
+                        semantic_tag_type tag = semantic_tag_type::none)
+        : var_(bs, tag)
+    {
+        switch (encoding_hint)
+        {
+            {
+                case semantic_tag_type::base16:
+                    var_ = variant(bs, semantic_tag_type::base16);
+                    break;
+                case semantic_tag_type::base64:
+                    var_ = variant(bs, semantic_tag_type::base64);
+                    break;
+                case semantic_tag_type::base64url:
+                    var_ = variant(bs, semantic_tag_type::base64url);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+#endif
+
     explicit basic_json(const byte_string_view& bs, 
                         semantic_tag_type tag = semantic_tag_type::none)
         : var_(bs, tag)

@@ -116,6 +116,55 @@ public:
     {
         return do_byte_string_value(byte_string(p, size), tag, context);
     }
+#if !defined(JSONCONS_NO_DEPRECATED)
+    bool byte_string_value(const byte_string_view& b, 
+                           byte_string_chars_format encoding_hint, 
+                           semantic_tag_type tag=semantic_tag_type::none, 
+                           const serializing_context& context=null_serializing_context())
+    {
+        switch (encoding_hint)
+        {
+            {
+                case semantic_tag_type::base16:
+                    tag = semantic_tag_type::base16;
+                    break;
+                case semantic_tag_type::base64:
+                    tag = semantic_tag_type::base64;
+                    break;
+                case semantic_tag_type::base64url:
+                    tag = semantic_tag_type::base64url;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return do_byte_string_value(b, tag, context);
+    }
+
+    bool byte_string_value(const uint8_t* p, size_t size, 
+                           byte_string_chars_format encoding_hint, 
+                           semantic_tag_type tag=semantic_tag_type::none, 
+                           const serializing_context& context=null_serializing_context())
+    {
+        switch (encoding_hint)
+        {
+            {
+                case semantic_tag_type::base16:
+                    tag = semantic_tag_type::base16;
+                    break;
+                case semantic_tag_type::base64:
+                    tag = semantic_tag_type::base64;
+                    break;
+                case semantic_tag_type::base64url:
+                    tag = semantic_tag_type::base64url;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return do_byte_string_value(byte_string(p, size), tag, context);
+    }
+#endif
 
     bool big_integer_value(const string_view_type& s, const serializing_context& context=null_serializing_context()) 
     {
