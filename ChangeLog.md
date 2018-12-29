@@ -1,7 +1,7 @@
 master
 ------
 
-New features
+New features:
 
 - bson UTC datetime associated with jsoncons `semantic_tag_type::timestamp`
 
@@ -13,6 +13,21 @@ New features
   are no longer restricted to filter expressions.
 
 - New jsonpath functions `sum`, `count`, `avg`, and `prod` have been added.
+
+- Added `semantic_tag_type::base16`, `semantic_tag_type::base64`, `semantic_tag_type::base64url`
+
+Non-breaking changes:
+
+- The json constructor that takes a `byte_string` and a `byte_string_chars_format` 
+  has been deprecated, use a `semantic_tag_type` to supply an encoding hint for a byte string, if any.
+
+- The content handler `byte_string_value` function that takes a `byte_string` and a `byte_string_chars_format` 
+  has been deprecated, use a `semantic_tag_type` to supply an encoding hint for a byte string, if any.
+
+Changes:
+
+- The `byte_string_chars_format` parameter in the content handler `do_byte_string_value` function
+  has been removed, the `semantic_tag_type` parameter is now used to supply an encoding hint for a byte string, if any.
 
 v0.114.0
 --------
