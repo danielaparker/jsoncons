@@ -2649,13 +2649,13 @@ public:
         switch (encoding_hint)
         {
             {
-                case semantic_tag_type::base16:
+                case byte_string_chars_format::base16:
                     var_ = variant(bs, semantic_tag_type::base16);
                     break;
-                case semantic_tag_type::base64:
+                case byte_string_chars_format::base64:
                     var_ = variant(bs, semantic_tag_type::base64);
                     break;
-                case semantic_tag_type::base64url:
+                case byte_string_chars_format::base64url:
                     var_ = variant(bs, semantic_tag_type::base64url);
                     break;
                 default:
