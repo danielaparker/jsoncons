@@ -63,9 +63,11 @@ namespace jsoncons
 #endif
 
 #define JSONCONS_DEFINE_LITERAL( name, lit ) \
-template< class Ch > Ch const* name(); \
+template<class CharT> CharT const* name(); \
 template<> inline char const * name<char>() { return lit; } \
-template<> inline wchar_t const* name<wchar_t>() { return L ## lit; }
+template<> inline wchar_t const* name<wchar_t>() { return L ## lit; } \
+template<> inline char16_t const* name<char16_t>() { return u ## lit; } \
+template<> inline char32_t const* name<char32_t>() { return U ## lit; }
 
 }
 
