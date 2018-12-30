@@ -16,20 +16,21 @@ enum class jsonpath_errc
 {
     ok = 0,
     expected_root = 1,
-    expected_right_bracket = 2,
-    expected_name = 3,
-    expected_separator = 4,
-    invalid_filter = 5,
-    invalid_filter_expected_slash = 6,
-    invalid_filter_unbalanced_paren = 7,
-    invalid_filter_unsupported_operator = 8,
-    invalid_filter_expected_right_brace = 9,
-    invalid_filter_expected_primary = 10,
-    expected_index = 11,
-    expected_left_bracket_token = 12,
-    unexpected_operator = 13,
-    invalid_function_name = 14,
-    invalid_function_argument = 15
+    expected_current_node = 2,
+    expected_right_bracket = 3,
+    expected_name = 4,
+    expected_separator = 5,
+    invalid_filter = 6,
+    invalid_filter_expected_slash = 7,
+    invalid_filter_unbalanced_paren = 8,
+    invalid_filter_unsupported_operator = 9,
+    invalid_filter_expected_right_brace = 10,
+    invalid_filter_expected_primary = 11,
+    expected_index = 12,
+    expected_left_bracket_token = 13,
+    unexpected_operator = 14,
+    invalid_function_name = 15,
+    invalid_function_argument = 16
 };
 
 class jsonpath_error_category_impl
@@ -46,6 +47,8 @@ public:
         {
         case jsonpath_errc::expected_root:
             return "Expected $";
+        case jsonpath_errc::expected_current_node:
+            return "Expected @";
         case jsonpath_errc::expected_right_bracket:
             return "Expected ]";
         case jsonpath_errc::expected_name:

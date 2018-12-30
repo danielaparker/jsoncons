@@ -40,14 +40,14 @@ Json json_query(const Json& root, const typename Json::string_view_type& path, r
 {
     if (result_t == result_type::value)
     {
-        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
-        evaluator.evaluate('$',root, path);
+        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator('$');
+        evaluator.evaluate(root, path);
         return evaluator.get_values();
     }
     else
     {
-        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
-        evaluator.evaluate('$',root, path);
+        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator('$');
+        evaluator.evaluate(root, path);
         return evaluator.get_normalized_paths();
     }
 }
@@ -55,8 +55,8 @@ Json json_query(const Json& root, const typename Json::string_view_type& path, r
 template<class Json, class T>
 void json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
 {
-    jsoncons::jsonpath::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
-    evaluator.evaluate('$', root, path);
+    jsoncons::jsonpath::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator('$');
+    evaluator.evaluate(root, path);
     evaluator.replace(std::forward<T>(new_value));
 }
 
@@ -510,8 +510,8 @@ private:
     };
     function_table functions_;
 
+    char_type path_start_;
     default_parse_error_handler default_err_handler_;
-    parse_error_handler *err_handler_;
     path_state state_;
     string_type buffer_;
     size_t start_;
@@ -533,8 +533,8 @@ private:
     std::vector<std::unique_ptr<Json>> temp_json_values_;
 
 public:
-    jsonpath_evaluator()
-        : err_handler_(&default_err_handler_),
+    jsonpath_evaluator(char_type path_start)
+        : path_start_(path_start),
           state_(path_state::start),
           start_(0), positive_start_(true), 
           end_(0), positive_end_(true), undefined_end_(false),
@@ -611,26 +611,24 @@ public:
         }
     }
 
-    void evaluate(char_type path_start, reference root, const string_view_type& path)
+    void evaluate(reference root, const string_view_type& path)
     {
         std::error_code ec;
-        evaluate(path_start, root, path.data(), path.length(), ec);
+        evaluate(root, path.data(), path.length(), ec);
         if (ec)
         {
             throw serialization_error(ec, line_, column_);
         }
     }
 
-    void evaluate(char_type path_start, 
-                  reference root, 
+    void evaluate(reference root, 
                   const string_view_type& path, 
                   std::error_code& ec)
     {
-        evaluate(path_start, root, path.data(), path.length(), ec);
+        evaluate(root, path.data(), path.length(), ec);
     }
 
-    void evaluate(char_type path_start, 
-                  reference root, 
+    void evaluate(reference root, 
                   const char_type* path, 
                   size_t length,
                   std::error_code& ec)
@@ -682,11 +680,18 @@ public:
                     case '$':
                     case '@':
                     {
-                        if (*p_ != path_start)
+                        if (*p_ != path_start_)
                         {
-                            err_handler_->fatal_error(jsonpath_errc::expected_root, *this);
-                            ec = jsonpath_errc::expected_root;
-                            return;
+                            if (*p_ == '@')
+                            {
+                                ec = jsonpath_errc::expected_root;
+                                return;
+                            }
+                            else
+                            {
+                                ec = jsonpath_errc::expected_current_node;
+                                return;
+                            }
                         }
                         string_type s;
                         s.push_back(*p_);
@@ -703,7 +708,6 @@ public:
                         {
                             case '.':
                             case '[':
-                                err_handler_->fatal_error(jsonpath_errc::expected_root, *this);
                                 ec = jsonpath_errc::expected_root;
                                 return;
                             default: // might be function, validate name later
@@ -737,8 +741,8 @@ public:
                 {
                 case ')':
                 {
-                    jsonpath_evaluator<Json,JsonReference,PathCons> evaluator;
-                    evaluator.evaluate('$', root, buffer_, ec);
+                    jsonpath_evaluator<Json,JsonReference,PathCons> evaluator('$');
+                    evaluator.evaluate(root, buffer_, ec);
                     if (ec)
                     {
                         return;
@@ -753,7 +757,7 @@ public:
                     auto result = it->second(evaluator.get_pointers());
 
                     string_type s;
-                    s.push_back(path_start);
+                    s.push_back(path_start_);
                     node_set v;
 
                     pointer ptr = create_temp(std::move(result));
@@ -788,7 +792,6 @@ public:
                 switch (*p_)
                 {
                 case '.':
-                    err_handler_->fatal_error(jsonpath_errc::expected_name, *this);
                     ec = jsonpath_errc::expected_name;
                     return;
                 case '*':
@@ -821,7 +824,6 @@ public:
                     state_ = path_state::left_bracket;
                     break;
                 default:
-                    err_handler_->fatal_error(jsonpath_errc::expected_separator, *this);
                     ec = jsonpath_errc::expected_separator;
                     return;
                 };
@@ -841,7 +843,6 @@ public:
                 case ' ':case '\t':
                     break;
                 default:
-                    err_handler_->fatal_error(jsonpath_errc::expected_right_bracket, *this);
                     ec = jsonpath_errc::expected_right_bracket;
                     return;
                 }
@@ -912,7 +913,6 @@ public:
                 case ':':
                     if (!try_string_to_index(buffer_.data(), buffer_.size(), &start_, &positive_start_))
                     {
-                        err_handler_->fatal_error(jsonpath_errc::expected_index, *this);
                         ec = jsonpath_errc::expected_index;
                         return;
                     }
