@@ -94,8 +94,7 @@ struct VoidPathConstructor
 
 template <class Json,
           class JsonReference,
-          class PathCons,
-          char PathStart>
+          class PathCons>
 class jsonpath_evaluator;
 
 enum class filter_state
@@ -685,8 +684,8 @@ public:
 
     void initialize(const Json& context_node) override
     {
-        jsonpath_evaluator<Json,const Json&,VoidPathConstructor<Json>,'@'> evaluator;
-        evaluator.evaluate(context_node, path_);
+        jsonpath_evaluator<Json,const Json&,VoidPathConstructor<Json>> evaluator;
+        evaluator.evaluate('@', context_node, path_);
         nodes_ = evaluator.get_values();
     }
 
@@ -1286,8 +1285,8 @@ public:
                             try
                             {
                                 // path, parse against root, get value
-                                jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>,'$'> evaluator;
-                                evaluator.evaluate(root, buffer);
+                                jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
+                                evaluator.evaluate('$', root, buffer);
                                 auto result = evaluator.get_values();
                                 if (result.size() > 0)
                                 {

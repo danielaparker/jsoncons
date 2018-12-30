@@ -40,14 +40,14 @@ Json json_query(const Json& root, const typename Json::string_view_type& path, r
 {
     if (result_t == result_type::value)
     {
-        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>,'$'> evaluator;
-        evaluator.evaluate(root, path);
+        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
+        evaluator.evaluate('$',root, path);
         return evaluator.get_values();
     }
     else
     {
-        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>,'$'> evaluator;
-        evaluator.evaluate(root, path);
+        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
+        evaluator.evaluate('$',root, path);
         return evaluator.get_normalized_paths();
     }
 }
@@ -55,8 +55,8 @@ Json json_query(const Json& root, const typename Json::string_view_type& path, r
 template<class Json, class T>
 void json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
 {
-    jsoncons::jsonpath::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>,'$'> evaluator;
-    evaluator.evaluate(root, path);
+    jsoncons::jsonpath::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
+    evaluator.evaluate('$', root, path);
     evaluator.replace(std::forward<T>(new_value));
 }
 
@@ -143,8 +143,7 @@ enum class path_state
 
 template<class Json,
          class JsonReference,
-         class PathCons,
-         char PathStart>
+         class PathCons>
 class jsonpath_evaluator : private serializing_context
 {
 private:
@@ -612,24 +611,26 @@ public:
         }
     }
 
-    void evaluate(reference root, const string_view_type& path)
+    void evaluate(char_type path_start, reference root, const string_view_type& path)
     {
         std::error_code ec;
-        evaluate(root, path.data(), path.length(), ec);
+        evaluate(path_start, root, path.data(), path.length(), ec);
         if (ec)
         {
             throw serialization_error(ec, line_, column_);
         }
     }
 
-    void evaluate(reference root, 
+    void evaluate(char_type path_start, 
+                  reference root, 
                   const string_view_type& path, 
                   std::error_code& ec)
     {
-        evaluate(root, path.data(), path.length(), ec);
+        evaluate(path_start, root, path.data(), path.length(), ec);
     }
 
-    void evaluate(reference root, 
+    void evaluate(char_type path_start, 
+                  reference root, 
                   const char_type* path, 
                   size_t length,
                   std::error_code& ec)
@@ -678,8 +679,15 @@ public:
                 {
                     case ' ':case '\t':
                         break;
-                    case PathStart:
+                    case '$':
+                    case '@':
                     {
+                        if (*p_ != path_start)
+                        {
+                            err_handler_->fatal_error(jsonpath_errc::expected_root, *this);
+                            ec = jsonpath_errc::expected_root;
+                            return;
+                        }
                         string_type s;
                         s.push_back(*p_);
                         node_set v;
@@ -729,8 +737,8 @@ public:
                 {
                 case ')':
                 {
-                    jsonpath_evaluator<Json,JsonReference,PathCons,'$'> evaluator;
-                    evaluator.evaluate(root, buffer_, ec);
+                    jsonpath_evaluator<Json,JsonReference,PathCons> evaluator;
+                    evaluator.evaluate('$', root, buffer_, ec);
                     if (ec)
                     {
                         return;
@@ -745,7 +753,7 @@ public:
                     auto result = it->second(evaluator.get_pointers());
 
                     string_type s;
-                    s.push_back(PathStart);
+                    s.push_back(path_start);
                     node_set v;
 
                     pointer ptr = create_temp(std::move(result));
