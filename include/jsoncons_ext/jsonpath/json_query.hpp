@@ -26,6 +26,64 @@ JSONCONS_DEFINE_LITERAL(sum_literal,"sum")
 JSONCONS_DEFINE_LITERAL(prod_literal,"prod")
 JSONCONS_DEFINE_LITERAL(count_literal,"count")
 
+template <class JsonPointer>
+class argument
+{
+public:
+    typedef JsonPointer pointer;
+
+    virtual const std::vector<pointer>& nodes() const = 0;
+};
+
+template <class JsonPointer>
+class node_set_argument : public argument<JsonPointer>
+{
+public:
+    typedef JsonPointer pointer;
+private:
+    std::vector<pointer> nodes_;
+public:
+    node_set_argument(const std::vector<pointer>& nodes)
+        : nodes_(nodes)
+    {
+    }
+    node_set_argument(std::vector<pointer>&& nodes)
+        : nodes_(std::move(nodes))
+    {
+    }
+
+    const std::vector<pointer>& nodes() const override
+    {
+        return nodes_;
+    }
+};
+
+template <class Json, class JsonPointer>
+class value_argument : public argument<JsonPointer>
+{
+public:
+    typedef JsonPointer pointer;
+private:
+    Json value_;
+    std::vector<pointer> nodes_;
+public:
+    value_argument(const Json& value)
+        : value_(value)
+    {
+        nodes_.push_back(&value_);
+    }
+    value_argument(Json&& value)
+        : value_(std::move(value))
+    {
+        nodes_.push_back(&value_);
+    }
+
+    const std::vector<pointer>& nodes() const override
+    {
+        return nodes_;
+    }
+};
+
 // work around for std::make_unique not being available until C++14
 template<typename T, typename... Args>
 std::unique_ptr<T> make_unique_ptr(Args&&... args)
@@ -412,16 +470,17 @@ private:
 
     class function_table
     {
-        typedef std::function<Json(const std::vector<pointer>&)> function_type;
+        typedef std::function<Json(std::vector<std::unique_ptr<argument<pointer>>>)> function_type;
         typedef std::map<string_type,function_type> function_dictionary;
 
         const function_dictionary functions_ =
         {
             {
-                max_literal<char_type>(),[](const std::vector<pointer>& nodes)
+                max_literal<char_type>(),[](std::vector<std::unique_ptr<argument<pointer>>> args)
                       {
+                          auto arg = args[0].get();
                           double v = std::numeric_limits<double>::lowest();
-                          for (auto& node : nodes)
+                          for (auto& node : arg->nodes())
                           {
                               double x = node->template as<double>();
                               if (x > v)
@@ -433,11 +492,11 @@ private:
                       }
             },
             {
-                min_literal<char_type>(),[](const std::vector<pointer>& nodes) 
+                min_literal<char_type>(),[](std::vector<std::unique_ptr<argument<pointer>>> args) 
                       {
-                          std::vector<pointer> result;
+                          auto arg = args[0].get();
                           double v = (std::numeric_limits<double>::max)(); 
-                          for (const auto& node : nodes)
+                          for (const auto& node : arg->nodes())
                           {
                               double x = node->template as<double>();
                               if (x < v)
@@ -449,21 +508,23 @@ private:
                       }
             },
             {
-                avg_literal<char_type>(),[](const std::vector<pointer>& nodes)
+                avg_literal<char_type>(),[](std::vector<std::unique_ptr<argument<pointer>>> args)
                       {
+                          auto arg = args[0].get();
                           double v = 0.0;
-                          for (const auto& node : nodes)
+                          for (const auto& node : arg->nodes())
                           {
                               v += node->template as<double>();
                           }
-                          return nodes.size() > 0 ? Json(v/nodes.size()) : Json::null();
+                          return arg->nodes().size() > 0 ? Json(v/arg->nodes().size()) : Json::null();
                       }
             },
             {
-                sum_literal<char_type>(),[](const std::vector<pointer>& nodes)
+                sum_literal<char_type>(),[](std::vector<std::unique_ptr<argument<pointer>>> args)
                       {
+                          auto arg = args[0].get();
                           double v = 0.0;
-                          for (const auto& node : nodes)
+                          for (const auto& node : arg->nodes())
                           {
                               v += node->template as<double>();
                           }
@@ -471,10 +532,11 @@ private:
                       }
             },
             {
-                count_literal<char_type>(),[](const std::vector<pointer>& nodes)
+                count_literal<char_type>(),[](std::vector<std::unique_ptr<argument<pointer>>> args)
                       {
+                          auto arg = args[0].get();
                           size_t count = 0;
-                          while (count < nodes.size())
+                          while (count < arg->nodes().size())
                           {
                               ++count;
                           }
@@ -482,10 +544,11 @@ private:
                       }
             },
             {
-                prod_literal<char_type>(),[](const std::vector<pointer>& nodes)
+                prod_literal<char_type>(),[](std::vector<std::unique_ptr<argument<pointer>>> args)
                       {
+                          auto arg = args[0].get();
                           double v = 0.0;
-                          for (const auto& node : nodes)
+                          for (const auto& node : arg->nodes())
                           {
                               double x = node->template as<double>();
                               v == 0.0 && x != 0.0
@@ -531,6 +594,7 @@ private:
     const char_type* p_;
     std::vector<std::unique_ptr<selector>> selectors_;
     std::vector<std::unique_ptr<Json>> temp_json_values_;
+    std::vector<std::unique_ptr<argument<pointer>>> function_stack_;
 
 public:
     jsonpath_evaluator(char_type path_start)
@@ -754,7 +818,9 @@ public:
                         ec = jsonpath_errc::invalid_filter_unsupported_operator;
                         return;
                     }
-                    auto result = it->second(evaluator.get_pointers());
+
+                    function_stack_.push_back(make_unique_ptr<node_set_argument<pointer>>(evaluator.get_pointers()));
+                    auto result = it->second(std::move(function_stack_));
 
                     string_type s;
                     s.push_back(path_start_);
