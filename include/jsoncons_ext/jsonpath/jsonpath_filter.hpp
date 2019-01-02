@@ -684,7 +684,7 @@ public:
 
     void initialize(const Json& context_node) override
     {
-        jsonpath_evaluator<Json,const Json&,VoidPathConstructor<Json>> evaluator('@');
+        jsonpath_evaluator<Json,const Json&,VoidPathConstructor<Json>> evaluator;
         evaluator.evaluate(context_node, path_);
         nodes_ = evaluator.get_values();
     }
@@ -1285,7 +1285,7 @@ public:
                             try
                             {
                                 // path, parse against root, get value
-                                jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator('$');
+                                jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
                                 evaluator.evaluate(root, buffer);
                                 auto result = evaluator.get_values();
                                 if (result.size() > 0)
@@ -1562,7 +1562,7 @@ public:
                     break;
                 }
                     case '@':
-                    buffer.push_back(*p);
+                    buffer.push_back('$');
                     state = filter_state::path;
                     ++p;
                     ++column_;

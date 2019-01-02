@@ -63,13 +63,13 @@ Json json_query(const Json& root, const typename Json::string_view_type& path, r
 {
     if (result_t == result_type::value)
     {
-        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator('$');
+        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
         evaluator.evaluate(root, path);
         return evaluator.get_values();
     }
     else
     {
-        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator('$');
+        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
         evaluator.evaluate(root, path);
         return evaluator.get_normalized_paths();
     }
@@ -78,7 +78,7 @@ Json json_query(const Json& root, const typename Json::string_view_type& path, r
 template<class Json, class T>
 void json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
 {
-    jsoncons::jsonpath::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator('$');
+    jsoncons::jsonpath::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
     evaluator.evaluate(root, path);
     evaluator.replace(std::forward<T>(new_value));
 }
@@ -165,6 +165,7 @@ enum class path_state
     unquoted_argument,
     single_quoted_argument,
     double_quoted_argument,
+    expect_comma_or_right_round_bracket,
     dot
 };
 
@@ -542,7 +543,6 @@ private:
     };
     function_table functions_;
 
-    char_type path_start_;
     default_parse_error_handler default_err_handler_;
     path_state state_;
     string_type buffer_;
@@ -566,9 +566,8 @@ private:
     std::vector<node_set<pointer>> function_stack_;
 
 public:
-    jsonpath_evaluator(char_type path_start)
-        : path_start_(path_start),
-          state_(path_state::start),
+    jsonpath_evaluator()
+        : state_(path_state::start),
           start_(0), positive_start_(true), 
           end_(0), positive_end_(true), undefined_end_(false),
           step_(0), positive_step_(true),
@@ -621,7 +620,7 @@ public:
         auto result = it->second(function_stack_);
 
         string_type s;
-        s.push_back(path_start_);
+        s.push_back('$');
         node_selection v;
 
         pointer ptr = create_temp(std::move(result));
@@ -731,21 +730,7 @@ public:
                         case ' ':case '\t':
                             break;
                         case '$':
-                        case '@':
                         {
-                            if (*p_ != path_start_)
-                            {
-                                if (*p_ == '@')
-                                {
-                                    ec = jsonpath_errc::expected_root;
-                                    return;
-                                }
-                                else
-                                {
-                                    ec = jsonpath_errc::expected_current_node;
-                                    return;
-                                }
-                            }
                             string_type s;
                             s.push_back(*p_);
                             node_selection v;
@@ -820,7 +805,7 @@ public:
                     {
                         case ',':
                         {
-                            jsonpath_evaluator<Json, JsonReference, PathCons> evaluator('$');
+                            jsonpath_evaluator<Json, JsonReference, PathCons> evaluator;
                             evaluator.evaluate(root, buffer_, ec);
                             if (ec)
                             {
@@ -832,7 +817,7 @@ public:
                         }
                         case ')':
                         {
-                            jsonpath_evaluator<Json,JsonReference,PathCons> evaluator('$');
+                            jsonpath_evaluator<Json,JsonReference,PathCons> evaluator;
                             evaluator.evaluate(root, buffer_, ec);
                             if (ec)
                             {
@@ -856,7 +841,7 @@ public:
                     ++p_;
                     ++column_;
                     break;
-                case path_state::single_quoted_argument:
+                case path_state::unquoted_argument:
                     switch (*p_)
                     {
                         case ',':
@@ -896,6 +881,81 @@ public:
                         default:
                             buffer_.push_back(*p_);
                             break;
+                    }
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::single_quoted_argument:
+                    switch (*p_)
+                    {
+                        case '\'':
+                            buffer_.push_back('\"');
+                            state_ = path_state::expect_comma_or_right_round_bracket;
+                            break;
+                        default:
+                            buffer_.push_back(*p_);
+                            break;
+                    }
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::double_quoted_argument:
+                    switch (*p_)
+                    {
+                        case '\"':
+                            buffer_.push_back('\"');
+                            state_ = path_state::expect_comma_or_right_round_bracket;
+                            break;
+                        default:
+                            buffer_.push_back(*p_);
+                            break;
+                    }
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::expect_comma_or_right_round_bracket:
+                    switch (*p_)
+                    {
+                        case ' ':
+                        case '\t':
+                            break;
+                        case ',':
+                            try
+                            {
+                                auto val = Json::parse(buffer_);
+                                auto temp = create_temp(val);
+                                function_stack_.push_back(node_set<pointer>(std::vector<pointer>{temp}));
+                            }
+                            catch (const serialization_error& e)
+                            {
+                                throw serialization_error(e.code(),line_,column_);
+                            }
+                            buffer_.clear();
+                            state_ = path_state::function_argument;
+                            break;
+                        case ')':
+                        {
+                            try
+                            {
+                                auto val = Json::parse(buffer_);
+                                auto temp = create_temp(val);
+                                function_stack_.push_back(node_set<pointer>(std::vector<pointer>{temp}));
+                            }
+                            catch (const serialization_error& e)
+                            {
+                                throw serialization_error(e.code(),line_,column_);
+                            }
+                            invoke_function(function_name, ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            state_ = path_state::expect_dot_or_left_bracket;
+                            break;
+                        }
+                        default:
+                            ec = jsonpath_errc::invalid_filter_unsupported_operator;
+                            return;
                     }
                     ++p_;
                     ++column_;
