@@ -58,7 +58,7 @@ TEST_CASE("jsonpath function tests")
         }
     }
     )");
-
+#if 0
     SECTION("sum")
     {
         json result = json_query(store,"count($.store.book[*])");
@@ -134,6 +134,12 @@ TEST_CASE("jsonpath function tests")
         json result = json_query(store,path);
 
         CHECK(result == expected);
+    }
+#endif
+    SECTION("tokenize")
+    {
+        json j("Hello world");
+        json result = json_query(j,"tokenize($,' ')");
     }
 }
 

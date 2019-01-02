@@ -25,6 +25,7 @@ JSONCONS_DEFINE_LITERAL(min_literal,"min")
 JSONCONS_DEFINE_LITERAL(sum_literal,"sum")
 JSONCONS_DEFINE_LITERAL(prod_literal,"prod")
 JSONCONS_DEFINE_LITERAL(count_literal,"count")
+JSONCONS_DEFINE_LITERAL(tokenize_literal,"tokenize")
 
 template <class JsonPointer>
 class node_set 
@@ -528,6 +529,15 @@ private:
                           }
                           return Json(v);
                       }
+            },
+            {
+                tokenize_literal<char_type>(),[](const std::vector<node_set<pointer>>& args)
+                      {
+                          assert(args.size() == 2);
+                          const auto& arg1 = args[0];
+                          const auto& arg2 = args[1];
+                          return Json();
+                      }
             }
         };
     public:
@@ -781,19 +791,22 @@ public:
                         case '\t':
                             break;
                         case '$':
-                        case '@':
+                            buffer_.clear();
                             buffer_.push_back(*p_);
                             state_ = path_state::path_argument;
                             break;
                         case '\'':
+                            buffer_.clear();
                             buffer_.push_back('\"');
                             state_ = path_state::single_quoted_argument;
                             break;
                         case '\"':
+                            buffer_.clear();
                             buffer_.push_back('\"');
                             state_ = path_state::double_quoted_argument;
                             break;
                         default:
+                            buffer_.clear();
                             state_ = path_state::unquoted_argument;
                             break;
                     }
