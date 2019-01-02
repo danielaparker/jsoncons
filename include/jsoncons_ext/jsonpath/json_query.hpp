@@ -13,6 +13,7 @@
 #include <type_traits> // std::is_const
 #include <limits> // std::numeric_limits
 #include <utility> // std::move
+#include <regex>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_filter.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
@@ -441,103 +442,151 @@ private:
 
     class function_table
     {
-        typedef std::function<Json(const std::vector<node_set<pointer>>&)> function_type;
+        typedef std::function<Json(const std::vector<node_set<pointer>>&, std::error_code&)> function_type;
         typedef std::map<string_type,function_type> function_dictionary;
 
         const function_dictionary functions_ =
         {
             {
-                max_literal<char_type>(),[](const std::vector<node_set<pointer>>& args)
-                      {
-                          const auto& arg = args[0];
-                          double v = std::numeric_limits<double>::lowest();
-                          for (auto& node : arg.nodes())
-                          {
-                              double x = node->template as<double>();
-                              if (x > v)
-                              {
-                                  v = x;
-                              }
-                          }
-                          return Json(v);
-                      }
+                max_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
+                    {
+                       if (args.size() != 1)
+                       {
+                           ec = jsonpath_errc::invalid_function_argument;
+                           return Json(); 
+                       }
+                        const auto& arg = args[0];
+                        double v = std::numeric_limits<double>::lowest();
+                        for (auto& node : arg.nodes())
+                        {
+                            double x = node->template as<double>();
+                            if (x > v)
+                            {
+                                v = x;
+                            }
+                        }
+                        return Json(v);
+                    }
             },
             {
-                min_literal<char_type>(),[](const std::vector<node_set<pointer>>& args) 
-                      {
-                          const auto& arg = args[0];
-                          double v = (std::numeric_limits<double>::max)(); 
-                          for (const auto& node : arg.nodes())
-                          {
-                              double x = node->template as<double>();
-                              if (x < v)
-                              {
-                                  v = x;
-                              }
-                          }
-                          return Json(v);
-                      }
+                min_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec) 
+                    {
+                        if (args.size() != 1)
+                        {
+                            ec = jsonpath_errc::invalid_function_argument;
+                            return Json();
+                        }
+                        const auto& arg = args[0];
+                        double v = (std::numeric_limits<double>::max)(); 
+                        for (const auto& node : arg.nodes())
+                        {
+                            double x = node->template as<double>();
+                            if (x < v)
+                            {
+                                v = x;
+                            }
+                        }
+                        return Json(v);
+                    }
             },
             {
-                avg_literal<char_type>(),[](const std::vector<node_set<pointer>>& args)
-                      {
-                          const auto& arg = args[0];
-                          double v = 0.0;
-                          for (const auto& node : arg.nodes())
-                          {
-                              v += node->template as<double>();
-                          }
-                          return arg.nodes().size() > 0 ? Json(v/arg.nodes().size()) : Json::null();
-                      }
+                avg_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
+                    {
+                        if (args.size() != 1)
+                        {
+                            ec = jsonpath_errc::invalid_function_argument;
+                            return Json();
+                        }
+                        const auto& arg = args[0];
+                        double v = 0.0;
+                        for (const auto& node : arg.nodes())
+                        {
+                            v += node->template as<double>();
+                        }
+                        return arg.nodes().size() > 0 ? Json(v/arg.nodes().size()) : Json::null();
+                    }
             },
             {
-                sum_literal<char_type>(),[](const std::vector<node_set<pointer>>& args)
-                      {
-                          const auto& arg = args[0];
-                          double v = 0.0;
-                          for (const auto& node : arg.nodes())
-                          {
-                              v += node->template as<double>();
-                          }
-                          return Json(v);
-                      }
+                sum_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
+                    {
+                        if (args.size() != 1)
+                        {
+                            ec = jsonpath_errc::invalid_function_argument;
+                            return Json();
+                        }
+                        const auto& arg = args[0];
+                        double v = 0.0;
+                        for (const auto& node : arg.nodes())
+                        {
+                            v += node->template as<double>();
+                        }
+                        return Json(v);
+                    }
             },
             {
-                count_literal<char_type>(),[](const std::vector<node_set<pointer>>& args)
-                      {
-                          const auto& arg = args[0];
-                          size_t count = 0;
-                          while (count < arg.nodes().size())
-                          {
-                              ++count;
-                          }
-                          return Json(count);
-                      }
+                count_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
+                    {
+                        if (args.size() != 1)
+                        {
+                            ec = jsonpath_errc::invalid_function_argument;
+                            return Json();
+                        }
+                        const auto& arg = args[0];
+                        size_t count = 0;
+                        while (count < arg.nodes().size())
+                        {
+                            ++count;
+                        }
+                        return Json(count);
+                    }
             },
             {
-                prod_literal<char_type>(),[](const std::vector<node_set<pointer>>& args)
-                      {
-                          const auto& arg = args[0];
-                          double v = 0.0;
-                          for (const auto& node : arg.nodes())
-                          {
-                              double x = node->template as<double>();
-                              v == 0.0 && x != 0.0
-                              ? (v = x)
-                              : (v *= x);
+                prod_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
+                    {
+                        if (args.size() != 1)
+                        {
+                            ec = jsonpath_errc::invalid_function_argument;
+                            return Json();
+                        }
+                        const auto& arg = args[0];
+                        double v = 0.0;
+                        for (const auto& node : arg.nodes())
+                        {
+                            double x = node->template as<double>();
+                            v == 0.0 && x != 0.0
+                            ? (v = x)
+                            : (v *= x);
 
-                          }
-                          return Json(v);
-                      }
+                        }
+                        return Json(v);
+                    }
             },
             {
-                tokenize_literal<char_type>(),[](const std::vector<node_set<pointer>>& args)
-                      {
-                          assert(args.size() == 2);
-                          const auto& arg1 = args[0];
-                          const auto& arg2 = args[1];
-                          return Json();
-                      }
+                tokenize_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
+                    {
+                        if (args.size() != 2)
+                        {
+                            ec = jsonpath_errc::invalid_function_argument;
+                            return Json();
+                        }
+                        string_type arg1 = args[0].nodes()[0]->as_string();
+                        string_type arg2 = args[1].nodes()[0]->as_string();
+
+                        std::regex::flag_type flags = std::regex_constants::ECMAScript; 
+                        std::basic_regex<char_type> pieces_regex(arg2, flags);
+
+                        std::regex_token_iterator<string_type::const_iterator> rit ( arg1.begin(), arg1.end(), pieces_regex, -1);
+                        std::regex_token_iterator<string_type::const_iterator> rend;
+
+                        Json j = Json::array();
+                        while (rit!=rend) 
+                        {
+                            j.push_back(rit->str());
+                            //std::cout << rit->str() << std::endl;
+                            ++rit;
+                        }
+                        return j;
+                    }
             }
         };
     public:
@@ -627,7 +676,11 @@ public:
             return;
         }
 
-        auto result = it->second(function_stack_);
+        auto result = it->second(function_stack_, ec);
+        if (ec)
+        {
+            return;
+        }
 
         string_type s;
         s.push_back('$');

@@ -138,8 +138,12 @@ TEST_CASE("jsonpath function tests")
 #endif
     SECTION("tokenize")
     {
-        json j("Hello world");
-        json result = json_query(j,"tokenize($,' ')");
+        json j("The cat sat on the mat");
+        json result = json_query(j,"tokenize($,'\\\\s+')");
+
+        json expected = json::parse("[[\"The\",\"cat\",\"sat\",\"on\",\"the\",\"mat\"]]");
+
+        CHECK(result == expected);
     }
 }
 
