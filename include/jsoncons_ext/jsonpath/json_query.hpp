@@ -27,58 +27,23 @@ JSONCONS_DEFINE_LITERAL(prod_literal,"prod")
 JSONCONS_DEFINE_LITERAL(count_literal,"count")
 
 template <class JsonPointer>
-class argument
-{
-public:
-    typedef JsonPointer pointer;
-
-    virtual const std::vector<pointer>& nodes() const = 0;
-};
-
-template <class JsonPointer>
-class node_set_argument : public argument<JsonPointer>
+class node_set 
 {
 public:
     typedef JsonPointer pointer;
 private:
     std::vector<pointer> nodes_;
 public:
-    node_set_argument(const std::vector<pointer>& nodes)
+    node_set(const std::vector<pointer>& nodes)
         : nodes_(nodes)
     {
     }
-    node_set_argument(std::vector<pointer>&& nodes)
+    node_set(std::vector<pointer>&& nodes)
         : nodes_(std::move(nodes))
     {
     }
 
-    const std::vector<pointer>& nodes() const override
-    {
-        return nodes_;
-    }
-};
-
-template <class Json, class JsonPointer>
-class value_argument : public argument<JsonPointer>
-{
-public:
-    typedef JsonPointer pointer;
-private:
-    Json value_;
-    std::vector<pointer> nodes_;
-public:
-    value_argument(const Json& value)
-        : value_(value)
-    {
-        nodes_.push_back(&value_);
-    }
-    value_argument(Json&& value)
-        : value_(std::move(value))
-    {
-        nodes_.push_back(&value_);
-    }
-
-    const std::vector<pointer>& nodes() const override
+    const std::vector<pointer>& nodes() const 
     {
         return nodes_;
     }
@@ -230,7 +195,7 @@ private:
         string_type path;
         pointer val_ptr;
     };
-    typedef std::vector<node_type> node_set;
+    typedef std::vector<node_type> node_selection;
 
     static string_view_type length_literal() 
     {
@@ -245,7 +210,7 @@ private:
         {
         }
         virtual void select(jsonpath_evaluator& evaluator,
-                            node_type& node, const string_type& path, reference val, node_set& nodes) = 0;
+                            node_type& node, const string_type& path, reference val, node_selection& nodes) = 0;
     };
 
     class expr_selector final : public selector
@@ -260,7 +225,7 @@ private:
 
         void select(jsonpath_evaluator& evaluator,
                     node_type& node, const string_type& path, reference val, 
-                    node_set& nodes) override
+                    node_selection& nodes) override
         {
             auto index = result_.eval(val);
             if (index.template is<size_t>())
@@ -291,7 +256,7 @@ private:
 
         void select(jsonpath_evaluator&,
                     node_type& node, const string_type& path, reference val, 
-                    node_set& nodes) override
+                    node_selection& nodes) override
         {
             if (val.is_array())
             {
@@ -334,7 +299,7 @@ private:
 
         void select(jsonpath_evaluator& evaluator,
                     node_type&, const string_type& path, reference val,
-                    node_set& nodes) override
+                    node_selection& nodes) override
         {
             if (val.is_object() && val.contains(name_))
             {
@@ -404,7 +369,7 @@ private:
 
         void select(jsonpath_evaluator&,
                     node_type&, const string_type& path, reference val,
-                    node_set& nodes) override
+                    node_selection& nodes) override
         {
             if (positive_step_)
             {
@@ -416,7 +381,7 @@ private:
             }
         }
 
-        void end_array_slice1(const string_type& path, reference val, node_set& nodes)
+        void end_array_slice1(const string_type& path, reference val, node_selection& nodes)
         {
             if (val.is_array())
             {
@@ -440,7 +405,7 @@ private:
             }
         }
 
-        void end_array_slice2(const string_type& path, reference val, node_set& nodes)
+        void end_array_slice2(const string_type& path, reference val, node_selection& nodes)
         {
             if (val.is_array())
             {
@@ -470,17 +435,17 @@ private:
 
     class function_table
     {
-        typedef std::function<Json(std::vector<std::unique_ptr<argument<pointer>>>)> function_type;
+        typedef std::function<Json(const std::vector<node_set<pointer>>&)> function_type;
         typedef std::map<string_type,function_type> function_dictionary;
 
         const function_dictionary functions_ =
         {
             {
-                max_literal<char_type>(),[](std::vector<std::unique_ptr<argument<pointer>>> args)
+                max_literal<char_type>(),[](const std::vector<node_set<pointer>>& args)
                       {
-                          auto arg = args[0].get();
+                          const auto& arg = args[0];
                           double v = std::numeric_limits<double>::lowest();
-                          for (auto& node : arg->nodes())
+                          for (auto& node : arg.nodes())
                           {
                               double x = node->template as<double>();
                               if (x > v)
@@ -492,11 +457,11 @@ private:
                       }
             },
             {
-                min_literal<char_type>(),[](std::vector<std::unique_ptr<argument<pointer>>> args) 
+                min_literal<char_type>(),[](const std::vector<node_set<pointer>>& args) 
                       {
-                          auto arg = args[0].get();
+                          const auto& arg = args[0];
                           double v = (std::numeric_limits<double>::max)(); 
-                          for (const auto& node : arg->nodes())
+                          for (const auto& node : arg.nodes())
                           {
                               double x = node->template as<double>();
                               if (x < v)
@@ -508,23 +473,23 @@ private:
                       }
             },
             {
-                avg_literal<char_type>(),[](std::vector<std::unique_ptr<argument<pointer>>> args)
+                avg_literal<char_type>(),[](const std::vector<node_set<pointer>>& args)
                       {
-                          auto arg = args[0].get();
+                          const auto& arg = args[0];
                           double v = 0.0;
-                          for (const auto& node : arg->nodes())
+                          for (const auto& node : arg.nodes())
                           {
                               v += node->template as<double>();
                           }
-                          return arg->nodes().size() > 0 ? Json(v/arg->nodes().size()) : Json::null();
+                          return arg.nodes().size() > 0 ? Json(v/arg.nodes().size()) : Json::null();
                       }
             },
             {
-                sum_literal<char_type>(),[](std::vector<std::unique_ptr<argument<pointer>>> args)
+                sum_literal<char_type>(),[](const std::vector<node_set<pointer>>& args)
                       {
-                          auto arg = args[0].get();
+                          const auto& arg = args[0];
                           double v = 0.0;
-                          for (const auto& node : arg->nodes())
+                          for (const auto& node : arg.nodes())
                           {
                               v += node->template as<double>();
                           }
@@ -532,11 +497,11 @@ private:
                       }
             },
             {
-                count_literal<char_type>(),[](std::vector<std::unique_ptr<argument<pointer>>> args)
+                count_literal<char_type>(),[](const std::vector<node_set<pointer>>& args)
                       {
-                          auto arg = args[0].get();
+                          const auto& arg = args[0];
                           size_t count = 0;
-                          while (count < arg->nodes().size())
+                          while (count < arg.nodes().size())
                           {
                               ++count;
                           }
@@ -544,11 +509,11 @@ private:
                       }
             },
             {
-                prod_literal<char_type>(),[](std::vector<std::unique_ptr<argument<pointer>>> args)
+                prod_literal<char_type>(),[](const std::vector<node_set<pointer>>& args)
                       {
-                          auto arg = args[0].get();
+                          const auto& arg = args[0];
                           double v = 0.0;
-                          for (const auto& node : arg->nodes())
+                          for (const auto& node : arg.nodes())
                           {
                               double x = node->template as<double>();
                               v == 0.0 && x != 0.0
@@ -585,8 +550,8 @@ private:
     size_t step_;
     bool positive_step_;
     bool recursive_descent_;
-    node_set nodes_;
-    std::vector<node_set> stack_;
+    node_selection nodes_;
+    std::vector<node_selection> stack_;
     size_t line_;
     size_t column_;
     const char_type* begin_input_;
@@ -594,7 +559,7 @@ private:
     const char_type* p_;
     std::vector<std::unique_ptr<selector>> selectors_;
     std::vector<std::unique_ptr<Json>> temp_json_values_;
-    std::vector<std::unique_ptr<argument<pointer>>> function_stack_;
+    std::vector<node_set<pointer>> function_stack_;
 
 public:
     jsonpath_evaluator(char_type path_start)
@@ -759,7 +724,7 @@ public:
                         }
                         string_type s;
                         s.push_back(*p_);
-                        node_set v;
+                        node_selection v;
                         v.emplace_back(std::move(s),std::addressof(root));
                         stack_.push_back(v);
 
@@ -819,12 +784,12 @@ public:
                         return;
                     }
 
-                    function_stack_.push_back(make_unique_ptr<node_set_argument<pointer>>(evaluator.get_pointers()));
-                    auto result = it->second(std::move(function_stack_));
+                    function_stack_.push_back(node_set<pointer>(evaluator.get_pointers()));
+                    auto result = it->second(function_stack_);
 
                     string_type s;
                     s.push_back(path_start_);
-                    node_set v;
+                    node_selection v;
 
                     pointer ptr = create_temp(std::move(result));
                     v.emplace_back(std::move(s),ptr);
