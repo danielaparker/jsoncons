@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <unordered_map>
 #include <type_traits> // std::is_const
 #include <limits> // std::numeric_limits
 #include <utility> // std::move
@@ -17,39 +18,9 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_filter.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath_function.hpp>
 
 namespace jsoncons { namespace jsonpath {
-
-JSONCONS_DEFINE_LITERAL(avg_literal,"avg")
-JSONCONS_DEFINE_LITERAL(max_literal,"max")
-JSONCONS_DEFINE_LITERAL(min_literal,"min")
-JSONCONS_DEFINE_LITERAL(sum_literal,"sum")
-JSONCONS_DEFINE_LITERAL(prod_literal,"prod")
-JSONCONS_DEFINE_LITERAL(count_literal,"count")
-JSONCONS_DEFINE_LITERAL(tokenize_literal,"tokenize")
-
-template <class JsonPointer>
-class node_set 
-{
-public:
-    typedef JsonPointer pointer;
-private:
-    std::vector<pointer> nodes_;
-public:
-    node_set(const std::vector<pointer>& nodes)
-        : nodes_(nodes)
-    {
-    }
-    node_set(std::vector<pointer>&& nodes)
-        : nodes_(std::move(nodes))
-    {
-    }
-
-    const std::vector<pointer>& nodes() const 
-    {
-        return nodes_;
-    }
-};
 
 // work around for std::make_unique not being available until C++14
 template<typename T, typename... Args>
@@ -440,167 +411,7 @@ private:
         }
     };
 
-    class function_table
-    {
-        typedef std::function<Json(const std::vector<node_set<pointer>>&, std::error_code&)> function_type;
-        typedef std::map<string_type,function_type> function_dictionary;
-
-        const function_dictionary functions_ =
-        {
-            {
-                max_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
-                    {
-                       if (args.size() != 1)
-                       {
-                           ec = jsonpath_errc::invalid_function_argument;
-                           return Json(); 
-                       }
-                        const auto& arg = args[0];
-                        double v = std::numeric_limits<double>::lowest();
-                        for (auto& node : arg.nodes())
-                        {
-                            double x = node->template as<double>();
-                            if (x > v)
-                            {
-                                v = x;
-                            }
-                        }
-                        return Json(v);
-                    }
-            },
-            {
-                min_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec) 
-                    {
-                        if (args.size() != 1)
-                        {
-                            ec = jsonpath_errc::invalid_function_argument;
-                            return Json();
-                        }
-                        const auto& arg = args[0];
-                        double v = (std::numeric_limits<double>::max)(); 
-                        for (const auto& node : arg.nodes())
-                        {
-                            double x = node->template as<double>();
-                            if (x < v)
-                            {
-                                v = x;
-                            }
-                        }
-                        return Json(v);
-                    }
-            },
-            {
-                avg_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
-                    {
-                        if (args.size() != 1)
-                        {
-                            ec = jsonpath_errc::invalid_function_argument;
-                            return Json();
-                        }
-                        const auto& arg = args[0];
-                        double v = 0.0;
-                        for (const auto& node : arg.nodes())
-                        {
-                            v += node->template as<double>();
-                        }
-                        return arg.nodes().size() > 0 ? Json(v/arg.nodes().size()) : Json::null();
-                    }
-            },
-            {
-                sum_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
-                    {
-                        if (args.size() != 1)
-                        {
-                            ec = jsonpath_errc::invalid_function_argument;
-                            return Json();
-                        }
-                        const auto& arg = args[0];
-                        double v = 0.0;
-                        for (const auto& node : arg.nodes())
-                        {
-                            v += node->template as<double>();
-                        }
-                        return Json(v);
-                    }
-            },
-            {
-                count_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
-                    {
-                        if (args.size() != 1)
-                        {
-                            ec = jsonpath_errc::invalid_function_argument;
-                            return Json();
-                        }
-                        const auto& arg = args[0];
-                        size_t count = 0;
-                        while (count < arg.nodes().size())
-                        {
-                            ++count;
-                        }
-                        return Json(count);
-                    }
-            },
-            {
-                prod_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
-                    {
-                        if (args.size() != 1)
-                        {
-                            ec = jsonpath_errc::invalid_function_argument;
-                            return Json();
-                        }
-                        const auto& arg = args[0];
-                        double v = 0.0;
-                        for (const auto& node : arg.nodes())
-                        {
-                            double x = node->template as<double>();
-                            v == 0.0 && x != 0.0
-                            ? (v = x)
-                            : (v *= x);
-
-                        }
-                        return Json(v);
-                    }
-            },
-            {
-                tokenize_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
-                    {
-                        if (args.size() != 2)
-                        {
-                            ec = jsonpath_errc::invalid_function_argument;
-                            return Json();
-                        }
-                        string_type arg1 = args[0].nodes()[0]->as_string();
-                        string_type arg2 = args[1].nodes()[0]->as_string();
-
-                        std::regex::flag_type flags = std::regex_constants::ECMAScript; 
-                        std::basic_regex<char_type> pieces_regex(arg2, flags);
-
-                        std::regex_token_iterator<string_type::const_iterator> rit ( arg1.begin(), arg1.end(), pieces_regex, -1);
-                        std::regex_token_iterator<string_type::const_iterator> rend;
-
-                        Json j = Json::array();
-                        while (rit!=rend) 
-                        {
-                            j.push_back(rit->str());
-                            //std::cout << rit->str() << std::endl;
-                            ++rit;
-                        }
-                        return j;
-                    }
-            }
-        };
-    public:
-
-        typename function_dictionary::const_iterator find(const string_type& key) const
-        {
-            return functions_.find(key);
-        }
-        typename function_dictionary::const_iterator end() const
-        {
-            return functions_.end();
-        }
-    };
-    function_table functions_;
+    function_table<Json,pointer> functions_;
 
     default_parse_error_handler default_err_handler_;
     path_state state_;
@@ -669,14 +480,7 @@ public:
 
     void invoke_function(const string_type& function_name, std::error_code& ec)
     {
-        auto it = functions_.find(function_name);
-        if (it == functions_.end())
-        {
-            ec = jsonpath_errc::invalid_filter_unsupported_operator;
-            return;
-        }
-
-        auto result = it->second(function_stack_, ec);
+        auto result = functions_.invoke(function_name, function_stack_, ec);
         if (ec)
         {
             return;

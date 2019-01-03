@@ -17,6 +17,7 @@
 #include <limits> // std::numeric_limits
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath_function.hpp>
 
 namespace jsoncons { namespace jsonpath { namespace detail {
 
@@ -114,7 +115,10 @@ enum class filter_state
     value,
     oper,
     function_argument,
-    function_path_argument,
+    path_argument,
+    unquoted_argument,
+    single_quoted_argument,
+    double_quoted_argument,
     done
 };
 
@@ -1240,31 +1244,42 @@ public:
                 {
                     switch (*p)
                     {
-                    case '\r':
-                        push_state(state);
-                        state = filter_state::cr;
-                        break;
-                    case '\n':
-                        push_state(state);
-                        state = filter_state::lf;
-                        break;
-                    case ' ':case '\t':
-                        break;
-
-                        case '$':
-                            buffer.push_back(*p);
-                            state = filter_state::function_path_argument;
+                        case ' ':case '\t':
                             break;
-                    default: 
-                        throw serialization_error(jsonpath_errc::invalid_function_argument,line_,column_);
-                        break;
+                        case '\r':
+                            push_state(state);
+                            state = filter_state::cr;
+                            break;
+                        case '\n':
+                            push_state(state);
+                            state = filter_state::lf;
+                            break;
+                        case '$':
+                            buffer.clear();
+                            buffer.push_back(*p);
+                            state = filter_state::path_argument;
+                            break;
+                        case '\'':
+                            buffer.clear();
+                            buffer.push_back('\"');
+                            state = filter_state::single_quoted_argument;
+                            break;
+                        case '\"':
+                            buffer.clear();
+                            buffer.push_back('\"');
+                            state = filter_state::double_quoted_argument;
+                            break;
+                        default: 
+                            buffer.clear();
+                            state = filter_state::unquoted_argument;
+                            break;
                     }
                     ++p;
                     ++column_;
                 }
                 break;
 
-                case filter_state::function_path_argument:
+                case filter_state::path_argument:
                 {
                     switch (*p)
                     {

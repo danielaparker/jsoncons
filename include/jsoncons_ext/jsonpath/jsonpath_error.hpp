@@ -30,7 +30,8 @@ enum class jsonpath_errc
     expected_left_bracket_token = 13,
     unexpected_operator = 14,
     invalid_function_name = 15,
-    invalid_function_argument = 16
+    invalid_function_argument = 16,
+    function_name_not_found = 17
 };
 
 class jsonpath_error_category_impl
@@ -45,36 +46,40 @@ public:
     {
         switch (static_cast<jsonpath_errc>(ev))
         {
-        case jsonpath_errc::expected_root:
-            return "Expected $";
-        case jsonpath_errc::expected_current_node:
-            return "Expected @";
-        case jsonpath_errc::expected_right_bracket:
-            return "Expected ]";
-        case jsonpath_errc::expected_name:
-            return "Expected a name following a dot";
-        case jsonpath_errc::expected_index:
-            return "Expected index";
-        case jsonpath_errc::expected_separator:
-            return "Expected dot or left bracket separator";
-        case jsonpath_errc::invalid_filter:
-            return "Invalid path filter";
-        case jsonpath_errc::invalid_filter_expected_slash:
-            return "Invalid path filter, expected '/'";
-        case jsonpath_errc::invalid_filter_unbalanced_paren:
-            return "Invalid path filter, unbalanced parenthesis";
-        case jsonpath_errc::invalid_filter_unsupported_operator:
-            return "Unsupported operator";
-        case jsonpath_errc::invalid_filter_expected_right_brace:
-            return "Invalid path filter, expected right brace }";
-        case jsonpath_errc::invalid_filter_expected_primary:
-            return "Invalid path filter, expected primary expression.";
-        case jsonpath_errc::expected_left_bracket_token:
-            return "Expected ?,',\",0-9,*";
-        case jsonpath_errc::invalid_function_name:
-            return "Invalid function name";
-        default:
-            return "Unknown jsonpath parser error";
+            case jsonpath_errc::expected_root:
+                return "Expected $";
+            case jsonpath_errc::expected_current_node:
+                return "Expected @";
+            case jsonpath_errc::expected_right_bracket:
+                return "Expected ]";
+            case jsonpath_errc::expected_name:
+                return "Expected a name following a dot";
+            case jsonpath_errc::expected_index:
+                return "Expected index";
+            case jsonpath_errc::expected_separator:
+                return "Expected dot or left bracket separator";
+            case jsonpath_errc::invalid_filter:
+                return "Invalid path filter";
+            case jsonpath_errc::invalid_filter_expected_slash:
+                return "Invalid path filter, expected '/'";
+            case jsonpath_errc::invalid_filter_unbalanced_paren:
+                return "Invalid path filter, unbalanced parenthesis";
+            case jsonpath_errc::invalid_filter_unsupported_operator:
+                return "Unsupported operator";
+            case jsonpath_errc::invalid_filter_expected_right_brace:
+                return "Invalid path filter, expected right brace }";
+            case jsonpath_errc::invalid_filter_expected_primary:
+                return "Invalid path filter, expected primary expression.";
+            case jsonpath_errc::expected_left_bracket_token:
+                return "Expected ?,',\",0-9,*";
+            case jsonpath_errc::invalid_function_name:
+                return "Invalid function name";
+            case jsonpath_errc::invalid_function_argument:
+                return "Invalid function argument";
+            case jsonpath_errc::function_name_not_found:
+                return "Function name not found";
+            default:
+                return "Unknown jsonpath parser error";
         }
     }
 };
