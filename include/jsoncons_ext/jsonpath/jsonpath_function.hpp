@@ -195,7 +195,7 @@ private:
                     std::regex_token_iterator<typename string_type::const_iterator> rit ( arg1.begin(), arg1.end(), pieces_regex, -1);
                     std::regex_token_iterator<typename string_type::const_iterator> rend;
 
-                    Json j = Json::array();
+                    Json j = typename Json::array();
                     while (rit!=rend) 
                     {
                         j.push_back(rit->str());
