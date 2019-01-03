@@ -175,8 +175,10 @@ private:
                     }
                     return Json(v);
                 }
-        },
-        {
+        }
+#if !defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ < 9)
+// GCC 4.8 has broken regex support: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631
+        ,{
             tokenize_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
                 {
                     if (args.size() != 2)
@@ -190,18 +192,18 @@ private:
                     std::regex::flag_type flags = std::regex_constants::ECMAScript; 
                     std::basic_regex<char_type> pieces_regex(arg2, flags);
 
-                    std::regex_token_iterator<string_type::const_iterator> rit ( arg1.begin(), arg1.end(), pieces_regex, -1);
-                    std::regex_token_iterator<string_type::const_iterator> rend;
+                    std::regex_token_iterator<typename string_type::const_iterator> rit ( arg1.begin(), arg1.end(), pieces_regex, -1);
+                    std::regex_token_iterator<typename string_type::const_iterator> rend;
 
                     Json j = Json::array();
                     while (rit!=rend) 
                     {
-                        j.push_back((*rit).str());
-                        //std::cout << rit->str() << std::endl;
+                        j.push_back(rit->str());
                         ++rit;
                     }
                     return j;
                 }
+#endif
         }
     };
 public:
