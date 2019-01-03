@@ -196,7 +196,7 @@ private:
                     Json j = Json::array();
                     while (rit!=rend) 
                     {
-                        j.push_back(rit->str());
+                        j.push_back((*rit).str());
                         //std::cout << rit->str() << std::endl;
                         ++rit;
                     }

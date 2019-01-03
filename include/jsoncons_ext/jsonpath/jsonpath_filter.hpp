@@ -127,6 +127,7 @@ enum class token_type
     operand,
     unary_operator,
     binary_operator,
+    function,
     lparen,
     rparen
 };
@@ -147,7 +148,11 @@ public:
     {
         throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
-    virtual Json evaluate_single_node() const
+    virtual Json get_single_node() const
+    {
+        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+    }
+    virtual Json get_node_set() const
     {
         throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
@@ -275,25 +280,20 @@ struct operator_properties
 template <class Json>
 class token
 {
+public:
+    typedef std::function<Json(const term<Json>&)> unary_operator_type;
+    typedef std::function<Json(const term<Json>&, const term<Json>&)> operator_type;
+    typedef typename function_table<Json,const Json*>::function_type function_type;
+private:
     token_type type_;
     size_t precedence_level_;
     bool is_right_associative_;
     std::shared_ptr<term<Json>> operand_ptr_;
-    std::function<Json(const term<Json>&)> unary_operator_;
-    std::function<Json(const term<Json>&, const term<Json>&)> operator_;
+    unary_operator_type unary_operator_;
+    operator_type operator_;
+    size_t arg_count_;
+    function_type function_;
 public:
-    typedef std::function<Json(const term<Json>&)> unary_operator_type;
-    typedef std::function<Json(const term<Json>&, const term<Json>&)> operator_type;
-
-    Json operator()(const term<Json>& a)
-    {
-        return unary_operator_(a);
-    }
-
-    Json operator()(const term<Json>& a, const term<Json>& b)
-    {
-        return operator_(a,b);
-    }
 
     token(token_type type)
         : type_(type),precedence_level_(0),is_right_associative_(false)
@@ -305,11 +305,19 @@ public:
     }
     token(size_t precedence_level, 
           bool is_right_associative,
-          std::function<Json(const term<Json>&)> unary_operator)
+          unary_operator_type unary_operator)
         : type_(token_type::unary_operator), 
           precedence_level_(precedence_level), 
           is_right_associative_(is_right_associative),
           unary_operator_(unary_operator)
+    {
+    }
+    token(function_type function, size_t arg_count)
+        : type_(token_type::function),
+          precedence_level_(1), 
+          is_right_associative_(true),
+          function_(function),
+          arg_count_(arg_count)
     {
     }
     token(const operator_properties<Json>& properties)
@@ -327,6 +335,26 @@ public:
         return type_;
     }
 
+    size_t arg_count() const
+    {
+        return arg_count_;
+    }
+
+    Json operator()(const term<Json>& a)
+    {
+        return unary_operator_(a);
+    }
+
+    Json operator()(const term<Json>& a, const term<Json>& b)
+    {
+        return operator_(a,b);
+    }
+
+    Json operator()(const std::vector<node_set<const Json*>>& a, std::error_code& ec)
+    {
+        return function_(a,ec);
+    }
+
     token<Json>& operator=(const token<Json>& val) = default;
 
     bool is_operator() const
@@ -337,6 +365,11 @@ public:
     bool is_unary_operator() const
     {
         return type_ == token_type::unary_operator; 
+    }
+
+    bool is_function() const
+    {
+        return type_ == token_type::function; 
     }
 
     bool is_binary_operator() const
@@ -535,9 +568,14 @@ public:
         return value_.as_bool();
     }
 
-    Json evaluate_single_node() const override
+    Json get_single_node() const override
     {
         return value_;
+    }
+
+    Json get_node_set() const override
+    {
+        return typename Json::array{value_};
     }
 
     bool exclaim() const override
@@ -698,9 +736,14 @@ public:
         return nodes_.size() != 0;
     }
 
-    Json evaluate_single_node() const override
+    Json get_single_node() const override
     {
         return nodes_.size() == 1 ? nodes_[0] : nodes_;
+    }
+
+    Json get_node_set() const override
+    {
+        return nodes_;
     }
 
     bool exclaim() const override
@@ -949,6 +992,8 @@ public:
 template <class Json>
 token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
 {
+    function_table<Json,const Json*> functions;
+
     for (auto it= tokens.begin(); it != tokens.end(); ++it)
     {
         it->initialize(context);
@@ -974,6 +1019,30 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
             auto lhs = stack.back();
             stack.pop_back();
             Json val = t(lhs.operand(), rhs.operand());
+            stack.push_back(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
+        }
+        else if (t.is_function())
+        {
+            std::vector<Json> v;
+            v.reserve(t.arg_count());
+            for (size_t i = 0; i < t.arg_count(); ++i)
+            {
+                v.push_back(stack.back().operand().get_node_set());
+                stack.pop_back();
+            }
+            std::vector<node_set<const Json*>> args;
+            for (const auto& item : v)
+            {
+                std::vector<const Json*> ns;
+                for (const auto& j : item.array_range())
+                {
+                    ns.push_back(&j);
+                }
+                args.emplace_back(std::move(ns));
+            }
+
+            std::error_code ec;
+            Json val = t(args,ec);
             stack.push_back(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
         }
     }
@@ -1005,7 +1074,7 @@ public:
         {
             auto t = evaluate(context_node, tokens_);
 
-            return t.operand().evaluate_single_node();
+            return t.operand().get_single_node();
 
         }
         catch (const serialization_error& e)
