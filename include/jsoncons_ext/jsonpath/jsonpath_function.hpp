@@ -118,7 +118,7 @@ private:
                     {
                         v += node->template as<double>();
                     }
-                    return arg.nodes().size() > 0 ? Json(v/arg.nodes().size()) : Json::null();
+                    return arg.nodes().size() > 0 ? Json(v/arg.nodes().size()) : Json(null_type());
                 }
         },
         {

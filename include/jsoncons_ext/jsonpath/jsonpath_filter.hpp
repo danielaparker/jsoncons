@@ -141,9 +141,8 @@ public:
 
     virtual ~term() {}
 
-    virtual void initialize(const Json&)
-    {
-    }
+    virtual void initialize(const Json&) = 0;
+
     virtual bool accept_single_node() const
     {
         throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
@@ -706,6 +705,10 @@ class regex_term final : public term<Json>
 public:
     regex_term(const string_type& pattern, std::regex::flag_type flags)
         : pattern_(pattern,flags)
+    {
+    }
+
+    void initialize(const Json& context_node) override
     {
     }
 
