@@ -314,7 +314,7 @@ public:
     }
     token(function_type function, size_t arg_count)
         : type_(token_type::function),
-          precedence_level_(1), 
+          precedence_level_(0), 
           is_right_associative_(true),
           function_(function),
           arg_count_(arg_count)
@@ -563,6 +563,10 @@ public:
     {
     }
 
+    void initialize(const Json& context_node) override
+    {
+    }
+
     bool accept_single_node() const override
     {
         return value_.as_bool();
@@ -575,7 +579,7 @@ public:
 
     Json get_node_set() const override
     {
-        return typename Json::array{value_};
+        return value_;
     }
 
     bool exclaim() const override
@@ -992,8 +996,6 @@ public:
 template <class Json>
 token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
 {
-    function_table<Json,const Json*> functions;
-
     for (auto it= tokens.begin(); it != tokens.end(); ++it)
     {
         it->initialize(context);
@@ -1107,6 +1109,8 @@ class jsonpath_filter_parser
     std::vector<token<Json>> output_stack_;
     std::vector<token<Json>> operator_stack_;
     std::vector<filter_state> state_stack_;
+
+    function_table<Json,const Json*> functions_;
 
     size_t line_;
     size_t column_;
@@ -1242,6 +1246,11 @@ public:
                 }
                 break;
             }
+            case token_type::function:
+            {
+                output_stack_.push_back(token);
+                break;
+            }
             default:
                 break;
         }
@@ -1364,18 +1373,24 @@ public:
                     case ' ':case '\t':
                         break;
                     case ')':
-                        //buffer.push_back(*p);
                         if (buffer.length() > 0)
                         {
                             try
                             {
-                                function_table<Json,const Json*> functions;
-                                push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
                                 std::error_code ec;
-                                auto f = functions.get(function_name,ec);
+                                auto f = functions_.get(function_name,ec);
                                 if (!ec)
                                 {
-                                    push_token(token<Json>(f, 1));
+                                    jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
+                                    evaluator.evaluate(root, buffer);
+                                    auto result = evaluator.get_values();
+                                    if (result.size() > 0)
+                                    {
+                                        push_token(token<Json>(token_type::operand,
+                                                          std::make_shared<value_term<Json>>(std::move(result)))
+                                              );
+                                        push_token(token<Json>(f, 1));
+                                    }
                                 }
                             }
                             catch (const serialization_error& e)

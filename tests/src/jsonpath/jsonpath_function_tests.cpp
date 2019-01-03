@@ -58,7 +58,6 @@ TEST_CASE("jsonpath function tests")
         }
     }
     )");
-#if 0
     SECTION("sum")
     {
         json result = json_query(store,"count($.store.book[*])");
@@ -68,21 +67,21 @@ TEST_CASE("jsonpath function tests")
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<size_t>() == expected);
     }
-
     SECTION("sum")
     {
         json result = json_query(store,"sum($.store.book[*].price)");
         double expected = 53.92;
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<double>() == Approx(expected).epsilon(0.000001));
-
-        json result2 = json_query(store,"$.store.book[?(@.price > sum($.store.book[*].price) / count($.store.book[*]))].title");
-        std::cout << "result2: " << result2 << "\n";
-        std::string expected2 = "The Lord of the Rings";
-        REQUIRE(result2.size() == 1);
-        CHECK(result2[0].as<std::string>() == expected2);
     }
-
+    SECTION("sum in filter")
+    {
+        json result = json_query(store,"$.store.book[?(@.price > sum($.store.book[*].price) / count($.store.book[*]))].title");
+        std::cout << "result: " << result << "\n";
+        std::string expected = "The Lord of the Rings";
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<std::string>() == expected);
+    }
     SECTION("avg")
     {
         json result = json_query(store,"avg($.store.book[*].price)");
@@ -135,7 +134,6 @@ TEST_CASE("jsonpath function tests")
 
         CHECK(result == expected);
     }
-#endif
 #if !(defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ < 9))
 // GCC 4.8 has broken regex support: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631
     SECTION("tokenize")
