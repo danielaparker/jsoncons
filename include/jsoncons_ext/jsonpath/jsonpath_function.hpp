@@ -205,21 +205,15 @@ private:
         }
     };
 public:
-    Json invoke(const string_type& name, const std::vector<node_set<pointer>>& args, std::error_code& ec) const
+    function_type get(const string_type& name, std::error_code& ec) const
     {
         auto it = functions_.find(name);
         if (it == functions_.end())
         {
             ec = jsonpath_errc::function_name_not_found;
-            return Json::null();
+            return nullptr;
         }
-
-        auto result = it->second(args, ec);
-        if (ec)
-        {
-            return Json::null();
-        }
-        return result;
+        return it->second;
     }
 };
 

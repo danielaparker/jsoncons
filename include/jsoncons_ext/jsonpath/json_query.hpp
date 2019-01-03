@@ -480,7 +480,12 @@ public:
 
     void invoke_function(const string_type& function_name, std::error_code& ec)
     {
-        auto result = functions_.invoke(function_name, function_stack_, ec);
+        auto f = functions_.get(function_name, ec);
+        if (ec)
+        {
+            return;
+        }
+        auto result = f(function_stack_, ec);
         if (ec)
         {
             return;
