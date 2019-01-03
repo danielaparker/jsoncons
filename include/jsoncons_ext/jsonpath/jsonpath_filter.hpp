@@ -562,7 +562,7 @@ public:
     {
     }
 
-    void initialize(const Json& context_node) override
+    void initialize(const Json&) override
     {
     }
 
@@ -708,7 +708,7 @@ public:
     {
     }
 
-    void initialize(const Json& context_node) override
+    void initialize(const Json&) override
     {
     }
 
