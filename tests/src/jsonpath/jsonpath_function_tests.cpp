@@ -58,6 +58,7 @@ TEST_CASE("jsonpath function tests")
         }
     }
     )");
+
     SECTION("sum")
     {
         json result = json_query(store,"count($.store.book[*])");
@@ -77,7 +78,6 @@ TEST_CASE("jsonpath function tests")
     SECTION("sum in filter")
     {
         json result = json_query(store,"$.store.book[?(@.price > sum($.store.book[*].price) / count($.store.book[*]))].title");
-        std::cout << "result: " << result << "\n";
         std::string expected = "The Lord of the Rings";
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<std::string>() == expected);
@@ -90,6 +90,13 @@ TEST_CASE("jsonpath function tests")
 
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<double>() == Approx(expected).epsilon(0.000001));
+    }
+    SECTION("avg in filter")
+    {
+        json result = json_query(store,"$.store.book[?(@.price > avg($.store.book[*].price))].title");
+        std::string expected = "The Lord of the Rings";
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<std::string>() == expected);
     }
 
     SECTION("prod")
@@ -144,6 +151,13 @@ TEST_CASE("jsonpath function tests")
         json expected = json::parse("[[\"The\",\"cat\",\"sat\",\"on\",\"the\",\"mat\"]]");
 
         CHECK(result == expected);
+    }
+    SECTION("tokenize in filter")
+    {
+        json j = json::parse("[\"The cat sat on the mat\",\"The cat on the mat\"]");
+        json result = json_query(j,"$.[?(tokenize(@,'\\\\s+')[2]=='sat')]");
+
+        CHECK(result[0] == j[0]);
     }
 #endif
 }

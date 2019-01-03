@@ -133,12 +133,12 @@ enum class path_state
     left_bracket_step2,
     expect_comma_or_right_bracket,
     function_name,
-    function_argument,
+    expect_arg_or_right_round_bracket,
     path_argument,
     unquoted_argument,
     single_quoted_argument,
     double_quoted_argument,
-    expect_comma_or_right_round_bracket,
+    expect_more_args_or_right_round_bracket,
     dot
 };
 
@@ -637,7 +637,7 @@ public:
                     switch (*p_)
                     {
                         case '(':
-                            state_ = path_state::function_argument;
+                            state_ = path_state::expect_arg_or_right_round_bracket;
                             break;
                         default:
                             function_name.push_back(*p_);
@@ -646,7 +646,7 @@ public:
                     ++p_;
                     ++column_;
                     break;
-                case path_state::function_argument:
+                case path_state::expect_arg_or_right_round_bracket:
                     switch (*p_)
                     {
                         case ' ':
@@ -687,7 +687,7 @@ public:
                                 return;
                             }
                             function_stack_.push_back(node_set<pointer>(evaluator.get_pointers()));
-                            state_ = path_state::function_argument;
+                            state_ = path_state::expect_arg_or_right_round_bracket;
                             break;
                         }
                         case ')':
@@ -731,7 +731,7 @@ public:
                                 throw serialization_error(e.code(),line_,column_);
                             }
                             buffer_.clear();
-                            state_ = path_state::function_argument;
+                            state_ = path_state::expect_arg_or_right_round_bracket;
                             break;
                         case ')':
                         {
@@ -765,7 +765,7 @@ public:
                     {
                         case '\'':
                             buffer_.push_back('\"');
-                            state_ = path_state::expect_comma_or_right_round_bracket;
+                            state_ = path_state::expect_more_args_or_right_round_bracket;
                             break;
                         default:
                             buffer_.push_back(*p_);
@@ -779,7 +779,7 @@ public:
                     {
                         case '\"':
                             buffer_.push_back('\"');
-                            state_ = path_state::expect_comma_or_right_round_bracket;
+                            state_ = path_state::expect_more_args_or_right_round_bracket;
                             break;
                         default:
                             buffer_.push_back(*p_);
@@ -788,7 +788,7 @@ public:
                     ++p_;
                     ++column_;
                     break;
-                case path_state::expect_comma_or_right_round_bracket:
+                case path_state::expect_more_args_or_right_round_bracket:
                     switch (*p_)
                     {
                         case ' ':
@@ -806,7 +806,7 @@ public:
                                 throw serialization_error(e.code(),line_,column_);
                             }
                             buffer_.clear();
-                            state_ = path_state::function_argument;
+                            state_ = path_state::expect_arg_or_right_round_bracket;
                             break;
                         case ')':
                         {
