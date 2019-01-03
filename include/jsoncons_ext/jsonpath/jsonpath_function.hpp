@@ -176,7 +176,7 @@ private:
                     return Json(v);
                 }
         }
-#if !defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ < 9)
+#if !(defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ < 9))
 // GCC 4.8 has broken regex support: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631
         ,{
             tokenize_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
@@ -203,8 +203,8 @@ private:
                     }
                     return j;
                 }
-#endif
         }
+#endif
     };
 public:
     function_type get(const string_type& name, std::error_code& ec) const
