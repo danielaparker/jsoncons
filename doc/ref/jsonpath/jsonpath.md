@@ -90,20 +90,19 @@ Precedence|Operator|Associativity
 5 |`<` `>` `<=` `>=`|Left 
 6 |`==` `!=`        |Left 
 7 |`&&`             |Left 
-8 |<code>&#124;&#124;</code>             |Left 
+8 |<code>&#124;&#124;</code> |Left 
 
-#### JSONPath Functions
-
-The input to a JSONPath function is a JSONPath expression. The output is a JSON value.
+#### Functions
 
 Function|Description|Result|Example
 ----------|--------|-------|---
-`max`|Returns the maximum value of an array of numbers|`double`|`max($.store.book[*].price)`
-`min`|Returns the minimum value of an array of numbers|`double`|`min($.store.book[*].price)`
-`count`|Returns the number of items in an array|`uint64_t`|`count($.store.book[*])`
-`sum`|Returns the sum value of an array of numbers|`double`|`$.store.book[?(@.price > sum($.store.book[*].price) / count($.store.book[*]))].title`
-`avg`|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.store.book[?(@.price > avg($.store.book[*].price))].title`
-`prod`|Returns the product of the elements in an array of numbers.|`double`|`$.store.book[?(479373 < prod($..price) && prod($..price) < 479374)].title`
+`max(array)`|Returns the maximum value of an array of numbers|`double`|`max($.store.book[*].price)`
+`min(array)`|Returns the minimum value of an array of numbers|`double`|`min($.store.book[*].price)`
+`count(array)`|Returns the number of items in an array|`uint64_t`|`count($.store.book[*])`
+`sum(array)`|Returns the sum value of an array of numbers|`double`|`$.store.book[?(@.price > sum($.store.book[*].price) / count($.store.book[*]))].title`
+`avg(array)`|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.store.book[?(@.price > avg($.store.book[*].price))].title`
+`prod(array)`|Returns the product of the elements in an array of numbers.|`double`|`$.store.book[?(479373 < prod($..price) && prod($..price) < 479374)].title`
+`tokenize(string,pattern)`|Returns an array of strings formed by splitting the input string into an array of strings, separated by substrings that match the regular expression `pattern`.|`array of string`|$.store.book[?(tokenize(@.author,'\\s+')[1] == 'Waugh')].title
 
 ### Examples
 

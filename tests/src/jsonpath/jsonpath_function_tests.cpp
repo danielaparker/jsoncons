@@ -159,6 +159,13 @@ TEST_CASE("jsonpath function tests")
 
         CHECK(result[0] == j[0]);
     }
+    SECTION("tokenize in filter 2")
+    {
+        json result = json_query(store,"$.store.book[?(tokenize(@.author,'\\\\s+')[1] == 'Waugh')].title");
+        std::string expected = "Sword of Honour";
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<std::string>() == expected);
+    }
 #endif
 }
 

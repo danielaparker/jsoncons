@@ -114,7 +114,7 @@ enum class filter_state
     path,
     value,
     oper,
-    expect_arg_or_right_round_bracket,
+    expect_arg,
     root_path_argument,
     current_path_argument,
     unquoted_argument,
@@ -149,10 +149,6 @@ public:
         throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual Json get_single_node() const
-    {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
-    }
-    virtual Json get_node_set() const
     {
         throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
@@ -387,11 +383,11 @@ public:
         return *operand_ptr_;
     }
 
-    void initialize(const Json& context_node)
+    void initialize(const Json& current_node)
     {
         if (operand_ptr_.get() != nullptr)
         {
-            operand_ptr_->initialize(context_node);
+            operand_ptr_->initialize(current_node);
         }
     }
 };
@@ -556,11 +552,6 @@ public:
         return value_;
     }
 
-    Json get_node_set() const override
-    {
-        return value_;
-    }
-
     bool exclaim() const override
     {
         return !value_.as_bool();
@@ -711,10 +702,10 @@ public:
     {
     }
 
-    void initialize(const Json& context_node) override
+    void initialize(const Json& current_node) override
     {
         jsonpath_evaluator<Json,const Json&,VoidPathConstructor<Json>> evaluator;
-        evaluator.evaluate(context_node, path_);
+        evaluator.evaluate(current_node, path_);
         nodes_ = evaluator.get_values();
     }
 
@@ -726,11 +717,6 @@ public:
     Json get_single_node() const override
     {
         return nodes_.size() == 1 ? nodes_[0] : nodes_;
-    }
-
-    Json get_node_set() const override
-    {
-        return nodes_;
     }
 
     bool exclaim() const override
@@ -1033,11 +1019,11 @@ public:
     {
     }
 
-    Json eval(const Json& context_node)
+    Json eval(const Json& current_node)
     {
         try
         {
-            auto t = evaluate(context_node, tokens_);
+            auto t = evaluate(current_node, tokens_);
 
             return t.operand().get_single_node();
 
@@ -1048,11 +1034,11 @@ public:
         }
     }
 
-    bool exists(const Json& context_node)
+    bool exists(const Json& current_node)
     {
         try
         {
-            auto t = evaluate(context_node,tokens_);
+            auto t = evaluate(current_node,tokens_);
             return t.operand().accept_single_node();
         }
         catch (const serialization_error& e)
@@ -1276,7 +1262,7 @@ public:
                 ++p;
                 ++column_;
                 break;
-            case filter_state::expect_arg_or_right_round_bracket:
+            case filter_state::expect_arg:
                 {
                     switch (*p)
                     {
@@ -1371,6 +1357,10 @@ public:
                             push_state(state);
                             state = filter_state::lf;
                             break;
+                        case ',':
+                            buffer.push_back(*p);
+                            state = filter_state::expect_arg;
+                            break;
                         case ' ':case '\t':
                             break;
                         case ')':
@@ -1428,7 +1418,7 @@ public:
                             break;
                         case ',':
                             buffer.push_back(*p);
-                            state = filter_state::expect_arg_or_right_round_bracket;
+                            state = filter_state::expect_arg;
                             break;
                         case ')':
                         {
@@ -1518,7 +1508,7 @@ public:
                         case '(':
                         {
                             buffer.push_back(*p);
-                            state = filter_state::expect_arg_or_right_round_bracket;
+                            state = filter_state::expect_arg;
                             ++p;
                             ++column_;
                             break;
