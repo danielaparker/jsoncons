@@ -26,29 +26,6 @@ JSONCONS_DEFINE_LITERAL(prod_literal,"prod")
 JSONCONS_DEFINE_LITERAL(count_literal,"count")
 JSONCONS_DEFINE_LITERAL(tokenize_literal,"tokenize")
 
-template <class JsonPointer>
-class node_set 
-{
-public:
-    typedef JsonPointer pointer;
-private:
-    std::vector<pointer> nodes_;
-public:
-    node_set(const std::vector<pointer>& nodes)
-        : nodes_(nodes)
-    {
-    }
-    node_set(std::vector<pointer>&& nodes)
-        : nodes_(std::move(nodes))
-    {
-    }
-
-    const std::vector<pointer>& nodes() const 
-    {
-        return nodes_;
-    }
-};
-
 template <class Json, class JsonPointer>
 class function_table
 {
@@ -58,13 +35,14 @@ public:
     typedef std::basic_string<char_type,char_traits_type> string_type;
     typedef typename Json::string_view_type string_view_type;
     typedef JsonPointer pointer ;
-    typedef std::function<Json(const std::vector<node_set<pointer>>&, std::error_code&)> function_type;
+    typedef std::vector<pointer> argument_type;
+    typedef std::function<Json(const std::vector<argument_type>&, std::error_code&)> function_type;
     typedef std::unordered_map<string_type,function_type> function_dictionary;
 private:
     const function_dictionary functions_ =
     {
         {
-            keys_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
+            keys_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec)
                 {
                     Json j = typename Json::array();
                     if (args.size() != 1)
@@ -72,11 +50,11 @@ private:
                         ec = jsonpath_errc::invalid_function_argument;
                         return j; 
                     }
-                    if (args[0].nodes().size() != 1 && !args[0].nodes()[0]->is_object())
+                    if (args[0].size() != 1 && !args[0][0]->is_object())
                     {
                         return j; 
                     }
-                    pointer arg = args[0].nodes()[0];
+                    pointer arg = args[0][0];
                     for (const auto& kv : arg->object_range())
                     {
                         j.emplace_back(kv.key());
@@ -86,7 +64,7 @@ private:
                 }
         },
         {
-            max_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
+            max_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec)
                 {
                    if (args.size() != 1)
                    {
@@ -95,7 +73,7 @@ private:
                    }
                     const auto& arg = args[0];
                     double v = std::numeric_limits<double>::lowest();
-                    for (auto& node : arg.nodes())
+                    for (auto& node : arg)
                     {
                         double x = node->template as<double>();
                         if (x > v)
@@ -107,7 +85,7 @@ private:
                 }
         },
         {
-            min_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec) 
+            min_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec) 
                 {
                     if (args.size() != 1)
                     {
@@ -116,7 +94,7 @@ private:
                     }
                     const auto& arg = args[0];
                     double v = (std::numeric_limits<double>::max)(); 
-                    for (const auto& node : arg.nodes())
+                    for (const auto& node : arg)
                     {
                         double x = node->template as<double>();
                         if (x < v)
@@ -128,7 +106,7 @@ private:
                 }
         },
         {
-            avg_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
+            avg_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec)
                 {
                     if (args.size() != 1)
                     {
@@ -137,15 +115,15 @@ private:
                     }
                     const auto& arg = args[0];
                     double v = 0.0;
-                    for (const auto& node : arg.nodes())
+                    for (const auto& node : arg)
                     {
                         v += node->template as<double>();
                     }
-                    return arg.nodes().size() > 0 ? Json(v/arg.nodes().size()) : Json(null_type());
+                    return arg.size() > 0 ? Json(v/arg.size()) : Json(null_type());
                 }
         },
         {
-            sum_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
+            sum_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec)
                 {
                     if (args.size() != 1)
                     {
@@ -154,7 +132,7 @@ private:
                     }
                     const auto& arg = args[0];
                     double v = 0.0;
-                    for (const auto& node : arg.nodes())
+                    for (const auto& node : arg)
                     {
                         v += node->template as<double>();
                     }
@@ -162,7 +140,7 @@ private:
                 }
         },
         {
-            count_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
+            count_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec)
                 {
                     if (args.size() != 1)
                     {
@@ -171,7 +149,7 @@ private:
                     }
                     const auto& arg = args[0];
                     size_t count = 0;
-                    while (count < arg.nodes().size())
+                    while (count < arg.size())
                     {
                         ++count;
                     }
@@ -179,7 +157,7 @@ private:
                 }
         },
         {
-            prod_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
+            prod_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec)
                 {
                     if (args.size() != 1)
                     {
@@ -188,7 +166,7 @@ private:
                     }
                     const auto& arg = args[0];
                     double v = 0.0;
-                    for (const auto& node : arg.nodes())
+                    for (const auto& node : arg)
                     {
                         double x = node->template as<double>();
                         v == 0.0 && x != 0.0
@@ -202,15 +180,15 @@ private:
 #if !(defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ < 9))
 // GCC 4.8 has broken regex support: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631
         ,{
-            tokenize_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
+            tokenize_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec)
                 {
                     if (args.size() != 2)
                     {
                         ec = jsonpath_errc::invalid_function_argument;
                         return Json();
                     }
-                    string_type arg1 = args[0].nodes()[0]->as_string();
-                    string_type arg2 = args[1].nodes()[0]->as_string();
+                    string_type arg1 = args[0][0]->as_string();
+                    string_type arg2 = args[1][0]->as_string();
 
                     std::regex::flag_type flags = std::regex_constants::ECMAScript; 
                     std::basic_regex<char_type> pieces_regex(arg2, flags);

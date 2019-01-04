@@ -173,7 +173,7 @@ private:
         string_type path;
         pointer val_ptr;
     };
-    typedef std::vector<node_type> node_selection;
+    typedef std::vector<node_type> node_set;
 
     static string_view_type length_literal() 
     {
@@ -188,7 +188,7 @@ private:
         {
         }
         virtual void select(jsonpath_evaluator& evaluator,
-                            node_type& node, const string_type& path, reference val, node_selection& nodes) = 0;
+                            node_type& node, const string_type& path, reference val, node_set& nodes) = 0;
     };
 
     class expr_selector final : public selector
@@ -203,7 +203,7 @@ private:
 
         void select(jsonpath_evaluator& evaluator,
                     node_type& node, const string_type& path, reference val, 
-                    node_selection& nodes) override
+                    node_set& nodes) override
         {
             auto index = result_.eval(val);
             if (index.template is<size_t>())
@@ -234,7 +234,7 @@ private:
 
         void select(jsonpath_evaluator&,
                     node_type& node, const string_type& path, reference val, 
-                    node_selection& nodes) override
+                    node_set& nodes) override
         {
             if (val.is_array())
             {
@@ -277,7 +277,7 @@ private:
 
         void select(jsonpath_evaluator& evaluator,
                     node_type&, const string_type& path, reference val,
-                    node_selection& nodes) override
+                    node_set& nodes) override
         {
             if (val.is_object() && val.contains(name_))
             {
@@ -347,7 +347,7 @@ private:
 
         void select(jsonpath_evaluator&,
                     node_type&, const string_type& path, reference val,
-                    node_selection& nodes) override
+                    node_set& nodes) override
         {
             if (positive_step_)
             {
@@ -359,7 +359,7 @@ private:
             }
         }
 
-        void end_array_slice1(const string_type& path, reference val, node_selection& nodes)
+        void end_array_slice1(const string_type& path, reference val, node_set& nodes)
         {
             if (val.is_array())
             {
@@ -383,7 +383,7 @@ private:
             }
         }
 
-        void end_array_slice2(const string_type& path, reference val, node_selection& nodes)
+        void end_array_slice2(const string_type& path, reference val, node_set& nodes)
         {
             if (val.is_array())
             {
@@ -424,8 +424,8 @@ private:
     size_t step_;
     bool positive_step_;
     bool recursive_descent_;
-    node_selection nodes_;
-    std::vector<node_selection> stack_;
+    node_set nodes_;
+    std::vector<node_set> stack_;
     size_t line_;
     size_t column_;
     const char_type* begin_input_;
@@ -433,7 +433,9 @@ private:
     const char_type* p_;
     std::vector<std::unique_ptr<selector>> selectors_;
     std::vector<std::unique_ptr<Json>> temp_json_values_;
-    std::vector<node_set<pointer>> function_stack_;
+
+    typedef std::vector<pointer> argument_type;
+    std::vector<argument_type> function_stack_;
 
 public:
     jsonpath_evaluator()
@@ -494,7 +496,7 @@ public:
         string_type s;
         s.push_back('$');
 
-        node_selection v;
+        node_set v;
         pointer ptr = create_temp(std::move(result));
         v.emplace_back(s,ptr);
         stack_.push_back(v);
@@ -605,7 +607,7 @@ public:
                         {
                             string_type s;
                             s.push_back(*p_);
-                            node_selection v;
+                            node_set v;
                             v.emplace_back(std::move(s),std::addressof(root));
                             stack_.push_back(v);
 
@@ -686,7 +688,7 @@ public:
                             {
                                 return;
                             }
-                            function_stack_.push_back(node_set<pointer>(evaluator.get_pointers()));
+                            function_stack_.push_back(evaluator.get_pointers());
                             state_ = path_state::expect_arg_or_right_round_bracket;
                             break;
                         }
@@ -698,7 +700,7 @@ public:
                             {
                                 return;
                             }
-                            function_stack_.push_back(node_set<pointer>(evaluator.get_pointers()));
+                            function_stack_.push_back(evaluator.get_pointers());
 
                             invoke_function(function_name, ec);
                             if (ec)
@@ -724,7 +726,7 @@ public:
                             {
                                 auto val = Json::parse(buffer_);
                                 auto temp = create_temp(val);
-                                function_stack_.push_back(node_set<pointer>(std::vector<pointer>{temp}));
+                                function_stack_.push_back(std::vector<pointer>{temp});
                             }
                             catch (const serialization_error& e)
                             {
@@ -739,7 +741,7 @@ public:
                             {
                                 auto val = Json::parse(buffer_);
                                 auto temp = create_temp(val);
-                                function_stack_.push_back(node_set<pointer>(std::vector<pointer>{temp}));
+                                function_stack_.push_back(std::vector<pointer>{temp});
                             }
                             catch (const serialization_error& e)
                             {
@@ -799,7 +801,7 @@ public:
                             {
                                 auto val = Json::parse(buffer_);
                                 auto temp = create_temp(val);
-                                function_stack_.push_back(node_set<pointer>(std::vector<pointer>{temp}));
+                                function_stack_.push_back(std::vector<pointer>{temp});
                             }
                             catch (const serialization_error& e)
                             {
@@ -814,7 +816,7 @@ public:
                             {
                                 auto val = Json::parse(buffer_);
                                 auto temp = create_temp(val);
-                                function_stack_.push_back(node_set<pointer>(std::vector<pointer>{temp}));
+                                function_stack_.push_back(std::vector<pointer>{temp});
                             }
                             catch (const serialization_error& e)
                             {
