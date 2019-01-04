@@ -1,3 +1,10 @@
+master
+------
+
+New features:
+
+- New jsonpath functions `keys` and `tokenize`.
+
 v0.115.0
 --------
 
@@ -12,7 +19,7 @@ New features:
 - Following a proposal from soberich, jsonpath functions on JSONPath expressions 
   are no longer restricted to filter expressions.
 
-- New jsonpath functions `sum`, `count`, `avg`, `prod`, and `tokenize` have been added.
+- New jsonpath functions `sum`, `count`, `avg`, and `prod`
 
 - Added `semantic_tag_type::base16`, `semantic_tag_type::base64`, `semantic_tag_type::base64url`
 
