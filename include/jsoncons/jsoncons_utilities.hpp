@@ -735,21 +735,34 @@ std::vector<uint8_t> decode_base64(const std::basic_string<CharT>& base64_string
     return result;
 }
 
-inline
-std::string string_to_hex(const std::string& input)
+template <class CharT>
+std::vector<uint8_t> decode_base16(const std::basic_string<CharT>& input)
 {
-    static const char* const lut = "0123456789ABCDEF";
+    static const char* const alphabet = "0123456789ABCDEF";
     size_t len = input.length();
-
-    std::string output;
-    output.reserve(2 * len);
-    for (size_t i = 0; i < len; ++i)
+    if (len & 1) 
     {
-        const unsigned char c = input[i];
-        output.push_back(lut[c >> 4]);
-        output.push_back(lut[c & 15]);
+        throw std::invalid_argument("odd length");
     }
-    return output;
+
+    std::vector<uint8_t> result;
+    result.reserve(len / 2);
+    for (size_t i = 0; i < len; i += 2)
+    {
+        char a = (char)input[i];
+        const char* p = std::lower_bound(alphabet, alphabet + 16, a);
+        if (*p != a) throw std::invalid_argument("not a hex digit");
+
+        char b = (char)input[i + 1];
+        const char* q = std::lower_bound(alphabet, alphabet + 16, b);
+        if (*q != b) 
+        {
+            throw std::invalid_argument("not a hex digit");
+        }
+
+        result.push_back(((p - alphabet) << 4) | (q - alphabet));
+    }
+    return result;
 }
 
 
