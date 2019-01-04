@@ -97,6 +97,13 @@ template <class Json,
           class PathCons>
 class jsonpath_evaluator;
 
+enum class filter_path_mode
+{
+    path,
+    root_path,
+    current_path
+};
+
 enum class filter_state
 {
     start,
@@ -114,8 +121,7 @@ enum class filter_state
     value,
     oper,
     expect_arg,
-    root_path_argument,
-    current_path_argument,
+    path_argument,
     unquoted_argument,
     single_quoted_argument,
     double_quoted_argument,
@@ -1052,6 +1058,7 @@ class jsonpath_filter_parser
     std::vector<token<Json>> output_stack_;
     std::vector<token<Json>> operator_stack_;
     std::vector<filter_state> state_stack_;
+    std::vector<filter_path_mode> path_mode_stack_;
 
     size_t line_;
     size_t column_;
@@ -1124,10 +1131,7 @@ public:
 
     filter_state pop_state()
     {
-        if (state_stack_.empty())
-        {
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Invalid state"));
-        }
+        JSONCONS_ASSERT(!state_stack_.empty())
         filter_state state = state_stack_.back();
         state_stack_.pop_back();
         return state;
@@ -1254,7 +1258,8 @@ public:
                 ++p;
                 ++column_;
                 break;
-            case filter_state::expect_arg:
+
+                case filter_state::expect_arg:
                 {
                     switch (*p)
                     {
@@ -1270,11 +1275,13 @@ public:
                             break;
                         case '$':
                             buffer.push_back(*p);
-                            state = filter_state::root_path_argument;
+                            path_mode_stack_.back() = filter_path_mode::root_path;
+                            state = filter_state::path_argument;
                             break;
                         case '@':
                             buffer.push_back('$');
-                            state = filter_state::current_path_argument;
+                            path_mode_stack_.back() = filter_path_mode::current_path;
+                            state = filter_state::path_argument;
                             break;
                         // Maybe error from here down
                         case '\'':
@@ -1292,10 +1299,10 @@ public:
                     }
                     ++p;
                     ++column_;
+                    break;
                 }
-                break;
 
-                case filter_state::root_path_argument:
+                case filter_state::path_argument:
                 {
                     switch (*p)
                     {
@@ -1308,52 +1315,10 @@ public:
                             state = filter_state::lf;
                             break;
                         case ' ':case '\t':
-                            break;
-                        case ')':
-                            buffer.push_back(*p);
-                            try
-                            {
-                                jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
-                                evaluator.evaluate(root, buffer);
-                                auto result = evaluator.get_values();
-                                if (result.size() > 0)
-                                {
-                                    push_token(token<Json>(token_type::operand,
-                                                      std::make_shared<value_term<Json>>(std::move(result[0]))));
-                                }
-                            }
-                            catch (const serialization_error& e)
-                            {
-                                throw serialization_error(e.code(),line_,column_);
-                            }
-                            buffer.clear();
-                            state = filter_state::expect_oper_or_right_round_bracket;
-                            break;
-                        default: 
-                            buffer.push_back(*p);
-                            break;
-                    }
-                    ++p;
-                    ++column_;
-                    break;
-                }
-                case filter_state::current_path_argument:
-                {
-                    switch (*p)
-                    {
-                        case '\r':
-                            push_state(state);
-                            state = filter_state::cr;
-                            break;
-                        case '\n':
-                            push_state(state);
-                            state = filter_state::lf;
                             break;
                         case ',':
                             buffer.push_back(*p);
                             state = filter_state::expect_arg;
-                            break;
-                        case ' ':case '\t':
                             break;
                         case ')':
                         {
@@ -1396,6 +1361,28 @@ public:
                         default: 
                             buffer.push_back(*p);
                             break;
+                    }
+                    ++p;
+                    ++column_;
+                    break;
+                }
+                case filter_state::unquoted_argument:
+                {
+                    switch (*p)
+                    {
+                        case ',':
+                            buffer.push_back(*p);
+                            state = filter_state::expect_arg;
+                            break;
+                        case ')':
+                        {
+                            buffer.push_back(*p);
+                            state = filter_state::path;
+                            break;
+                        }
+                        default:
+                            buffer.push_back(*p);
+                            break;;
                     }
                     ++p;
                     ++column_;
@@ -1500,6 +1487,7 @@ public:
                         case '(':
                         {
                             buffer.push_back(*p);
+                            path_mode_stack_.push_back(filter_path_mode::path);
                             state = filter_state::expect_arg;
                             ++p;
                             ++column_;
@@ -1808,11 +1796,36 @@ public:
                 case '*':
                 case '/':
                     {
-                        if (buffer.length() > 0)
+                        if (!path_mode_stack_.empty())
+                        {
+                            if (path_mode_stack_[0] == filter_path_mode::root_path)
+                            {
+                                try
+                                {
+                                    jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
+                                    evaluator.evaluate(root, buffer);
+                                    auto result = evaluator.get_values();
+                                    if (result.size() > 0)
+                                    {
+                                        push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(result[0]))));
+                                    }
+                                }
+                                catch (const serialization_error& e)
+                                {
+                                    throw serialization_error(e.code(),line_,column_);
+                                }
+                            }
+                            else
+                            {
+                                push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
+                            }
+                            path_mode_stack_.pop_back();
+                        }
+                        else
                         {
                             push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
-                            buffer.clear();
                         }
+                        buffer.clear();
                         buffer.push_back(*p);
                         ++p;
                         ++column_;
@@ -1820,12 +1833,38 @@ public:
                     }
                     break;
                 case ')':
-                    if (buffer.length() > 0)
+                    if (!path_mode_stack_.empty())
+                    {
+                        if (path_mode_stack_[0] == filter_path_mode::root_path)
+                        {
+                            try
+                            {
+                                jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
+                                evaluator.evaluate(root, buffer);
+                                auto result = evaluator.get_values();
+                                if (result.size() > 0)
+                                {
+                                    push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(result[0]))));
+                                }
+                                push_token(token<Json>(token_type::rparen));
+                            }
+                            catch (const serialization_error& e)
+                            {
+                                throw serialization_error(e.code(),line_,column_);
+                            }
+                        }
+                        else
+                        {
+                            push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
+                        }
+                        path_mode_stack_.pop_back();
+                    }
+                    else
                     {
                         push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
                         push_token(token<Json>(token_type::rparen));
-                        buffer.clear();
                     }
+                    buffer.clear();
                     if (--depth == 0)
                     {
                         state = filter_state::done;

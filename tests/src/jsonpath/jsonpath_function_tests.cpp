@@ -72,7 +72,6 @@ TEST_CASE("jsonpath function tests")
     SECTION("keys")
     {
         json result = json_query(store,"keys($.store.book[0])[*]");
-        std::cout << result << "\n";
 
         json expected = json::parse("[\"author\",\"category\",\"price\",\"title\"]");
 
