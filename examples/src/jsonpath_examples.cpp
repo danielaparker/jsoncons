@@ -43,7 +43,7 @@ void json_query_examples()
     json result7 = json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]", result_type::path);
     std::cout << "(7)\n" << pretty_print(result7) << "\n";
 
-    // All titles whose author's first name is 'Waugh'
+    // All titles whose author's second name is 'Waugh'
     json result8 = json_query(booklist,"$.store.book[?(tokenize(@.author,'\\\\s+')[1] == 'Waugh')].title");
     std::cout << "(8)\n" << result8 << "\n";
 
