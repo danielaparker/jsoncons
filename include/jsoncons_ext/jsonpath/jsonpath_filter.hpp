@@ -17,7 +17,6 @@
 #include <limits> // std::numeric_limits
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
-#include <jsoncons_ext/jsonpath/jsonpath_function.hpp>
 
 namespace jsoncons { namespace jsonpath { namespace detail {
 
@@ -328,11 +327,6 @@ public:
     Json operator()(const term<Json>& a, const term<Json>& b)
     {
         return operator_(a,b);
-    }
-
-    Json operator()(const std::vector<node_set<const Json*>>& a, std::error_code& ec)
-    {
-        return function_(a,ec);
     }
 
     token<Json>& operator=(const token<Json>& val) = default;
@@ -1058,8 +1052,6 @@ class jsonpath_filter_parser
     std::vector<token<Json>> output_stack_;
     std::vector<token<Json>> operator_stack_;
     std::vector<filter_state> state_stack_;
-
-    function_table<Json,const Json*> functions_;
 
     size_t line_;
     size_t column_;
