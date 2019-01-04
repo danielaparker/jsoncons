@@ -493,10 +493,10 @@ public:
 
         string_type s;
         s.push_back('$');
-        node_selection v;
 
+        node_selection v;
         pointer ptr = create_temp(std::move(result));
-        v.emplace_back(std::move(s),ptr);
+        v.emplace_back(s,ptr);
         stack_.push_back(v);
     }
 

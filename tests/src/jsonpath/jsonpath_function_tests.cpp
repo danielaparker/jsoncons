@@ -68,6 +68,17 @@ TEST_CASE("jsonpath function tests")
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<size_t>() == expected);
     }
+
+    SECTION("keys")
+    {
+        json result = json_query(store,"keys($.store.book[0])");
+        std::cout << result << "\n";
+
+        //size_t expected = 4;
+
+        //REQUIRE(result.size() == 1);
+        //CHECK(result[0].as<size_t>() == expected);
+    }
     SECTION("sum")
     {
         json result = json_query(store,"sum($.store.book[*].price)");

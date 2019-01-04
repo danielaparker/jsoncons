@@ -17,6 +17,7 @@
 
 namespace jsoncons { namespace jsonpath {
 
+JSONCONS_DEFINE_LITERAL(keys_literal,"keys")
 JSONCONS_DEFINE_LITERAL(avg_literal,"avg")
 JSONCONS_DEFINE_LITERAL(max_literal,"max")
 JSONCONS_DEFINE_LITERAL(min_literal,"min")
@@ -62,6 +63,28 @@ public:
 private:
     const function_dictionary functions_ =
     {
+        {
+            keys_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
+                {
+                    Json j = typename Json::array();
+                    if (args.size() != 1)
+                    {
+                        ec = jsonpath_errc::invalid_function_argument;
+                        return j; 
+                    }
+                    if (args[0].nodes().size() != 1 && !args[0].nodes()[0]->is_object())
+                    {
+                        return j; 
+                    }
+                    pointer arg = args[0].nodes()[0];
+                    for (const auto& kv : arg->object_range())
+                    {
+                        j.emplace_back(kv.key());
+                    }
+
+                    return j;
+                }
+        },
         {
             max_literal<char_type>(),[](const std::vector<node_set<pointer>>& args, std::error_code& ec)
                 {
