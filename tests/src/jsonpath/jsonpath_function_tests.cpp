@@ -71,13 +71,13 @@ TEST_CASE("jsonpath function tests")
 
     SECTION("keys")
     {
-        json result = json_query(store,"keys($.store.book[0])");
+        json result = json_query(store,"keys($.store.book[0])[*]");
         std::cout << result << "\n";
 
-        //size_t expected = 4;
+        json expected = json::parse("[\"author\",\"category\",\"price\",\"title\"]");
 
-        //REQUIRE(result.size() == 1);
-        //CHECK(result[0].as<size_t>() == expected);
+        REQUIRE(result.size() == 4);
+        CHECK(result == expected);
     }
     SECTION("sum")
     {
@@ -157,9 +157,9 @@ TEST_CASE("jsonpath function tests")
     SECTION("tokenize")
     {
         json j("The cat sat on the mat");
-        json result = json_query(j,"tokenize($,'\\\\s+')");
+        json result = json_query(j,"tokenize($,'\\\\s+')[*]");
 
-        json expected = json::parse("[[\"The\",\"cat\",\"sat\",\"on\",\"the\",\"mat\"]]");
+        json expected = json::parse("[\"The\",\"cat\",\"sat\",\"on\",\"the\",\"mat\"]");
 
         CHECK(result == expected);
     }
