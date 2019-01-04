@@ -543,7 +543,7 @@ public:
         evaluate(root, path.data(), path.length(), ec);
         if (ec)
         {
-            throw serialization_error(ec, line_, column_);
+            throw jsonpath_error(ec, line_, column_);
         }
     }
 
@@ -728,9 +728,9 @@ public:
                                 auto temp = create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
-                            catch (const serialization_error& e)
+                            catch (const serialization_error&)
                             {
-                                throw serialization_error(e.code(),line_,column_);
+                                throw jsonpath_error(jsonpath_errc::argument_parse_error,line_,column_);
                             }
                             buffer_.clear();
                             state_ = path_state::expect_arg_or_right_round_bracket;
@@ -743,9 +743,9 @@ public:
                                 auto temp = create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
-                            catch (const serialization_error& e)
+                            catch (const serialization_error&)
                             {
-                                throw serialization_error(e.code(),line_,column_);
+                                throw jsonpath_error(jsonpath_errc::argument_parse_error,line_,column_);
                             }
                             invoke_function(function_name, ec);
                             if (ec)
@@ -803,9 +803,9 @@ public:
                                 auto temp = create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
-                            catch (const serialization_error& e)
+                            catch (const serialization_error&)
                             {
-                                throw serialization_error(e.code(),line_,column_);
+                                throw jsonpath_error(jsonpath_errc::argument_parse_error,line_,column_);
                             }
                             buffer_.clear();
                             state_ = path_state::expect_arg_or_right_round_bracket;
@@ -818,9 +818,9 @@ public:
                                 auto temp = create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
-                            catch (const serialization_error& e)
+                            catch (const serialization_error&)
                             {
-                                throw serialization_error(e.code(),line_,column_);
+                                throw jsonpath_error(jsonpath_errc::argument_parse_error,line_,column_);
                             }
                             invoke_function(function_name, ec);
                             if (ec)

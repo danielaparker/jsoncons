@@ -12,26 +12,98 @@
 
 namespace jsoncons { namespace jsonpath {
 
+class jsonpath_error : public std::exception, public virtual json_exception
+{
+    std::error_code error_code_;
+    std::string buffer_;
+    size_t line_number_;
+    size_t column_number_;
+public:
+    jsonpath_error()
+        : line_number_(0),
+          column_number_(0)
+    {
+    }
+    jsonpath_error(std::error_code ec)
+        : error_code_(ec), line_number_(0), column_number_(0)
+    {
+    }
+    jsonpath_error(std::error_code ec, size_t position)
+        : error_code_(ec), line_number_(0), column_number_(position)
+    {
+    }
+    jsonpath_error(std::error_code ec, size_t line, size_t column)
+        : error_code_(ec), line_number_(line), column_number_(column)
+    {
+    }
+    jsonpath_error(const jsonpath_error& other)
+        : error_code_(other.error_code_),
+          line_number_(other.line_number_),
+          column_number_(other.column_number_)
+    {
+    }
+
+    const char* what() const noexcept override
+    {
+        try
+        {
+            std::ostringstream os;
+            os << error_code_.message();
+            if (line_number_ != 0 && column_number_ != 0)
+            {
+                os << " at line " << line_number_ << " and column " << column_number_;
+            }
+            else if (column_number_ != 0)
+            {
+                os << " at position " << column_number_;
+            }
+            const_cast<std::string&>(buffer_) = os.str();
+            return buffer_.c_str();
+        }
+        catch (...)
+        {
+            return "";
+        }
+    }
+
+    const std::error_code code() const
+    {
+        return error_code_;
+    }
+
+    size_t line_number() const
+    {
+        return line_number_;
+    }
+
+    size_t column_number() const
+    {
+        return column_number_;
+    }
+};
+
 enum class jsonpath_errc 
 {
     ok = 0,
-    expected_root = 1,
-    expected_current_node = 2,
-    expected_right_bracket = 3,
-    expected_name = 4,
-    expected_separator = 5,
-    invalid_filter = 6,
-    invalid_filter_expected_slash = 7,
-    invalid_filter_unbalanced_paren = 8,
-    invalid_filter_unsupported_operator = 9,
-    invalid_filter_expected_right_brace = 10,
-    invalid_filter_expected_primary = 11,
-    expected_index = 12,
-    expected_left_bracket_token = 13,
-    unexpected_operator = 14,
-    invalid_function_name = 15,
-    invalid_function_argument = 16,
-    function_name_not_found = 17
+    expected_root,
+    expected_current_node,
+    expected_right_bracket,
+    expected_name,
+    expected_separator,
+    invalid_filter,
+    invalid_filter_expected_slash,
+    invalid_filter_unbalanced_paren,
+    invalid_filter_unsupported_operator,
+    invalid_filter_expected_right_brace,
+    invalid_filter_expected_primary,
+    expected_index,
+    expected_left_bracket_token,
+    unexpected_operator,
+    invalid_function_name,
+    invalid_argument,
+    function_name_not_found,
+    parse_error_in_filter,
+    argument_parse_error
 };
 
 class jsonpath_error_category_impl
@@ -74,10 +146,14 @@ public:
                 return "Expected ?,',\",0-9,*";
             case jsonpath_errc::invalid_function_name:
                 return "Invalid function name";
-            case jsonpath_errc::invalid_function_argument:
+            case jsonpath_errc::invalid_argument:
                 return "Invalid function argument";
             case jsonpath_errc::function_name_not_found:
                 return "Function name not found";
+            case jsonpath_errc::parse_error_in_filter:
+                return "Could not parse JSON text in filter";
+            case jsonpath_errc::argument_parse_error:
+                return "Could not parse JSON text passed to function";
             default:
                 return "Unknown jsonpath parser error";
         }

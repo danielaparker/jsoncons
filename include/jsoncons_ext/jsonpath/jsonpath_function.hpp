@@ -47,7 +47,7 @@ private:
                     Json j = typename Json::array();
                     if (args.size() != 1)
                     {
-                        ec = jsonpath_errc::invalid_function_argument;
+                        ec = jsonpath_errc::invalid_argument;
                         return j; 
                     }
                     if (args[0].size() != 1 && !args[0][0]->is_object())
@@ -68,7 +68,7 @@ private:
                 {
                    if (args.size() != 1)
                    {
-                       ec = jsonpath_errc::invalid_function_argument;
+                       ec = jsonpath_errc::invalid_argument;
                        return Json(); 
                    }
                     const auto& arg = args[0];
@@ -89,7 +89,7 @@ private:
                 {
                     if (args.size() != 1)
                     {
-                        ec = jsonpath_errc::invalid_function_argument;
+                        ec = jsonpath_errc::invalid_argument;
                         return Json();
                     }
                     const auto& arg = args[0];
@@ -110,7 +110,7 @@ private:
                 {
                     if (args.size() != 1)
                     {
-                        ec = jsonpath_errc::invalid_function_argument;
+                        ec = jsonpath_errc::invalid_argument;
                         return Json();
                     }
                     const auto& arg = args[0];
@@ -127,7 +127,7 @@ private:
                 {
                     if (args.size() != 1)
                     {
-                        ec = jsonpath_errc::invalid_function_argument;
+                        ec = jsonpath_errc::invalid_argument;
                         return Json();
                     }
                     const auto& arg = args[0];
@@ -144,7 +144,7 @@ private:
                 {
                     if (args.size() != 1)
                     {
-                        ec = jsonpath_errc::invalid_function_argument;
+                        ec = jsonpath_errc::invalid_argument;
                         return Json();
                     }
                     const auto& arg = args[0];
@@ -161,7 +161,7 @@ private:
                 {
                     if (args.size() != 1)
                     {
-                        ec = jsonpath_errc::invalid_function_argument;
+                        ec = jsonpath_errc::invalid_argument;
                         return Json();
                     }
                     const auto& arg = args[0];
@@ -184,7 +184,7 @@ private:
                 {
                     if (args.size() != 2)
                     {
-                        ec = jsonpath_errc::invalid_function_argument;
+                        ec = jsonpath_errc::invalid_argument;
                         return Json();
                     }
                     string_type arg1 = args[0][0]->as_string();
