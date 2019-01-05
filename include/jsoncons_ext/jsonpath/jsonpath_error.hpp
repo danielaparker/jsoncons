@@ -103,7 +103,8 @@ enum class jsonpath_errc
     invalid_argument,
     function_name_not_found,
     parse_error_in_filter,
-    argument_parse_error
+    argument_parse_error,
+    unidentified_error
 };
 
 class jsonpath_error_category_impl
@@ -147,13 +148,15 @@ public:
             case jsonpath_errc::invalid_function_name:
                 return "Invalid function name";
             case jsonpath_errc::invalid_argument:
-                return "Invalid function argument";
+                return "Invalid argument type";
             case jsonpath_errc::function_name_not_found:
                 return "Function name not found";
             case jsonpath_errc::parse_error_in_filter:
-                return "Could not parse JSON text in filter";
+                return "Could not parse JSON expression in a JSONPath filter";
             case jsonpath_errc::argument_parse_error:
-                return "Could not parse JSON text passed to function";
+                return "Could not parse JSON expression passed to JSONPath function";
+            case jsonpath_errc::unidentified_error:
+                return "Unidentified error";
             default:
                 return "Unknown jsonpath parser error";
         }

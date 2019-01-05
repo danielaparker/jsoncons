@@ -1119,11 +1119,6 @@ public:
         return column_;
     }
 
-    jsonpath_filter_expr<Json> parse(const Json& root, const char_type* p, size_t length, const char_type** end_ptr)
-    {
-        return parse(root, p,p+length, end_ptr);
-    }
-
     void push_state(filter_state state)
     {
         state_stack_.push_back(state);
@@ -1406,8 +1401,7 @@ public:
                             break;
                         }
                         default:
-                            //ec = jsonpath_errc::invalid_filter_unsupported_operator;
-                            return jsonpath_filter_expr<Json>();
+                            throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_);
                     }
                     ++p;
                     ++column_;

@@ -48,6 +48,31 @@ Json json_query(const Json& root, const typename Json::string_view_type& path, r
     }
 }
 
+template<class Json>
+Json json_query(const Json& root, const typename Json::string_view_type& path, result_type result_t, std::error_code& ec)
+{
+    if (result_t == result_type::value)
+    {
+        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
+        evaluator.evaluate(root, path, ec);
+        if (ec)
+        {
+            return typename Json::array();
+        }
+        return evaluator.get_values();
+    }
+    else
+    {
+        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
+        evaluator.evaluate(root, path, ec);
+        if (ec)
+        {
+            return typename Json::array();
+        }
+        return evaluator.get_normalized_paths();
+    }
+}
+
 template<class Json, class T>
 void json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
 {
@@ -547,11 +572,16 @@ public:
         }
     }
 
-    void evaluate(reference root, 
-                  const string_view_type& path, 
-                  std::error_code& ec)
+    void evaluate(reference root, const string_view_type& path, std::error_code& ec)
     {
-        evaluate(root, path.data(), path.length(), ec);
+        try
+        {
+            evaluate(root, path.data(), path.length(), ec);
+        }
+        catch (...)
+        {
+            ec = jsonpath_errc::unidentified_error;
+        }
     }
 
     void evaluate(reference root, 
@@ -730,7 +760,8 @@ public:
                             }
                             catch (const serialization_error&)
                             {
-                                throw jsonpath_error(jsonpath_errc::argument_parse_error,line_,column_);
+                                ec = jsonpath_errc::argument_parse_error;
+                                return;
                             }
                             buffer_.clear();
                             state_ = path_state::expect_arg_or_right_round_bracket;
@@ -745,7 +776,8 @@ public:
                             }
                             catch (const serialization_error&)
                             {
-                                throw jsonpath_error(jsonpath_errc::argument_parse_error,line_,column_);
+                                ec = jsonpath_errc::argument_parse_error;
+                                return;
                             }
                             invoke_function(function_name, ec);
                             if (ec)
@@ -805,7 +837,8 @@ public:
                             }
                             catch (const serialization_error&)
                             {
-                                throw jsonpath_error(jsonpath_errc::argument_parse_error,line_,column_);
+                                ec = jsonpath_errc::argument_parse_error;
+                                return;
                             }
                             buffer_.clear();
                             state_ = path_state::expect_arg_or_right_round_bracket;
@@ -820,7 +853,8 @@ public:
                             }
                             catch (const serialization_error&)
                             {
-                                throw jsonpath_error(jsonpath_errc::argument_parse_error,line_,column_);
+                                ec = jsonpath_errc::argument_parse_error;
+                                return;
                             }
                             invoke_function(function_name, ec);
                             if (ec)
