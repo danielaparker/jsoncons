@@ -40,7 +40,7 @@ Stefan Goessner's original implementation supports unquoted or single quoted nam
 
 JSONPath|       Description
 --------|--------------------------------
-`$`|    The root JSON value
+`$`|    Selects the root JSON value
 `@`|    Selects the current node being processed by a filter predicate.
 `.` or `[]`|    Child operator
 `..`    |Recursive descent. JSONPath borrows this syntax from [E4X](https://en.wikipedia.org/wiki/ECMAScript_for_XML).
@@ -51,9 +51,9 @@ JSONPath|       Description
 `()`    |Filter expression.
 `?()`   |Applies a filter expression.
 
-#### Predicates
+#### Filter predicates
 
-JSONPath uses predicates to restrict the set of nodes returned by a path.
+JSONPath uses filter predicates to restrict the set of nodes returned by a path.
 
 [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) does not provide any specification for the allowable filter expressions, simply stating that expressions can be anything that the underlying script engine can handle. `jsoncons` expressions support the following comparision and arithmetic operators. 
 
