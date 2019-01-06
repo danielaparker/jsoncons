@@ -40,8 +40,8 @@ Stefan Goessner's original implementation supports unquoted or single quoted nam
 
 JSONPath|       Description
 --------|--------------------------------
-`$`|    Selects the root JSON value
-`@`|    Selects the current node being processed by a filter predicate.
+`$`|    Represents the root JSON value
+`@`|    Represents the current node being processed by a filter predicate.
 `.` or `[]`|    Child operator
 `..`    |Recursive descent. JSONPath borrows this syntax from [E4X](https://en.wikipedia.org/wiki/ECMAScript_for_XML).
 `*` |   Wildcard. All objects/elements regardless their names.
