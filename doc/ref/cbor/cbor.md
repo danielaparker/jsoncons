@@ -17,27 +17,27 @@ The mappings between the jsoncons and CBOR data items are shown below:
 
  jsoncons data item | jsoncons semantic tag | CBOR data item | CBOR tag
 ---------------|------------------|---------------|--------
- null          |                  | null |
- null          | undefined        | undefined |
- bool          |                  | true or false |
- int64         |                  | unsigned or negative integer |
+ null          |                  | null |&#160;
+ null          | undefined        | undefined |&#160;
+ bool          |                  | true or false |&#160;
+ int64         |                  | unsigned or negative integer |&#160;
  int64         | timestamp        | unsigned or negative integer | 1 (epoch-based date/time)
- uint64        |                  | unsigned integer |
+ uint64        |                  | unsigned integer |&#160;
  uint64        | timestamp        | unsigned integer | 1 (epoch-based date/time)
- double        |                  | half-precision float, float, or double |
+ double        |                  | half-precision float, float, or double |&#160;
  double        | timestamp        | double | 1 (epoch-based date/time)
- string        |                  | string |
+ string        |                  | string |&#160;
  string        | big_integer      | byte string | 2 (positive bignum) or 2 (negative bignum)  
  string        | big_decimal      | array | 4 (decimal fraction)
  string        | date_time        | string | 0 (date/time string) 
  string        | base64url        | CBOR date/time | 33 (base64url)
  string        | base64           | CBOR date/time | 34 (base64)
- byte_string   |                  | byte string |
+ byte_string   |                  | byte string |&#160;
  byte_string   | base64url        | byte string | 21 (Expected conversion to base64url encoding)
  byte_string   | base64           | byte string | 22 (Expected conversion to base64 encoding)
  byte_string   | base16           | byte string | 23 (Expected conversion to base16 encoding)
- array         |                  | array |
- object        |                  | map |
+ array         |                  | array |&#160;
+ object        |                  | map |&#160;
 
 ### Examples
 
