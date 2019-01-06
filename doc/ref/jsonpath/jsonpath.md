@@ -41,7 +41,7 @@ Note that Stefan Goessner's original implementation supports unquoted or single 
 
 JSONPath|       Description
 --------|--------------------------------
-`$`|    The root object or array
+`$`|    The root JSON value
 `@`|    the current node
 `.` or `[]`|    Child operator
 `..`    |Recursive descent. JSONPath borrows this syntax from [E4X](https://en.wikipedia.org/wiki/ECMAScript_for_XML).
