@@ -1,9 +1,11 @@
-master
-------
+v0.116.0
+--------
 
 New features:
 
 - New jsonpath functions `keys` and `tokenize`.
+
+- jsoncons-CBOR data item mappings supported for CBOR tags 33 (string base64url) and 34 (string base64)
 
 v0.115.0
 --------
