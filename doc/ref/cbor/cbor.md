@@ -15,7 +15,7 @@ on a view (`cbor_view`) of a packed CBOR value for iterating over and accessing 
 
 #### jsoncons - CBOR mappings
 
-jsoncons data item|jsoncons semantic tag|CBOR data item|CBOR tag
+jsoncons data item|jsoncons tag|CBOR data item|CBOR tag
 --------------|------------------|---------------|--------
 null          |                  | null |&#160;
 null          | undefined        | undefined |&#160;

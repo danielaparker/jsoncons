@@ -18,7 +18,7 @@ decimal fractions and binary encodings. This allows it to preserve these type se
 JSON-like data formats such as CBOR that have them, for example, the mappings between the jsoncons
 and CBOR data items are shown below:
 
-jsoncons data item|jsoncons semantic tag|CBOR data item|CBOR tag
+jsoncons data item|jsoncons tag|CBOR data item|CBOR tag
 --------------|------------------|---------------|--------
 null          |                  | null |&#160;
 null          | undefined        | undefined |&#160;

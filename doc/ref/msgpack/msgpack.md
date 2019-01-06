@@ -10,7 +10,7 @@ The msgpack extension implements decode from and encode to the [MessagePack](htt
 
 #### jsoncons-MessagePack mappings
 
-jsoncons data item|jsoncons semantic tag|BSON data item
+jsoncons data item|jsoncons tag|BSON data item
 --------------|------------------|---------------
 null          |                  | nil
 bool          |                  | true or false

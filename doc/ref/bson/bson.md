@@ -8,10 +8,9 @@ The bson extension implements decode from and encode to the [Binary JSON](http:/
 
 [bson_serializer](bson_serializer.md)
 
-
 #### jsoncons-BSON mappings
 
-jsoncons data item|jsoncons semantic tag|BSON data item
+jsoncons data item|jsoncons tag|BSON data item
 --------------|------------------|---------------
 null          |                  | null
 bool          |                  | true or false

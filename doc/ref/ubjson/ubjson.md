@@ -10,7 +10,7 @@ The ubjson extension implements decode from and encode to the [Universal Binary 
 
 #### jsoncons-ubjson mappings
 
-jsoncons data item|jsoncons semantic tag|UBJSON data item
+jsoncons data item|jsoncons tag|UBJSON data item
 --------------|------------------|---------------
 null          |                  | null
 bool          |                  | true or false
