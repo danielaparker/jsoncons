@@ -196,25 +196,36 @@ private:
             }
             case cbor_major_type::text_string:
             {
-                std::string s = jsoncons::cbor::detail::get_text_string(source_, ec);
                 if (ec)
                 {
                     return;
                 }
-                if (has_cbor_tag && cbor_tag == 0)
+                semantic_tag_type tag = semantic_tag_type::none;
+                if (has_cbor_tag)
                 {
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::date_time, *this);
-                }
-                else
-                {
-                    auto result = unicons::validate(s.begin(),s.end());
-                    if (result.ec != unicons::conv_errc())
+                    switch (cbor_tag)
                     {
-                        ec = cbor_errc::invalid_utf8_text_string;
-                        return;
+                        case 0:
+                            tag = semantic_tag_type::date_time;
+                            break;
+                        case 33:
+                            tag = semantic_tag_type::base64url;
+                            break;
+                        case 34:
+                            tag = semantic_tag_type::base64;
+                            break;
+                        default:
+                            break;
                     }
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
                 }
+                std::string s = jsoncons::cbor::detail::get_text_string(source_, ec);
+                auto result = unicons::validate(s.begin(),s.end());
+                if (result.ec != unicons::conv_errc())
+                {
+                    ec = cbor_errc::invalid_utf8_text_string;
+                    return;
+                }
+                handler_.string_value(basic_string_view<char>(s.data(),s.length()), tag, *this);
                 break;
             }
             case cbor_major_type::array:

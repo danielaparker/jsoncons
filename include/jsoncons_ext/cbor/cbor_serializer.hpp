@@ -522,6 +522,20 @@ private:
                 end_value();
                 break;
             }
+            case semantic_tag_type::base64url:
+            {
+                result_.push_back(33);
+                write_string(sv);
+                end_value();
+                break;
+            }
+            case semantic_tag_type::base64:
+            {
+                result_.push_back(34);
+                write_string(sv);
+                end_value();
+                break;
+            }
             default:
             {
                 write_string(sv);

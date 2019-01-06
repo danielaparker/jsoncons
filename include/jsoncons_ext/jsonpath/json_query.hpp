@@ -48,31 +48,6 @@ Json json_query(const Json& root, const typename Json::string_view_type& path, r
     }
 }
 
-template<class Json>
-Json json_query(const Json& root, const typename Json::string_view_type& path, result_type result_t, std::error_code& ec)
-{
-    if (result_t == result_type::value)
-    {
-        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
-        evaluator.evaluate(root, path, ec);
-        if (ec)
-        {
-            return typename Json::array();
-        }
-        return evaluator.get_values();
-    }
-    else
-    {
-        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
-        evaluator.evaluate(root, path, ec);
-        if (ec)
-        {
-            return typename Json::array();
-        }
-        return evaluator.get_normalized_paths();
-    }
-}
-
 template<class Json, class T>
 void json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
 {
