@@ -20,7 +20,7 @@ double        |                  | float32 or float64
 string        |                  | fixstr, str 8, str 16 or str 32
 byte_string   |                  | bin 8, bin 16 or bin 32
 array         |                  | array 
-object        |                  | object
+object        |                  | map
 
 ### Examples
 
