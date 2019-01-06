@@ -16,7 +16,7 @@ on a view (`cbor_view`) of a packed CBOR value for iterating over and accessing 
 The mappings between the jsoncons and CBOR data items are shown below:
 
  jsoncons data item | jsoncons semantic tag | CBOR data item | CBOR tag
----------------|------------------|---------------
+---------------|------------------|---------------|--------
  null          |                  | null |
  null          | undefined        | undefined |
  bool          |                  | true or false |
@@ -36,8 +36,8 @@ The mappings between the jsoncons and CBOR data items are shown below:
  byte_string   | base64url        | byte string | 21 (Expected conversion to base64url encoding)
  byte_string   | base64           | byte string | 22 (Expected conversion to base64 encoding)
  byte_string   | base16           | byte string | 23 (Expected conversion to base16 encoding)
- array         |                  | array
- object        |                  | map
+ array         |                  | array |
+ object        |                  | map |
 
 ### Examples
 
