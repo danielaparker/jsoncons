@@ -42,7 +42,7 @@ Note that Stefan Goessner's original implementation supports unquoted or single 
 JSONPath|       Description
 --------|--------------------------------
 `$`|    The root object or array
-`@`|    the current object
+`@`|    the current node
 `.` or `[]`|    Child operator
 `..`    |Recursive descent. JSONPath borrows this syntax from [E4X](https://en.wikipedia.org/wiki/ECMAScript_for_XML).
 `*` |   Wildcard. All objects/elements regardless their names.
@@ -93,6 +93,12 @@ Precedence|Operator|Associativity
 8 |<code>&#124;&#124;</code> |Left 
 
 #### Functions
+
+Functions can be passed JSONPath expressions and JSON expressions. 
+Outside a filter predicate, functions can be passed a path expression relative to
+the root element `$`. Within a filter predicate, functions can be passed either a 
+path expression relative to the root element `$`, or relative to the current node 
+being processed `@`.
 
 Function|Description|Result|Example
 ----------|--------|-------|---
