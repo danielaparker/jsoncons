@@ -17,9 +17,9 @@ are good online evaluators for checking JSONPath expressions.
 
 Stefan Goessner's javascript implemention returns `false` in case of no match, but in a note he suggests an alternative is to return an empty array. The `jsoncons` implementation takes that alternative and returns an empty array in case of no match.
 
-Unlike XML, the root of a JSON text is usually an anonymous object or array, so JSONPath identifies the outermost level of the text with the symbol $.
+#### Paths
 
-JSONPath expressions can use the dot-notation
+JSONPath uses paths to select a set of nodes in a JSON value. Paths can use the dot-notation
 
     $.store.book.0.title
 
@@ -36,7 +36,6 @@ or
 
     $["store"]["book"][0]["title"]
 
-
 The leading `$` represents the root JSON value.
 
 Note that Stefan Goessner's original implementation supports unquoted or single quoted names inside of square brackets, the jsoncons implementation in addition supports double quoted names.
@@ -44,7 +43,7 @@ Note that Stefan Goessner's original implementation supports unquoted or single 
 JSONPath|       Description
 --------|--------------------------------
 `$`|    The root JSON value
-`@`|    The current node being processed by a filter predicate.
+`@`|    Selects the current node being processed by a filter predicate.
 `.` or `[]`|    Child operator
 `..`    |Recursive descent. JSONPath borrows this syntax from [E4X](https://en.wikipedia.org/wiki/ECMAScript_for_XML).
 `*` |   Wildcard. All objects/elements regardless their names.
@@ -54,7 +53,9 @@ JSONPath|       Description
 `()`    |Filter expression.
 `?()`   |Applies a filter expression.
 
-### jsoncons filter expressions
+#### Predicates
+
+JSONPath uses predicates to restrict the set of nodes returned by a path.
 
 [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) does not provide any specification for the allowable filter expressions, simply stating that expressions can be anything that the underlying script engine can handle. `jsoncons` expressions support the following comparision and arithmetic operators. 
 
