@@ -20,10 +20,10 @@ allocator. It also supports memory efficient parsing of very large JSON texts wi
 built on top of its incremental parser.  
 
 The jsoncons [data model](doc/ref/data-model.md) supports the familiar JSON types - nulls,
-booleans, numbers, strings, arrays, objects - plus bytes strings. In addition, jsoncons 
+booleans, numbers, strings, arrays, objects - plus byte strings. In addition, jsoncons 
 supports semantic tagging of date-time values, timestamp values, big numbers, 
 decimal fractions and binary encodings. This allows it to preserve these type semantics when parsing 
-JSON-like data formats such as CBOR that allow them.
+JSON-like data formats such as CBOR that have them.
 
 Planned new features are listed on the [roadmap](doc/Roadmap.md)
 

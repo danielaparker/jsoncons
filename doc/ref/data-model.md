@@ -1,7 +1,7 @@
 ## jsoncons data model
 
 The jsoncons [data model](doc/ref/data-model.md) supports the familiar JSON types - nulls,
-booleans, numbers, strings, arrays, objects - plus bytes strings. It has
+booleans, numbers, strings, arrays, objects - plus byte strings. It has
 
 - null
 - bool
@@ -15,7 +15,7 @@ booleans, numbers, strings, arrays, objects - plus bytes strings. It has
 
 In addition, jsoncons supports semantic tagging of date-time values, timestamp values, big numbers, 
 decimal fractions and binary encodings. This allows it to preserve these type semantics when parsing 
-JSON-like data formats such as CBOR that allow them, for example, the mappings between the jsoncons
+JSON-like data formats such as CBOR that have them, for example, the mappings between the jsoncons
 and CBOR data items are shown below:
 
  jsoncons data item | jsoncons semantic tag | CBOR data item | CBOR tag
