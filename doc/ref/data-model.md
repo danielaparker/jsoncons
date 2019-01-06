@@ -1,6 +1,7 @@
 ## jsoncons data model
 
-The jsoncons data model consists of the following fundumental types:
+The jsoncons [data model](doc/ref/data-model.md) supports the familiar JSON types - nulls,
+booleans, numbers, strings, arrays, objects - plus bytes strings. It has
 
 - null
 - bool
@@ -12,20 +13,34 @@ The jsoncons data model consists of the following fundumental types:
 - array
 - object
 
-It also allows optional semantic tagging of the major types:
+In addition, jsoncons supports semantic tagging of date-time values, timestamp values, big numbers, 
+decimal fractions and binary encodings. This allows it to preserve these type semantics when parsing 
+JSON-like data formats such as CBOR that allow them, for example, the mappings between the jsoncons
+and CBOR data items are shown below:
 
- Type         | jsoncons semantic tag     | CBOR mapping
---------------|------------------|---------------
- null         | undefined        | CBOR undefined
- int64        | timestamp        | CBOR epoch time (unsigned or negative integer)
- uint64       | timestamp        | CBOR epoch time (unsigned integer)
- double       | timestamp        | CBOR epoch time (double)
- string       | big_integer      | CBOR bignum 
- &#160;       | big_decimal      | CBOR decimal fraction 
- &#160;       | date_time        | CBOR date/time
- byte_string | base16            | CBOR base16
- byte_string | base64            | CBOR base64
- byte_string | base64url         | CBOR base64url
+ jsoncons data item | jsoncons semantic tag | CBOR data item | CBOR tag
+---------------|------------------|---------------
+ null          |                  | null |
+ null          | undefined        | undefined |
+ bool          |                  | true or false |
+ int64         |                  | unsigned or negative integer |
+ int64         | timestamp        | unsigned or negative integer | 1 (epoch-based date/time)
+ uint64        |                  | unsigned integer |
+ uint64        | timestamp        | unsigned integer | 1 (epoch-based date/time)
+ double        |                  | half-precision float, float, or double |
+ double        | timestamp        | double | 1 (epoch-based date/time)
+ string        |                  | string |
+ string        | big_integer      | byte string | 2 (positive bignum) or 2 (negative bignum)  
+ string        | big_decimal      | array | 4 (decimal fraction)
+ string        | date_time        | string | 0 (date/time string) 
+ string        | base64url        | CBOR date/time | 33 (base64url)
+ string        | base64           | CBOR date/time | 34 (base64)
+ byte_string   |                  | byte string |
+ byte_string   | base64url        | byte string | 21 (Expected conversion to base64url encoding)
+ byte_string   | base64           | byte string | 22 (Expected conversion to base64 encoding)
+ byte_string   | base16           | byte string | 23 (Expected conversion to base16 encoding)
+ array         |                  | array
+ object        |                  | map
 
 ### Examples
 
