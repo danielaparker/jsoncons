@@ -34,6 +34,24 @@ void check_encode_base64(const std::vector<uint8_t>& input, const std::string& e
     }
 }
 
+void check_encode_base64url(const std::vector<uint8_t>& input, const std::string& expected)
+{
+    std::string result;
+    encode_base64url(input.data(),input.size(),result);
+    REQUIRE(result.size() == expected.size());
+    for (size_t i = 0; i < result.size(); ++i)
+    {
+        CHECK(result[i] == expected[i]);
+    }
+
+    std::vector<uint8_t> output = decode_base64url(result);
+    REQUIRE(output.size() == input.size());
+    for (size_t i = 0; i < output.size(); ++i)
+    {
+        CHECK(output[i] == input[i]);
+    }
+}
+
 void check_encode_base16(const std::vector<uint8_t>& input, const std::string& expected)
 {
     std::string result;
@@ -61,6 +79,17 @@ TEST_CASE("test_base64_conversion")
     check_encode_base64({'f','o','o','b'}, "Zm9vYg==");
     check_encode_base64({'f','o','o','b','a'}, "Zm9vYmE=");
     check_encode_base64({'f','o','o','b','a','r'}, "Zm9vYmFy");
+}
+
+TEST_CASE("test_base64url_conversion")
+{
+    check_encode_base64url({}, "");
+    check_encode_base64url({'f'}, "Zg");
+    check_encode_base64url({'f','o'}, "Zm8");
+    check_encode_base64url({'f','o','o'}, "Zm9v");
+    check_encode_base64url({'f','o','o','b'}, "Zm9vYg");
+    check_encode_base64url({'f','o','o','b','a'}, "Zm9vYmE");
+    check_encode_base64url({'f','o','o','b','a','r'}, "Zm9vYmFy");
 }
 
 TEST_CASE("test_base16_conversion")

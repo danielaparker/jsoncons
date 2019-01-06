@@ -665,9 +665,9 @@ size_t encode_base64(const uint8_t* first, size_t length, Container& result)
 }
 
 template <class CharT>
-std::vector<uint8_t> decode_base64(const std::basic_string<CharT>& base64_string)
+std::vector<uint8_t> decode_base64_generic(const std::basic_string<CharT>& base64_string, const char* alphabet)
 {
-    const char* alphabet_end = base64_alphabet + 65;
+    const char* alphabet_end = alphabet + 65;
     std::vector<uint8_t> result;
     uint8_t a4[4], a3[3];
     uint8_t i = 0;
@@ -678,7 +678,7 @@ std::vector<uint8_t> decode_base64(const std::basic_string<CharT>& base64_string
 
     while (first != last && *first != '=')
     {
-        JSONCONS_ASSERT(is_base64(*first));
+        //JSONCONS_ASSERT(is_base64(*first));
 
         a4[i++] = *first++; 
         if (i == 4)
@@ -733,6 +733,18 @@ std::vector<uint8_t> decode_base64(const std::basic_string<CharT>& base64_string
     }
 
     return result;
+}
+
+template <class CharT>
+std::vector<uint8_t> decode_base64(const std::basic_string<CharT>& base64_string)
+{
+    return decode_base64_generic(base64_string, base64_alphabet);
+}
+
+template <class CharT>
+std::vector<uint8_t> decode_base64url(const std::basic_string<CharT>& base64_string)
+{
+    return decode_base64_generic(base64_string, base64url_alphabet);
 }
 
 template <class CharT>
