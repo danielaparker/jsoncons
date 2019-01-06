@@ -36,7 +36,7 @@ or
 
 The leading `$` represents the root JSON value.
 
-Note that Stefan Goessner's original implementation supports unquoted or single quoted names inside of square brackets, the jsoncons implementation in addition supports double quoted names.
+Stefan Goessner's original implementation supports unquoted or single quoted names inside of square brackets. Support for double quoted names is a jsoncons extension.
 
 JSONPath|       Description
 --------|--------------------------------
