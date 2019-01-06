@@ -37,12 +37,14 @@ or
     $["store"]["book"][0]["title"]
 
 
+The leading `$` represents the root JSON value.
+
 Note that Stefan Goessner's original implementation supports unquoted or single quoted names inside of square brackets, the jsoncons implementation in addition supports double quoted names.
 
 JSONPath|       Description
 --------|--------------------------------
 `$`|    The root JSON value
-`@`|    the current node
+`@`|    The current node being processed by a filter predicate.
 `.` or `[]`|    Child operator
 `..`    |Recursive descent. JSONPath borrows this syntax from [E4X](https://en.wikipedia.org/wiki/ECMAScript_for_XML).
 `*` |   Wildcard. All objects/elements regardless their names.
@@ -93,6 +95,8 @@ Precedence|Operator|Associativity
 8 |<code>&#124;&#124;</code> |Left 
 
 #### Functions
+
+Functions are an extension to the original JSONPath.
 
 Functions can be passed JSONPath expressions and JSON expressions. 
 Outside a filter predicate, functions can be passed a path expression relative to
