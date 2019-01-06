@@ -95,13 +95,12 @@ Precedence|Operator|Associativity
 
 #### Functions
 
-Functions are an extension to the original JSONPath.
+Support for functions is a jsoncons extension.
 
 Functions can be passed JSONPath expressions and JSON expressions. 
-Outside a filter predicate, functions can be passed a path expression relative to
-the root element `$`. Within a filter predicate, functions can be passed either a 
-path expression relative to the root element `$`, or relative to the current node 
-being processed `@`.
+Outside a filter predicate, functions can be passed paths that select from
+the root JSON value `$`. Within a filter predicate, functions can be passed either a 
+path that selects from the root JSON value `$`, or a path that selects from the current node `@`.
 
 Function|Description|Result|Example
 ----------|--------|-------|---
