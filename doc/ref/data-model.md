@@ -1,6 +1,6 @@
 ## jsoncons data model
 
-The jsoncons [data model](doc/ref/data-model.md) supports the familiar JSON types - nulls,
+The jsoncons data model supports the familiar JSON types - nulls,
 booleans, numbers, strings, arrays, objects - plus byte strings. It has
 
 - null
