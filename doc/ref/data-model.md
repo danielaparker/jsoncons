@@ -30,7 +30,7 @@ uint64        | timestamp        | unsigned integer | 1 (epoch-based date/time)
 double        |                  | half-precision float, float, or double |&#160;
 double        | timestamp        | double | 1 (epoch-based date/time)
 string        |                  | string |&#160;
-string        | big_integer      | byte string | 2 (positive bignum) or 2 (negative bignum)  
+string        | big_integer      | byte string | 2 (positive bignum) or 3 (negative bignum)  
 string        | big_decimal      | array | 4 (decimal fraction)
 string        | date_time        | string | 0 (date/time string) 
 string        | base64url        | CBOR date/time | 33 (base64url)
