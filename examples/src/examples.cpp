@@ -563,13 +563,13 @@ int main()
  
         bson_examples();
 
-        cbor_examples();
-
         type_extensibility_examples();
 
         jsonpath_examples();
 
         readme_examples();
+
+        cbor_examples();
     }
     catch (const std::exception& e)
     {

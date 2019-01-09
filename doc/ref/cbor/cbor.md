@@ -69,9 +69,9 @@ int main()
     ojson j2 = cbor::decode_cbor<ojson>(data);
     std::cout << "(1)\n" << pretty_print(j2) << "\n\n";
 
-    // Iterating over and accessing the nested data items of a packed CBOR value
-    cbor::cbor_view datav{data};    
-    cbor::cbor_view reputons = datav.at("reputons");    
+    // Accessing the data items 
+
+    const ojson& reputons = j2["reputons"];
 
     std::cout << "(2)\n";
     for (auto element : reputons.array_range())
@@ -83,11 +83,14 @@ int main()
 
     // Querying a packed CBOR value for a nested data item with jsonpointer
     std::error_code ec;
-    cbor::cbor_view rated = jsonpointer::get(datav, "/reputons/0/rated", ec);
+    auto const& rated = jsonpointer::get(j2, "/reputons/0/rated", ec);
     if (!ec)
     {
         std::cout << "(3) " << rated.as_string() << "\n";
     }
+
+    std::cout << std::endl;
+}
 ```
 Output:
 ```
