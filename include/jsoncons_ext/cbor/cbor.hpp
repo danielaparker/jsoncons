@@ -17,7 +17,10 @@
 #include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons_ext/cbor/cbor_reader.hpp>
 #include <jsoncons_ext/cbor/cbor_serializer.hpp>
+
+#if !defined(JSONCONS_NO_DEPRECATED)
 #include <jsoncons_ext/cbor/cbor_view.hpp>
+#endif
 
 namespace jsoncons { namespace cbor {
 
@@ -72,6 +75,7 @@ decode_cbor(const std::vector<uint8_t>& v)
     return decoder.get_result();
 }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
 template<class Json>
 typename std::enable_if<std::is_same<typename Json::char_type,char>::value,Json>::type 
 decode_cbor(const cbor_view& v)
@@ -102,6 +106,7 @@ decode_cbor(const cbor_view& v)
     }
     return decoder.get_result();
 }
+#endif
 
 template<class Json>
 typename std::enable_if<std::is_same<typename Json::char_type,char>::value,Json>::type 

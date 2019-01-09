@@ -17,6 +17,8 @@
 using namespace jsoncons;
 using namespace jsoncons::cbor;
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+
 TEST_CASE("cbor_view_test")
 {
     ojson j1 = ojson::parse(R"(
@@ -529,4 +531,4 @@ TEST_CASE("cbor conversion tests")
     it2++;
     CHECK(it2 == range2.end());
 }
-
+#endif
