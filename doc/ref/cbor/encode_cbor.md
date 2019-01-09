@@ -168,6 +168,5 @@ Output:
 #### See also
 
 - [byte_string](../byte_string.md)
-- [cbor_view](cbor_view)
 - [decode_cbor](decode_cbor.md) decodes a [Concise Binary Object Representation](http://cbor.io/) data format to a json value.
 
