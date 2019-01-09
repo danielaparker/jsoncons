@@ -1,3 +1,11 @@
+master
+------
+
+Deprecated features:
+
+- cbor_view has been deprecated. Rationale: The complexity of supporting and documenting this component 
+  exceeds its benefits.
+
 v0.116.0
 --------
 
