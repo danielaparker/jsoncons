@@ -47,33 +47,33 @@ namespace readme
                 010000000000000000 -- Bytes content
           ff -- "break" 
 */
-        cbor::cbor_view bv = b; // a non-owning view of the CBOR bytes
+        // Unpack bytes into a json variant value, and add some more elements
+        json j = cbor::decode_cbor<json>(b);
 
         // Loop over the rows
         std::cout << "(2)\n";
-        for (cbor::cbor_view row : bv.array_range())
+        for (const json& row : j.array_range())
         {
             std::cout << row << "\n";
         }
         std::cout << "\n";
 
-        // Get element at position 0/2 using jsonpointer (must be by value)
-        cbor::cbor_view v = jsonpointer::get(bv, "/0/2");
+        // Get element at position 0/2 using jsonpointer 
+        json& v = jsonpointer::get(j, "/0/2");
         std::cout << "(3) " << v.as<std::string>() << "\n\n";
 
         // Print JSON representation with default options
         std::cout << "(4)\n";
-        std::cout << pretty_print(bv) << "\n\n";
+        std::cout << pretty_print(j) << "\n\n";
 
         // Print JSON representation with different options
         json_options options;
         options.byte_string_format(byte_string_chars_format::base64)
                .bignum_format(bignum_chars_format::base64url);
         std::cout << "(5)\n";
-        std::cout << pretty_print(bv, options) << "\n\n";
+        std::cout << pretty_print(j, options) << "\n\n";
 
-        // Unpack bytes into a json variant value, and add some more elements
-        json j = cbor::decode_cbor<json>(bv);
+        // Add some more elements
 
         json another_array = json::array(); 
         another_array.emplace_back(byte_string({'P','u','s','s'}),
@@ -85,7 +85,7 @@ namespace readme
         std::cout << "(6)\n";
         std::cout << pretty_print(j) << "\n\n";
 
-        // Get element at position /1/2 using jsonpointer (can be by reference)
+        // Get element at position /1/2 using jsonpointer
         json& ref = jsonpointer::get(j, "/1/2");
         std::cout << "(7) " << ref.as<std::string>() << "\n\n";
 
@@ -127,23 +127,14 @@ namespace readme
               21 -- -2
               19 6ab3 -- 27315
 */
-        std::cout << "(9)\n";
-        cbor::cbor_view bv2 = b2;
-        std::cout << pretty_print(bv2) << "\n\n";
-
         // Serialize to CSV
         csv::csv_options csv_options;
         csv_options.column_names("Column 1,Column 2,Column 3");
 
-        std::string csv_j;
-        csv::encode_csv(j, csv_j, csv_options);
-        std::cout << "(10)\n";
-        std::cout << csv_j << "\n\n";
-
-        std::string csv_bv2;
-        csv::encode_csv(bv2, csv_bv2, csv_options);
-        std::cout << "(11)\n";
-        std::cout << csv_bv2 << "\n\n";
+        std::string csv;
+        csv::encode_csv(j, csv, csv_options);
+        std::cout << "(9)\n";
+        std::cout << csv << "\n\n";
     }
 }
 
