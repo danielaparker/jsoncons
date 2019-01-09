@@ -205,7 +205,7 @@ The library includes four instantiations of `basic_json`:
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/csv/csv_serializer.hpp>
+#include <jsoncons_ext/csv/csv.hpp>
 
 // For convenience
 using namespace jsoncons;    
