@@ -35,6 +35,14 @@ Json json_query(const Json& root,
 Returns a `json` array containing either values or normalized path expressions matching the input path expression. 
 Returns an empty array if there is no match.
 
+#### Exceptions
+
+Throws [jsonpath_error](jsonpath_error.md) if JSONPath evaluation fails.
+
+#### Note
+Stefan Goessner's javascript implemention returns `false` in case of no match, but in a note he suggests an alternative is to return an empty array. The `jsoncons` implementation takes that alternative and returns an empty array in case of no match.
+####
+
 ### Store examples
 
 The examples below use the JSON text from [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) (booklist.json).
@@ -87,20 +95,58 @@ int main()
     std::ifstream is("./input/booklist.json");
     json booklist = json::parse(is);
 
-    // all authors whose books are cheaper than $10
-    json result = json_query(booklist,"$.store.book[?(@.price < 10)].author");
-    std::cout  << "(1)\n" << pretty_print(result) << std::endl;
+    // The authors of books that are cheaper than $10
+    json result1 = json_query(booklist, "$.store.book[?(@.price < 10)].author");
+    std::cout << "(1) " << result1 << "\n";
+
+    // The number of books
+    json result2 = json_query(booklist, "$..book.length");
+    std::cout << "(2) " << result2 << "\n";
+
+    // The third book
+    json result3 = json_query(booklist, "$..book[2]");
+    std::cout << "(3)\n" << pretty_print(result3) << "\n";
 
     // All books whose author's name starts with Evelyn
-    json result1 = json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]");
-    std::cout << "(2)\n" << pretty_print(result1) << std::endl;
+    json result4 = json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]");
+    std::cout << "(4)\n" << pretty_print(result4) << "\n";
+
+    // The titles of all books that have isbn number
+    json result5 = json_query(booklist, "$..book[?(@.isbn)].title");
+    std::cout << "(5) " << result5 << "\n";
+
+    // All authors and titles of books
+    json result6 = json_query(booklist, "$['store']['book']..['author','title']");
+    std::cout << "(6)\n" << pretty_print(result6) << "\n";
+
+    // Normalized path expressions
+    json result7 = json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]", result_type::path);
+    std::cout << "(7)\n" << pretty_print(result7) << "\n";
+
+    // All titles whose author's second name is 'Waugh'
+    json result8 = json_query(booklist,"$.store.book[?(tokenize(@.author,'\\\\s+')[1] == 'Waugh')].title");
+    std::cout << "(8)\n" << result8 << "\n";
+
+    // All keys in the second book
+    json result9 = json_query(booklist,"keys($.store.book[1])[*]");
+    std::cout << "(9)\n" << result9 << "\n";
 }
 ```
 Output:
 ```
-(1)
-["Nigel Rees","Herman Melville"]
-(2)
+(1) ["Nigel Rees","Herman Melville"]
+(2) [4]
+(3)
+[
+    {
+        "author": "Herman Melville",
+        "category": "fiction",
+        "isbn": "0-553-21311-3",
+        "price": 8.99,
+        "title": "Moby Dick"
+    }
+]
+(4)
 [
     {
         "author": "Evelyn Waugh",
@@ -109,6 +155,26 @@ Output:
         "title": "Sword of Honour"
     }
 ]
+(5) ["Moby Dick","The Lord of the Rings"]
+(6)
+[
+    "Nigel Rees",
+    "Sayings of the Century",
+    "Evelyn Waugh",
+    "Sword of Honour",
+    "Herman Melville",
+    "Moby Dick",
+    "J. R. R. Tolkien",
+    "The Lord of the Rings"
+]
+(7)
+[
+    "$['store']['book'][1]"
+]
+(8)
+["Sword of Honour"]
+(9)
+["author","category","price","title"]
 ```
 
 #### Return normalized path expressions

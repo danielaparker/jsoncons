@@ -10,21 +10,17 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <unordered_map>
 #include <type_traits> // std::is_const
 #include <limits> // std::numeric_limits
 #include <utility> // std::move
+#include <regex>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_filter.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath_function.hpp>
 
 namespace jsoncons { namespace jsonpath {
-
-JSONCONS_DEFINE_LITERAL(avg_literal,"avg")
-JSONCONS_DEFINE_LITERAL(max_literal,"max")
-JSONCONS_DEFINE_LITERAL(min_literal,"min")
-JSONCONS_DEFINE_LITERAL(sum_literal,"sum")
-JSONCONS_DEFINE_LITERAL(prod_literal,"prod")
-JSONCONS_DEFINE_LITERAL(count_literal,"count")
 
 // work around for std::make_unique not being available until C++14
 template<typename T, typename... Args>
@@ -40,13 +36,13 @@ Json json_query(const Json& root, const typename Json::string_view_type& path, r
 {
     if (result_t == result_type::value)
     {
-        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>,'$'> evaluator;
+        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
         evaluator.evaluate(root, path);
         return evaluator.get_values();
     }
     else
     {
-        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>,'$'> evaluator;
+        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
         evaluator.evaluate(root, path);
         return evaluator.get_normalized_paths();
     }
@@ -55,7 +51,7 @@ Json json_query(const Json& root, const typename Json::string_view_type& path, r
 template<class Json, class T>
 void json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
 {
-    jsoncons::jsonpath::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>,'$'> evaluator;
+    jsoncons::jsonpath::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
     evaluator.evaluate(root, path);
     evaluator.replace(std::forward<T>(new_value));
 }
@@ -137,14 +133,18 @@ enum class path_state
     left_bracket_step2,
     expect_comma_or_right_bracket,
     function_name,
-    function_argument,
+    expect_arg_or_right_round_bracket,
+    path_argument,
+    unquoted_argument,
+    single_quoted_argument,
+    double_quoted_argument,
+    expect_more_args_or_right_round_bracket,
     dot
 };
 
 template<class Json,
          class JsonReference,
-         class PathCons,
-         char PathStart>
+         class PathCons>
 class jsonpath_evaluator : private serializing_context
 {
 private:
@@ -411,108 +411,9 @@ private:
         }
     };
 
-    class function_table
-    {
-        typedef std::function<Json(const std::vector<pointer>&)> function_type;
-        typedef std::map<string_type,function_type> function_dictionary;
-
-        const function_dictionary functions_ =
-        {
-            {
-                max_literal<char_type>(),[](const std::vector<pointer>& nodes)
-                      {
-                          double v = std::numeric_limits<double>::lowest();
-                          for (auto& node : nodes)
-                          {
-                              double x = node->template as<double>();
-                              if (x > v)
-                              {
-                                  v = x;
-                              }
-                          }
-                          return Json(v);
-                      }
-            },
-            {
-                min_literal<char_type>(),[](const std::vector<pointer>& nodes) 
-                      {
-                          std::vector<pointer> result;
-                          double v = (std::numeric_limits<double>::max)(); 
-                          for (const auto& node : nodes)
-                          {
-                              double x = node->template as<double>();
-                              if (x < v)
-                              {
-                                  v = x;
-                              }
-                          }
-                          return Json(v);
-                      }
-            },
-            {
-                avg_literal<char_type>(),[](const std::vector<pointer>& nodes)
-                      {
-                          double v = 0.0;
-                          for (const auto& node : nodes)
-                          {
-                              v += node->template as<double>();
-                          }
-                          return nodes.size() > 0 ? Json(v/nodes.size()) : Json::null();
-                      }
-            },
-            {
-                sum_literal<char_type>(),[](const std::vector<pointer>& nodes)
-                      {
-                          double v = 0.0;
-                          for (const auto& node : nodes)
-                          {
-                              v += node->template as<double>();
-                          }
-                          return Json(v);
-                      }
-            },
-            {
-                count_literal<char_type>(),[](const std::vector<pointer>& nodes)
-                      {
-                          size_t count = 0;
-                          while (count < nodes.size())
-                          {
-                              ++count;
-                          }
-                          return Json(count);
-                      }
-            },
-            {
-                prod_literal<char_type>(),[](const std::vector<pointer>& nodes)
-                      {
-                          double v = 0.0;
-                          for (const auto& node : nodes)
-                          {
-                              double x = node->template as<double>();
-                              v == 0.0 && x != 0.0
-                              ? (v = x)
-                              : (v *= x);
-
-                          }
-                          return Json(v);
-                      }
-            }
-        };
-    public:
-
-        typename function_dictionary::const_iterator find(const string_type& key) const
-        {
-            return functions_.find(key);
-        }
-        typename function_dictionary::const_iterator end() const
-        {
-            return functions_.end();
-        }
-    };
-    function_table functions_;
+    function_table<Json,pointer> functions_;
 
     default_parse_error_handler default_err_handler_;
-    parse_error_handler *err_handler_;
     path_state state_;
     string_type buffer_;
     size_t start_;
@@ -533,10 +434,12 @@ private:
     std::vector<std::unique_ptr<selector>> selectors_;
     std::vector<std::unique_ptr<Json>> temp_json_values_;
 
+    typedef std::vector<pointer> argument_type;
+    std::vector<argument_type> function_stack_;
+
 public:
     jsonpath_evaluator()
-        : err_handler_(&default_err_handler_),
-          state_(path_state::start),
+        : state_(path_state::start),
           start_(0), positive_start_(true), 
           end_(0), positive_end_(true), undefined_end_(false),
           step_(0), positive_step_(true),
@@ -575,6 +478,28 @@ public:
             }
         }
         return result;
+    }
+
+    void invoke_function(const string_type& function_name, std::error_code& ec)
+    {
+        auto f = functions_.get(function_name, ec);
+        if (ec)
+        {
+            return;
+        }
+        auto result = f(function_stack_, ec);
+        if (ec)
+        {
+            return;
+        }
+
+        string_type s;
+        s.push_back('$');
+
+        node_set v;
+        pointer ptr = create_temp(std::move(result));
+        v.emplace_back(s,ptr);
+        stack_.push_back(v);
     }
 
     template <typename... Args>
@@ -618,15 +543,20 @@ public:
         evaluate(root, path.data(), path.length(), ec);
         if (ec)
         {
-            throw serialization_error(ec, line_, column_);
+            throw jsonpath_error(ec, line_, column_);
         }
     }
 
-    void evaluate(reference root, 
-                  const string_view_type& path, 
-                  std::error_code& ec)
+    void evaluate(reference root, const string_view_type& path, std::error_code& ec)
     {
-        evaluate(root, path.data(), path.length(), ec);
+        try
+        {
+            evaluate(root, path.data(), path.length(), ec);
+        }
+        catch (...)
+        {
+            ec = jsonpath_errc::unidentified_error;
+        }
     }
 
     void evaluate(reference root, 
@@ -653,154 +583,307 @@ public:
         {
             switch (state_)
             {
-            case path_state::cr:
-                ++line_;
-                column_ = 1;
-                switch (*p_)
-                {
-                case '\n':
-                    state_ = pre_line_break_state;
-                    ++p_;
-                    ++column_;
-                    break;
-                default:
-                    state_ = pre_line_break_state;
-                    break;
-                }
-                break;
-            case path_state::lf:
-                ++line_;
-                column_ = 1;
-                state_ = pre_line_break_state;
-                break;
-            case path_state::start: 
-                switch (*p_)
-                {
-                    case ' ':case '\t':
-                        break;
-                    case PathStart:
+                case path_state::cr:
+                    ++line_;
+                    column_ = 1;
+                    switch (*p_)
                     {
-                        string_type s;
-                        s.push_back(*p_);
-                        node_set v;
-                        v.emplace_back(std::move(s),std::addressof(root));
-                        stack_.push_back(v);
-
-                        state_ = path_state::expect_dot_or_left_bracket;
+                    case '\n':
+                        state_ = pre_line_break_state;
+                        ++p_;
+                        ++column_;
+                        break;
+                    default:
+                        state_ = pre_line_break_state;
                         break;
                     }
-                    default:
+                    break;
+                case path_state::lf:
+                    ++line_;
+                    column_ = 1;
+                    state_ = pre_line_break_state;
+                    break;
+                case path_state::start: 
+                    switch (*p_)
                     {
-                        switch (*p_)
+                        case ' ':case '\t':
+                            break;
+                        case '$':
                         {
-                            case '.':
-                            case '[':
-                                err_handler_->fatal_error(jsonpath_errc::expected_root, *this);
-                                ec = jsonpath_errc::expected_root;
-                                return;
-                            default: // might be function, validate name later
-                                state_ = path_state::function_name;
-                                function_name.push_back(*p_);
-                                break;
-                        }
-                        break;
-                    }
+                            string_type s;
+                            s.push_back(*p_);
+                            node_set v;
+                            v.emplace_back(std::move(s),std::addressof(root));
+                            stack_.push_back(v);
 
-                    return;
-                };
-                ++p_;
-                ++column_;
-                break;
-            case path_state::function_name:
-                switch (*p_)
-                {
-                    case '(':
-                        state_ = path_state::function_argument;
+                            state_ = path_state::expect_dot_or_left_bracket;
+                            break;
+                        }
+                        default:
+                        {
+                            switch (*p_)
+                            {
+                                case '.':
+                                case '[':
+                                    ec = jsonpath_errc::expected_root;
+                                    return;
+                                default: // might be function, validate name later
+                                    state_ = path_state::function_name;
+                                    function_name.push_back(*p_);
+                                    break;
+                            }
+                            break;
+                        }
+
+                        return;
+                    };
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::function_name:
+                    switch (*p_)
+                    {
+                        case '(':
+                            state_ = path_state::expect_arg_or_right_round_bracket;
+                            break;
+                        default:
+                            function_name.push_back(*p_);
+                            break;
+                    }
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::expect_arg_or_right_round_bracket:
+                    switch (*p_)
+                    {
+                        case ' ':
+                        case '\t':
+                            break;
+                        case '$':
+                            buffer_.clear();
+                            buffer_.push_back(*p_);
+                            state_ = path_state::path_argument;
+                            break;
+                        case '\'':
+                            buffer_.clear();
+                            buffer_.push_back('\"');
+                            state_ = path_state::single_quoted_argument;
+                            break;
+                        case '\"':
+                            buffer_.clear();
+                            buffer_.push_back('\"');
+                            state_ = path_state::double_quoted_argument;
+                            break;
+                        default:
+                            buffer_.clear();
+                            state_ = path_state::unquoted_argument;
+                            break;
+                    }
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::path_argument:
+                    switch (*p_)
+                    {
+                        case ',':
+                        {
+                            jsonpath_evaluator<Json, JsonReference, PathCons> evaluator;
+                            evaluator.evaluate(root, buffer_, ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            function_stack_.push_back(evaluator.get_pointers());
+                            state_ = path_state::expect_arg_or_right_round_bracket;
+                            break;
+                        }
+                        case ')':
+                        {
+                            jsonpath_evaluator<Json,JsonReference,PathCons> evaluator;
+                            evaluator.evaluate(root, buffer_, ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            function_stack_.push_back(evaluator.get_pointers());
+
+                            invoke_function(function_name, ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+
+                            state_ = path_state::expect_dot_or_left_bracket;
+                            break;
+                        }
+                        default:
+                            buffer_.push_back(*p_);
+                            break;
+                    }
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::unquoted_argument:
+                    switch (*p_)
+                    {
+                        case ',':
+                            try
+                            {
+                                auto val = Json::parse(buffer_);
+                                auto temp = create_temp(val);
+                                function_stack_.push_back(std::vector<pointer>{temp});
+                            }
+                            catch (const serialization_error&)
+                            {
+                                ec = jsonpath_errc::argument_parse_error;
+                                return;
+                            }
+                            buffer_.clear();
+                            state_ = path_state::expect_arg_or_right_round_bracket;
+                            break;
+                        case ')':
+                        {
+                            try
+                            {
+                                auto val = Json::parse(buffer_);
+                                auto temp = create_temp(val);
+                                function_stack_.push_back(std::vector<pointer>{temp});
+                            }
+                            catch (const serialization_error&)
+                            {
+                                ec = jsonpath_errc::argument_parse_error;
+                                return;
+                            }
+                            invoke_function(function_name, ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            state_ = path_state::expect_dot_or_left_bracket;
+                            break;
+                        }
+                        default:
+                            buffer_.push_back(*p_);
+                            break;
+                    }
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::single_quoted_argument:
+                    switch (*p_)
+                    {
+                        case '\'':
+                            buffer_.push_back('\"');
+                            state_ = path_state::expect_more_args_or_right_round_bracket;
+                            break;
+                        default:
+                            buffer_.push_back(*p_);
+                            break;
+                    }
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::double_quoted_argument:
+                    switch (*p_)
+                    {
+                        case '\"':
+                            buffer_.push_back('\"');
+                            state_ = path_state::expect_more_args_or_right_round_bracket;
+                            break;
+                        default:
+                            buffer_.push_back(*p_);
+                            break;
+                    }
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::expect_more_args_or_right_round_bracket:
+                    switch (*p_)
+                    {
+                        case ' ':
+                        case '\t':
+                            break;
+                        case ',':
+                            try
+                            {
+                                auto val = Json::parse(buffer_);
+                                auto temp = create_temp(val);
+                                function_stack_.push_back(std::vector<pointer>{temp});
+                            }
+                            catch (const serialization_error&)
+                            {
+                                ec = jsonpath_errc::argument_parse_error;
+                                return;
+                            }
+                            buffer_.clear();
+                            state_ = path_state::expect_arg_or_right_round_bracket;
+                            break;
+                        case ')':
+                        {
+                            try
+                            {
+                                auto val = Json::parse(buffer_);
+                                auto temp = create_temp(val);
+                                function_stack_.push_back(std::vector<pointer>{temp});
+                            }
+                            catch (const serialization_error&)
+                            {
+                                ec = jsonpath_errc::argument_parse_error;
+                                return;
+                            }
+                            invoke_function(function_name, ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            state_ = path_state::expect_dot_or_left_bracket;
+                            break;
+                        }
+                        default:
+                            ec = jsonpath_errc::invalid_filter_unsupported_operator;
+                            return;
+                    }
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::dot:
+                    switch (*p_)
+                    {
+                    case '.':
+                        recursive_descent_ = true;
+                        ++p_;
+                        ++column_;
+                        state_ = path_state::expect_unquoted_name_or_left_bracket;
                         break;
                     default:
-                        function_name.push_back(*p_);
+                        state_ = path_state::expect_unquoted_name_or_left_bracket;
                         break;
-                }
-                ++p_;
-                ++column_;
-                break;
-            case path_state::function_argument:
-                switch (*p_)
-                {
-                case ')':
-                {
-                    jsonpath_evaluator<Json,JsonReference,PathCons,'$'> evaluator;
-                    evaluator.evaluate(root, buffer_, ec);
-                    if (ec)
-                    {
-                        return;
                     }
-
-                    auto it = functions_.find(function_name);
-                    if (it == functions_.end())
+                    break;
+                case path_state::expect_unquoted_name_or_left_bracket:
+                    switch (*p_)
                     {
-                        ec = jsonpath_errc::invalid_filter_unsupported_operator;
+                    case '.':
+                        ec = jsonpath_errc::expected_name;
                         return;
+                    case '*':
+                        end_all();
+                        transfer_nodes();
+                        state_ = path_state::expect_dot_or_left_bracket;
+                        ++p_;
+                        ++column_;
+                        break;
+                    case '[':
+                        state_ = path_state::left_bracket;
+                        ++p_;
+                        ++column_;
+                        break;
+                    default:
+                        buffer_.clear();
+                        state_ = path_state::unquoted_name;
+                        break;
                     }
-                    auto result = it->second(evaluator.get_pointers());
-
-                    string_type s;
-                    s.push_back(PathStart);
-                    node_set v;
-
-                    pointer ptr = create_temp(std::move(result));
-                    v.emplace_back(std::move(s),ptr);
-                    stack_.push_back(v);
-
-                    state_ = path_state::expect_dot_or_left_bracket;
                     break;
-                }
-                default:
-                    buffer_.push_back(*p_);
-                    break;
-                }
-                ++p_;
-                ++column_;
-                break;
-            case path_state::dot:
-                switch (*p_)
-                {
-                case '.':
-                    recursive_descent_ = true;
-                    ++p_;
-                    ++column_;
-                    state_ = path_state::expect_unquoted_name_or_left_bracket;
-                    break;
-                default:
-                    state_ = path_state::expect_unquoted_name_or_left_bracket;
-                    break;
-                }
-                break;
-            case path_state::expect_unquoted_name_or_left_bracket:
-                switch (*p_)
-                {
-                case '.':
-                    err_handler_->fatal_error(jsonpath_errc::expected_name, *this);
-                    ec = jsonpath_errc::expected_name;
-                    return;
-                case '*':
-                    end_all();
-                    transfer_nodes();
-                    state_ = path_state::expect_dot_or_left_bracket;
-                    ++p_;
-                    ++column_;
-                    break;
-                case '[':
-                    state_ = path_state::left_bracket;
-                    ++p_;
-                    ++column_;
-                    break;
-                default:
-                    buffer_.clear();
-                    state_ = path_state::unquoted_name;
-                    break;
-                }
-                break;
             case path_state::expect_dot_or_left_bracket: 
                 switch (*p_)
                 {
@@ -813,7 +896,6 @@ public:
                     state_ = path_state::left_bracket;
                     break;
                 default:
-                    err_handler_->fatal_error(jsonpath_errc::expected_separator, *this);
                     ec = jsonpath_errc::expected_separator;
                     return;
                 };
@@ -833,7 +915,6 @@ public:
                 case ' ':case '\t':
                     break;
                 default:
-                    err_handler_->fatal_error(jsonpath_errc::expected_right_bracket, *this);
                     ec = jsonpath_errc::expected_right_bracket;
                     return;
                 }
@@ -904,7 +985,6 @@ public:
                 case ':':
                     if (!try_string_to_index(buffer_.data(), buffer_.size(), &start_, &positive_start_))
                     {
-                        err_handler_->fatal_error(jsonpath_errc::expected_index, *this);
                         ec = jsonpath_errc::expected_index;
                         return;
                     }

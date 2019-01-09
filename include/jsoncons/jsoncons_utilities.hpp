@@ -586,12 +586,6 @@ size_t encode_base16(const uint8_t* data, size_t length, Container& result)
     return length*2;
 }
 
-inline 
-static bool is_base64(uint8_t c) 
-{
-    return isalnum(c) || c == '+' || c == '/';
-}
-
 template <class Container>
 size_t encode_base64_generic(const uint8_t* first, size_t length, const char* alphabet, Container& result)
 {
@@ -664,10 +658,22 @@ size_t encode_base64(const uint8_t* first, size_t length, Container& result)
     return encode_base64_generic(first, length, base64_alphabet, result);
 }
 
-template <class CharT>
-std::vector<uint8_t> decode_base64(const std::basic_string<CharT>& base64_string)
+inline 
+static bool is_base64(uint8_t c) 
 {
-    const char* alphabet_end = base64_alphabet + 65;
+    return isalnum(c) || c == '+' || c == '/';
+}
+
+inline 
+static bool is_base64url(uint8_t c) 
+{
+    return isalnum(c) || c == '-' || c == '_';
+}
+
+template <class CharT, class F>
+std::vector<uint8_t> decode_base64_generic(const std::basic_string<CharT>& base64_string, const char* alphabet, F f)
+{
+    const char* alphabet_end = alphabet + 65;
     std::vector<uint8_t> result;
     uint8_t a4[4], a3[3];
     uint8_t i = 0;
@@ -678,7 +684,10 @@ std::vector<uint8_t> decode_base64(const std::basic_string<CharT>& base64_string
 
     while (first != last && *first != '=')
     {
-        JSONCONS_ASSERT(is_base64(*first));
+        if (!f(*first))
+        {
+            throw std::invalid_argument("Invalid encoded string");
+        }
 
         a4[i++] = *first++; 
         if (i == 4)
@@ -735,21 +744,46 @@ std::vector<uint8_t> decode_base64(const std::basic_string<CharT>& base64_string
     return result;
 }
 
-inline
-std::string string_to_hex(const std::string& input)
+template <class CharT>
+std::vector<uint8_t> decode_base64(const std::basic_string<CharT>& base64_string)
 {
-    static const char* const lut = "0123456789ABCDEF";
-    size_t len = input.length();
+    return decode_base64_generic(base64_string, base64_alphabet, is_base64);
+}
 
-    std::string output;
-    output.reserve(2 * len);
-    for (size_t i = 0; i < len; ++i)
+template <class CharT>
+std::vector<uint8_t> decode_base64url(const std::basic_string<CharT>& base64_string)
+{
+    return decode_base64_generic(base64_string, base64url_alphabet, is_base64url);
+}
+
+template <class CharT>
+std::vector<uint8_t> decode_base16(const std::basic_string<CharT>& input)
+{
+    static const char* const alphabet = "0123456789ABCDEF";
+    size_t len = input.length();
+    if (len & 1) 
     {
-        const unsigned char c = input[i];
-        output.push_back(lut[c >> 4]);
-        output.push_back(lut[c & 15]);
+        throw std::invalid_argument("odd length");
     }
-    return output;
+
+    std::vector<uint8_t> result;
+    result.reserve(len / 2);
+    for (size_t i = 0; i < len; i += 2)
+    {
+        char a = (char)input[i];
+        const char* p = std::lower_bound(alphabet, alphabet + 16, a);
+        if (*p != a) throw std::invalid_argument("not a hex digit");
+
+        char b = (char)input[i + 1];
+        const char* q = std::lower_bound(alphabet, alphabet + 16, b);
+        if (*q != b) 
+        {
+            throw std::invalid_argument("not a hex digit");
+        }
+
+        result.push_back(((p - alphabet) << 4) | (q - alphabet));
+    }
+    return result;
 }
 
 

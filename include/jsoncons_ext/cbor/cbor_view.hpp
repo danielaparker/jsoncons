@@ -1051,19 +1051,19 @@ public:
                     case 21:
                     {
                         auto s = as_byte_string();
-                        handler.byte_string_value(s.data(), s.size(),byte_string_chars_format::base64url);
+                        handler.byte_string_value(s.data(), s.size(),semantic_tag_type::base64url);
                         break;
                     }
                     case 22:
                     {
                         auto s = as_byte_string();
-                        handler.byte_string_value(s.data(), s.size(),byte_string_chars_format::base64);
+                        handler.byte_string_value(s.data(), s.size(),semantic_tag_type::base64);
                         break;
                     }
                     case 23:
                     {
                         auto s = as_byte_string();
-                        handler.byte_string_value(s.data(), s.size(),byte_string_chars_format::base16);
+                        handler.byte_string_value(s.data(), s.size(),semantic_tag_type::base16);
                         break;
                     }
                     default:

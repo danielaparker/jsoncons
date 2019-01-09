@@ -8,6 +8,20 @@ The msgpack extension implements decode from and encode to the [MessagePack](htt
 
 [msgpack_serializer](msgpack_serializer.md)
 
+#### jsoncons-MessagePack mappings
+
+jsoncons data item|jsoncons tag|BSON data item
+--------------|------------------|---------------
+null          |                  | nil
+bool          |                  | true or false
+int64         |                  | negative fixnum, int 8, int 16, int 32, int 64
+uint64        |                  | positive fixnum, uint 8, uint 16, uint 32, uint 64
+double        |                  | float32 or float64
+string        |                  | fixstr, str 8, str 16 or str 32
+byte_string   |                  | bin 8, bin 16 or bin 32
+array         |                  | array 
+object        |                  | map
+
 ### Examples
 
 Example file (book.json):

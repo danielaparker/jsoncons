@@ -94,9 +94,15 @@ struct VoidPathConstructor
 
 template <class Json,
           class JsonReference,
-          class PathCons,
-          char PathStart>
+          class PathCons>
 class jsonpath_evaluator;
+
+enum class filter_path_mode
+{
+    path,
+    root_path,
+    current_path
+};
 
 enum class filter_state
 {
@@ -114,8 +120,12 @@ enum class filter_state
     path,
     value,
     oper,
-    function_argument,
-    function_path_argument,
+    expect_arg,
+    path_argument,
+    unquoted_argument,
+    single_quoted_argument,
+    double_quoted_argument,
+    expect_more_args_or_right_round_bracket,
     done
 };
 
@@ -137,125 +147,124 @@ public:
 
     virtual ~term() {}
 
-    virtual void initialize(const Json&)
-    {
-    }
+    virtual void initialize(const Json&) = 0;
+
     virtual bool accept_single_node() const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
-    virtual Json evaluate_single_node() const
+    virtual Json get_single_node() const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual bool exclaim() const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual bool eq_term(const term&) const 
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual bool eq(const Json&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual bool ne_term(const term&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual bool ne(const Json&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual bool regex_term(const term&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual bool regex2(const string_type&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual bool ampamp_term(const term&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual bool ampamp(const Json&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual bool pipepipe_term(const term&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual bool pipepipe(const Json&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual bool lt_term(const term&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual bool lt(const Json&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual bool gt_term(const term&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual bool gt(const Json&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
 
     virtual Json minus_term(const term&) const 
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual Json minus(const Json&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
 
     virtual Json left_minus(const Json&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
 
     virtual Json unary_minus() const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual Json plus_term(const term&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual Json plus(const Json&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual Json mult_term(const term&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual Json mult(const Json&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
 
     virtual Json div_term(const term&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
     virtual Json div(const Json&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
 
     virtual Json left_div(const Json&) const
     {
-        throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
     }
 };
 
@@ -272,25 +281,17 @@ struct operator_properties
 template <class Json>
 class token
 {
+public:
+    typedef std::function<Json(const term<Json>&)> unary_operator_type;
+    typedef std::function<Json(const term<Json>&, const term<Json>&)> operator_type;
+private:
     token_type type_;
     size_t precedence_level_;
     bool is_right_associative_;
     std::shared_ptr<term<Json>> operand_ptr_;
-    std::function<Json(const term<Json>&)> unary_operator_;
-    std::function<Json(const term<Json>&, const term<Json>&)> operator_;
+    unary_operator_type unary_operator_;
+    operator_type operator_;
 public:
-    typedef std::function<Json(const term<Json>&)> unary_operator_type;
-    typedef std::function<Json(const term<Json>&, const term<Json>&)> operator_type;
-
-    Json operator()(const term<Json>& a)
-    {
-        return unary_operator_(a);
-    }
-
-    Json operator()(const term<Json>& a, const term<Json>& b)
-    {
-        return operator_(a,b);
-    }
 
     token(token_type type)
         : type_(type),precedence_level_(0),is_right_associative_(false)
@@ -302,7 +303,7 @@ public:
     }
     token(size_t precedence_level, 
           bool is_right_associative,
-          std::function<Json(const term<Json>&)> unary_operator)
+          unary_operator_type unary_operator)
         : type_(token_type::unary_operator), 
           precedence_level_(precedence_level), 
           is_right_associative_(is_right_associative),
@@ -322,6 +323,16 @@ public:
     token_type type() const
     {
         return type_;
+    }
+
+    Json operator()(const term<Json>& a)
+    {
+        return unary_operator_(a);
+    }
+
+    Json operator()(const term<Json>& a, const term<Json>& b)
+    {
+        return operator_(a,b);
     }
 
     token<Json>& operator=(const token<Json>& val) = default;
@@ -372,11 +383,11 @@ public:
         return *operand_ptr_;
     }
 
-    void initialize(const Json& context_node)
+    void initialize(const Json& current_node)
     {
         if (operand_ptr_.get() != nullptr)
         {
-            operand_ptr_->initialize(context_node);
+            operand_ptr_->initialize(current_node);
         }
     }
 };
@@ -527,12 +538,16 @@ public:
     {
     }
 
+    void initialize(const Json&) override
+    {
+    }
+
     bool accept_single_node() const override
     {
         return value_.as_bool();
     }
 
-    Json evaluate_single_node() const override
+    Json get_single_node() const override
     {
         return value_;
     }
@@ -664,6 +679,10 @@ public:
     {
     }
 
+    void initialize(const Json&) override
+    {
+    }
+
     bool regex2(const string_type& subject) const override
     {
         return std::regex_match(subject, pattern_);
@@ -683,10 +702,10 @@ public:
     {
     }
 
-    void initialize(const Json& context_node) override
+    void initialize(const Json& current_node) override
     {
-        jsonpath_evaluator<Json,const Json&,VoidPathConstructor<Json>,'@'> evaluator;
-        evaluator.evaluate(context_node, path_);
+        jsonpath_evaluator<Json,const Json&,VoidPathConstructor<Json>> evaluator;
+        evaluator.evaluate(current_node, path_);
         nodes_ = evaluator.get_values();
     }
 
@@ -695,7 +714,7 @@ public:
         return nodes_.size() != 0;
     }
 
-    Json evaluate_single_node() const override
+    Json get_single_node() const override
     {
         return nodes_.size() == 1 ? nodes_[0] : nodes_;
     }
@@ -990,37 +1009,41 @@ public:
     size_t line_;
     size_t column_;
 public:
+    jsonpath_filter_expr()
+        : line_(0), column_(0)
+    {
+    }
 
     jsonpath_filter_expr(const std::vector<token<Json>>& tokens, size_t line, size_t column)
         : tokens_(tokens), line_(line), column_(column)
     {
     }
 
-    Json eval(const Json& context_node)
+    Json eval(const Json& current_node)
     {
         try
         {
-            auto t = evaluate(context_node, tokens_);
+            auto t = evaluate(current_node, tokens_);
 
-            return t.operand().evaluate_single_node();
+            return t.operand().get_single_node();
 
         }
-        catch (const serialization_error& e)
+        catch (const jsonpath_error& e)
         {
-            throw serialization_error(e.code(),line_,column_);
+            throw jsonpath_error(e.code(),line_,column_);
         }
     }
 
-    bool exists(const Json& context_node)
+    bool exists(const Json& current_node)
     {
         try
         {
-            auto t = evaluate(context_node,tokens_);
+            auto t = evaluate(current_node,tokens_);
             return t.operand().accept_single_node();
         }
-        catch (const serialization_error& e)
+        catch (const jsonpath_error& e)
         {
-            throw serialization_error(e.code(),line_,column_);
+            throw jsonpath_error(e.code(),line_,column_);
         }
     }
 };
@@ -1035,6 +1058,7 @@ class jsonpath_filter_parser
     std::vector<token<Json>> output_stack_;
     std::vector<token<Json>> operator_stack_;
     std::vector<filter_state> state_stack_;
+    std::vector<filter_path_mode> path_mode_stack_;
 
     size_t line_;
     size_t column_;
@@ -1095,11 +1119,6 @@ public:
         return column_;
     }
 
-    jsonpath_filter_expr<Json> parse(const Json& root, const char_type* p, size_t length, const char_type** end_ptr)
-    {
-        return parse(root, p,p+length, end_ptr);
-    }
-
     void push_state(filter_state state)
     {
         state_stack_.push_back(state);
@@ -1107,10 +1126,7 @@ public:
 
     filter_state pop_state()
     {
-        if (state_stack_.empty())
-        {
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Invalid state"));
-        }
+        JSONCONS_ASSERT(!state_stack_.empty())
         filter_state state = state_stack_.back();
         state_stack_.pop_back();
         return state;
@@ -1237,81 +1253,161 @@ public:
                 ++p;
                 ++column_;
                 break;
-            case filter_state::function_argument:
+
+                case filter_state::expect_arg:
                 {
                     switch (*p)
                     {
-                    case '\r':
-                        push_state(state);
-                        state = filter_state::cr;
-                        break;
-                    case '\n':
-                        push_state(state);
-                        state = filter_state::lf;
-                        break;
-                    case ' ':case '\t':
-                        break;
-
+                        case ' ':case '\t':
+                            break;
+                        case '\r':
+                            push_state(state);
+                            state = filter_state::cr;
+                            break;
+                        case '\n':
+                            push_state(state);
+                            state = filter_state::lf;
+                            break;
                         case '$':
                             buffer.push_back(*p);
-                            state = filter_state::function_path_argument;
+                            path_mode_stack_.back() = filter_path_mode::root_path;
+                            state = filter_state::path_argument;
                             break;
-                    default: 
-                        throw serialization_error(jsonpath_errc::invalid_function_argument,line_,column_);
-                        break;
-                    }
-                    ++p;
-                    ++column_;
-                }
-                break;
-
-                case filter_state::function_path_argument:
-                {
-                    switch (*p)
-                    {
-                    case '\r':
-                        push_state(state);
-                        state = filter_state::cr;
-                        break;
-                    case '\n':
-                        push_state(state);
-                        state = filter_state::lf;
-                        break;
-                    case ' ':case '\t':
-                        break;
-                    case ')':
-                        buffer.push_back(*p);
-                        if (buffer.length() > 0)
-                        {
-                            try
-                            {
-                                // path, parse against root, get value
-                                jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>,'$'> evaluator;
-                                evaluator.evaluate(root, buffer);
-                                auto result = evaluator.get_values();
-                                if (result.size() > 0)
-                                {
-                                    push_token(token<Json>(token_type::operand,
-                                                          std::make_shared<value_term<Json>>(std::move(result[0]))) // revisit this value_term
-                                              );
-                                }
-                            }
-                            catch (const serialization_error& e)
-                            {
-                                throw serialization_error(e.code(),line_,column_);
-                            }
-                            buffer.clear();
-                            state = filter_state::expect_oper_or_right_round_bracket;
-                        }
-                        break;
-                    default: 
-                        buffer.push_back(*p);
-                        break;
+                        case '@':
+                            buffer.push_back('$');
+                            path_mode_stack_.back() = filter_path_mode::current_path;
+                            state = filter_state::path_argument;
+                            break;
+                        // Maybe error from here down
+                        case '\'':
+                            buffer.push_back('\"');
+                            state = filter_state::single_quoted_argument;
+                            break;
+                        case '\"':
+                            buffer.push_back('\"');
+                            state = filter_state::double_quoted_argument;
+                            break;
+                        default: 
+                            buffer.push_back(*p);
+                            state = filter_state::unquoted_argument;
+                            break;
                     }
                     ++p;
                     ++column_;
                     break;
                 }
+
+                case filter_state::path_argument:
+                {
+                    switch (*p)
+                    {
+                        case '\r':
+                            push_state(state);
+                            state = filter_state::cr;
+                            break;
+                        case '\n':
+                            push_state(state);
+                            state = filter_state::lf;
+                            break;
+                        case ' ':case '\t':
+                            break;
+                        case ',':
+                            buffer.push_back(*p);
+                            state = filter_state::expect_arg;
+                            break;
+                        case ')':
+                        {
+                            buffer.push_back(*p);
+                            state = filter_state::path;
+                            break;
+                        }
+                        default: 
+                            buffer.push_back(*p);
+                            break;
+                    }
+                    ++p;
+                    ++column_;
+                    break;
+                }
+                case filter_state::single_quoted_argument:
+                {
+                    switch (*p)
+                    {
+                        case '\'':
+                            buffer.push_back('\"');
+                            state = filter_state::expect_more_args_or_right_round_bracket;
+                            break;
+                        default: 
+                            buffer.push_back(*p);
+                            break;
+                    }
+                    ++p;
+                    ++column_;
+                    break;
+                }
+                case filter_state::double_quoted_argument:
+                {
+                    switch (*p)
+                    {
+                        case '\"':
+                            buffer.push_back('\"');
+                            state = filter_state::expect_more_args_or_right_round_bracket;
+                            break;
+                        default: 
+                            buffer.push_back(*p);
+                            break;
+                    }
+                    ++p;
+                    ++column_;
+                    break;
+                }
+                case filter_state::unquoted_argument:
+                {
+                    switch (*p)
+                    {
+                        case ',':
+                            buffer.push_back(*p);
+                            state = filter_state::expect_arg;
+                            break;
+                        case ')':
+                        {
+                            buffer.push_back(*p);
+                            state = filter_state::path;
+                            break;
+                        }
+                        default:
+                            buffer.push_back(*p);
+                            break;;
+                    }
+                    ++p;
+                    ++column_;
+                    break;
+                }
+                case filter_state::expect_more_args_or_right_round_bracket:
+                {
+                    switch (*p)
+                    {
+                        case ' ':
+                        case '\t':
+                            break;
+                        case ',':
+                            buffer.push_back(*p);
+                            state = filter_state::expect_arg;
+                            break;
+                        case ')':
+                        {
+                            buffer.push_back(*p);
+                            state = filter_state::path;
+                            break;
+                        }
+                        default:
+                            throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_);
+                    }
+                    ++p;
+                    ++column_;
+                    break;
+                }
+
             case filter_state::oper:
                 switch (*p)
                 {
@@ -1323,7 +1419,7 @@ public:
                         auto it = binary_operators_.find(buffer);
                         if (it == binary_operators_.end())
                         {
-                            throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_);
+                            throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_);
                         }
                         buffer.clear();
                         push_token(token<Json>(it->second));
@@ -1340,7 +1436,7 @@ public:
                         auto it = binary_operators_.find(buffer);
                         if (it == binary_operators_.end())
                         {
-                            throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_);
+                            throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_);
                         }
                         buffer.clear();
                         push_token(token<Json>(it->second));
@@ -1352,7 +1448,7 @@ public:
                         auto it = binary_operators_.find(buffer);
                         if (it == binary_operators_.end())
                         {
-                            throw serialization_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_);
+                            throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_);
                         }
                         buffer.clear();
                         push_token(token<Json>(it->second));
@@ -1366,41 +1462,6 @@ public:
                     switch (*p)
                     {
                         case ' ':case '\t':
-                        if (buffer.length() > 0)
-                        {
-                            try
-                            {
-                                auto val = Json::parse(buffer);
-                                push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
-                            }
-                            catch (const serialization_error& e)
-                            {
-                                throw serialization_error(e.code(),line_,column_);
-                            }
-                            buffer.clear();
-                        }
-                        ++p;
-                        ++column_;
-                        break; 
-                    case '(':
-                    {
-                        state = filter_state::function_argument;
-                        buffer.push_back(*p);
-                        ++p;
-                        ++column_;
-                        break;
-                    }
-                    case '<':
-                    case '>':
-                    case '!':
-                    case '=':
-                    case '&':
-                    case '|':
-                    case '+':
-                    case '-':
-                    case '*':
-                    case '/':
-                        {
                             if (buffer.length() > 0)
                             {
                                 try
@@ -1408,49 +1469,85 @@ public:
                                     auto val = Json::parse(buffer);
                                     push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
                                 }
-                                catch (const serialization_error& e)
+                                catch (const serialization_error&)
                                 {
-                                    throw serialization_error(e.code(),line_,column_);
+                                    throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
                                 }
                                 buffer.clear();
                             }
-                            buffer.push_back(*p);
-                            state = filter_state::oper;
                             ++p;
                             ++column_;
-                        }
-                        break;
-                    case ')':
-                        if (buffer.length() > 0)
+                            break; 
+                        case '(':
                         {
-                            try
+                            buffer.push_back(*p);
+                            path_mode_stack_.push_back(filter_path_mode::path);
+                            state = filter_state::expect_arg;
+                            ++p;
+                            ++column_;
+                            break;
+                        }
+                        case '<':
+                        case '>':
+                        case '!':
+                        case '=':
+                        case '&':
+                        case '|':
+                        case '+':
+                        case '-':
+                        case '*':
+                        case '/':
                             {
-                                auto val = Json::parse(buffer);
-                                push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
+                                if (buffer.length() > 0)
+                                {
+                                    try
+                                    {
+                                        auto val = Json::parse(buffer);
+                                        push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
+                                    }
+                                    catch (const serialization_error&)
+                                    {
+                                        throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
+                                    }
+                                    buffer.clear();
+                                }
+                                buffer.push_back(*p);
+                                state = filter_state::oper;
+                                ++p;
+                                ++column_;
                             }
-                            catch (const serialization_error& e)
+                            break;
+                        case ')':
+                            if (buffer.length() > 0)
                             {
-                                throw serialization_error(e.code(),line_,column_);
+                                try
+                                {
+                                    auto val = Json::parse(buffer);
+                                    push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
+                                }
+                                catch (const serialization_error&)
+                                {
+                                    throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
+                                }
+                                buffer.clear();
                             }
-                            buffer.clear();
-                        }
-                        push_token(token<Json>(token_type::rparen));
-                        if (--depth == 0)
-                        {
-                            state = filter_state::done;
-                        }
-                        else
-                        {
-                            state = filter_state::expect_path_or_value_or_unary_op;
-                        }
-                        ++p;
-                        ++column_;
-                        break;
-                    default: 
-                        buffer.push_back(*p);
-                        ++p;
-                        ++column_;
-                        break;
+                            push_token(token<Json>(token_type::rparen));
+                            if (--depth == 0)
+                            {
+                                state = filter_state::done;
+                            }
+                            else
+                            {
+                                state = filter_state::expect_path_or_value_or_unary_op;
+                            }
+                            ++p;
+                            ++column_;
+                            break;
+                        default: 
+                            buffer.push_back(*p);
+                            ++p;
+                            ++column_;
+                            break;
                     }
                 }
                 break;
@@ -1476,9 +1573,9 @@ public:
                                 auto val = Json::parse(buffer);
                                 push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
                             }
-                            catch (const serialization_error& e)
+                            catch (const serialization_error&)
                             {
-                                throw serialization_error(e.code(),line_,column_);
+                                throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
                             }
                             buffer.clear();
                         }
@@ -1513,9 +1610,9 @@ public:
                             auto val = Json::parse(buffer);
                             push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
                         }
-                        catch (const serialization_error& e)
+                        catch (const serialization_error&)
                         {
-                            throw serialization_error(e.code(),line_,column_);
+                            throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
                         }
                         buffer.clear();
                         state = filter_state::expect_path_or_value_or_unary_op;
@@ -1532,149 +1629,149 @@ public:
             case filter_state::expect_path_or_value_or_unary_op: 
                 switch (*p)
                 {
-                case '\r':
-                    push_state(state);
-                    state = filter_state::cr;
-                    ++p;
-                    break;
-                case '\n':
-                    push_state(state);
-                    state = filter_state::lf;
-                    ++p;
-                    break;
-                case ' ':case '\t':
-                    ++p;
-                    ++column_;
-                    break;
-                case '!':
-                {
-                    std::function<Json(const term<Json>&)> f = [](const term<Json>& b) {return Json(b.exclaim());};
-                    push_token(token<Json>(1, true, f));
-                    ++p;
-                    ++column_;
-                    break;
-                }
-                case '-':
-                {
-                    std::function<Json(const term<Json>&)> f = [](const term<Json>& b) {return b.unary_minus();};
-                    push_token(token<Json>(1, true, f));
-                    ++p;
-                    ++column_;
-                    break;
-                }
-                    case '@':
-                    buffer.push_back(*p);
-                    state = filter_state::path;
-                    ++p;
-                    ++column_;
-                    break;
-                case '\'':
-                    buffer.push_back('\"');
-                    state = filter_state::single_quoted_text;
-                    ++p;
-                    ++column_;
-                    break;
-                case '\"':
-                    buffer.push_back(*p);
-                    state = filter_state::double_quoted_text;
-                    ++p;
-                    ++column_;
-                    break;
-                case '(':
-                    ++depth;
-                    push_token(token<Json>(token_type::lparen));
-                    ++p;
-                    ++column_;
-                    break;
-                case ')':
-                    push_token(token<Json>(token_type::rparen));
-                    if (--depth == 0)
+                    case '\r':
+                        push_state(state);
+                        state = filter_state::cr;
+                        ++p;
+                        break;
+                    case '\n':
+                        push_state(state);
+                        state = filter_state::lf;
+                        ++p;
+                        break;
+                    case ' ':case '\t':
+                        ++p;
+                        ++column_;
+                        break;
+                    case '!':
                     {
-                        state = filter_state::done;
+                        std::function<Json(const term<Json>&)> f = [](const term<Json>& b) {return Json(b.exclaim());};
+                        push_token(token<Json>(1, true, f));
+                        ++p;
+                        ++column_;
+                        break;
                     }
-                    ++p;
-                    ++column_;
-                    break;
-                default: 
-                    // don't increment
-                    state = filter_state::unquoted_text;
-                    break;
+                    case '-':
+                    {
+                        std::function<Json(const term<Json>&)> f = [](const term<Json>& b) {return b.unary_minus();};
+                        push_token(token<Json>(1, true, f));
+                        ++p;
+                        ++column_;
+                        break;
+                    }
+                    case '@':
+                        buffer.push_back('$');
+                        state = filter_state::path;
+                        ++p;
+                        ++column_;
+                        break;
+                    case '\'':
+                        buffer.push_back('\"');
+                        state = filter_state::single_quoted_text;
+                        ++p;
+                        ++column_;
+                        break;
+                    case '\"':
+                        buffer.push_back(*p);
+                        state = filter_state::double_quoted_text;
+                        ++p;
+                        ++column_;
+                        break;
+                    case '(':
+                        ++depth;
+                        push_token(token<Json>(token_type::lparen));
+                        ++p;
+                        ++column_;
+                        break;
+                    case ')':
+                        push_token(token<Json>(token_type::rparen));
+                        if (--depth == 0)
+                        {
+                            state = filter_state::done;
+                        }
+                        ++p;
+                        ++column_;
+                        break;
+                    default: 
+                        // don't increment
+                        state = filter_state::unquoted_text;
+                        break;
                 };
                 break;
             case filter_state::expect_oper_or_right_round_bracket: 
                 switch (*p)
                 {
-                case '\r':
-                    push_state(state);
-                    state = filter_state::cr;
-                    ++p;
-                    break;
-                case '\n':
-                    push_state(state);
-                    state = filter_state::lf;
-                    ++p;
-                    break;
-                case ' ':case '\t':
-                    ++p;
-                    ++column_;
-                    break;
-                case ')':
-                    push_token(token<Json>(token_type::rparen));
-                    if (--depth == 0)
-                    {
-                        state = filter_state::done;
-                        ++p; // fix
-                    }
-                    break;
-                case '<':
-                case '>':
-                case '!':
-                case '=':
-                case '&':
-                case '|':
-                case '+':
-                case '-':
-                case '*':
-                case '/':
-                    {
-                        buffer.push_back(*p);
-                        state = filter_state::oper;
+                    case '\r':
+                        push_state(state);
+                        state = filter_state::cr;
+                        ++p;
+                        break;
+                    case '\n':
+                        push_state(state);
+                        state = filter_state::lf;
+                        ++p;
+                        break;
+                    case ' ':case '\t':
                         ++p;
                         ++column_;
-                    }
-                    break;
-                default: 
-                    throw serialization_error(jsonpath_errc::invalid_filter,line_,column_);
-                    break;
+                        break;
+                    case ')':
+                        push_token(token<Json>(token_type::rparen));
+                        if (--depth == 0)
+                        {
+                            state = filter_state::done;
+                            ++p; // fix
+                        }
+                        break;
+                    case '<':
+                    case '>':
+                    case '!':
+                    case '=':
+                    case '&':
+                    case '|':
+                    case '+':
+                    case '-':
+                    case '*':
+                    case '/':
+                        {
+                            buffer.push_back(*p);
+                            state = filter_state::oper;
+                            ++p;
+                            ++column_;
+                        }
+                        break;
+                    default: 
+                        throw jsonpath_error(jsonpath_errc::invalid_filter,line_,column_);
+                        break;
                 };
                 break;
             case filter_state::expect_right_round_bracket: 
                 switch (*p)
                 {
-                case '\r':
-                    push_state(state);
-                    state = filter_state::cr;
-                    break;
-                case '\n':
-                    push_state(state);
-                    state = filter_state::lf;
-                    break;
-                case ' ':case '\t':
-                    break;
-                case ')':
-                    push_token(token<Json>(token_type::rparen));
-                    if (--depth == 0)
-                    {
-                        state = filter_state::done;
-                    }
-                    else 
-                    {
-                        state = filter_state::expect_oper_or_right_round_bracket;
-                    }
-                    break;
-                default: 
-                    throw serialization_error(jsonpath_errc::invalid_filter,line_,column_);
-                    break;
+                    case '\r':
+                        push_state(state);
+                        state = filter_state::cr;
+                        break;
+                    case '\n':
+                        push_state(state);
+                        state = filter_state::lf;
+                        break;
+                    case ' ':case '\t':
+                        break;
+                    case ')':
+                        push_token(token<Json>(token_type::rparen));
+                        if (--depth == 0)
+                        {
+                            state = filter_state::done;
+                        }
+                        else 
+                        {
+                            state = filter_state::expect_oper_or_right_round_bracket;
+                        }
+                        break;
+                    default: 
+                        throw jsonpath_error(jsonpath_errc::invalid_filter,line_,column_);
+                        break;
                 };
                 ++p;
                 ++column_;
@@ -1693,11 +1790,36 @@ public:
                 case '*':
                 case '/':
                     {
-                        if (buffer.length() > 0)
+                        if (!path_mode_stack_.empty())
+                        {
+                            if (path_mode_stack_[0] == filter_path_mode::root_path)
+                            {
+                                try
+                                {
+                                    jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
+                                    evaluator.evaluate(root, buffer);
+                                    auto result = evaluator.get_values();
+                                    if (result.size() > 0)
+                                    {
+                                        push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(result[0]))));
+                                    }
+                                }
+                                catch (const jsonpath_error& e)
+                                {
+                                    throw jsonpath_error(e.code(),line_,column_);
+                                }
+                            }
+                            else
+                            {
+                                push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
+                            }
+                            path_mode_stack_.pop_back();
+                        }
+                        else
                         {
                             push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
-                            buffer.clear();
                         }
+                        buffer.clear();
                         buffer.push_back(*p);
                         ++p;
                         ++column_;
@@ -1705,12 +1827,38 @@ public:
                     }
                     break;
                 case ')':
-                    if (buffer.length() > 0)
+                    if (!path_mode_stack_.empty())
+                    {
+                        if (path_mode_stack_[0] == filter_path_mode::root_path)
+                        {
+                            try
+                            {
+                                jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
+                                evaluator.evaluate(root, buffer);
+                                auto result = evaluator.get_values();
+                                if (result.size() > 0)
+                                {
+                                    push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(result[0]))));
+                                }
+                                push_token(token<Json>(token_type::rparen));
+                            }
+                            catch (const jsonpath_error& e)
+                            {
+                                throw jsonpath_error(e.code(),line_,column_);
+                            }
+                        }
+                        else
+                        {
+                            push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
+                        }
+                        path_mode_stack_.pop_back();
+                    }
+                    else
                     {
                         push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
                         push_token(token<Json>(token_type::rparen));
-                        buffer.clear();
                     }
+                    buffer.clear();
                     if (--depth == 0)
                     {
                         state = filter_state::done;
@@ -1746,7 +1894,7 @@ public:
                     state = filter_state::regex;
                     break;
                 default: 
-                    throw serialization_error(jsonpath_errc::invalid_filter_expected_slash,line_,column_);
+                    throw jsonpath_error(jsonpath_errc::invalid_filter_expected_slash,line_,column_);
                     break;
                 };
                 ++p;
@@ -1788,7 +1936,7 @@ public:
         }
         if (depth != 0)
         {
-            throw serialization_error(jsonpath_errc::invalid_filter_unbalanced_paren,line_,column_);
+            throw jsonpath_error(jsonpath_errc::invalid_filter_unbalanced_paren,line_,column_);
         }
         *end_ptr = p;
 

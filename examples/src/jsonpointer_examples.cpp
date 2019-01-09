@@ -3,7 +3,6 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/cbor/cbor.hpp>
 
 using namespace jsoncons;
 
@@ -305,32 +304,6 @@ void jsonpointer_replace_array_value()
     }
 }
 
-void jsonpointer_cbor()
-{
-    ojson j = ojson::parse(R"(
-    {
-       "application": "hiking",
-       "reputons": [
-       {
-           "rater": "HikingAsylum.example.com",
-           "assertion": "is-good",
-           "rated": "sk",
-           "rating": 0.90
-         }
-       ]
-    }
-    )");
-
-    std::vector<uint8_t> data;
-    cbor::encode_cbor(j, data);
-
-    std::error_code ec;
-    cbor::cbor_view rated = jsonpointer::get(cbor::cbor_view(data), "/reputons/0/rated", ec);
-    cbor::cbor_view rating = jsonpointer::get(cbor::cbor_view(data), "/reputons/0/rating", ec);
-
-    std::cout << rated.as_string() << ", " << rating.as_double() << std::endl;
-}
-
 void jsonpointer_error_example()
 {
     json doc = json::parse(R"(
@@ -383,13 +356,6 @@ void jsonpointer_get_examples()
         std::cout << "(2) " << item << std::endl;
     }
     {
-        std::vector<uint8_t> b = {0x82,0x63,0x62,0x61,0x7a,0x63,0x66,0x6f,0x6f};
-        
-        cbor::cbor_view bv = b;
-        cbor::cbor_view item = jsonpointer::get(bv,"/0");
-        std::cout << "(3) " << item << std::endl;
-    }
-    {
         json j = json::array{"baz","foo"};
 
         std::error_code ec;
@@ -403,15 +369,6 @@ void jsonpointer_get_examples()
         const json& item = jsonpointer::get(j,"/0",ec);
         std::cout << "(5) " << item << std::endl;
     }
-    {
-        std::vector<uint8_t> b = {0x82,0x63,0x62,0x61,0x7a,0x63,0x66,0x6f,0x6f};
-        cbor::cbor_view bv = b;
-
-        std::error_code ec;
-        cbor::cbor_view item = jsonpointer::get(bv,"/1",ec);
-        std::cout << "(6) " << item << std::endl;
-    }
-
 }
 
 void jsonpointer_examples()
@@ -432,7 +389,6 @@ void jsonpointer_examples()
     jsonpointer_select_author();
     jsonpointer_insert_name_exists();
     jsonpointer_insert_or_assign_name_exists();
-    jsonpointer_cbor();
     jsonpointer_get_examples();
     std::cout << std::endl;
 }

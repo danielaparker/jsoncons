@@ -7,7 +7,7 @@ Decodes a [Concise Binary Object Representation](http://cbor.io/) data format to
 #include <jsoncons_ext/cbor/cbor.hpp>
 
 template<class Json>
-Json decode_cbor(const cbor_view& v); // (1)
+Json decode_cbor(const std::vector<uint8_t>& v); // (1)
 
 template<class Json>
 Json decode_cbor(std::basic_istream<typename Json::char_type>& is); // (2)
@@ -183,7 +183,6 @@ Output:
 #### See also
 
 - [byte_string](../byte_string.md)
-- [cbor_view](cbor_view)
 - [encode_cbor](encode_cbor.md) encodes a json value to the [Concise Binary Object Representation](http://cbor.io/) data format.
 
 

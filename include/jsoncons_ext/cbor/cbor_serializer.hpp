@@ -522,6 +522,20 @@ private:
                 end_value();
                 break;
             }
+            case semantic_tag_type::base64url:
+            {
+                result_.push_back(33);
+                write_string(sv);
+                end_value();
+                break;
+            }
+            case semantic_tag_type::base64:
+            {
+                result_.push_back(34);
+                write_string(sv);
+                end_value();
+                break;
+            }
             default:
             {
                 write_string(sv);
@@ -533,10 +547,25 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              byte_string_chars_format encoding_hint,
-                              semantic_tag_type, 
+                              semantic_tag_type tag, 
                               const serializing_context&) override
     {
+        byte_string_chars_format encoding_hint;
+        switch (tag)
+        {
+            case semantic_tag_type::base16:
+                encoding_hint = byte_string_chars_format::base16;
+                break;
+            case semantic_tag_type::base64:
+                encoding_hint = byte_string_chars_format::base64;
+                break;
+            case semantic_tag_type::base64url:
+                encoding_hint = byte_string_chars_format::base64url;
+                break;
+            default:
+                encoding_hint = byte_string_chars_format::none;
+                break;
+        }
         switch (encoding_hint)
         {
             case byte_string_chars_format::base64url:

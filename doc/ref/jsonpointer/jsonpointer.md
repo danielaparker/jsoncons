@@ -87,6 +87,4 @@ Output:
 (2) "Sayings of the Century"
 ```
 
-[jsonpointer::get](get.md) may also be used to query the nested data items of a packed CBOR value.
-
 

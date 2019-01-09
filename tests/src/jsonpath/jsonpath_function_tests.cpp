@@ -69,20 +69,29 @@ TEST_CASE("jsonpath function tests")
         CHECK(result[0].as<size_t>() == expected);
     }
 
+    SECTION("keys")
+    {
+        json result = json_query(store,"keys($.store.book[0])[*]");
+
+        json expected = json::parse("[\"author\",\"category\",\"price\",\"title\"]");
+
+        REQUIRE(result.size() == 4);
+        CHECK(result == expected);
+    }
     SECTION("sum")
     {
         json result = json_query(store,"sum($.store.book[*].price)");
         double expected = 53.92;
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<double>() == Approx(expected).epsilon(0.000001));
-
-        json result2 = json_query(store,"$.store.book[?(@.price > sum($.store.book[*].price) / count($.store.book[*]))].title");
-        std::cout << "result2: " << result2 << "\n";
-        std::string expected2 = "The Lord of the Rings";
-        REQUIRE(result2.size() == 1);
-        CHECK(result2[0].as<std::string>() == expected2);
     }
-
+    SECTION("sum in filter")
+    {
+        json result = json_query(store,"$.store.book[?(@.price > sum($.store.book[*].price) / count($.store.book[*]))].title");
+        std::string expected = "The Lord of the Rings";
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<std::string>() == expected);
+    }
     SECTION("avg")
     {
         json result = json_query(store,"avg($.store.book[*].price)");
@@ -91,6 +100,13 @@ TEST_CASE("jsonpath function tests")
 
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<double>() == Approx(expected).epsilon(0.000001));
+    }
+    SECTION("avg in filter")
+    {
+        json result = json_query(store,"$.store.book[?(@.price > avg($.store.book[*].price))].title");
+        std::string expected = "The Lord of the Rings";
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<std::string>() == expected);
     }
 
     SECTION("prod")
@@ -135,6 +151,32 @@ TEST_CASE("jsonpath function tests")
 
         CHECK(result == expected);
     }
+#if !(defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ < 9))
+// GCC 4.8 has broken regex support: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631
+    SECTION("tokenize")
+    {
+        json j("The cat sat on the mat");
+        json result = json_query(j,"tokenize($,'\\\\s+')[*]");
+
+        json expected = json::parse("[\"The\",\"cat\",\"sat\",\"on\",\"the\",\"mat\"]");
+
+        CHECK(result == expected);
+    }
+    SECTION("tokenize in filter")
+    {
+        json j = json::parse("[\"The cat sat on the mat\",\"The cat on the mat\"]");
+        json result = json_query(j,"$.[?(tokenize(@,'\\\\s+')[2]=='sat')]");
+
+        CHECK(result[0] == j[0]);
+    }
+    SECTION("tokenize in filter 2")
+    {
+        json result = json_query(store,"$.store.book[?(tokenize(@.author,'\\\\s+')[1] == 'Waugh')].title");
+        std::string expected = "Sword of Honour";
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<std::string>() == expected);
+    }
+#endif
 }
 
 

@@ -39,6 +39,12 @@ data formats such as [CBOR](http://cbor.io/). It supports
 
 - Streaming JSON read and write events, somewhat analogously to SAX (push parsing) and StAX (pull parsing) in the XML world. 
 
+The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. 
+
+To install the librray, download the [latest release](https://github.com/danielaparker/jsoncons/releases) and unpack the zip file. Copy the directory `include/jsoncons` to your `include` directory. If you wish to use extensions, copy `include/jsoncons_ext` as well. 
+
+Or, download the latest code on [master](https://github.com/danielaparker/jsoncons/archive/master.zip).
+
 Compared to other JSON libraries, jsoncons has been designed to handle very large JSON texts. At its heart are
 SAX style parsers and serializers. Its [json parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_parser.md) is an 
 incremental parser that can be fed its input in chunks, and does not require an entire file to be loaded in memory at one time. 
@@ -46,11 +52,11 @@ Its unpacked in-memory representation of JSON is more compact than most, and can
 allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_staj_reader.md),
 built on top of its incremental parser.  
 
-The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. 
-
-To install the librray, download the [latest release](https://github.com/danielaparker/jsoncons/releases) and unpack the zip file. Copy the directory `include/jsoncons` to your `include` directory. If you wish to use extensions, copy `include/jsoncons_ext` as well. 
-
-Or, download the latest code on [master](https://github.com/danielaparker/jsoncons/archive/master.zip).
+The [jsoncons data model](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/data-model.md) supports the familiar JSON types - nulls,
+booleans, numbers, strings, arrays, objects - plus byte strings. In addition, jsoncons 
+supports semantic tagging of date-time values, timestamp values, big numbers, 
+decimal fractions and binary encodings. This allows it to preserve these type semantics when parsing 
+JSON-like data formats such as CBOR that have them.
 
 The jsoncons classes and functions are in namespace `jsoncons`. You need to include the header file
 ```c++ 

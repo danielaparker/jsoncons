@@ -416,7 +416,6 @@ private:
                     }
 
                     handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
-                                               byte_string_chars_format::none, 
                                                semantic_tag_type::none, 
                                                *this);
                     break;
@@ -444,7 +443,6 @@ private:
                     }
 
                     handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
-                                               byte_string_chars_format::none, 
                                                semantic_tag_type::none, 
                                                *this);
                     break;
@@ -472,7 +470,6 @@ private:
                     }
 
                     handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
-                                               byte_string_chars_format::none, 
                                                semantic_tag_type::none, 
                                                *this);
                     break;

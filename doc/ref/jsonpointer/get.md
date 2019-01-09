@@ -43,30 +43,17 @@ get(const J& root, const typename J::string_view_type& path, std::error_code& ec
     const json j = json::array{"baz","foo"};
     const json& item = jsonpointer::get(j,"/1"); // "foo"
 
-(3) On success, returns the selected item by value.
-  
-    std::vector<uint8_t> b = {0x82,0x63,0x62,0x61,0x7a,0x63,0x66,0x6f,0x6f}; // in CBOR
-    cbor::cbor_view bv = b;
-    cbor::cbor_view item = jsonpointer::get(bv,"/0"); // "baz"
-
-(4) On success, returns the selected item by reference, otherwise an undefined item by reference.  
+(3) On success, returns the selected item by reference, otherwise an undefined item by reference.  
 
     json j = json::array{"baz","foo"};
     std::error_code ec;
     json& item = jsonpointer::get(j,"/1",ec); // "foo"
 
-(5) On success, returns the selected item by const reference, otherwise an undefined item by const reference.  
+(4) On success, returns the selected item by const reference, otherwise an undefined item by const reference.  
 
     const json j = json::array{"baz","foo"};
     std::error_code ec;
     const json& item = jsonpointer::get(j,"/0",ec); // "baz"
-
-(6) On success, returns the selected item by value, otherwise an undefined item by value.  
-
-    std::vector<uint8_t> b = {0x82,0x63,0x62,0x61,0x7a,0x63,0x66,0x6f,0x6f}; // in CBOR
-    cbor::cbor_view bv = b;
-    std::error_code ec; 
-    cbor::cbor_view item = jsonpointer::get(bv,"/1",ec); // "foo"
 
 ### Exceptions
 
@@ -245,46 +232,4 @@ Output:
 (2) "Sayings of the Century"
 ```
 
-#### Select values from `cbor_view` object
 
-A [cbor_view](../cbor/cbor_view.md) satisfies the requirements for `jsonpointer::get`.
-
-```c++
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/cbor/cbor.hpp>
-
-using namespace jsoncons;
-
-int main()
-{
-    ojson j = ojson::parse(R"(
-    {
-       "application": "hiking",
-       "reputons": [
-       {
-           "rater": "HikingAsylum.example.com",
-           "assertion": "is-good",
-           "rated": "sk",
-           "rating": 0.90
-         }
-       ]
-    }
-    )");
-
-    std::vector<uint8_t> data;
-    cbor::encode_cbor(j, data);
-
-    std::error_code ec;
-    cbor::cbor_view rated = jsonpointer::get(cbor::cbor_view(data), "/reputons/0/rated", ec);
-    cbor::cbor_view rating = jsonpointer::get(cbor::cbor_view(data), "/reputons/0/rating", ec);
-
-    std::cout << rated.as_string() << ", " << rating.as_double() << std::endl;
-}
-```
-
-Output:
-
-```
-sk, 0.9
-```

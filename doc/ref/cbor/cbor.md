@@ -2,8 +2,7 @@
 
 The cbor extension implements decode from and encode to the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/).
 It supports decoding a packed CBOR value to an unpacked (json) value and
-encoding an unpacked (json) value to a packed CBOR value. It also supports a set of operations 
-on a view (`cbor_view`) of a packed CBOR value for iterating over and accessing nested data items.
+encoding an unpacked (json) value to a packed CBOR value.
 
 [decode_cbor](decode_cbor.md)
 
@@ -11,7 +10,31 @@ on a view (`cbor_view`) of a packed CBOR value for iterating over and accessing 
 
 [cbor_serializer](cbor_serializer.md)
 
-[cbor_view](cbor_view.md)
+#### jsoncons - CBOR mappings
+
+jsoncons data item|jsoncons tag|CBOR data item|CBOR tag
+--------------|------------------|---------------|--------
+null          |                  | null |&#160;
+null          | undefined        | undefined |&#160;
+bool          |                  | true or false |&#160;
+int64         |                  | unsigned or negative integer |&#160;
+int64         | timestamp        | unsigned or negative integer | 1 (epoch-based date/time)
+uint64        |                  | unsigned integer |&#160;
+uint64        | timestamp        | unsigned integer | 1 (epoch-based date/time)
+double        |                  | half-precision float, float, or double |&#160;
+double        | timestamp        | double | 1 (epoch-based date/time)
+string        |                  | string |&#160;
+string        | big_integer      | byte string | 2 (positive bignum) or 2 (negative bignum)  
+string        | big_decimal      | array | 4 (decimal fraction)
+string        | date_time        | string | 0 (date/time string) 
+string        | base64url        | CBOR date/time | 33 (base64url)
+string        | base64           | CBOR date/time | 34 (base64)
+byte_string   |                  | byte string |&#160;
+byte_string   | base64url        | byte string | 21 (Expected conversion to base64url encoding)
+byte_string   | base64           | byte string | 22 (Expected conversion to base64 encoding)
+byte_string   | base16           | byte string | 23 (Expected conversion to base16 encoding)
+array         |                  | array |&#160;
+object        |                  | map |&#160;
 
 ### Examples
 
@@ -46,9 +69,9 @@ int main()
     ojson j2 = cbor::decode_cbor<ojson>(data);
     std::cout << "(1)\n" << pretty_print(j2) << "\n\n";
 
-    // Iterating over and accessing the nested data items of a packed CBOR value
-    cbor::cbor_view datav{data};    
-    cbor::cbor_view reputons = datav.at("reputons");    
+    // Accessing the data items 
+
+    const ojson& reputons = j2["reputons"];
 
     std::cout << "(2)\n";
     for (auto element : reputons.array_range())
@@ -60,11 +83,14 @@ int main()
 
     // Querying a packed CBOR value for a nested data item with jsonpointer
     std::error_code ec;
-    cbor::cbor_view rated = jsonpointer::get(datav, "/reputons/0/rated", ec);
+    auto const& rated = jsonpointer::get(j2, "/reputons/0/rated", ec);
     if (!ec)
     {
         std::cout << "(3) " << rated.as_string() << "\n";
     }
+
+    std::cout << std::endl;
+}
 ```
 Output:
 ```

@@ -49,29 +49,14 @@ struct jsonpath_fixture
     }
 };
 
-void test_error_code(const json& root, const std::string& path, int value, const std::error_category& category, size_t line, size_t column)
-{
-    REQUIRE_THROWS_AS(json_query(root,path),serialization_error);
-    try
-    {
-        json result = json_query(root,path);
-    }
-    catch (const serialization_error& e)
-    {
-        CHECK((e.code().value() == value && e.code().category() == category));
-        CHECK(e.line_number() == line);
-        CHECK(e.column_number() == column);
-    }
-}
-
 void test_error_code(const json& root, const std::string& path, std::error_code value, size_t line, size_t column)
 {
-    REQUIRE_THROWS_AS(json_query(root,path),serialization_error);
+    REQUIRE_THROWS_AS(json_query(root,path),jsonpath_error);
     try
     {
         json result = json_query(root,path);
     }
-    catch (const serialization_error& e)
+    catch (const jsonpath_error& e)
     {
         CHECK(e.code() == value);
         CHECK(e.line_number() == line);
@@ -109,9 +94,9 @@ TEST_CASE("test_dot_star_name")
 TEST_CASE("test_filter_error")
 {
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "$..book[?(.price<10)]", json_errc::invalid_json_text,1,17);
+    std::string path = "$..book[?(.price<10)]";
+    test_error_code(root, path, jsonpath_errc::parse_error_in_filter,1,17);
 }
-
 
 
 

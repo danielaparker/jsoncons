@@ -237,18 +237,18 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const byte_string_view& b, byte_string_chars_format encoding_hint, semantic_tag_type tag, const serializing_context&) override
+    bool do_byte_string_value(const byte_string_view& b, semantic_tag_type tag, const serializing_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
             case container_type::object_t:
-                stack_.back().value_ = Json(b, encoding_hint, tag, byte_allocator_);
+                stack_.back().value_ = Json(b, tag, byte_allocator_);
                 break;
             case container_type::array_t:
-                stack_.emplace_back(std::false_type(), b, encoding_hint, tag, byte_allocator_);
+                stack_.emplace_back(std::false_type(), b, tag, byte_allocator_);
                 break;
             case container_type::root_t:
-                result_ = Json(b, encoding_hint, tag, byte_allocator_);
+                result_ = Json(b, tag, byte_allocator_);
                 is_valid_ = true;
                 return false;
         }

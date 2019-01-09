@@ -68,12 +68,10 @@ Constructs a new serializer that writes to the specified result.
                       const serializing_context& context=null_serializing_context()); ;
 
     bool byte_string_value(const byte_string_view& b, 
-                           byte_string_chars_format encoding_hint = byte_string_chars_format::none,
                            semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context()); 
 
     bool byte_string_value(const uint8_t* p, size_t size, 
-                           byte_string_chars_format encoding_hint = byte_string_chars_format::none,
                            semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context()); 
 
@@ -129,7 +127,7 @@ int main()
     writer.string_value("cat");
     writer.byte_string_value(byte_string({'p','u','r','r'}));
     writer.byte_string_value(byte_string({'h','i','s','s'}),
-                             byte_string_chars_format::base64); // suggested conversion to base64
+                             semantic_tag_type::base64); // suggested conversion to base64
     writer.int64_value(1431027667, semantic_tag_type::timestamp);
     writer.end_array();
     writer.flush();

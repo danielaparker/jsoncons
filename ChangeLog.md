@@ -1,7 +1,24 @@
 master
 ------
 
-New features
+Deprecated features:
+
+- cbor_view has been deprecated. Rationale: The complexity of supporting and documenting this component 
+  exceeds its benefits.
+
+v0.116.0
+--------
+
+New features:
+
+- New jsonpath functions `keys` and `tokenize`.
+
+- jsoncons-CBOR data item mappings supported for CBOR tags 33 (string base64url) and 34 (string base64)
+
+v0.115.0
+--------
+
+New features:
 
 - bson UTC datetime associated with jsoncons `semantic_tag_type::timestamp`
 
@@ -12,7 +29,22 @@ New features
 - Following a proposal from soberich, jsonpath functions on JSONPath expressions 
   are no longer restricted to filter expressions.
 
-- New jsonpath functions `sum`, `count`, `avg`, and `prod` have been added.
+- New jsonpath functions `sum`, `count`, `avg`, and `prod`
+
+- Added `semantic_tag_type::base16`, `semantic_tag_type::base64`, `semantic_tag_type::base64url`
+
+Non-breaking changes:
+
+- The json constructor that takes a `byte_string` and a `byte_string_chars_format` 
+  has been deprecated, use a `semantic_tag_type` to supply an encoding hint for a byte string, if any.
+
+- The content handler `byte_string_value` function that takes a `byte_string` and a `byte_string_chars_format` 
+  has been deprecated, use a `semantic_tag_type` to supply an encoding hint for a byte string, if any.
+
+Changes:
+
+- The `byte_string_chars_format` parameter in the content handler `do_byte_string_value` function
+  has been removed, the `semantic_tag_type` parameter is now used to supply an encoding hint for a byte string, if any.
 
 v0.114.0
 --------

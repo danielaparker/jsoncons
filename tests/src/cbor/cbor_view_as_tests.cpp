@@ -17,6 +17,8 @@
 using namespace jsoncons;
 using namespace jsoncons::cbor;
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+
 TEST_CASE("cbor_view array as<> test")
 {
     std::vector<uint8_t> bytes;
@@ -116,4 +118,5 @@ TEST_CASE("cbor_view array as<> test")
         CHECK(it++->is<double>());
     }
 }
+#endif
 

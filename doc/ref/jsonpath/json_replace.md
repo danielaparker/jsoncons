@@ -30,6 +30,10 @@ void json_replace(Json& root,
   </tr>
 </table>
 
+#### Exceptions
+
+Throws [jsonpath_error](jsonpath_error.md) if JSONPath evaluation fails.
+
 ### Examples
 
 #### Change the price of a book

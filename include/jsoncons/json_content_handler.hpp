@@ -30,6 +30,9 @@ enum class semantic_tag_type : uint8_t
     timestamp,
     big_integer,
     big_decimal,
+    base16,
+    base64,
+    base64url,
     big_float
 };
 
@@ -101,20 +104,67 @@ public:
     }
 
     bool byte_string_value(const byte_string_view& b, 
-                           byte_string_chars_format encoding_hint = byte_string_chars_format::none,
                            semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context())
     {
-        return do_byte_string_value(b, encoding_hint, tag, context);
+        return do_byte_string_value(b, tag, context);
     }
 
     bool byte_string_value(const uint8_t* p, size_t size, 
-                           byte_string_chars_format encoding_hint = byte_string_chars_format::none,
                            semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context())
     {
-        return do_byte_string_value(byte_string(p, size), encoding_hint, tag, context);
+        return do_byte_string_value(byte_string(p, size), tag, context);
     }
+#if !defined(JSONCONS_NO_DEPRECATED)
+    bool byte_string_value(const byte_string_view& b, 
+                           byte_string_chars_format encoding_hint, 
+                           semantic_tag_type tag=semantic_tag_type::none, 
+                           const serializing_context& context=null_serializing_context())
+    {
+        switch (encoding_hint)
+        {
+            {
+                case byte_string_chars_format::base16:
+                    tag = semantic_tag_type::base16;
+                    break;
+                case byte_string_chars_format::base64:
+                    tag = semantic_tag_type::base64;
+                    break;
+                case byte_string_chars_format::base64url:
+                    tag = semantic_tag_type::base64url;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return do_byte_string_value(b, tag, context);
+    }
+
+    bool byte_string_value(const uint8_t* p, size_t size, 
+                           byte_string_chars_format encoding_hint, 
+                           semantic_tag_type tag=semantic_tag_type::none, 
+                           const serializing_context& context=null_serializing_context())
+    {
+        switch (encoding_hint)
+        {
+            {
+                case byte_string_chars_format::base16:
+                    tag = semantic_tag_type::base16;
+                    break;
+                case byte_string_chars_format::base64:
+                    tag = semantic_tag_type::base64;
+                    break;
+                case byte_string_chars_format::base64url:
+                    tag = semantic_tag_type::base64url;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return do_byte_string_value(byte_string(p, size), tag, context);
+    }
+#endif
 
     bool big_integer_value(const string_view_type& s, const serializing_context& context=null_serializing_context()) 
     {
@@ -278,7 +328,6 @@ private:
     virtual bool do_string_value(const string_view_type& value, semantic_tag_type tag, const serializing_context& context) = 0;
 
     virtual bool do_byte_string_value(const byte_string_view& b, 
-                                      byte_string_chars_format encoding_hint,
                                       semantic_tag_type tag, 
                                       const serializing_context& context) = 0;
 
@@ -344,7 +393,6 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view&,
-                              byte_string_chars_format, 
                               semantic_tag_type, 
                               const serializing_context&) override
     {

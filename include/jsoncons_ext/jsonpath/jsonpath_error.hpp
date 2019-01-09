@@ -12,24 +12,99 @@
 
 namespace jsoncons { namespace jsonpath {
 
+class jsonpath_error : public std::exception, public virtual json_exception
+{
+    std::error_code error_code_;
+    std::string buffer_;
+    size_t line_number_;
+    size_t column_number_;
+public:
+    jsonpath_error()
+        : line_number_(0),
+          column_number_(0)
+    {
+    }
+    jsonpath_error(std::error_code ec)
+        : error_code_(ec), line_number_(0), column_number_(0)
+    {
+    }
+    jsonpath_error(std::error_code ec, size_t position)
+        : error_code_(ec), line_number_(0), column_number_(position)
+    {
+    }
+    jsonpath_error(std::error_code ec, size_t line, size_t column)
+        : error_code_(ec), line_number_(line), column_number_(column)
+    {
+    }
+    jsonpath_error(const jsonpath_error& other)
+        : error_code_(other.error_code_),
+          line_number_(other.line_number_),
+          column_number_(other.column_number_)
+    {
+    }
+
+    const char* what() const noexcept override
+    {
+        try
+        {
+            std::ostringstream os;
+            os << error_code_.message();
+            if (line_number_ != 0 && column_number_ != 0)
+            {
+                os << " at line " << line_number_ << " and column " << column_number_;
+            }
+            else if (column_number_ != 0)
+            {
+                os << " at position " << column_number_;
+            }
+            const_cast<std::string&>(buffer_) = os.str();
+            return buffer_.c_str();
+        }
+        catch (...)
+        {
+            return "";
+        }
+    }
+
+    const std::error_code code() const
+    {
+        return error_code_;
+    }
+
+    size_t line_number() const
+    {
+        return line_number_;
+    }
+
+    size_t column_number() const
+    {
+        return column_number_;
+    }
+};
+
 enum class jsonpath_errc 
 {
     ok = 0,
-    expected_root = 1,
-    expected_right_bracket = 2,
-    expected_name = 3,
-    expected_separator = 4,
-    invalid_filter = 5,
-    invalid_filter_expected_slash = 6,
-    invalid_filter_unbalanced_paren = 7,
-    invalid_filter_unsupported_operator = 8,
-    invalid_filter_expected_right_brace = 9,
-    invalid_filter_expected_primary = 10,
-    expected_index = 11,
-    expected_left_bracket_token = 12,
-    unexpected_operator = 13,
-    invalid_function_name = 14,
-    invalid_function_argument = 15
+    expected_root,
+    expected_current_node,
+    expected_right_bracket,
+    expected_name,
+    expected_separator,
+    invalid_filter,
+    invalid_filter_expected_slash,
+    invalid_filter_unbalanced_paren,
+    invalid_filter_unsupported_operator,
+    invalid_filter_expected_right_brace,
+    invalid_filter_expected_primary,
+    expected_index,
+    expected_left_bracket_token,
+    unexpected_operator,
+    invalid_function_name,
+    invalid_argument,
+    function_name_not_found,
+    parse_error_in_filter,
+    argument_parse_error,
+    unidentified_error
 };
 
 class jsonpath_error_category_impl
@@ -44,34 +119,46 @@ public:
     {
         switch (static_cast<jsonpath_errc>(ev))
         {
-        case jsonpath_errc::expected_root:
-            return "Expected $";
-        case jsonpath_errc::expected_right_bracket:
-            return "Expected ]";
-        case jsonpath_errc::expected_name:
-            return "Expected a name following a dot";
-        case jsonpath_errc::expected_index:
-            return "Expected index";
-        case jsonpath_errc::expected_separator:
-            return "Expected dot or left bracket separator";
-        case jsonpath_errc::invalid_filter:
-            return "Invalid path filter";
-        case jsonpath_errc::invalid_filter_expected_slash:
-            return "Invalid path filter, expected '/'";
-        case jsonpath_errc::invalid_filter_unbalanced_paren:
-            return "Invalid path filter, unbalanced parenthesis";
-        case jsonpath_errc::invalid_filter_unsupported_operator:
-            return "Unsupported operator";
-        case jsonpath_errc::invalid_filter_expected_right_brace:
-            return "Invalid path filter, expected right brace }";
-        case jsonpath_errc::invalid_filter_expected_primary:
-            return "Invalid path filter, expected primary expression.";
-        case jsonpath_errc::expected_left_bracket_token:
-            return "Expected ?,',\",0-9,*";
-        case jsonpath_errc::invalid_function_name:
-            return "Invalid function name";
-        default:
-            return "Unknown jsonpath parser error";
+            case jsonpath_errc::expected_root:
+                return "Expected $";
+            case jsonpath_errc::expected_current_node:
+                return "Expected @";
+            case jsonpath_errc::expected_right_bracket:
+                return "Expected ]";
+            case jsonpath_errc::expected_name:
+                return "Expected a name following a dot";
+            case jsonpath_errc::expected_index:
+                return "Expected index";
+            case jsonpath_errc::expected_separator:
+                return "Expected dot or left bracket separator";
+            case jsonpath_errc::invalid_filter:
+                return "Invalid path filter";
+            case jsonpath_errc::invalid_filter_expected_slash:
+                return "Invalid path filter, expected '/'";
+            case jsonpath_errc::invalid_filter_unbalanced_paren:
+                return "Invalid path filter, unbalanced parenthesis";
+            case jsonpath_errc::invalid_filter_unsupported_operator:
+                return "Unsupported operator";
+            case jsonpath_errc::invalid_filter_expected_right_brace:
+                return "Invalid path filter, expected right brace }";
+            case jsonpath_errc::invalid_filter_expected_primary:
+                return "Invalid path filter, expected primary expression.";
+            case jsonpath_errc::expected_left_bracket_token:
+                return "Expected ?,',\",0-9,*";
+            case jsonpath_errc::invalid_function_name:
+                return "Invalid function name";
+            case jsonpath_errc::invalid_argument:
+                return "Invalid argument type";
+            case jsonpath_errc::function_name_not_found:
+                return "Function name not found";
+            case jsonpath_errc::parse_error_in_filter:
+                return "Could not parse JSON expression in a JSONPath filter";
+            case jsonpath_errc::argument_parse_error:
+                return "Could not parse JSON expression passed to JSONPath function";
+            case jsonpath_errc::unidentified_error:
+                return "Unidentified error";
+            default:
+                return "Unknown jsonpath parser error";
         }
     }
 };

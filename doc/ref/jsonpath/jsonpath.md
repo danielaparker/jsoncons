@@ -15,11 +15,9 @@ are good online evaluators for checking JSONPath expressions.
 
 [JSONPath](http://goessner.net/articles/JsonPath/) is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document. 
 
-Stefan Goessner's javascript implemention returns `false` in case of no match, but in a note he suggests an alternative is to return an empty array. The `jsoncons` implementation takes that alternative and returns an empty array in case of no match.
+#### Paths
 
-Unlike XML, the root of a JSON text is usually an anonymous object or array, so JSONPath identifies the outermost level of the text with the symbol $.
-
-JSONPath expressions can use the dot-notation
+JSONPath uses paths to select a set of nodes in a JSON value. Paths can use the dot-notation
 
     $.store.book.0.title
 
@@ -36,13 +34,14 @@ or
 
     $["store"]["book"][0]["title"]
 
+The leading `$` represents the root JSON value.
 
-Note that Stefan Goessner's original implementation supports unquoted or single quoted names inside of square brackets, the jsoncons implementation in addition supports double quoted names.
+Stefan Goessner's original implementation supports unquoted or single quoted names inside of square brackets. Support for double quoted names inside of square brackets is a jsoncons extension.
 
 JSONPath|       Description
 --------|--------------------------------
-`$`|    The root object or array
-`@`|    the current object
+`$`|    Represents the root JSON value
+`@`|    Represents the current node being processed by a filter predicate.
 `.` or `[]`|    Child operator
 `..`    |Recursive descent. JSONPath borrows this syntax from [E4X](https://en.wikipedia.org/wiki/ECMAScript_for_XML).
 `*` |   Wildcard. All objects/elements regardless their names.
@@ -52,7 +51,9 @@ JSONPath|       Description
 `()`    |Filter expression.
 `?()`   |Applies a filter expression.
 
-### jsoncons filter expressions
+#### Filter predicates
+
+JSONPath uses filter predicates to restrict the set of nodes returned by a path.
 
 [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) does not provide any specification for the allowable filter expressions, simply stating that expressions can be anything that the underlying script engine can handle. `jsoncons` expressions support the following comparision and arithmetic operators. 
 
@@ -90,20 +91,27 @@ Precedence|Operator|Associativity
 5 |`<` `>` `<=` `>=`|Left 
 6 |`==` `!=`        |Left 
 7 |`&&`             |Left 
-8 |<code>&#124;&#124;</code>             |Left 
+8 |<code>&#124;&#124;</code> |Left 
 
-#### JSONPath Functions
+#### Functions
 
-The input to a JSONPath function is a JSONPath expression. The output is a JSON value.
+Support for functions is a jsoncons extension.
+
+Functions can be passed JSONPath paths and JSON expressions. 
+Outside a filter predicate, functions can be passed paths that select from
+the root JSON value `$`. Within a filter predicate, functions can be passed either a 
+path that selects from the root JSON value `$`, or a path that selects from the current node `@`.
 
 Function|Description|Result|Example
 ----------|--------|-------|---
-`max`|Returns the maximum value of an array of numbers|`double`|`max($.store.book[*].price)`
-`min`|Returns the minimum value of an array of numbers|`double`|`min($.store.book[*].price)`
-`count`|Returns the number of items in an array|`uint64_t`|`count($.store.book[*])`
-`sum`|Returns the sum value of an array of numbers|`double`|`$.store.book[?(@.price > sum($.store.book[*].price) / count($.store.book[*]))].title`
-`avg`|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.store.book[?(@.price > avg($.store.book[*].price))].title`
-`prod`|Returns the product of the elements in an array of numbers.|`double`|`$.store.book[?(479373 < prod($..price) && prod($..price) < 479374)].title`
+`max(array)`|Returns the maximum value of an array of numbers|`double`|`max($.store.book[*].price)`
+`min(array)`|Returns the minimum value of an array of numbers|`double`|`min($.store.book[*].price)`
+`count(array)`|Returns the number of items in an array|`uint64_t`|`count($.store.book[*])`
+`sum(array)`|Returns the sum value of an array of numbers|`double`|`$.store.book[?(@.price > sum($.store.book[*].price) / count($.store.book[*]))].title`
+`avg(array)`|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.store.book[?(@.price > avg($.store.book[*].price))].title`
+`prod(array)`|Returns the product of the elements in an array of numbers.|`double`|`$.store.book[?(479373 < prod($..price) && prod($..price) < 479374)].title`
+`keys(object)`|Returns an array of keys.|`array of string`|`keys($.store.book[0])[*]`
+`tokenize(string,pattern)`|Returns an array of strings formed by splitting the input string into an array of strings, separated by substrings that match the regular expression `pattern`.|`array of string`|`$.store.book[?(tokenize(@.author,'\\s+')[1] == 'Waugh')].title`
 
 ### Examples
 

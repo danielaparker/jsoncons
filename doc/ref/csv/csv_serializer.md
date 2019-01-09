@@ -74,12 +74,10 @@ and uses the specified [csv options](csv_options.md).
                       const serializing_context& context=null_serializing_context()); ;
 
     bool byte_string_value(const byte_string_view& b, 
-                           byte_string_chars_format encoding_hint = byte_string_chars_format::none,
                            semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context()); 
 
     bool byte_string_value(const uint8_t* p, size_t size, 
-                           byte_string_chars_format encoding_hint = byte_string_chars_format::none,
                            semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context()); 
 
