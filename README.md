@@ -244,7 +244,7 @@ int main()
                 010000000000000000 -- Bytes content
           ff -- "break" 
 */
-        // Unpack bytes into a json variant value, and add some more elements
+        // Unpack bytes into a json variant value
         json j = cbor::decode_cbor<json>(b);
 
         // Loop over the rows
