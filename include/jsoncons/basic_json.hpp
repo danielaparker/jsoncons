@@ -144,9 +144,9 @@ public:
 
     typedef json_array<basic_json> array;
 
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type> kvp_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type> key_value_allocator_type;
 
-    using object_storage_type = typename implementation_policy::template object_storage<key_value_type , kvp_allocator_type>;
+    using object_storage_type = typename implementation_policy::template object_storage<key_value_type , key_value_allocator_type>;
     typedef json_object<key_storage_type,basic_json,implementation_policy::preserve_order> object;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
