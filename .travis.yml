@@ -64,6 +64,15 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - g++-8
+      env: COMPILER=gcc VERSION=8 CXXFLAGS="-JSONCONS_HAS_STRING_VIEW" 
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
             - clang-3.9
             - g++-4.8-aarch64-linux-gnu
             - gcc-4.8-aarch64-linux-gnu
