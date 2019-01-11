@@ -1,16 +1,9 @@
 // Copyright 2019 Daniel Parker
 // Distributed under Boost license
 
-#if defined(__GNUC__) && __GNUC__ == 8
+#if defined(JSON_HAS_CPP_17)
 
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_serializer.hpp>
-#include <jsoncons/detail/parse_number.hpp>
-#include <sstream>
-#include <vector>
-#include <utility>
-#include <ctime>
-#include <cwchar>
 #include <catch/catch.hpp>
 #include <string_view>
 

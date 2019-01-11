@@ -47,7 +47,9 @@ namespace jsoncons
 
 #define JSONCONS_NO_TO_CHARS
 
-//#define JSONCONS_HAS_STRING_VIEW
+#if defined(JSON_HAS_CPP_17)
+#define JSONCONS_HAS_STRING_VIEW
+#endif
 
 #if defined(ANDROID) || defined(__ANDROID__)
 #define JSONCONS_HAS_STRTOLD_L
