@@ -25,7 +25,7 @@ TEST_CASE("string_view tests")
     }
     )");
 
-    auto s = j.as<std::string_view>();
+    auto s = j["a"].as<std::string_view>();
     CHECK(bool(s == "2"));
 }
 
