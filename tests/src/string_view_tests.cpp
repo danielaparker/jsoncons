@@ -11,6 +11,7 @@ using namespace jsoncons;
 
 TEST_CASE("string_view tests")
 {
+    std::cout << "string_view tests\n";
     json j = json::parse(R"(
     {
         "a" : "2",
