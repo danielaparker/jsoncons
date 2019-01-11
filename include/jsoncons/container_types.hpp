@@ -369,23 +369,19 @@ public:
 #endif
     }
 
-#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
-    // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
     template <class A=allocator_type, class... Args>
     typename std::enable_if<is_stateless<A>::value,iterator>::type 
     emplace(const_iterator pos, Args&&... args)
     {
+#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+        // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
         iterator it = elements_.begin() + (pos - elements_.begin());
         return elements_.emplace(it, std::forward<Args>(args)...);
-    }
 #else
-    template <class A=allocator_type, class... Args>
-    typename std::enable_if<is_stateless<A>::value,iterator>::type 
-    emplace(const_iterator pos, Args&&... args)
-    {
         return elements_.emplace(pos, std::forward<Args>(args)...);
-    }
 #endif
+    }
+
     template <class... Args>
     Json& emplace_back(Args&&... args)
     {
