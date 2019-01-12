@@ -59,6 +59,10 @@ namespace jsoncons
             {
                 return false;
             }
+            else
+            {
+                return true;
+            }
         }
 
         static multiprecision_type as(const Json& val)
