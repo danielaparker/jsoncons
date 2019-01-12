@@ -23,7 +23,7 @@ void pool_allocator_examples()
     static std::string s("[1,2,3,4,5,6]");
     std::istringstream is(s);
 
-    basic_json_reader<char,text_stream_source,boost::pool_allocator<char>> reader(is,decoder); 
+    basic_json_reader<char,text_stream_source<char>,boost::pool_allocator<char>> reader(is,decoder); 
     reader.read();
 
     my_json j = decoder.get_result();

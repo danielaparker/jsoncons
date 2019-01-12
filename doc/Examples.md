@@ -1,6 +1,6 @@
 # Examples
 
-### Parsing
+### Parse
 
 [Parse JSON from a string](#A1)  
 [Parse JSON from a file](#A2)  
@@ -10,14 +10,18 @@
 [Prevent the alphabetic sort of the outputted JSON, retaining the original insertion order](#A6)  
 [Parse a very large JSON file with json_staj_reader](#A7)  
 
-### Serializing
+### Serialize
 
 [Serialize a json value to a string](#B1)  
 [Serialize a json value to a stream](#B2)  
 [Escape all non-ascii characters](#B3)  
 [Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.](#B4)
 
-### Constructing
+### Convert
+
+[Convert JSON numbers to/from boost multiprecision numbers](#G1)
+
+### Construct
 
 [Construct a json object](#C1)  
 [Construct a json array](#C2)  
@@ -25,12 +29,12 @@
 [Create arrays of arrays of arrays of ...](#C4)  
 [Merge two json objects](#C5)  
 
-### Iterating
+### Iterate
 
 [Iterate over a json array](#D1)  
 [Iterate over a json object](#D2)  
 
-### Getters
+### Access
 
 [Use `string_view` to access the actual memory that's being used to hold a string](#E1)  
 [Given a string in a `json` object that represents a decimal number, assign it to a double](#E2)  
@@ -42,7 +46,7 @@
 [Search for and repace an object member key](#F1)  
 [Search for and replace a value](#F2)  
 
-### Deserializing
+### Parse
 
 <div id="A1"/> 
 
@@ -401,7 +405,7 @@ Graham Greene
 
 See [json_staj_reader](doc/ref/json_staj_reader.md) 
 
-### Serializing
+### Serialize
 
 <div id="B1"/>
 
@@ -501,7 +505,75 @@ Output:
 }
 ```
 
-### Constructing
+### Convert
+
+<div id="G1"/>
+
+#### Convert JSON numbers to/from boost multiprecision numbers
+
+```
+#include <jsoncons/json.hpp>
+#include <boost/multiprecision/cpp_dec_float.hpp>
+
+namespace jsoncons 
+{
+    template <class Json, class Backend>
+    struct json_type_traits<Json,boost::multiprecision::number<Backend>>
+    {
+        typedef boost::multiprecision::number<Backend> multiprecision_type;
+
+        static bool is(const Json& val) noexcept
+        {
+            if (!(val.is_string() && (val.semantic_tag() == semantic_tag_type::big_decimal || 
+                                      val.semantic_tag() == semantic_tag_type::big_integer)))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        static multiprecision_type as(const Json& val)
+        {
+            return multiprecision_type(val.template as<std::string>());
+        }
+
+        static Json to_json(multiprecision_type val)
+        {
+            return Json(val.str());
+        }
+    };
+}
+
+int main()
+{
+    typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float_100> multiprecision_type;
+
+    multiprecision_type x;
+
+    std::string s = "[100000000000000000000000000000000.1234]";
+    json_options options;
+    options.dec_to_str(true);
+    json j = json::parse(s, options);
+
+    x = j[0].as<multiprecision_type>();
+
+    std::cout << "(1) " << std::setprecision(std::numeric_limits<multiprecision_type>::max_digits10)
+        << x << "\n";
+
+    json j2 = json::array{x};
+    std::cout << "(2) " << j2[0].as<std::string>() << "\n";
+}
+```
+Output:
+```
+(1) 100000000000000000000000000000000.1234
+(2) 100000000000000000000000000000000.1234
+```
+
+### Construct
 
 <div id="C1"/>
 
@@ -653,7 +725,7 @@ Output:
 }
 ```
 
-### Iterating
+### Iterate
 
 <div id="D1"/>
 
@@ -686,7 +758,7 @@ for (const auto& member : j.object_range())
 }
 ```
 
-### Getters
+### Access
 
 <div id="E1"/>
 
