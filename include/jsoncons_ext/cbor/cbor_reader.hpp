@@ -18,7 +18,9 @@
 #include <jsoncons_ext/cbor/cbor_serializer.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
+#if !defined(JSONCONS_NO_DEPRECATED)
 #include <jsoncons_ext/cbor/cbor_view.hpp>
+#endif  
 
 namespace jsoncons { namespace cbor {
 

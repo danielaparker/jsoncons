@@ -71,4 +71,22 @@ template<> inline char32_t const* name<char32_t>() { return U ## lit; }
 
 }
 
+#if !defined(JSONCONS_HAS_STRING_VIEW)
+#include <jsoncons/detail/string_view.hpp>
+namespace jsoncons {
+template <class CharT, class Traits = std::char_traits<CharT>>
+using basic_string_view = jsoncons::detail::basic_string_view<CharT, Traits>;
+using string_view = basic_string_view<char, std::char_traits<char>>;
+using wstring_view = basic_string_view<wchar_t, std::char_traits<wchar_t>>;
+}
+#else
+#include <string_view>
+namespace jsoncons {
+template <class CharT, class Traits = std::char_traits<CharT>>
+using basic_string_view = std::basic_string_view<CharT, Traits>;
+using string_view = std::string_view;
+using wstring_view = std::wstring_view;
+}
+#endif
+
 #endif
