@@ -1,7 +1,7 @@
 // Copyright 2019 Daniel Parker
 // Distributed under Boost license
 
-#if defined(JSON_HAS_CPP_17)
+#if defined(JSONCONS_HAS_STRING_VIEW)
 
 #include <jsoncons/json.hpp>
 #include <catch/catch.hpp>
