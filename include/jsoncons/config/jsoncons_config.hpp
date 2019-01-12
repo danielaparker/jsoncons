@@ -42,14 +42,30 @@
 #define JSONCONS_UNREACHABLE() do {} while (0)
 #endif
 
-namespace jsoncons
-{
+// Follows boost 1_68
+#if !defined(JSONCONS_HAS_STRING_VIEW)
+#  if defined(__clang__)
+#   if (__cplusplus >= 201703)
+#    if __has_include(<string_view>)
+#     define JSONCONS_HAS_STRING_VIEW 1
+#    endif // __has_include(<string_view>)
+#   endif // (__cplusplus >= 201703)
+#  endif // defined(__clang__)
+#  if defined(__GNUC__)
+#   if (__GNUC__ >= 7)
+#    if (__cplusplus >= 201703)
+#     define JSONCONS_HAS_STRING_VIEW 1
+#    endif // (__cplusplus >= 201703)
+#   endif // (__GNUC__ >= 7)
+#  endif // defined(__GNUC__)
+#  if defined(_MSC_VER)
+#   if (_MSC_VER >= 1910 && _HAS_CXX17)
+#    define JSONCONS_HAS_STRING_VIEW
+#   endif // (_MSC_VER >= 1910 && _HAS_CXX17)
+#  endif // defined(_MSC_VER)
+#endif // !defined(JSONCONS_HAS_STRING_VIEW)
 
 #define JSONCONS_NO_TO_CHARS
-
-#if defined(JSON_HAS_CPP_17)
-#define JSONCONS_HAS_STRING_VIEW
-#endif
 
 #if defined(ANDROID) || defined(__ANDROID__)
 #define JSONCONS_HAS_STRTOLD_L
@@ -63,6 +79,9 @@ namespace jsoncons
 #define JSONCONS_HAS_MSC__STRTOD_L
 #define JSONCONS_HAS_FOPEN_S
 #endif
+
+namespace jsoncons
+{
 
 #define JSONCONS_DEFINE_LITERAL( name, lit ) \
 template<class CharT> CharT const* name(); \
