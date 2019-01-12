@@ -8,8 +8,9 @@
 #include <utility>
 #include <ctime>
 #include <cassert>
-#include "boost/date_time/gregorian/gregorian.hpp"
+#include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/multiprecision/cpp_dec_float.hpp>
 
 namespace jsoncons 
 {
@@ -43,6 +44,31 @@ namespace jsoncons
         static Json to_json(boost::gregorian::date val)
         {
             return Json(to_iso_extended_string(val));
+        }
+    };
+
+    template <class Json, class Backend>
+    struct json_type_traits<Json,boost::multiprecision::number<Backend>>
+    {
+        typedef boost::multiprecision::number<Backend> multiprecision_type;
+
+        static bool is(const Json& val) noexcept
+        {
+            if (!(val.is_string() && (val.semantic_tag() == semantic_tag_type::big_decimal || 
+                                      val.semantic_tag() == semantic_tag_type::big_integer)))
+            {
+                return false;
+            }
+        }
+
+        static multiprecision_type as(const Json& val)
+        {
+            return multiprecision_type(val.template as<std::string>());
+        }
+
+        static Json to_json(multiprecision_type val)
+        {
+            return Json(val.str());
         }
     };
 
@@ -179,10 +205,32 @@ void boost_matrix_conversions()
     assert(a[1][1].as<double>()==B(1,1));
 }
 
+
+void boost_multiprecison_conversions()
+{
+    typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float_100> multiprecision_type;
+
+    multiprecision_type x;
+
+    std::string s = "[100000000000000000000000000000000.1234]";
+    json_options options;
+    options.dec_to_str(true);
+    json j = json::parse(s, options);
+
+    x = j[0].as<multiprecision_type>();
+
+    std::cout << "(1) " << std::setprecision(std::numeric_limits<multiprecision_type>::max_digits10)
+        << x << "\n";
+
+    json j2 = json::array{x};
+    std::cout << "(2) " << j2[0].as<std::string>() << "\n";
+}
+
 void extensibility_examples()
 {
     std::cout << "extensibility examples\n\n";
 
     boost_date_conversions();
     boost_matrix_conversions();
+    boost_multiprecison_conversions();
 }

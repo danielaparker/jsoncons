@@ -172,6 +172,7 @@ class basic_json_parser : private serializing_context
     string_type neginf_to_str_;
     int initial_stack_capacity_;
     size_t max_nesting_depth_;
+    bool decimal_to_str_;
     size_t nesting_depth_;
     uint32_t cp_;
     uint32_t cp2_;
@@ -223,6 +224,7 @@ public:
          neginf_to_str_(options.neginf_to_str()),
          initial_stack_capacity_(default_initial_stack_capacity_),
          max_nesting_depth_(options.max_nesting_depth()),
+         decimal_to_str_(options.dec_to_str()),
          nesting_depth_(0), 
          cp_(0),
          cp2_(0),
@@ -2702,16 +2704,22 @@ private:
     {
         try
         {
-            double d = to_double_(string_buffer_.c_str(), string_buffer_.length());
-
-            if (precision_ > std::numeric_limits<double>::max_digits10)
+            if (decimal_to_str_)
             {
-                continue_ = handler.double_value(d, floating_point_options(format,std::numeric_limits<double>::max_digits10, decimal_places_), 
-                                                  semantic_tag_type::none, *this);            }
+                continue_ = handler.string_value(string_buffer_, semantic_tag_type::big_decimal, *this);
+            }
             else
             {
-                continue_ = handler.double_value(d, floating_point_options(format,static_cast<uint8_t>(precision_), decimal_places_), 
-                                                  semantic_tag_type::none, *this);
+                double d = to_double_(string_buffer_.c_str(), string_buffer_.length());
+                if (precision_ > std::numeric_limits<double>::max_digits10)
+                {
+                    continue_ = handler.double_value(d, floating_point_options(format,std::numeric_limits<double>::max_digits10, decimal_places_), 
+                                                      semantic_tag_type::none, *this);            }
+                else
+                {
+                    continue_ = handler.double_value(d, floating_point_options(format,static_cast<uint8_t>(precision_), decimal_places_), 
+                                                      semantic_tag_type::none, *this);
+                }
             }
         }
         catch (...)

@@ -17,7 +17,11 @@
 [Escape all non-ascii characters](#B3)  
 [Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.](#B4)
 
-### Constructing
+### Conversion
+
+[Convert JSON numbers to/from boost multiprecision numbers](#G1)
+
+### Construction
 
 [Construct a json object](#C1)  
 [Construct a json array](#C2)  
@@ -501,7 +505,71 @@ Output:
 }
 ```
 
-### Constructing
+### Conversion
+
+<div id="G1"/>
+
+#### Convert JSON numbers to/from boost multiprecision numbers
+
+```
+#include <jsoncons/json.hpp>
+#include <boost/multiprecision/cpp_dec_float.hpp>
+
+namespace jsoncons 
+{
+    template <class Json, class Backend>
+    struct json_type_traits<Json,boost::multiprecision::number<Backend>>
+    {
+        typedef boost::multiprecision::number<Backend> multiprecision_type;
+
+        static bool is(const Json& val) noexcept
+        {
+            if (!(val.is_string() && (val.semantic_tag() == semantic_tag_type::big_decimal || 
+                                      val.semantic_tag() == semantic_tag_type::big_integer)))
+            {
+                return false;
+            }
+        }
+
+        static multiprecision_type as(const Json& val)
+        {
+            return multiprecision_type(val.template as<std::string>());
+        }
+
+        static Json to_json(multiprecision_type val)
+        {
+            return Json(val.str());
+        }
+    };
+}
+
+int main()
+{
+    typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float_100> multiprecision_type;
+
+    multiprecision_type x;
+
+    std::string s = "[100000000000000000000000000000000.1234]";
+    json_options options;
+    options.dec_to_str(true);
+    json j = json::parse(s, options);
+
+    x = j[0].as<multiprecision_type>();
+
+    std::cout << "(1) " << std::setprecision(std::numeric_limits<multiprecision_type>::max_digits10)
+        << x << "\n";
+
+    json j2 = json::array{x};
+    std::cout << "(2) " << j2[0].as<std::string>() << "\n";
+}
+```
+Output:
+```
+(1) 100000000000000000000000000000000.1234
+(2) 100000000000000000000000000000000.1234
+```
+
+### Construction
 
 <div id="C1"/>
 
