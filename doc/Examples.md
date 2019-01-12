@@ -1,6 +1,6 @@
 # Examples
 
-### Parsing
+### Parse
 
 [Parse JSON from a string](#A1)  
 [Parse JSON from a file](#A2)  
@@ -10,18 +10,18 @@
 [Prevent the alphabetic sort of the outputted JSON, retaining the original insertion order](#A6)  
 [Parse a very large JSON file with json_staj_reader](#A7)  
 
-### Serializing
+### Serialize
 
 [Serialize a json value to a string](#B1)  
 [Serialize a json value to a stream](#B2)  
 [Escape all non-ascii characters](#B3)  
 [Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.](#B4)
 
-### Conversion
+### Convert
 
 [Convert JSON numbers to/from boost multiprecision numbers](#G1)
 
-### Construction
+### Construct
 
 [Construct a json object](#C1)  
 [Construct a json array](#C2)  
@@ -29,12 +29,12 @@
 [Create arrays of arrays of arrays of ...](#C4)  
 [Merge two json objects](#C5)  
 
-### Iterating
+### Iterate
 
 [Iterate over a json array](#D1)  
 [Iterate over a json object](#D2)  
 
-### Getters
+### Access
 
 [Use `string_view` to access the actual memory that's being used to hold a string](#E1)  
 [Given a string in a `json` object that represents a decimal number, assign it to a double](#E2)  
@@ -46,7 +46,7 @@
 [Search for and repace an object member key](#F1)  
 [Search for and replace a value](#F2)  
 
-### Deserializing
+### Parse
 
 <div id="A1"/> 
 
@@ -405,7 +405,7 @@ Graham Greene
 
 See [json_staj_reader](doc/ref/json_staj_reader.md) 
 
-### Serializing
+### Serialize
 
 <div id="B1"/>
 
@@ -505,7 +505,7 @@ Output:
 }
 ```
 
-### Conversion
+### Convert
 
 <div id="G1"/>
 
@@ -573,7 +573,7 @@ Output:
 (2) 100000000000000000000000000000000.1234
 ```
 
-### Construction
+### Construct
 
 <div id="C1"/>
 
@@ -725,7 +725,7 @@ Output:
 }
 ```
 
-### Iterating
+### Iterate
 
 <div id="D1"/>
 
@@ -758,7 +758,7 @@ for (const auto& member : j.object_range())
 }
 ```
 
-### Getters
+### Access
 
 <div id="E1"/>
 
