@@ -542,7 +542,7 @@ namespace jsoncons
 
         static Json to_json(multiprecision_type val)
         {
-            return Json(val.str());
+            return Json(val.str(), semantic_tag_type::big_decimal);
         }
     };
 }
