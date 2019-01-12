@@ -65,6 +65,15 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-8
+      env: COMPILER=gcc VERSION=8 SANITIZE=1 CXXFLAGS="-std=c++17 -DJSONCONS_HAS_STRING_VIEW" 
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-8
       env: COMPILER=gcc VERSION=8 SANITIZE=1 CXXFLAGS="-std=gnu++17" -Wall -Wextra -Wimplicit-fallthrough" 
 
     - os: linux
