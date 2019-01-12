@@ -1,10 +1,11 @@
 // Copyright 2019 Daniel Parker
 // Distributed under Boost license
 
-#if defined(JSONCONS_HAS_STRING_VIEW)
-
 #include <jsoncons/json.hpp>
 #include <catch/catch.hpp>
+
+#if defined(JSONCONS_HAS_STRING_VIEW)
+
 #include <string_view>
 
 using namespace jsoncons;
