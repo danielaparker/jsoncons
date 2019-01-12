@@ -53,7 +53,7 @@
 #  endif // defined(__clang__)
 #  if defined(__GNUC__)
 #   if (__GNUC__ >= 7)
-#    if (__cplusplus >= 201703)
+#    if (__cplusplus >= 201703) || (defined(_HAS_CXX17) && _HAS_CXX17 == 1)
 #     define JSONCONS_HAS_STRING_VIEW 1
 #    endif // (__cplusplus >= 201703)
 #   endif // (__GNUC__ >= 7)
