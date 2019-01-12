@@ -98,7 +98,7 @@ Sets a string replacement for negative infinity when writing JSON, and indicate 
 to be used when reading JSON.
 
     json_options& dec_to_str(bool value); 
-If set to `true`, parses decimal numbers as strings with semantic tagging `semantic_tag_type::big_decimal` instead of double.
+If set to `true`, parse decimal numbers as strings with semantic tagging `semantic_tag_type::big_decimal` instead of double.
 Defaults to `false`.
 
     serializing_options& new_line_chars(const std::string& value)

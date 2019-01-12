@@ -30,11 +30,8 @@ typedef boost::interprocess::allocator<int,
 
 struct boost_sorted_policy : public sorted_policy
 {
-    template <class T,class Allocator>
-    using object_storage = boost::interprocess::vector<T,Allocator>;
-
     template <class T, class Allocator>
-    using array_storage = boost::interprocess::vector<T,Allocator>;
+    using sequence_container_type = boost::interprocess::vector<T,Allocator>;
 
     template <class CharT, class CharTraits, class Allocator>
     using key_storage = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;

@@ -170,16 +170,17 @@ public:
 template <class Json>
 class json_array: public Json_array_base_<Json>
 {
-    typedef typename Json::array_storage_type array_storage_type;
-    array_storage_type elements_;
 public:
     typedef typename Json::allocator_type allocator_type;
     typedef Json value_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> val_allocator_type;
-
-    typedef typename array_storage_type::iterator iterator;
-    typedef typename array_storage_type::const_iterator const_iterator;
-
+private:
+    typedef typename Json::implementation_policy implementation_policy;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> value_allocator_type;
+    using value_storage_type = typename implementation_policy::template sequence_container_type<value_type,value_allocator_type>;
+    value_storage_type elements_;
+public:
+    typedef typename value_storage_type::iterator iterator;
+    typedef typename value_storage_type::const_iterator const_iterator;
     typedef typename std::iterator_traits<iterator>::reference reference;
     typedef typename std::iterator_traits<const_iterator>::reference const_reference;
 
@@ -193,14 +194,14 @@ public:
 
     explicit json_array(const allocator_type& allocator)
         : Json_array_base_<Json>(allocator), 
-          elements_(val_allocator_type(allocator))
+          elements_(value_allocator_type(allocator))
     {
     }
 
     explicit json_array(size_t n, 
                         const allocator_type& allocator = allocator_type())
         : Json_array_base_<Json>(allocator), 
-          elements_(n,Json(),val_allocator_type(allocator))
+          elements_(n,Json(),value_allocator_type(allocator))
     {
     }
 
@@ -208,14 +209,14 @@ public:
                         const Json& value, 
                         const allocator_type& allocator = allocator_type())
         : Json_array_base_<Json>(allocator), 
-          elements_(n,value,val_allocator_type(allocator))
+          elements_(n,value,value_allocator_type(allocator))
     {
     }
 
     template <class InputIterator>
     json_array(InputIterator begin, InputIterator end, const allocator_type& allocator = allocator_type())
         : Json_array_base_<Json>(allocator), 
-          elements_(begin,end,val_allocator_type(allocator))
+          elements_(begin,end,value_allocator_type(allocator))
     {
     }
     json_array(const json_array& val)
@@ -225,7 +226,7 @@ public:
     }
     json_array(const json_array& val, const allocator_type& allocator)
         : Json_array_base_<Json>(allocator), 
-          elements_(val.elements_,val_allocator_type(allocator))
+          elements_(val.elements_,value_allocator_type(allocator))
     {
     }
 
@@ -236,7 +237,7 @@ public:
     }
     json_array(json_array&& val, const allocator_type& allocator)
         : Json_array_base_<Json>(allocator), 
-          elements_(std::move(val.elements_),val_allocator_type(allocator))
+          elements_(std::move(val.elements_),value_allocator_type(allocator))
     {
     }
 
@@ -249,7 +250,7 @@ public:
     json_array(std::initializer_list<Json> init, 
                const allocator_type& allocator)
         : Json_array_base_<Json>(allocator), 
-          elements_(std::move(init),val_allocator_type(allocator))
+          elements_(std::move(init),value_allocator_type(allocator))
     {
     }
     ~json_array()
@@ -503,22 +504,23 @@ class json_object<KeyT,Json,false> final
 {
 public:
     typedef typename Json::allocator_type allocator_type;
-    typedef typename Json::char_type char_type;
-    typedef typename Json::char_allocator_type char_allocator_type;
     typedef KeyT key_type;
+    typedef key_value<KeyT,Json> key_value_type;
+    typedef typename Json::char_type char_type;
     typedef typename Json::string_view_type string_view_type;
-    typedef key_value<KeyT,Json> value_type;
-
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> key_value_allocator_type;
-    typedef typename Json::object_storage_type object_storage_type;
-
-    typedef typename object_storage_type::iterator iterator;
-    typedef typename object_storage_type::const_iterator const_iterator;
-
 private:
+    typedef typename Json::implementation_policy implementation_policy;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type> key_value_allocator_type;
+    using key_value_storage_type = typename implementation_policy::template sequence_container_type<key_value_type,key_value_allocator_type>;
+
     allocator_type self_allocator_;
-    object_storage_type members_;
+    key_value_storage_type members_;
 public:
+    typedef typename key_value_storage_type::iterator iterator;
+    typedef typename key_value_storage_type::const_iterator const_iterator;
+
+    typedef typename key_value_storage_type::iterator iterator;
+    typedef typename key_value_storage_type::const_iterator const_iterator;
 
     json_object()
     {
@@ -654,7 +656,7 @@ public:
     iterator find(const string_view_type& name)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                   [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                   [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         auto result = (it != members_.end() && it->key() == name) ? it : members_.end();
         return result;
     }
@@ -663,7 +665,7 @@ public:
     {
         auto it = std::lower_bound(members_.begin(),members_.end(), 
                                    name, 
-                                   [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});
+                                   [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});
         auto result = (it != members_.end() && it->key() == name) ? it : members_.end();
         return result;
     }
@@ -692,7 +694,7 @@ public:
     void erase(const string_view_type& name) 
     {
         auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                   [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                   [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         if (it != members_.end() && it->key() == name)
         {
             members_.erase(it);
@@ -709,9 +711,9 @@ public:
             members_.emplace_back(pred(*s));
         }
         std::stable_sort(members_.begin(),members_.end(),
-                         [](const value_type& a, const value_type& b){return a.key().compare(b.key()) < 0;});
+                         [](const key_value_type& a, const key_value_type& b){return a.key().compare(b.key()) < 0;});
         auto it = std::unique(members_.rbegin(), members_.rend(),
-                              [](const value_type& a, const value_type& b){ return !(a.key().compare(b.key()));});
+                              [](const key_value_type& a, const key_value_type& b){ return !(a.key().compare(b.key()));});
         members_.erase(members_.begin(),it.base());
     }
 
@@ -732,7 +734,7 @@ public:
         for (; it != end; ++it)
         {
             auto pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
-                                        [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});   
+                                        [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});   
             if (pos == members_.end() )
             {
                 members_.emplace_back(*it);
@@ -762,12 +764,12 @@ public:
             if (hint != members_.end() && hint->key() <= it->key())
             {
                 pos = std::lower_bound(hint,members_.end(), it->key(), 
-                                      [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                      [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
             }
             else
             {
                 pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
-                                      [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                      [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
             }
             if (pos == members_.end() )
             {
@@ -798,7 +800,7 @@ public:
         for (; it != end; ++it)
         {
             auto pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
-                                        [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});   
+                                        [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});   
             if (pos == members_.end() )
             {
                 members_.emplace_back(*it);
@@ -828,12 +830,12 @@ public:
             if (hint != members_.end() && hint->key() <= it->key())
             {
                 pos = std::lower_bound(hint,members_.end(), it->key(), 
-                                      [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                      [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
             }
             else
             {
                 pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
-                                      [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                      [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
             }
             if (pos == members_.end() )
             {
@@ -856,7 +858,7 @@ public:
     {
         bool inserted;
         auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                   [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                   [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         if (it == members_.end())
         {
             members_.emplace_back(key_type(name.begin(),name.end()), 
@@ -885,7 +887,7 @@ public:
     {
         bool inserted;
         auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                   [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                   [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         if (it == members_.end())
         {
             members_.emplace_back(key_type(name.begin(),name.end(), get_allocator()), 
@@ -916,7 +918,7 @@ public:
     {
         bool inserted;
         auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                   [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                   [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         if (it == members_.end())
         {
             members_.emplace_back(key_type(name.begin(),name.end()), 
@@ -944,7 +946,7 @@ public:
     {
         bool inserted;
         auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                   [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                   [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         if (it == members_.end())
         {
             members_.emplace_back(key_type(name.begin(),name.end(), get_allocator()), 
@@ -975,12 +977,12 @@ public:
         if (hint != members_.end() && hint->key() <= name)
         {
             it = std::lower_bound(hint,members_.end(), name, 
-                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                  [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
         else
         {
             it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                  [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
 
         if (it == members_.end())
@@ -1010,12 +1012,12 @@ public:
         if (hint != members_.end() && hint->key() <= name)
         {
             it = std::lower_bound(hint,members_.end(), name, 
-                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                  [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
         else
         {
             it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                  [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
 
         if (it == members_.end())
@@ -1046,12 +1048,12 @@ public:
         if (hint != members_.end() && hint->key() <= name)
         {
             it = std::lower_bound(hint,members_.end(), name, 
-                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                  [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
         else
         {
             it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                  [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
 
         if (it == members_.end())
@@ -1081,12 +1083,12 @@ public:
         if (hint != members_.end() && hint->key() <= name)
         {
             it = std::lower_bound(hint,members_.end(), name, 
-                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                  [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
         else
         {
             it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                  [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
 
         if (it == members_.end())
@@ -1118,7 +1120,7 @@ public:
         {
 
             auto rhs_it = std::lower_bound(rhs.begin(), rhs.end(), *it, 
-                                           [](const value_type& a, const value_type& b){return a.key().compare(b.key()) < 0;});
+                                           [](const key_value_type& a, const key_value_type& b){return a.key().compare(b.key()) < 0;});
             if (rhs_it == rhs.end() || rhs_it->key() != it->key() || rhs_it->value() != it->value())
             {
                 return false;
@@ -1137,21 +1139,22 @@ class json_object<KeyT,Json,true> final
 public:
     typedef typename Json::allocator_type allocator_type;
     typedef typename Json::char_type char_type;
-    typedef typename Json::char_allocator_type char_allocator_type;
     typedef KeyT key_type;
     typedef typename Json::string_view_type string_view_type;
-    typedef key_value<KeyT,Json> value_type;
-
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> key_value_allocator_type;
-    typedef typename Json::object_storage_type object_storage_type;
-
-    typedef typename object_storage_type::iterator iterator;
-    typedef typename object_storage_type::const_iterator const_iterator;
-
+    typedef key_value<KeyT,Json> key_value_type;
 private:
+    typedef typename Json::implementation_policy implementation_policy;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type> key_value_allocator_type;
+    using key_value_storage_type = typename implementation_policy::template sequence_container_type<key_value_type,key_value_allocator_type>;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<size_t> index_allocator_type;
+    using index_storage_type = typename implementation_policy::template sequence_container_type<size_t,index_allocator_type>;
+
     allocator_type self_allocator_;
-    object_storage_type members_;
+    key_value_storage_type members_;
+    index_storage_type index_;
 public:
+    typedef typename key_value_storage_type::iterator iterator;
+    typedef typename key_value_storage_type::const_iterator const_iterator;
 
     json_object()
     {
@@ -1287,13 +1290,13 @@ public:
     iterator find(const string_view_type& name)
     {
         return std::find_if(members_.begin(),members_.end(), 
-                            [name](const value_type& kv){return kv.key() == name;});
+                            [name](const key_value_type& kv){return kv.key() == name;});
     }
 
     const_iterator find(const string_view_type& name) const
     {
         return std::find_if(members_.begin(),members_.end(), 
-                            [name](const value_type& kv){return kv.key() == name;});
+                            [name](const key_value_type& kv){return kv.key() == name;});
     }
 
     void erase(const_iterator first, const_iterator last) 
@@ -1304,7 +1307,7 @@ public:
     void erase(const string_view_type& name) 
     {
         auto it = std::find_if(members_.begin(),members_.end(), 
-                              [name](const value_type& kv){return kv.key() == name;});
+                              [name](const key_value_type& kv){return kv.key() == name;});
         if (it != members_.end())
         {
             members_.erase(it);
@@ -1321,7 +1324,7 @@ public:
             members_.emplace_back(pred(*s));
         }
         auto it = last_wins_unique_sequence(members_.begin(), members_.end(),
-                              [](const value_type& a, const value_type& b){ return a.key().compare(b.key());});
+                              [](const key_value_type& a, const key_value_type& b){ return a.key().compare(b.key());});
         members_.erase(it,members_.end());
     }
 
@@ -1333,7 +1336,7 @@ public:
     {
         bool inserted;
         auto it = std::find_if(members_.begin(),members_.end(), 
-                               [name](const value_type& a){return a.key() == name;});
+                               [name](const key_value_type& a){return a.key() == name;});
 
         if (it == members_.end())
         {
@@ -1356,7 +1359,7 @@ public:
     {
         bool inserted;
         auto it = std::find_if(members_.begin(),members_.end(), 
-                               [name](const value_type& a){return a.key() == name;});
+                               [name](const key_value_type& a){return a.key() == name;});
 
         if (it == members_.end())
         {
@@ -1386,7 +1389,7 @@ public:
         else
         {
             it = std::find_if(members_.begin(),members_.end(), 
-                              [key](const value_type& a){return a.key() == key;});
+                              [key](const key_value_type& a){return a.key() == key;});
 
             if (it == members_.end())
             {
@@ -1415,7 +1418,7 @@ public:
         else
         {
             it = std::find_if(members_.begin(),members_.end(), 
-                              [key](const value_type& a){return a.key() == key;});
+                              [key](const key_value_type& a){return a.key() == key;});
 
             if (it == members_.end())
             {
@@ -1448,7 +1451,7 @@ public:
         for (; it != end; ++it)
         {
             auto pos = std::find_if(members_.begin(),members_.end(), 
-                                    [it](const value_type& a){return a.key() == it->key();});
+                                    [it](const key_value_type& a){return a.key() == it->key();});
             if (pos == members_.end() )
             {
                 members_.emplace_back(*it);
@@ -1471,7 +1474,7 @@ public:
         for (; it != end; ++it)
         {
             auto pos = std::find_if(members_.begin(),members_.end(), 
-                                    [it](const value_type& a){return a.key() == it->key();});
+                                    [it](const key_value_type& a){return a.key() == it->key();});
             if (pos == members_.end() )
             {
                 hint = members_.emplace(hint,*it);
@@ -1496,7 +1499,7 @@ public:
         for (; it != end; ++it)
         {
             auto pos = std::find_if(members_.begin(),members_.end(), 
-                                    [it](const value_type& a){return a.key() == it->key();});
+                                    [it](const key_value_type& a){return a.key() == it->key();});
             if (pos == members_.end() )
             {
                 members_.emplace_back(*it);
@@ -1523,7 +1526,7 @@ public:
         for (; it != end; ++it)
         {
             auto pos = std::find_if(members_.begin(),members_.end(), 
-                                    [it](const value_type& a){return a.key() == it->key();});
+                                    [it](const key_value_type& a){return a.key() == it->key();});
             if (pos == members_.end() )
             {
                 hint = members_.emplace(hint,*it);
@@ -1543,7 +1546,7 @@ public:
     {
         bool inserted;
         auto it = std::find_if(members_.begin(),members_.end(), 
-                               [key](const value_type& a){return a.key() == key;});
+                               [key](const key_value_type& a){return a.key() == key;});
 
         if (it == members_.end())
         {
@@ -1566,7 +1569,7 @@ public:
     {
         bool inserted;
         auto it = std::find_if(members_.begin(),members_.end(), 
-                               [key](const value_type& a){return a.key() == key;});
+                               [key](const key_value_type& a){return a.key() == key;});
 
         if (it == members_.end())
         {
@@ -1588,7 +1591,7 @@ public:
     try_emplace(iterator hint, const string_view_type& key, Args&&... args)
     {
         auto it = std::find_if(members_.begin(),members_.end(), 
-                               [key](const value_type& a){return a.key() == key;});
+                               [key](const key_value_type& a){return a.key() == key;});
 
         if (it == members_.end())
         {
@@ -1613,7 +1616,7 @@ public:
     try_emplace(iterator hint, const string_view_type& key, Args&&... args)
     {
         auto it = std::find_if(members_.begin(),members_.end(), 
-                               [key](const value_type& a){return a.key() == key;});
+                               [key](const key_value_type& a){return a.key() == key;});
 
         if (it == members_.end())
         {
@@ -1642,7 +1645,7 @@ public:
         for (auto it = members_.begin(); it != members_.end(); ++it)
         {
             auto rhs_it = std::find_if(rhs.begin(),rhs.end(), 
-                                       [it](const value_type& a){return a.key() == it->key();});
+                                       [it](const key_value_type& a){return a.key() == it->key();});
             if (rhs_it == rhs.end() || rhs_it->key() != it->key() || rhs_it->value() != it->value())
             {
                 return false;

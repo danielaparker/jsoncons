@@ -44,10 +44,7 @@ struct sorted_policy
     static const bool preserve_order = false;
 
     template <class T,class Allocator>
-    using object_storage = std::vector<T,Allocator>;
-
-    template <class T,class Allocator>
-    using array_storage = std::vector<T,Allocator>;
+    using sequence_container_type = std::vector<T,Allocator>;
 
     template <class CharT, class CharTraits, class Allocator>
     using key_storage = std::basic_string<CharT, CharTraits,Allocator>;
@@ -136,17 +133,13 @@ public:
     typedef jsoncons::null_type null_type;
 #endif
 
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<basic_json> val_allocator_type;
-    using array_storage_type = typename implementation_policy::template array_storage<basic_json, val_allocator_type>;
-
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
-    using byte_string_storage_type = typename implementation_policy::template array_storage<uint8_t, byte_allocator_type>;
+    using byte_string_storage_type = typename implementation_policy::template sequence_container_type<uint8_t, byte_allocator_type>;
 
     typedef json_array<basic_json> array;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type> key_value_allocator_type;
 
-    using object_storage_type = typename implementation_policy::template object_storage<key_value_type , key_value_allocator_type>;
     typedef json_object<key_storage_type,basic_json,implementation_policy::preserve_order> object;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
