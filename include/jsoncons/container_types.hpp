@@ -167,7 +167,7 @@ public:
 // json_array
 
 template <class Json>
-class json_array: public container_base<typename Json::allocator_type>
+class json_array : public container_base<typename Json::allocator_type>
 {
 public:
     typedef typename Json::allocator_type allocator_type;
@@ -186,8 +186,6 @@ public:
     using container_base<allocator_type>::get_allocator;
 
     json_array()
-        : container_base<allocator_type>(), 
-          elements_()
     {
     }
 
@@ -499,7 +497,8 @@ class json_object
 
 // Sort keys
 template <class KeyT,class Json>
-class json_object<KeyT,Json,typename std::enable_if<!Json::implementation_policy::preserve_order>::type> 
+class json_object<KeyT,Json,typename std::enable_if<!Json::implementation_policy::preserve_order>::type> : 
+    public container_base<typename Json::allocator_type>
 {
 public:
     typedef typename Json::allocator_type allocator_type;
@@ -512,40 +511,43 @@ private:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type> key_value_allocator_type;
     using key_value_container_type = typename implementation_policy::template sequence_container_type<key_value_type,key_value_allocator_type>;
 
-    allocator_type allocator_;
     key_value_container_type members_;
 public:
     typedef typename key_value_container_type::iterator iterator;
     typedef typename key_value_container_type::const_iterator const_iterator;
 
+    using container_base<allocator_type>::get_allocator;
+
     json_object()
     {
     }
-    json_object(const allocator_type& allocator)
-        : allocator_(allocator), 
+
+    explicit json_object(const allocator_type& allocator)
+        : container_base<allocator_type>(allocator), 
           members_(key_value_allocator_type(allocator))
     {
     }
 
     json_object(const json_object& val)
-        : allocator_(val.get_allocator()), members_(val.members_)
+        : container_base<allocator_type>(val.get_allocator()),
+          members_(val.members_)
     {
     }
 
     json_object(json_object&& val)
-        : allocator_(val.get_allocator()), 
+        : container_base<allocator_type>(val.get_allocator()), 
           members_(std::move(val.members_))
     {
     }
 
     json_object(const json_object& val, const allocator_type& allocator) 
-        : allocator_(allocator), 
+        : container_base<allocator_type>(allocator), 
           members_(val.members_,key_value_allocator_type(allocator))
     {
     }
 
     json_object(json_object&& val,const allocator_type& allocator) 
-        : allocator_(allocator), members_(std::move(val.members_),key_value_allocator_type(allocator))
+        : container_base<allocator_type>(allocator), members_(std::move(val.members_),key_value_allocator_type(allocator))
     {
     }
 
@@ -567,7 +569,7 @@ public:
 
     json_object(std::initializer_list<typename Json::array> init, 
                 const allocator_type& allocator)
-        : allocator_(allocator), 
+        : container_base<allocator_type>(allocator), 
           members_(key_value_allocator_type(allocator))
     {
         for (const auto& element : init)
@@ -582,11 +584,6 @@ public:
         {
             insert_or_assign(element[0].as_string_view(), std::move(element[1]));
         }
-    }
-
-    allocator_type get_allocator() const
-    {
-        return allocator_;
     }
 
     void swap(json_object& val)
@@ -1130,7 +1127,8 @@ private:
 
 // Preserve order
 template <class KeyT,class Json>
-class json_object<KeyT,Json,typename std::enable_if<Json::implementation_policy::preserve_order>::type> 
+class json_object<KeyT,Json,typename std::enable_if<Json::implementation_policy::preserve_order>::type> :
+    public container_base<typename Json::allocator_type>
 {
 public:
     typedef typename Json::allocator_type allocator_type;
@@ -1145,41 +1143,42 @@ private:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<size_t> index_allocator_type;
     using index_container_type = typename implementation_policy::template sequence_container_type<size_t,index_allocator_type>;
 
-    allocator_type allocator_;
     key_value_container_type members_;
     index_container_type index_;
 public:
     typedef typename key_value_container_type::iterator iterator;
     typedef typename key_value_container_type::const_iterator const_iterator;
 
+    using container_base<allocator_type>::get_allocator;
+
     json_object()
     {
     }
     json_object(const allocator_type& allocator)
-        : allocator_(allocator), 
+        : container_base<allocator_type>(allocator), 
           members_(key_value_allocator_type(allocator))
     {
     }
 
     json_object(const json_object& val)
-        : allocator_(val.get_allocator()), members_(val.members_)
+        : container_base<allocator_type>(val.get_allocator()), members_(val.members_)
     {
     }
 
     json_object(json_object&& val)
-        : allocator_(val.get_allocator()), 
+        : container_base<allocator_type>(val.get_allocator()), 
           members_(std::move(val.members_))
     {
     }
 
     json_object(const json_object& val, const allocator_type& allocator) 
-        : allocator_(allocator), 
+        : container_base<allocator_type>(allocator), 
           members_(val.members_,key_value_allocator_type(allocator))
     {
     }
 
     json_object(json_object&& val,const allocator_type& allocator) 
-        : allocator_(allocator), members_(std::move(val.members_),key_value_allocator_type(allocator))
+        : container_base<allocator_type>(allocator), members_(std::move(val.members_),key_value_allocator_type(allocator))
     {
     }
 
@@ -1201,7 +1200,7 @@ public:
 
     json_object(std::initializer_list<typename Json::array> init, 
                 const allocator_type& allocator)
-        : allocator_(allocator), 
+        : container_base<allocator_type>(allocator), 
           members_(key_value_allocator_type(allocator))
     {
         for (const auto& element : init)
@@ -1216,11 +1215,6 @@ public:
         {
             insert_or_assign(element[0].as_string_view(), std::move(element[1]));
         }
-    }
-
-    allocator_type get_allocator() const
-    {
-        return allocator_;
     }
 
     void swap(json_object& val)
