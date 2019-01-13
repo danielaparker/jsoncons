@@ -492,14 +492,14 @@ BidirectionalIt last_wins_unique_sequence(BidirectionalIt first, BidirectionalIt
 
 // json_object
 
-template <class KeyT,class Json,bool PreserveOrder>
+template <class KeyT,class Json,class Enable = void>
 class json_object
 {
 };
 
 // Sort keys
 template <class KeyT,class Json>
-class json_object<KeyT,Json,false> final 
+class json_object<KeyT,Json,typename std::enable_if<!Json::implementation_policy::preserve_order>::type> 
 {
 public:
     typedef typename Json::allocator_type allocator_type;
@@ -1130,7 +1130,7 @@ private:
 
 // Preserve order
 template <class KeyT,class Json>
-class json_object<KeyT,Json,true> final
+class json_object<KeyT,Json,typename std::enable_if<Json::implementation_policy::preserve_order>::type> 
 {
 public:
     typedef typename Json::allocator_type allocator_type;
