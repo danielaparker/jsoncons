@@ -417,79 +417,6 @@ private:
 
 // json_object
 
-template <class BidirectionalIt,class BinaryPredicate>
-BidirectionalIt last_wins_unique_sequence(BidirectionalIt first, BidirectionalIt last, BinaryPredicate compare)
-{
-    
-    if (first == last)
-    {
-        return last;
-    }
-
-    typedef typename BidirectionalIt::value_type value_type;
-    typedef typename BidirectionalIt::pointer pointer;
-    std::vector<value_type> dups;
-    {
-        std::vector<pointer> v(std::distance(first,last));
-        auto p = v.begin();
-        for (auto it = first; it != last; ++it)
-        {
-            *p++ = &(*it);
-        }
-        std::sort(v.begin(), v.end(), [&](pointer a, pointer b){return compare(*a,*b)<0;});
-        auto it = v.begin();
-        auto end = v.end();
-        for (auto begin = it+1; begin != end; ++it, ++begin)
-        {
-            if (compare(*(*it),*(*begin)) == 0)
-            {
-                dups.push_back(*(*it));
-            }
-        }
-    }
-    if (dups.size() == 0)
-    {
-        return last;
-    }
-    
-    auto it = last;
-    for (auto p = first; p != last && p != it; )
-    {
-        bool no_dup = true;
-        if (dups.size() > 0)
-        {
-            for (auto q = dups.begin(); no_dup && q != dups.end();)
-            {
-                if (compare(*p,*q) == 0)
-                {
-                    dups.erase(q);
-                    no_dup = false;
-                }
-                else
-                {
-                    ++q;
-                }
-            }
-        }
-        if (!no_dup)
-        {
-            --it;
-            for (auto r = p; r != it; ++r)
-            {
-                *r = std::move(*(r+1));
-            }
-        }
-        else
-        {
-            ++p;
-        }
-    }
-    
-    return it;
-}
-
-// json_object
-
 template <class KeyT,class Json,class Enable = void>
 class json_object
 {
@@ -705,142 +632,9 @@ public:
         }
         std::stable_sort(members_.begin(),members_.end(),
                          [](const key_value_type& a, const key_value_type& b){return a.key().compare(b.key()) < 0;});
-        auto it = std::unique(members_.rbegin(), members_.rend(),
+        auto it = std::unique(members_.begin(), members_.end(),
                               [](const key_value_type& a, const key_value_type& b){ return !(a.key().compare(b.key()));});
-        members_.erase(members_.begin(),it.base());
-    }
-
-    // merge
-
-    void merge(const json_object& source)
-    {
-        for (auto it = source.begin(); it != source.end(); ++it)
-        {
-            try_emplace(it->key(),it->value());
-        }
-    }
-
-    void merge(json_object&& source)
-    {
-        auto it = std::make_move_iterator(source.begin());
-        auto end = std::make_move_iterator(source.end());
-        for (; it != end; ++it)
-        {
-            auto pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
-                                        [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});   
-            if (pos == members_.end() )
-            {
-                members_.emplace_back(*it);
-            }
-            else if (it->key() != pos->key())
-            {
-                members_.emplace(pos,*it);
-            }
-        }
-    }
-
-    void merge(iterator hint, const json_object& source)
-    {
-        for (auto it = source.begin(); it != source.end(); ++it)
-        {
-            hint = try_emplace(hint, it->key(),it->value());
-        }
-    }
-
-    void merge(iterator hint, json_object&& source)
-    {
-        auto it = std::make_move_iterator(source.begin());
-        auto end = std::make_move_iterator(source.end());
-        for (; it != end; ++it)
-        {
-            iterator pos;
-            if (hint != members_.end() && hint->key() <= it->key())
-            {
-                pos = std::lower_bound(hint,members_.end(), it->key(), 
-                                      [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
-            }
-            else
-            {
-                pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
-                                      [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
-            }
-            if (pos == members_.end() )
-            {
-                members_.emplace_back(*it);
-                hint = members_.begin() + (members_.size() - 1);
-            }
-            else if (it->key() != pos->key())
-            {
-                hint = members_.emplace(pos,*it);
-            }
-        }
-    }
-
-    // merge_or_update
-
-    void merge_or_update(const json_object& source)
-    {
-        for (auto it = source.begin(); it != source.end(); ++it)
-        {
-            insert_or_assign(it->key(),it->value());
-        }
-    }
-
-    void merge_or_update(json_object&& source)
-    {
-        auto it = std::make_move_iterator(source.begin());
-        auto end = std::make_move_iterator(source.end());
-        for (; it != end; ++it)
-        {
-            auto pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
-                                        [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});   
-            if (pos == members_.end() )
-            {
-                members_.emplace_back(*it);
-            }
-            else 
-            {
-                pos->value(it->value());
-            }
-        }
-    }
-
-    void merge_or_update(iterator hint, const json_object& source)
-    {
-        for (auto it = source.begin(); it != source.end(); ++it)
-        {
-            hint = insert_or_assign(hint, it->key(),it->value());
-        }
-    }
-
-    void merge_or_update(iterator hint, json_object&& source)
-    {
-        auto it = std::make_move_iterator(source.begin());
-        auto end = std::make_move_iterator(source.end());
-        for (; it != end; ++it)
-        {
-            iterator pos;
-            if (hint != members_.end() && hint->key() <= it->key())
-            {
-                pos = std::lower_bound(hint,members_.end(), it->key(), 
-                                      [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
-            }
-            else
-            {
-                pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
-                                      [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
-            }
-            if (pos == members_.end() )
-            {
-                members_.emplace_back(*it);
-                hint = members_.begin() + (members_.size() - 1);
-            }
-            else 
-            {
-                pos->value(it->value());
-                hint = pos;
-            }
-        }
+        members_.erase(it, members_.end());
     }
 
     // insert_or_assign
@@ -1103,6 +897,139 @@ public:
         return it;
     }
 
+    // merge
+
+    void merge(const json_object& source)
+    {
+        for (auto it = source.begin(); it != source.end(); ++it)
+        {
+            try_emplace(it->key(),it->value());
+        }
+    }
+
+    void merge(json_object&& source)
+    {
+        auto it = std::make_move_iterator(source.begin());
+        auto end = std::make_move_iterator(source.end());
+        for (; it != end; ++it)
+        {
+            auto pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
+                                        [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});   
+            if (pos == members_.end() )
+            {
+                members_.emplace_back(*it);
+            }
+            else if (it->key() != pos->key())
+            {
+                members_.emplace(pos,*it);
+            }
+        }
+    }
+
+    void merge(iterator hint, const json_object& source)
+    {
+        for (auto it = source.begin(); it != source.end(); ++it)
+        {
+            hint = try_emplace(hint, it->key(),it->value());
+        }
+    }
+
+    void merge(iterator hint, json_object&& source)
+    {
+        auto it = std::make_move_iterator(source.begin());
+        auto end = std::make_move_iterator(source.end());
+        for (; it != end; ++it)
+        {
+            iterator pos;
+            if (hint != members_.end() && hint->key() <= it->key())
+            {
+                pos = std::lower_bound(hint,members_.end(), it->key(), 
+                                      [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+            }
+            else
+            {
+                pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
+                                      [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+            }
+            if (pos == members_.end() )
+            {
+                members_.emplace_back(*it);
+                hint = members_.begin() + (members_.size() - 1);
+            }
+            else if (it->key() != pos->key())
+            {
+                hint = members_.emplace(pos,*it);
+            }
+        }
+    }
+
+    // merge_or_update
+
+    void merge_or_update(const json_object& source)
+    {
+        for (auto it = source.begin(); it != source.end(); ++it)
+        {
+            insert_or_assign(it->key(),it->value());
+        }
+    }
+
+    void merge_or_update(json_object&& source)
+    {
+        auto it = std::make_move_iterator(source.begin());
+        auto end = std::make_move_iterator(source.end());
+        for (; it != end; ++it)
+        {
+            auto pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
+                                        [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});   
+            if (pos == members_.end() )
+            {
+                members_.emplace_back(*it);
+            }
+            else 
+            {
+                pos->value(it->value());
+            }
+        }
+    }
+
+    void merge_or_update(iterator hint, const json_object& source)
+    {
+        for (auto it = source.begin(); it != source.end(); ++it)
+        {
+            hint = insert_or_assign(hint, it->key(),it->value());
+        }
+    }
+
+    void merge_or_update(iterator hint, json_object&& source)
+    {
+        auto it = std::make_move_iterator(source.begin());
+        auto end = std::make_move_iterator(source.end());
+        for (; it != end; ++it)
+        {
+            iterator pos;
+            if (hint != members_.end() && hint->key() <= it->key())
+            {
+                pos = std::lower_bound(hint,members_.end(), it->key(), 
+                                      [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+            }
+            else
+            {
+                pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
+                                      [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+            }
+            if (pos == members_.end() )
+            {
+                members_.emplace_back(*it);
+                hint = members_.begin() + (members_.size() - 1);
+            }
+            else 
+            {
+                pos->value(it->value());
+                hint = pos;
+            }
+        }
+    }
+
     bool operator==(const json_object& rhs) const
     {
         if (size() != rhs.size())
@@ -1156,29 +1083,36 @@ public:
     }
     json_object(const allocator_type& allocator)
         : container_base<allocator_type>(allocator), 
-          members_(key_value_allocator_type(allocator))
+          members_(key_value_allocator_type(allocator)), 
+          index_(index_allocator_type(allocator))
     {
     }
 
     json_object(const json_object& val)
-        : container_base<allocator_type>(val.get_allocator()), members_(val.members_)
+        : container_base<allocator_type>(val.get_allocator()), 
+          members_(val.members_),
+          index_(val.index_)
     {
     }
 
     json_object(json_object&& val)
         : container_base<allocator_type>(val.get_allocator()), 
-          members_(std::move(val.members_))
+          members_(std::move(val.members_)),
+          index_(std::move(val.index_))
     {
     }
 
     json_object(const json_object& val, const allocator_type& allocator) 
         : container_base<allocator_type>(allocator), 
-          members_(val.members_,key_value_allocator_type(allocator))
+          members_(val.members_,key_value_allocator_type(allocator)),
+          index_(val.index_,index_allocator_type(allocator))
     {
     }
 
     json_object(json_object&& val,const allocator_type& allocator) 
-        : container_base<allocator_type>(allocator), members_(std::move(val.members_),key_value_allocator_type(allocator))
+        : container_base<allocator_type>(allocator), 
+          members_(std::move(val.members_),key_value_allocator_type(allocator)),
+          index_(std::move(val.index_),index_allocator_type(allocator))
     {
     }
 
@@ -1201,7 +1135,8 @@ public:
     json_object(std::initializer_list<typename Json::array> init, 
                 const allocator_type& allocator)
         : container_base<allocator_type>(allocator), 
-          members_(key_value_allocator_type(allocator))
+          members_(key_value_allocator_type(allocator)), 
+          index_(index_allocator_type(allocator))
     {
         for (const auto& element : init)
         {
@@ -1246,7 +1181,11 @@ public:
 
     size_t capacity() const {return members_.capacity();}
 
-    void clear() {members_.clear();}
+    void clear() 
+    {
+        members_.clear();
+        index_.clear();
+    }
 
     void shrink_to_fit() 
     {
@@ -1255,6 +1194,7 @@ public:
             members_[i].shrink_to_fit();
         }
         members_.shrink_to_fit();
+        index_.shrink_to_fit();
     }
 
     void reserve(size_t n) {members_.reserve(n);}
@@ -1279,27 +1219,50 @@ public:
 
     iterator find(const string_view_type& name)
     {
-        return std::find_if(members_.begin(),members_.end(), 
-                            [name](const key_value_type& kv){return kv.key() == name;});
+        auto it = std::lower_bound(index_.begin(),index_.end(), name, 
+                                    [&](size_t i, const string_view_type& k){return members_.at(i).key().compare(k) < 0;});        
+        if (it != index_.end() && members_.at(*it).key() == name)
+        {
+            return members_.begin() + *it;
+        }
+        else
+        {
+            return members_.end();
+        }
     }
 
     const_iterator find(const string_view_type& name) const
     {
-        return std::find_if(members_.begin(),members_.end(), 
-                            [name](const key_value_type& kv){return kv.key() == name;});
+        auto it = std::lower_bound(index_.begin(),index_.end(), name, 
+                                    [&](size_t i, const string_view_type& k){return members_.at(i).key().compare(k) < 0;});        
+        if (it != index_.end() && members_.at(*it).key() == name)
+        {
+            return members_.begin() + *it;
+        }
+        else
+        {
+            return members_.end();
+        }
     }
 
     void erase(const_iterator first, const_iterator last) 
     {
-        members_.erase(first,last);
+        size_t pos1 = first == members_.end() ? members_.size() : first - members_.begin();
+        size_t pos2 = last == members_.end() ? members_.size() : last - members_.begin();
+
+        if (pos1 < members_.size() && pos2 <= members_.size())
+        {
+            erase_index_entries(pos1,pos2);
+            members_.erase(first,last);
+        }
     }
 
     void erase(const string_view_type& name) 
     {
-        auto it = std::find_if(members_.begin(),members_.end(), 
-                              [name](const key_value_type& kv){return kv.key() == name;});
+        auto it = find(name);
         if (it != members_.end())
         {
+            erase_index_entry(name);
             members_.erase(it);
         }
     }
@@ -1313,115 +1276,127 @@ public:
         {
             members_.emplace_back(pred(*s));
         }
-        auto it = last_wins_unique_sequence(members_.begin(), members_.end(),
-                              [](const key_value_type& a, const key_value_type& b){ return a.key().compare(b.key());});
-        members_.erase(it,members_.end());
-    }
 
-    // insert_or_assign
+        build_index();
+        auto last_unique = std::unique(index_.begin(), index_.end(),
+            [&](size_t a, size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
+
+        if (last_unique != index_.end())
+        {
+            index_.erase(last_unique, index_.end());
+            std::sort(index_.begin(), index_.end());
+
+            auto result = index_.rbegin();
+            if (*result != members_.size())
+            {
+                members_.erase(members_.begin() + (*result + 1), members_.end());
+            }
+            for (auto it = index_.rbegin() + 1; it != index_.rend(); ++it, ++result)
+            {
+                if (*result - *it > 1)
+                {
+                    members_.erase(members_.begin() + (*it + 1), members_.begin() + *result);
+                }
+            }
+        }
+        build_index();
+    }
 
     template <class T, class A=allocator_type>
     typename std::enable_if<is_stateless<A>::value,std::pair<iterator,bool>>::type
     insert_or_assign(const string_view_type& name, T&& value)
     {
-        bool inserted;
-        auto it = std::find_if(members_.begin(),members_.end(), 
-                               [name](const key_value_type& a){return a.key() == name;});
-
-        if (it == members_.end())
+        auto result = insert_index_entry(name,members_.size());
+        if (result.second)
         {
-            members_.emplace_back(key_type(name.begin(),name.end()), 
-                                        std::forward<T>(value));
-            it = members_.begin() + members_.size() - 1;
-            inserted = true;
+            members_.emplace_back(key_type(name.begin(), name.end()), std::forward<T>(value));
+            auto it = members_.begin() + result.first;
+            return std::make_pair(it,true);
         }
         else
         {
+            auto it = members_.begin() + result.first;
             it->value(Json(std::forward<T>(value)));
-            inserted = false; // assigned
+            return std::make_pair(it,false);
         }
-        return std::make_pair(it,inserted);
     }
 
     template <class T, class A=allocator_type>
     typename std::enable_if<!is_stateless<A>::value,std::pair<iterator,bool>>::type
     insert_or_assign(const string_view_type& name, T&& value)
     {
-        bool inserted;
-        auto it = std::find_if(members_.begin(),members_.end(), 
-                               [name](const key_value_type& a){return a.key() == name;});
-
-        if (it == members_.end())
+        auto result = insert_index_entry(name,members_.size());
+        if (result.second)
         {
             members_.emplace_back(key_type(name.begin(),name.end(),get_allocator()), 
-                                        std::forward<T>(value),get_allocator());
-            it = members_.begin() + members_.size() - 1;
-            inserted = true;
+                                  std::forward<T>(value),get_allocator());
+            auto it = members_.begin() + result.first;
+            return std::make_pair(it,true);
         }
         else
         {
+            auto it = members_.begin() + result.first;
             it->value(Json(std::forward<T>(value),get_allocator()));
-            inserted = false; // assigned
+            return std::make_pair(it,false);
         }
-        return std::make_pair(it,inserted);
     }
 
     template <class A=allocator_type, class T>
     typename std::enable_if<is_stateless<A>::value,iterator>::type 
     insert_or_assign(iterator hint, const string_view_type& key, T&& value)
     {
-        iterator it;
         if (hint == members_.end())
         {
             auto result = insert_or_assign(key, std::forward<T>(value));
-            it = result.first;
+            return result.first;
         }
         else
         {
-            it = std::find_if(members_.begin(),members_.end(), 
-                              [key](const key_value_type& a){return a.key() == key;});
+            size_t pos = hint - members_.begin();
+            auto result = insert_index_entry(key,pos);
 
-            if (it == members_.end())
+            if (result.second)
             {
-                members_.emplace_back(key_type(key.begin(),key.end()), 
-                                            std::forward<T>(value));
-                it = members_.begin() + members_.size() - 1;
+                auto it = members_.emplace(hint, key_type(key.begin(), key.end()), std::forward<T>(value));
+                return it;
             }
             else
             {
+                auto it = members_.begin() + result.first;
                 it->value(Json(std::forward<T>(value)));
+                return it;
             }
         }
-        return it;
     }
 
     template <class A=allocator_type, class T>
     typename std::enable_if<!is_stateless<A>::value,iterator>::type 
     insert_or_assign(iterator hint, const string_view_type& key, T&& value)
     {
-        iterator it;
         if (hint == members_.end())
         {
             auto result = insert_or_assign(key, std::forward<T>(value));
-            it = result.first;
+            return result.first;
         }
         else
         {
-            it = std::find_if(members_.begin(),members_.end(), 
-                              [key](const key_value_type& a){return a.key() == key;});
+            size_t pos = hint - members_.begin();
+            auto result = insert_index_entry(key,pos);
 
-            if (it == members_.end())
+            if (result.second)
             {
-                members_.emplace_back(key_type(key.begin(),key.end(),get_allocator()), 
-                                            std::forward<T>(value),get_allocator());
-                it = members_.begin() + members_.size() - 1;
+                auto it = members_.emplace(hint, 
+                                           key_type(key.begin(),key.end(),get_allocator()), 
+                                           std::forward<T>(value),get_allocator());
+                return it;
             }
             else
             {
+                auto it = members_.begin() + result.first;
                 it->value(Json(std::forward<T>(value),get_allocator()));
+                return it;
             }
         }
-        return it;
     }
 
     // merge
@@ -1440,11 +1415,10 @@ public:
         auto end = std::make_move_iterator(source.end());
         for (; it != end; ++it)
         {
-            auto pos = std::find_if(members_.begin(),members_.end(), 
-                                    [it](const key_value_type& a){return a.key() == it->key();});
+            auto pos = find(it->key());
             if (pos == members_.end() )
             {
-                members_.emplace_back(*it);
+                try_emplace(it->key(),it->value());
             }
         }
     }
@@ -1463,11 +1437,10 @@ public:
         auto end = std::make_move_iterator(source.end());
         for (; it != end; ++it)
         {
-            auto pos = std::find_if(members_.begin(),members_.end(), 
-                                    [it](const key_value_type& a){return a.key() == it->key();});
+            auto pos = find(it->key());
             if (pos == members_.end() )
             {
-                hint = members_.emplace(hint,*it);
+                hint = try_emplace(hint, it->key(), it->value());
             }
         }
     }
@@ -1488,11 +1461,10 @@ public:
         auto end = std::make_move_iterator(source.end());
         for (; it != end; ++it)
         {
-            auto pos = std::find_if(members_.begin(),members_.end(), 
-                                    [it](const key_value_type& a){return a.key() == it->key();});
+            auto pos = find(it->key());
             if (pos == members_.end() )
             {
-                members_.emplace_back(*it);
+                insert_or_assign(it->key(),it->value());
             }
             else
             {
@@ -1515,115 +1487,112 @@ public:
         auto end = std::make_move_iterator(source.end());
         for (; it != end; ++it)
         {
-            auto pos = std::find_if(members_.begin(),members_.end(), 
-                                    [it](const key_value_type& a){return a.key() == it->key();});
+            auto pos = find(it->key());
             if (pos == members_.end() )
             {
-                hint = members_.emplace(hint,*it);
+                hint = try_emplace(hint,it->key(),std::move(it->value()));
             }
             else
             {
-                pos->value(it->value());
+                pos->value(std::move(it->value()));
                 hint = pos;
             }
         }
     }
 
     // try_emplace
+
     template <class A=allocator_type, class... Args>
     typename std::enable_if<is_stateless<A>::value,std::pair<iterator,bool>>::type
-    try_emplace(const string_view_type& key, Args&&... args)
+    try_emplace(const string_view_type& name, Args&&... args)
     {
-        bool inserted;
-        auto it = std::find_if(members_.begin(),members_.end(), 
-                               [key](const key_value_type& a){return a.key() == key;});
-
-        if (it == members_.end())
+        auto result = insert_index_entry(name,members_.size());
+        if (result.second)
         {
-            members_.emplace_back(key_type(key.begin(),key.end()), 
-                                        std::forward<Args>(args)...);
-            it = members_.begin() + members_.size() - 1;
-            inserted = true;
-
+            members_.emplace_back(key_type(name.begin(), name.end()), std::forward<Args>(args)...);
+            auto it = members_.begin() + result.first;
+            return std::make_pair(it,true);
         }
-        else 
+        else
         {
-            inserted = false;
+            auto it = members_.begin() + result.first;
+            return std::make_pair(it,false);
         }
-        return std::make_pair(it,inserted);
     }
 
     template <class A=allocator_type, class... Args>
     typename std::enable_if<!is_stateless<A>::value,std::pair<iterator,bool>>::type
     try_emplace(const string_view_type& key, Args&&... args)
     {
-        bool inserted;
-        auto it = std::find_if(members_.begin(),members_.end(), 
-                               [key](const key_value_type& a){return a.key() == key;});
-
-        if (it == members_.end())
+        auto result = insert_index_entry(key,members_.size());
+        if (result.second)
         {
             members_.emplace_back(key_type(key.begin(),key.end(), get_allocator()), 
-                                        std::forward<Args>(args)...);
-            it = members_.begin() + members_.size() - 1;
-            inserted = true;
-
+                                  std::forward<Args>(args)...);
+            auto it = members_.begin() + result.first;
+            return std::make_pair(it,true);
         }
-        else 
+        else
         {
-            inserted = false;
+            auto it = members_.begin() + result.first;
+            return std::make_pair(it,false);
         }
-        return std::make_pair(it,inserted);
     }
 
     template <class A=allocator_type, class ... Args>
     typename std::enable_if<is_stateless<A>::value,iterator>::type
     try_emplace(iterator hint, const string_view_type& key, Args&&... args)
     {
-        auto it = std::find_if(members_.begin(),members_.end(), 
-                               [key](const key_value_type& a){return a.key() == key;});
-
-        if (it == members_.end())
+        if (hint == members_.end())
         {
-            if (hint == members_.end())
+            auto result = try_emplace(key, std::forward<Args>(args)...);
+            return result.first;
+        }
+        else
+        {
+            size_t pos = hint - members_.begin();
+            auto result = insert_index_entry(key, pos);
+
+            if (result.second)
             {
-                members_.emplace_back(key_type(key.begin(),key.end()), 
-                                            std::forward<Args>(args)...);
-                it = members_.begin() + (members_.size() - 1);
+                auto it = members_.emplace(hint, key_type(key.begin(), key.end()), std::forward<Args>(args)...);
+                return it;
             }
             else
             {
-                it = members_.emplace(hint, 
-                                            key_type(key.begin(),key.end()), 
-                                            std::forward<Args>(args)...);
+                auto it = members_.begin() + result.first;
+                return it;
             }
         }
-        return it;
     }
 
     template <class A=allocator_type, class ... Args>
     typename std::enable_if<!is_stateless<A>::value,iterator>::type
     try_emplace(iterator hint, const string_view_type& key, Args&&... args)
     {
-        auto it = std::find_if(members_.begin(),members_.end(), 
-                               [key](const key_value_type& a){return a.key() == key;});
-
-        if (it == members_.end())
+        if (hint == members_.end())
         {
-            if (hint == members_.end())
+            auto result = try_emplace(key, std::forward<Args>(args)...);
+            return result.first;
+        }
+        else
+        {
+            size_t pos = hint - members_.begin();
+            auto result = insert_index_entry(key, pos);
+
+            if (result.second)
             {
-                members_.emplace_back(key_type(key.begin(),key.end(), get_allocator()), 
-                                            std::forward<Args>(args)...);
-                it = members_.begin() + (members_.size() - 1);
+                auto it = members_.emplace(hint, 
+                                           key_type(key.begin(),key.end(), get_allocator()), 
+                                           std::forward<Args>(args)...);
+                return it;
             }
             else
             {
-                it = members_.emplace(hint, 
-                                            key_type(key.begin(),key.end(), get_allocator()), 
-                                            std::forward<Args>(args)...);
+                auto it = members_.begin() + result.first;
+                return it;
             }
         }
-        return it;
     }
 
     bool operator==(const json_object& rhs) const
@@ -1634,8 +1603,7 @@ public:
         }
         for (auto it = members_.begin(); it != members_.end(); ++it)
         {
-            auto rhs_it = std::find_if(rhs.begin(),rhs.end(), 
-                                       [it](const key_value_type& a){return a.key() == it->key();});
+            auto rhs_it = rhs.find(it->key());
             if (rhs_it == rhs.end() || rhs_it->key() != it->key() || rhs_it->value() != it->value())
             {
                 return false;
@@ -1644,6 +1612,96 @@ public:
         return true;
     }
 private:
+
+    std::pair<size_t,bool> insert_index_entry(const string_view_type& key, size_t pos)
+    {
+        JSONCONS_ASSERT(pos <= index_.size());
+
+        auto it = std::lower_bound(index_.begin(),index_.end(), key, 
+                                    [&](size_t i, const string_view_type& k){return members_.at(i).key().compare(k) < 0;});        
+
+        if (it == index_.end())
+        {
+            size_t count = index_.size() - pos;
+            for (size_t i = 0; count > 0 && i < index_.size(); ++i)
+            {
+                if (index_[i] >= pos)
+                {
+                    ++index_[i];
+                    --count;
+                }
+            }
+            index_.push_back(pos);
+            return std::make_pair(pos,true);
+        }
+        else if (members_.at(*it).key() != key)
+        {
+            size_t count = index_.size() - pos;
+            for (size_t i = 0; count > 0 && i < index_.size(); ++i)
+            {
+                if (index_[i] >= pos)
+                {
+                    ++index_[i];
+                    --count;
+                }
+            }
+            auto it2 = index_.insert(it, pos);
+            return std::make_pair(*it2,true);
+        }
+        else
+        {
+            return std::make_pair(*it,false);
+        }
+    }
+
+    void erase_index_entry(const string_view_type& key)
+    {
+        auto it = std::lower_bound(index_.begin(),index_.end(), key, 
+                                   [&](size_t i, const string_view_type& k){return members_.at(i).key().compare(k) < 0;});        
+
+        if (it != index_.end() && members_.at(*it).key() != key)
+        {
+            size_t pos = *it;
+            size_t count = index_.size() - pos;
+            for (size_t i = 0; i < index_.size() && count > 0; ++i)
+            {
+                if (index_[i] > pos)
+                {
+                    --index_[i];
+                    --count;
+                }
+            }
+            auto it2 = index_.erase(it);
+        }
+    }
+
+    void erase_index_entries(size_t pos1, size_t pos2)
+    {
+        for (size_t i = 0; i < index_.size(); ++i)
+        {
+            if (index_[i] >= pos1 && index_[i] < pos2)
+            {
+                index_.erase(index_.begin()+index_[i]);
+            }
+            else if (index_[i] > pos2)
+            {
+                --index_[i];
+            }
+        }
+    }
+
+    void build_index()
+    {
+        index_.clear();
+        index_.reserve(members_.size());
+        for (size_t i = 0; i < members_.size(); ++i)
+        {
+            index_.push_back(i);
+        }
+        std::stable_sort(index_.begin(),index_.end(),
+                         [&](size_t a, size_t b){return members_.at(a).key().compare(members_.at(b).key()) < 0;});
+    }
+
     json_object& operator=(const json_object&) = delete;
 };
 

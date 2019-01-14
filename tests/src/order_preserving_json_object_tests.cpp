@@ -9,170 +9,170 @@
 #include <utility>
 #include <ctime>
 #include <map>
+#include <assert.h>
 
 using namespace jsoncons;
 
-TEST_CASE("ojson parse_duplicate_names")
+TEST_CASE("order preserving insert")
 {
-    ojson oj1 = ojson::parse(R"({"first":1,"second":2,"third":3})");
-    CHECK(3 == oj1.size());
-    CHECK(1 == oj1["first"].as<int>());
-    CHECK(2 == oj1["second"].as<int>());
-    CHECK(3 == oj1["third"].as<int>());
+    json_object<std::string, ojson> o;
 
-    ojson oj2 = ojson::parse(R"({"first":1,"second":2,"first":3})");
-    CHECK(2 == oj2.size());
-    CHECK(3 == oj2["first"].as<int>());
-    CHECK(2 == oj2["second"].as<int>());
+    typedef std::pair<ojson::key_storage_type,ojson> item_type;
+    std::vector<item_type> items;
+    items.emplace_back("b", 1);
+    items.emplace_back("a", 2);
+    items.emplace_back("c", 3);
+    items.emplace_back("a", 4);
+    items.emplace_back("a", 5);
+    items.emplace_back("d", 6);
+    items.emplace_back("a", 7);
+
+    o.insert(std::make_move_iterator(items.begin()), std::make_move_iterator(items.end()), 
+             [](item_type&& item){return ojson::key_value_type(std::move(item.first),std::move(item.second));});
+
+    SECTION("iterate")
+    {
+        REQUIRE(o.size() == 4);
+
+        auto it = o.begin();
+        CHECK(it->key() == std::string("b"));
+        CHECK(it->value().as<int>() == 1);
+        CHECK((++it)->key() == std::string("a"));
+        CHECK(it->value().as<int>() == 2);
+        CHECK((++it)->key() == std::string("c"));
+        CHECK(it->value().as<int>() == 3);
+        CHECK((++it)->key() == std::string("d"));
+        CHECK(it->value().as<int>() == 6);
+    }
+
+    SECTION("find")
+    {
+        auto it1 = o.find("a");
+        REQUIRE(bool(it1 != o.end()));
+        CHECK(it1->value().as<int>() == 2);
+
+        auto it2 = o.find("b");
+        REQUIRE(bool(it2 != o.end()));
+        CHECK(it2->value().as<int>() == 1);
+
+        auto it3 = o.find("c");
+        REQUIRE(bool(it3 != o.end()));
+        CHECK(it3->value().as<int>() == 3);
+
+        auto it4 = o.find("d");
+        REQUIRE(bool(it4 != o.end()));
+        CHECK(it4->value().as<int>() == 6);
+    }
 }
 
-TEST_CASE("test_ojson_merge")
+TEST_CASE("order preserving insert_or_assign")
 {
-ojson j = ojson::parse(R"(
-{
-    "a" : 1,
-    "b" : 2
-}
-)");
+    json_object<std::string, ojson> o;
 
-ojson j2 = j;
+    o.insert_or_assign("b", 1);
+    o.insert_or_assign("a", 2);
+    o.insert_or_assign("c", 3);
+    o.insert_or_assign("a", 4);
+    o.insert_or_assign("a", 5);
 
-const ojson source = ojson::parse(R"(
-{
-    "a" : 2,
-    "c" : 3
-}
-)");
-const ojson expected = ojson::parse(R"(
-{
-    "a" : 1,
-    "b" : 2,
-    "c" : 3
-}
-)");
+    SECTION("insert_or_assign")
+    {
+        REQUIRE(o.size() == 3);
 
-    j.merge(source);
-    CHECK(j.size() == 3);
-    CHECK(j == expected);
+        auto it = o.find("a");
+        REQUIRE(bool(it != o.end()));
+        CHECK(it->value().as<int>() == 5);
 
-    j2.merge(j2.object_range().begin()+1,source);
-    CHECK(j2.size() == 3);
-    CHECK(expected == j2);
+        auto it2 = o.begin();
+        CHECK(it2->key() == std::string("b"));
+        CHECK(it2->value().as<int>() == 1);
+        CHECK((++it2)->key() == std::string("a"));
+        CHECK(it2->value().as<int>() == 5);
+        CHECK((++it2)->key() == std::string("c"));
+        CHECK(it2->value().as<int>() == 3);
+    }
 
-    //std::cout << j << std::endl;
-}
+    SECTION("insert_or_assign at pos")
+    {
+        auto it = o.find("a");
+        auto it2 = o.insert_or_assign(it,"d",3);
 
-TEST_CASE("test_ojson_merge_move")
-{
-ojson j = ojson::parse(R"(
-{
-    "a" : "1",
-    "d" : [1,2,3]
-}
-)");
-ojson j2 = j;
+        auto it3 = o.begin();
+        CHECK(it3->key() == std::string("b"));
+        CHECK(it3->value().as<int>() == 1);
+        CHECK((++it3)->key() == std::string("d"));
+        CHECK(it3->value().as<int>() == 3);
+        CHECK((++it3)->key() == std::string("a"));
+        CHECK(it3->value().as<int>() == 5);
+        CHECK((++it3)->key() == std::string("c"));
+        CHECK(it3->value().as<int>() == 3);
 
-ojson source = ojson::parse(R"(
-{
-    "a" : "2",
-    "c" : [4,5,6]
-}
-)");
+        //for (auto kv : o)
+        //{
+        //    std::cout << kv.key() << ": " << kv.value() << "\n";
+        //}
+    }
 
-ojson source2 = source;
+    SECTION("try_emplace")
+    {
+        REQUIRE(o.size() == 3);
 
-ojson expected = ojson::parse(R"(
-{
-    "d" : [1,2,3],
-    "a" : "1",
-    "c" : [4,5,6]
-}
-)");
+        auto it = o.find("a");
+        o.try_emplace("d",7);
+        o.try_emplace("d",8);
 
-    j.merge(std::move(source));
-    CHECK(j.size() == 3);
-    CHECK(j == expected);
+        auto it3 = o.begin();
+        CHECK(it3->key() == std::string("b"));
+        CHECK(it3->value().as<int>() == 1);
+        CHECK((++it3)->key() == std::string("a"));
+        CHECK(it3->value().as<int>() == 5);
+        CHECK((++it3)->key() == std::string("c"));
+        CHECK(it3->value().as<int>() == 3);
+        CHECK((++it3)->key() == std::string("d"));
+        CHECK(it3->value().as<int>() == 7);
+    }
 
-    j2.merge(j2.object_range().begin(),std::move(source2));
-    CHECK(j2.size() == 3);
-    CHECK(expected == j2);
+    SECTION("try_emplace at pos")
+    {
+        auto it = o.find("a");
+        auto it2 = o.try_emplace(it,"d",7);
+        o.try_emplace(it2, "d", 8);
 
-    //std::cout << "(1)\n" << j << std::endl;
-    //std::cout << "(2)\n" << source << std::endl;
-}
+        auto it3 = o.begin();
+        CHECK(it3->key() == std::string("b"));
+        CHECK(it3->value().as<int>() == 1);
+        CHECK((++it3)->key() == std::string("d"));
+        CHECK(it3->value().as<int>() == 7);
+        CHECK((++it3)->key() == std::string("a"));
+        CHECK(it3->value().as<int>() == 5);
+        CHECK((++it3)->key() == std::string("c"));
+        CHECK(it3->value().as<int>() == 3);
+    }
 
-TEST_CASE("test_ojson_merge_or_update")
-{
-ojson j = ojson::parse(R"(
-{
-    "a" : 1,
-    "b" : 2
-}
-)");
+    SECTION("erase")
+    {
+        REQUIRE(o.size() == 3);
 
-ojson j2 = j;
+        o.erase("a");
+        REQUIRE(o.size() == 2);
 
-const ojson source = ojson::parse(R"(
-{
-    "a" : 2,
-    "c" : 3
-}
-)");
-const ojson expected = ojson::parse(R"(
-{
-    "a" : 2,
-    "b" : 2,
-    "c" : 3
-}
-)");
+        auto it2 = o.begin();
+        CHECK(it2->key() == std::string("b"));
+        CHECK(it2->value().as<int>() == 1);
+        CHECK((++it2)->key() == std::string("c"));
+        CHECK(it2->value().as<int>() == 3);
+    }
 
-    j.merge_or_update(source);
-    CHECK(j.size() == 3);
-    CHECK(j == expected);
+    SECTION("erase range")
+    {
+        REQUIRE(o.size() == 3);
 
-    j2.merge_or_update(j2.object_range().begin()+1,source);
-    CHECK(j2.size() == 3);
-    CHECK(expected == j2);
+        o.erase(o.begin(),o.begin()+2);
+        REQUIRE(o.size() == 1);
 
-    //std::cout << j << std::endl;
-}
-
-TEST_CASE("test_ojson_merge_or_update_move")
-{
-ojson j = ojson::parse(R"(
-{
-    "a" : "1",
-    "d" : [1,2,3]
-}
-)");
-ojson j2 = j;
-
-ojson source = ojson::parse(R"(
-{
-    "a" : "2",
-    "c" : [4,5,6]
-}
-)");
-
-ojson source2 = source;
-
-ojson expected = ojson::parse(R"(
-{
-    "d" : [1,2,3],
-    "a" : "2",
-    "c" : [4,5,6]
-}
-)");
-
-    j.merge_or_update(std::move(source));
-    CHECK(j.size() == 3);
-    CHECK(j == expected);
-
-    j2.merge_or_update(j2.object_range().begin(),std::move(source2));
-    CHECK(j2.size() == 3);
-    CHECK(expected == j2);
-
-    //std::cout << "(1)\n" << j << std::endl;
-    //std::cout << "(2)\n" << source << std::endl;
+        auto it2 = o.begin();
+        CHECK(it2->key() == std::string("c"));
+        CHECK(it2->value().as<int>() == 3);
+    }
 }
 

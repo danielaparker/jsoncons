@@ -36,78 +36,6 @@ TEST_CASE("json as<T>")
     }
 }
 
-TEST_CASE("test_last_wins_unique_sequence_1")
-{
-    std::vector<std::string> u = {"a","c","a"};
-    auto it = last_wins_unique_sequence(u.begin(),u.end(),
-                              [](const std::string& a, const std::string& b){return a.compare(b);});
-    std::vector<std::string> expected = { "c","a"};
-    size_t count = std::distance(u.begin(),it);
-
-    REQUIRE(expected.size() == count);
-    for (size_t i = 0; i < count; ++i)
-    {
-        CHECK (expected[i] == u[i]);
-    }
-}
-
-TEST_CASE("test_last_wins_unique_sequence_2")
-{
-    std::vector<std::string> u = {"a","c","a","c"};
-    auto it = last_wins_unique_sequence(u.begin(),u.end(),
-                              [](const std::string& a, const std::string& b){return a.compare(b);});
-    std::vector<std::string> expected = { "a","c"};
-    size_t count = std::distance(u.begin(),it);
-
-    REQUIRE(expected.size() == count);
-    for (size_t i = 0; i < count; ++i)
-    {
-        CHECK (expected[i] == u[i]);
-    }
-}
-TEST_CASE("test_last_wins_unique_sequence_3")
-{
-    std::vector<std::string> u = {"a","c","a","d","e"};
-    auto it = last_wins_unique_sequence(u.begin(),u.end(),
-                              [](const std::string& a, const std::string& b){return a.compare(b);});
-    std::vector<std::string> expected = { "c","a","d","e"};
-    size_t count = std::distance(u.begin(),it);
-
-    REQUIRE(expected.size() == count);
-    for (size_t i = 0; i < count; ++i)
-    {
-        CHECK (expected[i] == u[i]);
-    }
-}
-TEST_CASE("test_last_wins_unique_sequence_4")
-{
-    std::vector<std::string> u = { "a","c","a","d","e","e","f","a" };
-    auto it = last_wins_unique_sequence(u.begin(),u.end(),
-                              [](const std::string& a, const std::string& b){return a.compare(b);});
-    std::vector<std::string> expected = { "c","d","e","f","a" };
-    size_t count = std::distance(u.begin(),it);
-
-    REQUIRE(expected.size() == count);
-    for (size_t i = 0; i < count; ++i)
-    {
-        CHECK (expected[i] == u[i]);
-    }
-}
-TEST_CASE("test_last_wins_unique_sequence_5")
-{
-    std::vector<std::string> u = { "a","b","f","e","c","d"};
-    auto it = last_wins_unique_sequence(u.begin(),u.end(),
-                              [](const std::string& a, const std::string& b){return a.compare(b);});
-    std::vector<std::string> expected = { "a","b","f","e","c","d" };
-    size_t count = std::distance(u.begin(),it);
-
-    REQUIRE(expected.size() == count);
-    for (size_t i = 0; i < count; ++i)
-    {
-        CHECK (expected[i] == u[i]);
-    }
-}
-
 TEST_CASE("parse_duplicate_names")
 {
     json j1 = json::parse(R"({"first":1,"second":2,"third":3})");
@@ -118,7 +46,7 @@ TEST_CASE("parse_duplicate_names")
 
     json j2 = json::parse(R"({"first":1,"second":2,"first":3})");
     CHECK(2 == j2.size());
-    CHECK(3 == j2["first"].as<int>());
+    CHECK(1 == j2["first"].as<int>());
     CHECK(2 == j2["second"].as<int>());
 }
 
@@ -1001,5 +929,176 @@ json expected = json::parse(R"(
     CHECK(expected == j2);
 
     //std::cout << source << std::endl;
+}
+
+TEST_CASE("ojson parse_duplicate_names")
+{
+    ojson oj1 = ojson::parse(R"({"first":1,"second":2,"third":3})");
+    CHECK(3 == oj1.size());
+    CHECK(1 == oj1["first"].as<int>());
+    CHECK(2 == oj1["second"].as<int>());
+    CHECK(3 == oj1["third"].as<int>());
+
+    ojson oj2 = ojson::parse(R"({"first":1,"second":2,"first":3})");
+    CHECK(2 == oj2.size());
+    CHECK(1 == oj2["first"].as<int>());
+    CHECK(2 == oj2["second"].as<int>());
+}
+
+TEST_CASE("test_ojson_merge")
+{
+ojson j = ojson::parse(R"(
+{
+    "a" : 1,
+    "b" : 2
+}
+)");
+
+ojson j2 = j;
+
+const ojson source = ojson::parse(R"(
+{
+    "a" : 2,
+    "c" : 3
+}
+)");
+const ojson expected = ojson::parse(R"(
+{
+    "a" : 1,
+    "b" : 2,
+    "c" : 3
+}
+)");
+
+    j.merge(source);
+    CHECK(j.size() == 3);
+    CHECK(j == expected);
+
+    j2.merge(j2.object_range().begin()+1,source);
+    CHECK(j2.size() == 3);
+    CHECK(expected == j2);
+
+    //std::cout << j << std::endl;
+}
+
+TEST_CASE("test_ojson_merge_move")
+{
+ojson j = ojson::parse(R"(
+{
+    "a" : "1",
+    "d" : [1,2,3]
+}
+)");
+ojson j2 = j;
+
+ojson source = ojson::parse(R"(
+{
+    "a" : "2",
+    "c" : [4,5,6]
+}
+)");
+
+ojson source2 = ojson::parse(R"(
+{
+    "a" : "2",
+    "c" : [4,5,6]
+}
+)");
+
+//ojson source2 = source;
+
+ojson expected = ojson::parse(R"(
+{
+    "d" : [1,2,3],
+    "a" : "1",
+    "c" : [4,5,6]
+}
+)");
+
+    j.merge(std::move(source));
+    CHECK(j.size() == 3);
+    CHECK(j == expected);
+
+    j2.merge(j2.object_range().begin(),std::move(source2));
+    CHECK(j2.size() == 3);
+    CHECK(expected == j2);
+
+    //std::cout << "(1)\n" << j << std::endl;
+    //std::cout << "(2)\n" << source << std::endl;
+}
+
+TEST_CASE("test_ojson_merge_or_update")
+{
+ojson j = ojson::parse(R"(
+{
+    "a" : 1,
+    "b" : 2
+}
+)");
+
+ojson j2 = j;
+
+const ojson source = ojson::parse(R"(
+{
+    "a" : 2,
+    "c" : 3
+}
+)");
+const ojson expected = ojson::parse(R"(
+{
+    "a" : 2,
+    "b" : 2,
+    "c" : 3
+}
+)");
+
+    j.merge_or_update(source);
+    CHECK(j.size() == 3);
+    CHECK(j == expected);
+
+    j2.merge_or_update(j2.object_range().begin()+1,source);
+    CHECK(j2.size() == 3);
+    CHECK(expected == j2);
+
+    //std::cout << j << std::endl;
+}
+
+TEST_CASE("test_ojson_merge_or_update_move")
+{
+ojson j = ojson::parse(R"(
+{
+    "a" : "1",
+    "d" : [1,2,3]
+}
+)");
+ojson j2 = j;
+
+ojson source = ojson::parse(R"(
+{
+    "a" : "2",
+    "c" : [4,5,6]
+}
+)");
+
+ojson source2 = source;
+
+ojson expected = ojson::parse(R"(
+{
+    "d" : [1,2,3],
+    "a" : "2",
+    "c" : [4,5,6]
+}
+)");
+
+    j.merge_or_update(std::move(source));
+    CHECK(j.size() == 3);
+    CHECK(j == expected);
+
+    j2.merge_or_update(j2.object_range().begin(),std::move(source2));
+    CHECK(j2.size() == 3);
+    CHECK(expected == j2);
+
+    //std::cout << "(1)\n" << j << std::endl;
+    //std::cout << "(2)\n" << source << std::endl;
 }
 
