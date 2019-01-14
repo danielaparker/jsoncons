@@ -4,12 +4,15 @@ master
 Deprecated features:
 
 - cbor_view has been deprecated. Rationale: The complexity of supporting and documenting this component 
-  exceeds its benefits.
+  exceeded its benefits.
 
 New features
 
 - New `json_options` option `dec_to_str`. If set to `true`, parse decimal numbers as strings with
   semantic tagging `semantic_tag_type::big_decimal` instead of double. Defaults to `false`.
+
+- The `ojson` (order preserving) implementation now has an index to support binary search 
+  for retrieval. 
 
 v0.116.0
 --------
