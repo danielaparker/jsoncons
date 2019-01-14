@@ -14,6 +14,8 @@ New features
 - The `ojson` (order preserving) implementation now has an index to support binary search 
   for retrieval. 
 
+- Added `std::string_view` detection
+
 v0.116.0
 --------
 
