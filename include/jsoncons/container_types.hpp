@@ -1253,17 +1253,29 @@ public:
         if (pos1 < members_.size() && pos2 <= members_.size())
         {
             erase_index_entries(pos1,pos2);
+
+#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+            iterator it1 = members_.begin() + (first - members_.begin());
+            iterator it2 = members_.begin() + (last - members_.begin());
+            members_.erase(it1,it2);
+#else
             members_.erase(first,last);
+#endif
         }
     }
 
     void erase(const string_view_type& name) 
     {
-        auto it = find(name);
-        if (it != members_.end())
+        auto pos = find(name);
+        if (pos != members_.end())
         {
             erase_index_entry(name);
+#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+            iterator it = members_.begin() + (pos - members_.begin());
             members_.erase(it);
+#else
+            members_.erase(pos);
+#endif
         }
     }
 
