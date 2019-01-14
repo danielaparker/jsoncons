@@ -290,7 +290,7 @@ public:
 #endif
     void erase(const_iterator pos) 
     {
-#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+#if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
         iterator it = elements_.begin() + (pos - elements_.begin());
         elements_.erase(it);
 #else
@@ -300,7 +300,7 @@ public:
 
     void erase(const_iterator first, const_iterator last) 
     {
-#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+#if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
         iterator it1 = elements_.begin() + (first - elements_.begin());
         iterator it2 = elements_.begin() + (last - elements_.begin());
         elements_.erase(it1,it2);
@@ -333,8 +333,7 @@ public:
     typename std::enable_if<is_stateless<A>::value,iterator>::type 
     insert(const_iterator pos, T&& value)
     {
-#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
-    // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
+#if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
         iterator it = elements_.begin() + (pos - elements_.begin());
         return elements_.emplace(it, std::forward<T>(value));
 #else
@@ -345,8 +344,7 @@ public:
     typename std::enable_if<!is_stateless<A>::value,iterator>::type 
     insert(const_iterator pos, T&& value)
     {
-#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
-    // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
+#if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
         iterator it = elements_.begin() + (pos - elements_.begin());
         return elements_.emplace(it, std::forward<T>(value), get_allocator());
 #else
@@ -357,8 +355,7 @@ public:
     template <class InputIt>
     iterator insert(const_iterator pos, InputIt first, InputIt last)
     {
-#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
-    // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
+#if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
         iterator it = elements_.begin() + (pos - elements_.begin());
         elements_.insert(it, first, last);
         return first == last ? it : it + 1;
@@ -371,8 +368,7 @@ public:
     typename std::enable_if<is_stateless<A>::value,iterator>::type 
     emplace(const_iterator pos, Args&&... args)
     {
-#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
-        // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
+#if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
         iterator it = elements_.begin() + (pos - elements_.begin());
         return elements_.emplace(it, std::forward<Args>(args)...);
 #else
@@ -592,7 +588,7 @@ public:
 
     void erase(const_iterator pos) 
     {
-#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+#if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
         iterator it = members_.begin() + (pos - members_.begin());
         members_.erase(it);
 #else
@@ -602,7 +598,7 @@ public:
 
     void erase(const_iterator first, const_iterator last) 
     {
-#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+#if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
         iterator it1 = members_.begin() + (first - members_.begin());
         iterator it2 = members_.begin() + (last - members_.begin());
         members_.erase(it1,it2);
@@ -1254,7 +1250,7 @@ public:
         {
             erase_index_entries(pos1,pos2);
 
-#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+#if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
             iterator it1 = members_.begin() + (first - members_.begin());
             iterator it2 = members_.begin() + (last - members_.begin());
             members_.erase(it1,it2);
@@ -1270,7 +1266,7 @@ public:
         if (pos != members_.end())
         {
             erase_index_entry(name);
-#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+#if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
             iterator it = members_.begin() + (pos - members_.begin());
             members_.erase(it);
 #else
@@ -1430,7 +1426,7 @@ public:
             auto pos = find(it->key());
             if (pos == members_.end() )
             {
-                try_emplace(it->key(),it->value());
+                try_emplace(it->key(),std::move(it->value()));
             }
         }
     }
@@ -1452,7 +1448,7 @@ public:
             auto pos = find(it->key());
             if (pos == members_.end() )
             {
-                hint = try_emplace(hint, it->key(), it->value());
+                hint = try_emplace(hint, it->key(), std::move(it->value()));
             }
         }
     }
@@ -1476,11 +1472,11 @@ public:
             auto pos = find(it->key());
             if (pos == members_.end() )
             {
-                insert_or_assign(it->key(),it->value());
+                insert_or_assign(it->key(),std::move(it->value()));
             }
             else
             {
-                pos->value(it->value());
+                pos->value(std::move(it->value()));
             }
         }
     }
