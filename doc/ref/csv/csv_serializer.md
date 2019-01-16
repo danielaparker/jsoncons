@@ -102,7 +102,6 @@ and uses the specified [csv options](csv_options.md).
                       const serializing_context& context=null_serializing_context()); 
 
     bool double_value(double value, 
-                      const floating_point_options& fmt = floating_point_options(), 
                       semantic_tag_type tag = semantic_tag_type::none, 
                       const serializing_context& context=null_serializing_context()); 
 

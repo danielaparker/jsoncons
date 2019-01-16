@@ -12,10 +12,10 @@ using namespace jsoncons;
 static void check_safe_dtoa(double x, const std::vector<std::string>& expected)
 {
     std::string s;
-    bool result = jsoncons::detail::safe_dtoa(x, s);
+    bool result = jsoncons::detail::dtoa(x, '.', s, std::false_type());
     if (!result)
     {
-        std::cout << "safe_dtoa failed " << s << "\n";
+        std::cout << "safe dtoa failed " << s << "\n";
     }
     REQUIRE(result);
 
@@ -26,7 +26,7 @@ static void check_safe_dtoa(double x, const std::vector<std::string>& expected)
     }
     if (!accept)
     {
-        std::cout << "safe_dtoa does not match expected " << x << " " << s << "\n";
+        std::cout << "safe dtoa does not match expected " << x << " " << s << "\n";
     }
 
     CHECK(accept);
@@ -35,7 +35,7 @@ static void check_safe_dtoa(double x, const std::vector<std::string>& expected)
 static void check_dtoa(double x, const std::vector<std::string>& expected)
 {
     std::string s;
-    bool result = jsoncons::detail::dtoa(x, s);
+    bool result = jsoncons::detail::dtoa(x, '.', s);
     if (!result)
     {
         std::cout << "dtoa failed " << s << "\n";

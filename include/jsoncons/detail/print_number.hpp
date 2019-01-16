@@ -76,8 +76,48 @@ size_t print_uinteger(uint64_t value, Result& writer)
 }
 
 // print_double
+
 template <class Result>
-bool safe_dtoa(double val, Result& result)
+void dump_buffer(const char* buffer, size_t length, char decimal_point, Result& writer)
+{
+    const char* sbeg = buffer;
+    const char* send = sbeg + length;
+
+    if (sbeg != send)
+    {
+        bool needs_dot = true;
+        for (const char* q = sbeg; q < send; ++q)
+        {
+            switch (*q)
+            {
+                case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':case '+':
+                    writer.push_back(*q);
+                    break;
+                case 'e':
+                case 'E':
+                    writer.push_back('e');
+                    needs_dot = false;
+                    break;
+                default:
+                    if (*q == decimal_point)
+                    {
+                        needs_dot = false;
+                        writer.push_back('.');
+                    }
+                    break;
+            }
+        }
+        if (needs_dot)
+        {
+            writer.push_back('.');
+            writer.push_back('0');
+            needs_dot = true;
+        }
+    }
+}
+
+template <class Result>
+bool dtoa(double val, char decimal_point, Result& result, std::false_type)
 {
     if (val == 0)
     {
@@ -105,29 +145,12 @@ bool safe_dtoa(double val, Result& result)
             return false;
         }
     }
-    bool needs_dot = true;
-    for (int i = 0; i < length; ++i)
-    {
-        switch (buffer[i])
-        {
-            case '.':
-            case 'e':
-            case 'E':
-                needs_dot = false;
-                break;
-        }
-        result.push_back(buffer[i]);
-    }
-    if (needs_dot)
-    {
-        result.push_back('.');
-        result.push_back('0');
-    }
+    dump_buffer(buffer, length, decimal_point, result);
     return true;
 }
 
 template <class Result>
-bool dtoa(double v, Result& result)
+bool dtoa(double v, char decimal_point, Result& result, std::true_type)
 {
     if (v == 0)
     {
@@ -154,8 +177,14 @@ bool dtoa(double v, Result& result)
     }
     else
     {
-        return safe_dtoa(v, result);
+        return dtoa(v, decimal_point, result, std::false_type());
     }
+}
+
+template <class Result>
+bool dtoa(double v, char decimal_point, Result& result)
+{
+    return dtoa(v, decimal_point, result, std::integral_constant<bool,std::numeric_limits<double>::is_iec559>());
 }
 
 class print_double
@@ -211,6 +240,7 @@ public:
                 {
                     JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
                 }
+                dump_buffer(number_buffer, length, decimal_point_, writer);
             }
             break;
         case chars_format::scientific:
@@ -220,6 +250,7 @@ public:
                 {
                     JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
                 }
+                dump_buffer(number_buffer, length, decimal_point_, writer);
             }
             break;
         case chars_format::general:
@@ -232,10 +263,11 @@ public:
                     {
                         JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
                     }
+                    dump_buffer(number_buffer, length, decimal_point_, writer);
                 }
                 else
                 {
-                    if (!dtoa(val,writer))
+                    if (!dtoa(val, decimal_point_, writer))
                     {
                         JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
                     }
@@ -245,49 +277,6 @@ public:
             default:
                 JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
                 break;
-        }
-
-        const char* sbeg = number_buffer;
-        const char* send = sbeg + length;
-        const char* pexp = send;
-
-        if (sbeg != send)
-        {
-            bool dot = false;
-            for (pexp = sbeg; *pexp != 'e' && *pexp != 'E' && pexp < send; ++pexp)
-            {
-            }
-
-            for (const char* q = sbeg; q < pexp; ++q)
-            {
-                switch (*q)
-                {
-                case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    writer.push_back(*q);
-                    ++count;
-                    break;
-                default:
-                    if (*q == decimal_point_)
-                    {
-                        dot = true;
-                        writer.push_back('.');
-                        ++count;
-                    }
-                    break;
-                }
-            }
-            if (!dot)
-            {
-                writer.push_back('.');
-                writer.push_back('0');
-                count += 2;
-                dot = true;
-            }
-            for (const char* q = pexp; q < send; ++q)
-            {
-                writer.push_back(*q);
-                ++count;
-            }
         }
         return count;
     }

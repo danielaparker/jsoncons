@@ -134,10 +134,9 @@ Returns `true` if the producer should continue streaming events, `false` otherwi
 Throws a [serialization_error](serialization_error.md) to indicate an error. 
 
     bool double_value(double value, 
-                      const floating_point_options& fmt = floating_point_options(), 
                       semantic_tag_type tag = semantic_tag_type::none, 
                       const serializing_context& context=null_serializing_context()); 
-Writes a floating point value with default precision (`std::numeric_limits<double>::digits10`.) Contextual information including
+Writes a floating point value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 Throws a [serialization_error](serialization_error.md) to indicate an error. 
@@ -243,7 +242,6 @@ Returns `true` if the producer should continue streaming events, `false` otherwi
 Sets `ec` to indicate an error.
 
     virtual bool do_double_value(double value, 
-                                 const floating_point_options& fmt, 
                                  semantic_tag_type tag, 
                                  const serializing_context& context) = 0;
 Handles a floating point value. Contextual information including
