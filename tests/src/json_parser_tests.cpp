@@ -50,7 +50,6 @@ TEST_CASE("test_object_with_three_members")
 TEST_CASE("test_double")
 {
     json val = json::parse("42.229999999999997");
-    CHECK(17 == val.precision());
 }
 
 TEST_CASE("test_array_of_integer")

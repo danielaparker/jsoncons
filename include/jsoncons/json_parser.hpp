@@ -71,15 +71,15 @@ public:
         {
             if (is_str_to_nan_ && s == nan_to_str_)
             {
-                return this->destination_handler().double_value(std::nan(""), floating_point_options(), tag, context);
+                return this->destination_handler().double_value(std::nan(""), tag, context);
             }
             else if (is_str_to_inf_ && s == inf_to_str_)
             {
-                return this->destination_handler().double_value(std::numeric_limits<double>::infinity(), floating_point_options(), tag, context);
+                return this->destination_handler().double_value(std::numeric_limits<double>::infinity(), tag, context);
             }
             else if (is_str_to_neginf_ && s == neginf_to_str_)
             {
-                return this->destination_handler().double_value(-std::numeric_limits<double>::infinity(), floating_point_options(), tag, context);
+                return this->destination_handler().double_value(-std::numeric_limits<double>::infinity(), tag, context);
             }
             else
             {
@@ -2713,12 +2713,10 @@ private:
                 double d = to_double_(string_buffer_.c_str(), string_buffer_.length());
                 if (precision_ > std::numeric_limits<double>::max_digits10)
                 {
-                    continue_ = handler.double_value(d, floating_point_options(format,std::numeric_limits<double>::max_digits10, decimal_places_), 
-                                                      semantic_tag_type::none, *this);            }
+                    continue_ = handler.double_value(d, semantic_tag_type::none, *this);            }
                 else
                 {
-                    continue_ = handler.double_value(d, floating_point_options(format,static_cast<uint8_t>(precision_), decimal_places_), 
-                                                      semantic_tag_type::none, *this);
+                    continue_ = handler.double_value(d, semantic_tag_type::none, *this);
                 }
             }
         }

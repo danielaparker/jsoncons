@@ -419,11 +419,11 @@ private:
                         }
                         if (has_cbor_tag && cbor_tag == 1)
                         {
-                            handler_.double_value(val, floating_point_options(), semantic_tag_type::timestamp, *this);
+                            handler_.double_value(val, semantic_tag_type::timestamp, *this);
                         }
                         else
                         {
-                            handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this);
+                            handler_.double_value(val, semantic_tag_type::none, *this);
                         }
                         break;
                 }

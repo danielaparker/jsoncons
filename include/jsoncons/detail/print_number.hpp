@@ -193,10 +193,6 @@ public:
         {
             decimal_places = override_.decimal_places();
         }
-        /* else if (fmt.decimal_places() != 0)
-        {
-            decimal_places = fmt.decimal_places();
-        } */
         else
         {
             format = chars_format::general;

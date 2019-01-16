@@ -748,7 +748,6 @@ private:
     }
 
     bool do_double_value(double value, 
-                         const floating_point_options& fmt, 
                          semantic_tag_type,
                          const serializing_context& context) override
     {
@@ -1353,7 +1352,6 @@ private:
     }
 
     bool do_double_value(double value, 
-                         const floating_point_options& fmt, 
                          semantic_tag_type,
                          const serializing_context& context) override
     {

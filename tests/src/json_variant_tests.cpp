@@ -116,7 +116,7 @@ TEST_CASE("test_copy_constructor")
     CHECK(var4.uint64_data_cast()->value() == val3);
 
     double val5 = 123456789.9;
-    json::variant var5(val5,floating_point_options(), semantic_tag_type::none);
+    json::variant var5(val5, floating_point_options(), semantic_tag_type::none);
     json::variant var6(var5);
     CHECK(structure_tag_type::double_tag == var5.structure_tag());
     CHECK(structure_tag_type::double_tag == var6.structure_tag());

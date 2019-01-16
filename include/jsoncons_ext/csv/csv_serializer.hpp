@@ -342,7 +342,6 @@ private:
     }
 
     bool do_double_value(double val, 
-                         const floating_point_options& fmt, 
                          semantic_tag_type, 
                          const serializing_context&) override
     {
@@ -355,14 +354,14 @@ private:
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_result<std::basic_string<CharT>> bo(s);
-                    value(val, fmt, bo);
+                    value(val, bo);
                     bo.flush();
                     it->second = s;
                 }
             }
             else
             {
-                value(val, fmt, result_);
+                value(val, result_);
             }
         }
         return true;
@@ -453,7 +452,7 @@ private:
     }
 
     template <class AnyWriter>
-    void value(double val, const floating_point_options& fmt, AnyWriter& result)
+    void value(double val, AnyWriter& result)
     {
         begin_value(result);
 

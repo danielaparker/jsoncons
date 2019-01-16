@@ -54,7 +54,6 @@ class basic_staj_event
         const uint8_t* byte_string_data_;
     } value_;
     size_t length_;
-    floating_point_options fmt_;
 public:
     basic_staj_event(staj_event_type event_type, semantic_tag_type semantic_tag = semantic_tag_type::none)
         : event_type_(event_type), semantic_tag_(semantic_tag), length_(0)
@@ -84,8 +83,8 @@ public:
         value_.uint64_value_ = value;
     }
 
-    basic_staj_event(double value, const floating_point_options& fmt, semantic_tag_type semantic_tag)
-        : event_type_(staj_event_type::double_value), semantic_tag_(semantic_tag), length_(0), fmt_(fmt)
+    basic_staj_event(double value, semantic_tag_type semantic_tag)
+        : event_type_(staj_event_type::double_value), semantic_tag_(semantic_tag), length_(0)
     {
         value_.double_value_ = value;
     }
@@ -124,7 +123,7 @@ public:
         case staj_event_type::double_value:
         {
             jsoncons::string_result<T> writer(s);
-            jsoncons::detail::print_double f(fmt_);
+            jsoncons::detail::print_double f{ floating_point_options() };
             f(value_.double_value_, writer);
             break;
         }

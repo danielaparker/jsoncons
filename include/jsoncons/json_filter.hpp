@@ -105,11 +105,10 @@ private:
     }
 
     bool do_double_value(double value, 
-                         const floating_point_options& fmt,
                          semantic_tag_type tag,
                          const serializing_context& context) override
     {
-        return destination_handler_.double_value(value, fmt, tag, context);
+        return destination_handler_.double_value(value, tag, context);
     }
 
     bool do_int64_value(int64_t value,
@@ -285,11 +284,10 @@ private:
     }
 
     bool do_double_value(double value, 
-                         const floating_point_options& fmt,
                          semantic_tag_type tag,
                          const serializing_context& context) override
     {
-        return destination_handler_.double_value(value, fmt, tag, context);
+        return destination_handler_.double_value(value, tag, context);
     }
 
     bool do_int64_value(int64_t value,

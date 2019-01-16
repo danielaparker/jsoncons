@@ -926,7 +926,7 @@ private:
                     iss >> val;
                     if (!iss.fail())
                     {
-                        handler.double_value(val, floating_point_options(), semantic_tag_type::none, *this);
+                        handler.double_value(val, semantic_tag_type::none, *this);
                     }
                     else
                     {
@@ -1283,7 +1283,7 @@ private:
         case numeric_check_state::exp:
             {
                 double d = to_double_(buffer.c_str(), buffer.length());
-                handler.double_value(d, floating_point_options(format, precision, decimal_places), semantic_tag_type::none, *this);
+                handler.double_value(d, semantic_tag_type::none, *this);
                 break;
             }
         default:

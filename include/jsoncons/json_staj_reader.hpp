@@ -118,11 +118,10 @@ private:
     }
 
     bool do_double_value(double value, 
-                         const floating_point_options& fmt, 
                          semantic_tag_type tag, 
                          const serializing_context&) override
     {
-        event_ = basic_staj_event<CharT>(value, fmt, tag);
+        event_ = basic_staj_event<CharT>(value, tag);
         return false;
     }
 

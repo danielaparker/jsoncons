@@ -115,7 +115,7 @@ private:
                 }
                 const uint8_t* endp;
                 double res = jsoncons::detail::from_little_endian<double>(buf,buf+sizeof(buf),&endp);
-                handler_.double_value(res, floating_point_options(), semantic_tag_type::none, *this);
+                handler_.double_value(res, semantic_tag_type::none, *this);
                 break;
             }
             case bson_format::string_cd:

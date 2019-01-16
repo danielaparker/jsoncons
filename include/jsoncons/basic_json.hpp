@@ -4515,7 +4515,6 @@ private:
                 break;
             case structure_tag_type::double_tag:
                 handler.double_value(var_.double_data_cast()->value(), 
-                                     var_.double_data_cast()->options(), 
                                      var_.semantic_tag());
                 break;
             case structure_tag_type::int64_tag:

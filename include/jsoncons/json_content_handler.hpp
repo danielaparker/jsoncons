@@ -204,15 +204,7 @@ public:
                       semantic_tag_type tag = semantic_tag_type::none, 
                       const serializing_context& context=null_serializing_context())
     {
-        return do_double_value(value, floating_point_options(), tag, context);
-    }
-
-    bool double_value(double value, 
-                      const floating_point_options& fmt, 
-                      semantic_tag_type tag = semantic_tag_type::none, 
-                      const serializing_context& context=null_serializing_context())
-    {
-        return do_double_value(value, fmt, tag, context);
+        return do_double_value(value, tag, context);
     }
 
     bool bool_value(bool value, 
@@ -275,14 +267,6 @@ public:
         uint64_value(value,context);
     }
 
-    bool double_value(double value, uint8_t precision, const serializing_context& context = null_serializing_context())
-    {
-        return do_double_value(value, 
-                               floating_point_options(chars_format::general, precision), 
-                               semantic_tag_type::none,
-                               context);
-    }
-
     bool bignum_value(const string_view_type& s, const serializing_context& context=null_serializing_context()) 
     {
         return do_string_value(s, semantic_tag_type::big_integer, context);
@@ -332,7 +316,6 @@ private:
                                       const serializing_context& context) = 0;
 
     virtual bool do_double_value(double value, 
-                                 const floating_point_options& fmt, 
                                  semantic_tag_type tag,
                                  const serializing_context& context) = 0;
 
@@ -414,7 +397,6 @@ private:
     }
 
     bool do_double_value(double, 
-                         const floating_point_options&, 
                          semantic_tag_type,
                          const serializing_context&) override
     {

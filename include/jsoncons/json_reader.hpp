@@ -119,11 +119,10 @@ private:
     }
 
     bool do_double_value(double value, 
-                         const floating_point_options& fmt, 
                          semantic_tag_type tag,
                          const serializing_context& context) override
     {
-        return other_handler_.double_value(value, fmt, tag, context);
+        return other_handler_.double_value(value, tag, context);
     }
 
     bool do_bool_value(bool value, semantic_tag_type tag, const serializing_context& context) override

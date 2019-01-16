@@ -295,7 +295,6 @@ private:
     }
 
     bool do_double_value(double val, 
-                         const floating_point_options&, 
                          semantic_tag_type,
                          const serializing_context&) override
     {

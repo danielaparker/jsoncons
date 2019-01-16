@@ -176,7 +176,7 @@ private:
                 }
                 const uint8_t* endp;
                 float val = jsoncons::detail::from_big_endian<float>(buf,buf+sizeof(buf),&endp);
-                handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this);
+                handler_.double_value(val, semantic_tag_type::none, *this);
                 break;
             }
             case ubjson_format::float64_type: 
@@ -190,7 +190,7 @@ private:
                 }
                 const uint8_t* endp;
                 double val = jsoncons::detail::from_big_endian<double>(buf,buf+sizeof(buf),&endp);
-                handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this);
+                handler_.double_value(val, semantic_tag_type::none, *this);
                 break;
             }
             case ubjson_format::char_type: 

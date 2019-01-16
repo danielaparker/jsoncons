@@ -296,20 +296,19 @@ private:
     }
 
     bool do_double_value(double value, 
-                         const floating_point_options& fmt, 
                          semantic_tag_type tag,   
                          const serializing_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
             case container_type::object_t:
-                stack_.back().value_ = Json(value, fmt, tag);
+                stack_.back().value_ = Json(value, tag);
                 break;
             case container_type::array_t:
-                stack_.emplace_back(std::false_type(), value, fmt, tag);
+                stack_.emplace_back(std::false_type(), value, tag);
                 break;
             case container_type::root_t:
-                result_ = Json(value, fmt, tag);
+                result_ = Json(value, tag);
                 is_valid_ = true;
                 return false;
         }

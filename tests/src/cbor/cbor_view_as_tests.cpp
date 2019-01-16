@@ -31,7 +31,7 @@ TEST_CASE("cbor_view array as<> test")
     writer.date_time_value("2015-05-07 12:41:07-07:00");
     writer.timestamp_value(1431027667);
     writer.int64_value(-1431027667, semantic_tag_type::timestamp);
-    writer.double_value(1431027667.5, jsoncons::floating_point_options(), semantic_tag_type::timestamp);
+    writer.double_value(1431027667.5, semantic_tag_type::timestamp);
     writer.end_array();
     writer.flush();
 
