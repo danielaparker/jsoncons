@@ -62,14 +62,13 @@ void check_encode_base16(const std::vector<uint8_t>& input, const std::string& e
         CHECK(result[i] == expected[i]);
     }
 
-    //std::vector<uint8_t> output = decode_base16(result);
-    //REQUIRE(output.size() == input.size());
-    //for (size_t i = 0; i < output.size(); ++i)
-    //{
-    //    CHECK(output[i] == input[i]);
-    //}
+    std::vector<uint8_t> output = decode_base16(result);
+    REQUIRE(output.size() == input.size());
+    for (size_t i = 0; i < output.size(); ++i)
+    {
+        CHECK(output[i] == input[i]);
+    }
 }
-
 TEST_CASE("test_base64_conversion")
 {
     check_encode_base64({}, "");
@@ -80,7 +79,7 @@ TEST_CASE("test_base64_conversion")
     check_encode_base64({'f','o','o','b','a'}, "Zm9vYmE=");
     check_encode_base64({'f','o','o','b','a','r'}, "Zm9vYmFy");
 }
-
+ 
 TEST_CASE("test_base64url_conversion")
 {
     check_encode_base64url({}, "");
@@ -91,7 +90,7 @@ TEST_CASE("test_base64url_conversion")
     check_encode_base64url({'f','o','o','b','a'}, "Zm9vYmE");
     check_encode_base64url({'f','o','o','b','a','r'}, "Zm9vYmFy");
 }
-
+ 
 TEST_CASE("test_base16_conversion")
 {
     check_encode_base16({}, "");
@@ -102,5 +101,4 @@ TEST_CASE("test_base16_conversion")
     check_encode_base16({'f','o','o','b','a'}, "666F6F6261");
     check_encode_base16({'f','o','o','b','a','r'}, "666F6F626172");
 }
-
 
