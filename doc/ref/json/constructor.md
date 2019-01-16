@@ -29,22 +29,20 @@ json(const T& val); // (12)
 template <class T>
 json(const T& val, const allocator_type& allocator); // (13)
 
-json(double val, uint8_t precision); // (14)
+json(const char* val); // (14)
 
-json(const char* val); // (15)
-
-json(const char* val, const allocator_type& allocator); // (16)
+json(const char* val, const allocator_type& allocator); // (15)
 
 json(const byte_string_view& bs,
-     semantic_tag_type tag = semantic_tag_type::none); // (17)
+     semantic_tag_type tag = semantic_tag_type::none); // (16)
 
 json(const byte_string_view& bs, 
      semantic_tag_type tag = semantic_tag_type::none, 
-     const allocator_type& allocator); // (18)
+     const allocator_type& allocator); // (17)
 
-json(const bignum& n); // (19)
+json(const bignum& n); // (18)
 
-json(const bignum& n, const allocator_type& allocator); // (20)
+json(const bignum& n, const allocator_type& allocator); // (19)
 ```
 
 (1) Constructs a `json` value that holds an empty json object. 
@@ -73,19 +71,17 @@ json(const bignum& n, const allocator_type& allocator); // (20)
 
 (13) Constructs a `json` value for types supported in [json_type_traits](json_type_traits.md) with allocator.
 
-(14) Constructs a `json` value for double value with specified precision.
+(14) Constructs a `json` value for a text string.
 
-(15) Constructs a `json` value for a text string.
+(15) Constructs a `json` value for a text string with supplied allocator.
 
-(16) Constructs a `json` value for a text string with supplied allocator.
+(16) Constructs a `json` value for a [byte_string](../byte_string.md).
 
-(17) Constructs a `json` value for a [byte_string](../byte_string.md).
+(17) Constructs a `json` value for a [byte_string](../byte_string.md) with supplied allocator.
 
-(18) Constructs a `json` value for a [byte_string](../byte_string.md) with supplied allocator.
+(18) Constructs a `json` value for a [bignum](../bignum.md).
 
-(19) Constructs a `json` value for a [bignum](../bignum.md).
-
-(20) Constructs a `json` value for a [bignum](../bignum.md) with supplied allocator.
+(19) Constructs a `json` value for a [bignum](../bignum.md) with supplied allocator.
 
 ### Examples
 

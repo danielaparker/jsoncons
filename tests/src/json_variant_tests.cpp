@@ -27,7 +27,7 @@ TEST_CASE("test_variant")
     CHECK(structure_tag_type::null_tag == var7.structure_tag());
     json::variant var8{ json::object(json::allocator_type()), semantic_tag_type::none };
     CHECK(structure_tag_type::object_tag == var8.structure_tag());
-    json::variant var9(123456789.9, floating_point_options(), semantic_tag_type::none);
+    json::variant var9(123456789.9, semantic_tag_type::none);
     CHECK(structure_tag_type::double_tag == var9.structure_tag());
 }
 
@@ -48,7 +48,7 @@ TEST_CASE("test_move_constructor")
     CHECK(var4.uint64_data_cast()->value() == val3);
 
     double val5 = 123456789.9;
-    json::variant var5(val5, floating_point_options(), semantic_tag_type::none);
+    json::variant var5(val5, semantic_tag_type::none);
     json::variant var6(std::move(var5));
     //CHECK(structure_tag_type::null_tag == var5.structure_tag());
     CHECK(structure_tag_type::double_tag == var6.structure_tag());
@@ -116,7 +116,7 @@ TEST_CASE("test_copy_constructor")
     CHECK(var4.uint64_data_cast()->value() == val3);
 
     double val5 = 123456789.9;
-    json::variant var5(val5, floating_point_options(), semantic_tag_type::none);
+    json::variant var5(val5, semantic_tag_type::none);
     json::variant var6(var5);
     CHECK(structure_tag_type::double_tag == var5.structure_tag());
     CHECK(structure_tag_type::double_tag == var6.structure_tag());
@@ -179,7 +179,7 @@ TEST_CASE("test_equals")
     json::variant var7(uint64_t(100), semantic_tag_type::none);
     CHECK((var6 == var7 && var7 == var6));
 
-    json::variant var8(100.0, floating_point_options(), semantic_tag_type::none);
+    json::variant var8(100.0, semantic_tag_type::none);
     CHECK((var8 == var8 && var6 == var8 && var8 == var6 && var7 == var8 && var8 == var7));
 
     std::string val9("small string");

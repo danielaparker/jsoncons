@@ -273,36 +273,17 @@ public:
 
         class double_data final : public data_base
         {
-            uint8_t format_;
-            uint8_t precision_;
-            uint8_t decimal_places_;
             double val_;
         public:
-            double_data(double val)
-                : data_base(structure_tag_type::double_tag, semantic_tag_type::none), 
-                  format_(static_cast<uint8_t>(chars_format::general)),
-                  precision_(0), 
-                  decimal_places_(0), 
-                  val_(val)
-            {
-            }
-
             double_data(double val, 
-                        const floating_point_options& fmt,
                         semantic_tag_type tag = semantic_tag_type::none)
                 : data_base(structure_tag_type::double_tag, tag), 
-                  format_(static_cast<uint8_t>(fmt.format())), 
-                  precision_(fmt.precision()), 
-                  decimal_places_(fmt.decimal_places()), 
                   val_(val)
             {
             }
 
             double_data(const double_data& val)
                 : data_base(val.type()),
-                  format_(static_cast<uint8_t>(val.format_)),
-                  precision_(val.precision_), 
-                  decimal_places_(val.decimal_places_), 
                   val_(val.val_)
             {
             }
@@ -310,13 +291,6 @@ public:
             double value() const
             {
                 return val_;
-            }
-
-            floating_point_options options() const
-            {
-                return floating_point_options(static_cast<chars_format>(format_),
-                                              precision_,
-                                              decimal_places_);
             }
         };
 
@@ -703,9 +677,9 @@ public:
             new(reinterpret_cast<void*>(&data_))uint64_data(val, tag);
         }
 
-        variant(double val, const floating_point_options& fmt, semantic_tag_type tag)
+        variant(double val, semantic_tag_type tag)
         {
-            new(reinterpret_cast<void*>(&data_))double_data(val, fmt, tag);
+            new(reinterpret_cast<void*>(&data_))double_data(val, tag);
         }
 
         variant(const char_type* s, size_t length, semantic_tag_type tag)
@@ -2570,22 +2544,21 @@ public:
     {
     }
 
-    basic_json(double val, uint8_t precision)
-        : var_(val, floating_point_options(chars_format::general, precision, 0), semantic_tag_type::none)
+#if !defined(JSONCONS_NO_DEPRECATED)
+    basic_json(double val, uint8_t)
+        : var_(val, semantic_tag_type::none)
     {
     }
+    basic_json(double val, 
+               const floating_point_options&,
+               semantic_tag_type tag = semantic_tag_type::none)
+        : var_(val, tag)
+    {
+    }
+#endif
 
     basic_json(double val, semantic_tag_type tag)
-        : var_(val, 
-               floating_point_options(),
-               tag)
-    {
-    }
-
-    basic_json(double val, 
-               const floating_point_options& fmt,
-               semantic_tag_type tag = semantic_tag_type::none)
-        : var_(val, fmt, tag)
+        : var_(val, tag)
     {
     }
 
@@ -3269,12 +3242,13 @@ public:
         }
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     size_t precision() const
     {
         switch (var_.structure_tag())
         {
         case structure_tag_type::double_tag:
-            return var_.double_data_cast()->options().precision();
+            return 0;
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
         }
@@ -3285,11 +3259,12 @@ public:
         switch (var_.structure_tag())
         {
         case structure_tag_type::double_tag:
-            return var_.double_data_cast()->options().decimal_places();
+            return 0;
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
         }
     }
+#endif
 
     double as_double() const
     {
@@ -3449,7 +3424,7 @@ public:
         switch (var_.structure_tag())
         {
         case structure_tag_type::double_tag:
-            return var_.double_data_cast()->precision();
+            return 0;
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
         }

@@ -214,16 +214,16 @@ void fill_exponent(int K, Result& result)
     }
     if (K >= 100)
     {
-        result.push_back('0' + K / 100); K %= 100;
-        result.push_back('0' + K / 10); K %= 10;
-        result.push_back('0' + K);
+        result.push_back((char)('0' + K / 100)); K %= 100;
+        result.push_back((char)('0' + K / 10)); K %= 10;
+        result.push_back((char)('0' + K));
     } else if (K >= 10)
     {
-        result.push_back('0' + K / 10); K %= 10;
-        result.push_back('0' + K);
+        result.push_back((char)('0' + K / 10)); K %= 10;
+        result.push_back((char)('0' + K));
     } else
     {
-        result.push_back('0' + K);
+        result.push_back((char)('0' + K));
     }
 }
 
@@ -231,7 +231,7 @@ template <class Result>
 void prettify_string(const char *buffer, int length, int k, int min_exp, int max_exp, Result& result)
 {
     int nb_digits = length;
-    int i, offset;
+    int offset;
     /* v = buffer * 10^k
        kk is such that 10^(kk-1) <= v < 10^kk
        this way kk gives the position of the comma.
@@ -273,7 +273,7 @@ void prettify_string(const char *buffer, int length, int k, int min_exp, int max
 
         result.push_back('0');
         result.push_back('.');
-        for (i = 2; i < offset; ++i) 
+        for (int i = 2; i < offset; ++i) 
             result.push_back('0');
         for (int i = 0; i < nb_digits; ++i)
         {
@@ -290,7 +290,7 @@ void prettify_string(const char *buffer, int length, int k, int min_exp, int max
     {
         result.push_back(buffer[0]);
         result.push_back('.');
-        for (i = 1; i < nb_digits; ++i)
+        for (int i = 1; i < nb_digits; ++i)
         {
             result.push_back(buffer[i]);
         }
@@ -341,7 +341,7 @@ bool digit_gen(diy_fp_t Wm, diy_fp_t W, diy_fp_t Wp,
     while (kappa > 0)
     {
         d = p1 / div;
-        if (d || *len) buffer[(*len)++] = '0' + d;
+        if (d || *len) buffer[(*len)++] = (char)('0' + d);
         p1 %= div; kappa--;
         tmp = (((uint64_t)p1) << -one.e) + p2;
         if (tmp < Delta.f)
@@ -356,7 +356,7 @@ bool digit_gen(diy_fp_t Wm, diy_fp_t W, diy_fp_t Wp,
     {
         p2 *= 10; Delta.f *= 10; unit *= 10;
         d = static_cast<int>(p2 >> -one.e);
-        if (d || *len) buffer[(*len)++] = '0' + d;
+        if (d || *len) buffer[(*len)++] = (char)('0' + d);
         p2 &= one.f - 1; kappa--;
         if (p2 < Delta.f)
         {
