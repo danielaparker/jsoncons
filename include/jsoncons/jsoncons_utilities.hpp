@@ -52,7 +52,7 @@ static const char* base64_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                            "abcdefghijklmnopqrstuvwxyz"
                                            "0123456789+/"
                                            "=";
-static const char base64url_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+static const char* base64url_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                               "abcdefghijklmnopqrstuvwxyz"
                                               "0123456789-_"
                                               "\0";
@@ -157,9 +157,11 @@ static bool is_base64url(uint8_t c)
 }
 
 template <class CharT, class F>
-std::vector<uint8_t> decode_base64_generic(const std::basic_string<CharT>& base64_string, const char* alphabet, F f)
+std::vector<uint8_t> decode_base64_generic(const std::basic_string<CharT>& base64_string, 
+                                           const char* alphabet, 
+                                           const char* alphabet_end, 
+                                           F f)
 {
-    const char* alphabet_end = alphabet + 65;
     std::vector<uint8_t> result;
     uint8_t a4[4], a3[3];
     uint8_t i = 0;
@@ -233,13 +235,13 @@ std::vector<uint8_t> decode_base64_generic(const std::basic_string<CharT>& base6
 template <class CharT>
 std::vector<uint8_t> decode_base64(const std::basic_string<CharT>& base64_string)
 {
-    return decode_base64_generic(base64_string, base64_alphabet, is_base64);
+    return decode_base64_generic(base64_string, base64_alphabet, base64_alphabet+65, is_base64);
 }
 
 template <class CharT>
 std::vector<uint8_t> decode_base64url(const std::basic_string<CharT>& base64_string)
 {
-    return decode_base64_generic(base64_string, base64url_alphabet, is_base64url);
+    return decode_base64_generic(base64_string, base64url_alphabet, base64url_alphabet+64, is_base64url);
 }
 
 template <class CharT>
@@ -267,7 +269,7 @@ std::vector<uint8_t> decode_base16(const std::basic_string<CharT>& input)
             throw std::invalid_argument("not a hex digit");
         }
 
-        result.push_back(((p - alphabet) << 4) | (q - alphabet));
+        result.push_back((uint8_t)(((p - alphabet) << 4) | (q - alphabet)));
     }
     return result;
 }
