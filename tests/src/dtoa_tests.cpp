@@ -9,92 +9,10 @@
 
 using namespace jsoncons;
 
-template <class Result>
-bool safe_dtoa(double val, Result& result)
-{
-    if (val == 0)
-    {
-        result.push_back('0');
-        result.push_back('.');
-        result.push_back('0');
-        return true;
-    }
-
-    jsoncons::detail::string_to_double to_double_;
-
-    char buffer[100];
-    int precision = std::numeric_limits<double>::digits10;
-    int length = snprintf(buffer, sizeof(buffer), "%1.*g", precision, val);
-    if (length < 0)
-    {
-        return false;
-    }
-    int precision2 = std::numeric_limits<double>::max_digits10;
-    if (to_double_(buffer,sizeof(buffer)) != val)
-    {
-        length = snprintf(buffer, sizeof(buffer), "%1.*g", precision2, val);
-        if (length < 0)
-        {
-            return false;
-        }
-    }
-    bool needs_dot = true;
-    for (size_t i = 0; i < length; ++i)
-    {
-        switch (buffer[i])
-        {
-            case '.':
-            case 'e':
-            case 'E':
-                needs_dot = false;
-                break;
-        }
-        result.push_back(buffer[i]);
-    }
-    if (needs_dot)
-    {
-        result.push_back('.');
-        result.push_back('0');
-    }
-    return true;
-}
-
-template <class Result>
-bool dtoa(double v, Result& result)
-{
-    if (v == 0)
-    {
-        result.push_back('0');
-        result.push_back('.');
-        result.push_back('0');
-        return true;
-    }
-
-    int length = 0;
-    int k;
-
-    char buffer[100];
-
-    double u = std::signbit(v) ? -v : v;
-    if (jsoncons::detail::grisu3(u, buffer, &length, &k))
-    {
-        if (std::signbit(v))
-        {
-            result.push_back('-');
-        }
-        jsoncons::detail::prettify_string(buffer, length, k, -6, 21, result);
-        return true;
-    }
-    else
-    {
-        return safe_dtoa(v, result);
-    }
-}
-
 static void check_safe_dtoa(double x, const std::vector<std::string>& expected)
 {
     std::string s;
-    bool result = safe_dtoa(x, s);
+    bool result = jsoncons::detail::safe_dtoa(x, s);
     if (!result)
     {
         std::cout << "safe_dtoa failed " << s << "\n";
@@ -117,7 +35,7 @@ static void check_safe_dtoa(double x, const std::vector<std::string>& expected)
 static void check_dtoa(double x, const std::vector<std::string>& expected)
 {
     std::string s;
-    bool result = dtoa(x, s);
+    bool result = jsoncons::detail::dtoa(x, s);
     if (!result)
     {
         std::cout << "dtoa failed " << s << "\n";
