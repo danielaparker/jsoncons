@@ -242,7 +242,7 @@ TEST_CASE("object_array with/without line_length_limit")
         CHECK(os.str() == expected);
     }
 
-    SECTION("new_line with line length limit")
+    SECTION("new_line with line length limit") // Revisit 234
     {
     std::string expected = R"({
     "foo": [
@@ -251,8 +251,7 @@ TEST_CASE("object_array with/without line_length_limit")
     ],
     "qux": [
         1,2,3,null,123,
-        45.3,342334,
-        234
+        45.3,342334,234
     ]
 })";
 

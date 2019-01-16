@@ -14,6 +14,8 @@
 #include <limits> // std::numeric_limits
 #include <exception>
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/json_options.hpp>
+#include <jsoncons/detail/grisu3.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 
 namespace jsoncons { namespace detail {
@@ -74,6 +76,87 @@ size_t print_uinteger(uint64_t value, Result& writer)
 }
 
 // print_double
+template <class Result>
+bool safe_dtoa(double val, Result& result)
+{
+    if (val == 0)
+    {
+        result.push_back('0');
+        result.push_back('.');
+        result.push_back('0');
+        return true;
+    }
+
+    jsoncons::detail::string_to_double to_double_;
+
+    char buffer[100];
+    int precision = std::numeric_limits<double>::digits10;
+    int length = snprintf(buffer, sizeof(buffer), "%1.*g", precision, val);
+    if (length < 0)
+    {
+        return false;
+    }
+    int precision2 = std::numeric_limits<double>::max_digits10;
+    if (to_double_(buffer,sizeof(buffer)) != val)
+    {
+        length = snprintf(buffer, sizeof(buffer), "%1.*g", precision2, val);
+        if (length < 0)
+        {
+            return false;
+        }
+    }
+    bool needs_dot = true;
+    for (size_t i = 0; i < length; ++i)
+    {
+        switch (buffer[i])
+        {
+            case '.':
+            case 'e':
+            case 'E':
+                needs_dot = false;
+                break;
+        }
+        result.push_back(buffer[i]);
+    }
+    if (needs_dot)
+    {
+        result.push_back('.');
+        result.push_back('0');
+    }
+    return true;
+}
+
+template <class Result>
+bool dtoa(double v, Result& result)
+{
+    if (v == 0)
+    {
+        result.push_back('0');
+        result.push_back('.');
+        result.push_back('0');
+        return true;
+    }
+
+    int length = 0;
+    int k;
+
+    char buffer[100];
+
+    double u = std::signbit(v) ? -v : v;
+    if (jsoncons::detail::grisu3(u, buffer, &length, &k))
+    {
+        if (std::signbit(v))
+        {
+            result.push_back('-');
+        }
+        jsoncons::detail::prettify_string(buffer, length, k, -6, 21, result);
+        return true;
+    }
+    else
+    {
+        return safe_dtoa(v, result);
+    }
+}
 
 class print_double
 {
@@ -103,17 +186,17 @@ public:
     {
         size_t count = 0;
 
-        chars_format format = override_.format() != chars_format() ? override_.format() : fmt.format();
+        chars_format format = override_.format() != chars_format() ? override_.format() : chars_format::general;
 
         int decimal_places;
         if (override_.decimal_places() != 0)
         {
             decimal_places = override_.decimal_places();
         }
-        else if (fmt.decimal_places() != 0)
+        /* else if (fmt.decimal_places() != 0)
         {
             decimal_places = fmt.decimal_places();
-        }
+        } */
         else
         {
             format = chars_format::general;
@@ -154,31 +237,11 @@ public:
                         JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
                     }
                 }
-                else if (fmt.precision() != 0)
-                {
-                    int precision = fmt.precision();
-                    length = snprintf(number_buffer, sizeof(number_buffer), "%1.*g", precision, val);
-                    if (length < 0)
-                    {
-                        JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
-                    }
-                }
                 else
                 {
-                    int precision = std::numeric_limits<double>::digits10;
-                    length = snprintf(number_buffer, sizeof(number_buffer), "%1.*g", precision, val);
-                    if (length < 0)
+                    if (!dtoa(val,writer))
                     {
                         JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
-                    }
-                    int precision2 = std::numeric_limits<double>::max_digits10;
-                    if (to_double_(number_buffer,sizeof(number_buffer)) != val)
-                    {
-                        length = snprintf(number_buffer, sizeof(number_buffer), "%1.*g", precision2, val);
-                        if (length < 0)
-                        {
-                            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
-                        }
                     }
                 }             
                 break;

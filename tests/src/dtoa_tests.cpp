@@ -1,9 +1,8 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/detail/grisu3.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/detail/print_number.hpp>
 #include <catch/catch.hpp>
 #include <iostream>
 #include <cstdio>
@@ -164,6 +163,20 @@ TEST_CASE("test grisu3")
     check_dtoa(-1, {"-1.0"});
     check_dtoa(10, {"10.0"});
     check_dtoa(-10, {"-10.0"});
-    check_dtoa(-11, {"-11.0"});
+    check_dtoa(-11, {"-11.0"}); 
+
+    check_dtoa(12.272727012634277, {"12.272727012634277"}); 
+
+    check_dtoa(4094.1111111111113, {"4094.1111111111113"}); 
+
+    check_dtoa(0.119942, {"0.119942"}); 
+
+    check_dtoa(-36.973846435546875, {"-36.973846435546875"}); 
+
+    check_dtoa(42.229999999999997, {"42.23"}); 
+    check_dtoa(9.0099999999999998, {"9.01"}); 
+    check_dtoa(13.449999999999999, {"13.45"}); 
+
+    check_dtoa(0.000071, {"7.1e-05","0.000071"}); 
 }
 

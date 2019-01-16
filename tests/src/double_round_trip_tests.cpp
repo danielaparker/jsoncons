@@ -70,7 +70,36 @@ TEST_CASE("test_precision")
 
 TEST_CASE("test_round_trip")
 {
-    std::string input = "42.229999999999997";
+    {
+        std::ostringstream os;
+        double d = 42.229999999999997;
+        json j = d;
+        os << j;
+        CHECK(json::parse(os.str()).as<double>() == d);
+    }
+    {
+        std::ostringstream os;
+        double d = 9.0099999999999998;
+        json j = d;
+        os << j;
+        CHECK(json::parse(os.str()).as<double>() == d);
+    }
+    {
+        std::ostringstream os;
+        double d = 13.449999999999999;
+        json j = d;
+        os << j;
+        CHECK(json::parse(os.str()).as<double>() == d);
+    }
+    {
+        std::ostringstream os;
+        double d = 0.000071;
+        json j = d;
+        os << j;
+        CHECK(json::parse(os.str()).as<double>() == d);
+    }
+
+    /*std::string input = "42.229999999999997";
     CHECK(input == json::parse(input).as<std::string>());
 
     input = "9.0099999999999998";
@@ -80,6 +109,6 @@ TEST_CASE("test_round_trip")
     CHECK(input == json::parse(input).as<std::string>());
 
     input = "0.000071";
-    CHECK(input == json::parse(input).as<std::string>());
+    CHECK(input == json::parse(input).as<std::string>());*/
 }
 
