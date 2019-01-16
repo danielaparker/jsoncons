@@ -1,4 +1,12 @@
 /*
+Implements the Grisu3 algorithm for printing floating-point numbers. 
+ 
+Follows Florian Loitsch's grisu3_59_56 implementation, available at
+http://florian.loitsch.com/publications, in bench.tar.gz, with 
+minor modifications. 
+*/
+
+/*
   Copyright (c) 2009 Florian Loitsch
 
   Permission is hereby granted, free of charge, to any person

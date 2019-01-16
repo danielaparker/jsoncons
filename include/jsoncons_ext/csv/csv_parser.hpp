@@ -1033,7 +1033,7 @@ private:
     {
         numeric_check_state state = numeric_check_state::initial;
         bool is_negative = false;
-        uint8_t precision = 0;
+        int precision = 0;
         uint8_t decimal_places = 0;
         chars_format format = chars_format::general;
 

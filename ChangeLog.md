@@ -21,7 +21,7 @@ Changes to floating-point printing
 - If the platform supports the IEEE 754 standard, jsoncons now uses the Grisu3 algorithm for printing floating-point numbers, 
   falling back to a safe method using C library functions for the estimated 0.5% of floating-point numbers that might be rejected by Grisu3.
   The Grisu3 implementation follows Florian Loitsch's [grisu3_59_56](https://www.cs.tufts.edu/~nr/cs257/archive/florian-loitsch/printf.pdf) 
-  reference implementation. If the platform does not support the IEEE 754 standard, the fall back method is used. 
+  implementation. If the platform does not support the IEEE 754 standard, the fall back method is used. 
 
 - In previous versions, jsoncons preserved information about the format, precision, and decimal places
   of the floating-point numbers that it read, and used that information when printing them. With the

@@ -13,7 +13,7 @@
 using namespace jsoncons;
 
 template<class CharT>
-std::basic_string<CharT> float_to_string(double val, uint8_t precision)
+std::basic_string<CharT> float_to_string(double val, int precision)
 {
     jsoncons::detail::print_double print(floating_point_options(chars_format::general,precision,0));
 

@@ -51,7 +51,7 @@ The default is [bignum_chars_format::base10](bignum_chars_format.md).
 Overrides [byte string format](byte_string_chars_format.md) when serializing json.
 The default is [byte_string_chars_format::base64url](byte_string_chars_format.md). 
 
-    virtual uint8_t precision() const = 0 
+    virtual int precision() const = 0 
 Overrides floating point precision when serializing json. 
 The default, for a floating point value that was previously decoded from json text, is to preserve the original precision. 
 The fefault, for a floating point value that was directly inserted into a json value, to serialize with shortest representation. 

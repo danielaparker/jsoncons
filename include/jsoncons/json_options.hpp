@@ -27,7 +27,7 @@ enum class chars_format : uint8_t {fixed=1,scientific=2,hex=4,general=fixed|scie
 class floating_point_options
 {
     chars_format format_;
-    uint8_t precision_;
+    int precision_;
     uint8_t decimal_places_;
 public:
     floating_point_options()
@@ -35,7 +35,7 @@ public:
     {
     }
 
-    floating_point_options(chars_format format, uint8_t precision, uint8_t decimal_places = 0)
+    floating_point_options(chars_format format, int precision, uint8_t decimal_places = 0)
         : format_(format), precision_(precision), decimal_places_(decimal_places)
     {
     }
@@ -50,7 +50,7 @@ public:
     floating_point_options& operator=(const floating_point_options& e) = default;
     floating_point_options& operator=(floating_point_options&& e) = default;
 
-    uint8_t precision() const
+    int precision() const
     {
         return precision_;
     }
@@ -133,7 +133,7 @@ public:
 
     virtual chars_format floating_point_format() const = 0; 
 
-    virtual uint8_t precision() const = 0; 
+    virtual int precision() const = 0; 
 
     virtual bool escape_all_non_ascii() const = 0; 
 
@@ -184,7 +184,7 @@ public:
 private:
     size_t indent_size_;
     chars_format floating_point_format_;
-    uint8_t precision_;
+    int precision_;
 #if !defined(JSONCONS_NO_DEPRECATED)
     bool can_read_nan_replacement_;
     bool can_read_pos_inf_replacement_;
@@ -607,12 +607,12 @@ public:
         return *this;
     }
 
-    uint8_t precision() const override
+    int precision() const override
     {
         return precision_;
     }
 
-    basic_json_options<CharT>& precision(uint8_t value)
+    basic_json_options<CharT>& precision(int value)
     {
         precision_ = value;
         return *this;

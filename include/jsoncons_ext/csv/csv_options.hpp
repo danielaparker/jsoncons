@@ -68,7 +68,7 @@ class basic_csv_options
     typedef std::basic_string<CharT> string_type;
 
     chars_format floating_point_format_;
-    uint8_t precision_;
+    int precision_;
     bool assume_header_;
     bool ignore_empty_values_;
     bool ignore_empty_lines_;
@@ -138,12 +138,12 @@ public:
         return *this;
     }
 
-    uint8_t precision() const
+    int precision() const
     {
         return precision_;
     }
 
-    basic_csv_options<CharT>& precision(uint8_t value)
+    basic_csv_options<CharT>& precision(int value)
     {
         precision_ = value;
         return *this;
