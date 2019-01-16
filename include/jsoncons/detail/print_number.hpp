@@ -106,7 +106,7 @@ bool safe_dtoa(double val, Result& result)
         }
     }
     bool needs_dot = true;
-    for (size_t i = 0; i < length; ++i)
+    for (int i = 0; i < length; ++i)
     {
         switch (buffer[i])
         {
@@ -182,7 +182,7 @@ public:
     }
 
     template <class Result>
-    size_t operator()(double val, const floating_point_options& fmt, Result& writer)
+    size_t operator()(double val, Result& writer)
     {
         size_t count = 0;
 

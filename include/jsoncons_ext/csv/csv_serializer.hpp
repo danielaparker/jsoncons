@@ -471,7 +471,7 @@ private:
         }
         else
         {
-            fp_(val, fmt ,result);
+            fp_(val, result);
         }
 
         end_value();

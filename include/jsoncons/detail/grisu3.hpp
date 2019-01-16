@@ -70,7 +70,7 @@ diy_fp_t multiply(diy_fp_t x, diy_fp_t y)
 // k_comp
 
 inline 
-int k_comp(int e, int alpha, int gamma)
+int k_comp(int e, int alpha, int /*gamma*/)
 {
     constexpr double d_1_log2_10 = 0.30102999566398114; //  1 / lg(10)
     return static_cast<int>(std::ceil((alpha - e + 63) * d_1_log2_10));
@@ -205,7 +205,7 @@ double random_double()
 
 // fast_exponent
 template <class Result>
-void fill_exponent(int K, const char *buffer, Result& result)
+void fill_exponent(int K, Result& result)
 {
     if (K < 0)
     {
@@ -243,11 +243,11 @@ void prettify_string(const char *buffer, int length, int k, int min_exp, int max
         /* the first digits are already in. Add some 0s and call it a day. */
         /* the max_exp is a personal choice. Only 16 digits could possibly be relevant.
          * Basically we want to print 12340000000 rather than 1234.0e7 or 1.234e10 */
-        for (size_t i = 0; i < nb_digits; ++i)
+        for (int i = 0; i < nb_digits; ++i)
         {
             result.push_back(buffer[i]);
         }
-        for (size_t i = nb_digits; i < kk; ++i)
+        for (int i = nb_digits; i < kk; ++i)
         {
             result.push_back('0');
         }
@@ -257,12 +257,12 @@ void prettify_string(const char *buffer, int length, int k, int min_exp, int max
     else if (0 < kk && kk <= max_exp)
     {
         /* comma number. Just insert a '.' at the correct location. */
-        for (size_t i = 0; i < kk; ++i)
+        for (int i = 0; i < kk; ++i)
         {
             result.push_back(buffer[i]);
         }
         result.push_back('.');
-        for (size_t i = kk; i < nb_digits; ++i)
+        for (int i = kk; i < nb_digits; ++i)
         {
             result.push_back(buffer[i]);
         }
@@ -275,7 +275,7 @@ void prettify_string(const char *buffer, int length, int k, int min_exp, int max
         result.push_back('.');
         for (i = 2; i < offset; ++i) 
             result.push_back('0');
-        for (size_t i = 0; i < nb_digits; ++i)
+        for (int i = 0; i < nb_digits; ++i)
         {
             result.push_back(buffer[i]);
         }
@@ -284,7 +284,7 @@ void prettify_string(const char *buffer, int length, int k, int min_exp, int max
     {
         result.push_back(buffer[0]);
         result.push_back('e');
-        fill_exponent(kk - 1, &buffer[2], result);
+        fill_exponent(kk - 1, result);
     } 
     else
     {
@@ -295,7 +295,7 @@ void prettify_string(const char *buffer, int length, int k, int min_exp, int max
             result.push_back(buffer[i]);
         }
         result.push_back('e');
-        fill_exponent(kk - 1, &buffer[nb_digits + 2], result);
+        fill_exponent(kk - 1, result);
     }
 }
 

@@ -125,7 +125,7 @@ public:
         {
             jsoncons::string_result<T> writer(s);
             jsoncons::detail::print_double f(fmt_);
-            f(value_.double_value_, fmt_, writer);
+            f(value_.double_value_, writer);
             break;
         }
         case staj_event_type::bool_value:

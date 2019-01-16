@@ -817,7 +817,7 @@ private:
         }
         else
         {
-            size_t length = fp_(value, fmt, result_);
+            size_t length = fp_(value, result_);
             column_ += length;
         }
 
@@ -1409,7 +1409,7 @@ private:
         }
         else
         {
-            fp_(value, fmt, result_);
+            fp_(value, result_);
         }
 
         if (!stack_.empty())
