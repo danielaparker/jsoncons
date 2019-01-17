@@ -172,7 +172,8 @@ bool dtoa(double v, char decimal_point, Result& result, std::true_type)
         {
             result.push_back('-');
         }
-        jsoncons::detail::prettify_string(buffer, length, k, -6, 21, result);
+        // min exp -4 is consistent with sprintf
+        jsoncons::detail::prettify_string(buffer, length, k, -4, 21, result);
         return true;
     }
     else

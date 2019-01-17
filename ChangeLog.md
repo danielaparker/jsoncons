@@ -16,6 +16,10 @@ New features
 
 - Added `std::string_view` detection
 
+Name change
+
+- The json option function name `dec_to_str()` has been deprecated and renamed to `float_to_big_decimal`
+
 Changes to floating-point printing
 
 - If the platform supports the IEEE 754 standard, jsoncons now uses the Grisu3 algorithm for printing floating-point numbers, 

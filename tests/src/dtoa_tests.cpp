@@ -58,16 +58,16 @@ static void check_dtoa(double x, const std::vector<std::string>& expected)
 
 TEST_CASE("test grisu3")
 {
-    check_dtoa(1.0e100, {"1e+100","1e100"});
+    check_dtoa(1.0e100, {"1e+100"});
     check_dtoa(1.0e-100, {"1e-100"});
     check_dtoa(0.123456789e-100, {"1.23456789e-101"});
-    check_dtoa(0.123456789e100, {"1.23456789e+99","1.23456789e99"});
+    check_dtoa(0.123456789e100, {"1.23456789e+99"});
 
-    check_dtoa(1234563, {"1.234563e+6,1.234563e6","1234563.0"});
+    check_dtoa(1234563, {"1234563.0"});
 
     check_dtoa(0.0000001234563, {"1.234563e-07","1.234563e-7"});
 
-    check_dtoa(-1.0e+100, {"-1e+100","-1e100"});
+    check_dtoa(-1.0e+100, {"-1e+100"});
 
     check_dtoa(-1.0e-100, {"-1e-100"});
 
@@ -95,6 +95,6 @@ TEST_CASE("test grisu3")
     check_dtoa(9.0099999999999998, {"9.01"}); 
     check_dtoa(13.449999999999999, {"13.45"}); 
 
-    check_dtoa(0.000071, {"7.1e-05","0.000071"}); 
+    check_dtoa(0.000071, {"7.1e-05","7.1e-5"}); 
 }
 

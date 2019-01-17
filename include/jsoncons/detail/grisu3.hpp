@@ -220,16 +220,22 @@ void fill_exponent(int K, Result& result)
         result.push_back('-');
         K = -K;
     }
+    else
+    {
+        result.push_back('+'); // consistent with sprintf
+    }
     if (K >= 100)
     {
         result.push_back((char)('0' + K / 100)); K %= 100;
         result.push_back((char)('0' + K / 10)); K %= 10;
         result.push_back((char)('0' + K));
-    } else if (K >= 10)
+    } 
+    else if (K >= 10)
     {
         result.push_back((char)('0' + K / 10)); K %= 10;
         result.push_back((char)('0' + K));
-    } else
+    } 
+    else
     {
         result.push_back((char)('0' + K));
     }

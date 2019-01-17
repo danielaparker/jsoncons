@@ -52,11 +52,6 @@ Default is `false`
     json_options & pad_inside_array_brackets(bool value)
 Default is `false`
 
-    json_options& floating_point_format(chars_format value)
-Overrides [floating point format](chars_format.md) when serializing json.
-The default, for a floating point value that was previously decoded from json text, is to preserve the original format when serializing.
-The default, for a floating point value that was directly inserted into a json value, to serialize with [chars_format::general](chars_format.md). 
-
     json_options& bignum_format(bignum_chars_format value)
 Overrides [bignum format](bignum_chars_format.md) when serializing json.
 The default is [bignum_chars_format::base10](bignum_chars_format.md). 
@@ -97,8 +92,8 @@ to be used when reading JSON.
 Sets a string replacement for negative infinity when writing JSON, and indicate whether it is also
 to be used when reading JSON.
 
-    json_options& dec_to_str(bool value); 
-If set to `true`, parse decimal numbers as strings with semantic tagging `semantic_tag_type::big_decimal` instead of double.
+    json_options& float_to_big_decimal(bool value); 
+If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag_type::big_decimal`, instead of double.
 Defaults to `false`.
 
     serializing_options& new_line_chars(const std::string& value)

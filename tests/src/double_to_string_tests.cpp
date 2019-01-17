@@ -29,11 +29,11 @@ TEST_CASE("test_double_to_string")
     double x = 1.0e100;
     std::string s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
     //std::cout << x << ": " << s << std::endl;
-    CHECK((s == std::string("1.0e+100") || s == std::string("1.0e100") || s == std::string("1e+100") || s == std::string("1e100")));
+    CHECK(s == std::string("1e+100"));
 
     x = 1.0e-100;
     s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
-    CHECK((s == std::string("1.0e-100") || s == std::string("1e-100")));
+    CHECK(s == std::string("1e-100"));
 
     x = 0.123456789e-100;
     s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
@@ -45,7 +45,7 @@ TEST_CASE("test_double_to_string")
 
     x = 1234563;
     s = float_to_string<char>(x, 6);
-    CHECK((s == std::string("1.23456e+6") || s == std::string("1.23456e+06") || s == std::string("1.23456e+006") || s == std::string("1234560.0")));
+    CHECK((s == std::string("1.23456e+6") || s == std::string("1.23456e+06") || s == std::string("1.23456e+006")));
 
     x = 0.0000001234563;
     s = float_to_string<char>(x, 6);
@@ -54,11 +54,11 @@ TEST_CASE("test_double_to_string")
     x = -1.0e+100;
     s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
     std::cout << s << "\n";
-    CHECK((s == std::string("-1.0e+100") || s == std::string("-1.0e100") || s == std::string("-1e+100") || s == std::string("-1e100")));
+    CHECK(s == std::string("-1e+100"));
 
     x = -1.0e-100;
     s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
-    CHECK((s == std::string("-1.0e-100") || s == std::string("-1e-100")));
+    CHECK(s == std::string("-1e-100"));
 
     x = 0;
     s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
@@ -120,19 +120,19 @@ TEST_CASE("test_double_to_wstring")
     double x = 1.0e100;
     std::wstring s = float_to_string<wchar_t>(x, std::numeric_limits<double>::digits10);
     //std::wcout << x << L":" << s << std::endl;
-    CHECK((s == std::wstring(L"1.0e+100") || s == std::wstring(L"1.0e100") || s == std::wstring(L"1e100") || s == std::wstring(L"1e+100")));
+    CHECK(s == std::wstring(L"1e+100"));
 
     x = 1.0e-100;
     s = float_to_string<wchar_t>(x, std::numeric_limits<double>::digits10);
-    CHECK((s == std::wstring(L"1.0e-100") || s == std::wstring(L"1e-100")));
+    CHECK(s == std::wstring(L"1e-100"));
 
     x = -1.0e+100;
     s = float_to_string<wchar_t>(x, std::numeric_limits<double>::digits10);
-    CHECK((s == std::wstring(L"-1.0e+100") || s == std::wstring(L"-1.0e100") || s == std::wstring(L"-1e+100") || s == std::wstring(L"-1e100")));
+    CHECK(s == std::wstring(L"-1e+100"));
 
     x = -1.0e-100;
     s = float_to_string<wchar_t>(x, std::numeric_limits<double>::digits10);
-    CHECK((s == std::wstring(L"-1.0e-100") || s == std::wstring(L"-1e-100")));
+    CHECK(s == std::wstring(L"-1e-100"));
 
     x = 0;
     s = float_to_string<wchar_t>(x, std::numeric_limits<double>::digits10);

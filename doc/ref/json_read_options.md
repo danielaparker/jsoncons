@@ -39,7 +39,7 @@ Indicates `Negative Infinity` replacement for string when parsing.
     virtual const std::string& neginf_to_str() const = 0; 
 When parsing JSON text, replace string with minus infinity if `is_neginf_to_str()` returns true.
 
-    virtual bool dec_to_str() const = 0; 
+    virtual bool float_to_big_decimal() const = 0; 
 If set to `true`, parse decimal numbers as strings with semantic tagging `semantic_tag_type::big_decimal` instead of double.
 
     virtual size_t max_nesting_depth() = 0;
