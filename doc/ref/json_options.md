@@ -160,7 +160,7 @@ By default, jsoncons parses a number with an exponent or fractional part
 into a double precision floating point number. If you wish, you can
 keep the number as a string with semantic tagging `big_decimal`, 
 using the `dec_to_str` option. You can then put it into a `float`, 
-`double`, a boost multiprecision number, or whatever other type you need. 
+`double`, a boost multiprecision number, or whatever other type you want. 
 
 ```c++
 int main()
@@ -174,6 +174,9 @@ int main()
 
     // Default
     json j = json::parse(s);
+
+    std::cout.precision(15);
+
     // Access as string
     std::cout << "(1) a: " << j["a"].as<std::string>() << ", b: " << j["b"].as<std::string>() << "\n"; 
     // Access as double
@@ -193,10 +196,10 @@ int main()
 Output:
 ```
 (1) a: 12.0, b: 1.2345678901234567
-(2) a: 12, b: 1.2
+(2) a: 12, b: 1.23456789012346
 
 (3) a: 12.00, b: 1.23456789012345678901234567890
-(4) a: 12, b: 1.2
+(4) a: 12, b: 1.23456789012346
 ```
 
 #### Object-array block formatting
