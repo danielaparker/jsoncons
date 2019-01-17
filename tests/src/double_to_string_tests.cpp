@@ -41,15 +41,15 @@ TEST_CASE("test_double_to_string")
 
     x = 0.123456789e100;
     s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
-    CHECK((s == std::string("1.23456789e+99") || s == std::string("1.23456789e+099")));
+    CHECK(s == std::string("1.23456789e+99"));
 
     x = 1234563;
     s = float_to_string<char>(x, 6);
-    CHECK((s == std::string("1.23456e+6") || s == std::string("1.23456e+06") || s == std::string("1.23456e+006")));
+    CHECK(s == std::string("1.23456e+06"));
 
     x = 0.0000001234563;
     s = float_to_string<char>(x, 6);
-    CHECK((s == std::string("1.23456e-7") || s == std::string("1.23456e-07") || s == std::string("1.23456e-007")));
+    CHECK(s == std::string("1.23456e-07"));
 
     x = -1.0e+100;
     s = float_to_string<char>(x, std::numeric_limits<double>::digits10);

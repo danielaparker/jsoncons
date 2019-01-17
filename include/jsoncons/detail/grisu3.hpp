@@ -222,7 +222,7 @@ void fill_exponent(int K, Result& result)
     }
     else
     {
-        result.push_back('+'); // consistent with sprintf
+        result.push_back('+'); // compatibility with sprintf
     }
     if (K >= 100)
     {
@@ -237,6 +237,7 @@ void fill_exponent(int K, Result& result)
     } 
     else
     {
+        result.push_back('0'); // compatibility with sprintf
         result.push_back((char)('0' + K));
     }
 }
