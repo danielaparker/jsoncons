@@ -4,6 +4,7 @@
 
 [Parse JSON from a string](#A1)  
 [Parse JSON from a file](#A2)  
+[Keep numbers with exponent or fractional parts as strings](#A8)  
 [Validate JSON without incurring parse exceptions](#A3)  
 [How to allow comments? How not to?](#A4)  
 [Set a maximum nesting depth](#A5)  
@@ -69,6 +70,57 @@ json j = R"(
     "MaturityDate" : "2020-12-30"          
 }
 )"_json;
+```
+
+<div id="A8"/> 
+
+#### Keep numbers with exponent or fractional parts as strings
+
+```
+By default, jsoncons parses a number with an exponent or fractional part
+into a double precision floating point number. If you wish, you can
+keep the number as a string with semantic tagging `big_decimal`, 
+using the `dec_to_str` option. You can then put it into a `float`, 
+`double`, a boost multiprecision number, or whatever other type you need. 
+
+```c++
+int main()
+{
+    std::string s = R"(
+    {
+        "a" : 12.00,
+        "b" : 1.23456789012345678901234567890
+    }
+    )";
+
+    // Default
+    json j = json::parse(s);
+
+    std::cout.precision(15);
+
+    // Access as string
+    std::cout << "(1) a: " << j["a"].as<std::string>() << ", b: " << j["b"].as<std::string>() << "\n"; 
+    // Access as double
+    std::cout << "(2) a: " << j["a"].as<double>() << ", b: " << j["b"].as<double>() << "\n\n"; 
+
+    // Using dec_to_str option
+    json_options options;
+    options.dec_to_str(true);
+
+    json j2 = json::parse(s, options);
+    // Access as string
+    std::cout << "(3) a: " << j2["a"].as<std::string>() << ", b: " << j2["b"].as<std::string>() << "\n";
+    // Access as double
+    std::cout << "(4) a: " << j2["a"].as<double>() << ", b: " << j2["b"].as<double>() << "\n\n"; 
+}
+```
+Output:
+```
+(1) a: 12.0, b: 1.2345678901234567
+(2) a: 12, b: 1.23456789012346
+
+(3) a: 12.00, b: 1.23456789012345678901234567890
+(4) a: 12, b: 1.23456789012346
 ```
 
 <div id="A2"/> 
@@ -524,8 +576,7 @@ namespace jsoncons
 
         static bool is(const Json& val) noexcept
         {
-            if (!(val.is_string() && (val.semantic_tag() == semantic_tag_type::big_decimal || 
-                                      val.semantic_tag() == semantic_tag_type::big_integer)))
+            if (!(val.is_string() && val.semantic_tag() == semantic_tag_type::big_decimal))
             {
                 return false;
             }
@@ -555,7 +606,7 @@ int main()
 
     std::string s = "[100000000000000000000000000000000.1234]";
     json_options options;
-    options.float_to_big_decimal(true);
+    options.dec_to_str(true);
     json j = json::parse(s, options);
 
     x = j[0].as<multiprecision_type>();

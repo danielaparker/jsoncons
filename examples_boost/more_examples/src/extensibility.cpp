@@ -54,8 +54,7 @@ namespace jsoncons
 
         static bool is(const Json& val) noexcept
         {
-            if (!(val.is_string() && (val.semantic_tag() == semantic_tag_type::big_decimal || 
-                                      val.semantic_tag() == semantic_tag_type::big_integer)))
+            if (!(val.is_string() && val.semantic_tag() == semantic_tag_type::big_decimal))
             {
                 return false;
             }
@@ -218,7 +217,7 @@ void boost_multiprecison_conversions()
 
     std::string s = "[100000000000000000000000000000000.1234]";
     json_options options;
-    options.float_to_big_decimal(true);
+    options.dec_to_str(true);
     json j = json::parse(s, options);
 
     x = j[0].as<multiprecision_type>();

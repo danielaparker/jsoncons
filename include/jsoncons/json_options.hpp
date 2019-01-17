@@ -102,7 +102,7 @@ public:
 
     virtual std::basic_string<CharT> neginf_to_str() const = 0;
 
-    virtual bool float_to_big_decimal() const = 0;
+    virtual bool dec_to_str() const = 0;
 };
 
 template <class CharT>
@@ -227,7 +227,7 @@ private:
     std::basic_string<CharT> inf_to_str_;
     std::basic_string<CharT> neginf_to_str_;
 
-    bool float_to_big_decimal_;
+    bool dec_to_str_;
 public:
     static const size_t indent_size_default = 4;
     static const size_t line_length_limit_default = 120;
@@ -266,7 +266,7 @@ public:
           is_str_to_nan_(false),
           is_str_to_inf_(false),
           is_str_to_neginf_(false),
-          float_to_big_decimal_(false)
+          dec_to_str_(false)
     {
         new_line_chars_.push_back('\n');
     }
@@ -574,14 +574,14 @@ public:
         return *this;
     }
 
-    bool float_to_big_decimal() const override
+    bool dec_to_str() const override
     {
-        return float_to_big_decimal_;
+        return dec_to_str_;
     }
 
-    basic_json_options<CharT>& float_to_big_decimal(bool value) 
+    basic_json_options<CharT>& dec_to_str(bool value) 
     {
-        float_to_big_decimal_ = value;
+        dec_to_str_ = value;
         return *this;
     }
 
@@ -660,12 +660,6 @@ public:
     basic_json_options<CharT>& indent(size_t value)
     {
         return indent_size(value);
-    }
-
-    basic_json_options<CharT>& dec_to_string(bool value) 
-    {
-        float_to_big_decimal_ = value;
-        return *this;
     }
 
     bool can_read_nan_replacement() const {return can_read_nan_replacement_;}

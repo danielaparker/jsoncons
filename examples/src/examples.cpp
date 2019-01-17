@@ -545,8 +545,6 @@ int main()
 
         jsonpointer_examples();
 
-        serialization_examples();
-
         json_parser_examples();
 
         byte_string_examples();
@@ -563,13 +561,15 @@ int main()
  
         bson_examples();
 
-        type_extensibility_examples();
-
         jsonpath_examples();
 
         readme_examples();
 
         cbor_examples();
+
+        type_extensibility_examples();
+
+        serialization_examples();
     }
     catch (const std::exception& e)
     {

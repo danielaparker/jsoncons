@@ -3,6 +3,7 @@
 
 #include <string>
 #include <jsoncons/json.hpp>
+#include <iomanip>
 
 using namespace jsoncons;
 
@@ -387,6 +388,36 @@ void bignum_serialization_examples2()
     std::cout << "\n\n";
 }
 
+void decimal_precision_examples()
+{
+    std::string s = R"(
+    {
+        "a" : 12.00,
+        "b" : 1.23456789012345678901234567890
+    }
+    )";
+
+    // Default
+    json j = json::parse(s);
+
+    std::cout.precision(15);
+
+    // Access as string
+    std::cout << "(1) a: " << j["a"].as<std::string>() << ", b: " << j["b"].as<std::string>() << "\n"; 
+    // Access as double
+    std::cout << "(2) a: " << j["a"].as<double>() << ", b: " << j["b"].as<double>() << "\n\n"; 
+
+    // Using dec_to_str option
+    json_options options;
+    options.dec_to_str(true);
+
+    json j2 = json::parse(s, options);
+    // Access as string
+    std::cout << "(3) a: " << j2["a"].as<std::string>() << ", b: " << j2["b"].as<std::string>() << "\n";
+    // Access as double
+    std::cout << "(4) a: " << j2["a"].as<double>() << ", b: " << j2["b"].as<double>() << "\n\n"; 
+}
+
 void serialization_examples()
 {
     std::cout << "\nSerialization examples\n\n";
@@ -398,6 +429,7 @@ void serialization_examples()
     nan_inf_replacement();
     bignum_serialization_examples2();
     bignum_serialization_examples1();
+    decimal_precision_examples();
     std::cout << std::endl;
 }
 

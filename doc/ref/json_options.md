@@ -92,8 +92,8 @@ to be used when reading JSON.
 Sets a string replacement for negative infinity when writing JSON, and indicate whether it is also
 to be used when reading JSON.
 
-    json_options& float_to_big_decimal(bool value); 
-If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag_type::big_decimal`, instead of double.
+    json_options& dec_to_str(bool value); 
+If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag_type::big_decimal`.
 Defaults to `false`.
 
     serializing_options& new_line_chars(const std::string& value)
@@ -118,7 +118,7 @@ For an array whose parent is an array, set whether that array is split on a new 
 
 ### Examples
 
-#### Default NaN, inf and -inf replacement
+#### Default NaN and inf replacement
 ```c++
 json obj;
 obj["field1"] = std::sqrt(-1.0);
@@ -152,6 +152,51 @@ Output:
         "field2":1e9999,
         "field3":-1e9999
     }
+```
+
+#### Decimal precision
+
+By default, jsoncons parses a number with an exponent or fractional part
+into a double precision floating point number. If you wish, you can
+keep the number as a string with semantic tagging `big_decimal`, 
+using the `dec_to_str` option. You can then put it into a `float`, 
+`double`, a boost multiprecision number, or whatever other type you need. 
+
+```c++
+int main()
+{
+    std::string s = R"(
+    {
+        "a" : 12.00,
+        "b" : 1.23456789012345678901234567890
+    }
+    )";
+
+    // Default
+    json j = json::parse(s);
+    // Access as string
+    std::cout << "(1) a: " << j["a"].as<std::string>() << ", b: " << j["b"].as<std::string>() << "\n"; 
+    // Access as double
+    std::cout << "(2) a: " << j["a"].as<double>() << ", b: " << j["b"].as<double>() << "\n\n"; 
+
+    // Using dec_to_str option
+    json_options options;
+    options.dec_to_str(true);
+
+    json j2 = json::parse(s, options);
+    // Access as string
+    std::cout << "(3) a: " << j2["a"].as<std::string>() << ", b: " << j2["b"].as<std::string>() << "\n";
+    // Access as double
+    std::cout << "(4) a: " << j2["a"].as<double>() << ", b: " << j2["b"].as<double>() << "\n\n"; 
+}
+```
+Output:
+```
+(1) a: 12.0, b: 1.2345678901234567
+(2) a: 12, b: 1.2
+
+(3) a: 12.00, b: 1.23456789012345678901234567890
+(4) a: 12, b: 1.2
 ```
 
 #### Object-array block formatting
