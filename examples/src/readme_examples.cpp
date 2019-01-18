@@ -69,7 +69,7 @@ namespace readme
         // Print JSON representation with different options
         json_options options;
         options.byte_string_format(byte_string_chars_format::base64)
-               .bignum_format(bignum_chars_format::base64url);
+               .big_integer_format(big_integer_chars_format::base64url);
         std::cout << "(5)\n";
         std::cout << pretty_print(j, options) << "\n\n";
 

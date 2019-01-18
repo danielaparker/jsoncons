@@ -289,7 +289,7 @@ private:
     bool escape_all_non_ascii_;
     bool escape_solidus_;
     byte_string_chars_format byte_string_format_;
-    bignum_chars_format bignum_format_;
+    big_integer_chars_format big_integer_format_;
     line_split_kind object_object_line_splits_;
     line_split_kind object_array_line_splits_;
     line_split_kind array_array_line_splits_;
@@ -336,7 +336,7 @@ public:
          escape_all_non_ascii_(options.escape_all_non_ascii()),
          escape_solidus_(options.escape_solidus()),
          byte_string_format_(options.byte_string_format()),
-         bignum_format_(options.bignum_format()),
+         big_integer_format_(options.big_integer_format()),
          object_object_line_splits_(options.object_object_line_splits()),
          object_array_line_splits_(options.object_array_line_splits()),
          array_array_line_splits_(options.array_array_line_splits()),
@@ -659,7 +659,7 @@ private:
         switch (tag)
         {
             case semantic_tag_type::big_integer:
-                write_bignum_value(sv);
+                write_big_integer_value(sv);
                 break;
             default:
             {
@@ -912,17 +912,20 @@ private:
         }
     }
 
-    void write_bignum_value(const string_view_type& sv)
+    void write_big_integer_value(const string_view_type& sv)
     {
-        switch (bignum_format_)
+        switch (big_integer_format_)
         {
-            case bignum_chars_format::integer:
+#if !defined(JSONCONS_NO_DEPRECATED)
+            case big_integer_chars_format::integer:
+#endif
+            case big_integer_chars_format::number:
             {
                 result_.insert(sv.data(),sv.size());
                 column_ += sv.size();
                 break;
             }
-            case bignum_chars_format::base64:
+            case big_integer_chars_format::base64:
             {
                 bignum n(sv.data(), sv.length());
                 int signum;
@@ -940,7 +943,7 @@ private:
                 column_ += (length+2);
                 break;
             }
-            case bignum_chars_format::base64url:
+            case big_integer_chars_format::base64url:
             {
                 bignum n(sv.data(), sv.length());
                 int signum;
@@ -1068,7 +1071,7 @@ private:
     bool escape_all_non_ascii_;
     bool escape_solidus_;
     byte_string_chars_format byte_string_format_;
-    bignum_chars_format bignum_format_;
+    big_integer_chars_format big_integer_format_;
 
     std::vector<serialization_context> stack_;
     jsoncons::detail::print_double fp_;
@@ -1100,7 +1103,7 @@ public:
          escape_all_non_ascii_(options.escape_all_non_ascii()),
          escape_solidus_(options.escape_solidus()),
          byte_string_format_(options.byte_string_format()),
-         bignum_format_(options.bignum_format()),
+         big_integer_format_(options.big_integer_format()),
          fp_(floating_point_options(options.floating_point_format(), 
                                     options.precision(),
                                     0)),
@@ -1207,16 +1210,16 @@ private:
         return true;
     }
 
-    void write_bignum_value(const string_view_type& sv)
+    void write_big_integer_value(const string_view_type& sv)
     {
-        switch (bignum_format_)
+        switch (big_integer_format_)
         {
-            case bignum_chars_format::integer:
+            case big_integer_chars_format::number:
             {
                 result_.insert(sv.data(),sv.size());
                 break;
             }
-            case bignum_chars_format::base64:
+            case big_integer_chars_format::base64:
             {
                 bignum n(sv.data(), sv.length());
                 int signum;
@@ -1232,7 +1235,7 @@ private:
                 result_.push_back('\"');
                 break;
             }
-            case bignum_chars_format::base64url:
+            case big_integer_chars_format::base64url:
             {
                 bignum n(sv.data(), sv.length());
                 int signum;
@@ -1268,7 +1271,7 @@ private:
         switch (tag)
         {
             case semantic_tag_type::big_integer:
-                write_bignum_value(sv);
+                write_big_integer_value(sv);
                 break;
             default:
             {

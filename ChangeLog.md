@@ -16,6 +16,13 @@ New features
 
 - Added `std::string_view` detection
 
+Name changes (non-breaking)
+
+- The json options name `bignum_chars_format` has been deprecated and replaced with `big_integer_chars_format`.
+- `big_integer_chars_format::integer` (`bignum_chars_format::integer`) has been deprecated and replaced with 
+  `big_integer_chars_format::number`
+- The `json_options function` `bignum_format` has been deprecated and replaced with `big_integer_format`
+
 Changes to floating-point printing
 
 - If the platform supports the IEEE 754 standard, jsoncons now uses the Grisu3 algorithm for printing floating-point numbers, 

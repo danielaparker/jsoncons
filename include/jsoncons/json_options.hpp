@@ -70,11 +70,15 @@ enum class indenting : uint8_t {no_indent = 0, indent = 1};
 
 enum class line_split_kind  : uint8_t {same_line,new_line,multi_line};
 
-enum class bignum_chars_format : uint8_t {integer, base10, base64, base64url
+enum class big_integer_chars_format : uint8_t {number, base10, base64, base64url
 #if !defined(JSONCONS_NO_DEPRECATED)
-,string
+,string,integer
 #endif
 };
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+typedef big_integer_chars_format bignum_chars_format;
+#endif
 
 enum class byte_string_chars_format : uint8_t {none=0,base16,base64,base64url};
 
@@ -117,7 +121,7 @@ public:
 
     virtual byte_string_chars_format byte_string_format() const = 0; 
 
-    virtual bignum_chars_format bignum_format() const = 0; 
+    virtual big_integer_chars_format big_integer_format() const = 0; 
 
     virtual line_split_kind object_object_line_splits() const = 0; 
 
@@ -196,7 +200,7 @@ private:
     bool escape_all_non_ascii_;
     bool escape_solidus_;
     byte_string_chars_format byte_string_format_;
-    bignum_chars_format bignum_format_;
+    big_integer_chars_format big_integer_format_;
     line_split_kind object_object_line_splits_;
     line_split_kind object_array_line_splits_;
     line_split_kind array_array_line_splits_;
@@ -246,7 +250,7 @@ public:
           escape_all_non_ascii_(false),
           escape_solidus_(false),
           byte_string_format_(byte_string_chars_format::none),
-          bignum_format_(bignum_chars_format::base10),
+          big_integer_format_(big_integer_chars_format::base10),
           object_object_line_splits_(line_split_kind::multi_line),
           object_array_line_splits_(line_split_kind::same_line),
           array_array_line_splits_(line_split_kind::new_line),
@@ -275,9 +279,13 @@ public:
     byte_string_chars_format byte_string_format() const override {return byte_string_format_;}
     basic_json_options<CharT>&  byte_string_format(byte_string_chars_format value) {byte_string_format_ = value; return *this;}
 
-    bignum_chars_format bignum_format() const override {return bignum_format_;}
-    basic_json_options<CharT>&  bignum_format(bignum_chars_format value) {bignum_format_ = value; return *this;}
+    big_integer_chars_format big_integer_format() const override {return big_integer_format_;}
+    basic_json_options<CharT>&  big_integer_format(big_integer_chars_format value) {big_integer_format_ = value; return *this;}
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+    bignum_chars_format bignum_format() const {return big_integer_format_;}
+    basic_json_options<CharT>&  bignum_format(bignum_chars_format value) {big_integer_format_ = value; return *this;}
+#endif
     line_split_kind object_object_line_splits() const override {return object_object_line_splits_;}
     basic_json_options<CharT>& object_object_line_splits(line_split_kind value) {object_object_line_splits_ = value; return *this;}
 

@@ -52,9 +52,9 @@ Default is `false`
     json_options & pad_inside_array_brackets(bool value)
 Default is `false`
 
-    json_options& bignum_format(bignum_chars_format value)
-Overrides [bignum format](bignum_chars_format.md) when serializing json.
-The default is [bignum_chars_format::base10](bignum_chars_format.md). 
+    json_options& big_integer_format(big_integer_chars_format value)
+Overrides [bignum format](big_integer_chars_format.md) when serializing json.
+The default is [big_integer_chars_format::base10](big_integer_chars_format.md). 
 
     json_options& byte_string_format(byte_string_chars_format value)
 Overrides [byte string format](byte_string_chars_format.md) when serializing json.
