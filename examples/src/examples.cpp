@@ -567,9 +567,9 @@ int main()
 
         cbor_examples();
 
-        type_extensibility_examples();
-
         serialization_examples();
+
+        type_extensibility_examples();
     }
     catch (const std::exception& e)
     {
