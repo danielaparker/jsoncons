@@ -84,6 +84,43 @@ void book_extensibility_example()
     }
 }
 
+void book_extensibility_example2()
+{
+    // For convenience
+    using jsoncons::json;
+    using jsoncons::decode_json;
+    using jsoncons::encode_json;
+    using jsoncons::indenting;
+
+    std::string s = R"(
+    [
+        {
+            "author" : "Haruki Murakami",
+            "title" : "Kafka on the Shore",
+            "price" : 25.17
+        },
+        {
+            "author" : "Charles Bukowski",
+            "title" : "Pulp",
+            "price" : 22.48
+        }
+    ]
+    )";
+
+    std::vector<book> book_list = decode_json<std::vector<book>>(s);
+
+    std::cout << "(1)\n";
+    for (auto book : book_list)
+    {
+        std::cout << book.author << ", " 
+                  << book.title << ", " 
+                  << book.price << "\n";
+    }
+    std::cout << "\n(2)\n";
+    encode_json(book_list, std::cout, indenting::indent);
+    std::cout << "\n";
+}
+
 //own vector will always be of an even length 
 struct own_vector : std::vector<int64_t> { using  std::vector<int64_t>::vector; };
 
@@ -139,6 +176,8 @@ void type_extensibility_examples()
     book_extensibility_example();
 
     own_vector_extensibility_example();
+
+    book_extensibility_example2();
 
     std::cout << std::endl;
 }
