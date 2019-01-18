@@ -27,8 +27,9 @@ string        |                  | string |&#160;
 string        | big_integer      | byte string | 2 (positive bignum) or 2 (negative bignum)  
 string        | big_decimal      | array | 4 (decimal fraction)
 string        | date_time        | string | 0 (date/time string) 
-string        | base64url        | CBOR date/time | 33 (base64url)
-string        | base64           | CBOR date/time | 34 (base64)
+string        | uri              | string | 32 (uri)
+string        | base64url        | string | 33 (base64url)
+string        | base64           | string | 34 (base64)
 byte_string   |                  | byte string |&#160;
 byte_string   | base64url        | byte string | 21 (Expected conversion to base64url encoding)
 byte_string   | base64           | byte string | 22 (Expected conversion to base64 encoding)
