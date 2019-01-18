@@ -950,6 +950,7 @@ with semantic tagging `big_integer`.
 ```c++
 #include <jsoncons/json.hpp>
 #include <iostream>
+#include <iomanip>
 
 using jsoncons::json;
 
