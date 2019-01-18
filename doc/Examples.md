@@ -20,7 +20,7 @@
 
 ### Convert
 
-[Convert JSON to/from C++ types](#G1)
+[Convert JSON to/from C++ types](#G1)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G2)
 
 ### Construct
