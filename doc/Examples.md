@@ -40,8 +40,9 @@
 
 [Use `string_view` to access the actual memory that's being used to hold a string](#E1)  
 [Given a string in a `json` object that represents a decimal number, assign it to a double](#E2)  
-[Look up a key, if found, return the value converted to type T, otherwise, return a default value of type T.](#E3)  
-[Retrieve a value in a hierarchy of JSON objects](#E4)  
+[Retrieve a big integer that's been parsed as a string](#E3)  
+[Look up a key, if found, return the value converted to type T, otherwise, return a default value of type T.](#E4)  
+[Retrieve a value in a hierarchy of JSON objects](#E5)  
 
 ### Search and Replace
 
@@ -940,6 +941,55 @@ double price = j["price"].as<double>();
 ```
 
 <div id="E3"/>
+ 
+#### Retrieve a big integer that's been parsed as a string
+
+If an integer exceeds the range of an `int64_t` or `uint64_t`, jsoncons parses it as a string 
+with semantic tagging `big_integer`.
+
+```c++
+#include <jsoncons/json.hpp>
+#include <iostream>
+
+using jsoncons::json;
+
+int main()
+{
+    std::string input = "-18446744073709551617";
+
+    json j = json::parse(input);
+
+    // Access as string
+    std::string s = j.as<std::string>();
+    std::cout << "(1) " << s << "\n\n";
+
+    // Access as double
+    double d = j.as<double>();
+    std::cout << "(2) " << std::setprecision(17) << d << "\n\n";
+
+    // Access as jsoncons::bignum
+    jsoncons::bignum bn = j.as<jsoncons::bignum>();
+    std::cout << "(3) " << bn << "\n\n";
+
+    // If your compiler supports extended integral types for which std::numeric_limits is specialized 
+#if (defined(__GNUC__) || defined(__clang__)) && (!defined(__STRICT_ANSI__) && defined(_GLIBCXX_USE_INT128))
+    __int128 i = j.as<__int128>();
+    std::cout << "(4) " << i << "\n\n";
+#endif
+}
+```
+Output:
+```
+(1) -18446744073709551617
+
+(2) -1.8446744073709552e+19
+
+(3) -18446744073709551617
+
+(4) -18446744073709551617
+```
+
+<div id="E4"/>
 
 #### Look up a key, if found, return the value converted to type T, otherwise, return a default value of type T.
  
@@ -953,7 +1003,7 @@ double price = j.get_with_default("price", 25.00); // returns 25.17
 double sale_price = j.get_with_default("sale_price", 22.0); // returns 22.0
 ```
 
-<div id="E4"/>
+<div id="E5"/>
  
 #### Retrieve a value in a hierarchy of JSON objects
 

@@ -90,7 +90,7 @@ namespace readme
         std::cout << "(7) " << ref.as<std::string>() << "\n\n";
 
 #if (defined(__GNUC__) || defined(__clang__)) && (!defined(__STRICT_ANSI__) && defined(_GLIBCXX_USE_INT128))
-        // If code compiled with GCC and std=gnu++11 (rather than std=c++11)
+        // e.g. if code compiled with GCC and std=gnu++11 (rather than std=c++11)
         __int128 i = j[1][2].as<__int128>();
 #endif
 

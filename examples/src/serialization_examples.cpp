@@ -388,6 +388,31 @@ void bignum_serialization_examples2()
     std::cout << "\n\n";
 }
 
+void bignum_access_examples()
+{
+    std::string input = "-18446744073709551617";
+
+    json j = json::parse(input);
+
+    // Access as string
+    std::string s = j.as<std::string>();
+    std::cout << "(1) " << s << "\n\n";
+
+    // Access as double
+    double d = j.as<double>();
+    std::cout << "(2) " << std::setprecision(17) << d << "\n\n";
+
+    // Access as jsoncons::bignum
+    jsoncons::bignum bn = j.as<jsoncons::bignum>();
+    std::cout << "(3) " << bn << "\n\n";
+
+    // If your compiler supports extended integral types for which std::numeric_limits is specialized 
+#if (defined(__GNUC__) || defined(__clang__)) && (!defined(__STRICT_ANSI__) && defined(_GLIBCXX_USE_INT128))
+    __int128 i = j.as<__int128>();
+    std::cout << "(4) " << i << "\n\n";
+#endif
+}
+
 void decimal_precision_examples()
 {
     std::string s = R"(
@@ -430,6 +455,7 @@ void serialization_examples()
     bignum_serialization_examples2();
     bignum_serialization_examples1();
     decimal_precision_examples();
+    bignum_access_examples();
     std::cout << std::endl;
 }
 
