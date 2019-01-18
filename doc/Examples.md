@@ -74,6 +74,16 @@ json j = R"(
 )"_json;
 ```
 
+<div id="A2"/> 
+
+#### Parse JSON from a file
+
+```
+std::ifstream is("myfile.json");    
+
+json j = json::parse(is);
+```
+
 <div id="A8"/> 
 
 #### Keep numbers with exponent or fractional parts as strings
@@ -124,16 +134,6 @@ Output:
 
 (3) a: 12.00, b: 1.23456789012345678901234567890
 (4) a: 12, b: 1.23456789012346
-```
-
-<div id="A2"/> 
-
-#### Parse JSON from a file
-
-```
-std::ifstream is("myfile.json");    
-
-json j = json::parse(is);
 ```
 
 <div id="A3"/> 
