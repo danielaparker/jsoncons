@@ -85,6 +85,8 @@ using the `dec_to_str` option. You can then put it into a `float`,
 `double`, a boost multiprecision number, or whatever other type you want. 
 
 ```c++
+#include <jsoncons/json.hpp>
+
 int main()
 {
     std::string s = R"(
