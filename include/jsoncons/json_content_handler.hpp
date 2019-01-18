@@ -33,7 +33,8 @@ enum class semantic_tag_type : uint8_t
     base16,
     base64,
     base64url,
-    big_float
+    uri,
+    big_float // unused
 };
 
 template <class CharT>

@@ -16,6 +16,8 @@ New features
 
 - Added `std::string_view` detection
 
+- jsoncons-CBOR semantic tagging supported for CBOR tags 32 (uri)
+
 Name changes (non-breaking)
 
 - The json options name `bignum_chars_format` has been deprecated and replaced with `big_integer_chars_format`.

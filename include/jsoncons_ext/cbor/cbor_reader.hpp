@@ -210,6 +210,9 @@ private:
                         case 0:
                             tag = semantic_tag_type::date_time;
                             break;
+                        case 32:
+                            tag = semantic_tag_type::uri;
+                            break;
                         case 33:
                             tag = semantic_tag_type::base64url;
                             break;

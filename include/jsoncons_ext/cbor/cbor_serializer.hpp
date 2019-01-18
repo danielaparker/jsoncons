@@ -522,6 +522,13 @@ private:
                 end_value();
                 break;
             }
+            case semantic_tag_type::uri:
+            {
+                result_.push_back(32);
+                write_string(sv);
+                end_value();
+                break;
+            }
             case semantic_tag_type::base64url:
             {
                 result_.push_back(33);
