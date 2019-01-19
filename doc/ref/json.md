@@ -5,9 +5,23 @@ typedef basic_json<char,
                    ImplementationPolicy = sorted_policy,
                    Allocator = std::allocator<char>> json
 ```
-The `json` class is an instantiation of the `basic_json` class template that uses `char` as the character type. The order of an object's name/value pairs is not preserved, they are sorted alphabetically by name. If you want to preserve the original insertion order, use [ojson](ojson.md) instead.
+The class `json` is an instantiation of the `basic_json` class template that uses `char` as the character type. The order of an object's name/value pairs is not preserved, they are sorted alphabetically by name. If you want to preserve the original insertion order, use [ojson](ojson.md) instead.
 
-The `jsoncons` library will always rebind the supplied allocator from the template parameter to internal data structures.
+The class `json` resembles a union. An instance of `json` holds a value of one of its alternative types:
+
+- null
+- bool
+- int64
+- uint64
+- double
+- string
+- byte string
+- array
+- object
+
+When assigned a new value, the old value is overwritten. The new value may have a different type. 
+
+The `jsoncons` library will rebind the supplied allocator from the template parameter to internal data structures.
 
 #### Header
 ```c++
