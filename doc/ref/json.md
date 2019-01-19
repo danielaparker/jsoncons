@@ -19,7 +19,7 @@ The class `json` resembles a union. An instance of `json` holds a value of one o
 - array
 - object
 
-When assigned a new value, the old value is overwritten. The new value may have a different type. 
+When assigned a new value, the old value is overwritten. The type of the new value may be different from the old value. 
 
 The `jsoncons` library will rebind the supplied allocator from the template parameter to internal data structures.
 

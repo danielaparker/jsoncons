@@ -9,7 +9,7 @@ booleans, numbers, strings, arrays, objects - plus byte strings. It has
 - uint64
 - double
 - string
-- byte_string
+- byte string
 - array
 - object
 

@@ -706,16 +706,14 @@ namespace jsoncons
 
 int main()
 {
-    typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float_100> multiprecision_type;
-
-    multiprecision_type x;
+    typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float_50> multiprecision_type;
 
     std::string s = "[100000000000000000000000000000000.1234]";
     json_options options;
     options.dec_to_str(true);
     json j = json::parse(s, options);
 
-    x = j[0].as<multiprecision_type>();
+    multiprecision_type x = j[0].as<multiprecision_type>();
 
     std::cout << "(1) " << std::setprecision(std::numeric_limits<multiprecision_type>::max_digits10)
         << x << "\n";
