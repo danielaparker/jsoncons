@@ -812,11 +812,11 @@ On UNIX:
 
 ## Acknowledgements
 
-Special debt owed to the excellent MIT licensed [tinycbor](https://github.com/intel/tinycbor), which this library draws on for platform dependent binary configuration.
+The jsoncons platform dependent binary configuration draws on to the excellent MIT licensed [tinycbor](https://github.com/intel/tinycbor).
 
 A _big_ thanks to Milo Yip, author of [RapidJSON](http://rapidjson.org/), for raising the quality of JSON libraries across the board, by publishing [the benchmarks](https://github.com/miloyip/nativejson-benchmark), and contacting this project (among others) to share the results.
 
-The jsoncons implementation of the Grisu3 algorithm for printing floating-point numbers follows [Florian Loitsch's MIT licensed grisu3_59_56 implementation](http://florian.loitsch.com/publications), with minor modifications. 
+The jsoncons implementation of the Grisu3 algorithm for printing floating-point numbers follows Florian Loitsch's MIT licensed [grisu3_59_56 implementation](http://florian.loitsch.com/publications), with minor modifications. 
 
 Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.txt)
 

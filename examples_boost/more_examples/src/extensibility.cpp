@@ -211,7 +211,7 @@ void boost_matrix_conversions()
 
 void boost_multiprecison_conversions()
 {
-    typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float_100> multiprecision_type;
+    typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float_50> multiprecision_type;
 
     std::string s = "[100000000000000000000000000000000.1234]";
     json_options options;
