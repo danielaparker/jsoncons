@@ -152,7 +152,9 @@ private:
         stack_[structure_index].value_.object_value().insert(
             std::make_move_iterator(first),
             std::make_move_iterator(last),
-            [](stack_item&& val){return key_value_type(std::move(val.name_),std::move(val.value_));});
+            [](stack_item&& val){return std::move(val.name_);},
+            [](stack_item&& val){return std::move(val.value_);}
+        );
         stack_.erase(stack_.begin()+structure_index+1, stack_.end());
         stack_offsets_.pop_back();
         if (stack_offsets_.back().type_ == container_type::root_t)

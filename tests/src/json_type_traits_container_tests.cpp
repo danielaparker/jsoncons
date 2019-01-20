@@ -318,7 +318,7 @@ TEST_CASE("test_from_stl_container")
     json j_mmap(a_mmap); // one entry for key "three"
     CHECK(true == j_mmap.find("one")->value().as<bool>());
     CHECK(true == j_mmap.find("two")->value().as<bool>());
-    CHECK(true == j_mmap.find("three")->value().as<bool>());
+    CHECK(false == j_mmap.find("three")->value().as<bool>());
 
     std::unordered_multimap<std::string, bool> a_ummap { {"one", true}, {"two", true}, /*{"three", false},*/ {"three", true} };
     json j_ummap(a_ummap); // two entries for key "three"

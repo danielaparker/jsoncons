@@ -474,6 +474,41 @@ public:
     {
     }
 
+    template<class InputIt, class Key, class Value>
+    json_object(InputIt first, InputIt last, Key k, Value v)
+    {
+        size_t count = std::distance(first,last);
+        members_.reserve(count);
+        for (auto s = first; s != last; ++s)
+        {
+            members_.emplace_back(k(*s), v(*s));
+        }
+        std::stable_sort(members_.begin(),members_.end(),
+                         [](const key_value_type& a, const key_value_type& b){return a.key().compare(b.key()) < 0;});
+        auto it = std::unique(members_.begin(), members_.end(),
+                              [](const key_value_type& a, const key_value_type& b){ return !(a.key().compare(b.key()));});
+        members_.erase(it, members_.end());
+    }
+
+    template<class InputIt, class Key, class Value>
+    json_object(InputIt first, InputIt last, Key k, Value v, 
+                const allocator_type& allocator)
+        : container_base<allocator_type>(allocator), 
+          members_(key_value_allocator_type(allocator))
+    {
+        size_t count = std::distance(first,last);
+        members_.reserve(count);
+        for (auto s = first; s != last; ++s)
+        {
+            members_.emplace_back(k(*s), v(*s));
+        }
+        std::stable_sort(members_.begin(),members_.end(),
+                         [](const key_value_type& a, const key_value_type& b){return a.key().compare(b.key()) < 0;});
+        auto it = std::unique(members_.begin(), members_.end(),
+                              [](const key_value_type& a, const key_value_type& b){ return !(a.key().compare(b.key()));});
+        members_.erase(it, members_.end());
+    }
+
     json_object(std::initializer_list<typename Json::array> init)
     {
         for (const auto& element : init)
@@ -617,14 +652,14 @@ public:
         }
     }
 
-    template<class InputIt, class UnaryPredicate>
-    void insert(InputIt first, InputIt last, UnaryPredicate pred)
+    template<class InputIt, class Key, class Value>
+    void insert(InputIt first, InputIt last, Key k, Value v)
     {
         size_t count = std::distance(first,last);
         members_.reserve(members_.size() + count);
         for (auto s = first; s != last; ++s)
         {
-            members_.emplace_back(pred(*s));
+            members_.emplace_back(k(*s), v(*s));
         }
         std::stable_sort(members_.begin(),members_.end(),
                          [](const key_value_type& a, const key_value_type& b){return a.key().compare(b.key()) < 0;});
@@ -1112,6 +1147,80 @@ public:
     {
     }
 
+    template<class InputIt, class Key, class Value>
+    json_object(InputIt first, InputIt last, Key k, Value v)
+    {
+        size_t count = std::distance(first,last);
+        members_.reserve(count);
+        for (auto s = first; s != last; ++s)
+        {
+            members_.emplace_back(k(*s), v(*s));
+        }
+
+        build_index();
+        auto last_unique = std::unique(index_.begin(), index_.end(),
+            [&](size_t a, size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
+
+        if (last_unique != index_.end())
+        {
+            index_.erase(last_unique, index_.end());
+            std::sort(index_.begin(), index_.end());
+
+            auto result = index_.rbegin();
+            if (*result != members_.size())
+            {
+                members_.erase(members_.begin() + (*result + 1), members_.end());
+            }
+            for (auto it = index_.rbegin() + 1; it != index_.rend(); ++it, ++result)
+            {
+                if (*result - *it > 1)
+                {
+                    members_.erase(members_.begin() + (*it + 1), members_.begin() + *result);
+                }
+            }
+        }
+        build_index();
+    }
+
+    template<class InputIt, class Key, class Value>
+    json_object(InputIt first, InputIt last, Key k, Value v, 
+                const allocator_type& allocator)
+        : container_base<allocator_type>(allocator), 
+          members_(key_value_allocator_type(allocator)), 
+          index_(index_allocator_type(allocator))
+    {
+        size_t count = std::distance(first,last);
+        members_.reserve(count);
+        for (auto s = first; s != last; ++s)
+        {
+            members_.emplace_back(k(*s), v(*s));
+        }
+
+        build_index();
+        auto last_unique = std::unique(index_.begin(), index_.end(),
+            [&](size_t a, size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
+
+        if (last_unique != index_.end())
+        {
+            index_.erase(last_unique, index_.end());
+            std::sort(index_.begin(), index_.end());
+
+            auto result = index_.rbegin();
+            if (*result != members_.size())
+            {
+                members_.erase(members_.begin() + (*result + 1), members_.end());
+            }
+            for (auto it = index_.rbegin() + 1; it != index_.rend(); ++it, ++result)
+            {
+                if (*result - *it > 1)
+                {
+                    members_.erase(members_.begin() + (*it + 1), members_.begin() + *result);
+                }
+            }
+        }
+        build_index();
+    }
+
     json_object(std::initializer_list<typename Json::array> init)
     {
         for (const auto& element : init)
@@ -1275,14 +1384,14 @@ public:
         }
     }
 
-    template<class InputIt, class UnaryPredicate>
-    void insert(InputIt first, InputIt last, UnaryPredicate pred)
+    template<class InputIt, class Key, class Value>
+    void insert(InputIt first, InputIt last, Key k, Value v)
     {
         size_t count = std::distance(first,last);
         members_.reserve(members_.size() + count);
         for (auto s = first; s != last; ++s)
         {
-            members_.emplace_back(pred(*s));
+            members_.emplace_back(k(*s), v(*s));
         }
 
         build_index();
