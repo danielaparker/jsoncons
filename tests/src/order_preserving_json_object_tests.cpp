@@ -28,8 +28,7 @@ TEST_CASE("order preserving insert")
     items.emplace_back("a", 7);
 
     o.insert(std::make_move_iterator(items.begin()), std::make_move_iterator(items.end()), 
-             [](item_type&& item){return std::move(item.first);},
-             [](item_type&& item) {return std::move(item.second); });
+             [](item_type&& item){return ojson::key_value_type(std::forward<ojson::key_type>(item.first),std::forward<ojson>(item.second));});
 
     SECTION("iterate")
     {
