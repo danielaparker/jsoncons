@@ -217,7 +217,7 @@ Throws `std::runtime_error` if not an object.
   </tr>
   <tr>
     <td><a href="json/insert.md">insert</a></td>
-    <td>Inserts a value at the specified location in a json array</td> 
+    <td>Inserts elements</td> 
   </tr>
   <tr>
     <td><a href="json/emplace_back.md">emplace_back</a></td>

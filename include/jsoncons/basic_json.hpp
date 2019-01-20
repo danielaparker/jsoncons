@@ -96,7 +96,7 @@ enum class structure_tag_type : uint8_t
     empty_object_tag = 0x09,
     object_tag = 0x0a
 };
-                      
+
 template <class CharT, class ImplementationPolicy, class Allocator>
 class basic_json
 {
@@ -114,7 +114,7 @@ public:
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
     using string_storage_type = typename implementation_policy::template string_storage<CharT,char_traits_type,char_allocator_type>;
-    using key_storage_type = typename implementation_policy::template key_storage<CharT,char_traits_type,char_allocator_type>;
+    using key_type = typename implementation_policy::template key_storage<CharT,char_traits_type,char_allocator_type>;
 
     // string_type is for interface only, not storage 
     typedef std::basic_string<CharT,char_traits_type,char_allocator_type> string_type;
@@ -124,7 +124,7 @@ public:
     typedef const value_type& const_reference;
     typedef value_type* pointer;
     typedef const value_type* const_pointer;
-    typedef key_value<key_storage_type,value_type> key_value_type;
+    typedef key_value<key_type,value_type> key_value_type;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     typedef value_type json_type;
@@ -140,7 +140,7 @@ public:
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type> key_value_allocator_type;
 
-    typedef json_object<key_storage_type,basic_json> object;
+    typedef json_object<key_type,basic_json> object;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
@@ -149,6 +149,30 @@ public:
     typedef typename object::const_iterator const_object_iterator;
     typedef typename array::iterator array_iterator;
     typedef typename array::const_iterator const_array_iterator;
+
+    struct get_key_value
+    {
+        template <class T1,class T2>
+        key_value_type operator()(const std::pair<T1,T2>& p)
+        {
+            return key_value_type(p.first,p.second);
+        }
+        template <class T1,class T2>
+        key_value_type operator()(std::pair<T1,T2>&& p)
+        {
+            return key_value_type(std::forward<T1>(p.first),std::forward<T2>(p.second));
+        }
+        template <class T1,class T2>
+        const key_value_type& operator()(const key_value<T1,T2>& p)
+        {
+            return p;
+        }
+        template <class T1,class T2>
+        key_value_type operator()(key_value<T1,T2>&& p)
+        {
+            return std::move(p);
+        }
+    };
 
     struct variant
     {
@@ -1934,6 +1958,12 @@ public:
             return evaluate_with_default().insert(pos, first, last);
         }
 
+        template <class InputIt>
+        void insert(InputIt first, InputIt last)
+        {
+            evaluate_with_default().insert(first, last);
+        }
+
         template <class SAllocator>
         void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
         {
@@ -2237,7 +2267,7 @@ public:
             return evaluate().as_longlong();
         }
 
-        bool has_member(const key_storage_type& name) const
+        bool has_member(const key_type& name) const
         {
             return evaluate().has_member(name);
         }
@@ -3956,6 +3986,22 @@ public:
         }
     }
 
+    template <class InputIt>
+    void insert(InputIt first, InputIt last)
+    {
+        switch (var_.structure_tag())
+        {
+        case structure_tag_type::empty_object_tag:
+        case structure_tag_type::object_tag:
+            return object_value().insert(first, last, get_key_value{});
+            break;
+        default:
+            {
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Attempting to insert into a value that is not an object"));
+            }
+        }
+    }
+
     template <class... Args> 
     array_iterator emplace(const_array_iterator pos, Args&&... args)
     {
@@ -4267,7 +4313,7 @@ public:
         }
     }
 
-    bool has_member(const key_storage_type& name) const
+    bool has_member(const key_type& name) const
     {
         switch (var_.structure_tag())
         {

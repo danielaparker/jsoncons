@@ -26,7 +26,7 @@ public:
     using typename basic_json_content_handler<char_type>::string_view_type;
 
     typedef typename Json::key_value_type key_value_type;
-    typedef typename Json::key_storage_type key_storage_type;
+    typedef typename Json::key_type key_storage_type;
     typedef typename Json::string_type string_type;
     typedef typename Json::array array;
     typedef typename Json::object object;
@@ -152,8 +152,7 @@ private:
         stack_[structure_index].value_.object_value().insert(
             std::make_move_iterator(first),
             std::make_move_iterator(last),
-            [](stack_item&& val){return std::move(val.name_);},
-            [](stack_item&& val){return std::move(val.value_);}
+            [](stack_item&& val){return key_value_type(std::move(val.name_), std::move(val.value_));}
         );
         stack_.erase(stack_.begin()+structure_index+1, stack_.end());
         stack_offsets_.pop_back();

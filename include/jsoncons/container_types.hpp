@@ -652,14 +652,14 @@ public:
         }
     }
 
-    template<class InputIt, class Key, class Value>
-    void insert(InputIt first, InputIt last, Key k, Value v)
+    template<class InputIt, class Get>
+    void insert(InputIt first, InputIt last, Get get)
     {
         size_t count = std::distance(first,last);
         members_.reserve(members_.size() + count);
         for (auto s = first; s != last; ++s)
         {
-            members_.emplace_back(k(*s), v(*s));
+            members_.emplace_back(get(*s));
         }
         std::stable_sort(members_.begin(),members_.end(),
                          [](const key_value_type& a, const key_value_type& b){return a.key().compare(b.key()) < 0;});
@@ -1384,14 +1384,14 @@ public:
         }
     }
 
-    template<class InputIt, class Key, class Value>
-    void insert(InputIt first, InputIt last, Key k, Value v)
+    template<class InputIt, class Get>
+    void insert(InputIt first, InputIt last, Get get)
     {
         size_t count = std::distance(first,last);
         members_.reserve(members_.size() + count);
         for (auto s = first; s != last; ++s)
         {
-            members_.emplace_back(k(*s), v(*s));
+            members_.emplace_back(get(*s));
         }
 
         build_index();

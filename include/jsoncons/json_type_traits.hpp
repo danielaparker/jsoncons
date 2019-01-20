@@ -708,22 +708,15 @@ struct json_type_traits<Json, T,
 
     static Json to_json(const T& val)
     {
-        Json j = typename Json::object(val.begin(),
-               val.end(),
-               [](const value_type& val){return val.first;},
-               [](const value_type& val){return val.second;}
-               );
+        Json j;
+        j.insert(val.begin(), val.end());
         return j;
     }
 
     static Json to_json(const T& val, const allocator_type& allocator)
     {
-        Json j = typename Json::object(val.begin(),
-               val.end(),
-               [](const value_type& val){return val.first;},
-               [](const value_type& val){return val.second;},
-               allocator
-               );
+        Json j(allocator);
+        j.insert(val.begin(), val.end());
         return j;
     }
 };

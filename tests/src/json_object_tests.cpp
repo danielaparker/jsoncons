@@ -9,8 +9,67 @@
 #include <utility>
 #include <ctime>
 #include <map>
+#include <iterator>
 
 using namespace jsoncons;
+
+TEST_CASE("json insert(first,last) test")
+{
+    SECTION("copy map into json")
+    {
+        std::map<std::string,double> m1 = {{"f",4},{"e",5},{"d",6}};
+        std::map<std::string,double> m2 = {{"c",1},{"b",2},{"a",3}};
+
+        json j;
+        j.insert(m1.begin(),m1.end());
+        j.insert(m2.begin(),m2.end());
+
+        REQUIRE(j.size() == 6);
+        auto it = j.object_range().begin();
+        CHECK(it++->key() == "a");
+        CHECK(it++->key() == "b");
+        CHECK(it++->key() == "c");
+        CHECK(it++->key() == "d");
+        CHECK(it++->key() == "e");
+        CHECK(it++->key() == "f");
+    }
+    SECTION("copy map into ojson")
+    {
+        std::map<std::string,double> m1 = {{"f",4},{"e",5},{"d",6}};
+        std::map<std::string,double> m2 = {{"c",1},{"b",2},{"a",3}};
+
+        ojson j;
+        j.insert(m1.begin(),m1.end());
+        j.insert(m2.begin(),m2.end());
+
+        REQUIRE(j.size() == 6);
+        auto it = j.object_range().begin();
+        CHECK(it++->key() == "d");
+        CHECK(it++->key() == "e");
+        CHECK(it++->key() == "f");
+        CHECK(it++->key() == "a");
+        CHECK(it++->key() == "b");
+        CHECK(it++->key() == "c");
+    }
+    SECTION("move map into json")
+    {
+        std::map<std::string,double> m1 = {{"a",1},{"b",2},{"c",3}};
+        std::map<std::string,double> m2 = {{"d",4},{"e",5},{"f",6}};
+
+        json j;
+        j.insert(std::make_move_iterator(m1.begin()),std::make_move_iterator(m1.end()));
+        j.insert(std::make_move_iterator(m2.begin()),std::make_move_iterator(m2.end()));
+
+        REQUIRE(j.size() == 6);
+        auto it = j.object_range().begin();
+        CHECK(it++->key() == "a");
+        CHECK(it++->key() == "b");
+        CHECK(it++->key() == "c");
+        CHECK(it++->key() == "d");
+        CHECK(it++->key() == "e");
+        CHECK(it++->key() == "f");
+    }
+}
 
 TEST_CASE("json as<T>")
 {
