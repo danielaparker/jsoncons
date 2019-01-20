@@ -19,7 +19,7 @@ The class `json` resembles a union. An instance of `json` holds a data item of o
 - array
 - object
 
-The data item may be tagged with a [semantic_tag_type](../semantic_tag_type.md) that provides additional
+The data item may be tagged with a [semantic_tag_type](semantic_tag_type.md) that provides additional
 information about the data item.
 
 When assigned a new value, the old value is overwritten. The type of the new value may be different from the old value. 
