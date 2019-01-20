@@ -26,7 +26,7 @@ public:
     using typename basic_json_content_handler<char_type>::string_view_type;
 
     typedef typename Json::key_value_type key_value_type;
-    typedef typename Json::key_type key_storage_type;
+    typedef typename Json::key_type key_type;
     typedef typename Json::string_type string_type;
     typedef typename Json::array array;
     typedef typename Json::object object;
@@ -62,7 +62,7 @@ private:
         stack_item& operator=(const stack_item&) = default;
         stack_item& operator=(stack_item&&) = default;
 
-        key_storage_type name_;
+        key_type name_;
         Json value_;
     };
 
