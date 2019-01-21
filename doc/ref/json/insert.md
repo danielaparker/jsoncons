@@ -65,3 +65,56 @@ capacity=10, size=3
 ["Montreal","Toronto","Vancouver"]
 ```
 
+### Copy two std::map's into a json 
+
+```c++
+std::map<std::string,double> m1 = {{"f",4},{"e",5},{"d",6}};
+std::map<std::string,double> m2 = {{"c",1},{"b",2},{"a",3}};
+
+json j;
+j.insert(m1.begin(),m1.end());
+j.insert(m2.begin(),m2.end());
+
+std::cout << j << "\n";
+```
+Output:
+```
+{"a":3.0,"b":2.0,"c":1.0,"d":6.0,"e":5.0,"f":4.0}
+```
+
+### Copy two std::map's into an ojson 
+
+```c++
+std::map<std::string,double> m1 = {{"f",4},{"e",5},{"d",6}};
+std::map<std::string,double> m2 = {{"c",1},{"b",2},{"a",3}};
+
+ojson j;
+j.insert(m1.begin(),m1.end());
+j.insert(m2.begin(),m2.end());
+
+std::cout << j << "\n";
+```
+Output:
+```
+{"d":6.0,"e":5.0,"f":4.0,"a":3.0,"b":2.0,"c":1.0}
+```
+
+### Move two std::map's into a json 
+
+```c++
+std::map<std::string,double> m1 = {{"a",1},{"b",2},{"c",3}};
+std::map<std::string,double> m2 = {{"d",4},{"e",5},{"f",6}};
+
+json j;
+j.insert(std::make_move_iterator(m1.begin()),std::make_move_iterator(m1.end()));
+j.insert(std::make_move_iterator(m2.begin()),std::make_move_iterator(m2.end()));
+
+std::cout << j << "\n";
+```
+Output:
+```
+{"a":1.0,"b":2.0,"c":3.0,"d":4.0,"e":5.0,"f":6.0}
+```
+
+
+

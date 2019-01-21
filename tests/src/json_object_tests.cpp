@@ -24,6 +24,8 @@ TEST_CASE("json insert(first,last) test")
         j.insert(m1.begin(),m1.end());
         j.insert(m2.begin(),m2.end());
 
+        //std::cout << j << "\n";
+
         REQUIRE(j.size() == 6);
         auto it = j.object_range().begin();
         CHECK(it++->key() == "a");
@@ -42,6 +44,8 @@ TEST_CASE("json insert(first,last) test")
         j.insert(m1.begin(),m1.end());
         j.insert(m2.begin(),m2.end());
 
+        //std::cout << j << "\n";
+
         REQUIRE(j.size() == 6);
         auto it = j.object_range().begin();
         CHECK(it++->key() == "d");
@@ -59,6 +63,8 @@ TEST_CASE("json insert(first,last) test")
         json j;
         j.insert(std::make_move_iterator(m1.begin()),std::make_move_iterator(m1.end()));
         j.insert(std::make_move_iterator(m2.begin()),std::make_move_iterator(m2.end()));
+
+        //std::cout << j << "\n";
 
         REQUIRE(j.size() == 6);
         auto it = j.object_range().begin();
