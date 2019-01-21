@@ -113,21 +113,21 @@ public:
     typedef basic_string_view<char_type,char_traits_type> string_view_type;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
-    using string_storage_type = typename implementation_policy::template string_storage<CharT,char_traits_type,char_allocator_type>;
-    using key_type = typename implementation_policy::template key_storage<CharT,char_traits_type,char_allocator_type>;
 
-    // string_type is for interface only, not storage 
     typedef std::basic_string<CharT,char_traits_type,char_allocator_type> string_type;
 
-    typedef basic_json<CharT,ImplementationPolicy,Allocator> value_type;
-    typedef value_type& reference;
-    typedef const value_type& const_reference;
-    typedef value_type* pointer;
-    typedef const value_type* const_pointer;
-    typedef key_value<key_type,value_type> key_value_type;
+    typedef basic_json<CharT,ImplementationPolicy,Allocator> json_type;
+
+    typedef json_type& reference;
+    typedef const json_type& const_reference;
+    typedef json_type* pointer;
+    typedef const json_type* const_pointer;
+
+    typedef key_value<string_type,json_type> key_value_type;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    typedef value_type json_type;
+    typedef json_type value_type;
+    typedef string_type key_type;
     typedef key_value_type kvp_type;
     typedef key_value_type member_type;
     typedef jsoncons::null_type null_type;
@@ -140,7 +140,7 @@ public:
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type> key_value_allocator_type;
 
-    typedef json_object<key_type,basic_json> object;
+    typedef json_object<string_type,basic_json> object;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
@@ -2267,7 +2267,7 @@ public:
             return evaluate().as_longlong();
         }
 
-        bool has_member(const key_type& name) const
+        bool has_member(const string_type& name) const
         {
             return evaluate().has_member(name);
         }
@@ -4313,7 +4313,7 @@ public:
         }
     }
 
-    bool has_member(const key_type& name) const
+    bool has_member(const string_type& name) const
     {
         switch (var_.structure_tag())
         {

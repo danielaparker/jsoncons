@@ -35,7 +35,7 @@ The `jsoncons` library will rebind the supplied allocator from the template para
 
 Member type                         |Definition
 ------------------------------------|------------------------------
-`value_type`|json
+`json_type`|json
 `reference`|json&
 `const_reference`|const json&
 `pointer`|json*

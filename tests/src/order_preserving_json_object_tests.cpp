@@ -17,7 +17,7 @@ TEST_CASE("order preserving insert")
 {
     json_object<std::string, ojson> o;
 
-    typedef std::pair<ojson::key_type,ojson> item_type;
+    typedef std::pair<ojson::string_type,ojson> item_type;
     std::vector<item_type> items;
     items.emplace_back("b", 1);
     items.emplace_back("a", 2);
@@ -28,7 +28,7 @@ TEST_CASE("order preserving insert")
     items.emplace_back("a", 7);
 
     o.insert(std::make_move_iterator(items.begin()), std::make_move_iterator(items.end()), 
-             [](item_type&& item){return ojson::key_value_type(std::forward<ojson::key_type>(item.first),std::forward<ojson>(item.second));});
+             [](item_type&& item){return ojson::key_value_type(std::forward<ojson::string_type>(item.first),std::forward<ojson>(item.second));});
 
     SECTION("iterate")
     {
