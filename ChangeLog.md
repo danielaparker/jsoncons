@@ -1,3 +1,11 @@
+master
+------
+
+New features
+
+- New `csv_options` option `dec_to_str`. If set to `true`, parse decimal numbers as strings with
+  semantic tagging `semantic_tag_type::big_decimal` instead of double. Defaults to `false`.
+
 v0.117.0
 --------
 
