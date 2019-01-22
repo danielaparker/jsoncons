@@ -409,7 +409,7 @@ public:
         return dec_to_str_;
     }
 
-    basic_json_options<CharT>& dec_to_str(bool value) 
+    basic_csv_options& dec_to_str(bool value) 
     {
         dec_to_str_ = value;
         return *this;
