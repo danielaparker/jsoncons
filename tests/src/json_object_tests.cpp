@@ -13,6 +13,22 @@
 
 using namespace jsoncons;
 
+TEST_CASE("json = json::object(first,last)")
+{
+    SECTION("copy map into json")
+    {
+        std::map<std::string,double> m = {{"c",1},{"b",2},{"a",3}};
+
+        json j = json::object(m.begin(),m.end());
+
+        REQUIRE(j.size() == 3);
+        auto it = j.object_range().begin();
+        CHECK(it++->key() == "a");
+        CHECK(it++->key() == "b");
+        CHECK(it++->key() == "c");
+    }
+}
+
 TEST_CASE("json insert(first,last) test")
 {
     SECTION("copy map into json")

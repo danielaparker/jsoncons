@@ -150,30 +150,6 @@ public:
     typedef typename array::iterator array_iterator;
     typedef typename array::const_iterator const_array_iterator;
 
-    struct get_key_value
-    {
-        template <class T1,class T2>
-        key_value_type operator()(const std::pair<T1,T2>& p)
-        {
-            return key_value_type(p.first,p.second);
-        }
-        template <class T1,class T2>
-        key_value_type operator()(std::pair<T1,T2>&& p)
-        {
-            return key_value_type(std::forward<T1>(p.first),std::forward<T2>(p.second));
-        }
-        template <class T1,class T2>
-        const key_value_type& operator()(const key_value<T1,T2>& p)
-        {
-            return p;
-        }
-        template <class T1,class T2>
-        key_value_type operator()(key_value<T1,T2>&& p)
-        {
-            return std::move(p);
-        }
-    };
-
     struct variant
     {
         class data_base
@@ -1962,6 +1938,12 @@ public:
         void insert(InputIt first, InputIt last)
         {
             evaluate_with_default().insert(first, last);
+        }
+
+        template <class InputIt>
+        void insert(sorted_unique_range_tag tag, InputIt first, InputIt last)
+        {
+            evaluate_with_default().insert(tag, first, last);
         }
 
         template <class SAllocator>
@@ -3993,7 +3975,23 @@ public:
         {
         case structure_tag_type::empty_object_tag:
         case structure_tag_type::object_tag:
-            return object_value().insert(first, last, get_key_value{});
+            return object_value().insert(first, last, get_key_value<string_type,json_type>());
+            break;
+        default:
+            {
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Attempting to insert into a value that is not an object"));
+            }
+        }
+    }
+
+    template <class InputIt>
+    void insert(sorted_unique_range_tag tag, InputIt first, InputIt last)
+    {
+        switch (var_.structure_tag())
+        {
+        case structure_tag_type::empty_object_tag:
+        case structure_tag_type::object_tag:
+            return object_value().insert(tag, first, last, get_key_value<string_type,json_type>());
             break;
         default:
             {

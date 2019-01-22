@@ -139,6 +139,33 @@ public:
 #endif
 };
 
+template <class KeyT, class ValueT>
+struct get_key_value
+{
+    typedef key_value<KeyT,ValueT> key_value_type;
+
+    template <class T1,class T2>
+    key_value_type operator()(const std::pair<T1,T2>& p)
+    {
+        return key_value_type(p.first,p.second);
+    }
+    template <class T1,class T2>
+    key_value_type operator()(std::pair<T1,T2>&& p)
+    {
+        return key_value_type(std::forward<T1>(p.first),std::forward<T2>(p.second));
+    }
+    template <class T1,class T2>
+    const key_value_type& operator()(const key_value<T1,T2>& p)
+    {
+        return p;
+    }
+    template <class T1,class T2>
+    key_value_type operator()(key_value<T1,T2>&& p)
+    {
+        return std::move(p);
+    }
+};
+
 // json_array
 
 template <class Allocator>
@@ -411,6 +438,10 @@ private:
     json_array& operator=(const json_array<Json>&) = delete;
 };
 
+struct sorted_unique_range_tag
+{
+};
+
 // json_object
 
 template <class KeyT,class Json,class Enable = void>
@@ -474,14 +505,14 @@ public:
     {
     }
 
-    template<class InputIt, class Key, class Value>
-    json_object(InputIt first, InputIt last, Key k, Value v)
+    template<class InputIt>
+    json_object(InputIt first, InputIt last)
     {
         size_t count = std::distance(first,last);
         members_.reserve(count);
         for (auto s = first; s != last; ++s)
         {
-            members_.emplace_back(k(*s), v(*s));
+            members_.emplace_back(get_key_value<KeyT,Json>()(*s));
         }
         std::stable_sort(members_.begin(),members_.end(),
                          [](const key_value_type& a, const key_value_type& b){return a.key().compare(b.key()) < 0;});
@@ -491,7 +522,7 @@ public:
     }
 
     template<class InputIt, class Key, class Value>
-    json_object(InputIt first, InputIt last, Key k, Value v, 
+    json_object(InputIt first, InputIt last, 
                 const allocator_type& allocator)
         : container_base<allocator_type>(allocator), 
           members_(key_value_allocator_type(allocator))
@@ -500,7 +531,7 @@ public:
         members_.reserve(count);
         for (auto s = first; s != last; ++s)
         {
-            members_.emplace_back(k(*s), v(*s));
+            members_.emplace_back(get_key_value<KeyT,Json>()(*s));
         }
         std::stable_sort(members_.begin(),members_.end(),
                          [](const key_value_type& a, const key_value_type& b){return a.key().compare(b.key()) < 0;});
@@ -652,20 +683,46 @@ public:
         }
     }
 
-    template<class InputIt, class Get>
-    void insert(InputIt first, InputIt last, Get get)
+    template<class InputIt, class Convert>
+    void insert(InputIt first, InputIt last, Convert convert)
     {
         size_t count = std::distance(first,last);
         members_.reserve(members_.size() + count);
         for (auto s = first; s != last; ++s)
         {
-            members_.emplace_back(get(*s));
+            members_.emplace_back(convert(*s));
         }
         std::stable_sort(members_.begin(),members_.end(),
                          [](const key_value_type& a, const key_value_type& b){return a.key().compare(b.key()) < 0;});
         auto it = std::unique(members_.begin(), members_.end(),
                               [](const key_value_type& a, const key_value_type& b){ return !(a.key().compare(b.key()));});
         members_.erase(it, members_.end());
+    }
+
+    template<class InputIt, class Convert>
+    void insert(sorted_unique_range_tag, InputIt first, InputIt last, Convert convert)
+    {
+        if (first != last)
+        {
+            size_t count = std::distance(first,last);
+            members_.reserve(members_.size() + count);
+
+            auto it = find(convert(*first).key());
+            if (it != members_.end())
+            {
+                for (auto s = first; s != last; ++s)
+                {
+                    it = members_.emplace(it, convert(*s));
+                }
+            }
+            else
+            {
+                for (auto s = first; s != last; ++s)
+                {
+                    members_.emplace_back(convert(*s));
+                }
+            }
+        }
     }
 
     // insert_or_assign
@@ -1147,14 +1204,14 @@ public:
     {
     }
 
-    template<class InputIt, class Key, class Value>
-    json_object(InputIt first, InputIt last, Key k, Value v)
+    template<class InputIt>
+    json_object(InputIt first, InputIt last)
     {
         size_t count = std::distance(first,last);
         members_.reserve(count);
         for (auto s = first; s != last; ++s)
         {
-            members_.emplace_back(k(*s), v(*s));
+            members_.emplace_back(get_key_value<KeyT,Json>()(*s));
         }
 
         build_index();
@@ -1182,8 +1239,8 @@ public:
         build_index();
     }
 
-    template<class InputIt, class Key, class Value>
-    json_object(InputIt first, InputIt last, Key k, Value v, 
+    template<class InputIt>
+    json_object(InputIt first, InputIt last, 
                 const allocator_type& allocator)
         : container_base<allocator_type>(allocator), 
           members_(key_value_allocator_type(allocator)), 
@@ -1193,7 +1250,7 @@ public:
         members_.reserve(count);
         for (auto s = first; s != last; ++s)
         {
-            members_.emplace_back(k(*s), v(*s));
+            members_.emplace_back(get_key_value<KeyT,Json>()(*s));
         }
 
         build_index();
@@ -1384,14 +1441,14 @@ public:
         }
     }
 
-    template<class InputIt, class Get>
-    void insert(InputIt first, InputIt last, Get get)
+    template<class InputIt, class Convert>
+    void insert(InputIt first, InputIt last, Convert convert)
     {
         size_t count = std::distance(first,last);
         members_.reserve(members_.size() + count);
         for (auto s = first; s != last; ++s)
         {
-            members_.emplace_back(get(*s));
+            members_.emplace_back(convert(*s));
         }
 
         build_index();
@@ -1416,6 +1473,20 @@ public:
                 }
             }
         }
+        build_index();
+    }
+
+    template<class InputIt, class Convert>
+    void insert(sorted_unique_range_tag, InputIt first, InputIt last, Convert convert)
+    {
+        size_t count = std::distance(first,last);
+
+        members_.reserve(members_.size() + count);
+        for (auto s = first; s != last; ++s)
+        {
+            members_.emplace_back(convert(*s));
+        }
+
         build_index();
     }
 

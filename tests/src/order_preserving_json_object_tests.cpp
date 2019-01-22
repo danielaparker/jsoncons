@@ -13,6 +13,118 @@
 
 using namespace jsoncons;
 
+TEST_CASE("json sorted_unique_range_tag")
+{
+    typedef std::pair<json::string_type, json> item_type;
+    std::vector<item_type> items;
+    items.emplace_back("a", 1);
+    items.emplace_back("b", 2);
+    items.emplace_back("c", 3);
+    items.emplace_back("d", 4);
+    items.emplace_back("e", 5);
+    items.emplace_back("f", 6);
+    items.emplace_back("g", 7);
+
+    json j;
+    j.insert(sorted_unique_range_tag(), items.begin(), items.end());
+
+    SECTION("iterate")
+    {
+        REQUIRE(j.size() == 7);
+
+        auto it = j.object_range().begin();
+        CHECK(it->key() == std::string("a"));
+        CHECK(it->value().as<int>() == 1);
+        CHECK((++it)->key() == std::string("b"));
+        CHECK(it->value().as<int>() == 2);
+        CHECK((++it)->key() == std::string("c"));
+        CHECK(it->value().as<int>() == 3);
+        CHECK((++it)->key() == std::string("d"));
+        CHECK(it->value().as<int>() == 4);
+        CHECK((++it)->key() == std::string("e"));
+        CHECK(it->value().as<int>() == 5);
+        CHECK((++it)->key() == std::string("f"));
+        CHECK(it->value().as<int>() == 6);
+        CHECK((++it)->key() == std::string("g"));
+        CHECK(it->value().as<int>() == 7);
+    }
+
+    SECTION("find")
+    {
+        auto it1 = j.find("a");
+        REQUIRE(bool(it1 != j.object_range().end()));
+        CHECK(it1->value().as<int>() == 1);
+
+        auto it2 = j.find("b");
+        REQUIRE(bool(it2 != j.object_range().end()));
+        CHECK(it2->value().as<int>() == 2);
+
+        auto it3 = j.find("c");
+        REQUIRE(bool(it3 != j.object_range().end()));
+        CHECK(it3->value().as<int>() == 3);
+
+        auto it4 = j.find("d");
+        REQUIRE(bool(it4 != j.object_range().end()));
+        CHECK(it4->value().as<int>() == 4);
+    }
+}
+
+TEST_CASE("ojson sorted_unique_range_tag")
+{
+    typedef std::pair<ojson::string_type, ojson> item_type;
+    std::vector<item_type> items;
+    items.emplace_back("a", 1);
+    items.emplace_back("b", 2);
+    items.emplace_back("c", 3);
+    items.emplace_back("d", 4);
+    items.emplace_back("e", 5);
+    items.emplace_back("f", 6);
+    items.emplace_back("g", 7);
+
+    ojson j;
+    j.insert(sorted_unique_range_tag(), items.begin(), items.end());
+
+    SECTION("iterate")
+    {
+        REQUIRE(j.size() == 7);
+
+        auto it = j.object_range().begin();
+        CHECK(it->key() == std::string("a"));
+        CHECK(it->value().as<int>() == 1);
+        CHECK((++it)->key() == std::string("b"));
+        CHECK(it->value().as<int>() == 2);
+        CHECK((++it)->key() == std::string("c"));
+        CHECK(it->value().as<int>() == 3);
+        CHECK((++it)->key() == std::string("d"));
+        CHECK(it->value().as<int>() == 4);
+        CHECK((++it)->key() == std::string("e"));
+        CHECK(it->value().as<int>() == 5);
+        CHECK((++it)->key() == std::string("f"));
+        CHECK(it->value().as<int>() == 6);
+        CHECK((++it)->key() == std::string("g"));
+        CHECK(it->value().as<int>() == 7);
+    }
+
+    SECTION("find")
+    {
+        auto it1 = j.find("a");
+        REQUIRE(bool(it1 != j.object_range().end()));
+        CHECK(it1->value().as<int>() == 1);
+
+        auto it2 = j.find("b");
+        REQUIRE(bool(it2 != j.object_range().end()));
+        CHECK(it2->value().as<int>() == 2);
+
+        auto it3 = j.find("c");
+        REQUIRE(bool(it3 != j.object_range().end()));
+        CHECK(it3->value().as<int>() == 3);
+
+        auto it4 = j.find("d");
+        REQUIRE(bool(it4 != j.object_range().end()));
+        CHECK(it4->value().as<int>() == 4);
+    }
+}
+
 TEST_CASE("order preserving insert")
 {
     json_object<std::string, ojson> o;
