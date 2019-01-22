@@ -89,6 +89,7 @@ class basic_csv_options
     size_t header_lines_;
     string_type line_delimiter_;
     bool infer_types_;
+    bool dec_to_str_;
 
     std::vector<string_type> column_names_;
     std::vector<csv_type_info> column_types_;
@@ -120,7 +121,8 @@ public:
         mapping_({mapping_type::n_rows,false}),
         max_lines_((std::numeric_limits<unsigned long>::max)()),
         header_lines_(0),
-        infer_types_(true)
+        infer_types_(true),
+        dec_to_str_(false)
     {
         line_delimiter_.push_back('\n');
     }
@@ -399,6 +401,17 @@ public:
     basic_csv_options& infer_types(bool value)
     {
         infer_types_ = value;
+        return *this;
+    }
+
+    bool dec_to_str() const
+    {
+        return dec_to_str_;
+    }
+
+    basic_json_options<CharT>& dec_to_str(bool value) 
+    {
+        dec_to_str_ = value;
         return *this;
     }
 
