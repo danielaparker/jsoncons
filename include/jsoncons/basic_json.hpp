@@ -2445,11 +2445,11 @@ public:
     {
         const size_t dim1 = dim - 1;
 
-        basic_json val = make_array<dim1>(args...);
+        basic_json val = make_array<dim1>(std::forward<Args>(args)...);
         val.resize(n);
         for (size_t i = 0; i < n; ++i)
         {
-            val[i] = make_array<dim1>(args...);
+            val[i] = make_array<dim1>(std::forward<Args>(args)...);
         }
         return val;
     }
