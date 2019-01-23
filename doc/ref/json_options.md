@@ -92,7 +92,7 @@ to be used when reading JSON.
 Sets a string replacement for negative infinity when writing JSON, and indicate whether it is also
 to be used when reading JSON.
 
-    json_options& dec_to_str(bool value); 
+    json_options& lossless_number(bool value); 
 If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag_type::big_decimal`.
 Defaults to `false`.
 
@@ -159,7 +159,7 @@ Output:
 By default, jsoncons parses a number with an exponent or fractional part
 into a double precision floating point number. If you wish, you can
 keep the number as a string with semantic tagging `big_decimal`, 
-using the `dec_to_str` option. You can then put it into a `float`, 
+using the `lossless_number` option. You can then put it into a `float`, 
 `double`, a boost multiprecision number, or whatever other type you want. 
 
 ```c++
@@ -182,9 +182,9 @@ int main()
     // Access as double
     std::cout << "(2) a: " << j["a"].as<double>() << ", b: " << j["b"].as<double>() << "\n\n"; 
 
-    // Using dec_to_str option
+    // Using lossless_number option
     json_options options;
-    options.dec_to_str(true);
+    options.lossless_number(true);
 
     json j2 = json::parse(s, options);
     // Access as string

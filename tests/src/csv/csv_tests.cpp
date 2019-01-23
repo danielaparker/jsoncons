@@ -1134,7 +1134,7 @@ TEST_CASE("test_type_inference")
     //CHECK("2017-01-09" == j2[0]["Date"].as<std::string>());
 }
 
-TEST_CASE("csv_options dec_to_str")
+TEST_CASE("csv_options lossless_number")
 {
     const std::string input = R"(index_id,observation_date,rate
 EUR_LIBOR_06M,2015-10-23,0.0000214
@@ -1150,7 +1150,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
     options.assume_header(true)
            .mapping(mapping_type::n_objects)
            .trim(true)
-           .dec_to_str(true);
+           .lossless_number(true);
 
     ojson j1 = decode_csv<ojson>(input,options);
     std::cout << pretty_print(j1) << "\n";

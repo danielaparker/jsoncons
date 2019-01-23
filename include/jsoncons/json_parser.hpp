@@ -172,7 +172,7 @@ class basic_json_parser : private serializing_context
     string_type neginf_to_str_;
     int initial_stack_capacity_;
     size_t max_nesting_depth_;
-    bool dec_to_str_;
+    bool lossless_number;
     size_t nesting_depth_;
     uint32_t cp_;
     uint32_t cp2_;
@@ -222,7 +222,7 @@ public:
          neginf_to_str_(options.neginf_to_str()),
          initial_stack_capacity_(default_initial_stack_capacity_),
          max_nesting_depth_(options.max_nesting_depth()),
-         dec_to_str_(options.dec_to_str()),
+         lossless_number(options.lossless_number()),
          nesting_depth_(0), 
          cp_(0),
          cp2_(0),
@@ -2682,7 +2682,7 @@ private:
     {
         try
         {
-            if (dec_to_str_)
+            if (lossless_number)
             {
                 continue_ = handler.string_value(string_buffer_, semantic_tag_type::big_decimal, *this);
             }

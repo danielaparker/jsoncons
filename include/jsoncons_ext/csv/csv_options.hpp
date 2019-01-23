@@ -89,7 +89,7 @@ class basic_csv_options
     size_t header_lines_;
     string_type line_delimiter_;
     bool infer_types_;
-    bool dec_to_str_;
+    bool lossless_number;
 
     std::vector<string_type> column_names_;
     std::vector<csv_type_info> column_types_;
@@ -122,7 +122,7 @@ public:
         max_lines_((std::numeric_limits<unsigned long>::max)()),
         header_lines_(0),
         infer_types_(true),
-        dec_to_str_(false)
+        lossless_number(false)
     {
         line_delimiter_.push_back('\n');
     }
@@ -404,14 +404,14 @@ public:
         return *this;
     }
 
-    bool dec_to_str() const
+    bool lossless_number() const
     {
-        return dec_to_str_;
+        return lossless_number;
     }
 
-    basic_csv_options& dec_to_str(bool value) 
+    basic_csv_options& lossless_number(bool value) 
     {
-        dec_to_str_ = value;
+        lossless_number = value;
         return *this;
     }
 

@@ -432,9 +432,9 @@ void decimal_precision_examples()
     // Access as double
     std::cout << "(2) a: " << j["a"].as<double>() << ", b: " << j["b"].as<double>() << "\n\n"; 
 
-    // Using dec_to_str option
+    // Using lossless_number option
     json_options options;
-    options.dec_to_str(true);
+    options.lossless_number(true);
 
     json j2 = json::parse(s, options);
     // Access as string

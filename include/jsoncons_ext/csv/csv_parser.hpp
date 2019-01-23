@@ -921,7 +921,7 @@ private:
                 break;
             case csv_column_type::float_t:
                 {
-                    if (options_.dec_to_str())
+                    if (options_.lossless_number())
                     {
                         handler.string_value(value,semantic_tag_type::big_decimal, *this);
                     }
@@ -1289,7 +1289,7 @@ private:
         case numeric_check_state::fraction:
         case numeric_check_state::exp:
             {
-                if (options_.dec_to_str())
+                if (options_.lossless_number())
                 {
                     handler.string_value(value,semantic_tag_type::big_decimal, *this);
                 }

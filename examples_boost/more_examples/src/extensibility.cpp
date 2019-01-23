@@ -215,7 +215,7 @@ void boost_multiprecison_conversions()
 
     std::string s = "[100000000000000000000000000000000.1234]";
     json_options options;
-    options.dec_to_str(true);
+    options.lossless_number(true);
     json j = json::parse(s, options);
 
     multiprecision_type x = j[0].as<multiprecision_type>();

@@ -106,7 +106,7 @@ public:
 
     virtual std::basic_string<CharT> neginf_to_str() const = 0;
 
-    virtual bool dec_to_str() const = 0;
+    virtual bool lossless_number() const = 0;
 };
 
 template <class CharT>
@@ -231,7 +231,7 @@ private:
     std::basic_string<CharT> inf_to_str_;
     std::basic_string<CharT> neginf_to_str_;
 
-    bool dec_to_str_;
+    bool lossless_number;
 public:
     static const size_t indent_size_default = 4;
     static const size_t line_length_limit_default = 120;
@@ -270,7 +270,7 @@ public:
           is_str_to_nan_(false),
           is_str_to_inf_(false),
           is_str_to_neginf_(false),
-          dec_to_str_(false)
+          lossless_number(false)
     {
         new_line_chars_.push_back('\n');
     }
@@ -582,14 +582,14 @@ public:
         return *this;
     }
 
-    bool dec_to_str() const override
+    bool lossless_number() const override
     {
-        return dec_to_str_;
+        return lossless_number;
     }
 
-    basic_json_options<CharT>& dec_to_str(bool value) 
+    basic_json_options<CharT>& lossless_number(bool value) 
     {
-        dec_to_str_ = value;
+        lossless_number = value;
         return *this;
     }
 
@@ -659,6 +659,17 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+    bool dec_to_str() const 
+    {
+        return lossless_number;
+    }
+
+    basic_json_options<CharT>& dec_to_str(bool value) 
+    {
+        lossless_number = value;
+        return *this;
+    }
 
     size_t indent() const 
     {

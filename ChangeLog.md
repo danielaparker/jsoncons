@@ -3,8 +3,12 @@ master
 
 New features
 
-- New `csv_options` option `dec_to_str`. If set to `true`, parse decimal numbers as strings with
-  semantic tagging `semantic_tag_type::big_decimal` instead of double. Defaults to `false`.
+- New csv option `lossless_number`. If set to `true`, parse numbers with exponent and fractional parts as strings with
+  semantic tagging `semantic_tag_type::big_decimal` (instead of double.) Defaults to `false`.
+
+Name change
+
+- The name `dec_to_str` has been deprecated and renamed to `lossless_number`.
 
 v0.117.0
 --------
