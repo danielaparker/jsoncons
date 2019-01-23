@@ -136,9 +136,9 @@ bool dtoa(double val, char decimal_point, Result& result, std::false_type)
     {
         return false;
     }
-    int precision2 = std::numeric_limits<double>::max_digits10;
     if (to_double_(buffer,sizeof(buffer)) != val)
     {
+        const int precision2 = std::numeric_limits<double>::max_digits10;
         length = snprintf(buffer, sizeof(buffer), "%1.*g", precision2, val);
         if (length < 0)
         {
@@ -172,8 +172,9 @@ bool dtoa(double v, char decimal_point, Result& result, std::true_type)
         {
             result.push_back('-');
         }
-        // min exp -4 is consistent with sprintf
-        jsoncons::detail::prettify_string(buffer, length, k, -4, 21, result);
+        // min exp: -4 is consistent with sprintf
+        // max exp: std::numeric_limits<double>::max_digits10
+        jsoncons::detail::prettify_string(buffer, length, k, -4, std::numeric_limits<double>::max_digits10, result);
         return true;
     }
     else
