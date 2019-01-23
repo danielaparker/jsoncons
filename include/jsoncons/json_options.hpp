@@ -231,7 +231,7 @@ private:
     std::basic_string<CharT> inf_to_str_;
     std::basic_string<CharT> neginf_to_str_;
 
-    bool lossless_number;
+    bool lossless_number_;
 public:
     static const size_t indent_size_default = 4;
     static const size_t line_length_limit_default = 120;
@@ -270,7 +270,7 @@ public:
           is_str_to_nan_(false),
           is_str_to_inf_(false),
           is_str_to_neginf_(false),
-          lossless_number(false)
+          lossless_number_(false)
     {
         new_line_chars_.push_back('\n');
     }
@@ -584,12 +584,12 @@ public:
 
     bool lossless_number() const override
     {
-        return lossless_number;
+        return lossless_number_;
     }
 
     basic_json_options<CharT>& lossless_number(bool value) 
     {
-        lossless_number = value;
+        lossless_number_ = value;
         return *this;
     }
 
@@ -662,12 +662,12 @@ public:
 
     bool dec_to_str() const 
     {
-        return lossless_number;
+        return lossless_number_;
     }
 
     basic_json_options<CharT>& dec_to_str(bool value) 
     {
-        lossless_number = value;
+        lossless_number_ = value;
         return *this;
     }
 
