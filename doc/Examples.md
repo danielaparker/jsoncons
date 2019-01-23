@@ -4,7 +4,7 @@
 
 [Parse JSON from a string](#A1)  
 [Parse JSON from a file](#A2)  
-[Keep numbers with exponent or fractional parts as strings](#A8)  
+[Parse numbers without loosing precision](#A8)  
 [Validate JSON without incurring parse exceptions](#A3)  
 [How to allow comments? How not to?](#A4)  
 [Set a maximum nesting depth](#A5)  
@@ -86,7 +86,7 @@ json j = json::parse(is);
 
 <div id="A8"/> 
 
-#### Keep numbers with exponent or fractional parts as strings
+#### Parse numbers without loosing precision
 
 By default, jsoncons parses a number with an exponent or fractional part
 into a double precision floating point number. If you wish, you can
