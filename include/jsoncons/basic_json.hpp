@@ -27,7 +27,7 @@
 #include <jsoncons/pretty_print.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
-#include <jsoncons/container_types.hpp>
+#include <jsoncons/json_container_types.hpp>
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_serializer.hpp>
