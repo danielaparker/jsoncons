@@ -9,7 +9,7 @@
 
 #include <string>
 #include <sstream>
-#include <vector>
+#include <vector> 
 #include <memory>
 #include <algorithm> // std::min
 #include <utility> // std::move
