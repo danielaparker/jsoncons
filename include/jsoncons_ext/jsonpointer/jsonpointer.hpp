@@ -428,24 +428,25 @@ public:
         return current_.back().get();
     }
 
-    jsonpointer_errc get(reference root, const basic_path<char_type>& path)
+    void get(reference root, const basic_path<char_type>& path, std::error_code& ec)
     {
-        jsonpointer_errc ec = evaluate(root,path);
-        if (ec != jsonpointer_errc())
+        evaluate(root, path, ec);
+        if (ec)
         {
-            return ec;
+            return;
         }
         if (path.empty())
         {
-            return jsonpointer_errc();
+            return;
         }
-        return resolve(current_,buffer_);
+        resolve(current_, buffer_, ec);
     }
 
     string_type normalized_path(reference root, const basic_path<char_type>& path)
     {
-        jsonpointer_errc ec = evaluate(root,path);
-        if (ec != jsonpointer_errc())
+        std::error_code ec;
+        evaluate(root, path, ec);
+        if (ec)
         {
             return path.string();
         }
@@ -465,12 +466,12 @@ public:
         }
     }
 
-    jsonpointer_errc insert_or_assign(reference root, const basic_path<char_type>& path, const J& value)
+    void insert_or_assign(reference root, const basic_path<char_type>& path, const J& value, std::error_code& ec)
     {
-        jsonpointer_errc ec = evaluate(root,path);
-        if (ec != jsonpointer_errc())
+        evaluate(root, path, ec);
+        if (ec)
         {
-            return ec;
+            return;
         }
         if (current_.back().get().is_array())
         {
@@ -482,12 +483,14 @@ public:
             {
                 if (!jsoncons::detail::is_integer(buffer_.data(), buffer_.length()))
                 {
-                    return jsonpointer_errc::invalid_index;
+                    ec = jsonpointer_errc::invalid_index;
+                    return;
                 }
                 auto result = jsoncons::detail::to_integer<size_t>(buffer_.data(), buffer_.length());
                 if (result.overflow)
                 {
-                    return jsonpointer_errc::invalid_index;
+                    ec = jsonpointer_errc::invalid_index;
+                    return;
                 }
                 size_t index = result.value;
                 current_.back().get().insert(current_.back().get().array_range().begin()+index,value);
@@ -499,17 +502,17 @@ public:
         }
         else
         {
-            return jsonpointer_errc::expected_object_or_array;
+            ec = jsonpointer_errc::expected_object_or_array;
+            return;
         }
-        return jsonpointer_errc();
     }
 
-    jsonpointer_errc insert(reference root, const basic_path<char_type>& path, const J& value)
+    void insert(reference root, const basic_path<char_type>& path, const J& value, std::error_code& ec)
     {
-        jsonpointer_errc ec = evaluate(root,path);
-        if (ec != jsonpointer_errc())
+        evaluate(root, path, ec);
+        if (ec)
         {
-            return ec;
+            return;
         }
         if (current_.back().get().is_array())
         {
@@ -521,12 +524,14 @@ public:
             {
                 if (!jsoncons::detail::is_integer(buffer_.data(), buffer_.length()))
                 {
-                    return jsonpointer_errc::invalid_index;
+                    ec = jsonpointer_errc::invalid_index;
+                    return;
                 }
                 auto result = jsoncons::detail::to_integer<size_t>(buffer_.data(), buffer_.length());
                 if (result.overflow)
                 {
-                    return jsonpointer_errc::invalid_index;
+                    ec = jsonpointer_errc::invalid_index;
+                    return;
                 }
                 size_t index = result.value;
                 current_.back().get().insert(current_.back().get().array_range().begin()+index,value);
@@ -536,7 +541,8 @@ public:
         {
             if (current_.back().get().contains(buffer_))
             {
-                return jsonpointer_errc::key_already_exists;
+                ec = jsonpointer_errc::key_already_exists;
+                return;
             }
             else
             {
@@ -545,39 +551,43 @@ public:
         }
         else
         {
-            return jsonpointer_errc::expected_object_or_array;
+            ec = jsonpointer_errc::expected_object_or_array;
+            return;
         }
-        return jsonpointer_errc();
     }
 
-    jsonpointer_errc remove(reference root, const basic_path<char_type>& path)
+    void remove(reference root, const basic_path<char_type>& path, std::error_code& ec)
     {
-        jsonpointer_errc ec = evaluate(root,path);
-        if (ec != jsonpointer_errc())
+        evaluate(root, path, ec);
+        if (ec)
         {
-            return ec;
+            return;
         }
         if (current_.back().get().is_array())
         {
             if (buffer_.size() == 1 && buffer_[0] == '-')
             {
-                return jsonpointer_errc::index_exceeds_array_size;
+                ec = jsonpointer_errc::index_exceeds_array_size;
+                return;
             }
             else
             {
                 if (!jsoncons::detail::is_integer(buffer_.data(), buffer_.length()))
                 {
-                    return jsonpointer_errc::invalid_index;
+                    ec = jsonpointer_errc::invalid_index;
+                    return;
                 }
                 auto result = jsoncons::detail::to_integer<size_t>(buffer_.data(), buffer_.length());
                 if (result.overflow)
                 {
-                    return jsonpointer_errc::invalid_index;
+                    ec = jsonpointer_errc::invalid_index;
+                    return;
                 }
                 size_t index = result.value;
                 if (index >= current_.back().get().size())
                 {
-                    return jsonpointer_errc::index_exceeds_array_size;
+                    ec = jsonpointer_errc::index_exceeds_array_size;
+                    return;
                 }
                 current_.back().get().erase(current_.back().get().array_range().begin()+index);
             }
@@ -586,7 +596,8 @@ public:
         {
             if (!current_.back().get().contains(buffer_))
             {
-                return jsonpointer_errc::name_not_found;
+                ec = jsonpointer_errc::name_not_found;
+                return;
             }
             else
             {
@@ -595,39 +606,43 @@ public:
         }
         else
         {
-            return jsonpointer_errc::expected_object_or_array;
+            ec = jsonpointer_errc::expected_object_or_array;
+            return;
         }
-        return jsonpointer_errc();
     }
 
-    jsonpointer_errc replace(reference root, const basic_path<char_type>& path, const J& value)
+    void replace(reference root, const basic_path<char_type>& path, const J& value, std::error_code& ec)
     {
-        jsonpointer_errc ec = evaluate(root,path);
-        if (ec != jsonpointer_errc())
+        evaluate(root, path, ec);
+        if (ec)
         {
-            return ec;
+            return;
         }
         if (current_.back().get().is_array())
         {
             if (buffer_.size() == 1 && buffer_[0] == '-')
             {
-                return jsonpointer_errc::index_exceeds_array_size;
+                ec = jsonpointer_errc::index_exceeds_array_size;
+                return;
             }
             else
             {
                 if (!jsoncons::detail::is_integer(buffer_.data(), buffer_.length()))
                 {
-                    return jsonpointer_errc::invalid_index;
+                    ec = jsonpointer_errc::invalid_index;
+                    return;
                 }
                 auto result = jsoncons::detail::to_integer<size_t>(buffer_.data(), buffer_.length());
                 if (result.overflow)
                 {
-                    return jsonpointer_errc::invalid_index;
+                    ec = jsonpointer_errc::invalid_index;
+                    return;
                 }
                 size_t index = result.value;
                 if (index >= current_.back().get().size())
                 {
-                    return jsonpointer_errc::index_exceeds_array_size;
+                    ec = jsonpointer_errc::index_exceeds_array_size;
+                    return;
                 }
                 (current_.back().get())[index] = value;
             }
@@ -636,7 +651,8 @@ public:
         {
             if (!current_.back().get().contains(buffer_))
             {
-                return jsonpointer_errc::key_already_exists;
+                ec = jsonpointer_errc::key_already_exists;
+                return;
             }
             else
             {
@@ -645,15 +661,13 @@ public:
         }
         else
         {
-            return jsonpointer_errc::expected_object_or_array;
+            ec = jsonpointer_errc::expected_object_or_array;
+            return;
         }
-        return jsonpointer_errc();
     }
 
-    jsonpointer_errc evaluate(reference root, const basic_path<char_type>& path)
+    void evaluate(reference root, const basic_path<char_type>& path, std::error_code& ec)
     {
-        jsonpointer_errc ec = jsonpointer_errc();
-
         current_.push_back(root);
 
         auto it = path.begin();
@@ -662,42 +676,48 @@ public:
         while (it != end)
         {
             buffer_ = *it;
-            ++it;
+            it.increment(ec);
+            if (ec)
+                return;
             if (it == end)
             {
-                return jsonpointer_errc();
+                return;
             }
-            ec = resolve(current_, buffer_);
-            if (ec != jsonpointer_errc())
-                return ec;
+            resolve(current_, buffer_, ec);
+            if (ec)
+                return;
         }
-        return ec;
     }
 
-    static jsonpointer_errc resolve(std::vector<handle_type<J,JReference>>& current,
-                                    const string_view_type& buffer)
+    static void resolve(std::vector<handle_type<J,JReference>>& current,
+                        const string_view_type& buffer,
+                        std::error_code& ec)
     {
         if (current.back().get().is_array())
         {
             if (buffer.size() == 1 && buffer[0] == '-')
             {
-                return jsonpointer_errc::index_exceeds_array_size;
+                ec = jsonpointer_errc::index_exceeds_array_size;
+                return;
             }
             else
             {
                 if (!jsoncons::detail::is_integer(buffer.data(), buffer.length()))
                 {
-                    return jsonpointer_errc::invalid_index;
+                    ec = jsonpointer_errc::invalid_index;
+                    return;
                 }
                 auto result = jsoncons::detail::to_integer<size_t>(buffer.data(), buffer.length());
                 if (result.overflow)
                 {
-                    return jsonpointer_errc::invalid_index;
+                    ec = jsonpointer_errc::invalid_index;
+                    return;
                 }
                 size_t index = result.value;
                 if (index >= current.back().get().size())
                 {
-                    return jsonpointer_errc::index_exceeds_array_size;
+                    ec = jsonpointer_errc::index_exceeds_array_size;
+                    return;
                 }
                 current.push_back(current.back().get().at(index));
             }
@@ -706,15 +726,16 @@ public:
         {
             if (!current.back().get().contains(buffer))
             {
-                return jsonpointer_errc::name_not_found;
+                ec = jsonpointer_errc::name_not_found;
+                return;
             }
             current.push_back(current.back().get().at(buffer));
         }
         else
         {
-            return jsonpointer_errc::expected_object_or_array;
+            ec = jsonpointer_errc::expected_object_or_array;
+            return;
         }
-        return jsonpointer_errc();
     }
 
     // serializing_context
@@ -745,7 +766,7 @@ get(J& root, const basic_path<typename J::char_type>& path)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
     jsonpointer_errc ec = evaluator.get(root,path);
-    if (ec != jsonpointer_errc())
+    if (ec)
     {
         JSONCONS_THROW(jsonpointer_error(ec));
     }
@@ -756,52 +777,47 @@ template<class J>
 typename std::enable_if<is_accessible_by_reference<J>::value,const J&>::type
 get(const J& root, const basic_path<typename J::char_type>& path)
 {
-    jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
-    jsonpointer_errc ec = evaluator.get(root,path);
-    if (ec != jsonpointer_errc())
+    jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
+
+    std::error_code ec;
+    evaluator.get(root, path, ec);
+    if (ec)
     {
         JSONCONS_THROW(jsonpointer_error(ec));
     }
     return evaluator.get_result();
 }
-/*
+
 template<class J>
-typename std::enable_if<!is_accessible_by_reference<J>::value,J>::type
+typename std::enable_if<!is_accessible_by_reference<J>::value,const J&>::type
 get(const J& root, const basic_path<typename J::char_type>& path)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
-    jsonpointer_errc ec = evaluator.get(root,path);
-    if (ec != jsonpointer_errc())
+
+    std::error_code ec;
+    evaluator.get(root, path, ec);
+    if (ec)
     {
         JSONCONS_THROW(jsonpointer_error(ec));
     }
     return evaluator.get_result();
 }
-*/
+
 template<class J>
 typename std::enable_if<is_accessible_by_reference<J>::value,J&>::type
 get(J& root, const basic_path<typename J::char_type>& path, std::error_code& ec)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
-    ec = evaluator.get(root,path);
+    evaluator.get(root, path, ec);
     return evaluator.get_result();
 }
-/*
-template<class J>
-typename std::enable_if<is_accessible_by_reference<J>::value,const J&>::type
-get(const J& root, const basic_path<typename J::char_type>& path, std::error_code& ec)
-{
-    jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
-    ec = evaluator.get(root,path);
-    return evaluator.get_result();
-}
-*/
+
 template<class J>
 typename std::enable_if<!is_accessible_by_reference<J>::value,J>::type
 get(const J& root, const basic_path<typename J::char_type>& path, std::error_code& ec)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
-    ec = evaluator.get(root,path);
+    evaluator.get(root, path, ec);
     return evaluator.get_result();
 }
 
@@ -809,8 +825,9 @@ template<class J>
 bool contains(const J& root, const basic_path<typename J::char_type>& path)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
-    jsonpointer_errc ec = evaluator.get(root,path);
-    return ec == jsonpointer_errc() ? true : false;
+    std::error_code ec;
+    evaluator.get(root, path, ec);
+    return !ec ? true : false;
 }
 
 template<class J>
@@ -818,8 +835,9 @@ void insert_or_assign(J& root, const basic_path<typename J::char_type>& path, co
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
-    jsonpointer_errc ec = evaluator.insert_or_assign(root,path,value);
-    if (ec != jsonpointer_errc())
+    std::error_code ec;
+    evaluator.insert_or_assign(root, path, value, ec);
+    if (ec)
     {
         JSONCONS_THROW(jsonpointer_error(ec));
     }
@@ -830,7 +848,7 @@ void insert_or_assign(J& root, const basic_path<typename J::char_type>& path, co
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
-    ec = evaluator.insert_or_assign(root,path,value);
+    evaluator.insert_or_assign(root, path, value, ec);
 }
 
 template<class J>
@@ -838,8 +856,9 @@ void insert(J& root, const basic_path<typename J::char_type>& path, const J& val
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
-    jsonpointer_errc ec = evaluator.insert(root,path,value);
-    if (ec != jsonpointer_errc())
+    std::error_code ec;
+    evaluator.insert(root, path, value, ec);
+    if (ec)
     {
         JSONCONS_THROW(jsonpointer_error(ec));
     }
@@ -850,7 +869,7 @@ void insert(J& root, const basic_path<typename J::char_type>& path, const J& val
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
-    ec = evaluator.insert(root,path,value);
+    evaluator.insert(root, path, value, ec);
 }
 
 template<class J>
@@ -858,8 +877,9 @@ void remove(J& root, const basic_path<typename J::char_type>& path)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
-    jsonpointer_errc ec = evaluator.remove(root,path);
-    if (ec != jsonpointer_errc())
+    std::error_code ec;
+    evaluator.remove(root, path, ec);
+    if (ec)
     {
         JSONCONS_THROW(jsonpointer_error(ec));
     }
@@ -870,7 +890,7 @@ void remove(J& root, const basic_path<typename J::char_type>& path, std::error_c
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
-    ec = evaluator.remove(root,path);
+    evaluator.remove(root, path, ec);
 }
 
 template<class J>
@@ -878,8 +898,9 @@ void replace(J& root, const basic_path<typename J::char_type>& path, const J& va
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
-    jsonpointer_errc ec = evaluator.replace(root,path,value);
-    if (ec != jsonpointer_errc())
+    std::error_code ec;
+    evaluator.replace(root, path, value, ec);
+    if (ec)
     {
         JSONCONS_THROW(jsonpointer_error(ec));
     }
@@ -890,7 +911,7 @@ void replace(J& root, const basic_path<typename J::char_type>& path, const J& va
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
-    ec = evaluator.replace(root,path,value);
+    evaluator.replace(root, path, value, ec);
 }
 
 template <class String>
