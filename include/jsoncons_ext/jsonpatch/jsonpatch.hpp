@@ -252,8 +252,8 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
         }
         else
         {
-            const string_view_type op = operation.at(detail::op_literal<char_type>()).as_string_view();
-            const string_view_type path = operation.at(detail::path_literal<char_type>()).as_string_view();
+            string_view_type op = operation.at(detail::op_literal<char_type>()).as_string_view();
+            string_view_type path = operation.at(detail::path_literal<char_type>()).as_string_view();
 
             if (op ==jsoncons::jsonpatch::detail::test_literal<char_type>())
             {
