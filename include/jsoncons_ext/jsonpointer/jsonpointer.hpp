@@ -775,9 +775,9 @@ get(J& root, const basic_path<typename J::char_type>& path)
 
 template<class J>
 typename std::enable_if<is_accessible_by_reference<J>::value,const J&>::type
-get(J& root, const basic_path<typename J::char_type>& path)
+get(const J& root, const basic_path<typename J::char_type>& path)
 {
-    jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
+    jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
 
     std::error_code ec;
     evaluator.get(root, path, ec);
@@ -789,7 +789,7 @@ get(J& root, const basic_path<typename J::char_type>& path)
 }
 
 template<class J>
-typename std::enable_if<!is_accessible_by_reference<J>::value,const J&>::type
+typename std::enable_if<!is_accessible_by_reference<J>::value,J>::type
 get(const J& root, const basic_path<typename J::char_type>& path)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
@@ -808,6 +808,15 @@ typename std::enable_if<is_accessible_by_reference<J>::value,J&>::type
 get(J& root, const basic_path<typename J::char_type>& path, std::error_code& ec)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
+    evaluator.get(root, path, ec);
+    return evaluator.get_result();
+}
+
+template<class J>
+typename std::enable_if<is_accessible_by_reference<J>::value,const J&>::type
+get(const J& root, const basic_path<typename J::char_type>& path, std::error_code& ec)
+{
+    jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
     evaluator.get(root, path, ec);
     return evaluator.get_result();
 }
