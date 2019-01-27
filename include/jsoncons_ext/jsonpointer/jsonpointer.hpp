@@ -97,8 +97,8 @@ class path_iterator
     std::basic_string<char_type> buffer_;
 public:
     typedef string_type value_type;
-    typedef typename std::ptrdiff_t difference_type;
-    typedef typename value_type* pointer;
+    typedef std::ptrdiff_t difference_type;
+    typedef value_type* pointer;
     typedef const value_type& reference;
     typedef std::input_iterator_tag iterator_category;
 
