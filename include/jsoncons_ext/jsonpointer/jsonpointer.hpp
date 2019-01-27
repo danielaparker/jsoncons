@@ -775,7 +775,7 @@ get(J& root, const basic_path<typename J::char_type>& path)
 
 template<class J>
 typename std::enable_if<is_accessible_by_reference<J>::value,const J&>::type
-get(const J& root, const basic_path<typename J::char_type>& path)
+get(J& root, const basic_path<typename J::char_type>& path)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
