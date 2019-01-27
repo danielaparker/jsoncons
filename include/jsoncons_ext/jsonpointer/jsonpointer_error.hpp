@@ -1,4 +1,4 @@
-/// Copyright 2013 Daniel Parker
+// Copyright 2013 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -16,10 +16,9 @@ enum class jsonpointer_errc
 {
     ok = 0,
     expected_slash = 1,
-    expected_digit_or_dash,
-    unexpected_leading_zero,
     index_exceeds_array_size,
     expected_0_or_1,
+    invalid_index,
     name_not_found,
     key_already_exists,
     expected_object_or_array,
@@ -38,26 +37,24 @@ public:
     {
         switch (static_cast<jsonpointer_errc>(ev))
         {
-        case jsonpointer_errc::expected_slash:
-            return "Expected /";
-        case jsonpointer_errc::expected_digit_or_dash:
-            return "Expected digit or '-'";
-        case jsonpointer_errc::unexpected_leading_zero:
-            return "Unexpected leading zero";
-        case jsonpointer_errc::index_exceeds_array_size:
-            return "Index exceeds array size";
-        case jsonpointer_errc::expected_0_or_1:
-            return "Expected '0' or '1' after escape character '~'";
-        case jsonpointer_errc::name_not_found:
-            return "Name not found";
-        case jsonpointer_errc::key_already_exists:
-            return "Key already exists";
-        case jsonpointer_errc::expected_object_or_array:
-            return "Expected object or array";
-        case jsonpointer_errc::end_of_input:
-            return "Unexpected end of input";
-        default:
-            return "Unknown jsonpointer error";
+            case jsonpointer_errc::expected_slash:
+                return "Expected /";
+            case jsonpointer_errc::index_exceeds_array_size:
+                return "Index exceeds array size";
+            case jsonpointer_errc::expected_0_or_1:
+                return "Expected '0' or '1' after escape character '~'";
+            case jsonpointer_errc::name_not_found:
+                return "Name not found";
+            case jsonpointer_errc::invalid_index:
+                return "Invalid index";
+            case jsonpointer_errc::key_already_exists:
+                return "Key already exists";
+            case jsonpointer_errc::expected_object_or_array:
+                return "Expected object or array";
+            case jsonpointer_errc::end_of_input:
+                return "Unexpected end of input";
+            default:
+                return "Unknown jsonpointer error";
         }
     }
 };

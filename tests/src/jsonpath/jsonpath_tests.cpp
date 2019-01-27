@@ -580,7 +580,7 @@ TEST_CASE("test_jsonpath_book_filter_false_or_true")
     json result = json_query(root,"$..book[?(false || true)]");
     //std::cout << pretty_print(result) << std::endl;
     
-    CHECK(fixture.book() == result);
+    CHECK(result == fixture.book());
 }
 
 TEST_CASE("test_jsonpath_store_book_authors")
@@ -1396,7 +1396,6 @@ TEST_CASE("test_array_array_nested")
 
     CHECK(result == expected);
 }
-
 
 
 

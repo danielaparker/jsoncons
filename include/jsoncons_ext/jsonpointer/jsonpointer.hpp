@@ -11,10 +11,13 @@
 #include <sstream>
 #include <vector>
 #include <memory>
+#include <iostream>
+#include <iterator>
 #include <utility> // std::move
 #include <type_traits> // std::enable_if, std::true_type
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
+#include <jsoncons/detail/print_number.hpp>
 
 namespace jsoncons { namespace jsonpointer {
 
@@ -65,20 +68,280 @@ struct is_accessible_by_reference<J,
                                                     && std::is_reference<decltype(std::declval<J>().at(0))>::value>::type> 
 : std::true_type {};
 
-
-
 namespace detail {
 
 enum class pointer_state 
 {
     start,
-    array_reference_token,
-    zero_array_reference_token,
-    nonzero_array_reference_token,
-    after_last_array_reference_token,
-    object_reference_token,
-    escaped
+    escaped,
+    delim
 };
+
+} // detail
+
+// path_iterator
+template <class InputIt>
+class path_iterator
+{
+    typedef typename std::iterator_traits<InputIt>::value_type char_type;
+    typedef std::basic_string<char_type> string_type;
+    typedef InputIt base_iterator;
+
+    jsonpointer::detail::pointer_state state_;
+    size_t line_;
+    size_t column_;
+    base_iterator path_ptr_;
+    base_iterator end_input_;
+    base_iterator p_;
+    base_iterator q_;
+    std::basic_string<char_type> buffer_;
+public:
+    typedef string_type value_type;
+    typedef typename std::ptrdiff_t difference_type;
+    typedef typename value_type* pointer;
+    typedef const value_type& reference;
+    typedef std::input_iterator_tag iterator_category;
+
+    path_iterator(base_iterator first, base_iterator last)
+        : path_iterator(first, last, first)
+    {
+        std::error_code ec;
+        increment(ec);
+    }
+
+    path_iterator(base_iterator first, base_iterator last, base_iterator current)
+    {
+        path_ptr_ = first;
+        end_input_ = last;
+        p_ = current;
+        q_ = current;
+    }
+
+    path_iterator(const path_iterator&) = default;
+
+    path_iterator(path_iterator&&) = default;
+
+    path_iterator& operator=(const path_iterator&) = default;
+
+    path_iterator& operator=(path_iterator&&) = default;
+
+    path_iterator& operator++()
+    {
+        std::error_code ec;
+        increment(ec);
+        if (ec)
+        {
+            throw jsonpointer_error(ec);
+        }
+        return *this;
+    }
+
+    path_iterator& increment(std::error_code& ec)
+    {
+        q_ = p_;
+        buffer_.clear();
+
+        bool done = false;
+        while (p_ < end_input_ && !done)
+        {
+            switch (state_)
+            {
+                case jsonpointer::detail::pointer_state::start: 
+                    switch (*p_)
+                    {
+                        case '/':
+                            state_ = jsonpointer::detail::pointer_state::delim;
+                            break;
+                        default:
+                            ec = jsonpointer_errc::expected_slash;
+                            done = true;
+                            break;
+                        };
+                        ++p_;
+                        ++column_;
+                        break;
+                    case jsonpointer::detail::pointer_state::delim: 
+                        switch (*p_)
+                        {
+                            case '/':
+                                state_ = jsonpointer::detail::pointer_state::delim;
+                                done = true;
+                                break;
+                            case '~':
+                                state_ = jsonpointer::detail::pointer_state::escaped;
+                                break;
+                            default:
+                                buffer_.push_back(*p_);
+                                break;
+                        };
+                        ++p_;
+                        ++column_;
+                        break;
+                    case jsonpointer::detail::pointer_state::escaped: 
+                        switch (*p_)
+                        {
+                        case '0':
+                            buffer_.push_back('~');
+                            state_ = jsonpointer::detail::pointer_state::delim;
+                            break;
+                        case '1':
+                            buffer_.push_back('/');
+                            state_ = jsonpointer::detail::pointer_state::delim;
+                            break;
+                        default:
+                            ec = jsonpointer_errc::expected_0_or_1;
+                            done = true;
+                            break;
+                        };
+                        ++p_;
+                        ++column_;
+                        break;
+            }
+        }
+        return *this;
+    }
+
+    path_iterator operator++(int) // postfix increment
+    {
+        path_iterator temp(*this);
+        return temp;
+    }
+
+    path_iterator& operator--()
+    {
+        return *this;
+    }
+
+    path_iterator operator--(int)
+    {
+        path_iterator temp(*this);
+        return temp;
+    }
+
+    reference operator*() const
+    {
+        return buffer_;
+    }
+
+    friend bool operator==(const path_iterator& it1, const path_iterator& it2)
+    {
+        return it1.q_ == it2.q_;
+    }
+    friend bool operator!=(const path_iterator& it1, const path_iterator& it2)
+    {
+        return !(it1 == it2);
+    }
+
+private:
+};
+
+template <class Source>
+Source escape_string(const Source& s)
+{
+    Source result;
+    auto begin = s.begin();
+    auto end = s.end();
+    for (auto it = begin; it != end; ++it)
+    {
+        switch (*it)
+        {
+            case '~':
+                result.push_back('~');
+                result.push_back('0');
+                break;
+            case '/':
+                result.push_back('~');
+                result.push_back('1');
+                break;
+            default:
+                result.push_back(*it);
+                break;
+        }
+    }
+    return result;
+}
+
+// path
+
+template <class CharT>
+class basic_path
+{
+    std::basic_string<CharT> path_;
+public:
+    typedef CharT char_type;
+    typedef std::basic_string<char_type> string_type;
+    typedef path_iterator<typename string_type::const_iterator> const_iterator;
+    typedef const_iterator iterator;
+
+    basic_path()
+    {
+    }
+    basic_path(const std::basic_string<CharT>& path)
+        : path_(path)
+    {
+    }
+    basic_path(std::basic_string<CharT>&& path)
+        : path_(std::move(path))
+    {
+    }
+
+    basic_path(const basic_path&) = default;
+
+    basic_path(basic_path&&) = default;
+
+    basic_path& operator=(const basic_path&) = default;
+
+    basic_path& operator=(basic_path&&) = default;
+
+    std::basic_string<CharT> as_string() const
+    {
+        return path_;
+    }
+
+    size_t as_index() const
+    {
+        auto result = jsoncons::detail::to_integer<size_t>(path_.data(), path_.length());
+        return result.value;
+    }
+
+    iterator begin()
+    {
+        return iterator(path_.begin(),path_.end());
+    }
+    iterator end()
+    {
+        return iterator(path_.begin(), path_.end(), path_.end());
+    }
+
+    const_iterator begin() const
+    {
+        return iterator(path_.begin(),path_.end());
+    }
+    const iterator end() const
+    {
+        return iterator(path_.begin(), path_.end(), path_.end());
+    }
+
+    basic_path& append(const std::basic_string<CharT>& rhs)
+    {
+        path_.push_back('/');
+        path_.append(escape_string(rhs));
+
+        return *this;
+    }
+
+    friend std::basic_ostream<CharT>&
+    operator<<( std::basic_ostream<CharT>& os, const basic_path<CharT>& p )
+    {
+        os << p.path_;
+        return os;
+    }
+};
+
+typedef basic_path<char> path;
+
+namespace detail {
+
 template <class J,class JReference,class Enable = void>
 class handle_type
 {
@@ -138,63 +401,6 @@ private:
 };
 
 template<class J,class JReference>
-struct path_resolver
-{
-    typedef typename J::string_view_type string_view_type;
-
-    jsonpointer_errc operator()(std::vector<handle_type<J,JReference>>& current,
-                                size_t index) const
-    {
-        if (index >= current.back().get().size())
-        {
-            return jsonpointer_errc::index_exceeds_array_size;
-        }
-        current.push_back(current.back().get().at(index));
-        return jsonpointer_errc();
-    }
-
-    jsonpointer_errc operator()(std::vector<handle_type<J,JReference>>& current,
-                                const string_view_type& name) const
-    {
-        if (!current.back().get().contains(name))
-        {
-            return jsonpointer_errc::name_not_found;
-        }
-        current.push_back(current.back().get().at(name));
-        return jsonpointer_errc();
-    }
-};
-
-template<class J, class JReference>
-struct path_setter
-{
-    typedef typename J::string_view_type string_view_type;
-
-    jsonpointer_errc operator()(std::vector<handle_type<J,JReference>>& current,
-                                size_t index) const
-    {
-        if (index >= current.back().get().size())
-        {
-            return jsonpointer_errc::index_exceeds_array_size;
-        }
-        current.push_back(current.back().get().at(index));
-        return jsonpointer_errc();
-    }
-
-    jsonpointer_errc operator()(std::vector<handle_type<J,JReference>>& current,
-                                const string_view_type& name) const
-    {
-        jsonpointer_errc ec = jsonpointer_errc();
-        if (!current.back().get().contains(name))
-        {
-            return jsonpointer_errc::name_not_found;
-        }
-        current.push_back(current.back().get().at(name));
-        return ec;
-    }
-};
-
-template<class J,class JReference>
 class jsonpointer_evaluator : private serializing_context
 {
     typedef typename handle_type<J,JReference>::type type;
@@ -204,14 +410,9 @@ class jsonpointer_evaluator : private serializing_context
     using reference = JReference;
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JReference>::type>::value,typename J::const_pointer,typename J::pointer>::type;
 
-    jsonpointer::detail::pointer_state state_;
     size_t line_;
     size_t column_;
-    const char_type* begin_input_;
-    const char_type* end_input_;
-    const char_type* p_;
     string_type buffer_;
-    size_t index_;
     std::vector<handle_type<J,JReference>> current_;
 public:
     type get_result() 
@@ -221,38 +422,26 @@ public:
 
     jsonpointer_errc get(reference root, const string_view_type& path)
     {
-        path_resolver<J,reference> op;
-        jsonpointer_errc ec = evaluate(root,op,path);
+        jsonpointer_errc ec = evaluate(root,path);
         if (ec != jsonpointer_errc())
         {
             return ec;
         }
-
-        switch (state_)
+        if (path.empty())
         {
-        case pointer_state::start: 
-            break;
-        case pointer_state::zero_array_reference_token: 
-        case pointer_state::nonzero_array_reference_token: 
-            ec = op(current_,index_);
-            break;
-        case pointer_state::object_reference_token: 
-            ec = op(current_,buffer_);
-            break;
-        default:
-            return jsonpointer_errc::end_of_input;
+            return jsonpointer_errc();
         }
-        return ec;
+        return resolve(current_,buffer_);
     }
 
     string_type normalized_path(reference root, const string_view_type& path)
     {
-        jsonpointer_errc ec = evaluate(root,path_setter<J,reference>(),path);
+        jsonpointer_errc ec = evaluate(root,path);
         if (ec != jsonpointer_errc())
         {
             return string_type(path);
         }
-        if (state_ == jsonpointer::detail::pointer_state::after_last_array_reference_token)
+        if (current_.back().get().is_array() && buffer_.size() == 1 && buffer_[0] == '-')
         {
             string_type p = string_type(path.substr(0,path.length()-1));
             std::string s = std::to_string(current_.back().get().size());
@@ -270,382 +459,256 @@ public:
 
     jsonpointer_errc insert_or_assign(reference root, const string_view_type& path, const J& value)
     {
-        jsonpointer_errc ec = evaluate(root,path_setter<J,reference>(),path);
+        jsonpointer_errc ec = evaluate(root,path);
         if (ec != jsonpointer_errc())
         {
             return ec;
         }
-
-        switch (state_)
+        if (current_.back().get().is_array())
         {
-        case jsonpointer::detail::pointer_state::start: 
-            break;
-        case jsonpointer::detail::pointer_state::zero_array_reference_token: 
-        case jsonpointer::detail::pointer_state::nonzero_array_reference_token: 
-            if (index_ > current_.back().get().size())
-            {
-                return jsonpointer_errc::index_exceeds_array_size;
-            }
-            if (index_ == current_.back().get().size())
+            if (buffer_.size() == 1 && buffer_[0] == '-')
             {
                 current_.back().get().push_back(value);
             }
             else
             {
-                current_.back().get().insert(current_.back().get().array_range().begin()+index_,value);
+                if (!jsoncons::detail::is_integer(buffer_.data(), buffer_.length()))
+                {
+                    return jsonpointer_errc::invalid_index;
+                }
+                auto result = jsoncons::detail::to_integer<size_t>(buffer_.data(), buffer_.length());
+                if (result.overflow)
+                {
+                    return jsonpointer_errc::invalid_index;
+                }
+                size_t index = result.value;
+                current_.back().get().insert(current_.back().get().array_range().begin()+index,value);
             }
-            break;
-        case jsonpointer::detail::pointer_state::after_last_array_reference_token:
-            current_.back().get().push_back(value);
-            break;
-        case jsonpointer::detail::pointer_state::object_reference_token: 
-            current_.back().get().insert_or_assign(buffer_,value);
-            break;
-        default:
-            return jsonpointer_errc::end_of_input;
         }
-        return ec;
+        else if (current_.back().get().is_object())
+        {
+            current_.back().get().insert_or_assign(buffer_,value);
+        }
+        else
+        {
+            return jsonpointer_errc::expected_object_or_array;
+        }
+        return jsonpointer_errc();
     }
 
     jsonpointer_errc insert(reference root, const string_view_type& path, const J& value)
     {
-        jsonpointer_errc ec = evaluate(root,path_setter<J,reference>(),path);
+        jsonpointer_errc ec = evaluate(root,path);
         if (ec != jsonpointer_errc())
         {
             return ec;
         }
-
-        switch (state_)
+        if (current_.back().get().is_array())
         {
-        case jsonpointer::detail::pointer_state::start: 
-            break;
-        case jsonpointer::detail::pointer_state::zero_array_reference_token: 
-        case jsonpointer::detail::pointer_state::nonzero_array_reference_token: 
-            if (index_ > current_.back().get().size())
-            {
-                return jsonpointer_errc::index_exceeds_array_size;
-            }
-            if (index_ == current_.back().get().size())
+            if (buffer_.size() == 1 && buffer_[0] == '-')
             {
                 current_.back().get().push_back(value);
             }
             else
             {
-                current_.back().get().insert(current_.back().get().array_range().begin()+index_,value);
+                if (!jsoncons::detail::is_integer(buffer_.data(), buffer_.length()))
+                {
+                    return jsonpointer_errc::invalid_index;
+                }
+                auto result = jsoncons::detail::to_integer<size_t>(buffer_.data(), buffer_.length());
+                if (result.overflow)
+                {
+                    return jsonpointer_errc::invalid_index;
+                }
+                size_t index = result.value;
+                current_.back().get().insert(current_.back().get().array_range().begin()+index,value);
             }
-            break;
-        case jsonpointer::detail::pointer_state::after_last_array_reference_token:
-            current_.back().get().push_back(value);
-            break;
-        case jsonpointer::detail::pointer_state::object_reference_token: 
+        }
+        else if (current_.back().get().is_object())
+        {
             if (current_.back().get().contains(buffer_))
             {
-                ec = jsonpointer_errc::key_already_exists;
+                return jsonpointer_errc::key_already_exists;
             }
             else
             {
                 current_.back().get().insert_or_assign(buffer_,value);
             }
-            break;
-        default:
-            return jsonpointer_errc::end_of_input;
         }
-        return ec;
-    }
-
-    jsonpointer_errc remove(reference root, const string_view_type& path)
-    {
-        jsonpointer_errc ec = evaluate(root,path_resolver<J,reference>(),path);
-        if (ec != jsonpointer_errc())
+        else
         {
-            return ec;
-        }
-
-        switch (state_)
-        {
-        case jsonpointer::detail::pointer_state::start: 
-            break;
-        case jsonpointer::detail::pointer_state::zero_array_reference_token: 
-        case jsonpointer::detail::pointer_state::nonzero_array_reference_token: 
-            if (index_ >= current_.back().get().size())
-            {
-                return jsonpointer_errc::index_exceeds_array_size;
-            }
-            current_.back().get().erase(current_.back().get().array_range().begin()+index_);
-            break;
-        case jsonpointer::detail::pointer_state::after_last_array_reference_token:
-            return jsonpointer_errc::index_exceeds_array_size;
-        case jsonpointer::detail::pointer_state::object_reference_token: 
-            if (!current_.back().get().contains(buffer_))
-            {
-                return jsonpointer_errc::name_not_found;
-            }
-            current_.back().get().erase(buffer_);
-            break;
-        default:
-            return jsonpointer_errc::end_of_input;
-        }
-        return ec;
-    }
-
-    jsonpointer_errc replace(reference root, const string_view_type& path, const J& value)
-    {
-        jsonpointer_errc ec = evaluate(root,path_resolver<J,reference>(),path);
-        if (ec != jsonpointer_errc())
-        {
-            return ec;
-        }
-
-        switch (state_)
-        {
-        case jsonpointer::detail::pointer_state::start: 
-            break;
-        case jsonpointer::detail::pointer_state::zero_array_reference_token: 
-        case jsonpointer::detail::pointer_state::nonzero_array_reference_token: 
-            if (index_ >= current_.back().get().size())
-            {
-                return jsonpointer_errc::index_exceeds_array_size;
-            }
-            (current_.back().get())[index_] = value;
-            break;
-        case jsonpointer::detail::pointer_state::after_last_array_reference_token:
-            return jsonpointer_errc::index_exceeds_array_size;
-        case jsonpointer::detail::pointer_state::object_reference_token: 
-            if (!current_.back().get().contains(buffer_))
-            {
-                return jsonpointer_errc::name_not_found;
-            }
-            current_.back().get().insert_or_assign(buffer_,value);
-            break;
-        default:
-            return jsonpointer_errc::end_of_input;
+            return jsonpointer_errc::expected_object_or_array;
         }
         return jsonpointer_errc();
     }
 
-    template <class Op>
-    jsonpointer_errc evaluate(reference root, Op op, const string_view_type& path)
+    jsonpointer_errc remove(reference root, const string_view_type& path)
+    {
+        jsonpointer_errc ec = evaluate(root,path);
+        if (ec != jsonpointer_errc())
+        {
+            return ec;
+        }
+        if (current_.back().get().is_array())
+        {
+            if (buffer_.size() == 1 && buffer_[0] == '-')
+            {
+                return jsonpointer_errc::index_exceeds_array_size;
+            }
+            else
+            {
+                if (!jsoncons::detail::is_integer(buffer_.data(), buffer_.length()))
+                {
+                    return jsonpointer_errc::invalid_index;
+                }
+                auto result = jsoncons::detail::to_integer<size_t>(buffer_.data(), buffer_.length());
+                if (result.overflow)
+                {
+                    return jsonpointer_errc::invalid_index;
+                }
+                size_t index = result.value;
+                if (index >= current_.back().get().size())
+                {
+                    return jsonpointer_errc::index_exceeds_array_size;
+                }
+                current_.back().get().erase(current_.back().get().array_range().begin()+index);
+            }
+        }
+        else if (current_.back().get().is_object())
+        {
+            if (!current_.back().get().contains(buffer_))
+            {
+                return jsonpointer_errc::name_not_found;
+            }
+            else
+            {
+                current_.back().get().erase(buffer_);
+            }
+        }
+        else
+        {
+            return jsonpointer_errc::expected_object_or_array;
+        }
+        return jsonpointer_errc();
+    }
+
+    jsonpointer_errc replace(reference root, const string_view_type& path, const J& value)
+    {
+        jsonpointer_errc ec = evaluate(root,path);
+        if (ec != jsonpointer_errc())
+        {
+            return ec;
+        }
+        if (current_.back().get().is_array())
+        {
+            if (buffer_.size() == 1 && buffer_[0] == '-')
+            {
+                return jsonpointer_errc::index_exceeds_array_size;
+            }
+            else
+            {
+                if (!jsoncons::detail::is_integer(buffer_.data(), buffer_.length()))
+                {
+                    return jsonpointer_errc::invalid_index;
+                }
+                auto result = jsoncons::detail::to_integer<size_t>(buffer_.data(), buffer_.length());
+                if (result.overflow)
+                {
+                    return jsonpointer_errc::invalid_index;
+                }
+                size_t index = result.value;
+                if (index >= current_.back().get().size())
+                {
+                    return jsonpointer_errc::index_exceeds_array_size;
+                }
+                (current_.back().get())[index] = value;
+            }
+        }
+        else if (current_.back().get().is_object())
+        {
+            if (!current_.back().get().contains(buffer_))
+            {
+                return jsonpointer_errc::key_already_exists;
+            }
+            else
+            {
+                current_.back().get().insert_or_assign(buffer_,value);
+            }
+        }
+        else
+        {
+            return jsonpointer_errc::expected_object_or_array;
+        }
+        return jsonpointer_errc();
+    }
+
+    jsonpointer_errc evaluate(reference root, const string_view_type& path)
     {
         jsonpointer_errc ec = jsonpointer_errc();
 
-        line_ = 1;
-        column_ = 1;
-        state_ = jsonpointer::detail::pointer_state::start;
-        begin_input_ = path.data();
-        end_input_ = path.data() + path.length();
-        p_ = begin_input_;
-
-        index_ = 0;
-
         current_.push_back(root);
 
-        while (p_ < end_input_)
+        basic_path<char_type> p{ std::basic_string<char_type>(path) };
+
+        path_iterator<typename string_view_type::const_iterator> it(path.begin(),path.end());
+        path_iterator<typename string_view_type::const_iterator> end(path.begin(),path.end(),path.end());
+
+        while (it != end)
         {
-            switch (state_)
+            buffer_ = *it;
+            ++it;
+            if (it == end)
             {
-            case jsonpointer::detail::pointer_state::start: 
-                switch (*p_)
-                {
-                case '/':
-                    if (current_.back().get().is_array())
-                    {
-                        state_ = jsonpointer::detail::pointer_state::array_reference_token;
-                        index_ = 0;
-                    }
-                    else if (current_.back().get().is_object())
-                    {
-                        state_ = jsonpointer::detail::pointer_state::object_reference_token;
-                        buffer_.clear();
-                    }
-                    else
-                    {
-                        return jsonpointer_errc::expected_object_or_array;
-                    }
-                    break;
-                default:
-                    return jsonpointer_errc::expected_slash;
-                };
-                ++p_;
-                ++column_;
-                break;
-            case jsonpointer::detail::pointer_state::array_reference_token: 
-                switch (*p_)
-                {
-                case '0':
-                    index_ = 0;
-                    state_ = jsonpointer::detail::pointer_state::zero_array_reference_token;
-                    break;
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                    index_ = (*p_ - '0');
-                    state_ = jsonpointer::detail::pointer_state::nonzero_array_reference_token;
-                    break;
-                case '-':
-                    state_ = jsonpointer::detail::pointer_state::after_last_array_reference_token;
-                    break;
-                default:
-                    return jsonpointer_errc::expected_digit_or_dash;
-                };
-                ++p_;
-                ++column_;
-                break;
-            case jsonpointer::detail::pointer_state::zero_array_reference_token: 
-                switch (*p_)
-                {
-                case '/':
-                    ec = op(current_,index_);
-                    if (ec != jsonpointer_errc())
-                    {
-                        return ec;
-                    }
-                    if (current_.back().get().is_array())
-                    {
-                        state_ = jsonpointer::detail::pointer_state::array_reference_token;
-                        index_ = 0;
-                    }
-                    else if (current_.back().get().is_object())
-                    {
-                        state_ = jsonpointer::detail::pointer_state::object_reference_token;
-                        buffer_.clear();
-                    }
-                    else
-                    {
-                        return jsonpointer_errc::expected_object_or_array;
-                    }
-                    break;
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                    return jsonpointer_errc::unexpected_leading_zero;
-                case '-':
-                    return jsonpointer_errc::index_exceeds_array_size;
-                default:
-                    return jsonpointer_errc::expected_digit_or_dash;
-                };
-                ++p_;
-                ++column_;
-                break;
-            case jsonpointer::detail::pointer_state::after_last_array_reference_token: 
-                switch (*p_)
-                {
-                case '/':
-                    return jsonpointer_errc::index_exceeds_array_size;
-                default:
-                    return jsonpointer_errc::expected_slash;
-                };
-                break;
-            case jsonpointer::detail::pointer_state::nonzero_array_reference_token: 
-                switch (*p_)
-                {
-                case '/':
-                    ec = op(current_,index_);
-                    if (ec != jsonpointer_errc())
-                    {
-                        return ec;
-                    }
-                    if (current_.back().get().is_array())
-                    {
-                        state_ = jsonpointer::detail::pointer_state::array_reference_token;
-                        index_ = 0;
-                    }
-                    else if (current_.back().get().is_object())
-                    {
-                        state_ = jsonpointer::detail::pointer_state::object_reference_token;
-                        buffer_.clear();
-                    }
-                    else
-                    {
-                        return jsonpointer_errc::expected_object_or_array;
-                    }
-                    break;
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                    index_ = index_ * 10 + (*p_ - '0');
-                    break;
-                case '-':
-                    return jsonpointer_errc::index_exceeds_array_size;
-                default:
-                    return jsonpointer_errc::expected_digit_or_dash;
-                };
-                ++p_;
-                ++column_;
-                break;
-            case jsonpointer::detail::pointer_state::object_reference_token: 
-                switch (*p_)
-                {
-                case '/':
-                    ec = op(current_,buffer_);
-                    if (ec != jsonpointer_errc())
-                    {
-                        return ec;
-                    }
-                    if (current_.back().get().is_array())
-                    {
-                        state_ = jsonpointer::detail::pointer_state::array_reference_token;
-                        index_ = 0;
-                    }
-                    else if (current_.back().get().is_object())
-                    {
-                        state_ = jsonpointer::detail::pointer_state::object_reference_token;
-                        buffer_.clear();
-                    }
-                    else
-                    {
-                        return jsonpointer_errc::expected_object_or_array;
-                    }
-                    break;
-                case '~':
-                    state_ = jsonpointer::detail::pointer_state::escaped;
-                    break;
-                default:
-                    buffer_.push_back(*p_);
-                    break;
-                };
-                ++p_;
-                ++column_;
-                break;
-            case jsonpointer::detail::pointer_state::escaped: 
-                switch (*p_)
-                {
-                case '0':
-                    buffer_.push_back('~');
-                    state_ = jsonpointer::detail::pointer_state::object_reference_token;
-                    break;
-                case '1':
-                    buffer_.push_back('/');
-                    state_ = jsonpointer::detail::pointer_state::object_reference_token;
-                    break;
-                default:
-                    return jsonpointer_errc::expected_0_or_1;
-                };
-                ++p_;
-                ++column_;
-                break;
+                return jsonpointer_errc();
             }
+            ec = resolve(current_, buffer_);
+            if (ec != jsonpointer_errc())
+                return ec;
         }
         return ec;
+    }
+
+    static jsonpointer_errc resolve(std::vector<handle_type<J,JReference>>& current,
+                                    const string_view_type& buffer)
+    {
+        if (current.back().get().is_array())
+        {
+            if (buffer.size() == 1 && buffer[0] == '-')
+            {
+                return jsonpointer_errc::index_exceeds_array_size;
+            }
+            else
+            {
+                if (!jsoncons::detail::is_integer(buffer.data(), buffer.length()))
+                {
+                    return jsonpointer_errc::invalid_index;
+                }
+                auto result = jsoncons::detail::to_integer<size_t>(buffer.data(), buffer.length());
+                if (result.overflow)
+                {
+                    return jsonpointer_errc::invalid_index;
+                }
+                size_t index = result.value;
+                if (index >= current.back().get().size())
+                {
+                    return jsonpointer_errc::index_exceeds_array_size;
+                }
+                current.push_back(current.back().get().at(index));
+            }
+        }
+        else if (current.back().get().is_object())
+        {
+            if (!current.back().get().contains(buffer))
+            {
+                return jsonpointer_errc::name_not_found;
+            }
+            current.push_back(current.back().get().at(buffer));
+        }
+        else
+        {
+            return jsonpointer_errc::expected_object_or_array;
+        }
+        return jsonpointer_errc();
     }
 
     // serializing_context
