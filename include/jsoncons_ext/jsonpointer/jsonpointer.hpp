@@ -671,8 +671,8 @@ public:
     {
         current_.push_back(root);
 
-        path_iterator<string_view_type::iterator> it(path.begin(), path.end());
-        path_iterator<string_view_type::iterator> end(path.begin(), path.end(), path.end());
+        path_iterator<typename string_view_type::iterator> it(path.begin(), path.end());
+        path_iterator<typename string_view_type::iterator> end(path.begin(), path.end(), path.end());
         while (it != end)
         {
             buffer_ = *it;
