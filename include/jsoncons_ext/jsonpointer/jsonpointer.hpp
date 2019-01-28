@@ -138,15 +138,18 @@ public:
 
     path_iterator& increment(std::error_code& ec)
     {
+        std::cout << "check 100" << std::endl;
         q_ = p_;
         buffer_.clear();
 
         bool done = false;
         while (p_ != end_input_ && !done)
         {
+            std::cout << "check 110" << std::endl;
             switch (state_)
             {
                 case jsonpointer::detail::pointer_state::start: 
+                    std::cout << "check 120" << std::endl;
                     switch (*p_)
                     {
                         case '/':
@@ -161,6 +164,7 @@ public:
                         ++column_;
                         break;
                 case jsonpointer::detail::pointer_state::delim: 
+                    std::cout << "check 130" << std::endl;
                     switch (*p_)
                     {
                         case '/':
@@ -178,6 +182,7 @@ public:
                     ++column_;
                     break;
                 case jsonpointer::detail::pointer_state::escaped: 
+                    std::cout << "check 140" << std::endl;
                     switch (*p_)
                     {
                     case '0':
@@ -195,6 +200,9 @@ public:
                     };
                     ++p_;
                     ++column_;
+                    break;
+                default:
+                    std::cout << "check 150" << std::endl;
                     break;
             }
         }
