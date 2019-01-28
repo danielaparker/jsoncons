@@ -261,8 +261,8 @@ TEST_CASE("jsonpointer path tests")
 
     while (it != end)
     {
-      std::cout << "check 50" << std::endl;
-        std::cout << item << "\n";
+        std::cout << "check 50" << std::endl;
+        std::cout << *it << "\n";
         ++it;
     }
 
