@@ -449,7 +449,7 @@ public:
         evaluate(root, path, ec);
         if (ec)
         {
-            return path;
+            return string_type(path);
         }
         if (current_.back().get().is_array() && buffer_.size() == 1 && buffer_[0] == '-')
         {
