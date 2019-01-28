@@ -110,7 +110,7 @@ public:
     }
 
     path_iterator(base_iterator first, base_iterator last, base_iterator current)
-        : path_ptr_(first), end_input_(last), p_(current), q_(current), state_(pointer_state::start)
+        : path_ptr_(first), end_input_(last), p_(current), q_(current), state_(jsonpointer::detail::pointer_state::start)
     {
     }
 
