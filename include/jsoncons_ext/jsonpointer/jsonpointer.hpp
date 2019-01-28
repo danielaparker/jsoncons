@@ -285,10 +285,6 @@ public:
         : path_(std::move(path))
     {
     }
-    basic_path(const basic_string_view<CharT>& path)
-        : path_(path.begin(),path.end())
-    {
-    }
     basic_path(const CharT* s)
         : path_(s)
     {
@@ -328,6 +324,11 @@ public:
     const iterator end() const
     {
         return iterator(path_.begin(), path_.end(), path_.end());
+    }
+
+    operator string_type() const
+    {
+        return path_;
     }
 
     basic_path& append(const std::basic_string<CharT>& rhs)
@@ -428,7 +429,7 @@ public:
         return current_.back().get();
     }
 
-    void get(reference root, const basic_path<char_type>& path, std::error_code& ec)
+    void get(reference root, const string_view_type& path, std::error_code& ec)
     {
         evaluate(root, path, ec);
         if (ec)
@@ -442,7 +443,7 @@ public:
         resolve(current_, buffer_, ec);
     }
 
-    string_type normalized_path(reference root, const basic_path<char_type>& path)
+    string_type normalized_path(reference root, const string_view_type& path)
     {
         std::error_code ec;
         evaluate(root, path, ec);
@@ -466,7 +467,7 @@ public:
         }
     }
 
-    void insert_or_assign(reference root, const basic_path<char_type>& path, const J& value, std::error_code& ec)
+    void insert_or_assign(reference root, const string_view_type& path, const J& value, std::error_code& ec)
     {
         evaluate(root, path, ec);
         if (ec)
@@ -507,7 +508,7 @@ public:
         }
     }
 
-    void insert(reference root, const basic_path<char_type>& path, const J& value, std::error_code& ec)
+    void insert(reference root, const string_view_type& path, const J& value, std::error_code& ec)
     {
         evaluate(root, path, ec);
         if (ec)
@@ -556,7 +557,7 @@ public:
         }
     }
 
-    void remove(reference root, const basic_path<char_type>& path, std::error_code& ec)
+    void remove(reference root, const string_view_type& path, std::error_code& ec)
     {
         evaluate(root, path, ec);
         if (ec)
@@ -611,7 +612,7 @@ public:
         }
     }
 
-    void replace(reference root, const basic_path<char_type>& path, const J& value, std::error_code& ec)
+    void replace(reference root, const string_view_type& path, const J& value, std::error_code& ec)
     {
         evaluate(root, path, ec);
         if (ec)
@@ -666,13 +667,12 @@ public:
         }
     }
 
-    void evaluate(reference root, const basic_path<char_type>& path, std::error_code& ec)
+    void evaluate(reference root, const string_view_type& path, std::error_code& ec)
     {
         current_.push_back(root);
 
-        auto it = path.begin();
-        auto end = path.end();
-
+        path_iterator<string_view_type::iterator> it(path.begin(), path.end());
+        path_iterator<string_view_type::iterator> end(path.begin(), path.end(), path.end());
         while (it != end)
         {
             buffer_ = *it;
@@ -754,7 +754,7 @@ public:
 }
 
 template<class J>
-typename J::string_type normalized_path(const J& root, const basic_path<typename J::char_type>& path)
+typename J::string_type normalized_path(const J& root, const typename J::string_view_type& path)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
     return evaluator.normalized_path(root,path);
@@ -762,7 +762,7 @@ typename J::string_type normalized_path(const J& root, const basic_path<typename
 
 template<class J>
 typename std::enable_if<is_accessible_by_reference<J>::value,J&>::type
-get(J& root, const basic_path<typename J::char_type>& path)
+get(J& root, const typename J::string_view_type& path)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
     jsonpointer_errc ec = evaluator.get(root,path);
@@ -775,7 +775,7 @@ get(J& root, const basic_path<typename J::char_type>& path)
 
 template<class J>
 typename std::enable_if<is_accessible_by_reference<J>::value,const J&>::type
-get(const J& root, const basic_path<typename J::char_type>& path)
+get(const J& root, const typename J::string_view_type& path)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
 
@@ -790,7 +790,7 @@ get(const J& root, const basic_path<typename J::char_type>& path)
 
 template<class J>
 typename std::enable_if<!is_accessible_by_reference<J>::value,J>::type
-get(const J& root, const basic_path<typename J::char_type>& path)
+get(const J& root, const typename J::string_view_type& path)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
 
@@ -805,7 +805,7 @@ get(const J& root, const basic_path<typename J::char_type>& path)
 
 template<class J>
 typename std::enable_if<is_accessible_by_reference<J>::value,J&>::type
-get(J& root, const basic_path<typename J::char_type>& path, std::error_code& ec)
+get(J& root, const typename J::string_view_type& path, std::error_code& ec)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
     evaluator.get(root, path, ec);
@@ -814,7 +814,7 @@ get(J& root, const basic_path<typename J::char_type>& path, std::error_code& ec)
 
 template<class J>
 typename std::enable_if<is_accessible_by_reference<J>::value,const J&>::type
-get(const J& root, const basic_path<typename J::char_type>& path, std::error_code& ec)
+get(const J& root, const typename J::string_view_type& path, std::error_code& ec)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
     evaluator.get(root, path, ec);
@@ -823,7 +823,7 @@ get(const J& root, const basic_path<typename J::char_type>& path, std::error_cod
 
 template<class J>
 typename std::enable_if<!is_accessible_by_reference<J>::value,J>::type
-get(const J& root, const basic_path<typename J::char_type>& path, std::error_code& ec)
+get(const J& root, const typename J::string_view_type& path, std::error_code& ec)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
     evaluator.get(root, path, ec);
@@ -831,7 +831,7 @@ get(const J& root, const basic_path<typename J::char_type>& path, std::error_cod
 }
 
 template<class J>
-bool contains(const J& root, const basic_path<typename J::char_type>& path)
+bool contains(const J& root, const typename J::string_view_type& path)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
     std::error_code ec;
@@ -840,7 +840,7 @@ bool contains(const J& root, const basic_path<typename J::char_type>& path)
 }
 
 template<class J>
-void insert_or_assign(J& root, const basic_path<typename J::char_type>& path, const J& value)
+void insert_or_assign(J& root, const typename J::string_view_type& path, const J& value)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
@@ -853,7 +853,7 @@ void insert_or_assign(J& root, const basic_path<typename J::char_type>& path, co
 }
 
 template<class J>
-void insert_or_assign(J& root, const basic_path<typename J::char_type>& path, const J& value, std::error_code& ec)
+void insert_or_assign(J& root, const typename J::string_view_type& path, const J& value, std::error_code& ec)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
@@ -861,7 +861,7 @@ void insert_or_assign(J& root, const basic_path<typename J::char_type>& path, co
 }
 
 template<class J>
-void insert(J& root, const basic_path<typename J::char_type>& path, const J& value)
+void insert(J& root, const typename J::string_view_type& path, const J& value)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
@@ -874,7 +874,7 @@ void insert(J& root, const basic_path<typename J::char_type>& path, const J& val
 }
 
 template<class J>
-void insert(J& root, const basic_path<typename J::char_type>& path, const J& value, std::error_code& ec)
+void insert(J& root, const typename J::string_view_type& path, const J& value, std::error_code& ec)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
@@ -882,7 +882,7 @@ void insert(J& root, const basic_path<typename J::char_type>& path, const J& val
 }
 
 template<class J>
-void remove(J& root, const basic_path<typename J::char_type>& path)
+void remove(J& root, const typename J::string_view_type& path)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
@@ -895,7 +895,7 @@ void remove(J& root, const basic_path<typename J::char_type>& path)
 }
 
 template<class J>
-void remove(J& root, const basic_path<typename J::char_type>& path, std::error_code& ec)
+void remove(J& root, const typename J::string_view_type& path, std::error_code& ec)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
@@ -903,7 +903,7 @@ void remove(J& root, const basic_path<typename J::char_type>& path, std::error_c
 }
 
 template<class J>
-void replace(J& root, const basic_path<typename J::char_type>& path, const J& value)
+void replace(J& root, const typename J::string_view_type& path, const J& value)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
@@ -916,7 +916,7 @@ void replace(J& root, const basic_path<typename J::char_type>& path, const J& va
 }
 
 template<class J>
-void replace(J& root, const basic_path<typename J::char_type>& path, const J& value, std::error_code& ec)
+void replace(J& root, const typename J::string_view_type& path, const J& value, std::error_code& ec)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
