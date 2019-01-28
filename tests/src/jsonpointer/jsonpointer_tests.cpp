@@ -56,7 +56,7 @@ void check_remove(json& example, const std::string& path, const json& expected)
     CHECK_FALSE(ec);
     CHECK(expected == example);
 }
-
+#if 0
 TEST_CASE("get_with_const_ref_test")
 {
 // Example from RFC 6901
@@ -230,8 +230,7 @@ TEST_CASE("test_replace_array_value")
 
     check_replace(example,"/foo/1", json("qux"), expected);
 }
-
-#if 0
+#endif
 TEST_CASE("jsonpointer path tests")
 {
     // Example from RFC 6901
@@ -262,4 +261,4 @@ TEST_CASE("jsonpointer path tests")
         std::cout << item << "\n";
     }
 }
-#endif
+
