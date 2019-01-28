@@ -225,15 +225,14 @@ public:
 private:
 };
 
-template <class Source>
-Source escape_string(const Source& s)
+template <class CharT>
+std::basic_string<CharT> escape_string(const std::basic_string<CharT>& s)
 {
-    Source result;
-    auto begin = s.begin();
-    auto end = s.end();
-    for (auto it = begin; it != end; ++it)
+    std::cout << "check 10\n";
+    std::basic_string<CharT> result;
+    for (auto c : s)
     {
-        switch (*it)
+        switch (c)
         {
             case '~':
                 result.push_back('~');
@@ -244,10 +243,11 @@ Source escape_string(const Source& s)
                 result.push_back('1');
                 break;
             default:
-                result.push_back(*it);
+                result.push_back(c);
                 break;
         }
     }
+    std::cout << "check 20\n";
     return result;
 }
 
@@ -293,7 +293,7 @@ public:
       return path_.empty();
     }
 
-    const std::basic_string<CharT>& string() const
+    const string_type& string() const
     {
         return path_;
     }
@@ -321,10 +321,15 @@ public:
         return path_;
     }
 
-    basic_path& append(const std::basic_string<CharT>& rhs)
+    basic_path& append(const string_type& rhs)
     {
+        std::cout << "check 100\n";
         path_.push_back('/');
+        std::cout << "check 110\n";
         path_.append(escape_string(rhs));
+        std::cout << "check 120\n";
+
+        std::cout << path_ << "\n";
 
         return *this;
     }
@@ -484,7 +489,19 @@ public:
                     return;
                 }
                 size_t index = result.value;
-                current_.back().get().insert(current_.back().get().array_range().begin()+index,value);
+                if (index > current_.back().get().size())
+                {
+                    ec = jsonpointer_errc::index_exceeds_array_size;
+                    return;
+                }
+                if (index == current_.back().get().size())
+                {
+                    current_.back().get().push_back(value);
+                }
+                else
+                {
+                    current_.back().get().insert(current_.back().get().array_range().begin()+index,value);
+                }
             }
         }
         else if (current_.back().get().is_object())
@@ -525,7 +542,19 @@ public:
                     return;
                 }
                 size_t index = result.value;
-                current_.back().get().insert(current_.back().get().array_range().begin()+index,value);
+                if (index > current_.back().get().size())
+                {
+                    ec = jsonpointer_errc::index_exceeds_array_size;
+                    return;
+                }
+                if (index == current_.back().get().size())
+                {
+                    current_.back().get().push_back(value);
+                }
+                else
+                {
+                    current_.back().get().insert(current_.back().get().array_range().begin()+index,value);
+                }
             }
         }
         else if (current_.back().get().is_object())
@@ -755,7 +784,8 @@ typename std::enable_if<is_accessible_by_reference<J>::value,J&>::type
 get(J& root, const typename J::string_view_type& path)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
-    jsonpointer_errc ec = evaluator.get(root,path);
+    std::error_code ec;
+    evaluator.get(root, path, ec);
     if (ec)
     {
         JSONCONS_THROW(jsonpointer_error(ec));

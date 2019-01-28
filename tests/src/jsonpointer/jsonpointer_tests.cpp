@@ -233,23 +233,6 @@ TEST_CASE("test_replace_array_value")
 
 TEST_CASE("jsonpointer path tests")
 {
-    // Example from RFC 6901
-    const json example = json::parse(R"(
-       {
-          "foo": ["bar", "baz"],
-          "": 0,
-          "a/b": 1,
-          "c%d": 2,
-          "e^f": 3,
-          "g|h": 4,
-          "i\\j": 5,
-          "k\"l": 6,
-          " ": 7,
-          "m~n": 8
-       }
-    )");
-
-
     SECTION("/a~1b")
     {
         jsonpointer::path p("/a~1b");
@@ -258,6 +241,16 @@ TEST_CASE("jsonpointer path tests")
         auto end = p.end();
 
         CHECK((*it++ == "a/b"));
+        CHECK(it == end);
+    }
+    SECTION("/a~1b")
+    {
+        jsonpointer::path p("/m~0n");
+
+        auto it = p.begin();
+        auto end = p.end();
+
+        CHECK((*it++ == "m~n"));
         CHECK(it == end);
     }
     SECTION("/0/1")
@@ -270,6 +263,52 @@ TEST_CASE("jsonpointer path tests")
         CHECK((*it++ == "0"));
         CHECK((*it++ == "1"));
         CHECK(it == end);
+    }
+}
+
+TEST_CASE("jsonpointer path append tests")
+{
+    // Example from RFC 6901
+    json example = json::parse(R"(
+       {
+          "a/b": ["bar", "baz"],
+          "m~n": ["foo", "qux"]
+       }
+    )");
+
+    SECTION("path append a/b")
+    {
+        jsonpointer::path p;
+        p.append("a/b");
+        p.append("0");
+
+        auto it = p.begin();
+        auto end = p.end();
+
+        CHECK((*it++ == "a/b"));
+        CHECK((*it++ == "0"));
+        CHECK(it == end);
+
+        std::error_code ec;
+        json j = jsonpointer::get(example, p.string(), ec);
+        std::cout << j << "\n";
+    }
+
+    SECTION("path append m~n")
+    {
+        jsonpointer::path p;
+        p.append("m~n");
+        p.append("1");
+
+        auto it = p.begin();
+        auto end = p.end();
+
+        CHECK((*it++ == "m~n"));
+        CHECK((*it++ == "1"));
+        CHECK(it == end);
+
+        json j = jsonpointer::get(example, p.string());
+        std::cout << j << "\n";
     }
 }
 

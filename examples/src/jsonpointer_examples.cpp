@@ -371,6 +371,32 @@ void jsonpointer_get_examples()
     }
 }
 
+void jsonpointer_path_example()
+{
+    json example = json::parse(R"(
+       {
+          "a/b": ["bar", "baz"],
+          "m~n": ["foo", "qux"]
+       }
+    )");
+
+    jsonpointer::path p;
+    p.append("m~n");
+    p.append("1");
+
+    std::cout << "(1) " << p << "\n\n";
+
+    std::cout << "(2)\n";
+    for (const auto& item : p)
+    {
+        std::cout << item << "\n";
+    }
+    std::cout << "\n";
+
+    json j = jsonpointer::get(example, p.string());
+    std::cout << "(3) " << j << "\n";
+}
+
 void jsonpointer_examples()
 {
     std::cout << "\njsonpointer examples\n\n";
@@ -390,6 +416,6 @@ void jsonpointer_examples()
     jsonpointer_insert_name_exists();
     jsonpointer_insert_or_assign_name_exists();
     jsonpointer_get_examples();
-    std::cout << std::endl;
+    jsonpointer_path_example();
 }
 

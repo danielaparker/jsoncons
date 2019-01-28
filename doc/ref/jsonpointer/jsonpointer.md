@@ -31,7 +31,7 @@ The jsonpointer extension implements the IETF standard [JavaScript Object Notati
 
 ### Examples
 
-Example. Select author from second book
+#### Select author from second book
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -87,4 +87,42 @@ Output:
 (2) "Sayings of the Century"
 ```
 
+#### Using `jsonpointer::path` to build JSONPointer 
 
+```c++
+int main()
+{
+    json example = json::parse(R"(
+       {
+          "a/b": ["bar", "baz"],
+          "m~n": ["foo", "qux"]
+       }
+    )");
+
+    jsonpointer::path p;
+    p.append("m~n");
+    p.append("1");
+
+    std::cout << "(1) " << p << "\n\n";
+
+    std::cout << "(2)\n";
+    for (const auto& item : p)
+    {
+        std::cout << item << "\n";
+    }
+    std::cout << "\n";
+
+    json j = jsonpointer::get(example, p.string());
+    std::cout << "(3) " << j << "\n";
+}
+```
+Output
+```
+(1) /m~0n/1
+
+(2)
+m~n
+1
+
+(3) "qux"
+```
