@@ -230,6 +230,8 @@ TEST_CASE("test_replace_array_value")
 
     check_replace(example,"/foo/1", json("qux"), expected);
 }
+
+#if 0
 TEST_CASE("jsonpointer path tests")
 {
     // Example from RFC 6901
@@ -260,4 +262,4 @@ TEST_CASE("jsonpointer path tests")
         std::cout << item << "\n";
     }
 }
-
+#endif
