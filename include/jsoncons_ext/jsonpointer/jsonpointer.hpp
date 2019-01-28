@@ -87,13 +87,13 @@ class path_iterator
     typedef std::basic_string<char_type> string_type;
     typedef InputIt base_iterator;
 
-    jsonpointer::detail::pointer_state state_;
-    size_t line_;
-    size_t column_;
     base_iterator path_ptr_;
     base_iterator end_input_;
     base_iterator p_;
     base_iterator q_;
+    jsonpointer::detail::pointer_state state_;
+    size_t line_;
+    size_t column_;
     std::basic_string<char_type> buffer_;
 public:
     typedef string_type value_type;
@@ -110,11 +110,8 @@ public:
     }
 
     path_iterator(base_iterator first, base_iterator last, base_iterator current)
+        : path_ptr_(first), end_input_(last), p_(current), q_(current), state_(pointer_state::start)
     {
-        path_ptr_ = first;
-        end_input_ = last;
-        p_ = current;
-        q_ = current;
     }
 
     path_iterator(const path_iterator&) = default;
