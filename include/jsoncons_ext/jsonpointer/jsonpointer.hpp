@@ -142,7 +142,7 @@ public:
         buffer_.clear();
 
         bool done = false;
-        while (p_ < end_input_ && !done)
+        while (p_ != end_input_ && !done)
         {
             switch (state_)
             {
@@ -160,42 +160,42 @@ public:
                         ++p_;
                         ++column_;
                         break;
-                    case jsonpointer::detail::pointer_state::delim: 
-                        switch (*p_)
-                        {
-                            case '/':
-                                state_ = jsonpointer::detail::pointer_state::delim;
-                                done = true;
-                                break;
-                            case '~':
-                                state_ = jsonpointer::detail::pointer_state::escaped;
-                                break;
-                            default:
-                                buffer_.push_back(*p_);
-                                break;
-                        };
-                        ++p_;
-                        ++column_;
-                        break;
-                    case jsonpointer::detail::pointer_state::escaped: 
-                        switch (*p_)
-                        {
-                        case '0':
-                            buffer_.push_back('~');
+                case jsonpointer::detail::pointer_state::delim: 
+                    switch (*p_)
+                    {
+                        case '/':
                             state_ = jsonpointer::detail::pointer_state::delim;
-                            break;
-                        case '1':
-                            buffer_.push_back('/');
-                            state_ = jsonpointer::detail::pointer_state::delim;
-                            break;
-                        default:
-                            ec = jsonpointer_errc::expected_0_or_1;
                             done = true;
                             break;
-                        };
-                        ++p_;
-                        ++column_;
+                        case '~':
+                            state_ = jsonpointer::detail::pointer_state::escaped;
+                            break;
+                        default:
+                            buffer_.push_back(*p_);
+                            break;
+                    };
+                    ++p_;
+                    ++column_;
+                    break;
+                case jsonpointer::detail::pointer_state::escaped: 
+                    switch (*p_)
+                    {
+                    case '0':
+                        buffer_.push_back('~');
+                        state_ = jsonpointer::detail::pointer_state::delim;
                         break;
+                    case '1':
+                        buffer_.push_back('/');
+                        state_ = jsonpointer::detail::pointer_state::delim;
+                        break;
+                    default:
+                        ec = jsonpointer_errc::expected_0_or_1;
+                        done = true;
+                        break;
+                    };
+                    ++p_;
+                    ++column_;
+                    break;
             }
         }
         return *this;
@@ -204,17 +204,7 @@ public:
     path_iterator operator++(int) // postfix increment
     {
         path_iterator temp(*this);
-        return temp;
-    }
-
-    path_iterator& operator--()
-    {
-        return *this;
-    }
-
-    path_iterator operator--(int)
-    {
-        path_iterator temp(*this);
+        temp++;
         return temp;
     }
 
