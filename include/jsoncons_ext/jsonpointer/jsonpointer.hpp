@@ -453,7 +453,7 @@ public:
         }
         if (current_.back().get().is_array() && buffer_.size() == 1 && buffer_[0] == '-')
         {
-            string_type p = path.substr(0,path.length()-1);
+            string_type p = string_type(path.substr(0,path.length()-1));
             std::string s = std::to_string(current_.back().get().size());
             for (auto c : s)
             {
