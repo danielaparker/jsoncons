@@ -449,11 +449,11 @@ public:
         evaluate(root, path, ec);
         if (ec)
         {
-            return path.string();
+            return path;
         }
         if (current_.back().get().is_array() && buffer_.size() == 1 && buffer_[0] == '-')
         {
-            string_type p = string_type(path.string().substr(0,path.string().length()-1));
+            string_type p = path.substr(0,path.length()-1);
             std::string s = std::to_string(current_.back().get().size());
             for (auto c : s)
             {
@@ -463,7 +463,7 @@ public:
         }
         else
         {
-            return path.string();
+            return string_type(path);
         }
     }
 
