@@ -259,7 +259,7 @@ TEST_CASE("jsonpointer path tests")
     auto end = p.end();
     std::cout << "check 40" << std::endl;
 
-    for (it != end)
+    while (it != end)
     {
       std::cout << "check 50" << std::endl;
         std::cout << item << "\n";
