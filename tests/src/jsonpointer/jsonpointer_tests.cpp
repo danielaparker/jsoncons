@@ -56,7 +56,7 @@ void check_remove(json& example, const std::string& path, const json& expected)
     CHECK_FALSE(ec);
     CHECK(expected == example);
 }
-#if 0
+
 TEST_CASE("get_with_const_ref_test")
 {
 // Example from RFC 6901
@@ -117,7 +117,7 @@ json example = json::parse(R"(
 
     result = "bat";
 
-    std::cout << example << std::endl;
+    //std::cout << example << std::endl;
 }
 
 TEST_CASE("get_with_nonexistent_target")
@@ -230,7 +230,7 @@ TEST_CASE("test_replace_array_value")
 
     check_replace(example,"/foo/1", json("qux"), expected);
 }
-#endif
+
 TEST_CASE("jsonpointer path tests")
 {
     // Example from RFC 6901
@@ -250,30 +250,26 @@ TEST_CASE("jsonpointer path tests")
     )");
 
 
-    std::cout << "check 10" << std::endl;
-    jsonpointer::path p("/a~1b");
-    std::cout << "check 20" << std::endl;
-
-    auto it = p.begin();
-    std::cout << "check 30" << std::endl;
-    auto end = p.end();
-    std::cout << "check 40" << std::endl;
-
-    while (it != end)
+    SECTION("/a~1b")
     {
-        std::cout << "check 50" << std::endl;
-        std::cout << *it << "\n";
-        ++it;
+        jsonpointer::path p("/a~1b");
+
+        auto it = p.begin();
+        auto end = p.end();
+
+        CHECK((*it++ == "a/b"));
+        CHECK(it == end);
     }
-
-    //for (const auto& item : p)
-    //{
-    //    std::cout << item << "\n";
-    //}
-    /* jsonpointer::path p2("/0/1");
-    for (const auto& item : p2)
+    SECTION("/0/1")
     {
-        std::cout << item << "\n";
-    }*/
+        jsonpointer::path p("/0/1");
+
+        auto it = p.begin();
+        auto end = p.end();
+
+        CHECK((*it++ == "0"));
+        CHECK((*it++ == "1"));
+        CHECK(it == end);
+    }
 }
 

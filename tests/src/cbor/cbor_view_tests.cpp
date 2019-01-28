@@ -101,19 +101,19 @@ TEST_CASE("jsonpointer_test")
     json j1 = json::parse(s);
     CHECK(j1 == j);
 
-    //std::error_code ec;
-    //cbor_view application = jsonpointer::get(cbor_view(buffer), "/application", ec);
-    //CHECK_FALSE(ec);
+    std::error_code ec;
+    cbor_view application = jsonpointer::get(cbor_view(buffer), "/application", ec);
+    CHECK_FALSE(ec);
 
-    //json j2 = decode_cbor<json>(application);
-    //CHECK(j2 == j["application"]);
+    json j2 = decode_cbor<json>(application);
+    CHECK(j2 == j["application"]);
 
-    //cbor_view reputons_0_rated = jsonpointer::get(cbor_view(buffer), "/reputons", ec);
-    //CHECK_FALSE(ec);
+    cbor_view reputons_0_rated = jsonpointer::get(cbor_view(buffer), "/reputons", ec);
+    CHECK_FALSE(ec);
 
-    //json j3 = decode_cbor<json>(reputons_0_rated);
-    //json j4 = j["reputons"];
-    //CHECK(j3 == j4);
+    json j3 = decode_cbor<json>(reputons_0_rated);
+    json j4 = j["reputons"];
+    CHECK(j3 == j4);
 
     //std::cout << pretty_print(j3) << std::endl;
 }
