@@ -250,15 +250,30 @@ TEST_CASE("jsonpointer path tests")
     )");
 
 
+    std::cout << "check 10" << std::endl;
     jsonpointer::path p("/a~1b");
-    for (const auto& item : p)
+    std::cout << "check 20" << std::endl;
+
+    auto it = p.begin();
+    std::cout << "check 30" << std::endl;
+    auto end = p.end();
+    std::cout << "check 40" << std::endl;
+
+    for (it != end)
     {
+      std::cout << "check 50" << std::endl;
         std::cout << item << "\n";
+        ++it;
     }
-    jsonpointer::path p2("/0/1");
+
+    //for (const auto& item : p)
+    //{
+    //    std::cout << item << "\n";
+    //}
+    /* jsonpointer::path p2("/0/1");
     for (const auto& item : p2)
     {
         std::cout << item << "\n";
-    }
+    }*/
 }
 
