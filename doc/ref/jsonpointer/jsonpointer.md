@@ -2,6 +2,16 @@
 
 The jsonpointer extension implements the IETF standard [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
 
+### Classes
+<table border="0">
+  <tr>
+    <td><a href="path.md">basic_path</a></td>
+    <td>Objects of type `basic_path` represent JSON Pointer paths.</td> 
+  </tr>
+</table>
+
+### Non-member functions
+
 <table border="0">
   <tr>
     <td><a href="contains.md">contains</a></td>
@@ -9,29 +19,29 @@ The jsonpointer extension implements the IETF standard [JavaScript Object Notati
   </tr>
   <tr>
     <td><a href="get.md">get</a></td>
-    <td>Get a value from a JSON document using Json Pointer path notation.</td> 
+    <td>Get a value from a JSON document using JSON Pointer path notation.</td> 
   </tr>
   <tr>
     <td><a href="insert.md">insert</a></td>
-    <td>Inserts a value in a JSON document using Json Pointer path notation, if the path doesn't specify an object member that already has the same key.</td> 
+    <td>Inserts a value in a JSON document using JSON Pointer path notation, if the path doesn't specify an object member that already has the same key.</td> 
   </tr>
   <tr>
     <td><a href="insert_or_assign.md">insert_or_assign</a></td>
-    <td>Inserts a value in a JSON document using Json Pointer path notation, or if the path specifies an object member that already has the same key, assigns the new value to that member.</td> 
+    <td>Inserts a value in a JSON document using JSON Pointer path notation, or if the path specifies an object member that already has the same key, assigns the new value to that member.</td> 
   </tr>
   <tr>
     <td><a href="remove.md">remove</a></td>
-    <td>Removes a value from a JSON document using Json Pointer path notation.</td> 
+    <td>Removes a value from a JSON document using JSON Pointer path notation.</td> 
   </tr>
   <tr>
     <td><a href="replace.md">replace</a></td>
-    <td>Replaces a value in a JSON document using Json Pointer path notation.</td> 
+    <td>Replaces a value in a JSON document using JSON Pointer path notation.</td> 
   </tr>
 </table>
 
 ### Examples
 
-Example. Select author from second book
+#### Select author from second book
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -87,4 +97,42 @@ Output:
 (2) "Sayings of the Century"
 ```
 
+#### Using `jsonpointer::path` to build JSON Pointer 
 
+```c++
+int main()
+{
+    json example = json::parse(R"(
+       {
+          "a/b": ["bar", "baz"],
+          "m~n": ["foo", "qux"]
+       }
+    )");
+
+    jsonpointer::path p;
+    p /= "m~n";
+    p /= "1";
+
+    std::cout << "(1) " << p << "\n\n";
+
+    std::cout << "(2)\n";
+    for (const auto& item : p)
+    {
+        std::cout << item << "\n";
+    }
+    std::cout << "\n";
+
+    json j = jsonpointer::get(example, p);
+    std::cout << "(3) " << j << "\n";
+}
+```
+Output
+```
+(1) /m~0n/1
+
+(2)
+m~n
+1
+
+(3) "qux"
+```

@@ -100,6 +100,10 @@ contains(key)   |`bool`                     |
 at(index)      |`reference` or `value_type`|
 at(key)        |`reference` or `value_type`|
 
+### See also
+
+[basic_path](path.md)
+
 ### Examples
 
 #### Examples from [RFC6901](https://tools.ietf.org/html/rfc6901)

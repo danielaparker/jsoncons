@@ -543,8 +543,6 @@ int main()
 
         get_example();
 
-        jsonpointer_examples();
-
         json_parser_examples();
 
         byte_string_examples();
@@ -570,6 +568,8 @@ int main()
         type_extensibility_examples();
 
         serialization_examples();
+
+        jsonpointer_examples();
     }
     catch (const std::exception& e)
     {

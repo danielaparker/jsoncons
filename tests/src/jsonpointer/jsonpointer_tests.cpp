@@ -16,6 +16,7 @@
 #include <new>
 
 using namespace jsoncons;
+using namespace jsoncons::literals;
 
 void check_get_with_const_ref(const json& example, const std::string& pointer, const json& expected)
 {
@@ -32,7 +33,7 @@ void check_contains(const json& example, const std::string& pointer, bool expect
     CHECK(result == expected);
 }
 
-void check_add(json& example, const std::string& path, const json& value, const json& expected)
+void check_insert_or_assign(json& example, const std::string& path, const json& value, const json& expected)
 {
     std::error_code ec;
     jsonpointer::insert_or_assign(example, path, value, ec);
@@ -116,10 +117,19 @@ json example = json::parse(R"(
 
     result = "bat";
 
-    std::cout << example << std::endl;
+    //std::cout << example << std::endl;
 }
 
-// add
+TEST_CASE("get_with_nonexistent_target")
+{
+    json example = R"(
+        { "foo": "bar" }
+    )"_json;
+
+    check_contains(example,"/baz",false);
+}
+
+// insert_or_assign
 
 TEST_CASE("test_add_object_member")
 {
@@ -131,7 +141,7 @@ TEST_CASE("test_add_object_member")
     { "foo": "bar", "baz" : "qux"}
     )");
 
-    check_add(example,"/baz", json("qux"), expected);
+    check_insert_or_assign(example,"/baz", json("qux"), expected);
 }
 
 TEST_CASE("test_add_array_element")
@@ -144,7 +154,7 @@ TEST_CASE("test_add_array_element")
     { "foo": [ "bar", "qux", "baz" ] }
     )");
 
-    check_add(example,"/foo/1", json("qux"), expected);
+    check_insert_or_assign(example,"/foo/1", json("qux"), expected);
 }
 
 TEST_CASE("test_add_array_value")
@@ -157,7 +167,7 @@ TEST_CASE("test_add_array_value")
     { "foo": ["bar", ["abc", "def"]] }
     )");
 
-    check_add(example,"/foo/-", json::array({"abc", "def"}), expected);
+    check_insert_or_assign(example,"/foo/-", json::array({"abc", "def"}), expected);
 }
 
 // remove
@@ -208,7 +218,6 @@ TEST_CASE("test_replace_object_value")
 
     check_replace(example,"/baz", json("boo"), expected);
 }
-
 TEST_CASE("test_replace_array_value")
 {
     json example = json::parse(R"(
@@ -222,6 +231,86 @@ TEST_CASE("test_replace_array_value")
     check_replace(example,"/foo/1", json("qux"), expected);
 }
 
+TEST_CASE("jsonpointer path tests")
+{
+    SECTION("/a~1b")
+    {
+        jsonpointer::path p("/a~1b");
 
+        auto it = p.begin();
+        auto end = p.end();
 
+        CHECK((*it++ == "a/b"));
+        CHECK(it == end);
+    }
+    SECTION("/a~1b")
+    {
+        jsonpointer::path p("/m~0n");
+
+        auto it = p.begin();
+        auto end = p.end();
+
+        CHECK((*it++ == "m~n"));
+        CHECK(it == end);
+    }
+    SECTION("/0/1")
+    {
+        jsonpointer::path p("/0/1");
+
+        auto it = p.begin();
+        auto end = p.end();
+
+        CHECK((*it++ == "0"));
+        CHECK((*it++ == "1"));
+        CHECK(it == end);
+    }
+}
+
+TEST_CASE("jsonpointer concatenation")
+{
+    // Example from RFC 6901
+    json example = json::parse(R"(
+       {
+          "a/b": ["bar", "baz"],
+          "m~n": ["foo", "qux"]
+       }
+    )");
+
+    SECTION("path append a/b")
+    {
+        jsonpointer::path p;
+        p /= "a/b";
+        p /= "0";
+
+        auto it = p.begin();
+        auto end = p.end();
+
+        CHECK((*it++ == "a/b"));
+        CHECK((*it++ == "0"));
+        CHECK(it == end);
+
+        std::error_code ec;
+        json j = jsonpointer::get(example, p, ec);
+        std::cout << j << "\n";
+    }
+
+    SECTION("concatenate two paths")
+    {
+        jsonpointer::path p1;
+        p1 /= "m~n";
+        jsonpointer::path p2;
+        p2 /= "1";
+        jsonpointer::path p = p1 + p2;
+
+        auto it = p.begin();
+        auto end = p.end();
+
+        CHECK((*it++ == "m~n"));
+        CHECK((*it++ == "1"));
+        CHECK(it == end);
+
+        json j = jsonpointer::get(example, p);
+        std::cout << j << "\n";
+    }
+}
 

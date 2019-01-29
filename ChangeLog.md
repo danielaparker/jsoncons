@@ -6,9 +6,11 @@ New features
 - New csv option `lossless_number`. If set to `true`, parse numbers with exponent and fractional parts as strings with
   semantic tagging `semantic_tag_type::big_decimal` (instead of double.) Defaults to `false`.
 
+- A class `jsonpointer::path` has been introduced to make it simpler to construct JSON Pointer paths
+
 Name change
 
-- The name `dec_to_str` has been deprecated and renamed to `lossless_number`.
+- The `json_options` name `dec_to_str` has been deprecated and renamed to `lossless_number`.
 
 v0.117.0
 --------

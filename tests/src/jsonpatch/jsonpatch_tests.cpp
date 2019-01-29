@@ -27,7 +27,7 @@ void check_patch(json& target, const json& patch, std::error_code expected_ec, c
         std::cout << "target:\n" << target << std::endl;
     }
     CHECK(ec == expected_ec);
-    CHECK(expected == target);
+    CHECK(target == expected);
 }
 
 TEST_CASE("add_an_object_member")
@@ -491,7 +491,6 @@ TEST_CASE("add_when_new_items_in_target_array2")
 
     check_patch(source,patch,std::error_code(),target);
 }
-
 
 
 
