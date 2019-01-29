@@ -266,7 +266,7 @@ TEST_CASE("jsonpointer path tests")
     }
 }
 
-TEST_CASE("jsonpointer path append tests")
+TEST_CASE("jsonpointer concatenation")
 {
     // Example from RFC 6901
     json example = json::parse(R"(
@@ -279,8 +279,8 @@ TEST_CASE("jsonpointer path append tests")
     SECTION("path append a/b")
     {
         jsonpointer::path p;
-        p.append("a/b");
-        p.append("0");
+        p /= "a/b";
+        p /= "0";
 
         auto it = p.begin();
         auto end = p.end();
@@ -294,11 +294,13 @@ TEST_CASE("jsonpointer path append tests")
         std::cout << j << "\n";
     }
 
-    SECTION("path append m~n")
+    SECTION("concatenate two paths")
     {
-        jsonpointer::path p;
-        p.append("m~n");
-        p.append("1");
+        jsonpointer::path p1;
+        p1 /= "m~n";
+        jsonpointer::path p2;
+        p2 /= "1";
+        jsonpointer::path p = p1 + p2;
 
         auto it = p.begin();
         auto end = p.end();

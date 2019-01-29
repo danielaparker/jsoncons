@@ -36,11 +36,11 @@ iterator    | An alias to `const_iterator`
 
     basic_path();
 
-    basic_path(const string_type& path);
+    explicit basic_path(const string_type& path);
 
-    basic_path(string_type&& path);
+    explicit basic_path(string_type&& path);
 
-    basic_path(const CharT* s);
+    explicit basic_path(const CharT* s);
 
     basic_path(const basic_path&);
 
@@ -52,16 +52,19 @@ iterator    | An alias to `const_iterator`
 
     basic_path& operator=(basic_path&&);
 
+#### Modifiers
+
+    basic_path& operator/=(const string_type& s)
+First, appends the JSON Pointer separator `/` to the path. Then appends the token s, escaping any `/` or `~` characters.
+
+    basic_path& operator+=(const basic_path& p)
+Concatenates the current path and the specified path `p`. 
+
 #### Iterators
 
     iterator begin() const;
     iterator end() const;
-Iterator access to the path.
-
-#### Modifiers
-
-    basic_path& append(const string_type& s);
-First, appends the JSON Pointer separator `/` to the path. Then appends s, escaping any `/` or `~` characters.
+Iterator access to the tokens in the path.
 
 #### Accessors
 
@@ -72,6 +75,18 @@ Checks if the path is empty
     operator string_view_type() const;
 Access the JSON Pointer path as a string view.
 
+#### Non-member functions
+    basic_path<CharT> operator/(const basic_path<CharT>& lhs, const string_type& rhs);
+Concatenates a JSON Pointer path and a token. Effectively returns basic_path<CharT>(lhs) /= rhs.
+
+    basic_path<CharT> operator+( const basic_path<CharT>& lhs, const basic_path<CharT>& rhs );
+Concatenates two JSON Pointer paths. Effectively returns basic_path<CharT>(lhs) += rhs.
+
+    bool operator==(const basic_path<CharT>& lhs, const basic_path<CharT>& rhs);
+
+    bool operator!=(const basic_path<CharT>& lhs, const basic_path<CharT>& rhs);
+
     std::basic_ostream<CharT>&
     operator<<(std::basic_ostream<CharT>& os, const basic_path<CharT>& p);
+Performs stream output
 

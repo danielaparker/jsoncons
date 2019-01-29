@@ -257,24 +257,26 @@ class basic_path
 public:
     std::basic_string<CharT> path_;
 public:
+    // Member types
     typedef CharT char_type;
     typedef std::basic_string<char_type> string_type;
     typedef basic_string_view<char_type> string_view_type;
     typedef path_iterator<typename string_type::const_iterator> const_iterator;
     typedef const_iterator iterator;
 
+    // Constructors
     basic_path()
     {
     }
-    basic_path(const string_type& path)
+    explicit basic_path(const string_type& path)
         : path_(path)
     {
     }
-    basic_path(string_type&& path)
+    explicit basic_path(string_type&& path)
         : path_(std::move(path))
     {
     }
-    basic_path(const CharT* s)
+    explicit basic_path(const CharT* s)
         : path_(s)
     {
     }
@@ -283,10 +285,33 @@ public:
 
     basic_path(basic_path&&) = default;
 
+    // operator=
     basic_path& operator=(const basic_path&) = default;
 
     basic_path& operator=(basic_path&&) = default;
 
+    // Modifiers
+
+    void clear()
+    {
+        path_.clear();
+    }
+
+    basic_path& operator/=(const string_type& s)
+    {
+        path_.push_back('/');
+        path_.append(escape_string(s));
+
+        return *this;
+    }
+
+    basic_path& operator+=(const basic_path& p)
+    {
+        path_.append(p.path_);
+        return *this;
+    }
+
+    // Accessors
     bool empty() const
     {
       return path_.empty();
@@ -297,6 +322,12 @@ public:
         return path_;
     }
 
+    operator string_view_type() const
+    {
+        return path_;
+    }
+
+    // Iterators
     iterator begin() const
     {
         return iterator(path_.begin(),path_.end());
@@ -306,17 +337,29 @@ public:
         return iterator(path_.begin(), path_.end(), path_.end());
     }
 
-    operator string_view_type() const
+    // Non-member functions
+    friend basic_path<CharT> operator/(const basic_path<CharT>& lhs, const string_type& rhs)
     {
-        return path_;
+        basic_path<CharT> p(lhs);
+        p /= rhs;
+        return p;
     }
 
-    basic_path& append(const string_type& rhs)
+    friend basic_path<CharT> operator+( const basic_path<CharT>& lhs, const basic_path<CharT>& rhs )
     {
-        path_.push_back('/');
-        path_.append(escape_string(rhs));
+        basic_path<CharT> p(lhs);
+        p += rhs;
+        return p;
+    }
 
-        return *this;
+    friend bool operator==( const basic_path& lhs, const basic_path& rhs )
+    {
+        return lhs.path_ == rhs.path_;
+    }
+
+    friend bool operator!=( const basic_path& lhs, const basic_path& rhs )
+    {
+        return lhs.path_ != rhs.path_;
     }
 
     friend std::basic_ostream<CharT>&
