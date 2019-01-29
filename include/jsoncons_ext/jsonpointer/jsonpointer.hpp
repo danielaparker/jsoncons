@@ -313,7 +313,7 @@ public:
       return path_.empty();
     }
 
-    const string_view_type& string_view() const
+    const string_type& string() const
     {
         return path_;
     }

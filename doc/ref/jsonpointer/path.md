@@ -71,9 +71,11 @@ Iterator access to the tokens in the path.
     bool empty() const
 Checks if the path is empty
 
-    const string_view_type& string_view() const
+    const string_type& string() const
+Returns the string representation of the JSON Pointer by reference.
+
     operator string_view_type() const;
-Access the JSON Pointer path as a string view.
+Returns a string view representation of the JSON Pointer.
 
 #### Non-member functions
     basic_path<CharT> operator/(const basic_path<CharT>& lhs, const string_type& rhs);
