@@ -266,11 +266,11 @@ public:
     basic_path()
     {
     }
-    basic_path(const std::basic_string<CharT>& path)
+    basic_path(const string_type& path)
         : path_(path)
     {
     }
-    basic_path(std::basic_string<CharT>&& path)
+    basic_path(string_type&& path)
         : path_(std::move(path))
     {
     }
@@ -297,20 +297,11 @@ public:
         return path_;
     }
 
-    iterator begin()
+    iterator begin() const
     {
         return iterator(path_.begin(),path_.end());
     }
-    iterator end()
-    {
-        return iterator(path_.begin(), path_.end(), path_.end());
-    }
-
-    const_iterator begin() const
-    {
-        return iterator(path_.begin(),path_.end());
-    }
-    const iterator end() const
+    iterator end() const
     {
         return iterator(path_.begin(), path_.end(), path_.end());
     }

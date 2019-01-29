@@ -46,7 +46,7 @@ public:
             case jsonpointer_errc::name_not_found:
                 return "Name not found";
             case jsonpointer_errc::invalid_index:
-                return "Invalid index";
+                return "Invalid array index";
             case jsonpointer_errc::key_already_exists:
                 return "Key already exists";
             case jsonpointer_errc::expected_object_or_array:
