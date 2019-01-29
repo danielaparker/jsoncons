@@ -5,7 +5,7 @@ A JSON Pointer is a string of zero or more tokens, each prefixed by `/` characte
 These tokens denote keys in JSON objects or indexes in JSON arrays.
 
 The characters `~` and `/` have special meanings in JSON Pointer, 
-so if an object key has these characters, `~` needs to be escaped as `~0`,
+so if a key in a JSON object has these characters, `~` needs to be escaped as `~0`,
 and `/` needs to be escaped as `~1`.
 
 ### Classes
