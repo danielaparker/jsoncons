@@ -90,3 +90,111 @@ Concatenates two JSON Pointer paths. Effectively returns basic_path<CharT>(lhs) 
     operator<<(std::basic_ostream<CharT>& os, const basic_path<CharT>& p);
 Performs stream output
 
+### Examples
+
+#### Iterate over the tokens in a JSON Pointer
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
+namespace jp = jsoncons::jsonpointer;
+
+int main()
+{
+    jp::path p("/store/book/1/author");
+
+    std::cout << "(1) " << p << "\n\n";
+
+    std::cout << "(2)\n";
+    for (const auto& token : p)
+    {
+        std::cout << token << "\n";
+    }
+
+    std::cout << "\n";
+}
+```
+Output:
+```
+(1) /store/book/1/author
+
+(2)
+store
+book
+1
+author
+```
+
+#### Append tokens to a JSON Pointer
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
+namespace jp = jsoncons::jsonpointer;
+
+int main()
+{
+    jp::path p;
+
+    p /= "a/b";
+    p /= "";
+    p /= "m~n";
+
+    std::cout << "(1) " << p << "\n\n";
+
+    std::cout << "(2)\n";
+    for (const auto& token : p)
+    {
+        std::cout << token << "\n";
+    }
+
+    std::cout << "\n";
+}
+```
+Output:
+```
+(1) /a~1b//m~0n
+
+(2)
+a/b
+
+m~n
+```
+
+#### Concatentate two JSON Pointers
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
+namespace jp = jsoncons::jsonpointer;
+
+int main()
+{
+    jp::path p("/a~1b");
+
+    p += jp::path("//m~0n");
+
+    std::cout << "(1) " << p << "\n\n";
+
+    std::cout << "(2)\n";
+    for (const auto& token : p)
+    {
+        std::cout << token << "\n";
+    }
+
+    std::cout << "\n";
+}
+```
+Output:
+```
+(1) /a~1b//m~0n
+
+(2)
+a/b
+
+m~n
+```
+

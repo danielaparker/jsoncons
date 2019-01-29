@@ -397,6 +397,59 @@ void jsonpointer_path_example()
     std::cout << "(3) " << j << "\n";
 }
 
+namespace jp = jsoncons::jsonpointer;
+
+void jsonpointer_path_iterator_example()
+{
+    jp::path p("/store/book/1/author");
+
+    std::cout << "(1) " << p << "\n\n";
+
+    std::cout << "(2)\n";
+    for (const auto& token : p)
+    {
+        std::cout << token << "\n";
+    }
+
+    std::cout << "\n";
+}
+
+void jsonpointer_path_append_tokens()
+{
+    jp::path p;
+
+    p /= "a/b";
+    p /= "";
+    p /= "m~n";
+
+    std::cout << "(1) " << p << "\n\n";
+
+    std::cout << "(2)\n";
+    for (const auto& token : p)
+    {
+        std::cout << token << "\n";
+    }
+
+    std::cout << "\n";
+}
+
+void jsonpointer_path_concatentae()
+{
+    jp::path p("/a~1b");
+
+    p += jp::path("//m~0n");
+
+    std::cout << "(1) " << p << "\n\n";
+
+    std::cout << "(2)\n";
+    for (const auto& token : p)
+    {
+        std::cout << token << "\n";
+    }
+
+    std::cout << "\n";
+}
+
 void jsonpointer_examples()
 {
     std::cout << "\njsonpointer examples\n\n";
@@ -417,5 +470,8 @@ void jsonpointer_examples()
     jsonpointer_insert_or_assign_name_exists();
     jsonpointer_get_examples();
     jsonpointer_path_example();
+    jsonpointer_path_iterator_example();
+    jsonpointer_path_append_tokens();
+    jsonpointer_path_concatentae();
 }
 
