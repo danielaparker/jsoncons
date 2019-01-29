@@ -16,7 +16,7 @@ Type      |Definition
 path      |`basic_path<char>`
 wpath     |`basic_path<wchar_t>`
 
-Objects of type `basic_path` represent JSON Pointer paths.
+Objects of type `basic_path` represent JSON Pointer strings.
 
 #### Member types
 Type        |Definition
@@ -36,9 +36,9 @@ iterator    | An alias to `const_iterator`
 
     basic_path();
 
-    explicit basic_path(const string_type& path);
+    explicit basic_path(const string_type& s);
 
-    explicit basic_path(string_type&& path);
+    explicit basic_path(string_type&& s);
 
     explicit basic_path(const CharT* s);
 

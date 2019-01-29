@@ -264,12 +264,12 @@ public:
     basic_path()
     {
     }
-    explicit basic_path(const string_type& path)
-        : path_(path)
+    explicit basic_path(const string_type& s)
+        : path_(s)
     {
     }
-    explicit basic_path(string_type&& path)
-        : path_(std::move(path))
+    explicit basic_path(string_type&& s)
+        : path_(std::move(s))
     {
     }
     explicit basic_path(const CharT* s)
