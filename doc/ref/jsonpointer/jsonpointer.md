@@ -1,6 +1,6 @@
 ### jsonpointer extension
 
-[JSON Pointer]((https://tools.ietf.org/html/rfc6901)) defines a string syntax to locate a specific value in a JSON document. 
+[JSON Pointer](https://tools.ietf.org/html/rfc6901) defines a string syntax to locate a specific value in a JSON document. 
 A JSON Pointer is a string of zero or more tokens, each prefixed by `/` characters. 
 These tokens denote keys in JSON objects or indexes in JSON arrays.
 
