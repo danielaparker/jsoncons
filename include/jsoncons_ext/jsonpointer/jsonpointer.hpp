@@ -153,10 +153,10 @@ public:
                             ec = jsonpointer_errc::expected_slash;
                             done = true;
                             break;
-                        };
-                        ++p_;
-                        ++column_;
-                        break;
+                    };
+                    ++p_;
+                    ++column_;
+                    break;
                 case jsonpointer::detail::pointer_state::delim: 
                     switch (*p_)
                     {
