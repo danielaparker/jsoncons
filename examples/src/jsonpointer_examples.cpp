@@ -393,7 +393,7 @@ void jsonpointer_path_example()
     }
     std::cout << "\n";
 
-    json j = jsonpointer::get(example, p.string());
+    json j = jsonpointer::get(example, p);
     std::cout << "(3) " << j << "\n";
 }
 

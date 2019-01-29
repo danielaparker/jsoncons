@@ -228,7 +228,6 @@ private:
 template <class CharT>
 std::basic_string<CharT> escape_string(const std::basic_string<CharT>& s)
 {
-    std::cout << "check 10\n";
     std::basic_string<CharT> result;
     for (auto c : s)
     {
@@ -247,7 +246,6 @@ std::basic_string<CharT> escape_string(const std::basic_string<CharT>& s)
                 break;
         }
     }
-    std::cout << "check 20\n";
     return result;
 }
 
@@ -261,6 +259,7 @@ public:
 public:
     typedef CharT char_type;
     typedef std::basic_string<char_type> string_type;
+    typedef basic_string_view<char_type> string_view_type;
     typedef path_iterator<typename string_type::const_iterator> const_iterator;
     typedef const_iterator iterator;
 
@@ -293,7 +292,7 @@ public:
       return path_.empty();
     }
 
-    const string_type& string() const
+    const string_view_type& string_view() const
     {
         return path_;
     }
@@ -316,20 +315,15 @@ public:
         return iterator(path_.begin(), path_.end(), path_.end());
     }
 
-    operator string_type() const
+    operator string_view_type() const
     {
         return path_;
     }
 
     basic_path& append(const string_type& rhs)
     {
-        std::cout << "check 100\n";
         path_.push_back('/');
-        std::cout << "check 110\n";
         path_.append(escape_string(rhs));
-        std::cout << "check 120\n";
-
-        std::cout << path_ << "\n";
 
         return *this;
     }

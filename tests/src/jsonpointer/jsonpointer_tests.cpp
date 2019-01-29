@@ -290,7 +290,7 @@ TEST_CASE("jsonpointer path append tests")
         CHECK(it == end);
 
         std::error_code ec;
-        json j = jsonpointer::get(example, p.string(), ec);
+        json j = jsonpointer::get(example, p, ec);
         std::cout << j << "\n";
     }
 
@@ -307,7 +307,7 @@ TEST_CASE("jsonpointer path append tests")
         CHECK((*it++ == "1"));
         CHECK(it == end);
 
-        json j = jsonpointer::get(example, p.string());
+        json j = jsonpointer::get(example, p);
         std::cout << j << "\n";
     }
 }
