@@ -110,8 +110,8 @@ int main()
     )");
 
     jsonpointer::path p;
-    p.append("m~n");
-    p.append("1");
+    p /= "m~n";
+    p /= "1";
 
     std::cout << "(1) " << p << "\n\n";
 
