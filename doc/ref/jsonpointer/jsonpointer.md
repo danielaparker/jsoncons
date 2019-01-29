@@ -6,7 +6,7 @@ The jsonpointer extension implements the IETF standard [JavaScript Object Notati
 <table border="0">
   <tr>
     <td><a href="path.md">basic_path</a></td>
-    <td>Objects of type `basic_path` represent JSON Pointer paths.</td> 
+    <td>Objects of type <code>basic_path</code> represent JSON Pointer paths.</td> 
   </tr>
 </table>
 
@@ -15,7 +15,7 @@ The jsonpointer extension implements the IETF standard [JavaScript Object Notati
 <table border="0">
   <tr>
     <td><a href="contains.md">contains</a></td>
-    <td>Returns `true` if the json document contains the given json pointer</td> 
+    <td>Returns <code>true</code> if the json document contains the given JSON Pointer</td> 
   </tr>
   <tr>
     <td><a href="get.md">get</a></td>

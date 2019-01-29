@@ -30,7 +30,7 @@ iterator    | An alias to `const_iterator`
 #### Header
 ```c++
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-
+```
 
 #### Constructors
 
