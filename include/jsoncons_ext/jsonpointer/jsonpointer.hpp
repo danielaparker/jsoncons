@@ -154,8 +154,6 @@ public:
                             done = true;
                             break;
                     };
-                    ++p_;
-                    ++column_;
                     break;
                 case jsonpointer::detail::pointer_state::delim: 
                     switch (*p_)
@@ -171,8 +169,6 @@ public:
                             buffer_.push_back(*p_);
                             break;
                     };
-                    ++p_;
-                    ++column_;
                     break;
                 case jsonpointer::detail::pointer_state::escaped: 
                     switch (*p_)
@@ -190,13 +186,13 @@ public:
                         done = true;
                         break;
                     };
-                    ++p_;
-                    ++column_;
                     break;
                 default:
                     JSONCONS_UNREACHABLE();
                     break;
             }
+            ++p_;
+            ++column_;
         }
         return *this;
     }
