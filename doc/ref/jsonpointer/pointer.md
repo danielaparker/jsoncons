@@ -1,8 +1,8 @@
-### jsoncons::jsonpointer::basic_path
+### jsoncons::jsonpointer::basic_pointer
 
 ```
 template <class CharT>
-class basic_path
+class basic_pointer
 ```
 #### Header
 ```c++
@@ -13,10 +13,10 @@ Two specializations for common character types are defined:
 
 Type      |Definition
 ----------|------------------------------
-path      |`basic_path<char>`
-wpath     |`basic_path<wchar_t>`
+pointer   |`basic_pointer<char>`
+wpointer  |`basic_pointer<wchar_t>`
 
-Objects of type `basic_path` represent JSON Pointer paths.
+Objects of type `basic_pointer` represent a JSON Pointer.
 
 #### Member types
 Type        |Definition
@@ -34,60 +34,60 @@ iterator    | An alias to `const_iterator`
 
 #### Constructors
 
-    basic_path();
+    basic_pointer();
 
-    explicit basic_path(const string_type& path);
+    explicit basic_pointer(const string_type& pointer);
 
-    explicit basic_path(string_type&& path);
+    explicit basic_pointer(string_type&& pointer);
 
-    explicit basic_path(const CharT* s);
+    explicit basic_pointer(const CharT* s);
 
-    basic_path(const basic_path&);
+    basic_pointer(const basic_pointer&);
 
-    basic_path(basic_path&&);
+    basic_pointer(basic_pointer&&);
 
 #### operator=
 
-    basic_path& operator=(const basic_path&);
+    basic_pointer& operator=(const basic_pointer&);
 
-    basic_path& operator=(basic_path&&);
+    basic_pointer& operator=(basic_pointer&&);
 
 #### Modifiers
 
-    basic_path& operator/=(const string_type& s)
-First, appends the JSON Pointer separator `/` to the path. Then appends the string token s, escaping any `/` or `~` characters.
+    basic_pointer& operator/=(const string_type& s)
+First, appends the JSON Pointer separator `/`. Then appends the token s, escaping any `/` or `~` characters.
 
-    basic_path& operator+=(const basic_path& p)
-Concatenates the current path and the specified path `p`. 
+    basic_pointer& operator+=(const basic_pointer& p)
+Concatenates the current pointer and the specified pointer `p`. 
 
 #### Iterators
 
     iterator begin() const;
     iterator end() const;
-Iterator access to the tokens in the path.
+Iterator access to the tokens in the pointer.
 
 #### Accessors
 
     bool empty() const
-Checks if the path is empty
+Checks if the pointer is empty
 
     const string_view_type& string_view() const
     operator string_view_type() const;
-Access the JSON Pointer path as a string view.
+Access the JSON Pointer pointer as a string view.
 
 #### Non-member functions
-    basic_path<CharT> operator/(const basic_path<CharT>& lhs, const string_type& rhs);
-Concatenates a JSON Pointer path and a token. Effectively returns basic_path<CharT>(lhs) /= rhs.
+    basic_pointer<CharT> operator/(const basic_pointer<CharT>& lhs, const string_type& rhs);
+Concatenates a JSON Pointer pointer and a token. Effectively returns basic_pointer<CharT>(lhs) /= rhs.
 
-    basic_path<CharT> operator+( const basic_path<CharT>& lhs, const basic_path<CharT>& rhs );
-Concatenates two JSON Pointer paths. Effectively returns basic_path<CharT>(lhs) += rhs.
+    basic_pointer<CharT> operator+( const basic_pointer<CharT>& lhs, const basic_pointer<CharT>& rhs );
+Concatenates two JSON Pointers. Effectively returns basic_pointer<CharT>(lhs) += rhs.
 
-    bool operator==(const basic_path<CharT>& lhs, const basic_path<CharT>& rhs);
+    bool operator==(const basic_pointer<CharT>& lhs, const basic_pointer<CharT>& rhs);
 
-    bool operator!=(const basic_path<CharT>& lhs, const basic_path<CharT>& rhs);
+    bool operator!=(const basic_pointer<CharT>& lhs, const basic_pointer<CharT>& rhs);
 
     std::basic_ostream<CharT>&
-    operator<<(std::basic_ostream<CharT>& os, const basic_path<CharT>& p);
+    operator<<(std::basic_ostream<CharT>& os, const basic_pointer<CharT>& p);
 Performs stream output
 
 ### Examples
@@ -102,7 +102,7 @@ namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    jp::path p("/store/book/1/author");
+    jp::pointer p("/store/book/1/author");
 
     std::cout << "(1) " << p << "\n\n";
 
@@ -136,7 +136,7 @@ namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    jp::path p;
+    jp::pointer p;
 
     p /= "a/b";
     p /= "";
@@ -173,9 +173,9 @@ namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    jp::path p("/a~1b");
+    jp::pointer p("/a~1b");
 
-    p += jp::path("//m~0n");
+    p += jp::pointer("//m~0n");
 
     std::cout << "(1) " << p << "\n\n";
 
