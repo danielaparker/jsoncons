@@ -11,7 +11,7 @@ and `/` needs to be escaped as `~1`.
 ### Classes
 <table border="0">
   <tr>
-    <td><a href="path.md">basic_address</a></td>
+    <td><a href="address.md">basic_address</a></td>
     <td>Objects of type <code>basic_address</code> represent JSON Pointer paths.</td> 
   </tr>
 </table>
