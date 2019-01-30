@@ -23,12 +23,12 @@ Returns `true` if the json doc contains the given JSON Pointer, otherwise `false
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-using namespace jsoncons;
+namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
     // Example from RFC 6901
-    const json example = json::parse(R"(
+    auto j = jsoncons::json::parse(R"(
        {
           "foo": ["bar", "baz"],
           "": 0,
@@ -43,8 +43,8 @@ int main()
        }
     )");
 
-    std::cout << "(1) " << jsonpointer::contains(example, "/foo/0") << std::endl;
-    std::cout << "(2) " << jsonpointer::contains(example, "e^g") << std::endl;
+    std::cout << "(1) " << jp::contains(j, "/foo/0") << std::endl;
+    std::cout << "(2) " << jp::contains(j, "e^g") << std::endl;
 }
 ```
 Output:

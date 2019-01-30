@@ -53,11 +53,11 @@ and `/` needs to be escaped as `~1`.
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-using namespace jsoncons;
+namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    json doc = json::parse(R"(
+    auto j = jsoncons::json::parse(R"(
     [
       { "category": "reference",
         "author": "Nigel Rees",
@@ -75,17 +75,17 @@ int main()
     // Using exceptions to report errors
     try
     {
-        json result = jsonpointer::get(doc, "/1/author");
+        jsoncons::json result = jp::get(j, "/1/author");
         std::cout << "(1) " << result << std::endl;
     }
-    catch (const jsonpointer::jsonpointer_error& e)
+    catch (const jp::jsonpointer_error& e)
     {
         std::cout << e.what() << std::endl;
     }
 
     // Using error codes to report errors
     std::error_code ec;
-    json result = jsonpointer::get(doc, "/0/title", ec);
+    const jsoncons::json& result = jp::get(j, "/0/title", ec);
 
     if (ec)
     {
@@ -103,36 +103,41 @@ Output:
 (2) "Sayings of the Century"
 ```
 
-#### Using `jsonpointer::address` to build JSON Pointer 
+#### Using addresses with jsonpointer::get 
 
 ```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
+namespace jp = jsoncons::jsonpointer;
+
 int main()
 {
-    json example = json::parse(R"(
+    auto j = jsoncons::json::parse(R"(
        {
           "a/b": ["bar", "baz"],
           "m~n": ["foo", "qux"]
        }
     )");
 
-    jsonpointer::address p;
-    p /= "m~n";
-    p /= "1";
+    jp::address addr;
+    addr /= "m~n";
+    addr /= "1";
 
-    std::cout << "(1) " << p << "\n\n";
+    std::cout << "(1) " << addr << "\n\n";
 
     std::cout << "(2)\n";
-    for (const auto& item : p)
+    for (const auto& item : addr)
     {
         std::cout << item << "\n";
     }
     std::cout << "\n";
 
-    json j = jsonpointer::get(example, p);
-    std::cout << "(3) " << j << "\n";
+    jsoncons::json item = jp::get(j, addr);
+    std::cout << "(3) " << item << "\n";
 }
 ```
-Output
+Output:
 ```
 (1) /m~0n/1
 
@@ -142,3 +147,4 @@ m~n
 
 (3) "qux"
 ```
+

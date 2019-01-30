@@ -18,6 +18,10 @@ wpath     |`basic_address<wchar_t>`
 
 Objects of type `basic_address` represent JSON Pointer strings.
 
+Addreses are implicitly convertible to string views, 
+which makes it possible to use them with `jsonpointer::get`,
+`jsonpointer::insert_or_assign` etc, which expect string views.
+
 #### Member types
 Type        |Definition
 ------------|------------------------------
@@ -104,12 +108,12 @@ namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    jp::address p("/store/book/1/author");
+    jp::address addr("/store/book/1/author");
 
-    std::cout << "(1) " << p << "\n\n";
+    std::cout << "(1) " << addr << "\n\n";
 
     std::cout << "(2)\n";
-    for (const auto& token : p)
+    for (const auto& token : addr)
     {
         std::cout << token << "\n";
     }
@@ -138,16 +142,16 @@ namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    jp::address p;
+    jp::address addr;
 
-    p /= "a/b";
-    p /= "";
-    p /= "m~n";
+    addr /= "a/b";
+    addr /= "";
+    addr /= "m~n";
 
-    std::cout << "(1) " << p << "\n\n";
+    std::cout << "(1) " << addr << "\n\n";
 
     std::cout << "(2)\n";
-    for (const auto& token : p)
+    for (const auto& token : addr)
     {
         std::cout << token << "\n";
     }
@@ -175,14 +179,14 @@ namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    jp::address p("/a~1b");
+    jp::address addr("/a~1b");
 
-    p += jp::address("//m~0n");
+    addr += jp::address("//m~0n");
 
-    std::cout << "(1) " << p << "\n\n";
+    std::cout << "(1) " << addr << "\n\n";
 
     std::cout << "(2)\n";
-    for (const auto& token : p)
+    for (const auto& token : addr)
     {
         std::cout << token << "\n";
     }

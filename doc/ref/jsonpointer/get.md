@@ -106,18 +106,119 @@ at(key)        |`reference` or `value_type`|
 
 ### Examples
 
+#### Select author from second book
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
+namespace jp = jsoncons::jsonpointer;
+
+int main()
+{
+    auto j = jsoncons::json::parse(R"(
+    [
+      { "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "price": 8.95
+      },
+      { "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "price": 12.99
+      }
+    ]
+    )");
+
+    // Using exceptions to report errors
+    try
+    {
+        jsoncons::json result = jp::get(j, "/1/author");
+        std::cout << "(1) " << result << std::endl;
+    }
+    catch (const jp::jsonpointer_error& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+
+    // Using error codes to report errors
+    std::error_code ec;
+    const jsoncons::json& result = jp::get(j, "/0/title", ec);
+
+    if (ec)
+    {
+        std::cout << ec.message() << std::endl;
+    }
+    else
+    {
+        std::cout << "(2) " << result << std::endl;
+    }
+}
+```
+Output:
+```json
+(1) "Evelyn Waugh"
+(2) "Sayings of the Century"
+```
+
+#### Using addresses with jsonpointer::get 
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
+namespace jp = jsoncons::jsonpointer;
+
+int main()
+{
+    auto j = jsoncons::json::parse(R"(
+       {
+          "a/b": ["bar", "baz"],
+          "m~n": ["foo", "qux"]
+       }
+    )");
+
+    jp::address addr;
+    addr /= "m~n";
+    addr /= "1";
+
+    std::cout << "(1) " << addr << "\n\n";
+
+    std::cout << "(2)\n";
+    for (const auto& item : addr)
+    {
+        std::cout << item << "\n";
+    }
+    std::cout << "\n";
+
+    jsoncons::json item = jp::get(j, addr);
+    std::cout << "(3) " << item << "\n";
+}
+```
+Output:
+```
+(1) /m~0n/1
+
+(2)
+m~n
+1
+
+(3) "qux"
+```
+
 #### Examples from [RFC6901](https://tools.ietf.org/html/rfc6901)
 
 ```c++
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-using namespace jsoncons;
+namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    const json example = json::parse(R"(
-        {
+    auto j = jsoncons::json::parse(R"(
+       {
           "foo": ["bar", "baz"],
           "": 0,
           "a/b": 1,
@@ -130,35 +231,35 @@ int main()
           "m~n": 8
        }
     )");
-   
+
     try
     {
-        const json& result1 = jsonpointer::get(example, "");
+        const jsoncons::json& result1 = jp::get(j, "");
         std::cout << "(1) " << result1 << std::endl;
-        const json& result2 = jsonpointer::get(example, "/foo");
+        const jsoncons::json& result2 = jp::get(j, "/foo");
         std::cout << "(2) " << result2 << std::endl;
-        const json& result3 = jsonpointer::get(example, "/foo/0");
+        const jsoncons::json& result3 = jp::get(j, "/foo/0");
         std::cout << "(3) " << result3 << std::endl;
-        const json& result4 = jsonpointer::get(example, "/");
+        const jsoncons::json& result4 = jp::get(j, "/");
         std::cout << "(4) " << result4 << std::endl;
-        const json& result5 = jsonpointer::get(example, "/a~1b");
+        const jsoncons::json& result5 = jp::get(j, "/a~1b");
         std::cout << "(5) " << result5 << std::endl;
-        const json& result6 = jsonpointer::get(example, "/c%d");
+        const jsoncons::json& result6 = jp::get(j, "/c%d");
         std::cout << "(6) " << result6 << std::endl;
-        const json& result7 = jsonpointer::get(example, "/e^f");
+        const jsoncons::json& result7 = jp::get(j, "/e^f");
         std::cout << "(7) " << result7 << std::endl;
-        const json& result8 = jsonpointer::get(example, "/g|h");
+        const jsoncons::json& result8 = jp::get(j, "/g|h");
         std::cout << "(8) " << result8 << std::endl;
-        const json& result9 = jsonpointer::get(example, "/i\\j");
+        const jsoncons::json& result9 = jp::get(j, "/i\\j");
         std::cout << "(9) " << result9 << std::endl;
-        const json& result10 = jsonpointer::get(example, "/k\"l");
+        const jsoncons::json& result10 = jp::get(j, "/k\"l");
         std::cout << "(10) " << result10 << std::endl;
-        const json& result11 = jsonpointer::get(example, "/ ");
+        const jsoncons::json& result11 = jp::get(j, "/ ");
         std::cout << "(11) " << result11 << std::endl;
-        const json& result12 = jsonpointer::get(example, "/m~0n");
+        const jsoncons::json& result12 = jp::get(j, "/m~0n");
         std::cout << "(12) " << result12 << std::endl;
     }
-    catch (const std::runtime_error& e)
+    catch (const jp::jsonpointer_error& e)
     {
         std::cerr << e.what() << std::endl;
     }
@@ -178,62 +279,6 @@ Output:
 (10) 6
 (11) 7
 (12) 8
-```
-
-#### Select author from second book
-
-```c++
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-
-using namespace jsoncons;
-
-int main()
-{
-    json doc = json::parse(R"(
-    [
-      { "category": "reference",
-        "author": "Nigel Rees",
-        "title": "Sayings of the Century",
-        "price": 8.95
-      },
-      { "category": "fiction",
-        "author": "Evelyn Waugh",
-        "title": "Sword of Honour",
-        "price": 12.99
-      }
-    ]
-    )");
-
-    // Using exceptions to report errors
-    try
-    {
-        json result = jsonpointer::get(doc, "/1/author");
-        std::cout << "(1) " << result << std::endl;
-    }
-    catch (const jsonpointer::jsonpointer_error& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    // Using error codes to report errors
-    std::error_code ec;
-    const json& result = jsonpointer::get(doc, "/0/title", ec);
-
-    if (ec)
-    {
-        std::cout << ec.message() << std::endl;
-    }
-    else
-    {
-        std::cout << "(2) " << result << std::endl;
-    }
-}
-```
-Output:
-```json
-(1) "Evelyn Waugh"
-(2) "Sayings of the Century"
 ```
 
 

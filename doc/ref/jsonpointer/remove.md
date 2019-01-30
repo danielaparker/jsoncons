@@ -33,16 +33,16 @@ None
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-using namespace jsoncons;
+namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    json target = json::parse(R"(
+    auto target = jsoncons::json::parse(R"(
         { "foo": "bar", "baz" : "qux"}
     )");
 
     std::error_code ec;
-    jsonpointer::remove(target, "/baz", ec);
+    jp::remove(target, "/baz", ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -64,16 +64,16 @@ Output:
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-using namespace jsoncons;
+namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    json target = json::parse(R"(
+    auto target = jsoncons::json::parse(R"(
         { "foo": [ "bar", "qux", "baz" ] }
     )");
 
     std::error_code ec;
-    jsonpointer::remove(target, "/foo/1", ec);
+    jp::remove(target, "/foo/1", ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;

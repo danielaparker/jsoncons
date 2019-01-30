@@ -39,16 +39,16 @@ None
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-using namespace jsoncons;
+namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    json target = json::parse(R"(
+    auto target = jsoncons::json::parse(R"(
         { "foo": "bar", "baz" : "abc"}
     )");
 
     std::error_code ec;
-    jsonpointer::insert_or_assign(target, "/baz", json("qux"), ec);
+    jp::insert_or_assign(target, "/baz", jsoncons::json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;

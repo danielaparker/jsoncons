@@ -4,12 +4,12 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-using namespace jsoncons;
+namespace jp = jsoncons::jsonpointer;
 
 void jsonpointer_select_RFC6901()
 {
     // Example from RFC 6901
-    const json example = json::parse(R"(
+    auto j = jsoncons::json::parse(R"(
        {
           "foo": ["bar", "baz"],
           "": 0,
@@ -26,32 +26,32 @@ void jsonpointer_select_RFC6901()
 
     try
     {
-        const json& result1 = jsonpointer::get(example, "");
+        const jsoncons::json& result1 = jp::get(j, "");
         std::cout << "(1) " << result1 << std::endl;
-        const json& result2 = jsonpointer::get(example, "/foo");
+        const jsoncons::json& result2 = jp::get(j, "/foo");
         std::cout << "(2) " << result2 << std::endl;
-        const json& result3 = jsonpointer::get(example, "/foo/0");
+        const jsoncons::json& result3 = jp::get(j, "/foo/0");
         std::cout << "(3) " << result3 << std::endl;
-        const json& result4 = jsonpointer::get(example, "/");
+        const jsoncons::json& result4 = jp::get(j, "/");
         std::cout << "(4) " << result4 << std::endl;
-        const json& result5 = jsonpointer::get(example, "/a~1b");
+        const jsoncons::json& result5 = jp::get(j, "/a~1b");
         std::cout << "(5) " << result5 << std::endl;
-        const json& result6 = jsonpointer::get(example, "/c%d");
+        const jsoncons::json& result6 = jp::get(j, "/c%d");
         std::cout << "(6) " << result6 << std::endl;
-        const json& result7 = jsonpointer::get(example, "/e^f");
+        const jsoncons::json& result7 = jp::get(j, "/e^f");
         std::cout << "(7) " << result7 << std::endl;
-        const json& result8 = jsonpointer::get(example, "/g|h");
+        const jsoncons::json& result8 = jp::get(j, "/g|h");
         std::cout << "(8) " << result8 << std::endl;
-        const json& result9 = jsonpointer::get(example, "/i\\j");
+        const jsoncons::json& result9 = jp::get(j, "/i\\j");
         std::cout << "(9) " << result9 << std::endl;
-        const json& result10 = jsonpointer::get(example, "/k\"l");
+        const jsoncons::json& result10 = jp::get(j, "/k\"l");
         std::cout << "(10) " << result10 << std::endl;
-        const json& result11 = jsonpointer::get(example, "/ ");
+        const jsoncons::json& result11 = jp::get(j, "/ ");
         std::cout << "(11) " << result11 << std::endl;
-        const json& result12 = jsonpointer::get(example, "/m~0n");
+        const jsoncons::json& result12 = jp::get(j, "/m~0n");
         std::cout << "(12) " << result12 << std::endl;
     }
-    catch (const std::runtime_error& e)
+    catch (const jp::jsonpointer_error& e)
     {
         std::cerr << e.what() << std::endl;
     }
@@ -60,7 +60,7 @@ void jsonpointer_select_RFC6901()
 void jsonpointer_contains()
 {
     // Example from RFC 6901
-    const json example = json::parse(R"(
+    auto j = jsoncons::json::parse(R"(
        {
           "foo": ["bar", "baz"],
           "": 0,
@@ -75,13 +75,13 @@ void jsonpointer_contains()
        }
     )");
 
-    std::cout << "(1) " << jsonpointer::contains(example, "/foo/0") << std::endl;
-    std::cout << "(2) " << jsonpointer::contains(example, "e^g") << std::endl;
+    std::cout << "(1) " << jp::contains(j, "/foo/0") << std::endl;
+    std::cout << "(2) " << jp::contains(j, "e^g") << std::endl;
 }
 
 void jsonpointer_select_author()
 {
-    json doc = json::parse(R"(
+    auto j = jsoncons::json::parse(R"(
     [
       { "category": "reference",
         "author": "Nigel Rees",
@@ -99,17 +99,17 @@ void jsonpointer_select_author()
     // Using exceptions to report errors
     try
     {
-        json result = jsonpointer::get(doc, "/1/author");
+        jsoncons::json result = jp::get(j, "/1/author");
         std::cout << "(1) " << result << std::endl;
     }
-    catch (const std::runtime_error& e)
+    catch (const jp::jsonpointer_error& e)
     {
         std::cout << e.what() << std::endl;
     }
 
     // Using error codes to report errors
     std::error_code ec;
-    const json& result = jsonpointer::get(doc, "/0/title", ec);
+    const jsoncons::json& result = jp::get(j, "/0/title", ec);
 
     if (ec)
     {
@@ -123,12 +123,12 @@ void jsonpointer_select_author()
 
 void jsonpointer_add_member_to_object()
 {
-    json target = json::parse(R"(
+    auto target = jsoncons::json::parse(R"(
         { "foo": "bar"}
     )");
 
     std::error_code ec;
-    jsonpointer::insert(target, "/baz", json("qux"), ec);
+    jp::insert(target, "/baz", jsoncons::json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -141,12 +141,12 @@ void jsonpointer_add_member_to_object()
 
 void jsonpointer_add_element_to_array()
 {
-    json target = json::parse(R"(
+    auto target = jsoncons::json::parse(R"(
         { "foo": [ "bar", "baz" ] }
     )");
 
     std::error_code ec;
-    jsonpointer::insert(target, "/foo/1", json("qux"), ec);
+    jp::insert(target, "/foo/1", jsoncons::json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -159,12 +159,12 @@ void jsonpointer_add_element_to_array()
 
 void jsonpointer_add_element_to_end_array()
 {
-    json target = json::parse(R"(
+    auto target = jsoncons::json::parse(R"(
         { "foo": [ "bar", "baz" ] }
     )");
 
     std::error_code ec;
-    jsonpointer::insert(target, "/foo/-", json("qux"), ec);
+    jp::insert(target, "/foo/-", jsoncons::json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -177,30 +177,12 @@ void jsonpointer_add_element_to_end_array()
 
 void jsonpointer_insert_name_exists()
 {
-    json target = json::parse(R"(
+    auto target = jsoncons::json::parse(R"(
         { "foo": "bar", "baz" : "abc"}
     )");
 
     std::error_code ec;
-    jsonpointer::insert(target, "/baz", json("qux"), ec);
-    if (ec)
-    {
-        std::cout << ec.message() << std::endl;
-    }
-    else
-    {
-        std::cout << target << std::endl;
-    }
-}
-
-void jsonpointer_insert_or_assign_name_exists()
-{
-    json target = json::parse(R"(
-        { "foo": "bar", "baz" : "abc"}
-    )");
-
-    std::error_code ec;
-    jsonpointer::insert_or_assign(target, "/baz", json("qux"), ec);
+    jp::insert(target, "/baz", jsoncons::json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -213,12 +195,30 @@ void jsonpointer_insert_or_assign_name_exists()
 
 void jsonpointer_add_element_outside_range()
 {
-    json target = json::parse(R"(
+    auto target = jsoncons::json::parse(R"(
     { "foo": [ "bar", "baz" ] }
     )");
 
     std::error_code ec;
-    jsonpointer::insert_or_assign(target, "/foo/3", json("qux"), ec);
+    jp::insert_or_assign(target, "/foo/3", jsoncons::json("qux"), ec);
+    if (ec)
+    {
+        std::cout << ec.message() << std::endl;
+    }
+    else
+    {
+        std::cout << target << std::endl;
+    }
+}
+
+void jsonpointer_insert_or_assign_name_exists()
+{
+    auto target = jsoncons::json::parse(R"(
+        { "foo": "bar", "baz" : "abc"}
+    )");
+
+    std::error_code ec;
+    jp::insert_or_assign(target, "/baz", jsoncons::json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -231,12 +231,12 @@ void jsonpointer_add_element_outside_range()
 
 void jsonpointer_remove_object_member()
 {
-    json target = json::parse(R"(
+    auto target = jsoncons::json::parse(R"(
         { "foo": "bar", "baz" : "qux"}
     )");
 
     std::error_code ec;
-    jsonpointer::remove(target, "/baz", ec);
+    jp::remove(target, "/baz", ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -249,12 +249,12 @@ void jsonpointer_remove_object_member()
 
 void jsonpointer_remove_array_element()
 {
-    json target = json::parse(R"(
+    auto target = jsoncons::json::parse(R"(
         { "foo": [ "bar", "qux", "baz" ] }
     )");
 
     std::error_code ec;
-    jsonpointer::remove(target, "/foo/1", ec);
+    jp::remove(target, "/foo/1", ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -267,7 +267,7 @@ void jsonpointer_remove_array_element()
 
 void jsonpointer_replace_object_value()
 {
-    json target = json::parse(R"(
+    auto target = jsoncons::json::parse(R"(
         {
           "baz": "qux",
           "foo": "bar"
@@ -275,7 +275,7 @@ void jsonpointer_replace_object_value()
     )");
 
     std::error_code ec;
-    jsonpointer::replace(target, "/baz", json("boo"), ec);
+    jp::replace(target, "/baz", jsoncons::json("boo"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -288,12 +288,12 @@ void jsonpointer_replace_object_value()
 
 void jsonpointer_replace_array_value()
 {
-    json target = json::parse(R"(
+    auto target = jsoncons::json::parse(R"(
         { "foo": [ "bar", "baz" ] }
     )");
 
     std::error_code ec;
-    jsonpointer::replace(target, "/foo/1", json("qux"), ec);
+    jp::replace(target, "/foo/1", jsoncons::json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -306,7 +306,7 @@ void jsonpointer_replace_array_value()
 
 void jsonpointer_error_example()
 {
-    json doc = json::parse(R"(
+    auto j = jsoncons::json::parse(R"(
     [
       { "category": "reference",
         "author": "Nigel Rees",
@@ -323,11 +323,11 @@ void jsonpointer_error_example()
 
     try
     {
-        json result = jsonpointer::get(doc, "/1/isbn");
+        jsoncons::json result = jp::get(j, "/1/isbn");
         std::cout << "succeeded?" << std::endl;
         std::cout << result << std::endl;
     }
-    catch (const jsonpointer::jsonpointer_error& e)
+    catch (const jp::jsonpointer_error& e)
     {
         std::cout << "Caught jsonpointer_error with category " << e.code().category().name() 
                   << ", code " << e.code().value() 
@@ -338,8 +338,8 @@ void jsonpointer_error_example()
 void jsonpointer_get_examples()
 {
     {
-        json j = json::array{"baz","foo"};
-        json& item = jsonpointer::get(j,"/0");
+        jsoncons::json j = jsoncons::json::array{"baz","foo"};
+        jsoncons::json& item = jp::get(j,"/0");
         std::cout << "(1) " << item << std::endl;
 
         //std::vector<uint8_t> u;
@@ -351,62 +351,60 @@ void jsonpointer_get_examples()
         //std::cout << std::endl;
     }
     {
-        const json j = json::array{"baz","foo"};
-        const json& item = jsonpointer::get(j,"/1");
+        const jsoncons::json j = jsoncons::json::array{"baz","foo"};
+        const jsoncons::json& item = jp::get(j,"/1");
         std::cout << "(2) " << item << std::endl;
     }
     {
-        json j = json::array{"baz","foo"};
+        jsoncons::json j = jsoncons::json::array{"baz","foo"};
 
         std::error_code ec;
-        json& item = jsonpointer::get(j,"/1",ec);
+        jsoncons::json& item = jp::get(j,"/1",ec);
         std::cout << "(4) " << item << std::endl;
     }
     {
-        const json j = json::array{"baz","foo"};
+        const jsoncons::json j = jsoncons::json::array{"baz","foo"};
 
         std::error_code ec;
-        const json& item = jsonpointer::get(j,"/0",ec);
+        const jsoncons::json& item = jp::get(j,"/0",ec);
         std::cout << "(5) " << item << std::endl;
     }
 }
 
-void jsonpointer_path_example()
+void jsonpointer_address_example()
 {
-    json example = json::parse(R"(
+    auto j = jsoncons::json::parse(R"(
        {
           "a/b": ["bar", "baz"],
           "m~n": ["foo", "qux"]
        }
     )");
 
-    jsonpointer::address p;
-    p /= "m~n";
-    p /= "1";
+    jp::address addr;
+    addr /= "m~n";
+    addr /= "1";
 
-    std::cout << "(1) " << p << "\n\n";
+    std::cout << "(1) " << addr << "\n\n";
 
     std::cout << "(2)\n";
-    for (const auto& item : p)
+    for (const auto& item : addr)
     {
         std::cout << item << "\n";
     }
     std::cout << "\n";
 
-    json j = jsonpointer::get(example, p);
-    std::cout << "(3) " << j << "\n";
+    jsoncons::json item = jp::get(j, addr);
+    std::cout << "(3) " << item << "\n";
 }
 
-namespace jp = jsoncons::jsonpointer;
-
-void jsonpointer_path_iterator_example()
+void jsonpointer_address_iterator_example()
 {
-    jp::address p("/store/book/1/author");
+    jp::address addr("/store/book/1/author");
 
-    std::cout << "(1) " << p << "\n\n";
+    std::cout << "(1) " << addr << "\n\n";
 
     std::cout << "(2)\n";
-    for (const auto& token : p)
+    for (const auto& token : addr)
     {
         std::cout << token << "\n";
     }
@@ -414,18 +412,18 @@ void jsonpointer_path_iterator_example()
     std::cout << "\n";
 }
 
-void jsonpointer_path_append_tokens()
+void jsonpointer_address_append_tokens()
 {
-    jp::address p;
+    jp::address addr;
 
-    p /= "a/b";
-    p /= "";
-    p /= "m~n";
+    addr /= "a/b";
+    addr /= "";
+    addr /= "m~n";
 
-    std::cout << "(1) " << p << "\n\n";
+    std::cout << "(1) " << addr << "\n\n";
 
     std::cout << "(2)\n";
-    for (const auto& token : p)
+    for (const auto& token : addr)
     {
         std::cout << token << "\n";
     }
@@ -433,16 +431,16 @@ void jsonpointer_path_append_tokens()
     std::cout << "\n";
 }
 
-void jsonpointer_path_concatentae()
+void jsonpointer_address_concatentae()
 {
-    jp::address p("/a~1b");
+    jp::address addr("/a~1b");
 
-    p += jp::address("//m~0n");
+    addr += jp::address("//m~0n");
 
-    std::cout << "(1) " << p << "\n\n";
+    std::cout << "(1) " << addr << "\n\n";
 
     std::cout << "(2)\n";
-    for (const auto& token : p)
+    for (const auto& token : addr)
     {
         std::cout << token << "\n";
     }
@@ -453,6 +451,8 @@ void jsonpointer_path_concatentae()
 void jsonpointer_examples()
 {
     std::cout << "\njsonpointer examples\n\n";
+    jsonpointer_select_author();
+    jsonpointer_address_example();
     jsonpointer_select_RFC6901();
     jsonpointer_add_member_to_object();
     jsonpointer_add_element_to_array();
@@ -464,14 +464,11 @@ void jsonpointer_examples()
     jsonpointer_replace_array_value();
     jsonpointer_contains();
     jsonpointer_error_example();
-    jsonpointer_select_RFC6901();
-    jsonpointer_select_author();
     jsonpointer_insert_name_exists();
     jsonpointer_insert_or_assign_name_exists();
     jsonpointer_get_examples();
-    jsonpointer_path_example();
-    jsonpointer_path_iterator_example();
-    jsonpointer_path_append_tokens();
-    jsonpointer_path_concatentae();
+    jsonpointer_address_iterator_example();
+    jsonpointer_address_append_tokens();
+    jsonpointer_address_concatentae();
 }
 
