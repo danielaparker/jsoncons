@@ -39,12 +39,12 @@ iterator    | An alias to `const_iterator`
 #### Constructors
 
     basic_address();
+Constructs an address with an empty string, which points to the root of a json document.
 
     explicit basic_address(const string_type& s);
-
     explicit basic_address(string_type&& s);
-
     explicit basic_address(const CharT* s);
+Constructs an address from a JSON Pointer string
 
     basic_address(const basic_address&);
 

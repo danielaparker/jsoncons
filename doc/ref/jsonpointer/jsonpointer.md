@@ -1,12 +1,15 @@
 ### jsonpointer extension
 
 [JSON Pointer](https://tools.ietf.org/html/rfc6901) defines a string syntax to locate a specific value in a JSON document. 
-A JSON Pointer is a string of zero or more tokens, each prefixed by `/` characters. 
-These tokens denote keys in JSON objects or indexes in JSON arrays.
+A JSON Pointer is a string of zero or more tokens, each token prefixed by `/` characters. 
+These tokens denote keys in JSON objects or indexes in JSON arrays. An empty string with zero tokens points 
+to the root of a json document.
 
 The characters `~` and `/` have special meanings in JSON Pointer, 
 so if a key in a JSON object has these characters, `~` needs to be escaped as `~0`,
-and `/` needs to be escaped as `~1`.
+and `/` needs to be escaped as `~1`. 
+
+When applied to a JSON array, the character `-` indicates one past the last element in the array.
 
 ### Classes
 <table border="0">
