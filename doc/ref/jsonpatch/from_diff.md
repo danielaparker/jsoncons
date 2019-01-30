@@ -22,23 +22,23 @@ Returns a JSON Patch.
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
-using namespace jsoncons;
 using namespace jsoncons::literals;
+namespace jp = jsoncons::jsonpatch;
 
 int main()
 {
-    json source = R"(
+    jsoncons::json source = R"(
         {"/": 9, "foo": "bar"}
     )"_json;
 
-    json target = R"(
+    jsoncons::json target = R"(
         { "baz":"qux", "foo": [ "bar", "baz" ]}
     )"_json;
 
-    auto patch = jsonpatch::from_diff(source, target);
+    auto patch = jp::from_diff(source, target);
 
     std::error_code ec;
-    jsonpatch::apply_patch(source, patch, ec);
+    jp::apply_patch(source, patch, ec);
 
     std::cout << "(1) " << pretty_print(patch) << std::endl;
     std::cout << "(2) " << pretty_print(source) << std::endl;

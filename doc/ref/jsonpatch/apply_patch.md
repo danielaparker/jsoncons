@@ -31,16 +31,16 @@ None
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
-using namespace jsoncons;
 using namespace jsoncons::literals;
+namespace jp = jsoncons::jsonpatch;
 
 int main()
 {
-    json target = R"(
+    jsoncons::json target = R"(
         { "foo": "bar"}
     )"_json;
 
-    json patch = R"(
+    jsoncons::json patch = R"(
         [
             { "op": "add", "path": "/baz", "value": "qux" },
             { "op": "add", "path": "/foo", "value": [ "bar", "baz" ] }
@@ -48,7 +48,7 @@ int main()
     )"_json;
 
     std::error_code ec;
-    jsonpatch::apply_patch(target,patch,ec);
+    jp::apply_patch(target,patch,ec);
 
     std::cout << pretty_print(target) << std::endl;
 }
@@ -67,16 +67,16 @@ Output:
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
-using namespace jsoncons;
 using namespace jsoncons::literals;
+namespace jp = jsoncons::jsonpatch;
 
 int main()
 {
-    json target = R"(
+    jsoncons::json target = R"(
         { "foo": "bar"}
     )"_json;
 
-    json patch = R"(
+    jsoncons::json patch = R"(
         [
             { "op": "add", "path": "/baz", "value": "qux" },
             { "op": "add", "path": "/foo", "value": [ "bar", "baz" ] },
@@ -85,7 +85,7 @@ int main()
     )"_json;
 
     std::error_code ec;
-    jsonpatch::apply_patch(target, patch, ec);
+    jp::apply_patch(target, patch, ec);
 
     std::cout << "(1) " << ec.message() << std::endl;
     std::cout << "(2) " << target << std::endl;
