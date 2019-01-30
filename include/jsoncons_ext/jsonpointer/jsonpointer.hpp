@@ -79,9 +79,9 @@ enum class pointer_state
 
 } // detail
 
-// path_iterator
+// address_iterator
 template <class InputIt>
-class path_iterator
+class address_iterator
 {
     typedef typename std::iterator_traits<InputIt>::value_type char_type;
     typedef std::basic_string<char_type> string_type;
@@ -102,27 +102,27 @@ public:
     typedef const value_type& reference;
     typedef std::input_iterator_tag iterator_category;
 
-    path_iterator(base_iterator first, base_iterator last)
-        : path_iterator(first, last, first)
+    address_iterator(base_iterator first, base_iterator last)
+        : address_iterator(first, last, first)
     {
         std::error_code ec;
         increment(ec);
     }
 
-    path_iterator(base_iterator first, base_iterator last, base_iterator current)
+    address_iterator(base_iterator first, base_iterator last, base_iterator current)
         : path_ptr_(first), end_input_(last), p_(current), q_(current), state_(jsonpointer::detail::pointer_state::start)
     {
     }
 
-    path_iterator(const path_iterator&) = default;
+    address_iterator(const address_iterator&) = default;
 
-    path_iterator(path_iterator&&) = default;
+    address_iterator(address_iterator&&) = default;
 
-    path_iterator& operator=(const path_iterator&) = default;
+    address_iterator& operator=(const address_iterator&) = default;
 
-    path_iterator& operator=(path_iterator&&) = default;
+    address_iterator& operator=(address_iterator&&) = default;
 
-    path_iterator& operator++()
+    address_iterator& operator++()
     {
         std::error_code ec;
         increment(ec);
@@ -133,7 +133,7 @@ public:
         return *this;
     }
 
-    path_iterator& increment(std::error_code& ec)
+    address_iterator& increment(std::error_code& ec)
     {
         q_ = p_;
         buffer_.clear();
@@ -197,9 +197,9 @@ public:
         return *this;
     }
 
-    path_iterator operator++(int) // postfix increment
+    address_iterator operator++(int) // postfix increment
     {
-        path_iterator temp(*this);
+        address_iterator temp(*this);
         ++(*this);
         return temp;
     }
@@ -209,11 +209,11 @@ public:
         return buffer_;
     }
 
-    friend bool operator==(const path_iterator& it1, const path_iterator& it2)
+    friend bool operator==(const address_iterator& it1, const address_iterator& it2)
     {
         return it1.q_ == it2.q_;
     }
-    friend bool operator!=(const path_iterator& it1, const path_iterator& it2)
+    friend bool operator!=(const address_iterator& it1, const address_iterator& it2)
     {
         return !(it1 == it2);
     }
@@ -257,7 +257,7 @@ public:
     typedef CharT char_type;
     typedef std::basic_string<char_type> string_type;
     typedef basic_string_view<char_type> string_view_type;
-    typedef path_iterator<typename string_type::const_iterator> const_iterator;
+    typedef address_iterator<typename string_type::const_iterator> const_iterator;
     typedef const_iterator iterator;
 
     // Constructors
@@ -714,8 +714,8 @@ public:
     {
         current_.push_back(root);
 
-        path_iterator<typename string_view_type::iterator> it(path.begin(), path.end());
-        path_iterator<typename string_view_type::iterator> end(path.begin(), path.end(), path.end());
+        address_iterator<typename string_view_type::iterator> it(path.begin(), path.end());
+        address_iterator<typename string_view_type::iterator> end(path.begin(), path.end(), path.end());
         while (it != end)
         {
             buffer_ = *it;

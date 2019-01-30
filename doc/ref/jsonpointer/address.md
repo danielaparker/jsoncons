@@ -104,7 +104,7 @@ namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    jp::path p("/store/book/1/author");
+    jp::address p("/store/book/1/author");
 
     std::cout << "(1) " << p << "\n\n";
 
@@ -138,7 +138,7 @@ namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    jp::path p;
+    jp::address p;
 
     p /= "a/b";
     p /= "";
@@ -175,9 +175,9 @@ namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    jp::path p("/a~1b");
+    jp::address p("/a~1b");
 
-    p += jp::path("//m~0n");
+    p += jp::address("//m~0n");
 
     std::cout << "(1) " << p << "\n\n";
 

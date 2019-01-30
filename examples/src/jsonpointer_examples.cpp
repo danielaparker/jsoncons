@@ -401,7 +401,7 @@ namespace jp = jsoncons::jsonpointer;
 
 void jsonpointer_path_iterator_example()
 {
-    jp::path p("/store/book/1/author");
+    jp::address p("/store/book/1/author");
 
     std::cout << "(1) " << p << "\n\n";
 
@@ -416,7 +416,7 @@ void jsonpointer_path_iterator_example()
 
 void jsonpointer_path_append_tokens()
 {
-    jp::path p;
+    jp::address p;
 
     p /= "a/b";
     p /= "";
@@ -435,9 +435,9 @@ void jsonpointer_path_append_tokens()
 
 void jsonpointer_path_concatentae()
 {
-    jp::path p("/a~1b");
+    jp::address p("/a~1b");
 
-    p += jp::path("//m~0n");
+    p += jp::address("//m~0n");
 
     std::cout << "(1) " << p << "\n\n";
 
