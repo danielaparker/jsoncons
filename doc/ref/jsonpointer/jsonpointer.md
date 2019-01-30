@@ -12,7 +12,7 @@ and `/` needs to be escaped as `~1`.
 <table border="0">
   <tr>
     <td><a href="address.md">basic_address</a></td>
-    <td>Objects of type <code>basic_address</code> represent JSON Pointer paths.</td> 
+    <td>Objects of type <code>basic_address</code> represent JSON Pointer addresses.</td> 
   </tr>
 </table>
 

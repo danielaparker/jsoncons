@@ -86,7 +86,7 @@ Returns a string view representation of the JSON Pointer.
 Concatenates a JSON Pointer path and a token. Effectively returns basic_address<CharT>(lhs) /= rhs.
 
     basic_address<CharT> operator+( const basic_address<CharT>& lhs, const basic_address<CharT>& rhs );
-Concatenates two JSON Pointer paths. Effectively returns basic_address<CharT>(lhs) += rhs.
+Concatenates two JSON Pointer addresses. Effectively returns basic_address<CharT>(lhs) += rhs.
 
     bool operator==(const basic_address<CharT>& lhs, const basic_address<CharT>& rhs);
 
