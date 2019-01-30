@@ -11,8 +11,8 @@ and `/` needs to be escaped as `~1`.
 ### Classes
 <table border="0">
   <tr>
-    <td><a href="path.md">basic_path</a></td>
-    <td>Objects of type <code>basic_path</code> represent JSON Pointer paths.</td> 
+    <td><a href="path.md">basic_address</a></td>
+    <td>Objects of type <code>basic_address</code> represent JSON Pointer paths.</td> 
   </tr>
 </table>
 
@@ -103,7 +103,7 @@ Output:
 (2) "Sayings of the Century"
 ```
 
-#### Using `jsonpointer::path` to build JSON Pointer 
+#### Using `jsonpointer::address` to build JSON Pointer 
 
 ```c++
 int main()
@@ -115,7 +115,7 @@ int main()
        }
     )");
 
-    jsonpointer::path p;
+    jsonpointer::address p;
     p /= "m~n";
     p /= "1";
 

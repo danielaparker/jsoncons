@@ -1,8 +1,8 @@
-### jsoncons::jsonpointer::basic_path
+### jsoncons::jsonpointer::basic_address
 
 ```
 template <class CharT>
-class basic_path
+class basic_address
 ```
 #### Header
 ```c++
@@ -13,10 +13,10 @@ Two specializations for common character types are defined:
 
 Type      |Definition
 ----------|------------------------------
-path      |`basic_path<char>`
-wpath     |`basic_path<wchar_t>`
+path      |`basic_address<char>`
+wpath     |`basic_address<wchar_t>`
 
-Objects of type `basic_path` represent JSON Pointer strings.
+Objects of type `basic_address` represent JSON Pointer strings.
 
 #### Member types
 Type        |Definition
@@ -34,30 +34,30 @@ iterator    | An alias to `const_iterator`
 
 #### Constructors
 
-    basic_path();
+    basic_address();
 
-    explicit basic_path(const string_type& s);
+    explicit basic_address(const string_type& s);
 
-    explicit basic_path(string_type&& s);
+    explicit basic_address(string_type&& s);
 
-    explicit basic_path(const CharT* s);
+    explicit basic_address(const CharT* s);
 
-    basic_path(const basic_path&);
+    basic_address(const basic_address&);
 
-    basic_path(basic_path&&);
+    basic_address(basic_address&&);
 
 #### operator=
 
-    basic_path& operator=(const basic_path&);
+    basic_address& operator=(const basic_address&);
 
-    basic_path& operator=(basic_path&&);
+    basic_address& operator=(basic_address&&);
 
 #### Modifiers
 
-    basic_path& operator/=(const string_type& s)
+    basic_address& operator/=(const string_type& s)
 First, appends the JSON Pointer separator `/` to the path. Then appends the string token s, escaping any `/` or `~` characters.
 
-    basic_path& operator+=(const basic_path& p)
+    basic_address& operator+=(const basic_address& p)
 Concatenates the current path and the specified path `p`. 
 
 #### Iterators
@@ -78,18 +78,18 @@ Returns the string representation of the JSON Pointer by reference.
 Returns a string view representation of the JSON Pointer.
 
 #### Non-member functions
-    basic_path<CharT> operator/(const basic_path<CharT>& lhs, const string_type& rhs);
-Concatenates a JSON Pointer path and a token. Effectively returns basic_path<CharT>(lhs) /= rhs.
+    basic_address<CharT> operator/(const basic_address<CharT>& lhs, const string_type& rhs);
+Concatenates a JSON Pointer path and a token. Effectively returns basic_address<CharT>(lhs) /= rhs.
 
-    basic_path<CharT> operator+( const basic_path<CharT>& lhs, const basic_path<CharT>& rhs );
-Concatenates two JSON Pointer paths. Effectively returns basic_path<CharT>(lhs) += rhs.
+    basic_address<CharT> operator+( const basic_address<CharT>& lhs, const basic_address<CharT>& rhs );
+Concatenates two JSON Pointer paths. Effectively returns basic_address<CharT>(lhs) += rhs.
 
-    bool operator==(const basic_path<CharT>& lhs, const basic_path<CharT>& rhs);
+    bool operator==(const basic_address<CharT>& lhs, const basic_address<CharT>& rhs);
 
-    bool operator!=(const basic_path<CharT>& lhs, const basic_path<CharT>& rhs);
+    bool operator!=(const basic_address<CharT>& lhs, const basic_address<CharT>& rhs);
 
     std::basic_ostream<CharT>&
-    operator<<(std::basic_ostream<CharT>& os, const basic_path<CharT>& p);
+    operator<<(std::basic_ostream<CharT>& os, const basic_address<CharT>& p);
 Performs stream output
 
 ### Examples

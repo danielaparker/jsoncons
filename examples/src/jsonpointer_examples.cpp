@@ -380,7 +380,7 @@ void jsonpointer_path_example()
        }
     )");
 
-    jsonpointer::path p;
+    jsonpointer::address p;
     p /= "m~n";
     p /= "1";
 

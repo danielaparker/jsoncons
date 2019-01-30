@@ -245,10 +245,10 @@ std::basic_string<CharT> escape_string(const std::basic_string<CharT>& s)
     return result;
 }
 
-// path
+// address
 
 template <class CharT>
-class basic_path
+class basic_address
 {
 public:
     std::basic_string<CharT> path_;
@@ -261,30 +261,30 @@ public:
     typedef const_iterator iterator;
 
     // Constructors
-    basic_path()
+    basic_address()
     {
     }
-    explicit basic_path(const string_type& s)
+    explicit basic_address(const string_type& s)
         : path_(s)
     {
     }
-    explicit basic_path(string_type&& s)
+    explicit basic_address(string_type&& s)
         : path_(std::move(s))
     {
     }
-    explicit basic_path(const CharT* s)
+    explicit basic_address(const CharT* s)
         : path_(s)
     {
     }
 
-    basic_path(const basic_path&) = default;
+    basic_address(const basic_address&) = default;
 
-    basic_path(basic_path&&) = default;
+    basic_address(basic_address&&) = default;
 
     // operator=
-    basic_path& operator=(const basic_path&) = default;
+    basic_address& operator=(const basic_address&) = default;
 
-    basic_path& operator=(basic_path&&) = default;
+    basic_address& operator=(basic_address&&) = default;
 
     // Modifiers
 
@@ -293,7 +293,7 @@ public:
         path_.clear();
     }
 
-    basic_path& operator/=(const string_type& s)
+    basic_address& operator/=(const string_type& s)
     {
         path_.push_back('/');
         path_.append(escape_string(s));
@@ -301,7 +301,7 @@ public:
         return *this;
     }
 
-    basic_path& operator+=(const basic_path& p)
+    basic_address& operator+=(const basic_address& p)
     {
         path_.append(p.path_);
         return *this;
@@ -334,39 +334,39 @@ public:
     }
 
     // Non-member functions
-    friend basic_path<CharT> operator/(const basic_path<CharT>& lhs, const string_type& rhs)
+    friend basic_address<CharT> operator/(const basic_address<CharT>& lhs, const string_type& rhs)
     {
-        basic_path<CharT> p(lhs);
+        basic_address<CharT> p(lhs);
         p /= rhs;
         return p;
     }
 
-    friend basic_path<CharT> operator+( const basic_path<CharT>& lhs, const basic_path<CharT>& rhs )
+    friend basic_address<CharT> operator+( const basic_address<CharT>& lhs, const basic_address<CharT>& rhs )
     {
-        basic_path<CharT> p(lhs);
+        basic_address<CharT> p(lhs);
         p += rhs;
         return p;
     }
 
-    friend bool operator==( const basic_path& lhs, const basic_path& rhs )
+    friend bool operator==( const basic_address& lhs, const basic_address& rhs )
     {
         return lhs.path_ == rhs.path_;
     }
 
-    friend bool operator!=( const basic_path& lhs, const basic_path& rhs )
+    friend bool operator!=( const basic_address& lhs, const basic_address& rhs )
     {
         return lhs.path_ != rhs.path_;
     }
 
     friend std::basic_ostream<CharT>&
-    operator<<( std::basic_ostream<CharT>& os, const basic_path<CharT>& p )
+    operator<<( std::basic_ostream<CharT>& os, const basic_address<CharT>& p )
     {
         os << p.path_;
         return os;
     }
 };
 
-typedef basic_path<char> path;
+typedef basic_address<char> address;
 
 namespace detail {
 
