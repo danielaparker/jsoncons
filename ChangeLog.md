@@ -1,6 +1,13 @@
 master
 ------
 
+Name change:
+
+- The name `json_staj_reader` has been deprecated and renamed to `json_pull_reader`
+
+v0.118.0
+--------
+
 New features
 
 - New csv option `lossless_number`. If set to `true`, parse numbers with exponent and fractional parts as strings with
