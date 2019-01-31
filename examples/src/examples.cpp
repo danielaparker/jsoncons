@@ -14,6 +14,7 @@ using namespace jsoncons;
 
 void readme_examples();
 void basics_examples();
+void basics_wexamples();
 void json_filter_examples();
 void array_examples();
 void container_examples();
@@ -497,6 +498,7 @@ int main()
         object_range_based_for_loop();
 
         basics_examples();
+        basics_wexamples();
         ojson_examples();
 
         first_example_a();
