@@ -6,7 +6,6 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 [json_parser](ref/json_parser.md)  
 [json_reader](ref/json_reader.md)  
 [json_decoder](ref/json_decoder.md)  
-[json_pull_reader](ref/json_pull_reader.md)  
 
 [ojson](ref/ojson.md)  
 
@@ -32,6 +31,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 [json_filter](ref/json_filter.md)  
 [rename_object_member_filter](ref/rename_object_member_filter.md)  
 
+[json_pull_reader](ref/json_pull_reader.md)  
 [staj_reader](ref/staj_reader.md)  
 [staj_object_iterator](ref/staj_object_iterator.md)  
 [staj_array_iterator](ref/staj_array_iterator.md)  
