@@ -1,18 +1,18 @@
-### jsoncons::json_staj_reader
+### jsoncons::json_pull_reader
 
 ```c++
-typedef basic_json_staj_reader<char,std::allocator<char>> json_staj_reader
+typedef basic_json_pull_reader<char,std::allocator<char>> json_pull_reader
 ```
 
 A pull parser for parsing json events. A typical application will 
 repeatedly process the `current()` event and call the `next()`
 function to advance to the next event, until `done()` returns `true`.
 
-`json_staj_reader` is noncopyable and nonmoveable.
+`json_pull_reader` is noncopyable and nonmoveable.
 
 #### Header
 ```c++
-#include <jsoncons/json_staj_reader.hpp>
+#include <jsoncons/json_pull_reader.hpp>
 ```
 
 ### Implemented interfaces
@@ -21,26 +21,26 @@ function to advance to the next event, until `done()` returns `true`.
 
 #### Constructors
 
-    json_staj_reader(std::istream& is); // (1)
+    json_pull_reader(std::istream& is); // (1)
 
-    json_staj_reader(std::istream& is,
+    json_pull_reader(std::istream& is,
                      staj_filter& filter); // (2)
 
-    json_staj_reader(std::istream& is, 
+    json_pull_reader(std::istream& is, 
                      const json_read_options& options); // (3)
 
-    json_staj_reader(std::istream& is,
+    json_pull_reader(std::istream& is,
                      staj_filter& filter, 
                      const json_read_options& options); // (4)
 
-    json_staj_reader(std::istream& is, 
+    json_pull_reader(std::istream& is, 
                      parse_error_handler& err_handler); // (5)
 
-    json_staj_reader(std::istream& is,
+    json_pull_reader(std::istream& is,
                      staj_filter& filter, 
                      parse_error_handler& err_handler); // (6)
 
-    json_staj_reader(std::istream& is, 
+    json_pull_reader(std::istream& is, 
                      const json_read_options& options,
                      parse_error_handler& err_handler); // (7)
 
@@ -48,63 +48,63 @@ Constructors (1)-(7) read from a `std::istream` and throw a
 [serialization_error](serialization_error.md) if a parsing error is encountered 
 while processing the initial event.
 
-(1) Constructs a `json_staj_reader` that reads from an input stream `is` of 
+(1) Constructs a `json_pull_reader` that reads from an input stream `is` of 
 JSON text, uses default [json_read_options](json_read_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(2) Constructs a `json_staj_reader` that reads from an input stream `is` of 
+(2) Constructs a `json_pull_reader` that reads from an input stream `is` of 
 JSON text, applies a [staj_filter](staj_filter.md) to the events, uses default [json_read_options](json_read_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(3) Constructs a `json_staj_reader` that reads from an input stream `is` of JSON text, 
+(3) Constructs a `json_pull_reader` that reads from an input stream `is` of JSON text, 
 uses the specified [json_read_options](json_read_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(4) Constructs a `json_staj_reader` that reads from an input stream `is` of JSON text, 
+(4) Constructs a `json_pull_reader` that reads from an input stream `is` of JSON text, 
 applies a [staj_filter](staj_filter.md) to the events, 
 uses the specified [json_read_options](json_read_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(5) Constructs a `json_staj_reader` that reads from an input stream `is` of JSON text, 
+(5) Constructs a `json_pull_reader` that reads from an input stream `is` of JSON text, 
 uses default [json_read_options](json_read_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
-(6) Constructs a `json_staj_reader` that reads from an input stream `is` of JSON text, 
+(6) Constructs a `json_pull_reader` that reads from an input stream `is` of JSON text, 
 applies a [staj_filter](staj_filter.md) to the events, 
 uses default [json_read_options](json_read_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
-(7) Constructs a `json_staj_reader` that reads from an input stream `is` of JSON text, 
+(7) Constructs a `json_pull_reader` that reads from an input stream `is` of JSON text, 
 applies a [staj_filter](staj_filter.md), 
 uses the specified [json_read_options](json_read_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
-    json_staj_reader(std::istream& is,
+    json_pull_reader(std::istream& is,
                      std::error_code& ec); // (8)
 
-    json_staj_reader(std::istream& is,
+    json_pull_reader(std::istream& is,
                      staj_filter& filter,
                      std::error_code& ec); // (9)
 
-    json_staj_reader(std::istream& is, 
+    json_pull_reader(std::istream& is, 
                      const json_read_options& options,
                      std::error_code& ec); // (10)
 
-    json_staj_reader(std::istream& is,
+    json_pull_reader(std::istream& is,
                      staj_filter& filter, 
                      const json_read_options& options,
                      std::error_code& ec); // (11)
 
-    json_staj_reader(std::istream& is, 
+    json_pull_reader(std::istream& is, 
                      parse_error_handler& err_handler,
                      std::error_code& ec); // (12)
 
-    json_staj_reader(std::istream& is,
+    json_pull_reader(std::istream& is,
                      staj_filter& filter, 
                      parse_error_handler& err_handler,
                      std::error_code& ec); // (13)
 
-    json_staj_reader(std::istream& is, 
+    json_pull_reader(std::istream& is, 
                      const json_read_options& options,
                      parse_error_handler& err_handler,
                      std::error_code& ec); // (14)
@@ -112,26 +112,26 @@ and a specified [parse_error_handler](parse_error_handler.md).
 Constructors (8)-(14) read from a `std::istream` and set `ec`
 if a parsing error is encountered while processing the initial event.
 
-    json_staj_reader(string_view_type& s); // (15)
+    json_pull_reader(string_view_type& s); // (15)
 
-    json_staj_reader(string_view_type& s, 
+    json_pull_reader(string_view_type& s, 
                      staj_filter& filter); // (16)
 
-    json_staj_reader(string_view_type& s, 
+    json_pull_reader(string_view_type& s, 
                      const json_read_options& options); // (17)
 
-    json_staj_reader(string_view_type& s,
+    json_pull_reader(string_view_type& s,
                      staj_filter& filter, 
                      const json_read_options& options); // (18)
 
-    json_staj_reader(string_view_type& s, 
+    json_pull_reader(string_view_type& s, 
                      parse_error_handler& err_handler); // (19)
 
-    json_staj_reader(string_view_type& s,
+    json_pull_reader(string_view_type& s,
                      staj_filter& filter, 
                      parse_error_handler& err_handler); // (20)
 
-    json_staj_reader(string_view_type& s, 
+    json_pull_reader(string_view_type& s, 
                      const json_read_options& options,
                      parse_error_handler& err_handler); // (21)
 
@@ -139,32 +139,32 @@ Constructors (15)-(21) read from a `string_view_type` and throw a
 [serialization_error](serialization_error.md) if a parsing error s encountered 
 while processing the initial event.
 
-    json_staj_reader(std::string_view_type& s,
+    json_pull_reader(std::string_view_type& s,
                      std::error_code& ec); // (22)
 
-    json_staj_reader(std::string_view_type& s,
+    json_pull_reader(std::string_view_type& s,
                      staj_filter& filter,
                      std::error_code& ec); // (23)
 
-    json_staj_reader(std::string_view_type& s, 
+    json_pull_reader(std::string_view_type& s, 
                      const json_read_options& options,
                      std::error_code& ec); // (24)
 
-    json_staj_reader(std::string_view_type& s,
+    json_pull_reader(std::string_view_type& s,
                      staj_filter& filter, 
                      const json_read_options& options,
                      std::error_code& ec); // (25)
 
-    json_staj_reader(std::string_view_type& s, 
+    json_pull_reader(std::string_view_type& s, 
                      parse_error_handler& err_handler,
                      std::error_code& ec); // (26)
 
-    json_staj_reader(std::string_view_type& s,
+    json_pull_reader(std::string_view_type& s,
                      staj_filter& filter, 
                      parse_error_handler& err_handler,
                      std::error_code& ec); // (27)
 
-    json_staj_reader(std::string_view_type& s, 
+    json_pull_reader(std::string_view_type& s, 
                      const json_read_options& options,
                      parse_error_handler& err_handler,
                      std::error_code& ec); // (28)
@@ -172,7 +172,7 @@ while processing the initial event.
 Constructors (22)-(28) read from a `string_view_type` and set `ec` 
 if a parsing error is encountered while processing the initial event.
 
-Note: It is the programmer's responsibility to ensure that `json_staj_reader` does not outlive an error handler passed in the constuctor.
+Note: It is the programmer's responsibility to ensure that `json_pull_reader` does not outlive an error handler passed in the constuctor.
 
 #### Member functions
 
@@ -235,7 +235,7 @@ The example JSON text, `book_catalog.json`, is used by the examples below.
 #### Reading a JSON stream
 
 ```c++
-#include <jsoncons/json_staj_reader.hpp>
+#include <jsoncons/json_pull_reader.hpp>
 #include <string>
 #include <fstream>
 
@@ -245,7 +245,7 @@ int main()
 {
     std::ifstream is("book_catalog.json");
 
-    json_staj_reader reader(is);
+    json_pull_reader reader(is);
 
     for (; !reader.done(); reader.next())
     {
@@ -334,7 +334,7 @@ end_array
 #### Filtering a JSON stream
 
 ```c++
-#include <jsoncons/json_staj_reader.hpp>
+#include <jsoncons/json_pull_reader.hpp>
 #include <string>
 #include <fstream>
 
@@ -370,7 +370,7 @@ int main()
     std::ifstream is("book_catalog.json");
 
     author_filter filter;
-    json_staj_reader reader(is, filter);
+    json_pull_reader reader(is, filter);
 
     for (; !reader.done(); reader.next())
     {

@@ -13,7 +13,7 @@
 #include <memory>
 #include <istream> // std::basic_istream
 #include <jsoncons/conversion_traits.hpp>
-#include <jsoncons/json_staj_reader.hpp>
+#include <jsoncons/json_pull_reader.hpp>
 
 namespace jsoncons {
 
@@ -22,7 +22,7 @@ namespace jsoncons {
 template <class T, class CharT>
 T decode_json(const std::basic_string<CharT>& s)
 {
-    basic_json_staj_reader<CharT> reader(s);
+    basic_json_pull_reader<CharT> reader(s);
     T val;
     decode_stream(reader, val);
     return val;
@@ -32,7 +32,7 @@ template <class T, class CharT>
 T decode_json(const std::basic_string<CharT>& s,
               const basic_json_options<CharT>& options)
 {
-    basic_json_staj_reader<CharT> reader(s, options);
+    basic_json_pull_reader<CharT> reader(s, options);
     T val;
     decode_stream(reader, val);
     return val;
@@ -41,7 +41,7 @@ T decode_json(const std::basic_string<CharT>& s,
 template <class T, class CharT>
 T decode_json(std::basic_istream<CharT>& is)
 {
-    basic_json_staj_reader<CharT> reader(is);
+    basic_json_pull_reader<CharT> reader(is);
     T val;
     decode_stream(reader, val);
     return val;
@@ -51,7 +51,7 @@ template <class T, class CharT>
 T decode_json(std::basic_istream<CharT>& is,
               const basic_json_options<CharT>& options)
 {
-    basic_json_staj_reader<CharT> reader(is, options);
+    basic_json_pull_reader<CharT> reader(is, options);
     T val;
     decode_stream(reader, val);
     return val;
