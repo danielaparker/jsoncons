@@ -37,7 +37,7 @@ jsoncons is distributed under the [Boost Software License](http://www.boost.org/
 
 "this software is great and the ability to have an xpath like facility is so useful."
 
-"really good" "great job" "rocks!!!!!"
+"really good" "very solid and very dependable" "great job" "rocks!!!!!"
 
 ## Supported compilers
 
