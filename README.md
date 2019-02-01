@@ -29,6 +29,16 @@ Planned new features are listed on the [roadmap](doc/Roadmap.md)
 
 jsoncons is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
 
+## What users say
+
+"I'm using your lib and it is really good."
+
+"I’m using your library for an external interface to pass data, as well as using the conversions from csv to json, which are really helpful for converting data for use in javascript ... it's a great library."
+
+"this software is great and the ability to have an xpath like facility is so useful."
+
+"Your repo rocks!!!!!"
+
 ## Supported compilers
 
 jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It is tested in continuous integration on [AppVeyor](https://ci.appveyor.com/project/danielaparker/jsoncons) and [Travis](https://travis-ci.org/danielaparker/jsoncons).
