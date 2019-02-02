@@ -53,6 +53,7 @@ class basic_csv_reader
     size_t buffer_length_;
     size_t buffer_position_;
     bool eof_;
+    bool begin_;
 public:
     // Structural characters
     static const size_t default_max_buffer_length = 16384;
@@ -101,7 +102,8 @@ public:
          source_(std::move(source)),
          buffer_length_(default_max_buffer_length),
          buffer_position_(0),
-         eof_(false)
+         eof_(false),
+         begin_(true)
     {
         buffer_.reserve(buffer_length_);
     }
@@ -181,7 +183,12 @@ private:
             {
                 if (!source_.eof())
                 {
-                    buffer_.clear();
+                    read_buffer(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                    /* buffer_.clear();
                     buffer_.resize(buffer_length_);
                     size_t count = source_.read(buffer_.data(), buffer_length_);
                     buffer_.resize(count);
@@ -189,7 +196,7 @@ private:
                     {
                         eof_ = true;
                     }
-                    parser_.update(buffer_.data(),buffer_.size());
+                    parser_.update(buffer_.data(),buffer_.size());*/
                 }
                 else
                 {
@@ -199,6 +206,33 @@ private:
             }
             parser_.parse_some(ec);
             if (ec) return;
+        }
+    }
+    void read_buffer(std::error_code& ec)
+    {
+        buffer_.clear();
+        buffer_.resize(buffer_length_);
+        size_t count = source_.read(buffer_.data(), buffer_length_);
+        buffer_.resize(static_cast<size_t>(count));
+        if (buffer_.size() == 0)
+        {
+            eof_ = true;
+        }
+        else if (begin_)
+        {
+            auto result = unicons::skip_bom(buffer_.begin(), buffer_.end());
+            if (result.ec != unicons::encoding_errc())
+            {
+                ec = result.ec;
+                return;
+            }
+            size_t offset = result.it - buffer_.begin();
+            parser_.update(buffer_.data()+offset,buffer_.size()-offset);
+            begin_ = false;
+        }
+        else
+        {
+            parser_.update(buffer_.data(),buffer_.size());
         }
     }
 

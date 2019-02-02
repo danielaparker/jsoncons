@@ -1158,45 +1158,27 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
     CHECK((j1[0]["rate"].as<std::string>() == "0.0000214"));
 }
 
-TEST_CASE("issue test")
+// Test case contributed by karimhm
+TEST_CASE("csv detect bom")
 {
-    const std::string input = R"(0xEF0xBB0xBF"stop_id",stop_name,stop_lat,stop_lon,location_type,parent_station
-"8220B007612","Hotel Merrion Street","53","-6","",""
-)";
+    const std::string input = "\xEF\xBB\xBFstop_id,stop_name,stop_lat,stop_lon,location_type,parent_station\n"
+"\"8220B007612\",\"Hotel Merrion Street\",\"53\",\"-6\",\"\",\"\"";
 
     csv_options options;
     options.assume_header(true);
     
     std::istringstream is(input);
-    ojson station = decode_csv<ojson>(is, options)[0];
+    ojson j = decode_csv<ojson>(is, options);
+    REQUIRE(j.size() == 1);
+    ojson station = j[0];
     
-    // Will throw and print: "Key 'stop_id' not found"
     try {
-        ojson stop_id = station["stop_id"];
-        std::cout << pretty_print(stop_id) << std::endl;
-    } catch (const jsoncons::key_not_found& e) {
+        auto it = station.find("stop_id");
+        REQUIRE((it != station.object_range().end()));
+        std::string stop_id = it->value().as<std::string>();
+        CHECK((stop_id == "8220B007612"));
+    } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
-    }
-    
-    // Will print: "Hotel Merrion Street"
-    try {
-        ojson stop_name = station["stop_name"];
-        std::cout << pretty_print(stop_name) << std::endl;
-    } catch (const jsoncons::key_not_found& e) {
-        std::cout << e.what() << std::endl;
-    }
-    
-    // Will print:
-    /*
-        stop_id
-        stop_name
-        stop_lat
-        stop_lon
-        location_type
-        parent_station
-     */
-    for (auto &obj: station.object_value()) {
-        std::cout << obj.key() << std::endl;
     }
 }
 
