@@ -1156,6 +1156,47 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
     std::cout << pretty_print(j1) << "\n";
     REQUIRE(j1.size() == 3);
     CHECK((j1[0]["rate"].as<std::string>() == "0.0000214"));
+}
 
+TEST_CASE("issue test")
+{
+    const std::string input = R"(0xEF0xBB0xBF"stop_id",stop_name,stop_lat,stop_lon,location_type,parent_station
+"8220B007612","Hotel Merrion Street","53","-6","",""
+)";
+
+    csv_options options;
+    options.assume_header(true);
+    
+    std::istringstream is(input);
+    ojson station = decode_csv<ojson>(is, options)[0];
+    
+    // Will throw and print: "Key 'stop_id' not found"
+    try {
+        ojson stop_id = station["stop_id"];
+        std::cout << pretty_print(stop_id) << std::endl;
+    } catch (const jsoncons::key_not_found& e) {
+        std::cout << e.what() << std::endl;
+    }
+    
+    // Will print: "Hotel Merrion Street"
+    try {
+        ojson stop_name = station["stop_name"];
+        std::cout << pretty_print(stop_name) << std::endl;
+    } catch (const jsoncons::key_not_found& e) {
+        std::cout << e.what() << std::endl;
+    }
+    
+    // Will print:
+    /*
+        stop_id
+        stop_name
+        stop_lat
+        stop_lon
+        location_type
+        parent_station
+     */
+    for (auto &obj: station.object_value()) {
+        std::cout << obj.key() << std::endl;
+    }
 }
 
