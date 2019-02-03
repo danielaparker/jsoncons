@@ -31,13 +31,13 @@ jsoncons is distributed under the [Boost Software License](http://www.boost.org/
 
 ## What users say
 
-"I am so happy I have come across your json c++ library!"
+_"I am so happy I have come across your json c++ library!"_
 
-"I’m using your library for an external interface to pass data, as well as using the conversions from csv to json, which are really helpful for converting data for use in javascript ... it's a great library."
+_"I’m using your library for an external interface to pass data, as well as using the conversions from csv to json, which are really helpful for converting data for use in javascript ... it's a great library."_
 
-"this software is great and the ability to have an xpath like facility is so useful."
+_"this software is great and the ability to have an xpath like facility is so useful."_
 
-"really good" "very solid and very dependable" "great job" "rocks!!!!!"
+_"really good"_ _"very solid and very dependable"_ _"great job"_ _"rocks!!!!!"_
 
 ## Supported compilers
 
