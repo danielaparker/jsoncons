@@ -8,8 +8,7 @@
 
 std::exception
 
-![GitHub Logo](./diagrams/jsonpointer_error.png)
-Format: ![Alt Text](url)
+![jsonpointer_error](./diagrams/jsonpointer_error.png)
 
 #### Constructors
 
