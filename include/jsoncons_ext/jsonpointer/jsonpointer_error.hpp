@@ -12,6 +12,31 @@
 
 namespace jsoncons { namespace jsonpointer {
 
+class jsonpointer_error : public std::system_error, public virtual json_exception
+{
+public:
+    jsonpointer_error(const std::error_code& ec)
+        : std::system_error(ec)
+    {
+    }
+    jsonpointer_error(const std::error_code& ec, const std::string& what_arg)
+        : std::system_error(ec, what_arg)
+    {
+    }
+    jsonpointer_error(const std::error_code& ec, const char* what_arg)
+        : std::system_error(ec, what_arg)
+    {
+    }
+    jsonpointer_error(const jsonpointer_error& other) = default;
+
+    jsonpointer_error(jsonpointer_error&& other) = default;
+
+    const char* what() const noexcept override
+    {
+        return std::system_error::what();
+    }
+};
+
 enum class jsonpointer_errc 
 {
     ok = 0,

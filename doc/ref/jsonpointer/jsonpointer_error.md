@@ -2,7 +2,7 @@
 
 #### Header
 
-    #include <jsoncons/jsonpointer/jsonpointer.hpp>
+    #include <jsoncons/jsonpointer/jsonpointer_error.hpp>
 
 ![jsonpointer_error](./diagrams/jsonpointer_error.png)
 
