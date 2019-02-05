@@ -88,39 +88,31 @@ private:
     std::string buffer_;
 };
 
-class serialization_error : public std::exception, public virtual json_exception
+class serialization_error : public std::system_error, public virtual json_exception
 {
 public:
-    serialization_error()
-        : line_number_(0),
-          column_number_(0)
-    {
-    }
     serialization_error(std::error_code ec)
-        : error_code_(ec), line_number_(0), column_number_(0)
+        : std::system_error(ec), line_number_(0), column_number_(0)
     {
     }
     serialization_error(std::error_code ec, size_t position)
-        : error_code_(ec), line_number_(0), column_number_(position)
+        : std::system_error(ec), line_number_(0), column_number_(position)
     {
     }
     serialization_error(std::error_code ec, size_t line, size_t column)
-        : error_code_(ec), line_number_(line), column_number_(column)
+        : std::system_error(ec), line_number_(line), column_number_(column)
     {
     }
-    serialization_error(const serialization_error& other)
-        : error_code_(other.error_code_),
-          line_number_(other.line_number_),
-          column_number_(other.column_number_)
-    {
-    }
+    serialization_error(const serialization_error& other) = default;
+
+    serialization_error(serialization_error&& other) = default;
 
     const char* what() const noexcept override
     {
         try
         {
             std::ostringstream os;
-            os << error_code_.message();
+            os << this->code().message();
             if (line_number_ != 0 && column_number_ != 0)
             {
                 os << " at line " << line_number_ << " and column " << column_number_;
@@ -134,13 +126,8 @@ public:
         }
         catch (...)
         {
-            return "";
+            return std::system_error::what();
         }
-    }
-
-    const std::error_code code() const
-    {
-        return error_code_;
     }
 
     size_t line_number() const
@@ -153,7 +140,6 @@ public:
         return column_number_;
     }
 private:
-    std::error_code error_code_;
     std::string buffer_;
     size_t line_number_;
     size_t column_number_;

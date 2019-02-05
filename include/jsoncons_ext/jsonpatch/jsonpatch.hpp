@@ -19,42 +19,6 @@
 
 namespace jsoncons { namespace jsonpatch {
 
-class jsonpatch_error : public std::exception, public virtual json_exception
-{
-public:
-    jsonpatch_error(const std::error_code& ec)
-        : error_code_(ec)
-    {
-    }
-    jsonpatch_error(const jsonpatch_error& other) = default;
-
-    jsonpatch_error(jsonpatch_error&& other) = default;
-
-    const char* what() const noexcept override
-    {
-        try
-        {
-            const_cast<std::string&>(buffer_) = error_code_.message();
-            return buffer_.c_str();
-        }
-        catch (...)
-        {
-            return "";
-        }
-    }
-
-    const std::error_code code() const
-    {
-        return error_code_;
-    }
-
-    jsonpatch_error& operator=(const jsonpatch_error& e) = default;
-    jsonpatch_error& operator=(jsonpatch_error&& e) = default;
-private:
-    std::string buffer_;
-    std::error_code error_code_;
-};
-
 namespace detail {
 
     JSONCONS_DEFINE_LITERAL(test_literal,"test")

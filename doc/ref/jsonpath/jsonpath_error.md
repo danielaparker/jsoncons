@@ -4,13 +4,9 @@
 
     #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 
-### Base class
-
-std::exception
+![jsonpath_error](./diagrams/jsonpath_error.png)
 
 #### Constructors
-
-    jsonpath_error();
 
     jsonpath_error(std::error_code ec);
 

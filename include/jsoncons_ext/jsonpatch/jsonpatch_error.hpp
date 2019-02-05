@@ -12,6 +12,28 @@
 
 namespace jsoncons { namespace jsonpatch {
 
+class jsonpatch_error : public std::system_error, public virtual json_exception
+{
+public:
+    jsonpatch_error(const std::error_code& ec)
+        : std::system_error(ec)
+    {
+    }
+
+    jsonpatch_error(const jsonpatch_error& other) = default;
+
+    jsonpatch_error(jsonpatch_error&& other) = default;
+
+    const char* what() const noexcept override
+    {
+        return std::system_error::what();
+    }
+
+    jsonpatch_error& operator=(const jsonpatch_error& e) = default;
+    jsonpatch_error& operator=(jsonpatch_error&& e) = default;
+private:
+};
+
 enum class jsonpatch_errc 
 {
     ok = 0,

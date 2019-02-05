@@ -4,13 +4,11 @@
 
     #include <jsoncons/json_exception.hpp>
 
-### Base class
+![serialization_error](./diagrams/serialization_error.png)
 
 std::exception
 
 #### Constructors
-
-    serialization_error();
 
     serialization_error(std::error_code ec);
 

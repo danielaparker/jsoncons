@@ -1,12 +1,11 @@
-### jsoncons::jsonpointer::jsonpatch_error
+### jsoncons::jsonpatch::jsonpatch_error
 
 #### Header
 
-    #include <jsoncons/jsonpointer/jsonpointer.hpp>
+    #include <jsoncons/jsonpointer/jsonpatch_error.hpp>
 
-### Base class
 
-std::exception
+![jsonpatch_error](./diagrams/jsonpatch_error.png)
 
 #### Constructors
 
