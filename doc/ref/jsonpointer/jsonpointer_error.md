@@ -4,6 +4,8 @@
 
     #include <jsoncons/jsonpointer/jsonpointer_error.hpp>
 
+`jsoncons::jsonpointer::jsonpointer_error` defines an exception type for reporting failures in jsonpointer operations.
+
 ![jsonpointer_error](./diagrams/jsonpointer_error.png)
 
 #### Constructors
@@ -14,11 +16,13 @@
 
 #### Member functions
 
-    const std::error_code code() const
-Returns an error code for this exception
-
-    const char* what() const
+    const char* what() const noexcept
 Returns an error message
+
+#### Inherited from std::system_error
+
+    const std::error_code code() const noexcept
+Returns an error code for this exception
 
 ### Example
 

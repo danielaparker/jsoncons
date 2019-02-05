@@ -4,6 +4,7 @@
 
     #include <jsoncons/jsonpointer/jsonpatch_error.hpp>
 
+`jsoncons::jsonpatch::jsonpatch_error` defines an exception type for reporting failures in jsonpatch operations.
 
 ![jsonpatch_error](./diagrams/jsonpatch_error.png)
 
@@ -15,11 +16,13 @@
 
 #### Member functions
 
-    const std::error_code code() const
-Returns an error code for this exception
+    const char* what() const noexcept
+Returns a message for this exception
 
-    const char* what() const
-Returns an error message
+#### Inherited from std::system_error
+
+    const std::error_code code() const noexcept
+Returns an error code for this exception
 
 ### Example
 

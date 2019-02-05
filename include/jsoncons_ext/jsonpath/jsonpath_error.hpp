@@ -57,12 +57,12 @@ public:
         }
     }
 
-    size_t line_number() const
+    size_t line_number() const noexcept
     {
         return line_number_;
     }
 
-    size_t column_number() const
+    size_t column_number() const noexcept
     {
         return column_number_;
     }

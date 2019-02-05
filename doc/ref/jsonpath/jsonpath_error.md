@@ -4,6 +4,8 @@
 
     #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 
+`jsoncons::jsonpath::jsonpath_error` defines an exception type for reporting failures in jsonpath queries.
+
 ![jsonpath_error](./diagrams/jsonpath_error.png)
 
 #### Constructors
@@ -16,19 +18,21 @@
 
 #### Member functions
 
-    const std::error_code code() const
-Returns a message for this exception
-
-    size_t line_number() const
+    size_t line_number() const noexcept
 Returns the line number to the end of the text where the exception occurred.
 Line numbers start at 1.
 
-    size_t column_number() const
+    size_t column_number() const noexcept
 Returns the column number to the end of the text where the exception occurred.
 Column numbers start at 1.
 
-    const char* what() const
+    const char* what() const noexcept
 Constructs an error message, including line and column position
+
+#### Inherited from std::system_error
+
+    const std::error_code code() const noexcept
+Returns an error code for this exception
 
 ### Example
 
