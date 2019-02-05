@@ -13,40 +13,15 @@
 **/temp
 **/build
 
-test_suite/build/cmake/build_vc140x64
-test_suite/build/vs2015
-test_suite/build/vs2013
-test_suite/build/vs2010sp1
-
-examples/build/cmake/build_vc140x64
-examples/build/vs2015
-examples/build/vs2010sp1
-
-
 examples/build/cmake/build_llvm.sh
 examples/build/cmake/build_llvm
-
-test_suite/src/jcr_tests.cpp
 
 src/jsoncons/json_structures.hpp.orig
 
 examples/build/vs2013/
 
 src/jsoncons/json_serializer2.hpp
-test_suite/build/vs2013/ReadMe.txt
-test_suite/build/vs2013/stdafx.cpp
-test_suite/build/vs2013/stdafx.h
-test_suite/build/vs2013/targetver.h
-test_suite/build/vs2013/vs2013.cpp
-test_suite/build/vs2013/vs2013.sdf
-test_suite/build/vs2013/vs2013.sln
-test_suite/build/vs2013/vs2013.vcxproj
-test_suite/build/vs2013/vs2013.vcxproj.filters
-test_suite/build/vs2013/vs2013.vcxproj.user
-test_suite/output/test.json
-test_suite/output/test.json
 
-test_suite/output/address-book-new.json
 examples/booklist.json
 examples/booklist2.json
 
