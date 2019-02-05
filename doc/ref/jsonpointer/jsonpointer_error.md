@@ -4,10 +4,6 @@
 
     #include <jsoncons/jsonpointer/jsonpointer.hpp>
 
-### Base class
-
-std::exception
-
 ![jsonpointer_error](./diagrams/jsonpointer_error.png)
 
 #### Constructors
