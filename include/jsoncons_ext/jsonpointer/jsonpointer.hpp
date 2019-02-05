@@ -14,6 +14,7 @@
 #include <iostream>
 #include <iterator>
 #include <utility> // std::move
+#include <system_error> // system_error
 #include <type_traits> // std::enable_if, std::true_type
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
@@ -21,11 +22,19 @@
 
 namespace jsoncons { namespace jsonpointer {
 
-class jsonpointer_error : public std::exception, public virtual json_exception
+class jsonpointer_error : public std::system_error, public virtual json_exception
 {
 public:
     jsonpointer_error(const std::error_code& ec)
-        : error_code_(ec)
+        : std::system_error(ec)
+    {
+    }
+    jsonpointer_error(const std::error_code& ec, const std::string& what_arg)
+        : std::system_error(ec, what_arg)
+    {
+    }
+    jsonpointer_error(const std::error_code& ec, const char* what_arg)
+        : std::system_error(ec, what_arg)
     {
     }
     jsonpointer_error(const jsonpointer_error& other) = default;
@@ -34,27 +43,8 @@ public:
 
     const char* what() const noexcept override
     {
-        try
-        {
-            const_cast<std::string&>(buffer_) = error_code_.message();
-            return buffer_.c_str();
-        }
-        catch (...)
-        {
-            return "";
-        }
+        return std::system_error::what();
     }
-
-    const std::error_code code() const
-    {
-        return error_code_;
-    }
-
-    jsonpointer_error& operator=(const jsonpointer_error& e) = default;
-    jsonpointer_error& operator=(jsonpointer_error&& e) = default;
-private:
-    std::string buffer_;
-    std::error_code error_code_;
 };
 
 // find_by_reference
