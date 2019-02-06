@@ -18,6 +18,8 @@ template<
 
     #include <jsoncons/json_serializer.hpp>
 
+![json_serializer](./diagrams/json_serializer.png)
+
 Four specializations for common character types and result types are defined
 for both the pretty print and compressed serializers:
 
