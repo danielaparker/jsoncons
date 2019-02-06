@@ -10,9 +10,7 @@ json_decoder
 #include <jsoncons/json_decoder.hpp>
 ```
 
-#### Base classes
-
-[json_content_handler](json_content_handler.md)
+![json_decoder](./diagrams/json_decoder.png)
 
 #### Member types
 
@@ -34,3 +32,8 @@ Checks if the `deserializer` contains a valid json_type value. The initial `is_v
 
     Json get_result()
 Returns the json value `v` stored in the `deserializer` as `std::move(v)`. If before calling this function `is_valid()` is false, the behavior is undefined. After `get_result()` is called, 'is_valid()' becomes false.
+
+### See also
+
+- [json_content_handler](json_content_handler.md)
+
