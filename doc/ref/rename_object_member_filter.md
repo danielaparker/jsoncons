@@ -12,9 +12,7 @@ Renames object member names.
 #include <jsoncons/json_filter.hpp>
 ```
 
-#### Base classes
-
-[json_filter](json_filter.md)
+![rename_object_member_filter](./diagrams/rename_object_member_filter.png)
 
 #### Constructors
 
@@ -25,6 +23,10 @@ Renames object member names.
     rename_object_member_filter(const std::string& name,
                                 const std::string& new_name,
                                 json_content_handler& handler)
+
+### See also
+
+- [json_filter](json_filter.md)
 
 ### Examples
 
