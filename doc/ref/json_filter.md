@@ -12,9 +12,7 @@ The `json_filter` class is an instantiation of the `basic_json_filter` class tem
 
     #include <jsoncons/json_filter.hpp>
 
-#### Base classes
-
-[json_content_handler](json_content_handler.md)
+![json_filter](./diagrams/json_filter.png)
 
 #### Member types
 
@@ -32,6 +30,10 @@ You must ensure that the `handler` exists as long as does `json_filter`, as `jso
 
     json_content_handler& destination_handler()
 Returns a reference to the JSON handler that sends json events to a destination handler. 
+
+### See also
+
+- [json_content_handler](json_content_handler.md)
 
 ### Examples
 
