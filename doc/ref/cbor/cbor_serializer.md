@@ -13,6 +13,8 @@ template<
 
     #include <jsoncons_ext/cbor/cbor_serializer.hpp>
 
+![cbor_serializer](./diagrams/cbor_serializer.png)
+
 Four specializations for common character types and result types are defined:
 
 Type                       |Definition

@@ -13,6 +13,8 @@ template<
 
     #include <jsoncons_ext/ubjson/ubjson_serializer.hpp>
 
+![ubjson_serializer](./diagrams/ubjson_serializer.png)
+
 Four specializations for common character types and result types are defined:
 
 Type                       |Definition

@@ -13,6 +13,8 @@ template<
 
     #include <jsoncons_ext/bson/bson_serializer.hpp>
 
+![msgpack_serializer](./diagrams/msgpack_serializer.png)
+
 Four specializations for common character types and result types are defined:
 
 Type                       |Definition

@@ -14,6 +14,8 @@ template<
 
     #include <jsoncons_ext/csv/csv_serializer.hpp>
 
+![csv_serializer](./diagrams/csv_serializer.png)
+
 Four specializations for common character types and result types are defined:
 
 Type                       |Definition
