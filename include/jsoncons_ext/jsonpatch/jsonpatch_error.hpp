@@ -20,6 +20,16 @@ public:
     {
     }
 
+    jsonpatch_error(const std::error_code& ec, const std::string& what_arg)
+        : std::system_error(ec, what_arg)
+    {
+    }
+
+    jsonpatch_error(const std::error_code& ec, const char* what_arg)
+        : std::system_error(ec, what_arg)
+    {
+    }
+
     jsonpatch_error(const jsonpatch_error& other) = default;
 
     jsonpatch_error(jsonpatch_error&& other) = default;

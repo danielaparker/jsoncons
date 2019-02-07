@@ -24,14 +24,14 @@ public:
 };
 
 template <class Base>
-class json_exception_impl : public Base, public virtual json_exception
+class json_runtime_error : public Base, public virtual json_exception
 {
 public:
-    json_exception_impl(const std::string& s) noexcept
+    json_runtime_error(const std::string& s) noexcept
         : Base(""), message_(s)
     {
     }
-    ~json_exception_impl() noexcept
+    ~json_runtime_error() noexcept
     {
     }
     const char* what() const noexcept override
@@ -156,11 +156,11 @@ typedef serialization_error parse_error;
 
 #ifdef _DEBUG
 #define JSONCONS_ASSERT(x) if (!(x)) { \
-    throw jsoncons::json_exception_impl<std::runtime_error>("assertion '" #x "' failed at " __FILE__ ":" \
+    throw jsoncons::json_runtime_error<std::runtime_error>("assertion '" #x "' failed at " __FILE__ ":" \
             JSONCONS_STR(__LINE__)); }
 #else
 #define JSONCONS_ASSERT(x) if (!(x)) { \
-    throw jsoncons::json_exception_impl<std::runtime_error>("assertion '" #x "' failed at  <> :" \
+    throw jsoncons::json_runtime_error<std::runtime_error>("assertion '" #x "' failed at  <> :" \
             JSONCONS_STR( 0 )); }
 #endif // _DEBUG
 

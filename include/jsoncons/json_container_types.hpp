@@ -546,7 +546,7 @@ public:
         {
             if (element.size() != 2 || !element[0].is_string())
             {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Cannot create object from initializer list"));
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Cannot create object from initializer list"));
                 break;
             }
         }
@@ -565,7 +565,7 @@ public:
         {
             if (element.size() != 2 || !element[0].is_string())
             {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Cannot create object from initializer list"));
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Cannot create object from initializer list"));
                 break;
             }
         }
@@ -621,7 +621,7 @@ public:
     {
         if (i >= members_.size())
         {
-            JSONCONS_THROW(json_exception_impl<std::out_of_range>("Invalid array subscript"));
+            JSONCONS_THROW(json_runtime_error<std::out_of_range>("Invalid array subscript"));
         }
         return members_[i].value();
     }
@@ -630,7 +630,7 @@ public:
     {
         if (i >= members_.size())
         {
-            JSONCONS_THROW(json_exception_impl<std::out_of_range>("Invalid array subscript"));
+            JSONCONS_THROW(json_runtime_error<std::out_of_range>("Invalid array subscript"));
         }
         return members_[i].value();
     }
@@ -1284,7 +1284,7 @@ public:
         {
             if (element.size() != 2 || !element[0].is_string())
             {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Cannot create object from initializer list"));
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Cannot create object from initializer list"));
                 break;
             }
         }
@@ -1304,7 +1304,7 @@ public:
         {
             if (element.size() != 2 || !element[0].is_string())
             {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Cannot create object from initializer list"));
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Cannot create object from initializer list"));
                 break;
             }
         }
@@ -1365,7 +1365,7 @@ public:
     {
         if (i >= members_.size())
         {
-            JSONCONS_THROW(json_exception_impl<std::out_of_range>("Invalid array subscript"));
+            JSONCONS_THROW(json_runtime_error<std::out_of_range>("Invalid array subscript"));
         }
         return members_[i].value();
     }
@@ -1374,7 +1374,7 @@ public:
     {
         if (i >= members_.size())
         {
-            JSONCONS_THROW(json_exception_impl<std::out_of_range>("Invalid array subscript"));
+            JSONCONS_THROW(json_runtime_error<std::out_of_range>("Invalid array subscript"));
         }
         return members_[i].value();
     }

@@ -54,7 +54,7 @@ public:
     {
         if (empty())
         {
-            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Not an object"));
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not an object"));
         }
         std::error_code ec{};
         if (major_type() == cbor_major_type::map)
@@ -86,7 +86,7 @@ public:
         }
         else
         {
-            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Not an object"));
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not an object"));
         }
     }
 
@@ -94,7 +94,7 @@ public:
     {
         if (empty())
         {
-            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Not an array"));
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not an array"));
         }
 
         std::error_code ec{};
@@ -487,7 +487,7 @@ public:
         }
         if (it == range.end() || i != index)
         {
-            JSONCONS_THROW(json_exception_impl<std::out_of_range>("Invalid array subscript"));
+            JSONCONS_THROW(json_runtime_error<std::out_of_range>("Invalid array subscript"));
         }
         return *it;
     }
@@ -505,7 +505,7 @@ public:
                 return it->value();
             }
         }
-        JSONCONS_THROW(json_exception_impl<std::out_of_range>("Key not found"));
+        JSONCONS_THROW(json_runtime_error<std::out_of_range>("Key not found"));
     }
 
     bool contains(const string_view_type& key) const
@@ -567,7 +567,7 @@ public:
                 return v.as_integer<T>();
             }
             default:
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an integer"));
         }
     }
 
@@ -595,7 +595,7 @@ public:
                 return v.as_integer<T>();
             }
             default:
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an integer"));
         }
     }
 
@@ -611,7 +611,7 @@ public:
                     case 0x15:
                         return true;
                     default:
-                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bool"));
+                        JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a bool"));
                 }
             case cbor_major_type::semantic_tag:
             {
@@ -619,7 +619,7 @@ public:
                 return v.as_bool();
             }
             default:
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bool"));
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a bool"));
         }
     }
 
@@ -667,7 +667,7 @@ public:
                         return val;
                     }
                     default:
-                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
+                        JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a double"));
                         break;
                 }
             }
@@ -677,7 +677,7 @@ public:
                 return v.as_double();
             }
             default:
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a double"));
         }
     }
 
@@ -831,7 +831,7 @@ public:
             }
             default:
             {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a byte string"));
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a byte string"));
                 break;
             }
         }
@@ -871,14 +871,14 @@ public:
                         return n;
                     }
                     default:
-                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bignum"));
+                        JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a bignum"));
                         break;
                 }
                 break;
             }
             default:
             {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bignum"));
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a bignum"));
                 break;
             }
         }

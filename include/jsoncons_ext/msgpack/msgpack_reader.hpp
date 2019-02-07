@@ -691,7 +691,7 @@ private:
                     //    first, last,std::back_inserter(s),unicons::conv_flags::strict);
                     //if (result.ec != unicons::conv_errc())
                     //{
-                    //    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
+                    //    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Illegal unicode"));
                     //}
                     handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
                     break;
@@ -722,7 +722,7 @@ private:
                     //    first, last,std::back_inserter(s),unicons::conv_flags::strict);
                     //if (result.ec != unicons::conv_errc())
                     //{
-                    //    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
+                    //    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Illegal unicode"));
                     //}
                     handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
                     break;

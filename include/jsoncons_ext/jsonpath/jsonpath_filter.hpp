@@ -995,7 +995,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
     }
     if (stack.size() != 1)
     {
-        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Invalid state"));
+        JSONCONS_THROW(json_runtime_error<std::runtime_error>("Invalid state"));
     }
 
     return stack.back();
@@ -1152,7 +1152,7 @@ public:
                     }
                     if (it == operator_stack_.rend())
                     {
-                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Unbalanced parenthesis"));
+                        JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced parenthesis"));
                     }
                     operator_stack_.erase(it.base(),operator_stack_.end());
                     operator_stack_.pop_back();

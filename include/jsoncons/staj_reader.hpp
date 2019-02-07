@@ -150,7 +150,7 @@ public:
             break;
         }
         default:
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a string"));
+            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a string"));
         }
         return s;
     }
@@ -167,7 +167,7 @@ public:
             s = T(value_.string_data_, length_);
             break;
         default:
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a string"));
+            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a string"));
         }
         return s;
     }
@@ -222,12 +222,12 @@ private:
         {
             if (!jsoncons::detail::is_integer(value_.string_data_, length_))
             {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an integer"));
             }
             auto result = jsoncons::detail::to_integer<int64_t>(value_.string_data_, length_);
             if (result.overflow)
             {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Integer overflow"));
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Integer overflow"));
             }
             value = result.value;
             break;
@@ -245,7 +245,7 @@ private:
             value = value_.bool_value_ ? 1 : 0;
             break;
         default:
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an integer"));
         }
         return value;
     }
@@ -260,12 +260,12 @@ private:
         {
             if (!jsoncons::detail::is_uinteger(value_.string_data_, length_))
             {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an integer"));
             }
             auto result = jsoncons::detail::to_integer<uint64_t>(value_.string_data_, length_);
             if (result.overflow)
             {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Integer overflow"));
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Integer overflow"));
             }
             value = result.value;
             break;
@@ -283,7 +283,7 @@ private:
             value = value_.bool_value_ ? 1 : 0;
             break;
         default:
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an unsigned integer"));
+            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an unsigned integer"));
         }
         return value;
     }
@@ -300,7 +300,7 @@ private:
                 value_.string_data_, value_.string_data_ + length_, std::back_inserter(target), unicons::conv_flags::strict);
             if (result.ec != unicons::conv_errc())
             {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a double"));
             }
             jsoncons::detail::string_to_double f;
             return f(target.data(), target.length());
@@ -312,7 +312,7 @@ private:
         case staj_event_type::uint64_value:
             return static_cast<double>(value_.uint64_value_);
         default:
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
+            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a double"));
         }
     }
 
@@ -329,7 +329,7 @@ private:
         case staj_event_type::uint64_value:
             return value_.uint64_value_ != 0;
         default:
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bool"));
+            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a bool"));
         }
     }
 
@@ -341,7 +341,7 @@ private:
         case staj_event_type::string_value:
             if (!jsoncons::detail::is_integer(value_.string_data_, length_))
             {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bignum"));
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a bignum"));
             }
             return basic_bignum<UserAllocator>(value_.string_data_, length_);
         case staj_event_type::double_value:
@@ -353,7 +353,7 @@ private:
         case staj_event_type::bool_value:
             return basic_bignum<UserAllocator>(value_.bool_value_ ? 1 : 0);
         default:
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bignum"));
+            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a bignum"));
         }
     }
 

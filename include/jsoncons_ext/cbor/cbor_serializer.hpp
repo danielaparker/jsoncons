@@ -277,7 +277,7 @@ private:
             unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
+            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Illegal unicode"));
         }
 
         const size_t length = target.size();

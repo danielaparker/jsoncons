@@ -240,7 +240,7 @@ public:
                 length = snprintf(number_buffer, sizeof(number_buffer), "%1.*f", decimal_places, val);
                 if (length < 0)
                 {
-                    JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
+                    JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
                 }
                 dump_buffer(number_buffer, length, decimal_point_, writer);
             }
@@ -250,7 +250,7 @@ public:
                 length = snprintf(number_buffer, sizeof(number_buffer), "%1.*e", decimal_places, val);
                 if (length < 0)
                 {
-                    JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
+                    JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
                 }
                 dump_buffer(number_buffer, length, decimal_point_, writer);
             }
@@ -263,7 +263,7 @@ public:
                     length = snprintf(number_buffer, sizeof(number_buffer), "%1.*g", precision, val);
                     if (length < 0)
                     {
-                        JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
+                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
                     }
                     dump_buffer(number_buffer, length, decimal_point_, writer);
                 }
@@ -271,13 +271,13 @@ public:
                 {
                     if (!dtoa(val, decimal_point_, writer))
                     {
-                        JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
+                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
                     }
                 }             
                 break;
             }
             default:
-                JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
+                JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
                 break;
         }
         return count;
