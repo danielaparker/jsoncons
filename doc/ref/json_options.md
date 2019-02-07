@@ -15,10 +15,7 @@ The default floating point formatting for a floating point value that was direct
 #include <jsoncons/json_options.hpp>
 ```
 
-#### Abstract base classes
-
-[json_read_options](json_read_options.md)
-[json_write_options](json_write_options.md)
+![json_serializer](./diagrams/json_serializer.png)
 
 #### Member constants
 
@@ -115,6 +112,11 @@ For an array whose parent is an object, set whether that array is split on a new
 
     json_options& array_array_line_splits(line_split_kind value)
 For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind.md).
+
+### See also
+
+[json_read_options](json_read_options.md)
+[json_write_options](json_write_options.md)
 
 ### Examples
 
