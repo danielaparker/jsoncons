@@ -43,14 +43,14 @@ TEST_CASE("cbor bigfloat tests")
         if (exp > 0)
         {
             newExp = static_cast<int64_t>(std::floor(exp*std::log(2)/std::log(10)));
-            bignum fivePower = power(five,newExp);
+            bignum fivePower = power(five,(unsigned)newExp);
             uint64_t binShift = exp - newExp;
             integer = ((integer) << (unsigned)binShift)/fivePower;
         }
         else
         {
             newExp = static_cast<int64_t>(std::ceil(-exp*std::log(2)/std::log(10)));
-            bignum fivePower = power(five,newExp);
+            bignum fivePower = power(five,(unsigned)newExp);
             uint64_t binShift = -exp - newExp;
             integer = (integer*fivePower) >> (unsigned)binShift;
         }
@@ -88,7 +88,7 @@ TEST_CASE("cbor bigfloat tests")
         std::string s;
         std::string result;
         integer.dump(s);
-        jsoncons::detail::prettify_string(s.c_str(),s.length(),-newExp,6,100, result);
+        jsoncons::detail::prettify_string(s.c_str(),s.length(),(int)-newExp,6,(std::numeric_limits<int>::max)(), result);
 
         std::cout << "result: " << result << "\n"; 
     }
