@@ -41,6 +41,7 @@ byte_string   | base64url        | byte string | 21 (Expected conversion to base
 byte_string   | base64           | byte string | 22 (Expected conversion to base64 encoding)
 byte_string   | base16           | byte string | 23 (Expected conversion to base16 encoding)
 array         |                  | array |&#160;
+array         | big_float        | array |&#160; | 5 (bigfloat)
 object        |                  | map |&#160;
 
 ### Examples

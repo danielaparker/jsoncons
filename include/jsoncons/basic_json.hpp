@@ -3396,7 +3396,7 @@ public:
                 if (semantic_tag() == semantic_tag_type::big_float)
                 {
                     JSONCONS_ASSERT(size() == 2);
-                    int64_t exp = at(0).as_integer<int64_t>();
+                    int64_t exp = at(0).template as_integer<int64_t>();
                     string_type mantissa = at(1).as_string();
                     bignum n(mantissa);
                     int64_t new_exp = 0;
