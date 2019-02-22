@@ -30,10 +30,10 @@
 jsoncons is a C++, header-only library for constructing [JSON](http://www.json.org) and JSON-like
 data formats such as [CBOR](http://cbor.io/). It supports 
 
-- Parsing JSON-like text or binary formats into an unpacked representation
-  of variant type that defines an interface for accessing and modifying that data (covers bignum and byte string values.)
+- Parsing JSON-like text or binary formats into a tree model
+  that defines an interface for accessing and modifying that data (covers bignum and byte string values.)
 
-- Serializing the unpacked representation into different JSON-like text or binary formats.
+- Serializing the tree model into different JSON-like text or binary formats.
 
 - Converting from JSON-like text or binary formats to C++ objects and back via [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md).
 
@@ -48,7 +48,7 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 Compared to other JSON libraries, jsoncons has been designed to handle very large JSON texts. At its heart are
 SAX style parsers and serializers. Its [json parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_parser.md) is an 
 incremental parser that can be fed its input in chunks, and does not require an entire file to be loaded in memory at one time. 
-Its unpacked in-memory representation of JSON is more compact than most, and can be made more compact still with a user-supplied
+Its tree model is more compact than most, and can be made more compact still with a user-supplied
 allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_pull_reader.md),
 built on top of its incremental parser.  
 
@@ -752,7 +752,7 @@ Output:
 ```
 
 <div id="A12"/>
-### Convert unpacked `json` value to user defined type and back
+### Convert `json` value to user defined type and back
 
 In the json class, constructors, accessors and modifiers are templated, for example,
 ```c++

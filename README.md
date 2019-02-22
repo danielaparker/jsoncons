@@ -3,10 +3,10 @@
 jsoncons is a C++, header-only library for constructing [JSON](http://www.json.org) and JSON-like
 data formats such as [CBOR](http://cbor.io/). It supports 
 
-- Parsing JSON-like text or binary formats into an unpacked representation of variant type
+- Parsing JSON-like text or binary formats into a tree model
   that defines an interface for accessing and modifying that data.
 
-- Serializing the unpacked representation into different JSON-like text or binary formats.
+- Serializing the tree model into different JSON-like text or binary formats.
 
 - Converting from JSON-like text or binary formats to C++ objects and back via [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md).
 
@@ -15,7 +15,7 @@ data formats such as [CBOR](http://cbor.io/). It supports
 Compared to other JSON libraries, jsoncons has been designed to handle very large JSON texts. At its heart are
 SAX style parsers and serializers. Its [json parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_parser.md) is an 
 incremental parser that can be fed its input in chunks, and does not require an entire file to be loaded in memory at one time. 
-Its unpacked in-memory representation of JSON is more compact than most, and can be made more compact still with a user-supplied
+Its tree model is more compact than most, and can be made more compact still with a user-supplied
 allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_pull_reader.md),
 built on top of its incremental parser.  
 
@@ -175,8 +175,9 @@ Output:
 ## About jsoncons::basic_json
 
 The jsoncons library provides a `basic_json` class template, which is the generalization of a `json` value for different 
-character types, different policies for ordering name-value pairs, etc. A `basic_json` provides an unpacked representation 
-of JSON-like string or binary formats formats, and defines an interface for accessing and modifying that data.
+character types, different policies for ordering name-value pairs, etc. A `basic_json` provides a tree model
+of JSON-like data formats, and defines an interface for accessing and modifying that data.
+Despite its name, it is not JSON specific.
 
 ```c++
 typedef basic_json<char,
