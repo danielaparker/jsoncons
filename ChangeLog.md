@@ -13,6 +13,10 @@ Changes:
 
 - Removed deprecated feature `cbor_view`
 
+Enhancements:
+
+- json `to_string()` and `to_double()` now work with CBOR bigfloat
+
 v0.118.0
 --------
 
