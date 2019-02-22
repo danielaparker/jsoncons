@@ -3285,21 +3285,32 @@ public:
     {
         switch (var_.structure_tag())
         {
-        case structure_tag_type::short_string_tag:
-        case structure_tag_type::long_string_tag:
-        {
-            jsoncons::detail::string_to_double to_double;
-            // to_double() throws std::invalid_argument if conversion fails
-            return to_double(as_cstring(), as_string_view().length());
-        }
-        case structure_tag_type::double_tag:
-            return var_.double_data_cast()->value();
-        case structure_tag_type::int64_tag:
-            return static_cast<double>(var_.int64_data_cast()->value());
-        case structure_tag_type::uint64_tag:
-            return static_cast<double>(var_.uint64_data_cast()->value());
-        default:
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
+            case structure_tag_type::short_string_tag:
+            case structure_tag_type::long_string_tag:
+            {
+                jsoncons::detail::string_to_double to_double;
+                // to_double() throws std::invalid_argument if conversion fails
+                return to_double(as_cstring(), as_string_view().length());
+            }
+            case structure_tag_type::double_tag:
+                return var_.double_data_cast()->value();
+            case structure_tag_type::int64_tag:
+                return static_cast<double>(var_.int64_data_cast()->value());
+            case structure_tag_type::uint64_tag:
+                return static_cast<double>(var_.uint64_data_cast()->value());
+            case structure_tag_type::array_tag:
+                if (semantic_tag() == semantic_tag_type::big_float)
+                {
+                    jsoncons::detail::string_to_double to_double;
+                    string_type s = as_string();
+                    return to_double(s.c_str(), s.length());
+                }
+                else
+                {
+                    JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
+                }
+            default:
+                JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
         }
     }
 
@@ -3376,6 +3387,43 @@ public:
                                          var_.byte_string_data_cast()->length(),
                                          s);
                         break;
+                }
+                return s;
+            }
+            case structure_tag_type::array_tag:
+            {
+                string_type s(allocator);
+                if (semantic_tag() == semantic_tag_type::big_float)
+                {
+                    JSONCONS_ASSERT(size() == 2);
+                    int64_t exp = at(0).as_integer<int64_t>();
+                    string_type mantissa = at(1).as_string();
+                    bignum n(mantissa);
+                    int64_t new_exp = 0;
+                    bignum five(5);
+                    if (exp > 0)
+                    {
+                        new_exp = static_cast<int64_t>(std::floor(exp*std::log(2)/std::log(10)));
+                        bignum five_power = power(five,(unsigned)new_exp);
+                        uint64_t binShift = exp - new_exp;
+                        n = ((n) << (unsigned)binShift)/five_power;
+                    }
+                    else
+                    {
+                        new_exp = static_cast<int64_t>(std::ceil(-exp*std::log(2)/std::log(10)));
+                        bignum five_power = power(five,(unsigned)new_exp);
+                        uint64_t binShift = -exp - new_exp;
+                        n = (n*five_power) >> (unsigned)binShift;
+                    }
+
+                    std::string str;
+                    n.dump(str);
+                    jsoncons::detail::prettify_string(str.c_str(),str.length(),(int)-new_exp,6,(std::numeric_limits<int>::max)(), s);
+                }
+                else
+                {
+                    basic_json_compressed_serializer<char_type,jsoncons::string_result<string_type>> serializer(s,options);
+                    dump(serializer);
                 }
                 return s;
             }

@@ -243,9 +243,9 @@ void fill_exponent(int K, Result& result)
 }
 
 template <class Result>
-void prettify_string(const char *buffer, int length, int k, int min_exp, int max_exp, Result& result)
+void prettify_string(const char *buffer, size_t length, int k, int min_exp, int max_exp, Result& result)
 {
-    int nb_digits = length;
+    int nb_digits = (int)length;
     int offset;
     /* v = buffer * 10^k
        kk is such that 10^(kk-1) <= v < 10^kk

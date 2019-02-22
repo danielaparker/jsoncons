@@ -17,8 +17,6 @@
 using namespace jsoncons;
 using namespace jsoncons::cbor;
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
 TEST_CASE("cbor_view_test")
 {
     ojson j1 = ojson::parse(R"(
@@ -628,4 +626,19 @@ TEST_CASE("cbor array as<> test")
     }
 }
 
-#endif
+TEST_CASE("cbor bigfloat tests")
+{
+    std::vector<uint8_t> v = {0xc5, // Tag 5 
+                              0x82, // Array of length 2
+                              0x20, // -1 
+                              0x03 // 3 
+                             };
+
+    SECTION("Test 1")
+    {
+        json j = decode_cbor<json>(v);
+        std::string s = j.as<std::string>();
+        CHECK(s == std::string("1.5"));
+    }
+} 
+
