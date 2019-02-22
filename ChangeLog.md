@@ -5,6 +5,14 @@ Name change:
 
 - The name `json_staj_reader` has been deprecated and renamed to `json_pull_reader`
 
+Bug fix:
+
+- Fixed a bug in json function `empty()` when type is `byte_string`
+
+Changes:
+
+- Removed deprecated feature `cbor_view`
+
 v0.118.0
 --------
 

@@ -18,10 +18,6 @@
 #include <jsoncons_ext/cbor/cbor_reader.hpp>
 #include <jsoncons_ext/cbor/cbor_serializer.hpp>
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-#include <jsoncons_ext/cbor/cbor_view.hpp>
-#endif
-
 namespace jsoncons { namespace cbor {
 
 // encode_cbor
@@ -74,39 +70,6 @@ decode_cbor(const std::vector<uint8_t>& v)
     }
     return decoder.get_result();
 }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-template<class Json>
-typename std::enable_if<std::is_same<typename Json::char_type,char>::value,Json>::type 
-decode_cbor(const cbor_view& v)
-{
-    jsoncons::json_decoder<Json> decoder;
-    basic_cbor_reader<jsoncons::buffer_source> parser(jsoncons::buffer_source(v.buffer(),v.buflen()), decoder);
-    std::error_code ec;
-    parser.read(ec);
-    if (ec)
-    {
-        throw serialization_error(ec,parser.line_number(),parser.column_number());
-    }
-    return decoder.get_result();
-}
-
-template<class Json>
-typename std::enable_if<!std::is_same<typename Json::char_type,char>::value,Json>::type 
-decode_cbor(const cbor_view& v)
-{
-    jsoncons::json_decoder<Json> decoder;
-    basic_utf8_adaptor<typename Json::char_type> adaptor(decoder);
-    basic_cbor_reader<jsoncons::buffer_source> parser(jsoncons::buffer_source(v.buffer(),v.buflen()), adaptor);
-    std::error_code ec;
-    parser.read(ec);
-    if (ec)
-    {
-        throw serialization_error(ec,parser.line_number(),parser.column_number());
-    }
-    return decoder.get_result();
-}
-#endif
 
 template<class Json>
 typename std::enable_if<std::is_same<typename Json::char_type,char>::value,Json>::type 
