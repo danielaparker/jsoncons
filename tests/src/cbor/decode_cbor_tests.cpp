@@ -191,7 +191,7 @@ TEST_CASE("as_string_test")
     CHECK(std::string("-18446744073709551617") == j[9].as_string());
 }
 
-TEST_CASE("test_dump_to_string")
+TEST_CASE("dump cbor to string test")
 {
     std::vector<uint8_t> v;
     cbor_buffer_serializer serializer(v);
