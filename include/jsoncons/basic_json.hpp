@@ -3088,18 +3088,21 @@ public:
     {
         switch (var_.structure_tag())
         {
-        case structure_tag_type::short_string_tag:
-            return var_.short_string_data_cast()->length() == 0;
-        case structure_tag_type::long_string_tag:
-            return var_.string_data_cast()->length() == 0;
-        case structure_tag_type::array_tag:
-            return array_value().size() == 0;
-        case structure_tag_type::empty_object_tag:
-            return true;
-        case structure_tag_type::object_tag:
-            return object_value().size() == 0;
-        default:
-            return false;
+            case structure_tag_type::byte_string_tag:
+                return var_.byte_string_data_cast()->length() == 0;
+                break;
+            case structure_tag_type::short_string_tag:
+                return var_.short_string_data_cast()->length() == 0;
+            case structure_tag_type::long_string_tag:
+                return var_.string_data_cast()->length() == 0;
+            case structure_tag_type::array_tag:
+                return array_value().size() == 0;
+            case structure_tag_type::empty_object_tag:
+                return true;
+            case structure_tag_type::object_tag:
+                return object_value().size() == 0;
+            default:
+                return false;
         }
     }
 

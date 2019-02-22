@@ -42,9 +42,6 @@ TEST_CASE("cbor_view_test")
     CHECK(v.is_object());
     CHECK_FALSE(v.is_array());
 
-    ojson jv = decode_cbor<ojson>(v);
-    CHECK(jv == j1);
-
     const json& reputons = v.at("reputons");
     CHECK(reputons.is_array());
 
@@ -59,10 +56,10 @@ TEST_CASE("cbor_view_test")
     for (const auto& member : v.object_range())
     {
         const auto& key = member.key();
-        const auto& val = member.value();
+        const json& jval = member.value();
 
         (void)key;
-        json jval = decode_cbor<json>(val);
+        (void)jval;
 
         //std::cout << key << ": " << jval << std::endl;
     }
@@ -70,7 +67,7 @@ TEST_CASE("cbor_view_test")
 
     for (auto element : reputons.array_range())
     {
-        json j = decode_cbor<json>(element);
+        json j = element;
         //std::cout << j << std::endl;
     }
     //std::cout << std::endl;
@@ -92,36 +89,34 @@ TEST_CASE("jsonpointer_test")
     }
     )");
 
-    std::vector<uint8_t> buffer;
-    encode_cbor(j, buffer);
+    std::vector<uint8_t> v;
+    encode_cbor(j, v);
 
-    json bv = decode_cbor<json>(buffer);
+    json jdoc = decode_cbor<json>(v);
     std::string s;
-    bv.dump(s);
+    jdoc.dump(s);
     json j1 = json::parse(s);
     CHECK(j1 == j);
 
     std::error_code ec;
-    const json& application = jsonpointer::get(bv, "/application", ec);
+    const json& application = jsonpointer::get(jdoc, "/application", ec);
     CHECK_FALSE(ec);
 
-    json j2 = decode_cbor<json>(application);
-    CHECK(j2 == j["application"]);
+    CHECK(application == j["application"]);
 
-    const json& reputons_0_rated = jsonpointer::get(bv, "/reputons", ec);
+    const json& reputons_0_rated = jsonpointer::get(jdoc, "/reputons", ec);
     CHECK_FALSE(ec);
 
-    json j3 = decode_cbor<json>(reputons_0_rated);
     json j4 = j["reputons"];
-    CHECK(j3 == j4);
+    CHECK(reputons_0_rated == j4);
 
     //std::cout << pretty_print(j3) << std::endl;
 }
 
 TEST_CASE("as_string_test")
 {
-    std::vector<uint8_t> b;
-    jsoncons::cbor::cbor_buffer_serializer serializer(b);
+    std::vector<uint8_t> v;
+    jsoncons::cbor::cbor_buffer_serializer serializer(v);
     serializer.begin_array(10);
     serializer.bool_value(true);
     serializer.bool_value(false);
@@ -136,69 +131,70 @@ TEST_CASE("as_string_test")
     serializer.end_array();
     serializer.flush();
 
-    json bv = decode_json<json>(b);
+    json j = decode_cbor<json>(v);
 
     std::string s0;
-    bv[0].dump(s0);
+    j[0].dump(s0);
     CHECK(std::string("true") == s0);
-    CHECK(std::string("true") == bv[0].as_string());
-    CHECK(true == bv[0].as<bool>());
-    CHECK(bv[0].is<bool>());
+    CHECK(std::string("true") == j[0].as_string());
+    CHECK(true == j[0].as<bool>());
+    CHECK(j[0].is<bool>());
 
     std::string s1;
-    bv[1].dump(s1);
+    j[1].dump(s1);
     CHECK(std::string("false") == s1);
-    CHECK(std::string("false") == bv[1].as_string());
-    CHECK(false == bv[1].as<bool>());
-    CHECK(bv[1].is<bool>());
+    CHECK(std::string("false") == j[1].as_string());
+    CHECK(false == j[1].as<bool>());
+    CHECK(j[1].is<bool>());
 
     std::string s2;
-    bv[2].dump(s2);
+    j[2].dump(s2);
     CHECK(std::string("null") == s2);
-    CHECK(std::string("null") == bv[2].as_string());
+    CHECK(std::string("null") == j[2].as_string());
 
     std::string s3;
-    bv[3].dump(s3);
+    j[3].dump(s3);
     CHECK(std::string("\"Toronto\"") == s3);
-    CHECK(std::string("Toronto") == bv[3].as_string());
-    CHECK(std::string("Toronto") ==bv[3].as<std::string>());
+    CHECK(std::string("Toronto") == j[3].as_string());
+    CHECK(std::string("Toronto") ==j[3].as<std::string>());
 
     std::string s4;
-    bv[4].dump(s4);
+    j[4].dump(s4);
     CHECK(std::string("\"SGVsbG8\"") == s4);
-    CHECK(std::string("SGVsbG8") == bv[4].as_string());
-    CHECK(byte_string({'H','e','l','l','o'}) == bv[4].as<byte_string>());
+    CHECK(std::string("SGVsbG8") == j[4].as_string());
+    CHECK(byte_string({'H','e','l','l','o'}) == j[4].as<byte_string>());
 
     std::string s5;
-    bv[5].dump(s5);
+    j[5].dump(s5);
     CHECK(std::string("-100") ==s5);
-    CHECK(std::string("-100") == bv[5].as_string());
-    CHECK(-100 ==bv[5].as<int>());
+    CHECK(std::string("-100") == j[5].as_string());
+    CHECK(-100 ==j[5].as<int>());
 
     std::string s6;
-    bv[6].dump(s6);
+    j[6].dump(s6);
     CHECK(std::string("100") == s6);
-    CHECK(std::string("100") == bv[6].as_string());
+    CHECK(std::string("100") == j[6].as_string());
 
     std::string s7;
-    bv[7].dump(s7);
+    j[7].dump(s7);
     CHECK(std::string("\"18446744073709551616\"") == s7);
-    CHECK(std::string("18446744073709551616") == bv[7].as_string());
+    CHECK(std::string("18446744073709551616") == j[7].as_string());
 
     std::string s8;
-    bv[8].dump(s8);
+    j[8].dump(s8);
     CHECK(std::string("10.5") == s8);
-    CHECK(std::string("10.5") == bv[8].as_string());
+    CHECK(std::string("10.5") == j[8].as_string());
 
     std::string s9;
-    bv[9].dump(s9);
+    j[9].dump(s9);
     CHECK(std::string("\"-18446744073709551617\"") == s9);
-    CHECK(std::string("-18446744073709551617") == bv[9].as_string());
+    CHECK(std::string("-18446744073709551617") == j[9].as_string());
 }
+
 TEST_CASE("test_dump_to_string")
 {
-    std::vector<uint8_t> b;
-    cbor_buffer_serializer serializer(b);
+    std::vector<uint8_t> v;
+    cbor_buffer_serializer serializer(v);
     serializer.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     bignum n(-1, bytes.data(), bytes.size());
@@ -208,39 +204,39 @@ TEST_CASE("test_dump_to_string")
     serializer.end_array();
     serializer.flush();
 
-    json bv = decode_cbor<json>(b);
+    json j = decode_cbor<json>(v);
 
     std::string s0;
-    bv.dump(s0);
+    j.dump(s0);
     CHECK("[\"-18446744073709551617\"]" == s0);
     //std::cout << s0 << std::endl;
 
     std::string s1;
     json_options options1;
     options1.big_integer_format(big_integer_chars_format::number);
-    bv.dump(s1,options1);
+    j.dump(s1,options1);
     CHECK("[-18446744073709551617]" == s1);
     //std::cout << s1 << std::endl;
 
     std::string s2;
     json_options options2;
     options2.big_integer_format(big_integer_chars_format::base10);
-    bv.dump(s2,options2);
+    j.dump(s2,options2);
     CHECK("[\"-18446744073709551617\"]" == s2);
     //std::cout << s2 << std::endl;
 
     std::string s3;
     json_options options3;
     options3.big_integer_format(big_integer_chars_format::base64url);
-    bv.dump(s3,options3);
+    j.dump(s3,options3);
     CHECK("[\"~AQAAAAAAAAAA\"]" == s3);
     //std::cout << s3 << std::endl;
 } 
 
 TEST_CASE("test_dump_to_stream")
 {
-    std::vector<uint8_t> b;
-    cbor_buffer_serializer serializer(b);
+    std::vector<uint8_t> v;
+    cbor_buffer_serializer serializer(v);
     serializer.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     bignum n(-1, bytes.data(), bytes.size());
@@ -250,39 +246,39 @@ TEST_CASE("test_dump_to_stream")
     serializer.end_array();
     serializer.flush();
 
-    json bv = decode_cbor<json>(b);
+    json j = decode_cbor<json>(v);
 
     std::ostringstream os0;
-    bv.dump(os0);
+    j.dump(os0);
     CHECK("[\"-18446744073709551617\"]" == os0.str());
     //std::cout << os0.str() << std::endl;
 
     std::ostringstream os1;
     json_options options1;
     options1.big_integer_format(big_integer_chars_format::number);
-    bv.dump(os1,options1);
+    j.dump(os1,options1);
     CHECK("[-18446744073709551617]" == os1.str());
     //std::cout << os1.str() << std::endl;
 
     std::ostringstream os2;
     json_options options2;
     options2.big_integer_format(big_integer_chars_format::base10);
-    bv.dump(os2,options2);
+    j.dump(os2,options2);
     CHECK("[\"-18446744073709551617\"]" == os2.str());
     //std::cout << os2.str() << std::endl;
 
     std::ostringstream os3;
     json_options options3;
     options3.big_integer_format(big_integer_chars_format::base64url);
-    bv.dump(os3,options3);
+    j.dump(os3,options3);
     CHECK("[\"~AQAAAAAAAAAA\"]" == os3.str());
     //std::cout << os3.str() << std::endl;
 } 
 
 TEST_CASE("test_indefinite_length_object_iterator")
 {
-    std::vector<uint8_t> b;
-    cbor::cbor_buffer_serializer serializer(b);
+    std::vector<uint8_t> v;
+    cbor::cbor_buffer_serializer serializer(v);
     serializer.begin_object(); // indefinite length object
     serializer.name("City");
     serializer.string_value("Toronto");
@@ -290,7 +286,7 @@ TEST_CASE("test_indefinite_length_object_iterator")
     serializer.string_value("Ontario");
     serializer.end_object(); 
     serializer.flush();
-    json bv2 = decode_cbor<json>(b);
+    json bv2 = decode_cbor<json>(v);
 
     auto it2 = bv2.object_range().begin();
     CHECK_FALSE((it2 == bv2.object_range().end()));
@@ -300,76 +296,76 @@ TEST_CASE("test_indefinite_length_object_iterator")
 
 TEST_CASE("test_indefinite_length_array_iterator")
 {
-    std::vector<uint8_t> b;
-    cbor::cbor_buffer_serializer serializer(b);
+    std::vector<uint8_t> v;
+    cbor::cbor_buffer_serializer serializer(v);
     serializer.begin_array(); // indefinite length array
     serializer.string_value("Toronto");
     serializer.string_value("Ontario");
     serializer.end_array(); 
     serializer.flush();
-    json bv2 = decode_cbor<json>(b);
+    json j = decode_cbor<json>(v);
 
-    CHECK(bv2.size() == 2);
+    CHECK(j.size() == 2);
 
-    auto it2 = bv2.array_range().begin();
-    CHECK(it2 != bv2.array_range().end());
-    CHECK(++it2 != bv2.array_range().end());
-    CHECK(++it2 == bv2.array_range().end());
+    auto it2 = j.array_range().begin();
+    CHECK_FALSE((it2 == j.array_range().end()));
+    CHECK_FALSE((++it2 == j.array_range().end()));
+    CHECK((++it2 == j.array_range().end()));
 
 }
 
-TEST_CASE("cbor_view array comparison test")
+TEST_CASE("cbor array comparison test")
 {
-    std::vector<uint8_t> buf1;
-    cbor::cbor_buffer_serializer serializer1(buf1);
+    std::vector<uint8_t> v1;
+    cbor::cbor_buffer_serializer serializer1(v1);
     serializer1.begin_array(); // indefinite length array
     serializer1.string_value("Toronto");
     serializer1.string_value("Vancouver");
     serializer1.end_array(); 
     serializer1.flush();
-    json v1 = decode_cbor<json>(buf1);
+    json j1 = decode_cbor<json>(v1);
 
-    std::vector<uint8_t> buf2;
-    cbor::cbor_buffer_serializer serializer2(buf2);
+    std::vector<uint8_t> v2;
+    cbor::cbor_buffer_serializer serializer2(v2);
     serializer2.begin_array(); // indefinite length array
     serializer2.string_value("Toronto");
     serializer2.string_value("Vancouver");
     serializer2.end_array(); 
     serializer2.flush();
-    json v2 = decode_cbor<json>(buf2);
+    json j2 = decode_cbor<json>(v2);
 
-    std::vector<uint8_t> buf3;
-    cbor::cbor_buffer_serializer serializer3(buf3);
+    std::vector<uint8_t> v3;
+    cbor::cbor_buffer_serializer serializer3(v3);
     serializer3.begin_array(); // indefinite length array
     serializer3.string_value("Toronto");
     serializer3.string_value("Montreal");
     serializer3.end_array(); 
     serializer3.flush();
-    json v3 = decode_cbor<json>(buf3);
+    json j3 = decode_cbor<json>(v3);
 
     SECTION("operator== test")
     {
-        CHECK(v1 == v2);
-        REQUIRE(v1.size() == 2);
-        REQUIRE(v2.size() == 2);
-        CHECK(v1[0] == v2[0]);
-        CHECK(v1[1] == v2[1]);
+        CHECK(j1 == j2);
+        REQUIRE(j1.size() == 2);
+        REQUIRE(j2.size() == 2);
+        CHECK(j1[0] == j2[0]);
+        CHECK(j1[1] == j2[1]);
     }
 
     SECTION("element operator== test")
     {
-        CHECK_FALSE(v1 == v3);
-        REQUIRE(v1.size() == 2);
-        REQUIRE(v1.size() == v3.size());
-        CHECK(v1[0] == v3[0]);
-        CHECK_FALSE(v1[1] == v3[1]);
+        CHECK_FALSE(j1 == j3);
+        REQUIRE(j1.size() == 2);
+        REQUIRE(j1.size() == j3.size());
+        CHECK(j1[0] == j3[0]);
+        CHECK_FALSE(j1[1] == j3[1]);
     }
 }
 
-TEST_CASE("cbor_view object comparison")
+TEST_CASE("cbor object comparison")
 {
-    std::vector<uint8_t> buf1;
-    cbor::cbor_buffer_serializer serializer1(buf1);
+    std::vector<uint8_t> v;
+    cbor::cbor_buffer_serializer serializer1(v);
     serializer1.begin_object(); // indefinite length array
     serializer1.name("City");
     serializer1.string_value("Montreal");
@@ -379,9 +375,9 @@ TEST_CASE("cbor_view object comparison")
     serializer1.date_time_value("2018-05-07 12:41:07-07:00");
     serializer1.end_object(); 
     serializer1.flush();
-    json view1 = decode_cbor<json>(buf1);
+    json j1 = decode_cbor<json>(v);
 
-    REQUIRE(view1.size() == 3);
+    REQUIRE(j1.size() == 3);
 
     std::vector<uint8_t> buf2;
     cbor::cbor_buffer_serializer serializer2(buf2);
@@ -394,8 +390,8 @@ TEST_CASE("cbor_view object comparison")
     serializer2.date_time_value("2018-10-18 12:41:07-07:00");
     serializer2.end_object(); 
     serializer2.flush();
-    json view2 = decode_cbor<json>(buf2);
-    REQUIRE(view2.size() == view1.size());
+    json j2 = decode_cbor<json>(buf2);
+    REQUIRE(j2.size() == j1.size());
 
     std::vector<uint8_t> buf3;
     cbor::cbor_buffer_serializer serializer3(buf3);
@@ -412,44 +408,44 @@ TEST_CASE("cbor_view object comparison")
     serializer3.byte_string_value(jsoncons::byte_string{});
     serializer3.end_object(); 
     serializer3.flush();
-    json view3 = decode_cbor<json>(buf3);
+    json j3 = decode_cbor<json>(buf3);
 
     SECTION("contains")
     {
-        CHECK(view1.contains("City"));
-        CHECK(view1.contains("Amount"));
-        CHECK(view1.contains("Date"));
-        CHECK_FALSE(view1.contains("Country"));
+        CHECK(j1.contains("City"));
+        CHECK(j1.contains("Amount"));
+        CHECK(j1.contains("Date"));
+        CHECK_FALSE(j1.contains("Country"));
     }
 
     SECTION("empty")
     {
-        CHECK_FALSE(view3.empty());
-        CHECK(view3["empty-object"].empty());
-        CHECK(view3["empty-array"].empty());
-        CHECK(view3["empty-string"].empty());
-        CHECK(view3["empty-byte_string"].empty());
+        CHECK_FALSE(j3.empty());
+        CHECK(j3["empty-object"].empty());
+        CHECK(j3["empty-array"].empty());
+        CHECK(j3["empty-string"].empty());
+        CHECK(j3["empty-byte_string"].empty());
     }
 
     SECTION("size")
     {
-        CHECK(view1.size() == 3);
+        CHECK(j1.size() == 3);
     }
 
     SECTION("operator==")
     {
-        CHECK_FALSE(view1 == view2);
-        CHECK_FALSE(view1["City"] == view2["City"]);
-        CHECK(view1["Amount"] == view2["Amount"]);
-        CHECK_FALSE(view1["Date"] == view2["Date"]);
+        CHECK_FALSE(j1 == j2);
+        CHECK_FALSE(j1["City"] == j2["City"]);
+        CHECK(j1["Amount"] == j2["Amount"]);
+        CHECK_FALSE(j1["Date"] == j2["Date"]);
     }
 
 }
 
-TEST_CASE("cbor_view member tests")
+TEST_CASE("cbor member tests")
 {
-    std::vector<uint8_t> buf;
-    cbor::cbor_buffer_serializer serializer(buf);
+    std::vector<uint8_t> v;
+    cbor::cbor_buffer_serializer serializer(v);
     serializer.begin_object(); // indefinite length object
     serializer.name("empty-object");
     serializer.begin_object(0);
@@ -471,35 +467,35 @@ TEST_CASE("cbor_view member tests")
 
     serializer.end_object(); 
     serializer.flush();
-    json view = decode_cbor<json>(buf);
+    json j = decode_cbor<json>(v);
 
     SECTION("contains")
     {
-        CHECK(view.contains("City"));
-        CHECK(view.contains("Amount"));
-        CHECK(view.contains("Date"));
-        CHECK_FALSE(view.contains("Country"));
+        CHECK(j.contains("City"));
+        CHECK(j.contains("Amount"));
+        CHECK(j.contains("Date"));
+        CHECK_FALSE(j.contains("Country"));
     }
 
     SECTION("empty")
     {
-        CHECK_FALSE(view.empty());
-        CHECK(view["empty-object"].empty());
-        CHECK(view["empty-array"].empty());
-        CHECK(view["empty-string"].empty());
-        CHECK(view["empty-byte_string"].empty());
+        CHECK_FALSE(j.empty());
+        CHECK(j["empty-object"].empty());
+        CHECK(j["empty-array"].empty());
+        CHECK(j["empty-string"].empty());
+        CHECK(j["empty-byte_string"].empty());
     }
 
     SECTION("size")
     {
-        CHECK(view.size() == 7);
+        CHECK(j.size() == 7);
     }
 }
 
 TEST_CASE("cbor conversion tests")
 {
-    std::vector<uint8_t> b;
-    cbor::cbor_buffer_serializer writer(b);
+    std::vector<uint8_t> v;
+    cbor::cbor_buffer_serializer writer(v);
     writer.begin_array(); // indefinite length outer array
     writer.begin_array(4); // a fixed length array
     writer.string_value("foo");
@@ -510,14 +506,14 @@ TEST_CASE("cbor conversion tests")
     writer.end_array();
     writer.flush();
 
-    json bv = decode_cbor<json>(b);
-    REQUIRE(bv.size() == 1);
+    json j = decode_cbor<json>(v);
+    REQUIRE(j.size() == 1);
 
-    auto range1 = bv.array_range();
+    auto range1 = j.array_range();
     auto it = range1.begin();
     const json& inner_array = *it++;
     REQUIRE(inner_array.size() == 4);
-    REQUIRE(it == range1.end());
+    REQUIRE((it == range1.end()));
 
     auto range2 = inner_array.array_range();
     auto it2 = range2.begin();
@@ -529,6 +525,107 @@ TEST_CASE("cbor conversion tests")
     it2++;
     CHECK(bool(it2->as_string() == bignum{"273.15"}));
     it2++;
-    CHECK(it2 == range2.end());
+    CHECK((it2 == range2.end()));
 }
+
+TEST_CASE("cbor array as<> test")
+{
+    std::vector<uint8_t> v;
+    cbor::cbor_buffer_serializer writer(v);
+    writer.begin_array(); // indefinite length outer array
+    writer.string_value("foo");
+    writer.byte_string_value(byte_string({'b','a','r'}));
+    writer.big_integer_value("-18446744073709551617");
+    writer.big_decimal_value("273.15");
+    writer.date_time_value("2015-05-07 12:41:07-07:00");
+    writer.timestamp_value(1431027667);
+    writer.int64_value(-1431027667, semantic_tag_type::timestamp);
+    writer.double_value(1431027667.5, semantic_tag_type::timestamp);
+    writer.end_array();
+    writer.flush();
+
+/*
+9f -- Start indefinite length array 
+  63 -- String value of length 3 
+    666f6f -- "foo"
+  43 -- Byte string value of length 3
+    626172 -- 'b''a''r'
+  c3 -- Tag 3 (negative bignum)
+    49 Byte string value of length 9
+      010000000000000000 -- Bytes content
+  c4  - Tag 4 (decimal fraction)
+    82 -- Array of length 2
+      21 -- -2
+      19 6ab3 -- 27315
+  c0 -- Tag 0 (date-time)
+    78 19 -- Length (25)
+      323031352d30352d30372031323a34313a30372d30373a3030 -- "2015-05-07 12:41:07-07:00"
+  c1 -- Tag 1 (epoch time)
+    1a -- uint32_t
+      554bbfd3 -- 1431027667 
+  c1
+    3a
+      554bbfd2
+  c1
+    fb
+      41d552eff4e00000
+  ff -- "break" 
+*/
+
+    //std::cout << "v: \n";
+    //for (auto c : v)
+    //{
+    //    std::cout << std::hex << std::setprecision(2) << std::setw(2)
+    //              << std::setfill('0') << static_cast<int>(c);
+    //}
+    //std::cout << "\n\n";
+
+    json j = decode_cbor<json>(v); // a non-owning view of the CBOR v
+
+    CHECK(j.size() == 8);
+
+    SECTION("j[0].is<T>()")
+    {
+        CHECK(j[0].is<std::string>());
+        CHECK(j[1].is<byte_string>());
+        CHECK(j[1].is<byte_string_view>());
+        CHECK(j[2].is<bignum>());
+        CHECK(j[3].is_string());
+        CHECK(j[3].semantic_tag() == semantic_tag_type::big_decimal);
+        CHECK(j[4].is<std::string>());
+        CHECK(j[5].is<int>());
+        CHECK(j[5].is<unsigned int>());
+        CHECK(j[6].is<int>());
+        CHECK_FALSE(j[6].is<unsigned int>());
+        CHECK(j[7].is<double>());
+    }
+
+    SECTION("j[0].as<T>()")
+    {
+        CHECK(j[0].as<std::string>() == std::string("foo"));
+        CHECK(j[1].as<jsoncons::byte_string>() == jsoncons::byte_string({'b','a','r'}));
+        CHECK(j[2].as<std::string>() == std::string("-18446744073709551617"));
+        CHECK(bool(j[2].as<jsoncons::bignum>() == jsoncons::bignum("-18446744073709551617")));
+        CHECK(j[3].as<std::string>() == std::string("273.15"));
+        CHECK(j[4].as<std::string>() == std::string("2015-05-07 12:41:07-07:00"));
+        CHECK(j[5].as<int64_t>() == 1431027667);
+        CHECK(j[5].as<uint64_t>() == 1431027667U);
+        CHECK(j[6].as<int64_t>() == -1431027667);
+        CHECK(j[7].as<double>() == 1431027667.5);
+    }
+
+    SECTION("array_iterator is<T> test")
+    {
+        auto it = j.array_range().begin();
+        CHECK(it++->is<std::string>());
+        CHECK(it++->is<byte_string>());
+        CHECK(it++->is<bignum>());
+        CHECK(it++->is<std::string>());
+        CHECK(it++->is<std::string>());
+        CHECK(it++->is<int>());
+        CHECK(it++->is<int>());
+        CHECK(it++->is<double>());
+    }
+}
+
 #endif
