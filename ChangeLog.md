@@ -13,6 +13,8 @@ Changes:
 
 - Removed deprecated feature `cbor_view`
 
+- CBOR decimal fraction and bigfloat string formatting now consistent with double string formatting
+
 Enhancements:
 
 - json `to_string()` and `to_double()` now work with CBOR bigfloat
