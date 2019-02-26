@@ -285,14 +285,14 @@ TEST_CASE("cbor decimal fraction")
                    0x25, // -6
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("0.27315e-1", semantic_tag_type::big_decimal));
+                  json("0.027315", semantic_tag_type::big_decimal));
 
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x04, // 4
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("27315e4", semantic_tag_type::big_decimal));
+                  json("273150000.0", semantic_tag_type::big_decimal));
 }
 
 TEST_CASE("test_decimal_as_string")
@@ -321,7 +321,7 @@ TEST_CASE("test_decimal_as_string")
         jsoncons::buffer_source source(v);
         std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
         REQUIRE_FALSE(ec);
-        CHECK(std::string("0.27315e-1") == s);
+        CHECK(std::string("0.027315") == s);
     }
     SECTION("-5 27315")
     {
@@ -360,7 +360,7 @@ TEST_CASE("test_decimal_as_string")
         jsoncons::buffer_source source(v);
         std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
         REQUIRE_FALSE(ec);
-        CHECK(s == std::string("27315e2"));
+        CHECK(s == std::string("2731500.0"));
     }
     SECTION("-2 18446744073709551616")
     {
@@ -373,7 +373,7 @@ TEST_CASE("test_decimal_as_string")
         jsoncons::buffer_source source(v);
         std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
         REQUIRE_FALSE(ec);
-        CHECK(std::string("184467440737095516.16") == s);
+        CHECK(std::string("1.8446744073709551616e+17") == s);
     }
     SECTION("-2 -65537")
     {
@@ -412,7 +412,7 @@ TEST_CASE("test_decimal_as_string")
         jsoncons::buffer_source source(v);
         std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
         REQUIRE_FALSE(ec);
-        CHECK(s == std::string("-0.65537e-1"));
+        CHECK(s == std::string("-0.065537"));
     }
 }
 
@@ -436,14 +436,13 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
     writer.flush();
 
     json expected = json::array();
-
     expected.emplace_back("foo");
     expected.emplace_back(byte_string{ 'b','a','r' });
     expected.emplace_back("-18446744073709551617", semantic_tag_type::big_integer);
     expected.emplace_back("-273.15", semantic_tag_type::big_decimal);
     expected.emplace_back("273.15", semantic_tag_type::big_decimal);
-    expected.emplace_back("18446744073709551616.15", semantic_tag_type::big_decimal);
-    expected.emplace_back("-18446744073709551617.15", semantic_tag_type::big_decimal);
+    expected.emplace_back("1.844674407370955161615e+19", semantic_tag_type::big_decimal);
+    expected.emplace_back("-1.844674407370955161715e+19", semantic_tag_type::big_decimal);
     expected.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag_type::date_time);
     expected.emplace_back(1431027667, semantic_tag_type::timestamp);
     expected.emplace_back(-1431027667, semantic_tag_type::timestamp);

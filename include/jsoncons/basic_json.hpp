@@ -3418,7 +3418,7 @@ public:
 
                     std::string str;
                     n.dump(str);
-                    jsoncons::detail::prettify_string(str.c_str(),str.length(),(int)-new_exp,6,(std::numeric_limits<int>::max)(), s);
+                    jsoncons::detail::prettify_string(str.c_str(),str.length(),(int)-new_exp,-4,17, s);
                 }
                 else
                 {

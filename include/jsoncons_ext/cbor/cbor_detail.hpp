@@ -1044,53 +1044,22 @@ std::string get_array_as_decimal_string(Source& source, std::error_code& ec)
             return s;
         }
     }
-    if (exponent < 0)
+
+    std::string result;
+    if (s.size() > 0)
     {
-        int64_t digits_length = static_cast<int64_t >(s.length()) + exponent;
-        bool is_negative = false;
         if (s[0] == '-')
         {
-            --digits_length;
-            is_negative = true;
+            result.push_back('-');
+            jsoncons::detail::prettify_string(s.c_str()+1, s.size()-1, (int)exponent, -4, 17, result);
         }
-
-        if (digits_length > 0)
+        else
         {
-            size_t index = is_negative ? (size_t)(digits_length+1) : (size_t)digits_length; 
-            s.insert(index, ".");
-        }
-        else if (digits_length == 0)
-        {
-            size_t index = is_negative ? 1u : 0u; 
-            s.insert(index, "0.");
-        }
-        else 
-        {
-            size_t index = is_negative ? 1u : 0u; 
-            s.insert(index, "0.");
-            s.append("e-");
-            uint64_t u = static_cast<uint64_t>(-digits_length);
-            do 
-            {
-                s.push_back(static_cast<char>(48+u%10));
-            }
-            while (u /= 10);
+            jsoncons::detail::prettify_string(s.c_str(), s.size(), (int)exponent, -4, 17, result);
         }
     }
-    else if (exponent == 0)
-    {
-        s.append(".0");
-    }
-    else if (exponent > 0)
-    {
-        s.append("e");
-        do 
-        {
-            s.push_back(static_cast<char>(48+exponent%10));
-        }
-        while (exponent /= 10);
-    }
-    return s;
+    //std::cout << "s: " << s << ", exponent: " << std::dec << exponent << ", result: " << result << "\n";
+    return result;
 }
 
 template <class T>

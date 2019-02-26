@@ -249,7 +249,7 @@ void prettify_string(const char *buffer, size_t length, int k, int min_exp, int 
     int offset;
     /* v = buffer * 10^k
        kk is such that 10^(kk-1) <= v < 10^kk
-       this way kk gives the position of the comma.
+       this way kk gives the position of the decimal point.
     */
     int kk = nb_digits + k;
 

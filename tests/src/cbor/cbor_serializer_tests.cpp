@@ -217,7 +217,7 @@ TEST_CASE("serialize big_decimal to cbor")
         try
         {
             json result = decode_cbor<json>(v);
-            CHECK(result.as<std::string>() == std::string("18446744073709551616.0"));
+            CHECK(result.as<std::string>() == std::string("1.84467440737095516160e+19"));
         }
         catch (const std::exception& e)
         {
@@ -265,7 +265,7 @@ TEST_CASE("serialize big_decimal to cbor")
         try
         {
             json result = decode_cbor<json>(v);
-            CHECK(result.as<std::string>() == std::string("-18446744073709551616e5"));
+            CHECK(result.as<std::string>() == std::string("-1.8446744073709551616e+24"));
         }
         catch (const std::exception& e)
         {
