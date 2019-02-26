@@ -628,17 +628,29 @@ TEST_CASE("cbor array as<> test")
 
 TEST_CASE("cbor bigfloat tests")
 {
-    std::vector<uint8_t> v = {0xc5, // Tag 5 
-                              0x82, // Array of length 2
-                              0x20, // -1 
-                              0x03 // 3 
-                             };
-
-    SECTION("Test 1")
+    SECTION("1.5")
     {
+        std::vector<uint8_t> v = {0xc5, // Tag 5 
+                                  0x82, // Array of length 2
+                                  0x20, // -1 
+                                  0x03 // 3 
+                                 };
+
         json j = decode_cbor<json>(v);
         std::string s = j.as<std::string>();
         CHECK(s == std::string("1.5"));
+    }
+    SECTION("-1.5")
+    {
+        std::vector<uint8_t> v = {0xc5, // Tag 5 
+                                  0x82, // Array of length 2
+                                  0x20, // -1 
+                                  0x22 // -3 
+                                 };
+
+        json j = decode_cbor<json>(v);
+        std::string s = j.as<std::string>();
+        CHECK(s == std::string("-1.5"));
     }
 } 
 

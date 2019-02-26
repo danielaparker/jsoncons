@@ -3418,7 +3418,15 @@ public:
 
                     std::string str;
                     n.dump(str);
-                    jsoncons::detail::prettify_string(str.c_str(),str.length(),(int)-new_exp,-4,17, s);
+                    if (str[0] == '-')
+                    {
+                        s.push_back('-');
+                        jsoncons::detail::prettify_string(str.c_str()+1, str.size()-1, -(int)new_exp, -4, 17, s);
+                    }
+                    else
+                    {
+                        jsoncons::detail::prettify_string(str.c_str(), str.size(), -(int)new_exp, -4, 17, s);
+                    }
                 }
                 else
                 {
