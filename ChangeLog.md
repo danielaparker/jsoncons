@@ -23,6 +23,9 @@ Enhancements:
 - JSONPath operators in filter expressions now work with `big_integer`, `big_decimal`, and `big_float`
   tagged json values
 
+- json `is_number()` function now returns `true` if string value is tagged with `big_integer` or 
+  `big_decimal`, or if array value is tagged with `big_float`.
+
 v0.118.0
 --------
 
