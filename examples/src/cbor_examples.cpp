@@ -4,6 +4,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/jsonpath/json_query.hpp>
 #include <string>
 #include <iomanip>
 
@@ -198,6 +199,76 @@ void encode_byte_string_with_encoding_hint()
     std::cout << "(2) " << j2 << std::endl;
 }
 
+void query_cbor()
+{
+    // Construct a json array of numbers
+    json j = json::array();
+
+    j.emplace_back(0.0);
+
+    j.emplace_back(0.000071);
+
+    j.emplace_back("-18446744073709551617",semantic_tag_type::big_integer);
+
+    j.emplace_back("1.23456789012345678901234567890", semantic_tag_type::big_decimal);
+
+    j.emplace_back(json::array({-1,3}), semantic_tag_type::big_float);
+
+    // Serialize to JSON
+    std::cout << "(1)\n";
+    std::cout << pretty_print(j);
+    std::cout << "\n\n";
+
+    std::cout << "(2)\n";
+    std::cout << std::dec << std::setprecision(15);
+    for (const auto& item : j.array_range())
+    {
+        std::cout << item.as<std::string>() << "\t\t" << item.as<double>() << "\n";
+    }
+    std::cout << "\n";
+
+    // Encode to CBOR
+    std::vector<uint8_t> v;
+    cbor::encode_cbor(j,v);
+
+    std::cout << "(3)\n";
+    for (auto c : v)
+    {
+        std::cout << std::hex << std::setprecision(2) << std::setw(2)
+                  << std::setfill('0') << static_cast<int>(c);
+    }
+    std::cout << "\n\n";
+/*
+    85 -- Array of length 5     
+      fa -- float 
+        00000000 -- 0.0
+      fb -- double 
+        3f129cbab649d389 -- 0.000071
+      c3 -- Tag 3 (negative bignum)
+        49 -- Byte string value of length 9
+          010000000000000000
+      c4 -- Tag 4 (decimal fraction)
+        82 -- Array of length 2
+          38 -- Negative integer of length 1
+            1c -- -29
+          c2 -- Tag 2 (positive bignum)
+            4d -- Byte string value of length 13
+              018ee90ff6c373e0ee4e3f0ad2
+      c5 -- Tag 5 (bigfloat)
+        82 -- Array of length 2
+          20 -- -1
+          03 -- 3   
+*/
+
+    // Decode back to json
+    json other = cbor::decode_cbor<json>(v);
+    assert(other == j);
+
+    std::cout << "(4)\n";
+    json result = jsonpath::json_query(other,"$.[?(@ < 100.0)]");
+    std::cout << pretty_print(result) << "\n\n";
+}
+
 void cbor_examples()
 {
     std::cout << "\ncbor examples\n\n";
@@ -208,6 +279,7 @@ void cbor_examples()
     serialize_to_cbor_buffer();
     serialize_to_cbor_stream();
     cbor_reputon_example();
+    query_cbor();
     std::cout << std::endl;
 }
 
