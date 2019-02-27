@@ -394,6 +394,8 @@ bar,UHVzcw==,273.15
 #include <jsoncons_ext/jsonpath/json_query.hpp>
 #include <iomanip>
 
+using namespace jsoncons; // For convenience
+
 int main()
 {
     // Construct a json array of numbers
