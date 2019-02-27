@@ -26,6 +26,10 @@ Enhancements:
 - json `is_number()` function now returns `true` if string value is tagged with `big_integer` or 
   `big_decimal`, or if array value is tagged with `big_float`.
 
+- json `as_string()` function now converts arrays tagged with `big_float` to decimal strings
+
+- json `as_double()` function now converts arrays tagged with `big_float` to double values
+
 v0.118.0
 --------
 
