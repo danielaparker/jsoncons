@@ -390,7 +390,6 @@ bar,UHVzcw==,273.15
 ```c++
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonpath/json_query.hpp>
 #include <iomanip>
 
@@ -401,7 +400,7 @@ int main()
     // Construct a json array of numbers
     json j = json::array();
 
-    j.emplace_back(0.0);
+    j.emplace_back(5.0);
 
     j.emplace_back(0.000071);
 
@@ -416,6 +415,7 @@ int main()
     std::cout << pretty_print(j);
     std::cout << "\n\n";
 
+    // as<std::string>() and as<double>()
     std::cout << "(2)\n";
     std::cout << std::dec << std::setprecision(15);
     for (const auto& item : j.array_range())
@@ -438,7 +438,7 @@ int main()
 /*
     85 -- Array of length 5     
       fa -- float 
-        00000000 -- 0.0
+        40a00000 -- 5.0
       fb -- double 
         3f129cbab649d389 -- 0.000071
       c3 -- Tag 3 (negative bignum)
@@ -461,16 +461,16 @@ int main()
     json other = cbor::decode_cbor<json>(v);
     assert(other == j);
 
+    // Query with JSONPath
     std::cout << "(4)\n";
-    json result = jsonpath::json_query(other,"$.[?(@ < 100.0)]");
+    json result = jsonpath::json_query(other,"$.[?(@ < 1.5)]");
     std::cout << pretty_print(result) << "\n\n";
-}
 ```
 Output:
 ```
 (1)
 [
-    0.0,
+    5.0,
     7.1e-05,
     "-18446744073709551617",
     "1.23456789012345678901234567890",
@@ -478,19 +478,20 @@ Output:
 ]
 
 (2)
-0.0, 0
+5.0, 5
 7.1e-05, 7.1e-05
 -18446744073709551617, -1.84467440737096e+19
 1.23456789012345678901234567890, 1.23456789012346
 1.5, 1.5
 
 (3)
-85fa00000000fb3f129cbab649d389c349010000000000000000c482381cc24d018ee90ff6c373e0ee4e3f0ad2c5822003
+85fa40a00000fb3f129cbab649d389c349010000000000000000c482381cc24d018ee90ff6c373e0ee4e3f0ad2c5822003
 
 (4)
 [
-    0.0,
-    7.1e-05
+    7.1e-05,
+    "-18446744073709551617",
+    "1.23456789012345678901234567890"
 ]
 ```
 

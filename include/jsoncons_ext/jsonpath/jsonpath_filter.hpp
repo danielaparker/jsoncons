@@ -408,15 +408,15 @@ template <class Json>
 bool lt(const Json& lhs, const Json& rhs)
 {
     bool result = false;
-    if (lhs.template is<unsigned long long>() && rhs.template is<unsigned long long>())
+    if (lhs.template is<int64_t>() && rhs.template is<int64_t>())
     {
-        result = lhs.template as<unsigned long long>() < rhs.template as<unsigned long long>();
+        result = lhs.template as<int64_t>() < rhs.template as<int64_t>();
     }
-    else if (lhs.template is<long long>() && rhs.template is<long long>())
+    else if (lhs.template is<uint64_t>() && rhs.template is<uint64_t>())
     {
-        result = lhs.template as<long long>() < rhs.template as<long long>();
+        result = lhs.template as<uint64_t>() < rhs.template as<uint64_t>();
     }
-    else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
+    else if (lhs.is_number() && rhs.is_number())
     {
         result = lhs.as_double() < rhs.as_double();
     }
@@ -441,13 +441,13 @@ Json plus(const Json& lhs, const Json& rhs)
     {
         result = Json(((lhs.template as<int64_t>() + rhs.template as<int64_t>())));
     }
-    else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
-    {
-        result = Json((lhs.as_double() + rhs.as_double()));
-    }
     else if (lhs.is_uint64() && rhs.is_uint64())
     {
         result = Json((lhs.template as<uint64_t>() + rhs.template as<uint64_t>()));
+    }
+    else if ((lhs.is_number() && rhs.is_number()))
+    {
+        result = Json((lhs.as_double() + rhs.as_double()));
     }
     return result;
 }
@@ -460,13 +460,13 @@ Json mult(const Json& lhs, const Json& rhs)
     {
         result = Json(((lhs.template as<int64_t>() * rhs.template as<int64_t>())));
     }
-    else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
-    {
-        result = Json((lhs.as_double() * rhs.as_double()));
-    }
     else if (lhs.is_uint64() && rhs.is_uint64())
     {
         result = Json((lhs.template as<uint64_t>() * rhs.template as<uint64_t>()));
+    }
+    else if ((lhs.is_number() && rhs.is_number()))
+    {
+        result = Json((lhs.as_double() * rhs.as_double()));
     }
     return result;
 }
@@ -479,13 +479,13 @@ Json div(const Json& lhs, const Json& rhs)
     {
         result = Json((double)(lhs.template as<int64_t>() / (double)rhs.template as<int64_t>()));
     }
-    else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
-    {
-        result = Json((lhs.as_double() / rhs.as_double()));
-    }
     else if (lhs.is_uint64() && rhs.is_uint64())
     {
         result = Json((double)(lhs.template as<uint64_t>() / (double)rhs.template as<uint64_t>()));
+    }
+    else if ((lhs.is_number() && rhs.is_number()))
+    {
+        result = Json((lhs.as_double() / rhs.as_double()));
     }
     return result;
 }
@@ -513,13 +513,13 @@ Json minus(const Json& lhs, const Json& rhs)
     {
         result = ((lhs.template as<int64_t>() - rhs.template as<int64_t>()));
     }
-    else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
-    {
-        result = (lhs.as_double() - rhs.as_double());
-    }
     else if (lhs.is_uint64() && rhs.is_uint64() && lt(rhs,lhs))
     {
         result = (lhs.template as<uint64_t>() - rhs.template as<uint64_t>());
+    }
+    else if ((lhs.is_number() && rhs.is_number()))
+    {
+        result = (lhs.as_double() - rhs.as_double());
     }
     return result;
 }

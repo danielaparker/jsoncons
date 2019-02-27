@@ -302,8 +302,8 @@ public:
         public:
             static const size_t max_length = (14 / sizeof(char_type)) - 1;
 
-            short_string_data(semantic_tag_type semantic_type, const char_type* p, uint8_t length)
-                : data_base(structure_tag_type::short_string_tag, semantic_type), length_(length)
+            short_string_data(semantic_tag_type tag, const char_type* p, uint8_t length)
+                : data_base(structure_tag_type::short_string_tag, tag), length_(length)
             {
                 JSONCONS_ASSERT(length <= max_length);
                 std::memcpy(data_,p,length*sizeof(char_type));
@@ -341,14 +341,14 @@ public:
             pointer ptr_;
         public:
 
-            long_string_data(semantic_tag_type semantic_type, const char_type* data, size_t length, const Allocator& a)
-                : data_base(structure_tag_type::long_string_tag, semantic_type)
+            long_string_data(semantic_tag_type tag, const char_type* data, size_t length, const Allocator& a)
+                : data_base(structure_tag_type::long_string_tag, tag)
             {
                 ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(data,length,a);
             }
 
             long_string_data(const long_string_data& val)
-                : data_base(structure_tag_type::long_string_tag, semantic_tag_type::none)
+                : data_base(val.type())
             {
                 ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),val.get_allocator());
             }
@@ -2591,7 +2591,7 @@ public:
     {
     }
 
-    basic_json(const string_view_type sv, semantic_tag_type tag)
+    basic_json(const string_view_type& sv, semantic_tag_type tag)
         : var_(sv.data(), sv.length(), tag)
     {
     }
@@ -2606,7 +2606,7 @@ public:
     {
     }
 
-    basic_json(const string_view_type sv, semantic_tag_type tag, const Allocator& allocator)
+    basic_json(const string_view_type& sv, semantic_tag_type tag, const Allocator& allocator)
         : var_(sv.data(), sv.length(), tag, allocator)
     {
     }
@@ -2620,8 +2620,8 @@ public:
 #if !defined(JSONCONS_NO_DEPRECATED)
 
     basic_json(const byte_string_view& bs, 
-                        byte_string_chars_format encoding_hint,
-                        semantic_tag_type tag = semantic_tag_type::none)
+               byte_string_chars_format encoding_hint,
+               semantic_tag_type tag = semantic_tag_type::none)
         : var_(bs, tag)
     {
         switch (encoding_hint)
@@ -3081,7 +3081,21 @@ public:
 
     bool is_number() const noexcept
     {
-        return var_.structure_tag() == structure_tag_type::int64_tag || var_.structure_tag() == structure_tag_type::uint64_tag || var_.structure_tag() == structure_tag_type::double_tag;
+        switch (var_.structure_tag())
+        {
+            case structure_tag_type::int64_tag:
+            case structure_tag_type::uint64_tag:
+            case structure_tag_type::double_tag:
+                return true;
+            case structure_tag_type::short_string_tag:
+            case structure_tag_type::long_string_tag:
+                return var_.semantic_tag() == semantic_tag_type::big_integer ||
+                       var_.semantic_tag() == semantic_tag_type::big_decimal;
+            case structure_tag_type::array_tag:
+                return var_.semantic_tag() == semantic_tag_type::big_float;
+            default:
+                return false;
+        }
     }
 
     bool empty() const noexcept
