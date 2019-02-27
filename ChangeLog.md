@@ -1,5 +1,5 @@
-master
-------
+v0.119.0
+--------
 
 Name change:
 
@@ -7,7 +7,8 @@ Name change:
 
 Bug fix:
 
-- Fixed a bug in json function `empty()` when type is `byte_string`
+- Fixed a bug in json function `empty()` when type is `byte_string`.
+- Fixed a bug with preserving semantic_tag_type when copying json values of long string type.
 
 Changes:
 
@@ -18,6 +19,9 @@ Changes:
 Enhancements:
 
 - json `to_string()` and `to_double()` now work with CBOR bigfloat
+
+- JSONPath operators in filter expressions now work with `big_integer`, `big_decimal`, and `big_float`
+  tagged json values
 
 v0.118.0
 --------
