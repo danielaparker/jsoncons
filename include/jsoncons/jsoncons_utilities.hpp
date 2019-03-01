@@ -283,21 +283,21 @@ template <class CharT>
 basic_string_view<CharT> null_literal()
 {
     static const CharT chars[] = {'n','u','l', 'l'};
-    return basic_string_view<CharT>(chars,sizeof(chars));
+    return basic_string_view<CharT>(chars,sizeof(chars)/sizeof(CharT));
 }
 
 template <class CharT>
 basic_string_view<CharT> true_literal()
 {
     static const CharT chars[] = {'t','r','u', 'e'};
-    return basic_string_view<CharT>(chars,sizeof(chars));
+    return basic_string_view<CharT>(chars,sizeof(chars)/sizeof(CharT));
 }
 
 template <class CharT>
 basic_string_view<CharT> false_literal()
 {
     static const CharT chars[] = {'f','a','l', 's', 'e'};
-    return basic_string_view<CharT>(chars,sizeof(chars));
+    return basic_string_view<CharT>(chars,sizeof(chars)/sizeof(CharT));
 }
 
 }

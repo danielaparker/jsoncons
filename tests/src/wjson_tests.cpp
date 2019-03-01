@@ -39,4 +39,15 @@ TEST_CASE("test_wjson_escape_u")
     CHECK( s[0] == 0xABCD );
 }
 
+TEST_CASE("wjson serialization tests")
+{
+    jsoncons::wjson testBlock;
+    testBlock[L"foo"] = true;
+    testBlock[L"bar"] = false;
+    testBlock[L"baz"] = true;
+    std::wstring testStr;
+    testBlock.dump(testStr);
+
+    CHECK(testStr == L"{\"bar\":false,\"baz\":true,\"foo\":true}");
+}
 
