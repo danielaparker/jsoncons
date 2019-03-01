@@ -1,3 +1,10 @@
+master
+------
+
+Bug fix:
+
+Fixed issue wjson dump() not formatting booleans correctly #174
+
 v0.119.0
 --------
 
