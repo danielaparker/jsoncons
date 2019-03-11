@@ -36,13 +36,13 @@ static const char* base64url_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 template <class Container>
 size_t encode_base16(const uint8_t* data, size_t length, Container& result)
 {
-    static const char* lut = "0123456789ABCDEF";
+    static const char* characters = "0123456789ABCDEF";
 
     for (size_t i = 0; i < length; ++i)
     {
         uint8_t c = data[i];
-        result.push_back(lut[c >> 4]);
-        result.push_back(lut[c & 15]);
+        result.push_back(characters[c >> 4]);
+        result.push_back(characters[c & 0xf]);
     }
     return length*2;
 }
@@ -222,7 +222,7 @@ std::vector<uint8_t> decode_base64url(const std::basic_string<CharT>& base64_str
 template <class CharT>
 std::vector<uint8_t> decode_base16(const std::basic_string<CharT>& input)
 {
-    static const char* const alphabet = "0123456789ABCDEF";
+    static const char* const characters = "0123456789ABCDEF";
     size_t len = input.length();
     if (len & 1) 
     {
@@ -234,20 +234,20 @@ std::vector<uint8_t> decode_base16(const std::basic_string<CharT>& input)
     for (size_t i = 0; i < len; i += 2)
     {
         char a = (char)input[i];
-        const char* p = std::lower_bound(alphabet, alphabet + 16, a);
+        const char* p = std::lower_bound(characters, characters + 16, a);
         if (*p != a) 
         {
             JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a hex digit"));
         }
 
         char b = (char)input[i + 1];
-        const char* q = std::lower_bound(alphabet, alphabet + 16, b);
+        const char* q = std::lower_bound(characters, characters + 16, b);
         if (*q != b) 
         {
             JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a hex digit"));
         }
 
-        result.push_back((uint8_t)(((p - alphabet) << 4) | (q - alphabet)));
+        result.push_back((uint8_t)(((p - characters) << 4) | (q - characters)));
     }
     return result;
 }
