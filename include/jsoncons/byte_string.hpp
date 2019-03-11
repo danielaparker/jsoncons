@@ -15,6 +15,7 @@
 #include <iterator>
 #include <exception>
 #include <initializer_list>
+#include <algorithm> // std::find
 #include <utility> // std::move
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
@@ -157,7 +158,7 @@ std::vector<uint8_t> decode_base64_generic(const std::basic_string<CharT>& base6
         {
             for (i = 0; i < 4; ++i) 
             {
-                auto p = std::find(alphabet,alphabet_end,static_cast<char>(a4[i]));
+                auto p = std::find(alphabet,alphabet_end,a4[i]);
                 if (p == alphabet_end)
                 {
                     a4[i] = 0xff;
@@ -184,7 +185,7 @@ std::vector<uint8_t> decode_base64_generic(const std::basic_string<CharT>& base6
     {
         for (j = 0; j < i; ++j) 
         {
-            auto p = std::find(alphabet,alphabet_end,static_cast<char>(a4[j]));
+            auto p = std::find(alphabet,alphabet_end,a4[j]);
             if (p == alphabet_end)
             {
                 a4[j] = 0xff;
