@@ -252,15 +252,28 @@ std::vector<uint8_t> decode_base16(const std::basic_string<CharT>& input)
     return result;
 }
 
+struct byte_traits
+{
+    typedef uint8_t char_type;
+
+    static constexpr int eof() 
+    {
+        return std::char_traits<char>::eof();
+    }
+};
+
 // byte_string_view
 class byte_string_view
 {
     const uint8_t* data_;
     size_t length_; 
 public:
+    typedef byte_traits traits_type;
+
     typedef const uint8_t* const_iterator;
     typedef const uint8_t* iterator;
     typedef std::size_t size_type;
+    typedef uint8_t value_type;
 
     byte_string_view()
         : data_(nullptr), length_(0)
@@ -351,9 +364,12 @@ class basic_byte_string
 {
     std::vector<uint8_t,Allocator> data_;
 public:
+    typedef byte_traits traits_type;
+
     typedef typename std::vector<uint8_t,Allocator>::const_iterator const_iterator;
     typedef typename std::vector<uint8_t,Allocator>::const_iterator iterator;
     typedef std::size_t size_type;
+    typedef uint8_t value_type;
 
     basic_byte_string() = default;
 

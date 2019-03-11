@@ -16,7 +16,7 @@
 #include <exception>
 #include <type_traits> // std::enable_if
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/jsoncons_utilities.hpp>
+#include <jsoncons/byte_string.hpp> // jsoncons::byte_traits
 
 namespace jsoncons { 
 
@@ -359,19 +359,11 @@ public:
 
 // binary sources
 
-struct binary_traits
-{
-    static constexpr int eof() 
-    {
-        return std::char_traits<char>::eof();
-    }
-};
-
 class binary_stream_source 
 {
 public:
     typedef uint8_t value_type;
-    typedef binary_traits traits_type;
+    typedef byte_traits traits_type;
 private:
     std::istream* is_;
     std::streambuf* sbuf_;
@@ -531,7 +523,7 @@ class buffer_source
 {
 public:
     typedef uint8_t value_type;
-    typedef binary_traits traits_type;
+    typedef byte_traits traits_type;
 private:
     const value_type* data_;
     const value_type* input_ptr_;
