@@ -968,12 +968,12 @@ public:
         {
             switch (structure_tag())
             {
-            case structure_tag_type::short_string_tag:
-                return string_view_type(short_string_data_cast()->data(),short_string_data_cast()->length());
-            case structure_tag_type::long_string_tag:
-                return string_view_type(string_data_cast()->data(),string_data_cast()->length());
-            default:
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a string"));
+                case structure_tag_type::short_string_tag:
+                    return string_view_type(short_string_data_cast()->data(),short_string_data_cast()->length());
+                case structure_tag_type::long_string_tag:
+                    return string_view_type(string_data_cast()->data(),string_data_cast()->length());
+                default:
+                    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a string"));
             }
         }
 
@@ -982,10 +982,37 @@ public:
         {
             switch (structure_tag())
             {
-            case structure_tag_type::byte_string_tag:
-                return basic_byte_string<BAllocator>(byte_string_data_cast()->data(),byte_string_data_cast()->length());
-            default:
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a byte string"));
+                case structure_tag_type::short_string_tag:
+                case structure_tag_type::long_string_tag:
+                    auto s = as_string_view();
+                    switch (semantic_tag())
+                    {
+                        case semantic_tag_type::base16:
+                        {
+                            auto v = decode_base16(s);
+                            return basic_byte_string<BAllocator>(v.data(),v.size());
+                        }
+                        case semantic_tag_type::base64:
+                        {
+                            auto v = decode_base64(s);
+                            return basic_byte_string<BAllocator>(v.data(),v.size());
+                        }
+                        case semantic_tag_type::base64url:
+                        {
+                            auto v = decode_base64url(s);
+                            return basic_byte_string<BAllocator>(v.data(),v.size());
+                        }
+                        default:
+                        {
+                            auto v = decode_base64url(s);
+                            return basic_byte_string<BAllocator>(v.data(),v.size());
+                        }
+                    }
+                    break;
+                case structure_tag_type::byte_string_tag:
+                    return basic_byte_string<BAllocator>(byte_string_data_cast()->data(),byte_string_data_cast()->length());
+                default:
+                    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a byte string"));
             }
         }
 

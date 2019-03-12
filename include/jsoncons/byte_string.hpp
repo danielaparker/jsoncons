@@ -133,7 +133,7 @@ static bool is_base64url(uint8_t c)
 }
 
 template <class CharT, class F>
-std::vector<uint8_t> decode_base64_generic(const std::basic_string<CharT>& base64_string, 
+std::vector<uint8_t> decode_base64_generic(const basic_string_view<CharT>& base64_string, 
                                            const char* alphabet, 
                                            const char* alphabet_end, 
                                            F f)
@@ -209,19 +209,31 @@ std::vector<uint8_t> decode_base64_generic(const std::basic_string<CharT>& base6
 }
 
 template <class CharT>
-std::vector<uint8_t> decode_base64(const std::basic_string<CharT>& base64_string)
+std::vector<uint8_t> decode_base64(const basic_string_view<CharT>& base64_string)
 {
     return decode_base64_generic(base64_string, base64_alphabet, base64_alphabet+65, is_base64);
 }
 
 template <class CharT>
-std::vector<uint8_t> decode_base64url(const std::basic_string<CharT>& base64_string)
+std::vector<uint8_t> decode_base64url(const basic_string_view<CharT>& base64_string)
 {
     return decode_base64_generic(base64_string, base64url_alphabet, base64url_alphabet+64, is_base64url);
 }
 
 template <class CharT>
-std::vector<uint8_t> decode_base16(const std::basic_string<CharT>& input)
+std::vector<uint8_t> decode_base64(const std::basic_string<CharT>& base64_string)
+{
+    return decode_base64_generic(basic_string_view<CharT>(base64_string), base64_alphabet, base64_alphabet+65, is_base64);
+}
+
+template <class CharT>
+std::vector<uint8_t> decode_base64url(const std::basic_string<CharT>& base64_string)
+{
+    return decode_base64_generic(basic_string_view<CharT>(base64_string), base64url_alphabet, base64url_alphabet+64, is_base64url);
+}
+
+template <class CharT>
+std::vector<uint8_t> decode_base16(const basic_string_view<CharT>& input)
 {
     static const char* const characters = "0123456789ABCDEF";
     size_t len = input.length();
@@ -251,6 +263,13 @@ std::vector<uint8_t> decode_base16(const std::basic_string<CharT>& input)
         result.push_back((uint8_t)(((p - characters) << 4) | (q - characters)));
     }
     return result;
+}
+
+
+template <class CharT>
+std::vector<uint8_t> decode_base16(const std::basic_string<CharT>& input)
+{
+    return decode_base16(basic_string_view<CharT>(input)); 
 }
 
 struct byte_traits

@@ -25,7 +25,7 @@ TEST_CASE("json_pull_reader string_value test")
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == staj_event_type::string_value);
     CHECK(reader.current().as<std::string>() == std::string("Tom"));
-    CHECK(reader.current().as<jsoncons::string_view>() == jsoncons::string_view("Tom"));
+    CHECK((reader.current().as<jsoncons::string_view>() == jsoncons::string_view("Tom")));
     reader.next();
     CHECK(reader.done());
 }
