@@ -49,6 +49,7 @@ export(EXPORT ${PROJECT_NAME}-targets
        FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake")
 
 install(DIRECTORY ${JSONCONS_INCLUDE_DIR}/jsoncons
+                  ${JSONCONS_INCLUDE_DIR}/jsoncons_ext
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # GNUInstallDirs "DATADIR" wrong here; CMake search path wants "share".
