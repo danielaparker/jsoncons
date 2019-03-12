@@ -150,7 +150,7 @@ std::vector<uint8_t> decode_base64_generic(const basic_string_view<CharT>& base6
     {
         if (!f(*first))
         {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Invalid encoded string"));
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Cannot decode encoded byte string"));
         }
 
         a4[i++] = *first++; 
@@ -239,7 +239,7 @@ std::vector<uint8_t> decode_base16(const basic_string_view<CharT>& input)
     size_t len = input.length();
     if (len & 1) 
     {
-        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Odd length"));
+        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Cannot decode encoded base16 string - odd length"));
     }
 
     std::vector<uint8_t> result;
@@ -250,14 +250,14 @@ std::vector<uint8_t> decode_base16(const basic_string_view<CharT>& input)
         const char* p = std::lower_bound(characters, characters + 16, a);
         if (*p != a) 
         {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a hex digit"));
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a hex digit. Cannot decode encoded base16 string"));
         }
 
         char b = (char)input[i + 1];
         const char* q = std::lower_bound(characters, characters + 16, b);
         if (*q != b) 
         {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a hex digit"));
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a hex digit. Cannot decode encoded base16 string"));
         }
 
         result.push_back((uint8_t)(((p - characters) << 4) | (q - characters)));
