@@ -984,6 +984,7 @@ public:
             {
                 case structure_tag_type::short_string_tag:
                 case structure_tag_type::long_string_tag:
+                {
                     auto s = as_string_view();
                     switch (semantic_tag())
                     {
@@ -1009,6 +1010,7 @@ public:
                         }
                     }
                     break;
+                }
                 case structure_tag_type::byte_string_tag:
                     return basic_byte_string<BAllocator>(byte_string_data_cast()->data(),byte_string_data_cast()->length());
                 default:
