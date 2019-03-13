@@ -547,8 +547,6 @@ int main()
 
         json_parser_examples();
 
-        byte_string_examples();
-
         more_examples();
 
         data_model_examples();
@@ -572,6 +570,8 @@ int main()
         readme_examples();
 
         cbor_examples();
+
+        byte_string_examples();
     }
     catch (const std::exception& e)
     {
