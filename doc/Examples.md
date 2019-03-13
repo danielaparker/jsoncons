@@ -22,7 +22,7 @@
 
 [Construct a json object](#C1)  
 [Construct a json array](#C2)  
-[Construct a byte string](#C6)
+[Construct a byte string](#C6)  
 [Insert a new value in an array at a specific position](#C3)  
 [Create arrays of arrays of arrays of ...](#C4)  
 [Merge two json objects](#C5)  
