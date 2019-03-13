@@ -15,7 +15,6 @@
 #include <iterator>
 #include <exception>
 #include <initializer_list>
-#include <algorithm> // std::find
 #include <utility> // std::move
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
@@ -28,7 +27,7 @@ namespace jsoncons
 template <class Container>
 size_t encode_base16(const uint8_t* data, size_t length, Container& result)
 {
-    static const char* characters = "0123456789ABCDEF";
+    static constexpr char characters[16] = "0123456789ABCDEF";
 
     for (size_t i = 0; i < length; ++i)
     {
