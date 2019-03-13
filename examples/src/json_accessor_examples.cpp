@@ -108,7 +108,7 @@ void introspection_example()
     }
 }
 
-void json_is_as_examples()
+void json_accessor_examples()
 {
     is_as_examples();
 

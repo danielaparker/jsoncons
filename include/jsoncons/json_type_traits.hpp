@@ -909,7 +909,7 @@ public:
     
     static byte_string_view as(const Json& j)
     {
-        return j.template as_byte_string_view();
+        return j.as_byte_string_view();
     }
     
     static Json to_json(const byte_string_view& val)

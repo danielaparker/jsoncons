@@ -32,8 +32,9 @@
 [Use `string_view` to access the actual memory that's being used to hold a string](#E1)  
 [Given a string in a `json` object that represents a decimal number, assign it to a double](#E2)  
 [Retrieve a big integer that's been parsed as a string](#E3)  
-[Look up a key, if found, return the value converted to type T, otherwise, return a default value of type T.](#E4)  
+[Look up a key, if found, return the value converted to type T, otherwise, return a default value of type T](#E4)  
 [Retrieve a value in a hierarchy of JSON objects](#E5)  
+[Retrieve a value as a byte string](#E6)
 
 ### Iterate
 
@@ -1086,6 +1087,64 @@ int main()
         std::cout << "(5) " << result5[0].as<std::string>() << std::endl;
     }
 }
+```
+
+<div id="E6"/>
+ 
+#### Retrieve a value as a byte string
+
+```c++
+#include <jsoncons/json.hpp>
+
+namespace jc=jsoncons;
+
+int main()
+{
+    jc::json j;
+    j["ByteString"] = jc::byte_string({'H','e','l','l','o'});
+    j["EncodedByteString"] = jc::json("SGVsbG8=", jc::semantic_tag_type::base64);
+
+    std::cout << "(1)\n";
+    std::cout << pretty_print(j) << "\n\n";
+
+    // Retrieve a byte string
+    jc::byte_string bs1 = j["ByteString"].as<jc::byte_string>();
+    std::cout << "(2) " << bs1 << "\n\n";
+
+    // Retrieve a byte string from a base64 encoding
+    jc::byte_string bs2 = j["EncodedByteString"].as<jc::byte_string>();
+    std::cout << "(3) " << bs2 << "\n\n";
+
+    // Retrieve a byte string view  to access the memory that's holding the byte string
+    jc::byte_string_view bsv3 = j["ByteString"].as<jc::byte_string_view>();
+    std::cout << "(4) " << bsv3 << "\n\n";
+
+    // Can't retrieve a byte string view of a string 
+    try
+    {
+        jc::byte_string_view bsv4 = j["EncodedByteString"].as<jc::byte_string_view>();
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << "(5) "<< e.what() << "\n\n";
+    }
+}
+```
+Output:
+```
+(1)
+{
+    "ByteString": "SGVsbG8",
+    "EncodedByteString": "SGVsbG8="
+}
+
+(2) 0x480x650x6c0x6c0x6f
+
+(3) 0x480x650x6c0x6c0x6f
+
+(4) 0x480x650x6c0x6c0x6f
+
+(5) Not a byte string
 ```
 
 ### Search and Replace

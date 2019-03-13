@@ -26,7 +26,7 @@ void ojson_examples();
 void unicode_examples();
 void csv_examples();
 void jsonpath_examples();
-void json_is_as_examples();
+void json_accessor_examples();
 void msgpack_examples();
 void jsonpointer_examples();
 void jsonpatch_examples();
@@ -533,9 +533,9 @@ int main()
 
         json_constructor_examples();
 
-        json_is_as_examples();
+        json_accessor_examples();
 
-        json_is_as_examples();
+        json_accessor_examples();
 
         jsonpatch_examples();
 

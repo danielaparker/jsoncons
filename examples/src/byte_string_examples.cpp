@@ -22,6 +22,38 @@ void construct_json_byte_string()
     std::cout << "(3) "<< j3 << "\n\n";
 }
 
+void retrieve_json_value_as_byte_string()
+{
+    jc::json j;
+    j["ByteString"] = jc::byte_string({'H','e','l','l','o'});
+    j["EncodedByteString"] = jc::json("SGVsbG8=", jc::semantic_tag_type::base64);
+
+    std::cout << "(1)\n";
+    std::cout << pretty_print(j) << "\n\n";
+
+    // Retrieve a byte string
+    jc::byte_string bs1 = j["ByteString"].as<jc::byte_string>();
+    std::cout << "(2) " << bs1 << "\n\n";
+
+    // Retrieve a byte string from a base64 encoding
+    jc::byte_string bs2 = j["EncodedByteString"].as<jc::byte_string>();
+    std::cout << "(3) " << bs2 << "\n\n";
+
+    // Retrieve a byte string view  to access the memory that's holding the byte string
+    jc::byte_string_view bsv3 = j["ByteString"].as<jc::byte_string_view>();
+    std::cout << "(4) " << bsv3 << "\n\n";
+
+    // Can't retrieve a byte string view of a string 
+    try
+    {
+        jc::byte_string_view bsv4 = j["EncodedByteString"].as<jc::byte_string_view>();
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << "(5) "<< e.what() << "\n\n";
+    }
+}
+
 void serialize_json_byte_string()
 {
     jc::byte_string bs = {'H','e','l','l','o'};
@@ -49,10 +81,10 @@ void serialize_json_byte_string()
 
 void byte_string_examples()
 {
-    serialize_json_byte_string();
-
     std::cout << "jc::byte_string examples" << "\n\n";
     construct_json_byte_string();
+    serialize_json_byte_string();
+    retrieve_json_value_as_byte_string();
 }
 
 
