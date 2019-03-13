@@ -25,7 +25,6 @@ namespace jsoncons {
 
 namespace detail {
 
-// Hack to support vs2015
 template <class Container>
 size_t encode_base64_generic(const uint8_t* first, size_t length, const char alphabet[65], Container& result)
 {
@@ -86,6 +85,7 @@ size_t encode_base64_generic(const uint8_t* first, size_t length, const char alp
     return count;
 }
 
+// Hack to support vs2015
 template <class InputIt, class F, class Container>
 typename std::enable_if<std::true_type::value && sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
 decode_base64_generic(InputIt first, InputIt last, 
