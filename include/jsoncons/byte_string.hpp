@@ -40,7 +40,7 @@ size_t encode_base16(const uint8_t* data, size_t length, Container& result)
 }
 
 template <class Container>
-size_t encode_base64_generic(const uint8_t* first, size_t length, const char* alphabet, Container& result)
+size_t encode_base64_generic(const uint8_t* first, size_t length, const char alphabet[65], Container& result)
 {
     size_t count = 0;
     const uint8_t* last = first + length;
