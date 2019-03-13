@@ -235,12 +235,12 @@ decode_base64(InputIt first, InputIt last, Container& result)
     static constexpr uint8_t reverse_alphabet[256] = {
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 62, 0xff, 0xff, 0xff, 63,
-        52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-        0xff,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
-        15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 0xff, 0xff, 0xff, 0xff, 0xff,
-        0xff, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-        41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 0xff, 0xff, 0xff, 0xff, 0xff,
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 62,   0xff, 0xff, 0xff, 63,
+        52,   53,   54,   55,   56,   57,   58,   59,   60,   61,   0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+        0xff, 0,    1,    2,    3,    4,    5,    6,    7,    8,    9,    10,   11,   12,   13,   14,
+        15,   16,   17,   18,   19,   20,   21,   22,   23,   24,   25,   0xff, 0xff, 0xff, 0xff, 0xff,
+        0xff, 26,   27,   28,   29,   30,   31,   32,   33,   34,   35,   36,   37,   38,   39,   40,
+        41,   42,   43,   44,   45,   46,   47,   48,   49,   50,   51,   0xff, 0xff, 0xff, 0xff, 0xff,
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -260,36 +260,45 @@ template <class InputIt,class Container>
 typename std::enable_if<std::true_type::value && sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
 decode_base16(InputIt first, InputIt last, Container& result)
 {
-    static constexpr char characters[] = "0123456789ABCDEF";
     size_t len = std::distance(first,last);
     if (len & 1) 
     {
         JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Cannot decode encoded base16 string - odd length"));
     }
 
-    result.reserve(result.size()+(len / 2));
-    for (InputIt it = first; it != last; ++it)
+    InputIt it = first;
+    while (it != last)
     {
-        if (!(*it >= 0 || *it < 128))
+        uint8_t val;
+        auto a = *it++;
+        if (a >= '0' && a <= '9') 
         {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a hex digit. Cannot decode encoded base16 string"));
-        }
-        char a = (char)(*it);
-        const char* p = std::lower_bound(characters, characters + 16, a);
-        if (*p != a) 
+            val = (a - '0') << 4;
+        } 
+        else if ((a | 0x20) >= 'a' && (a | 0x20) <= 'f') 
         {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a hex digit. Cannot decode encoded base16 string"));
-        }
-
-        ++it;
-        char b = (char)(*it);
-        const char* q = std::lower_bound(characters, characters + 16, b);
-        if (*q != b) 
+            val = ((a | 0x20) - 'a' + 10) << 4;
+        } 
+        else 
         {
             JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a hex digit. Cannot decode encoded base16 string"));
         }
 
-        result.push_back((uint8_t)(((p - characters) << 4) | (q - characters)));
+        auto b = *it++;
+        if (b >= '0' && b <= '9') 
+        {
+            val |= (b - '0');
+        } 
+        else if ((b | 0x20) >= 'a' && (b | 0x20) <= 'f') 
+        {
+            val |= ((b | 0x20) - 'a' + 10);
+        } 
+        else 
+        {
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a hex digit. Cannot decode encoded base16 string"));
+        }
+
+        result.push_back(val);
     }
 }
 
