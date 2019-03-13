@@ -25,15 +25,6 @@ namespace jsoncons
 
 // Algorithms
 
-static const char* base64_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                           "abcdefghijklmnopqrstuvwxyz"
-                                           "0123456789+/"
-                                           "=";
-static const char* base64url_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                              "abcdefghijklmnopqrstuvwxyz"
-                                              "0123456789-_"
-                                              "\0";
-
 template <class Container>
 size_t encode_base16(const uint8_t* data, size_t length, Container& result)
 {
@@ -111,13 +102,21 @@ size_t encode_base64_generic(const uint8_t* first, size_t length, const char* al
 template <class Container>
 size_t encode_base64url(const uint8_t* first, size_t length, Container& result)
 {
-    return encode_base64_generic(first, length, base64url_alphabet, result);
+    static constexpr char alphabet[65] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                                  "abcdefghijklmnopqrstuvwxyz"
+                                                  "0123456789-_"
+                                                  "\0";
+    return encode_base64_generic(first, length, alphabet, result);
 }
 
 template <class Container>
 size_t encode_base64(const uint8_t* first, size_t length, Container& result)
 {
-    return encode_base64_generic(first, length, base64_alphabet, result);
+    static constexpr char alphabet[65] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                               "abcdefghijklmnopqrstuvwxyz"
+                                               "0123456789+/"
+                                               "=";
+    return encode_base64_generic(first, length, alphabet, result);
 }
 
 inline 
