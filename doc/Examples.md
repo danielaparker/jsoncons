@@ -1111,7 +1111,7 @@ int main()
     jc::byte_string bs1 = j["ByteString"].as<jc::byte_string>();
     std::cout << "(2) " << bs1 << "\n\n";
 
-    // Retrieve a byte string from a base64 encoding
+    // Retrieve a byte string from a text string containing base64 character values
     jc::byte_string bs2 = j["EncodedByteString"].as<jc::byte_string>();
     std::cout << "(3) " << bs2 << "\n\n";
 
@@ -1119,7 +1119,7 @@ int main()
     jc::byte_string_view bsv3 = j["ByteString"].as<jc::byte_string_view>();
     std::cout << "(4) " << bsv3 << "\n\n";
 
-    // Can't retrieve a byte string view of a string 
+    // Can't retrieve a byte string view of a text string 
     try
     {
         jc::byte_string_view bsv4 = j["EncodedByteString"].as<jc::byte_string_view>();
