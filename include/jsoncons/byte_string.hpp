@@ -144,7 +144,7 @@ namespace detail {
 template <class Container>
 size_t encode_base16(const uint8_t* data, size_t length, Container& result)
 {
-    static constexpr char characters[16] = "0123456789ABCDEF";
+    static constexpr char characters[] = "0123456789ABCDEF";
 
     for (size_t i = 0; i < length; ++i)
     {
@@ -158,7 +158,7 @@ size_t encode_base16(const uint8_t* data, size_t length, Container& result)
 template <class Container>
 size_t encode_base64url(const uint8_t* first, size_t length, Container& result)
 {
-    static constexpr char alphabet[65] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    static constexpr char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                                   "abcdefghijklmnopqrstuvwxyz"
                                                   "0123456789-_"
                                                   "\0";
@@ -168,7 +168,7 @@ size_t encode_base64url(const uint8_t* first, size_t length, Container& result)
 template <class Container>
 size_t encode_base64(const uint8_t* first, size_t length, Container& result)
 {
-    static constexpr char alphabet[65] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    static constexpr char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                                "abcdefghijklmnopqrstuvwxyz"
                                                "0123456789+/"
                                                "=";
