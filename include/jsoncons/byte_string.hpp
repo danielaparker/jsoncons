@@ -132,19 +132,18 @@ static bool is_base64url(uint8_t c)
     return isalnum(c) || c == '-' || c == '_';
 }
 
-template <class CharT, class F>
-std::vector<uint8_t> decode_base64_generic(const basic_string_view<CharT>& base64_string, 
-                                           const char* alphabet, 
-                                           const char* alphabet_end, 
-                                           F f)
+// decode
+template <class InputIt, class F, class Container>
+typename std::enable_if<sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
+decode_base64_generic(InputIt first, InputIt last, 
+                      const char* alphabet, 
+                      const char* alphabet_end, 
+                      F f,
+                      Container& result)
 {
-    std::vector<uint8_t> result;
     uint8_t a4[4], a3[3];
     uint8_t i = 0;
     uint8_t j = 0;
-
-    auto first = base64_string.begin();
-    auto last = base64_string.end();
 
     while (first != last && *first != '=')
     {
@@ -204,56 +203,45 @@ std::vector<uint8_t> decode_base64_generic(const basic_string_view<CharT>& base6
             result.push_back(a3[j]);
         }
     }
-
-    return result;
 }
 
-template <class CharT>
-std::vector<uint8_t> decode_base64(const basic_string_view<CharT>& base64_string)
+template <class InputIt, class Container>
+typename std::enable_if<sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
+decode_base64url(InputIt first, InputIt last, Container& result)
 {
-    return decode_base64_generic(base64_string, base64_alphabet, base64_alphabet+65, is_base64);
+    decode_base64_generic(first, last, base64url_alphabet, base64url_alphabet+64, is_base64url, result);
 }
 
-template <class CharT>
-std::vector<uint8_t> decode_base64url(const basic_string_view<CharT>& base64_string)
+template <class InputIt, class Container>
+typename std::enable_if<sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
+decode_base64(InputIt first, InputIt last, Container& result)
 {
-    return decode_base64_generic(base64_string, base64url_alphabet, base64url_alphabet+64, is_base64url);
+    decode_base64_generic(first, last, base64_alphabet, base64_alphabet+65, is_base64, result);
 }
 
-template <class CharT>
-std::vector<uint8_t> decode_base64(const std::basic_string<CharT>& base64_string)
-{
-    return decode_base64_generic(basic_string_view<CharT>(base64_string), base64_alphabet, base64_alphabet+65, is_base64);
-}
-
-template <class CharT>
-std::vector<uint8_t> decode_base64url(const std::basic_string<CharT>& base64_string)
-{
-    return decode_base64_generic(basic_string_view<CharT>(base64_string), base64url_alphabet, base64url_alphabet+64, is_base64url);
-}
-
-template <class CharT>
-std::vector<uint8_t> decode_base16(const basic_string_view<CharT>& input)
+template <class InputIt,class Container>
+typename std::enable_if<sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
+decode_base16(InputIt first, InputIt last, Container& result)
 {
     static const char* const characters = "0123456789ABCDEF";
-    size_t len = input.length();
+    size_t len = std::distance(first,last);
     if (len & 1) 
     {
         JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Cannot decode encoded base16 string - odd length"));
     }
 
-    std::vector<uint8_t> result;
-    result.reserve(len / 2);
-    for (size_t i = 0; i < len; i += 2)
+    result.reserve(result.size()+(len / 2));
+    for (InputIt it = first; it != last; ++it)
     {
-        char a = (char)input[i];
+        char a = (char)(*it);
         const char* p = std::lower_bound(characters, characters + 16, a);
         if (*p != a) 
         {
             JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a hex digit. Cannot decode encoded base16 string"));
         }
 
-        char b = (char)input[i + 1];
+        ++it;
+        char b = (char)(*it);
         const char* q = std::lower_bound(characters, characters + 16, b);
         if (*q != b) 
         {
@@ -262,14 +250,6 @@ std::vector<uint8_t> decode_base16(const basic_string_view<CharT>& input)
 
         result.push_back((uint8_t)(((p - characters) << 4) | (q - characters)));
     }
-    return result;
-}
-
-
-template <class CharT>
-std::vector<uint8_t> decode_base16(const std::basic_string<CharT>& input)
-{
-    return decode_base16(basic_string_view<CharT>(input)); 
 }
 
 struct byte_traits
@@ -448,6 +428,11 @@ public:
     operator byte_string_view() const noexcept
     {
         return byte_string_view(data(),length());
+    }
+
+    void reserve(size_t new_cap)
+    {
+        data_.reserve(new_cap);
     }
 
     void push_back(uint8_t b)

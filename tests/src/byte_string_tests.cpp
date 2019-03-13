@@ -26,7 +26,8 @@ void check_encode_base64(const std::vector<uint8_t>& input, const std::string& e
         CHECK(result[i] == expected[i]);
     }
 
-    std::vector<uint8_t> output = decode_base64(result);
+    std::vector<uint8_t> output;
+    decode_base64(result.begin(), result.end(), output);
     REQUIRE(output.size() == input.size());
     for (size_t i = 0; i < output.size(); ++i)
     {
@@ -44,7 +45,8 @@ void check_encode_base64url(const std::vector<uint8_t>& input, const std::string
         CHECK(result[i] == expected[i]);
     }
 
-    std::vector<uint8_t> output = decode_base64url(result);
+    std::vector<uint8_t> output; 
+    decode_base64url(result.begin(), result.end(), output);
     REQUIRE(output.size() == input.size());
     for (size_t i = 0; i < output.size(); ++i)
     {
@@ -62,7 +64,8 @@ void check_encode_base16(const std::vector<uint8_t>& input, const std::string& e
         CHECK(result[i] == expected[i]);
     }
 
-    std::vector<uint8_t> output = decode_base16(result);
+    std::vector<uint8_t> output;
+    decode_base16(result.begin(), result.end(), output);
     REQUIRE(output.size() == input.size());
     for (size_t i = 0; i < output.size(); ++i)
     {

@@ -990,23 +990,21 @@ public:
                     {
                         case semantic_tag_type::base16:
                         {
-                            auto v = decode_base16(s);
-                            return basic_byte_string<BAllocator>(v.data(),v.size());
+                            basic_byte_string<BAllocator> bs;
+                            decode_base16(s, bs);
+                            return bs;
                         }
                         case semantic_tag_type::base64:
                         {
-                            auto v = decode_base64(s);
-                            return basic_byte_string<BAllocator>(v.data(),v.size());
-                        }
-                        case semantic_tag_type::base64url:
-                        {
-                            auto v = decode_base64url(s);
-                            return basic_byte_string<BAllocator>(v.data(),v.size());
+                            basic_byte_string<BAllocator> bs;
+                            decode_base64(s, bs);
+                            return bs;
                         }
                         default:
                         {
-                            auto v = decode_base64url(s);
-                            return basic_byte_string<BAllocator>(v.data(),v.size());
+                            basic_byte_string<BAllocator> bs;
+                            decode_base64url(s, bs);
+                            return bs;
                         }
                     }
                     break;
