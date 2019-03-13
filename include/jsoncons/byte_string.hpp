@@ -98,7 +98,7 @@ namespace detail {
 
         while (first != last && *first != '=')
         {
-            if (!(*first >= 0 && *first < 128) || !f((int)*first))
+            if (!f(*first))
             {
                 JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Cannot decode encoded byte string"));
             }
@@ -175,10 +175,16 @@ size_t encode_base64(const uint8_t* first, size_t length, Container& result)
     return detail::encode_base64_generic(first, length, alphabet, result);
 }
 
-inline 
-static bool is_base64(int c) 
+template <class Char>
+bool is_base64(Char c) 
 {
-    return isalnum(c) || c == '+' || c == '/';
+    return (c >= 0 && c < 128) && (isalnum((int)c) || c == '+' || c == '/');
+}
+
+template <class Char>
+bool is_base64url(Char c) 
+{
+    return (c >= 0 && c < 128) && (isalnum((int)c) || c == '-' || c == '_');
 }
 
 inline 
@@ -211,7 +217,11 @@ decode_base64url(InputIt first, InputIt last, Container& result)
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
     };
-    jsoncons::detail::decode_base64_generic(first, last, reverse_alphabet, is_base64url, result);
+
+    
+    jsoncons::detail::decode_base64_generic(first, last, reverse_alphabet, 
+                                            is_base64url<typename std::iterator_traits<InputIt>::value_type>, 
+                                            result);
 }
 
 template <class InputIt, class Container>
@@ -236,7 +246,9 @@ decode_base64(InputIt first, InputIt last, Container& result)
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
     };
-    jsoncons::detail::decode_base64_generic(first, last, reverse_alphabet, is_base64, result);
+    jsoncons::detail::decode_base64_generic(first, last, reverse_alphabet, 
+                                            is_base64<typename std::iterator_traits<InputIt>::value_type>, 
+                                            result);
 }
 
 template <class InputIt,class Container>
