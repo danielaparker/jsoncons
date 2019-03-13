@@ -4741,7 +4741,7 @@ typedef json_decoder<ojson> ojson_deserializer;
 typedef json_decoder<wojson> wojson_deserializer;
 #endif
 
-namespace literals {
+inline namespace literals {
 
 inline 
 jsoncons::json operator "" _json(const char* s, std::size_t n)
