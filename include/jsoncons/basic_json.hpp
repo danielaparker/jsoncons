@@ -985,24 +985,26 @@ public:
                 case structure_tag_type::short_string_tag:
                 case structure_tag_type::long_string_tag:
                 {
-                    auto s = as_string_view();
                     switch (semantic_tag())
                     {
                         case semantic_tag_type::base16:
                         {
                             basic_byte_string<BAllocator> bs;
+                            auto s = as_string_view();
                             decode_base16(s.begin(), s.end(), bs);
                             return bs;
                         }
                         case semantic_tag_type::base64:
                         {
                             basic_byte_string<BAllocator> bs;
+                            auto s = as_string_view();
                             decode_base64(s.begin(), s.end(), bs);
                             return bs;
                         }
                         case semantic_tag_type::base64url:
                         {
                             basic_byte_string<BAllocator> bs;
+                            auto s = as_string_view();
                             decode_base64url(s.begin(), s.end(), bs);
                             return bs;
                         }
