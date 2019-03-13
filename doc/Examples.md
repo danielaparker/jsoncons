@@ -18,11 +18,6 @@
 [Escape all non-ascii characters](#B3)  
 [Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.](#B4)
 
-### Convert
-
-[Convert JSON to/from C++ types](#G1)  
-[Convert JSON numbers to/from boost multiprecision numbers](#G2)
-
 ### Construct
 
 [Construct a json object](#C1)  
@@ -32,11 +27,6 @@
 [Create arrays of arrays of arrays of ...](#C4)  
 [Merge two json objects](#C5)  
 
-### Iterate
-
-[Iterate over a json array](#D1)  
-[Iterate over a json object](#D2)  
-
 ### Access
 
 [Use `string_view` to access the actual memory that's being used to hold a string](#E1)  
@@ -44,6 +34,16 @@
 [Retrieve a big integer that's been parsed as a string](#E3)  
 [Look up a key, if found, return the value converted to type T, otherwise, return a default value of type T.](#E4)  
 [Retrieve a value in a hierarchy of JSON objects](#E5)  
+
+### Iterate
+
+[Iterate over a json array](#D1)  
+[Iterate over a json object](#D2)  
+
+### Convert
+
+[Convert JSON to/from C++ types](#G1)  
+[Convert JSON numbers to/from boost multiprecision numbers](#G2)
 
 ### Search and Replace
 
