@@ -121,13 +121,13 @@ size_t encode_base64(const uint8_t* first, size_t length, Container& result)
 }
 
 inline 
-static bool is_base64(uint8_t c) 
+static bool is_base64(int c) 
 {
     return isalnum(c) || c == '+' || c == '/';
 }
 
 inline 
-static bool is_base64url(uint8_t c) 
+static bool is_base64url(int c) 
 {
     return isalnum(c) || c == '-' || c == '_';
 }
@@ -147,7 +147,7 @@ decode_base64_generic(InputIt first, InputIt last,
 
     while (first != last && *first != '=')
     {
-        if (!f(*first))
+        if (!(*first >= 0 && *first < 128) || !f((int)*first))
         {
             JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Cannot decode encoded byte string"));
         }
@@ -233,6 +233,10 @@ decode_base16(InputIt first, InputIt last, Container& result)
     result.reserve(result.size()+(len / 2));
     for (InputIt it = first; it != last; ++it)
     {
+        if (!(*it >= 0 || *it < 128))
+        {
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a hex digit. Cannot decode encoded base16 string"));
+        }
         char a = (char)(*it);
         const char* p = std::lower_bound(characters, characters + 16, a);
         if (*p != a) 
