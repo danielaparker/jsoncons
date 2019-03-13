@@ -1000,12 +1000,14 @@ public:
                             decode_base64(s.begin(), s.end(), bs);
                             return bs;
                         }
-                        default:
+                        case semantic_tag_type::base64url:
                         {
                             basic_byte_string<BAllocator> bs;
                             decode_base64url(s.begin(), s.end(), bs);
                             return bs;
                         }
+                        default:
+                            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a byte string"));
                     }
                     break;
                 }

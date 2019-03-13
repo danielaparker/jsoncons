@@ -1,3 +1,10 @@
+master
+------
+
+Enhancements
+
+- json `as_byte_string` attempts to decode string values if `semantic_tag_type` is `base64`, `base64url`, or `base16`.
+
 v0.119.1
 --------
 
