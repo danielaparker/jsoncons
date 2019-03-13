@@ -31,9 +31,12 @@ void retrieve_json_value_as_byte_string()
     std::cout << "(1)\n";
     std::cout << pretty_print(j) << "\n\n";
 
-    // Retrieve a byte string
+    // Retrieve a byte string as a jsoncons::byte_string
     jc::byte_string bs1 = j["ByteString"].as<jc::byte_string>();
     std::cout << "(2) " << bs1 << "\n\n";
+
+    // or alternatively as a std::vector<uint8_t>
+    std::vector<uint8_t> v = j["ByteString"].as<std::vector<uint8_t>>();
 
     // Retrieve a byte string from a text string containing base64 character values
     jc::byte_string bs2 = j["EncodedByteString"].as<jc::byte_string>();
