@@ -991,19 +991,19 @@ public:
                         case semantic_tag_type::base16:
                         {
                             basic_byte_string<BAllocator> bs;
-                            decode_base16(s, bs);
+                            decode_base16(s.begin(), s.end(), bs);
                             return bs;
                         }
                         case semantic_tag_type::base64:
                         {
                             basic_byte_string<BAllocator> bs;
-                            decode_base64(s, bs);
+                            decode_base64(s.begin(), s.end(), bs);
                             return bs;
                         }
                         default:
                         {
                             basic_byte_string<BAllocator> bs;
-                            decode_base64url(s, bs);
+                            decode_base64url(s.begin(), s.end(), bs);
                             return bs;
                         }
                     }
