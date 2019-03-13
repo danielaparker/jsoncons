@@ -27,7 +27,7 @@ void check_encode_base64(const std::vector<uint8_t>& input, const std::string& e
     }
 
     std::vector<uint8_t> output;
-    decode_base64(result.begin(), result.end(), output);
+    //decode_base64(result.begin(), result.end(), output);
     REQUIRE(output.size() == input.size());
     for (size_t i = 0; i < output.size(); ++i)
     {

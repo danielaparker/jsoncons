@@ -25,120 +25,122 @@ namespace jsoncons {
 
 namespace detail {
 
-    template <class Container>
-    size_t encode_base64_generic(const uint8_t* first, size_t length, const char alphabet[65], Container& result)
+// Hack to support vs2015
+template <class Container>
+size_t encode_base64_generic(const uint8_t* first, size_t length, const char alphabet[65], Container& result)
+{
+    size_t count = 0;
+    const uint8_t* last = first + length;
+    unsigned char a3[3];
+    unsigned char a4[4];
+    unsigned char fill = alphabet[64];
+    int i = 0;
+    int j = 0;
+
+    while (first != last)
     {
-        size_t count = 0;
-        const uint8_t* last = first + length;
-        unsigned char a3[3];
-        unsigned char a4[4];
-        unsigned char fill = alphabet[64];
-        int i = 0;
-        int j = 0;
-
-        while (first != last)
+        a3[i++] = *first++;
+        if (i == 3)
         {
-            a3[i++] = *first++;
-            if (i == 3)
-            {
-                a4[0] = (a3[0] & 0xfc) >> 2;
-                a4[1] = ((a3[0] & 0x03) << 4) + ((a3[1] & 0xf0) >> 4);
-                a4[2] = ((a3[1] & 0x0f) << 2) + ((a3[2] & 0xc0) >> 6);
-                a4[3] = a3[2] & 0x3f;
-
-                for (i = 0; i < 4; i++) 
-                {
-                    result.push_back(alphabet[a4[i]]);
-                    ++count;
-                }
-                i = 0;
-            }
-        }
-
-        if (i > 0)
-        {
-            for (j = i; j < 3; ++j) 
-            {
-                a3[j] = 0;
-            }
-
             a4[0] = (a3[0] & 0xfc) >> 2;
             a4[1] = ((a3[0] & 0x03) << 4) + ((a3[1] & 0xf0) >> 4);
             a4[2] = ((a3[1] & 0x0f) << 2) + ((a3[2] & 0xc0) >> 6);
+            a4[3] = a3[2] & 0x3f;
 
-            for (j = 0; j < i + 1; ++j) 
+            for (i = 0; i < 4; i++) 
             {
-                result.push_back(alphabet[a4[j]]);
+                result.push_back(alphabet[a4[i]]);
                 ++count;
             }
-
-            if (fill != 0)
-            {
-                while (i++ < 3) 
-                {
-                    result.push_back(fill);
-                    ++count;
-                }
-            }
+            i = 0;
         }
-
-        return count;
     }
 
-    template <class InputIt, class F, class Container>
-    typename std::enable_if<sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
-    decode_base64_generic(InputIt first, InputIt last, 
-                          const uint8_t reverse_alphabet[256],
-                          F f,
-                          Container& result)
+    if (i > 0)
     {
-        uint8_t a4[4], a3[3];
-        uint8_t i = 0;
-        uint8_t j = 0;
-
-        while (first != last && *first != '=')
+        for (j = i; j < 3; ++j) 
         {
-            if (!f(*first))
-            {
-                JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Cannot decode encoded byte string"));
-            }
-
-            a4[i++] = *first++; 
-            if (i == 4)
-            {
-                for (i = 0; i < 4; ++i) 
-                {
-                    a4[i] = reverse_alphabet[a4[i]];
-                }
-
-                a3[0] = (a4[0] << 2) + ((a4[1] & 0x30) >> 4);
-                a3[1] = ((a4[1] & 0xf) << 4) + ((a4[2] & 0x3c) >> 2);
-                a3[2] = ((a4[2] & 0x3) << 6) +   a4[3];
-
-                for (i = 0; i < 3; i++) 
-                {
-                    result.push_back(a3[i]);
-                }
-                i = 0;
-            }
+            a3[j] = 0;
         }
 
-        if (i > 0)
+        a4[0] = (a3[0] & 0xfc) >> 2;
+        a4[1] = ((a3[0] & 0x03) << 4) + ((a3[1] & 0xf0) >> 4);
+        a4[2] = ((a3[1] & 0x0f) << 2) + ((a3[2] & 0xc0) >> 6);
+
+        for (j = 0; j < i + 1; ++j) 
         {
-            for (j = 0; j < i; ++j) 
+            result.push_back(alphabet[a4[j]]);
+            ++count;
+        }
+
+        if (fill != 0)
+        {
+            while (i++ < 3) 
             {
-                a4[j] = reverse_alphabet[a4[j]];
+                result.push_back(fill);
+                ++count;
+            }
+        }
+    }
+
+    return count;
+}
+
+template <class InputIt, class F, class Container>
+typename std::enable_if<std::true_type::value && sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
+decode_base64_generic(InputIt first, InputIt last, 
+                      const uint8_t reverse_alphabet[256],
+                      F f,
+                      Container& result)
+{
+    uint8_t a4[4], a3[3];
+    uint8_t i = 0;
+    uint8_t j = 0;
+
+    while (first != last && *first != '=')
+    {
+        if (!f(*first))
+        {
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Cannot decode encoded byte string"));
+        }
+
+        a4[i++] = *first++; 
+        if (i == 4)
+        {
+            for (i = 0; i < 4; ++i) 
+            {
+                a4[i] = reverse_alphabet[a4[i]];
             }
 
             a3[0] = (a4[0] << 2) + ((a4[1] & 0x30) >> 4);
             a3[1] = ((a4[1] & 0xf) << 4) + ((a4[2] & 0x3c) >> 2);
+            a3[2] = ((a4[2] & 0x3) << 6) +   a4[3];
 
-            for (j = 0; j < i - 1; ++j) 
+            for (i = 0; i < 3; i++) 
             {
-                result.push_back(a3[j]);
+                result.push_back(a3[i]);
             }
+            i = 0;
         }
     }
+
+    if (i > 0)
+    {
+        for (j = 0; j < i; ++j) 
+        {
+            a4[j] = reverse_alphabet[a4[j]];
+        }
+
+        a3[0] = (a4[0] << 2) + ((a4[1] & 0x30) >> 4);
+        a3[1] = ((a4[1] & 0xf) << 4) + ((a4[2] & 0x3c) >> 2);
+
+        for (j = 0; j < i - 1; ++j) 
+        {
+            result.push_back(a3[j]);
+        }
+    }
+}
+
 }
 
 template <class Container>
@@ -195,8 +197,9 @@ static bool is_base64url(int c)
 
 // decode
 
+// Hack to support vs2015
 template <class InputIt, class Container>
-typename std::enable_if<sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
+typename std::enable_if<std::true_type::value && sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
 decode_base64url(InputIt first, InputIt last, Container& result)
 {
     static constexpr uint8_t reverse_alphabet[256] = {
@@ -224,8 +227,9 @@ decode_base64url(InputIt first, InputIt last, Container& result)
                                             result);
 }
 
+// Hack to support vs2015
 template <class InputIt, class Container>
-typename std::enable_if<sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
+typename std::enable_if<std::true_type::value && sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
 decode_base64(InputIt first, InputIt last, Container& result)
 {
     static constexpr uint8_t reverse_alphabet[256] = {
@@ -251,11 +255,12 @@ decode_base64(InputIt first, InputIt last, Container& result)
                                             result);
 }
 
+// Hack to support vs2015
 template <class InputIt,class Container>
-typename std::enable_if<sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
+typename std::enable_if<std::true_type::value && sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
 decode_base16(InputIt first, InputIt last, Container& result)
 {
-    static const char* const characters = "0123456789ABCDEF";
+    static constexpr char characters[] = "0123456789ABCDEF";
     size_t len = std::distance(first,last);
     if (len & 1) 
     {
