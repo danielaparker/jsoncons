@@ -157,7 +157,7 @@ class jsonpath_evaluator : private serializing_context
 
     static string_view_type length_literal()
     {
-        static constexpr std::array<char_type, 6> length_k = { 'l','e','n','g','t','h' };
+        static constexpr std::array<char_type, 6> length_k{ 'l','e','n','g','t','h' };
         return string_view_type{ length_k.data(),length_k.size() };
     }
 
