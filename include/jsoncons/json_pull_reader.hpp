@@ -14,10 +14,12 @@
 #include <system_error>
 #include <ios>
 #include <istream> // std::basic_istream
-#include <jsoncons/json_exception.hpp>
+#include <jsoncons/byte_string.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/parse_error_handler.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_parser.hpp>
+#include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/staj_reader.hpp>
 
 namespace jsoncons {
@@ -126,6 +128,26 @@ private:
     }
 
     void do_flush() override
+    {
+    }
+};
+
+template <class CharT>
+class basic_null_istream : public std::basic_istream<CharT>
+{
+    class null_buffer : public std::basic_streambuf<CharT>
+    {
+    public:
+        using typename std::basic_streambuf<CharT>::int_type;
+        using typename std::basic_streambuf<CharT>::traits_type;
+        int_type overflow( int_type ch = traits_type::eof() ) override
+        {
+            return ch;
+        }
+    } nb_;
+public:
+    basic_null_istream()
+      : std::basic_istream<CharT>(&nb_)
     {
     }
 };

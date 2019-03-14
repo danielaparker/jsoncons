@@ -20,7 +20,6 @@
 #include <utility> // std::move
 #include <type_traits> // std::enable_if
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_type_traits.hpp>
 
 namespace jsoncons {

@@ -7,6 +7,7 @@
 #ifndef JSONCONS_CSV_CSV_SERIALIZER_HPP
 #define JSONCONS_CSV_CSV_SERIALIZER_HPP
 
+#include <array> // std::array
 #include <string>
 #include <sstream>
 #include <vector>
@@ -26,6 +27,10 @@ namespace jsoncons { namespace csv {
 template<class CharT,class Result=jsoncons::text_stream_result<CharT>,class Allocator=std::allocator<CharT>>
 class basic_csv_serializer final : public basic_json_content_handler<CharT>
 {
+    static constexpr std::array<CharT,4> null_k = {'n','u','l','l'};
+    static constexpr std::array<CharT,4> true_k = {'t','r','u','e'};
+    static constexpr std::array<CharT,5> false_k = {'f','a','l','s','e'};
+
 public:
     typedef CharT char_type;
     using typename basic_json_content_handler<CharT>::string_view_type;
@@ -458,15 +463,15 @@ private:
 
         if ((std::isnan)(val))
         {
-            result.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
+            result.insert(null_k.data(), null_k.size());
         }
         else if (val == std::numeric_limits<double>::infinity())
         {
-            result.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
+            result.insert(null_k.data(), null_k.size());
         }
         else if (!(std::isfinite)(val))
         {
-            result.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
+            result.insert(null_k.data(), null_k.size());
         }
         else
         {
@@ -508,13 +513,11 @@ private:
 
         if (val)
         {
-            result.insert(jsoncons::detail::true_literal<CharT>().data(),
-                         jsoncons::detail::true_literal<CharT>().length());
+            result.insert(true_k.data(), true_k.size());
         }
         else
         {
-            result.insert(jsoncons::detail::false_literal<CharT>().data(),
-                         jsoncons::detail::false_literal<CharT>().length());
+            result.insert(false_k.data(), false_k.size());
         }
 
         end_value();
@@ -524,8 +527,7 @@ private:
     bool accept_null_value(AnyWriter& result) 
     {
         begin_value(result);
-        result.insert(jsoncons::detail::null_literal<CharT>().data(), 
-                     jsoncons::detail::null_literal<CharT>().length());
+        result.insert(null_k.data(), null_k.size());
         end_value();
         return true;
     }

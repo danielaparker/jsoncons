@@ -13,6 +13,7 @@
 #include <system_error>
 #include <ios>
 #include <type_traits> // std::enable_if
+#include <array> // std::array
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/bignum.hpp>
@@ -42,6 +43,10 @@ enum class staj_event_type
 template<class CharT>
 class basic_staj_event
 {
+    static constexpr std::array<CharT,4> null_k = {'n','u','l','l'};
+    static constexpr std::array<CharT,4> true_k = {'t','r','u','e'};
+    static constexpr std::array<CharT,5> false_k = {'f','a','l','s','e'};
+
     staj_event_type event_type_;
     semantic_tag_type semantic_tag_;
     union
@@ -132,21 +137,18 @@ public:
             jsoncons::string_result<T> writer(s);
             if (value_.bool_value_)
             {
-                writer.insert(jsoncons::detail::true_literal<CharT>().data(),
-                    jsoncons::detail::true_literal<CharT>().length());
+                writer.insert(true_k.data(),true_k.size());
             }
             else
             {
-                writer.insert(jsoncons::detail::false_literal<CharT>().data(),
-                    jsoncons::detail::false_literal<CharT>().length());
+                writer.insert(false_k.data(),false_k.size());
             }
             break;
         }
         case staj_event_type::null_value:
         {
             jsoncons::string_result<T> writer(s);
-            writer.insert(jsoncons::detail::null_literal<CharT>().data(),
-                jsoncons::detail::null_literal<CharT>().size());
+            writer.insert(null_k.data(),null_k.size());
             break;
         }
         default:

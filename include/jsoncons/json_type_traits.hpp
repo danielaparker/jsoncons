@@ -18,7 +18,6 @@
 #include <limits> // std::numeric_limits
 #include <type_traits> // std::enable_if
 #include <iterator> // std::iterator_traits, std::input_iterator_tag
-#include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/detail/type_traits_helper.hpp>

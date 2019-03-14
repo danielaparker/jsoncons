@@ -12,7 +12,6 @@
 #include <unordered_map> // std::unordered_map
 #include <limits> // std::numeric_limits
 #include <utility> // std::move
-#include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 
 namespace jsoncons { namespace jsonpath {

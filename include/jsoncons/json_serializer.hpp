@@ -7,13 +7,13 @@
 #ifndef JSONCONS_JSON_SERIALIZER_HPP
 #define JSONCONS_JSON_SERIALIZER_HPP
 
+#include <array> // std::array
 #include <string>
 #include <vector>
 #include <limits> // std::numeric_limits
 #include <memory>
 #include <utility> // std::move
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/json_options.hpp>
@@ -177,6 +177,9 @@ namespace jsoncons {
 template<class CharT,class Result=jsoncons::text_stream_result<CharT>>
 class basic_json_serializer final : public basic_json_content_handler<CharT>
 {
+    static constexpr std::array<CharT,4> null_k = {'n','u','l','l'};
+    static constexpr std::array<CharT,4> true_k = {'t','r','u','e'};
+    static constexpr std::array<CharT,5> false_k = {'f','a','l','s','e'};
 public:
     typedef CharT char_type;
     using typename basic_json_content_handler<CharT>::string_view_type;
@@ -634,9 +637,8 @@ private:
             }
         }
 
-        result_.insert(jsoncons::detail::null_literal<CharT>().data(), 
-                       jsoncons::detail::null_literal<CharT>().size());
-        column_ += jsoncons::detail::null_literal<CharT>().size();
+        result_.insert(null_k.data(), null_k.size());
+        column_ += null_k.size();
 
         end_value();
         return true;
@@ -776,8 +778,8 @@ private:
             }
             else
             {
-                result_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
-                column_ += jsoncons::detail::null_literal<CharT>().length();
+                result_.insert(null_k.data(), null_k.size());
+                column_ += null_k.size();
             }
         }
         else if (value == std::numeric_limits<double>::infinity())
@@ -793,8 +795,8 @@ private:
             }
             else
             {
-                result_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
-                column_ += jsoncons::detail::null_literal<CharT>().length();
+                result_.insert(null_k.data(), null_k.size());
+                column_ += null_k.size();
             }
         }
         else if (!(std::isfinite)(value))
@@ -810,8 +812,8 @@ private:
             }
             else
             {
-                result_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
-                column_ += jsoncons::detail::null_literal<CharT>().length();
+                result_.insert(null_k.data(), null_k.size());
+                column_ += null_k.size();
             }
         }
         else
@@ -882,13 +884,13 @@ private:
 
         if (value)
         {
-            result_.insert(jsoncons::detail::true_literal<CharT>().data(), jsoncons::detail::true_literal<CharT>().length());
-            column_ += jsoncons::detail::true_literal<CharT>().length();
+            result_.insert(true_k.data(), true_k.size());
+            column_ += true_k.size();
         }
         else
         {
-            result_.insert(jsoncons::detail::false_literal<CharT>().data(), jsoncons::detail::false_literal<CharT>().length());
-            column_ += jsoncons::detail::false_literal<CharT>().length();
+            result_.insert(false_k.data(), false_k.size());
+            column_ += false_k.size();
         }
 
         end_value();
@@ -1020,6 +1022,9 @@ private:
 template<class CharT,class Result=jsoncons::text_stream_result<CharT>>
 class basic_json_compressed_serializer final : public basic_json_content_handler<CharT>
 {
+    static constexpr std::array<CharT,4> null_k = {'n','u','l','l'};
+    static constexpr std::array<CharT,4> true_k = {'t','r','u','e'};
+    static constexpr std::array<CharT,5> false_k = {'f','a','l','s','e'};
 public:
     typedef CharT char_type;
     using typename basic_json_content_handler<CharT>::string_view_type;
@@ -1200,8 +1205,7 @@ private:
             result_.push_back(',');
         }
 
-        result_.insert(jsoncons::detail::null_literal<CharT>().data(), 
-                      jsoncons::detail::null_literal<CharT>().size());
+        result_.insert(null_k.data(), null_k.size());
 
         if (!stack_.empty())
         {
@@ -1375,7 +1379,7 @@ private:
             }
             else
             {
-                result_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
+                result_.insert(null_k.data(), null_k.size());
             }
         }
         else if (value == std::numeric_limits<double>::infinity())
@@ -1390,7 +1394,7 @@ private:
             }
             else
             {
-                result_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
+                result_.insert(null_k.data(), null_k.size());
             }
         }
         else if (!(std::isfinite)(value))
@@ -1405,7 +1409,7 @@ private:
             }
             else
             {
-                result_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
+                result_.insert(null_k.data(), null_k.size());
             }
         }
         else
@@ -1461,13 +1465,11 @@ private:
 
         if (value)
         {
-            result_.insert(jsoncons::detail::true_literal<CharT>().data(),
-                           jsoncons::detail::true_literal<CharT>().length());
+            result_.insert(true_k.data(), true_k.size());
         }
         else
         {
-            result_.insert(jsoncons::detail::false_literal<CharT>().data(),
-                           jsoncons::detail::false_literal<CharT>().length());
+            result_.insert(false_k.data(), false_k.size());
         }
 
         if (!stack_.empty())

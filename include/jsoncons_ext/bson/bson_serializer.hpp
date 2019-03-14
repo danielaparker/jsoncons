@@ -13,7 +13,6 @@
 #include <memory>
 #include <utility> // std::move
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons/result.hpp>
