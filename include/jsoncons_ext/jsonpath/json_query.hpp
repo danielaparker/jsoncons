@@ -7,6 +7,7 @@
 #ifndef JSONCONS_JSONPATH_JSON_QUERY_HPP
 #define JSONCONS_JSONPATH_JSON_QUERY_HPP
 
+#include <array> // std::array
 #include <string>
 #include <vector>
 #include <memory>
@@ -147,13 +148,18 @@ template<class Json,
          class PathCons>
 class jsonpath_evaluator : private serializing_context
 {
-private:
     typedef typename Json::char_type char_type;
     typedef typename Json::char_traits_type char_traits_type;
     typedef std::basic_string<char_type,char_traits_type> string_type;
     typedef typename Json::string_view_type string_view_type;
     typedef JsonReference reference;
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
+
+    static string_view_type length_literal()
+    {
+        static constexpr std::array<char_type, 6> length_k = { 'l','e','n','g','t','h' };
+        return string_view_type{ length_k.data(),length_k.size() };
+    }
 
     struct node_type
     {
@@ -174,12 +180,6 @@ private:
         pointer val_ptr;
     };
     typedef std::vector<node_type> node_set;
-
-    static string_view_type length_literal() 
-    {
-        static const char_type data[] = {'l','e','n','g','t','h'};
-        return string_view_type{data,sizeof(data)/sizeof(char_type)};
-    }
 
     class selector
     {

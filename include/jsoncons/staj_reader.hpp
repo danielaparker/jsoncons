@@ -43,9 +43,21 @@ enum class staj_event_type
 template<class CharT>
 class basic_staj_event
 {
-    static constexpr std::array<CharT,4> null_k = {'n','u','l','l'};
-    static constexpr std::array<CharT,4> true_k = {'t','r','u','e'};
-    static constexpr std::array<CharT,5> false_k = {'f','a','l','s','e'};
+    static constexpr const std::array<CharT, 4>& null_k()
+    {
+        static constexpr std::array<CharT,4> k = {'n','u','l','l'};
+        return k;
+    }
+    static constexpr const std::array<CharT, 4>& true_k()
+    {
+        static constexpr std::array<CharT,4> k = {'t','r','u','e'};
+        return k;
+    }
+    static constexpr const std::array<CharT, 5>& false_k()
+    {
+        static constexpr std::array<CharT,5> k = {'f','a','l','s','e'};
+        return k;
+    }
 
     staj_event_type event_type_;
     semantic_tag_type semantic_tag_;
@@ -137,18 +149,18 @@ public:
             jsoncons::string_result<T> writer(s);
             if (value_.bool_value_)
             {
-                writer.insert(true_k.data(),true_k.size());
+                writer.insert(true_k().data(),true_k().size());
             }
             else
             {
-                writer.insert(false_k.data(),false_k.size());
+                writer.insert(false_k().data(),false_k().size());
             }
             break;
         }
         case staj_event_type::null_value:
         {
             jsoncons::string_result<T> writer(s);
-            writer.insert(null_k.data(),null_k.size());
+            writer.insert(null_k().data(),null_k().size());
             break;
         }
         default:

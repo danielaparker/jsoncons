@@ -27,9 +27,21 @@ namespace jsoncons { namespace csv {
 template<class CharT,class Result=jsoncons::text_stream_result<CharT>,class Allocator=std::allocator<CharT>>
 class basic_csv_serializer final : public basic_json_content_handler<CharT>
 {
-    static constexpr std::array<CharT,4> null_k = {'n','u','l','l'};
-    static constexpr std::array<CharT,4> true_k = {'t','r','u','e'};
-    static constexpr std::array<CharT,5> false_k = {'f','a','l','s','e'};
+    static constexpr const std::array<CharT, 4>& null_k()
+    {
+        static constexpr std::array<CharT,4> k = {'n','u','l','l'};
+        return k;
+    }
+    static constexpr const std::array<CharT, 4>& true_k()
+    {
+        static constexpr std::array<CharT,4> k = {'t','r','u','e'};
+        return k;
+    }
+    static constexpr const std::array<CharT, 5>& false_k()
+    {
+        static constexpr std::array<CharT,5> k = {'f','a','l','s','e'};
+        return k;
+    }
 
 public:
     typedef CharT char_type;
@@ -463,15 +475,15 @@ private:
 
         if ((std::isnan)(val))
         {
-            result.insert(null_k.data(), null_k.size());
+            result.insert(null_k().data(), null_k().size());
         }
         else if (val == std::numeric_limits<double>::infinity())
         {
-            result.insert(null_k.data(), null_k.size());
+            result.insert(null_k().data(), null_k().size());
         }
         else if (!(std::isfinite)(val))
         {
-            result.insert(null_k.data(), null_k.size());
+            result.insert(null_k().data(), null_k().size());
         }
         else
         {
@@ -513,11 +525,11 @@ private:
 
         if (val)
         {
-            result.insert(true_k.data(), true_k.size());
+            result.insert(true_k().data(), true_k().size());
         }
         else
         {
-            result.insert(false_k.data(), false_k.size());
+            result.insert(false_k().data(), false_k().size());
         }
 
         end_value();
@@ -527,7 +539,7 @@ private:
     bool accept_null_value(AnyWriter& result) 
     {
         begin_value(result);
-        result.insert(null_k.data(), null_k.size());
+        result.insert(null_k().data(), null_k().size());
         end_value();
         return true;
     }
