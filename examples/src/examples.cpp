@@ -567,11 +567,11 @@ int main()
 
         jsonpointer_examples();
 
-        readme_examples();
-
         cbor_examples();
 
         byte_string_examples();
+
+        readme_examples();
     }
     catch (const std::exception& e)
     {

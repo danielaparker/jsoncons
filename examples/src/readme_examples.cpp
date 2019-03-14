@@ -28,7 +28,7 @@ namespace readme
         writer.flush();
 
         // Print bytes
-        std::cout << "(1)\n";
+        std::cout << "(1) ";
         for (auto c : b)
         {
             std::cout << std::hex << std::setprecision(2) << std::setw(2)
@@ -58,7 +58,7 @@ namespace readme
         }
         std::cout << "\n";
 
-        // Get element at position 0/2 using jsonpointer 
+        // Get bignum value at position 0/2 using jsonpointer 
         json& v = jsonpointer::get(j, "/0/2");
         std::cout << "(3) " << v.as<std::string>() << "\n\n";
 
@@ -85,7 +85,7 @@ namespace readme
         std::cout << "(6)\n";
         std::cout << pretty_print(j) << "\n\n";
 
-        // Get element at position /1/2 using jsonpointer
+        // Get big decimal value at position /1/2 using jsonpointer
         json& ref = jsonpointer::get(j, "/1/2");
         std::cout << "(7) " << ref.as<std::string>() << "\n\n";
 
@@ -94,12 +94,25 @@ namespace readme
         __int128 i = j[1][2].as<__int128>();
 #endif
 
+        // Get byte string value at position /1/1 as a byte_string
+        byte_string bs = j[1][1].as<byte_string>();
+        std::cout << "(8) ";
+        for (auto c : bs)
+        {
+            std::cout << std::hex << std::setprecision(2) << std::setw(2)
+                      << std::setfill('0') << static_cast<int>(c);
+        }
+        std::cout << "\n\n";
+
+        // or alternatively as a std::vector<uint8_t>
+        std::vector<uint8_t> u = j[1][1].as<std::vector<uint8_t>>();
+
         // Repack bytes
         std::vector<uint8_t> b2;
         cbor::encode_cbor(j, b2);
 
         // Print the repacked bytes
-        std::cout << "(8)\n";
+        std::cout << "(9) ";
         for (auto c : b2)
         {
             std::cout << std::hex << std::setprecision(2) << std::setw(2)
@@ -131,10 +144,8 @@ namespace readme
         csv::csv_options csv_options;
         csv_options.column_names("Column 1,Column 2,Column 3");
 
-        std::string csv;
-        csv::encode_csv(j, csv, csv_options);
-        std::cout << "(9)\n";
-        std::cout << csv << "\n\n";
+        std::cout << "(10)\n";
+        csv::encode_csv(j, std::cout, csv_options);
     }
 }
 
