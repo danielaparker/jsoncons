@@ -34,7 +34,7 @@
 [Retrieve a big integer that's been parsed as a string](#E3)  
 [Look up a key, if found, return the value converted to type T, otherwise, return a default value of type T](#E4)  
 [Retrieve a value in a hierarchy of JSON objects](#E5)  
-[Retrieve a value as a byte string](#E6)
+[Retrieve a json value as a byte string](#E6)
 
 ### Iterate
 
@@ -1091,7 +1091,7 @@ int main()
 
 <div id="E6"/>
  
-#### Retrieve a value as a byte string
+#### Retrieve a json value as a byte string
 
 ```c++
 #include <jsoncons/json.hpp>
