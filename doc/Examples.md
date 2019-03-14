@@ -22,10 +22,10 @@
 
 [Construct a json object](#C1)  
 [Construct a json array](#C2)  
-[Construct a byte string](#C6)  
 [Insert a new value in an array at a specific position](#C3)  
 [Create arrays of arrays of arrays of ...](#C4)  
 [Merge two json objects](#C5)  
+[Construct a json byte string](#C6)  
 
 ### Access
 
@@ -774,42 +774,6 @@ or use an array initializer-list,
 json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
 ```
 
-<div id="C6"/>
-
-#### Construct a byte string
-
-```c++
-#include <jsoncons/json.hpp>
-
-namespace jc=jsoncons;
-
-int main()
-{
-    jc::byte_string bs = {'H','e','l','l','o'};
-
-    // default suggested encoding (base64url)
-    jc::json j1(bs);
-    std::cout << "(1) "<< j1 << "\n\n";
-
-    // base64 suggested encoding
-    jc::json j2(bs, jc::semantic_tag_type::base64);
-    std::cout << "(2) "<< j2 << "\n\n";
-
-    // base16 suggested encoding
-    jc::json j3(bs, jc::semantic_tag_type::base16);
-    std::cout << "(3) "<< j3 << "\n\n";
-}
-```
-
-Output:
-```
-(1) "SGVsbG8"
-
-(2) "SGVsbG8="
-
-(3) "48656C6C6F"
-```
-
 <div id="C3"/>
 
 #### Insert a new value in an array at a specific position
@@ -914,6 +878,42 @@ Output:
     "b": [1,2,3],
     "c": [4,5,6]
 }
+```
+
+<div id="C6"/>
+
+#### Construct a json byte string
+
+```c++
+#include <jsoncons/json.hpp>
+
+namespace jc=jsoncons;
+
+int main()
+{
+    jc::byte_string bs = {'H','e','l','l','o'};
+
+    // default suggested encoding (base64url)
+    jc::json j1(bs);
+    std::cout << "(1) "<< j1 << "\n\n";
+
+    // base64 suggested encoding
+    jc::json j2(bs, jc::semantic_tag_type::base64);
+    std::cout << "(2) "<< j2 << "\n\n";
+
+    // base16 suggested encoding
+    jc::json j3(bs, jc::semantic_tag_type::base16);
+    std::cout << "(3) "<< j3 << "\n\n";
+}
+```
+
+Output:
+```
+(1) "SGVsbG8"
+
+(2) "SGVsbG8="
+
+(3) "48656C6C6F"
 ```
 
 ### Iterate
