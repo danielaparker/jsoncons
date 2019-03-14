@@ -662,7 +662,7 @@ struct json_type_traits<Json, T,
 
     static T as(const Json& j)
     {
-   	    return T(j.as_string_view());
+   	    return T(j.as_string_view().data(),j.as_string_view().size());
     }
 
     static Json to_json(const T& val)
