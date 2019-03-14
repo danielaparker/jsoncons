@@ -398,7 +398,11 @@ public:
     friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const byte_string_view& o)
     {
         std::basic_ostringstream<CharT> ss;
-        ss.flags(std::ios::hex | std::ios::showbase);
+        ss.flags(std::ios::hex);
+        ss.precision(2);
+        ss.width(2);
+        ss.fill('0');
+
         for (auto b : o)
         {
             ss << (int)b;

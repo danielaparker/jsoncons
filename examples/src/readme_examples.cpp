@@ -96,13 +96,7 @@ namespace readme
 
         // Get byte string value at position /1/1 as a byte_string
         byte_string bs = j[1][1].as<byte_string>();
-        std::cout << "(8) ";
-        for (auto c : bs)
-        {
-            std::cout << std::hex << std::setprecision(2) << std::setw(2)
-                      << std::setfill('0') << static_cast<int>(c);
-        }
-        std::cout << "\n\n";
+        std::cout << "(8) " << bs << "\n\n";
 
         // or alternatively as a std::vector<uint8_t>
         std::vector<uint8_t> u = j[1][1].as<std::vector<uint8_t>>();
