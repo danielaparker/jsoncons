@@ -5,36 +5,38 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <iomanip>
 #include <jsoncons/json.hpp>
 
-struct book
-{
-    std::string author;
-    std::string title;
-    double price;
-};
+namespace jc = jsoncons;
 
-namespace jsoncons
-{
+namespace ns {
+    struct book
+    {
+        std::string author;
+        std::string title;
+        double price;
+    };
+} // namespace ns
+
+namespace jsoncons {
     template<class Json>
-    struct json_type_traits<Json, book>
+    struct json_type_traits<Json, ns::book>
     {
         static bool is(const Json& j) noexcept
         {
-            return j.is_object() &&
-                   j.contains("author") && 
-                   j.contains("title") && 
-                   j.contains("price");
+            return j.is_object() && j.contains("author") && 
+                   j.contains("title") && j.contains("price");
         }
-        static book as(const Json& j)
+        static ns::book as(const Json& j)
         {
-            book val;
+            ns::book val;
             val.author = j["author"].template as<std::string>();
             val.title = j["title"].template as<std::string>();
             val.price = j["price"].template as<double>();
             return val;
         }
-        static Json to_json(const book& val)
+        static Json to_json(const ns::book& val)
         {
             Json j;
             j["author"] = val.author;
@@ -43,37 +45,37 @@ namespace jsoncons
             return j;
         }
     };
-} // jsoncons
+} // namespace jsoncons
 
 void book_extensibility_example()
 {
     using jsoncons::json;
 
-    book book1{"Haruki Murakami", "Kafka on the Shore", 25.17};
+    ns::book book1{"Haruki Murakami", "Kafka on the Shore", 25.17};
 
     json j = book1;
 
-    std::cout << "(1) " << std::boolalpha << j.is<book>() << "\n\n";
+    std::cout << "(1) " << std::boolalpha << j.is<ns::book>() << "\n\n";
 
     std::cout << "(2) " << pretty_print(j) << "\n\n";
 
-    book temp = j.as<book>();
+    ns::book temp = j.as<ns::book>();
     std::cout << "(3) " << temp.author << "," 
                         << temp.title << "," 
                         << temp.price << "\n\n";
 
-    book book2{"Charles Bukowski", "Women: A Novel", 12.0};
+    ns::book book2{"Charles Bukowski", "Women: A Novel", 12.0};
 
-    std::vector<book> book_array{book1, book2};
+    std::vector<ns::book> book_array{book1, book2};
 
     json ja = book_array;
 
     std::cout << "(4) " << std::boolalpha 
-                        << ja.is<std::vector<book>>() << "\n\n";
+                        << ja.is<std::vector<ns::book>>() << "\n\n";
 
     std::cout << "(5)\n" << pretty_print(ja) << "\n\n";
 
-    auto book_list = ja.as<std::list<book>>();
+    auto book_list = ja.as<std::list<ns::book>>();
 
     std::cout << "(6)" << std::endl;
     for (auto b : book_list)
@@ -86,13 +88,7 @@ void book_extensibility_example()
 
 void book_extensibility_example2()
 {
-    // For convenience
-    using jsoncons::json;
-    using jsoncons::decode_json;
-    using jsoncons::encode_json;
-    using jsoncons::indenting;
-
-    std::string s = R"(
+    const std::string s = R"(
     [
         {
             "author" : "Haruki Murakami",
@@ -107,18 +103,19 @@ void book_extensibility_example2()
     ]
     )";
 
-    std::vector<book> book_list = decode_json<std::vector<book>>(s);
+    std::vector<ns::book> book_list = jc::decode_json<std::vector<ns::book>>(s);
 
     std::cout << "(1)\n";
-    for (auto book : book_list)
+    for (auto item : book_list)
     {
-        std::cout << book.author << ", " 
-                  << book.title << ", " 
-                  << book.price << "\n";
+        std::cout << item.author << ", " 
+                  << item.title << ", " 
+                  << item.price << "\n";
     }
+
     std::cout << "\n(2)\n";
-    encode_json(book_list, std::cout, indenting::indent);
-    std::cout << "\n";
+    jc::encode_json(book_list, std::cout, jc::indenting::indent);
+    std::cout << "\n\n";
 }
 
 //own vector will always be of an even length 
@@ -171,6 +168,8 @@ void own_vector_extensibility_example()
 
 void type_extensibility_examples()
 {
+    std::cout << std::setprecision(6);
+
     std::cout << "\nType extensibility examples\n\n";
 
     book_extensibility_example();

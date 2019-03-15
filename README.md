@@ -196,21 +196,123 @@ The library includes four instantiations of `basic_json`:
 
 ## More examples
 
+[Conversion between JSON and C++ objects](#conversion-between-JSON-and-C++-objects)
+
 [Playing around with CBOR, JSON, and CSV](#Playing-around-with-CBOR,-JSON,-and-CSV)
 
 [Query CBOR with JSONPath](#Query-CBOR-with-JSONPath)
-
-[Convert json values to standard library types and back](#Convert-json-values-to-standard-library-types-and-back)
-
-[Convert json values to user defined types and back](#Convert-json-values-to-user-defined-types-and-back)
-
-[General json_decode and json_encode functions](#General-json_decode-and-json_encode-functions)
 
 [Pull parser example](#pull-parser-example)
 
 [Iterate over a json stream with staj iterators](#Iterate-over-a-json-stream-with-staj-iterators)
 
 [Dump json content into a larger document](#Dump-json-content-into-a-larger-document)
+
+### conversion-between-JSON-and-C++-objects
+
+The functions [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) convert JSON 
+formatted strings or streams to C++ objects and back. [decode_json](doc/ref/decode_json.md) 
+and [encode_json](doc/ref/encode_json.md) will work for all C++ classes that have 
+[json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
+defined.
+
+```c++
+#include <iostream>
+#include <jsoncons/json.hpp>
+
+namespace jc = jsoncons;
+
+namespace ns {
+    struct book
+    {
+        std::string author;
+        std::string title;
+        double price;
+    };
+} // namespace ns
+
+namespace jsoncons {
+    template<class Json>
+    struct json_type_traits<Json, ns::book>
+    {
+        static bool is(const Json& j) noexcept
+        {
+            return j.is_object() && j.contains("author") && 
+                   j.contains("title") && j.contains("price");
+        }
+        static ns::book as(const Json& j)
+        {
+            ns::book val;
+            val.author = j["author"].template as<std::string>();
+            val.title = j["title"].template as<std::string>();
+            val.price = j["price"].template as<double>();
+            return val;
+        }
+        static Json to_json(const ns::book& val)
+        {
+            Json j;
+            j["author"] = val.author;
+            j["title"] = val.title;
+            j["price"] = val.price;
+            return j;
+        }
+    };
+} // namespace jsoncons
+
+int main()
+{
+    const std::string s = R"(
+    [
+        {
+            "author" : "Haruki Murakami",
+            "title" : "Kafka on the Shore",
+            "price" : 25.17
+        },
+        {
+            "author" : "Charles Bukowski",
+            "title" : "Pulp",
+            "price" : 22.48
+        }
+    ]
+    )";
+
+    std::vector<ns::book> book_list = jc::decode_json<std::vector<ns::book>>(s);
+
+    std::cout << "(1)\n";
+    for (auto item : book_list)
+    {
+        std::cout << item.author << ", " 
+                  << item.title << ", " 
+                  << item.price << "\n";
+    }
+
+    std::cout << "\n(2)\n";
+    jc::encode_json(book_list, std::cout, jc::indenting::indent);
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+(1)
+Haruki Murakami, Kafka on the Shore, 25.17
+Charles Bukowski, Pulp, 22.48
+
+(2)
+[
+    {
+        "author": "Haruki Murakami",
+        "price": 25.17,
+        "title": "Kafka on the Shore"
+    },
+    {
+        "author": "Charles Bukowski",
+        "price": 22.48,
+        "title": "Pulp"
+    }
+]
+```
+
+See [type extensibility](doc/Tutorials/Type%20Extensibility.md)
 
 ### Playing around with CBOR, JSON, and CSV
 
@@ -498,117 +600,6 @@ Output:
     "1.23456789012345678901234567890"
 ]
 ```
-
-### Convert json values to standard library types and back
-
-```c++
-std::vector<int> v{1, 2, 3, 4};
-json j(v);
-std::cout << "(1) "<< j << std::endl;
-std::deque<int> d = j.as<std::deque<int>>();
-
-std::map<std::string,int> m{{"one",1},{"two",2},{"three",3}};
-json j(m);
-std::cout << "(2) " << j << std::endl;
-std::unordered_map<std::string,int> um = j.as<std::unordered_map<std::string,int>>();
-```
-Output:
-```
-(1) [1,2,3,4]
-
-(2) {"one":1,"three":3,"two":2}
-```
-
-See [json_type_traits](doc/ref/json_type_traits.md)
-
-### Convert json values to user defined types and back
-
-(also standard library containers of user defined types)
-
-```c++
-struct book
-{
-    std::string author;
-    std::string title;
-    double price;
-};
-
-namespace jsoncons
-{
-    template<class Json>
-    struct json_type_traits<Json, book>
-    {
-        // Implement static functions is, as and to_json 
-    };
-}        
-
-book book1{"Haruki Murakami", "Kafka on the Shore", 25.17};
-book book2{"Charles Bukowski", "Women: A Novel", 12.0};
-
-std::vector<book> v{book1, book2};
-
-json j = v;
-
-std::list<book> l = j.as<std::list<book>>();
-```
-
-See [Type Extensibility](doc/Tutorials/Type%20Extensibility.md) for details.
-
-### General json_decode and json_encode functions
-
-The functions `decode_json` and `encode_json` convert JSON 
-formatted strings or streams to C++ objects and back. `decode_json` 
-and `encode_json` will work for all C++ classes that have 
-[json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
-defined.
-
-```c++
-#include <iostream>
-#include <map>
-#include <tuple>
-#include <jsoncons/json.hpp>
-
-using namespace jsoncons;
-
-int main()
-{
-    typedef std::map<std::string,std::tuple<std::string,std::string,double>> employee_collection;
-
-    employee_collection employees = 
-    { 
-        {"John Smith",{"Hourly","Software Engineer",10000}},
-        {"Jane Doe",{"Commission","Sales",20000}}
-    };
-
-    std::string s;
-    jsoncons::encode_json(employees, s, jsoncons::indenting::indent);
-    std::cout << "(1)\n" << s << std::endl;
-    auto employees2 = jsoncons::decode_json<employee_collection>(s);
-
-    std::cout << "\n(2)\n";
-    for (const auto& pair : employees2)
-    {
-        std::cout << pair.first << ": " << std::get<1>(pair.second) << std::endl;
-    }
-}
-```
-Output:
-```
-(1)
-{
-    "Jane Doe": ["Commission","Sales",20000.0],
-    "John Smith": ["Hourly","Software Engineer",10000.0]
-}
-
-(2)
-Jane Doe: Sales
-John Smith: Software Engineer
-```
-
-`decode_json` and `encode_json` are supported for many standard library types, and for  
-[user defined types](doc/Tutorials/Type%20Extensibility.md)
-
-See [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) 
 
 ### Pull parser example
 
