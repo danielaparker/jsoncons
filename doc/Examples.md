@@ -43,7 +43,7 @@
 
 ### Convert
 
-[Convert JSON to/from C++ types](#G1)  
+[Convert JSON to/from C++ objects](#G1)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G2)
 
 ### Search and Replace
@@ -566,7 +566,7 @@ Output:
 
 <div id="G1"/>
 
-#### Convert JSON to/from C++ types
+#### Convert JSON to/from C++ objects
 
 ```c++
 #include <iostream>
