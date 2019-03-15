@@ -196,17 +196,19 @@ The library includes four instantiations of `basic_json`:
 
 ## More examples
 
-[Conversion between JSON and C++ objects](#Conversion-between-JSON-and-C++-objects)
+[Conversion between JSON and C++ objects](#E1)  
 
 [Playing around with CBOR, JSON, and CSV](#E2)  
 
-[Query CBOR with JSONPath](#Query-CBOR-with-JSONPath)
+[Query CBOR with JSONPath](#E3)  
 
-[Pull parser example](#pull-parser-example)
+[Pull parser example](#E4)  
 
-[Iterate over a json stream with staj iterators](#Iterate-over-a-json-stream-with-staj-iterators)
+[Iterate over a json stream with staj iterators](#E5)  
 
-[Dump json content into a larger document](#Dump-json-content-into-a-larger-document)
+[Dump json content into a larger document](#E6)  
+
+<div id="E1"/> 
 
 ### Conversion between JSON and C++ objects
 
@@ -494,6 +496,8 @@ foo,UHVzcw,-18446744073709551617
 bar,UHVzcw==,273.15
 ```
 
+<div id="E3"/> 
+
 ### Query CBOR with JSONPath
 ```c++
 #include <jsoncons/json.hpp>
@@ -602,6 +606,8 @@ Output:
     "1.23456789012345678901234567890"
 ]
 ```
+
+<div id="E4"/> 
 
 ### Pull parser example
 
@@ -718,6 +724,8 @@ end_object
 end_array
 ```
 
+<div id="E5"/> 
+
 #### Implementing a staj_filter
 
 ```c++
@@ -824,6 +832,8 @@ Output:
 }
 ```
 See [staj_array_iterator](doc/ref/staj_array_iterator.md) and [staj_object_iterator](doc/ref/staj_object_iterator.md)
+
+<div id="E6"/> 
 
 ### Dump json content into a larger document
 
