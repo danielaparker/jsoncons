@@ -196,7 +196,7 @@ The library includes four instantiations of `basic_json`:
 
 ## More examples
 
-[Conversion between JSON and C++ objects](#conversion-between-JSON-and-C++-objects)
+[Conversion between JSON and C++ objects](#Conversion-between-JSON-and-C++-objects)
 
 [Playing around with CBOR, JSON, and CSV](#Playing-around-with-CBOR,-JSON,-and-CSV)
 
@@ -208,7 +208,7 @@ The library includes four instantiations of `basic_json`:
 
 [Dump json content into a larger document](#Dump-json-content-into-a-larger-document)
 
-### conversion-between-JSON-and-C++-objects
+### Conversion between JSON and C++ objects
 
 The functions [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) convert JSON 
 formatted strings or streams to C++ objects and back. [decode_json](doc/ref/decode_json.md) 
