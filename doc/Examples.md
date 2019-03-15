@@ -29,8 +29,8 @@
 
 ### Access
 
-[Use `string_view` to access the actual memory that's being used to hold a string](#E1)  
-[Given a string in a `json` object that represents a decimal number, assign it to a double](#E2)  
+[Use string_view to access the actual memory that's being used to hold a string](#E1)  
+[Given a string in a json object that represents a decimal number, assign it to a double](#E2)  
 [Retrieve a big integer that's been parsed as a string](#E3)  
 [Look up a key, if found, return the value converted to type T, otherwise, return a default value of type T](#E4)  
 [Retrieve a value in a hierarchy of JSON objects](#E5)  
@@ -951,7 +951,7 @@ for (const auto& member : j.object_range())
 
 <div id="E1"/>
 
-#### Use `string_view` to access the actual memory that's being used to hold a string
+#### Use string_view to access the actual memory that's being used to hold a string
 
 You can use `j.as<jsoncons::string_view>()`, e.g.
 ```c++
@@ -964,7 +964,7 @@ If your compiler supports `std::string_view`, you can also use `j.as<std::string
 
 <div id="E2"/>
 
-#### Given a string in a `json` object that represents a decimal number, assign it to a double
+#### Given a string in a json object that represents a decimal number, assign it to a double
 
 ```c++
 json j = json::object{
