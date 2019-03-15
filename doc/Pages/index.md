@@ -778,7 +778,11 @@ The implementations of these functions and operators make use of the class templ
 
 If you want to use the json constructor, `is<T>`, `as<T>`, `operator=`, `push_back`, `insert`, and `insert_or_assign` to access or modify with a new type, you need to show `json` how to interact with that type, by extending `json_type_traits` in the `jsoncons` namespace.
 
-Note that the json::is<T>() and json::as<T>() functions accept template packs, which they forward to the `json_type_traits` `is` and `as` functions.
+The functions [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) convert JSON 
+formatted strings or streams to C++ objects and back. [decode_json](doc/ref/decode_json.md) 
+and [encode_json](doc/ref/encode_json.md) will work for all C++ classes that have 
+[json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
+defined.
 
 ```c++
 #include <iostream>
