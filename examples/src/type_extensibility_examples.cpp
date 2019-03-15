@@ -106,7 +106,7 @@ void book_extensibility_example2()
     std::vector<ns::book> book_list = jc::decode_json<std::vector<ns::book>>(s);
 
     std::cout << "(1)\n";
-    for (auto item : book_list)
+    for (const auto& item : book_list)
     {
         std::cout << item.author << ", " 
                   << item.title << ", " 
