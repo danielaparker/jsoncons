@@ -583,6 +583,7 @@ namespace ns {
     };
 } // namespace ns
 
+// Specialize json_type_traits for your type in the jsoncons namespace
 namespace jsoncons {
     template<class Json>
     struct json_type_traits<Json, ns::book>
