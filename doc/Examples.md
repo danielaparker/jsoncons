@@ -568,37 +568,39 @@ Output:
 
 #### Convert JSON to/from C++ types
 
-```
+```c++
+#include <iostream>
 #include <jsoncons/json.hpp>
 
-struct book
-{
-    std::string author;
-    std::string title;
-    double price;
-};
+namespace jc = jsoncons;
 
-namespace jsoncons
-{
+namespace ns {
+    struct book
+    {
+        std::string author;
+        std::string title;
+        double price;
+    };
+} // namespace ns
+
+namespace jsoncons {
     template<class Json>
-    struct json_type_traits<Json, book>
+    struct json_type_traits<Json, ns::book>
     {
         static bool is(const Json& j) noexcept
         {
-            return j.is_object() &&
-                   j.contains("author") && 
-                   j.contains("title") && 
-                   j.contains("price");
+            return j.is_object() && j.contains("author") && 
+                   j.contains("title") && j.contains("price");
         }
-        static book as(const Json& j)
+        static ns::book as(const Json& j)
         {
-            book val;
+            ns::book val;
             val.author = j["author"].template as<std::string>();
             val.title = j["title"].template as<std::string>();
             val.price = j["price"].template as<double>();
             return val;
         }
-        static Json to_json(const book& val)
+        static Json to_json(const ns::book& val)
         {
             Json j;
             j["author"] = val.author;
@@ -607,17 +609,11 @@ namespace jsoncons
             return j;
         }
     };
-} // jsoncons
+} // namespace jsoncons
 
 int main()
 {
-    // For convenience
-    using jsoncons::json;
-    using jsoncons::decode_json;
-    using jsoncons::encode_json;
-    using jsoncons::indenting;
-
-    std::string s = R"(
+    const std::string s = R"(
     [
         {
             "author" : "Haruki Murakami",
@@ -632,18 +628,19 @@ int main()
     ]
     )";
 
-    std::vector<book> book_list = decode_json<std::vector<book>>(s);
+    std::vector<ns::book> book_list = jc::decode_json<std::vector<ns::book>>(s);
 
     std::cout << "(1)\n";
-    for (auto book : book_list)
+    for (auto item : book_list)
     {
-        std::cout << book.author << ", " 
-                  << book.title << ", " 
-                  << book.price << "\n";
+        std::cout << item.author << ", " 
+                  << item.title << ", " 
+                  << item.price << "\n";
     }
+
     std::cout << "\n(2)\n";
-    encode_json(book_list, std::cout, indenting::indent);
-    std::cout << "\n";
+    jc::encode_json(book_list, std::cout, jc::indenting::indent);
+    std::cout << "\n\n";
 }
 ```
 Output:
