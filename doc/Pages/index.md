@@ -779,152 +779,103 @@ The implementations of these functions and operators make use of the class templ
 If you want to use the json constructor, `is<T>`, `as<T>`, `operator=`, `push_back`, `insert`, and `insert_or_assign` to access or modify with a new type, you need to show `json` how to interact with that type, by extending `json_type_traits` in the `jsoncons` namespace.
 
 Note that the json::is<T>() and json::as<T>() functions accept template packs, which they forward to the `json_type_traits` `is` and `as` functions.
-This allows user defined `json_type_traits` implementations to resolve, for instance, a name into a C++ object
-looked up from a registry, as illustrated below.
-
 
 ```c++
-#include <string>
-#include <unordered_map>
-#include <memory>
+#include <iostream>
 #include <jsoncons/json.hpp>
 
-using namespace jsoncons;
-using namespace jsoncons::literals;
+namespace jc = jsoncons;
 
-class Employee
-{
-    std::string name_;
-public:
-    Employee(const std::string& name)
-        : name_(name)
+namespace ns {
+    struct book
     {
-    }
-    virtual ~Employee() = default;
-    const std::string& name() const
-    {
-        return name_;
-    }
-    virtual double calculatePay() const = 0;
-};
+        std::string author;
+        std::string title;
+        double price;
+    };
+} // namespace ns
 
-class HourlyEmployee : public Employee
-{
-public:
-    HourlyEmployee(const std::string& name)
-        : Employee(name)
-    {
-    }
-    double calculatePay() const override
-    {
-        return 10000;
-    }
-};
-
-class CommissionedEmployee : public Employee
-{
-public:
-    CommissionedEmployee(const std::string& name)
-        : Employee(name)
-    {
-    }
-    double calculatePay() const override
-    {
-        return 20000;
-    }
-};
-
-class EmployeeRegistry
-{
-    typedef std::unordered_map<std::string,std::shared_ptr<Employee>> employee_map;
-    employee_map employees_;
-public:
-    EmployeeRegistry()
-    {
-        employees_.try_emplace("John Smith",std::make_shared<HourlyEmployee>("John Smith"));
-        employees_.try_emplace("Jane Doe",std::make_shared<CommissionedEmployee>("Jane Doe"));
-    }
-
-    bool contains(const std::string& name) const
-    {
-        return employees_.count(name) > 0; 
-    }
-
-    std::shared_ptr<Employee> get(const std::string& name) const
-    {
-        auto it = employees_.find(name);
-        if (it == employees_.end())
-        {
-            throw std::runtime_error("Employee not found");
-        }
-        return it->second; 
-    }
-};
-
-namespace jsoncons
-{
+namespace jsoncons {
     template<class Json>
-    struct json_type_traits<Json, std::shared_ptr<Employee>>
+    struct json_type_traits<Json, ns::book>
     {
-        static bool is(const Json& rhs, const EmployeeRegistry& registry) noexcept
+        static bool is(const Json& j) noexcept
         {
-            return rhs.is_string() && registry.contains(rhs.as<std::string>());
+            return j.is_object() && j.contains("author") && 
+                   j.contains("title") && j.contains("price");
         }
-        static std::shared_ptr<Employee> as(const Json& rhs, 
-                                            const EmployeeRegistry& registry)
+        static ns::book as(const Json& j)
         {
-            return registry.get(rhs.as<std::string>());
+            ns::book val;
+            val.author = j["author"].template as<std::string>();
+            val.title = j["title"].template as<std::string>();
+            val.price = j["price"].template as<double>();
+            return val;
         }
-        static Json to_json(std::shared_ptr<Employee> val)
+        static Json to_json(const ns::book& val)
         {
-            Json j(val->name());
+            Json j;
+            j["author"] = val.author;
+            j["title"] = val.title;
+            j["price"] = val.price;
             return j;
         }
     };
-};
+} // namespace jsoncons
 
 int main()
 {
-    json j = R"(
+    const std::string s = R"(
+    [
+        {
+            "author" : "Haruki Murakami",
+            "title" : "Kafka on the Shore",
+            "price" : 25.17
+        },
+        {
+            "author" : "Charles Bukowski",
+            "title" : "Pulp",
+            "price" : 22.48
+        }
+    ]
+    )";
+
+    std::vector<ns::book> book_list = jc::decode_json<std::vector<ns::book>>(s);
+
+    std::cout << "(1)\n";
+    for (auto item : book_list)
     {
-        "EmployeeName" : "John Smith"
+        std::cout << item.author << ", " 
+                  << item.title << ", " 
+                  << item.price << "\n";
     }
-    )"_json;
 
-    EmployeeRegistry registry;
-
-    std::shared_ptr<Employee> employee = j["EmployeeName"].as<std::shared_ptr<Employee>>(registry);
-
-    std::cout << "(1) " << employee->name() << " => " 
-              << employee->calculatePay() << std::endl;
-
-    // j does not have a key "SalesRep", so get_with_default returns "Jane Doe"
-    // The template parameter is explicitly specified as json, to return a json string
-    // json::as is then applied to the returned json string  
-    std::shared_ptr<Employee> salesRep = j.get_with_default<json>("SalesRep","Jane Doe")
-                                          .as<std::shared_ptr<Employee>>(registry);
-
-    std::cout << "(2) " << salesRep->name() << " => " 
-              << salesRep->calculatePay() << std::endl;
-
-    json j2;
-    j2["EmployeeName"] = employee;
-    j2["SalesRep"] = salesRep;
-
-    std::cout << "(3)\n" << pretty_print(j2) << std::endl;
+    std::cout << "\n(2)\n";
+    jc::encode_json(book_list, std::cout, jc::indenting::indent);
+    std::cout << "\n\n";
 }
 ```
 
 Output:
 
-```json
-(1) John Smith => 10000
-(2) Jane Doe => 20000
-(3)
-{
-    "EmployeeName": "John Smith",
-    "SalesRep": "Jane Doe"
-}
+```
+(1)
+Haruki Murakami, Kafka on the Shore, 25.17
+Charles Bukowski, Pulp, 22.48
+
+(2)
+[
+    {
+        "author": "Haruki Murakami",
+        "price": 25.17,
+        "title": "Kafka on the Shore"
+    },
+    {
+        "author": "Charles Bukowski",
+        "price": 22.48,
+        "title": "Pulp"
+    }
+]
 ```
 
 For more information, consult the latest [documentation](https://github.com/danielaparker/jsoncons/blob/master/doc/Home.md) and [roadmap](https://github.com/danielaparker/jsoncons/blob/master/doc/Roadmap.md). 
