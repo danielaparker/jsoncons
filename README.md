@@ -198,7 +198,7 @@ The library includes four instantiations of `basic_json`:
 
 [Conversion between JSON and C++ objects](#Conversion-between-JSON-and-C++-objects)
 
-[Playing around with CBOR, JSON, and CSV](#Playing-around-with-CBOR,-JSON,-and-CSV)
+[Playing around with CBOR, JSON, and CSV](#E2)  
 
 [Query CBOR with JSONPath](#Query-CBOR-with-JSONPath)
 
@@ -313,6 +313,8 @@ Charles Bukowski, Pulp, 22.48
 ```
 
 See [type extensibility](doc/Tutorials/Type%20Extensibility.md)
+
+<div id="E2"/> 
 
 ### Playing around with CBOR, JSON, and CSV
 
