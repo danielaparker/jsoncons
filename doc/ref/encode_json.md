@@ -27,7 +27,7 @@ void encode_json(const T& val,
                  std::basic_ostream<CharT>& os, indenting line_indent); // (5)
 ```
 
-(1) Applies `conversion_traits` to serialize `val` to JSON output stream.
+(1) Applies `json_conversion_traits` to serialize `val` to JSON output stream.
 
 #### Parameters
 

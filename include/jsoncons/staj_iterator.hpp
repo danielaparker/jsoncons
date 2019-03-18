@@ -298,7 +298,7 @@ typedef basic_staj_filter<wchar_t> wstream_filter;
 
 }
 
-#include <jsoncons/conversion_traits.hpp>
+#include <jsoncons/json_conversion_traits.hpp>
 
 namespace jsoncons {
 

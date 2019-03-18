@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CONVERSION_TRAITS_HPP
-#define JSONCONS_CONVERSION_TRAITS_HPP
+#ifndef JSONCONS_JSON_CONVERSION_TRAITS_HPP
+#define JSONCONS_JSON_CONVERSION_TRAITS_HPP
 
 #include <string>
 #include <tuple>
@@ -46,7 +46,7 @@ void encode_stream(const T&val, basic_json_content_handler<CharT>& writer);
 namespace jsoncons {
 
 template <class T, class Enable = void>
-struct conversion_traits
+struct json_conversion_traits
 {
     template <class CharT, class Json>
     static T decode(basic_staj_reader<CharT>& reader, std::error_code& ec)
@@ -69,7 +69,7 @@ struct conversion_traits
 // vector like
 
 template <class T>
-struct conversion_traits<T,
+struct json_conversion_traits<T,
     typename std::enable_if<jsoncons::detail::is_vector_like<T>::value
 >::type>
 {
@@ -96,7 +96,7 @@ struct conversion_traits<T,
         writer.begin_array();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            conversion_traits<value_type>::template encode<CharT,Json>(*it,writer);
+            json_conversion_traits<value_type>::template encode<CharT,Json>(*it,writer);
         }
         writer.end_array();
         writer.flush();
@@ -105,7 +105,7 @@ struct conversion_traits<T,
 // std::array
 
 template <class T, size_t N>
-struct conversion_traits<std::array<T,N>>
+struct json_conversion_traits<std::array<T,N>>
 {
     typedef typename std::array<T,N>::value_type value_type;
 
@@ -131,7 +131,7 @@ struct conversion_traits<std::array<T,N>>
         writer.begin_array();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            conversion_traits<value_type>::template encode<CharT,Json>(*it,writer);
+            json_conversion_traits<value_type>::template encode<CharT,Json>(*it,writer);
         }
         writer.end_array();
         writer.flush();
@@ -141,7 +141,7 @@ struct conversion_traits<std::array<T,N>>
 // map like
 
 template <class T>
-struct conversion_traits<T,
+struct json_conversion_traits<T,
     typename std::enable_if<jsoncons::detail::is_map_like<T>::value
 >::type>
 {
@@ -171,7 +171,7 @@ struct conversion_traits<T,
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
             writer.name(it->first);
-            conversion_traits<mapped_type>::template encode<CharT,Json>(it->second,writer);
+            json_conversion_traits<mapped_type>::template encode<CharT,Json>(it->second,writer);
         }
         writer.end_object();
         writer.flush();
@@ -181,13 +181,13 @@ struct conversion_traits<T,
 template <class T, class CharT, class Json>
 void decode_stream(basic_staj_reader<CharT>& reader, T& val, std::error_code& ec)
 {
-    val = conversion_traits<T>::template decode<CharT,Json>(reader,ec);
+    val = json_conversion_traits<T>::template decode<CharT,Json>(reader,ec);
 }
 
 template <class T, class CharT, class Json>
 void encode_stream(const T&val, basic_json_content_handler<CharT>& writer)
 {
-    conversion_traits<T>::template encode<CharT,Json>(val, writer);
+    json_conversion_traits<T>::template encode<CharT,Json>(val, writer);
 }
 
 }
