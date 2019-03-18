@@ -7,21 +7,21 @@ have [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/do
 ```c++
 #include <jsoncons/json.hpp>
 
-template <class T, class CharT>
+template <class T, class CharT, class Json=basic_json<CharT>>
 void encode_json(const T& val, basic_json_content_handler<CharT>& handler); // (1)
 
-template <class T, class CharT>
+template <class T, class CharT, class Json=basic_json<CharT>>
 void encode_json(const T& val, std::basic_ostream<CharT>& os); // (2)
 
-template <class T, class CharT>
+template <class T, class CharT, class Json=basic_json<CharT>>
 void encode_json(const T& val, 
                  const basic_json_options<CharT>& options,
                  std::basic_ostream<CharT>& os); // (3)
 
-template <class T, class CharT>
+template <class T, class CharT, class Json=basic_json<CharT>>
 void encode_json(const T& val, std::basic_ostream<CharT>& os, indenting line_indent); // (4)
 
-template <class T, class CharT>
+template <class T, class CharT, class Json=basic_json<CharT>>
 void encode_json(const T& val, 
                  const basic_json_options<CharT>& options,
                  std::basic_ostream<CharT>& os, indenting line_indent); // (5)

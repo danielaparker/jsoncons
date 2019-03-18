@@ -8,17 +8,17 @@ work for all C++ classes that have [json_type_traits](https://github.com/daniela
 ```c++
 #include <jsoncons/json.hpp>
 
-template <class T, class CharT>
+template <class T, class CharT, class Json=basic_json<CharT>>
 T decode_json(const std::basic_string<CharT>& s);  // (1)
 
-template <class T, class CharT>
+template <class T, class CharT, class Json=basic_json<CharT>>
 T decode_json(const std::basic_string<CharT>& s,
               const basic_json_options<CharT>& options); // (2)
 
-template <class T, class CharT>
+template <class T, class CharT, class Json=basic_json<CharT>>
 T decode_json(std::basic_istream<CharT>& is); // (3)
 
-template <class T, class CharT>
+template <class T, class CharT, class Json=basic_json<CharT>>
 T decode_json(std::basic_istream<CharT>& is,
               const basic_json_options<CharT>& options); // (4)
 ```
