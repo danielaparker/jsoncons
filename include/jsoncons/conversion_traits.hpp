@@ -22,22 +22,21 @@
 
 namespace jsoncons {
 
-
-template <class CharT, class T>
+template <class T, class CharT, class Json>
 void decode_stream(basic_staj_reader<CharT>& reader, T& val, std::error_code& ec);
 
-template <class CharT, class T>
+template <class T, class CharT, class Json>
 void decode_stream(basic_staj_reader<CharT>& reader, T& val)
 {
     std::error_code ec;
-    decode_stream(reader, val, ec);
+    decode_stream<T,CharT,Json>(reader, val, ec);
     if (ec)
     {
         throw serialization_error(ec, reader.context().line_number(), reader.context().column_number());
     }
 }
 
-template <class CharT, class T>
+template <class T, class CharT, class Json>
 void encode_stream(const T&val, basic_json_content_handler<CharT>& writer);
 
 } // namespace jsoncons
@@ -49,18 +48,18 @@ namespace jsoncons {
 template <class T, class Enable = void>
 struct conversion_traits
 {
-    template <class CharT>
+    template <class CharT, class Json>
     static T decode(basic_staj_reader<CharT>& reader, std::error_code& ec)
     {
-        json_decoder<basic_json<CharT>> decoder;
+        json_decoder<Json> decoder;
         reader.accept(decoder, ec);
         return decoder.get_result().template as<T>();
     }
 
-    template <class CharT>
+    template <class CharT, class Json>
     static void encode(const T& val, basic_json_content_handler<CharT>& writer)
     {
-        auto j = json_type_traits<basic_json<CharT>, T>::to_json(val);
+        auto j = json_type_traits<Json, T>::to_json(val);
         j.dump(writer);
     }
 };
@@ -76,12 +75,12 @@ struct conversion_traits<T,
 {
     typedef typename T::value_type value_type;
 
-    template <class CharT>
+    template <class CharT, class Json>
     static T decode(basic_staj_reader<CharT>& reader, std::error_code& ec)
     {
         T v;
-        basic_staj_array_iterator<CharT,value_type> end;
-        basic_staj_array_iterator<CharT,value_type> it(reader, ec);
+        basic_staj_array_iterator<value_type,CharT,Json> end;
+        basic_staj_array_iterator<value_type,CharT,Json> it(reader, ec);
 
         while (it != end && !ec)
         {
@@ -91,13 +90,13 @@ struct conversion_traits<T,
         return v;
     }
 
-    template <class CharT>
+    template <class CharT, class Json>
     static void encode(const T& val, basic_json_content_handler<CharT>& writer)
     {
         writer.begin_array();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            conversion_traits<value_type>::encode(*it,writer);
+            conversion_traits<value_type>::template encode<CharT,Json>(*it,writer);
         }
         writer.end_array();
         writer.flush();
@@ -110,13 +109,13 @@ struct conversion_traits<std::array<T,N>>
 {
     typedef typename std::array<T,N>::value_type value_type;
 
-    template <class CharT>
+    template <class CharT,class Json>
     static std::array<T, N> decode(basic_staj_reader<CharT>& reader, std::error_code& ec)
     {
         std::array<T,N> v;
         v.fill(T{});
-        basic_staj_array_iterator<CharT,value_type> end;
-        basic_staj_array_iterator<CharT,value_type> it(reader, ec);
+        basic_staj_array_iterator<value_type,CharT,Json> end;
+        basic_staj_array_iterator<value_type,CharT,Json> it(reader, ec);
 
         for (size_t i = 0; it != end && i < N && !ec; ++i)
         {
@@ -126,13 +125,13 @@ struct conversion_traits<std::array<T,N>>
         return v;
     }
 
-    template <class CharT>
+    template <class CharT, class Json>
     static void encode(const std::array<T, N>& val, basic_json_content_handler<CharT>& writer)
     {
         writer.begin_array();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            conversion_traits<value_type>::encode(*it,writer);
+            conversion_traits<value_type>::template encode<CharT,Json>(*it,writer);
         }
         writer.end_array();
         writer.flush();
@@ -150,13 +149,12 @@ struct conversion_traits<T,
     typedef typename T::value_type value_type;
     typedef typename T::key_type key_type;
 
-    template <class CharT>
+    template <class CharT, class Json>
     static T decode(basic_staj_reader<CharT>& reader, std::error_code& ec)
     {
-        
         T m;
-        basic_staj_object_iterator<CharT,mapped_type> end;
-        basic_staj_object_iterator<CharT,mapped_type> it(reader, ec);
+        basic_staj_object_iterator<mapped_type,CharT,Json> end;
+        basic_staj_object_iterator<mapped_type,CharT,Json> it(reader, ec);
 
         while (it != end && !ec)
         {
@@ -166,30 +164,30 @@ struct conversion_traits<T,
         return m;
     }
 
-    template <class CharT>
+    template <class CharT, class Json>
     static void encode(const T& val, basic_json_content_handler<CharT>& writer)
     {
         writer.begin_object();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
             writer.name(it->first);
-            conversion_traits<mapped_type>::encode(it->second,writer);
+            conversion_traits<mapped_type>::template encode<CharT,Json>(it->second,writer);
         }
         writer.end_object();
         writer.flush();
     }
 };
 
-template <class CharT, class T>
+template <class T, class CharT, class Json>
 void decode_stream(basic_staj_reader<CharT>& reader, T& val, std::error_code& ec)
 {
-    val = conversion_traits<T>::decode(reader,ec);
+    val = conversion_traits<T>::template decode<CharT,Json>(reader,ec);
 }
 
-template <class CharT, class T>
+template <class T, class CharT, class Json>
 void encode_stream(const T&val, basic_json_content_handler<CharT>& writer)
 {
-    conversion_traits<T>::encode(val, writer);
+    conversion_traits<T>::template encode<CharT,Json>(val, writer);
 }
 
 }

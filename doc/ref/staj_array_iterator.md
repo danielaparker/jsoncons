@@ -2,7 +2,7 @@
 
 ```c++
 template <class T>
-using staj_array_iterator = basic_staj_array_iterator<char,T>;
+using staj_array_iterator = basic_staj_array_iterator<T,char,basic_json<char>>;
 ```
 
 #### Header

@@ -2,7 +2,7 @@
 
 ```c++
 template <class T>
-using staj_object_iterator = basic_staj_object_iterator<char,T>;
+using staj_object_iterator = basic_staj_object_iterator<T,char,basic_json<char>>;
 ```
 
 #### Header

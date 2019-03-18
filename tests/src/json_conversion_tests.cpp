@@ -10,8 +10,6 @@
 #include <ctime>
 #include <cstdint>
 
-using namespace jsoncons;
-
 TEST_CASE("convert_pair_test")
 {
     auto val = std::make_pair(false,std::string("foo"));

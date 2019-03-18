@@ -19,7 +19,7 @@
 
 namespace jsoncons {
 
-template<class CharT, class T>
+template<class T, class CharT, class Json=basic_json<CharT>>
 class basic_staj_array_iterator
 {
     typedef CharT char_type;
@@ -102,14 +102,14 @@ public:
         return temp;
     }
 
-    friend bool operator==(const basic_staj_array_iterator<CharT, T>& a, const basic_staj_array_iterator<CharT, T>& b)
+    friend bool operator==(const basic_staj_array_iterator<T,CharT,Json>& a, const basic_staj_array_iterator<T,CharT,Json>& b)
     {
         return (!a.reader_ && !b.reader_)
             || (!a.reader_ && b.done())
             || (!b.reader_ && a.done());
     }
 
-    friend bool operator!=(const basic_staj_array_iterator<CharT, T>& a, const basic_staj_array_iterator<CharT, T>& b)
+    friend bool operator!=(const basic_staj_array_iterator<T,CharT,Json>& a, const basic_staj_array_iterator<T,CharT,Json>& b)
     {
         return !(a == b);
     }
@@ -126,19 +126,19 @@ private:
     void next(std::error_code& ec);
 };
 
-template <class CharT, class T>
-basic_staj_array_iterator<CharT, T> begin(basic_staj_array_iterator<CharT, T> iter) noexcept
+template <class T, class CharT, class Json>
+basic_staj_array_iterator<T,CharT,Json> begin(basic_staj_array_iterator<T,CharT,Json> iter) noexcept
 {
     return iter;
 }
 
-template <class CharT, class T>
-basic_staj_array_iterator<CharT, T> end(const basic_staj_array_iterator<CharT, T>&) noexcept
+template <class T, class CharT, class Json>
+basic_staj_array_iterator<T,CharT,Json> end(const basic_staj_array_iterator<T,CharT,Json>&) noexcept
 {
-    return basic_staj_array_iterator<CharT, T>();
+    return basic_staj_array_iterator<T,CharT,Json>();
 }
 
-template<class CharT, class T>
+template <class T, class CharT, class Json>
 class basic_staj_object_iterator
 {
 public:
@@ -224,14 +224,14 @@ public:
         return temp;
     }
 
-    friend bool operator==(const basic_staj_object_iterator<CharT,T>& a, const basic_staj_object_iterator<CharT,T>& b)
+    friend bool operator==(const basic_staj_object_iterator<T,CharT,Json>& a, const basic_staj_object_iterator<T,CharT,Json>& b)
     {
         return (!a.reader_ && !b.reader_)
                || (!a.reader_ && b.done())
                || (!b.reader_ && a.done());
     }
 
-    friend bool operator!=(const basic_staj_object_iterator<CharT,T>& a, const basic_staj_object_iterator<CharT,T>& b)
+    friend bool operator!=(const basic_staj_object_iterator<T,CharT,Json>& a, const basic_staj_object_iterator<T,CharT,Json>& b)
     {
         return !(a == b);
     }
@@ -248,29 +248,29 @@ private:
     void next(std::error_code& ec);
 };
 
-template <class CharT,class T>
-basic_staj_object_iterator<CharT,T> begin(basic_staj_object_iterator<CharT,T> iter) noexcept
+template <class T,class CharT,class Json>
+basic_staj_object_iterator<T,CharT,Json> begin(basic_staj_object_iterator<T,CharT,Json> iter) noexcept
 {
     return iter;
 }
 
-template <class CharT,class T>
-basic_staj_object_iterator<CharT,T> end(const basic_staj_object_iterator<CharT,T>&) noexcept
+template <class T,class CharT,class Json>
+basic_staj_object_iterator<T,CharT,Json> end(const basic_staj_object_iterator<T,CharT,Json>&) noexcept
 {
-    return basic_staj_object_iterator<CharT,T>();
+    return basic_staj_object_iterator<T,CharT,Json>();
 }
 
 template <class T>
-using staj_array_iterator = basic_staj_array_iterator<char,T>;
+using staj_array_iterator = basic_staj_array_iterator<T,char,json>;
 
 template <class T>
-using wstaj_array_iterator = basic_staj_array_iterator<wchar_t,T>;
+using wstaj_array_iterator = basic_staj_array_iterator<T,wchar_t,wjson>;
 
 template <class T>
-using staj_object_iterator = basic_staj_object_iterator<char,T>;
+using staj_object_iterator = basic_staj_object_iterator<T,char,json>;
 
 template <class T>
-using wstaj_object_iterator = basic_staj_object_iterator<wchar_t,T>;
+using wstaj_object_iterator = basic_staj_object_iterator<T,wchar_t,wjson>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
@@ -302,21 +302,21 @@ typedef basic_staj_filter<wchar_t> wstream_filter;
 
 namespace jsoncons {
 
-template<class CharT, class T>
-void basic_staj_array_iterator<CharT,T>::next()
+template <class T, class CharT, class Json>
+void basic_staj_array_iterator<T,CharT,Json>::next()
 {
     if (!done())
     {
         reader_->next();
         if (!done())
         {
-            decode_stream(*reader_, value_);
+            decode_stream<T,CharT,Json>(*reader_, value_);
         }
     }
 }
 
-template<class CharT, class T>
-void basic_staj_array_iterator<CharT,T>::next(std::error_code& ec)
+template<class T, class CharT, class Json>
+void basic_staj_array_iterator<T,CharT,Json>::next(std::error_code& ec)
 {
     if (!done())
     {
@@ -327,13 +327,13 @@ void basic_staj_array_iterator<CharT,T>::next(std::error_code& ec)
         }
         if (!done())
         {
-            decode_stream(*reader_, value_, ec);
+            decode_stream<T,CharT,Json>(*reader_, value_, ec);
         }
     }
 }
 
-template<class CharT, class T>
-void basic_staj_object_iterator<CharT,T>::next()
+template<class T, class CharT, class Json>
+void basic_staj_object_iterator<T,CharT,Json>::next()
 {
     reader_->next();
     if (!done())
@@ -343,13 +343,13 @@ void basic_staj_object_iterator<CharT,T>::next()
         reader_->next();
         if (!done())
         {
-            decode_stream(*reader_, kv_.second);
+            decode_stream<T,CharT,Json>(*reader_, kv_.second);
         }
     }
 }
 
-template<class CharT, class T>
-void basic_staj_object_iterator<CharT,T>::next(std::error_code& ec)
+template<class T, class CharT, class Json>
+void basic_staj_object_iterator<T,CharT,Json>::next(std::error_code& ec)
 {
     reader_->next(ec);
     if (ec)
@@ -367,7 +367,7 @@ void basic_staj_object_iterator<CharT,T>::next(std::error_code& ec)
         }
         if (!done())
         {
-             decode_stream(*reader_, kv_.second, ec);
+             decode_stream<T,CharT,Json>(*reader_, kv_.second, ec);
         }
     }
 }
