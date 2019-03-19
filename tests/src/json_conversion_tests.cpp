@@ -109,7 +109,7 @@ struct book
 
 } // namespace ns
 
-JSONCONS_TYPE_TRAITS_IMPL(ns::book,author,title,price);
+JSONCONS_TYPE_TRAITS_DECL(ns::book,author,title,price);
     
 TEST_CASE("book_conversion_test")
 {
@@ -122,49 +122,42 @@ TEST_CASE("book_conversion_test")
 
 }
 
-struct Color
+struct reputon
 {
-    int     red;
-    int     green;
-    int     blue;
+    std::string rater;
+    std::string assertion;
+    std::string rated;
+    double rating;
 };    
 
-struct TeamMember
+struct reputation_object
 {
-    std::string     name;
-    int             score;
-    int             damage;
-    Color           team;
+    std::string application;
+    std::vector<reputon> reputons;
     public:
-        TeamMember()
+        reputation_object()
+            : application("hiking")
         {
         }
-        TeamMember(std::string const& name, int score, int damage, Color const& team)
-            : name(name)
-            , score(score)
-            , damage(damage)
-            , team(team)
+        reputation_object(const std::string& application, const std::vector<reputon>& reputons)
+            : application(application), reputons(reputons)
         {}
-        // Define the trait as a friend to get accesses to private
-        // Members.
-        //friend class ThorsAnvil::Serialize::Traits<TeamMember>;
 };
 
-// Declare the traits.
-// Specifying what members need to be serialized.
-JSONCONS_TYPE_TRAITS_IMPL(Color, red, green, blue);
-JSONCONS_TYPE_TRAITS_IMPL(TeamMember, name, score, damage, team);
+// Declare the traits. Specify which data members need to be serialized.
+JSONCONS_TYPE_TRAITS_DECL(reputon, rater, assertion, rated, rating);
+JSONCONS_TYPE_TRAITS_DECL(reputation_object, application, reputons);
 
-TEST_CASE("TeamMember")
+TEST_CASE("reputation_object")
 {
-    TeamMember mark("mark", 10, 5, Color{255,0,0});
+    reputation_object val("hiking", { reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
 
-    jc::encode_json(mark, std::cout);
+    jc::encode_json(val, std::cout);
+    std::cout << "\n";
     
-    //TeamMember john("Empty", 0, 0, Color{0,0,0});
-    std::string s = R"({"name": "John","score": 13,"team":{"red": 0,"green": 0,"blue": 255, "black":25}})";
+    std::string s = R"({"reputons":[{"assertion":"strong-hiker","rated":"Marilyn C","rater":"HikingAsylum.example.com","rating":0.9}]})";
 
-    TeamMember john = jc::decode_json<TeamMember>(s);
+    reputation_object val2 = jc::decode_json<reputation_object>(s);
 }
 
 
