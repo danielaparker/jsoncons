@@ -219,7 +219,7 @@ Decode and encode work for all C++ classes that have
 defined. The standard library containers are already supported, and you can specialize `json_type_traits`
 for your own types in the `jsoncons` namespace. 
 
-`JSONCONS_TYPE_TRAITS_DECL` is a macro that can be used to generate the the necessary boilerplate
+`JSONCONS_TYPE_TRAITS_DECL` is a macro that simplifies the creation of the necessary boilerplate
 for your own types.
 
 ```c++
