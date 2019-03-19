@@ -9,6 +9,9 @@ Enhancements
 
 - json `as_byte_string` attempts to decode string values if `semantic_tag_type` is `base64`, `base64url`, or `base16`.
 
+- New macro `JSONCONS_TYPE_TRAITS_DECL` that can be used to generate the `json_type_traits` boilerplate 
+for your own types.
+
 v0.119.1
 --------
 
