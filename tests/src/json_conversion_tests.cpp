@@ -10,6 +10,8 @@
 #include <ctime>
 #include <cstdint>
 
+namespace jc = jsoncons;
+
 TEST_CASE("convert_pair_test")
 {
     auto val = std::make_pair(false,std::string("foo"));
@@ -65,6 +67,35 @@ TEST_CASE("convert_array_test")
     }
 }
 
+namespace ns {
+
+struct book
+{
+    std::string author;
+    std::string title;
+    double price;
+
+    friend std::ostream& operator<<(std::ostream& os, const book& b)
+    {
+        std::cout << "author: " << b.author << ", title: " << b.title << ", price: " << b.price << "\n";
+        return os;
+    }
+};
+
+} // namespace ns
+
+JSONCONS_TYPE_TRAITS_IMPL(ns::book,author,title,price);
+    
+TEST_CASE("book_conversion_test")
+{
+    ns::book book_list{"Haruki Murakami", "Kafka on the Shore", 25.17};
+
+    std::string s;
+    jc::encode_json(book_list, s, jc::indenting::indent);
+
+    std::cout << "s: " << s << "\n";
+
+}
 
 #if !(defined(__GNUC__) && __GNUC__ <= 5)
 TEST_CASE("convert_tuple_test")

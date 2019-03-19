@@ -21,6 +21,11 @@
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/detail/type_traits_helper.hpp>
+#include <string>
+#include <tuple>
+#include <map>
+#include <functional>
+#include <memory>
 
 namespace jsoncons {
 
@@ -994,7 +999,7 @@ struct json_type_traits<Json, std::valarray<T>>
             j.push_back(*it);
         }
         return j;
-    }
+    } 
 
     static Json to_json(const std::valarray<T>& val, const allocator_type& allocator)
     {
@@ -1012,6 +1017,104 @@ struct json_type_traits<Json, std::valarray<T>>
 };
 
 }
+#define JSONCONS_EXPAND(X) X    
+
+#define JSONCONS_NARGS(...) JSONCONS_EXPAND( JSONCONS_NARG_(__VA_ARGS__, JSONCONS_RSEQ_N()) )
+#define JSONCONS_NARG_(...) JSONCONS_EXPAND( JSONCONS_ARG_N(__VA_ARGS__) )
+#define JSONCONS_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31, _32, _33, _34, _35, _36, _37, _38, _39, _40, _41, _42, _43, N, ...) N
+#define JSONCONS_RSEQ_N() 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+
+#define JSONCONS_QUOTE(A)                        JSONCONS_EXPAND(#A)
+
+#define JSONCONS_GENERATE(Act, TC, P1, P2)         JSONCONS_EXPAND(JSONCONS_EXPAND(Act(TC, P1, P2)))
+
+#define JSONCONS_REP_N(Act, TC, P1, ...)            JSONCONS_EXPAND(JSONCONS_REP_OF_N(Act, TC, P1, JSONCONS_NARGS(__VA_ARGS__), __VA_ARGS__))
+#define JSONCONS_REP_OF_N(Act, TC, P1, Count, ...)  JSONCONS_EXPAND(JSONCONS_REP_OF_N_(Act, TC, P1, Count, __VA_ARGS__))
+#define JSONCONS_REP_OF_N_(Act, TC, P1, Count, ...) JSONCONS_EXPAND(JSONCONS_REP_OF_ ## Count(Act, TC, P1, __VA_ARGS__))
+
+#define JSONCONS_REP_OF_43(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_42(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_42(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_41(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_41(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_40(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_40(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_39(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_39(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_38(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_38(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_37(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_37(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_36(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_36(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_35(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_35(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_34(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_34(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_33(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_33(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_32(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_32(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_31(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_31(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_30(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_30(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_29(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_29(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_28(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_28(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_27(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_27(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_26(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_26(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_25(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_25(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_24(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_24(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_23(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_23(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_22(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_22(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_21(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_21(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_20(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_20(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_19(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_19(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_18(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_18(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_17(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_17(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_16(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_16(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_15(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_15(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_14(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_14(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_13(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_13(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_12(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_12(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_11(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_11(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_10(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_10(Act, TC, P1, P2, ...)    JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_9(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_9(Act, TC, P1, P2, ...)     JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_8(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_8(Act, TC, P1, P2, ...)     JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_7(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_7(Act, TC, P1, P2, ...)     JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_6(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_6(Act, TC, P1, P2, ...)     JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_5(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_5(Act, TC, P1, P2, ...)     JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_4(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_4(Act, TC, P1, P2, ...)     JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_3(Act, TC, P1, __VA_ARGS__))
+#define JSONCONS_REP_OF_3(Act, TC, P1, P2, ...)     JSONCONS_GENERATE(Act, TC, P1 ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_2(Act, TC, P1, __VA_ARGS__)) 
+#define JSONCONS_REP_OF_2(Act, TC, P1, P2, ...)     JSONCONS_GENERATE(Act, TC, P1, P2); JSONCONS_EXPAND(JSONCONS_REP_OF_1(Act, TC, P1, __VA_ARGS__)) 
+#define JSONCONS_REP_OF_1(Act, TC, P1, P2)          JSONCONS_GENERATE(Act, TC, P1, P2);
+#define JSONCONS_REP_OF_0(Act, TC, P1)              Act(TC, P1) ## _LAST 
+
+#define JSONCONS_IS(TC, Type, Member) JSONCONS_EXPAND(j.contains(JSONCONS_QUOTE(Member)));
+#define JSONCONS_IS_LAST(TC, Type)
+
+#define JSONCONS_TO_JSON(TC, Type, Member) j.try_emplace(JSONCONS_QUOTE(Member), val.Member);
+#define JSONCONS_TO_JSON_LAST(TC, Type)
+
+#define JSONCONS_AS(TC, Type, Member) val.Member = j.at(JSONCONS_QUOTE(Member)).template as<decltype(val.Member)>();
+#define JSONCONS_AS_LAST(TC, Type)
+
+#define JSONCONS_TYPE_TRAITS_IMPL_BASE(Count, ValueType, ...)  \
+namespace jsoncons \
+{ \
+    template<class Json> \
+    struct json_type_traits<Json, ValueType> \
+    { \
+        static bool is(const Json& j) noexcept \
+        { \
+            JSONCONS_REP_N(JSONCONS_IS, Count, ValueType, __VA_ARGS__)\
+            return j.is_object(); \
+        } \
+        static ValueType as(const Json& j) \
+        { \
+            ValueType val; \
+            JSONCONS_REP_N(JSONCONS_AS, Count, ValueType, __VA_ARGS__) \
+            return val; \
+        } \
+        static Json to_json(const ValueType& val) \
+        { \
+            Json j; \
+            JSONCONS_REP_N(JSONCONS_TO_JSON, Count, ValueType, __VA_ARGS__) \
+            return j; \
+        } \
+    }; \
+} // jsoncons \
+
+
+#define JSONCONS_TYPE_TRAITS_IMPL(ValueType,...) \
+    JSONCONS_TYPE_TRAITS_IMPL_BASE(0, ValueType, __VA_ARGS__)
 
 #endif
 
