@@ -67,6 +67,31 @@ TEST_CASE("convert_array_test")
     }
 }
 
+#if !(defined(__GNUC__) && __GNUC__ <= 5)
+TEST_CASE("convert_tuple_test")
+{
+    typedef std::map<std::string,std::tuple<std::string,std::string,double>> employee_collection;
+
+    employee_collection employees = 
+    { 
+        {"John Smith",{"Hourly","Software Engineer",10000}},
+        {"Jane Doe",{"Commission","Sales",20000}}
+    };
+
+    std::string s;
+    jsoncons::encode_json(employees, s, jsoncons::indenting::indent);
+    std::cout << "(1)\n" << s << std::endl;
+    auto employees2 = jsoncons::decode_json<employee_collection>(s);
+    REQUIRE(employees2.size() == employees.size());
+
+    std::cout << "\n(2)\n";
+    for (const auto& pair : employees2)
+    {
+        std::cout << pair.first << ": " << std::get<1>(pair.second) << std::endl;
+    }
+}
+#endif
+
 namespace ns {
 
 struct book
@@ -97,30 +122,50 @@ TEST_CASE("book_conversion_test")
 
 }
 
-#if !(defined(__GNUC__) && __GNUC__ <= 5)
-TEST_CASE("convert_tuple_test")
+struct Color
 {
-    typedef std::map<std::string,std::tuple<std::string,std::string,double>> employee_collection;
+    int     red;
+    int     green;
+    int     blue;
+};    
 
-    employee_collection employees = 
-    { 
-        {"John Smith",{"Hourly","Software Engineer",10000}},
-        {"Jane Doe",{"Commission","Sales",20000}}
-    };
+struct TeamMember
+{
+    std::string     name;
+    int             score;
+    int             damage;
+    Color           team;
+    public:
+        TeamMember()
+        {
+        }
+        TeamMember(std::string const& name, int score, int damage, Color const& team)
+            : name(name)
+            , score(score)
+            , damage(damage)
+            , team(team)
+        {}
+        // Define the trait as a friend to get accesses to private
+        // Members.
+        //friend class ThorsAnvil::Serialize::Traits<TeamMember>;
+};
 
-    std::string s;
-    jsoncons::encode_json(employees, s, jsoncons::indenting::indent);
-    std::cout << "(1)\n" << s << std::endl;
-    auto employees2 = jsoncons::decode_json<employee_collection>(s);
-    REQUIRE(employees2.size() == employees.size());
+// Declare the traits.
+// Specifying what members need to be serialized.
+JSONCONS_TYPE_TRAITS_IMPL(Color, red, green, blue);
+JSONCONS_TYPE_TRAITS_IMPL(TeamMember, name, score, damage, team);
 
-    std::cout << "\n(2)\n";
-    for (const auto& pair : employees2)
-    {
-        std::cout << pair.first << ": " << std::get<1>(pair.second) << std::endl;
-    }
+TEST_CASE("TeamMember")
+{
+    TeamMember mark("mark", 10, 5, Color{255,0,0});
+
+    jc::encode_json(mark, std::cout);
+    
+    //TeamMember john("Empty", 0, 0, Color{0,0,0});
+    std::string s = R"({"name": "John","score": 13,"team":{"red": 0,"green": 0,"blue": 255, "black":25}})";
+
+    TeamMember john = jc::decode_json<TeamMember>(s);
 }
-#endif
 
 
 
