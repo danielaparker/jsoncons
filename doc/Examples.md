@@ -43,8 +43,9 @@
 
 ### Convert
 
-[Convert JSON to/from C++ objects](#G1)  
-[Convert JSON numbers to/from boost multiprecision numbers](#G2)
+[Convert JSON to/from C++ objects by specializing json_type_traits](#G1)  
+[Using JSONCONS_TYPE_TRAITS_DECL to generate the json_type_traits boilerplate](#G2)  
+[Convert JSON numbers to/from boost multiprecision numbers](#G3)
 
 ### Search and Replace
 
@@ -566,7 +567,7 @@ Output:
 
 <div id="G1"/>
 
-#### Convert JSON to/from C++ objects
+#### Convert JSON to/from C++ objects by specializing json_type_traits
 
 ```c++
 #include <iostream>
@@ -666,6 +667,116 @@ Charles Bukowski, Pulp, 22.48
 ```
 
 <div id="G2"/>
+
+#### Using JSONCONS_TYPE_TRAITS_DECL to generate the json_type_traits 
+
+`JSONCONS_TYPE_TRAITS_DECL` is a macro that can be used to generate the the necessary boilerplate
+for your own types.
+
+```c++
+#include <cassert>
+#include <iostream>
+#include <jsoncons/json.hpp>
+
+namespace jc = jsoncons;
+
+namespace ns {
+
+    struct reputon
+    {
+        std::string rater;
+        std::string assertion;
+        std::string rated;
+        double rating;
+
+        friend bool operator==(const reputon& lhs, const reputon& rhs)
+        {
+            return lhs.rater == rhs.rater &&
+                lhs.assertion == rhs.assertion &&
+                lhs.rated == rhs.rated &&
+                lhs.rating == rhs.rating;
+        }
+
+        friend bool operator!=(const reputon& lhs, const reputon& rhs)
+        {
+            return !(lhs == rhs);
+        };
+    };
+
+    struct reputation_object
+    {
+        std::string application;
+        std::vector<reputon> reputons;
+
+        reputation_object()
+            : application("hiking")
+        {
+        }
+        reputation_object(const std::string& application, const std::vector<reputon>& reputons)
+            : application(application), reputons(reputons)
+        {}
+
+        friend bool operator==(const reputation_object& lhs, const reputation_object& rhs)
+        {
+            if (lhs.application != rhs.application)
+            {
+                return false;
+            }
+            if (lhs.reputons.size() != rhs.reputons.size())
+            {
+                return false;
+            }
+            for (size_t i = 0; i < lhs.reputons.size(); ++i)
+            {
+                if (lhs.reputons[i] != rhs.reputons[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        friend bool operator!=(const reputation_object& lhs, const reputation_object& rhs)
+        {
+            return !(lhs == rhs);
+        };
+    };
+
+} // namespace ns
+
+// Declare the traits. Specify which data members need to be serialized.
+JSONCONS_TYPE_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
+JSONCONS_TYPE_TRAITS_DECL(ns::reputation_object, application, reputons);
+
+int main()
+{
+    ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
+
+    std::string s;
+    jc::encode_json(val, s, jc::indenting::indent);
+    std::cout << s << "\n";
+
+    auto val2 = jc::decode_json<ns::reputation_object>(s);
+
+    assert(val2 == val);
+}
+```
+Output:
+```
+{
+    "application": "hiking",
+    "reputons": [
+        {
+            "assertion": "strong-hiker",
+            "rated": "Marilyn C",
+            "rater": "HikingAsylum.example.com",
+            "rating": 0.9
+        }
+    ]
+}
+```
+
+<div id="G3"/>
 
 #### Convert JSON numbers to/from boost multiprecision numbers
 

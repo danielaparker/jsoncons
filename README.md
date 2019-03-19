@@ -212,107 +212,117 @@ The library includes four instantiations of `basic_json`:
 
 ### Conversion between JSON and C++ objects
 
-The functions [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) convert JSON 
-formatted strings or streams to C++ objects and back. [decode_json](doc/ref/decode_json.md) 
-and [encode_json](doc/ref/encode_json.md) will work for all C++ classes that have 
+jsoncons supports conversion between JSON text and C++ objects. The functions [decode_json](doc/ref/decode_json.md) 
+and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ objects and back. 
+Decode and encode work for all C++ classes that have 
 [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
-defined.
+defined. The standard library containers are already supported, and you can specialize `json_type_traits`
+for your own types in the `jsoncons` namespace. 
+
+`JSONCONS_TYPE_TRAITS_DECL` is a macro that can be used to generate the the necessary boilerplate
+for your own types.
 
 ```c++
+#include <cassert>
 #include <iostream>
 #include <jsoncons/json.hpp>
 
 namespace jc = jsoncons;
 
 namespace ns {
-    struct book
+
+    struct reputon
     {
-        std::string author;
-        std::string title;
-        double price;
+        std::string rater;
+        std::string assertion;
+        std::string rated;
+        double rating;
+
+        friend bool operator==(const reputon& lhs, const reputon& rhs)
+        {
+            return lhs.rater == rhs.rater &&
+                lhs.assertion == rhs.assertion &&
+                lhs.rated == rhs.rated &&
+                lhs.rating == rhs.rating;
+        }
+
+        friend bool operator!=(const reputon& lhs, const reputon& rhs)
+        {
+            return !(lhs == rhs);
+        };
     };
+
+    struct reputation_object
+    {
+        std::string application;
+        std::vector<reputon> reputons;
+
+        reputation_object()
+            : application("hiking")
+        {
+        }
+        reputation_object(const std::string& application, const std::vector<reputon>& reputons)
+            : application(application), reputons(reputons)
+        {}
+
+        friend bool operator==(const reputation_object& lhs, const reputation_object& rhs)
+        {
+            if (lhs.application != rhs.application)
+            {
+                return false;
+            }
+            if (lhs.reputons.size() != rhs.reputons.size())
+            {
+                return false;
+            }
+            for (size_t i = 0; i < lhs.reputons.size(); ++i)
+            {
+                if (lhs.reputons[i] != rhs.reputons[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        friend bool operator!=(const reputation_object& lhs, const reputation_object& rhs)
+        {
+            return !(lhs == rhs);
+        };
+    };
+
 } // namespace ns
 
-// Specialize json_type_traits for your type in the jsoncons namespace
-namespace jsoncons {
-    template<class Json>
-    struct json_type_traits<Json, ns::book>
-    {
-        static bool is(const Json& j) noexcept
-        {
-            return j.is_object() && j.contains("author") && 
-                   j.contains("title") && j.contains("price");
-        }
-        static ns::book as(const Json& j)
-        {
-            ns::book val;
-            val.author = j["author"].template as<std::string>();
-            val.title = j["title"].template as<std::string>();
-            val.price = j["price"].template as<double>();
-            return val;
-        }
-        static Json to_json(const ns::book& val)
-        {
-            Json j;
-            j["author"] = val.author;
-            j["title"] = val.title;
-            j["price"] = val.price;
-            return j;
-        }
-    };
-} // namespace jsoncons
+// Declare the traits. Specify which data members need to be serialized.
+JSONCONS_TYPE_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
+JSONCONS_TYPE_TRAITS_DECL(ns::reputation_object, application, reputons);
 
 int main()
 {
-    const std::string s = R"(
-    [
-        {
-            "author" : "Haruki Murakami",
-            "title" : "Kafka on the Shore",
-            "price" : 25.17
-        },
-        {
-            "author" : "Charles Bukowski",
-            "title" : "Pulp",
-            "price" : 22.48
-        }
-    ]
-    )";
+    ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
 
-    std::vector<ns::book> book_list = jc::decode_json<std::vector<ns::book>>(s);
+    std::string s;
+    jc::encode_json(val, s, jc::indenting::indent);
+    std::cout << s << "\n";
 
-    std::cout << "(1)\n";
-    for (const auto& item : book_list)
-    {
-        std::cout << item.author << ", " 
-                  << item.title << ", " 
-                  << item.price << "\n";
-    }
+    auto val2 = jc::decode_json<ns::reputation_object>(s);
 
-    std::cout << "\n(2)\n";
-    jc::encode_json(book_list, std::cout, jc::indenting::indent);
-    std::cout << "\n\n";
+    assert(val2 == val);
 }
 ```
 Output:
 ```
-(1)
-Haruki Murakami, Kafka on the Shore, 25.17
-Charles Bukowski, Pulp, 22.48
-
-(2)
-[
-    {
-        "author": "Haruki Murakami",
-        "price": 25.17,
-        "title": "Kafka on the Shore"
-    },
-    {
-        "author": "Charles Bukowski",
-        "price": 22.48,
-        "title": "Pulp"
-    }
-]
+{
+    "application": "hiking",
+    "reputons": [
+        {
+            "assertion": "strong-hiker",
+            "rated": "Marilyn C",
+            "rater": "HikingAsylum.example.com",
+            "rating": 0.9
+        }
+    ]
+}
 ```
 
 See [type extensibility](doc/Tutorials/Type%20Extensibility.md)
