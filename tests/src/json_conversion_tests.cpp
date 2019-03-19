@@ -122,19 +122,34 @@ TEST_CASE("book_conversion_test")
 
 }
 
-struct reputon
-{
-    std::string rater;
-    std::string assertion;
-    std::string rated;
-    double rating;
-};    
+namespace ns {
 
-struct reputation_object
-{
-    std::string application;
-    std::vector<reputon> reputons;
-    public:
+    struct reputon
+    {
+        std::string rater;
+        std::string assertion;
+        std::string rated;
+        double rating;
+
+        friend bool operator==(const reputon& lhs, const reputon& rhs)
+        {
+            return lhs.rater == rhs.rater &&
+                lhs.assertion == rhs.assertion &&
+                lhs.rated == rhs.rated &&
+                lhs.rating == rhs.rating;
+        }
+
+        friend bool operator!=(const reputon& lhs, const reputon& rhs)
+        {
+            return !(lhs == rhs);
+        };
+    };
+
+    struct reputation_object
+    {
+        std::string application;
+        std::vector<reputon> reputons;
+
         reputation_object()
             : application("hiking")
         {
@@ -142,22 +157,50 @@ struct reputation_object
         reputation_object(const std::string& application, const std::vector<reputon>& reputons)
             : application(application), reputons(reputons)
         {}
-};
+
+        friend bool operator==(const reputation_object& lhs, const reputation_object& rhs)
+        {
+            if (lhs.application != rhs.application)
+            {
+                return false;
+            }
+            if (lhs.reputons.size() != rhs.reputons.size())
+            {
+                return false;
+            }
+            for (size_t i = 0; i < lhs.reputons.size(); ++i)
+            {
+                if (lhs.reputons[i] != rhs.reputons[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        friend bool operator!=(const reputation_object& lhs, const reputation_object& rhs)
+        {
+            return !(lhs == rhs);
+        };
+    };
+
+} // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_TYPE_TRAITS_DECL(reputon, rater, assertion, rated, rating);
-JSONCONS_TYPE_TRAITS_DECL(reputation_object, application, reputons);
+JSONCONS_TYPE_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
+JSONCONS_TYPE_TRAITS_DECL(ns::reputation_object, application, reputons);
 
 TEST_CASE("reputation_object")
 {
-    reputation_object val("hiking", { reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
+    ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
 
-    jc::encode_json(val, std::cout);
-    std::cout << "\n";
-    
-    std::string s = R"({"reputons":[{"assertion":"strong-hiker","rated":"Marilyn C","rater":"HikingAsylum.example.com","rating":0.9}]})";
+    std::string s;
+    jc::encode_json(val, s, jc::indenting::indent);
+    std::cout << s << "\n";
 
-    reputation_object val2 = jc::decode_json<reputation_object>(s);
+    auto val2 = jc::decode_json<ns::reputation_object>(s);
+
+    CHECK(val2 == val);
 }
 
 
