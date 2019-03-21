@@ -252,11 +252,14 @@ namespace ns {
         };
     };
 
-    struct reputation_object
+    class reputation_object
     {
         std::string application;
         std::vector<reputon> reputons;
 
+        // Define the json_type_traits instantiations as friends to give accesses to private members
+        friend struct jsoncons::json_type_traits<jsoncons::json,reputation_object>;
+    public:
         reputation_object()
             : application("hiking")
         {
