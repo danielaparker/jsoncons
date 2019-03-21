@@ -1110,7 +1110,7 @@ public:
         walk(source,ec);
         if (ec)
         {
-            throw serialization_error(ec,source.position());
+            throw ser_error(ec,source.position());
         }
         p_ = p_ + source.position() - 1;
         return *this;
@@ -1124,7 +1124,7 @@ public:
         walk(source,ec);
         if (ec)
         {
-            throw serialization_error(ec,source.position());
+            throw ser_error(ec,source.position());
         }
         p_ = p_ + source.position() - 1;
         return temp;
@@ -1137,7 +1137,7 @@ public:
         walk(source,ec);
         if (ec)
         {
-            throw serialization_error(ec,source.position());
+            throw ser_error(ec,source.position());
         }
         const uint8_t* endp = p_ + source.position() - 1;
 
@@ -1154,7 +1154,7 @@ public:
         walk(source,ec);
         if (ec)
         {
-            throw serialization_error(ec,source.position());
+            throw ser_error(ec,source.position());
         }
         const uint8_t* endp = p_ + source.position() - 1;
 
@@ -1200,7 +1200,7 @@ public:
         std::string s = get_text_string(source,ec);
         if (ec)
         {
-            throw serialization_error(ec,source.position());
+            throw ser_error(ec,source.position());
         }
         return s;
     }
@@ -1259,12 +1259,12 @@ public:
         walk(source,ec);
         if (ec)
         {
-            throw serialization_error(ec,source.position());
+            throw ser_error(ec,source.position());
         }
         walk(source,ec);
         if (ec)
         {
-            throw serialization_error(ec,source.position());
+            throw ser_error(ec,source.position());
         }
         p_ = p_ + source.position() - 1;
         return *this;
@@ -1278,12 +1278,12 @@ public:
         walk(source,ec);
         if (ec)
         {
-            throw serialization_error(ec,source.position());
+            throw ser_error(ec,source.position());
         }
         walk(source,ec);
         if (ec)
         {
-            throw serialization_error(ec,source.position());
+            throw ser_error(ec,source.position());
         }
         p_ = p_ + source.position() - 1;
         return temp;
@@ -1298,7 +1298,7 @@ public:
         walk(source,ec);
         if (ec)
         {
-            throw serialization_error(ec,source.position());
+            throw ser_error(ec,source.position());
         }
         const uint8_t* endk = p_ + source.position() - 1;
 
@@ -1308,7 +1308,7 @@ public:
         walk(source,ec);
         if (ec)
         {
-            throw serialization_error(ec,source.position());
+            throw ser_error(ec,source.position());
         }
         const uint8_t* endv = p_ + source.position() - 1;
         const_cast<key_value_view<T>*>(&kvpair_)->val_end_ = endv;
@@ -1327,7 +1327,7 @@ public:
         walk(source,ec);
         if (ec)
         {
-            throw serialization_error(ec,source.position());
+            throw ser_error(ec,source.position());
         }
         const uint8_t* endk = p_ + source.position() - 1;
 
@@ -1337,7 +1337,7 @@ public:
         walk(source,ec);
         if (ec)
         {
-            throw serialization_error(ec,source.position());
+            throw ser_error(ec,source.position());
         }
         const uint8_t* endv = p_ + source.position() - 1;
 

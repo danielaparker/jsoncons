@@ -1,26 +1,26 @@
-### jsoncons::serialization_error
+### jsoncons::ser_error
 
 #### Header
 
     #include <jsoncons/json_exception.hpp>
 
-`jsoncons::serialization_error` defines an exception type for reporting serialization and deserialization failures.
+`jsoncons::ser_error` defines an exception type for reporting serialization and deserialization failures.
 
-![serialization_error](./diagrams/serialization_error.png)
+![ser_error](./diagrams/serialization_error.png)
 
 std::exception
 
 #### Constructors
 
-    serialization_error(std::error_code ec);
+    ser_error(std::error_code ec);
 
-    serialization_error(std::error_code ec, size_t position);
+    ser_error(std::error_code ec, size_t position);
 
-    serialization_error(std::error_code ec,
+    ser_error(std::error_code ec,
                         size_t line,
                         size_t column);
 
-    serialization_error(const serialization_error& other);
+    ser_error(const ser_error& other);
 
 #### Member functions
 
@@ -53,9 +53,9 @@ Returns an error code for this exception
         {
             jsoncons::json val = jsoncons::json::parse(s);
         } 
-        catch(const jsoncons::serialization_error& e) 
+        catch(const jsoncons::ser_error& e) 
         {
-            std::cout << "Caught serialization_error with category " 
+            std::cout << "Caught ser_error with category " 
                       << e.code().category().name() 
                               << ", code " << e.code().value() 
                       << " and message " << e.what() << std::endl;
@@ -65,4 +65,4 @@ Returns an error code for this exception
 
 Output:
 
-    Caught serialization_error with category json_input, code 1 and message Unexpected value separator ',' at line 1 and column 10
+    Caught ser_error with category json_input, code 1 and message Unexpected value separator ',' at line 1 and column 10

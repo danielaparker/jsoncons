@@ -84,7 +84,7 @@ size_t escape_string(const CharT* s, size_t length,
                 unicons::sequence_generator<const CharT*> g(it, end, unicons::conv_flags::strict);
                 if (g.done() || g.status() != unicons::conv_errc())
                 {
-                    throw serialization_error(json_errc::illegal_codepoint);
+                    throw ser_error(json_errc::illegal_codepoint);
                 }
                 uint32_t cp = g.get().codepoint();
                 it += (g.get().length() - 1);
@@ -435,7 +435,7 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type, const serializing_context&) override
+    bool do_begin_object(semantic_tag_type, const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -503,7 +503,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const serializing_context&) override
+    bool do_end_object(const ser_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         unindent();
@@ -519,7 +519,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag_type, const serializing_context&) override
+    bool do_begin_array(semantic_tag_type, const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -588,7 +588,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const serializing_context&) override
+    bool do_end_array(const ser_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         unindent();
@@ -603,7 +603,7 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const serializing_context&) override
+    bool do_name(const string_view_type& name, const ser_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().count() > 0)
@@ -635,7 +635,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag_type, const serializing_context&) override
+    bool do_null_value(semantic_tag_type, const ser_context&) override
     {
         if (!stack_.empty()) 
         {
@@ -656,7 +656,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const ser_context&) override
     {
         if (!stack_.empty()) 
         {
@@ -691,7 +691,7 @@ private:
 
     bool do_byte_string_value(const byte_string_view& b, 
                               semantic_tag_type tag,
-                              const serializing_context&) override
+                              const ser_context&) override
     {
         if (!stack_.empty()) 
         {
@@ -763,7 +763,7 @@ private:
 
     bool do_double_value(double value, 
                          semantic_tag_type,
-                         const serializing_context& context) override
+                         const ser_context& context) override
     {
         if (!stack_.empty()) 
         {
@@ -840,7 +840,7 @@ private:
 
     bool do_int64_value(int64_t value, 
                         semantic_tag_type,
-                        const serializing_context&) override
+                        const ser_context&) override
     {
         if (!stack_.empty()) 
         {
@@ -861,7 +861,7 @@ private:
 
     bool do_uint64_value(uint64_t value, 
                          semantic_tag_type, 
-                         const serializing_context&) override
+                         const ser_context&) override
     {
         if (!stack_.empty()) 
         {
@@ -880,7 +880,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool value, semantic_tag_type, const serializing_context&) override
+    bool do_bool_value(bool value, semantic_tag_type, const ser_context&) override
     {
         if (!stack_.empty()) 
         {
@@ -1159,7 +1159,7 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type, const serializing_context&) override
+    bool do_begin_object(semantic_tag_type, const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1171,7 +1171,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const serializing_context&) override
+    bool do_end_object(const ser_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         stack_.pop_back();
@@ -1185,7 +1185,7 @@ private:
     }
 
 
-    bool do_begin_array(semantic_tag_type, const serializing_context&) override
+    bool do_begin_array(semantic_tag_type, const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1196,7 +1196,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const serializing_context&) override
+    bool do_end_array(const ser_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         stack_.pop_back();
@@ -1208,7 +1208,7 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const serializing_context&) override
+    bool do_name(const string_view_type& name, const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().count() > 0)
         {
@@ -1222,7 +1222,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag_type, const serializing_context&) override
+    bool do_null_value(semantic_tag_type, const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1289,7 +1289,7 @@ private:
         }
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1319,7 +1319,7 @@ private:
 
     bool do_byte_string_value(const byte_string_view& b, 
                               semantic_tag_type tag,
-                              const serializing_context&) override
+                              const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1384,7 +1384,7 @@ private:
 
     bool do_double_value(double value, 
                          semantic_tag_type,
-                         const serializing_context& context) override
+                         const ser_context& context) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1450,7 +1450,7 @@ private:
 
     bool do_int64_value(int64_t value, 
                         semantic_tag_type,
-                        const serializing_context&) override
+                        const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1466,7 +1466,7 @@ private:
 
     bool do_uint64_value(uint64_t value, 
                          semantic_tag_type, 
-                         const serializing_context&) override
+                         const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1480,7 +1480,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool value, semantic_tag_type, const serializing_context&) override
+    bool do_bool_value(bool value, semantic_tag_type, const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {

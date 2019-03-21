@@ -119,7 +119,7 @@ private:
     {
     }
 
-    bool do_begin_object(semantic_tag_type tag, const serializing_context&) override
+    bool do_begin_object(semantic_tag_type tag, const ser_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
@@ -139,7 +139,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const serializing_context&) override
+    bool do_end_object(const ser_context&) override
     {
         JSONCONS_ASSERT(stack_offsets_.size() > 0);
         JSONCONS_ASSERT(stack_offsets_.back().type_ == container_type::object_t);
@@ -165,7 +165,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag_type tag, const serializing_context&) override
+    bool do_begin_array(semantic_tag_type tag, const ser_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
@@ -185,7 +185,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const serializing_context&) override
+    bool do_end_array(const ser_context&) override
     {
         JSONCONS_ASSERT(stack_offsets_.size() > 0);
         JSONCONS_ASSERT(stack_offsets_.back().type_ == container_type::array_t);
@@ -213,13 +213,13 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const serializing_context&) override
+    bool do_name(const string_view_type& name, const ser_context&) override
     {
         stack_.emplace_back(std::true_type(), name.data(), name.length(), string_allocator_);
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const ser_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
@@ -237,7 +237,7 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const byte_string_view& b, semantic_tag_type tag, const serializing_context&) override
+    bool do_byte_string_value(const byte_string_view& b, semantic_tag_type tag, const ser_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
@@ -257,7 +257,7 @@ private:
 
     bool do_int64_value(int64_t value, 
                         semantic_tag_type tag, 
-                        const serializing_context&) override
+                        const ser_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
@@ -277,7 +277,7 @@ private:
 
     bool do_uint64_value(uint64_t value, 
                          semantic_tag_type tag, 
-                         const serializing_context&) override
+                         const ser_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
@@ -297,7 +297,7 @@ private:
 
     bool do_double_value(double value, 
                          semantic_tag_type tag,   
-                         const serializing_context&) override
+                         const ser_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
@@ -315,7 +315,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool value, semantic_tag_type tag, const serializing_context&) override
+    bool do_bool_value(bool value, semantic_tag_type tag, const ser_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
@@ -333,7 +333,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag_type tag, const serializing_context&) override
+    bool do_null_value(semantic_tag_type tag, const ser_context&) override
     {
         switch (stack_offsets_.back().type_)
         {

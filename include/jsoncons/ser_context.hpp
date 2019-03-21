@@ -4,22 +4,22 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_SERIALIZING_CONTEXT_HPP
-#define JSONCONS_SERIALIZING_CONTEXT_HPP
+#ifndef JSONCONS_SER_CONTEXT_HPP
+#define JSONCONS_SER_CONTEXT_HPP
 
 namespace jsoncons {
 
-class serializing_context
+class ser_context
 {
 public:
-    virtual ~serializing_context() = default;
+    virtual ~ser_context() = default;
 
     virtual size_t line_number() const = 0;
 
     virtual size_t column_number() const = 0; 
 };
 
-class null_serializing_context : public serializing_context
+class null_ser_context : public ser_context
 {
 private:
     size_t line_number() const override { return 0; }
@@ -28,8 +28,10 @@ private:
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef serializing_context serializing_context;
-typedef null_serializing_context null_serializing_context;
+typedef ser_context parsing_context;
+typedef ser_context serializing_context;
+typedef null_ser_context null_parsing_context;
+typedef null_ser_context null_serializing_context;
 #endif
 
 }

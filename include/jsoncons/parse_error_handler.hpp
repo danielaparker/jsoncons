@@ -9,7 +9,7 @@
 
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_error.hpp>
-#include <jsoncons/serializing_context.hpp>
+#include <jsoncons/ser_context.hpp>
 
 namespace jsoncons {
 
@@ -21,23 +21,23 @@ public:
     }
 
     bool error(std::error_code ec,
-               const serializing_context& context) noexcept 
+               const ser_context& context) noexcept 
     {
         return do_error(ec,context);
     }
 
     void fatal_error(std::error_code ec,
-                     const serializing_context& context) noexcept 
+                     const ser_context& context) noexcept 
     {
         do_fatal_error(ec,context);
     }
 
 private:
     virtual bool do_error(std::error_code,
-                          const serializing_context& context) noexcept = 0;
+                          const ser_context& context) noexcept = 0;
 
     virtual void do_fatal_error(std::error_code,
-                                const serializing_context&) noexcept
+                                const ser_context&) noexcept
     {
     }
 };
@@ -46,7 +46,7 @@ class default_parse_error_handler : public parse_error_handler
 {
 private:
     bool do_error(std::error_code code,
-                  const serializing_context&) noexcept override
+                  const ser_context&) noexcept override
     {
         static const std::error_code illegal_comment = make_error_code(json_errc::illegal_comment);
 
@@ -64,7 +64,7 @@ private:
 class strict_parse_error_handler : public parse_error_handler
 {
 private:
-    bool do_error(std::error_code, const serializing_context&) noexcept override
+    bool do_error(std::error_code, const ser_context&) noexcept override
     {
         return false;
     }

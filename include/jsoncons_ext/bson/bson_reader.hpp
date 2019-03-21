@@ -21,7 +21,7 @@
 namespace jsoncons { namespace bson {
 
 template <class Source>
-class basic_bson_reader : public serializing_context
+class basic_bson_reader : public ser_context
 {
     Source source_;
     json_content_handler& handler_;
@@ -58,7 +58,7 @@ public:
             handler_.end_object(*this);
             --nesting_depth_;
         }
-        catch (const serialization_error& e)
+        catch (const ser_error& e)
         {
             ec = e.code();
         }

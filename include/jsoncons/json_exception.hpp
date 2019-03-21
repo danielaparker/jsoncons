@@ -88,24 +88,24 @@ private:
     std::string buffer_;
 };
 
-class serialization_error : public std::system_error, public virtual json_exception
+class ser_error : public std::system_error, public virtual json_exception
 {
 public:
-    serialization_error(std::error_code ec)
+    ser_error(std::error_code ec)
         : std::system_error(ec), line_number_(0), column_number_(0)
     {
     }
-    serialization_error(std::error_code ec, size_t position)
+    ser_error(std::error_code ec, size_t position)
         : std::system_error(ec), line_number_(0), column_number_(position)
     {
     }
-    serialization_error(std::error_code ec, size_t line, size_t column)
+    ser_error(std::error_code ec, size_t line, size_t column)
         : std::system_error(ec), line_number_(line), column_number_(column)
     {
     }
-    serialization_error(const serialization_error& other) = default;
+    ser_error(const ser_error& other) = default;
 
-    serialization_error(serialization_error&& other) = default;
+    ser_error(ser_error&& other) = default;
 
     const char* what() const noexcept override
     {
@@ -146,9 +146,10 @@ private:
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef serialization_error json_parse_exception;
-typedef serialization_error parse_exception;
-typedef serialization_error parse_error;
+typedef ser_error serialization_error;
+typedef ser_error json_parse_exception;
+typedef ser_error parse_exception;
+typedef ser_error parse_error;
 #endif
 
 #define JSONCONS_STR2(x)  #x

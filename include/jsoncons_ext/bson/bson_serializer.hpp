@@ -103,7 +103,7 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type, const serializing_context&) override
+    bool do_begin_object(semantic_tag_type, const ser_context&) override
     {
         if (buffer_.size() > 0)
         {
@@ -115,7 +115,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const serializing_context&) override
+    bool do_end_object(const ser_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
 
@@ -135,7 +135,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag_type, const serializing_context&) override
+    bool do_begin_array(semantic_tag_type, const ser_context&) override
     {
         if (buffer_.size() > 0)
         {
@@ -146,7 +146,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const serializing_context&) override
+    bool do_end_array(const ser_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
 
@@ -166,7 +166,7 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const serializing_context&) override
+    bool do_name(const string_view_type& name, const ser_context&) override
     {
         stack_.back().member_offset(buffer_.size());
         buffer_.push_back(0x00); // reserve space for code
@@ -178,13 +178,13 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag_type, const serializing_context&) override
+    bool do_null_value(semantic_tag_type, const ser_context&) override
     {
         before_value(bson_format::null_cd);
         return true;
     }
 
-    bool do_bool_value(bool val, semantic_tag_type, const serializing_context&) override
+    bool do_bool_value(bool val, semantic_tag_type, const ser_context&) override
     {
         before_value(bson_format::bool_cd);
         if (val)
@@ -199,7 +199,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type, const serializing_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag_type, const ser_context&) override
     {
         before_value(bson_format::string_cd);
 
@@ -222,7 +222,7 @@ private:
 
     bool do_byte_string_value(const byte_string_view& b, 
                               semantic_tag_type, 
-                              const serializing_context&) override
+                              const ser_context&) override
     {
         before_value(bson_format::binary_cd);
 
@@ -242,7 +242,7 @@ private:
 
     bool do_int64_value(int64_t val, 
                         semantic_tag_type tag, 
-                        const serializing_context&) override
+                        const ser_context&) override
     {
         if (tag == semantic_tag_type::timestamp)
         {
@@ -270,7 +270,7 @@ private:
 
     bool do_uint64_value(uint64_t val, 
                          semantic_tag_type tag, 
-                         const serializing_context&) override
+                         const ser_context&) override
     {
         if (tag == semantic_tag_type::timestamp)
         {
@@ -298,7 +298,7 @@ private:
 
     bool do_double_value(double val, 
                          semantic_tag_type,
-                         const serializing_context&) override
+                         const ser_context&) override
     {
         before_value(bson_format::double_cd);
 

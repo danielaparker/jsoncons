@@ -18,7 +18,7 @@ class relaxed_error_handler : public parse_error_handler
 private:
 
     bool do_error(std::error_code ec,
-                  const serializing_context&) noexcept override
+                  const ser_context&) noexcept override
     {
         if (ec == jsoncons::json_errc::extra_comma)
         {

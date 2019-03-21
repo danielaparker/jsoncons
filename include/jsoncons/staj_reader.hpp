@@ -18,7 +18,7 @@
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/parse_error_handler.hpp>
-#include <jsoncons/serializing_context.hpp>
+#include <jsoncons/ser_context.hpp>
 #include <jsoncons/result.hpp>
 #include <jsoncons/detail/print_number.hpp>
 
@@ -392,7 +392,7 @@ public:
 
     virtual void next(std::error_code& ec) = 0;
 
-    virtual const serializing_context& context() const = 0;
+    virtual const ser_context& context() const = 0;
 };
 
 template<class CharT>
@@ -402,14 +402,14 @@ public:
 
     virtual ~basic_staj_filter() = default;
 
-    virtual bool accept(const basic_staj_event<CharT>& event, const serializing_context& context) = 0;
+    virtual bool accept(const basic_staj_event<CharT>& event, const ser_context& context) = 0;
 };
 
 template<class CharT>
 class default_basic_staj_filter : public basic_staj_filter<CharT>
 {
 public:
-    bool accept(const basic_staj_event<CharT>&, const serializing_context&) override
+    bool accept(const basic_staj_event<CharT>&, const ser_context&) override
     {
         return true;
     }

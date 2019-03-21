@@ -65,7 +65,7 @@ public:
 
     bool do_string_value(const string_view_type& s, 
                          semantic_tag_type tag, 
-                         const serializing_context& context) override
+                         const ser_context& context) override
     {
         if (tag == semantic_tag_type::none)
         {
@@ -149,7 +149,7 @@ enum class json_parse_state : uint8_t
 };
 
 template <class CharT, class Allocator = std::allocator<char>>
-class basic_json_parser : private serializing_context
+class basic_json_parser : private ser_context
 {
     typedef std::basic_string<CharT> string_type;
     typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
@@ -498,7 +498,7 @@ public:
         check_done(ec);
         if (ec)
         {
-            throw serialization_error(ec,line_,column_);
+            throw ser_error(ec,line_,column_);
         }
     }
 
@@ -549,7 +549,7 @@ public:
         parse_some(handler, ec);
         if (ec)
         {
-            throw serialization_error(ec,line_,column_);
+            throw ser_error(ec,line_,column_);
         }
     }
 
@@ -578,7 +578,7 @@ public:
         finish_parse(handler, ec);
         if (ec)
         {
-            throw serialization_error(ec,line_,column_);
+            throw ser_error(ec,line_,column_);
         }
     }
 
@@ -2607,7 +2607,7 @@ escape_u9:
         finish_parse(handler, ec);
         if (ec)
         {
-            throw serialization_error(ec,line_,column_);
+            throw ser_error(ec,line_,column_);
         }
     }
 

@@ -97,12 +97,12 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type, const serializing_context&) override
+    bool do_begin_object(semantic_tag_type, const ser_context&) override
     {
-        throw serialization_error(msgpack_errc::object_length_required);
+        throw ser_error(msgpack_errc::object_length_required);
     }
 
-    bool do_begin_object(size_t length, semantic_tag_type, const serializing_context&) override
+    bool do_begin_object(size_t length, semantic_tag_type, const ser_context&) override
     {
         stack_.push_back(stack_item(msgpack_container_type::object, length));
 
@@ -132,17 +132,17 @@ private:
         return true;
     }
 
-    bool do_end_object(const serializing_context&) override
+    bool do_end_object(const ser_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
 
         if (stack_.back().count() < stack_.back().length())
         {
-            throw serialization_error( msgpack_errc::too_few_items);
+            throw ser_error( msgpack_errc::too_few_items);
         }
         else if (stack_.back().count() > stack_.back().length())
         {
-            throw serialization_error( msgpack_errc::too_many_items);
+            throw ser_error( msgpack_errc::too_many_items);
         }
 
         stack_.pop_back();
@@ -150,12 +150,12 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag_type, const serializing_context&) override
+    bool do_begin_array(semantic_tag_type, const ser_context&) override
     {
-        throw serialization_error(msgpack_errc::array_length_required);
+        throw ser_error(msgpack_errc::array_length_required);
     }
 
-    bool do_begin_array(size_t length, semantic_tag_type, const serializing_context&) override
+    bool do_begin_array(size_t length, semantic_tag_type, const ser_context&) override
     {
         stack_.push_back(stack_item(msgpack_container_type::array, length));
         if (length <= 15)
@@ -178,17 +178,17 @@ private:
         return true;
     }
 
-    bool do_end_array(const serializing_context&) override
+    bool do_end_array(const ser_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
 
         if (stack_.back().count() < stack_.back().length())
         {
-            throw serialization_error(msgpack_errc::too_few_items);
+            throw ser_error(msgpack_errc::too_few_items);
         }
         else if (stack_.back().count() > stack_.back().length())
         {
-            throw serialization_error(msgpack_errc::too_many_items);
+            throw ser_error(msgpack_errc::too_many_items);
         }
 
         stack_.pop_back();
@@ -196,13 +196,13 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const serializing_context&) override
+    bool do_name(const string_view_type& name, const ser_context&) override
     {
         write_string_value(name);
         return true;
     }
 
-    bool do_null_value(semantic_tag_type, const serializing_context&) override
+    bool do_null_value(semantic_tag_type, const ser_context&) override
     {
         // nil
         jsoncons::detail::to_big_endian(static_cast<uint8_t>(msgpack_format::nil_cd), std::back_inserter(result_));
@@ -210,7 +210,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type, const serializing_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag_type, const ser_context&) override
     {
         write_string_value(sv);
         end_value();
@@ -225,7 +225,7 @@ private:
             unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            throw serialization_error(msgpack_errc::invalid_utf8_text_string);
+            throw ser_error(msgpack_errc::invalid_utf8_text_string);
         }
 
         const size_t length = target.length();
@@ -261,7 +261,7 @@ private:
 
     bool do_byte_string_value(const byte_string_view& b, 
                               semantic_tag_type, 
-                              const serializing_context&) override
+                              const ser_context&) override
     {
 
         const size_t length = b.length();
@@ -295,7 +295,7 @@ private:
 
     bool do_double_value(double val, 
                          semantic_tag_type,
-                         const serializing_context&) override
+                         const ser_context&) override
     {
         float valf = (float)val;
         if ((double)valf == val)
@@ -319,7 +319,7 @@ private:
 
     bool do_int64_value(int64_t val, 
                         semantic_tag_type, 
-                        const serializing_context&) override
+                        const ser_context&) override
     {
         if (val >= 0)
         {
@@ -391,7 +391,7 @@ private:
 
     bool do_uint64_value(uint64_t val, 
                          semantic_tag_type, 
-                         const serializing_context&) override
+                         const ser_context&) override
     {
         if (val <= (std::numeric_limits<int8_t>::max)())
         {
@@ -426,7 +426,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool val, semantic_tag_type, const serializing_context&) override
+    bool do_bool_value(bool val, semantic_tag_type, const ser_context&) override
     {
         // true and false
         result_.push_back(static_cast<uint8_t>(val ? msgpack_format::true_cd : msgpack_format::false_cd));

@@ -30,7 +30,7 @@ Json decode_bson(const std::vector<uint8_t>& v)
     parser.read(ec);
     if (ec)
     {
-        throw serialization_error(ec,parser.line_number(),parser.column_number());
+        throw ser_error(ec,parser.line_number(),parser.column_number());
     }
     return decoder.get_result();
 }
@@ -47,7 +47,7 @@ decode_bson(std::basic_istream<typename Json::char_type>& is)
     parser.read(ec);
     if (ec)
     {
-        throw serialization_error(ec,parser.line_number(),parser.column_number());
+        throw ser_error(ec,parser.line_number(),parser.column_number());
     }
     return decoder.get_result();
 }
@@ -65,7 +65,7 @@ decode_bson(std::basic_istream<typename Json::char_type>& is)
     parser.read(ec);
     if (ec)
     {
-        throw serialization_error(ec,parser.line_number(),parser.column_number());
+        throw ser_error(ec,parser.line_number(),parser.column_number());
     }
     return decoder.get_result();
 }

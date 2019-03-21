@@ -198,7 +198,7 @@ try
     strict_parse_error_handler err_handler;
     json j = json::parse(s, err_handler);
 }
-catch (const serialization_error& e)
+catch (const ser_error& e)
 {
     std::cout << "(2) " << e.what() << std::endl;
 }
@@ -222,7 +222,7 @@ try
     options.max_nesting_depth(20);
     json j = json::parse(s, options);
 }
-catch (const serialization_error& e)
+catch (const ser_error& e)
 {
      std::cout << e.what() << std::endl;
 }
@@ -414,7 +414,7 @@ class author_filter : public staj_filter
 {
     bool accept_next_ = false;
 public:
-    bool accept(const staj_event& event, const serializing_context&) override
+    bool accept(const staj_event& event, const ser_context&) override
     {
         if (event.event_type()  == staj_event_type::name &&
             event.as<jsoncons::string_view>() == "author")

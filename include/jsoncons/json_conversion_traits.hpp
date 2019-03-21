@@ -32,7 +32,7 @@ void decode_stream(basic_staj_reader<CharT>& reader, T& val)
     decode_stream<T,CharT,Json>(reader, val, ec);
     if (ec)
     {
-        throw serialization_error(ec, reader.context().line_number(), reader.context().column_number());
+        throw ser_error(ec, reader.context().line_number(), reader.context().column_number());
     }
 }
 

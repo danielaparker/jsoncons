@@ -20,22 +20,22 @@ will then report all warnings and errors through this interface.
 #### Public interface methods
 
     void error(std::error_code ec,
-               const serializing_context& context) throw (serialization_error) = 0
-Called for recoverable errors. Calls `do_error`, if `do_error` returns `false`, throws a [serialization_error](serialization_error.md), otherwise an attempt is made to recover.
+               const ser_context& context) throw (ser_error) = 0
+Called for recoverable errors. Calls `do_error`, if `do_error` returns `false`, throws a [ser_error](serialization_error.md), otherwise an attempt is made to recover.
 
     void fatal_error(std::error_code ec,
-                     const serializing_context& context) throw (serialization_error) = 0
-Called for unrecoverable errors. Calls `do_fatal_error` and throws a [serialization_error](serialization_error.md).
+                     const ser_context& context) throw (ser_error) = 0
+Called for unrecoverable errors. Calls `do_fatal_error` and throws a [ser_error](serialization_error.md).
 
 #### Private virtual implementation methods
 
     virtual bool do_error(std::error_code ec,
-                          const serializing_context& context) = 0
+                          const ser_context& context) = 0
 Receive an error event, possibly recoverable. An [error_code](json_error_category.md) indicates the type of error. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. Returns `false` to fail, `true` to attempt recovery.
 
     virtual void do_fatal_error(std::error_code ec,
-                                const serializing_context& context) = 0
+                                const ser_context& context) = 0
 Receives a non recoverable error. An [error_code](json_error_category.md) indicates the type of error. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
     

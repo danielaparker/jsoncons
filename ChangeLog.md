@@ -8,6 +8,8 @@ Bug fix:
 Non-breaking changes
 
 - The name `is_json_type_traits_impl` has been deprecated and renamed to `is_json_type_traits_declared`
+- The name `serializing_context` has been deprecated and renamed to `ser_context`
+- The name `serialization_error` has been deprecated and renamed to `ser_error`
 
 Enhancements
 

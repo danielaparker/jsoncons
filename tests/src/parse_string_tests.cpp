@@ -26,7 +26,7 @@ public:
 private:
     std::error_code value_;
 
-    bool do_error(std::error_code ec, const serializing_context&) noexcept
+    bool do_error(std::error_code ec, const ser_context&) noexcept
     {
         return ec == value_; // if returns true, use default processing
     }

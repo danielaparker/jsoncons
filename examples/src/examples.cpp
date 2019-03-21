@@ -59,7 +59,7 @@ void comment_example()
         strict_parse_error_handler err_handler;
         json j = json::parse(s, err_handler);
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
         std::cout << "(2) " << e.what() << std::endl;
     }
@@ -154,7 +154,7 @@ void first_example_c()
             book.get_with_default<json>("price", "N/A").dump(price,options);
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
-        catch (const serialization_error& e)
+        catch (const ser_error& e)
         {
             std::cerr << e.what() << std::endl;
         }
@@ -403,9 +403,9 @@ void parse_error_example()
     {
         jsoncons::json val = jsoncons::json::parse(s);
     } 
-    catch(const jsoncons::serialization_error& e) 
+    catch(const jsoncons::ser_error& e) 
     {
-        std::cout << "Caught serialization_error with category " << e.code().category().name() 
+        std::cout << "Caught ser_error with category " << e.code().category().name() 
                   << ", code " << e.code().value() 
                   << " and message " << e.what() << std::endl;
     }
@@ -443,7 +443,7 @@ void max_nesting_path_example()
         options.max_nesting_depth(20);
         json::parse(s, options);
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
          std::cout << e.what() << std::endl;
     }

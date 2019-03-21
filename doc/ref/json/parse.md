@@ -27,10 +27,10 @@ static json parse(std::istream& is,
                   parse_error_handler& err_handler); // (8)
 ```
 (1) - (4) Parses a string of JSON text and returns a json object or array value. 
-Throws [serialization_error](serialization_error.md) if parsing fails.
+Throws [ser_error](serialization_error.md) if parsing fails.
 
 (5) - (8) Parses an input stream of JSON text and returns a json object or array value. 
-Throws [serialization_error](serialization_error.md) if parsing fails.
+Throws [ser_error](serialization_error.md) if parsing fails.
 
 ### Examples
 
@@ -66,7 +66,7 @@ try
 {
     json val = json::parse("[1,2,3,4,]");
 } 
-catch(const jsoncons::serialization_error& e) 
+catch(const jsoncons::ser_error& e) 
 {
     std::cout << e.what() << std::endl;
 }

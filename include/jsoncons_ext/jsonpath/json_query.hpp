@@ -146,7 +146,7 @@ enum class path_state
 template<class Json,
          class JsonReference,
          class PathCons>
-class jsonpath_evaluator : private serializing_context
+class jsonpath_evaluator : private ser_context
 {
     typedef typename Json::char_type char_type;
     typedef typename Json::char_traits_type char_traits_type;
@@ -733,7 +733,7 @@ public:
                                 auto temp = create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
-                            catch (const serialization_error&)
+                            catch (const ser_error&)
                             {
                                 ec = jsonpath_errc::argument_parse_error;
                                 return;
@@ -749,7 +749,7 @@ public:
                                 auto temp = create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
-                            catch (const serialization_error&)
+                            catch (const ser_error&)
                             {
                                 ec = jsonpath_errc::argument_parse_error;
                                 return;
@@ -810,7 +810,7 @@ public:
                                 auto temp = create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
-                            catch (const serialization_error&)
+                            catch (const ser_error&)
                             {
                                 ec = jsonpath_errc::argument_parse_error;
                                 return;
@@ -826,7 +826,7 @@ public:
                                 auto temp = create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
-                            catch (const serialization_error&)
+                            catch (const ser_error&)
                             {
                                 ec = jsonpath_errc::argument_parse_error;
                                 return;

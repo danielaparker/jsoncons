@@ -19,7 +19,7 @@ void test_parse_error(const std::string& text, std::error_code ec)
     {
         json::parse(text);        
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
         if (e.code() != ec)
         {

@@ -118,7 +118,7 @@ public:
         read(ec);
         if (ec)
         {
-            throw serialization_error(ec,parser_.line_number(),parser_.column_number());
+            throw ser_error(ec,parser_.line_number(),parser_.column_number());
         }
     }
 
@@ -128,7 +128,7 @@ public:
         {
             read_internal(ec);
         }
-        catch (const serialization_error& e)
+        catch (const ser_error& e)
         {
             ec = e.code();
         }

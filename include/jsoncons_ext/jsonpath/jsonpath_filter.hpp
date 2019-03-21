@@ -1469,7 +1469,7 @@ public:
                                     auto val = Json::parse(buffer);
                                     push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
                                 }
-                                catch (const serialization_error&)
+                                catch (const ser_error&)
                                 {
                                     throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
                                 }
@@ -1505,7 +1505,7 @@ public:
                                         auto val = Json::parse(buffer);
                                         push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
                                     }
-                                    catch (const serialization_error&)
+                                    catch (const ser_error&)
                                     {
                                         throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
                                     }
@@ -1525,7 +1525,7 @@ public:
                                     auto val = Json::parse(buffer);
                                     push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
                                 }
-                                catch (const serialization_error&)
+                                catch (const ser_error&)
                                 {
                                     throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
                                 }
@@ -1573,7 +1573,7 @@ public:
                                 auto val = Json::parse(buffer);
                                 push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
                             }
-                            catch (const serialization_error&)
+                            catch (const ser_error&)
                             {
                                 throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
                             }
@@ -1610,7 +1610,7 @@ public:
                             auto val = Json::parse(buffer);
                             push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
                         }
-                        catch (const serialization_error&)
+                        catch (const ser_error&)
                         {
                             throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
                         }

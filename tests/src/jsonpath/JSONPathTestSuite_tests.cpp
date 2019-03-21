@@ -73,7 +73,7 @@ TEST_CASE("JSONPath Test Suite")
                     j = ojson::parse(is);
                     expected_dictionary[p.path().stem()] = j;
                 }
-                catch (const jsoncons::serialization_error& e)
+                catch (const jsoncons::ser_error& e)
                 {
                     std::cerr << e.what() << std::endl;
                     return; 
@@ -92,7 +92,7 @@ TEST_CASE("JSONPath Test Suite")
                 ojson result = json_query(document, pair.second);
                 CHECK(it->second == result);
             }
-            catch (const jsoncons::serialization_error& e)
+            catch (const jsoncons::ser_error& e)
             {
                 std::cerr << pair.first << " " << pair.second << " " << e.what() << std::endl;
             }

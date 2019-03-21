@@ -83,7 +83,7 @@ Returns `true` if the input in the source buffer has been exhausted, `false` oth
     void parse_some(json_content_handler& handler)
 Parses the source until a complete json text has been consumed or the source has been exhausted.
 Parse events are sent to the supplied `handler`.
-Throws [serialization_error](serialization_error.md) if parsing fails.
+Throws [ser_error](serialization_error.md) if parsing fails.
 
     void parse_some(json_content_handler<CharT>& handler,
                     std::error_code& ec)
@@ -94,7 +94,7 @@ Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
     void finish_parse(json_content_handler<CharT>& handler)
 Called after `source_exhausted()` is `true` and there is no more input. 
 Repeatedly calls `parse_some(handler)` until `finished()` returns `true`
-Throws [serialization_error](serialization_error.md) if parsing fails.
+Throws [ser_error](serialization_error.md) if parsing fails.
 
     void finish_parse(json_content_handler<CharT>& handler,
                    std::error_code& ec)
@@ -104,11 +104,11 @@ Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
 
     void skip_bom()
 Reads the next JSON text from the stream and reports JSON events to a [json_content_handler](json_content_handler.md), such as a [json_decoder](json_decoder.md).
-Throws [serialization_error](serialization_error.md) if parsing fails.
+Throws [ser_error](serialization_error.md) if parsing fails.
 
     void check_done()
 Throws if there are any unconsumed non-whitespace characters in the input.
-Throws [serialization_error](serialization_error.md) if parsing fails.
+Throws [ser_error](serialization_error.md) if parsing fails.
 
     void check_done(std::error_code& ec)
 Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
@@ -150,7 +150,7 @@ int main()
         json j = decoder.get_result();
         std::cout << "(5) " << j << "\n";
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
         std::cout << e.what() << std::endl;
     }
@@ -195,7 +195,7 @@ int main()
                              // non-whitespace characters in the input
                              // (there are)
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
         std::cout << "(4) " << e.what() << std::endl;
     }
@@ -240,7 +240,7 @@ int main()
         parser.finish_parse(decoder);
         parser.check_done();
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
         std::cout << e.what() << std::endl;
     }

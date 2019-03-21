@@ -56,7 +56,7 @@ Returns `true` when there is no more data to be read from the stream, `false` ot
 
     void read()
 Reports JSON related events for JSON objects, arrays, object members and array elements to a [json_content_handler](../json_content_handler.md), such as a [json_decoder](json_decoder.md).
-Throws [serialization_error](../serialization_error.md) if parsing fails.
+Throws [ser_error](../serialization_error.md) if parsing fails.
 
     size_t buffer_length() const
 

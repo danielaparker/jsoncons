@@ -97,7 +97,7 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type, const serializing_context&) override
+    bool do_begin_object(semantic_tag_type, const ser_context&) override
     {
         stack_.push_back(stack_item(cbor_container_type::indefinite_length_object));
         
@@ -105,7 +105,7 @@ private:
         return true;
     }
 
-    bool do_begin_object(size_t length, semantic_tag_type, const serializing_context&) override
+    bool do_begin_object(size_t length, semantic_tag_type, const ser_context&) override
     {
         stack_.push_back(stack_item(cbor_container_type::object, length));
 
@@ -146,7 +146,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const serializing_context&) override
+    bool do_end_object(const ser_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
@@ -157,11 +157,11 @@ private:
         {
             if (stack_.back().count() < stack_.back().length())
             {
-                throw serialization_error(cbor_errc::too_few_items);
+                throw ser_error(cbor_errc::too_few_items);
             }
             if (stack_.back().count() > stack_.back().length())
             {
-                throw serialization_error(cbor_errc::too_many_items);
+                throw ser_error(cbor_errc::too_many_items);
             }
         }
 
@@ -171,14 +171,14 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag_type, const serializing_context&) override
+    bool do_begin_array(semantic_tag_type, const ser_context&) override
     {
         stack_.push_back(stack_item(cbor_container_type::indefinite_length_array));
         result_.push_back(0x9f);
         return true;
     }
 
-    bool do_begin_array(size_t length, semantic_tag_type tag, const serializing_context&) override
+    bool do_begin_array(size_t length, semantic_tag_type tag, const ser_context&) override
     {
         if (length == 2 && tag == semantic_tag_type::big_float)
         {
@@ -221,7 +221,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const serializing_context&) override
+    bool do_end_array(const ser_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
 
@@ -233,11 +233,11 @@ private:
         {
             if (stack_.back().count() < stack_.back().length())
             {
-                throw serialization_error(cbor_errc::too_few_items);
+                throw ser_error(cbor_errc::too_few_items);
             }
             if (stack_.back().count() > stack_.back().length())
             {
-                throw serialization_error(cbor_errc::too_many_items);
+                throw ser_error(cbor_errc::too_many_items);
             }
         }
 
@@ -247,13 +247,13 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const serializing_context&) override
+    bool do_name(const string_view_type& name, const ser_context&) override
     {
         write_string(name);
         return true;
     }
 
-    bool do_null_value(semantic_tag_type tag, const serializing_context&) override
+    bool do_null_value(semantic_tag_type tag, const ser_context&) override
     {
         if (tag == semantic_tag_type::undefined)
         {
@@ -379,7 +379,7 @@ private:
         }
     }
 
-    void write_decimal_value(const string_view_type& sv, const serializing_context& context)
+    void write_decimal_value(const string_view_type& sv, const ser_context& context)
     {
         decimal_parse_state state = decimal_parse_state::start;
         std::basic_string<CharT> s;
@@ -499,7 +499,7 @@ private:
         do_end_array(context);
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context& context) override
+    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const ser_context& context) override
     {
         switch (tag)
         {
@@ -554,7 +554,7 @@ private:
 
     bool do_byte_string_value(const byte_string_view& b, 
                               semantic_tag_type tag, 
-                              const serializing_context&) override
+                              const ser_context&) override
     {
         byte_string_chars_format encoding_hint;
         switch (tag)
@@ -632,7 +632,7 @@ private:
 
     bool do_double_value(double val, 
                          semantic_tag_type tag,
-                         const serializing_context&) override
+                         const ser_context&) override
     {
         if (tag == semantic_tag_type::timestamp)
         {
@@ -661,7 +661,7 @@ private:
 
     bool do_int64_value(int64_t value, 
                         semantic_tag_type tag, 
-                        const serializing_context&) override
+                        const ser_context&) override
     {
         if (tag == semantic_tag_type::timestamp)
         {
@@ -745,7 +745,7 @@ private:
 
     bool do_uint64_value(uint64_t value, 
                          semantic_tag_type tag, 
-                         const serializing_context&) override
+                         const ser_context&) override
     {
         if (tag == semantic_tag_type::timestamp)
         {
@@ -789,7 +789,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool value, semantic_tag_type, const serializing_context&) override
+    bool do_bool_value(bool value, semantic_tag_type, const ser_context&) override
     {
         if (value)
         {

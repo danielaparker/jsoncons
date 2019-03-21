@@ -80,7 +80,7 @@ void json_replace_example2()
 }]}}
 )");
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
         std::cout << e.what() << "\n";
     }

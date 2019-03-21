@@ -45,7 +45,7 @@ function to advance to the next event, until `done()` returns `true`.
                      parse_error_handler& err_handler); // (7)
 
 Constructors (1)-(7) read from a `std::istream` and throw a 
-[serialization_error](serialization_error.md) if a parsing error is encountered 
+[ser_error](serialization_error.md) if a parsing error is encountered 
 while processing the initial event.
 
 (1) Constructs a `json_pull_reader` that reads from an input stream `is` of 
@@ -136,7 +136,7 @@ if a parsing error is encountered while processing the initial event.
                      parse_error_handler& err_handler); // (21)
 
 Constructors (15)-(21) read from a `string_view_type` and throw a 
-[serialization_error](serialization_error.md) if a parsing error s encountered 
+[ser_error](serialization_error.md) if a parsing error s encountered 
 while processing the initial event.
 
     json_pull_reader(std::string_view_type& s,
@@ -187,7 +187,7 @@ Sends the parse events from the current event to the
 matching completion event to the supplied [handler](json_content_handler.md)
 E.g., if the current event is `begin_object`, sends the `begin_object`
 event and all inbetween events until the matching `end_object` event.
-If a parsing error is encountered, throws a [serialization_error](serialization_error.md).
+If a parsing error is encountered, throws a [ser_error](serialization_error.md).
 
     void accept(json_content_handler& handler,
                 std::error_code& ec) override
@@ -199,12 +199,12 @@ If a parsing error is encountered, sets `ec`.
 
     void next() override;
 Advances to the next event. If a parsing error is encountered, throws a 
-[serialization_error](serialization_error.md).
+[ser_error](serialization_error.md).
 
     void next(std::error_code& ec) override;
 Advances to the next event. If a parsing error is encountered, sets `ec`.
 
-    const serializing_context& context() const override;
+    const ser_context& context() const override;
 Returns the current [context](serializing_context.md)
 
 ### Examples
@@ -344,7 +344,7 @@ class author_filter : public staj_filter
 {
     bool accept_next_ = false;
 public:
-    bool accept(const staj_event& event, const serializing_context&) override
+    bool accept(const staj_event& event, const ser_context&) override
     {
         if (event.event_type()  == staj_event_type::name &&
             event.as<jsoncons::string_view>() == "author")

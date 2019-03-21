@@ -15,7 +15,7 @@ Json decode_msgpack(std::basic_istream<typename Json::char_type>& is); // (2)
 
 #### Exceptions
 
-Throws [serialization_error](../serialization_error.md) if parsing fails.
+Throws [ser_error](../serialization_error.md) if parsing fails.
 
 #### See also
 

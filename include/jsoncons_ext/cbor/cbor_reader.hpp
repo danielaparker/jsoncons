@@ -22,7 +22,7 @@
 namespace jsoncons { namespace cbor {
 
 template <class Source>
-class basic_cbor_reader : public serializing_context
+class basic_cbor_reader : public ser_context
 {
     Source source_;
     json_content_handler& handler_;
@@ -42,7 +42,7 @@ public:
         {
             read_internal(ec);
         }
-        catch (const serialization_error& e)
+        catch (const ser_error& e)
         {
             ec = e.code();
         }

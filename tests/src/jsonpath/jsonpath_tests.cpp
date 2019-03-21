@@ -1111,7 +1111,7 @@ TEST_CASE("test_replace")
 }]}}
 )");
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
         std::cout << e.what() << std::endl;
     }

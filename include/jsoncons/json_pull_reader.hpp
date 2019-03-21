@@ -48,49 +48,49 @@ public:
     }
 private:
 
-    bool do_begin_object(semantic_tag_type, const serializing_context&) override
+    bool do_begin_object(semantic_tag_type, const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::begin_object);
         return false;
     }
 
-    bool do_end_object(const serializing_context&) override
+    bool do_end_object(const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::end_object);
         return false;
     }
 
-    bool do_begin_array(semantic_tag_type, const serializing_context&) override
+    bool do_begin_array(semantic_tag_type, const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::begin_array);
         return false;
     }
 
-    bool do_end_array(const serializing_context&) override
+    bool do_end_array(const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::end_array);
         return false;
     }
 
-    bool do_name(const string_view_type& name, const serializing_context&) override
+    bool do_name(const string_view_type& name, const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(name.data(), name.length(), staj_event_type::name);
         return false;
     }
 
-    bool do_null_value(semantic_tag_type, const serializing_context&) override
+    bool do_null_value(semantic_tag_type, const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::null_value);
         return false;
     }
 
-    bool do_bool_value(bool value, semantic_tag_type, const serializing_context&) override
+    bool do_bool_value(bool value, semantic_tag_type, const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(value);
         return false;
     }
 
-    bool do_string_value(const string_view_type& s, semantic_tag_type tag, const serializing_context&) override
+    bool do_string_value(const string_view_type& s, semantic_tag_type tag, const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(s.data(), s.length(), staj_event_type::string_value, tag);
         return false;
@@ -98,14 +98,14 @@ private:
 
     bool do_byte_string_value(const byte_string_view&, 
                               semantic_tag_type,
-                              const serializing_context&) override
+                              const ser_context&) override
     {
         JSONCONS_UNREACHABLE();
     }
 
     bool do_int64_value(int64_t value, 
                         semantic_tag_type tag,
-                        const serializing_context&) override
+                        const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
         return false;
@@ -113,7 +113,7 @@ private:
 
     bool do_uint64_value(uint64_t value, 
                          semantic_tag_type tag, 
-                         const serializing_context&) override
+                         const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
         return false;
@@ -121,7 +121,7 @@ private:
 
     bool do_double_value(double value, 
                          semantic_tag_type tag, 
-                         const serializing_context&) override
+                         const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
         return false;
@@ -153,7 +153,7 @@ public:
 };
 
 template<class CharT,class Allocator=std::allocator<CharT>>
-class basic_json_pull_reader : public basic_staj_reader<CharT>, private virtual serializing_context
+class basic_json_pull_reader : public basic_staj_reader<CharT>, private virtual ser_context
 {
     static const size_t default_max_buffer_length = 16384;
 
@@ -449,7 +449,7 @@ public:
         accept(handler, ec);
         if (ec)
         {
-            throw serialization_error(ec,parser_.line_number(),parser_.column_number());
+            throw ser_error(ec,parser_.line_number(),parser_.column_number());
         }
     }
 
@@ -540,7 +540,7 @@ public:
         next(ec);
         if (ec)
         {
-            throw serialization_error(ec,parser_.line_number(),parser_.column_number());
+            throw ser_error(ec,parser_.line_number(),parser_.column_number());
         }
     }
 
@@ -620,11 +620,11 @@ public:
         check_done(ec);
         if (ec)
         {
-            throw serialization_error(ec,parser_.line_number(),parser_.column_number());
+            throw ser_error(ec,parser_.line_number(),parser_.column_number());
         }
     }
 
-    const serializing_context& context() const override
+    const ser_context& context() const override
     {
         return *this;
     }

@@ -42,7 +42,7 @@ TEST_CASE("test_exception_left_brace")
         json_reader reader(is,decoder);
         reader.read_next();
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
         CHECK(e.code() == json_errc::expected_comma_or_right_bracket);
         CHECK(14 == e.line_number());
@@ -62,7 +62,7 @@ TEST_CASE("test_exception_right_brace")
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
         //std::cout << e.what() << std::endl;
         CHECK(e.code() == json_errc::expected_comma_or_right_brace);
@@ -83,7 +83,7 @@ TEST_CASE("test_exception_array_eof")
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
         CHECK(e.code() == json_errc::unexpected_eof);
         CHECK(1 == e.line_number());
@@ -103,7 +103,7 @@ TEST_CASE("test_exception_unicode_eof")
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
         //std::cout << e.what() << std::endl;
         CHECK(e.code() == json_errc::unexpected_eof);
@@ -124,7 +124,7 @@ TEST_CASE("test_exception_tru_eof")
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
         //std::cout << e.what() << std::endl;
         CHECK(e.code() == json_errc::unexpected_eof);
@@ -145,7 +145,7 @@ TEST_CASE("test_exception_fals_eof")
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
         //std::cout << e.what() << std::endl;
         CHECK(e.code() == json_errc::unexpected_eof);
@@ -166,7 +166,7 @@ TEST_CASE("test_exception_nul_eof")
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
         //std::cout << e.what() << std::endl;
         CHECK(e.code() == json_errc::unexpected_eof);
@@ -187,7 +187,7 @@ TEST_CASE("test_exception_true_eof")
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
         CHECK(e.code() == json_errc::unexpected_eof);
         CHECK(1 == e.line_number());
@@ -207,7 +207,7 @@ TEST_CASE("test_exception_false_eof")
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
         CHECK(e.code() == json_errc::unexpected_eof);
         CHECK(1 == e.line_number());
@@ -227,7 +227,7 @@ TEST_CASE("test_exception_null_eof")
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
         CHECK(e.code() == json_errc::unexpected_eof);
         CHECK(1 == e.line_number());
@@ -239,12 +239,12 @@ TEST_CASE("test_exception_null_eof")
 TEST_CASE("test_exception")
 {
     std::string input("{\"field1\":\n\"value}");
-    REQUIRE_THROWS_AS(json::parse(input),serialization_error);
+    REQUIRE_THROWS_AS(json::parse(input),ser_error);
     try
     {
         json::parse(input);
     }
-    catch (const serialization_error& e)
+    catch (const ser_error& e)
     {
         CHECK((e.code() == json_errc::unexpected_eof && e.line_number() == 2 && e.column_number() == 9));
     }
