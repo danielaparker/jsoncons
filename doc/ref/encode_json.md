@@ -7,24 +7,62 @@ have [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/do
 ```c++
 #include <jsoncons/json.hpp>
 
-template <class T, class CharT, class Json=basic_json<CharT>>
-void encode_json(const T& val, basic_json_content_handler<CharT>& handler); // (1)
-
-template <class T, class CharT, class Json=basic_json<CharT>>
-void encode_json(const T& val, std::basic_ostream<CharT>& os); // (2)
-
-template <class T, class CharT, class Json=basic_json<CharT>>
+template <class T, class CharT>
 void encode_json(const T& val, 
-                 const basic_json_options<CharT>& options,
-                 std::basic_ostream<CharT>& os); // (3)
+                 basic_json_content_handler<CharT>& writer); // (1)
 
-template <class T, class CharT, class Json=basic_json<CharT>>
-void encode_json(const T& val, std::basic_ostream<CharT>& os, indenting line_indent); // (4)
-
-template <class T, class CharT, class Json=basic_json<CharT>>
+template <class T, class CharT>
 void encode_json(const T& val, 
-                 const basic_json_options<CharT>& options,
-                 std::basic_ostream<CharT>& os, indenting line_indent); // (5)
+                 std::basic_ostream<CharT>& os, 
+                 indenting line_indent = indenting::no_indent); // (2)
+
+template <class T, class CharT>
+void encode_json(const T& val,
+                 std::basic_ostream<CharT>& os, 
+                 const basic_json_options<CharT>& options, 
+                 indenting line_indent = indenting::no_indent); // (3)
+
+template <class T, class CharT>
+void encode_json(const T& val, 
+                 std::basic_string<CharT>& s, 
+                 indenting line_indent = indenting::no_indent); // (4)
+
+template <class T, class CharT>
+void encode_json(const T& val,
+                 std::basic_string<CharT>& s, 
+                 const basic_json_options<CharT>& options, 
+                 indenting line_indent = indenting::no_indent); // (5)
+
+template <class T, class CharT, class Json>
+void encode_json(const T& val, 
+                 basic_json_content_handler<CharT>& writer, 
+                 const Json&); // (6)
+
+template <class T, class CharT, class Json>
+void encode_json(const T& val, 
+                 std::basic_ostream<CharT>& os, 
+                 indenting line_indent, 
+                 const Json& j); // (7)
+
+template <class T, class CharT, class Json>
+void encode_json(const T& val,
+                 std::basic_ostream<CharT>& os, 
+                 const basic_json_options<CharT>& options, 
+                 indenting line_indent, 
+                 const Json& j); // (8)
+
+template <class T, class CharT, class Json>
+void encode_json(const T& val, 
+                 std::basic_string<CharT>& s, 
+                 indenting line_indent, 
+                 const Json& j); // (9)
+
+template <class T, class CharT, class Json>
+void encode_json(const T& val,
+                 std::basic_string<CharT>& s, 
+                 const basic_json_options<CharT>& options, 
+                 indenting line_indent, 
+                 const Json& j); // (10)
 ```
 
 (1) Applies `json_conversion_traits` to serialize `val` to JSON output stream.
