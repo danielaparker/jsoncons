@@ -358,7 +358,7 @@ struct json_type_traits<Json, own_vector> {
 };
 
 template <> 
-struct is_json_type_traits_impl<own_vector> : public std::true_type 
+struct is_json_type_traits_declared<own_vector> : public std::true_type 
 {}; 
 } // jsoncons
 

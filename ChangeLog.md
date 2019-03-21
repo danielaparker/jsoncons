@@ -5,6 +5,10 @@ Bug fix:
 
 - Fixed issue with `j.as<byte_string_view>()`
 
+Non-breaking changes
+
+- The name `is_json_type_traits_impl` has been deprecated and renamed to `is_json_type_traits_declared`
+
 Enhancements
 
 - json `as_byte_string` attempts to decode string values if `semantic_tag_type` is `base64`, `base64url`, or `base16`.

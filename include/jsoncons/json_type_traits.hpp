@@ -30,8 +30,11 @@
 namespace jsoncons {
 
 template <class T>
-struct is_json_type_traits_impl : public std::false_type
+struct is_json_type_traits_declared : public std::false_type
 {};
+
+template <class T>
+using is_json_type_traits_impl = is_json_type_traits_declared<T>;
 
 // json_type_traits
 
@@ -533,7 +536,7 @@ struct json_type_traits<Json, std::vector<bool>::reference>
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<!is_json_type_traits_impl<T>::value && jsoncons::detail::is_compatible_array_type<Json,T>::value>::type>
+                        typename std::enable_if<!is_json_type_traits_declared<T>::value && jsoncons::detail::is_compatible_array_type<Json,T>::value>::type>
 {
     typedef typename std::iterator_traits<typename T::iterator>::value_type element_type;
     typedef typename Json::allocator_type allocator_type;
@@ -629,7 +632,7 @@ struct json_type_traits<Json, T,
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<!is_json_type_traits_impl<T>::value && jsoncons::detail::is_compatible_string_type<Json,T>::value>::type>
+                        typename std::enable_if<!is_json_type_traits_declared<T>::value && jsoncons::detail::is_compatible_string_type<Json,T>::value>::type>
 {
     typedef typename Json::allocator_type allocator_type;
 
@@ -656,7 +659,7 @@ struct json_type_traits<Json, T,
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<!is_json_type_traits_impl<T>::value && jsoncons::detail::is_compatible_string_view_type<Json,T>::value>::type>
+                        typename std::enable_if<!is_json_type_traits_declared<T>::value && jsoncons::detail::is_compatible_string_view_type<Json,T>::value>::type>
 {
     typedef typename Json::allocator_type allocator_type;
 
@@ -683,7 +686,7 @@ struct json_type_traits<Json, T,
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<!is_json_type_traits_impl<T>::value && jsoncons::detail::is_compatible_object_type<Json,T>::value>::type
+                        typename std::enable_if<!is_json_type_traits_declared<T>::value && jsoncons::detail::is_compatible_object_type<Json,T>::value>::type
 >
 {
     typedef typename T::mapped_type mapped_type;

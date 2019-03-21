@@ -37,7 +37,7 @@ may see a compile error "more than one partial specialization matches the templa
 For these situations `jsoncons` provides the traits class
 ```c++
 template <class T>
-struct is_json_type_traits_impl : public false_type {};
+struct is_json_type_traits_declared : public false_type {};
 ```
 which inherits from [false_type](http://www.cplusplus.com/reference/type_traits/false_type/).
 This traits class may be specialized for a user-defined type with a [true_type](http://www.cplusplus.com/reference/type_traits/true_type/) value to
@@ -345,7 +345,7 @@ struct json_type_traits<Json, own_vector> {
 };
 
 template <> 
-struct is_json_type_traits_impl<own_vector> : public std::true_type 
+struct is_json_type_traits_declared<own_vector> : public std::true_type 
 {}; 
 } // jsoncons
 

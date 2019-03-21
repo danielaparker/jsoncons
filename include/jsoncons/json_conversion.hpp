@@ -17,7 +17,7 @@
 
 namespace jsoncons {
 
-// decode_json
+// decode_json 
 
 template <class T, class CharT, class Json=basic_json<CharT>>
 T decode_json(const std::basic_string<CharT>& s)
