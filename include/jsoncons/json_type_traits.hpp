@@ -891,6 +891,8 @@ template<class Json, class Allocator>
 struct json_type_traits<Json, basic_byte_string<Allocator>>
 {
 public:
+    typedef typename Json::allocator_type allocator_type;
+
     static bool is(const Json& j) noexcept
     {
         return j.is_byte_string();
@@ -901,9 +903,10 @@ public:
         return j.template as_byte_string<Allocator>();
     }
     
-    static Json to_json(const basic_byte_string<Allocator>& val)
+    static Json to_json(const basic_byte_string<Allocator>& val, 
+                        const allocator_type& allocator = allocator_type())
     {
-        return Json(byte_string_view(val.data(),val.length()));
+        return Json(val, semantic_tag_type::none, allocator);
     }
 };
 

@@ -61,3 +61,40 @@ TEST_CASE("json(string, semantic_tag_type::timestamp)")
 
 }
 
+TEST_CASE("json get_allocator() tests")
+{
+    SECTION("short string")
+    {
+        json j("short");
+
+        CHECK(j.get_allocator() == json::allocator_type());
+    }
+    SECTION("long string")
+    {
+        json::allocator_type alloc;
+        json j("string too long for short string", alloc);
+
+        CHECK(j.get_allocator() == alloc);
+    }
+    SECTION("byte string")
+    {
+        json::allocator_type alloc;
+        json j(byte_string({'H','e','l','l','o'}),alloc);
+
+        CHECK(j.get_allocator() == alloc);
+    }
+    SECTION("array")
+    {
+        json::allocator_type alloc;
+        json j = json::array(alloc);
+
+        CHECK(j.get_allocator() == alloc);
+    }
+    SECTION("object")
+    {
+        json::allocator_type alloc;
+        json j(alloc);
+
+        CHECK(j.get_allocator() == alloc);
+    }
+}

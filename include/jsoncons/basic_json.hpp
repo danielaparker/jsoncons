@@ -1565,6 +1565,11 @@ public:
             return evaluate().count(name);
         }
 
+        allocator_type get_allocator() const
+        {
+            return evaluate().get_allocator();
+        }
+
         bool contains(const string_view_type& name) const
         {
             return evaluate().contains(name);
@@ -2995,6 +3000,31 @@ public:
     bool is_null() const noexcept
     {
         return var_.structure_tag() == structure_tag_type::null_tag;
+    }
+
+    allocator_type get_allocator() const
+    {
+        switch (var_.structure_tag())
+        {
+            case structure_tag_type::long_string_tag:
+            {
+                return var_.string_data_cast()->get_allocator();
+            }
+            case structure_tag_type::byte_string_tag:
+            {
+                return var_.byte_string_data_cast()->get_allocator();
+            }
+            case structure_tag_type::array_tag:
+            {
+                return var_.array_data_cast()->get_allocator();
+            }
+            case structure_tag_type::object_tag:
+            {
+                return var_.object_data_cast()->get_allocator();
+            }
+            default:
+                return allocator_type();
+        }
     }
 
     bool contains(const string_view_type& name) const
