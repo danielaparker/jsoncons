@@ -1111,6 +1111,7 @@ namespace jsoncons \
     template<class Json> \
     struct json_type_traits<Json, ValueType> \
     { \
+        typedef typename Json::allocator_type allocator_type; \
         static bool is(const Json& j) noexcept \
         { \
             bool val = j.is_object(); \
@@ -1123,9 +1124,9 @@ namespace jsoncons \
             JSONCONS_REP_N(JSONCONS_AS, Count, j, ValueType, val, __VA_ARGS__) \
             return val; \
         } \
-        static Json to_json(const ValueType& val) \
+        static Json to_json(const ValueType& val, allocator_type allocator=allocator_type()) \
         { \
-            Json j; \
+            Json j(allocator); \
             JSONCONS_REP_N(JSONCONS_TO_JSON, Count, j, ValueType, val, __VA_ARGS__) \
             return j; \
         } \

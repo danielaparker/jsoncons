@@ -18,6 +18,8 @@ Enhancements
 - New macro `JSONCONS_TYPE_TRAITS_DECL` that can be used to generate the `json_type_traits` boilerplate 
 for your own types.
 
+- New `basic_json` member function `get_allocator`
+
 v0.119.1
 --------
 

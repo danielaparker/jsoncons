@@ -86,6 +86,9 @@ Member type                         |Definition
   </tr>
 </table>
 
+    allocator_type get_allocator() const
+Returns the allocator associated with the json value.
+
 #### Ranges and Iterators
 
 <table border="0">
