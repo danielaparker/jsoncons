@@ -15,5 +15,7 @@ At this point we'll slap a Version 1.0.0 Full Release stamp on `jsoncons`
 
 - Support cbor keys implemented using SIDs
 
+- Support JSON Schema https://json-schema.org/ for schema validation in `jsoncons_ext`
+
 - Support [JSON Content Rules](https://datatracker.ietf.org/doc/draft-newton-json-content-rules/) for schema validation in `jsoncons_ext`
 
