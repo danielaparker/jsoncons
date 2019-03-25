@@ -125,7 +125,7 @@ size_t get_length(Source& source, std::error_code& ec)
             length = info & 0x1f;
             break;
         }
-    case 0x18: // one-byte uint8_t for n follows
+        case 0x18: // one-byte uint8_t for n follows
         {
             uint8_t c{};
             source.get(c);
@@ -137,7 +137,7 @@ size_t get_length(Source& source, std::error_code& ec)
             length = c;
             break;
         }
-    case 0x19: // two-byte uint16_t for n follow
+        case 0x19: // two-byte uint16_t for n follow
         {
             uint8_t buf[sizeof(uint16_t)];
             source.read(buf, sizeof(uint16_t));
@@ -149,7 +149,7 @@ size_t get_length(Source& source, std::error_code& ec)
             length = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
             break;
         }
-    case 0x1a: // four-byte uint32_t for n follow
+        case 0x1a: // four-byte uint32_t for n follow
         {
             uint8_t buf[sizeof(uint32_t)];
             source.read(buf, sizeof(uint32_t));
@@ -161,7 +161,7 @@ size_t get_length(Source& source, std::error_code& ec)
             length = jsoncons::detail::from_big_endian<uint32_t>(buf,buf+sizeof(buf),&endp);
             break;
         }
-    case 0x1b: // eight-byte uint64_t for n follow
+        case 0x1b: // eight-byte uint64_t for n follow
         {
             uint8_t buf[sizeof(uint64_t)];
             source.read(buf, sizeof(uint64_t));
@@ -1061,292 +1061,6 @@ std::string get_array_as_decimal_string(Source& source, std::error_code& ec)
     //std::cout << "s: " << s << ", exponent: " << std::dec << exponent << ", result: " << result << "\n";
     return result;
 }
-
-template <class T>
-class cbor_array_iterator
-{
-    const uint8_t* p_;
-    const uint8_t* last_;
-    const uint8_t* base_relative_;
-    T current_;
-public:
-    typedef typename T::difference_type difference_type;
-    typedef typename T::value_type value_type;
-    typedef typename T::const_reference reference;
-    typedef typename T::const_pointer pointer;
-    typedef std::forward_iterator_tag iterator_catagory;
-
-    cbor_array_iterator()
-        : p_(nullptr), last_(nullptr), base_relative_(nullptr)
-    {
-    }
-
-    cbor_array_iterator(const uint8_t* p, const uint8_t* last, const uint8_t* base_relative)
-        : p_(p), last_(last), base_relative_(base_relative)
-    {
-    }
-
-    cbor_array_iterator(const cbor_array_iterator& other) = default;
-
-    friend bool operator==(const cbor_array_iterator& lhs, const cbor_array_iterator& rhs) 
-    {
-        return lhs.p_ == rhs.p_; 
-    }
-
-    friend bool operator!=(const cbor_array_iterator& lhs, const cbor_array_iterator& rhs) 
-    {
-        return lhs.p_ != rhs.p_; 
-    }
-
-    friend bool operator<(const cbor_array_iterator& lhs, const cbor_array_iterator& rhs) 
-    {
-        return lhs.p_ == rhs.p_; 
-    }
-
-    cbor_array_iterator& operator++()
-    {
-        jsoncons::buffer_source source(p_,last_-p_);
-        std::error_code ec;
-        walk(source,ec);
-        if (ec)
-        {
-            throw ser_error(ec,source.position());
-        }
-        p_ = p_ + source.position() - 1;
-        return *this;
-    }
-
-    cbor_array_iterator operator++(int) // postfix increment
-    {
-        cbor_array_iterator temp(*this);
-        jsoncons::buffer_source source(p_,last_-p_);
-        std::error_code ec;
-        walk(source,ec);
-        if (ec)
-        {
-            throw ser_error(ec,source.position());
-        }
-        p_ = p_ + source.position() - 1;
-        return temp;
-    }
-
-    reference operator*() const
-    {
-        jsoncons::buffer_source source(p_,last_-p_);
-        std::error_code ec;
-        walk(source,ec);
-        if (ec)
-        {
-            throw ser_error(ec,source.position());
-        }
-        const uint8_t* endp = p_ + source.position() - 1;
-
-        const_cast<T*>(&current_)->first_ = p_;
-        const_cast<T*>(&current_)->last_ = endp;
-        const_cast<T*>(&current_)->base_relative_ = base_relative_;
-        return current_;
-    }
-
-    pointer operator->() const
-    {
-        jsoncons::buffer_source source(p_,last_-p_);
-        std::error_code ec;
-        walk(source,ec);
-        if (ec)
-        {
-            throw ser_error(ec,source.position());
-        }
-        const uint8_t* endp = p_ + source.position() - 1;
-
-        const_cast<T*>(&current_)->first_ = p_;
-        const_cast<T*>(&current_)->last_ = endp;
-        const_cast<T*>(&current_)->base_relative_ = base_relative_;
-        return &current_;
-    }
-};
-
-template <class T>
-class cbor_map_iterator;
-
-template <class T>
-class key_value_view
-{
-    const uint8_t* key_begin_;
-    const uint8_t* key_end_;
-    const uint8_t* val_begin_;
-    const uint8_t* val_end_;
-    const uint8_t* base_relative_;
-
-public:
-    friend class cbor_map_iterator<T>;
-
-    key_value_view()
-        : key_begin_(nullptr), key_end_(nullptr), val_begin_(nullptr), val_end_(nullptr)
-    {
-    }
-    key_value_view(const uint8_t* key_begin, const uint8_t* key_end, 
-                        const uint8_t* val_begin, const uint8_t* val_end, 
-                        const uint8_t* base_relative)
-        : key_begin_(key_begin), key_end_(key_end), val_begin_(val_begin), val_end_(val_end), 
-          base_relative_(base_relative)
-    {
-    }
-    key_value_view(const key_value_view& other) = default;
-
-    std::string key() const
-    {
-        jsoncons::buffer_source source(key_begin_, key_end_ - key_begin_);
-        std::error_code ec;
-        std::string s = get_text_string(source,ec);
-        if (ec)
-        {
-            throw ser_error(ec,source.position());
-        }
-        return s;
-    }
-
-    T value() const
-    {
-        return T(val_begin_, val_end_ - val_begin_, base_relative_);
-    }
-};
-
-template <class T>
-class cbor_map_iterator
-{
-    const uint8_t* p_;
-    const uint8_t* last_;
-    const uint8_t* base_relative_;
-    key_value_view<T> kvpair_;
-public:
-    typedef typename T::difference_type difference_type;
-    typedef key_value_view<T> value_type;
-    typedef const key_value_view<T>& reference;
-    typedef const key_value_view<T>* pointer;
-    typedef std::forward_iterator_tag iterator_catagory;
-
-    cbor_map_iterator()
-        : p_(nullptr), last_(nullptr), base_relative_(nullptr)
-    {
-    }
-
-    cbor_map_iterator(const uint8_t* p, const uint8_t* last, const uint8_t* base_relative)
-        : p_(p), last_(last), base_relative_(base_relative)
-    {
-    }
-
-    cbor_map_iterator(const cbor_map_iterator& other) = default;
-
-    friend bool operator==(const cbor_map_iterator& lhs, const cbor_map_iterator& rhs) 
-    {
-        return lhs.p_ == rhs.p_; 
-    }
-
-    friend bool operator!=(const cbor_map_iterator& lhs, const cbor_map_iterator& rhs) 
-    {
-        return lhs.p_ != rhs.p_; 
-    }
-
-    friend bool operator<(const cbor_map_iterator& lhs, const cbor_map_iterator& rhs) 
-    {
-        return lhs.p_ == rhs.p_; 
-    }
-
-    cbor_map_iterator& operator++()
-    {
-        jsoncons::buffer_source source(p_,last_-p_);
-        std::error_code ec;
-        walk(source,ec);
-        if (ec)
-        {
-            throw ser_error(ec,source.position());
-        }
-        walk(source,ec);
-        if (ec)
-        {
-            throw ser_error(ec,source.position());
-        }
-        p_ = p_ + source.position() - 1;
-        return *this;
-    }
-
-    cbor_map_iterator operator++(int) // postfix increment
-    {
-        cbor_map_iterator temp(*this);
-        jsoncons::buffer_source source(p_,last_-p_);
-        std::error_code ec;
-        walk(source,ec);
-        if (ec)
-        {
-            throw ser_error(ec,source.position());
-        }
-        walk(source,ec);
-        if (ec)
-        {
-            throw ser_error(ec,source.position());
-        }
-        p_ = p_ + source.position() - 1;
-        return temp;
-    }
-
-    reference operator*() const
-    {
-        const_cast<key_value_view<T>*>(&kvpair_)->key_begin_ = p_;
-
-        jsoncons::buffer_source source(p_,last_-p_);
-        std::error_code ec;
-        walk(source,ec);
-        if (ec)
-        {
-            throw ser_error(ec,source.position());
-        }
-        const uint8_t* endk = p_ + source.position() - 1;
-
-        const_cast<key_value_view<T>*>(&kvpair_)->key_end_ = endk;
-        const_cast<key_value_view<T>*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
-
-        walk(source,ec);
-        if (ec)
-        {
-            throw ser_error(ec,source.position());
-        }
-        const uint8_t* endv = p_ + source.position() - 1;
-        const_cast<key_value_view<T>*>(&kvpair_)->val_end_ = endv;
-        const_cast<key_value_view<T>*>(&kvpair_)->base_relative_ = base_relative_;
-
-        return kvpair_;
-    }
-
-    pointer operator->() const
-    {
-        jsoncons::buffer_source source(p_,last_-p_);
-        std::error_code ec;
-
-        const_cast<key_value_view<T>*>(&kvpair_)->key_begin_ = p_;
-
-        walk(source,ec);
-        if (ec)
-        {
-            throw ser_error(ec,source.position());
-        }
-        const uint8_t* endk = p_ + source.position() - 1;
-
-        const_cast<key_value_view<T>*>(&kvpair_)->key_end_ = endk;
-        const_cast<key_value_view<T>*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
-
-        walk(source,ec);
-        if (ec)
-        {
-            throw ser_error(ec,source.position());
-        }
-        const uint8_t* endv = p_ + source.position() - 1;
-
-        const_cast<key_value_view<T>*>(&kvpair_)->val_end_ = endv;
-        const_cast<key_value_view<T>*>(&kvpair_)->base_relative_ = base_relative_;
-
-        return &kvpair_;
-    }
-};
 
 } // namespace detail
 
