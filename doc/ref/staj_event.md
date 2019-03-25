@@ -32,7 +32,7 @@ A JSON-like data event.
 Returns a [staj_event_type](staj_event_type.md) for this event.
 
     semantic_tag get_semantic_tag() const noexcept;
-Returns a [semantic_tag](semantic_tag_type.md) for this event.
+Returns a [semantic_tag](semantic_tag.md) for this event.
 
     template <class T, class... Args>
     T as(Args&&... args) const;

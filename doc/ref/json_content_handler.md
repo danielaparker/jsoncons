@@ -269,5 +269,5 @@ Allows producers of json events to flush whatever they've buffered.
 
 #### See also
 
-- [semantic_tag](../semantic_tag_type.md)
+- [semantic_tag](../semantic_tag.md)
 

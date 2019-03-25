@@ -19,7 +19,7 @@ The class `json` resembles a union. An instance of `json` holds a data item of o
 - array
 - object
 
-The data item may be tagged with a [semantic_tag](semantic_tag_type.md) that provides additional
+The data item may be tagged with a [semantic_tag](semantic_tag.md) that provides additional
 information about the data item.
 
 When assigned a new value, the old value is overwritten. The type of the new value may be different from the old value. 
@@ -157,7 +157,7 @@ Returns the allocator associated with the json value.
 </table>
 
     semantic_tag get_semantic_tag() const
-Returns the [semantic_tag](semantic_tag_type.md) associated with this value
+Returns the [semantic_tag](semantic_tag.md) associated with this value
 
     json& operator[](size_t i)
     const json& operator[](size_t i) const
