@@ -42,7 +42,7 @@ void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
         }
 
         REQUIRE(result == expected);
-        CHECK(result.semantic_tag() == expected.semantic_tag());
+        CHECK(result.get_semantic_tag() == expected.get_semantic_tag());
 
         std::string s;
         for (auto c : v)
@@ -104,7 +104,7 @@ TEST_CASE("test_cbor_parsing")
 
     // null, undefined, true, false
     check_parse_cbor({0xf6},json::null());
-    check_parse_cbor({0xf7},json{null_type(),semantic_tag_type::undefined});
+    check_parse_cbor({0xf7},json{null_type(),semantic_tag::undefined});
     check_parse_cbor({0xf5},json(true));
     check_parse_cbor({0xf4},json(false));
 
@@ -199,7 +199,7 @@ TEST_CASE("test_cbor_parsing")
                      0x82, // Array of length 2
                        0x21, // -2 
                          0x19, 0x6a, 0xb3 // 27315 
-                  },json(json::array({-2,27315}),semantic_tag_type::big_float));
+                  },json(json::array({-2,27315}),semantic_tag::big_float));
 
     SECTION("maps with definite length")
     {
@@ -247,11 +247,11 @@ TEST_CASE("test_cbor_parsing")
 
     // date_time
     check_parse_cbor({0xc0,0x78,0x19,'2','0','1','5','-','0','5','-','0','7',' ','1','2',':','4','1',':','0','7','-','0','7',':','0','0'},
-                  json("2015-05-07 12:41:07-07:00", semantic_tag_type::date_time));
+                  json("2015-05-07 12:41:07-07:00", semantic_tag::date_time));
 
     // epoch_time
     check_parse_cbor({0xc1,0x1a,0x55,0x4b,0xbf,0xd3},
-                  json(1431027667, semantic_tag_type::timestamp));
+                  json(1431027667, semantic_tag::timestamp));
 }
 
 TEST_CASE("cbor decimal fraction")
@@ -261,38 +261,38 @@ TEST_CASE("cbor decimal fraction")
                    0x21, // -2
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("273.15", semantic_tag_type::big_decimal));
+                  json("273.15", semantic_tag::big_decimal));
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x22, // -3
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("27.315", semantic_tag_type::big_decimal));
+                  json("27.315", semantic_tag::big_decimal));
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x23, // -4
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("2.7315", semantic_tag_type::big_decimal));
+                  json("2.7315", semantic_tag::big_decimal));
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x24, // -5
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("0.27315", semantic_tag_type::big_decimal));
+                  json("0.27315", semantic_tag::big_decimal));
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x25, // -6
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("0.027315", semantic_tag_type::big_decimal));
+                  json("0.027315", semantic_tag::big_decimal));
 
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x04, // 4
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("273150000.0", semantic_tag_type::big_decimal));
+                  json("273150000.0", semantic_tag::big_decimal));
 }
 
 TEST_CASE("test_decimal_as_string")
@@ -430,30 +430,30 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
     writer.big_decimal_value("-18446744073709551617.15");
     writer.date_time_value("2018-10-19 12:41:07-07:00");
     writer.timestamp_value(1431027667);
-    writer.int64_value(-1431027667, semantic_tag_type::timestamp);
-    writer.double_value(1431027667.5, semantic_tag_type::timestamp);
+    writer.int64_value(-1431027667, semantic_tag::timestamp);
+    writer.double_value(1431027667.5, semantic_tag::timestamp);
     writer.end_array();
     writer.flush();
 
     json expected = json::array();
     expected.emplace_back("foo");
     expected.emplace_back(byte_string{ 'b','a','r' });
-    expected.emplace_back("-18446744073709551617", semantic_tag_type::big_integer);
-    expected.emplace_back("-273.15", semantic_tag_type::big_decimal);
-    expected.emplace_back("273.15", semantic_tag_type::big_decimal);
-    expected.emplace_back("1.844674407370955161615e+19", semantic_tag_type::big_decimal);
-    expected.emplace_back("-1.844674407370955161715e+19", semantic_tag_type::big_decimal);
-    expected.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag_type::date_time);
-    expected.emplace_back(1431027667, semantic_tag_type::timestamp);
-    expected.emplace_back(-1431027667, semantic_tag_type::timestamp);
-    expected.emplace_back(1431027667.5, semantic_tag_type::timestamp);
+    expected.emplace_back("-18446744073709551617", semantic_tag::big_integer);
+    expected.emplace_back("-273.15", semantic_tag::big_decimal);
+    expected.emplace_back("273.15", semantic_tag::big_decimal);
+    expected.emplace_back("1.844674407370955161615e+19", semantic_tag::big_decimal);
+    expected.emplace_back("-1.844674407370955161715e+19", semantic_tag::big_decimal);
+    expected.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag::date_time);
+    expected.emplace_back(1431027667, semantic_tag::timestamp);
+    expected.emplace_back(-1431027667, semantic_tag::timestamp);
+    expected.emplace_back(1431027667.5, semantic_tag::timestamp);
 
     json j = cbor::decode_cbor<json>(bytes);
 
     REQUIRE(j == expected);
     for (size_t i = 0; i < j.size(); ++i)
     {
-        CHECK(j[i].semantic_tag() == expected[i].semantic_tag()); 
+        CHECK(j[i].get_semantic_tag() == expected[i].get_semantic_tag()); 
     }
 }
 

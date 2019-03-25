@@ -803,7 +803,7 @@ namespace jsoncons
 
         static bool is(const Json& val) noexcept
         {
-            if (!(val.is_string() && val.semantic_tag() == semantic_tag_type::big_decimal))
+            if (!(val.is_string() && val.semantic_tag() == semantic_tag::big_decimal))
             {
                 return false;
             }
@@ -820,7 +820,7 @@ namespace jsoncons
 
         static Json to_json(multiprecision_type val)
         {
-            return Json(val.str(), semantic_tag_type::big_decimal);
+            return Json(val.str(), semantic_tag::big_decimal);
         }
     };
 }
@@ -1017,11 +1017,11 @@ int main()
     std::cout << "(1) "<< j1 << "\n\n";
 
     // base64 suggested encoding
-    jc::json j2(bs, jc::semantic_tag_type::base64);
+    jc::json j2(bs, jc::semantic_tag::base64);
     std::cout << "(2) "<< j2 << "\n\n";
 
     // base16 suggested encoding
-    jc::json j3(bs, jc::semantic_tag_type::base16);
+    jc::json j3(bs, jc::semantic_tag::base16);
     std::cout << "(3) "<< j3 << "\n\n";
 }
 ```
@@ -1221,7 +1221,7 @@ int main()
 {
     jc::json j;
     j["ByteString"] = jc::byte_string({'H','e','l','l','o'});
-    j["EncodedByteString"] = jc::json("SGVsbG8=", jc::semantic_tag_type::base64);
+    j["EncodedByteString"] = jc::json("SGVsbG8=", jc::semantic_tag::base64);
 
     std::cout << "(1)\n";
     std::cout << pretty_print(j) << "\n\n";

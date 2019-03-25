@@ -97,7 +97,7 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type, const ser_context&) override
+    bool do_begin_object(semantic_tag, const ser_context&) override
     {
         stack_.push_back(stack_item(ubjson_container_type::indefinite_length_object));
         result_.push_back(ubjson_format::start_object_marker);
@@ -105,7 +105,7 @@ private:
         return true;
     }
 
-    bool do_begin_object(size_t length, semantic_tag_type, const ser_context&) override
+    bool do_begin_object(size_t length, semantic_tag, const ser_context&) override
     {
         stack_.push_back(stack_item(ubjson_container_type::object, length));
         result_.push_back(ubjson_format::start_object_marker);
@@ -138,7 +138,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag_type, const ser_context&) override
+    bool do_begin_array(semantic_tag, const ser_context&) override
     {
         stack_.push_back(stack_item(ubjson_container_type::indefinite_length_array));
         result_.push_back(ubjson_format::start_array_marker);
@@ -146,7 +146,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(size_t length, semantic_tag_type, const ser_context&) override
+    bool do_begin_array(size_t length, semantic_tag, const ser_context&) override
     {
         stack_.push_back(stack_item(ubjson_container_type::array, length));
         result_.push_back(ubjson_format::start_array_marker);
@@ -199,7 +199,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag_type, const ser_context&) override
+    bool do_null_value(semantic_tag, const ser_context&) override
     {
         // nil
         jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::null_type), std::back_inserter(result_));
@@ -207,12 +207,12 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const ser_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context&) override
     {
         switch (tag)
         {
-            case semantic_tag_type::big_integer:
-            case semantic_tag_type::big_decimal:
+            case semantic_tag::big_integer:
+            case semantic_tag::big_decimal:
             {
                 result_.push_back(ubjson_format::high_precision_number_type);
                 break;
@@ -269,7 +269,7 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              semantic_tag_type, 
+                              semantic_tag, 
                               const ser_context&) override
     {
 
@@ -289,7 +289,7 @@ private:
     }
 
     bool do_double_value(double val, 
-                         semantic_tag_type,
+                         semantic_tag,
                          const ser_context&) override
     {
         float valf = (float)val;
@@ -313,7 +313,7 @@ private:
     }
 
     bool do_int64_value(int64_t val, 
-                        semantic_tag_type, 
+                        semantic_tag, 
                         const ser_context&) override
     {
         if (val >= 0)
@@ -379,7 +379,7 @@ private:
     }
 
     bool do_uint64_value(uint64_t val, 
-                         semantic_tag_type, 
+                         semantic_tag, 
                          const ser_context&) override
     {
         if (val <= (std::numeric_limits<uint8_t>::max)())
@@ -406,7 +406,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool val, semantic_tag_type, const ser_context&) override
+    bool do_bool_value(bool val, semantic_tag, const ser_context&) override
     {
         // true and false
         result_.push_back(static_cast<uint8_t>(val ? ubjson_format::true_type : ubjson_format::false_type));

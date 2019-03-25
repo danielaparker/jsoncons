@@ -64,10 +64,10 @@ public:
     }
 
     bool do_string_value(const string_view_type& s, 
-                         semantic_tag_type tag, 
+                         semantic_tag tag, 
                          const ser_context& context) override
     {
-        if (tag == semantic_tag_type::none)
+        if (tag == semantic_tag::none)
         {
             if (is_str_to_nan_ && s == nan_to_str_)
             {
@@ -376,7 +376,7 @@ public:
         } 
         push_state(json_parse_state::object);
         state_ = json_parse_state::expect_member_name_or_end;
-        continue_ = handler.begin_object(semantic_tag_type::none, *this);
+        continue_ = handler.begin_object(semantic_tag::none, *this);
     }
 
     void end_object(basic_json_content_handler<CharT>& handler, std::error_code& ec)
@@ -432,7 +432,7 @@ public:
         }
         push_state(json_parse_state::array);
         state_ = json_parse_state::expect_value_or_end;
-        continue_ = handler.begin_array(semantic_tag_type::none, *this);
+        continue_ = handler.begin_array(semantic_tag::none, *this);
     }
 
     void end_array(basic_json_content_handler<CharT>& handler, std::error_code& ec)
@@ -1388,7 +1388,7 @@ public:
                 switch (*input_ptr_)
                 {
                 case 'e':
-                    continue_ = handler.bool_value(true,  semantic_tag_type::none, *this);
+                    continue_ = handler.bool_value(true,  semantic_tag::none, *this);
                     if (parent() == json_parse_state::root)
                     {
                         state_ = json_parse_state::before_done;
@@ -1456,7 +1456,7 @@ public:
                 switch (*input_ptr_)
                 {
                 case 'e':
-                    continue_ = handler.bool_value(false, semantic_tag_type::none, *this);
+                    continue_ = handler.bool_value(false, semantic_tag::none, *this);
                     if (parent() == json_parse_state::root)
                     {
                         state_ = json_parse_state::before_done;
@@ -1509,7 +1509,7 @@ public:
                 switch (*input_ptr_)
                 {
                 case 'l':
-                    continue_ = handler.null_value(semantic_tag_type::none, *this);
+                    continue_ = handler.null_value(semantic_tag::none, *this);
                     if (parent() == json_parse_state::root)
                     {
                         state_ = json_parse_state::before_done;
@@ -1627,7 +1627,7 @@ public:
         {
             if (*(input_ptr_+1) == 'r' && *(input_ptr_+2) == 'u' && *(input_ptr_+3) == 'e')
             {
-                continue_ = handler.bool_value(true, semantic_tag_type::none, *this);
+                continue_ = handler.bool_value(true, semantic_tag::none, *this);
                 input_ptr_ += 4;
                 column_ += 4;
                 if (parent() == json_parse_state::root)
@@ -1661,7 +1661,7 @@ public:
         {
             if (*(input_ptr_+1) == 'u' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 'l')
             {
-                continue_ = handler.null_value(semantic_tag_type::none, *this);
+                continue_ = handler.null_value(semantic_tag::none, *this);
                 input_ptr_ += 4;
                 column_ += 4;
                 if (parent() == json_parse_state::root)
@@ -1695,7 +1695,7 @@ public:
         {
             if (*(input_ptr_+1) == 'a' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 's' && *(input_ptr_+4) == 'e')
             {
-                continue_ = handler.bool_value(false, semantic_tag_type::none, *this);
+                continue_ = handler.bool_value(false, semantic_tag::none, *this);
                 input_ptr_ += 5;
                 column_ += 5;
                 if (parent() == json_parse_state::root)
@@ -2655,11 +2655,11 @@ private:
         auto result = jsoncons::detail::to_integer<int64_t>(string_buffer_.data(), string_buffer_.length());
         if (!result.overflow)
         {
-            continue_ = handler.int64_value(result.value, semantic_tag_type::none, *this);
+            continue_ = handler.int64_value(result.value, semantic_tag::none, *this);
         }
         else
         {
-            continue_ = handler.string_value(string_buffer_, semantic_tag_type::big_integer, *this);
+            continue_ = handler.string_value(string_buffer_, semantic_tag::big_integer, *this);
         }
         after_value(ec);
     }
@@ -2669,11 +2669,11 @@ private:
         auto result = jsoncons::detail::to_integer<uint64_t>(string_buffer_.data(), string_buffer_.length());
         if (!result.overflow)
         {
-            continue_ = handler.uint64_value(result.value, semantic_tag_type::none, *this);
+            continue_ = handler.uint64_value(result.value, semantic_tag::none, *this);
         }
         else
         {
-            continue_ = handler.string_value(string_buffer_, semantic_tag_type::big_integer, *this);
+            continue_ = handler.string_value(string_buffer_, semantic_tag::big_integer, *this);
         }
         after_value(ec);
     }
@@ -2684,12 +2684,12 @@ private:
         {
             if (lossless_number)
             {
-                continue_ = handler.string_value(string_buffer_, semantic_tag_type::big_decimal, *this);
+                continue_ = handler.string_value(string_buffer_, semantic_tag::big_decimal, *this);
             }
             else
             {
                 double d = to_double_(string_buffer_.c_str(), string_buffer_.length());
-                continue_ = handler.double_value(d, semantic_tag_type::none, *this);
+                continue_ = handler.double_value(d, semantic_tag::none, *this);
             }
         }
         catch (...)
@@ -2700,7 +2700,7 @@ private:
                 ec = json_errc::invalid_number;
                 return;
             }
-            continue_ = handler.null_value(semantic_tag_type::none, *this); // recovery
+            continue_ = handler.null_value(semantic_tag::none, *this); // recovery
         }
 
         after_value(ec);
@@ -2767,11 +2767,11 @@ private:
             break;
         case json_parse_state::object:
         case json_parse_state::array:
-            continue_ = handler.string_value(string_view_type(s, length), semantic_tag_type::none, *this);
+            continue_ = handler.string_value(string_view_type(s, length), semantic_tag::none, *this);
             state_ = json_parse_state::expect_comma_or_end;
             break;
         case json_parse_state::root:
-            continue_ = handler.string_value(string_view_type(s, length), semantic_tag_type::none, *this);
+            continue_ = handler.string_value(string_view_type(s, length), semantic_tag::none, *this);
             state_ = json_parse_state::before_done;
             break;
         default:

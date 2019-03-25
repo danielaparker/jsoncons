@@ -54,12 +54,12 @@ private:
         destination_handler_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type tag, const ser_context& context) override
+    bool do_begin_object(semantic_tag tag, const ser_context& context) override
     {
         return destination_handler_.begin_object(tag, context);
     }
 
-    bool do_begin_object(size_t length, semantic_tag_type tag, const ser_context& context) override
+    bool do_begin_object(size_t length, semantic_tag tag, const ser_context& context) override
     {
         return destination_handler_.begin_object(length, tag, context);
     }
@@ -69,12 +69,12 @@ private:
         return destination_handler_.end_object(context);
     }
 
-    bool do_begin_array(semantic_tag_type tag, const ser_context& context) override
+    bool do_begin_array(semantic_tag tag, const ser_context& context) override
     {
         return destination_handler_.begin_array(tag, context);
     }
 
-    bool do_begin_array(size_t length, semantic_tag_type tag, const ser_context& context) override
+    bool do_begin_array(size_t length, semantic_tag tag, const ser_context& context) override
     {
         return destination_handler_.begin_array(length, tag, context);
     }
@@ -91,46 +91,46 @@ private:
     }
 
     bool do_string_value(const string_view_type& value,
-                         semantic_tag_type tag,
+                         semantic_tag tag,
                          const ser_context& context) override
     {
         return destination_handler_.string_value(value, tag, context);
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              semantic_tag_type tag,
+                              semantic_tag tag,
                               const ser_context& context) override
     {
         return destination_handler_.byte_string_value(b, tag, context);
     }
 
     bool do_double_value(double value, 
-                         semantic_tag_type tag,
+                         semantic_tag tag,
                          const ser_context& context) override
     {
         return destination_handler_.double_value(value, tag, context);
     }
 
     bool do_int64_value(int64_t value,
-                        semantic_tag_type tag,
+                        semantic_tag tag,
                         const ser_context& context) override
     {
         return destination_handler_.int64_value(value, tag, context);
     }
 
     bool do_uint64_value(uint64_t value,
-                         semantic_tag_type tag,
+                         semantic_tag tag,
                          const ser_context& context) override
     {
         return destination_handler_.uint64_value(value, tag, context);
     }
 
-    bool do_bool_value(bool value, semantic_tag_type tag, const ser_context& context) override
+    bool do_bool_value(bool value, semantic_tag tag, const ser_context& context) override
     {
         return destination_handler_.bool_value(value, tag, context);
     }
 
-    bool do_null_value(semantic_tag_type tag, const ser_context& context) override
+    bool do_null_value(semantic_tag tag, const ser_context& context) override
     {
         return destination_handler_.null_value(tag, context);
     }
@@ -215,14 +215,14 @@ private:
         destination_handler_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type tag, 
+    bool do_begin_object(semantic_tag tag, 
                          const ser_context& context) override
     {
         return destination_handler_.begin_object(tag, context);
     }
 
     bool do_begin_object(size_t length, 
-                         semantic_tag_type tag, 
+                         semantic_tag tag, 
                          const ser_context& context) override
     {
         return destination_handler_.begin_object(length, tag, context);
@@ -233,14 +233,14 @@ private:
         return destination_handler_.end_object(context);
     }
 
-    bool do_begin_array(semantic_tag_type tag, 
+    bool do_begin_array(semantic_tag tag, 
                         const ser_context& context) override
     {
         return destination_handler_.begin_array(tag, context);
     }
 
     bool do_begin_array(size_t length, 
-                        semantic_tag_type tag, 
+                        semantic_tag tag, 
                         const ser_context& context) override
     {
         return destination_handler_.begin_array(length, tag, context);
@@ -264,7 +264,7 @@ private:
     }
 
     bool do_string_value(const string_view_type& value,
-                         semantic_tag_type tag,
+                         semantic_tag tag,
                          const ser_context& context) override
     {
         std::basic_string<CharT> target;
@@ -277,39 +277,39 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              semantic_tag_type tag,
+                              semantic_tag tag,
                               const ser_context& context) override
     {
         return destination_handler_.byte_string_value(b, tag, context);
     }
 
     bool do_double_value(double value, 
-                         semantic_tag_type tag,
+                         semantic_tag tag,
                          const ser_context& context) override
     {
         return destination_handler_.double_value(value, tag, context);
     }
 
     bool do_int64_value(int64_t value,
-                        semantic_tag_type tag,
+                        semantic_tag tag,
                         const ser_context& context) override
     {
         return destination_handler_.int64_value(value, tag, context);
     }
 
     bool do_uint64_value(uint64_t value,
-                         semantic_tag_type tag,
+                         semantic_tag tag,
                          const ser_context& context) override
     {
         return destination_handler_.uint64_value(value, tag, context);
     }
 
-    bool do_bool_value(bool value, semantic_tag_type tag, const ser_context& context) override
+    bool do_bool_value(bool value, semantic_tag tag, const ser_context& context) override
     {
         return destination_handler_.bool_value(value, tag, context);
     }
 
-    bool do_null_value(semantic_tag_type tag, const ser_context& context) override
+    bool do_null_value(semantic_tag tag, const ser_context& context) override
     {
         return destination_handler_.null_value(tag, context);
     }

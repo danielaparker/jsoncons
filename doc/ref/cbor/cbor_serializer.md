@@ -45,19 +45,19 @@ Constructs a new serializer that writes to the specified result.
 
 #### Member functions
 
-    bool begin_object(semantic_tag_type tag=semantic_tag_type::none,
+    bool begin_object(semantic_tag tag=semantic_tag::none,
                       const ser_context& context=null_ser_context()); 
 
     bool begin_object(size_t length, 
-                      semantic_tag_type tag=semantic_tag_type::none,
+                      semantic_tag tag=semantic_tag::none,
                       const ser_context& context=null_ser_context()); 
 
     bool end_object(const ser_context& context = null_ser_context())
 
-    bool begin_array(semantic_tag_type tag=semantic_tag_type::none,
+    bool begin_array(semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context()); 
 
-    bool begin_array(semantic_tag_type tag=semantic_tag_type::none,
+    bool begin_array(semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context()); 
 
     bool end_array(const ser_context& context=null_ser_context()); 
@@ -66,15 +66,15 @@ Constructs a new serializer that writes to the specified result.
               const ser_context& context=null_ser_context()); 
 
     bool string_value(const string_view_type& value, 
-                      semantic_tag_type tag = semantic_tag_type::none, 
+                      semantic_tag tag = semantic_tag::none, 
                       const ser_context& context=null_ser_context()); ;
 
     bool byte_string_value(const byte_string_view& b, 
-                           semantic_tag_type tag=semantic_tag_type::none, 
+                           semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=null_ser_context()); 
 
     bool byte_string_value(const uint8_t* p, size_t size, 
-                           semantic_tag_type tag=semantic_tag_type::none, 
+                           semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=null_ser_context()); 
 
     bool big_integer_value(const string_view_type& s, 
@@ -90,22 +90,22 @@ Constructs a new serializer that writes to the specified result.
                          const ser_context& context=null_ser_context());  
 
     bool int64_value(int64_t value, 
-                     semantic_tag_type tag = semantic_tag_type::none, 
+                     semantic_tag tag = semantic_tag::none, 
                      const ser_context& context=null_ser_context()); ;
 
     bool uint64_value(uint64_t value, 
-                      semantic_tag_type tag = semantic_tag_type::none, 
+                      semantic_tag tag = semantic_tag::none, 
                       const ser_context& context=null_ser_context()); 
 
     bool double_value(double value, 
-                      semantic_tag_type tag = semantic_tag_type::none, 
+                      semantic_tag tag = semantic_tag::none, 
                       const ser_context& context=null_ser_context()); 
 
     bool bool_value(bool value, 
-                    semantic_tag_type tag = semantic_tag_type::none,
+                    semantic_tag tag = semantic_tag::none,
                     const ser_context& context=null_ser_context());  
 
-    bool null_value(semantic_tag_type tag = semantic_tag_type::none,
+    bool null_value(semantic_tag tag = semantic_tag::none,
                     const ser_context& context=null_ser_context());  
 
     void flush()
@@ -128,8 +128,8 @@ int main()
     writer.string_value("cat");
     writer.byte_string_value(byte_string({'p','u','r','r'}));
     writer.byte_string_value(byte_string({'h','i','s','s'}),
-                             semantic_tag_type::base64); // suggested conversion to base64
-    writer.int64_value(1431027667, semantic_tag_type::timestamp);
+                             semantic_tag::base64); // suggested conversion to base64
+    writer.int64_value(1431027667, semantic_tag::timestamp);
     writer.end_array();
     writer.flush();
 

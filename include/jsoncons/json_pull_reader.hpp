@@ -48,7 +48,7 @@ public:
     }
 private:
 
-    bool do_begin_object(semantic_tag_type, const ser_context&) override
+    bool do_begin_object(semantic_tag, const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::begin_object);
         return false;
@@ -60,7 +60,7 @@ private:
         return false;
     }
 
-    bool do_begin_array(semantic_tag_type, const ser_context&) override
+    bool do_begin_array(semantic_tag, const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::begin_array);
         return false;
@@ -78,33 +78,33 @@ private:
         return false;
     }
 
-    bool do_null_value(semantic_tag_type, const ser_context&) override
+    bool do_null_value(semantic_tag, const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::null_value);
         return false;
     }
 
-    bool do_bool_value(bool value, semantic_tag_type, const ser_context&) override
+    bool do_bool_value(bool value, semantic_tag, const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(value);
         return false;
     }
 
-    bool do_string_value(const string_view_type& s, semantic_tag_type tag, const ser_context&) override
+    bool do_string_value(const string_view_type& s, semantic_tag tag, const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(s.data(), s.length(), staj_event_type::string_value, tag);
         return false;
     }
 
     bool do_byte_string_value(const byte_string_view&, 
-                              semantic_tag_type,
+                              semantic_tag,
                               const ser_context&) override
     {
         JSONCONS_UNREACHABLE();
     }
 
     bool do_int64_value(int64_t value, 
-                        semantic_tag_type tag,
+                        semantic_tag tag,
                         const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
@@ -112,7 +112,7 @@ private:
     }
 
     bool do_uint64_value(uint64_t value, 
-                         semantic_tag_type tag, 
+                         semantic_tag tag, 
                          const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
@@ -120,7 +120,7 @@ private:
     }
 
     bool do_double_value(double value, 
-                         semantic_tag_type tag, 
+                         semantic_tag tag, 
                          const ser_context&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
@@ -459,7 +459,7 @@ public:
         switch (event_handler_.event().event_type())
         {
             case staj_event_type::begin_array:
-                if (!handler.begin_array(semantic_tag_type::none, *this))
+                if (!handler.begin_array(semantic_tag::none, *this))
                 {
                     return;
                 }
@@ -471,7 +471,7 @@ public:
                 }
                 break;
             case staj_event_type::begin_object:
-                if (!handler.begin_object(semantic_tag_type::none, *this))
+                if (!handler.begin_object(semantic_tag::none, *this))
                 {
                     return;
                 }
@@ -489,37 +489,37 @@ public:
                 }
                 break;
             case staj_event_type::string_value:
-                if (!handler.string_value(event_handler_.event().template as<jsoncons::basic_string_view<CharT>>(), semantic_tag_type::none, *this))
+                if (!handler.string_value(event_handler_.event().template as<jsoncons::basic_string_view<CharT>>(), semantic_tag::none, *this))
                 {
                     return;
                 }
                 break;
             case staj_event_type::null_value:
-                if (!handler.null_value(semantic_tag_type::none, *this))
+                if (!handler.null_value(semantic_tag::none, *this))
                 {
                     return;
                 }
                 break;
             case staj_event_type::bool_value:
-                if (!handler.bool_value(event_handler_.event().template as<bool>(), semantic_tag_type::none, *this))
+                if (!handler.bool_value(event_handler_.event().template as<bool>(), semantic_tag::none, *this))
                 {
                     return;
                 }
                 break;
             case staj_event_type::int64_value:
-                if (!handler.int64_value(event_handler_.event().template as<int64_t>(), semantic_tag_type::none, *this))
+                if (!handler.int64_value(event_handler_.event().template as<int64_t>(), semantic_tag::none, *this))
                 {
                     return;
                 }
                 break;
             case staj_event_type::uint64_value:
-                if (!handler.uint64_value(event_handler_.event().template as<uint64_t>(), semantic_tag_type::none, *this))
+                if (!handler.uint64_value(event_handler_.event().template as<uint64_t>(), semantic_tag::none, *this))
                 {
                     return;
                 }
                 break;
             case staj_event_type::double_value:
-                if (!handler.double_value(event_handler_.event().template as<double>(), semantic_tag_type::none, *this))
+                if (!handler.double_value(event_handler_.event().template as<double>(), semantic_tag::none, *this))
                 {
                     return;
                 }

@@ -296,7 +296,7 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::c
     template <class ... Args>
     static Json to_json(const char_type* s, Args&&... args)
     {
-        return Json(s, semantic_tag_type::none, std::forward<Args>(args)...);
+        return Json(s, semantic_tag::none, std::forward<Args>(args)...);
     }
 };
 
@@ -313,7 +313,7 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::p
     template <class ... Args>
     static Json to_json(const char_type* s, Args&&... args)
     {
-        return Json(s, semantic_tag_type::none, std::forward<Args>(args)...);
+        return Json(s, semantic_tag::none, std::forward<Args>(args)...);
     }
 };
 
@@ -347,7 +347,7 @@ struct json_type_traits<Json, T,
     }
     static Json to_json(T val, allocator_type = allocator_type())
     {
-        return Json(val, semantic_tag_type::none);
+        return Json(val, semantic_tag::none);
     }
 };
 
@@ -380,7 +380,7 @@ struct json_type_traits<Json, T,
 
     static Json to_json(T val, allocator_type = allocator_type())
     {
-        return Json(val, semantic_tag_type::none);
+        return Json(val, semantic_tag::none);
     }
 };
 
@@ -401,7 +401,7 @@ struct json_type_traits<Json, T,
     }
     static Json to_json(T val, allocator_type = allocator_type())
     {
-        return Json(val, semantic_tag_type::none);
+        return Json(val, semantic_tag::none);
     }
 };
 
@@ -417,7 +417,7 @@ struct json_type_traits<Json, typename Json::object>
     }
     static Json to_json(const json_object& o)
     {
-        return Json(o,semantic_tag_type::none);
+        return Json(o,semantic_tag::none);
     }
 };
 
@@ -433,7 +433,7 @@ struct json_type_traits<Json, typename Json::array>
     }
     static Json to_json(const json_array& a)
     {
-        return Json(a, semantic_tag_type::none);
+        return Json(a, semantic_tag::none);
     }
 };
 
@@ -491,7 +491,7 @@ struct json_type_traits<Json, bool>
     }
     static Json to_json(bool val, allocator_type = allocator_type())
     {
-        return Json(val, semantic_tag_type::none);
+        return Json(val, semantic_tag::none);
     }
 };
 
@@ -513,7 +513,7 @@ struct json_type_traits<Json, T, typename std::enable_if<std::is_same<T,
     }
     static Json to_json(bool val, allocator_type = allocator_type())
     {
-        return Json(val, semantic_tag_type::none);
+        return Json(val, semantic_tag::none);
     }
 };
 
@@ -532,7 +532,7 @@ struct json_type_traits<Json, std::vector<bool>::reference>
     }
     static Json to_json(bool val, allocator_type = allocator_type())
     {
-        return Json(val, semantic_tag_type::none);
+        return Json(val, semantic_tag::none);
     }
 };
 
@@ -650,12 +650,12 @@ struct json_type_traits<Json, T,
 
     static Json to_json(const T& val)
     {
-        return Json(val, semantic_tag_type::none);
+        return Json(val, semantic_tag::none);
     }
 
     static Json to_json(const T& val, const allocator_type& allocator)
     {
-        return Json(val, semantic_tag_type::none, allocator);
+        return Json(val, semantic_tag::none, allocator);
     }
 };
 
@@ -677,12 +677,12 @@ struct json_type_traits<Json, T,
 
     static Json to_json(const T& val)
     {
-        return Json(val, semantic_tag_type::none);
+        return Json(val, semantic_tag::none);
     }
 
     static Json to_json(const T& val, const allocator_type& allocator)
     {
-        return Json(val, semantic_tag_type::none, allocator);
+        return Json(val, semantic_tag::none, allocator);
     }
 };
 
@@ -906,7 +906,7 @@ public:
     static Json to_json(const basic_byte_string<Allocator>& val, 
                         const allocator_type& allocator = allocator_type())
     {
-        return Json(val, semantic_tag_type::none, allocator);
+        return Json(val, semantic_tag::none, allocator);
     }
 };
 
@@ -950,7 +950,7 @@ public:
     {
         std::basic_string<typename Json::char_type> s;
         val.dump(s);
-        return Json(s,semantic_tag_type::big_integer);
+        return Json(s,semantic_tag::big_integer);
     }
 };
 

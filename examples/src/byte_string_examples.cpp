@@ -14,11 +14,11 @@ void construct_json_byte_string()
     std::cout << "(1) "<< j1 << "\n\n";
 
     // base64 suggested encoding
-    jc::json j2(bs, jc::semantic_tag_type::base64);
+    jc::json j2(bs, jc::semantic_tag::base64);
     std::cout << "(2) "<< j2 << "\n\n";
 
     // base16 suggested encoding
-    jc::json j3(bs, jc::semantic_tag_type::base16);
+    jc::json j3(bs, jc::semantic_tag::base16);
     std::cout << "(3) "<< j3 << "\n\n";
 }
 
@@ -26,7 +26,7 @@ void retrieve_json_value_as_byte_string()
 {
     jc::json j;
     j["ByteString"] = jc::byte_string({'H','e','l','l','o'});
-    j["EncodedByteString"] = jc::json("SGVsbG8=", jc::semantic_tag_type::base64);
+    j["EncodedByteString"] = jc::json("SGVsbG8=", jc::semantic_tag::base64);
 
     std::cout << "(1)\n";
     std::cout << pretty_print(j) << "\n\n";

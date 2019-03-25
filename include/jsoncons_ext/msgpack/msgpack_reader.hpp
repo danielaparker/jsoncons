@@ -75,13 +75,13 @@ private:
             if (type <= 0x7f) 
             {
                 // positive fixint
-                handler_.uint64_value(type, semantic_tag_type::none, *this);
+                handler_.uint64_value(type, semantic_tag::none, *this);
             }
             else if (type <= 0x8f) 
             {
                 // fixmap
                 const size_t len = type & 0x0f;
-                handler_.begin_object(len, semantic_tag_type::none, *this);
+                handler_.begin_object(len, semantic_tag::none, *this);
                 ++nesting_depth_;
                 for (size_t i = 0; i < len; ++i)
                 {
@@ -103,7 +103,7 @@ private:
             {
                 // fixarray
                 const size_t len = type & 0x0f;
-                handler_.begin_array(len, semantic_tag_type::none, *this);
+                handler_.begin_array(len, semantic_tag::none, *this);
                 ++nesting_depth_;
                 for (size_t i = 0; i < len; ++i)
                 {
@@ -135,13 +135,13 @@ private:
                     ec = msgpack_errc::invalid_utf8_text_string;
                     return;
                 }
-                handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
+                handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this);
             }
         }
         else if (type >= 0xe0) 
         {
             // negative fixint
-            handler_.int64_value(static_cast<int8_t>(type), semantic_tag_type::none, *this);
+            handler_.int64_value(static_cast<int8_t>(type), semantic_tag::none, *this);
         }
         else
         {
@@ -149,17 +149,17 @@ private:
             {
                 case msgpack_format::nil_cd: 
                 {
-                    handler_.null_value(semantic_tag_type::none, *this);
+                    handler_.null_value(semantic_tag::none, *this);
                     break;
                 }
                 case msgpack_format::true_cd:
                 {
-                    handler_.bool_value(true, semantic_tag_type::none, *this);
+                    handler_.bool_value(true, semantic_tag::none, *this);
                     break;
                 }
                 case msgpack_format::false_cd:
                 {
-                    handler_.bool_value(false, semantic_tag_type::none, *this);
+                    handler_.bool_value(false, semantic_tag::none, *this);
                     break;
                 }
                 case msgpack_format::float32_cd: 
@@ -173,7 +173,7 @@ private:
                     }
                     const uint8_t* endp;
                     float val = jsoncons::detail::from_big_endian<float>(buf,buf+sizeof(buf),&endp);
-                    handler_.double_value(val, semantic_tag_type::none, *this);
+                    handler_.double_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -188,7 +188,7 @@ private:
                     }
                     const uint8_t* endp;
                     double val = jsoncons::detail::from_big_endian<double>(buf,buf+sizeof(buf),&endp);
-                    handler_.double_value(val, semantic_tag_type::none, *this);
+                    handler_.double_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -196,7 +196,7 @@ private:
                 {
                     uint8_t val{};
                     source_.get(val);
-                    handler_.uint64_value(val, semantic_tag_type::none, *this);
+                    handler_.uint64_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -211,7 +211,7 @@ private:
                     }
                     const uint8_t* endp;
                     uint16_t val = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.uint64_value(val, semantic_tag_type::none, *this);
+                    handler_.uint64_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -226,7 +226,7 @@ private:
                     }
                     const uint8_t* endp;
                     uint32_t val = jsoncons::detail::from_big_endian<uint32_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.uint64_value(val, semantic_tag_type::none, *this);
+                    handler_.uint64_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -241,7 +241,7 @@ private:
                     }
                     const uint8_t* endp;
                     uint64_t val = jsoncons::detail::from_big_endian<uint64_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.uint64_value(val, semantic_tag_type::none, *this);
+                    handler_.uint64_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -256,7 +256,7 @@ private:
                     }
                     const uint8_t* endp;
                     int8_t val = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.int64_value(val, semantic_tag_type::none, *this);
+                    handler_.int64_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -271,7 +271,7 @@ private:
                     }
                     const uint8_t* endp;
                     int16_t val = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.int64_value(val, semantic_tag_type::none, *this);
+                    handler_.int64_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -286,7 +286,7 @@ private:
                     }
                     const uint8_t* endp;
                     int32_t val = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.int64_value(val, semantic_tag_type::none, *this);
+                    handler_.int64_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -301,7 +301,7 @@ private:
                     }
                     const uint8_t* endp;
                     int64_t val = jsoncons::detail::from_big_endian<int64_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.int64_value(val, semantic_tag_type::none, *this);
+                    handler_.int64_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -330,7 +330,7 @@ private:
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this);
                     break;
                 }
 
@@ -360,7 +360,7 @@ private:
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this);
                     break;
                 }
 
@@ -390,7 +390,7 @@ private:
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this);
                     break;
                 }
 
@@ -416,7 +416,7 @@ private:
                     }
 
                     handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
-                                               semantic_tag_type::none, 
+                                               semantic_tag::none, 
                                                *this);
                     break;
                 }
@@ -443,7 +443,7 @@ private:
                     }
 
                     handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
-                                               semantic_tag_type::none, 
+                                               semantic_tag::none, 
                                                *this);
                     break;
                 }
@@ -470,7 +470,7 @@ private:
                     }
 
                     handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
-                                               semantic_tag_type::none, 
+                                               semantic_tag::none, 
                                                *this);
                     break;
                 }
@@ -487,7 +487,7 @@ private:
                     const uint8_t* endp;
                     int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
 
-                    handler_.begin_array(len, semantic_tag_type::none, *this);
+                    handler_.begin_array(len, semantic_tag::none, *this);
                     ++nesting_depth_;
                     for (int16_t i = 0; i < len; ++i)
                     {
@@ -514,7 +514,7 @@ private:
                     const uint8_t* endp;
                     int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
 
-                    handler_.begin_array(len, semantic_tag_type::none, *this);
+                    handler_.begin_array(len, semantic_tag::none, *this);
                     ++nesting_depth_;
                     for (int32_t i = 0; i < len; ++i)
                     {
@@ -541,7 +541,7 @@ private:
                     const uint8_t* endp;
                     int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
 
-                    handler_.begin_object(len, semantic_tag_type::none, *this);
+                    handler_.begin_object(len, semantic_tag::none, *this);
                     ++nesting_depth_;
                     for (int16_t i = 0; i < len; ++i)
                     {
@@ -573,7 +573,7 @@ private:
                     const uint8_t* endp;
                     int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
 
-                    handler_.begin_object(len, semantic_tag_type::none, *this);
+                    handler_.begin_object(len, semantic_tag::none, *this);
                     ++nesting_depth_;
                     for (int32_t i = 0; i < len; ++i)
                     {

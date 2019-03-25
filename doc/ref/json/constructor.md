@@ -34,10 +34,10 @@ json(const char* val); // (14)
 json(const char* val, const allocator_type& allocator); // (15)
 
 json(const byte_string_view& bs,
-     semantic_tag_type tag = semantic_tag_type::none); // (16)
+     semantic_tag tag = semantic_tag::none); // (16)
 
 json(const byte_string_view& bs, 
-     semantic_tag_type tag = semantic_tag_type::none, 
+     semantic_tag tag = semantic_tag::none, 
      const allocator_type& allocator); // (17)
 
 json(const bignum& n); // (18)

@@ -97,7 +97,7 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type, const ser_context&) override
+    bool do_begin_object(semantic_tag, const ser_context&) override
     {
         stack_.push_back(stack_item(cbor_container_type::indefinite_length_object));
         
@@ -105,7 +105,7 @@ private:
         return true;
     }
 
-    bool do_begin_object(size_t length, semantic_tag_type, const ser_context&) override
+    bool do_begin_object(size_t length, semantic_tag, const ser_context&) override
     {
         stack_.push_back(stack_item(cbor_container_type::object, length));
 
@@ -171,16 +171,16 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag_type, const ser_context&) override
+    bool do_begin_array(semantic_tag, const ser_context&) override
     {
         stack_.push_back(stack_item(cbor_container_type::indefinite_length_array));
         result_.push_back(0x9f);
         return true;
     }
 
-    bool do_begin_array(size_t length, semantic_tag_type tag, const ser_context&) override
+    bool do_begin_array(size_t length, semantic_tag tag, const ser_context&) override
     {
-        if (length == 2 && tag == semantic_tag_type::big_float)
+        if (length == 2 && tag == semantic_tag::big_float)
         {
             result_.push_back(0xc5);
         }
@@ -253,9 +253,9 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag_type tag, const ser_context&) override
+    bool do_null_value(semantic_tag tag, const ser_context&) override
     {
-        if (tag == semantic_tag_type::undefined)
+        if (tag == semantic_tag::undefined)
         {
             result_.push_back(0xf7);
         }
@@ -474,7 +474,7 @@ private:
         }
 
         result_.push_back(0xc4);
-        do_begin_array((size_t)2, semantic_tag_type::none, context);
+        do_begin_array((size_t)2, semantic_tag::none, context);
         if (exponent.length() > 0)
         {
             auto result = jsoncons::detail::to_integer<int64_t>(exponent.data(), exponent.length());
@@ -484,12 +484,12 @@ private:
             }
             scale += result.value;
         }
-        do_int64_value(scale, semantic_tag_type::none, context);
+        do_int64_value(scale, semantic_tag::none, context);
 
         auto result = jsoncons::detail::to_integer<int64_t>(s.data(),s.length());
         if (!result.overflow)
         {
-            do_int64_value(result.value, semantic_tag_type::none, context);
+            do_int64_value(result.value, semantic_tag::none, context);
         }
         else
         {
@@ -499,43 +499,43 @@ private:
         do_end_array(context);
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const ser_context& context) override
+    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context& context) override
     {
         switch (tag)
         {
-            case semantic_tag_type::big_integer:
+            case semantic_tag::big_integer:
             {
                 write_bignum(sv);
                 end_value();
                 break;
             }
-            case semantic_tag_type::big_decimal:
+            case semantic_tag::big_decimal:
             {
                 write_decimal_value(sv, context);
                 break;
             }
-            case semantic_tag_type::date_time:
+            case semantic_tag::date_time:
             {
                 result_.push_back(0xc0);
                 write_string(sv);
                 end_value();
                 break;
             }
-            case semantic_tag_type::uri:
+            case semantic_tag::uri:
             {
                 result_.push_back(32);
                 write_string(sv);
                 end_value();
                 break;
             }
-            case semantic_tag_type::base64url:
+            case semantic_tag::base64url:
             {
                 result_.push_back(33);
                 write_string(sv);
                 end_value();
                 break;
             }
-            case semantic_tag_type::base64:
+            case semantic_tag::base64:
             {
                 result_.push_back(34);
                 write_string(sv);
@@ -553,19 +553,19 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              semantic_tag_type tag, 
+                              semantic_tag tag, 
                               const ser_context&) override
     {
         byte_string_chars_format encoding_hint;
         switch (tag)
         {
-            case semantic_tag_type::base16:
+            case semantic_tag::base16:
                 encoding_hint = byte_string_chars_format::base16;
                 break;
-            case semantic_tag_type::base64:
+            case semantic_tag::base64:
                 encoding_hint = byte_string_chars_format::base64;
                 break;
-            case semantic_tag_type::base64url:
+            case semantic_tag::base64url:
                 encoding_hint = byte_string_chars_format::base64url;
                 break;
             default:
@@ -631,10 +631,10 @@ private:
     }
 
     bool do_double_value(double val, 
-                         semantic_tag_type tag,
+                         semantic_tag tag,
                          const ser_context&) override
     {
-        if (tag == semantic_tag_type::timestamp)
+        if (tag == semantic_tag::timestamp)
         {
             result_.push_back(0xc1);
         }
@@ -660,10 +660,10 @@ private:
     }
 
     bool do_int64_value(int64_t value, 
-                        semantic_tag_type tag, 
+                        semantic_tag tag, 
                         const ser_context&) override
     {
-        if (tag == semantic_tag_type::timestamp)
+        if (tag == semantic_tag::timestamp)
         {
             result_.push_back(0xc1);
         }
@@ -744,10 +744,10 @@ private:
     }
 
     bool do_uint64_value(uint64_t value, 
-                         semantic_tag_type tag, 
+                         semantic_tag tag, 
                          const ser_context&) override
     {
-        if (tag == semantic_tag_type::timestamp)
+        if (tag == semantic_tag::timestamp)
         {
             result_.push_back(0xc1);
         }
@@ -789,7 +789,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool value, semantic_tag_type, const ser_context&) override
+    bool do_bool_value(bool value, semantic_tag, const ser_context&) override
     {
         if (value)
         {

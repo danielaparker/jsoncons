@@ -90,7 +90,7 @@ Sets a string replacement for negative infinity when writing JSON, and indicate 
 to be used when reading JSON.
 
     json_options& lossless_number(bool value); 
-If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag_type::big_decimal`.
+If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::big_decimal`.
 Defaults to `false`.
 
     serializing_options& new_line_chars(const std::string& value)

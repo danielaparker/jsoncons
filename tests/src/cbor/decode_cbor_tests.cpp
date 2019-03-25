@@ -537,8 +537,8 @@ TEST_CASE("cbor array as<> test")
     writer.big_decimal_value("273.15");
     writer.date_time_value("2015-05-07 12:41:07-07:00");
     writer.timestamp_value(1431027667);
-    writer.int64_value(-1431027667, semantic_tag_type::timestamp);
-    writer.double_value(1431027667.5, semantic_tag_type::timestamp);
+    writer.int64_value(-1431027667, semantic_tag::timestamp);
+    writer.double_value(1431027667.5, semantic_tag::timestamp);
     writer.end_array();
     writer.flush();
 
@@ -589,7 +589,7 @@ TEST_CASE("cbor array as<> test")
         CHECK(j[1].is<byte_string_view>());
         CHECK(j[2].is<bignum>());
         CHECK(j[3].is_string());
-        CHECK(j[3].semantic_tag() == semantic_tag_type::big_decimal);
+        CHECK(j[3].get_semantic_tag() == semantic_tag::big_decimal);
         CHECK(j[4].is<std::string>());
         CHECK(j[5].is<int>());
         CHECK(j[5].is<unsigned int>());

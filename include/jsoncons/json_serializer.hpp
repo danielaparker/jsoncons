@@ -435,7 +435,7 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type, const ser_context&) override
+    bool do_begin_object(semantic_tag, const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -519,7 +519,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag_type, const ser_context&) override
+    bool do_begin_array(semantic_tag, const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -635,7 +635,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag_type, const ser_context&) override
+    bool do_null_value(semantic_tag, const ser_context&) override
     {
         if (!stack_.empty()) 
         {
@@ -656,7 +656,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const ser_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context&) override
     {
         if (!stack_.empty()) 
         {
@@ -672,7 +672,7 @@ private:
 
         switch (tag)
         {
-            case semantic_tag_type::big_integer:
+            case semantic_tag::big_integer:
                 write_big_integer_value(sv);
                 break;
             default:
@@ -690,7 +690,7 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              semantic_tag_type tag,
+                              semantic_tag tag,
                               const ser_context&) override
     {
         if (!stack_.empty()) 
@@ -708,13 +708,13 @@ private:
         byte_string_chars_format encoding_hint;
         switch (tag)
         {
-            case semantic_tag_type::base16:
+            case semantic_tag::base16:
                 encoding_hint = byte_string_chars_format::base16;
                 break;
-            case semantic_tag_type::base64:
+            case semantic_tag::base64:
                 encoding_hint = byte_string_chars_format::base64;
                 break;
-            case semantic_tag_type::base64url:
+            case semantic_tag::base64url:
                 encoding_hint = byte_string_chars_format::base64url;
                 break;
             default:
@@ -762,7 +762,7 @@ private:
     }
 
     bool do_double_value(double value, 
-                         semantic_tag_type,
+                         semantic_tag,
                          const ser_context& context) override
     {
         if (!stack_.empty()) 
@@ -786,7 +786,7 @@ private:
             }
             else if (is_nan_to_str_)
             {
-                do_string_value(nan_to_str_, semantic_tag_type::none, context);
+                do_string_value(nan_to_str_, semantic_tag::none, context);
             }
             else
             {
@@ -803,7 +803,7 @@ private:
             }
             else if (is_inf_to_str_)
             {
-                do_string_value(inf_to_str_, semantic_tag_type::none, context);
+                do_string_value(inf_to_str_, semantic_tag::none, context);
             }
             else
             {
@@ -820,7 +820,7 @@ private:
             }
             else if (is_neginf_to_str_)
             {
-                do_string_value(neginf_to_str_, semantic_tag_type::none, context);
+                do_string_value(neginf_to_str_, semantic_tag::none, context);
             }
             else
             {
@@ -839,7 +839,7 @@ private:
     }
 
     bool do_int64_value(int64_t value, 
-                        semantic_tag_type,
+                        semantic_tag,
                         const ser_context&) override
     {
         if (!stack_.empty()) 
@@ -860,7 +860,7 @@ private:
     }
 
     bool do_uint64_value(uint64_t value, 
-                         semantic_tag_type, 
+                         semantic_tag, 
                          const ser_context&) override
     {
         if (!stack_.empty()) 
@@ -880,7 +880,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool value, semantic_tag_type, const ser_context&) override
+    bool do_bool_value(bool value, semantic_tag, const ser_context&) override
     {
         if (!stack_.empty()) 
         {
@@ -1159,7 +1159,7 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type, const ser_context&) override
+    bool do_begin_object(semantic_tag, const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1185,7 +1185,7 @@ private:
     }
 
 
-    bool do_begin_array(semantic_tag_type, const ser_context&) override
+    bool do_begin_array(semantic_tag, const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1222,7 +1222,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag_type, const ser_context&) override
+    bool do_null_value(semantic_tag, const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1289,7 +1289,7 @@ private:
         }
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const ser_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1298,7 +1298,7 @@ private:
 
         switch (tag)
         {
-            case semantic_tag_type::big_integer:
+            case semantic_tag::big_integer:
                 write_big_integer_value(sv);
                 break;
             default:
@@ -1318,7 +1318,7 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              semantic_tag_type tag,
+                              semantic_tag tag,
                               const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
@@ -1329,13 +1329,13 @@ private:
         byte_string_chars_format encoding_hint;
         switch (tag)
         {
-            case semantic_tag_type::base16:
+            case semantic_tag::base16:
                 encoding_hint = byte_string_chars_format::base16;
                 break;
-            case semantic_tag_type::base64:
+            case semantic_tag::base64:
                 encoding_hint = byte_string_chars_format::base64;
                 break;
-            case semantic_tag_type::base64url:
+            case semantic_tag::base64url:
                 encoding_hint = byte_string_chars_format::base64url;
                 break;
             default:
@@ -1383,7 +1383,7 @@ private:
     }
 
     bool do_double_value(double value, 
-                         semantic_tag_type,
+                         semantic_tag,
                          const ser_context& context) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
@@ -1399,7 +1399,7 @@ private:
             }
             else if (is_nan_to_str_)
             {
-                do_string_value(nan_to_str_, semantic_tag_type::none, context);
+                do_string_value(nan_to_str_, semantic_tag::none, context);
             }
             else
             {
@@ -1414,7 +1414,7 @@ private:
             }
             else if (is_inf_to_str_)
             {
-                do_string_value(inf_to_str_, semantic_tag_type::none, context);
+                do_string_value(inf_to_str_, semantic_tag::none, context);
             }
             else
             {
@@ -1429,7 +1429,7 @@ private:
             }
             else if (is_neginf_to_str_)
             {
-                do_string_value(neginf_to_str_, semantic_tag_type::none, context);
+                do_string_value(neginf_to_str_, semantic_tag::none, context);
             }
             else
             {
@@ -1449,7 +1449,7 @@ private:
     }
 
     bool do_int64_value(int64_t value, 
-                        semantic_tag_type,
+                        semantic_tag,
                         const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
@@ -1465,7 +1465,7 @@ private:
     }
 
     bool do_uint64_value(uint64_t value, 
-                         semantic_tag_type, 
+                         semantic_tag, 
                          const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
@@ -1480,7 +1480,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool value, semantic_tag_type, const ser_context&) override
+    bool do_bool_value(bool value, semantic_tag, const ser_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {

@@ -139,7 +139,7 @@ TEST_CASE("json_pull_reader big_integer_value as bignum")
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == staj_event_type::string_value);
-    CHECK(reader.current().semantic_tag() == semantic_tag_type::big_integer);
+    CHECK(reader.current().get_semantic_tag() == semantic_tag::big_integer);
     bignum c = reader.current().as<bignum>();
     CHECK(bool(bignum(s) == c));
     reader.next();

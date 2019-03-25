@@ -114,11 +114,11 @@ private:
 
                 if (has_cbor_tag && cbor_tag == 1)
                 {
-                    handler_.uint64_value(val, semantic_tag_type::timestamp, *this);
+                    handler_.uint64_value(val, semantic_tag::timestamp, *this);
                 }
                 else
                 {
-                    handler_.uint64_value(val, semantic_tag_type::none, *this);
+                    handler_.uint64_value(val, semantic_tag::none, *this);
                 }
                 break;
             }
@@ -131,11 +131,11 @@ private:
                 }
                 if (has_cbor_tag && cbor_tag == 1)
                 {
-                    handler_.int64_value(val, semantic_tag_type::timestamp, *this);
+                    handler_.int64_value(val, semantic_tag::timestamp, *this);
                 }
                 else 
                 {
-                    handler_.int64_value(val, semantic_tag_type::none, *this);
+                    handler_.int64_value(val, semantic_tag::none, *this);
                 }
                 break;
             }
@@ -169,27 +169,27 @@ private:
                             }
                         case 0x15:
                             {
-                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag_type::base64url, *this);
+                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag::base64url, *this);
                                 break;
                             }
                         case 0x16:
                             {
-                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag_type::base64, *this);
+                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag::base64, *this);
                                 break;
                             }
                         case 0x17:
                             {
-                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag_type::base16, *this);
+                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag::base16, *this);
                                 break;
                             }
                         default:
-                            handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag_type::none, *this);
+                            handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag::none, *this);
                             break;
                     }
                 }
                 else
                 {
-                    handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag_type::none, *this);
+                    handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag::none, *this);
                 }
                 break;
             }
@@ -199,22 +199,22 @@ private:
                 {
                     return;
                 }
-                semantic_tag_type tag = semantic_tag_type::none;
+                semantic_tag tag = semantic_tag::none;
                 if (has_cbor_tag)
                 {
                     switch (cbor_tag)
                     {
                         case 0:
-                            tag = semantic_tag_type::date_time;
+                            tag = semantic_tag::date_time;
                             break;
                         case 32:
-                            tag = semantic_tag_type::uri;
+                            tag = semantic_tag::uri;
                             break;
                         case 33:
-                            tag = semantic_tag_type::base64url;
+                            tag = semantic_tag::base64url;
                             break;
                         case 34:
-                            tag = semantic_tag_type::base64;
+                            tag = semantic_tag::base64;
                             break;
                         default:
                             break;
@@ -232,29 +232,29 @@ private:
             }
             case cbor_major_type::array:
             {
-                semantic_tag_type tag = semantic_tag_type::none;
+                semantic_tag tag = semantic_tag::none;
                 if (has_cbor_tag)
                 {
                     switch (cbor_tag)
                     {
                         case 0x04:
-                            tag = semantic_tag_type::big_decimal;
+                            tag = semantic_tag::big_decimal;
                             break;
                         case 0x05:
-                            tag = semantic_tag_type::big_float;
+                            tag = semantic_tag::big_float;
                             break;
                         default:
                             break;
                     }
                 }
-                if (tag == semantic_tag_type::big_decimal)
+                if (tag == semantic_tag::big_decimal)
                 {
                     std::string s = jsoncons::cbor::detail::get_array_as_decimal_string(source_, ec);
                     if (ec)
                     {
                         return;
                     }
-                    handler_.string_value(s, semantic_tag_type::big_decimal);
+                    handler_.string_value(s, semantic_tag::big_decimal);
                 }
                 else
                 {
@@ -323,7 +323,7 @@ private:
                     case additional_info::indefinite_length: 
                     {
                         ++nesting_depth_;
-                        handler_.begin_object(semantic_tag_type::none, *this);
+                        handler_.begin_object(semantic_tag::none, *this);
                         source_.ignore(1);
                         bool done = false;
                         while (!done)
@@ -364,7 +364,7 @@ private:
                             return;
                         }
                         ++nesting_depth_;
-                        handler_.begin_object(len, semantic_tag_type::none, *this);
+                        handler_.begin_object(len, semantic_tag::none, *this);
                         for (size_t i = 0; i < len; ++i)
                         {
                             read_name(ec);
@@ -394,19 +394,19 @@ private:
                 switch (info)
                 {
                     case 0x14:
-                        handler_.bool_value(false, semantic_tag_type::none, *this);
+                        handler_.bool_value(false, semantic_tag::none, *this);
                         source_.ignore(1);
                         break;
                     case 0x15:
-                        handler_.bool_value(true, semantic_tag_type::none, *this);
+                        handler_.bool_value(true, semantic_tag::none, *this);
                         source_.ignore(1);
                         break;
                     case 0x16:
-                        handler_.null_value(semantic_tag_type::none, *this);
+                        handler_.null_value(semantic_tag::none, *this);
                         source_.ignore(1);
                         break;
                     case 0x17:
-                        handler_.null_value(semantic_tag_type::undefined, *this);
+                        handler_.null_value(semantic_tag::undefined, *this);
                         source_.ignore(1);
                         break;
                     case 0x19: // Half-Precision Float (two-byte IEEE 754)
@@ -419,11 +419,11 @@ private:
                         }
                         if (has_cbor_tag && cbor_tag == 1)
                         {
-                            handler_.double_value(val, semantic_tag_type::timestamp, *this);
+                            handler_.double_value(val, semantic_tag::timestamp, *this);
                         }
                         else
                         {
-                            handler_.double_value(val, semantic_tag_type::none, *this);
+                            handler_.double_value(val, semantic_tag::none, *this);
                         }
                         break;
                 }

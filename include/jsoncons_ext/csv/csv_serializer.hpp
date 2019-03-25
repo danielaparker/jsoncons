@@ -141,7 +141,7 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type, const ser_context&) override
+    bool do_begin_object(semantic_tag, const ser_context&) override
     {
         stack_.push_back(stack_item(true));
         return true;
@@ -186,7 +186,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag_type, const ser_context&) override
+    bool do_begin_array(semantic_tag, const ser_context&) override
     {
         stack_.push_back(stack_item(false));
         if (stack_.size() == 2)
@@ -258,7 +258,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag_type, const ser_context&) override
+    bool do_null_value(semantic_tag, const ser_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -282,7 +282,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type, const ser_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag, const ser_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -307,19 +307,19 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              semantic_tag_type tag, 
+                              semantic_tag tag, 
                               const ser_context& context) override
     {
         byte_string_chars_format encoding_hint;
         switch (tag)
         {
-            case semantic_tag_type::base16:
+            case semantic_tag::base16:
                 encoding_hint = byte_string_chars_format::base16;
                 break;
-            case semantic_tag_type::base64:
+            case semantic_tag::base64:
                 encoding_hint = byte_string_chars_format::base64;
                 break;
-            case semantic_tag_type::base64url:
+            case semantic_tag::base64url:
                 encoding_hint = byte_string_chars_format::base64url;
                 break;
             default:
@@ -334,19 +334,19 @@ private:
             case byte_string_chars_format::base16:
             {
                 encode_base16(b.data(),b.length(),s);
-                do_string_value(s, semantic_tag_type::none, context);
+                do_string_value(s, semantic_tag::none, context);
                 break;
             }
             case byte_string_chars_format::base64:
             {
                 encode_base64(b.data(),b.length(),s);
-                do_string_value(s, semantic_tag_type::none, context);
+                do_string_value(s, semantic_tag::none, context);
                 break;
             }
             case byte_string_chars_format::base64url:
             {
                 encode_base64url(b.data(),b.length(),s);
-                do_string_value(s, semantic_tag_type::none, context);
+                do_string_value(s, semantic_tag::none, context);
                 break;
             }
             default:
@@ -359,7 +359,7 @@ private:
     }
 
     bool do_double_value(double val, 
-                         semantic_tag_type, 
+                         semantic_tag, 
                          const ser_context&) override
     {
         if (stack_.size() == 2)
@@ -385,7 +385,7 @@ private:
     }
 
     bool do_int64_value(int64_t val, 
-                        semantic_tag_type, 
+                        semantic_tag, 
                         const ser_context&) override
     {
         if (stack_.size() == 2)
@@ -411,7 +411,7 @@ private:
     }
 
     bool do_uint64_value(uint64_t val, 
-                         semantic_tag_type, 
+                         semantic_tag, 
                          const ser_context&) override
     {
         if (stack_.size() == 2)
@@ -436,7 +436,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool val, semantic_tag_type, const ser_context&) override
+    bool do_bool_value(bool val, semantic_tag, const ser_context&) override
     {
         if (stack_.size() == 2)
         {

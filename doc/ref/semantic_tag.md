@@ -1,7 +1,7 @@
-### jsoncons::semantic_tag_type
+### jsoncons::semantic_tag
 
 ```c++
-enum class semantic_tag_type : uint8_t 
+enum class semantic_tag : uint8_t 
 {
     none = 0,
     undefined,
@@ -11,7 +11,9 @@ enum class semantic_tag_type : uint8_t
     big_decimal,
     base16,
     base64,
-    base64url
+    base64url,
+    uri,
+    big_float
 };
 ```
 

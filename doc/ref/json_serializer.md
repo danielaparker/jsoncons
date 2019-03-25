@@ -60,19 +60,19 @@ and uses the specified [json options](json_options.md).
 
 #### Member functions
 
-    bool begin_object(semantic_tag_type tag=semantic_tag_type::none,
+    bool begin_object(semantic_tag tag=semantic_tag::none,
                       const ser_context& context=null_ser_context()); 
 
     bool begin_object(size_t length, 
-                      semantic_tag_type tag=semantic_tag_type::none,
+                      semantic_tag tag=semantic_tag::none,
                       const ser_context& context=null_ser_context()); 
 
     bool end_object(const ser_context& context = null_ser_context())
 
-    bool begin_array(semantic_tag_type tag=semantic_tag_type::none,
+    bool begin_array(semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context()); 
 
-    bool begin_array(semantic_tag_type tag=semantic_tag_type::none,
+    bool begin_array(semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context()); 
 
     bool end_array(const ser_context& context=null_ser_context()); 
@@ -81,15 +81,15 @@ and uses the specified [json options](json_options.md).
               const ser_context& context=null_ser_context()); 
 
     bool string_value(const string_view_type& value, 
-                      semantic_tag_type tag = semantic_tag_type::none, 
+                      semantic_tag tag = semantic_tag::none, 
                       const ser_context& context=null_ser_context()); ;
 
     bool byte_string_value(const byte_string_view& b, 
-                           semantic_tag_type tag=semantic_tag_type::none, 
+                           semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=null_ser_context()); 
 
     bool byte_string_value(const uint8_t* p, size_t size, 
-                           semantic_tag_type tag=semantic_tag_type::none, 
+                           semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=null_ser_context()); 
 
     bool big_integer_value(const string_view_type& s, 
@@ -105,22 +105,22 @@ and uses the specified [json options](json_options.md).
                          const ser_context& context=null_ser_context());  
 
     bool int64_value(int64_t value, 
-                     semantic_tag_type tag = semantic_tag_type::none, 
+                     semantic_tag tag = semantic_tag::none, 
                      const ser_context& context=null_ser_context()); ;
 
     bool uint64_value(uint64_t value, 
-                      semantic_tag_type tag = semantic_tag_type::none, 
+                      semantic_tag tag = semantic_tag::none, 
                       const ser_context& context=null_ser_context()); 
 
     bool double_value(double value, 
-                      semantic_tag_type tag = semantic_tag_type::none, 
+                      semantic_tag tag = semantic_tag::none, 
                       const ser_context& context=null_ser_context()); 
 
     bool bool_value(bool value, 
-                    semantic_tag_type tag = semantic_tag_type::none,
+                    semantic_tag tag = semantic_tag::none,
                     const ser_context& context=null_ser_context());  
 
-    bool null_value(semantic_tag_type tag = semantic_tag_type::none,
+    bool null_value(semantic_tag tag = semantic_tag::none,
                     const ser_context& context=null_ser_context());  
 
     void flush()

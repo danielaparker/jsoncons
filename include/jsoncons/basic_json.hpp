@@ -162,7 +162,7 @@ public:
                 : type_(type)
             {}
 
-            data_base(storage_type data_type, semantic_tag_type semantic_type)
+            data_base(storage_type data_type, semantic_tag semantic_type)
                 : type_((static_cast<uint8_t>(data_type) << major_type_shift) | static_cast<uint8_t>(semantic_type))
             {}
 
@@ -178,10 +178,10 @@ public:
                 return static_cast<storage_type>(value);
             }
 
-            semantic_tag_type semantic_tag() const 
+            semantic_tag get_semantic_tag() const 
             {
                 uint8_t value = type_ & additional_information_mask;
-                return static_cast<semantic_tag_type>(value);
+                return static_cast<semantic_tag>(value);
             }
         };
 
@@ -189,10 +189,10 @@ public:
         {
         public:
             null_data()
-                : data_base(storage_type::null_val, semantic_tag_type::none)
+                : data_base(storage_type::null_val, semantic_tag::none)
             {
             }
-            null_data(semantic_tag_type tag)
+            null_data(semantic_tag tag)
                 : data_base(storage_type::null_val, tag)
             {
             }
@@ -201,7 +201,7 @@ public:
         class empty_object_data final : public data_base
         {
         public:
-            empty_object_data(semantic_tag_type tag)
+            empty_object_data(semantic_tag tag)
                 : data_base(storage_type::empty_object_val, tag)
             {
             }
@@ -211,7 +211,7 @@ public:
         {
             bool val_;
         public:
-            bool_data(bool val, semantic_tag_type tag)
+            bool_data(bool val, semantic_tag tag)
                 : data_base(storage_type::bool_val, tag),val_(val)
             {
             }
@@ -233,7 +233,7 @@ public:
             int64_t val_;
         public:
             int64_data(int64_t val, 
-                       semantic_tag_type tag = semantic_tag_type::none)
+                       semantic_tag tag = semantic_tag::none)
                 : data_base(storage_type::int64_val, tag),val_(val)
             {
             }
@@ -254,7 +254,7 @@ public:
             uint64_t val_;
         public:
             uint64_data(uint64_t val, 
-                        semantic_tag_type tag = semantic_tag_type::none)
+                        semantic_tag tag = semantic_tag::none)
                 : data_base(storage_type::uint64_val, tag),val_(val)
             {
             }
@@ -275,7 +275,7 @@ public:
             double val_;
         public:
             double_data(double val, 
-                        semantic_tag_type tag = semantic_tag_type::none)
+                        semantic_tag tag = semantic_tag::none)
                 : data_base(storage_type::double_val, tag), 
                   val_(val)
             {
@@ -301,7 +301,7 @@ public:
         public:
             static const size_t max_length = (14 / sizeof(char_type)) - 1;
 
-            short_string_data(semantic_tag_type tag, const char_type* p, uint8_t length)
+            short_string_data(semantic_tag tag, const char_type* p, uint8_t length)
                 : data_base(storage_type::short_string_val, tag), length_(length)
             {
                 JSONCONS_ASSERT(length <= max_length);
@@ -340,7 +340,7 @@ public:
             pointer ptr_;
         public:
 
-            long_string_data(semantic_tag_type tag, const char_type* data, size_t length, const Allocator& a)
+            long_string_data(semantic_tag tag, const char_type* data, size_t length, const Allocator& a)
                 : data_base(storage_type::long_string_val, tag)
             {
                 ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(data,length,a);
@@ -423,7 +423,7 @@ public:
             }
         public:
 
-            byte_string_data(semantic_tag_type semantic_type, 
+            byte_string_data(semantic_tag semantic_type, 
                              const uint8_t* data, size_t length, 
                              const Allocator& a)
                 : data_base(storage_type::byte_string_val, semantic_type)
@@ -502,13 +502,13 @@ public:
                 }
             }
         public:
-            array_data(const array& val, semantic_tag_type tag)
+            array_data(const array& val, semantic_tag tag)
                 : data_base(storage_type::array_val, tag)
             {
                 create(val.get_allocator(), val);
             }
 
-            array_data(const array& val, semantic_tag_type tag, const Allocator& a)
+            array_data(const array& val, semantic_tag tag, const Allocator& a)
                 : data_base(storage_type::array_val, tag)
             {
                 create(array_allocator(a), val, a);
@@ -584,13 +584,13 @@ public:
                 }
             }
         public:
-            explicit object_data(const object& val, semantic_tag_type tag)
+            explicit object_data(const object& val, semantic_tag tag)
                 : data_base(storage_type::object_val, tag)
             {
                 create(val.get_allocator(), val);
             }
 
-            explicit object_data(const object& val, semantic_tag_type tag, const Allocator& a)
+            explicit object_data(const object& val, semantic_tag tag, const Allocator& a)
                 : data_base(storage_type::object_val, tag)
             {
                 create(object_allocator(a), val, a);
@@ -653,35 +653,35 @@ public:
 
         data_t data_;
     public:
-        variant(semantic_tag_type tag)
+        variant(semantic_tag tag)
         {
             new(reinterpret_cast<void*>(&data_))empty_object_data(tag);
         }
 
-        explicit variant(null_type, semantic_tag_type tag)
+        explicit variant(null_type, semantic_tag tag)
         {
             new(reinterpret_cast<void*>(&data_))null_data(tag);
         }
 
-        explicit variant(bool val, semantic_tag_type tag)
+        explicit variant(bool val, semantic_tag tag)
         {
             new(reinterpret_cast<void*>(&data_))bool_data(val,tag);
         }
-        explicit variant(int64_t val, semantic_tag_type tag)
+        explicit variant(int64_t val, semantic_tag tag)
         {
             new(reinterpret_cast<void*>(&data_))int64_data(val, tag);
         }
-        explicit variant(uint64_t val, semantic_tag_type tag)
+        explicit variant(uint64_t val, semantic_tag tag)
         {
             new(reinterpret_cast<void*>(&data_))uint64_data(val, tag);
         }
 
-        variant(double val, semantic_tag_type tag)
+        variant(double val, semantic_tag tag)
         {
             new(reinterpret_cast<void*>(&data_))double_data(val, tag);
         }
 
-        variant(const char_type* s, size_t length, semantic_tag_type tag)
+        variant(const char_type* s, size_t length, semantic_tag tag)
         {
             if (length <= short_string_data::max_length)
             {
@@ -693,7 +693,7 @@ public:
             }
         }
 
-        variant(const char_type* s, size_t length, semantic_tag_type tag, const Allocator& alloc)
+        variant(const char_type* s, size_t length, semantic_tag tag, const Allocator& alloc)
         {
             if (length <= short_string_data::max_length)
             {
@@ -705,12 +705,12 @@ public:
             }
         }
 
-        variant(const byte_string_view& bs, semantic_tag_type tag)
+        variant(const byte_string_view& bs, semantic_tag tag)
         {
             new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.length(), byte_allocator_type());
         }
 
-        variant(const byte_string_view& bs, semantic_tag_type tag, const Allocator& allocator)
+        variant(const byte_string_view& bs, semantic_tag tag, const Allocator& allocator)
         {
             new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.length(), allocator);
         }
@@ -722,11 +722,11 @@ public:
 
             if (s.length() <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::big_integer, s.data(), static_cast<uint8_t>(s.length()));
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag::big_integer, s.data(), static_cast<uint8_t>(s.length()));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::big_integer, s.data(), s.length(), char_allocator_type());
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag::big_integer, s.data(), s.length(), char_allocator_type());
             }
         }
 
@@ -737,26 +737,26 @@ public:
 
             if (s.length() <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::big_integer, s.data(), static_cast<uint8_t>(s.length()));
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag::big_integer, s.data(), static_cast<uint8_t>(s.length()));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::big_integer, s.data(), s.length(), char_allocator_type(allocator));
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag::big_integer, s.data(), s.length(), char_allocator_type(allocator));
             }
         }
-        variant(const object& val, semantic_tag_type tag)
+        variant(const object& val, semantic_tag tag)
         {
             new(reinterpret_cast<void*>(&data_))object_data(val, tag);
         }
-        variant(const object& val, semantic_tag_type tag, const Allocator& alloc)
+        variant(const object& val, semantic_tag tag, const Allocator& alloc)
         {
             new(reinterpret_cast<void*>(&data_))object_data(val, tag, alloc);
         }
-        variant(const array& val, semantic_tag_type tag)
+        variant(const array& val, semantic_tag tag)
         {
             new(reinterpret_cast<void*>(&data_))array_data(val, tag);
         }
-        variant(const array& val, semantic_tag_type tag, const Allocator& alloc)
+        variant(const array& val, semantic_tag tag, const Allocator& alloc)
         {
             new(reinterpret_cast<void*>(&data_))array_data(val, tag, alloc);
         }
@@ -870,9 +870,9 @@ public:
             return reinterpret_cast<const data_base*>(&data_)->get_storage_type();
         }
 
-        semantic_tag_type semantic_tag() const
+        semantic_tag get_semantic_tag() const
         {
-            return reinterpret_cast<const data_base*>(&data_)->semantic_tag();
+            return reinterpret_cast<const data_base*>(&data_)->get_semantic_tag();
         }
 
         const null_data* null_data_cast() const
@@ -984,23 +984,23 @@ public:
                 case storage_type::short_string_val:
                 case storage_type::long_string_val:
                 {
-                    switch (semantic_tag())
+                    switch (get_semantic_tag())
                     {
-                        case semantic_tag_type::base16:
+                        case semantic_tag::base16:
                         {
                             basic_byte_string<BAllocator> bs;
                             auto s = as_string_view();
                             decode_base16(s.begin(), s.end(), bs);
                             return bs;
                         }
-                        case semantic_tag_type::base64:
+                        case semantic_tag::base64:
                         {
                             basic_byte_string<BAllocator> bs;
                             auto s = as_string_view();
                             decode_base64(s.begin(), s.end(), bs);
                             return bs;
                         }
-                        case semantic_tag_type::base64url:
+                        case semantic_tag::base64url:
                         {
                             basic_byte_string<BAllocator> bs;
                             auto s = as_string_view();
@@ -1556,9 +1556,9 @@ public:
             return evaluate().get_storage_type();
         }
 
-        semantic_tag_type semantic_tag() const
+        semantic_tag get_semantic_tag() const
         {
-            return evaluate().semantic_tag();
+            return evaluate().get_semantic_tag();
         }
 
         size_t count(const string_view_type& name) const
@@ -2444,7 +2444,7 @@ public:
 
     static basic_json make_array(const array& a, allocator_type allocator)
     {
-        return basic_json(variant(a, semantic_tag_type::none, allocator));
+        return basic_json(variant(a, semantic_tag::none, allocator));
     }
 
     static basic_json make_array(std::initializer_list<basic_json> init, const Allocator& allocator = Allocator())
@@ -2491,18 +2491,18 @@ public:
 
     static const basic_json& null()
     {
-        static basic_json a_null = basic_json(null_type(), semantic_tag_type::none);
+        static basic_json a_null = basic_json(null_type(), semantic_tag::none);
         return a_null;
     }
 
     variant var_;
 
-    basic_json(semantic_tag_type tag = semantic_tag_type::none) 
+    basic_json(semantic_tag tag = semantic_tag::none) 
         : var_(tag)
     {
     }
 
-    explicit basic_json(const Allocator& allocator, semantic_tag_type tag = semantic_tag_type::none) 
+    explicit basic_json(const Allocator& allocator, semantic_tag tag = semantic_tag::none) 
         : var_(object(allocator),tag)
     {
     }
@@ -2537,22 +2537,22 @@ public:
     {
     }
 
-    basic_json(const array& val, semantic_tag_type tag = semantic_tag_type::none)
+    basic_json(const array& val, semantic_tag tag = semantic_tag::none)
         : var_(val, tag)
     {
     }
 
-    basic_json(array&& other, semantic_tag_type tag = semantic_tag_type::none)
+    basic_json(array&& other, semantic_tag tag = semantic_tag::none)
         : var_(std::forward<array>(other), tag)
     {
     }
 
-    basic_json(const object& other, semantic_tag_type tag = semantic_tag_type::none)
+    basic_json(const object& other, semantic_tag tag = semantic_tag::none)
         : var_(other, tag)
     {
     }
 
-    basic_json(object&& other, semantic_tag_type tag = semantic_tag_type::none)
+    basic_json(object&& other, semantic_tag tag = semantic_tag::none)
         : var_(std::forward<object>(other), tag)
     {
     }
@@ -2581,73 +2581,73 @@ public:
     {
     }
 
-    basic_json(const char_type* s, semantic_tag_type tag = semantic_tag_type::none)
+    basic_json(const char_type* s, semantic_tag tag = semantic_tag::none)
         : var_(s, char_traits_type::length(s), tag)
     {
     }
 
     basic_json(const char_type* s, const Allocator& allocator)
-        : var_(s, char_traits_type::length(s), semantic_tag_type::none, allocator)
+        : var_(s, char_traits_type::length(s), semantic_tag::none, allocator)
     {
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     basic_json(double val, uint8_t)
-        : var_(val, semantic_tag_type::none)
+        : var_(val, semantic_tag::none)
     {
     }
     basic_json(double val, 
                const floating_point_options&,
-               semantic_tag_type tag = semantic_tag_type::none)
+               semantic_tag tag = semantic_tag::none)
         : var_(val, tag)
     {
     }
 #endif
 
-    basic_json(double val, semantic_tag_type tag)
+    basic_json(double val, semantic_tag tag)
         : var_(val, tag)
     {
     }
 
     template <class T>
-    basic_json(T val, semantic_tag_type tag, typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value>::type* = 0)
+    basic_json(T val, semantic_tag tag, typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value>::type* = 0)
         : var_(static_cast<int64_t>(val), tag)
     {
     }
 
     template <class T>
-    basic_json(T val, semantic_tag_type tag, typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value>::type* = 0)
+    basic_json(T val, semantic_tag tag, typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value>::type* = 0)
         : var_(static_cast<uint64_t>(val), tag)
     {
     }
 
-    basic_json(const char_type *s, size_t length, semantic_tag_type tag = semantic_tag_type::none)
+    basic_json(const char_type *s, size_t length, semantic_tag tag = semantic_tag::none)
         : var_(s, length, tag)
     {
     }
 
-    basic_json(const string_view_type& sv, semantic_tag_type tag)
+    basic_json(const string_view_type& sv, semantic_tag tag)
         : var_(sv.data(), sv.length(), tag)
     {
     }
 
-    basic_json(null_type val, semantic_tag_type tag)
+    basic_json(null_type val, semantic_tag tag)
         : var_(val, tag)
     {
     }
 
-    basic_json(bool val, semantic_tag_type tag)
+    basic_json(bool val, semantic_tag tag)
         : var_(val, tag)
     {
     }
 
-    basic_json(const string_view_type& sv, semantic_tag_type tag, const Allocator& allocator)
+    basic_json(const string_view_type& sv, semantic_tag tag, const Allocator& allocator)
         : var_(sv.data(), sv.length(), tag, allocator)
     {
     }
 
     basic_json(const char_type *s, size_t length, 
-               semantic_tag_type tag, const Allocator& allocator)
+               semantic_tag tag, const Allocator& allocator)
         : var_(s, length, tag, allocator)
     {
     }
@@ -2656,20 +2656,20 @@ public:
 
     basic_json(const byte_string_view& bs, 
                byte_string_chars_format encoding_hint,
-               semantic_tag_type tag = semantic_tag_type::none)
+               semantic_tag tag = semantic_tag::none)
         : var_(bs, tag)
     {
         switch (encoding_hint)
         {
             {
                 case byte_string_chars_format::base16:
-                    var_ = variant(bs, semantic_tag_type::base16);
+                    var_ = variant(bs, semantic_tag::base16);
                     break;
                 case byte_string_chars_format::base64:
-                    var_ = variant(bs, semantic_tag_type::base64);
+                    var_ = variant(bs, semantic_tag::base64);
                     break;
                 case byte_string_chars_format::base64url:
-                    var_ = variant(bs, semantic_tag_type::base64url);
+                    var_ = variant(bs, semantic_tag::base64url);
                     break;
                 default:
                     break;
@@ -2679,13 +2679,13 @@ public:
 #endif
 
     explicit basic_json(const byte_string_view& bs, 
-                        semantic_tag_type tag = semantic_tag_type::none)
+                        semantic_tag tag = semantic_tag::none)
         : var_(bs, tag)
     {
     }
 
     basic_json(const byte_string_view& bs, 
-               semantic_tag_type tag, 
+               semantic_tag tag, 
                const Allocator& allocator)
         : var_(bs, tag, allocator)
     {
@@ -2741,7 +2741,7 @@ public:
 
     basic_json& operator=(const char_type* s)
     {
-        var_ = variant(s, char_traits_type::length(s), semantic_tag_type::none);
+        var_ = variant(s, char_traits_type::length(s), semantic_tag::none);
         return *this;
     }
 
@@ -3149,10 +3149,10 @@ public:
                 return true;
             case storage_type::short_string_val:
             case storage_type::long_string_val:
-                return var_.semantic_tag() == semantic_tag_type::big_integer ||
-                       var_.semantic_tag() == semantic_tag_type::big_decimal;
+                return var_.get_semantic_tag() == semantic_tag::big_integer ||
+                       var_.get_semantic_tag() == semantic_tag::big_decimal;
             case storage_type::array_val:
-                return var_.semantic_tag() == semantic_tag_type::big_float;
+                return var_.get_semantic_tag() == semantic_tag::big_float;
             default:
                 return false;
         }
@@ -3197,7 +3197,7 @@ public:
     void create_object_implicitly()
     {
         static_assert(is_stateless<U>::value, "Cannot create object implicitly - allocator is stateful.");
-        var_ = variant(object(Allocator()), semantic_tag_type::none);
+        var_ = variant(object(Allocator()), semantic_tag::none);
     }
 
     void reserve(size_t n)
@@ -3267,7 +3267,7 @@ public:
         {
         case storage_type::short_string_val:
         case storage_type::long_string_val:
-            if (var_.semantic_tag() == semantic_tag_type::big_integer)
+            if (var_.get_semantic_tag() == semantic_tag::big_integer)
             {
                 return static_cast<bool>(var_.as_bignum());
             }
@@ -3373,7 +3373,7 @@ public:
             case storage_type::uint64_val:
                 return static_cast<double>(var_.uint64_data_cast()->value());
             case storage_type::array_val:
-                if (semantic_tag() == semantic_tag_type::big_float)
+                if (get_semantic_tag() == semantic_tag::big_float)
                 {
                     jsoncons::detail::string_to_double to_double;
                     string_type s = as_string();
@@ -3467,7 +3467,7 @@ public:
             case storage_type::array_val:
             {
                 string_type s(allocator);
-                if (semantic_tag() == semantic_tag_type::big_float)
+                if (get_semantic_tag() == semantic_tag::big_float)
                 {
                     JSONCONS_ASSERT(size() == 2);
                     int64_t exp = at(0).template as_integer<int64_t>();
@@ -3536,12 +3536,12 @@ public:
 
     bool is_date_time() const noexcept
     {
-        return var_.semantic_tag() == semantic_tag_type::date_time;
+        return var_.get_semantic_tag() == semantic_tag::date_time;
     }
 
     bool is_epoch_time() const noexcept
     {
-        return var_.semantic_tag() == semantic_tag_type::timestamp;
+        return var_.get_semantic_tag() == semantic_tag::timestamp;
     }
 
     bool has_key(const string_view_type& name) const
@@ -4167,9 +4167,9 @@ public:
         return var_.get_storage_type();
     }
 
-    semantic_tag_type semantic_tag() const
+    semantic_tag get_semantic_tag() const
     {
-        return var_.semantic_tag();
+        return var_.get_semantic_tag();
     }
 
     void swap(basic_json& b)
@@ -4659,35 +4659,35 @@ private:
         {
             case storage_type::short_string_val:
             case storage_type::long_string_val:
-                handler.string_value(as_string_view(), var_.semantic_tag());
+                handler.string_value(as_string_view(), var_.get_semantic_tag());
                 break;
             case storage_type::byte_string_val:
                 handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length(), 
-                                          var_.semantic_tag());
+                                          var_.get_semantic_tag());
                 break;
             case storage_type::double_val:
                 handler.double_value(var_.double_data_cast()->value(), 
-                                     var_.semantic_tag());
+                                     var_.get_semantic_tag());
                 break;
             case storage_type::int64_val:
-                handler.int64_value(var_.int64_data_cast()->value(), var_.semantic_tag());
+                handler.int64_value(var_.int64_data_cast()->value(), var_.get_semantic_tag());
                 break;
             case storage_type::uint64_val:
-                handler.uint64_value(var_.uint64_data_cast()->value(), var_.semantic_tag());
+                handler.uint64_value(var_.uint64_data_cast()->value(), var_.get_semantic_tag());
                 break;
             case storage_type::bool_val:
-                handler.bool_value(var_.bool_data_cast()->value(), var_.semantic_tag());
+                handler.bool_value(var_.bool_data_cast()->value(), var_.get_semantic_tag());
                 break;
             case storage_type::null_val:
-                handler.null_value(var_.semantic_tag());
+                handler.null_value(var_.get_semantic_tag());
                 break;
             case storage_type::empty_object_val:
-                handler.begin_object(0, var_.semantic_tag());
+                handler.begin_object(0, var_.get_semantic_tag());
                 handler.end_object();
                 break;
             case storage_type::object_val:
                 {
-                    handler.begin_object(size(), var_.semantic_tag());
+                    handler.begin_object(size(), var_.get_semantic_tag());
                     const object& o = object_value();
                     for (const_object_iterator it = o.begin(); it != o.end(); ++it)
                     {
@@ -4699,7 +4699,7 @@ private:
                 break;
             case storage_type::array_val:
                 {
-                    handler.begin_array(size(), var_.semantic_tag());
+                    handler.begin_array(size(), var_.get_semantic_tag());
                     const array& o = array_value();
                     for (const_array_iterator it = o.begin(); it != o.end(); ++it)
                     {

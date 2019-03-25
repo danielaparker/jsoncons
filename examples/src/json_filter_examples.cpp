@@ -30,7 +30,7 @@ private:
     }
 
     bool do_string_value(const string_view_type& s, 
-                         semantic_tag_type tag,
+                         semantic_tag tag,
                          const ser_context& context) override
     {
         if (member_name_ == "name")

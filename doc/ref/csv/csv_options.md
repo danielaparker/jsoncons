@@ -23,7 +23,7 @@ floating_point_format|Overrides [floating point format}(../chars_format.md) when
 precision|Overrides floating point precision when serializing csv from json. |The default, For a floating point value that was previously decoded from json text, preserves the original precision. The fefault, For a floating point value that was directly inserted into a json value, serializes with shortest representation.
 assume_header      | Assume first row in file is header, use field names to construct objects | false         
 infer_types      | Infer null, true, false, integers and floating point values in the CSV source | true         
-lossless_number      | If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag_type::big_decimal`. | false         
+lossless_number      | If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::big_decimal`. | false         
 header_lines      | Number of header lines in the CSV text | 1 if assume_header is true, otherwise 0         
 column_names      | A comma separated list of names corresponding to the fields in the file | "bool-field,float-field,string-field"
 column_types      | A comma separated list of data types corresponding to the columns in the file. The following data types are supported: string, integer, float and boolean | "bool,float,string"}

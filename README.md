@@ -407,8 +407,8 @@ int main()
 
     json another_array = json::array(); 
     another_array.emplace_back(byte_string({'P','u','s','s'}),
-                               semantic_tag_type::base64); // suggested conversion to base64
-    another_array.emplace_back("273.15", semantic_tag_type::big_decimal);
+                               semantic_tag::base64); // suggested conversion to base64
+    another_array.emplace_back("273.15", semantic_tag::big_decimal);
     another_array.emplace(another_array.array_range().begin(),"bar"); // place at front
 
     j.push_back(std::move(another_array));
@@ -530,11 +530,11 @@ int main()
 
     j.emplace_back(0.000071);
 
-    j.emplace_back("-18446744073709551617",semantic_tag_type::big_integer);
+    j.emplace_back("-18446744073709551617",semantic_tag::big_integer);
 
-    j.emplace_back("1.23456789012345678901234567890", semantic_tag_type::big_decimal);
+    j.emplace_back("1.23456789012345678901234567890", semantic_tag::big_decimal);
 
-    j.emplace_back(json::array({-1,3}), semantic_tag_type::big_float);
+    j.emplace_back(json::array({-1,3}), semantic_tag::big_float);
 
     // Serialize to JSON
     std::cout << "(1)\n";

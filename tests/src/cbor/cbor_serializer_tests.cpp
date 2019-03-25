@@ -212,7 +212,7 @@ TEST_CASE("serialize big_decimal to cbor")
     {
         std::vector<uint8_t> v;
         cbor_buffer_serializer serializer(v);
-        serializer.string_value("18446744073709551616.0", semantic_tag_type::big_decimal);
+        serializer.string_value("18446744073709551616.0", semantic_tag::big_decimal);
         serializer.flush();
         try
         {
@@ -228,7 +228,7 @@ TEST_CASE("serialize big_decimal to cbor")
     {
         std::vector<uint8_t> v;
         cbor_buffer_serializer serializer(v);
-        serializer.string_value("18446744073709551616e-5", semantic_tag_type::big_decimal);
+        serializer.string_value("18446744073709551616e-5", semantic_tag::big_decimal);
         serializer.flush();
         try
         {
@@ -244,7 +244,7 @@ TEST_CASE("serialize big_decimal to cbor")
     {
         std::vector<uint8_t> v;
         cbor_buffer_serializer serializer(v);
-        serializer.string_value("-18446744073709551616e-5", semantic_tag_type::big_decimal);
+        serializer.string_value("-18446744073709551616e-5", semantic_tag::big_decimal);
         serializer.flush();
         try
         {
@@ -260,7 +260,7 @@ TEST_CASE("serialize big_decimal to cbor")
     {
         std::vector<uint8_t> v;
         cbor_buffer_serializer serializer(v);
-        serializer.string_value("-18446744073709551616e5", semantic_tag_type::big_decimal);
+        serializer.string_value("-18446744073709551616e5", semantic_tag::big_decimal);
         serializer.flush();
         try
         {

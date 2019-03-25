@@ -41,7 +41,7 @@ TEST_CASE("json::as<jsoncons::bignum>()")
     SECTION("from bignum")
     {
         std::string s = "-18446744073709551617";
-        jsoncons::json j(s,  jsoncons::semantic_tag_type::big_integer);
+        jsoncons::json j(s,  jsoncons::semantic_tag::big_integer);
         CHECK(bool(j.as<jsoncons::bignum>() == jsoncons::bignum(s)));
     }
 }

@@ -19,8 +19,8 @@ void serialize_to_cbor_buffer()
     writer.string_value("cat");
     writer.byte_string_value(byte_string({'p','u','r','r'}));
     writer.byte_string_value(byte_string({'h','i','s','s'}),
-                             semantic_tag_type::base64); // suggested conversion to base64
-    writer.int64_value(1431027667, semantic_tag_type::timestamp);
+                             semantic_tag::base64); // suggested conversion to base64
+    writer.int64_value(1431027667, semantic_tag::timestamp);
     writer.end_array();
     writer.flush();
 
@@ -183,7 +183,7 @@ void encode_cbor_byte_string()
 void encode_byte_string_with_encoding_hint()
 {
     // construct byte string value
-     json j1(byte_string("Hello"), semantic_tag_type::base64);
+     json j1(byte_string("Hello"), semantic_tag::base64);
 
     std::vector<uint8_t> buf;
     cbor::encode_cbor(j1, buf);
@@ -208,11 +208,11 @@ void query_cbor()
 
     j.emplace_back(0.000071);
 
-    j.emplace_back("-18446744073709551617",semantic_tag_type::big_integer);
+    j.emplace_back("-18446744073709551617",semantic_tag::big_integer);
 
-    j.emplace_back("1.23456789012345678901234567890", semantic_tag_type::big_decimal);
+    j.emplace_back("1.23456789012345678901234567890", semantic_tag::big_decimal);
 
-    j.emplace_back(json::array({-1,3}), semantic_tag_type::big_float);
+    j.emplace_back(json::array({-1,3}), semantic_tag::big_float);
 
     // Serialize to JSON
     std::cout << "(1)\n";

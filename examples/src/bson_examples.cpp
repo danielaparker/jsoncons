@@ -16,7 +16,7 @@ void serialize_to_bson()
                           // the bson document will be calculated
     writer.string_value("cat");
     writer.byte_string_value(byte_string({'p','u','r','r'}));
-    writer.int64_value(1431027667, semantic_tag_type::timestamp);
+    writer.int64_value(1431027667, semantic_tag::timestamp);
     writer.end_array();
     writer.flush();
 

@@ -21,7 +21,7 @@ struct null_type
 {
 };
 
-enum class semantic_tag_type : uint8_t 
+enum class semantic_tag : uint8_t 
 {
     none = 0,
     undefined,
@@ -33,8 +33,12 @@ enum class semantic_tag_type : uint8_t
     base64,
     base64url,
     uri,
-    big_float // unused
+    big_float
 };
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    typedef semantic_tag semantic_tag_type;
+#endif
 
 template <class CharT>
 class basic_json_content_handler
@@ -55,14 +59,14 @@ public:
         do_flush();
     }
 
-    bool begin_object(semantic_tag_type tag=semantic_tag_type::none,
+    bool begin_object(semantic_tag tag=semantic_tag::none,
                       const ser_context& context=null_ser_context())
     {
         return do_begin_object(tag, context);
     }
 
     bool begin_object(size_t length, 
-                      semantic_tag_type tag=semantic_tag_type::none, 
+                      semantic_tag tag=semantic_tag::none, 
                       const ser_context& context = null_ser_context())
     {
         return do_begin_object(length, tag, context);
@@ -73,14 +77,14 @@ public:
         return do_end_object(context);
     }
 
-    bool begin_array(semantic_tag_type tag=semantic_tag_type::none,
+    bool begin_array(semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context())
     {
         return do_begin_array(tag, context);
     }
 
     bool begin_array(size_t length, 
-                     semantic_tag_type tag=semantic_tag_type::none,
+                     semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context())
     {
         return do_begin_array(length, tag, context);
@@ -97,21 +101,21 @@ public:
     }
 
     bool string_value(const string_view_type& value, 
-                      semantic_tag_type tag = semantic_tag_type::none, 
+                      semantic_tag tag = semantic_tag::none, 
                       const ser_context& context=null_ser_context()) 
     {
         return do_string_value(value, tag, context);
     }
 
     bool byte_string_value(const byte_string_view& b, 
-                           semantic_tag_type tag=semantic_tag_type::none, 
+                           semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=null_ser_context())
     {
         return do_byte_string_value(b, tag, context);
     }
 
     bool byte_string_value(const uint8_t* p, size_t size, 
-                           semantic_tag_type tag=semantic_tag_type::none, 
+                           semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=null_ser_context())
     {
         return do_byte_string_value(byte_string(p, size), tag, context);
@@ -119,20 +123,20 @@ public:
 #if !defined(JSONCONS_NO_DEPRECATED)
     bool byte_string_value(const byte_string_view& b, 
                            byte_string_chars_format encoding_hint, 
-                           semantic_tag_type tag=semantic_tag_type::none, 
+                           semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=null_ser_context())
     {
         switch (encoding_hint)
         {
             {
                 case byte_string_chars_format::base16:
-                    tag = semantic_tag_type::base16;
+                    tag = semantic_tag::base16;
                     break;
                 case byte_string_chars_format::base64:
-                    tag = semantic_tag_type::base64;
+                    tag = semantic_tag::base64;
                     break;
                 case byte_string_chars_format::base64url:
-                    tag = semantic_tag_type::base64url;
+                    tag = semantic_tag::base64url;
                     break;
                 default:
                     break;
@@ -143,20 +147,20 @@ public:
 
     bool byte_string_value(const uint8_t* p, size_t size, 
                            byte_string_chars_format encoding_hint, 
-                           semantic_tag_type tag=semantic_tag_type::none, 
+                           semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=null_ser_context())
     {
         switch (encoding_hint)
         {
             {
                 case byte_string_chars_format::base16:
-                    tag = semantic_tag_type::base16;
+                    tag = semantic_tag::base16;
                     break;
                 case byte_string_chars_format::base64:
-                    tag = semantic_tag_type::base64;
+                    tag = semantic_tag::base64;
                     break;
                 case byte_string_chars_format::base64url:
-                    tag = semantic_tag_type::base64url;
+                    tag = semantic_tag::base64url;
                     break;
                 default:
                     break;
@@ -168,53 +172,53 @@ public:
 
     bool big_integer_value(const string_view_type& s, const ser_context& context=null_ser_context()) 
     {
-        return do_string_value(s, semantic_tag_type::big_integer, context);
+        return do_string_value(s, semantic_tag::big_integer, context);
     }
 
     bool big_decimal_value(const string_view_type& s, const ser_context& context=null_ser_context()) 
     {
-        return do_string_value(s, semantic_tag_type::big_decimal, context);
+        return do_string_value(s, semantic_tag::big_decimal, context);
     }
 
     bool date_time_value(const string_view_type& s, const ser_context& context=null_ser_context()) 
     {
-        return do_string_value(s, semantic_tag_type::date_time, context);
+        return do_string_value(s, semantic_tag::date_time, context);
     }
 
     bool timestamp_value(int64_t val, const ser_context& context=null_ser_context()) 
     {
-        return do_int64_value(val, semantic_tag_type::timestamp, context);
+        return do_int64_value(val, semantic_tag::timestamp, context);
     }
 
     bool int64_value(int64_t value, 
-                     semantic_tag_type tag = semantic_tag_type::none, 
+                     semantic_tag tag = semantic_tag::none, 
                      const ser_context& context=null_ser_context())
     {
         return do_int64_value(value, tag, context);
     }
 
     bool uint64_value(uint64_t value, 
-                      semantic_tag_type tag = semantic_tag_type::none, 
+                      semantic_tag tag = semantic_tag::none, 
                       const ser_context& context=null_ser_context())
     {
         return do_uint64_value(value, tag, context);
     }
 
     bool double_value(double value, 
-                      semantic_tag_type tag = semantic_tag_type::none, 
+                      semantic_tag tag = semantic_tag::none, 
                       const ser_context& context=null_ser_context())
     {
         return do_double_value(value, tag, context);
     }
 
     bool bool_value(bool value, 
-                    semantic_tag_type tag = semantic_tag_type::none,
+                    semantic_tag tag = semantic_tag::none,
                     const ser_context& context=null_ser_context()) 
     {
         return do_bool_value(value, tag, context);
     }
 
-    bool null_value(semantic_tag_type tag = semantic_tag_type::none,
+    bool null_value(semantic_tag tag = semantic_tag::none,
                     const ser_context& context=null_ser_context()) 
     {
         return do_null_value(tag, context);
@@ -269,17 +273,17 @@ public:
 
     bool bignum_value(const string_view_type& s, const ser_context& context=null_ser_context()) 
     {
-        return do_string_value(s, semantic_tag_type::big_integer, context);
+        return do_string_value(s, semantic_tag::big_integer, context);
     }
 
     bool decimal_value(const string_view_type& s, const ser_context& context=null_ser_context()) 
     {
-        return do_string_value(s, semantic_tag_type::big_decimal, context);
+        return do_string_value(s, semantic_tag::big_decimal, context);
     }
 
     bool epoch_time_value(int64_t val, const ser_context& context=null_ser_context()) 
     {
-        return do_int64_value(val, semantic_tag_type::timestamp, context);
+        return do_int64_value(val, semantic_tag::timestamp, context);
     }
 
 #endif
@@ -287,18 +291,18 @@ public:
 private:
     virtual void do_flush() = 0;
 
-    virtual bool do_begin_object(semantic_tag_type, const ser_context& context) = 0;
+    virtual bool do_begin_object(semantic_tag, const ser_context& context) = 0;
 
-    virtual bool do_begin_object(size_t, semantic_tag_type tag, const ser_context& context)
+    virtual bool do_begin_object(size_t, semantic_tag tag, const ser_context& context)
     {
         return do_begin_object(tag, context);
     }
 
     virtual bool do_end_object(const ser_context& context) = 0;
 
-    virtual bool do_begin_array(semantic_tag_type, const ser_context& context) = 0;
+    virtual bool do_begin_array(semantic_tag, const ser_context& context) = 0;
 
-    virtual bool do_begin_array(size_t, semantic_tag_type tag, const ser_context& context)
+    virtual bool do_begin_array(size_t, semantic_tag tag, const ser_context& context)
     {
         return do_begin_array(tag, context);
     }
@@ -307,27 +311,27 @@ private:
 
     virtual bool do_name(const string_view_type& name, const ser_context& context) = 0;
 
-    virtual bool do_null_value(semantic_tag_type, const ser_context& context) = 0;
+    virtual bool do_null_value(semantic_tag, const ser_context& context) = 0;
 
-    virtual bool do_string_value(const string_view_type& value, semantic_tag_type tag, const ser_context& context) = 0;
+    virtual bool do_string_value(const string_view_type& value, semantic_tag tag, const ser_context& context) = 0;
 
     virtual bool do_byte_string_value(const byte_string_view& b, 
-                                      semantic_tag_type tag, 
+                                      semantic_tag tag, 
                                       const ser_context& context) = 0;
 
     virtual bool do_double_value(double value, 
-                                 semantic_tag_type tag,
+                                 semantic_tag tag,
                                  const ser_context& context) = 0;
 
     virtual bool do_int64_value(int64_t value, 
-                                semantic_tag_type tag,
+                                semantic_tag tag,
                                 const ser_context& context) = 0;
 
     virtual bool do_uint64_value(uint64_t value, 
-                                 semantic_tag_type tag, 
+                                 semantic_tag tag, 
                                  const ser_context& context) = 0;
 
-    virtual bool do_bool_value(bool value, semantic_tag_type tag, const ser_context& context) = 0;
+    virtual bool do_bool_value(bool value, semantic_tag tag, const ser_context& context) = 0;
 };
 
 template <class CharT>
@@ -340,7 +344,7 @@ private:
     {
     }
 
-    bool do_begin_object(semantic_tag_type, const ser_context&) override
+    bool do_begin_object(semantic_tag, const ser_context&) override
     {
         return true;
     }
@@ -350,7 +354,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag_type, const ser_context&) override
+    bool do_begin_array(semantic_tag, const ser_context&) override
     {
         return true;
     }
@@ -365,45 +369,45 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag_type, const ser_context&) override
+    bool do_null_value(semantic_tag, const ser_context&) override
     {
         return true;
     }
 
-    bool do_string_value(const string_view_type&, semantic_tag_type, const ser_context&) override
+    bool do_string_value(const string_view_type&, semantic_tag, const ser_context&) override
     {
         return true;
     }
 
     bool do_byte_string_value(const byte_string_view&,
-                              semantic_tag_type, 
+                              semantic_tag, 
                               const ser_context&) override
     {
         return true;
     }
 
     bool do_int64_value(int64_t, 
-                        semantic_tag_type, 
+                        semantic_tag, 
                         const ser_context&) override
     {
         return true;
     }
 
     bool do_uint64_value(uint64_t, 
-                         semantic_tag_type, 
+                         semantic_tag, 
                          const ser_context&) override
     {
         return true;
     }
 
     bool do_double_value(double, 
-                         semantic_tag_type,
+                         semantic_tag,
                          const ser_context&) override
     {
         return true;
     }
 
-    bool do_bool_value(bool, semantic_tag_type, const ser_context&) override
+    bool do_bool_value(bool, semantic_tag, const ser_context&) override
     {
         return true;
     }
