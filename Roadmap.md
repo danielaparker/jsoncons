@@ -2,7 +2,7 @@
 
 ### For later releases
 
-- Support CBOR tag `25` "reference the nth previously seen string" [http://cbor.schmorp.de/stringref]
+- Support CBOR tags `256` (mark value as having string references) and `25` (reference the nth previously seen string) [http://cbor.schmorp.de/stringref]
 
 - Support more error recovery and introduce optional `lenient_error_handler`.
 
