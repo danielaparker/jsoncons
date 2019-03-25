@@ -12,7 +12,7 @@
 #include <limits> // std::numeric_limits
 #include <memory>
 #include <utility> // std::move
-#include <jsoncons/json_exception.hpp>
+#include <jsoncons/json_exception.hpp> // jsoncons::ser_error
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons/result.hpp>

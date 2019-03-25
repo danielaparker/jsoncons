@@ -9,6 +9,7 @@
 
 #include <system_error>
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/json_exception.hpp> // jsoncons::ser_error
 
 namespace jsoncons { namespace cbor {
 
@@ -71,26 +72,9 @@ std::error_code make_error_code(cbor_errc e)
 
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-class cbor_error : public std::invalid_argument, public virtual json_exception
-{
-public:
-    explicit cbor_error(size_t pos) noexcept
-        : std::invalid_argument("")
-    {
-        buffer_.append("Error decoding a cbor at position ");
-        buffer_.append(std::to_string(pos));
-    }
-    ~cbor_error() noexcept
-    {
-    }
-    const char* what() const noexcept override
-    {
-        return buffer_.c_str();
-    }
-private:
-    std::string buffer_;
-};
-typedef cbor_error cbor_decode_error;
+
+typedef ser_error cbor_error;
+typedef ser_error cbor_decode_error;
 typedef cbor_errc cbor_reader_errc;
 #endif
 
