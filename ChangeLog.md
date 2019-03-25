@@ -1,3 +1,13 @@
+master
+
+Name change
+
+- The name `j.semantic_tag()` has been renamed to `j.get_semantic_tag()`
+
+Non-breaking changes
+
+- The name `semantic_tag_type` has been deprecated and renamed to `semantic_tag`
+
 v 0.120.0
 ---------
 
