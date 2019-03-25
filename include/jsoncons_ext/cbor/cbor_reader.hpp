@@ -599,60 +599,6 @@ private:
         uint8_t info = get_additional_information_value(type);
         switch (info)
         {
-            case JSONCONS_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
-            {
-                length = info & 0x1f;
-                break;
-            }
-            case 0x18: // one-byte uint8_t for n follows
-            {
-                uint8_t c{};
-                source.get(c);
-                if (source.eof())
-                {
-                    ec = cbor_errc::unexpected_eof;
-                    return length;
-                }
-                length = c;
-                break;
-            }
-            case 0x19: // two-byte uint16_t for n follow
-            {
-                uint8_t buf[sizeof(uint16_t)];
-                source.read(buf, sizeof(uint16_t));
-                if (source.eof())
-                {
-                    ec = cbor_errc::unexpected_eof;
-                    return 0;
-                }
-                length = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
-                break;
-            }
-            case 0x1a: // four-byte uint32_t for n follow
-            {
-                uint8_t buf[sizeof(uint32_t)];
-                source.read(buf, sizeof(uint32_t));
-                if (source.eof())
-                {
-                    ec = cbor_errc::unexpected_eof;
-                    return 0;
-                }
-                length = jsoncons::detail::from_big_endian<uint32_t>(buf,buf+sizeof(buf),&endp);
-                break;
-            }
-            case 0x1b: // eight-byte uint64_t for n follow
-            {
-                uint8_t buf[sizeof(uint64_t)];
-                source.read(buf, sizeof(uint64_t));
-                if (source.eof())
-                {
-                    ec = cbor_errc::unexpected_eof;
-                    return 0;
-                }
-                // Silence vs warning about conversion of uint64_t to size_t for x86 builds
-                length = (size_t)jsoncons::detail::from_big_endian<uint64_t>(buf,buf+sizeof(buf),&endp);
-                break;
-            }
             case additional_info::indefinite_length: 
             {
                 switch (get_major_type(type))
@@ -751,6 +697,7 @@ private:
                 break;
             }
             default: 
+                length = get_definite_length(source, ec);
                 break;
         }
         
