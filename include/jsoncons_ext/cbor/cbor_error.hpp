@@ -66,7 +66,28 @@ std::error_code make_error_code(cbor_errc e)
     return std::error_code(static_cast<int>(e),cbor_error_category());
 }
 
+
 #if !defined(JSONCONS_NO_DEPRECATED)
+class cbor_error : public std::invalid_argument, public virtual json_exception
+{
+public:
+    explicit cbor_error(size_t pos) noexcept
+        : std::invalid_argument("")
+    {
+        buffer_.append("Error decoding a cbor at position ");
+        buffer_.append(std::to_string(pos));
+    }
+    ~cbor_error() noexcept
+    {
+    }
+    const char* what() const noexcept override
+    {
+        return buffer_.c_str();
+    }
+private:
+    std::string buffer_;
+};
+typedef cbor_error cbor_decode_error;
 typedef cbor_errc cbor_reader_errc;
 #endif
 

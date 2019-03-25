@@ -16,10 +16,8 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_detail.hpp>
-#include <jsoncons_ext/cbor/cbor_serializer.hpp>
-#include <jsoncons_ext/cbor/cbor_error.hpp>
 
-namespace jsoncons { namespace cbor {
+namespace jsoncons { namespace cbor { namespace detail {
 
 enum class cbor_major_type : uint8_t
 {
@@ -38,50 +36,6 @@ namespace additional_info
     const uint8_t indefinite_length = 0x1f;
 }
 
-inline
-cbor_major_type get_major_type(uint8_t type)
-{
-    static const uint8_t major_type_shift = 0x05;
-    uint8_t value = type >> major_type_shift;
-    return static_cast<cbor_major_type>(value);
-}
-
-inline
-uint8_t get_additional_information_value(uint8_t type)
-{
-    static const uint8_t additional_information_mask = (1U << 5) - 1;
-    uint8_t value = type & additional_information_mask;
-    return value;
-}
-
-// 0x00..0x17 (0..23)
-#define JSONCONS_CBOR_0x00_0x17 \
-        0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x09:case 0x0a:case 0x0b:case 0x0c:case 0x0d:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:case 0x17
-
-class cbor_error : public std::invalid_argument, public virtual json_exception
-{
-public:
-    explicit cbor_error(size_t pos) noexcept
-        : std::invalid_argument("")
-    {
-        buffer_.append("Error decoding a cbor at position ");
-        buffer_.append(std::to_string(pos));
-    }
-    ~cbor_error() noexcept
-    {
-    }
-    const char* what() const noexcept override
-    {
-        return buffer_.c_str();
-    }
-private:
-    std::string buffer_;
-};
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-typedef cbor_error cbor_decode_error;
-#endif
-
-}}
+}}}
 
 #endif
