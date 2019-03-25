@@ -1377,7 +1377,7 @@ public:
                         }
                         default:
                             buffer.push_back(*p);
-                            break;;
+                            break;
                     }
                     ++p;
                     ++column_;

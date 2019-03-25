@@ -299,120 +299,102 @@ TEST_CASE("test_decimal_as_string")
 {
     SECTION("-2 27315")
     {
-        std::vector<uint8_t> v = {0x82, // Array of length 2
+        std::vector<uint8_t> v = {0xc4, // Tag 4,
+                                  0x82, // Array of length 2
                                   0x21, // -2
                                   0x19,0x6a,0xb3 // 27315
                                   };
 
-        std::error_code ec;;
-        jsoncons::buffer_source source(v);
-        std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
-        REQUIRE_FALSE(ec);
-        CHECK(std::string("273.15") == s);
+        json j = decode_cbor<json>(v);
+        CHECK(j.as<std::string>() == std::string("273.15"));
     }
     SECTION("-6 27315")
     {
-        std::vector<uint8_t> v = {0x82, // Array of length 2
+        std::vector<uint8_t> v = {0xc4, // Tag 4,
+                                  0x82, // Array of length 2
                                   0x25, // -6
                                   0x19,0x6a,0xb3 // 27315
                                   };
 
-        std::error_code ec;;
-        jsoncons::buffer_source source(v);
-        std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
-        REQUIRE_FALSE(ec);
-        CHECK(std::string("0.027315") == s);
+        json j = decode_cbor<json>(v);
+        CHECK(j.as<std::string>() == std::string("0.027315"));
     }
     SECTION("-5 27315")
     {
-        std::vector<uint8_t> v = {0x82, // Array of length 2
+        std::vector<uint8_t> v = {0xc4, // Tag 4,
+                                  0x82, // Array of length 2
                                   0x24, // -5
                                   0x19,0x6a,0xb3 // 27315
                                   };
 
-        std::error_code ec;;
-        jsoncons::buffer_source source(v);
-        std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
-        REQUIRE_FALSE(ec);
-        CHECK(std::string("0.27315") == s);
+        json j = decode_cbor<json>(v);
+        CHECK(j.as<std::string>() == std::string("0.27315"));
     }
     SECTION("0 27315")
     {
-        std::vector<uint8_t> v = {0x82, // Array of length 2
+        std::vector<uint8_t> v = {0xc4, // Tag 4,
+                                  0x82, // Array of length 2
                                   0x00, // 0
                                   0x19,0x6a,0xb3 // 27315
                                   };
 
-        std::error_code ec;;
-        jsoncons::buffer_source source(v);
-        std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
-        REQUIRE_FALSE(ec);
-        CHECK(std::string("27315.0") == s);
+        json j = decode_cbor<json>(v);
+        CHECK(j.as<std::string>() == std::string("27315.0"));
     }
     SECTION("2 27315")
     {
-        std::vector<uint8_t> v = {0x82, // Array of length 2
+        std::vector<uint8_t> v = {0xc4, // Tag 4,
+                                  0x82, // Array of length 2
                                   0x02, // 2
                                   0x19,0x6a,0xb3 // 27315
                                   };
 
-        std::error_code ec;;
-        jsoncons::buffer_source source(v);
-        std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
-        REQUIRE_FALSE(ec);
-        CHECK(s == std::string("2731500.0"));
+        json j = decode_cbor<json>(v);
+        CHECK(j.as<std::string>() == std::string("2731500.0"));
     }
     SECTION("-2 18446744073709551616")
     {
-        std::vector<uint8_t> v = {0x82, // Array of length 2
+        std::vector<uint8_t> v = {0xc4, // Tag 4,
+                                  0x82, // Array of length 2
                                   0x21, // -2
                                   0xc2,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 // 18446744073709551616
                                   };
 
-        std::error_code ec;;
-        jsoncons::buffer_source source(v);
-        std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
-        REQUIRE_FALSE(ec);
-        CHECK(std::string("1.8446744073709551616e+17") == s);
+        json j = decode_cbor<json>(v);
+        CHECK(j.as<std::string>() == std::string("1.8446744073709551616e+17"));
     }
     SECTION("-2 -65537")
     {
-        std::vector<uint8_t> v = {0x82, // Array of length 2
+        std::vector<uint8_t> v = {0xc4, // Tag 4,
+                                  0x82, // Array of length 2
                                   0x21, // -2
                                   0x3a,0,1,0x00,0x00 // -65537
                                   };
 
-        std::error_code ec;;
-        jsoncons::buffer_source source(v);
-        std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
-        REQUIRE_FALSE(ec);
-        CHECK(s == std::string("-655.37"));
+        json j = decode_cbor<json>(v);
+        CHECK(j.as<std::string>() == std::string("-655.37"));
     }
     SECTION("-5 -65537")
     {
-        std::vector<uint8_t> v = {0x82, // Array of length 2
+        std::vector<uint8_t> v = {0xc4, // Tag 4,
+                                  0x82, // Array of length 2
                                   0x24, // -5
                                   0x3a,0,1,0x00,0x00 // -65537
                                   };
 
-        std::error_code ec;;
-        jsoncons::buffer_source source(v);
-        std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
-        REQUIRE_FALSE(ec);
-        CHECK(s == std::string("-0.65537"));
+        json j = decode_cbor<json>(v);
+        CHECK(j.as<std::string>() == std::string("-0.65537"));
     }
     SECTION("-6 -65537")
     {
-        std::vector<uint8_t> v = {0x82, // Array of length 2
+        std::vector<uint8_t> v = {0xc4, // Tag 4,
+                                  0x82, // Array of length 2
                                   0x25, // -6
                                   0x3a,0,1,0x00,0x00 // -65537
                                   };
 
-        std::error_code ec;;
-        jsoncons::buffer_source source(v);
-        std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
-        REQUIRE_FALSE(ec);
-        CHECK(s == std::string("-0.065537"));
+        json j = decode_cbor<json>(v);
+        CHECK(j.as<std::string>() == std::string("-0.065537"));
     }
 }
 
