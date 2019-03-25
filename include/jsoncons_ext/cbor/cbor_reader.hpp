@@ -293,7 +293,7 @@ private:
                         }
                         default: // definite length
                         {
-                            size_t len = get_length(source_,ec);
+                            size_t len = get_definite_length(source_,ec);
                             if (ec)
                             {
                                 return;
@@ -358,7 +358,7 @@ private:
                     }
                     default: // definite_length
                     {
-                        size_t len = get_length(source_, ec);
+                        size_t len = get_definite_length(source_, ec);
                         if (ec)
                         {
                             return;
@@ -548,7 +548,7 @@ private:
             }
             default: // definite length
             {
-                size_t length = get_length(source, ec);
+                size_t length = get_definite_length(source, ec);
                 if (ec)
                 {
                     return s;
@@ -757,6 +757,27 @@ private:
         return length;
     }
 
+    static size_t get_definite_length(Source& source, std::error_code& ec)
+    {
+        if (JSONCONS_UNLIKELY(source.eof()))
+        {
+            ec = cbor_errc::unexpected_eof;
+            return 0;
+        }
+        switch (get_major_type((uint8_t)source.peek()))
+        {
+            case cbor_major_type::byte_string:
+            case cbor_major_type::text_string:
+            case cbor_major_type::array:
+            case cbor_major_type::map:
+                break;
+            default:
+                return 0;
+        }
+
+        return get_uint64_value(source, ec);
+    }
+
     static std::vector<uint8_t> get_byte_string(Source& source, std::error_code& ec)
     {
         std::vector<uint8_t> v;
@@ -806,9 +827,9 @@ private:
                 source.ignore(1);
                 break;
             }
-        default: 
+            default: 
             {
-                size_t length = get_length(source, ec);
+                size_t length = get_definite_length(source, ec);
                 if (ec)
                 {
                     return v;
@@ -825,6 +846,68 @@ private:
         }
         
         return v;
+    }
+
+    template <class Function>
+    static void iterate_string_chunks(Source& source,
+                                      Function func, 
+                                      std::error_code& ec)
+    {
+        int c = source.peek();
+        if (c == Source::traits_type::eof())
+        {
+            ec = cbor_errc::unexpected_eof;
+            return;
+        }
+
+        cbor_major_type major_type = get_major_type((uint8_t)c);
+        JSONCONS_ASSERT(major_type == cbor_major_type::text_string || major_type == cbor_major_type::byte_string);
+        uint8_t info = get_additional_information_value((uint8_t)c);
+
+        switch (info)
+        {
+            case additional_info::indefinite_length:
+            {
+                source.ignore(1);
+                bool done = false;
+                while (!done)
+                {
+                    int test = source.peek();
+                    switch (test)
+                    {
+                        case Source::traits_type::eof():
+                            ec = cbor_errc::unexpected_eof;
+                            return;
+                        case 0xff:
+                            done = true;
+                            break;
+                        default:
+                            iterate_string_chunks(source, func, ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            break;
+                    }
+                }
+                source.ignore(1);
+                break;
+            }
+            default: // definite length
+            {
+                size_t length = get_definite_string_length(source, ec);
+                if (ec)
+                {
+                    return;
+                }
+                func(source, length, ec);
+                if (ec)
+                {
+                    return;
+                }
+                break;
+            }
+        }
     }
 
     static void walk_object(Source& source, std::error_code& ec)
@@ -885,7 +968,7 @@ private:
             }
             default: // definite length
             {
-                size_t size = get_length(source, ec);
+                size_t size = get_definite_length(source, ec);
                 if (ec)
                 {
                     return;
@@ -955,7 +1038,7 @@ private:
             }
             default: // definite length
             {
-                size_t size = get_length(source, ec);
+                size_t size = get_definite_length(source, ec);
                 if (ec)
                 {
                     return;
@@ -1256,7 +1339,7 @@ private:
                 } 
                 else
                 {
-                    size_t len = get_length(source, ec);
+                    size_t len = get_definite_length(source, ec);
                     if (ec)
                     {
                         return;
