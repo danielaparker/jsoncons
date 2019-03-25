@@ -272,30 +272,6 @@ using staj_object_iterator = basic_staj_object_iterator<T,char,json>;
 template <class T>
 using wstaj_object_iterator = basic_staj_object_iterator<T,wchar_t,wjson>;
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-typedef staj_event_type stream_event_type;
-
-template<class CharT>
-using basic_stream_event = basic_staj_event<CharT>;
-
-template<class CharT>
-using basic_stream_reader = basic_staj_reader<CharT>;
-
-template<class CharT>
-using basic_stream_filter = basic_staj_filter<CharT>;
-
-typedef basic_staj_event<char> stream_event;
-typedef basic_staj_event<wchar_t> wstream_event;
-
-typedef basic_staj_reader<char> stream_reader;
-typedef basic_staj_reader<wchar_t> wstream_reader;
-
-typedef basic_staj_filter<char> stream_filter;
-typedef basic_staj_filter<wchar_t> wstream_filter;
-
-#endif
-
 }
 
 #include <jsoncons/json_conversion_traits.hpp>
