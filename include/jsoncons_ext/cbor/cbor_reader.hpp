@@ -552,7 +552,13 @@ private:
                 return 0;
         }
 
-        return get_uint64_value(source, ec);
+        uint64_t u = get_uint64_value(source, ec);
+        size_t len = (size_t)u;
+        if (len != u)
+        {
+            ec = cbor_errc::number_too_large;
+        }
+        return len;
     }
 
     static std::vector<uint8_t> get_byte_string(Source& source, std::error_code& ec)

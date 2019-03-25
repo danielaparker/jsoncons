@@ -20,7 +20,8 @@ enum class cbor_errc
     invalid_decimal,
     invalid_utf8_text_string,
     too_many_items,
-    too_few_items
+    too_few_items,
+    number_too_large
 };
 
 class cbor_error_category_impl
@@ -47,7 +48,9 @@ public:
                 return "Too many items were added to a CBOR map or array of known length";
             case cbor_errc::too_few_items:
                 return "Too few items were added to a CBOR map or array of known length";
-           default:
+            case cbor_errc::number_too_large:
+                return "Number exceeds implementation limits";
+            default:
                 return "Unknown CBOR parser error";
         }
     }
