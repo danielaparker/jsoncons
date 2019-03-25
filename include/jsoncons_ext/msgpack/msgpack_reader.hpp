@@ -147,22 +147,22 @@ private:
         {
             switch (type)
             {
-                case msgpack_format::nil_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::nil_cd: 
                 {
                     handler_.null_value(semantic_tag::none, *this);
                     break;
                 }
-                case msgpack_format::true_cd:
+                case jsoncons::msgpack::detail::msgpack_format ::true_cd:
                 {
                     handler_.bool_value(true, semantic_tag::none, *this);
                     break;
                 }
-                case msgpack_format::false_cd:
+                case jsoncons::msgpack::detail::msgpack_format ::false_cd:
                 {
                     handler_.bool_value(false, semantic_tag::none, *this);
                     break;
                 }
-                case msgpack_format::float32_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::float32_cd: 
                 {
                     uint8_t buf[sizeof(float)];
                     source_.read(buf, sizeof(float));
@@ -177,7 +177,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::float64_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::float64_cd: 
                 {
                     uint8_t buf[sizeof(double)];
                     source_.read(buf, sizeof(double));
@@ -192,7 +192,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::uint8_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::uint8_cd: 
                 {
                     uint8_t val{};
                     source_.get(val);
@@ -200,7 +200,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::uint16_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::uint16_cd: 
                 {
                     uint8_t buf[sizeof(uint16_t)];
                     source_.read(buf, sizeof(uint16_t));
@@ -215,7 +215,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::uint32_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::uint32_cd: 
                 {
                     uint8_t buf[sizeof(uint32_t)];
                     source_.read(buf, sizeof(uint32_t));
@@ -230,7 +230,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::uint64_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::uint64_cd: 
                 {
                     uint8_t buf[sizeof(uint64_t)];
                     source_.read(buf, sizeof(uint64_t));
@@ -245,7 +245,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::int8_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::int8_cd: 
                 {
                     uint8_t buf[sizeof(int8_t)];
                     source_.read(buf, sizeof(int8_t));
@@ -260,7 +260,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::int16_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::int16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(buf, sizeof(int16_t));
@@ -275,7 +275,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::int32_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::int32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(buf, sizeof(int32_t));
@@ -290,7 +290,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::int64_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::int64_cd: 
                 {
                     uint8_t buf[sizeof(int64_t)];
                     source_.read(buf, sizeof(int64_t));
@@ -305,7 +305,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::str8_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::str8_cd: 
                 {
                     uint8_t buf[sizeof(int8_t)];
                     source_.read(buf, sizeof(int8_t));
@@ -334,7 +334,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::str16_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::str16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(buf, sizeof(int16_t));
@@ -364,7 +364,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::str32_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::str32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(buf, sizeof(int32_t));
@@ -394,7 +394,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::bin8_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::bin8_cd: 
                 {
                     uint8_t buf[sizeof(int8_t)];
                     source_.read(buf, sizeof(int8_t));
@@ -421,7 +421,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::bin16_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::bin16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(buf, sizeof(int16_t));
@@ -448,7 +448,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::bin32_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::bin32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(buf, sizeof(int32_t));
@@ -475,7 +475,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::array16_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::array16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(buf, sizeof(int16_t));
@@ -502,7 +502,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::array32_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::array32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(buf, sizeof(int32_t));
@@ -529,7 +529,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::map16_cd : 
+                case jsoncons::msgpack::detail::msgpack_format ::map16_cd : 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(buf, sizeof(int16_t));
@@ -561,7 +561,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::map32_cd : 
+                case jsoncons::msgpack::detail::msgpack_format ::map32_cd : 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(buf, sizeof(int32_t));
@@ -636,7 +636,7 @@ private:
         {
             switch (type)
             {
-                case msgpack_format::str8_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::str8_cd: 
                 {
                     uint8_t buf[sizeof(int8_t)];
                     source_.read(buf, sizeof(int8_t));
@@ -666,7 +666,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::str16_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::str16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(buf, sizeof(int16_t));
@@ -697,7 +697,7 @@ private:
                     break;
                 }
 
-                case msgpack_format::str32_cd: 
+                case jsoncons::msgpack::detail::msgpack_format ::str32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(buf, sizeof(int32_t));

@@ -79,26 +79,26 @@ private:
     {
         switch (type)
         {
-            case ubjson_format::null_type: 
+            case jsoncons::ubjson::detail::ubjson_format::null_type: 
             {
                 handler_.null_value(semantic_tag::none, *this);
                 break;
             }
-            case ubjson_format::no_op_type: 
+            case jsoncons::ubjson::detail::ubjson_format::no_op_type: 
             {
                 break;
             }
-            case ubjson_format::true_type:
+            case jsoncons::ubjson::detail::ubjson_format::true_type:
             {
                 handler_.bool_value(true, semantic_tag::none, *this);
                 break;
             }
-            case ubjson_format::false_type:
+            case jsoncons::ubjson::detail::ubjson_format::false_type:
             {
                 handler_.bool_value(false, semantic_tag::none, *this);
                 break;
             }
-            case ubjson_format::int8_type: 
+            case jsoncons::ubjson::detail::ubjson_format::int8_type: 
             {
                 uint8_t buf[sizeof(int8_t)];
                 source_.read(buf, sizeof(int8_t));
@@ -112,7 +112,7 @@ private:
                 handler_.int64_value(val, semantic_tag::none, *this);
                 break;
             }
-            case ubjson_format::uint8_type: 
+            case jsoncons::ubjson::detail::ubjson_format::uint8_type: 
             {
                 uint8_t val{};
                 if (source_.get(val) == 0)
@@ -123,7 +123,7 @@ private:
                 handler_.uint64_value(val, semantic_tag::none, *this);
                 break;
             }
-            case ubjson_format::int16_type: 
+            case jsoncons::ubjson::detail::ubjson_format::int16_type: 
             {
                 uint8_t buf[sizeof(int16_t)];
                 source_.read(buf, sizeof(int16_t));
@@ -137,7 +137,7 @@ private:
                 handler_.int64_value(val, semantic_tag::none, *this);
                 break;
             }
-            case ubjson_format::int32_type: 
+            case jsoncons::ubjson::detail::ubjson_format::int32_type: 
             {
                 uint8_t buf[sizeof(int32_t)];
                 source_.read(buf, sizeof(int32_t));
@@ -151,7 +151,7 @@ private:
                 handler_.int64_value(val, semantic_tag::none, *this);
                 break;
             }
-            case ubjson_format::int64_type: 
+            case jsoncons::ubjson::detail::ubjson_format::int64_type: 
             {
                 uint8_t buf[sizeof(int64_t)];
                 source_.read(buf, sizeof(int64_t));
@@ -165,7 +165,7 @@ private:
                 handler_.int64_value(val, semantic_tag::none, *this);
                 break;
             }
-            case ubjson_format::float32_type: 
+            case jsoncons::ubjson::detail::ubjson_format::float32_type: 
             {
                 uint8_t buf[sizeof(float)];
                 source_.read(buf, sizeof(float));
@@ -179,7 +179,7 @@ private:
                 handler_.double_value(val, semantic_tag::none, *this);
                 break;
             }
-            case ubjson_format::float64_type: 
+            case jsoncons::ubjson::detail::ubjson_format::float64_type: 
             {
                 uint8_t buf[sizeof(double)];
                 source_.read(buf, sizeof(double));
@@ -193,7 +193,7 @@ private:
                 handler_.double_value(val, semantic_tag::none, *this);
                 break;
             }
-            case ubjson_format::char_type: 
+            case jsoncons::ubjson::detail::ubjson_format::char_type: 
             {
                 uint8_t buf[sizeof(char)];
                 source_.read(buf, sizeof(char));
@@ -213,7 +213,7 @@ private:
                 handler_.string_value(basic_string_view<char>(&c,1), semantic_tag::none, *this);
                 break;
             }
-            case ubjson_format::string_type: 
+            case jsoncons::ubjson::detail::ubjson_format::string_type: 
             {
                 size_t length = get_length(ec);
                 if (ec)
@@ -236,7 +236,7 @@ private:
                 handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this);
                 break;
             }
-            case ubjson_format::high_precision_number_type: 
+            case jsoncons::ubjson::detail::ubjson_format::high_precision_number_type: 
             {
                 size_t length = get_length(ec);
                 if (ec)
@@ -260,9 +260,9 @@ private:
                 }
                 break;
             }
-            case ubjson_format::start_array_marker: 
+            case jsoncons::ubjson::detail::ubjson_format::start_array_marker: 
             {
-                if (source_.peek() == ubjson_format::type_marker)
+                if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::type_marker)
                 {
                     source_.ignore(1);
                     uint8_t item_type{};
@@ -271,7 +271,7 @@ private:
                         ec = ubjson_errc::unexpected_eof;
                         return;
                     }
-                    if (source_.peek() == ubjson_format::count_marker)
+                    if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::count_marker)
                     {
                         source_.ignore(1);
                         size_t length = get_length(ec);
@@ -292,7 +292,7 @@ private:
                         return;
                     }
                 }
-                else if (source_.peek() == ubjson_format::count_marker)
+                else if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::count_marker)
                 {
                     source_.ignore(1);
                     size_t length = get_length(ec);
@@ -310,7 +310,7 @@ private:
                 else
                 {
                     handler_.begin_array(semantic_tag::none, *this);
-                    while (source_.peek() != ubjson_format::end_array_marker)
+                    while (source_.peek() != jsoncons::ubjson::detail::ubjson_format::end_array_marker)
                     {
                         read(ec);
                         if (ec)
@@ -323,9 +323,9 @@ private:
                 }
                 break;
             }
-            case ubjson_format::start_object_marker: 
+            case jsoncons::ubjson::detail::ubjson_format::start_object_marker: 
             {
-                if (source_.peek() == ubjson_format::type_marker)
+                if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::type_marker)
                 {
                     source_.ignore(1);
                     uint8_t item_type{};
@@ -334,7 +334,7 @@ private:
                         ec = ubjson_errc::unexpected_eof;
                         return;
                     }
-                    if (source_.peek() == ubjson_format::count_marker)
+                    if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::count_marker)
                     {
                         source_.ignore(1);
                         size_t length = get_length(ec);
@@ -362,7 +362,7 @@ private:
                 }
                 else
                 {
-                    if (source_.peek() == ubjson_format::count_marker)
+                    if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::count_marker)
                     {
                         source_.ignore(1);
                         size_t length = get_length(ec);
@@ -385,7 +385,7 @@ private:
                     else
                     {
                         handler_.begin_object(semantic_tag::none, *this);
-                        while (source_.peek() != ubjson_format::end_object_marker)
+                        while (source_.peek() != jsoncons::ubjson::detail::ubjson_format::end_object_marker)
                         {
                             read_name(ec);
                             if (ec)
@@ -428,7 +428,7 @@ private:
         }
         switch (type)
         {
-            case ubjson_format::int8_type: 
+            case jsoncons::ubjson::detail::ubjson_format::int8_type: 
             {
                 uint8_t buf[sizeof(int8_t)];
                 source_.read(buf, sizeof(int8_t));
@@ -450,7 +450,7 @@ private:
                 }
                 break;
             }
-            case ubjson_format::uint8_type: 
+            case jsoncons::ubjson::detail::ubjson_format::uint8_type: 
             {
                 uint8_t val{};
                 if (source_.get(val) == 0)
@@ -461,7 +461,7 @@ private:
                 length = val;
                 break;
             }
-            case ubjson_format::int16_type: 
+            case jsoncons::ubjson::detail::ubjson_format::int16_type: 
             {
                 uint8_t buf[sizeof(int16_t)];
                 source_.read(buf, sizeof(int16_t));
@@ -483,7 +483,7 @@ private:
                 }
                 break;
             }
-            case ubjson_format::int32_type: 
+            case jsoncons::ubjson::detail::ubjson_format::int32_type: 
             {
                 uint8_t buf[sizeof(int32_t)];
                 source_.read(buf, sizeof(int32_t));
@@ -505,7 +505,7 @@ private:
                 }
                 break;
             }
-            case ubjson_format::int64_type: 
+            case jsoncons::ubjson::detail::ubjson_format::int64_type: 
             {
                 uint8_t buf[sizeof(int64_t)];
                 source_.read(buf, sizeof(int64_t));

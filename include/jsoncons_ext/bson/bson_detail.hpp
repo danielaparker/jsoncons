@@ -11,7 +11,7 @@
 #include <memory>
 #include <jsoncons/config/binary_detail.hpp>
 
-namespace jsoncons { namespace bson {
+namespace jsoncons { namespace bson { namespace detail {
 
 namespace bson_format
 {
@@ -37,6 +37,6 @@ namespace bson_format
 
 enum class bson_container_type {document, array};
 
-}}
+}}}
 
 #endif

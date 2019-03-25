@@ -33,12 +33,12 @@ public:
 private:
     struct stack_item
     {
-        bson_container_type type_;
+        jsoncons::bson::detail::bson_container_type type_;
         size_t offset_;
         size_t name_offset_;
         size_t index_;
 
-        stack_item(bson_container_type type, size_t offset)
+        stack_item(jsoncons::bson::detail::bson_container_type type, size_t offset)
            : type_(type), offset_(offset), name_offset_(0), index_(0)
         {
         }
@@ -65,7 +65,7 @@ private:
 
         bool is_object() const
         {
-            return type_ == bson_container_type::document;
+            return type_ == jsoncons::bson::detail::bson_container_type::document;
         }
 
 
@@ -107,9 +107,9 @@ private:
     {
         if (buffer_.size() > 0)
         {
-            before_value(bson_format::document_cd);
+            before_value(jsoncons::bson::detail::bson_format::document_cd);
         }
-        stack_.emplace_back(bson_container_type::document, buffer_.size());
+        stack_.emplace_back(jsoncons::bson::detail::bson_container_type::document, buffer_.size());
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
 
         return true;
@@ -139,9 +139,9 @@ private:
     {
         if (buffer_.size() > 0)
         {
-            before_value(bson_format::array_cd);
+            before_value(jsoncons::bson::detail::bson_format::array_cd);
         }
-        stack_.emplace_back(bson_container_type::array, buffer_.size());
+        stack_.emplace_back(jsoncons::bson::detail::bson_container_type::array, buffer_.size());
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
         return true;
     }
@@ -180,13 +180,13 @@ private:
 
     bool do_null_value(semantic_tag, const ser_context&) override
     {
-        before_value(bson_format::null_cd);
+        before_value(jsoncons::bson::detail::bson_format::null_cd);
         return true;
     }
 
     bool do_bool_value(bool val, semantic_tag, const ser_context&) override
     {
-        before_value(bson_format::bool_cd);
+        before_value(jsoncons::bson::detail::bson_format::bool_cd);
         if (val)
         {
             buffer_.push_back(0x01);
@@ -201,7 +201,7 @@ private:
 
     bool do_string_value(const string_view_type& sv, semantic_tag, const ser_context&) override
     {
-        before_value(bson_format::string_cd);
+        before_value(jsoncons::bson::detail::bson_format::string_cd);
 
         size_t offset = buffer_.size();
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
@@ -224,7 +224,7 @@ private:
                               semantic_tag, 
                               const ser_context&) override
     {
-        before_value(bson_format::binary_cd);
+        before_value(jsoncons::bson::detail::bson_format::binary_cd);
 
         size_t offset = buffer_.size();
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
@@ -246,11 +246,11 @@ private:
     {
         if (tag == semantic_tag::timestamp)
         {
-            before_value(bson_format::datetime_cd);
+            before_value(jsoncons::bson::detail::bson_format::datetime_cd);
         }
         else
         {
-            before_value(bson_format::int64_cd);
+            before_value(jsoncons::bson::detail::bson_format::int64_cd);
         }
         if (val >= (std::numeric_limits<int32_t>::lowest)() && val <= (std::numeric_limits<int32_t>::max)())
         {
@@ -274,11 +274,11 @@ private:
     {
         if (tag == semantic_tag::timestamp)
         {
-            before_value(bson_format::datetime_cd);
+            before_value(jsoncons::bson::detail::bson_format::datetime_cd);
         }
         else
         {
-            before_value(bson_format::int64_cd);
+            before_value(jsoncons::bson::detail::bson_format::int64_cd);
         }
         if (val <= (std::numeric_limits<int32_t>::max)())
         {
@@ -300,7 +300,7 @@ private:
                          semantic_tag,
                          const ser_context&) override
     {
-        before_value(bson_format::double_cd);
+        before_value(jsoncons::bson::detail::bson_format::double_cd);
 
         jsoncons::detail::to_little_endian(val,std::back_inserter(buffer_));
 

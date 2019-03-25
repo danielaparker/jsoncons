@@ -11,7 +11,7 @@
 #include <memory>
 #include <jsoncons/config/binary_detail.hpp>
 
-namespace jsoncons { namespace msgpack {
+namespace jsoncons { namespace msgpack { namespace detail {
 
 namespace msgpack_format
 {
@@ -45,6 +45,6 @@ namespace msgpack_format
     const uint8_t negative_fixint_base_cd = 0xe0;
 }
  
-}}
+}}}
 
 #endif

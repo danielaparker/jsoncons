@@ -54,7 +54,7 @@ public:
 
             handler_.begin_object(semantic_tag::none, *this);
             ++nesting_depth_;
-            read_e_list(bson_container_type::document, ec);
+            read_e_list(jsoncons::bson::detail::bson_container_type::document, ec);
             handler_.end_object(*this);
             --nesting_depth_;
         }
@@ -75,7 +75,7 @@ public:
     }
 private:
 
-    void read_e_list(bson_container_type type, std::error_code& ec)
+    void read_e_list(jsoncons::bson::detail::bson_container_type type, std::error_code& ec)
     {
         uint8_t t{};
         while (source_.get(t) > 0 && t != 0x00)
@@ -87,7 +87,7 @@ private:
                 s.push_back(c);
             }
 
-            if (type == bson_container_type::document)
+            if (type == jsoncons::bson::detail::bson_container_type::document)
             {
                 auto result = unicons::validate(s.begin(),s.end());
                 if (result.ec != unicons::conv_errc())
@@ -105,7 +105,7 @@ private:
     {
         switch (type)
         {
-            case bson_format::double_cd:
+            case jsoncons::bson::detail::bson_format::double_cd:
             {
                 uint8_t buf[sizeof(double)]; 
                 if (source_.read(buf, sizeof(double)) != sizeof(double))
@@ -118,7 +118,7 @@ private:
                 handler_.double_value(res, semantic_tag::none, *this);
                 break;
             }
-            case bson_format::string_cd:
+            case jsoncons::bson::detail::bson_format::string_cd:
             {
                 uint8_t buf[sizeof(int32_t)]; 
                 if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
@@ -147,7 +147,7 @@ private:
                 handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this);
                 break;
             }
-            case bson_format::document_cd: 
+            case jsoncons::bson::detail::bson_format::document_cd: 
             {
                 read(ec);
                 if (ec)
@@ -157,7 +157,7 @@ private:
                 break;
             }
 
-            case bson_format::array_cd: 
+            case jsoncons::bson::detail::bson_format::array_cd: 
             {
                 uint8_t buf[sizeof(int32_t)]; 
                 if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
@@ -170,17 +170,17 @@ private:
 
                 handler_.begin_array(semantic_tag::none, *this);
                 ++nesting_depth_;
-                read_e_list(bson_container_type::document, ec);
+                read_e_list(jsoncons::bson::detail::bson_container_type::document, ec);
                 handler_.end_array(*this);
                 --nesting_depth_;
                 break;
             }
-            case bson_format::null_cd: 
+            case jsoncons::bson::detail::bson_format::null_cd: 
             {
                 handler_.null_value(semantic_tag::none, *this);
                 break;
             }
-            case bson_format::bool_cd:
+            case jsoncons::bson::detail::bson_format::bool_cd:
             {
                 uint8_t val{};
                 if (source_.get(val) == 0)
@@ -191,7 +191,7 @@ private:
                 handler_.bool_value(val != 0, semantic_tag::none, *this);
                 break;
             }
-            case bson_format::int32_cd: 
+            case jsoncons::bson::detail::bson_format::int32_cd: 
             {
                 uint8_t buf[sizeof(int32_t)]; 
                 if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
@@ -205,7 +205,7 @@ private:
                 break;
             }
 
-            case bson_format::timestamp_cd: 
+            case jsoncons::bson::detail::bson_format::timestamp_cd: 
             {
                 uint8_t buf[sizeof(uint64_t)]; 
                 if (source_.read(buf, sizeof(uint64_t)) != sizeof(uint64_t))
@@ -219,7 +219,7 @@ private:
                 break;
             }
 
-            case bson_format::int64_cd: 
+            case jsoncons::bson::detail::bson_format::int64_cd: 
             {
                 uint8_t buf[sizeof(int64_t)]; 
                 if (source_.read(buf, sizeof(int64_t)) != sizeof(int64_t))
@@ -233,7 +233,7 @@ private:
                 break;
             }
 
-            case bson_format::datetime_cd: 
+            case jsoncons::bson::detail::bson_format::datetime_cd: 
             {
                 uint8_t buf[sizeof(int64_t)]; 
                 if (source_.read(buf, sizeof(int64_t)) != sizeof(int64_t))
@@ -246,7 +246,7 @@ private:
                 handler_.int64_value(val, semantic_tag::timestamp, *this);
                 break;
             }
-            case bson_format::binary_cd: 
+            case jsoncons::bson::detail::bson_format::binary_cd: 
             {
                 uint8_t buf[sizeof(int32_t)]; 
                 if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))

@@ -11,7 +11,7 @@
 #include <memory>
 #include <jsoncons/config/binary_detail.hpp>
 
-namespace jsoncons { namespace ubjson {
+namespace jsoncons { namespace ubjson { namespace detail {
 
 namespace ubjson_format
 {
@@ -37,6 +37,6 @@ namespace ubjson_format
     const uint8_t count_marker = '#';
 }
  
-}}
+}}}
 
 #endif
