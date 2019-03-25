@@ -515,54 +515,17 @@ private:
                 break;
         }
         JSONCONS_ASSERT(major_type == cbor_major_type::text_string);
-
-        switch (info)
+        auto func = [&s](Source& source, size_t length, std::error_code& ec)
         {
-            case additional_info::indefinite_length:
+            s.reserve(s.size()+length);
+            source.read(std::back_inserter(s), length);
+            if (source.eof())
             {
-                source.ignore(1);
-                bool done = false;
-                while (!done)
-                {
-                    int test = source.peek();
-                    switch (test)
-                    {
-                        case Source::traits_type::eof():
-                            ec = cbor_errc::unexpected_eof;
-                            return s;
-                        case 0xff:
-                            done = true;
-                            break;
-                        default:
-                            std::string ss = get_text_string(source, ec);
-                            if (ec)
-                            {
-                                return s;
-                            }
-                            s.append(std::move(ss));
-                            break;
-                    }
-                }
-                source.ignore(1);
-                break;
+                ec = cbor_errc::unexpected_eof;
+                return;
             }
-            default: // definite length
-            {
-                size_t length = get_definite_length(source, ec);
-                if (ec)
-                {
-                    return s;
-                }
-                s.reserve(length);
-                source.read(std::back_inserter(s), length);
-                if (source.eof())
-                {
-                    ec = cbor_errc::unexpected_eof;
-                    return s;
-                }
-                break;
-            }
-        }
+        };
+        iterate_string_chunks(source, func, ec);
         
         return s;
     }
@@ -705,7 +668,7 @@ private:
             }
             default: // definite length
             {
-                size_t length = get_definite_string_length(source, ec);
+                size_t length = get_definite_length(source, ec);
                 if (ec)
                 {
                     return;
