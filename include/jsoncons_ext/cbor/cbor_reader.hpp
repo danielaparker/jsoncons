@@ -95,7 +95,6 @@ private:
                 return;
             }
             tags.push_back(val);
-            //source_.ignore(1);
             c = source_.peek();
             switch (c)
             {
