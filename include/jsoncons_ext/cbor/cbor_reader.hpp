@@ -86,28 +86,6 @@ private:
                 break;
         }
 
-        while (major_type == jsoncons::cbor::detail::cbor_major_type::semantic_tag)
-        {
-            uint64_t val = get_uint64_value(source_, ec);
-            std::cout << "tag: " << val << "\n";
-            if (ec)
-            {
-                return;
-            }
-            tags_.push_back(val);
-            c = source_.peek();
-            switch (c)
-            {
-                case Source::traits_type::eof():
-                    ec = cbor_errc::unexpected_eof;
-                    return;
-                default:
-                    major_type = get_major_type((uint8_t)c);
-                    info = get_additional_information_value((uint8_t)c);
-                    break;
-            }
-        }
-
         switch (major_type)
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
@@ -291,7 +269,7 @@ private:
                                         done = true;
                                         break;
                                     default:
-                                        read(ec);
+                                        read_internal(ec);
                                         if (ec)
                                         {
                                             return;
@@ -315,7 +293,7 @@ private:
                             handler_.begin_array(len, tag, *this);
                             for (size_t i = 0; i < len; ++i)
                             {
-                                read(ec);
+                                read_internal(ec);
                                 if (ec)
                                 {
                                     return;
@@ -356,7 +334,7 @@ private:
                                     {
                                         return;
                                     }
-                                    read(ec);
+                                    read_internal(ec);
                                     if (ec)
                                     {
                                         return;
@@ -385,7 +363,7 @@ private:
                             {
                                 return;
                             }
-                            read(ec);
+                            read_internal(ec);
                             if (ec)
                             {
                                 return;
@@ -400,6 +378,13 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
             {
+                uint64_t val = get_uint64_value(source_, ec);
+                if (ec)
+                {
+                    return;
+                }
+                tags_.push_back(val);
+                read_internal(ec);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::simple:

@@ -16,7 +16,7 @@
 
 using namespace jsoncons;
 using namespace jsoncons::cbor;
-#if 0
+
 void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
 {
     try
@@ -438,7 +438,6 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
         CHECK(j[i].get_semantic_tag() == expected[i].get_semantic_tag()); 
     }
 }
-#endif
 
 TEST_CASE("CBOR stringref tag")
 {
