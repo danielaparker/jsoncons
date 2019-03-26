@@ -16,7 +16,7 @@
 
 using namespace jsoncons;
 using namespace jsoncons::cbor;
-
+#if 0
 void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
 {
     try
@@ -436,6 +436,53 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
     for (size_t i = 0; i < j.size(); ++i)
     {
         CHECK(j[i].get_semantic_tag() == expected[i].get_semantic_tag()); 
+    }
+}
+#endif
+
+TEST_CASE("CBOR stringref tag")
+{
+    std::vector<uint8_t> v = {0xd9,0x01,0x00, // tag(256)
+                                0x83, // array(3)
+                                   0xa3, // map(3)
+                                      0x44, // bytes(4)
+                                         0x72,0x61,0x6e,0x6b, // "rank"
+                                      0x04, // unsigned(4)
+                                      0x45, // bytes(5)
+                                         0x63,0x6f,0x75,0x6e,0x74, // "count"
+                                      0x19,0x01,0xa1, // unsigned(417)
+                                      0x44, // bytes(4)
+                                         0x6e,0x61,0x6d,0x65, // "name"
+                                      0x48, // bytes(8)
+                                         0x43,0x6f,0x63,0x6b,0x74,0x61,0x69,0x6c, // "Cocktail"
+                                   0xa3, // map(3)
+                                      0xd8,0x19, // tag(25)
+                                         0x02, // unsigned(2)
+                                      0x44, // bytes(4)
+                                         0x42,0x61,0x74,0x68, // "Bath"
+                                      0xd8,0x19, // tag(25)
+                                         0x01, // unsigned(1)
+                                      0x19,0x01,0x38, // unsigned(312)
+                                      0xd8,0x19, // tag(25)
+                                         0x00, // unsigned(0)
+                                      0x04, // unsigned(4)
+                                   0xa3, // map(3)
+                                      0xd8,0x19, // tag(25)
+                                         0x02, // unsigned(2)
+                                      0x44, // bytes(4)
+                                         0x46,0x6f,0x6f,0x64, // "Food"
+                                      0xd8,0x19, // tag(25)
+                                         0x01, // unsigned(1)
+                                      0x19,0x02,0xb3, // unsigned(691)
+                                      0xd8,0x19, // tag(25)
+                                         0x00, // unsigned(0)
+                                      0x04 // unsigned(4)
+    };
+
+    SECTION("decode")
+    {
+        json j = decode_cbor<json>(v);
+        std::cout << pretty_print(j) << "\n";
     }
 }
 

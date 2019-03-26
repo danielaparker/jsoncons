@@ -32,6 +32,7 @@ class basic_cbor_reader : public ser_context
     json_content_handler& handler_;
     size_t nesting_depth_;
     std::string buffer_;
+    std::vector<uint64_t> tags_; 
 public:
     basic_cbor_reader(Source source, json_content_handler& handler)
        : source_(std::move(source)),
@@ -65,8 +66,6 @@ private:
 
     void read_internal(std::error_code& ec)
     {
-        std::vector<uint64_t> tags; 
-
         if (source_.is_error())
         {
             ec = cbor_errc::source_error;
@@ -90,11 +89,12 @@ private:
         while (major_type == jsoncons::cbor::detail::cbor_major_type::semantic_tag)
         {
             uint64_t val = get_uint64_value(source_, ec);
+            std::cout << "tag: " << val << "\n";
             if (ec)
             {
                 return;
             }
-            tags.push_back(val);
+            tags_.push_back(val);
             c = source_.peek();
             switch (c)
             {
@@ -118,14 +118,16 @@ private:
                     return;
                 }
 
-                if (!tags.empty() && tags.back() == 1)
+                semantic_tag tag = semantic_tag::none;
+                if (!tags_.empty())
                 {
-                    handler_.uint64_value(val, semantic_tag::timestamp, *this);
+                    if (tags_.back() == 1)
+                    {
+                        tag = semantic_tag::timestamp;
+                    }
+                    tags_.clear();
                 }
-                else
-                {
-                    handler_.uint64_value(val, semantic_tag::none, *this);
-                }
+                handler_.uint64_value(val, tag, *this);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -135,14 +137,16 @@ private:
                 {
                     return;
                 }
-                if (!tags.empty() && tags.back() == 1)
+                semantic_tag tag = semantic_tag::none;
+                if (!tags_.empty())
                 {
-                    handler_.int64_value(val, semantic_tag::timestamp, *this);
+                    if (tags_.back() == 1)
+                    {
+                        tag = semantic_tag::timestamp;
+                    }
+                    tags_.clear();
                 }
-                else 
-                {
-                    handler_.int64_value(val, semantic_tag::none, *this);
-                }
+                handler_.int64_value(val, tag, *this);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::byte_string:
@@ -153,9 +157,9 @@ private:
                     return;
                 }
 
-                if (!tags.empty())
+                if (!tags_.empty())
                 {
-                    switch (tags.back())
+                    switch (tags_.back())
                     {
                         case 0x2:
                             {
@@ -192,6 +196,7 @@ private:
                             handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag::none, *this);
                             break;
                     }
+                    tags_.clear();
                 }
                 else
                 {
@@ -206,9 +211,9 @@ private:
                     return;
                 }
                 semantic_tag tag = semantic_tag::none;
-                if (!tags.empty())
+                if (!tags_.empty())
                 {
-                    switch (tags.back())
+                    switch (tags_.back())
                     {
                         case 0:
                             tag = semantic_tag::date_time;
@@ -225,6 +230,7 @@ private:
                         default:
                             break;
                     }
+                    tags_.clear();
                 }
                 std::string s = get_text_string(source_, ec);
                 auto result = unicons::validate(s.begin(),s.end());
@@ -239,9 +245,9 @@ private:
             case jsoncons::cbor::detail::cbor_major_type::array:
             {
                 semantic_tag tag = semantic_tag::none;
-                if (!tags.empty())
+                if (!tags_.empty())
                 {
-                    switch (tags.back())
+                    switch (tags_.back())
                     {
                         case 0x04:
                             tag = semantic_tag::big_decimal;
@@ -252,6 +258,7 @@ private:
                         default:
                             break;
                     }
+                    tags_.clear();
                 }
                 if (tag == semantic_tag::big_decimal)
                 {
@@ -423,14 +430,16 @@ private:
                         {
                             return;
                         }
-                        if (!tags.empty() && tags.back() == 1)
+                        semantic_tag tag = semantic_tag::none;
+                        if (!tags_.empty())
                         {
-                            handler_.double_value(val, semantic_tag::timestamp, *this);
+                            if (tags_.back() == 1)
+                            {
+                                tag = semantic_tag::timestamp;
+                            }
+                            tags_.clear();
                         }
-                        else
-                        {
-                            handler_.double_value(val, semantic_tag::none, *this);
-                        }
+                        handler_.double_value(val, tag, *this);
                         break;
                 }
                 break;
