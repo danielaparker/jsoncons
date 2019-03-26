@@ -87,7 +87,7 @@ private:
                 break;
         }
 
-        if (major_type == jsoncons::cbor::detail::cbor_major_type::semantic_tag)
+        while (major_type == jsoncons::cbor::detail::cbor_major_type::semantic_tag)
         {
             tags.push_back(info);
             source_.ignore(1);
