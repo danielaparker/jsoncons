@@ -65,14 +65,13 @@ private:
 
     void read_internal(std::error_code& ec)
     {
+        std::vector<uint8_t> tags;
+
         if (source_.is_error())
         {
             ec = cbor_errc::source_error;
             return;
         }   
-
-        bool has_cbor_tag = false;
-        uint8_t cbor_tag = 0;
 
         jsoncons::cbor::detail::cbor_major_type major_type;
         uint8_t info;
@@ -90,8 +89,7 @@ private:
 
         if (major_type == jsoncons::cbor::detail::cbor_major_type::semantic_tag)
         {
-            has_cbor_tag = true;
-            cbor_tag = info;
+            tags.push_back(info);
             source_.ignore(1);
             c = source_.peek();
             switch (c)
@@ -116,7 +114,7 @@ private:
                     return;
                 }
 
-                if (has_cbor_tag && cbor_tag == 1)
+                if (!tags.empty() && tags.back() == 1)
                 {
                     handler_.uint64_value(val, semantic_tag::timestamp, *this);
                 }
@@ -133,7 +131,7 @@ private:
                 {
                     return;
                 }
-                if (has_cbor_tag && cbor_tag == 1)
+                if (!tags.empty() && tags.back() == 1)
                 {
                     handler_.int64_value(val, semantic_tag::timestamp, *this);
                 }
@@ -151,9 +149,9 @@ private:
                     return;
                 }
 
-                if (has_cbor_tag)
+                if (!tags.empty())
                 {
-                    switch (cbor_tag)
+                    switch (tags.back())
                     {
                         case 0x2:
                             {
@@ -204,9 +202,9 @@ private:
                     return;
                 }
                 semantic_tag tag = semantic_tag::none;
-                if (has_cbor_tag)
+                if (!tags.empty())
                 {
-                    switch (cbor_tag)
+                    switch (tags.back())
                     {
                         case 0:
                             tag = semantic_tag::date_time;
@@ -237,9 +235,9 @@ private:
             case jsoncons::cbor::detail::cbor_major_type::array:
             {
                 semantic_tag tag = semantic_tag::none;
-                if (has_cbor_tag)
+                if (!tags.empty())
                 {
-                    switch (cbor_tag)
+                    switch (tags.back())
                     {
                         case 0x04:
                             tag = semantic_tag::big_decimal;
@@ -421,7 +419,7 @@ private:
                         {
                             return;
                         }
-                        if (has_cbor_tag && cbor_tag == 1)
+                        if (!tags.empty() && tags.back() == 1)
                         {
                             handler_.double_value(val, semantic_tag::timestamp, *this);
                         }
