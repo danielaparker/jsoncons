@@ -65,7 +65,7 @@ private:
 
     void read_internal(std::error_code& ec)
     {
-        std::vector<uint8_t> tags;
+        std::vector<uint64_t> tags; 
 
         if (source_.is_error())
         {
@@ -89,8 +89,13 @@ private:
 
         while (major_type == jsoncons::cbor::detail::cbor_major_type::semantic_tag)
         {
-            tags.push_back(info);
-            source_.ignore(1);
+            uint64_t val = get_uint64_value(source_, ec);
+            if (ec)
+            {
+                return;
+            }
+            tags.push_back(val);
+            //source_.ignore(1);
             c = source_.peek();
             switch (c)
             {
