@@ -69,7 +69,6 @@ TEST_CASE("test_cbor_parsing")
     check_parse_cbor({0x18,0x18},json(24U));
     check_parse_cbor({0x18,0xff},json(255U));
     check_parse_cbor({0x19,0x01,0x00},json(256U));
-
     check_parse_cbor({0x19,0xff,0xff},json(65535U));
     check_parse_cbor({0x1a,0,1,0x00,0x00},json(65536U));
     check_parse_cbor({0x1a,0xff,0xff,0xff,0xff},json(4294967295U));
@@ -161,7 +160,6 @@ TEST_CASE("test_cbor_parsing")
         check_parse_cbor({0x81,0x65,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
 
         check_parse_cbor({0x83,0x01,0x82,0x02,0x03,0x82,0x04,0x05},json::parse("[1, [2, 3], [4, 5]]"));
-
         check_parse_cbor({0x82,
                        0x7f,0xff,
                        0x7f,0xff},
@@ -172,6 +170,7 @@ TEST_CASE("test_cbor_parsing")
                        0x5f,0xff},
                       json::array{json(byte_string()),json(byte_string())});
     }
+
     SECTION("arrays with indefinite length")
     {
         //check_parse_cbor({0x9f,0xff},json::array());
@@ -195,6 +194,7 @@ TEST_CASE("test_cbor_parsing")
     }
 
     // big float
+
     check_parse_cbor({0xc5, // Tag 5 
                      0x82, // Array of length 2
                        0x21, // -2 
