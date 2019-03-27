@@ -9,6 +9,10 @@ Non-breaking changes
 
 - The name `semantic_tag_type` has been deprecated and renamed to `semantic_tag`
 
+Enhancements
+
+- Rewrote cbor_reader to avoid recursive function calls
+
 v 0.120.0
 ---------
 

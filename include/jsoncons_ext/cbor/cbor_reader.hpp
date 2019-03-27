@@ -47,15 +47,13 @@ class basic_cbor_reader : public ser_context
 {
     Source source_;
     json_content_handler& handler_;
-    size_t nesting_depth_;
     std::string buffer_;
     std::vector<uint64_t> tags_; 
     std::vector<parse_state> state_stack_;
 public:
     basic_cbor_reader(Source source, json_content_handler& handler)
        : source_(std::move(source)),
-         handler_(handler), 
-         nesting_depth_(0)
+         handler_(handler)
     {
     }
 
@@ -315,7 +313,6 @@ private:
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length:
             {
-                ++nesting_depth_;
                 state_stack_.emplace_back(parse_mode::indefinite_array,0);
                 handler_.begin_array(tag, *this);
                 source_.ignore(1);
@@ -329,7 +326,6 @@ private:
                     return;
                 }
                 state_stack_.emplace_back(parse_mode::array,len);
-                ++nesting_depth_;
                 handler_.begin_array(len, tag, *this);
                 break;
             }
@@ -349,7 +345,6 @@ private:
                 break;
         }
         handler_.end_array(*this);
-        --nesting_depth_;
         state_stack_.pop_back();
     }
 
@@ -360,7 +355,6 @@ private:
             case jsoncons::cbor::detail::additional_info::indefinite_length: 
             {
                 state_stack_.emplace_back(parse_mode::indefinite_map,0);
-                ++nesting_depth_;
                 handler_.begin_object(semantic_tag::none, *this);
                 source_.ignore(1);
                 break;
@@ -373,7 +367,6 @@ private:
                     return;
                 }
                 state_stack_.emplace_back(parse_mode::map,len);
-                ++nesting_depth_;
                 handler_.begin_object(len, semantic_tag::none, *this);
                 break;
             }
@@ -393,7 +386,6 @@ private:
                 break;
         }
         handler_.end_object(*this);
-        --nesting_depth_;
         state_stack_.pop_back();
     }
 
