@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <unordered_map> // std::unordered_map
 #include <utility> // std::move
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
@@ -27,14 +28,22 @@ namespace jsoncons { namespace cbor {
 
 enum class parse_mode {root,array,indefinite_array,map,indefinite_map};
 
+typedef std::unordered_map<uint64_t,std::string> stringref_map_type;
+
 struct parse_state 
 {
     parse_mode mode; 
     size_t length;
     size_t index;
+    std::shared_ptr<stringref_map_type> stringref_map; 
 
     parse_state(parse_mode mode, size_t length)
         : mode(mode), length(length), index(0)
+    {
+    }
+
+    parse_state(parse_mode mode, size_t length, std::shared_ptr<stringref_map_type> stringref_map)
+        : mode(mode), length(length), index(0), stringref_map(stringref_map)
     {
     }
 
@@ -121,26 +130,22 @@ private:
                         case Source::traits_type::eof():
                             ec = cbor_errc::unexpected_eof;
                             return;
+                        case 0xff:
+                            end_array(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            break;
                         default:
+                            read_item(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
                             break;
                     }
-                    if (c == 0xff)
-                   {
-                       end_array(ec);
-                       if (ec)
-                       {
-                           return;
-                       }
-                   }
-                   else
-                   {
-                       read_item(ec);
-                       if (ec)
-                       {
-                           return;
-                       }
-                   }
-                   break;
+                    break;
                 }
                 case parse_mode::map:
                 {
@@ -172,27 +177,27 @@ private:
                         case Source::traits_type::eof():
                             ec = cbor_errc::unexpected_eof;
                             return;
+                        case 0xff:
+                            end_map(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            break;
                         default:
+                            read_name(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            read_item(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
                             break;
                     }
-                   if (c == 0xff)
-                   {
-                       end_map(ec);
-                       if (ec)
-                       {
-                           return;
-                       }
-                   }
-                   else
-                   {
-                       read_name(ec);
-                       if (ec)
-                       {
-                           return;
-                       }
-                       read_item(ec);
-                   }
-                   break;
+                    break;
                 }
                 case parse_mode::root:
                 {
@@ -233,16 +238,21 @@ private:
             if (ec)
             {
                 return;
-            }
-            tags_.push_back(val);
-            c = source_.peek();
-            switch (c)
+            } 
+            switch (val)
             {
-                case Source::traits_type::eof():
-                    ec = cbor_errc::unexpected_eof;
-                    return;
-                default:
+                case 0x100: // 256 (stringref-namespace)
+                    state_stack_.back().stringref_map = std::make_shared<stringref_map_type>();
                     break;
+                default:
+                    tags_.push_back(val);
+                    break;
+            }
+            c = source_.peek();
+            if (c == Source::traits_type::eof())
+            {
+                ec = cbor_errc::unexpected_eof;
+                return;
             }
             major_type = get_major_type((uint8_t)c);
         }
@@ -265,23 +275,7 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::array:
             {
-                semantic_tag tag = semantic_tag::none;
-                if (!tags_.empty())
-                {
-                    switch (tags_.back())
-                    {
-                        case 0x04:
-                            tag = semantic_tag::big_decimal;
-                            break;
-                        case 0x05:
-                            tag = semantic_tag::big_float;
-                            break;
-                        default:
-                            break;
-                    }
-                    tags_.clear();
-                }
-                if (tag == semantic_tag::big_decimal)
+                if (!tags_.empty() && tags_.back() == 0x04)
                 {
                     std::string s = get_array_as_decimal_string(source_, ec);
                     if (ec)
@@ -289,10 +283,11 @@ private:
                         return;
                     }
                     handler_.string_value(s, semantic_tag::big_decimal);
+                    tags_.pop_back();
                 }
                 else
                 {
-                    begin_array(info, tag, ec);
+                    begin_array(info, ec);
                 }
                 break;
             }
@@ -307,13 +302,26 @@ private:
         tags_.clear();
     }
 
-    void begin_array(uint8_t info, semantic_tag tag, std::error_code& ec)
+    void begin_array(uint8_t info, std::error_code& ec)
     {
+        semantic_tag tag = semantic_tag::none;
+        if (!tags_.empty())
+        {
+            switch (tags_.back())
+            {
+                case 0x05:
+                    tag = semantic_tag::big_float;
+                    break;
+                default:
+                    break;
+            }
+            tags_.clear();
+        }
         switch (info)
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length:
             {
-                state_stack_.emplace_back(parse_mode::indefinite_array,0);
+                state_stack_.emplace_back(parse_mode::indefinite_array,0,state_stack_.back().stringref_map);
                 handler_.begin_array(tag, *this);
                 source_.ignore(1);
                 break;
@@ -325,7 +333,7 @@ private:
                 {
                     return;
                 }
-                state_stack_.emplace_back(parse_mode::array,len);
+                state_stack_.emplace_back(parse_mode::array,len,state_stack_.back().stringref_map);
                 handler_.begin_array(len, tag, *this);
                 break;
             }
@@ -354,7 +362,7 @@ private:
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length: 
             {
-                state_stack_.emplace_back(parse_mode::indefinite_map,0);
+                state_stack_.emplace_back(parse_mode::indefinite_map,0,state_stack_.back().stringref_map);
                 handler_.begin_object(semantic_tag::none, *this);
                 source_.ignore(1);
                 break;
@@ -366,7 +374,7 @@ private:
                 {
                     return;
                 }
-                state_stack_.emplace_back(parse_mode::map,len);
+                state_stack_.emplace_back(parse_mode::map,len,state_stack_.back().stringref_map);
                 handler_.begin_object(len, semantic_tag::none, *this);
                 break;
             }
