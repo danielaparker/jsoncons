@@ -187,6 +187,7 @@ TEST_CASE("as_string_test")
     j[9].dump(s9);
     CHECK(std::string("\"-18446744073709551617\"") == s9);
     CHECK(std::string("-18446744073709551617") == j[9].as_string());
+
 }
 
 TEST_CASE("dump cbor to string test")
@@ -375,6 +376,8 @@ TEST_CASE("cbor object comparison")
     serializer1.flush();
     json j1 = decode_cbor<json>(v);
 
+    //std::cout << pretty_print(j1) << "\n";
+ 
     REQUIRE(j1.size() == 3);
 
     std::vector<uint8_t> buf2;
@@ -437,7 +440,6 @@ TEST_CASE("cbor object comparison")
         CHECK(j1["Amount"] == j2["Amount"]);
         CHECK_FALSE(j1["Date"] == j2["Date"]);
     }
-
 }
 
 TEST_CASE("cbor member tests")
