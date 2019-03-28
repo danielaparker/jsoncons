@@ -703,8 +703,8 @@ private:
                     tags_.pop_back();
                     break;
                 }
-                JSONCONS_FALLTHROUGH
             }
+                JSONCONS_FALLTHROUGH;
             default:
             {
                 std::string s;
