@@ -1,14 +1,14 @@
-### jsoncons::json_read_options
+### jsoncons::json_decode_options
 
 ```c++
-typedef basic_json_read_options<char> json_read_options
+typedef basic_json_decode_options<char> json_decode_options
 ```
 
-An abstract class that defines accessors for JSON deserialization options. The `json_read_options` class is an instantiation of the `basic_json_read_options` class template that uses `char` as the character type.
+An abstract class that defines accessors for JSON decoding options. The `json_decode_options` class is an instantiation of the `basic_json_decode_options` class template that uses `char` as the character type.
 
 #### Header
 ```c++
-#include <jsoncons/json_read_options.hpp>
+#include <jsoncons/json_options.hpp>
 ```
 
 #### Implementing classes
@@ -17,7 +17,7 @@ An abstract class that defines accessors for JSON deserialization options. The `
 
 #### Destructor
 
-    virtual ~json_read_options();
+    virtual ~json_decode_options();
 
 #### Accessors
 

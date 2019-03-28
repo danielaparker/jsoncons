@@ -19,6 +19,10 @@
 
 namespace jsoncons { namespace cbor { namespace detail {
 
+// 0x00..0x17 (0..23)
+#define JSONCONS_CBOR_0x00_0x17 \
+        0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x09:case 0x0a:case 0x0b:case 0x0c:case 0x0d:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:case 0x17
+
 enum class cbor_major_type : uint8_t
 {
     unsigned_integer = 0x00,
@@ -34,6 +38,47 @@ enum class cbor_major_type : uint8_t
 namespace additional_info
 {
     const uint8_t indefinite_length = 0x1f;
+}
+
+inline
+size_t min_length_for_stringref(uint8_t info)
+{
+    size_t len = 0;
+    switch (info)
+    {
+        case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
+        {
+            len = 3;
+            break;
+        }
+
+        case 0x18: // Unsigned integer (one-byte uint8_t follows)
+        {
+            len = 4;
+            break;
+        }
+
+        case 0x19: // Unsigned integer (two-byte uint16_t follows)
+        {
+            len = 5;
+            break;
+        }
+
+        case 0x1a: // Unsigned integer (four-byte uint32_t follows)
+        {
+            len = 7;
+            break;
+        }
+
+        case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
+        {
+            len = 11;
+            break;
+        }
+        default:
+            break;
+    }
+    return len;
 }
 
 }}}

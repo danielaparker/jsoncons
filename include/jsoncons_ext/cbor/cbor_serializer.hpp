@@ -18,6 +18,7 @@
 #include <jsoncons/result.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
+#include <jsoncons_ext/cbor/cbor_options.hpp>
 
 namespace jsoncons { namespace cbor {
 
@@ -68,13 +69,19 @@ private:
     };
     std::vector<stack_item> stack_;
     Result result_;
+    bool pack_strings_;
 
     // Noncopyable and nonmoveable
     basic_cbor_serializer(const basic_cbor_serializer&) = delete;
     basic_cbor_serializer& operator=(const basic_cbor_serializer&) = delete;
 public:
     explicit basic_cbor_serializer(result_type result)
-       : result_(std::move(result))
+       : result_(std::move(result)), pack_strings_(false)
+    {
+    }
+    explicit basic_cbor_serializer(result_type result, 
+                                   const cbor_encode_options& options)
+       : result_(std::move(result)), pack_strings_(options.pack_strings())
     {
     }
 

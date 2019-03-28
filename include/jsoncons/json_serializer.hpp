@@ -334,7 +334,7 @@ public:
     }
 
     basic_json_serializer(result_type result, 
-                          const basic_json_write_options<CharT>& options)
+                          const basic_json_encode_options<CharT>& options)
        : indent_size_(options.indent_size()),
          is_nan_to_num_(options.is_nan_to_num()),
          is_inf_to_num_(options.is_inf_to_num()),
@@ -1116,7 +1116,7 @@ public:
     }
 
     basic_json_compressed_serializer(result_type result, 
-                                     const basic_json_write_options<CharT>& options)
+                                     const basic_json_encode_options<CharT>& options)
        : is_nan_to_num_(options.is_nan_to_num()),
          is_inf_to_num_(options.is_inf_to_num()),
          is_neginf_to_num_(options.is_neginf_to_num()),

@@ -3,7 +3,7 @@
 ```c++
 typedef basic_csv_options<char> csv_options
 ```
-Specifies options for serializing and deserializing csv data. The `csv_options` class is an instantiation of the `basic_csv_options` class template that uses `char` as the character type.
+Specifies options for encoding and decoding csv data. The `csv_options` class is an instantiation of the `basic_csv_options` class template that uses `char` as the character type.
 
 #### Header
 ```c++

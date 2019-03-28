@@ -84,12 +84,12 @@ enum class byte_string_chars_format : uint8_t {none=0,base16,base64,base64url};
 enum class spaces_option{no_spaces=0,space_after,space_before,space_before_and_after};
 
 template <class CharT>
-class basic_json_read_options
+class basic_json_decode_options
 {
 public:
     typedef std::basic_string<CharT> string_type;
 
-    virtual ~basic_json_read_options() = default;
+    virtual ~basic_json_decode_options() = default;
 
     virtual size_t max_nesting_depth() const = 0;
 
@@ -109,12 +109,12 @@ public:
 };
 
 template <class CharT>
-class basic_json_write_options
+class basic_json_encode_options
 {
 public:
     typedef std::basic_string<CharT> string_type;
 
-    virtual ~basic_json_write_options() = default;
+    virtual ~basic_json_encode_options() = default;
 
     virtual size_t max_nesting_depth() const = 0;
 
@@ -178,8 +178,8 @@ public:
 };
 
 template <class CharT>
-class basic_json_options : public virtual basic_json_read_options<CharT>, 
-                                       public virtual basic_json_write_options<CharT>
+class basic_json_options : public virtual basic_json_decode_options<CharT>, 
+                                       public virtual basic_json_encode_options<CharT>
 {
 public:
     typedef CharT char_type;
@@ -810,11 +810,11 @@ private:
 typedef basic_json_options<char> json_options;
 typedef basic_json_options<wchar_t> wjson_options;
 
-typedef basic_json_read_options<char> json_read_options;
-typedef basic_json_read_options<wchar_t> wjson_read_options;
+typedef basic_json_decode_options<char> json_decode_options;
+typedef basic_json_decode_options<wchar_t> wjson_decode_options;
 
-typedef basic_json_write_options<char> json_write_options;
-typedef basic_json_write_options<wchar_t> wjson_write_options;
+typedef basic_json_encode_options<char> json_encode_options;
+typedef basic_json_encode_options<wchar_t> wjson_encode_options;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 typedef basic_json_options<char> output_format;

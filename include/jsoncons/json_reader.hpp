@@ -176,7 +176,7 @@ public:
     }
 
     basic_json_reader(source_type source, 
-                      const basic_json_read_options<CharT>& options)
+                      const basic_json_decode_options<CharT>& options)
         : basic_json_reader(std::move(source),
                             default_content_handler_,
                             options,
@@ -194,7 +194,7 @@ public:
     }
 
     basic_json_reader(source_type source, 
-                      const basic_json_read_options<CharT>& options,
+                      const basic_json_decode_options<CharT>& options,
                       parse_error_handler& err_handler)
         : basic_json_reader(std::move(source),
                             default_content_handler_,
@@ -214,7 +214,7 @@ public:
 
     basic_json_reader(source_type source, 
                       basic_json_content_handler<CharT>& handler,
-                      const basic_json_read_options<CharT>& options)
+                      const basic_json_decode_options<CharT>& options)
         : basic_json_reader(std::move(source),
                             handler,
                             options,
@@ -234,7 +234,7 @@ public:
 
     basic_json_reader(source_type source,
                       basic_json_content_handler<CharT>& handler, 
-                      const basic_json_read_options<CharT>& options,
+                      const basic_json_decode_options<CharT>& options,
                       parse_error_handler& err_handler)
        : handler_(handler),
          parser_(options,err_handler),

@@ -20,15 +20,46 @@
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
 
-// 0x00..0x17 (0..23)
-#define JSONCONS_CBOR_0x00_0x17 \
-        0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x09:case 0x0a:case 0x0b:case 0x0c:case 0x0d:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:case 0x17
-
 namespace jsoncons { namespace cbor {
 
 enum class parse_mode {root,array,indefinite_array,map,indefinite_map};
 
-typedef std::unordered_map<uint64_t,std::string> stringref_map_type;
+struct mapped_string
+{
+    jsoncons::cbor::detail::cbor_major_type type;
+    std::string s;
+    std::vector<uint8_t> bs;
+
+    mapped_string(const std::string& s)
+        : type(jsoncons::cbor::detail::cbor_major_type::text_string), s(s)
+    {
+    }
+
+    mapped_string(std::string&& s)
+        : type(jsoncons::cbor::detail::cbor_major_type::text_string), s(std::move(s))
+    {
+    }
+
+    mapped_string(const std::vector<uint8_t>& bs)
+        : type(jsoncons::cbor::detail::cbor_major_type::byte_string), bs(bs)
+    {
+    }
+
+    mapped_string(std::vector<uint8_t>&& bs)
+        : type(jsoncons::cbor::detail::cbor_major_type::byte_string), bs(std::move(bs))
+    {
+    }
+
+    mapped_string(const mapped_string&) = default;
+
+    mapped_string(mapped_string&&) = default;
+
+    mapped_string& operator=(const mapped_string&) = default;
+
+    mapped_string& operator=(mapped_string&&) = default;
+};
+
+typedef std::vector<mapped_string> stringref_map_type;
 
 struct parse_state 
 {
@@ -221,41 +252,18 @@ private:
 
     void read_item(std::error_code& ec)
     {
-        int c = source_.peek();
-        switch (c)
+        read_tags(ec);
+        if (ec)
         {
-            case Source::traits_type::eof():
-                ec = cbor_errc::unexpected_eof;
-                return;
-            default:
-                break;
+            return;
+        }
+        int c = source_.peek();
+        if (c == Source::traits_type::eof())
+        {
+            ec = cbor_errc::unexpected_eof;
+            return;
         }
         jsoncons::cbor::detail::cbor_major_type major_type = get_major_type((uint8_t)c);
-
-        while (major_type == jsoncons::cbor::detail::cbor_major_type::semantic_tag)
-        {
-            uint64_t val = get_uint64_value(source_, ec);
-            if (ec)
-            {
-                return;
-            } 
-            switch (val)
-            {
-                case 0x100: // 256 (stringref-namespace)
-                    state_stack_.back().stringref_map = std::make_shared<stringref_map_type>();
-                    break;
-                default:
-                    tags_.push_back(val);
-                    break;
-            }
-            c = source_.peek();
-            if (c == Source::traits_type::eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return;
-            }
-            major_type = get_major_type((uint8_t)c);
-        }
 
         uint8_t info = get_additional_information_value((uint8_t)c);
         switch (major_type)
@@ -277,7 +285,7 @@ private:
             {
                 if (!tags_.empty() && tags_.back() == 0x04)
                 {
-                    std::string s = get_array_as_decimal_string(source_, ec);
+                    std::string s = get_array_as_decimal_string(ec);
                     if (ec)
                     {
                         return;
@@ -410,17 +418,43 @@ private:
                 {
                     return;
                 }
-
-                semantic_tag tag = semantic_tag::none;
-                if (!tags_.empty())
+                if (state_stack_.back().stringref_map && !tags_.empty() && tags_.back() == 25)
                 {
-                    if (tags_.back() == 1)
+                    if (val >= state_stack_.back().stringref_map->size())
                     {
-                        tag = semantic_tag::timestamp;
+                        return;
                     }
-                    tags_.clear();
+                    auto& str = state_stack_.back().stringref_map->at(val);
+                    switch (str.type)
+                    {
+                        case jsoncons::cbor::detail::cbor_major_type::text_string:
+                        {
+                            handler_.string_value(basic_string_view<char>(str.s.data(),str.s.length()), semantic_tag::none, *this);
+                            break;
+                        }
+                        case jsoncons::cbor::detail::cbor_major_type::byte_string:
+                        {
+                            handler_.byte_string_value(byte_string_view(str.bs.data(),str.bs.size()), semantic_tag::none, *this);
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                    tags_.pop_back();
                 }
-                handler_.uint64_value(val, tag, *this);
+                else
+                {
+                    semantic_tag tag = semantic_tag::none;
+                    if (!tags_.empty())
+                    {
+                        if (tags_.back() == 1)
+                        {
+                            tag = semantic_tag::timestamp;
+                        }
+                        tags_.clear();
+                    }
+                    handler_.uint64_value(val, tag, *this);
+                }
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -444,7 +478,7 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::byte_string:
             {
-                std::vector<uint8_t> v = get_byte_string(source_, ec);
+                std::vector<uint8_t> v = get_byte_string(ec);
                 if (ec)
                 {
                     return;
@@ -525,7 +559,8 @@ private:
                     }
                     tags_.clear();
                 }
-                std::string s = get_text_string(source_, ec);
+
+                std::string s = get_text_string(ec);
                 auto result = unicons::validate(s.begin(),s.end());
                 if (result.ec != unicons::conv_errc())
                 {
@@ -586,7 +621,13 @@ private:
 
     void read_name(std::error_code& ec)
     {
+        read_tags(ec);
+        if (ec)
+        {
+            return;
+        }
         jsoncons::cbor::detail::cbor_major_type major_type;
+        uint8_t info;
         int c = source_.peek();
         switch (c)
         {
@@ -595,13 +636,14 @@ private:
                 return;
             default:
                 major_type = get_major_type((uint8_t)c);
+                info = get_additional_information_value((uint8_t)c);
                 break;
         }
         switch (major_type)
         {
             case jsoncons::cbor::detail::cbor_major_type::text_string:
             {
-                std::string s = get_text_string(source_,ec);
+                std::string s = get_text_string(ec);
                 if (ec)
                 {
                     return;
@@ -617,7 +659,7 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::byte_string:
             {
-                std::vector<uint8_t> v = get_byte_string(source_,ec);
+                std::vector<uint8_t> v = get_byte_string(ec);
                 if (ec)
                 {
                     return;
@@ -626,6 +668,42 @@ private:
                 encode_base64url(v.data(),v.size(),s);
                 handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
                 break;
+            }
+            case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
+            {
+                if (state_stack_.back().stringref_map && !tags_.empty() && tags_.back() == 25)
+                {
+                    uint64_t index = get_uint64_value(source_, ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                    if (index >= state_stack_.back().stringref_map->size())
+                    {
+                        return;
+                    }
+                    auto& val = state_stack_.back().stringref_map->at(index);
+                    switch (val.type)
+                    {
+                        case jsoncons::cbor::detail::cbor_major_type::text_string:
+                        {
+                            handler_.name(basic_string_view<char>(val.s.data(),val.s.length()), *this);
+                            break;
+                        }
+                        case jsoncons::cbor::detail::cbor_major_type::byte_string:
+                        {
+                            std::string s;
+                            encode_base64url(val.bs.data(),val.bs.size(),s);
+                            handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                    tags_.pop_back();
+                    break;
+                }
+                JSONCONS_FALLTHROUGH
             }
             default:
             {
@@ -645,13 +723,13 @@ private:
         }
     }
 
-    static std::string get_text_string(Source& source, std::error_code& ec)
+    std::string get_text_string(std::error_code& ec)
     {
         std::string s;
 
         jsoncons::cbor::detail::cbor_major_type major_type;
         uint8_t info;
-        int c = source.peek();
+        int c = source_.peek();
         switch (c)
         {
             case Source::traits_type::eof():
@@ -663,17 +741,23 @@ private:
                 break;
         }
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::text_string);
-        auto func = [&s](Source& source, size_t length, std::error_code& ec)
+        auto func = [&s](Source& source_, size_t length, std::error_code& ec)
         {
             s.reserve(s.size()+length);
-            source.read(std::back_inserter(s), length);
-            if (source.eof())
+            source_.read(std::back_inserter(s), length);
+            if (source_.eof())
             {
                 ec = cbor_errc::unexpected_eof;
                 return;
             }
         };
-        iterate_string_chunks(source, func, ec);
+        iterate_string_chunks(source_, func, ec);
+        if (state_stack_.back().stringref_map && 
+            info != jsoncons::cbor::detail::additional_info::indefinite_length &&
+            s.length() >= jsoncons::cbor::detail::min_length_for_stringref(info))
+        {
+            state_stack_.back().stringref_map->emplace_back(s);
+        }
         
         return s;
     }
@@ -705,13 +789,13 @@ private:
         return len;
     }
 
-    static std::vector<uint8_t> get_byte_string(Source& source, std::error_code& ec)
+    std::vector<uint8_t> get_byte_string(std::error_code& ec)
     {
         std::vector<uint8_t> v;
 
         jsoncons::cbor::detail::cbor_major_type major_type;
         uint8_t info;
-        int c = source.peek();
+        int c = source_.peek();
         switch (c)
         {
             case Source::traits_type::eof():
@@ -723,17 +807,23 @@ private:
                 break;
         }
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::byte_string);
-        auto func = [&v](Source& source, size_t length, std::error_code& ec)
+        auto func = [&v](Source& source_, size_t length, std::error_code& ec)
         {
             v.reserve(v.size()+length);
-            source.read(std::back_inserter(v), length);
-            if (source.eof())
+            source_.read(std::back_inserter(v), length);
+            if (source_.eof())
             {
                 ec = cbor_errc::unexpected_eof;
                 return;
             }
         };
-        iterate_string_chunks(source, func, ec);
+        iterate_string_chunks(source_, func, ec);
+        if (state_stack_.back().stringref_map && 
+            info != jsoncons::cbor::detail::additional_info::indefinite_length &&
+            v.size() >= jsoncons::cbor::detail::min_length_for_stringref(info))
+        {
+            state_stack_.back().stringref_map->emplace_back(v);
+        }
         return v;
     }
 
@@ -1031,12 +1121,12 @@ private:
         return val;
     }
 
-    static std::string get_array_as_decimal_string(Source& source, std::error_code& ec)
+    std::string get_array_as_decimal_string(std::error_code& ec)
     {
         std::string s;
 
         int c;
-        if ((c=source.get()) == Source::traits_type::eof())
+        if ((c=source_.get()) == Source::traits_type::eof())
         {
             ec = cbor_errc::unexpected_eof;
             return s;
@@ -1046,7 +1136,7 @@ private:
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::array);
         JSONCONS_ASSERT(info == 2);
 
-        if ((c=source.peek()) == Source::traits_type::eof())
+        if ((c=source_.peek()) == Source::traits_type::eof())
         {
             ec = cbor_errc::unexpected_eof;
             return s;
@@ -1056,7 +1146,7 @@ private:
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
-                exponent = get_uint64_value(source,ec);
+                exponent = get_uint64_value(source_,ec);
                 if (ec)
                 {
                     return s;
@@ -1065,7 +1155,7 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
             {
-                exponent = get_int64_value(source,ec);
+                exponent = get_int64_value(source_,ec);
                 if (ec)
                 {
                     return s;
@@ -1079,11 +1169,11 @@ private:
             }
         }
 
-        switch (get_major_type((uint8_t)source.peek()))
+        switch (get_major_type((uint8_t)source_.peek()))
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
-                uint64_t val = get_uint64_value(source,ec);
+                uint64_t val = get_uint64_value(source_,ec);
                 if (ec)
                 {
                     return s;
@@ -1094,7 +1184,7 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
             {
-                int64_t val = get_int64_value(source,ec);
+                int64_t val = get_int64_value(source_,ec);
                 if (ec)
                 {
                     return s;
@@ -1105,13 +1195,13 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
             {
-                if ((c=source.get()) == Source::traits_type::eof())
+                if ((c=source_.get()) == Source::traits_type::eof())
                 {
                     ec = cbor_errc::unexpected_eof;
                     return s;
                 }
                 uint8_t tag = get_additional_information_value((uint8_t)c);
-                if ((c=source.peek()) == Source::traits_type::eof())
+                if ((c=source_.peek()) == Source::traits_type::eof())
                 {
                     ec = cbor_errc::unexpected_eof;
                     return s;
@@ -1119,7 +1209,7 @@ private:
 
                 if (get_major_type((uint8_t)c) == jsoncons::cbor::detail::cbor_major_type::byte_string)
                 {
-                    std::vector<uint8_t> v = get_byte_string(source,ec);
+                    std::vector<uint8_t> v = get_byte_string(ec);
                     if (ec)
                     {
                         return s;
@@ -1173,6 +1263,41 @@ private:
         static const uint8_t additional_information_mask = (1U << 5) - 1;
         uint8_t value = type & additional_information_mask;
         return value;
+    }
+
+    void read_tags(std::error_code& ec)
+    {
+        int c = source_.peek();
+        if (c == Source::traits_type::eof())
+        {
+            ec = cbor_errc::unexpected_eof;
+            return;
+        }
+        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type((uint8_t)c);
+        while (major_type == jsoncons::cbor::detail::cbor_major_type::semantic_tag)
+        {
+            uint64_t val = get_uint64_value(source_, ec);
+            if (ec)
+            {
+                return;
+            } 
+            switch (val)
+            {
+                case 0x100: // 256 (stringref-namespace)
+                    state_stack_.back().stringref_map = std::make_shared<stringref_map_type>();
+                    break;
+                default:
+                    tags_.push_back(val);
+                    break;
+            }
+            c = source_.peek();
+            if (c == Source::traits_type::eof())
+            {
+                ec = cbor_errc::unexpected_eof;
+                return;
+            }
+            major_type = get_major_type((uint8_t)c);
+        }
     }
 };
 

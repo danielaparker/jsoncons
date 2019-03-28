@@ -1,14 +1,14 @@
-### jsoncons::json_write_options
+### jsoncons::json_encode_options
 
 ```c++
-typedef basic_json_write_options<char> json_write_options
+typedef basic_json_encode_options<char> json_encode_options
 ```
 
-An abstract class that defines accessors for JSON serialization options. The `json_write_options` class is an instantiation of the `basic_json_write_options` class template that uses `char` as the character type.
+An abstract class that defines accessors for JSON encoding options. The `json_encode_options` class is an instantiation of the `basic_json_encode_options` class template that uses `char` as the character type.
 
 #### Header
 ```c++
-#include <jsoncons/json_write_options.hpp>
+#include <jsoncons/json_options.hpp>
 ```
 
 #### Implementing classes
@@ -17,7 +17,7 @@ An abstract class that defines accessors for JSON serialization options. The `js
 
 #### Destructor
 
-    virtual ~json_write_options();
+    virtual ~json_encode_options();
 
 #### Accessors
 

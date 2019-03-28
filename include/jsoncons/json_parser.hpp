@@ -206,12 +206,12 @@ public:
     {
     }
 
-    basic_json_parser(const basic_json_read_options<CharT>& options)
+    basic_json_parser(const basic_json_decode_options<CharT>& options)
         : basic_json_parser(options, default_err_handler_)
     {
     }
 
-    basic_json_parser(const basic_json_read_options<CharT>& options,
+    basic_json_parser(const basic_json_decode_options<CharT>& options,
                       parse_error_handler& err_handler)
        : err_handler_(err_handler),
          is_str_to_nan_(options.is_str_to_nan()),

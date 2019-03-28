@@ -208,21 +208,21 @@ public:
     }
 
     basic_json_pull_reader(std::basic_istream<CharT>& is, 
-                             const basic_json_read_options<CharT>& options)
+                             const basic_json_decode_options<CharT>& options)
         : basic_json_pull_reader(is,default_filter_,options,default_err_handler_)
     {
     }
 
     basic_json_pull_reader(std::basic_istream<CharT>& is,
                              basic_staj_filter<CharT>& filter, 
-                             const basic_json_read_options<CharT>& options)
+                             const basic_json_decode_options<CharT>& options)
         : basic_json_pull_reader(is,filter,options,default_err_handler_)
     {
     }
 
     basic_json_pull_reader(std::basic_istream<CharT>& is, 
                              basic_staj_filter<CharT>& filter,
-                             const basic_json_read_options<CharT>& options,
+                             const basic_json_decode_options<CharT>& options,
                              parse_error_handler& err_handler)
        : parser_(options,err_handler),
          is_(is),
@@ -268,7 +268,7 @@ public:
     }
 
     basic_json_pull_reader(std::basic_istream<CharT>& is, 
-                             const basic_json_read_options<CharT>& options,
+                             const basic_json_decode_options<CharT>& options,
                              std::error_code& ec)
         : basic_json_pull_reader(is,default_filter_,options,default_err_handler_,ec)
     {
@@ -276,7 +276,7 @@ public:
 
     basic_json_pull_reader(std::basic_istream<CharT>& is,
                              basic_staj_filter<CharT>& filter, 
-                             const basic_json_read_options<CharT>& options,
+                             const basic_json_decode_options<CharT>& options,
                              std::error_code& ec)
         : basic_json_pull_reader(is,filter,options,default_err_handler_,ec)
     {
@@ -284,7 +284,7 @@ public:
 
     basic_json_pull_reader(std::basic_istream<CharT>& is, 
                              basic_staj_filter<CharT>& filter,
-                             const basic_json_read_options<CharT>& options,
+                             const basic_json_decode_options<CharT>& options,
                              parse_error_handler& err_handler,
                              std::error_code& ec)
        : parser_(options,err_handler),
@@ -327,21 +327,21 @@ public:
     }
 
     basic_json_pull_reader(const string_view_type& s, 
-                             const basic_json_read_options<CharT>& options)
+                             const basic_json_decode_options<CharT>& options)
         : basic_json_pull_reader(s,default_filter_,options,default_err_handler_)
     {
     }
 
     basic_json_pull_reader(const string_view_type& s,
                              basic_staj_filter<CharT>& filter, 
-                             const basic_json_read_options<CharT>& options)
+                             const basic_json_decode_options<CharT>& options)
         : basic_json_pull_reader(s,filter,options,default_err_handler_)
     {
     }
 
     basic_json_pull_reader(const string_view_type& s, 
                            basic_staj_filter<CharT>& filter,
-                           const basic_json_read_options<CharT>& options,
+                           const basic_json_decode_options<CharT>& options,
                            parse_error_handler& err_handler)
        : parser_(options,err_handler),
          is_(null_is_),
@@ -388,7 +388,7 @@ public:
     }
 
     basic_json_pull_reader(const string_view_type& s, 
-                             const basic_json_read_options<CharT>& options,
+                             const basic_json_decode_options<CharT>& options,
                              std::error_code& ec)
         : basic_json_pull_reader(s,default_filter_,options,default_err_handler_,ec)
     {
@@ -396,7 +396,7 @@ public:
 
     basic_json_pull_reader(const string_view_type& s,
                              basic_staj_filter<CharT>& filter, 
-                             const basic_json_read_options<CharT>& options,
+                             const basic_json_decode_options<CharT>& options,
                              std::error_code& ec)
         : basic_json_pull_reader(s,filter,options,default_err_handler_,ec)
     {
@@ -404,7 +404,7 @@ public:
 
     basic_json_pull_reader(const string_view_type& s, 
                              basic_staj_filter<CharT>& filter,
-                             const basic_json_read_options<CharT>& options,
+                             const basic_json_decode_options<CharT>& options,
                              parse_error_handler& err_handler,
                              std::error_code& ec)
        : parser_(options,err_handler),

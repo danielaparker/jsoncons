@@ -38,23 +38,23 @@ and by the pull parser [json_pull_reader](json_pull_reader.md).
 
     json_parser(); // (1)
 
-    json_parser(const json_read_options& options); // (2)
+    json_parser(const json_decode_options& options); // (2)
 
     json_parser(parse_error_handler& err_handler); // (3)
 
-    json_parser(const json_read_options& options, 
+    json_parser(const json_decode_options& options, 
                 parse_error_handler& err_handler); // (4)
 
-(1) Constructs a `json_parser` that uses default [json_read_options](json_read_options.md)
+(1) Constructs a `json_parser` that uses default [json_decode_options](json_decode_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(2) Constructs a `json_parser` that uses the specified [json_read_options](json_read_options.md)
+(2) Constructs a `json_parser` that uses the specified [json_decode_options](json_decode_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(3) Constructs a `json_parser` that uses default [json_read_options](json_read_options.md)
+(3) Constructs a `json_parser` that uses default [json_decode_options](json_decode_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
-(4) Constructs a `json_parser` that uses the specified [json_read_options](json_read_options.md)
+(4) Constructs a `json_parser` that uses the specified [json_decode_options](json_decode_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
 Note: It is the programmer's responsibility to ensure that `json_reader` does not outlive any error handler passed in the constuctor.
@@ -227,7 +227,7 @@ int main()
         }
     )";
 
-    json_options options; // Implements json_read_options
+    json_options options; // Implements json_decode_options
     options.nan_to_str("NaN")
            .inf_to_str("Infinity");
 

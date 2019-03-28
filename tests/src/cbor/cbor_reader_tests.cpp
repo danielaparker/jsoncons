@@ -16,7 +16,7 @@
 
 using namespace jsoncons;
 using namespace jsoncons::cbor;
-
+#if 0
 void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
 {
     try
@@ -438,7 +438,7 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
         CHECK(j[i].get_semantic_tag() == expected[i].get_semantic_tag()); 
     }
 }
-
+#endif
 TEST_CASE("CBOR stringref tag")
 {
     std::vector<uint8_t> v = {0xd9,0x01,0x00, // tag(256)
@@ -480,8 +480,53 @@ TEST_CASE("CBOR stringref tag")
 
     SECTION("decode")
     {
-        json j = decode_cbor<json>(v);
-        std::cout << pretty_print(j) << "\n";
+        ojson j = decode_cbor<ojson>(v);
+
+        SECTION("row 0")
+        {
+            auto it = j[0].object_range().begin();
+            std::string key1;
+            decode_base64url(it->key().begin(),it->key().end(),key1);
+            CHECK(key1 == std::string("rank"));
+            ++it;
+            std::string key2;
+            decode_base64url(it->key().begin(),it->key().end(),key2);
+            CHECK(key2 == std::string("count"));
+            ++it;
+            std::string key3;
+            decode_base64url(it->key().begin(),it->key().end(),key3);
+            CHECK(key3 == std::string("name"));
+        }
+        SECTION("row 1")
+        {
+            auto it = j[1].object_range().begin();
+            std::string key3;
+            decode_base64url(it->key().begin(),it->key().end(),key3);
+            CHECK(key3 == std::string("name"));
+            ++it;
+            std::string key2;
+            decode_base64url(it->key().begin(),it->key().end(),key2);
+            CHECK(key2 == std::string("count"));
+            ++it;
+            std::string key1;
+            decode_base64url(it->key().begin(),it->key().end(),key1);
+            CHECK(key1 == std::string("rank"));
+        }
+        SECTION("row 2")
+        {
+            auto it = j[2].object_range().begin();
+            std::string key3;
+            decode_base64url(it->key().begin(),it->key().end(),key3);
+            CHECK(key3 == std::string("name"));
+            ++it;
+            std::string key2;
+            decode_base64url(it->key().begin(),it->key().end(),key2);
+            CHECK(key2 == std::string("count"));
+            ++it;
+            std::string key1;
+            decode_base64url(it->key().begin(),it->key().end(),key1);
+            CHECK(key1 == std::string("rank"));
+        }
     }
 }
 

@@ -48,7 +48,7 @@ string_view_type           |
 Constructs a new serializer that is associated with the output adaptor `result`.
 
     basic_json_serializer(result_type result, 
-                          const basic_json_write_options<CharT>& options)
+                          const basic_json_encode_options<CharT>& options)
 Constructs a new serializer that is associated with the output adaptor `result` 
 and uses the specified [json options](json_options.md). 
 

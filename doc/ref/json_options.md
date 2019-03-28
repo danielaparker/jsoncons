@@ -4,7 +4,7 @@
 typedef basic_json_options<char> json_options
 ```
 
-Specifies options for serializing and deserializing JSON text. The `json_options` class is an instantiation of the `basic_json_options` class template that uses `char` as the character type.
+Specifies options for encoding and decoding JSON text. The `json_options` class is an instantiation of the `basic_json_options` class template that uses `char` as the character type.
 
 The default floating point formatting for a floating point value that was previously decoded from json text is to preserve the original format and precision. This ensures round-trip for both format and precision, e.g. 1.1 read will remain `1.1` when written, and not become `1.1000000000000001` (an equivalent but longer representation.)
 
@@ -15,7 +15,7 @@ The default floating point formatting for a floating point value that was direct
 #include <jsoncons/json_options.hpp>
 ```
 
-![json_serializer](./diagrams/json_serializer.png)
+![json_options](./diagrams/json_options.png)
 
 #### Member constants
 
@@ -115,8 +115,8 @@ For an array whose parent is an array, set whether that array is split on a new 
 
 ### See also
 
-[json_read_options](json_read_options.md)
-[json_write_options](json_write_options.md)
+[json_decode_options](json_decode_options.md)
+[json_encode_options](json_encode_options.md)
 
 ### Examples
 
