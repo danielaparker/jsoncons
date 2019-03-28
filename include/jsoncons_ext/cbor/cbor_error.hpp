@@ -22,7 +22,8 @@ enum class cbor_errc
     invalid_utf8_text_string,
     too_many_items,
     too_few_items,
-    number_too_large
+    number_too_large,
+    stringref_too_large
 };
 
 class cbor_error_category_impl
@@ -51,6 +52,8 @@ public:
                 return "Too few items were added to a CBOR map or array of known length";
             case cbor_errc::number_too_large:
                 return "Number exceeds implementation limits";
+            case cbor_errc::stringref_too_large:
+                return "stringref exceeds stringref map size";
             default:
                 return "Unknown CBOR parser error";
         }

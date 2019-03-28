@@ -329,7 +329,7 @@ private:
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length:
             {
-                state_stack_.emplace_back(parse_mode::indefinite_array,0,state_stack_.back().stringref_map);
+                state_stack_.push_back(parse_state(parse_mode::indefinite_array,0,state_stack_.back().stringref_map));
                 handler_.begin_array(tag, *this);
                 source_.ignore(1);
                 break;
@@ -341,7 +341,7 @@ private:
                 {
                     return;
                 }
-                state_stack_.emplace_back(parse_mode::array,len,state_stack_.back().stringref_map);
+                state_stack_.push_back(parse_state(parse_mode::array,len,state_stack_.back().stringref_map));
                 handler_.begin_array(len, tag, *this);
                 break;
             }
@@ -370,7 +370,7 @@ private:
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length: 
             {
-                state_stack_.emplace_back(parse_mode::indefinite_map,0,state_stack_.back().stringref_map);
+                state_stack_.push_back(parse_state(parse_mode::indefinite_map,0,state_stack_.back().stringref_map));
                 handler_.begin_object(semantic_tag::none, *this);
                 source_.ignore(1);
                 break;
@@ -382,7 +382,7 @@ private:
                 {
                     return;
                 }
-                state_stack_.emplace_back(parse_mode::map,len,state_stack_.back().stringref_map);
+                state_stack_.push_back(parse_state(parse_mode::map,len,state_stack_.back().stringref_map));
                 handler_.begin_object(len, semantic_tag::none, *this);
                 break;
             }
@@ -422,6 +422,7 @@ private:
                 {
                     if (val >= state_stack_.back().stringref_map->size())
                     {
+                        ec = cbor_errc::stringref_too_large;
                         return;
                     }
                     auto& str = state_stack_.back().stringref_map->at(val);
@@ -438,6 +439,7 @@ private:
                             break;
                         }
                         default:
+                            JSONCONS_UNREACHABLE();
                             break;
                     }
                     tags_.pop_back();
@@ -680,6 +682,7 @@ private:
                     }
                     if (index >= state_stack_.back().stringref_map->size())
                     {
+                        ec = cbor_errc::stringref_too_large;
                         return;
                     }
                     auto& val = state_stack_.back().stringref_map->at(index);
@@ -698,6 +701,7 @@ private:
                             break;
                         }
                         default:
+                            JSONCONS_UNREACHABLE();
                             break;
                     }
                     tags_.pop_back();
