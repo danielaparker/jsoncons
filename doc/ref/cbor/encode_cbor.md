@@ -179,6 +179,95 @@ Output:
 (2) "SGVsbG8="
 ```
 
+#### Packed strings 
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    ojson j = ojson::parse(R"(
+[
+     {
+       "name" : "Cocktail",
+       "count" : 417,
+       "rank" : 4
+     },
+     {
+       "rank" : 4,
+       "count" : 312,
+       "name" : "Bath"
+     },
+     {
+       "count" : 691,
+       "name" : "Food",
+       "rank" : 4
+     }
+  ]
+)");
+
+    cbor::cbor_options options;
+    options.pack_strings(true);
+    std::vector<uint8_t> buf;
+
+    cbor::encode_cbor(j, buf, options);
+
+    for (auto c : buf)
+    {
+        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
+                  << std::noshowbase << std::setfill('0') << static_cast<int>(c);
+    }
+    std::cout << "\n";
+
+/*
+    d90100 -- tag (256)
+      83 -- array(3)
+        a3 -- map(3)
+          64 -- text string (4)
+            6e616d65 -- "name"
+          68 -- text string (8)
+            436f636b7461696c -- "Cocktail"
+          65 -- text string (5)
+            636f756e74 -- "count"
+            1901a1 -- unsigned(417)
+          64 -- text string (4)
+            72616e6b -- "rank"
+            04 -- unsigned(4)
+        a3 -- map(3)
+          d819 -- tag(25)
+            03 -- unsigned(3)
+          04 -- unsigned(4)
+          d819 -- tag(25)
+            02 -- unsigned(2)
+            190138 -- unsigned(312)
+          d819 -- tag(25)
+            00 -- unsigned(0)
+          64 -- text string(4)
+            42617468 -- "Bath"
+        a3 -- map(3)
+          d819 -- tag(25)
+            02 -- unsigned(2)
+          1902b3 -- unsigned(691)
+          d819 -- tag(25)
+            00 -- unsigned(0)
+          64 - text string(4)
+            466f6f64 -- "Food"
+          d819 -- tag(25)
+            03 -- unsigned(3)
+            04 -- unsigned(4)
+*/
+
+    ojson j2 = cbor::decode_cbor<ojson>(buf);
+    assert(j2 == j);
+}
+```
+Output:
+```
+d9010083a3646e616d6568436f636b7461696c65636f756e741901a16472616e6b04a3d8190304d81902190138d819006442617468a3d819021902b3d8190064466f6f64d8190304
+```
+
 #### See also
 
 - [byte_string](../byte_string.md)

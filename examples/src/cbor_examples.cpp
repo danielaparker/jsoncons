@@ -271,80 +271,81 @@ void query_cbor()
     std::cout << pretty_print(result) << "\n\n";
 }
 
-void query_cbor2()
+void cbor_with_packed_strings()
 {
-    std::vector<uint8_t> v = {0x85,0xfa,0x40,0x0,0x0,0x0,0xfb,0x3f,0x12,0x9c,0xba,0xb6,0x49,0xd3,0x89,0xc3,0x49,0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xc4,0x82,0x38,0x1c,0xc2,0x4d,0x1,0x8e,0xe9,0xf,0xf6,0xc3,0x73,0xe0,0xee,0x4e,0x3f,0xa,0xd2,0xc5,0x82,0x20,0x3};
-/*
-    85 -- Array of length 5     
-      fa -- float 
-        40a00000 -- 5.0
-      fb -- double 
-        3f129cbab649d389 -- 0.000071
-      c3 -- Tag 3 (negative bignum)
-        49 -- Byte string value of length 9
-          010000000000000000
-      c4 -- Tag 4 (decimal fraction)
-        82 -- Array of length 2
-          38 -- Negative integer of length 1
-            1c -- -29
-          c2 -- Tag 2 (positive bignum)
-            4d -- Byte string value of length 13
-              018ee90ff6c373e0ee4e3f0ad2
-      c5 -- Tag 5 (bigfloat)
-        82 -- Array of length 2
-          20 -- -1
-          03 -- 3   
-*/
+    ojson j = ojson::parse(R"(
+[
+     {
+       "name" : "Cocktail",
+       "count" : 417,
+       "rank" : 4
+     },
+     {
+       "rank" : 4,
+       "count" : 312,
+       "name" : "Bath"
+     },
+     {
+       "count" : 691,
+       "name" : "Food",
+       "rank" : 4
+     }
+  ]
+)");
 
-    // Decode to a json value (despite its name, it is not JSON specific.)
-    json j = cbor::decode_cbor<json>(v);
+    cbor::cbor_options options;
+    options.pack_strings(true);
+    std::vector<uint8_t> buf;
 
-    // Serialize to JSON
-    std::cout << "(1)\n";
-    std::cout << pretty_print(j);
-    std::cout << "\n\n";
+    cbor::encode_cbor(j, buf, options);
 
-    // as<std::string>() and as<double>()
-    std::cout << "(2)\n";
-    std::cout << std::dec << std::setprecision(15);
-    for (const auto& item : j.array_range())
+    for (auto c : buf)
     {
-        std::cout << item.as<std::string>() << ", " << item.as<double>() << "\n";
+        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
+                  << std::noshowbase << std::setfill('0') << static_cast<int>(c);
     }
     std::cout << "\n";
 
-    // Query with JSONPath
-    std::cout << "(3)\n";
-    json result = jsonpath::json_query(j,"$.[?(@ < 1.5)]");
-    std::cout << pretty_print(result) << "\n\n";
-
-    // Encode result as CBOR
-    std::vector<uint8_t> val;
-    cbor::encode_cbor(result,val);
-
-    std::cout << "(4)\n";
-    for (auto c : val)
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2)
-                  << std::setfill('0') << static_cast<int>(c);
-    }
-    std::cout << "\n\n";
-
 /*
-    83 -- Array of length 3
-      fb -- double
-        3f129cbab649d389 -- 0.000071
-    c3 -- Tag 3 (negative bignum)
-      49 -- Byte string value of length 9
-        010000000000000000
-    c4 -- Tag 4 (decimal fraction)
-      82 -- Array of length 2
-        38 -- Negative integer of length 1
-          1c -- -29
-        c2 -- Tag 2 (positive bignum)
-          4d -- Byte string value of length 13
-            018ee90ff6c373e0ee4e3f0ad2
+    d90100 -- tag (256)
+      83 -- array(3)
+        a3 -- map(3)
+          64 -- text string (4)
+            6e616d65 -- "name"
+          68 -- text string (8)
+            436f636b7461696c -- "Cocktail"
+          65 -- text string (5)
+            636f756e74 -- "count"
+            1901a1 -- unsigned(417)
+          64 -- text string (4)
+            72616e6b -- "rank"
+            04 -- unsigned(4)
+        a3 -- map(3)
+          d819 -- tag(25)
+            03 -- unsigned(3)
+          04 -- unsigned(4)
+          d819 -- tag(25)
+            02 -- unsigned(2)
+            190138 -- unsigned(312)
+          d819 -- tag(25)
+            00 -- unsigned(0)
+          64 -- text string(4)
+            42617468 -- "Bath"
+        a3 -- map(3)
+          d819 -- tag(25)
+            02 -- unsigned(2)
+          1902b3 -- unsigned(691)
+          d819 -- tag(25)
+            00 -- unsigned(0)
+          64 - text string(4)
+            466f6f64 -- "Food"
+          d819 -- tag(25)
+            03 -- unsigned(3)
+            04 -- unsigned(4)
 */
+
+    ojson j2 = cbor::decode_cbor<ojson>(buf);
+    assert(j2 == j);
 }
 
 void cbor_examples()
@@ -358,8 +359,10 @@ void cbor_examples()
     serialize_to_cbor_stream();
     cbor_reputon_example();
     query_cbor();
-*/
     query_cbor2();
+*/
+
+    cbor_with_packed_strings();
     std::cout << std::endl;
 }
 

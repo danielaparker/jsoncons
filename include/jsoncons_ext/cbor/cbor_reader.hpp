@@ -277,6 +277,7 @@ private:
                 }
                 if (state_stack_.back().stringref_map && !tags_.empty() && tags_.back() == 25)
                 {
+                    tags_.pop_back();
                     if (val >= state_stack_.back().stringref_map->size())
                     {
                         ec = cbor_errc::stringref_too_large;
@@ -287,19 +288,26 @@ private:
                     {
                         case jsoncons::cbor::detail::cbor_major_type::text_string:
                         {
-                            handler_.string_value(basic_string_view<char>(str.s.data(),str.s.length()), semantic_tag::none, *this);
+                            handle_string(basic_string_view<char>(str.s.data(),str.s.length()),ec);
+                            if (ec)
+                            {
+                                return;
+                            }
                             break;
                         }
                         case jsoncons::cbor::detail::cbor_major_type::byte_string:
                         {
-                            handler_.byte_string_value(byte_string_view(str.bs.data(),str.bs.size()), semantic_tag::none, *this);
+                            handle_byte_string(byte_string_view(str.bs.data(),str.bs.size()), ec);
+                            if (ec)
+                            {
+                                return;
+                            }
                             break;
                         }
                         default:
                             JSONCONS_UNREACHABLE();
                             break;
                     }
-                    tags_.pop_back();
                 }
                 else
                 {
@@ -342,83 +350,15 @@ private:
                 {
                     return;
                 }
-
-                if (!tags_.empty())
+                handle_byte_string(byte_string_view(v.data(), v.size()), ec);
+                if (ec)
                 {
-                    switch (tags_.back())
-                    {
-                        case 0x2:
-                            {
-                                bignum n(1, v.data(), v.size());
-                                buffer_.clear();
-                                n.dump(buffer_);
-                                handler_.big_integer_value(buffer_, *this);
-                                break;
-                            }
-                        case 0x3:
-                            {
-                                bignum n(-1, v.data(), v.size());
-                                buffer_.clear();
-                                n.dump(buffer_);
-                                handler_.big_integer_value(buffer_, *this);
-                                break;
-                            }
-                        case 0x15:
-                            {
-                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag::base64url, *this);
-                                break;
-                            }
-                        case 0x16:
-                            {
-                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag::base64, *this);
-                                break;
-                            }
-                        case 0x17:
-                            {
-                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag::base16, *this);
-                                break;
-                            }
-                        default:
-                            handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag::none, *this);
-                            break;
-                    }
-                    tags_.clear();
-                }
-                else
-                {
-                    handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag::none, *this);
+                    return;
                 }
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::text_string:
             {
-                if (ec)
-                {
-                    return;
-                }
-                semantic_tag tag = semantic_tag::none;
-                if (!tags_.empty())
-                {
-                    switch (tags_.back())
-                    {
-                        case 0:
-                            tag = semantic_tag::date_time;
-                            break;
-                        case 32:
-                            tag = semantic_tag::uri;
-                            break;
-                        case 33:
-                            tag = semantic_tag::base64url;
-                            break;
-                        case 34:
-                            tag = semantic_tag::base64;
-                            break;
-                        default:
-                            break;
-                    }
-                    tags_.clear();
-                }
-
                 std::string s = get_text_string(ec);
                 auto result = unicons::validate(s.begin(),s.end());
                 if (result.ec != unicons::conv_errc())
@@ -426,7 +366,11 @@ private:
                     ec = cbor_errc::invalid_utf8_text_string;
                     return;
                 }
-                handler_.string_value(basic_string_view<char>(s.data(),s.length()), tag, *this);
+                handle_string(basic_string_view<char>(s.data(),s.length()),ec);
+                if (ec)
+                {
+                    return;
+                }
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
@@ -1280,6 +1224,82 @@ private:
                 return;
             }
             major_type = get_major_type((uint8_t)c);
+        }
+    }
+
+    void handle_string(const basic_string_view<char>& v, std::error_code&)
+    {
+        semantic_tag tag = semantic_tag::none;
+        if (!tags_.empty())
+        {
+            switch (tags_.back())
+            {
+                case 0:
+                    tag = semantic_tag::date_time;
+                    break;
+                case 32:
+                    tag = semantic_tag::uri;
+                    break;
+                case 33:
+                    tag = semantic_tag::base64url;
+                    break;
+                case 34:
+                    tag = semantic_tag::base64;
+                    break;
+                default:
+                    break;
+            }
+            tags_.clear();
+        }
+        handler_.string_value(v, tag, *this);
+    }
+
+    void handle_byte_string(const byte_string_view& v, std::error_code&)
+    {
+        if (!tags_.empty())
+        {
+            switch (tags_.back())
+            {
+                case 0x2:
+                    {
+                        bignum n(1, v.data(), v.size());
+                        buffer_.clear();
+                        n.dump(buffer_);
+                        handler_.big_integer_value(buffer_, *this);
+                        break;
+                    }
+                case 0x3:
+                    {
+                        bignum n(-1, v.data(), v.size());
+                        buffer_.clear();
+                        n.dump(buffer_);
+                        handler_.big_integer_value(buffer_, *this);
+                        break;
+                    }
+                case 0x15:
+                    {
+                        handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag::base64url, *this);
+                        break;
+                    }
+                case 0x16:
+                    {
+                        handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag::base64, *this);
+                        break;
+                    }
+                case 0x17:
+                    {
+                        handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag::base16, *this);
+                        break;
+                    }
+                default:
+                    handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag::none, *this);
+                    break;
+            }
+            tags_.clear();
+        }
+        else
+        {
+            handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag::none, *this);
         }
     }
 
