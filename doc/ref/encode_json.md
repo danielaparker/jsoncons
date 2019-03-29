@@ -65,7 +65,7 @@ void encode_json(const T& val,
                  const Json& j); // (10)
 ```
 
-(1) Applies `json_conversion_traits` to serialize `val` to JSON output stream.
+(1) Serialize `val` to JSON output stream.
 
 #### Parameters
 
