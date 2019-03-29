@@ -303,7 +303,7 @@ private:
             auto it = stringref_map_.find(target);
             if (it == stringref_map_.end())
             {
-                stringref_map_.try_emplace(target, next_stringref_++);
+                stringref_map_.insert(std::make_pair(target, next_stringref_++));
                 write_utf8_string(target);
             }
             else
