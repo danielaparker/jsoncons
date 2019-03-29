@@ -627,6 +627,14 @@ private:
             default:
                 break;
         }
+        write_byte_string_value(b);
+
+        end_value();
+        return true;
+    }
+
+    void write_byte_string_value(const byte_string_view& b) 
+    {
         if (b.length() <= 0x17)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
@@ -666,9 +674,6 @@ private:
         {
             result_.push_back(c);
         }
-
-        end_value();
-        return true;
     }
 
     bool do_double_value(double val, 
