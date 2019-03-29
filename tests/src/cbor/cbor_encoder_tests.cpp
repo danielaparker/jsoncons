@@ -13,6 +13,7 @@
 #include <ctime>
 #include <limits>
 #include <fstream>
+#include <iomanip>
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
@@ -351,4 +352,43 @@ TEST_CASE("Too many and too few items in CBOR map or array")
         CHECK_FALSE(ec);
         encoder.flush();
     }
+}
+
+TEST_CASE("encode stringref")
+{
+    ojson j = ojson::parse(R"(
+[
+     {
+       "name" : "Cocktail",
+       "count" : 417,
+       "rank" : 4
+     },
+     {
+       "rank" : 4,
+       "count" : 312,
+       "name" : "Bath"
+     },
+     {
+       "count" : 691,
+       "name" : "Food",
+       "rank" : 4
+     }
+  ]
+)");
+
+    cbor_options options;
+    options.pack_strings(true);
+    std::vector<uint8_t> buf;
+    cbor_bytes_encoder encoder(buf, options);
+    for (auto c : buf)
+    {
+        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
+                  << std::noshowbase << std::setfill('0') << static_cast<int>(c);
+    }
+    std::cout << "\n";
+
+    j.dump(encoder);
+
+    ojson j2 = decode_cbor<ojson>(buf);
+    CHECK(j2 == j);
 }

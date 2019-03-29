@@ -29,6 +29,8 @@ class basic_cbor_encoder final : public basic_json_content_handler<CharT>
 {
 
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
+    const size_t min_length_for_stringref = 3;
+
 public:
     typedef CharT char_type;
     typedef Result result_type;
@@ -89,6 +91,7 @@ public:
     {
         if (pack_strings_)
         {
+            // tag(256)
             result_.push_back(0xd9);
             result_.push_back(0x01);
             result_.push_back(0x00);
@@ -298,7 +301,7 @@ private:
 
         const size_t length = target.size();
 
-        if (pack_strings_ && length >= 3)
+        if (pack_strings_ && length >= min_length_for_stringref)
         {
             auto it = stringref_map_.find(target);
             if (it == stringref_map_.end())
@@ -308,6 +311,9 @@ private:
             }
             else
             {
+                // tag(25)
+                result_.push_back(0xd8); 
+                result_.push_back(0x19); 
                 write_uint64_value(it->second);
             }
         }
@@ -627,7 +633,26 @@ private:
             default:
                 break;
         }
-        write_byte_string_value(b);
+        if (pack_strings_ && b.length() >= min_length_for_stringref)
+        {
+            auto it = bytestringref_map_.find(byte_string(b));
+            if (it == bytestringref_map_.end())
+            {
+                bytestringref_map_.insert(std::make_pair(byte_string(b), next_stringref_++));
+                write_byte_string_value(b);
+            }
+            else
+            {
+                // tag(25)
+                result_.push_back(0xd8); 
+                result_.push_back(0x19); 
+                write_uint64_value(it->second);
+            }
+        }
+        else
+        {
+            write_byte_string_value(b);
+        }
 
         end_value();
         return true;
