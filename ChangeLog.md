@@ -8,6 +8,9 @@ Name change
 Non-breaking changes
 
 - The name `semantic_tag_type` has been deprecated and renamed to `semantic_tag`
+- The names `json_serializer`, `bson_serializer`, `cbor_serializer`, `csv_serializer`, `msgpack_serializer`,
+  and `ubjson_serializer` have been deprecated and renamed to `json_encoder`, `bson_encoder`, 
+  `cbor_encoder`, `csv_encoder`, `msgpack_encoder`, and `ubjson_encoder`
 
 Enhancements
 
