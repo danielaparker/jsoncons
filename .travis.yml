@@ -138,11 +138,6 @@ matrix:
       env: COMPILER=clang VERSION=6.0 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" 
 
     - os: osx
-      osx_image: xcode6.4
-      compiler: clang
-      env: CXXFLAGS="-std=c++11"
-
-    - os: osx
       osx_image: xcode7.3
       compiler: clang
       env: CXXFLAGS="-std=c++11"

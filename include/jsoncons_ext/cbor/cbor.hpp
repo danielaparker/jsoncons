@@ -25,17 +25,13 @@ namespace jsoncons { namespace cbor {
 template<class Json>
 void encode_cbor(const Json& j, std::basic_ostream<typename Json::char_type>& os)
 {
-    typedef typename Json::char_type char_type;
-    basic_cbor_encoder<char_type> encoder(os);
-    j.dump(encoder);
+    encode_cbor(j,os,cbor_options());
 }
 
 template<class Json>
 void encode_cbor(const Json& j, std::vector<uint8_t>& v)
 {
-    typedef typename Json::char_type char_type;
-    basic_cbor_encoder<char_type,jsoncons::bytes_result> encoder(v);
-    j.dump(encoder);
+    encode_cbor(j,v,cbor_options());
 }
 
 template<class Json>

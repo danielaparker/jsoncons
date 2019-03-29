@@ -20,7 +20,9 @@ Non-breaking changes (old names still work)
 
 Enhancements
 
-- Rewrote cbor_reader to avoid recursive function calls
+- Rewrote cbor_reader to avoid recursive function call
+- CBOR reader supports [stringref extension to CBOR](http://cbor.schmorp.de/stringref)
+- New `cbor_options` has `packed_strings` option
 
 v 0.120.0
 ---------
