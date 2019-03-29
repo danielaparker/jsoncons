@@ -347,7 +347,7 @@ int main()
 {
     // Construct some CBOR using the streaming API
     std::vector<uint8_t> b;
-    cbor::cbor_buffer_encoder writer(b);
+    cbor::cbor_bytes_encoder writer(b);
     writer.begin_array(); // indefinite length outer array
     writer.begin_array(3); // a fixed length array
     writer.string_value("foo");

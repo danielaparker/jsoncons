@@ -25,7 +25,7 @@ template<class Json>
 Json decode_bson(const std::vector<uint8_t>& v)
 {
     jsoncons::json_decoder<Json> decoder;
-    basic_bson_reader<jsoncons::byte_array_source> parser{ v, decoder };
+    basic_bson_reader<jsoncons::bytes_source> parser{ v, decoder };
     std::error_code ec;
     parser.read(ec);
     if (ec)
@@ -84,7 +84,7 @@ template<class Json>
 void encode_bson(const Json& j, std::vector<uint8_t>& v)
 {
     typedef typename Json::char_type char_type;
-    basic_bson_encoder<char_type,jsoncons::byte_array_result> encoder(v);
+    basic_bson_encoder<char_type,jsoncons::bytes_result> encoder(v);
     j.dump(encoder);
 }
   

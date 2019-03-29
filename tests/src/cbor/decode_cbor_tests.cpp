@@ -114,7 +114,7 @@ TEST_CASE("jsonpointer_test")
 TEST_CASE("as_string_test")
 {
     std::vector<uint8_t> v;
-    jsoncons::cbor::cbor_buffer_encoder encoder(v);
+    jsoncons::cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array(10);
     encoder.bool_value(true);
     encoder.bool_value(false);
@@ -193,7 +193,7 @@ TEST_CASE("as_string_test")
 TEST_CASE("dump cbor to string test")
 {
     std::vector<uint8_t> v;
-    cbor_buffer_encoder encoder(v);
+    cbor_bytes_encoder encoder(v);
     encoder.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     bignum n(-1, bytes.data(), bytes.size());
@@ -235,7 +235,7 @@ TEST_CASE("dump cbor to string test")
 TEST_CASE("test_dump_to_stream")
 {
     std::vector<uint8_t> v;
-    cbor_buffer_encoder encoder(v);
+    cbor_bytes_encoder encoder(v);
     encoder.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     bignum n(-1, bytes.data(), bytes.size());
@@ -277,7 +277,7 @@ TEST_CASE("test_dump_to_stream")
 TEST_CASE("test_indefinite_length_object_iterator")
 {
     std::vector<uint8_t> v;
-    cbor::cbor_buffer_encoder encoder(v);
+    cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_object(); // indefinite length object
     encoder.name("City");
     encoder.string_value("Toronto");
@@ -296,7 +296,7 @@ TEST_CASE("test_indefinite_length_object_iterator")
 TEST_CASE("test_indefinite_length_array_iterator")
 {
     std::vector<uint8_t> v;
-    cbor::cbor_buffer_encoder encoder(v);
+    cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array(); // indefinite length array
     encoder.string_value("Toronto");
     encoder.string_value("Ontario");
@@ -316,7 +316,7 @@ TEST_CASE("test_indefinite_length_array_iterator")
 TEST_CASE("cbor array comparison test")
 {
     std::vector<uint8_t> v1;
-    cbor::cbor_buffer_encoder serializer1(v1);
+    cbor::cbor_bytes_encoder serializer1(v1);
     serializer1.begin_array(); // indefinite length array
     serializer1.string_value("Toronto");
     serializer1.string_value("Vancouver");
@@ -325,7 +325,7 @@ TEST_CASE("cbor array comparison test")
     json j1 = decode_cbor<json>(v1);
 
     std::vector<uint8_t> v2;
-    cbor::cbor_buffer_encoder serializer2(v2);
+    cbor::cbor_bytes_encoder serializer2(v2);
     serializer2.begin_array(); // indefinite length array
     serializer2.string_value("Toronto");
     serializer2.string_value("Vancouver");
@@ -334,7 +334,7 @@ TEST_CASE("cbor array comparison test")
     json j2 = decode_cbor<json>(v2);
 
     std::vector<uint8_t> v3;
-    cbor::cbor_buffer_encoder serializer3(v3);
+    cbor::cbor_bytes_encoder serializer3(v3);
     serializer3.begin_array(); // indefinite length array
     serializer3.string_value("Toronto");
     serializer3.string_value("Montreal");
@@ -364,7 +364,7 @@ TEST_CASE("cbor array comparison test")
 TEST_CASE("cbor object comparison")
 {
     std::vector<uint8_t> v;
-    cbor::cbor_buffer_encoder serializer1(v);
+    cbor::cbor_bytes_encoder serializer1(v);
     serializer1.begin_object(); // indefinite length array
     serializer1.name("City");
     serializer1.string_value("Montreal");
@@ -381,7 +381,7 @@ TEST_CASE("cbor object comparison")
     REQUIRE(j1.size() == 3);
 
     std::vector<uint8_t> buf2;
-    cbor::cbor_buffer_encoder serializer2(buf2);
+    cbor::cbor_bytes_encoder serializer2(buf2);
     serializer2.begin_object(); // indefinite length array
     serializer2.name("City");
     serializer2.string_value("Toronto");
@@ -395,7 +395,7 @@ TEST_CASE("cbor object comparison")
     REQUIRE(j2.size() == j1.size());
 
     std::vector<uint8_t> buf3;
-    cbor::cbor_buffer_encoder serializer3(buf3);
+    cbor::cbor_bytes_encoder serializer3(buf3);
     serializer3.begin_object(); // indefinite length array
     serializer3.name("empty-object");
     serializer3.begin_object(0);
@@ -445,7 +445,7 @@ TEST_CASE("cbor object comparison")
 TEST_CASE("cbor member tests")
 {
     std::vector<uint8_t> v;
-    cbor::cbor_buffer_encoder encoder(v);
+    cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_object(); // indefinite length object
     encoder.name("empty-object");
     encoder.begin_object(0);
@@ -495,7 +495,7 @@ TEST_CASE("cbor member tests")
 TEST_CASE("cbor conversion tests")
 {
     std::vector<uint8_t> v;
-    cbor::cbor_buffer_encoder writer(v);
+    cbor::cbor_bytes_encoder writer(v);
     writer.begin_array(); // indefinite length outer array
     writer.begin_array(4); // a fixed length array
     writer.string_value("foo");
@@ -531,7 +531,7 @@ TEST_CASE("cbor conversion tests")
 TEST_CASE("cbor array as<> test")
 {
     std::vector<uint8_t> v;
-    cbor::cbor_buffer_encoder writer(v);
+    cbor::cbor_bytes_encoder writer(v);
     writer.begin_array(); // indefinite length outer array
     writer.string_value("foo");
     writer.byte_string_value(byte_string({'b','a','r'}));

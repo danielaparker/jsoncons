@@ -324,20 +324,20 @@ private:
 };
 
 typedef basic_bson_encoder<char,jsoncons::binary_stream_result> bson_encoder;
-typedef basic_bson_encoder<char,jsoncons::byte_array_result> bson_buffer_encoder;
+typedef basic_bson_encoder<char,jsoncons::bytes_result> bson_bytes_encoder;
 
 typedef basic_bson_encoder<wchar_t,jsoncons::binary_stream_result> wbson_encoder;
-typedef basic_bson_encoder<wchar_t,jsoncons::byte_array_result> wbson_buffer_encoder;
+typedef basic_bson_encoder<wchar_t,jsoncons::bytes_result> wbson_bytes_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class CharT,class Result=jsoncons::binary_stream_result>
 using basic_bson_serializer = basic_bson_encoder<CharT,Result>; 
 
 typedef basic_bson_serializer<char,jsoncons::binary_stream_result> bson_serializer;
-typedef basic_bson_serializer<char,jsoncons::byte_array_result> bson_buffer_serializer;
+typedef basic_bson_serializer<char,jsoncons::bytes_result> bson_buffer_serializer;
 
 typedef basic_bson_serializer<wchar_t,jsoncons::binary_stream_result> wbson_serializer;
-typedef basic_bson_serializer<wchar_t,jsoncons::byte_array_result> wbson_buffer_serializer;
+typedef basic_bson_serializer<wchar_t,jsoncons::bytes_result> wbson_buffer_serializer;
 #endif
 
 }}

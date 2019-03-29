@@ -19,7 +19,7 @@ using namespace jsoncons::msgpack;
 TEST_CASE("serialize array to msgpack")
 {
     std::vector<uint8_t> v;
-    msgpack_buffer_encoder encoder(v);
+    msgpack_bytes_encoder encoder(v);
     //encoder.begin_object(1);
     encoder.begin_array(3);
     encoder.bool_value(true);
@@ -44,7 +44,7 @@ TEST_CASE("Too many and too few items in MessagePack object or array")
 {
     std::error_code ec{};
     std::vector<uint8_t> v;
-    msgpack_buffer_encoder encoder(v);
+    msgpack_bytes_encoder encoder(v);
 
     SECTION("Too many items in array")
     {

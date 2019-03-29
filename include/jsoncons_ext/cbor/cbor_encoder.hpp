@@ -860,22 +860,22 @@ private:
 };
 
 typedef basic_cbor_encoder<char,jsoncons::binary_stream_result> cbor_encoder;
-typedef basic_cbor_encoder<char,jsoncons::byte_array_result> cbor_buffer_encoder;
+typedef basic_cbor_encoder<char,jsoncons::bytes_result> cbor_bytes_encoder;
 
 typedef basic_cbor_encoder<wchar_t,jsoncons::binary_stream_result> wcbor_encoder;
-typedef basic_cbor_encoder<wchar_t,jsoncons::byte_array_result> wcbor_buffer_encoder;
+typedef basic_cbor_encoder<wchar_t,jsoncons::bytes_result> wcbor_bytes_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_cbor_encoder<char,jsoncons::byte_array_result> cbor_bytes_serializer;
+typedef basic_cbor_encoder<char,jsoncons::bytes_result> cbor_bytes_serializer;
 
 template<class CharT,class Result=jsoncons::binary_stream_result>
 using basic_cbor_serializer = basic_cbor_encoder<CharT,Result>; 
 
 typedef basic_cbor_serializer<char,jsoncons::binary_stream_result> cbor_serializer;
-typedef basic_cbor_serializer<char,jsoncons::byte_array_result> cbor_buffer_serializer;
+typedef basic_cbor_serializer<char,jsoncons::bytes_result> cbor_buffer_serializer;
 
 typedef basic_cbor_serializer<wchar_t,jsoncons::binary_stream_result> wcbor_serializer;
-typedef basic_cbor_serializer<wchar_t,jsoncons::byte_array_result> wcbor_buffer_serializer;
+typedef basic_cbor_serializer<wchar_t,jsoncons::bytes_result> wcbor_buffer_serializer;
 #endif
 
 }}

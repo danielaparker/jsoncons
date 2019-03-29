@@ -446,22 +446,22 @@ private:
 };
 
 typedef basic_msgpack_encoder<char,jsoncons::binary_stream_result> msgpack_encoder;
-typedef basic_msgpack_encoder<char,jsoncons::byte_array_result> msgpack_buffer_encoder;
+typedef basic_msgpack_encoder<char,jsoncons::bytes_result> msgpack_bytes_encoder;
 
 typedef basic_msgpack_encoder<wchar_t,jsoncons::binary_stream_result> wmsgpack_encoder;
-typedef basic_msgpack_encoder<wchar_t,jsoncons::byte_array_result> wmsgpack_buffer_encoder;
+typedef basic_msgpack_encoder<wchar_t,jsoncons::bytes_result> wmsgpack_bytes_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_msgpack_encoder<char,jsoncons::byte_array_result> msgpack_bytes_serializer;
+typedef basic_msgpack_encoder<char,jsoncons::bytes_result> msgpack_bytes_serializer;
 
 template<class CharT,class Result=jsoncons::binary_stream_result>
 using basic_msgpack_serializer = basic_msgpack_encoder<CharT,Result>; 
 
 typedef basic_msgpack_serializer<char,jsoncons::binary_stream_result> msgpack_serializer;
-typedef basic_msgpack_serializer<char,jsoncons::byte_array_result> msgpack_buffer_serializer;
+typedef basic_msgpack_serializer<char,jsoncons::bytes_result> msgpack_buffer_serializer;
 
 typedef basic_msgpack_serializer<wchar_t,jsoncons::binary_stream_result> wmsgpack_serializer;
-typedef basic_msgpack_serializer<wchar_t,jsoncons::byte_array_result> wmsgpack_buffer_serializer;
+typedef basic_msgpack_serializer<wchar_t,jsoncons::bytes_result> wmsgpack_buffer_serializer;
 #endif
 
 }}

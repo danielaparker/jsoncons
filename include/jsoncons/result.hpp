@@ -241,9 +241,9 @@ public:
     }
 };
 
-// byte_array_result
+// bytes_result
 
-class byte_array_result 
+class bytes_result 
 {
 public:
     typedef uint8_t value_type;
@@ -252,17 +252,17 @@ private:
     output_type& s_;
 
     // Noncopyable
-    byte_array_result(const byte_array_result&) = delete;
-    byte_array_result& operator=(const byte_array_result&) = delete;
+    bytes_result(const bytes_result&) = delete;
+    bytes_result& operator=(const bytes_result&) = delete;
 public:
-    byte_array_result(byte_array_result&&) = default;
+    bytes_result(bytes_result&&) = default;
 
-    byte_array_result(output_type& s)
+    bytes_result(output_type& s)
         : s_(s)
     {
     }
 
-    byte_array_result& operator=(byte_array_result&&) = default;
+    bytes_result& operator=(bytes_result&&) = default;
 
     void flush()
     {

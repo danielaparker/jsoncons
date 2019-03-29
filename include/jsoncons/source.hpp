@@ -519,7 +519,7 @@ public:
     }
 };
 
-class byte_array_source 
+class bytes_source 
 {
 public:
     typedef uint8_t value_type;
@@ -531,12 +531,12 @@ private:
     bool eof_;
 
     // Noncopyable 
-    byte_array_source(const byte_array_source&) = delete;
-    byte_array_source& operator=(const byte_array_source&) = delete;
+    bytes_source(const bytes_source&) = delete;
+    bytes_source& operator=(const bytes_source&) = delete;
 public:
-    byte_array_source(byte_array_source&&) = default;
+    bytes_source(bytes_source&&) = default;
 
-    byte_array_source(const std::vector<value_type>& s)
+    bytes_source(const std::vector<value_type>& s)
         : data_(s.data()), 
           input_ptr_(s.data()), 
           input_end_(s.data()+s.size()), 
@@ -544,7 +544,7 @@ public:
     {
     }
 
-    byte_array_source(const value_type* data, size_t size)
+    bytes_source(const value_type* data, size_t size)
         : data_(data), 
           input_ptr_(data), 
           input_end_(data+size), 
@@ -552,7 +552,7 @@ public:
     {
     }
 
-    byte_array_source& operator=(byte_array_source&&) = default;
+    bytes_source& operator=(bytes_source&&) = default;
 
     bool eof() const
     {

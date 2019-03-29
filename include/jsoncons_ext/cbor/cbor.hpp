@@ -34,7 +34,7 @@ template<class Json>
 void encode_cbor(const Json& j, std::vector<uint8_t>& v)
 {
     typedef typename Json::char_type char_type;
-    basic_cbor_encoder<char_type,jsoncons::byte_array_result> encoder(v);
+    basic_cbor_encoder<char_type,jsoncons::bytes_result> encoder(v);
     j.dump(encoder);
 }
 
@@ -45,7 +45,7 @@ typename std::enable_if<std::is_same<typename Json::char_type,char>::value,Json>
 decode_cbor(const std::vector<uint8_t>& v)
 {
     jsoncons::json_decoder<Json> decoder;
-    basic_cbor_reader<jsoncons::byte_array_source> parser(jsoncons::byte_array_source(v.data(),v.size()), decoder);
+    basic_cbor_reader<jsoncons::bytes_source> parser(jsoncons::bytes_source(v.data(),v.size()), decoder);
     std::error_code ec;
     parser.read(ec);
     if (ec)
@@ -61,7 +61,7 @@ decode_cbor(const std::vector<uint8_t>& v)
 {
     jsoncons::json_decoder<Json> decoder;
     basic_utf8_adaptor<typename Json::char_type> adaptor(decoder);
-    basic_cbor_reader<jsoncons::byte_array_source> parser(jsoncons::byte_array_source(v.data(),v.size()), adaptor);
+    basic_cbor_reader<jsoncons::bytes_source> parser(jsoncons::bytes_source(v.data(),v.size()), adaptor);
     std::error_code ec;
     parser.read(ec);
     if (ec)

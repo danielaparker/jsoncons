@@ -425,20 +425,20 @@ private:
 };
 
 typedef basic_ubjson_encoder<char,jsoncons::binary_stream_result> ubjson_encoder;
-typedef basic_ubjson_encoder<char,jsoncons::byte_array_result> ubjson_buffer_encoder;
+typedef basic_ubjson_encoder<char,jsoncons::bytes_result> ubjson_bytes_encoder;
 
 typedef basic_ubjson_encoder<wchar_t,jsoncons::binary_stream_result> wubjson_encoder;
-typedef basic_ubjson_encoder<wchar_t,jsoncons::byte_array_result> wubjson_buffer_encoder;
+typedef basic_ubjson_encoder<wchar_t,jsoncons::bytes_result> wubjson_bytes_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class CharT,class Result=jsoncons::binary_stream_result>
 using basic_ubjson_serializer = basic_ubjson_encoder<CharT,Result>; 
 
 typedef basic_ubjson_serializer<char,jsoncons::binary_stream_result> ubjson_serializer;
-typedef basic_ubjson_serializer<char,jsoncons::byte_array_result> ubjson_buffer_serializer;
+typedef basic_ubjson_serializer<char,jsoncons::bytes_result> ubjson_buffer_serializer;
 
 typedef basic_ubjson_serializer<wchar_t,jsoncons::binary_stream_result> wubjson_serializer;
-typedef basic_ubjson_serializer<wchar_t,jsoncons::byte_array_result> wubjson_buffer_serializer;
+typedef basic_ubjson_serializer<wchar_t,jsoncons::bytes_result> wubjson_buffer_serializer;
 #endif
 
 }}

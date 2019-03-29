@@ -33,7 +33,7 @@ template<class Json>
 void encode_ubjson(const Json& j, std::vector<uint8_t>& v)
 {
     typedef typename Json::char_type char_type;
-    basic_ubjson_encoder<char_type,jsoncons::byte_array_result> encoder(v);
+    basic_ubjson_encoder<char_type,jsoncons::bytes_result> encoder(v);
     j.dump(encoder);
 }
 
@@ -43,7 +43,7 @@ template<class Json>
 Json decode_ubjson(const std::vector<uint8_t>& v)
 {
     jsoncons::json_decoder<Json> decoder;
-    ubjson_buffer_reader parser(v, decoder);
+    ubjson_bytes_reader parser(v, decoder);
     std::error_code ec;
     parser.read(ec);
     if (ec)

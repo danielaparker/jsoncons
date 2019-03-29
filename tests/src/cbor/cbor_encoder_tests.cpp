@@ -52,7 +52,7 @@ json j = json::parse(R"(
 TEST_CASE("serialize array to cbor")
 {
     std::vector<uint8_t> v;
-    cbor_buffer_encoder encoder(v);
+    cbor_bytes_encoder encoder(v);
     //encoder.begin_object(1);
     encoder.begin_array(3);
     encoder.bool_value(true);
@@ -76,7 +76,7 @@ TEST_CASE("serialize array to cbor")
 TEST_CASE("test_serialize_indefinite_length_array")
 {
     std::vector<uint8_t> v;
-    cbor_buffer_encoder encoder(v);
+    cbor_bytes_encoder encoder(v);
     encoder.begin_array();
     encoder.begin_array(4);
     encoder.bool_value(true);
@@ -100,7 +100,7 @@ TEST_CASE("test_serialize_indefinite_length_array")
 TEST_CASE("test_serialize_bignum")
 {
     std::vector<uint8_t> v;
-    cbor_buffer_encoder encoder(v);
+    cbor_bytes_encoder encoder(v);
     encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -125,7 +125,7 @@ TEST_CASE("test_serialize_bignum")
 TEST_CASE("test_serialize_negative_bignum1")
 {
     std::vector<uint8_t> v;
-    cbor_buffer_encoder encoder(v);
+    cbor_bytes_encoder encoder(v);
     encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -150,7 +150,7 @@ TEST_CASE("test_serialize_negative_bignum1")
 TEST_CASE("test_serialize_negative_bignum2")
 {
     std::vector<uint8_t> v;
-    cbor_buffer_encoder encoder(v);
+    cbor_bytes_encoder encoder(v);
     encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -179,7 +179,7 @@ TEST_CASE("test_serialize_negative_bignum2")
 TEST_CASE("test_serialize_negative_bignum3")
 {
     std::vector<uint8_t> v;
-    cbor_buffer_encoder encoder(v);
+    cbor_bytes_encoder encoder(v);
     encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -211,7 +211,7 @@ TEST_CASE("serialize big_decimal to cbor")
     SECTION("-1 184467440737095516160")
     {
         std::vector<uint8_t> v;
-        cbor_buffer_encoder encoder(v);
+        cbor_bytes_encoder encoder(v);
         encoder.string_value("18446744073709551616.0", semantic_tag::big_decimal);
         encoder.flush();
         try
@@ -227,7 +227,7 @@ TEST_CASE("serialize big_decimal to cbor")
     SECTION("18446744073709551616e-5")
     {
         std::vector<uint8_t> v;
-        cbor_buffer_encoder encoder(v);
+        cbor_bytes_encoder encoder(v);
         encoder.string_value("18446744073709551616e-5", semantic_tag::big_decimal);
         encoder.flush();
         try
@@ -243,7 +243,7 @@ TEST_CASE("serialize big_decimal to cbor")
     SECTION("-18446744073709551616e-5")
     {
         std::vector<uint8_t> v;
-        cbor_buffer_encoder encoder(v);
+        cbor_bytes_encoder encoder(v);
         encoder.string_value("-18446744073709551616e-5", semantic_tag::big_decimal);
         encoder.flush();
         try
@@ -259,7 +259,7 @@ TEST_CASE("serialize big_decimal to cbor")
     SECTION("-18446744073709551616e5")
     {
         std::vector<uint8_t> v;
-        cbor_buffer_encoder encoder(v);
+        cbor_bytes_encoder encoder(v);
         encoder.string_value("-18446744073709551616e5", semantic_tag::big_decimal);
         encoder.flush();
         try
@@ -278,7 +278,7 @@ TEST_CASE("Too many and too few items in CBOR map or array")
 {
     std::error_code ec{};
     std::vector<uint8_t> v;
-    cbor_buffer_encoder encoder(v);
+    cbor_bytes_encoder encoder(v);
 
     SECTION("Too many items in array")
     {

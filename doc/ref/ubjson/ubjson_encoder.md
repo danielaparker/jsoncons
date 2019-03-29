@@ -20,9 +20,9 @@ Four specializations for common character types and result types are defined:
 Type                       |Definition
 ---------------------------|------------------------------
 ubjson_encoder            |basic_ubjson_encoder<char,jsoncons::binary_stream_result>
-ubjson_buffer_encoder     |basic_ubjson_encoder<char,jsoncons::binary_buffer_result>
+ubjson_bytes_encoder     |basic_ubjson_encoder<char,jsoncons::binary_buffer_result>
 wubjson_encoder           |basic_ubjson_encoder<wchar_t,jsoncons::binary_stream_result>
-wubjson_buffer_encoder    |basic_ubjson_encoder<wchar_t,jsoncons::binary_buffer_result>
+wubjson_bytes_encoder    |basic_ubjson_encoder<wchar_t,jsoncons::binary_buffer_result>
 
 #### Member types
 

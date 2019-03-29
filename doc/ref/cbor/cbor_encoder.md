@@ -20,9 +20,9 @@ Four specializations for common character types and result types are defined:
 Type                       |Definition
 ---------------------------|------------------------------
 cbor_encoder            |basic_cbor_encoder<char,jsoncons::binary_stream_result>
-cbor_buffer_encoder     |basic_cbor_encoder<char,jsoncons::binary_buffer_result>
+cbor_bytes_encoder     |basic_cbor_encoder<char,jsoncons::binary_buffer_result>
 wcbor_encoder           |basic_cbor_encoder<wchar_t,jsoncons::binary_stream_result>
-wcbor_buffer_encoder    |basic_cbor_encoder<wchar_t,jsoncons::binary_buffer_result>
+wcbor_bytes_encoder    |basic_cbor_encoder<wchar_t,jsoncons::binary_buffer_result>
 
 #### Member types
 
@@ -122,7 +122,7 @@ Constructs a new encoder that writes to the specified result.
 int main()
 {
     std::vector<uint8_t> buffer;
-    cbor::cbor_buffer_encoder writer(buffer);
+    cbor::cbor_bytes_encoder writer(buffer);
 
     writer.begin_array(); // Indefinite length array
     writer.string_value("cat");

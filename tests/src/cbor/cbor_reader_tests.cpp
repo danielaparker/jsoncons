@@ -24,7 +24,7 @@ void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
         std::error_code ec;
 
         jsoncons::json_decoder<json> decoder;
-        cbor_buffer_reader parser(v, decoder);
+        cbor_bytes_reader parser(v, decoder);
         parser.read(ec);
 
         json result = decoder.get_result();
@@ -401,7 +401,7 @@ TEST_CASE("test_decimal_as_string")
 TEST_CASE("Compare CBOR packed item and jsoncons item")
 {
     std::vector<uint8_t> bytes;
-    cbor::cbor_buffer_encoder writer(bytes);
+    cbor::cbor_bytes_encoder writer(bytes);
     writer.begin_array(); // indefinite length outer array
     writer.string_value("foo");
     writer.byte_string_value(byte_string{'b','a','r'});

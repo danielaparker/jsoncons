@@ -20,9 +20,9 @@ Four specializations for common character types and result types are defined:
 Type                       |Definition
 ---------------------------|------------------------------
 bson_encoder            |basic_bson_encoder<char,jsoncons::binary_stream_result>
-bson_buffer_encoder     |basic_bson_encoder<char,jsoncons::binary_buffer_result>
+bson_bytes_encoder     |basic_bson_encoder<char,jsoncons::binary_buffer_result>
 wbson_encoder           |basic_bson_encoder<wchar_t,jsoncons::binary_stream_result>
-wbson_buffer_encoder    |basic_bson_encoder<wchar_t,jsoncons::binary_buffer_result>
+wbson_bytes_encoder    |basic_bson_encoder<wchar_t,jsoncons::binary_buffer_result>
 
 #### Member types
 
@@ -122,7 +122,7 @@ Constructs a new encoder that writes to the specified result.
 int main()
 {
     std::vector<uint8_t> buffer;
-    bson::bson_buffer_encoder writer(buffer);
+    bson::bson_bytes_encoder writer(buffer);
     writer.begin_array(); // The total number of bytes comprising 
                           // the bson document will be calculated
     writer.string_value("cat");

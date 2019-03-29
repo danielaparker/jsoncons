@@ -11,7 +11,7 @@ using namespace jsoncons;
 void serialize_to_bson()
 {
     std::vector<uint8_t> buffer;
-    bson::bson_buffer_encoder writer(buffer);
+    bson::bson_bytes_encoder writer(buffer);
     writer.begin_array(); // The total number of bytes comprising 
                           // the bson document will be calculated
     writer.string_value("cat");

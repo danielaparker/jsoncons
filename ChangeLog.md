@@ -5,12 +5,18 @@ Name change
 
 - The name `j.semantic_tag()` has been renamed to `j.get_semantic_tag()`
 
-Non-breaking changes
+Non-breaking changes (old names still work)
 
 - The name `semantic_tag_type` has been deprecated and renamed to `semantic_tag`
 - The names `json_serializer`, `bson_serializer`, `cbor_serializer`, `csv_serializer`, `msgpack_serializer`,
   and `ubjson_serializer` have been deprecated and renamed to `json_encoder`, `bson_encoder`, 
   `cbor_encoder`, `csv_encoder`, `msgpack_encoder`, and `ubjson_encoder`
+- The names `bson_buffer_serializer`, `cbor_buffer_serializer`, `msgpack_buffer_serializer`,
+  and `ubjson_buffer_serializer` have been deprecated and renamed to `bson_bytes_encoder`, 
+  `cbor_bytes_encoder`, `msgpack_bytes_encoder`, and `ubjson_bytes_encoder`
+- The names `bson_buffer_reader`, `cbor_buffer_reader`, `msgpack_buffer_reader`,
+  and `ubjson_buffer_reader` have been deprecated and renamed to `bson_bytes_reader`, 
+  `cbor_bytes_reader`, `msgpack_bytes_reader`, and `ubjson_bytes_reader`
 
 Enhancements
 

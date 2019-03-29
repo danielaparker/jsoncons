@@ -140,7 +140,7 @@ TEST_CASE("decode_ubjson_arrays_and_maps")
 TEST_CASE("decode indefinite length ubjson arrays and maps")
 {
     std::vector<uint8_t> v;
-    ubjson_buffer_encoder encoder(v);
+    ubjson_bytes_encoder encoder(v);
 
     SECTION("[\"Hello\"]")
     {

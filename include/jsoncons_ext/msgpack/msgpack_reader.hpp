@@ -735,7 +735,11 @@ private:
 
 typedef basic_msgpack_reader<jsoncons::binary_stream_source> msgpack_reader;
 
-typedef basic_msgpack_reader<jsoncons::byte_array_source> msgpack_buffer_reader;
+typedef basic_msgpack_reader<jsoncons::bytes_source> msgpack_bytes_reader;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+typedef msgpack_bytes_reader msgpack_buffer_reader;
+#endif
 
 }}
 
