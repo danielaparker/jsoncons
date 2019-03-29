@@ -331,7 +331,6 @@ class byte_string_view
 public:
     typedef byte_traits traits_type;
 
-    typedef traits_type::char_type char_type;
     typedef const uint8_t* const_iterator;
     typedef const uint8_t* iterator;
     typedef std::size_t size_type;

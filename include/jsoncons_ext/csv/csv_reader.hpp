@@ -269,7 +269,7 @@ Json decode_csv(std::basic_istream<typename Json::char_type>& is)
 
     json_decoder<Json> decoder;
 
-    basic_csv_reader<char_type,jsoncons::text_stream_source<char_type>> reader(is,decoder);
+    basic_csv_reader<char_type,jsoncons::stream_source<char_type>> reader(is,decoder);
     reader.read();
     return decoder.get_result();
 }
@@ -281,14 +281,14 @@ Json decode_csv(std::basic_istream<typename Json::char_type>& is, const basic_cs
 
     json_decoder<Json,Allocator> decoder;
 
-    basic_csv_reader<char_type,jsoncons::text_stream_source<char_type>,Allocator> reader(is,decoder,options);
+    basic_csv_reader<char_type,jsoncons::stream_source<char_type>,Allocator> reader(is,decoder,options);
     reader.read();
     return decoder.get_result();
 }
 
-typedef basic_csv_reader<char,jsoncons::text_stream_source<char>> csv_reader;
+typedef basic_csv_reader<char,jsoncons::stream_source<char>> csv_reader;
 typedef basic_csv_reader<char,jsoncons::string_source<char>> csv_string_reader;
-typedef basic_csv_reader<wchar_t,jsoncons::text_stream_source<wchar_t>> wcsv_reader;
+typedef basic_csv_reader<wchar_t,jsoncons::stream_source<wchar_t>> wcsv_reader;
 typedef basic_csv_reader<wchar_t,jsoncons::string_source<wchar_t>> wcsv_string_reader;
 
 }}

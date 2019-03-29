@@ -2323,7 +2323,7 @@ public:
     static basic_json parse(std::basic_istream<char_type>& is, parse_error_handler& err_handler)
     {
         json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> handler;
-        basic_json_reader<char_type,text_stream_source<char_type>> reader(is, handler, err_handler);
+        basic_json_reader<char_type,stream_source<char_type>> reader(is, handler, err_handler);
         reader.read_next();
         reader.check_done();
         if (!handler.is_valid())
@@ -2394,7 +2394,7 @@ public:
     static basic_json parse(std::basic_istream<char_type>& is, const basic_json_options<CharT>& options, parse_error_handler& err_handler)
     {
         json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> handler;
-        basic_json_reader<char_type,text_stream_source<char_type>> reader(is, handler, options, err_handler);
+        basic_json_reader<char_type,stream_source<char_type>> reader(is, handler, options, err_handler);
         reader.read_next();
         reader.check_done();
         if (!handler.is_valid())
@@ -4722,7 +4722,7 @@ private:
     friend std::basic_istream<char_type>& operator<<(std::basic_istream<char_type>& is, basic_json& o)
     {
         json_decoder<basic_json> handler;
-        basic_json_reader<char_type,text_stream_source<char_type>> reader(is, handler);
+        basic_json_reader<char_type,stream_source<char_type>> reader(is, handler);
         reader.read_next();
         reader.check_done();
         if (!handler.is_valid())
@@ -4746,7 +4746,7 @@ std::basic_istream<typename Json::char_type>& operator>>(std::basic_istream<type
     typedef typename Json::char_type char_type;
 
     json_decoder<Json> handler;
-    basic_json_reader<char_type,text_stream_source<char_type>> reader(is, handler);
+    basic_json_reader<char_type,stream_source<char_type>> reader(is, handler);
     reader.read_next();
     reader.check_done();
     if (!handler.is_valid())

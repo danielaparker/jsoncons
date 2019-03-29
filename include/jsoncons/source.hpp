@@ -23,7 +23,7 @@ namespace jsoncons {
 // text sources
 
 template <class CharT>
-class text_stream_source 
+class stream_source 
 {
 public:
     typedef CharT value_type;
@@ -34,21 +34,21 @@ private:
     size_t position_;
 
     // Noncopyable 
-    text_stream_source(const text_stream_source&) = delete;
-    text_stream_source& operator=(const text_stream_source&) = delete;
+    stream_source(const stream_source&) = delete;
+    stream_source& operator=(const stream_source&) = delete;
 public:
-    text_stream_source(text_stream_source&&) = default;
+    stream_source(stream_source&&) = default;
 
-    text_stream_source(std::basic_istream<CharT>& is)
+    stream_source(std::basic_istream<CharT>& is)
         : is_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0)
     {
     }
 
-    ~text_stream_source()
+    ~stream_source()
     {
     }
 
-    text_stream_source& operator=(text_stream_source&&) = default;
+    stream_source& operator=(stream_source&&) = default;
 
     bool eof() const
     {
@@ -519,7 +519,7 @@ public:
     }
 };
 
-class buffer_source 
+class byte_array_source 
 {
 public:
     typedef uint8_t value_type;
@@ -531,12 +531,12 @@ private:
     bool eof_;
 
     // Noncopyable 
-    buffer_source(const buffer_source&) = delete;
-    buffer_source& operator=(const buffer_source&) = delete;
+    byte_array_source(const byte_array_source&) = delete;
+    byte_array_source& operator=(const byte_array_source&) = delete;
 public:
-    buffer_source(buffer_source&&) = default;
+    byte_array_source(byte_array_source&&) = default;
 
-    buffer_source(const std::vector<value_type>& s)
+    byte_array_source(const std::vector<value_type>& s)
         : data_(s.data()), 
           input_ptr_(s.data()), 
           input_end_(s.data()+s.size()), 
@@ -544,7 +544,7 @@ public:
     {
     }
 
-    buffer_source(const value_type* data, size_t size)
+    byte_array_source(const value_type* data, size_t size)
         : data_(data), 
           input_ptr_(data), 
           input_end_(data+size), 
@@ -552,7 +552,7 @@ public:
     {
     }
 
-    buffer_source& operator=(buffer_source&&) = default;
+    byte_array_source& operator=(byte_array_source&&) = default;
 
     bool eof() const
     {

@@ -24,9 +24,9 @@ Four specializations for common character types and result types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-json_reader            |basic_json_reader<char,jsoncons::text_stream_source<char>>
+json_reader            |basic_json_reader<char,jsoncons::stream_source<char>>
 json_string_reader     |basic_json_reader<char,jsoncons::string_source<char>>
-wjson_reader           |basic_json_reader<wchar_t, jsoncons::text_stream_source<wchar_t>>
+wjson_reader           |basic_json_reader<wchar_t, jsoncons::stream_source<wchar_t>>
 wjson_string_reader    |basic_json_reader<wchar_t, jsoncons::string_source<wchar_t>>
 
 #### Member types

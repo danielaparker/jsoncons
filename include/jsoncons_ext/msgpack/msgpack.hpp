@@ -33,7 +33,7 @@ template<class Json>
 void encode_msgpack(const Json& j, std::vector<uint8_t>& v)
 {
     typedef typename Json::char_type char_type;
-    basic_msgpack_serializer<char_type,jsoncons::buffer_result> serializer(v);
+    basic_msgpack_serializer<char_type,jsoncons::byte_array_result> serializer(v);
     j.dump(serializer);
 }
 

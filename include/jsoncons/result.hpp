@@ -20,10 +20,10 @@
 
 namespace jsoncons { 
 
-// text_stream_result
+// stream_result
 
 template <class CharT>
-class text_stream_result
+class stream_result
 {
 public:
     typedef CharT value_type;
@@ -39,27 +39,27 @@ private:
     CharT* p_;
 
     // Noncopyable
-    text_stream_result(const text_stream_result&) = delete;
-    text_stream_result& operator=(const text_stream_result&) = delete;
+    stream_result(const stream_result&) = delete;
+    stream_result& operator=(const stream_result&) = delete;
 
 public:
-    text_stream_result(text_stream_result&&) = default;
+    stream_result(stream_result&&) = default;
 
-    text_stream_result(std::basic_ostream<CharT>& os)
+    stream_result(std::basic_ostream<CharT>& os)
         : os_(std::addressof(os)), buffer_(default_buffer_length), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
     {
     }
-    text_stream_result(std::basic_ostream<CharT>& os, size_t buflen)
+    stream_result(std::basic_ostream<CharT>& os, size_t buflen)
     : os_(std::addressof(os)), buffer_(buflen), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
     {
     }
-    ~text_stream_result()
+    ~stream_result()
     {
         os_->write(begin_buffer_, buffer_length());
         os_->flush();
     }
 
-    text_stream_result& operator=(text_stream_result&&) = default;
+    stream_result& operator=(stream_result&&) = default;
 
     void flush()
     {
@@ -241,9 +241,9 @@ public:
     }
 };
 
-// buffer_result
+// byte_array_result
 
-class buffer_result 
+class byte_array_result 
 {
 public:
     typedef uint8_t value_type;
@@ -252,17 +252,17 @@ private:
     output_type& s_;
 
     // Noncopyable
-    buffer_result(const buffer_result&) = delete;
-    buffer_result& operator=(const buffer_result&) = delete;
+    byte_array_result(const byte_array_result&) = delete;
+    byte_array_result& operator=(const byte_array_result&) = delete;
 public:
-    buffer_result(buffer_result&&) = default;
+    byte_array_result(byte_array_result&&) = default;
 
-    buffer_result(output_type& s)
+    byte_array_result(output_type& s)
         : s_(s)
     {
     }
 
-    buffer_result& operator=(buffer_result&&) = default;
+    byte_array_result& operator=(byte_array_result&&) = default;
 
     void flush()
     {

@@ -1347,7 +1347,7 @@ private:
 
 typedef basic_cbor_reader<jsoncons::binary_stream_source> cbor_reader;
 
-typedef basic_cbor_reader<jsoncons::buffer_source> cbor_buffer_reader;
+typedef basic_cbor_reader<jsoncons::byte_array_source> cbor_buffer_reader;
 
 }}
 

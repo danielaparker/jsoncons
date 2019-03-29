@@ -860,13 +860,13 @@ private:
 };
 
 typedef basic_cbor_serializer<char,jsoncons::binary_stream_result> cbor_serializer;
-typedef basic_cbor_serializer<char,jsoncons::buffer_result> cbor_buffer_serializer;
+typedef basic_cbor_serializer<char,jsoncons::byte_array_result> cbor_buffer_serializer;
 
 typedef basic_cbor_serializer<wchar_t,jsoncons::binary_stream_result> wcbor_serializer;
-typedef basic_cbor_serializer<wchar_t,jsoncons::buffer_result> wcbor_buffer_serializer;
+typedef basic_cbor_serializer<wchar_t,jsoncons::byte_array_result> wcbor_buffer_serializer;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_cbor_serializer<char,jsoncons::buffer_result> cbor_bytes_serializer;
+typedef basic_cbor_serializer<char,jsoncons::byte_array_result> cbor_bytes_serializer;
 #endif
 
 }}

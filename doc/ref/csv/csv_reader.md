@@ -1,7 +1,7 @@
 ### jsoncons::csv::csv_reader
 
 ```c++
-typedef basic_csv_reader<char,text_stream_source<char>> csv_reader
+typedef basic_csv_reader<char,stream_source<char>> csv_reader
 ```
 
 The `csv_reader` class is an instantiation of the `basic_csv_reader` class template that uses `char` as the character type
@@ -15,14 +15,14 @@ and `text_stream_reader` as the input source. It reads a [CSV file](http://tools
 ```
 #### Constructors
 
-    csv_reader(jsoncons::text_stream_source source,
+    csv_reader(jsoncons::stream_source source,
                json_content_handler& handler)
 Constructs a `csv_reader` that is associated with an input stream
 `is` of CSV text and a [json_content_handler](../json_content_handler.md) that receives
 JSON events. Uses default [csv_options](csv_options.md).
 You must ensure that the input stream and input handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
-    csv_reader(jsoncons::text_stream_source source,
+    csv_reader(jsoncons::stream_source source,
                json_content_handler& handler,
                const csv_options& options)
 Constructs a `csv_reader` that is associated with an input stream
@@ -30,7 +30,7 @@ Constructs a `csv_reader` that is associated with an input stream
 JSON events, and [csv_options](csv_options.md).
 You must ensure that the input stream and input handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
-    csv_reader(jsoncons::text_stream_source source,
+    csv_reader(jsoncons::stream_source source,
                json_content_handler& handler,
                parse_error_handler& err_handler)
 Constructs a `csv_reader` that is associated with an input stream
@@ -39,7 +39,7 @@ JSON events and the specified [parse_error_handler](../parse_error_handler.md).
 Uses default [csv_options](csv_options.md).
 You must ensure that the input stream, input handler, and error handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
-    csv_reader(jsoncons::text_stream_source source,
+    csv_reader(jsoncons::stream_source source,
                json_content_handler& handler,
                const csv_options& options,
                parse_error_handler& err_handler)

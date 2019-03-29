@@ -324,10 +324,10 @@ private:
 };
 
 typedef basic_bson_serializer<char,jsoncons::binary_stream_result> bson_serializer;
-typedef basic_bson_serializer<char,jsoncons::buffer_result> bson_buffer_serializer;
+typedef basic_bson_serializer<char,jsoncons::byte_array_result> bson_buffer_serializer;
 
 typedef basic_bson_serializer<wchar_t,jsoncons::binary_stream_result> wbson_serializer;
-typedef basic_bson_serializer<wchar_t,jsoncons::buffer_result> wbson_buffer_serializer;
+typedef basic_bson_serializer<wchar_t,jsoncons::byte_array_result> wbson_buffer_serializer;
 
 }}
 #endif

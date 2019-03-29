@@ -562,7 +562,7 @@ private:
 
 typedef basic_ubjson_reader<jsoncons::binary_stream_source> ubjson_reader;
 
-typedef basic_ubjson_reader<jsoncons::buffer_source> ubjson_buffer_reader;
+typedef basic_ubjson_reader<jsoncons::byte_array_source> ubjson_buffer_reader;
 
 }}
 

@@ -276,7 +276,7 @@ private:
 
 typedef basic_bson_reader<jsoncons::binary_stream_source> bson_reader;
 
-typedef basic_bson_reader<jsoncons::buffer_source> bson_buffer_reader;
+typedef basic_bson_reader<jsoncons::byte_array_source> bson_buffer_reader;
 
 }}
 
