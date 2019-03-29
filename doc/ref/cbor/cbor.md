@@ -10,6 +10,8 @@ encoding an unpacked (json) value to a packed CBOR value.
 
 [cbor_encoder](cbor_encoder.md)
 
+[cbor_options](cbor_options.md)
+
 #### jsoncons - CBOR mappings
 
 jsoncons data item|jsoncons tag|CBOR data item|CBOR tag
