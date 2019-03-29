@@ -7,6 +7,7 @@
 #include <jsoncons_ext/jsonpath/json_query.hpp>
 #include <string>
 #include <iomanip>
+#include <cassert>
 
 using namespace jsoncons;
 

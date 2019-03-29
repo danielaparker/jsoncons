@@ -181,6 +181,8 @@ Output:
 
 #### Packed strings 
 ```c++
+#include <iomanip>
+#include <cassert>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 
