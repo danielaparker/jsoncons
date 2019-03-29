@@ -40,47 +40,6 @@ namespace additional_info
     const uint8_t indefinite_length = 0x1f;
 }
 
-inline
-size_t min_length_for_stringref(uint8_t info)
-{
-    size_t len = 0;
-    switch (info)
-    {
-        case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
-        {
-            len = 3;
-            break;
-        }
-
-        case 0x18: // Unsigned integer (one-byte uint8_t follows)
-        {
-            len = 4;
-            break;
-        }
-
-        case 0x19: // Unsigned integer (two-byte uint16_t follows)
-        {
-            len = 5;
-            break;
-        }
-
-        case 0x1a: // Unsigned integer (four-byte uint32_t follows)
-        {
-            len = 7;
-            break;
-        }
-
-        case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
-        {
-            len = 11;
-            break;
-        }
-        default:
-            break;
-    }
-    return len;
-}
-
 }}}
 
 #endif

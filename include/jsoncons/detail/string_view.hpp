@@ -162,7 +162,7 @@ public:
         return basic_string_view(data_ + pos, n);
     }
 
-    int compare(basic_string_view s) const 
+    int compare(const basic_string_view& s) const 
     {
         const int rc = Traits::compare(data_, s.data_, (std::min)(length_, s.length_));
         return rc != 0 ? rc : (length_ == s.length_ ? 0 : length_ < s.length_ ? -1 : 1);

@@ -11,6 +11,7 @@
 #include <vector>
 #include <ostream>
 #include <cmath>
+#include <cstring> // std::memcmp
 #include <memory> // std::allocator
 #include <iterator>
 #include <exception>
@@ -310,7 +311,17 @@ struct byte_traits
     {
         return std::char_traits<char>::eof();
     }
+
+    static int compare(const char_type* s1, const char_type* s2, std::size_t count)
+    {
+        return std::memcmp(s1,s2,count);
+    }
 };
+
+// basic_byte_string
+
+template <class Allocator>
+class basic_byte_string;
 
 // byte_string_view
 class byte_string_view
@@ -320,6 +331,7 @@ class byte_string_view
 public:
     typedef byte_traits traits_type;
 
+    typedef traits_type::char_type char_type;
     typedef const uint8_t* const_iterator;
     typedef const uint8_t* iterator;
     typedef std::size_t size_type;
@@ -373,25 +385,17 @@ public:
         return data_[pos]; 
     }
 
-    friend bool operator==(const byte_string_view& lhs, const byte_string_view& rhs)
+    int compare(const byte_string_view& s) const 
     {
-        if (lhs.length() != rhs.length())
-        {
-            return false;
-        }
-        for (size_t i = 0; i < lhs.length(); ++i)
-        {
-            if (lhs[i] != rhs[i])
-            {
-                return false;
-            }
-        }
-        return true;
+        const int rc = traits_type::compare(data_, s.data(), (std::min)(length_, s.length()));
+        return rc != 0 ? rc : (length_ == s.length() ? 0 : length_ < s.length() ? -1 : 1);
     }
 
-    friend bool operator!=(const byte_string_view& lhs, const byte_string_view& rhs)
+    template <class Allocator>
+    int compare(const basic_byte_string<Allocator>& s) const 
     {
-        return !(lhs == rhs);
+        const int rc = traits_type::compare(data_, s.data(), (std::min)(length_, s.length()));
+        return rc != 0 ? rc : (length_ == s.length() ? 0 : length_ < s.length() ? -1 : 1);
     }
 
     template <class CharT>
@@ -540,14 +544,16 @@ public:
         return data_.size();
     }
 
-    friend bool operator==(const basic_byte_string& lhs, const basic_byte_string& rhs)
+    int compare(const byte_string_view& s) const 
     {
-        return byte_string_view(lhs) == byte_string_view(rhs);
+        const int rc = traits_type::compare(data(), s.data(), (std::min)(length(), s.length()));
+        return rc != 0 ? rc : (length() == s.length() ? 0 : length() < s.length() ? -1 : 1);
     }
 
-    friend bool operator!=(const basic_byte_string& lhs, const basic_byte_string& rhs)
+    int compare(const basic_byte_string& s) const 
     {
-        return byte_string_view(lhs) != byte_string_view(rhs);
+        const int rc = traits_type::compare(data(), s.data(), (std::min)(length(), s.length()));
+        return rc != 0 ? rc : (length() == s.length() ? 0 : length() < s.length() ? -1 : 1);
     }
 
     template <class CharT>
@@ -557,6 +563,143 @@ public:
         return os;
     }
 };
+
+// ==
+inline
+bool operator==(const byte_string_view& lhs, const byte_string_view& rhs)
+{
+    return lhs.compare(rhs) == 0;
+}
+template<class Allocator>
+bool operator==(const byte_string_view& lhs, const basic_byte_string<Allocator>& rhs)
+{
+    return lhs.compare(rhs) == 0;
+}
+template<class Allocator>
+bool operator==(const basic_byte_string<Allocator>& lhs, const byte_string_view& rhs)
+{
+    return rhs.compare(lhs) == 0;
+}
+template<class Allocator>
+bool operator==(const basic_byte_string<Allocator>& lhs, const basic_byte_string<Allocator>& rhs)
+{
+    return rhs.compare(lhs) == 0;
+}
+
+// !=
+
+inline
+bool operator!=(const byte_string_view& lhs, const byte_string_view& rhs)
+{
+    return lhs.compare(rhs) != 0;
+}
+template<class Allocator>
+bool operator!=(const byte_string_view& lhs, const basic_byte_string<Allocator>& rhs)
+{
+    return lhs.compare(rhs) != 0;
+}
+template<class Allocator>
+bool operator!=(const basic_byte_string<Allocator>& lhs, const byte_string_view& rhs)
+{
+    return rhs.compare(lhs) != 0;
+}
+template<class Allocator>
+bool operator!=(const basic_byte_string<Allocator>& lhs, const basic_byte_string<Allocator>& rhs)
+{
+    return rhs.compare(lhs) != 0;
+}
+
+// <=
+
+inline
+bool operator<=(const byte_string_view& lhs, const byte_string_view& rhs)
+{
+    return lhs.compare(rhs) <= 0;
+}
+template<class Allocator>
+bool operator<=(const byte_string_view& lhs, const basic_byte_string<Allocator>& rhs)
+{
+    return lhs.compare(rhs) <= 0;
+}
+template<class Allocator>
+bool operator<=(const basic_byte_string<Allocator>& lhs, const byte_string_view& rhs)
+{
+    return rhs.compare(lhs) >= 0;
+}
+template<class Allocator>
+bool operator<=(const basic_byte_string<Allocator>& lhs, const basic_byte_string<Allocator>& rhs)
+{
+    return rhs.compare(lhs) >= 0;
+}
+
+// <
+
+inline
+bool operator<(const byte_string_view& lhs, const byte_string_view& rhs)
+{
+    return lhs.compare(rhs) < 0;
+}
+template<class Allocator>
+bool operator<(const byte_string_view& lhs, const basic_byte_string<Allocator>& rhs)
+{
+    return lhs.compare(rhs) < 0;
+}
+template<class Allocator>
+bool operator<(const basic_byte_string<Allocator>& lhs, const byte_string_view& rhs)
+{
+    return rhs.compare(lhs) > 0;
+}
+template<class Allocator>
+bool operator<(const basic_byte_string<Allocator>& lhs, const basic_byte_string<Allocator>& rhs)
+{
+    return rhs.compare(lhs) > 0;
+}
+
+// >=
+
+inline
+bool operator>=(const byte_string_view& lhs, const byte_string_view& rhs)
+{
+    return lhs.compare(rhs) >= 0;
+}
+template<class Allocator>
+bool operator>=(const byte_string_view& lhs, const basic_byte_string<Allocator>& rhs)
+{
+    return lhs.compare(rhs) >= 0;
+}
+template<class Allocator>
+bool operator>=(const basic_byte_string<Allocator>& lhs, const byte_string_view& rhs)
+{
+    return rhs.compare(lhs) <= 0;
+}
+template<class Allocator>
+bool operator>=(const basic_byte_string<Allocator>& lhs, const basic_byte_string<Allocator>& rhs)
+{
+    return rhs.compare(lhs) <= 0;
+}
+
+// >
+
+inline
+bool operator>(const byte_string_view& lhs, const byte_string_view& rhs)
+{
+    return lhs.compare(rhs) > 0;
+}
+template<class Allocator>
+bool operator>(const byte_string_view& lhs, const basic_byte_string<Allocator>& rhs)
+{
+    return lhs.compare(rhs) > 0;
+}
+template<class Allocator>
+bool operator>(const basic_byte_string<Allocator>& lhs, const byte_string_view& rhs)
+{
+    return rhs.compare(lhs) < 0;
+}
+template<class Allocator>
+bool operator>(const basic_byte_string<Allocator>& lhs, const basic_byte_string<Allocator>& rhs)
+{
+    return rhs.compare(lhs) < 0;
+}
 
 typedef basic_byte_string<std::allocator<uint8_t>> byte_string;
 
