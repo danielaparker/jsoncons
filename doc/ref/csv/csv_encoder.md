@@ -36,11 +36,11 @@ string_view_type           |
 #### Constructors
 
     explicit basic_csv_encoder(result_type result)
-Constructs a new csv serializer that is associated with the output adaptor `result`.
+Constructs a new csv encoder that is associated with the output adaptor `result`.
 
     basic_csv_encoder(result_type result, 
                          const basic_csv_options<CharT>& options)
-Constructs a new csv serializer that is associated with the output adaptor `result` 
+Constructs a new csv encoder that is associated with the output adaptor `result` 
 and uses the specified [csv options](csv_options.md). 
 
 #### Destructor
@@ -144,9 +144,9 @@ json_reader reader(is,decoder);
 reader.read();
 json countries = decoder.get_result();
 
-csv_encoder serializer(std::cout);
+csv_encoder encoder(std::cout);
 
-countries.dump(serializer);
+countries.dump(encoder);
 ```
 #### Output 
 ```
@@ -209,9 +209,9 @@ json_reader reader(is,decoder);
 reader.read();
 json employees = decoder.get_result();
 
-csv_encoder serializer(std::cout,options);
+csv_encoder encoder(std::cout,options);
 
-employees.dump(serializer);
+employees.dump(encoder);
 ```
 #### Tab delimited output file
 ```
@@ -255,9 +255,9 @@ int main()
     csv_options options;
     params.column_names("author,title,price");
 
-    csv_encoder serializer(std::cout, options);
+    csv_encoder encoder(std::cout, options);
 
-    books.dump(serializer);
+    books.dump(encoder);
 }
 ```
 

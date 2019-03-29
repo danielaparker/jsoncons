@@ -888,15 +888,15 @@ int main()
     ]
     )");
 
-    json_encoder serializer(std::cout, jsoncons::indenting::indent); // pretty print
+    json_encoder encoder(std::cout, jsoncons::indenting::indent); // pretty print
     serializer.begin_array();
     for (const auto& book : some_books.array_range())
     {
-        book.dump(serializer);
+        book.dump(encoder);
     }
     for (const auto& book : more_books.array_range())
     {
-        book.dump(serializer);
+        book.dump(encoder);
     }
     serializer.end_array();
     serializer.flush();

@@ -506,10 +506,10 @@ int main()
 {
     std::string s = R"({"first":1,"second":2,"fourth":3,"fifth":4})";    
 
-    json_encoder serializer(std::cout);
+    json_encoder encoder(std::cout);
 
     // Filters can be chained
-    rename_object_member_filter filter2("fifth", "fourth", serializer);
+    rename_object_member_filter filter2("fifth", "fourth", encoder);
     rename_object_member_filter filter1("fourth", "third", filter2);
 
     // A filter can be passed to any function that takes

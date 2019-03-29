@@ -114,20 +114,20 @@ TEST_CASE("jsonpointer_test")
 TEST_CASE("as_string_test")
 {
     std::vector<uint8_t> v;
-    jsoncons::cbor::cbor_buffer_encoder serializer(v);
-    serializer.begin_array(10);
-    serializer.bool_value(true);
-    serializer.bool_value(false);
-    serializer.null_value();
-    serializer.string_value("Toronto");
-    serializer.byte_string_value(byte_string{'H','e','l','l','o'});
-    serializer.int64_value(-100);
-    serializer.uint64_value(100);
-    serializer.big_integer_value("18446744073709551616");
-    serializer.double_value(10.5);
-    serializer.big_integer_value("-18446744073709551617");
-    serializer.end_array();
-    serializer.flush();
+    jsoncons::cbor::cbor_buffer_encoder encoder(v);
+    encoder.begin_array(10);
+    encoder.bool_value(true);
+    encoder.bool_value(false);
+    encoder.null_value();
+    encoder.string_value("Toronto");
+    encoder.byte_string_value(byte_string{'H','e','l','l','o'});
+    encoder.int64_value(-100);
+    encoder.uint64_value(100);
+    encoder.big_integer_value("18446744073709551616");
+    encoder.double_value(10.5);
+    encoder.big_integer_value("-18446744073709551617");
+    encoder.end_array();
+    encoder.flush();
 
     json j = decode_cbor<json>(v);
 
@@ -193,15 +193,15 @@ TEST_CASE("as_string_test")
 TEST_CASE("dump cbor to string test")
 {
     std::vector<uint8_t> v;
-    cbor_buffer_encoder serializer(v);
-    serializer.begin_array();
+    cbor_buffer_encoder encoder(v);
+    encoder.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     bignum n(-1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    serializer.big_integer_value(s);
-    serializer.end_array();
-    serializer.flush();
+    encoder.big_integer_value(s);
+    encoder.end_array();
+    encoder.flush();
 
     json j = decode_cbor<json>(v);
 
@@ -235,15 +235,15 @@ TEST_CASE("dump cbor to string test")
 TEST_CASE("test_dump_to_stream")
 {
     std::vector<uint8_t> v;
-    cbor_buffer_encoder serializer(v);
-    serializer.begin_array();
+    cbor_buffer_encoder encoder(v);
+    encoder.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     bignum n(-1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    serializer.big_integer_value(s);
-    serializer.end_array();
-    serializer.flush();
+    encoder.big_integer_value(s);
+    encoder.end_array();
+    encoder.flush();
 
     json j = decode_cbor<json>(v);
 
@@ -277,14 +277,14 @@ TEST_CASE("test_dump_to_stream")
 TEST_CASE("test_indefinite_length_object_iterator")
 {
     std::vector<uint8_t> v;
-    cbor::cbor_buffer_encoder serializer(v);
-    serializer.begin_object(); // indefinite length object
-    serializer.name("City");
-    serializer.string_value("Toronto");
-    serializer.name("Province");
-    serializer.string_value("Ontario");
-    serializer.end_object(); 
-    serializer.flush();
+    cbor::cbor_buffer_encoder encoder(v);
+    encoder.begin_object(); // indefinite length object
+    encoder.name("City");
+    encoder.string_value("Toronto");
+    encoder.name("Province");
+    encoder.string_value("Ontario");
+    encoder.end_object(); 
+    encoder.flush();
     json bv2 = decode_cbor<json>(v);
 
     auto it2 = bv2.object_range().begin();
@@ -296,12 +296,12 @@ TEST_CASE("test_indefinite_length_object_iterator")
 TEST_CASE("test_indefinite_length_array_iterator")
 {
     std::vector<uint8_t> v;
-    cbor::cbor_buffer_encoder serializer(v);
-    serializer.begin_array(); // indefinite length array
-    serializer.string_value("Toronto");
-    serializer.string_value("Ontario");
-    serializer.end_array(); 
-    serializer.flush();
+    cbor::cbor_buffer_encoder encoder(v);
+    encoder.begin_array(); // indefinite length array
+    encoder.string_value("Toronto");
+    encoder.string_value("Ontario");
+    encoder.end_array(); 
+    encoder.flush();
     json j = decode_cbor<json>(v);
 
     CHECK(j.size() == 2);
@@ -445,28 +445,28 @@ TEST_CASE("cbor object comparison")
 TEST_CASE("cbor member tests")
 {
     std::vector<uint8_t> v;
-    cbor::cbor_buffer_encoder serializer(v);
-    serializer.begin_object(); // indefinite length object
-    serializer.name("empty-object");
-    serializer.begin_object(0);
-    serializer.end_object();
-    serializer.name("empty-array");
-    serializer.begin_array(0);
-    serializer.end_array();
-    serializer.name("empty-string");
-    serializer.string_value("");
-    serializer.name("empty-byte_string");
-    serializer.byte_string_value(jsoncons::byte_string{});
+    cbor::cbor_buffer_encoder encoder(v);
+    encoder.begin_object(); // indefinite length object
+    encoder.name("empty-object");
+    encoder.begin_object(0);
+    encoder.end_object();
+    encoder.name("empty-array");
+    encoder.begin_array(0);
+    encoder.end_array();
+    encoder.name("empty-string");
+    encoder.string_value("");
+    encoder.name("empty-byte_string");
+    encoder.byte_string_value(jsoncons::byte_string{});
 
-    serializer.name("City");
-    serializer.string_value("Montreal");
-    serializer.name("Amount");
-    serializer.big_decimal_value("273.15");
-    serializer.name("Date");
-    serializer.date_time_value("2018-05-07 12:41:07-07:00");
+    encoder.name("City");
+    encoder.string_value("Montreal");
+    encoder.name("Amount");
+    encoder.big_decimal_value("273.15");
+    encoder.name("Date");
+    encoder.date_time_value("2018-05-07 12:41:07-07:00");
 
-    serializer.end_object(); 
-    serializer.flush();
+    encoder.end_object(); 
+    encoder.flush();
     json j = decode_cbor<json>(v);
 
     SECTION("contains")

@@ -330,7 +330,7 @@ typedef basic_bson_encoder<wchar_t,jsoncons::binary_stream_result> wbson_encoder
 typedef basic_bson_encoder<wchar_t,jsoncons::byte_array_result> wbson_buffer_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-template<class CharT,class Result>
+template<class CharT,class Result=jsoncons::binary_stream_result>
 using basic_bson_serializer = basic_bson_encoder<CharT,Result>; 
 
 typedef basic_bson_serializer<char,jsoncons::binary_stream_result> bson_serializer;

@@ -712,8 +712,8 @@ private:
             default:
             {
                 std::string s;
-                json_string_encoder serializer(s);
-                basic_cbor_reader<Source> reader(std::move(source_), serializer);
+                json_string_encoder encoder(s);
+                basic_cbor_reader<Source> reader(std::move(source_), encoder);
                 reader.read(ec);
                 source_ = std::move(reader.source_);
                 auto result = unicons::validate(s.begin(),s.end());

@@ -137,40 +137,40 @@ TEST_CASE("encode_ubjson_arrays_and_maps")
 TEST_CASE("encode indefinite length ubjson arrays and maps")
 {
     std::vector<uint8_t> v;
-    ubjson_buffer_encoder serializer(v);
+    ubjson_buffer_encoder encoder(v);
 
     SECTION("[\"Hello\"]")
     {
-        serializer.begin_array();
-        serializer.string_value("Hello");
-        serializer.end_array();
+        encoder.begin_array();
+        encoder.string_value("Hello");
+        encoder.end_array();
 
         check_encode_ubjson({'[','S','U',0x05,'H','e','l','l','o',']'}, v);
     }
 
     SECTION("{\"oc\": [0]}")
     {
-        serializer.begin_object();
-        serializer.name("oc");
-        serializer.begin_array();
-        serializer.uint64_value(0);
-        serializer.end_array();
-        serializer.end_object();
+        encoder.begin_object();
+        encoder.name("oc");
+        encoder.begin_array();
+        encoder.uint64_value(0);
+        encoder.end_array();
+        encoder.end_object();
 
         check_encode_ubjson({'{','U',0x02,'o','c','[','U',0x00,']','}'}, v);
     }
 
     SECTION("{\"oc\": [0,1,2,3]}")
     {
-        serializer.begin_object();
-        serializer.name("oc");
-        serializer.begin_array();
-        serializer.uint64_value(0);
-        serializer.uint64_value(1);
-        serializer.uint64_value(2);
-        serializer.uint64_value(3);
-        serializer.end_array();
-        serializer.end_object();
+        encoder.begin_object();
+        encoder.name("oc");
+        encoder.begin_array();
+        encoder.uint64_value(0);
+        encoder.uint64_value(1);
+        encoder.uint64_value(2);
+        encoder.uint64_value(3);
+        encoder.end_array();
+        encoder.end_object();
 
         check_encode_ubjson({'{','U',0x02,'o','c','[','U',0x00,'U',0x01,'U',0x02,'U',0x03,']','}'}, v);
     }

@@ -2805,8 +2805,8 @@ public:
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
-        basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> serializer(s);
-        dump(serializer);
+        basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s);
+        dump(encoder);
     }
 
     template <class SAllocator>
@@ -2815,13 +2815,13 @@ public:
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         if (line_indent == indenting::indent)
         {
-            basic_json_encoder<char_type,jsoncons::string_result<string_type>> serializer(s);
-            dump(serializer);
+            basic_json_encoder<char_type,jsoncons::string_result<string_type>> encoder(s);
+            dump(encoder);
         }
         else
         {
-            basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> serializer(s);
-            dump(serializer);
+            basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s);
+            dump(encoder);
         }
     }
 
@@ -2830,8 +2830,8 @@ public:
               const basic_json_options<char_type>& options) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
-        basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> serializer(s, options);
-        dump(serializer);
+        basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s, options);
+        dump(encoder);
     }
 
     template <class SAllocator>
@@ -2842,13 +2842,13 @@ public:
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         if (line_indent == indenting::indent)
         {
-            basic_json_encoder<char_type,jsoncons::string_result<string_type>> serializer(s, options);
-            dump(serializer);
+            basic_json_encoder<char_type,jsoncons::string_result<string_type>> encoder(s, options);
+            dump(encoder);
         }
         else
         {
-            basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> serializer(s, options);
-            dump(serializer);
+            basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s, options);
+            dump(encoder);
         }
     }
 
@@ -2860,49 +2860,49 @@ public:
 
     void dump(std::basic_ostream<char_type>& os) const
     {
-        basic_json_compressed_encoder<char_type> serializer(os);
-        dump(serializer);
+        basic_json_compressed_encoder<char_type> encoder(os);
+        dump(encoder);
     }
 
     void dump(std::basic_ostream<char_type>& os, indenting line_indent) const
     {
         if (line_indent == indenting::indent)
         {
-            basic_json_encoder<char_type> serializer(os);
-            dump(serializer);
+            basic_json_encoder<char_type> encoder(os);
+            dump(encoder);
         }
         else
         {
-            basic_json_compressed_encoder<char_type> serializer(os);
-            dump(serializer);
+            basic_json_compressed_encoder<char_type> encoder(os);
+            dump(encoder);
         }
     }
 
     void dump(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options) const
     {
-        basic_json_compressed_encoder<char_type> serializer(os, options);
-        dump(serializer);
+        basic_json_compressed_encoder<char_type> encoder(os, options);
+        dump(encoder);
     }
 
     void dump(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, indenting line_indent) const
     {
         if (line_indent == indenting::indent)
         {
-            basic_json_encoder<char_type> serializer(os, options);
-            dump(serializer);
+            basic_json_encoder<char_type> encoder(os, options);
+            dump(encoder);
         }
         else
         {
-            basic_json_compressed_encoder<char_type> serializer(os, options);
-            dump(serializer);
+            basic_json_compressed_encoder<char_type> encoder(os, options);
+            dump(encoder);
         }
     }
 
     string_type to_string(const char_allocator_type& allocator=char_allocator_type()) const noexcept
     {
         string_type s(allocator);
-        basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> serializer(s);
-        dump(serializer);
+        basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s);
+        dump(encoder);
         return s;
     }
 
@@ -2910,8 +2910,8 @@ public:
                           const char_allocator_type& allocator=char_allocator_type()) const
     {
         string_type s(allocator);
-        basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> serializer(s,options);
-        dump(serializer);
+        basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s,options);
+        dump(encoder);
         return s;
     }
 
@@ -2930,13 +2930,13 @@ public:
     {
         if (pprint)
         {
-            basic_json_encoder<char_type> serializer(os);
-            dump(serializer);
+            basic_json_encoder<char_type> encoder(os);
+            dump(encoder);
         }
         else
         {
-            basic_json_compressed_encoder<char_type> serializer(os);
-            dump(serializer);
+            basic_json_compressed_encoder<char_type> encoder(os);
+            dump(encoder);
         }
     }
 
@@ -2944,13 +2944,13 @@ public:
     {
         if (pprint)
         {
-            basic_json_encoder<char_type> serializer(os, options);
-            dump(serializer);
+            basic_json_encoder<char_type> encoder(os, options);
+            dump(encoder);
         }
         else
         {
-            basic_json_compressed_encoder<char_type> serializer(os, options);
-            dump(serializer);
+            basic_json_compressed_encoder<char_type> encoder(os, options);
+            dump(encoder);
         }
     }
 
@@ -3504,16 +3504,16 @@ public:
                 }
                 else
                 {
-                    basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> serializer(s,options);
-                    dump(serializer);
+                    basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s,options);
+                    dump(encoder);
                 }
                 return s;
             }
             default:
             {
                 string_type s(allocator);
-                basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> serializer(s,options);
-                dump(serializer);
+                basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s,options);
+                dump(encoder);
                 return s;
             }
         }

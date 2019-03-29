@@ -569,40 +569,40 @@ template <class Json>
 void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os)
 {
     typedef typename Json::char_type char_type;
-    basic_csv_encoder<char_type> serializer(os);
-    j.dump(serializer);
+    basic_csv_encoder<char_type> encoder(os);
+    j.dump(encoder);
 }
 
 template <class Json>
 void encode_csv(const Json& j, std::basic_string<typename Json::char_type>& s)
 {
     typedef typename Json::char_type char_type;
-    basic_csv_encoder<char_type,jsoncons::string_result<std::basic_string<typename Json::char_type>>> serializer(s);
-    j.dump(serializer);
+    basic_csv_encoder<char_type,jsoncons::string_result<std::basic_string<typename Json::char_type>>> encoder(s);
+    j.dump(encoder);
 }
 
 template <class Json,class Allocator=std::allocator<char>>
 void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os, const basic_csv_options<typename Json::char_type>& options)
 {
     typedef typename Json::char_type char_type;
-    basic_csv_encoder<char_type,jsoncons::stream_result<char_type>,Allocator> serializer(os,options);
-    j.dump(serializer);
+    basic_csv_encoder<char_type,jsoncons::stream_result<char_type>,Allocator> encoder(os,options);
+    j.dump(encoder);
 }
 
 template <class Json,class Allocator=std::allocator<char>>
 void encode_csv(const Json& j, std::basic_string<typename Json::char_type>& s, const basic_csv_options<typename Json::char_type>& options)
 {
     typedef typename Json::char_type char_type;
-    basic_csv_encoder<char_type,jsoncons::string_result<std::basic_string<typename Json::char_type>>,Allocator> serializer(s,options);
-    j.dump(serializer);
+    basic_csv_encoder<char_type,jsoncons::string_result<std::basic_string<typename Json::char_type>>,Allocator> encoder(s,options);
+    j.dump(encoder);
 }
 
 typedef basic_csv_encoder<char> csv_encoder;
 typedef basic_csv_encoder<char,jsoncons::string_result<std::string>> csv_string_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-template<class CharT,class Result,class Allocator>
-using basic_csv_serializer = basic_csv_encoder<CharT,Result,Allocator>; 
+template<class CharT, class Result = jsoncons::stream_result<CharT>, class Allocator = std::allocator<CharT>>
+using basic_csv_serializer = basic_csv_encoder<CharT,Result,Allocator>;
 
 typedef basic_csv_serializer<char> csv_serializer;
 typedef basic_csv_serializer<char,jsoncons::string_result<std::string>> csv_string_serializer;

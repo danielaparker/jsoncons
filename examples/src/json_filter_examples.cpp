@@ -70,8 +70,8 @@ void name_fix_up_example1()
     std::ifstream is(in_file);
     std::ofstream os(out_file);
 
-    json_encoder serializer(os);
-    name_fix_up_filter filter(serializer);
+    json_encoder encoder(os);
+    name_fix_up_filter filter(encoder);
     json_reader reader(is, filter);
     reader.read_next();
 }
@@ -86,8 +86,8 @@ void name_fix_up_example2()
     json j;
     is >> j;
 
-    json_encoder serializer(os);
-    name_fix_up_filter filter(serializer);
+    json_encoder encoder(os);
+    name_fix_up_filter filter(encoder);
     j.dump(filter);
 }
 
@@ -95,10 +95,10 @@ void change_member_name_example()
 {
     std::string s = R"({"first":1,"second":2,"fourth":3,"fifth":4})";    
 
-    json_encoder serializer(std::cout);
+    json_encoder encoder(std::cout);
 
     // Filters can be chained
-    rename_object_member_filter filter2("fifth", "fourth", serializer);
+    rename_object_member_filter filter2("fifth", "fourth", encoder);
     rename_object_member_filter filter1("fourth", "third", filter2);
 
     // A filter can be passed to any function that takes

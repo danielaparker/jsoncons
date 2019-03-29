@@ -45,11 +45,11 @@ string_view_type           |
 #### Constructors
 
     explicit basic_json_encoder(result_type result)
-Constructs a new serializer that is associated with the output adaptor `result`.
+Constructs a new encoder that is associated with the output adaptor `result`.
 
     basic_json_encoder(result_type result, 
                           const basic_json_encode_options<CharT>& options)
-Constructs a new serializer that is associated with the output adaptor `result` 
+Constructs a new encoder that is associated with the output adaptor `result` 
 and uses the specified [json options](json_options.md). 
 
 #### Destructor

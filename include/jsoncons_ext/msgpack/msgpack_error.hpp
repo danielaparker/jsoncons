@@ -43,9 +43,9 @@ public:
             case msgpack_errc::invalid_utf8_text_string:
                 return "Illegal UTF-8 encoding in text string";
             case msgpack_errc::array_length_required:
-                return "MessagePack serializer requires array length";
+                return "MessagePack encoder requires array length";
             case msgpack_errc::object_length_required:
-                return "MessagePack serializer requires object length";
+                return "MessagePack encoder requires object length";
             case msgpack_errc::too_many_items:
                 return "Too many items were added to a MessagePack object or array";
             case msgpack_errc::too_few_items:

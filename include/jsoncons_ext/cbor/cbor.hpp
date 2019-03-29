@@ -26,16 +26,16 @@ template<class Json>
 void encode_cbor(const Json& j, std::basic_ostream<typename Json::char_type>& os)
 {
     typedef typename Json::char_type char_type;
-    basic_cbor_encoder<char_type> serializer(os);
-    j.dump(serializer);
+    basic_cbor_encoder<char_type> encoder(os);
+    j.dump(encoder);
 }
 
 template<class Json>
 void encode_cbor(const Json& j, std::vector<uint8_t>& v)
 {
     typedef typename Json::char_type char_type;
-    basic_cbor_encoder<char_type,jsoncons::byte_array_result> serializer(v);
-    j.dump(serializer);
+    basic_cbor_encoder<char_type,jsoncons::byte_array_result> encoder(v);
+    j.dump(encoder);
 }
 
 // decode_cbor

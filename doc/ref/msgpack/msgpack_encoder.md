@@ -35,7 +35,7 @@ string_view_type           |
 #### Constructors
 
     explicit basic_msgpack_encoder(result_type result)
-Constructs a new serializer that writes to the specified result.
+Constructs a new encoder that writes to the specified result.
 
 #### Destructor
 

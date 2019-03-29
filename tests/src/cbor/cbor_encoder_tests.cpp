@@ -52,15 +52,15 @@ json j = json::parse(R"(
 TEST_CASE("serialize array to cbor")
 {
     std::vector<uint8_t> v;
-    cbor_buffer_encoder serializer(v);
-    //serializer.begin_object(1);
-    serializer.begin_array(3);
-    serializer.bool_value(true);
-    serializer.bool_value(false);
-    serializer.null_value();
-    serializer.end_array();
-    //serializer.end_object();
-    serializer.flush();
+    cbor_buffer_encoder encoder(v);
+    //encoder.begin_object(1);
+    encoder.begin_array(3);
+    encoder.bool_value(true);
+    encoder.bool_value(false);
+    encoder.null_value();
+    encoder.end_array();
+    //encoder.end_object();
+    encoder.flush();
 
     try
     {
@@ -76,16 +76,16 @@ TEST_CASE("serialize array to cbor")
 TEST_CASE("test_serialize_indefinite_length_array")
 {
     std::vector<uint8_t> v;
-    cbor_buffer_encoder serializer(v);
-    serializer.begin_array();
-    serializer.begin_array(4);
-    serializer.bool_value(true);
-    serializer.bool_value(false);
-    serializer.null_value();
-    serializer.string_value("Hello");
-    serializer.end_array();
-    serializer.end_array();
-    serializer.flush();
+    cbor_buffer_encoder encoder(v);
+    encoder.begin_array();
+    encoder.begin_array(4);
+    encoder.bool_value(true);
+    encoder.bool_value(false);
+    encoder.null_value();
+    encoder.string_value("Hello");
+    encoder.end_array();
+    encoder.end_array();
+    encoder.flush();
 
     try
     {
@@ -100,16 +100,16 @@ TEST_CASE("test_serialize_indefinite_length_array")
 TEST_CASE("test_serialize_bignum")
 {
     std::vector<uint8_t> v;
-    cbor_buffer_encoder serializer(v);
-    serializer.begin_array();
+    cbor_buffer_encoder encoder(v);
+    encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     bignum n(1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    serializer.big_integer_value(s);
-    serializer.end_array();
-    serializer.flush();
+    encoder.big_integer_value(s);
+    encoder.end_array();
+    encoder.flush();
 
     try
     {
@@ -125,16 +125,16 @@ TEST_CASE("test_serialize_bignum")
 TEST_CASE("test_serialize_negative_bignum1")
 {
     std::vector<uint8_t> v;
-    cbor_buffer_encoder serializer(v);
-    serializer.begin_array();
+    cbor_buffer_encoder encoder(v);
+    encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     bignum n(-1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    serializer.big_integer_value(s);
-    serializer.end_array();
-    serializer.flush();
+    encoder.big_integer_value(s);
+    encoder.end_array();
+    encoder.flush();
 
     try
     {
@@ -150,16 +150,16 @@ TEST_CASE("test_serialize_negative_bignum1")
 TEST_CASE("test_serialize_negative_bignum2")
 {
     std::vector<uint8_t> v;
-    cbor_buffer_encoder serializer(v);
-    serializer.begin_array();
+    cbor_buffer_encoder encoder(v);
+    encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     bignum n(-1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    serializer.big_integer_value(s);
-    serializer.end_array();
-    serializer.flush();
+    encoder.big_integer_value(s);
+    encoder.end_array();
+    encoder.flush();
 
     try
     {
@@ -179,17 +179,17 @@ TEST_CASE("test_serialize_negative_bignum2")
 TEST_CASE("test_serialize_negative_bignum3")
 {
     std::vector<uint8_t> v;
-    cbor_buffer_encoder serializer(v);
-    serializer.begin_array();
+    cbor_buffer_encoder encoder(v);
+    encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
     bignum n(-1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    serializer.big_integer_value(s);
-    serializer.end_array();
-    serializer.flush();
+    encoder.big_integer_value(s);
+    encoder.end_array();
+    encoder.flush();
 
     try
     {
@@ -211,9 +211,9 @@ TEST_CASE("serialize big_decimal to cbor")
     SECTION("-1 184467440737095516160")
     {
         std::vector<uint8_t> v;
-        cbor_buffer_encoder serializer(v);
-        serializer.string_value("18446744073709551616.0", semantic_tag::big_decimal);
-        serializer.flush();
+        cbor_buffer_encoder encoder(v);
+        encoder.string_value("18446744073709551616.0", semantic_tag::big_decimal);
+        encoder.flush();
         try
         {
             json result = decode_cbor<json>(v);
@@ -227,9 +227,9 @@ TEST_CASE("serialize big_decimal to cbor")
     SECTION("18446744073709551616e-5")
     {
         std::vector<uint8_t> v;
-        cbor_buffer_encoder serializer(v);
-        serializer.string_value("18446744073709551616e-5", semantic_tag::big_decimal);
-        serializer.flush();
+        cbor_buffer_encoder encoder(v);
+        encoder.string_value("18446744073709551616e-5", semantic_tag::big_decimal);
+        encoder.flush();
         try
         {
             json result = decode_cbor<json>(v);
@@ -243,9 +243,9 @@ TEST_CASE("serialize big_decimal to cbor")
     SECTION("-18446744073709551616e-5")
     {
         std::vector<uint8_t> v;
-        cbor_buffer_encoder serializer(v);
-        serializer.string_value("-18446744073709551616e-5", semantic_tag::big_decimal);
-        serializer.flush();
+        cbor_buffer_encoder encoder(v);
+        encoder.string_value("-18446744073709551616e-5", semantic_tag::big_decimal);
+        encoder.flush();
         try
         {
             json result = decode_cbor<json>(v);
@@ -259,9 +259,9 @@ TEST_CASE("serialize big_decimal to cbor")
     SECTION("-18446744073709551616e5")
     {
         std::vector<uint8_t> v;
-        cbor_buffer_encoder serializer(v);
-        serializer.string_value("-18446744073709551616e5", semantic_tag::big_decimal);
-        serializer.flush();
+        cbor_buffer_encoder encoder(v);
+        encoder.string_value("-18446744073709551616e5", semantic_tag::big_decimal);
+        encoder.flush();
         try
         {
             json result = decode_cbor<json>(v);
@@ -278,77 +278,77 @@ TEST_CASE("Too many and too few items in CBOR map or array")
 {
     std::error_code ec{};
     std::vector<uint8_t> v;
-    cbor_buffer_encoder serializer(v);
+    cbor_buffer_encoder encoder(v);
 
     SECTION("Too many items in array")
     {
-        CHECK(serializer.begin_array(3));
-        CHECK(serializer.bool_value(true));
-        CHECK(serializer.bool_value(false));
-        CHECK(serializer.null_value());
-        CHECK(serializer.begin_array(2));
-        CHECK(serializer.string_value("cat"));
-        CHECK(serializer.string_value("feline"));
-        CHECK(serializer.end_array());
-        REQUIRE_THROWS_WITH(serializer.end_array(), cbor_error_category_impl().message((int)cbor_errc::too_many_items).c_str());
-        serializer.flush();
+        CHECK(encoder.begin_array(3));
+        CHECK(encoder.bool_value(true));
+        CHECK(encoder.bool_value(false));
+        CHECK(encoder.null_value());
+        CHECK(encoder.begin_array(2));
+        CHECK(encoder.string_value("cat"));
+        CHECK(encoder.string_value("feline"));
+        CHECK(encoder.end_array());
+        REQUIRE_THROWS_WITH(encoder.end_array(), cbor_error_category_impl().message((int)cbor_errc::too_many_items).c_str());
+        encoder.flush();
     }
     SECTION("Too few items in array")
     {
-        CHECK(serializer.begin_array(5));
-        CHECK(serializer.bool_value(true));
-        CHECK(serializer.bool_value(false));
-        CHECK(serializer.null_value());
-        CHECK(serializer.begin_array(2));
-        CHECK(serializer.string_value("cat"));
-        CHECK(serializer.string_value("feline"));
-        CHECK(serializer.end_array());
-        REQUIRE_THROWS_WITH(serializer.end_array(), cbor_error_category_impl().message((int)cbor_errc::too_few_items).c_str());
-        serializer.flush();
+        CHECK(encoder.begin_array(5));
+        CHECK(encoder.bool_value(true));
+        CHECK(encoder.bool_value(false));
+        CHECK(encoder.null_value());
+        CHECK(encoder.begin_array(2));
+        CHECK(encoder.string_value("cat"));
+        CHECK(encoder.string_value("feline"));
+        CHECK(encoder.end_array());
+        REQUIRE_THROWS_WITH(encoder.end_array(), cbor_error_category_impl().message((int)cbor_errc::too_few_items).c_str());
+        encoder.flush();
     }
     SECTION("Too many items in map")
     {
-        CHECK(serializer.begin_object(3));
-        CHECK(serializer.name("a"));
-        CHECK(serializer.bool_value(true));
-        CHECK(serializer.name("b"));
-        CHECK(serializer.bool_value(false));
-        CHECK(serializer.name("c"));
-        CHECK(serializer.null_value());
-        CHECK(serializer.name("d"));
-        CHECK(serializer.begin_array(2));
-        CHECK(serializer.string_value("cat"));
-        CHECK(serializer.string_value("feline"));
-        CHECK(serializer.end_array());
-        REQUIRE_THROWS_WITH(serializer.end_object(), cbor_error_category_impl().message((int)cbor_errc::too_many_items).c_str());
-        serializer.flush();
+        CHECK(encoder.begin_object(3));
+        CHECK(encoder.name("a"));
+        CHECK(encoder.bool_value(true));
+        CHECK(encoder.name("b"));
+        CHECK(encoder.bool_value(false));
+        CHECK(encoder.name("c"));
+        CHECK(encoder.null_value());
+        CHECK(encoder.name("d"));
+        CHECK(encoder.begin_array(2));
+        CHECK(encoder.string_value("cat"));
+        CHECK(encoder.string_value("feline"));
+        CHECK(encoder.end_array());
+        REQUIRE_THROWS_WITH(encoder.end_object(), cbor_error_category_impl().message((int)cbor_errc::too_many_items).c_str());
+        encoder.flush();
     }
     SECTION("Too few items in map")
     {
-        CHECK(serializer.begin_object(5));
-        CHECK(serializer.name("a"));
-        CHECK(serializer.bool_value(true));
-        CHECK(serializer.name("b"));
-        CHECK(serializer.bool_value(false));
-        CHECK(serializer.name("c"));
-        CHECK(serializer.null_value());
-        CHECK(serializer.name("d"));
-        CHECK(serializer.begin_array(2));
-        CHECK(serializer.string_value("cat"));
-        CHECK(serializer.string_value("feline"));
-        CHECK(serializer.end_array());
-        REQUIRE_THROWS_WITH(serializer.end_object(), cbor_error_category_impl().message((int)cbor_errc::too_few_items).c_str());
-        serializer.flush();
+        CHECK(encoder.begin_object(5));
+        CHECK(encoder.name("a"));
+        CHECK(encoder.bool_value(true));
+        CHECK(encoder.name("b"));
+        CHECK(encoder.bool_value(false));
+        CHECK(encoder.name("c"));
+        CHECK(encoder.null_value());
+        CHECK(encoder.name("d"));
+        CHECK(encoder.begin_array(2));
+        CHECK(encoder.string_value("cat"));
+        CHECK(encoder.string_value("feline"));
+        CHECK(encoder.end_array());
+        REQUIRE_THROWS_WITH(encoder.end_object(), cbor_error_category_impl().message((int)cbor_errc::too_few_items).c_str());
+        encoder.flush();
     }
     SECTION("Just enough items")
     {
-        CHECK(serializer.begin_array(4)); // a fixed length array
-        CHECK(serializer.string_value("foo"));
-        CHECK(serializer.byte_string_value(byte_string{'P','u','s','s'})); // no suggested conversion
-        CHECK(serializer.big_integer_value("-18446744073709551617"));
-        CHECK(serializer.big_decimal_value("273.15"));
-        CHECK(serializer.end_array());
+        CHECK(encoder.begin_array(4)); // a fixed length array
+        CHECK(encoder.string_value("foo"));
+        CHECK(encoder.byte_string_value(byte_string{'P','u','s','s'})); // no suggested conversion
+        CHECK(encoder.big_integer_value("-18446744073709551617"));
+        CHECK(encoder.big_decimal_value("273.15"));
+        CHECK(encoder.end_array());
         CHECK_FALSE(ec);
-        serializer.flush();
+        encoder.flush();
     }
 }

@@ -431,7 +431,7 @@ typedef basic_ubjson_encoder<wchar_t,jsoncons::binary_stream_result> wubjson_enc
 typedef basic_ubjson_encoder<wchar_t,jsoncons::byte_array_result> wubjson_buffer_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-template<class CharT,class Result>
+template<class CharT,class Result=jsoncons::binary_stream_result>
 using basic_ubjson_serializer = basic_ubjson_encoder<CharT,Result>; 
 
 typedef basic_ubjson_serializer<char,jsoncons::binary_stream_result> ubjson_serializer;

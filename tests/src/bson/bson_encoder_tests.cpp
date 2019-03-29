@@ -16,13 +16,13 @@ using namespace jsoncons::bson;
 TEST_CASE("serialize object to bson")
 {
     std::vector<uint8_t> v;
-    bson_buffer_encoder serializer(v);
+    bson_buffer_encoder encoder(v);
 
-    serializer.begin_object();
-    serializer.name("null");
-    serializer.null_value();
-    serializer.end_object();
-    serializer.flush();
+    encoder.begin_object();
+    encoder.name("null");
+    encoder.null_value();
+    encoder.end_object();
+    encoder.flush();
 
     try
     {
@@ -69,19 +69,19 @@ TEST_CASE("serialize to bson")
     SECTION("array")
     {
         std::vector<uint8_t> v;
-        bson_buffer_encoder serializer(v);
+        bson_buffer_encoder encoder(v);
 
-        serializer.begin_array();
-        serializer.int64_value((std::numeric_limits<int64_t>::max)());
-        serializer.uint64_value((uint64_t)(std::numeric_limits<int64_t>::max)());
-        serializer.double_value((std::numeric_limits<double>::max)());
-        serializer.bool_value(true);
-        serializer.bool_value(false);
-        serializer.null_value();
-        serializer.string_value("Pussy cat");
-        serializer.byte_string_value(byte_string({'h','i','s','s'}));
-        serializer.end_array();
-        serializer.flush();
+        encoder.begin_array();
+        encoder.int64_value((std::numeric_limits<int64_t>::max)());
+        encoder.uint64_value((uint64_t)(std::numeric_limits<int64_t>::max)());
+        encoder.double_value((std::numeric_limits<double>::max)());
+        encoder.bool_value(true);
+        encoder.bool_value(false);
+        encoder.null_value();
+        encoder.string_value("Pussy cat");
+        encoder.byte_string_value(byte_string({'h','i','s','s'}));
+        encoder.end_array();
+        encoder.flush();
 
         std::vector<uint8_t> bson = {0x4d,0x00,0x00,0x00,
                                      0x12, // int64
@@ -126,27 +126,27 @@ TEST_CASE("serialize to bson")
     SECTION("object")
     {
         std::vector<uint8_t> v;
-        bson_buffer_encoder serializer(v);
+        bson_buffer_encoder encoder(v);
 
-        serializer.begin_object();
-        serializer.name("0");
-        serializer.int64_value((std::numeric_limits<int64_t>::max)());
-        serializer.name("1");
-        serializer.uint64_value((uint64_t)(std::numeric_limits<int64_t>::max)());
-        serializer.name("2");
-        serializer.double_value((std::numeric_limits<double>::max)());
-        serializer.name("3");
-        serializer.bool_value(true);
-        serializer.name("4");
-        serializer.bool_value(false);
-        serializer.name("5");
-        serializer.null_value();
-        serializer.name("6");
-        serializer.string_value("Pussy cat");
-        serializer.name("7");
-        serializer.byte_string_value(byte_string({'h','i','s','s'}));
-        serializer.end_object();
-        serializer.flush();
+        encoder.begin_object();
+        encoder.name("0");
+        encoder.int64_value((std::numeric_limits<int64_t>::max)());
+        encoder.name("1");
+        encoder.uint64_value((uint64_t)(std::numeric_limits<int64_t>::max)());
+        encoder.name("2");
+        encoder.double_value((std::numeric_limits<double>::max)());
+        encoder.name("3");
+        encoder.bool_value(true);
+        encoder.name("4");
+        encoder.bool_value(false);
+        encoder.name("5");
+        encoder.null_value();
+        encoder.name("6");
+        encoder.string_value("Pussy cat");
+        encoder.name("7");
+        encoder.byte_string_value(byte_string({'h','i','s','s'}));
+        encoder.end_object();
+        encoder.flush();
 
         std::vector<uint8_t> bson = {0x4d,0x00,0x00,0x00,
                                      0x12, // int64
@@ -191,16 +191,16 @@ TEST_CASE("serialize to bson")
     SECTION("outer object")
     {
         std::vector<uint8_t> v;
-        bson_buffer_encoder serializer(v);
+        bson_buffer_encoder encoder(v);
 
-        serializer.begin_object();
-        serializer.name("a");
-        serializer.begin_object();
-        serializer.name("0");
-        serializer.int64_value((std::numeric_limits<int64_t>::max)());
-        serializer.end_object();
-        serializer.end_object();
-        serializer.flush();
+        encoder.begin_object();
+        encoder.name("a");
+        encoder.begin_object();
+        encoder.name("0");
+        encoder.int64_value((std::numeric_limits<int64_t>::max)());
+        encoder.end_object();
+        encoder.end_object();
+        encoder.flush();
 
         std::vector<uint8_t> bson = {0x18,0x00,0x00,0x00,
                                      0x03, // object
@@ -220,15 +220,15 @@ TEST_CASE("serialize to bson")
     SECTION("outer array")
     {
         std::vector<uint8_t> v;
-        bson_buffer_encoder serializer(v);
+        bson_buffer_encoder encoder(v);
 
-        serializer.begin_array();
-        serializer.begin_object();
-        serializer.name("0");
-        serializer.int64_value((std::numeric_limits<int64_t>::max)());
-        serializer.end_object();
-        serializer.end_array();
-        serializer.flush();
+        encoder.begin_array();
+        encoder.begin_object();
+        encoder.name("0");
+        encoder.int64_value((std::numeric_limits<int64_t>::max)());
+        encoder.end_object();
+        encoder.end_array();
+        encoder.flush();
 
         std::vector<uint8_t> bson = {0x18,0x00,0x00,0x00,
                                      0x03, // object

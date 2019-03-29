@@ -124,13 +124,13 @@ void encode_json(const T& val,
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_encoder<CharT> serializer(os);
-        encode_json(val, serializer);
+        basic_json_encoder<CharT> encoder(os);
+        encode_json(val, encoder);
     }
     else
     {
-        basic_json_compressed_encoder<CharT> serializer(os);
-        encode_json(val, serializer);
+        basic_json_compressed_encoder<CharT> encoder(os);
+        encode_json(val, encoder);
     }
 }
 
@@ -142,13 +142,13 @@ void encode_json(const T& val,
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_encoder<CharT> serializer(os, options);
-        encode_json(val, serializer);
+        basic_json_encoder<CharT> encoder(os, options);
+        encode_json(val, encoder);
     }
     else
     {
-        basic_json_compressed_encoder<CharT> serializer(os, options);
-        encode_json(val, serializer);
+        basic_json_compressed_encoder<CharT> encoder(os, options);
+        encode_json(val, encoder);
     }
 }
 
@@ -159,13 +159,13 @@ void encode_json(const T& val,
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> serializer(s);
-        encode_json(val, serializer);
+        basic_json_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s);
+        encode_json(val, encoder);
     }
     else
     {
-        basic_json_compressed_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> serializer(s);
-        encode_json(val, serializer);
+        basic_json_compressed_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s);
+        encode_json(val, encoder);
     }
 }
 
@@ -177,13 +177,13 @@ void encode_json(const T& val,
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_encoder<CharT> serializer(s, options);
-        encode_json(val, serializer);
+        basic_json_encoder<CharT> encoder(s, options);
+        encode_json(val, encoder);
     }
     else
     {
-        basic_json_compressed_encoder<CharT> serializer(s, options);
-        encode_json(val, serializer);
+        basic_json_compressed_encoder<CharT> encoder(s, options);
+        encode_json(val, encoder);
     }
 }
 
@@ -204,13 +204,13 @@ void encode_json(const T& val,
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_encoder<CharT> serializer(os);
-        encode_json(val, serializer, j);
+        basic_json_encoder<CharT> encoder(os);
+        encode_json(val, encoder, j);
     }
     else
     {
-        basic_json_compressed_encoder<CharT> serializer(os);
-        encode_json(val, serializer, j);
+        basic_json_compressed_encoder<CharT> encoder(os);
+        encode_json(val, encoder, j);
     }
 }
 
@@ -223,13 +223,13 @@ void encode_json(const T& val,
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_encoder<CharT> serializer(os, options);
-        encode_json(val, serializer, j);
+        basic_json_encoder<CharT> encoder(os, options);
+        encode_json(val, encoder, j);
     }
     else
     {
-        basic_json_compressed_encoder<CharT> serializer(os, options);
-        encode_json(val, serializer, j);
+        basic_json_compressed_encoder<CharT> encoder(os, options);
+        encode_json(val, encoder, j);
     }
 }
 
@@ -241,13 +241,13 @@ void encode_json(const T& val,
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> serializer(s);
-        encode_json(val, serializer, j);
+        basic_json_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s);
+        encode_json(val, encoder, j);
     }
     else
     {
-        basic_json_compressed_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> serializer(s);
-        encode_json(val, serializer, j);
+        basic_json_compressed_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s);
+        encode_json(val, encoder, j);
     }
 }
 
@@ -260,13 +260,13 @@ void encode_json(const T& val,
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_encoder<CharT> serializer(s, options);
-        encode_json(val, serializer, j);
+        basic_json_encoder<CharT> encoder(s, options);
+        encode_json(val, encoder, j);
     }
     else
     {
-        basic_json_compressed_encoder<CharT> serializer(s, options);
-        encode_json(val, serializer, j);
+        basic_json_compressed_encoder<CharT> encoder(s, options);
+        encode_json(val, encoder, j);
     }
 }
 

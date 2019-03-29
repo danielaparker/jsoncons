@@ -868,7 +868,7 @@ typedef basic_cbor_encoder<wchar_t,jsoncons::byte_array_result> wcbor_buffer_enc
 #if !defined(JSONCONS_NO_DEPRECATED)
 typedef basic_cbor_encoder<char,jsoncons::byte_array_result> cbor_bytes_serializer;
 
-template<class CharT,class Result>
+template<class CharT,class Result=jsoncons::binary_stream_result>
 using basic_cbor_serializer = basic_cbor_encoder<CharT,Result>; 
 
 typedef basic_cbor_serializer<char,jsoncons::binary_stream_result> cbor_serializer;

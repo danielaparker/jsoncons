@@ -454,7 +454,7 @@ typedef basic_msgpack_encoder<wchar_t,jsoncons::byte_array_result> wmsgpack_buff
 #if !defined(JSONCONS_NO_DEPRECATED)
 typedef basic_msgpack_encoder<char,jsoncons::byte_array_result> msgpack_bytes_serializer;
 
-template<class CharT,class Result>
+template<class CharT,class Result=jsoncons::binary_stream_result>
 using basic_msgpack_serializer = basic_msgpack_encoder<CharT,Result>; 
 
 typedef basic_msgpack_serializer<char,jsoncons::binary_stream_result> msgpack_serializer;

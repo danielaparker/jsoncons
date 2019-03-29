@@ -1517,10 +1517,10 @@ typedef basic_json_compressed_encoder<char,jsoncons::string_result<std::string>>
 typedef basic_json_compressed_encoder<wchar_t,jsoncons::string_result<std::wstring>> wjson_compressed_string_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-template<class CharT,class Result>
+template<class CharT,class Result=jsoncons::stream_result<CharT>>
 using basic_json_serializer = basic_json_encoder<CharT,Result>; 
 
-template<class CharT,class Result>
+template<class CharT,class Result=jsoncons::stream_result<CharT>>
 using basic_json_compressed_serializer = basic_json_compressed_encoder<CharT,Result>; 
 
 typedef basic_json_serializer<char,jsoncons::stream_result<char>> json_serializer;
