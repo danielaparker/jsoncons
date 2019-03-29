@@ -439,7 +439,7 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
     }
 }
 
-TEST_CASE("CBOR stringref tag")
+TEST_CASE("CBOR stringref tag 1")
 {
     std::vector<uint8_t> v = {0xd9,0x01,0x00, // tag(256)
                                 0x83, // array(3)
@@ -526,5 +526,79 @@ TEST_CASE("CBOR stringref tag")
             CHECK(key1 == std::string("rank"));
         }
     }
+}
+
+TEST_CASE("CBOR stringref tag 2")
+{
+        std::vector<uint8_t> v = {0xd9, 0x01, 0x00,           // tag(256)
+         0x98, 0x20,          // array(32)
+         0x41,          // bytes(1)
+            0x31,       // "1"
+         0x43,          // bytes(3)
+            0x32,0x32,0x32,   // "222"
+         0x43,          // bytes(3)
+            0x33,0x33,0x33,   // "333"
+         0x41,          // bytes(1)
+            0x34,       // "4"
+         0x43,          // bytes(3)
+            0x35,0x35,0x35,   // "555"
+         0x43,          // bytes(3)
+            0x36,0x36,0x36,   // "666"
+         0x43,          // bytes(3)
+            0x37,0x37,0x37,   // "777"
+         0x43,          // bytes(3)
+            0x38,0x38,0x38,   // "888"
+         0x43,          // bytes(3)
+            0x39,0x39,0x39,   // "999"
+         0x43,          // bytes(3)
+            0x61,0x61,0x61,   // "aaa"
+         0x43,          // bytes(3)
+            0x62,0x62,0x62,   // "bbb"
+         0x43,          // bytes(3)
+            0x63,0x63,0x63,   // "ccc"
+         0x43,          // bytes(3)
+            0x64,0x64,0x64,   // "ddd"
+         0x43,          // bytes(3)
+            0x65,0x65,0x65,   // "eee"
+         0x43,          // bytes(3)
+            0x66,0x66,0x66,   // "fff"
+         0x43,          // bytes(3)
+            0x67,0x67,0x67,   // "ggg"
+         0x43,          // bytes(3)
+            0x68,0x68,0x68,   // "hhh"
+         0x43,          // bytes(3)
+            0x69,0x69,0x69,   // "iii"
+         0x43,          // bytes(3)
+            0x6a,0x6a,0x6a,   // "jjj"
+         0x43,          // bytes(3)
+            0x6b,0x6b,0x6b,   // "kkk"
+         0x43,          // bytes(3)
+            0x6c,0x6c,0x6c,   // "lll"
+         0x43,          // bytes(3)
+            0x6d,0x6d,0x6d,   // "mmm"
+         0x43,          // bytes(3)
+            0x6e,0x6e,0x6e,   // "nnn"
+         0x43,          // bytes(3)
+            0x6f,0x6f,0x6f,   // "ooo"
+         0x43,          // bytes(3)
+            0x70,0x70,0x70,   // "ppp"
+         0x43,          // bytes(3)
+            0x71,0x71,0x71,   // "qqq"
+         0x43,          // bytes(3)
+            0x72,0x72,0x72,   // "rrr"
+         0xd8, 0x19,       // tag(25)
+            0x01,       // unsigned(1)
+         0x44,          // bytes(4)
+            0x73,0x73,0x73,0x73, // "ssss"
+         0xd8, 0x19,       // tag(25)
+            0x17,       // unsigned(23)
+         0x43,          // bytes(3)
+            0x72,0x72,0x72,   // "rrr"
+         0xd8, 0x19,       // tag(25)
+            0x18, 0x18    // unsigned(24)
+        };
+
+        ojson j = decode_cbor<ojson>(v);
+        std::cout << j << "\n";
 }
 

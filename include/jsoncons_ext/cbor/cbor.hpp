@@ -38,6 +38,22 @@ void encode_cbor(const Json& j, std::vector<uint8_t>& v)
     j.dump(encoder);
 }
 
+template<class Json>
+void encode_cbor(const Json& j, std::basic_ostream<typename Json::char_type>& os, const cbor_encode_options& options)
+{
+    typedef typename Json::char_type char_type;
+    basic_cbor_encoder<char_type> encoder(os, options);
+    j.dump(encoder);
+}
+
+template<class Json>
+void encode_cbor(const Json& j, std::vector<uint8_t>& v, const cbor_encode_options& options)
+{
+    typedef typename Json::char_type char_type;
+    basic_cbor_encoder<char_type,jsoncons::bytes_result> encoder(v, options);
+    j.dump(encoder);
+}
+
 // decode_cbor
 
 template<class Json>

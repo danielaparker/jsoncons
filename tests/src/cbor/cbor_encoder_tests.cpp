@@ -379,15 +379,15 @@ TEST_CASE("encode stringref")
     cbor_options options;
     options.pack_strings(true);
     std::vector<uint8_t> buf;
-    cbor_bytes_encoder encoder(buf, options);
+
+    encode_cbor(j, buf, options);
+
     for (auto c : buf)
     {
         std::cout << std::hex << std::setprecision(2) << std::setw(2) 
                   << std::noshowbase << std::setfill('0') << static_cast<int>(c);
     }
     std::cout << "\n";
-
-    j.dump(encoder);
 
     ojson j2 = decode_cbor<ojson>(buf);
     CHECK(j2 == j);
