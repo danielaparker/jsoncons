@@ -354,7 +354,7 @@ You can read the `CSV` file into a `json` value with the `decode_csv` function.
 #include <fstream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>
-#include <jsoncons_ext/csv/csv_serializer.hpp>
+#include <jsoncons_ext/csv/csv_encoder.hpp>
 
 using namespace jsoncons;
 using namespace jsoncons::csv;
@@ -506,7 +506,7 @@ int main()
 {
     std::string s = R"({"first":1,"second":2,"fourth":3,"fifth":4})";    
 
-    json_serializer serializer(std::cout);
+    json_encoder serializer(std::cout);
 
     // Filters can be chained
     rename_object_member_filter filter2("fifth", "fourth", serializer);

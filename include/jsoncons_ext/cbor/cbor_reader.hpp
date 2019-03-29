@@ -16,7 +16,7 @@
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_detail.hpp>
-#include <jsoncons_ext/cbor/cbor_serializer.hpp>
+#include <jsoncons_ext/cbor/cbor_encoder.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
 
@@ -712,7 +712,7 @@ private:
             default:
             {
                 std::string s;
-                json_string_serializer serializer(s);
+                json_string_encoder serializer(s);
                 basic_cbor_reader<Source> reader(std::move(source_), serializer);
                 reader.read(ec);
                 source_ = std::move(reader.source_);

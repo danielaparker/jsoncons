@@ -4,7 +4,7 @@
 #include <string>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>
-#include <jsoncons_ext/csv/csv_serializer.hpp>
+#include <jsoncons_ext/csv/csv_encoder.hpp>
 #include <fstream>
 
 using namespace jsoncons;
@@ -71,7 +71,7 @@ void read_write_csv_tasks()
     std::cout << pretty_print(tasks) << "\n\n";
 
     std::cout << "(2)\n";
-    csv_serializer serializer(std::cout);
+    csv_encoder serializer(std::cout);
     tasks.dump(serializer);
 }
 
@@ -83,7 +83,7 @@ void serialize_array_of_arrays_to_comma_delimited()
     json countries;
     is >> countries;
 
-    csv_serializer serializer(std::cout);
+    csv_encoder serializer(std::cout);
     countries.dump(serializer);
 }
 
@@ -97,7 +97,7 @@ void serialize_to_tab_delimited_file()
 
     csv_options options;
     options.field_delimiter('\t');
-    csv_serializer serializer(std::cout,options);
+    csv_encoder serializer(std::cout,options);
 
     employees.dump(serializer);
 }
@@ -123,7 +123,7 @@ void serialize_books_to_csv_file()
     ]
     )");
 
-    csv_serializer serializer(std::cout);
+    csv_encoder serializer(std::cout);
 
     books.dump(serializer);
 }
@@ -152,7 +152,7 @@ void serialize_books_to_csv_file_with_reorder()
     csv_options options;
     options.column_names("author,title,price");
 
-    csv_serializer serializer(std::cout, options);
+    csv_encoder serializer(std::cout, options);
 
     books.dump(serializer);
 }

@@ -42,7 +42,7 @@ int main()
 {
     ojson j = ojson::parse(R"({"first":1,"second":2,"fourth":3})");
 
-    json_serializer serializer(std::cout);
+    json_encoder serializer(std::cout);
 
     rename_object_member_filter filter("fourth","third",serializer);
     j.dump(filter);

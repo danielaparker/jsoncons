@@ -1,38 +1,28 @@
-### jsoncons::basic_json_serializer
+### jsoncons::ubjson::basic_ubjson_encoder
 
 ```c++
 template<
     class CharT,
     class Result>
-> basic_json_serializer : public jsoncons::basic_json_content_handler<CharT>
-
-template<
-    class CharT,
-    class Result>
-> basic_json_compressed_serializer : public jsoncons::basic_json_content_handler<CharT>
+> class basic_ubjson_encoder : public jsoncons::basic_json_content_handler<CharT>
 ```
 
-`basic_json_serializer` and `basic_json_compressed_serializer` are noncopyable and nonmoveable.
+`basic_ubjson_encoder` is noncopyable and nonmoveable.
 
 #### Header
 
-    #include <jsoncons/json_serializer.hpp>
+    #include <jsoncons_ext/ubjson/ubjson_encoder.hpp>
 
-![json_serializer](./diagrams/json_serializer.png)
+![ubjson_encoder](./diagrams/ubjson_encoder.png)
 
-Four specializations for common character types and result types are defined
-for both the pretty print and compressed serializers:
+Four specializations for common character types and result types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-json_serializer            |basic_json_serializer<char,jsoncons::stream_result<char>>
-json_string_serializer     |basic_json_serializer<char,jsoncons::string_result<std::string>>
-wjson_serializer           |basic_json_serializer<wchar_t,jsoncons::stream_result<wchar_t>>
-wjson_string_serializer    |basic_json_serializer<wchar_t,jsoncons::string_result<std::wstring>>
-json_compressed_serializer            |basic_json_compressed_serializer<char,jsoncons::stream_result<char>>
-json_compressed_string_serializer     |basic_json_compressed_serializer<char,jsoncons::string_result<std::string>>
-wjson_compressed_serializer           |basic_json_compressed_serializer<wchar_t,jsoncons::stream_result<wchar_t>>
-wjson_compressed_string_serializer    |basic_json_compressed_serializer<wchar_t,jsoncons::string_result<std::wstring>>
+ubjson_encoder            |basic_ubjson_encoder<char,jsoncons::binary_stream_result>
+ubjson_buffer_encoder     |basic_ubjson_encoder<char,jsoncons::binary_buffer_result>
+wubjson_encoder           |basic_ubjson_encoder<wchar_t,jsoncons::binary_stream_result>
+wubjson_buffer_encoder    |basic_ubjson_encoder<wchar_t,jsoncons::binary_buffer_result>
 
 #### Member types
 
@@ -44,17 +34,12 @@ string_view_type           |
 
 #### Constructors
 
-    explicit basic_json_serializer(result_type result)
-Constructs a new serializer that is associated with the output adaptor `result`.
-
-    basic_json_serializer(result_type result, 
-                          const basic_json_encode_options<CharT>& options)
-Constructs a new serializer that is associated with the output adaptor `result` 
-and uses the specified [json options](json_options.md). 
+    explicit basic_ubjson_encoder(result_type result)
+Constructs a new serializer that writes to the specified result.
 
 #### Destructor
 
-    virtual ~basic_json_serializer()
+    virtual ~basic_ubjson_encoder()
 
 ### Inherited from [basic_json_content_handler](../json_content_handler.md)
 
@@ -127,46 +112,4 @@ and uses the specified [json options](json_options.md).
 
 ### Examples
 
-### Feeding json events directly to a `json_serializer`
-```c++
-#include <iostream>
-#include <boost/numeric/ublas/matrix.hpp>
-#include <jsoncons/json_serializer.hpp>
 
-using namespace jsoncons;
-using boost::numeric::ublas::matrix;
-
-int main()
-{
-    matrix<double> A(2, 2);
-    A(0, 0) = 1;
-    A(0, 1) = 2;
-    A(1, 0) = 3;
-    A(1, 1) = 4;
-
-    json_options options;
-    json_serializer os(std::cout, options); 
-    os.begin_array();
-    for (size_t i = 0; i < A.size1(); ++i)
-    {
-        os.begin_array();
-        for (size_t j = 0; j < A.size2(); ++j)
-        {
-            os.double_value(A(i, j));
-        }
-        os.end_array();
-    }
-    os.end_array();
-
-    return 0;
-}
-```
-
-Output:
-
-```json
-[
-    [1,2],
-    [3,4]
-]
-```

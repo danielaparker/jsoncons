@@ -4,7 +4,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/csv/csv_serializer.hpp>
+#include <jsoncons_ext/csv/csv_encoder.hpp>
 #include <string>
 #include <vector>
 #include <iomanip>
@@ -17,7 +17,7 @@ namespace readme
     {
         // Construct some CBOR using the streaming API
         std::vector<uint8_t> b;
-        cbor::cbor_buffer_serializer writer(b);
+        cbor::cbor_buffer_encoder writer(b);
         writer.begin_array(); // indefinite length outer array
         writer.begin_array(3); // a fixed length array
         writer.string_value("foo");

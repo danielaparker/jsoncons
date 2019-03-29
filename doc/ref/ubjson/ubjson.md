@@ -6,7 +6,7 @@ The ubjson extension implements decode from and encode to the [Universal Binary 
 
 [encode_ubjson](encode_ubjson.md)
 
-[ubjson_serializer](ubjson_serializer.md)
+[ubjson_encoder](ubjson_encoder.md)
 
 #### jsoncons-ubjson mappings
 

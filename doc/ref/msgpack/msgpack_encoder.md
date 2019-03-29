@@ -1,28 +1,28 @@
-### jsoncons::ubjson::basic_ubjson_serializer
+### jsoncons::bson::basic_msgpack_encoder
 
 ```c++
 template<
     class CharT,
     class Result>
-> class basic_ubjson_serializer : public jsoncons::basic_json_content_handler<CharT>
+> class basic_msgpack_encoder : public jsoncons::basic_json_content_handler<CharT>
 ```
 
-`basic_ubjson_serializer` is noncopyable and nonmoveable.
+`basic_msgpack_encoder` is noncopyable and nonmoveable.
 
 #### Header
 
-    #include <jsoncons_ext/ubjson/ubjson_serializer.hpp>
+    #include <jsoncons_ext/bson/msgpack_encoder.hpp>
 
-![ubjson_serializer](./diagrams/ubjson_serializer.png)
+![msgpack_encoder](./diagrams/msgpack_encoder.png)
 
 Four specializations for common character types and result types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-ubjson_serializer            |basic_ubjson_serializer<char,jsoncons::binary_stream_result>
-ubjson_buffer_serializer     |basic_ubjson_serializer<char,jsoncons::binary_buffer_result>
-wubjson_serializer           |basic_ubjson_serializer<wchar_t,jsoncons::binary_stream_result>
-wubjson_buffer_serializer    |basic_ubjson_serializer<wchar_t,jsoncons::binary_buffer_result>
+msgpack_encoder            |basic_msgpack_encoder<char,jsoncons::binary_stream_result>
+bson_buffer_encoder     |basic_msgpack_encoder<char,jsoncons::binary_buffer_result>
+wmsgpack_encoder           |basic_msgpack_encoder<wchar_t,jsoncons::binary_stream_result>
+wbson_buffer_encoder    |basic_msgpack_encoder<wchar_t,jsoncons::binary_buffer_result>
 
 #### Member types
 
@@ -34,12 +34,12 @@ string_view_type           |
 
 #### Constructors
 
-    explicit basic_ubjson_serializer(result_type result)
+    explicit basic_msgpack_encoder(result_type result)
 Constructs a new serializer that writes to the specified result.
 
 #### Destructor
 
-    virtual ~basic_ubjson_serializer()
+    virtual ~basic_msgpack_encoder()
 
 ### Inherited from [basic_json_content_handler](../json_content_handler.md)
 

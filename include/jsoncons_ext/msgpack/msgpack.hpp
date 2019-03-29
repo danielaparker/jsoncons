@@ -14,7 +14,7 @@
 #include <istream> // std::basic_istream
 #include <jsoncons/json.hpp>
 #include <jsoncons/config/binary_detail.hpp>
-#include <jsoncons_ext/msgpack/msgpack_serializer.hpp>
+#include <jsoncons_ext/msgpack/msgpack_encoder.hpp>
 #include <jsoncons_ext/msgpack/msgpack_reader.hpp>
 
 namespace jsoncons { namespace msgpack {
@@ -25,7 +25,7 @@ template<class Json>
 void encode_msgpack(const Json& j, std::basic_ostream<typename Json::char_type>& os)
 {
     typedef typename Json::char_type char_type;
-    basic_msgpack_serializer<char_type> serializer(os);
+    basic_msgpack_encoder<char_type> serializer(os);
     j.dump(serializer);
 }
 
@@ -33,7 +33,7 @@ template<class Json>
 void encode_msgpack(const Json& j, std::vector<uint8_t>& v)
 {
     typedef typename Json::char_type char_type;
-    basic_msgpack_serializer<char_type,jsoncons::byte_array_result> serializer(v);
+    basic_msgpack_encoder<char_type,jsoncons::byte_array_result> serializer(v);
     j.dump(serializer);
 }
 

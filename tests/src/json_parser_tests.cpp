@@ -2,7 +2,7 @@
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_serializer.hpp>
+#include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <catch/catch.hpp>

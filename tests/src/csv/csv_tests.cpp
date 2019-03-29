@@ -6,7 +6,7 @@
 #endif
 //#include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>
-#include <jsoncons_ext/csv/csv_serializer.hpp>
+#include <jsoncons_ext/csv/csv_encoder.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <sstream>
 #include <vector>
@@ -784,7 +784,7 @@ TEST_CASE("serialize_comma_delimited_file")
     ojson countries1 = encoder1.get_result();
 
     std::stringstream ss;
-    csv_serializer serializer(ss,options);
+    csv_encoder serializer(ss,options);
     countries1.dump(serializer);
 
     json_decoder<ojson> encoder2;
@@ -832,7 +832,7 @@ TEST_CASE("serialize_tab_delimited_file")
     ojson employees1 = decoder.get_result();
 
     std::stringstream ss;
-    csv_serializer serializer(ss,options);
+    csv_encoder serializer(ss,options);
     //std::cout << pretty_print(employees1) << std::endl;
     employees1.dump(serializer);
     //std::cout << ss.str() << std::endl;

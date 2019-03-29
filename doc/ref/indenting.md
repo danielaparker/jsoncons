@@ -9,5 +9,5 @@ enum class indenting {no_indent, indent}
 #include <jsoncons/json_options.hpp>
 ```
 
-Specifies indentation options for the [json_serializer](json_serializer.md)
+Specifies indentation options for the [json_encoder](json_encoder.md)
 

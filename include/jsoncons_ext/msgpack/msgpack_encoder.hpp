@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_MSGPACK_MSGPACK_SERIALIZER_HPP
-#define JSONCONS_MSGPACK_MSGPACK_SERIALIZER_HPP
+#ifndef JSONCONS_MSGPACK_MSGPACK_ENCODER_HPP
+#define JSONCONS_MSGPACK_MSGPACK_ENCODER_HPP
 
 #include <string>
 #include <vector>
@@ -25,7 +25,7 @@ namespace jsoncons { namespace msgpack {
 enum class msgpack_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template<class CharT,class Result=jsoncons::binary_stream_result>
-class basic_msgpack_serializer final : public basic_json_content_handler<CharT>
+class basic_msgpack_encoder final : public basic_json_content_handler<CharT>
 {
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
@@ -70,15 +70,15 @@ private:
     Result result_;
 
     // Noncopyable and nonmoveable
-    basic_msgpack_serializer(const basic_msgpack_serializer&) = delete;
-    basic_msgpack_serializer& operator=(const basic_msgpack_serializer&) = delete;
+    basic_msgpack_encoder(const basic_msgpack_encoder&) = delete;
+    basic_msgpack_encoder& operator=(const basic_msgpack_encoder&) = delete;
 public:
-    explicit basic_msgpack_serializer(result_type result)
+    explicit basic_msgpack_encoder(result_type result)
        : result_(std::move(result))
     {
     }
 
-    ~basic_msgpack_serializer()
+    ~basic_msgpack_encoder()
     {
         try
         {
@@ -445,14 +445,23 @@ private:
     }
 };
 
+typedef basic_msgpack_encoder<char,jsoncons::binary_stream_result> msgpack_encoder;
+typedef basic_msgpack_encoder<char,jsoncons::byte_array_result> msgpack_buffer_encoder;
+
+typedef basic_msgpack_encoder<wchar_t,jsoncons::binary_stream_result> wmsgpack_encoder;
+typedef basic_msgpack_encoder<wchar_t,jsoncons::byte_array_result> wmsgpack_buffer_encoder;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+typedef basic_msgpack_encoder<char,jsoncons::byte_array_result> msgpack_bytes_serializer;
+
+template<class CharT,class Result>
+using basic_msgpack_serializer = basic_msgpack_encoder<CharT,Result>; 
+
 typedef basic_msgpack_serializer<char,jsoncons::binary_stream_result> msgpack_serializer;
 typedef basic_msgpack_serializer<char,jsoncons::byte_array_result> msgpack_buffer_serializer;
 
 typedef basic_msgpack_serializer<wchar_t,jsoncons::binary_stream_result> wmsgpack_serializer;
 typedef basic_msgpack_serializer<wchar_t,jsoncons::byte_array_result> wmsgpack_buffer_serializer;
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_msgpack_serializer<char,jsoncons::byte_array_result> msgpack_bytes_serializer;
 #endif
 
 }}

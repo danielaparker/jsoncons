@@ -6,7 +6,7 @@ The msgpack extension implements decode from and encode to the [MessagePack](htt
 
 [encode_msgpack](encode_msgpack.md)
 
-[msgpack_serializer](msgpack_serializer.md)
+[msgpack_encoder](msgpack_encoder.md)
 
 #### jsoncons-MessagePack mappings
 

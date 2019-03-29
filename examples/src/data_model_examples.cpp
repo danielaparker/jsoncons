@@ -62,7 +62,7 @@ void data_model_example1()
 void data_model_example2()
 {
     std::vector<uint8_t> bytes;
-    cbor::cbor_buffer_serializer writer(bytes);
+    cbor::cbor_buffer_encoder writer(bytes);
     writer.begin_array(); // indefinite length outer array
     writer.string_value("foo");
     writer.byte_string_value(byte_string{'b','a','r'});

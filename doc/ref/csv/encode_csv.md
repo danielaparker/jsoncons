@@ -4,7 +4,7 @@ Serializes a json value as CSV to a string or an output stream.
 
 #### Header
 ```c++
-#include <jsoncons_ext/csv/csv_serializer.hpp>
+#include <jsoncons_ext/csv/csv_encoder.hpp>
 
 template <class Json>
 void encode_csv(const Json& j, 
@@ -40,7 +40,7 @@ void encode_csv(const Json& j,
 ```c++
 #include <iostream>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/csv/csv_serializer.hpp>
+#include <jsoncons_ext/csv/csv_encoder.hpp>
 
 using namespace jsoncons;
 using namespace jsoncons::csv;

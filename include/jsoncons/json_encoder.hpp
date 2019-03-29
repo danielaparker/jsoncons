@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_SERIALIZER_HPP
-#define JSONCONS_JSON_SERIALIZER_HPP
+#ifndef JSONCONS_JSON_ENCODER_HPP
+#define JSONCONS_JSON_ENCODER_HPP
 
 #include <array> // std::array
 #include <string>
@@ -175,7 +175,7 @@ byte_string_chars_format resolve_byte_string_chars_format(byte_string_chars_form
 namespace jsoncons {
 
 template<class CharT,class Result=jsoncons::stream_result<CharT>>
-class basic_json_serializer final : public basic_json_content_handler<CharT>
+class basic_json_encoder final : public basic_json_content_handler<CharT>
 {
     static const std::array<CharT, 4>& null_k()
     {
@@ -325,15 +325,15 @@ private:
     std::basic_string<CharT> close_array_bracket_str_;
 
     // Noncopyable and nonmoveable
-    basic_json_serializer(const basic_json_serializer&) = delete;
-    basic_json_serializer& operator=(const basic_json_serializer&) = delete;
+    basic_json_encoder(const basic_json_encoder&) = delete;
+    basic_json_encoder& operator=(const basic_json_encoder&) = delete;
 public:
-    basic_json_serializer(result_type result)
-        : basic_json_serializer(std::move(result), basic_json_options<CharT>())
+    basic_json_encoder(result_type result)
+        : basic_json_encoder(std::move(result), basic_json_options<CharT>())
     {
     }
 
-    basic_json_serializer(result_type result, 
+    basic_json_encoder(result_type result, 
                           const basic_json_encode_options<CharT>& options)
        : indent_size_(options.indent_size()),
          is_nan_to_num_(options.is_nan_to_num()),
@@ -417,7 +417,7 @@ public:
         }
     }
 
-    ~basic_json_serializer()
+    ~basic_json_encoder()
     {
         try
         {
@@ -1032,7 +1032,7 @@ private:
 };
 
 template<class CharT,class Result=jsoncons::stream_result<CharT>>
-class basic_json_compressed_serializer final : public basic_json_content_handler<CharT>
+class basic_json_compressed_encoder final : public basic_json_content_handler<CharT>
 {
     static const std::array<CharT, 4>& null_k()
     {
@@ -1107,15 +1107,15 @@ private:
     Result result_;
 
     // Noncopyable and nonmoveable
-    basic_json_compressed_serializer(const basic_json_compressed_serializer&) = delete;
-    basic_json_compressed_serializer& operator=(const basic_json_compressed_serializer&) = delete;
+    basic_json_compressed_encoder(const basic_json_compressed_encoder&) = delete;
+    basic_json_compressed_encoder& operator=(const basic_json_compressed_encoder&) = delete;
 public:
-    basic_json_compressed_serializer(result_type result)
-        : basic_json_compressed_serializer(std::move(result), basic_json_options<CharT>())
+    basic_json_compressed_encoder(result_type result)
+        : basic_json_compressed_encoder(std::move(result), basic_json_options<CharT>())
     {
     }
 
-    basic_json_compressed_serializer(result_type result, 
+    basic_json_compressed_encoder(result_type result, 
                                      const basic_json_encode_options<CharT>& options)
        : is_nan_to_num_(options.is_nan_to_num()),
          is_inf_to_num_(options.is_inf_to_num()),
@@ -1140,7 +1140,7 @@ public:
     {
     }
 
-    ~basic_json_compressed_serializer()
+    ~basic_json_compressed_encoder()
     {
         try
         {
@@ -1504,6 +1504,25 @@ private:
     }
 };
 
+typedef basic_json_encoder<char,jsoncons::stream_result<char>> json_encoder;
+typedef basic_json_encoder<wchar_t,jsoncons::stream_result<wchar_t>> wjson_encoder;
+
+typedef basic_json_compressed_encoder<char,jsoncons::stream_result<char>> json_compressed_encoder;
+typedef basic_json_compressed_encoder<wchar_t,jsoncons::stream_result<wchar_t>> wjson_compressed_encoder;
+
+typedef basic_json_encoder<char,jsoncons::string_result<std::string>> json_string_encoder;
+typedef basic_json_encoder<wchar_t,jsoncons::string_result<std::wstring>> wjson_string_encoder;
+
+typedef basic_json_compressed_encoder<char,jsoncons::string_result<std::string>> json_compressed_string_encoder;
+typedef basic_json_compressed_encoder<wchar_t,jsoncons::string_result<std::wstring>> wjson_compressed_string_encoder;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+template<class CharT,class Result>
+using basic_json_serializer = basic_json_encoder<CharT,Result>; 
+
+template<class CharT,class Result>
+using basic_json_compressed_serializer = basic_json_compressed_encoder<CharT,Result>; 
+
 typedef basic_json_serializer<char,jsoncons::stream_result<char>> json_serializer;
 typedef basic_json_serializer<wchar_t,jsoncons::stream_result<wchar_t>> wjson_serializer;
 
@@ -1515,6 +1534,7 @@ typedef basic_json_serializer<wchar_t,jsoncons::string_result<std::wstring>> wjs
 
 typedef basic_json_compressed_serializer<char,jsoncons::string_result<std::string>> json_compressed_string_serializer;
 typedef basic_json_compressed_serializer<wchar_t,jsoncons::string_result<std::wstring>> wjson_compressed_string_serializer;
+#endif
 
 }
 #endif

@@ -16,7 +16,7 @@
 #include <cstring>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_options.hpp>
-#include <jsoncons/json_serializer.hpp>
+#include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_error.hpp>
 

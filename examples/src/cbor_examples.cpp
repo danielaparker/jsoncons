@@ -13,7 +13,7 @@ using namespace jsoncons;
 void serialize_to_cbor_buffer()
 {
     std::vector<uint8_t> buffer;
-    cbor::cbor_buffer_serializer writer(buffer);
+    cbor::cbor_buffer_encoder writer(buffer);
 
     writer.begin_array(); // Indefinite length array
     writer.string_value("cat");
@@ -50,7 +50,7 @@ void serialize_to_cbor_buffer()
 void serialize_to_cbor_stream()
 {
     std::ostringstream os;
-    cbor::cbor_serializer writer(os);
+    cbor::cbor_encoder writer(os);
 
     writer.begin_array(3); // array of length 3
     writer.big_integer_value("-18446744073709551617");

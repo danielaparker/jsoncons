@@ -50,7 +50,7 @@ int main()
 {
     std::string s = R"({"first":1,"second":2,"fourth":3,"fifth":4})";    
 
-    json_serializer serializer(std::cout);
+    json_encoder serializer(std::cout);
 
     // Filters can be chained
     rename_object_member_filter filter2("fifth", "fourth", serializer);
@@ -98,9 +98,9 @@ Example address book file (`address-book.json`):
 
 Suppose you want to break the name into a first name and last name, and report a warning when `name` does not contain a space or tab separated part. 
 
-You can achieve the desired result by subclassing the [json_filter](json_filter.md) class, overriding the default methods for receiving name and string value events, and passing modified events on to the parent [json_content_handler](json_content_handler.md) (which in this example will forward them to a [json_serializer](json_serializer.md).) 
+You can achieve the desired result by subclassing the [json_filter](json_filter.md) class, overriding the default methods for receiving name and string value events, and passing modified events on to the parent [json_content_handler](json_content_handler.md) (which in this example will forward them to a [json_encoder](json_encoder.md).) 
 ```c++
-#include <jsoncons/json_serializer.hpp>
+#include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_reader.hpp>
 
@@ -160,10 +160,10 @@ private:
     }
 };
 ```
-Configure a [rename_object_member_filter](rename_object_member_filter.md) to emit json events to a [json_serializer](json_serializer.md). 
+Configure a [rename_object_member_filter](rename_object_member_filter.md) to emit json events to a [json_encoder](json_encoder.md). 
 ```c++
 std::ofstream os("output/new-address-book.json");
-json_serializer serializer(os, jsoncons::indenting::indent);
+json_encoder serializer(os, jsoncons::indenting::indent);
 name_fix_up_filter filter(serializer);
 ```
 Parse the input and send the json events into the filter ...

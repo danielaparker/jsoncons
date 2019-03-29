@@ -347,7 +347,7 @@ int main()
 {
     // Construct some CBOR using the streaming API
     std::vector<uint8_t> b;
-    cbor::cbor_buffer_serializer writer(b);
+    cbor::cbor_buffer_encoder writer(b);
     writer.begin_array(); // indefinite length outer array
     writer.begin_array(3); // a fixed length array
     writer.string_value("foo");
@@ -888,7 +888,7 @@ int main()
     ]
     )");
 
-    json_serializer serializer(std::cout, jsoncons::indenting::indent); // pretty print
+    json_encoder serializer(std::cout, jsoncons::indenting::indent); // pretty print
     serializer.begin_array();
     for (const auto& book : some_books.array_range())
     {

@@ -5,7 +5,7 @@
 #include "windows.h" // test no inadvertant macro expansions
 #endif
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/ubjson/ubjson.hpp>
+#include <jsoncons_ext/msgpack/msgpack.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -14,22 +14,24 @@
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::ubjson;
+using namespace jsoncons::msgpack;
 
-TEST_CASE("serialize array to ubjson")
+TEST_CASE("serialize array to msgpack")
 {
     std::vector<uint8_t> v;
-    ubjson_buffer_serializer serializer(v);
+    msgpack_buffer_encoder serializer(v);
+    //serializer.begin_object(1);
     serializer.begin_array(3);
     serializer.bool_value(true);
     serializer.bool_value(false);
     serializer.null_value();
     serializer.end_array();
+    //serializer.end_object();
     serializer.flush();
 
     try
     {
-        json result = decode_ubjson<json>(v);
+        json result = decode_msgpack<json>(v);
         std::cout << result << std::endl;
     }
     catch (const std::exception& e)
@@ -38,11 +40,11 @@ TEST_CASE("serialize array to ubjson")
     }
 } 
 
-TEST_CASE("Too many and too few items in UBJSON object or array")
+TEST_CASE("Too many and too few items in MessagePack object or array")
 {
     std::error_code ec{};
     std::vector<uint8_t> v;
-    ubjson_buffer_serializer serializer(v);
+    msgpack_buffer_encoder serializer(v);
 
     SECTION("Too many items in array")
     {
@@ -54,7 +56,7 @@ TEST_CASE("Too many and too few items in UBJSON object or array")
         CHECK(serializer.string_value("cat"));
         CHECK(serializer.string_value("feline"));
         CHECK(serializer.end_array());
-        REQUIRE_THROWS_WITH(serializer.end_array(), ubjson_error_category_impl().message((int)ubjson_errc::too_many_items).c_str());
+        REQUIRE_THROWS_WITH(serializer.end_array(), msgpack_error_category_impl().message((int)msgpack_errc::too_many_items).c_str());
         serializer.flush();
     }
     SECTION("Too few items in array")
@@ -67,7 +69,7 @@ TEST_CASE("Too many and too few items in UBJSON object or array")
         CHECK(serializer.string_value("cat"));
         CHECK(serializer.string_value("feline"));
         CHECK(serializer.end_array());
-        REQUIRE_THROWS_WITH(serializer.end_array(), ubjson_error_category_impl().message((int)ubjson_errc::too_few_items).c_str());
+        REQUIRE_THROWS_WITH(serializer.end_array(), msgpack_error_category_impl().message((int)msgpack_errc::too_few_items).c_str());
         serializer.flush();
     }
     SECTION("Too many items in object")
@@ -84,7 +86,7 @@ TEST_CASE("Too many and too few items in UBJSON object or array")
         CHECK(serializer.string_value("cat"));
         CHECK(serializer.string_value("feline"));
         CHECK(serializer.end_array());
-        REQUIRE_THROWS_WITH(serializer.end_object(), ubjson_error_category_impl().message((int)ubjson_errc::too_many_items).c_str());
+        REQUIRE_THROWS_WITH(serializer.end_object(), msgpack_error_category_impl().message((int)msgpack_errc::too_many_items).c_str());
         serializer.flush();
     }
     SECTION("Too few items in object")
@@ -101,7 +103,7 @@ TEST_CASE("Too many and too few items in UBJSON object or array")
         CHECK(serializer.string_value("cat"));
         CHECK(serializer.string_value("feline"));
         CHECK(serializer.end_array());
-        REQUIRE_THROWS_WITH(serializer.end_object(), ubjson_error_category_impl().message((int)ubjson_errc::too_few_items).c_str());
+        REQUIRE_THROWS_WITH(serializer.end_object(), msgpack_error_category_impl().message((int)msgpack_errc::too_few_items).c_str());
         serializer.flush();
     }
 }

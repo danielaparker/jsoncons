@@ -3,7 +3,7 @@
 
 #include <boost/pool/pool_alloc.hpp>
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_serializer.hpp>
+#include <jsoncons/json_encoder.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>

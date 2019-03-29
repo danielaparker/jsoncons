@@ -1,29 +1,29 @@
-### jsoncons::csv::basic_csv_serializer
+### jsoncons::csv::basic_csv_encoder
 
 ```c++
 template<
     class CharT,
     class Result
     class Allocator=std::allocator<CharT>=std::allocator<CharT>>
-> class basic_csv_serializer : public jsoncons::basic_json_content_handler<CharT>
+> class basic_csv_encoder : public jsoncons::basic_json_content_handler<CharT>
 ```
 
-`basic_csv_serializer` and `basic_json_compressed_serializer` are noncopyable and nonmoveable.
+`basic_csv_encoder` and `basic_json_compressed_encoder` are noncopyable and nonmoveable.
 
 #### Header
 
-    #include <jsoncons_ext/csv/csv_serializer.hpp>
+    #include <jsoncons_ext/csv/csv_encoder.hpp>
 
-![csv_serializer](./diagrams/csv_serializer.png)
+![csv_encoder](./diagrams/csv_encoder.png)
 
 Four specializations for common character types and result types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-csv_serializer            |basic_csv_serializer<char,jsoncons::stream_result<char>>
-json_string_serializer     |basic_csv_serializer<char,jsoncons::string_result<std::string>>
-wcsv_serializer           |basic_csv_serializer<wchar_t,jsoncons::stream_result<wchar_t>>
-wjson_string_serializer    |basic_csv_serializer<wchar_t,jsoncons::string_result<std::wstring>>
+csv_encoder            |basic_csv_encoder<char,jsoncons::stream_result<char>>
+json_string_encoder     |basic_csv_encoder<char,jsoncons::string_result<std::string>>
+wcsv_encoder           |basic_csv_encoder<wchar_t,jsoncons::stream_result<wchar_t>>
+wjson_string_encoder    |basic_csv_encoder<wchar_t,jsoncons::string_result<std::wstring>>
 
 #### Member types
 
@@ -35,17 +35,17 @@ string_view_type           |
 
 #### Constructors
 
-    explicit basic_csv_serializer(result_type result)
+    explicit basic_csv_encoder(result_type result)
 Constructs a new csv serializer that is associated with the output adaptor `result`.
 
-    basic_csv_serializer(result_type result, 
+    basic_csv_encoder(result_type result, 
                          const basic_csv_options<CharT>& options)
 Constructs a new csv serializer that is associated with the output adaptor `result` 
 and uses the specified [csv options](csv_options.md). 
 
 #### Destructor
 
-    virtual ~basic_csv_serializer()
+    virtual ~basic_csv_encoder()
 
 ### Inherited from [basic_json_content_handler](../json_content_handler.md)
 
@@ -134,7 +134,7 @@ Note
 
 - The third array element has a value that contains a comma, in the CSV file this value will be quoted.
 
-#### Serializing the comma delimited file with csv_serializer
+#### Serializing the comma delimited file with csv_encoder
 ```c++
 std::string in_file = "input/countries.json";
 std::ifstream is(in_file);
@@ -144,7 +144,7 @@ json_reader reader(is,decoder);
 reader.read();
 json countries = decoder.get_result();
 
-csv_serializer serializer(std::cout);
+csv_encoder serializer(std::cout);
 
 countries.dump(serializer);
 ```
@@ -209,7 +209,7 @@ json_reader reader(is,decoder);
 reader.read();
 json employees = decoder.get_result();
 
-csv_serializer serializer(std::cout,options);
+csv_encoder serializer(std::cout,options);
 
 employees.dump(serializer);
 ```
@@ -227,7 +227,7 @@ Dependable, trustworthy 75,000.00
 
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/csv/csv_serializer.hpp>
+#include <jsoncons_ext/csv/csv_encoder.hpp>
 
 using namespace jsoncons;
 
@@ -255,7 +255,7 @@ int main()
     csv_options options;
     params.column_names("author,title,price");
 
-    csv_serializer serializer(std::cout, options);
+    csv_encoder serializer(std::cout, options);
 
     books.dump(serializer);
 }

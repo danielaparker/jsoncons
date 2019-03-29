@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BSON_BSON_SERIALIZER_HPP
-#define JSONCONS_BSON_BSON_SERIALIZER_HPP
+#ifndef JSONCONS_BSON_BSON_ENCODER_HPP
+#define JSONCONS_BSON_BSON_ENCODER_HPP
 
 #include <string>
 #include <vector>
@@ -22,7 +22,7 @@
 namespace jsoncons { namespace bson {
 
 template<class CharT,class Result=jsoncons::binary_stream_result>
-class basic_bson_serializer final : public basic_json_content_handler<CharT>
+class basic_bson_encoder final : public basic_json_content_handler<CharT>
 {
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
@@ -76,15 +76,15 @@ private:
     result_type result_;
 
     // Noncopyable and nonmoveable
-    basic_bson_serializer(const basic_bson_serializer&) = delete;
-    basic_bson_serializer& operator=(const basic_bson_serializer&) = delete;
+    basic_bson_encoder(const basic_bson_encoder&) = delete;
+    basic_bson_encoder& operator=(const basic_bson_encoder&) = delete;
 public:
-    explicit basic_bson_serializer(result_type result)
+    explicit basic_bson_encoder(result_type result)
        : result_(std::move(result))
     {
     }
 
-    ~basic_bson_serializer()
+    ~basic_bson_encoder()
     {
         try
         {
@@ -323,11 +323,22 @@ private:
     }
 };
 
+typedef basic_bson_encoder<char,jsoncons::binary_stream_result> bson_encoder;
+typedef basic_bson_encoder<char,jsoncons::byte_array_result> bson_buffer_encoder;
+
+typedef basic_bson_encoder<wchar_t,jsoncons::binary_stream_result> wbson_encoder;
+typedef basic_bson_encoder<wchar_t,jsoncons::byte_array_result> wbson_buffer_encoder;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+template<class CharT,class Result>
+using basic_bson_serializer = basic_bson_encoder<CharT,Result>; 
+
 typedef basic_bson_serializer<char,jsoncons::binary_stream_result> bson_serializer;
 typedef basic_bson_serializer<char,jsoncons::byte_array_result> bson_buffer_serializer;
 
 typedef basic_bson_serializer<wchar_t,jsoncons::binary_stream_result> wbson_serializer;
 typedef basic_bson_serializer<wchar_t,jsoncons::byte_array_result> wbson_buffer_serializer;
+#endif
 
 }}
 #endif

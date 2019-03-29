@@ -1,7 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/json_serializer.hpp>
+#include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json.hpp>
@@ -84,7 +84,7 @@ TEST_CASE("test_filter")
     std::ifstream is(in_file, std::ofstream::binary);
     std::ofstream os(out_file);
 
-    json_serializer serializer(os);
+    json_encoder serializer(os);
     name_fix_up_filter filter(serializer);
     json_reader reader(is, filter);
     reader.read_next();
@@ -102,7 +102,7 @@ TEST_CASE("test_filter2")
     std::ifstream is(in_file, std::ofstream::binary);
     std::ofstream os(out_file);
 
-    json_serializer serializer(os);
+    json_encoder serializer(os);
 
     name_fix_up_filter filter2(serializer);
 
@@ -142,7 +142,7 @@ TEST_CASE("test_rename_name")
     CHECK(j["store"]["book"][0]["price"].as<double>() == Approx(31.96).epsilon(0.001));
 
     std::stringstream ss;
-    json_serializer serializer(ss);
+    json_encoder serializer(ss);
     rename_object_member_filter filter("price","price2",serializer);
     j.dump(filter);
 

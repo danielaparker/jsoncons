@@ -163,7 +163,7 @@ int main()
         {"Jane Doe",{"Commission","Sales",20000}}
     };
 
-    json_serializer serializer(std::cout, jsoncons::indenting::indent); 
+    json_encoder serializer(std::cout, jsoncons::indenting::indent); 
 
     serializer.begin_object();       
     serializer.write_name("Employees");       

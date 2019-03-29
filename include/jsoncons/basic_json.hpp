@@ -28,7 +28,7 @@
 #include <jsoncons/json_container_types.hpp>
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/json_options.hpp>
-#include <jsoncons/json_serializer.hpp>
+#include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_type_traits.hpp>
@@ -2805,7 +2805,7 @@ public:
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
-        basic_json_compressed_serializer<char_type,jsoncons::string_result<string_type>> serializer(s);
+        basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> serializer(s);
         dump(serializer);
     }
 
@@ -2815,12 +2815,12 @@ public:
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         if (line_indent == indenting::indent)
         {
-            basic_json_serializer<char_type,jsoncons::string_result<string_type>> serializer(s);
+            basic_json_encoder<char_type,jsoncons::string_result<string_type>> serializer(s);
             dump(serializer);
         }
         else
         {
-            basic_json_compressed_serializer<char_type,jsoncons::string_result<string_type>> serializer(s);
+            basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> serializer(s);
             dump(serializer);
         }
     }
@@ -2830,7 +2830,7 @@ public:
               const basic_json_options<char_type>& options) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
-        basic_json_compressed_serializer<char_type,jsoncons::string_result<string_type>> serializer(s, options);
+        basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> serializer(s, options);
         dump(serializer);
     }
 
@@ -2842,12 +2842,12 @@ public:
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         if (line_indent == indenting::indent)
         {
-            basic_json_serializer<char_type,jsoncons::string_result<string_type>> serializer(s, options);
+            basic_json_encoder<char_type,jsoncons::string_result<string_type>> serializer(s, options);
             dump(serializer);
         }
         else
         {
-            basic_json_compressed_serializer<char_type,jsoncons::string_result<string_type>> serializer(s, options);
+            basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> serializer(s, options);
             dump(serializer);
         }
     }
@@ -2860,7 +2860,7 @@ public:
 
     void dump(std::basic_ostream<char_type>& os) const
     {
-        basic_json_compressed_serializer<char_type> serializer(os);
+        basic_json_compressed_encoder<char_type> serializer(os);
         dump(serializer);
     }
 
@@ -2868,19 +2868,19 @@ public:
     {
         if (line_indent == indenting::indent)
         {
-            basic_json_serializer<char_type> serializer(os);
+            basic_json_encoder<char_type> serializer(os);
             dump(serializer);
         }
         else
         {
-            basic_json_compressed_serializer<char_type> serializer(os);
+            basic_json_compressed_encoder<char_type> serializer(os);
             dump(serializer);
         }
     }
 
     void dump(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options) const
     {
-        basic_json_compressed_serializer<char_type> serializer(os, options);
+        basic_json_compressed_encoder<char_type> serializer(os, options);
         dump(serializer);
     }
 
@@ -2888,12 +2888,12 @@ public:
     {
         if (line_indent == indenting::indent)
         {
-            basic_json_serializer<char_type> serializer(os, options);
+            basic_json_encoder<char_type> serializer(os, options);
             dump(serializer);
         }
         else
         {
-            basic_json_compressed_serializer<char_type> serializer(os, options);
+            basic_json_compressed_encoder<char_type> serializer(os, options);
             dump(serializer);
         }
     }
@@ -2901,7 +2901,7 @@ public:
     string_type to_string(const char_allocator_type& allocator=char_allocator_type()) const noexcept
     {
         string_type s(allocator);
-        basic_json_compressed_serializer<char_type,jsoncons::string_result<string_type>> serializer(s);
+        basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> serializer(s);
         dump(serializer);
         return s;
     }
@@ -2910,7 +2910,7 @@ public:
                           const char_allocator_type& allocator=char_allocator_type()) const
     {
         string_type s(allocator);
-        basic_json_compressed_serializer<char_type,jsoncons::string_result<string_type>> serializer(s,options);
+        basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> serializer(s,options);
         dump(serializer);
         return s;
     }
@@ -2930,12 +2930,12 @@ public:
     {
         if (pprint)
         {
-            basic_json_serializer<char_type> serializer(os);
+            basic_json_encoder<char_type> serializer(os);
             dump(serializer);
         }
         else
         {
-            basic_json_compressed_serializer<char_type> serializer(os);
+            basic_json_compressed_encoder<char_type> serializer(os);
             dump(serializer);
         }
     }
@@ -2944,12 +2944,12 @@ public:
     {
         if (pprint)
         {
-            basic_json_serializer<char_type> serializer(os, options);
+            basic_json_encoder<char_type> serializer(os, options);
             dump(serializer);
         }
         else
         {
-            basic_json_compressed_serializer<char_type> serializer(os, options);
+            basic_json_compressed_encoder<char_type> serializer(os, options);
             dump(serializer);
         }
     }
@@ -3504,7 +3504,7 @@ public:
                 }
                 else
                 {
-                    basic_json_compressed_serializer<char_type,jsoncons::string_result<string_type>> serializer(s,options);
+                    basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> serializer(s,options);
                     dump(serializer);
                 }
                 return s;
@@ -3512,7 +3512,7 @@ public:
             default:
             {
                 string_type s(allocator);
-                basic_json_compressed_serializer<char_type,jsoncons::string_result<string_type>> serializer(s,options);
+                basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> serializer(s,options);
                 dump(serializer);
                 return s;
             }

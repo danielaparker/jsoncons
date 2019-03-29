@@ -124,12 +124,12 @@ void encode_json(const T& val,
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_serializer<CharT> serializer(os);
+        basic_json_encoder<CharT> serializer(os);
         encode_json(val, serializer);
     }
     else
     {
-        basic_json_compressed_serializer<CharT> serializer(os);
+        basic_json_compressed_encoder<CharT> serializer(os);
         encode_json(val, serializer);
     }
 }
@@ -142,12 +142,12 @@ void encode_json(const T& val,
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_serializer<CharT> serializer(os, options);
+        basic_json_encoder<CharT> serializer(os, options);
         encode_json(val, serializer);
     }
     else
     {
-        basic_json_compressed_serializer<CharT> serializer(os, options);
+        basic_json_compressed_encoder<CharT> serializer(os, options);
         encode_json(val, serializer);
     }
 }
@@ -159,12 +159,12 @@ void encode_json(const T& val,
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_serializer<CharT,jsoncons::string_result<std::basic_string<CharT>>> serializer(s);
+        basic_json_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> serializer(s);
         encode_json(val, serializer);
     }
     else
     {
-        basic_json_compressed_serializer<CharT,jsoncons::string_result<std::basic_string<CharT>>> serializer(s);
+        basic_json_compressed_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> serializer(s);
         encode_json(val, serializer);
     }
 }
@@ -177,12 +177,12 @@ void encode_json(const T& val,
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_serializer<CharT> serializer(s, options);
+        basic_json_encoder<CharT> serializer(s, options);
         encode_json(val, serializer);
     }
     else
     {
-        basic_json_compressed_serializer<CharT> serializer(s, options);
+        basic_json_compressed_encoder<CharT> serializer(s, options);
         encode_json(val, serializer);
     }
 }
@@ -204,12 +204,12 @@ void encode_json(const T& val,
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_serializer<CharT> serializer(os);
+        basic_json_encoder<CharT> serializer(os);
         encode_json(val, serializer, j);
     }
     else
     {
-        basic_json_compressed_serializer<CharT> serializer(os);
+        basic_json_compressed_encoder<CharT> serializer(os);
         encode_json(val, serializer, j);
     }
 }
@@ -223,12 +223,12 @@ void encode_json(const T& val,
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_serializer<CharT> serializer(os, options);
+        basic_json_encoder<CharT> serializer(os, options);
         encode_json(val, serializer, j);
     }
     else
     {
-        basic_json_compressed_serializer<CharT> serializer(os, options);
+        basic_json_compressed_encoder<CharT> serializer(os, options);
         encode_json(val, serializer, j);
     }
 }
@@ -241,12 +241,12 @@ void encode_json(const T& val,
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_serializer<CharT,jsoncons::string_result<std::basic_string<CharT>>> serializer(s);
+        basic_json_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> serializer(s);
         encode_json(val, serializer, j);
     }
     else
     {
-        basic_json_compressed_serializer<CharT,jsoncons::string_result<std::basic_string<CharT>>> serializer(s);
+        basic_json_compressed_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> serializer(s);
         encode_json(val, serializer, j);
     }
 }
@@ -260,12 +260,12 @@ void encode_json(const T& val,
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_serializer<CharT> serializer(s, options);
+        basic_json_encoder<CharT> serializer(s, options);
         encode_json(val, serializer, j);
     }
     else
     {
-        basic_json_compressed_serializer<CharT> serializer(s, options);
+        basic_json_compressed_encoder<CharT> serializer(s, options);
         encode_json(val, serializer, j);
     }
 }

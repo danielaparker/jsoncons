@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CBOR_CBOR_SERIALIZER_HPP
-#define JSONCONS_CBOR_CBOR_SERIALIZER_HPP
+#ifndef JSONCONS_CBOR_CBOR_ENCODER_HPP
+#define JSONCONS_CBOR_CBOR_ENCODER_HPP
 
 #include <string>
 #include <vector>
@@ -25,7 +25,7 @@ namespace jsoncons { namespace cbor {
 enum class cbor_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template<class CharT,class Result=jsoncons::binary_stream_result>
-class basic_cbor_serializer final : public basic_json_content_handler<CharT>
+class basic_cbor_encoder final : public basic_json_content_handler<CharT>
 {
 
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
@@ -72,18 +72,18 @@ private:
     bool pack_strings_;
 
     // Noncopyable and nonmoveable
-    basic_cbor_serializer(const basic_cbor_serializer&) = delete;
-    basic_cbor_serializer& operator=(const basic_cbor_serializer&) = delete;
+    basic_cbor_encoder(const basic_cbor_encoder&) = delete;
+    basic_cbor_encoder& operator=(const basic_cbor_encoder&) = delete;
 
     std::map<std::string,size_t> stringref_map_;
     std::map<byte_string,size_t> bytestringref_map_;
     size_t next_stringref_ = 0;
 public:
-    explicit basic_cbor_serializer(result_type result)
+    explicit basic_cbor_encoder(result_type result)
        : result_(std::move(result)), pack_strings_(false)
     {
     }
-    basic_cbor_serializer(result_type result, 
+    basic_cbor_encoder(result_type result, 
                           const cbor_encode_options& options)
        : result_(std::move(result)), pack_strings_(options.pack_strings())
     {
@@ -95,7 +95,7 @@ public:
         }
     }
 
-    ~basic_cbor_serializer()
+    ~basic_cbor_encoder()
     {
         try
         {
@@ -859,14 +859,23 @@ private:
     }
 };
 
+typedef basic_cbor_encoder<char,jsoncons::binary_stream_result> cbor_encoder;
+typedef basic_cbor_encoder<char,jsoncons::byte_array_result> cbor_buffer_encoder;
+
+typedef basic_cbor_encoder<wchar_t,jsoncons::binary_stream_result> wcbor_encoder;
+typedef basic_cbor_encoder<wchar_t,jsoncons::byte_array_result> wcbor_buffer_encoder;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+typedef basic_cbor_encoder<char,jsoncons::byte_array_result> cbor_bytes_serializer;
+
+template<class CharT,class Result>
+using basic_cbor_serializer = basic_cbor_encoder<CharT,Result>; 
+
 typedef basic_cbor_serializer<char,jsoncons::binary_stream_result> cbor_serializer;
 typedef basic_cbor_serializer<char,jsoncons::byte_array_result> cbor_buffer_serializer;
 
 typedef basic_cbor_serializer<wchar_t,jsoncons::binary_stream_result> wcbor_serializer;
 typedef basic_cbor_serializer<wchar_t,jsoncons::byte_array_result> wcbor_buffer_serializer;
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_cbor_serializer<char,jsoncons::byte_array_result> cbor_bytes_serializer;
 #endif
 
 }}

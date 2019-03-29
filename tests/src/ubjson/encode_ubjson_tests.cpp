@@ -137,7 +137,7 @@ TEST_CASE("encode_ubjson_arrays_and_maps")
 TEST_CASE("encode indefinite length ubjson arrays and maps")
 {
     std::vector<uint8_t> v;
-    ubjson_buffer_serializer serializer(v);
+    ubjson_buffer_encoder serializer(v);
 
     SECTION("[\"Hello\"]")
     {

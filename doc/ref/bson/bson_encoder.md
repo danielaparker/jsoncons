@@ -1,28 +1,28 @@
-### jsoncons::bson::basic_bson_serializer
+### jsoncons::bson::basic_bson_encoder
 
 ```c++
 template<
     class CharT,
     class Result>
-> class basic_bson_serializer : public jsoncons::basic_json_content_handler<CharT>
+> class basic_bson_encoder : public jsoncons::basic_json_content_handler<CharT>
 ```
 
-`basic_bson_serializer` is noncopyable and nonmoveable.
+`basic_bson_encoder` is noncopyable and nonmoveable.
 
 #### Header
 
-    #include <jsoncons_ext/bson/bson_serializer.hpp>
+    #include <jsoncons_ext/bson/bson_encoder.hpp>
 
-![bson_serializer](./diagrams/bson_serializer.png)
+![bson_encoder](./diagrams/bson_encoder.png)
 
 Four specializations for common character types and result types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-bson_serializer            |basic_bson_serializer<char,jsoncons::binary_stream_result>
-bson_buffer_serializer     |basic_bson_serializer<char,jsoncons::binary_buffer_result>
-wbson_serializer           |basic_bson_serializer<wchar_t,jsoncons::binary_stream_result>
-wbson_buffer_serializer    |basic_bson_serializer<wchar_t,jsoncons::binary_buffer_result>
+bson_encoder            |basic_bson_encoder<char,jsoncons::binary_stream_result>
+bson_buffer_encoder     |basic_bson_encoder<char,jsoncons::binary_buffer_result>
+wbson_encoder           |basic_bson_encoder<wchar_t,jsoncons::binary_stream_result>
+wbson_buffer_encoder    |basic_bson_encoder<wchar_t,jsoncons::binary_buffer_result>
 
 #### Member types
 
@@ -34,12 +34,12 @@ string_view_type           |
 
 #### Constructors
 
-    explicit basic_bson_serializer(result_type result)
+    explicit basic_bson_encoder(result_type result)
 Constructs a new serializer that writes to the specified result.
 
 #### Destructor
 
-    virtual ~basic_bson_serializer()
+    virtual ~basic_bson_encoder()
 
 ### Inherited from [basic_json_content_handler](../json_content_handler.md)
 
@@ -122,7 +122,7 @@ Constructs a new serializer that writes to the specified result.
 int main()
 {
     std::vector<uint8_t> buffer;
-    bson::bson_buffer_serializer writer(buffer);
+    bson::bson_buffer_encoder writer(buffer);
     writer.begin_array(); // The total number of bytes comprising 
                           // the bson document will be calculated
     writer.string_value("cat");

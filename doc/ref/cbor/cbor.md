@@ -8,7 +8,7 @@ encoding an unpacked (json) value to a packed CBOR value.
 
 [encode_cbor](encode_cbor.md)
 
-[cbor_serializer](cbor_serializer.md)
+[cbor_encoder](cbor_encoder.md)
 
 #### jsoncons - CBOR mappings
 

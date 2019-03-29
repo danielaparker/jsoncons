@@ -14,7 +14,7 @@
 #include <istream> // std::basic_istream
 #include <jsoncons/json.hpp>
 #include <jsoncons/config/binary_detail.hpp>
-#include <jsoncons_ext/bson/bson_serializer.hpp>
+#include <jsoncons_ext/bson/bson_encoder.hpp>
 #include <jsoncons_ext/bson/bson_reader.hpp>
 
 namespace jsoncons { namespace bson {
@@ -76,7 +76,7 @@ template<class Json>
 void encode_bson(const Json& j, std::basic_ostream<typename Json::char_type>& os)
 {
     typedef typename Json::char_type char_type;
-    basic_bson_serializer<char_type> serializer(os);
+    basic_bson_encoder<char_type> serializer(os);
     j.dump(serializer);
 }
 
@@ -84,7 +84,7 @@ template<class Json>
 void encode_bson(const Json& j, std::vector<uint8_t>& v)
 {
     typedef typename Json::char_type char_type;
-    basic_bson_serializer<char_type,jsoncons::byte_array_result> serializer(v);
+    basic_bson_encoder<char_type,jsoncons::byte_array_result> serializer(v);
     j.dump(serializer);
 }
   

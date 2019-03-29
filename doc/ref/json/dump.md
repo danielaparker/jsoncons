@@ -52,7 +52,7 @@ void dump(basic_json_content_handler<char_type>& content_handler) const; // (9)
 
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/csv/csv_serializer.hpp>
+#include <jsoncons_ext/csv/csv_encoder.hpp>
 
 using namespace jsoncons;
 
@@ -80,7 +80,7 @@ int main()
     csv_options options;
     params.column_names("author,title,price");
 
-    csv_serializer serializer(std::cout, options);
+    csv_encoder serializer(std::cout, options);
 
     books.dump(serializer);
 }
@@ -134,7 +134,7 @@ int main()
     ]
     )");
 
-    json_serializer serializer(std::cout, jsoncons::indenting::indent); // pretty print
+    json_encoder serializer(std::cout, jsoncons::indenting::indent); // pretty print
     serializer.begin_array();
     for (const auto& book : some_books.array_range())
     {

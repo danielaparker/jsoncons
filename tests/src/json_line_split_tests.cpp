@@ -2,7 +2,7 @@
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_serializer.hpp>
+#include <jsoncons/json_encoder.hpp>
 #include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
@@ -39,7 +39,7 @@ bool are_equal(const std::string& s1, const std::string& s2)
     return true;
 }
 
-TEST_CASE("json_serializer line split tests")
+TEST_CASE("json_encoder line split tests")
 {
     json val = json::parse(R"(
     {

@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_UBJSON_UBJSON_SERIALIZER_HPP
-#define JSONCONS_UBJSON_UBJSON_SERIALIZER_HPP
+#ifndef JSONCONS_UBJSON_UBJSON_ENCODER_HPP
+#define JSONCONS_UBJSON_UBJSON_ENCODER_HPP
 
 #include <string>
 #include <vector>
@@ -25,7 +25,7 @@ namespace jsoncons { namespace ubjson {
 enum class ubjson_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template<class CharT,class Result=jsoncons::binary_stream_result>
-class basic_ubjson_serializer final : public basic_json_content_handler<CharT>
+class basic_ubjson_encoder final : public basic_json_content_handler<CharT>
 {
 
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
@@ -70,15 +70,15 @@ private:
     Result result_;
 
     // Noncopyable and nonmoveable
-    basic_ubjson_serializer(const basic_ubjson_serializer&) = delete;
-    basic_ubjson_serializer& operator=(const basic_ubjson_serializer&) = delete;
+    basic_ubjson_encoder(const basic_ubjson_encoder&) = delete;
+    basic_ubjson_encoder& operator=(const basic_ubjson_encoder&) = delete;
 public:
-    basic_ubjson_serializer(result_type result)
+    basic_ubjson_encoder(result_type result)
        : result_(std::move(result))
     {
     }
 
-    ~basic_ubjson_serializer()
+    ~basic_ubjson_encoder()
     {
         try
         {
@@ -424,11 +424,22 @@ private:
     }
 };
 
+typedef basic_ubjson_encoder<char,jsoncons::binary_stream_result> ubjson_encoder;
+typedef basic_ubjson_encoder<char,jsoncons::byte_array_result> ubjson_buffer_encoder;
+
+typedef basic_ubjson_encoder<wchar_t,jsoncons::binary_stream_result> wubjson_encoder;
+typedef basic_ubjson_encoder<wchar_t,jsoncons::byte_array_result> wubjson_buffer_encoder;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+template<class CharT,class Result>
+using basic_ubjson_serializer = basic_ubjson_encoder<CharT,Result>; 
+
 typedef basic_ubjson_serializer<char,jsoncons::binary_stream_result> ubjson_serializer;
 typedef basic_ubjson_serializer<char,jsoncons::byte_array_result> ubjson_buffer_serializer;
 
 typedef basic_ubjson_serializer<wchar_t,jsoncons::binary_stream_result> wubjson_serializer;
 typedef basic_ubjson_serializer<wchar_t,jsoncons::byte_array_result> wubjson_buffer_serializer;
+#endif
 
 }}
 #endif

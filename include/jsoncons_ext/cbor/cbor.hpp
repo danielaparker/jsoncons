@@ -16,7 +16,7 @@
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons_ext/cbor/cbor_reader.hpp>
-#include <jsoncons_ext/cbor/cbor_serializer.hpp>
+#include <jsoncons_ext/cbor/cbor_encoder.hpp>
 
 namespace jsoncons { namespace cbor {
 
@@ -26,7 +26,7 @@ template<class Json>
 void encode_cbor(const Json& j, std::basic_ostream<typename Json::char_type>& os)
 {
     typedef typename Json::char_type char_type;
-    basic_cbor_serializer<char_type> serializer(os);
+    basic_cbor_encoder<char_type> serializer(os);
     j.dump(serializer);
 }
 
@@ -34,7 +34,7 @@ template<class Json>
 void encode_cbor(const Json& j, std::vector<uint8_t>& v)
 {
     typedef typename Json::char_type char_type;
-    basic_cbor_serializer<char_type,jsoncons::byte_array_result> serializer(v);
+    basic_cbor_encoder<char_type,jsoncons::byte_array_result> serializer(v);
     j.dump(serializer);
 }
 

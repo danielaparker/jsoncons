@@ -6,7 +6,7 @@ The bson extension implements decode from and encode to the [Binary JSON](http:/
 
 [encode_bson](encode_bson.md)
 
-[bson_serializer](bson_serializer.md)
+[bson_encoder](bson_encoder.md)
 
 #### jsoncons-BSON mappings
 
