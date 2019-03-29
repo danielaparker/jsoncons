@@ -333,19 +333,19 @@ private:
         {
             case byte_string_chars_format::base16:
             {
-                encode_base16(b.data(),b.length(),s);
+                encode_base16(b.begin(),b.end(),s);
                 do_string_value(s, semantic_tag::none, context);
                 break;
             }
             case byte_string_chars_format::base64:
             {
-                encode_base64(b.data(),b.length(),s);
+                encode_base64(b.begin(),b.end(),s);
                 do_string_value(s, semantic_tag::none, context);
                 break;
             }
             case byte_string_chars_format::base64url:
             {
-                encode_base64url(b.data(),b.length(),s);
+                encode_base64url(b.begin(),b.end(),s);
                 do_string_value(s, semantic_tag::none, context);
                 break;
             }

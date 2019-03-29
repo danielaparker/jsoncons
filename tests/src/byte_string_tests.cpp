@@ -18,7 +18,7 @@ using namespace jsoncons;
 void check_encode_base64(const std::vector<uint8_t>& input, const std::string& expected)
 {
     std::string result;
-    encode_base64(input.data(),input.size(),result);
+    encode_base64(input.begin(),input.end(),result);
     REQUIRE(result.size() == expected.size());
     for (size_t i = 0; i < result.size(); ++i)
     {
@@ -37,7 +37,7 @@ void check_encode_base64(const std::vector<uint8_t>& input, const std::string& e
 void check_encode_base64url(const std::vector<uint8_t>& input, const std::string& expected)
 {
     std::string result;
-    encode_base64url(input.data(),input.size(),result);
+    encode_base64url(input.begin(),input.end(),result);
     REQUIRE(result.size() == expected.size());
     for (size_t i = 0; i < result.size(); ++i)
     {
@@ -56,7 +56,7 @@ void check_encode_base64url(const std::vector<uint8_t>& input, const std::string
 void check_encode_base16(const std::vector<uint8_t>& input, const std::string& expected)
 {
     std::string result;
-    encode_base16(input.data(),input.size(),result);
+    encode_base16(input.begin(),input.end(),result);
     REQUIRE(result.size() == expected.size());
     for (size_t i = 0; i < result.size(); ++i)
     {

@@ -25,12 +25,11 @@ namespace jsoncons {
 // Algorithms
 
 namespace detail {
-
-template <class Container>
-size_t encode_base64_generic(const uint8_t* first, size_t length, const char alphabet[65], Container& result)
+template <class InputIt, class Container>
+typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value,size_t>::type
+encode_base64_generic(InputIt first, InputIt last, const char alphabet[65], Container& result)
 {
     size_t count = 0;
-    const uint8_t* last = first + length;
     unsigned char a3[3];
     unsigned char a4[4];
     unsigned char fill = alphabet[64];
@@ -144,38 +143,41 @@ decode_base64_generic(InputIt first, InputIt last,
 
 }
 
-template <class Container>
-size_t encode_base16(const uint8_t* data, size_t length, Container& result)
+template <class InputIt, class Container>
+typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value,size_t>::type
+encode_base16(InputIt first, InputIt last, Container& result)
 {
     static constexpr char characters[] = "0123456789ABCDEF";
 
-    for (size_t i = 0; i < length; ++i)
+    for (auto it = first; it != last; ++it)
     {
-        uint8_t c = data[i];
+        uint8_t c = *it;
         result.push_back(characters[c >> 4]);
         result.push_back(characters[c & 0xf]);
     }
-    return length*2;
+    return (last-first)*2;
 }
 
-template <class Container>
-size_t encode_base64url(const uint8_t* first, size_t length, Container& result)
+template <class InputIt, class Container>
+typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value,size_t>::type
+encode_base64url(InputIt first, InputIt last, Container& result)
 {
     static constexpr char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                                   "abcdefghijklmnopqrstuvwxyz"
                                                   "0123456789-_"
                                                   "\0";
-    return detail::encode_base64_generic(first, length, alphabet, result);
+    return detail::encode_base64_generic(first, last, alphabet, result);
 }
 
-template <class Container>
-size_t encode_base64(const uint8_t* first, size_t length, Container& result)
+template <class InputIt, class Container>
+typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value,size_t>::type
+encode_base64(InputIt first, InputIt last, Container& result)
 {
     static constexpr char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                                "abcdefghijklmnopqrstuvwxyz"
                                                "0123456789+/"
                                                "=";
-    return detail::encode_base64_generic(first, length, alphabet, result);
+    return detail::encode_base64_generic(first, last, alphabet, result);
 }
 
 template <class Char>

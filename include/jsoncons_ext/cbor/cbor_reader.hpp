@@ -667,7 +667,7 @@ private:
                     return;
                 }
                 std::string s;
-                encode_base64url(v.data(),v.size(),s);
+                encode_base64url(v.begin(),v.end(),s);
                 handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
                 break;
             }
@@ -696,7 +696,7 @@ private:
                         case jsoncons::cbor::detail::cbor_major_type::byte_string:
                         {
                             std::string s;
-                            encode_base64url(val.bs.data(),val.bs.size(),s);
+                            encode_base64url(val.bs.begin(),val.bs.end(),s);
                             handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
                             break;
                         }

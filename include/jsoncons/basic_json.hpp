@@ -474,6 +474,16 @@ public:
                 return ptr_->size();
             }
 
+            const uint8_t* begin() const
+            {
+                return ptr_->data();
+            }
+
+            const uint8_t* end() const
+            {
+                return ptr_->data() + ptr_->size();
+            }
+
             allocator_type get_allocator() const
             {
                 return ptr_->get_allocator();
@@ -3447,18 +3457,18 @@ public:
                 switch (format)
                 {
                     case byte_string_chars_format::base64:
-                        encode_base64(var_.byte_string_data_cast()->data(), 
-                                      var_.byte_string_data_cast()->length(),
+                        encode_base64(var_.byte_string_data_cast()->begin(), 
+                                      var_.byte_string_data_cast()->end(),
                                       s);
                         break;
                     case byte_string_chars_format::base16:
-                        encode_base16(var_.byte_string_data_cast()->data(), 
-                                      var_.byte_string_data_cast()->length(),
+                        encode_base16(var_.byte_string_data_cast()->begin(), 
+                                      var_.byte_string_data_cast()->end(),
                                       s);
                         break;
                     default:
-                        encode_base64url(var_.byte_string_data_cast()->data(), 
-                                         var_.byte_string_data_cast()->length(),
+                        encode_base64url(var_.byte_string_data_cast()->begin(), 
+                                         var_.byte_string_data_cast()->end(),
                                          s);
                         break;
                 }

@@ -730,7 +730,7 @@ private:
             case byte_string_chars_format::base16:
             {
                 result_.push_back('\"');
-                size_t length = encode_base16(b.data(),b.length(),result_);
+                size_t length = encode_base16(b.begin(),b.end(),result_);
                 result_.push_back('\"');
                 column_ += (length + 2);
                 break;
@@ -738,7 +738,7 @@ private:
             case byte_string_chars_format::base64:
             {
                 result_.push_back('\"');
-                size_t length = encode_base64(b.data(), b.length(), result_);
+                size_t length = encode_base64(b.begin(), b.end(), result_);
                 result_.push_back('\"');
                 column_ += (length + 2);
                 break;
@@ -746,7 +746,7 @@ private:
             case byte_string_chars_format::base64url:
             {
                 result_.push_back('\"');
-                size_t length = encode_base64url(b.data(),b.length(),result_);
+                size_t length = encode_base64url(b.begin(),b.end(),result_);
                 result_.push_back('\"');
                 column_ += (length + 2);
                 break;
@@ -952,7 +952,7 @@ private:
                     result_.push_back('~');
                     ++column_;
                 }
-                size_t length = encode_base64(v.data(), v.size(), result_);
+                size_t length = encode_base64(v.begin(), v.end(), result_);
                 result_.push_back('\"');
                 column_ += (length+2);
                 break;
@@ -970,7 +970,7 @@ private:
                     result_.push_back('~');
                     ++column_;
                 }
-                size_t length = encode_base64url(v.data(), v.size(), result_);
+                size_t length = encode_base64url(v.begin(), v.end(), result_);
                 result_.push_back('\"');
                 column_ += (length+2);
                 break;
@@ -1259,7 +1259,7 @@ private:
                 {
                     result_.push_back('~');
                 }
-                encode_base64(v.data(), v.size(), result_);
+                encode_base64(v.begin(), v.end(), result_);
                 result_.push_back('\"');
                 break;
             }
@@ -1275,7 +1275,7 @@ private:
                 {
                     result_.push_back('~');
                 }
-                encode_base64url(v.data(), v.size(), result_);
+                encode_base64url(v.begin(), v.end(), result_);
                 result_.push_back('\"');
                 break;
             }
@@ -1351,21 +1351,21 @@ private:
             case byte_string_chars_format::base16:
             {
                 result_.push_back('\"');
-                encode_base16(b.data(),b.length(),result_);
+                encode_base16(b.begin(),b.end(),result_);
                 result_.push_back('\"');
                 break;
             }
             case byte_string_chars_format::base64:
             {
                 result_.push_back('\"');
-                encode_base64(b.data(), b.length(), result_);
+                encode_base64(b.begin(), b.end(), result_);
                 result_.push_back('\"');
                 break;
             }
             case byte_string_chars_format::base64url:
             {
                 result_.push_back('\"');
-                encode_base64url(b.data(),b.length(),result_);
+                encode_base64url(b.begin(),b.end(),result_);
                 result_.push_back('\"');
                 break;
             }
