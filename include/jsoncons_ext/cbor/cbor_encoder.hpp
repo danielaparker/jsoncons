@@ -29,7 +29,6 @@ class basic_cbor_encoder final : public basic_json_content_handler<CharT>
 {
 
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
-    const size_t min_length_for_stringref = 3;
 
 public:
     typedef CharT char_type;
@@ -301,7 +300,7 @@ private:
 
         const size_t length = target.size();
 
-        if (pack_strings_ && length >= min_length_for_stringref)
+        if (pack_strings_ && length >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
         {
             auto it = stringref_map_.find(target);
             if (it == stringref_map_.end())
@@ -633,7 +632,7 @@ private:
             default:
                 break;
         }
-        if (pack_strings_ && b.length() >= min_length_for_stringref)
+        if (pack_strings_ && b.length() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
         {
             auto it = bytestringref_map_.find(byte_string(b));
             if (it == bytestringref_map_.end())

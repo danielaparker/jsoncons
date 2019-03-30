@@ -40,6 +40,33 @@ namespace additional_info
     const uint8_t indefinite_length = 0x1f;
 }
 
+inline
+size_t min_length_for_stringref(uint64_t index)
+{
+    uint64_t n;
+    if (index <= 23)
+    {
+        n = 3;
+    }
+    else if (index <= 255)
+    {
+        n = 4;
+    }
+    else if (index <= 65535)
+    {
+        n = 5;
+    }
+    else if (index <= 4294967295)
+    {
+        n = 7;
+    }
+    else 
+    {
+        n = 11;
+    }
+    return n;
+}
+
 }}}
 
 #endif

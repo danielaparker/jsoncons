@@ -698,7 +698,7 @@ private:
         iterate_string_chunks(source_, func, ec);
         if (state_stack_.back().stringref_map && 
             info != jsoncons::cbor::detail::additional_info::indefinite_length &&
-            s.length() >= min_length_for_stringref(info))
+            s.length() >= jsoncons::cbor::detail::min_length_for_stringref(state_stack_.back().stringref_map->size()))
         {
             state_stack_.back().stringref_map->emplace_back(s);
         }
@@ -764,7 +764,7 @@ private:
         iterate_string_chunks(source_, func, ec);
         if (state_stack_.back().stringref_map && 
             info != jsoncons::cbor::detail::additional_info::indefinite_length &&
-            v.size() >= min_length_for_stringref(info))
+            v.size() >= jsoncons::cbor::detail::min_length_for_stringref(state_stack_.back().stringref_map->size()))
         {
             state_stack_.back().stringref_map->emplace_back(v);
         }
@@ -1312,45 +1312,6 @@ private:
         }
     }
 
-    static size_t min_length_for_stringref(uint8_t info)
-    {
-        size_t len = 0;
-        switch (info)
-        {
-            case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
-            {
-                len = 3;
-                break;
-            }
-
-            case 0x18: // Unsigned integer (one-byte uint8_t follows)
-            {
-                len = 4;
-                break;
-            }
-
-            case 0x19: // Unsigned integer (two-byte uint16_t follows)
-            {
-                len = 5;
-                break;
-            }
-
-            case 0x1a: // Unsigned integer (four-byte uint32_t follows)
-            {
-                len = 7;
-                break;
-            }
-
-            case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
-            {
-                len = 11;
-                break;
-            }
-            default:
-                break;
-        }
-        return len;
-    }
 };
 
 typedef basic_cbor_reader<jsoncons::binary_stream_source> cbor_reader;

@@ -694,6 +694,6 @@ TEST_CASE("CBOR stringref tag 2")
         CHECK(std::string(bs.begin(),bs.end()) == std::string("rrr"));
 
         bs = j[31].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("rrr"));
+        CHECK(std::string(bs.begin(),bs.end()) == std::string("ssss"));
 }
 
