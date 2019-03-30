@@ -21,7 +21,7 @@ Constructs a `cbor_options` with default values.
 If set to `true`, then encode will store text strings and
 byte strings once, and use references for repeated occurences
 of the strings. In order to decode CBOR so encoded, the decoder
-must understand the 
+must support the 
 [stringref extension to CBOR](http://cbor.schmorp.de/stringref).
 
 If set to `false` (the default), then encode
