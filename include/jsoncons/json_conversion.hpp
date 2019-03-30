@@ -109,12 +109,12 @@ T decode_json(std::basic_istream<CharT>& is,
 
 template <class T, class CharT>
 void encode_json(const T& val, 
-                 basic_json_content_handler<CharT>& writer)
+                 basic_json_content_handler<CharT>& receiver)
 {
     typedef basic_json<CharT> json_type;
 
-    encode_stream(val, writer, json_type());
-    writer.flush();
+    encode_stream(val, receiver, json_type());
+    receiver.flush();
 }
 
 template <class T, class CharT>
@@ -189,11 +189,11 @@ void encode_json(const T& val,
 
 template <class T, class CharT, class Json>
 void encode_json(const T& val, 
-                 basic_json_content_handler<CharT>& writer, 
+                 basic_json_content_handler<CharT>& receiver, 
                  const Json& j)
 {
-    encode_stream(val, writer, j);
-    writer.flush();
+    encode_stream(val, receiver, j);
+    receiver.flush();
 }
 
 template <class T, class CharT, class Json>

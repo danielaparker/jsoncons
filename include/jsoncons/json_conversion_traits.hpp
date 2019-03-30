@@ -37,7 +37,7 @@ void decode_stream(basic_staj_reader<CharT>& reader, T& val, const Json& j)
 }
 
 template <class T, class CharT, class Json>
-void encode_stream(const T&val, basic_json_content_handler<CharT>& writer);
+void encode_stream(const T&val, basic_json_content_handler<CharT>& receiver);
 
 } // namespace jsoncons
 
@@ -57,10 +57,10 @@ struct json_conversion_traits
     }
 
     template <class CharT, class Json>
-    static void encode(const T& val, basic_json_content_handler<CharT>& writer)
+    static void encode(const T& val, basic_json_content_handler<CharT>& receiver)
     {
         auto j = json_type_traits<Json, T>::to_json(val);
-        j.dump(writer);
+        j.dump(receiver);
     }
 };
 
@@ -91,15 +91,15 @@ struct json_conversion_traits<T,
     }
 
     template <class CharT, class Json>
-    static void encode(const T& val, basic_json_content_handler<CharT>& writer)
+    static void encode(const T& val, basic_json_content_handler<CharT>& receiver)
     {
-        writer.begin_array();
+        receiver.begin_array();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            json_conversion_traits<value_type>::template encode<CharT,Json>(*it,writer);
+            json_conversion_traits<value_type>::template encode<CharT,Json>(*it,receiver);
         }
-        writer.end_array();
-        writer.flush();
+        receiver.end_array();
+        receiver.flush();
     }
 };
 // std::array
@@ -126,15 +126,15 @@ struct json_conversion_traits<std::array<T,N>>
     }
 
     template <class CharT, class Json>
-    static void encode(const std::array<T, N>& val, basic_json_content_handler<CharT>& writer)
+    static void encode(const std::array<T, N>& val, basic_json_content_handler<CharT>& receiver)
     {
-        writer.begin_array();
+        receiver.begin_array();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            json_conversion_traits<value_type>::template encode<CharT,Json>(*it,writer);
+            json_conversion_traits<value_type>::template encode<CharT,Json>(*it,receiver);
         }
-        writer.end_array();
-        writer.flush();
+        receiver.end_array();
+        receiver.flush();
     }
 };
 
@@ -165,16 +165,16 @@ struct json_conversion_traits<T,
     }
 
     template <class CharT, class Json>
-    static void encode(const T& val, basic_json_content_handler<CharT>& writer)
+    static void encode(const T& val, basic_json_content_handler<CharT>& receiver)
     {
-        writer.begin_object();
+        receiver.begin_object();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            writer.name(it->first);
-            json_conversion_traits<mapped_type>::template encode<CharT,Json>(it->second,writer);
+            receiver.name(it->first);
+            json_conversion_traits<mapped_type>::template encode<CharT,Json>(it->second,receiver);
         }
-        writer.end_object();
-        writer.flush();
+        receiver.end_object();
+        receiver.flush();
     }
 };
 
@@ -185,9 +185,9 @@ void decode_stream(basic_staj_reader<CharT>& reader, T& val, const Json&, std::e
 }
 
 template <class T, class CharT, class Json>
-void encode_stream(const T&val, basic_json_content_handler<CharT>& writer, const Json&)
+void encode_stream(const T&val, basic_json_content_handler<CharT>& receiver, const Json&)
 {
-    json_conversion_traits<T>::template encode<CharT,Json>(val, writer);
+    json_conversion_traits<T>::template encode<CharT,Json>(val, receiver);
 }
 
 }

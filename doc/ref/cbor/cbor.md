@@ -1,4 +1,4 @@
-### cbor extension
+## cbor extension
 
 The cbor extension implements decode from and encode to the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/).
 It supports decoding a packed CBOR value to an unpacked (json) value and
@@ -12,7 +12,38 @@ encoding an unpacked (json) value to a packed CBOR value.
 
 [cbor_options](cbor_options.md)
 
-#### jsoncons - CBOR mappings
+### Tag handling and extensions
+
+All tags not explicitly mentioned below are ignored.
+
+0 (standard date/time string)
+Standard date/time strings are decoded into strings tagged with `semantic_tag::date_time`.
+Strings tagged with `semantic_tag::date_time` are encoded into standard date/time strings.
+
+1 (epoch time)
+When decoding, int64, uint64 or double is tagged with `semantic_tag::timestamp`. 
+
+2,3 (positive and negative bignum)
+Positive and negative bignums are decoded into strings tagged with `semantic_tag::big_integer`.
+Strings tagged with `semantic_tag::big_integer` are encoded into positive or negative bignums.
+
+4 (decimal fratction)
+Decimal fractions are decoded into strings tagged with `semantic_tag::big_decimal`.
+Strings tagged with `semantic_tag::big_decimal` are encoded into decimal fractions.
+
+5 (big float)
+Big floats are taken as an array and tagged with `semantic_tag::big_float`.
+
+21, 22, 23 (byte string expected conversion is base64url, base64 or base 16)
+
+32 (URI)
+
+33, 34 (UTF-8 string is base64url or base64)
+
+256, 25 [stringref-namespace, stringref](http://cbor.schmorp.de/stringref)
+Tags 256 and 25 are automatically decoded when detected. They are encoded when CBOR option `pack_strings` is set to true.
+
+### jsoncons - CBOR mappings
 
 jsoncons data item|jsoncons tag|CBOR data item|CBOR tag
 --------------|------------------|---------------|--------

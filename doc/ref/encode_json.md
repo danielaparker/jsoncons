@@ -9,7 +9,7 @@ have [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/do
 
 template <class T, class CharT>
 void encode_json(const T& val, 
-                 basic_json_content_handler<CharT>& writer); // (1)
+                 basic_json_content_handler<CharT>& receiver); // (1)
 
 template <class T, class CharT>
 void encode_json(const T& val, 
@@ -35,7 +35,7 @@ void encode_json(const T& val,
 
 template <class T, class CharT, class Json>
 void encode_json(const T& val, 
-                 basic_json_content_handler<CharT>& writer, 
+                 basic_json_content_handler<CharT>& receiver, 
                  const Json&); // (6)
 
 template <class T, class CharT, class Json>
