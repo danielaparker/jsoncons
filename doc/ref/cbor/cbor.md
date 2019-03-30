@@ -21,14 +21,15 @@ Standard date/time strings are decoded into strings tagged with `semantic_tag::d
 Strings tagged with `semantic_tag::date_time` are encoded into standard date/time strings.
 
 1 (epoch time)
-When decoding, int64, uint64 or double is tagged with `semantic_tag::timestamp`. 
+Epoch times are decoded into int64, uint64 or double and tagged with `semantic_tag::timestamp`. 
+int64, uint64 or double tagged with `semantic_tag::timestamp` are encoded into epoch time.
 
 2,3 (positive and negative bignum)
-Positive and negative bignums are decoded into strings tagged with `semantic_tag::big_integer`.
+Positive and negative bignums are decoded into strings and tagged with `semantic_tag::big_integer`.
 Strings tagged with `semantic_tag::big_integer` are encoded into positive or negative bignums.
 
 4 (decimal fratction)
-Decimal fractions are decoded into strings tagged with `semantic_tag::big_decimal`.
+Decimal fractions are decoded into strings and tagged with `semantic_tag::big_decimal`.
 Strings tagged with `semantic_tag::big_decimal` are encoded into decimal fractions.
 
 5 (big float)
