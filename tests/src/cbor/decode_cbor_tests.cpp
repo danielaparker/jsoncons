@@ -495,16 +495,16 @@ TEST_CASE("cbor member tests")
 TEST_CASE("cbor conversion tests")
 {
     std::vector<uint8_t> v;
-    cbor::cbor_bytes_encoder writer(v);
-    writer.begin_array(); // indefinite length outer array
-    writer.begin_array(4); // a fixed length array
-    writer.string_value("foo");
-    writer.byte_string_value(byte_string{'P','u','s','s'}); // no suggested conversion
-    writer.big_integer_value("-18446744073709551617");
-    writer.big_decimal_value("273.15");
-    writer.end_array();
-    writer.end_array();
-    writer.flush();
+    cbor::cbor_bytes_encoder encoder(v);
+    encoder.begin_array(); // indefinite length outer array
+    encoder.begin_array(4); // a fixed length array
+    encoder.string_value("foo");
+    encoder.byte_string_value(byte_string{'P','u','s','s'}); // no suggested conversion
+    encoder.big_integer_value("-18446744073709551617");
+    encoder.big_decimal_value("273.15");
+    encoder.end_array();
+    encoder.end_array();
+    encoder.flush();
 
     json j = decode_cbor<json>(v);
     REQUIRE(j.size() == 1);
@@ -531,18 +531,18 @@ TEST_CASE("cbor conversion tests")
 TEST_CASE("cbor array as<> test")
 {
     std::vector<uint8_t> v;
-    cbor::cbor_bytes_encoder writer(v);
-    writer.begin_array(); // indefinite length outer array
-    writer.string_value("foo");
-    writer.byte_string_value(byte_string({'b','a','r'}));
-    writer.big_integer_value("-18446744073709551617");
-    writer.big_decimal_value("273.15");
-    writer.date_time_value("2015-05-07 12:41:07-07:00");
-    writer.timestamp_value(1431027667);
-    writer.int64_value(-1431027667, semantic_tag::timestamp);
-    writer.double_value(1431027667.5, semantic_tag::timestamp);
-    writer.end_array();
-    writer.flush();
+    cbor::cbor_bytes_encoder encoder(v);
+    encoder.begin_array(); // indefinite length outer array
+    encoder.string_value("foo");
+    encoder.byte_string_value(byte_string({'b','a','r'}));
+    encoder.big_integer_value("-18446744073709551617");
+    encoder.big_decimal_value("273.15");
+    encoder.date_time_value("2015-05-07 12:41:07-07:00");
+    encoder.timestamp_value(1431027667);
+    encoder.int64_value(-1431027667, semantic_tag::timestamp);
+    encoder.double_value(1431027667.5, semantic_tag::timestamp);
+    encoder.end_array();
+    encoder.flush();
 
 /*
 9f -- Start indefinite length array 

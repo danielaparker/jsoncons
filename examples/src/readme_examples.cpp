@@ -17,15 +17,15 @@ namespace readme
     {
         // Construct some CBOR using the streaming API
         std::vector<uint8_t> b;
-        cbor::cbor_bytes_encoder writer(b);
-        writer.begin_array(); // indefinite length outer array
-        writer.begin_array(3); // a fixed length array
-        writer.string_value("foo");
-        writer.byte_string_value(byte_string{'P','u','s','s'}); // no suggested conversion
-        writer.big_integer_value("-18446744073709551617");
-        writer.end_array();
-        writer.end_array();
-        writer.flush();
+        cbor::cbor_bytes_encoder encoder(b);
+        encoder.begin_array(); // indefinite length outer array
+        encoder.begin_array(3); // a fixed length array
+        encoder.string_value("foo");
+        encoder.byte_string_value(byte_string{'P','u','s','s'}); // no suggested conversion
+        encoder.big_integer_value("-18446744073709551617");
+        encoder.end_array();
+        encoder.end_array();
+        encoder.flush();
 
         // Print bytes
         std::cout << "(1) ";

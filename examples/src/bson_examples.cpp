@@ -11,14 +11,14 @@ using namespace jsoncons;
 void serialize_to_bson()
 {
     std::vector<uint8_t> buffer;
-    bson::bson_bytes_encoder writer(buffer);
-    writer.begin_array(); // The total number of bytes comprising 
+    bson::bson_bytes_encoder encoder(buffer);
+    encoder.begin_array(); // The total number of bytes comprising 
                           // the bson document will be calculated
-    writer.string_value("cat");
-    writer.byte_string_value(byte_string({'p','u','r','r'}));
-    writer.int64_value(1431027667, semantic_tag::timestamp);
-    writer.end_array();
-    writer.flush();
+    encoder.string_value("cat");
+    encoder.byte_string_value(byte_string({'p','u','r','r'}));
+    encoder.int64_value(1431027667, semantic_tag::timestamp);
+    encoder.end_array();
+    encoder.flush();
 
     for (auto c : buffer)
     {

@@ -135,18 +135,18 @@ using namespace jsoncons;
 void main()
 {
     std::vector<uint8_t> bytes;
-    cbor::cbor_bytes_encoder writer(bytes);
-    writer.begin_array(); // indefinite length outer array
-    writer.string_value("foo");
-    writer.byte_string_value(byte_string({'b','a','r'}));
-    writer.big_integer_value("-18446744073709551617");
-    writer.decimal_value("273.15");
-    writer.date_time_value("2018-10-19 12:41:07-07:00");
-    writer.epoch_time_value(1431027667);
-    writer.int64_value(-1431027667, semantic_tag::timestamp);
-    writer.double_value(1431027667.5, semantic_tag::timestamp);
-    writer.end_array();
-    writer.flush();
+    cbor::cbor_bytes_encoder encoder(bytes);
+    encoder.begin_array(); // indefinite length outer array
+    encoder.string_value("foo");
+    encoder.byte_string_value(byte_string({'b','a','r'}));
+    encoder.big_integer_value("-18446744073709551617");
+    encoder.decimal_value("273.15");
+    encoder.date_time_value("2018-10-19 12:41:07-07:00");
+    encoder.epoch_time_value(1431027667);
+    encoder.int64_value(-1431027667, semantic_tag::timestamp);
+    encoder.double_value(1431027667.5, semantic_tag::timestamp);
+    encoder.end_array();
+    encoder.flush();
 
     std::cout << "(1)\n";
     for (auto c : bytes)

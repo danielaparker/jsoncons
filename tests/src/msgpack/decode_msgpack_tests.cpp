@@ -110,12 +110,12 @@ TEST_CASE("decode_msgpack_arrays_and_maps")
 TEST_CASE("Compare msgpack packed item and jsoncons item")
 {
     std::vector<uint8_t> bytes;
-    msgpack::msgpack_bytes_encoder writer(bytes);
-    writer.begin_array(2); // Must be definite length array
-    writer.string_value("foo");
-    writer.byte_string_value(byte_string{'b','a','r'});
-    writer.end_array();
-    writer.flush();
+    msgpack::msgpack_bytes_encoder encoder(bytes);
+    encoder.begin_array(2); // Must be definite length array
+    encoder.string_value("foo");
+    encoder.byte_string_value(byte_string{'b','a','r'});
+    encoder.end_array();
+    encoder.flush();
 
     json expected = json::array();
 

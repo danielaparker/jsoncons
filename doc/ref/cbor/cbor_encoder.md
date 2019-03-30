@@ -122,16 +122,16 @@ Constructs a new encoder that writes to the specified result.
 int main()
 {
     std::vector<uint8_t> buffer;
-    cbor::cbor_bytes_encoder writer(buffer);
+    cbor::cbor_bytes_encoder encoder(buffer);
 
-    writer.begin_array(); // Indefinite length array
-    writer.string_value("cat");
-    writer.byte_string_value(byte_string({'p','u','r','r'}));
-    writer.byte_string_value(byte_string({'h','i','s','s'}),
+    encoder.begin_array(); // Indefinite length array
+    encoder.string_value("cat");
+    encoder.byte_string_value(byte_string({'p','u','r','r'}));
+    encoder.byte_string_value(byte_string({'h','i','s','s'}),
                              semantic_tag::base64); // suggested conversion to base64
-    writer.int64_value(1431027667, semantic_tag::timestamp);
-    writer.end_array();
-    writer.flush();
+    encoder.int64_value(1431027667, semantic_tag::timestamp);
+    encoder.end_array();
+    encoder.flush();
 
     for (auto c : buffer)
     {
@@ -172,14 +172,14 @@ Output:
 int main()
 {
     std::ostringstream os;
-    cbor::cbor_encoder writer(os);
+    cbor::cbor_encoder encoder(os);
 
-    writer.begin_array(3); // array of length 3
-    writer.big_integer_value("-18446744073709551617");
-    writer.big_decimal_value("184467440737095516.16");
-    writer.timestamp_value(1431027667);
-    writer.end_array();
-    writer.flush();
+    encoder.begin_array(3); // array of length 3
+    encoder.big_integer_value("-18446744073709551617");
+    encoder.big_decimal_value("184467440737095516.16");
+    encoder.timestamp_value(1431027667);
+    encoder.end_array();
+    encoder.flush();
 
     for (auto c : os.str())
     {
