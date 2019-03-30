@@ -453,9 +453,9 @@ private:
     {
         semantic_tag tag = semantic_tag::none;
         auto stringref_map = state_stack_.back().stringref_map;
-        if (!tags_.empty())
+        for (auto t : tags_)
         {
-            switch (tags_.back())
+            switch (t)
             {
                 case 0x05:
                     tag = semantic_tag::big_float;
@@ -466,8 +466,8 @@ private:
                 default:
                     break;
             }
-            tags_.clear();
         }
+        tags_.clear();
         switch (info)
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length:
@@ -510,9 +510,9 @@ private:
     void begin_map(uint8_t info, std::error_code& ec)
     {
         auto stringref_map = state_stack_.back().stringref_map;
-        if (!tags_.empty())
+        for (auto t : tags_)
         {
-            switch (tags_.back())
+            switch (t)
             {
                 case 0x100: // 256 (stringref-namespace)
                     stringref_map = std::make_shared<stringref_map_type>();
@@ -520,8 +520,8 @@ private:
                 default:
                     break;
             }
-            tags_.clear();
         }
+        tags_.clear();
         switch (info)
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length: 
