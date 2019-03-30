@@ -179,7 +179,11 @@ Output:
 (2) "SGVsbG8="
 ```
 
-#### Packed strings 
+#### Encode packed strings [stringref-namespace, stringref](http://cbor.schmorp.de/stringref) 
+
+This example taken from [CBOR stringref extension](http://cbor.schmorp.de/stringref) shows how to encode a
+data structure that contains many repeated strings more efficiently.
+
 ```c++
 #include <iomanip>
 #include <cassert>

@@ -180,6 +180,54 @@ Output:
 (2) "SGVsbG8="
 ```
 
+#### Decode packed strings [stringref-namespace, stringref](http://cbor.schmorp.de/stringref)
+
+This example taken from [CBOR stringref extension](http://cbor.schmorp.de/stringref) shows three stringref-namespace tags, 
+with two nested inside another:
+
+```c++
+int main()
+{
+    std::vector<uint8_t> v = {0xd9,0x01,0x00, // tag(256)
+      0x85,                 // array(5)
+         0x63,              // text(3)
+            0x61,0x61,0x61, // "aaa"
+         0xd8, 0x19,        // tag(25)
+            0x00,           // unsigned(0)
+         0xd9, 0x01,0x00,   // tag(256)
+            0x83,           // array(3)
+               0x63,        // text(3)
+                  0x62,0x62,0x62, // "bbb"
+               0x63,        // text(3)
+                  0x61,0x61,0x61, // "aaa"
+               0xd8, 0x19,  // tag(25)
+                  0x01,     // unsigned(1)
+         0xd9, 0x01,0x00,   // tag(256)
+            0x82,           // array(2)
+               0x63,        // text(3)
+                  0x63,0x63,0x63, // "ccc"
+               0xd8, 0x19,  // tag(25)
+                  0x00,     // unsigned(0)
+         0xd8, 0x19,        // tag(25)
+            0x00           // unsigned(0)
+    };
+
+    ojson j = cbor::decode_cbor<ojson>(v);
+
+    std::cout << pretty_print(j) << "\n";
+}
+```
+Output:
+```
+[
+    "aaa",
+    "aaa",
+    ["bbb", "aaa", "aaa"],
+    ["ccc", "ccc"],
+    "aaa"
+]
+```
+
 #### See also
 
 - [byte_string](../byte_string.md)

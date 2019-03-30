@@ -272,7 +272,7 @@ void query_cbor()
     std::cout << pretty_print(result) << "\n\n";
 }
 
-void cbor_with_packed_strings()
+void encode_cbor_with_packed_strings()
 {
     ojson j = ojson::parse(R"(
 [
@@ -349,9 +349,40 @@ void cbor_with_packed_strings()
     assert(j2 == j);
 }
 
+void decode_cbor_with_packed_strings()
+{
+    std::vector<uint8_t> v = {0xd9,0x01,0x00, // tag(256)
+      0x85,                 // array(5)
+         0x63,              // text(3)
+            0x61,0x61,0x61, // "aaa"
+         0xd8, 0x19,        // tag(25)
+            0x00,           // unsigned(0)
+         0xd9, 0x01,0x00,   // tag(256)
+            0x83,           // array(3)
+               0x63,        // text(3)
+                  0x62,0x62,0x62, // "bbb"
+               0x63,        // text(3)
+                  0x61,0x61,0x61, // "aaa"
+               0xd8, 0x19,  // tag(25)
+                  0x01,     // unsigned(1)
+         0xd9, 0x01,0x00,   // tag(256)
+            0x82,           // array(2)
+               0x63,        // text(3)
+                  0x63,0x63,0x63, // "ccc"
+               0xd8, 0x19,  // tag(25)
+                  0x00,     // unsigned(0)
+         0xd8, 0x19,        // tag(25)
+            0x00           // unsigned(0)
+    };
+
+    ojson j = cbor::decode_cbor<ojson>(v);
+
+    std::cout << pretty_print(j) << "\n";
+}
+
 void cbor_examples()
 {
-/*    std::cout << "\ncbor examples\n\n";
+    std::cout << "\ncbor examples\n\n";
     decode_byte_string_with_encoding_hint();
     encode_byte_string_with_encoding_hint();
     decode_cbor_byte_string();
@@ -361,9 +392,10 @@ void cbor_examples()
     cbor_reputon_example();
     query_cbor();
     query_cbor2();
-*/
+    encode_cbor_with_packed_strings();
 
-    cbor_with_packed_strings();
+    decode_cbor_with_packed_strings();
+
     std::cout << std::endl;
 }
 

@@ -452,12 +452,16 @@ private:
     void begin_array(uint8_t info, std::error_code& ec)
     {
         semantic_tag tag = semantic_tag::none;
+        auto stringref_map = state_stack_.back().stringref_map;
         if (!tags_.empty())
         {
             switch (tags_.back())
             {
                 case 0x05:
                     tag = semantic_tag::big_float;
+                    break;
+                case 0x100: // 256 (stringref-namespace)
+                    stringref_map = std::make_shared<stringref_map_type>();
                     break;
                 default:
                     break;
@@ -468,7 +472,7 @@ private:
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length:
             {
-                state_stack_.push_back(parse_state(parse_mode::indefinite_array,0,state_stack_.back().stringref_map));
+                state_stack_.push_back(parse_state(parse_mode::indefinite_array,0,stringref_map));
                 handler_.begin_array(tag, *this);
                 source_.ignore(1);
                 break;
@@ -480,7 +484,7 @@ private:
                 {
                     return;
                 }
-                state_stack_.push_back(parse_state(parse_mode::array,len,state_stack_.back().stringref_map));
+                state_stack_.push_back(parse_state(parse_mode::array,len,stringref_map));
                 handler_.begin_array(len, tag, *this);
                 break;
             }
@@ -505,11 +509,24 @@ private:
 
     void begin_map(uint8_t info, std::error_code& ec)
     {
+        auto stringref_map = state_stack_.back().stringref_map;
+        if (!tags_.empty())
+        {
+            switch (tags_.back())
+            {
+                case 0x100: // 256 (stringref-namespace)
+                    stringref_map = std::make_shared<stringref_map_type>();
+                    break;
+                default:
+                    break;
+            }
+            tags_.clear();
+        }
         switch (info)
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length: 
             {
-                state_stack_.push_back(parse_state(parse_mode::indefinite_map,0,state_stack_.back().stringref_map));
+                state_stack_.push_back(parse_state(parse_mode::indefinite_map,0,stringref_map));
                 handler_.begin_object(semantic_tag::none, *this);
                 source_.ignore(1);
                 break;
@@ -521,7 +538,7 @@ private:
                 {
                     return;
                 }
-                state_stack_.push_back(parse_state(parse_mode::map,len,state_stack_.back().stringref_map));
+                state_stack_.push_back(parse_state(parse_mode::map,len,stringref_map));
                 handler_.begin_object(len, semantic_tag::none, *this);
                 break;
             }
@@ -1208,15 +1225,7 @@ private:
             {
                 return;
             } 
-            switch (val)
-            {
-                case 0x100: // 256 (stringref-namespace)
-                    state_stack_.back().stringref_map = std::make_shared<stringref_map_type>();
-                    break;
-                default:
-                    tags_.push_back(val);
-                    break;
-            }
+            tags_.push_back(val);
             c = source_.peek();
             if (c == Source::traits_type::eof())
             {
