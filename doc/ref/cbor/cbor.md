@@ -17,29 +17,40 @@ encoding an unpacked (json) value to a packed CBOR value.
 All tags not explicitly mentioned below are ignored.
 
 0 (standard date/time string)
-Standard date/time strings are decoded into strings tagged with `semantic_tag::date_time`.
-Strings tagged with `semantic_tag::date_time` are encoded into standard date/time strings.
+CBOR standard date/time strings are decoded into jsoncons strings tagged with `semantic_tag::date_time`.
+jsoncons strings tagged with `semantic_tag::date_time` are encoded into CBOR standard date/time strings.
 
 1 (epoch time)
-Epoch times are decoded into int64, uint64 or double and tagged with `semantic_tag::timestamp`. 
-int64, uint64 or double tagged with `semantic_tag::timestamp` are encoded into epoch time.
+CBOR epoch times are decoded into jsoncons int64_t, uint64_t and double and tagged with `semantic_tag::timestamp`. 
+jsoncons int64_t, uint64_t and double tagged with `semantic_tag::timestamp` are encoded into CBOR epoch time.
 
 2,3 (positive and negative bignum)
-Positive and negative bignums are decoded into strings and tagged with `semantic_tag::big_integer`.
-Strings tagged with `semantic_tag::big_integer` are encoded into positive or negative bignums.
+CBOR positive and negative bignums are decoded into jsoncons strings and tagged with `semantic_tag::big_integer`.
+jsoncons strings tagged with `semantic_tag::big_integer` are encoded into CBOR positive or negative bignums.
 
 4 (decimal fratction)
-Decimal fractions are decoded into strings and tagged with `semantic_tag::big_decimal`.
-Strings tagged with `semantic_tag::big_decimal` are encoded into decimal fractions.
+CBOR decimal fractions are decoded into jsoncons strings tagged with `semantic_tag::big_decimal`.
+jsoncons strings tagged with `semantic_tag::big_decimal` are encoded into CBOR decimal fractions.
 
-5 (big float)
-Big floats are taken as an array and tagged with `semantic_tag::big_float`.
+5 (bigfloat)
+CBOR bigfloats are decoded into a jsoncons array that contains a base-2 exponent and a mantissa, 
+and tagged with `semantic_tag::big_float`. The exponent is represented as an int64_t or uint64_t,
+while the mantissa can be an int64_t or uint64_t, or a string tagged with `semantic_tag::big_integer`.
+jsoncons arrays tagged with `semantic_tag::big_float` are encoded into CBOR bigfloats.
 
-21, 22, 23 (byte string expected conversion is base64url, base64 or base 16)
+21, 22, 23 (byte string expected conversion is base64url, base64 or base16)
+CBOR byte strings tagged with 21, 22 and 23 are decoded into jsoncons byte strings tagged with
+`semantic_tag::base64url`, `semantic_tag::base64` and `semantic_tag::base16`.
+jsoncons byte strings tagged with `semantic_tag::base64url`, `semantic_tag::base64` and `semantic_tag::base16`
+are encoded into CBOR byte strings tagged with 21, 22 and 23.
 
 32 (URI)
+CBOR URI strings are decoded into jsoncons strings tagged with `semantic_tag::uri`.
+jsoncons strings tagged with  `semantic_tag::uri` are encoded into CBOR URI strings.
 
 33, 34 (UTF-8 string is base64url or base64)
+CBOR strings tagged with 33 and 34 are decoded into jsoncons strings tagged with `semantic_tag::base64url` and `semantic_tag::base64`.
+jsoncons strings tagged with `semantic_tag::base64url` and `semantic_tag::base64` are encoded into CBOR strings tagged with 33 and 34.
 
 256, 25 [stringref-namespace, stringref](http://cbor.schmorp.de/stringref)
 Tags 256 and 25 are automatically decoded when detected. They are encoded when CBOR option `pack_strings` is set to true.
