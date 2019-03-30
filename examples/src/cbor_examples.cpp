@@ -391,7 +391,6 @@ void cbor_examples()
     serialize_to_cbor_stream();
     cbor_reputon_example();
     query_cbor();
-    query_cbor2();
     encode_cbor_with_packed_strings();
 
     decode_cbor_with_packed_strings();
