@@ -518,7 +518,12 @@ private:
                 int64_t val = jsoncons::detail::from_big_endian<int64_t>(buf,buf+sizeof(buf),&endp);
                 if (val >= 0)
                 {
-                    length = val;
+                    length = (size_t)val;
+                    if (length != val)
+                    {
+                        ec = ubjson_errc::number_too_large;
+                        return length;
+                    }
                 }
                 else
                 {

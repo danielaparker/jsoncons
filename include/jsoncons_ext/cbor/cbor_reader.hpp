@@ -283,7 +283,13 @@ private:
                         ec = cbor_errc::stringref_too_large;
                         return;
                     }
-                    auto& str = state_stack_.back().stringref_map->at(val);
+                    stringref_map_type::size_type index = (stringref_map_type::size_type)val;
+                    if (index != val)
+                    {
+                        ec = cbor_errc::number_too_large;
+                        return;
+                    }
+                    auto& str = state_stack_.back().stringref_map->at(index);
                     switch (str.type)
                     {
                         case jsoncons::cbor::detail::cbor_major_type::text_string:
@@ -615,14 +621,21 @@ private:
             {
                 if (state_stack_.back().stringref_map && !tags_.empty() && tags_.back() == 25)
                 {
-                    uint64_t index = get_uint64_value(source_, ec);
+                    uint64_t ref = get_uint64_value(source_, ec);
                     if (ec)
                     {
                         return;
                     }
-                    if (index >= state_stack_.back().stringref_map->size())
+                    if (ref >= state_stack_.back().stringref_map->size())
                     {
                         ec = cbor_errc::stringref_too_large;
+                        return;
+                    }
+
+                    stringref_map_type::size_type index = (stringref_map_type::size_type)ref;
+                    if (index != ref)
+                    {
+                        ec = cbor_errc::number_too_large;
                         return;
                     }
                     auto& val = state_stack_.back().stringref_map->at(index);

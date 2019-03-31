@@ -256,7 +256,7 @@ private:
             result_.push_back('I');
             jsoncons::detail::to_big_endian(static_cast<uint16_t>(length), std::back_inserter(result_));
         }
-        else if (length <= (std::numeric_limits<int32_t>::max)())
+        else if (length <= (uint32_t)(std::numeric_limits<int32_t>::max)())
         {
             result_.push_back('l');
             jsoncons::detail::to_big_endian(static_cast<uint32_t>(length),std::back_inserter(result_));

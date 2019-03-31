@@ -43,7 +43,7 @@ namespace additional_info
 inline
 size_t min_length_for_stringref(uint64_t index)
 {
-    uint64_t n;
+    size_t n;
     if (index <= 23)
     {
         n = 3;
