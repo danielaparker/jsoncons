@@ -20,17 +20,8 @@ namespace jsoncons {
 // decode_json 
 
 template <class T, class CharT>
-T decode_json(const std::basic_string<CharT>& s)
-{
-    basic_json_pull_reader<CharT> reader(s);
-    T val;
-    decode_stream(basic_json<CharT>(), reader, val);
-    return val;
-}
-
-template <class T, class CharT>
 T decode_json(const std::basic_string<CharT>& s,
-              const basic_json_decode_options<CharT>& options)
+              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>())
 {
     basic_json_pull_reader<CharT> reader(s, options);
     T val;
@@ -39,17 +30,8 @@ T decode_json(const std::basic_string<CharT>& s,
 }
 
 template <class T, class CharT>
-T decode_json(std::basic_istream<CharT>& is)
-{
-    basic_json_pull_reader<CharT> reader(is);
-    T val;
-    decode_stream(basic_json<CharT>(), reader, val);
-    return val;
-}
-
-template <class T, class CharT>
 T decode_json(std::basic_istream<CharT>& is,
-              const basic_json_decode_options<CharT>& options)
+              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>())
 {
     basic_json_pull_reader<CharT> reader(is, options);
     T val;
@@ -58,18 +40,9 @@ T decode_json(std::basic_istream<CharT>& is,
 }
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
-T decode_json(const std::basic_string<CharT>& s, const basic_json<CharT,ImplementationPolicy,Allocator>& j)
-{
-    basic_json_pull_reader<CharT> reader(s);
-    T val;
-    decode_stream(j, reader, val);
-    return val;
-}
-
-template <class T, class CharT, class ImplementationPolicy, class Allocator>
-T decode_json(const std::basic_string<CharT>& s,
-              const basic_json_decode_options<CharT>& options, 
-              const basic_json<CharT,ImplementationPolicy,Allocator>& j)
+T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
+              const std::basic_string<CharT>& s,
+              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>())
 {
     basic_json_pull_reader<CharT> reader(s, options);
     T val;
@@ -78,18 +51,9 @@ T decode_json(const std::basic_string<CharT>& s,
 }
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
-T decode_json(std::basic_istream<CharT>& is, const basic_json<CharT,ImplementationPolicy,Allocator>& j)
-{
-    basic_json_pull_reader<CharT> reader(is);
-    T val;
-    decode_stream(j, reader, val);
-    return val;
-}
-
-template <class T, class CharT, class ImplementationPolicy, class Allocator>
-T decode_json(std::basic_istream<CharT>& is,
-              const basic_json_decode_options<CharT>& options, 
-              const basic_json<CharT,ImplementationPolicy,Allocator>& j)
+T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
+              std::basic_istream<CharT>& is,
+              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>())
 {
     basic_json_pull_reader<CharT> reader(is, options);
     T val;
