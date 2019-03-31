@@ -1,9 +1,13 @@
-master
-------
+v0.121.0
+--------
+
+Bug fix:
+
+- Fixed issue with cbor_reader only reading tag values 0 through 23
 
 Name change
 
-- The name `j.semantic_tag()` has been renamed to `j.get_semantic_tag()`
+- The name `json::semantic_tag()` has been renamed to `json::get_semantic_tag()`
 
 Non-breaking changes (old names still work)
 
@@ -24,8 +28,8 @@ Enhancements
 - CBOR reader supports [stringref extension to CBOR](http://cbor.schmorp.de/stringref)
 - New `cbor_options` has `packed_strings` option
 
-v 0.120.0
----------
+v0.120.0
+--------
 
 Bug fix:
 
