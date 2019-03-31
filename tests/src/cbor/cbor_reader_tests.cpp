@@ -697,3 +697,37 @@ TEST_CASE("CBOR stringref tag 2")
         CHECK(std::string(bs.begin(),bs.end()) == std::string("ssss"));
 }
 
+TEST_CASE("CBOR stringref tag 3")
+{
+    std::vector<uint8_t> v = {0xd9,0x01,0x00, // tag(256)
+      0x85,                 // array(5)
+         0x63,              // text(3)
+            0x61,0x61,0x61, // "aaa"
+         0xd8, 0x19,        // tag(25)
+            0x00,           // unsigned(0)
+         0xd9, 0x01,0x00,   // tag(256)
+            0x83,           // array(3)
+               0x63,        // text(3)
+                  0x62,0x62,0x62, // "bbb"
+               0x63,        // text(3)
+                  0x61,0x61,0x61, // "aaa"
+               0xd8, 0x19,  // tag(25)
+                  0x01,     // unsigned(1)
+         0xd9, 0x01,0x00,   // tag(256)
+            0x82,           // array(2)
+               0x63,        // text(3)
+                  0x63,0x63,0x63, // "ccc"
+               0xd8, 0x19,  // tag(25)
+                  0x00,     // unsigned(0)
+         0xd8, 0x19,        // tag(25)
+            0x00           // unsigned(0)
+    };
+
+    json j = cbor::decode_cbor<json>(v);
+
+    json expected = json::parse(R"(
+        ["aaa","aaa",["bbb","aaa","aaa"],["ccc","ccc"],"aaa"]
+    )");
+
+    CHECK(j == expected);
+}

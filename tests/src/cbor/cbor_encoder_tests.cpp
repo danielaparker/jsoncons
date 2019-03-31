@@ -66,7 +66,7 @@ TEST_CASE("serialize array to cbor")
     try
     {
         json result = decode_cbor<json>(v);
-        std::cout << result << std::endl;
+        //std::cout << result << std::endl;
     }
     catch (const std::exception& e)
     {
@@ -91,7 +91,7 @@ TEST_CASE("test_serialize_indefinite_length_array")
     try
     {
         json result = decode_cbor<json>(v);
-        std::cout << result << std::endl;
+        //std::cout << result << std::endl;
     }
     catch (const std::exception& e)
     {
@@ -382,12 +382,12 @@ TEST_CASE("encode stringref")
 
     encode_cbor(j, buf, options);
 
-    for (auto c : buf)
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                  << std::noshowbase << std::setfill('0') << static_cast<int>(c);
-    }
-    std::cout << "\n";
+    //for (auto c : buf)
+    //{
+    //    std::cout << std::hex << std::setprecision(2) << std::setw(2) 
+    //              << std::noshowbase << std::setfill('0') << static_cast<int>(c);
+    //}
+    //std::cout << "\n";
 
     ojson j2 = decode_cbor<ojson>(buf);
     CHECK(j2 == j);
