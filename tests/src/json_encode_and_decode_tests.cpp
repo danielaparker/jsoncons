@@ -194,13 +194,54 @@ TEST_CASE("reputation_object")
 {
     ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
 
-    std::string s;
-    jc::encode_json(val, s, jc::indenting::indent);
-    std::cout << s << "\n";
+    SECTION("1")
+    {
+        std::string s;
+        jc::encode_json(val, s);
+        auto val2 = jc::decode_json<ns::reputation_object>(s);
+        CHECK(val2 == val);
+    }
 
-    auto val2 = jc::decode_json<ns::reputation_object>(s);
+    SECTION("2")
+    {
+        std::string s;
+        jc::encode_json(val, s, jc::indenting::indent);
+        auto val2 = jc::decode_json<ns::reputation_object>(s);
+        CHECK(val2 == val);
+    }
 
-    CHECK(val2 == val);
+    SECTION("3")
+    {
+        std::string s;
+        jc::json_options options;
+        jc::encode_json(val, s, options, jc::indenting::indent);
+        auto val2 = jc::decode_json<ns::reputation_object>(s, options);
+        CHECK(val2 == val);
+    }
+    SECTION("4")
+    {
+        std::string s;
+        jc::encode_json(val, s, jc::ojson());
+        auto val2 = jc::decode_json<ns::reputation_object>(s);
+        CHECK(val2 == val);
+    }
+
+    SECTION("5")
+    {
+        std::string s;
+        jc::encode_json(val, s, jc::indenting::indent, jc::ojson());
+        auto val2 = jc::decode_json<ns::reputation_object>(s);
+        CHECK(val2 == val);
+    }
+
+    SECTION("6")
+    {
+        std::string s;
+        jc::json_options options;
+        jc::encode_json(val, s, options, jc::indenting::indent, jc::ojson());
+        auto val2 = jc::decode_json<ns::reputation_object>(s, options, jc::ojson());
+        CHECK(val2 == val);
+    }
 }
 
 
