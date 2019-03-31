@@ -23,7 +23,8 @@ enum class ubjson_errc
     unknown_type,
     invalid_utf8_text_string,
     too_many_items,
-    too_few_items
+    too_few_items,
+    number_too_large
 };
 
 class ubjson_error_category_impl
@@ -54,6 +55,8 @@ public:
                 return "Too many items were added to a UBJSON object or array of known length";
             case ubjson_errc::too_few_items:
                 return "Too few items were added to a UBJSON object or array of known length";
+            case ubjson_errc::number_too_large:
+                return "Number exceeds implementation limits";
             default:
                 return "Unknown UBJSON parser error";
         }
