@@ -19,7 +19,7 @@ void encode_json(const T& val,
 template <class T, class CharT>
 void encode_json(const T& val,
                  std::basic_ostream<CharT>& os, 
-                 const basic_json_options<CharT>& options, 
+                 const basic_json_encode_options<CharT>& options, 
                  indenting line_indent = indenting::no_indent); // (3)
 
 template <class T, class CharT>
@@ -30,7 +30,7 @@ void encode_json(const T& val,
 template <class T, class CharT>
 void encode_json(const T& val,
                  std::basic_string<CharT>& s, 
-                 const basic_json_options<CharT>& options, 
+                 const basic_json_encode_options<CharT>& options, 
                  indenting line_indent = indenting::no_indent); // (5)
 
 template <class T, class CharT, class Json>
@@ -47,7 +47,7 @@ void encode_json(const T& val,
 template <class T, class CharT, class Json>
 void encode_json(const T& val,
                  std::basic_ostream<CharT>& os, 
-                 const basic_json_options<CharT>& options, 
+                 const basic_json_encode_options<CharT>& options, 
                  indenting line_indent, 
                  const Json& j); // (8)
 
@@ -60,7 +60,7 @@ void encode_json(const T& val,
 template <class T, class CharT, class Json>
 void encode_json(const T& val,
                  std::basic_string<CharT>& s, 
-                 const basic_json_options<CharT>& options, 
+                 const basic_json_encode_options<CharT>& options, 
                  indenting line_indent, 
                  const Json& j); // (10)
 ```
