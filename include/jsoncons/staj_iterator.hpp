@@ -286,7 +286,7 @@ void basic_staj_array_iterator<T,CharT,Json>::next()
         reader_->next();
         if (!done())
         {
-            decode_stream(*reader_, value_, Json());
+            decode_stream(Json(), *reader_, value_);
         }
     }
 }
@@ -303,7 +303,7 @@ void basic_staj_array_iterator<T,CharT,Json>::next(std::error_code& ec)
         }
         if (!done())
         {
-            decode_stream(*reader_, value_, Json(), ec);
+            decode_stream(Json(), *reader_, value_, ec);
         }
     }
 }
@@ -319,7 +319,7 @@ void basic_staj_object_iterator<T,CharT,Json>::next()
         reader_->next();
         if (!done())
         {
-            decode_stream(*reader_, kv_.second, Json());
+            decode_stream(Json(), *reader_, kv_.second);
         }
     }
 }
@@ -343,7 +343,7 @@ void basic_staj_object_iterator<T,CharT,Json>::next(std::error_code& ec)
         }
         if (!done())
         {
-             decode_stream(*reader_, kv_.second, Json(), ec);
+             decode_stream(Json(), *reader_, kv_.second, ec);
         }
     }
 }

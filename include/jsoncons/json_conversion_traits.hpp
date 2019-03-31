@@ -23,13 +23,13 @@
 namespace jsoncons {
 
 template <class T, class CharT, class Json>
-void decode_stream(basic_staj_reader<CharT>& reader, T& val, const Json& j, std::error_code& ec);
+void decode_stream(const Json& j, basic_staj_reader<CharT>& reader, T& val, std::error_code& ec);
 
 template <class T, class CharT, class Json>
-void decode_stream(basic_staj_reader<CharT>& reader, T& val, const Json& j)
+void decode_stream(const Json& j, basic_staj_reader<CharT>& reader, T& val)
 {
     std::error_code ec;
-    decode_stream(reader, val, j, ec);
+    decode_stream(j, reader, val, ec);
     if (ec)
     {
         throw ser_error(ec, reader.context().line_number(), reader.context().column_number());
@@ -179,13 +179,13 @@ struct json_conversion_traits<T,
 };
 
 template <class T, class CharT, class Json>
-void decode_stream(basic_staj_reader<CharT>& reader, T& val, const Json&, std::error_code& ec)
+void decode_stream(const Json&, basic_staj_reader<CharT>& reader, T& val, std::error_code& ec)
 {
     val = json_conversion_traits<T>::template decode<CharT,Json>(reader,ec);
 }
 
 template <class T, class CharT, class Json>
-void encode_stream(const T&val, basic_json_content_handler<CharT>& receiver, const Json&)
+void encode_stream(const Json&, const T&val, basic_json_content_handler<CharT>& receiver)
 {
     json_conversion_traits<T>::template encode<CharT,Json>(val, receiver);
 }
