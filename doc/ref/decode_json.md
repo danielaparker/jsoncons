@@ -9,35 +9,31 @@ work for all C++ classes that have [json_type_traits](https://github.com/daniela
 #include <jsoncons/json.hpp>
 
 template <class T, class CharT>
-T decode_json(const std::basic_string<CharT>& s); // (1)
+T decode_json(std::basic_istream<CharT>& is,
+              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>()); // (1)
 
 template <class T, class CharT>
 T decode_json(const std::basic_string<CharT>& s,
-              const basic_json_decode_options<CharT>& options); // (2)
+              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>()); // (2)
 
-template <class T, class CharT>
-T decode_json(std::basic_istream<CharT>& is); // (3)
 
-template <class T, class CharT>
-T decode_json(std::basic_istream<CharT>& is,
-              const basic_json_decode_options<CharT>& options); // (4)
+template <class T, class CharT, class ImplementationPolicy, class Allocator>
+T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
+              std::basic_istream<CharT>& is,
+              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>()); // (3)
 
-template <class T, class CharT, class Json>
-T decode_json(const std::basic_string<CharT>& s, const Json&); // (5)
-
-template <class T, class CharT, class Json>
-T decode_json(const std::basic_string<CharT>& s,
-              const basic_json_decode_options<CharT>& options, 
-              const Json&); // (6)
-
-template <class T, class CharT, class Json>
-T decode_json(std::basic_istream<CharT>& is, const Json&); // (7)
-
-template <class T, class CharT, class Json>
-T decode_json(std::basic_istream<CharT>& is,
-              const basic_json_decode_options<CharT>& options, 
-              const Json&); // (8)
+template <class T, class CharT, class ImplementationPolicy, class Allocator>
+T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
+              const std::basic_string<CharT>& s,
+              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>()); // (4)
 ```
+
+(1) Decode input stream to value `T`
+
+(2) Decode string to value `T`
+
+Functions (1)-(2) perform encodings using the default json type `basic_json<CharT>`.
+Functions (3)-(4) are the same but perform encodings using the supplied `basic_json`.
 
 ### Examples
 

@@ -102,17 +102,9 @@ void encode_json(const T& val,
 // to string
 
 template <class T, class CharT>
-void encode_json(const T& val, 
-                 std::basic_string<CharT>& s, 
-                 indenting line_indent = indenting::no_indent)
-{
-    encode_json(val, s, basic_json_options<CharT>(), line_indent);
-}
-
-template <class T, class CharT>
 void encode_json(const T& val,
                  std::basic_string<CharT>& s, 
-                 const basic_json_encode_options<CharT>& options, 
+                 const basic_json_encode_options<CharT>& options = basic_json_options<CharT>(), 
                  indenting line_indent = indenting::no_indent)
 {
     if (line_indent == indenting::indent)
@@ -125,6 +117,14 @@ void encode_json(const T& val,
         basic_json_compressed_encoder<CharT, jsoncons::string_result<std::basic_string<CharT>>> encoder(s, options);
         encode_json(val, encoder);
     }
+}
+
+template <class T, class CharT>
+void encode_json(const T& val, 
+                 std::basic_string<CharT>& s, 
+                 indenting line_indent)
+{
+    encode_json(val, s, basic_json_options<CharT>(), line_indent);
 }
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
