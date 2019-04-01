@@ -519,7 +519,7 @@ private:
                 if (val >= 0)
                 {
                     length = (size_t)val;
-                    if (length != val)
+                    if (length != (uint64_t)val)
                     {
                         ec = ubjson_errc::number_too_large;
                         return length;

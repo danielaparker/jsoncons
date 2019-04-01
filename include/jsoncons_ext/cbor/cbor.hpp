@@ -57,7 +57,7 @@ typename std::enable_if<std::is_same<typename Json::char_type,char>::value,Json>
 decode_cbor(const std::vector<uint8_t>& v)
 {
     jsoncons::json_decoder<Json> decoder;
-    basic_cbor_reader<jsoncons::bytes_source> parser(jsoncons::bytes_source(v.data(),v.size()), decoder);
+    basic_cbor_reader<jsoncons::bytes_source> parser(v, decoder);
     std::error_code ec;
     parser.read(ec);
     if (ec)
@@ -73,7 +73,7 @@ decode_cbor(const std::vector<uint8_t>& v)
 {
     jsoncons::json_decoder<Json> decoder;
     basic_utf8_adaptor<typename Json::char_type> adaptor(decoder);
-    basic_cbor_reader<jsoncons::bytes_source> parser(jsoncons::bytes_source(v.data(),v.size()), adaptor);
+    basic_cbor_reader<jsoncons::bytes_source> parser(v, adaptor);
     std::error_code ec;
     parser.read(ec);
     if (ec)
