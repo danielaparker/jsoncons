@@ -134,7 +134,7 @@ namespace readme
               21 -- -2
               19 6ab3 -- 27315
 */
-        // Serialize to CSV
+        // Encode to CSV
         csv::csv_options csv_options;
         csv_options.column_names("Column 1,Column 2,Column 3");
 

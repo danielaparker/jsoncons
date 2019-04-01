@@ -112,7 +112,7 @@ Constructs a new encoder that writes to the specified result.
 
 ### Examples
 
-#### Serialize to BSON
+#### Encode to BSON
 
 ```c++
 #include <jsoncons/json.hpp>

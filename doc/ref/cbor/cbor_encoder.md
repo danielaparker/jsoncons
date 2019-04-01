@@ -112,7 +112,7 @@ Constructs a new encoder that writes to the specified result.
 
 ### Examples
 
-#### Serialize to CBOR buffer
+#### Encode to CBOR buffer
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -161,7 +161,7 @@ Output:
 9f636361744470757272d64468697373c11a554bbfd3ff
 ```
 
-#### Serialize to CBOR stream
+#### Encode to CBOR stream
 
 ```c++
 

@@ -215,7 +215,7 @@ void query_cbor()
 
     j.emplace_back(json::array({-1,3}), semantic_tag::big_float);
 
-    // Serialize to JSON
+    // Encode to JSON
     std::cout << "(1)\n";
     std::cout << pretty_print(j);
     std::cout << "\n\n";

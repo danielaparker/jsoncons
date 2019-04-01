@@ -463,7 +463,7 @@ int main()
           21 -- -2
           19 6ab3 -- 27315
 */
-    // Serialize to CSV
+    // Encode to CSV
     csv::csv_options csv_options;
     csv_options.column_names("Column 1,Column 2,Column 3");
 
@@ -535,7 +535,7 @@ int main()
 
     j.emplace_back(json::array({-1,3}), semantic_tag::big_float);
 
-    // Serialize to JSON
+    // Encode to JSON
     std::cout << "(1)\n";
     std::cout << pretty_print(j);
     std::cout << "\n\n";

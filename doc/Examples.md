@@ -1,6 +1,6 @@
 # Examples
 
-### Parse
+### Parse and decode
 
 [Parse JSON from a string](#A1)  
 [Parse JSON from a file](#A2)  
@@ -11,10 +11,10 @@
 [Prevent the alphabetic sort of the outputted JSON, retaining the original insertion order](#A6)  
 [Parse a very large JSON file with json_pull_reader](#A7)  
 
-### Serialize
+### Encode
 
-[Serialize a json value to a string](#B1)  
-[Serialize a json value to a stream](#B2)  
+[Encode a json value to a string](#B1)  
+[Encode a json value to a stream](#B2)  
 [Escape all non-ascii characters](#B3)  
 [Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.](#B4)
 
@@ -52,7 +52,7 @@
 [Search for and repace an object member key](#F1)  
 [Search for and replace a value](#F2)  
 
-### Parse
+### Parse and decode
 
 <div id="A1"/> 
 
@@ -463,11 +463,11 @@ Graham Greene
 
 See [json_pull_reader](doc/ref/json_pull_reader.md) 
 
-### Serialize
+### Encode
 
 <div id="B1"/>
 
-#### Serialize a json value to a string
+#### Encode a json value to a string
 
 ```
 std::string s;
@@ -479,7 +479,7 @@ j.dump(s, indenting::indent); // pretty print
 
 <div id="B2"/>
 
-#### Serialize a json value to a stream
+#### Encode a json value to a stream
 
 ```
 j.dump(std::cout); // compressed
