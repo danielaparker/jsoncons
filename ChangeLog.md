@@ -24,6 +24,7 @@ Non-breaking changes (old names still work)
 
 Enhancements
 
+- Cleanup of `encode_json` and `decode_json` functions and increased test coverage
 - Rewrote cbor_reader to avoid recursive function call
 - CBOR reader supports [stringref extension to CBOR](http://cbor.schmorp.de/stringref)
 - New `cbor_options` has `packed_strings` option
