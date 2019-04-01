@@ -261,7 +261,6 @@ namespace ns {
         friend struct jsoncons::json_type_traits<jsoncons::json,reputation_object>;
     public:
         reputation_object()
-            : application("hiking")
         {
         }
         reputation_object(const std::string& application, const std::vector<reputon>& reputons)

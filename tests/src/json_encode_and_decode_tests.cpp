@@ -151,7 +151,6 @@ namespace ns {
         std::vector<reputon> reputons;
 
         reputation_object()
-            : application("hiking")
         {
         }
         reputation_object(const std::string& application, const std::vector<reputon>& reputons)
