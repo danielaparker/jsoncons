@@ -714,9 +714,9 @@ namespace ns {
         std::string application;
         std::vector<reputon> reputons;
 
-        // Define the json_type_traits instantiations as friends to give accesses to private members
-        friend struct jsoncons::json_type_traits<jsoncons::json,reputation_object>;
-        friend struct jsoncons::json_type_traits<jsoncons::ojson,reputation_object>;
+        // Make json_type_traits specializations friends to give accesses to private members
+        template <class JSON,class T,class Enable>
+        friend struct jsoncons::json_type_traits;
     public:
         reputation_object()
         {
