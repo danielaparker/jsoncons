@@ -268,7 +268,7 @@ private:
 
     bool do_name(const string_view_type& name, const ser_context&) override
     {
-        write_string(name);
+        write_string(name, std::integral_constant<bool,sizeof(CharT) == sizeof(char)>());
         return true;
     }
 
@@ -287,7 +287,7 @@ private:
         return true;
     }
 
-    void write_string(const string_view_type& sv)
+    void write_string(const string_view_type& sv, std::false_type)
     {
         std::string target;
         auto result = unicons::convert(
@@ -297,16 +297,25 @@ private:
         {
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Illegal unicode"));
         }
+        write_string(target, std::true_type());
+    }
 
-        const size_t length = target.size();
-
-        if (pack_strings_ && length >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
+    void write_string(const string_view& sv, std::true_type)
+    {
+        auto result = unicons::validate(sv.begin(), sv.end());
+        if (result.ec != unicons::conv_errc())
         {
-            auto it = stringref_map_.find(target);
+            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Illegal unicode"));
+        }
+
+        if (pack_strings_ && sv.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
+        {
+            std::string s(sv);
+            auto it = stringref_map_.find(s);
             if (it == stringref_map_.end())
             {
-                stringref_map_.insert(std::make_pair(target, next_stringref_++));
-                write_utf8_string(target);
+                stringref_map_.insert(std::make_pair(std::move(s), next_stringref_++));
+                write_utf8_string(sv);
             }
             else
             {
@@ -318,11 +327,11 @@ private:
         }
         else
         {
-            write_utf8_string(target);
+            write_utf8_string(sv);
         }
     }
 
-    void write_utf8_string(const std::string& sv)
+    void write_utf8_string(const string_view& sv)
     {
         const size_t length = sv.size();
 
@@ -563,34 +572,34 @@ private:
             case semantic_tag::date_time:
             {
                 result_.push_back(0xc0);
-                write_string(sv);
+                write_string(sv, std::integral_constant<bool,sizeof(CharT) == sizeof(char)>());
                 end_value();
                 break;
             }
             case semantic_tag::uri:
             {
                 result_.push_back(32);
-                write_string(sv);
+                write_string(sv, std::integral_constant<bool,sizeof(CharT) == sizeof(char)>());
                 end_value();
                 break;
             }
             case semantic_tag::base64url:
             {
                 result_.push_back(33);
-                write_string(sv);
+                write_string(sv, std::integral_constant<bool,sizeof(CharT) == sizeof(char)>());
                 end_value();
                 break;
             }
             case semantic_tag::base64:
             {
                 result_.push_back(34);
-                write_string(sv);
+                write_string(sv, std::integral_constant<bool,sizeof(CharT) == sizeof(char)>());
                 end_value();
                 break;
             }
             default:
             {
-                write_string(sv);
+                write_string(sv, std::integral_constant<bool,sizeof(CharT) == sizeof(char)>());
                 end_value();
                 break;
             }
