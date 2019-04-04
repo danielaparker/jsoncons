@@ -1137,5 +1137,9 @@ namespace jsoncons \
 #define JSONCONS_TYPE_TRAITS_DECL(ValueType,...) \
     JSONCONS_TYPE_TRAITS_DECL_BASE(0, ValueType, __VA_ARGS__)
 
+#define JSONCONS_TYPE_TRAITS_FRIEND \
+    template <class JSON,class T,class Enable> \
+    friend struct jsoncons::json_type_traits;
+
 #endif
 

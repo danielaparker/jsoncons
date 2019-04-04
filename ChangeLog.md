@@ -1,3 +1,10 @@
+master
+------
+
+Enhancements
+
+- Added macro JSONCONS_TYPE_TRAITS_FRIEND
+
 v0.121.1
 --------
 
