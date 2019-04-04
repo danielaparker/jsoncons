@@ -20,119 +20,124 @@ class basic_json_filter : public basic_json_content_handler<CharT>
 public:
     using typename basic_json_content_handler<CharT>::string_view_type                      ;
 private:
-    basic_json_content_handler<CharT>& destination_handler_;
+    basic_json_content_handler<CharT>& to_handler_;
 
     // noncopyable and nonmoveable
     basic_json_filter<CharT>(const basic_json_filter<CharT>&) = delete;
     basic_json_filter<CharT>& operator=(const basic_json_filter<CharT>&) = delete;
 public:
     basic_json_filter(basic_json_content_handler<CharT>& handler)
-        : destination_handler_(handler)
+        : to_handler_(handler)
     {
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     basic_json_content_handler<CharT>& input_handler()
     {
-        return destination_handler_;
+        return to_handler_;
     }
 
     basic_json_content_handler<CharT>& downstream_handler()
     {
-        return destination_handler_;
+        return to_handler_;
     }
-#endif
 
     basic_json_content_handler<CharT>& destination_handler()
     {
-        return destination_handler_;
+        return to_handler_;
+    }
+#endif
+
+    basic_json_content_handler<CharT>& to_handler()
+    {
+        return to_handler_;
     }
 
 private:
     void do_flush() override
     {
-        destination_handler_.flush();
+        to_handler_.flush();
     }
 
     bool do_begin_object(semantic_tag tag, const ser_context& context) override
     {
-        return destination_handler_.begin_object(tag, context);
+        return to_handler_.begin_object(tag, context);
     }
 
     bool do_begin_object(size_t length, semantic_tag tag, const ser_context& context) override
     {
-        return destination_handler_.begin_object(length, tag, context);
+        return to_handler_.begin_object(length, tag, context);
     }
 
     bool do_end_object(const ser_context& context) override
     {
-        return destination_handler_.end_object(context);
+        return to_handler_.end_object(context);
     }
 
     bool do_begin_array(semantic_tag tag, const ser_context& context) override
     {
-        return destination_handler_.begin_array(tag, context);
+        return to_handler_.begin_array(tag, context);
     }
 
     bool do_begin_array(size_t length, semantic_tag tag, const ser_context& context) override
     {
-        return destination_handler_.begin_array(length, tag, context);
+        return to_handler_.begin_array(length, tag, context);
     }
 
     bool do_end_array(const ser_context& context) override
     {
-        return destination_handler_.end_array(context);
+        return to_handler_.end_array(context);
     }
 
     bool do_name(const string_view_type& name,
                  const ser_context& context) override
     {
-        return destination_handler_.name(name, context);
+        return to_handler_.name(name, context);
     }
 
     bool do_string_value(const string_view_type& value,
                          semantic_tag tag,
                          const ser_context& context) override
     {
-        return destination_handler_.string_value(value, tag, context);
+        return to_handler_.string_value(value, tag, context);
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
                               semantic_tag tag,
                               const ser_context& context) override
     {
-        return destination_handler_.byte_string_value(b, tag, context);
+        return to_handler_.byte_string_value(b, tag, context);
     }
 
     bool do_double_value(double value, 
                          semantic_tag tag,
                          const ser_context& context) override
     {
-        return destination_handler_.double_value(value, tag, context);
+        return to_handler_.double_value(value, tag, context);
     }
 
     bool do_int64_value(int64_t value,
                         semantic_tag tag,
                         const ser_context& context) override
     {
-        return destination_handler_.int64_value(value, tag, context);
+        return to_handler_.int64_value(value, tag, context);
     }
 
     bool do_uint64_value(uint64_t value,
                          semantic_tag tag,
                          const ser_context& context) override
     {
-        return destination_handler_.uint64_value(value, tag, context);
+        return to_handler_.uint64_value(value, tag, context);
     }
 
     bool do_bool_value(bool value, semantic_tag tag, const ser_context& context) override
     {
-        return destination_handler_.bool_value(value, tag, context);
+        return to_handler_.bool_value(value, tag, context);
     }
 
     bool do_null_value(semantic_tag tag, const ser_context& context) override
     {
-        return destination_handler_.null_value(tag, context);
+        return to_handler_.null_value(tag, context);
     }
 
 };
@@ -178,146 +183,145 @@ private:
     {
         if (name == name_)
         {
-            return this->destination_handler().name(new_name_,context);
+            return this->to_handler().name(new_name_,context);
         }
         else
         {
-            return this->destination_handler().name(name,context);
+            return this->to_handler().name(name,context);
         }
     }
 };
 
-template <class CharT>
-class basic_utf8_adaptor : public basic_json_content_handler<char>
+
+template <class From,class To>
+class json_content_handler_adaptor : public From
 {
 public:
-    using typename basic_json_content_handler<char>::string_view_type;
+    using typename From::string_view_type;
 private:
-    basic_json_content_handler<CharT>& destination_handler_;
+    To& to_handler_;
 
     // noncopyable and nonmoveable
-    basic_utf8_adaptor<CharT>(const basic_utf8_adaptor<CharT>&) = delete;
-    basic_utf8_adaptor<CharT>& operator=(const basic_utf8_adaptor<CharT>&) = delete;
+    json_content_handler_adaptor(const json_content_handler_adaptor&) = delete;
+    json_content_handler_adaptor& operator=(const json_content_handler_adaptor&) = delete;
 public:
-    basic_utf8_adaptor(basic_json_content_handler<CharT>& handler)
-        : destination_handler_(handler)
+    json_content_handler_adaptor(To& handler)
+        : to_handler_(handler)
     {
     }
 
-    basic_json_content_handler<CharT>& destination_handler()
+    To& to_handler()
     {
-        return destination_handler_;
+        return to_handler_;
     }
 
 private:
     void do_flush() override
     {
-        destination_handler_.flush();
+        to_handler_.flush();
     }
 
     bool do_begin_object(semantic_tag tag, 
                          const ser_context& context) override
     {
-        return destination_handler_.begin_object(tag, context);
+        return to_handler_.begin_object(tag, context);
     }
 
     bool do_begin_object(size_t length, 
                          semantic_tag tag, 
                          const ser_context& context) override
     {
-        return destination_handler_.begin_object(length, tag, context);
+        return to_handler_.begin_object(length, tag, context);
     }
 
     bool do_end_object(const ser_context& context) override
     {
-        return destination_handler_.end_object(context);
+        return to_handler_.end_object(context);
     }
 
     bool do_begin_array(semantic_tag tag, 
                         const ser_context& context) override
     {
-        return destination_handler_.begin_array(tag, context);
+        return to_handler_.begin_array(tag, context);
     }
 
     bool do_begin_array(size_t length, 
                         semantic_tag tag, 
                         const ser_context& context) override
     {
-        return destination_handler_.begin_array(length, tag, context);
+        return to_handler_.begin_array(length, tag, context);
     }
 
     bool do_end_array(const ser_context& context) override
     {
-        return destination_handler_.end_array(context);
+        return to_handler_.end_array(context);
     }
 
     bool do_name(const string_view_type& name,
                  const ser_context& context) override
     {
-        std::basic_string<CharT> target;
+        std::basic_string<typename To::char_type> target;
         auto result = unicons::convert(name.begin(),name.end(),std::back_inserter(target),unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
             throw ser_error(result.ec);
         }
-        return destination_handler().name(target, context);
+        return to_handler().name(target, context);
     }
 
     bool do_string_value(const string_view_type& value,
                          semantic_tag tag,
                          const ser_context& context) override
     {
-        std::basic_string<CharT> target;
+        std::basic_string<typename To::char_type> target;
         auto result = unicons::convert(value.begin(),value.end(),std::back_inserter(target),unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
             throw ser_error(result.ec);
         }
-        return destination_handler().string_value(target, tag, context);
+        return to_handler().string_value(target, tag, context);
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
                               semantic_tag tag,
                               const ser_context& context) override
     {
-        return destination_handler_.byte_string_value(b, tag, context);
+        return to_handler_.byte_string_value(b, tag, context);
     }
 
     bool do_double_value(double value, 
                          semantic_tag tag,
                          const ser_context& context) override
     {
-        return destination_handler_.double_value(value, tag, context);
+        return to_handler_.double_value(value, tag, context);
     }
 
     bool do_int64_value(int64_t value,
                         semantic_tag tag,
                         const ser_context& context) override
     {
-        return destination_handler_.int64_value(value, tag, context);
+        return to_handler_.int64_value(value, tag, context);
     }
 
     bool do_uint64_value(uint64_t value,
                          semantic_tag tag,
                          const ser_context& context) override
     {
-        return destination_handler_.uint64_value(value, tag, context);
+        return to_handler_.uint64_value(value, tag, context);
     }
 
     bool do_bool_value(bool value, semantic_tag tag, const ser_context& context) override
     {
-        return destination_handler_.bool_value(value, tag, context);
+        return to_handler_.bool_value(value, tag, context);
     }
 
     bool do_null_value(semantic_tag tag, const ser_context& context) override
     {
-        return destination_handler_.null_value(tag, context);
+        return to_handler_.null_value(tag, context);
     }
 
 };
 
-typedef basic_utf8_adaptor<char> json_filter;
-typedef basic_utf8_adaptor<wchar_t> wjson_filter;
 typedef basic_rename_object_member_filter<char> rename_object_member_filter;
 typedef basic_rename_object_member_filter<wchar_t> wrename_object_member_filter;
 

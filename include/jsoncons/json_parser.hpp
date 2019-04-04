@@ -71,24 +71,24 @@ public:
         {
             if (is_str_to_nan_ && s == nan_to_str_)
             {
-                return this->destination_handler().double_value(std::nan(""), tag, context);
+                return this->to_handler().double_value(std::nan(""), tag, context);
             }
             else if (is_str_to_inf_ && s == inf_to_str_)
             {
-                return this->destination_handler().double_value(std::numeric_limits<double>::infinity(), tag, context);
+                return this->to_handler().double_value(std::numeric_limits<double>::infinity(), tag, context);
             }
             else if (is_str_to_neginf_ && s == neginf_to_str_)
             {
-                return this->destination_handler().double_value(-std::numeric_limits<double>::infinity(), tag, context);
+                return this->to_handler().double_value(-std::numeric_limits<double>::infinity(), tag, context);
             }
             else
             {
-                return this->destination_handler().string_value(s, tag, context);
+                return this->to_handler().string_value(s, tag, context);
             }
         }
         else
         {
-            return this->destination_handler().string_value(s, tag, context);
+            return this->to_handler().string_value(s, tag, context);
         }
     }
 };

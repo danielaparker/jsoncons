@@ -76,7 +76,7 @@ decode_ubjson(std::basic_istream<typename Json::char_type>& is)
     //typedef typename Json::char_type char_type;
 
     jsoncons::json_decoder<Json> decoder;
-    basic_utf8_adaptor<typename Json::char_type> adaptor(decoder);
+    json_content_handler_adaptor<jsoncons::json_content_handler,jsoncons::json_decoder<Json>> adaptor(decoder);
     ubjson_reader parser(is, adaptor);
     std::error_code ec;
     parser.read(ec);
