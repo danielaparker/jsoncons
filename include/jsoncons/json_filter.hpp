@@ -322,6 +322,8 @@ private:
 
 };
 
+typedef basic_json_filter<char> json_filter;
+typedef basic_json_filter<wchar_t> wjson_filter;
 typedef basic_rename_object_member_filter<char> rename_object_member_filter;
 typedef basic_rename_object_member_filter<wchar_t> wrename_object_member_filter;
 
