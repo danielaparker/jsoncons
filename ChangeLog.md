@@ -3,7 +3,7 @@ master
 
 Changes:
 
-- The template parameter `CharT` has been removed from
+- The template parameter `CharT` has been removed from the binary encoders
   `basic_bson_encoder`, `basic_cbor_encoder`, `basic_msgpack_encoder`,
   and `basic_ubjson_encoder`. 
 
