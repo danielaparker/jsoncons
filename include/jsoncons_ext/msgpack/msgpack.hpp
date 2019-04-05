@@ -21,20 +21,24 @@ namespace jsoncons { namespace msgpack {
 
 // encode_msgpack
 
-template<class Json>
-void encode_msgpack(const Json& j, std::basic_ostream<typename Json::char_type>& os)
+template<class T>
+typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+encode_msgpack(const T& j, std::ostream& os)
 {
-    typedef typename Json::char_type char_type;
-    basic_msgpack_encoder<char_type> encoder(os);
-    j.dump(encoder);
+    typedef typename T::char_type char_type;
+    msgpack_encoder encoder(os);
+    auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+    j.dump(adaptor);
 }
 
-template<class Json>
-void encode_msgpack(const Json& j, std::vector<uint8_t>& v)
+template<class T>
+typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+encode_msgpack(const T& j, std::vector<uint8_t>& v)
 {
-    typedef typename Json::char_type char_type;
-    basic_msgpack_encoder<char_type,jsoncons::bytes_result> encoder(v);
-    j.dump(encoder);
+    typedef typename T::char_type char_type;
+    msgpack_bytes_encoder encoder(v);
+    auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+    j.dump(adaptor);
 }
 
 // decode_msgpack

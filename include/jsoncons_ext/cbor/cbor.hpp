@@ -22,32 +22,36 @@ namespace jsoncons { namespace cbor {
 
 // encode_cbor
 
-template<class Json>
-void encode_cbor(const Json& j, std::basic_ostream<typename Json::char_type>& os)
+template<class T>
+void encode_cbor(const T& j, std::ostream& os)
 {
     encode_cbor(j,os,cbor_options());
 }
 
-template<class Json>
-void encode_cbor(const Json& j, std::vector<uint8_t>& v)
+template<class T>
+void encode_cbor(const T& j, std::vector<uint8_t>& v)
 {
     encode_cbor(j,v,cbor_options());
 }
 
-template<class Json>
-void encode_cbor(const Json& j, std::basic_ostream<typename Json::char_type>& os, const cbor_encode_options& options)
+template<class T>
+typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+encode_cbor(const T& j, std::ostream& os, const cbor_encode_options& options)
 {
-    typedef typename Json::char_type char_type;
-    basic_cbor_encoder<char_type> encoder(os, options);
-    j.dump(encoder);
+    typedef typename T::char_type char_type;
+    cbor_encoder encoder(os, options);
+    auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+    j.dump(adaptor);
 }
 
-template<class Json>
-void encode_cbor(const Json& j, std::vector<uint8_t>& v, const cbor_encode_options& options)
+template<class T>
+typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+encode_cbor(const T& j, std::vector<uint8_t>& v, const cbor_encode_options& options)
 {
-    typedef typename Json::char_type char_type;
-    basic_cbor_encoder<char_type,jsoncons::bytes_result> encoder(v, options);
-    j.dump(encoder);
+    typedef typename T::char_type char_type;
+    cbor_bytes_encoder encoder(v, options);
+    auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+    j.dump(adaptor);
 }
 
 // decode_cbor

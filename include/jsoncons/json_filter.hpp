@@ -192,7 +192,7 @@ private:
     }
 };
 
-template <class From,class To>
+template <class From,class To,class Enable=void>
 class json_content_handler_adaptor : public From
 {
 public:
@@ -214,6 +214,7 @@ public:
     {
     }
 
+    // moveable
     json_content_handler_adaptor(json_content_handler_adaptor&&) = default;
     json_content_handler_adaptor& operator=(json_content_handler_adaptor&&) = default;
 
@@ -327,6 +328,37 @@ private:
         return to_handler_->null_value(tag, context);
     }
 
+};
+
+template <class From,class To>
+class json_content_handler_adaptor<From,To,typename std::enable_if<std::is_convertible<To*,From*>::value>::type>
+{
+public:
+    typedef typename From::char_type char_type;
+    typedef typename From::char_traits_type char_traits_type;
+    typedef typename From::string_view_type string_view_type;
+private:
+    To* to_handler_;
+public:
+    json_content_handler_adaptor()
+        : to_handler_(nullptr)
+    {
+    }
+    json_content_handler_adaptor(To& handler)
+        : to_handler_(std::addressof(handler))
+    {
+    }
+
+    operator From&() { return *to_handler_; }
+
+    // moveable
+    json_content_handler_adaptor(json_content_handler_adaptor&&) = default;
+    json_content_handler_adaptor& operator=(json_content_handler_adaptor&&) = default;
+
+    To& to_handler()
+    {
+        return *to_handler_;
+    }
 };
 
 template <class From,class To>
