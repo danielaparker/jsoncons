@@ -52,71 +52,38 @@ void encode_cbor(const Json& j, std::vector<uint8_t>& v, const cbor_encode_optio
 
 // decode_cbor
 
-template<class Json>
-typename std::enable_if<std::is_same<typename Json::char_type,char>::value,Json>::type 
+template<class T>
+typename std::enable_if<is_basic_json_class<T>::value,T>::type 
 decode_cbor(const std::vector<uint8_t>& v)
 {
-    jsoncons::json_decoder<Json> decoder;
-    basic_cbor_reader<jsoncons::bytes_source> parser(v, decoder);
+    jsoncons::json_decoder<T> decoder;
+    auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
+    basic_cbor_reader<jsoncons::bytes_source> reader(v, adaptor);
     std::error_code ec;
-    parser.read(ec);
+    reader.read(ec);
     if (ec)
     {
-        throw ser_error(ec,parser.line_number(),parser.column_number());
+        throw ser_error(ec,reader.line_number(),reader.column_number());
     }
     return decoder.get_result();
 }
 
-template<class Json>
-typename std::enable_if<!std::is_same<typename Json::char_type,char>::value,Json>::type 
-decode_cbor(const std::vector<uint8_t>& v)
+template<class T>
+typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+decode_cbor(std::basic_istream<char>& is)
 {
-    jsoncons::json_decoder<Json> decoder;
-    json_content_handler_adaptor<jsoncons::json_content_handler,jsoncons::json_decoder<Json>> adaptor(decoder);
-    basic_cbor_reader<jsoncons::bytes_source> parser(v, adaptor);
+    jsoncons::json_decoder<T> decoder;
+    auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
+    cbor_reader reader(is, adaptor);
     std::error_code ec;
-    parser.read(ec);
+    reader.read(ec);
     if (ec)
     {
-        throw ser_error(ec,parser.line_number(),parser.column_number());
+        throw ser_error(ec,reader.line_number(),reader.column_number());
     }
     return decoder.get_result();
 }
 
-template<class Json>
-typename std::enable_if<std::is_same<typename Json::char_type,char>::value,Json>::type 
-decode_cbor(std::basic_istream<typename Json::char_type>& is)
-{
-    //typedef typename Json::char_type char_type;
-
-    jsoncons::json_decoder<Json> decoder;
-    cbor_reader parser(is, decoder);
-    std::error_code ec;
-    parser.read(ec);
-    if (ec)
-    {
-        throw ser_error(ec,parser.line_number(),parser.column_number());
-    }
-    return decoder.get_result();
-}
-
-template<class Json>
-typename std::enable_if<!std::is_same<typename Json::char_type,char>::value,Json>::type 
-decode_cbor(std::basic_istream<typename Json::char_type>& is)
-{
-    //typedef typename Json::char_type char_type;
-
-    jsoncons::json_decoder<Json> decoder;
-    json_content_handler_adaptor<jsoncons::json_content_handler,jsoncons::json_decoder<Json>> adaptor(decoder);
-    cbor_reader parser(is, adaptor);
-    std::error_code ec;
-    parser.read(ec);
-    if (ec)
-    {
-        throw ser_error(ec,parser.line_number(),parser.column_number());
-    }
-    return decoder.get_result();
-}
   
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class Json>

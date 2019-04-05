@@ -192,69 +192,76 @@ private:
     }
 };
 
-
 template <class From,class To>
 class json_content_handler_adaptor : public From
 {
 public:
     using typename From::string_view_type;
 private:
-    To& to_handler_;
+    To* to_handler_;
 
-    // noncopyable and nonmoveable
+    // noncopyable
     json_content_handler_adaptor(const json_content_handler_adaptor&) = delete;
     json_content_handler_adaptor& operator=(const json_content_handler_adaptor&) = delete;
 public:
+
+    json_content_handler_adaptor()
+        : to_handler_(nullptr)
+    {
+    }
     json_content_handler_adaptor(To& handler)
-        : to_handler_(handler)
+        : to_handler_(std::addressof(handler))
     {
     }
 
+    json_content_handler_adaptor(json_content_handler_adaptor&&) = default;
+    json_content_handler_adaptor& operator=(json_content_handler_adaptor&&) = default;
+
     To& to_handler()
     {
-        return to_handler_;
+        return *to_handler_;
     }
 
 private:
     void do_flush() override
     {
-        to_handler_.flush();
+        to_handler_->flush();
     }
 
     bool do_begin_object(semantic_tag tag, 
                          const ser_context& context) override
     {
-        return to_handler_.begin_object(tag, context);
+        return to_handler_->begin_object(tag, context);
     }
 
     bool do_begin_object(size_t length, 
                          semantic_tag tag, 
                          const ser_context& context) override
     {
-        return to_handler_.begin_object(length, tag, context);
+        return to_handler_->begin_object(length, tag, context);
     }
 
     bool do_end_object(const ser_context& context) override
     {
-        return to_handler_.end_object(context);
+        return to_handler_->end_object(context);
     }
 
     bool do_begin_array(semantic_tag tag, 
                         const ser_context& context) override
     {
-        return to_handler_.begin_array(tag, context);
+        return to_handler_->begin_array(tag, context);
     }
 
     bool do_begin_array(size_t length, 
                         semantic_tag tag, 
                         const ser_context& context) override
     {
-        return to_handler_.begin_array(length, tag, context);
+        return to_handler_->begin_array(length, tag, context);
     }
 
     bool do_end_array(const ser_context& context) override
     {
-        return to_handler_.end_array(context);
+        return to_handler_->end_array(context);
     }
 
     bool do_name(const string_view_type& name,
@@ -286,41 +293,47 @@ private:
                               semantic_tag tag,
                               const ser_context& context) override
     {
-        return to_handler_.byte_string_value(b, tag, context);
+        return to_handler_->byte_string_value(b, tag, context);
     }
 
     bool do_double_value(double value, 
                          semantic_tag tag,
                          const ser_context& context) override
     {
-        return to_handler_.double_value(value, tag, context);
+        return to_handler_->double_value(value, tag, context);
     }
 
     bool do_int64_value(int64_t value,
                         semantic_tag tag,
                         const ser_context& context) override
     {
-        return to_handler_.int64_value(value, tag, context);
+        return to_handler_->int64_value(value, tag, context);
     }
 
     bool do_uint64_value(uint64_t value,
                          semantic_tag tag,
                          const ser_context& context) override
     {
-        return to_handler_.uint64_value(value, tag, context);
+        return to_handler_->uint64_value(value, tag, context);
     }
 
     bool do_bool_value(bool value, semantic_tag tag, const ser_context& context) override
     {
-        return to_handler_.bool_value(value, tag, context);
+        return to_handler_->bool_value(value, tag, context);
     }
 
     bool do_null_value(semantic_tag tag, const ser_context& context) override
     {
-        return to_handler_.null_value(tag, context);
+        return to_handler_->null_value(tag, context);
     }
 
 };
+
+template <class From,class To>
+json_content_handler_adaptor<From,To> make_json_content_handler_adaptor(To& to)
+{
+    return json_content_handler_adaptor<From, To>(to);
+}
 
 typedef basic_json_filter<char> json_filter;
 typedef basic_json_filter<wchar_t> wjson_filter;

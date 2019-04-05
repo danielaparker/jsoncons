@@ -52,6 +52,12 @@ public:
 
     typedef basic_string_view<char_type,char_traits_type> string_view_type;
 
+    basic_json_content_handler(basic_json_content_handler&&) = default;
+
+    basic_json_content_handler& operator=(basic_json_content_handler&&) = default;
+
+    basic_json_content_handler() = default;
+
     virtual ~basic_json_content_handler() {}
 
     void flush()

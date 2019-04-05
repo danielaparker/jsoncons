@@ -39,51 +39,34 @@ void encode_msgpack(const Json& j, std::vector<uint8_t>& v)
 
 // decode_msgpack
 
-template<class Json>
-Json decode_msgpack(const std::vector<uint8_t>& v)
+template<class T>
+typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+decode_msgpack(const std::vector<uint8_t>& v)
 {
-    jsoncons::json_decoder<Json> decoder;
-    msgpack_bytes_reader parser(v, decoder);
+    jsoncons::json_decoder<T> decoder;
+    auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
+    basic_msgpack_reader<jsoncons::bytes_source> reader(v, adaptor);
     std::error_code ec;
-    parser.read(ec);
+    reader.read(ec);
     if (ec)
     {
-        throw ser_error(ec,parser.line_number(),parser.column_number());
+        throw ser_error(ec,reader.line_number(),reader.column_number());
     }
     return decoder.get_result();
 }
 
-template<class Json>
-typename std::enable_if<std::is_same<typename Json::char_type,char>::value,Json>::type 
-decode_msgpack(std::basic_istream<typename Json::char_type>& is)
+template<class T>
+typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+decode_msgpack(std::basic_istream<char>& is)
 {
-    //typedef typename Json::char_type char_type;
-
-    jsoncons::json_decoder<Json> decoder;
-    msgpack_reader parser(is, decoder);
+    jsoncons::json_decoder<T> decoder;
+    auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
+    msgpack_reader reader(is, adaptor);
     std::error_code ec;
-    parser.read(ec);
+    reader.read(ec);
     if (ec)
     {
-        throw ser_error(ec,parser.line_number(),parser.column_number());
-    }
-    return decoder.get_result();
-}
-
-template<class Json>
-typename std::enable_if<!std::is_same<typename Json::char_type,char>::value,Json>::type 
-decode_msgpack(std::basic_istream<typename Json::char_type>& is)
-{
-    //typedef typename Json::char_type char_type;
-
-    jsoncons::json_decoder<Json> decoder;
-    json_content_handler_adaptor<jsoncons::json_content_handler,jsoncons::json_decoder<Json>> adaptor(decoder);
-    msgpack_reader parser(is, adaptor);
-    std::error_code ec;
-    parser.read(ec);
-    if (ec)
-    {
-        throw ser_error(ec,parser.line_number(),parser.column_number());
+        throw ser_error(ec,reader.line_number(),reader.column_number());
     }
     return decoder.get_result();
 }

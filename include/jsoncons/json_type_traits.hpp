@@ -29,6 +29,16 @@
 
 namespace jsoncons {
 
+
+template <class T,class Enable=void>
+struct is_basic_json_class : std::false_type
+{};
+
+template <class T>
+struct is_basic_json_class<T, decltype(std::declval<jsoncons::basic_json<typename T::char_type,typename T::implementation_policy,typename T::allocator_type>>(),void())> : std::true_type
+{};
+
+
 template <class T>
 struct is_json_type_traits_declared : public std::false_type
 {};
