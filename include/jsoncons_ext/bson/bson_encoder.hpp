@@ -21,13 +21,13 @@
 
 namespace jsoncons { namespace bson {
 
-template<class CharT,class Result=jsoncons::binary_stream_result>
-class basic_bson_encoder final : public basic_json_content_handler<CharT>
+template<class Result=jsoncons::binary_stream_result>
+class basic_bson_encoder final : public basic_json_content_handler<char>
 {
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
-    typedef CharT char_type;
-    using typename basic_json_content_handler<CharT>::string_view_type;
+    typedef char char_type;
+    using typename basic_json_content_handler<char>::string_view_type;
     typedef Result result_type;
 
 private:
@@ -206,12 +206,15 @@ private:
         size_t offset = buffer_.size();
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
         size_t string_offset = buffer_.size();
-        auto result = unicons::convert(
-            sv.begin(), sv.end(), std::back_inserter(buffer_), 
-            unicons::conv_flags::strict);
+
+        auto result = unicons::validate(sv.begin(), sv.end());
         if (result.ec != unicons::conv_errc())
         {
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Illegal unicode"));
+        }
+        for (auto c : sv)
+        {
+            buffer_.push_back(c);
         }
         buffer_.push_back(0x00);
         size_t length = buffer_.size() - string_offset;
@@ -323,21 +326,16 @@ private:
     }
 };
 
-typedef basic_bson_encoder<char,jsoncons::binary_stream_result> bson_encoder;
-typedef basic_bson_encoder<char,jsoncons::bytes_result> bson_bytes_encoder;
-
-typedef basic_bson_encoder<wchar_t,jsoncons::binary_stream_result> wbson_encoder;
-typedef basic_bson_encoder<wchar_t,jsoncons::bytes_result> wbson_bytes_encoder;
+typedef basic_bson_encoder<jsoncons::binary_stream_result> bson_encoder;
+typedef basic_bson_encoder<jsoncons::bytes_result> bson_bytes_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-template<class CharT,class Result=jsoncons::binary_stream_result>
-using basic_bson_serializer = basic_bson_encoder<CharT,Result>; 
+template<class Result=jsoncons::binary_stream_result>
+using basic_bson_serializer = basic_bson_encoder<Result>; 
 
-typedef basic_bson_serializer<char,jsoncons::binary_stream_result> bson_serializer;
-typedef basic_bson_serializer<char,jsoncons::bytes_result> bson_buffer_serializer;
+typedef basic_bson_encoder<jsoncons::binary_stream_result> bson_serializer;
+typedef basic_bson_encoder<jsoncons::bytes_result> bson_buffer_serializer;
 
-typedef basic_bson_serializer<wchar_t,jsoncons::binary_stream_result> wbson_serializer;
-typedef basic_bson_serializer<wchar_t,jsoncons::bytes_result> wbson_buffer_serializer;
 #endif
 
 }}

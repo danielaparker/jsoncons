@@ -24,13 +24,13 @@ namespace jsoncons { namespace msgpack {
 
 enum class msgpack_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
-template<class CharT,class Result=jsoncons::binary_stream_result>
-class basic_msgpack_encoder final : public basic_json_content_handler<CharT>
+template<class Result=jsoncons::binary_stream_result>
+class basic_msgpack_encoder final : public basic_json_content_handler<char>
 {
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
-    typedef CharT char_type;
-    using typename basic_json_content_handler<CharT>::string_view_type;
+    typedef char char_type;
+    using typename basic_json_content_handler<char>::string_view_type;
     typedef Result result_type;
 
 private:
@@ -219,16 +219,13 @@ private:
 
     void write_string_value(const string_view_type& sv) 
     {
-        std::basic_string<uint8_t> target;
-        auto result = unicons::convert(
-            sv.begin(), sv.end(), std::back_inserter(target), 
-            unicons::conv_flags::strict);
+        auto result = unicons::validate(sv.begin(), sv.end());
         if (result.ec != unicons::conv_errc())
         {
             throw ser_error(msgpack_errc::invalid_utf8_text_string);
         }
 
-        const size_t length = target.length();
+        const size_t length = sv.length();
         if (length <= 31)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
@@ -253,7 +250,7 @@ private:
             jsoncons::detail::to_big_endian(static_cast<uint32_t>(length),std::back_inserter(result_));
         }
 
-        for (auto c : target)
+        for (auto c : sv)
         {
             result_.push_back(c);
         }
@@ -445,23 +442,17 @@ private:
     }
 };
 
-typedef basic_msgpack_encoder<char,jsoncons::binary_stream_result> msgpack_encoder;
-typedef basic_msgpack_encoder<char,jsoncons::bytes_result> msgpack_bytes_encoder;
-
-typedef basic_msgpack_encoder<wchar_t,jsoncons::binary_stream_result> wmsgpack_encoder;
-typedef basic_msgpack_encoder<wchar_t,jsoncons::bytes_result> wmsgpack_bytes_encoder;
+typedef basic_msgpack_encoder<jsoncons::binary_stream_result> msgpack_encoder;
+typedef basic_msgpack_encoder<jsoncons::bytes_result> msgpack_bytes_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_msgpack_encoder<char,jsoncons::bytes_result> msgpack_bytes_serializer;
+typedef basic_msgpack_encoder<jsoncons::bytes_result> msgpack_bytes_serializer;
 
-template<class CharT,class Result=jsoncons::binary_stream_result>
-using basic_msgpack_serializer = basic_msgpack_encoder<CharT,Result>; 
+template<class Result=jsoncons::binary_stream_result>
+using basic_msgpack_serializer = basic_msgpack_encoder<Result>; 
 
-typedef basic_msgpack_serializer<char,jsoncons::binary_stream_result> msgpack_serializer;
-typedef basic_msgpack_serializer<char,jsoncons::bytes_result> msgpack_buffer_serializer;
-
-typedef basic_msgpack_serializer<wchar_t,jsoncons::binary_stream_result> wmsgpack_serializer;
-typedef basic_msgpack_serializer<wchar_t,jsoncons::bytes_result> wmsgpack_buffer_serializer;
+typedef basic_msgpack_serializer<jsoncons::binary_stream_result> msgpack_serializer;
+typedef basic_msgpack_serializer<jsoncons::bytes_result> msgpack_buffer_serializer;
 #endif
 
 }}

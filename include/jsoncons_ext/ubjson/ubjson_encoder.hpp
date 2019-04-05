@@ -24,13 +24,13 @@ namespace jsoncons { namespace ubjson {
 
 enum class ubjson_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
-template<class CharT,class Result=jsoncons::binary_stream_result>
-class basic_ubjson_encoder final : public basic_json_content_handler<CharT>
+template<class Result=jsoncons::binary_stream_result>
+class basic_ubjson_encoder final : public basic_json_content_handler<char>
 {
 
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
-    using typename basic_json_content_handler<CharT>::string_view_type;
+    using typename basic_json_content_handler<char>::string_view_type;
     typedef Result result_type;
 
 private:
@@ -181,18 +181,15 @@ private:
 
     bool do_name(const string_view_type& name, const ser_context&) override
     {
-        std::basic_string<uint8_t> target;
-        auto result = unicons::convert(
-            name.begin(), name.end(), std::back_inserter(target), 
-            unicons::conv_flags::strict);
+        auto result = unicons::validate(name.begin(), name.end());
         if (result.ec != unicons::conv_errc())
         {
             throw ser_error(ubjson_errc::invalid_utf8_text_string);
         }
 
-        put_length(target.length());
+        put_length(name.length());
 
-        for (auto c : target)
+        for (auto c : name)
         {
             result_.push_back(c);
         }
@@ -224,10 +221,7 @@ private:
             }
         }
 
-        std::basic_string<uint8_t> target;
-        auto result = unicons::convert(
-            sv.begin(), sv.end(), std::back_inserter(target), 
-            unicons::conv_flags::strict);
+        auto result = unicons::validate(sv.begin(), sv.end());
         if (result.ec != unicons::conv_errc())
         {
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Illegal unicode"));
@@ -235,7 +229,7 @@ private:
 
         put_length(sv.length());
 
-        for (auto c : target)
+        for (auto c : sv)
         {
             result_.push_back(c);
         }
@@ -424,21 +418,15 @@ private:
     }
 };
 
-typedef basic_ubjson_encoder<char,jsoncons::binary_stream_result> ubjson_encoder;
-typedef basic_ubjson_encoder<char,jsoncons::bytes_result> ubjson_bytes_encoder;
-
-typedef basic_ubjson_encoder<wchar_t,jsoncons::binary_stream_result> wubjson_encoder;
-typedef basic_ubjson_encoder<wchar_t,jsoncons::bytes_result> wubjson_bytes_encoder;
+typedef basic_ubjson_encoder<jsoncons::binary_stream_result> ubjson_encoder;
+typedef basic_ubjson_encoder<jsoncons::bytes_result> ubjson_bytes_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-template<class CharT,class Result=jsoncons::binary_stream_result>
-using basic_ubjson_serializer = basic_ubjson_encoder<CharT,Result>; 
+template<class Result=jsoncons::binary_stream_result>
+using basic_ubjson_serializer = basic_ubjson_encoder<Result>; 
 
-typedef basic_ubjson_serializer<char,jsoncons::binary_stream_result> ubjson_serializer;
-typedef basic_ubjson_serializer<char,jsoncons::bytes_result> ubjson_buffer_serializer;
-
-typedef basic_ubjson_serializer<wchar_t,jsoncons::binary_stream_result> wubjson_serializer;
-typedef basic_ubjson_serializer<wchar_t,jsoncons::bytes_result> wubjson_buffer_serializer;
+typedef basic_ubjson_encoder<jsoncons::binary_stream_result> ubjson_serializer;
+typedef basic_ubjson_encoder<jsoncons::bytes_result> ubjson_buffer_serializer;
 #endif
 
 }}

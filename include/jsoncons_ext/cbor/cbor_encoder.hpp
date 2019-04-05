@@ -24,16 +24,15 @@ namespace jsoncons { namespace cbor {
 
 enum class cbor_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
-template<class CharT,class Result=jsoncons::binary_stream_result>
-class basic_cbor_encoder final : public basic_json_content_handler<CharT>
+template<class Result=jsoncons::binary_stream_result>
+class basic_cbor_encoder final : public basic_json_content_handler<char>
 {
-
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 
 public:
-    typedef CharT char_type;
+    typedef char char_type;
     typedef Result result_type;
-    using typename basic_json_content_handler<CharT>::string_view_type;
+    using typename basic_json_content_handler<char>::string_view_type;
 
 private:
     struct stack_item
@@ -268,7 +267,7 @@ private:
 
     bool do_name(const string_view_type& name, const ser_context&) override
     {
-        write_string(name, std::integral_constant<bool,sizeof(CharT) == sizeof(char)>());
+        write_string(name);
         return true;
     }
 
@@ -287,20 +286,7 @@ private:
         return true;
     }
 
-    void write_string(const string_view_type& sv, std::false_type)
-    {
-        std::string target;
-        auto result = unicons::convert(
-            sv.begin(), sv.end(), std::back_inserter(target), 
-            unicons::conv_flags::strict);
-        if (result.ec != unicons::conv_errc())
-        {
-            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Illegal unicode"));
-        }
-        write_string(target, std::true_type());
-    }
-
-    void write_string(const string_view& sv, std::true_type)
+    void write_string(const string_view& sv)
     {
         auto result = unicons::validate(sv.begin(), sv.end());
         if (result.ec != unicons::conv_errc())
@@ -437,8 +423,8 @@ private:
     void write_decimal_value(const string_view_type& sv, const ser_context& context)
     {
         decimal_parse_state state = decimal_parse_state::start;
-        std::basic_string<CharT> s;
-        std::basic_string<CharT> exponent;
+        std::basic_string<char> s;
+        std::basic_string<char> exponent;
         int64_t scale = 0;
         for (auto c : sv)
         {
@@ -572,34 +558,34 @@ private:
             case semantic_tag::date_time:
             {
                 result_.push_back(0xc0);
-                write_string(sv, std::integral_constant<bool,sizeof(CharT) == sizeof(char)>());
+                write_string(sv);
                 end_value();
                 break;
             }
             case semantic_tag::uri:
             {
                 result_.push_back(32);
-                write_string(sv, std::integral_constant<bool,sizeof(CharT) == sizeof(char)>());
+                write_string(sv);
                 end_value();
                 break;
             }
             case semantic_tag::base64url:
             {
                 result_.push_back(33);
-                write_string(sv, std::integral_constant<bool,sizeof(CharT) == sizeof(char)>());
+                write_string(sv);
                 end_value();
                 break;
             }
             case semantic_tag::base64:
             {
                 result_.push_back(34);
-                write_string(sv, std::integral_constant<bool,sizeof(CharT) == sizeof(char)>());
+                write_string(sv);
                 end_value();
                 break;
             }
             default:
             {
-                write_string(sv, std::integral_constant<bool,sizeof(CharT) == sizeof(char)>());
+                write_string(sv);
                 end_value();
                 break;
             }
@@ -897,23 +883,17 @@ private:
     }
 };
 
-typedef basic_cbor_encoder<char,jsoncons::binary_stream_result> cbor_encoder;
-typedef basic_cbor_encoder<char,jsoncons::bytes_result> cbor_bytes_encoder;
-
-typedef basic_cbor_encoder<wchar_t,jsoncons::binary_stream_result> wcbor_encoder;
-typedef basic_cbor_encoder<wchar_t,jsoncons::bytes_result> wcbor_bytes_encoder;
+typedef basic_cbor_encoder<jsoncons::binary_stream_result> cbor_encoder;
+typedef basic_cbor_encoder<jsoncons::bytes_result> cbor_bytes_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_cbor_encoder<char,jsoncons::bytes_result> cbor_bytes_serializer;
+typedef basic_cbor_encoder<jsoncons::bytes_result> cbor_bytes_serializer;
 
-template<class CharT,class Result=jsoncons::binary_stream_result>
-using basic_cbor_serializer = basic_cbor_encoder<CharT,Result>; 
+template<class Result=jsoncons::binary_stream_result>
+using basic_cbor_serializer = basic_cbor_encoder<Result>; 
 
-typedef basic_cbor_serializer<char,jsoncons::binary_stream_result> cbor_serializer;
-typedef basic_cbor_serializer<char,jsoncons::bytes_result> cbor_buffer_serializer;
-
-typedef basic_cbor_serializer<wchar_t,jsoncons::binary_stream_result> wcbor_serializer;
-typedef basic_cbor_serializer<wchar_t,jsoncons::bytes_result> wcbor_buffer_serializer;
+typedef basic_cbor_encoder<jsoncons::binary_stream_result> cbor_serializer;
+typedef basic_cbor_encoder<jsoncons::bytes_result> cbor_buffer_serializer;
 #endif
 
 }}
