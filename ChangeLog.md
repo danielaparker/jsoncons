@@ -1,7 +1,13 @@
 master
 ------
 
-Enhancements
+Changes:
+
+- The template parameter `CharT` has been removed from
+  `basic_bson_encoder`, `basic_cbor_encoder`, `basic_msgpack_encoder`,
+  and `basic_ubjson_encoder`. 
+
+Enhancements:
 
 - Added macro JSONCONS_TYPE_TRAITS_FRIEND
 

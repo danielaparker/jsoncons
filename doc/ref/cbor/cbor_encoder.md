@@ -2,12 +2,11 @@
 
 ```c++
 template<
-    class CharT,
     class Result>
-> class basic_cbor_encoder : public jsoncons::basic_json_content_handler<CharT>
+> class basic_cbor_encoder : public jsoncons::json_content_handler
 ```
 
-`basic_cbor_encoder` is noncopyable and nonmoveable.
+`basic_cbor_encoder` is noncopyable
 
 #### Header
 
@@ -15,20 +14,18 @@ template<
 
 ![cbor_encoder](./diagrams/cbor_encoder.png)
 
-Four specializations for common character types and result types are defined:
+Four specializations for common result types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-cbor_encoder            |basic_cbor_encoder<char,jsoncons::binary_stream_result>
-cbor_bytes_encoder     |basic_cbor_encoder<char,jsoncons::binary_buffer_result>
-wcbor_encoder           |basic_cbor_encoder<wchar_t,jsoncons::binary_stream_result>
-wcbor_bytes_encoder    |basic_cbor_encoder<wchar_t,jsoncons::binary_buffer_result>
+cbor_encoder            |basic_cbor_encoder<jsoncons::binary_stream_result>
+cbor_bytes_encoder     |basic_cbor_encoder<jsoncons::binary_buffer_result>
 
 #### Member types
 
 Type                       |Definition
 ---------------------------|------------------------------
-char_type                  |CharT
+char_type                  |char
 result_type                |Result
 string_view_type           |
 

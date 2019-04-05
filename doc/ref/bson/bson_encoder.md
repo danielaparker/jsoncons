@@ -2,12 +2,11 @@
 
 ```c++
 template<
-    class CharT,
     class Result>
-> class basic_bson_encoder : public jsoncons::basic_json_content_handler<CharT>
+> class basic_bson_encoder : public jsoncons::json_content_handler
 ```
 
-`basic_bson_encoder` is noncopyable and nonmoveable.
+`basic_bson_encoder` is noncopyable.
 
 #### Header
 
@@ -15,20 +14,18 @@ template<
 
 ![bson_encoder](./diagrams/bson_encoder.png)
 
-Four specializations for common character types and result types are defined:
+Two specializations for common result types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-bson_encoder            |basic_bson_encoder<char,jsoncons::binary_stream_result>
-bson_bytes_encoder     |basic_bson_encoder<char,jsoncons::binary_buffer_result>
-wbson_encoder           |basic_bson_encoder<wchar_t,jsoncons::binary_stream_result>
-wbson_bytes_encoder    |basic_bson_encoder<wchar_t,jsoncons::binary_buffer_result>
+bson_encoder            |basic_bson_encoder<jsoncons::binary_stream_result>
+bson_bytes_encoder     |basic_bson_encoder<jsoncons::binary_buffer_result>
 
 #### Member types
 
 Type                       |Definition
 ---------------------------|------------------------------
-char_type                  |CharT
+char_type                  |char
 result_type                |Result
 string_view_type           |
 
