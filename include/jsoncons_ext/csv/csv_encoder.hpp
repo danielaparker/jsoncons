@@ -565,35 +565,21 @@ private:
     }
 };
 
-template <class Json>
-void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os)
+template <class T, class CharT>
+typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+encode_csv(const T& j, std::basic_ostream<CharT>& os, const basic_csv_options<CharT>& options = basic_csv_options<CharT>())
 {
-    typedef typename Json::char_type char_type;
-    basic_csv_encoder<char_type> encoder(os);
+    typedef CharT char_type;
+    basic_csv_encoder<char_type,jsoncons::stream_result<char_type>> encoder(os,options);
     j.dump(encoder);
 }
 
-template <class Json>
-void encode_csv(const Json& j, std::basic_string<typename Json::char_type>& s)
+template <class T,class CharT>
+typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+encode_csv(const T& j, std::basic_string<CharT>& s, const basic_csv_options<CharT>& options = basic_csv_options<CharT>())
 {
-    typedef typename Json::char_type char_type;
-    basic_csv_encoder<char_type,jsoncons::string_result<std::basic_string<typename Json::char_type>>> encoder(s);
-    j.dump(encoder);
-}
-
-template <class Json,class Allocator=std::allocator<char>>
-void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os, const basic_csv_options<typename Json::char_type>& options)
-{
-    typedef typename Json::char_type char_type;
-    basic_csv_encoder<char_type,jsoncons::stream_result<char_type>,Allocator> encoder(os,options);
-    j.dump(encoder);
-}
-
-template <class Json,class Allocator=std::allocator<char>>
-void encode_csv(const Json& j, std::basic_string<typename Json::char_type>& s, const basic_csv_options<typename Json::char_type>& options)
-{
-    typedef typename Json::char_type char_type;
-    basic_csv_encoder<char_type,jsoncons::string_result<std::basic_string<typename Json::char_type>>,Allocator> encoder(s,options);
+    typedef CharT char_type;
+    basic_csv_encoder<char_type,jsoncons::string_result<std::basic_string<char_type>>> encoder(s,options);
     j.dump(encoder);
 }
 

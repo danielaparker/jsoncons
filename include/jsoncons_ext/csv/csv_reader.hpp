@@ -238,50 +238,28 @@ private:
 
 };
 
-template <class Json>
-Json decode_csv(typename Json::string_view_type s)
+template <class T,class CharT>
+typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+decode_csv(const std::basic_string<CharT>& s, const basic_csv_options<CharT>& options = basic_csv_options<CharT>())
 {
-    typedef typename Json::char_type char_type;
+    typedef CharT char_type;
 
-    json_decoder<Json> decoder;
-
-    basic_csv_reader<char_type,jsoncons::string_source<char_type>> reader(s,decoder);
-    reader.read();
-    return decoder.get_result();
-}
-
-template <class Json,class Allocator=std::allocator<char>>
-Json decode_csv(typename Json::string_view_type s, const basic_csv_options<typename Json::char_type>& options)
-{
-    typedef typename Json::char_type char_type;
-
-    json_decoder<Json> decoder;
+    json_decoder<T> decoder;
 
     basic_csv_reader<char_type,jsoncons::string_source<char_type>> reader(s,decoder,options);
     reader.read();
     return decoder.get_result();
 }
 
-template <class Json>
-Json decode_csv(std::basic_istream<typename Json::char_type>& is)
+template <class T,class CharT>
+typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+decode_csv(std::basic_istream<CharT>& is, const basic_csv_options<CharT>& options = basic_csv_options<CharT>())
 {
-    typedef typename Json::char_type char_type;
+    typedef CharT char_type;
 
-    json_decoder<Json> decoder;
+    json_decoder<T> decoder;
 
-    basic_csv_reader<char_type,jsoncons::stream_source<char_type>> reader(is,decoder);
-    reader.read();
-    return decoder.get_result();
-}
-
-template <class Json,class Allocator = std::allocator<char>>
-Json decode_csv(std::basic_istream<typename Json::char_type>& is, const basic_csv_options<typename Json::char_type>& options)
-{
-    typedef typename Json::char_type char_type;
-
-    json_decoder<Json,Allocator> decoder;
-
-    basic_csv_reader<char_type,jsoncons::stream_source<char_type>,Allocator> reader(is,decoder,options);
+    basic_csv_reader<char_type,jsoncons::stream_source<char_type>> reader(is,decoder,options);
     reader.read();
     return decoder.get_result();
 }

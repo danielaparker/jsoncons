@@ -6,32 +6,20 @@ Serializes a json value as CSV to a string or an output stream.
 ```c++
 #include <jsoncons_ext/csv/csv_encoder.hpp>
 
-template <class Json>
-void encode_csv(const Json& j, 
-                std::basic_ostream<typename Json::char_type>& os); // (1)
+template <class T, class CharT>
+void encode_csv(const T& j, 
+                std::basic_ostream<CharT>& os, 
+                const basic_csv_options<CharT>& options = basic_csv_options<CharT>()); // (1)
 
-template <class Json>
-void encode_csv(const Json& j, 
-                std::basic_ostream<typename Json::char_type>& os, 
-                const basic_csv_options<typename Json::char_type>& options); // (2)
-
-template <class Json>
-void encode_csv(const Json& j, 
-                std::basic_string<typename Json::char_type>& s); // (3)
-
-template <class Json>
-void encode_csv(const Json& j, 
-                std::basic_string<typename Json::char_type>& s, 
-                const basic_csv_options<typename Json::char_type>& options); // (4)
+template <class T,class CharT>
+void encode_csv(const T& j, 
+                std::basic_string<CharT>& s, 
+                const basic_csv_options<CharT>& options = basic_csv_options<CharT>()); // (2)
 ```
 
-(1) Serializes json value as CSV to an output stream using default [serializing options](csv_options.md)
+(1) Serializes json value as CSV to an output stream using specified [serializing options](csv_options.md)
 
-(2) Serializes json value as CSV to an output stream using specified [serializing options](csv_options.md)
-
-(3) Serializes json value as CSV to a string using default [serializing options](csv_options.md)
-
-(4) Serializes json value as CSV to a string using specified [serializing options](csv_options.md)
+(2) Serializes json value as CSV to a string using specified [serializing options](csv_options.md)
 
 ### Examples
 

@@ -6,28 +6,18 @@ Reads a `json` value from a CSV string or input stream.
 ```c++
 #include <jsoncons_ext/csv/csv_reader.hpp>
 
-template <class Json>
-Json decode_csv(typename Json::string_view_type s); // (1)
+template <class T,class CharT>
+T decode_csv(const std::basic_string<CharT>& s, 
+             const basic_csv_options<CharT>& options = basic_csv_options<CharT>()); // (1)
 
-template <class Json>
-Json decode_csv(typename Json::string_view_type s, 
-                const basic_csv_options<typename Json::char_type>& options); // (2)
-
-template <class Json>
-Json decode_csv(std::basic_istream<typename Json::char_type>& is); // (3)
-
-template <class Json>
-Json decode_csv(std::basic_istream<typename Json::char_type>& is, 
-                const basic_csv_options<typename Json::char_type>& options); // (4)
+template <class T,class CharT>
+T decode_csv(std::basic_istream<CharT>& is, 
+             const basic_csv_options<CharT>& options = basic_csv_options<CharT>()); // (2)
 ```
 
-(1) Reads json value from CSV string using default [parameters](csv_options.md)
+(1) Reads json value from CSV string using specified [parameters](csv_options.md)
 
-(2) Reads json value from CSV string using specified [parameters](csv_options.md)
-
-(3) Reads json value from CSV input stream using default [parameters](csv_options.md)
-
-(4) Reads json value from CSV input stream using specified [parameters](csv_options.md)
+(2) Reads json value from CSV input stream using specified [parameters](csv_options.md)
 
 #### Return value
 
