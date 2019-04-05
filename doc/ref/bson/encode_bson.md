@@ -6,8 +6,11 @@ Encodes a json value to the [Bin­ary JSON](http://bsonspec.org/) data format.
 ```c++
 #include <jsoncons_ext/bson/bson.hpp>
 
-template<class Json>
-void encode_bson(const Json& jval, std::vector<uint8_t>& v)
+template<class T>
+void encode_bson(const T& jval, std::vector<uint8_t>& v); // (1)
+
+template<class T>
+void encode_bson(const T& jval, std::ostream& os); // (2)
 ```
 
 #### See also

@@ -6,8 +6,11 @@ Encodes a json value to the [MessagePack](http://msgpack.org/index.html) data fo
 ```c++
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 
-template<class Json>
-void encode_msgpack(const Json& jval, std::vector<uint8_t>& v)
+template<class T>
+void encode_msgpack(const T& jval, std::vector<uint8_t>& v); // (1)
+
+template<class T>
+void encode_msgpack(const T& jval, std::ostream& os); // (2)
 ```
 
 #### See also

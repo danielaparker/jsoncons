@@ -6,11 +6,11 @@ Decodes a [Bin­ary JSON](http://bsonspec.org/) data format to a json value.
 ```c++
 #include <jsoncons_ext/bson/bson.hpp>
 
-template<class Json>
-Json decode_bson(const std::vector<uint8_t>& v); // (1)
+template<class T>
+T decode_bson(const std::vector<uint8_t>& v); // (1)
 
-template<class Json>
-Json decode_bson(std::basic_istream<typename Json::char_type>& is); // (2)
+template<class T>
+T decode_bson(std::istream& is); // (2)
 ```
 
 #### Exceptions

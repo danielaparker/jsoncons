@@ -6,11 +6,11 @@ Decodes a [Universal Binary JSON Specification](http://ubjson.org/) data format 
 ```c++
 #include <jsoncons_ext/ubjson/ubjson.hpp>
 
-template<class Json>
-Json decode_ubjson(const std::vector<uint8_t>& v); // (1)
+template<class T>
+T decode_ubjson(const std::vector<uint8_t>& v); // (1)
 
-template<class Json>
-Json decode_ubjson(std::basic_istream<typename Json::char_type>& is); // (2)
+template<class T>
+T decode_ubjson(std::istream>& is); // (2)
 ```
 
 #### Exceptions

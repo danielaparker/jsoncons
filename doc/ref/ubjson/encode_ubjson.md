@@ -6,8 +6,11 @@ Encodes a json value to the [Bin­ary JSON](http://ubjsonspec.org/) data format.
 ```c++
 #include <jsoncons_ext/ubjson/ubjson.hpp>
 
-template<class Json>
-void encode_ubjson(const Json& jval, std::vector<uint8_t>& v)
+template<class T>
+void encode_ubjson(const T& jval, std::vector<uint8_t>& v); // (1)
+
+template<class T>
+void encode_ubjson(const T& jval, std::ostream& os); // (2)
 ```
 
 #### See also

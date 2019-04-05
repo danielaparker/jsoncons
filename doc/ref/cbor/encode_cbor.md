@@ -6,27 +6,27 @@ Encodes a json value to the [Concise Binary Object Representation](http://cbor.i
 ```c++
 #include <jsoncons_ext/cbor/cbor.hpp>
 
-template<class Json>
-void encode_cbor(const Json& jval, std::vector<uint8_t>& buffer); // (1)
+template<class T>
+void encode_cbor(const T& jval, std::vector<uint8_t>& buffer); // (1)
 
-template<class Json>
-void encode_cbor(const Json& j, std::basic_ostream<typename Json::char_type>& os); // (2)
+template<class T>
+void encode_cbor(const T& j, std::vector<uint8_t>& buffer, 
+                 const cbor_encode_options& options); // (2)
 
-template<class Json>
-void encode_cbor(const Json& j, std::basic_ostream<typename Json::char_type>& os, 
-                 const cbor_encode_options& options); // (3)
+template<class T>
+void encode_cbor(const T& j, std::ostream& os); // (3)
 
-template<class Json>
-void encode_cbor(const Json& j, std::vector<uint8_t>& v, 
+template<class T>
+void encode_cbor(const T& j, std::ostream& os, 
                  const cbor_encode_options& options); // (4)
 ```
 
 (1) Writes json value to bytes buffer in CBOR data format
 
-(2) Writes json value to binary output stream in CBOR data format
-
-(3) Writes json value to bytes buffer in CBOR data format
+(2) Writes json value to bytes buffer in CBOR data format
     using [cbor_encode_options](cbor_encode_options.md)
+
+(3) Writes json value to binary output stream in CBOR data format
 
 (4) Writes json value to binary output stream in CBOR data format
     using [cbor_encode_options](cbor_encode_options.md)

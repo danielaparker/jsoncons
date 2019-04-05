@@ -74,7 +74,7 @@ decode_cbor(const std::vector<uint8_t>& v)
 
 template<class T>
 typename std::enable_if<is_basic_json_class<T>::value,T>::type 
-decode_cbor(std::basic_istream<char>& is)
+decode_cbor(std::istream& is)
 {
     jsoncons::json_decoder<T> decoder;
     auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);

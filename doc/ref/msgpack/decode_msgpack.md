@@ -6,11 +6,11 @@ Decodes a [MessagePack](http://msgpack.org/index.html) data format to a json val
 ```c++
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 
-template<class Json>
-Json decode_msgpack(const msgpack_view& v); // (1)
+template<class T>
+T decode_msgpack(const msgpack_view& v); // (1)
 
-template<class Json>
-Json decode_msgpack(std::basic_istream<typename Json::char_type>& is); // (2)
+template<class T>
+T decode_msgpack(std::istream& is); // (2)
 ```
 
 #### Exceptions

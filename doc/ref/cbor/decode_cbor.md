@@ -6,11 +6,11 @@ Decodes a [Concise Binary Object Representation](http://cbor.io/) data format to
 ```c++
 #include <jsoncons_ext/cbor/cbor.hpp>
 
-template<class Json>
-Json decode_cbor(const std::vector<uint8_t>& v); // (1)
+template<class T>
+T decode_cbor(const std::vector<uint8_t>& v); // (1)
 
-template<class Json>
-Json decode_cbor(std::basic_istream<typename Json::char_type>& is); // (2)
+template<class T>
+T decode_cbor(std::istream& is); // (2)
 ```
 
 #### Exceptions
