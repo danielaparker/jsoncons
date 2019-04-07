@@ -582,7 +582,7 @@ encode_csv(const T& val, std::basic_string<CharT>& s, const basic_csv_options<Ch
 {
     typedef CharT char_type;
     basic_csv_encoder<char_type,jsoncons::string_result<std::basic_string<char_type>>> encoder(s,options);
-    encode_stream(basic_json<CharT>(), val, encoder);
+    write_to(basic_json<CharT>(), val, encoder);
 }
 
 template <class T, class CharT>
@@ -600,7 +600,7 @@ encode_csv(const T& val, std::basic_ostream<CharT>& os, const basic_csv_options<
 {
     typedef CharT char_type;
     basic_csv_encoder<char_type,jsoncons::stream_result<char_type>> encoder(os,options);
-    encode_stream(basic_json<CharT>(), val, encoder);
+    write_to(basic_json<CharT>(), val, encoder);
 }
 
 typedef basic_csv_encoder<char> csv_encoder;

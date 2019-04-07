@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_CONVERSION_HPP
-#define JSONCONS_JSON_CONVERSION_HPP
+#ifndef JSONCONS_ENCODE_DECODE_JSON_HPP
+#define JSONCONS_ENCODE_DECODE_JSON_HPP
 
 #include <iostream>
 #include <string>
@@ -37,7 +37,7 @@ decode_json(const std::basic_string<CharT>& s,
 {
     basic_json_pull_reader<CharT> reader(s, options);
     T val;
-    decode_stream(basic_json<CharT>(), reader, val);
+    read_from(basic_json<CharT>(), reader, val);
     return val;
 }
 
@@ -59,7 +59,7 @@ decode_json(std::basic_istream<CharT>& is,
 {
     basic_json_pull_reader<CharT> reader(is, options);
     T val;
-    decode_stream(basic_json<CharT>(), reader, val);
+    read_from(basic_json<CharT>(), reader, val);
     return val;
 }
 
@@ -70,7 +70,7 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
 {
     basic_json_pull_reader<CharT> reader(s, options);
     T val;
-    decode_stream(j, reader, val);
+    read_from(j, reader, val);
     return val;
 }
 
@@ -81,7 +81,7 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
 {
     basic_json_pull_reader<CharT> reader(is, options);
     T val;
-    decode_stream(j, reader, val);
+    read_from(j, reader, val);
     return val;
 }
 
@@ -91,7 +91,7 @@ template <class T, class CharT>
 void encode_json(const T& val, 
                  basic_json_content_handler<CharT>& receiver)
 {
-    encode_stream(basic_json<CharT>(), val, receiver);
+    write_to(basic_json<CharT>(), val, receiver);
     receiver.flush();
 }
 
@@ -196,7 +196,7 @@ void encode_json(const basic_json<CharT, ImplementationPolicy, Allocator>& j,
                  const T& val,
                  basic_json_content_handler<CharT>& receiver)
 {
-    encode_stream(j, val, receiver);
+    write_to(j, val, receiver);
     receiver.flush();
 }
 
