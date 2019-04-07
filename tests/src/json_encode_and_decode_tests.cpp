@@ -33,6 +33,27 @@ TEST_CASE("encode and decode json")
     }
 }
 
+TEST_CASE("encode and decode wjson")
+{
+    jc::wjson j(std::make_pair(false,std::wstring(L"foo")));
+
+    SECTION("string test")
+    {
+        std::wstring s;
+        jc::encode_json(j, s);
+        jc::wjson result = jc::decode_json<jc::wjson>(s);
+        CHECK(result == j);
+    }
+
+    SECTION("stream test")
+    {
+        std::wstringstream ss;
+        jc::encode_json(j, ss);
+        jc::wjson result = jc::decode_json<jc::wjson>(ss);
+        CHECK(result == j);
+    }
+}
+
 TEST_CASE("convert_pair_test")
 {
     auto val = std::make_pair(false,std::string("foo"));
