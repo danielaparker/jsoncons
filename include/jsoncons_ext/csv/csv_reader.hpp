@@ -261,7 +261,7 @@ decode_csv(const std::basic_string<CharT>& s, const basic_csv_options<CharT>& op
 
     basic_csv_reader<char_type,jsoncons::string_source<char_type>> reader(s,decoder,options);
     reader.read();
-    return decoder.get_result().as<T>();
+    return decoder.get_result().template as<T>();
 }
 
 template <class T,class CharT>
@@ -287,7 +287,7 @@ decode_csv(std::basic_istream<CharT>& is, const basic_csv_options<CharT>& option
 
     basic_csv_reader<char_type,jsoncons::stream_source<char_type>> reader(is,decoder,options);
     reader.read();
-    return decoder.get_result().as<T>();
+    return decoder.get_result().template as<T>();
 }
 
 typedef basic_csv_reader<char,jsoncons::stream_source<char>> csv_reader;
