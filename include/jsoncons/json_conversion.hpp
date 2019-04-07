@@ -98,10 +98,30 @@ void encode_json(const T& val,
 // to stream
 
 template <class T, class CharT>
-void encode_json(const T& val,
-                 std::basic_ostream<CharT>& os, 
-                 const basic_json_encode_options<CharT>& options = basic_json_options<CharT>(), 
-                 indenting line_indent = indenting::no_indent)
+typename std::enable_if<is_basic_json_class<T>::value>::type
+encode_json(const T& val,
+            std::basic_ostream<CharT>& os, 
+            const basic_json_encode_options<CharT>& options = basic_json_options<CharT>(), 
+            indenting line_indent = indenting::no_indent)
+{
+    if (line_indent == indenting::indent)
+    {
+        basic_json_encoder<CharT> encoder(os, options);
+        val.dump(encoder);
+    }
+    else
+    {
+        basic_json_compressed_encoder<CharT> encoder(os, options);
+        val.dump(encoder);
+    }
+}
+
+template <class T, class CharT>
+typename std::enable_if<!is_basic_json_class<T>::value>::type
+encode_json(const T& val,
+            std::basic_ostream<CharT>& os, 
+            const basic_json_encode_options<CharT>& options = basic_json_options<CharT>(), 
+            indenting line_indent = indenting::no_indent)
 {
     if (line_indent == indenting::indent)
     {
@@ -126,10 +146,30 @@ void encode_json(const T& val,
 // to string
 
 template <class T, class CharT>
-void encode_json(const T& val,
-                 std::basic_string<CharT>& s, 
-                 const basic_json_encode_options<CharT>& options = basic_json_options<CharT>(), 
-                 indenting line_indent = indenting::no_indent)
+typename std::enable_if<is_basic_json_class<T>::value>::type
+encode_json(const T& val,
+            std::basic_string<CharT>& s, 
+            const basic_json_encode_options<CharT>& options = basic_json_options<CharT>(), 
+            indenting line_indent = indenting::no_indent)
+{
+    if (line_indent == indenting::indent)
+    {
+        basic_json_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s, options);
+        val.dump(encoder);
+    }
+    else
+    {
+        basic_json_compressed_encoder<CharT, jsoncons::string_result<std::basic_string<CharT>>> encoder(s, options);
+        val.dump(encoder);
+    }
+}
+
+template <class T, class CharT>
+typename std::enable_if<!is_basic_json_class<T>::value>::type
+encode_json(const T& val,
+            std::basic_string<CharT>& s, 
+            const basic_json_encode_options<CharT>& options = basic_json_options<CharT>(), 
+            indenting line_indent = indenting::no_indent)
 {
     if (line_indent == indenting::indent)
     {

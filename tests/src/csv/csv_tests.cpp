@@ -1182,3 +1182,49 @@ TEST_CASE("csv detect bom")
     }
 }
 
+TEST_CASE("test_encode_decode csv string")
+{
+    typedef std::vector<std::tuple<std::string,int>> cpp_type;
+    std::string s1 = "\"a\",1\n\"b\",2";
+    csv_options options;
+    options.mapping(mapping_type::n_rows)
+           .assume_header(false);
+
+    SECTION("string")
+    {
+        cpp_type v = decode_csv<cpp_type>(s1, options);
+        REQUIRE(v.size() == 2);
+        CHECK(std::get<0>(v[0]) == "a");
+        CHECK(std::get<1>(v[0]) == 1);
+        CHECK(std::get<0>(v[1]) == "b");
+        CHECK(std::get<1>(v[1]) == 2);
+
+        std::string s2;
+        encode_csv(v, s2, options);
+
+        json j1 = decode_csv<json>(s1);
+        json j2 = decode_csv<json>(s2);
+
+        CHECK(j1 == j2);
+    }
+
+    SECTION("stream")
+    {
+        std::stringstream ss1(s1);
+        cpp_type v = decode_csv<cpp_type>(ss1, options);
+        REQUIRE(v.size() == 2);
+        CHECK(std::get<0>(v[0]) == "a");
+        CHECK(std::get<1>(v[0]) == 1);
+        CHECK(std::get<0>(v[1]) == "b");
+        CHECK(std::get<1>(v[1]) == 2);
+
+        std::stringstream ss2;
+        encode_csv(v, ss2, options);
+
+        json j1 = decode_csv<json>(s1);
+        json j2 = decode_csv<json>(ss2);
+
+        CHECK(j1 == j2);
+    }
+}
+
