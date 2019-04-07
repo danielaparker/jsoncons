@@ -11,6 +11,8 @@ Enhancements:
 
 - Added macro JSONCONS_TYPE_TRAITS_FRIEND
 
+- Generalized `csv_encode`/`csv_decode` functions to convert from/to any type T that implements `json_type_traits` 
+
 v0.121.1
 --------
 
