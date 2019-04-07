@@ -12,6 +12,27 @@
 
 namespace jc = jsoncons;
 
+TEST_CASE("encode and decode json")
+{
+    jc::json j(std::make_pair(false,std::string("foo")));
+
+    SECTION("string test")
+    {
+        std::string s;
+        jc::encode_json(j, s);
+        jc::json result = jc::decode_json<jc::json>(s);
+        CHECK(result == j);
+    }
+
+    SECTION("stream test")
+    {
+        std::stringstream ss;
+        jc::encode_json(j, ss);
+        jc::json result = jc::decode_json<jc::json>(ss);
+        CHECK(result == j);
+    }
+}
+
 TEST_CASE("convert_pair_test")
 {
     auto val = std::make_pair(false,std::string("foo"));

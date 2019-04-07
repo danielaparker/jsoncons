@@ -34,10 +34,17 @@ template <class T,class Enable=void>
 struct is_basic_json_class : std::false_type
 {};
 
+#if defined(_MSC_VER) && _MSC_VER < 1916  
+template <class T>
+struct is_basic_json_class<T, typename std::enable_if<!std::is_void<typename T::char_type>::value && 
+                                                      !std::is_void<typename T::implementation_policy>::value && 
+                                                      !std::is_void<typename T::allocator_type>::value>::type> : std::true_type
+{};
+#else
 template <class T>
 struct is_basic_json_class<T, decltype(std::declval<jsoncons::basic_json<typename T::char_type,typename T::implementation_policy,typename T::allocator_type>>(),void())> : std::true_type
 {};
-
+#endif
 
 template <class T>
 struct is_json_type_traits_declared : public std::false_type

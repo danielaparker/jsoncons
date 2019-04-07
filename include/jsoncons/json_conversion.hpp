@@ -20,8 +20,20 @@ namespace jsoncons {
 // decode_json 
 
 template <class T, class CharT>
-T decode_json(const std::basic_string<CharT>& s,
+typename std::enable_if<is_basic_json_class<T>::value,T>::type
+decode_json(const std::basic_string<CharT>& s,
               const basic_json_decode_options<CharT>& options = basic_json_options<CharT>())
+{
+    jsoncons::json_decoder<T> decoder;
+    basic_json_reader<CharT, string_source<CharT>> reader(s, decoder, options);
+    reader.read();
+    return decoder.get_result();
+}
+
+template <class T, class CharT>
+typename std::enable_if<!is_basic_json_class<T>::value,T>::type
+decode_json(const std::basic_string<CharT>& s,
+            const basic_json_decode_options<CharT>& options = basic_json_options<CharT>())
 {
     basic_json_pull_reader<CharT> reader(s, options);
     T val;
@@ -30,8 +42,20 @@ T decode_json(const std::basic_string<CharT>& s,
 }
 
 template <class T, class CharT>
-T decode_json(std::basic_istream<CharT>& is,
-              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>())
+typename std::enable_if<is_basic_json_class<T>::value,T>::type
+decode_json(std::basic_istream<CharT>& is,
+            const basic_json_decode_options<CharT>& options = basic_json_options<CharT>())
+{
+    jsoncons::json_decoder<T> decoder;
+    basic_json_reader<CharT, stream_source<CharT>> reader(is, decoder, options);
+    reader.read();
+    return decoder.get_result();
+}
+
+template <class T, class CharT>
+typename std::enable_if<!is_basic_json_class<T>::value,T>::type
+decode_json(std::basic_istream<CharT>& is,
+            const basic_json_decode_options<CharT>& options = basic_json_options<CharT>())
 {
     basic_json_pull_reader<CharT> reader(is, options);
     T val;
