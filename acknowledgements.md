@@ -34,10 +34,10 @@ expressions over a single object.
 Clang, adding read support for std::array and, most appreciated,
 adding Travis CI configuration.
 
-- jakalx contributed fix for operator== throws when comparing a string 
+- [jakalx](https://github.com/jakalx) contributed fix for operator== throws when comparing a string 
 against an empty object
 
-- Alexander (rog13) for contributing fix to jsonpatch::diff
+- [Alexander](https://github.com/rog13) for contributing fix to jsonpatch::diff
 
 - Stefano Sinigardi for contributing workaround for vs2017 platform issue
 
@@ -58,6 +58,8 @@ a basic_json value leading to an infinite recursion when the
 value is a bignum, and for fixing undefined behavior in the bignum 
 class. 
 
+- [massimo morara](https://github.com/massimomorara) for reporting numerous issues
+
 - Alexander B, for uncovering a bug in how json_parser validated
 UTF-8 strings.
 
@@ -69,3 +71,4 @@ and a proposal for aggregation functions that work outside a filter.
 
 - [patternoia](https://github.com/patternoia) for fixing the installation script
 to include copying the jsoncons_ext directory into the installation place
+
