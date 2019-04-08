@@ -179,7 +179,7 @@ public:
 
 template <class CharT>
 class basic_json_options : public virtual basic_json_decode_options<CharT>, 
-                                       public virtual basic_json_encode_options<CharT>
+                           public virtual basic_json_encode_options<CharT>
 {
 public:
     typedef CharT char_type;

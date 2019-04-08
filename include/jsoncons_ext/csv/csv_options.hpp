@@ -62,7 +62,88 @@ struct csv_type_info
 };
 
 template <class CharT>
-class basic_csv_options
+class basic_csv_decode_options
+{
+public:
+    typedef std::basic_string<CharT> string_type;
+
+    virtual size_t header_lines() const = 0;
+
+    virtual bool assume_header() const = 0;
+
+    virtual bool ignore_empty_values() const = 0;
+
+    virtual bool ignore_empty_lines() const = 0;
+
+    virtual bool trim_leading() const = 0;
+
+    virtual bool trim_trailing() const = 0;
+
+    virtual bool trim_leading_inside_quotes() const = 0;
+
+    virtual bool trim_trailing_inside_quotes() const = 0;
+
+    virtual bool trim() const = 0;
+
+    virtual bool trim_inside_quotes() const = 0;
+
+    virtual bool unquoted_empty_value_is_null() const = 0;
+
+    virtual std::vector<string_type> column_names() const = 0;
+
+    virtual std::vector<csv_type_info> column_types() const = 0;
+
+    virtual std::vector<string_type> column_defaults() const = 0;
+
+    virtual CharT field_delimiter() const = 0;
+
+    virtual std::pair<CharT,bool> subfield_delimiter() const = 0;
+
+    virtual string_type line_delimiter() const = 0;
+
+    virtual CharT quote_char() const = 0;
+
+    virtual bool infer_types() const = 0;
+
+    virtual bool lossless_number() const = 0;
+
+    virtual CharT quote_escape_char() const = 0;
+
+    virtual CharT comment_starter() const = 0;
+
+    virtual mapping_type mapping() const = 0;
+
+    virtual unsigned long max_lines() const = 0;
+};
+
+template <class CharT>
+class basic_csv_encode_options
+{
+public:
+    typedef std::basic_string<CharT> string_type;
+
+    virtual chars_format floating_point_format() const = 0;
+
+    virtual int precision() const = 0;
+
+    virtual std::vector<string_type> column_names() const = 0;
+
+    virtual CharT field_delimiter() const = 0;
+
+    virtual std::pair<CharT,bool> subfield_delimiter() const = 0;
+
+    virtual string_type line_delimiter() const = 0;
+
+    virtual CharT quote_char() const = 0;
+
+    virtual CharT quote_escape_char() const = 0;
+
+    virtual quote_style_type quote_style() const = 0;
+};
+
+template <class CharT>
+class basic_csv_options : public virtual basic_csv_decode_options<CharT>,
+                          public virtual basic_csv_encode_options<CharT>
 {
     typedef CharT char_type;
     typedef std::basic_string<CharT> string_type;
@@ -99,8 +180,7 @@ public:
 
 //  Constructors
 
-    basic_csv_options()
-        :
+    basic_csv_options() :
         floating_point_format_(chars_format()),
         precision_(0),
         assume_header_(false),
@@ -129,7 +209,7 @@ public:
 
 //  Properties
 
-    chars_format floating_point_format() const
+    chars_format floating_point_format() const override
     {
         return floating_point_format_;
     }
@@ -140,7 +220,7 @@ public:
         return *this;
     }
 
-    int precision() const
+    int precision() const override
     {
         return precision_;
     }
@@ -151,7 +231,7 @@ public:
         return *this;
     }
 
-    size_t header_lines() const
+    size_t header_lines() const override
     {
         return (assume_header_ && header_lines_ <= 1) ? 1 : header_lines_;
     }
@@ -162,7 +242,7 @@ public:
         return *this;
     }
 
-    bool assume_header() const
+    bool assume_header() const override
     {
         return assume_header_;
     }
@@ -173,7 +253,7 @@ public:
         return *this;
     }
 
-    bool ignore_empty_values() const
+    bool ignore_empty_values() const override
     {
         return ignore_empty_values_;
     }
@@ -184,7 +264,7 @@ public:
         return *this;
     }
 
-    bool ignore_empty_lines() const
+    bool ignore_empty_lines() const override
     {
         return ignore_empty_lines_;
     }
@@ -195,7 +275,7 @@ public:
         return *this;
     }
 
-    bool trim_leading() const
+    bool trim_leading() const override
     {
         return trim_leading_;
     }
@@ -206,7 +286,7 @@ public:
         return *this;
     }
 
-    bool trim_trailing() const
+    bool trim_trailing() const override
     {
         return trim_trailing_;
     }
@@ -217,7 +297,7 @@ public:
         return *this;
     }
 
-    bool trim_leading_inside_quotes() const
+    bool trim_leading_inside_quotes() const override
     {
         return trim_leading_inside_quotes_;
     }
@@ -228,7 +308,7 @@ public:
         return *this;
     }
 
-    bool trim_trailing_inside_quotes() const
+    bool trim_trailing_inside_quotes() const override
     {
         return trim_trailing_inside_quotes_;
     }
@@ -239,7 +319,7 @@ public:
         return *this;
     }
 
-    bool trim() const
+    bool trim() const override
     {
         return trim_leading_ && trim_trailing_;
     }
@@ -251,7 +331,7 @@ public:
         return *this;
     }
 
-    bool trim_inside_quotes() const
+    bool trim_inside_quotes() const override
     {
         return trim_leading_inside_quotes_ && trim_trailing_inside_quotes_;
     }
@@ -263,7 +343,7 @@ public:
         return *this;
     }
 
-    bool unquoted_empty_value_is_null() const
+    bool unquoted_empty_value_is_null() const override
     {
         return unquoted_empty_value_is_null_;
     }
@@ -274,7 +354,7 @@ public:
         return *this;
     }
 
-    std::vector<string_type> column_names() const
+    std::vector<string_type> column_names() const override
     {
         return column_names_;
     }
@@ -326,7 +406,7 @@ public:
         return *this;
     }
 
-    std::vector<csv_type_info> column_types() const
+    std::vector<csv_type_info> column_types() const override
     {
         return column_types_;
     }
@@ -337,7 +417,7 @@ public:
         return *this;
     }
 
-    std::vector<string_type> column_defaults() const
+    std::vector<string_type> column_defaults() const override
     {
         return column_defaults_;
     }
@@ -348,12 +428,12 @@ public:
         return *this;
     }
 
-    CharT field_delimiter() const
+    CharT field_delimiter() const override
     {
         return field_delimiter_;
     }
 
-    std::pair<CharT,bool> subfield_delimiter() const
+    std::pair<CharT,bool> subfield_delimiter() const override
     {
         return std::make_pair(subfield_delimiter_,has_subfield_delimiter_);
     }
@@ -371,7 +451,7 @@ public:
         return *this;
     }
 
-    string_type line_delimiter() const
+    string_type line_delimiter() const override
     {
         return line_delimiter_;
     }
@@ -382,7 +462,7 @@ public:
         return *this;
     }
 
-    CharT quote_char() const
+    CharT quote_char() const override
     {
         return quote_char_;
     }
@@ -393,7 +473,7 @@ public:
         return *this;
     }
 
-    bool infer_types() const
+    bool infer_types() const override
     {
         return infer_types_;
     }
@@ -404,7 +484,7 @@ public:
         return *this;
     }
 
-    bool lossless_number() const
+    bool lossless_number() const override
     {
         return lossless_number_;
     }
@@ -415,7 +495,7 @@ public:
         return *this;
     }
 
-    CharT quote_escape_char() const
+    CharT quote_escape_char() const override
     {
         return quote_escape_char_;
     }
@@ -426,7 +506,7 @@ public:
         return *this;
     }
 
-    CharT comment_starter() const
+    CharT comment_starter() const override
     {
         return comment_starter_;
     }
@@ -437,12 +517,12 @@ public:
         return *this;
     }
 
-    quote_style_type quote_style() const
+    quote_style_type quote_style() const override
     {
         return quote_style_;
     }
 
-    mapping_type mapping() const
+    mapping_type mapping() const override
     {
         return mapping_.second ? (mapping_.first) : (assume_header() || column_names_.size() > 0 ? mapping_type::n_objects : mapping_type::n_rows);
     }
@@ -459,7 +539,7 @@ public:
         return *this;
     }
 
-    unsigned long max_lines() const
+    unsigned long max_lines() const override
     {
         return max_lines_;
     }
