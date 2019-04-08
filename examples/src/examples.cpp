@@ -539,8 +539,6 @@ int main()
 
         jsonpatch_examples();
 
-        csv_examples();
-
         max_nesting_path_example();
 
         get_example();
@@ -572,6 +570,8 @@ int main()
         type_extensibility_examples();
 
         cbor_examples();
+
+        csv_examples();
     }
     catch (const std::exception& e)
     {

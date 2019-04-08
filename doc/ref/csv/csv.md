@@ -14,6 +14,8 @@ The csv extension implements reading (writing) JSON values from (to) CSV files
 
 ### Examples
 
+#### Decode a CSV source to a basic_json value
+
 Example file (sales.csv)
 ```csv
 customer_name,has_coupon,phone_number,zip_code,sales_tax_rate,total_amount
@@ -110,4 +112,39 @@ Output:
 }
 ```
 
+#### Decode a CSV source to a C++ object that satisfies [json_type_traits](../json_type_traits.md) requirements
+
+```c++
+int main()
+{
+    const std::string s = R"(Date,1Y,2Y,3Y,5Y
+2017-01-09,0.0062,0.0075,0.0083,0.011
+2017-01-08,0.0063,0.0076,0.0084,0.0112
+2017-01-08,0.0063,0.0076,0.0084,0.0112
+)";
+
+    csv::csv_options options;
+    options.header_lines(1)
+           .mapping(csv::mapping_type::n_rows);
+
+    typedef std::vector<std::tuple<std::string,double,double,double,double>> table_type;
+
+    table_type table = csv::decode_csv<table_type>(s,options);
+
+    for (const auto& row : table)
+    {
+        std::cout << std::get<0>(row) << "," 
+                  << std::get<1>(row) << "," 
+                  << std::get<2>(row) << "," 
+                  << std::get<3>(row) << "," 
+                  << std::get<4>(row) << "\n";
+    }
+}
+```
+Output:
+```
+2017-01-09,0.0062,0.0075,0.0083,0.011
+2017-01-08,0.0063,0.0076,0.0084,0.011
+2017-01-08,0.0063,0.0076,0.0084,0.011
+```
 
