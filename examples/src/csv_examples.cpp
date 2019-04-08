@@ -10,7 +10,7 @@
 namespace jc = jsoncons;
 namespace csv = jsoncons::csv;
 
-void mapping_types()
+void csv_source_to_json_value()
 {
     const std::string s = R"(Date,1Y,2Y,3Y,5Y
 2017-01-09,0.0062,0.0075,0.0083,0.011
@@ -38,7 +38,7 @@ void mapping_types()
     std::cout << "\n(3)\n" << pretty_print(j3) << "\n";
 }
 
-void mapping_types2()
+void csv_source_to_cpp_object()
 {
     const std::string s = R"(Date,1Y,2Y,3Y,5Y
 2017-01-09,0.0062,0.0075,0.0083,0.011
@@ -391,11 +391,11 @@ void csv_examples()
     decode_encode_csv_tasks();
 
     csv_decode_without_type_inference();
-    mapping_types();
+    csv_source_to_json_value();
     csv_parser_type_inference();
 
     decode_csv_with_subfields();
-    mapping_types2();
+    csv_source_to_cpp_object();
     std::cout << std::endl;
 }
 
