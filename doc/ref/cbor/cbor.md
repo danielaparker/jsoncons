@@ -1,8 +1,8 @@
 ## cbor extension
 
 The cbor extension implements decode from and encode to the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/).
-It supports decoding a packed CBOR value to an unpacked (json) value and
-encoding an unpacked (json) value to a packed CBOR value.
+It supports decoding a CBOR value to a basic_json value and
+encoding a basic_json value to a CBOR value.
 
 [decode_cbor](decode_cbor.md)
 
@@ -107,11 +107,11 @@ int main()
     }
     )");
 
-    // Encoding an unpacked (json) value to a packed CBOR value
+    // Encoding a basic_json value to a CBOR value
     std::vector<uint8_t> data;
     cbor::encode_cbor(j1, data);
 
-    // Decoding a packed CBOR value to an unpacked (json) value
+    // Decoding a CBOR value to a basic_json value
     ojson j2 = cbor::decode_cbor<ojson>(data);
     std::cout << "(1)\n" << pretty_print(j2) << "\n\n";
 
@@ -127,7 +127,7 @@ int main()
     }
     std::cout << std::endl;
 
-    // Querying a packed CBOR value for a nested data item with jsonpointer
+    // Querying a CBOR value for a nested data item with jsonpointer
     std::error_code ec;
     auto const& rated = jsonpointer::get(j2, "/reputons/0/rated", ec);
     if (!ec)
