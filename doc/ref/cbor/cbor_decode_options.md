@@ -1,6 +1,6 @@
 ### jsoncons::cbor::cbor_decode_options
 
-An abstract class that defines accessors for JSON decoding options.
+An abstract class that defines accessors for CBOR decoding options.
 
 #### Header
 ```c++
