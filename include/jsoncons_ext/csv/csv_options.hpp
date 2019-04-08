@@ -178,6 +178,12 @@ class basic_csv_options : public virtual basic_csv_decode_options<CharT>,
 public:
     static const size_t default_indent = 4;
 
+    static const basic_csv_options<CharT>& default_options()
+    {
+        static basic_csv_options<CharT> options{};
+        return options;
+    }
+
 //  Constructors
 
     basic_csv_options() :

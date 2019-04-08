@@ -80,7 +80,7 @@ class basic_csv_parser : private ser_context
     CharT prev_char_;
     string_type value_buffer_;
     int depth_;
-    basic_csv_options<CharT> options_;
+    const basic_csv_decode_options<CharT>& options_;
     std::vector<string_type,string_allocator_type> column_names_;
     std::vector<std::vector<string_type,string_allocator_type>,string_vector_allocator_type> column_values_;
     std::vector<csv_type_info,csv_type_info_allocator_type> column_types_;
@@ -98,24 +98,24 @@ class basic_csv_parser : private ser_context
 
 public:
     basic_csv_parser(basic_json_content_handler<CharT>& handler)
-       : basic_csv_parser(handler, basic_csv_options<CharT>(), default_err_handler_)
+       : basic_csv_parser(handler, basic_csv_options<CharT>::default_options(), default_err_handler_)
     {
     }
 
     basic_csv_parser(basic_json_content_handler<CharT>& handler,
-                     const basic_csv_options<CharT>& options)
+                     const basic_csv_decode_options<CharT>& options)
         : basic_csv_parser(handler, options, default_err_handler_)
     {
     }
 
     basic_csv_parser(basic_json_content_handler<CharT>& handler,
                      parse_error_handler& err_handler)
-        : basic_csv_parser(handler, basic_csv_options<CharT>(), err_handler)
+        : basic_csv_parser(handler, basic_csv_options<CharT>::default_options(), err_handler)
     {
     }
 
     basic_csv_parser(basic_json_content_handler<CharT>& handler,
-                     const basic_csv_options<CharT>& options,
+                     const basic_csv_decode_options<CharT>& options,
                      parse_error_handler& err_handler)
        : top_(-1),
          stack_(default_depth),

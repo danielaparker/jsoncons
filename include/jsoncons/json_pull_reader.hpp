@@ -184,26 +184,26 @@ public:
 
     // Constructors with stream input that throw parse exceptions
     basic_json_pull_reader(std::basic_istream<CharT>& is)
-        : basic_json_pull_reader(is,default_filter_,basic_json_options<CharT>(),default_err_handler_)
+        : basic_json_pull_reader(is,default_filter_,basic_json_options<CharT>::default_options(),default_err_handler_)
     {
     }
 
     basic_json_pull_reader(std::basic_istream<CharT>& is,
                              basic_staj_filter<CharT>& filter)
-        : basic_json_pull_reader(is,filter,basic_json_options<CharT>(),default_err_handler_)
+        : basic_json_pull_reader(is,filter,basic_json_options<CharT>::default_options(),default_err_handler_)
     {
     }
 
     basic_json_pull_reader(std::basic_istream<CharT>& is,
                              parse_error_handler& err_handler)
-        : basic_json_pull_reader(is,default_filter_,basic_json_options<CharT>(),err_handler)
+        : basic_json_pull_reader(is,default_filter_,basic_json_options<CharT>::default_options(),err_handler)
     {
     }
 
     basic_json_pull_reader(std::basic_istream<CharT>& is,
                              basic_staj_filter<CharT>& filter,
                              parse_error_handler& err_handler)
-        : basic_json_pull_reader(is,filter,basic_json_options<CharT>(),err_handler)
+        : basic_json_pull_reader(is,filter,basic_json_options<CharT>::default_options(),err_handler)
     {
     }
 
@@ -241,21 +241,21 @@ public:
     // Constructors with stream input that set parse error codes
     basic_json_pull_reader(std::basic_istream<CharT>& is,
                            std::error_code& ec)
-        : basic_json_pull_reader(is,default_filter_,basic_json_options<CharT>(),default_err_handler_,ec)
+        : basic_json_pull_reader(is,default_filter_,basic_json_options<CharT>::default_options(),default_err_handler_,ec)
     {
     }
 
     basic_json_pull_reader(std::basic_istream<CharT>& is,
                              basic_staj_filter<CharT>& filter,
                              std::error_code& ec)
-        : basic_json_pull_reader(is,filter,basic_json_options<CharT>(),default_err_handler_,ec)
+        : basic_json_pull_reader(is,filter,basic_json_options<CharT>::default_options(),default_err_handler_,ec)
     {
     }
 
     basic_json_pull_reader(std::basic_istream<CharT>& is,
                              parse_error_handler& err_handler,
                              std::error_code& ec)
-        : basic_json_pull_reader(is,default_filter_,basic_json_options<CharT>(),err_handler,ec)
+        : basic_json_pull_reader(is,default_filter_,basic_json_options<CharT>::default_options(),err_handler,ec)
     {
     }
 
@@ -263,7 +263,7 @@ public:
                              basic_staj_filter<CharT>& filter,
                              parse_error_handler& err_handler,
                              std::error_code& ec)
-        : basic_json_pull_reader(is,filter,basic_json_options<CharT>(),err_handler,ec)
+        : basic_json_pull_reader(is,filter,basic_json_options<CharT>::default_options(),err_handler,ec)
     {
     }
 
@@ -303,26 +303,26 @@ public:
 
     // Constructors with string view input that throw parse exceptions
     basic_json_pull_reader(const string_view_type& s)
-        : basic_json_pull_reader(s,default_filter_,basic_json_options<CharT>(),default_err_handler_)
+        : basic_json_pull_reader(s,default_filter_,basic_json_options<CharT>::default_options(),default_err_handler_)
     {
     }
 
     basic_json_pull_reader(const string_view_type& s,
                            basic_staj_filter<CharT>& filter)
-        : basic_json_pull_reader(s,filter,basic_json_options<CharT>(),default_err_handler_)
+        : basic_json_pull_reader(s,filter,basic_json_options<CharT>::default_options(),default_err_handler_)
     {
     }
 
     basic_json_pull_reader(const string_view_type& s,
                            parse_error_handler& err_handler)
-        : basic_json_pull_reader(s,default_filter_,basic_json_options<CharT>(),err_handler)
+        : basic_json_pull_reader(s,default_filter_,basic_json_options<CharT>::default_options(),err_handler)
     {
     }
 
     basic_json_pull_reader(const string_view_type& s,
                              basic_staj_filter<CharT>& filter,
                              parse_error_handler& err_handler)
-        : basic_json_pull_reader(s,filter,basic_json_options<CharT>(),err_handler)
+        : basic_json_pull_reader(s,filter,basic_json_options<CharT>::default_options(),err_handler)
     {
     }
 
@@ -361,21 +361,21 @@ public:
     // Constructors with string view input that set parse error codes
     basic_json_pull_reader(const string_view_type& s,
                              std::error_code& ec)
-        : basic_json_pull_reader(s,default_filter_,basic_json_options<CharT>(),default_err_handler_,ec)
+        : basic_json_pull_reader(s,default_filter_,basic_json_options<CharT>::default_options(),default_err_handler_,ec)
     {
     }
 
     basic_json_pull_reader(const string_view_type& s,
                              basic_staj_filter<CharT>& filter,
                              std::error_code& ec)
-        : basic_json_pull_reader(s,filter,basic_json_options<CharT>(),default_err_handler_,ec)
+        : basic_json_pull_reader(s,filter,basic_json_options<CharT>::default_options(),default_err_handler_,ec)
     {
     }
 
     basic_json_pull_reader(const string_view_type& s,
                              parse_error_handler& err_handler,
                              std::error_code& ec)
-        : basic_json_pull_reader(s,default_filter_,basic_json_options<CharT>(),err_handler,ec)
+        : basic_json_pull_reader(s,default_filter_,basic_json_options<CharT>::default_options(),err_handler,ec)
     {
     }
 
@@ -383,7 +383,7 @@ public:
                              basic_staj_filter<CharT>& filter,
                              parse_error_handler& err_handler,
                              std::error_code& ec)
-        : basic_json_pull_reader(s,filter,basic_json_options<CharT>(),err_handler,ec)
+        : basic_json_pull_reader(s,filter,basic_json_options<CharT>::default_options(),err_handler,ec)
     {
     }
 

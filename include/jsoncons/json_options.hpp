@@ -235,6 +235,12 @@ public:
     static const size_t indent_size_default = 4;
     static const size_t line_length_limit_default = 120;
 
+    static const basic_json_options<CharT>& default_options()
+    {
+        static basic_json_options<CharT> options{};
+        return options;
+    }
+
 //  Constructors
 
     basic_json_options()

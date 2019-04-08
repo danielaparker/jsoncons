@@ -10,22 +10,22 @@ work for all C++ classes that have [json_type_traits](https://github.com/daniela
 
 template <class T, class CharT>
 T decode_json(std::basic_istream<CharT>& is,
-              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>()); // (1)
+              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options()); // (1)
 
 template <class T, class CharT>
 T decode_json(const std::basic_string<CharT>& s,
-              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>()); // (2)
+              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options()); // (2)
 
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
               std::basic_istream<CharT>& is,
-              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>()); // (3)
+              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options()); // (3)
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
               const std::basic_string<CharT>& s,
-              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>()); // (4)
+              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options()); // (4)
 ```
 
 (1) Reads a JSON string value into a type T if T is an instantiation of [basic_json](../json.md) 

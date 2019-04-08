@@ -35,6 +35,14 @@ class cbor_options : public virtual cbor_decode_options,
 private:
     bool pack_strings_;
 public:
+
+    static const cbor_options& default_options()
+    {
+        static cbor_options options{};
+        return options;
+    }
+
+
 //  Constructors
 
     cbor_options()

@@ -25,13 +25,13 @@ namespace jsoncons { namespace cbor {
 template<class T>
 void encode_cbor(const T& j, std::vector<uint8_t>& v)
 {
-    encode_cbor(j,v,cbor_options());
+    encode_cbor(j,v,cbor_options::default_options());
 }
 
 template<class T>
 void encode_cbor(const T& j, std::ostream& os)
 {
-    encode_cbor(j,os,cbor_options());
+    encode_cbor(j,os,cbor_options::default_options());
 }
 
 template<class T>

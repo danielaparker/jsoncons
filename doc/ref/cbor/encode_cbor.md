@@ -8,11 +8,11 @@ Encodes a C++ object to the [Concise Binary Object Representation](http://cbor.i
 
 template<class T>
 void encode_cbor(const T& val, std::vector<uint8_t>& buffer, 
-                 const cbor_encode_options& options = cbor_options()); // (1)
+                 const cbor_encode_options& options = cbor_options::default_options()); // (1)
 
 template<class T>
 void encode_cbor(const T& val, std::ostream& os, 
-                 const cbor_encode_options& options = cbor_options()); // (2)
+                 const cbor_encode_options& options = cbor_options::default_options()); // (2)
 ```
 
 (1) Writes a value of type T into a bytes buffer in the CBOR data format. Type T must be an instantiation of [basic_json](../json.md) 

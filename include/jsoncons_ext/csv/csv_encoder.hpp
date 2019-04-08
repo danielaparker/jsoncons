@@ -70,7 +70,7 @@ private:
         string_type name_;
     };
     Result result_;
-    basic_csv_options<CharT> parameters_;
+    const basic_csv_encode_options<CharT>& options_;
     std::vector<stack_item> stack_;
     jsoncons::detail::print_double fp_;
     std::vector<string_type,string_allocator_type> column_names_;
@@ -83,20 +83,20 @@ private:
     basic_csv_encoder& operator=(const basic_csv_encoder&) = delete;
 public:
     basic_csv_encoder(result_type result)
-       : basic_csv_encoder(std::move(result), basic_csv_options<CharT>())
+       : basic_csv_encoder(std::move(result), basic_csv_options<CharT>::default_options())
     {
     }
 
     basic_csv_encoder(result_type result,
-                         const basic_csv_options<CharT>& options)
+                      const basic_csv_encode_options<CharT>& options)
        :
        result_(std::move(result)),
-       parameters_(options),
+       options_(options),
        stack_(),
        fp_(floating_point_options(options.floating_point_format(), 
                                   options.precision(),
                                   0)),
-       column_names_(parameters_.column_names())
+       column_names_(options_.column_names())
     {
     }
 
@@ -157,19 +157,19 @@ private:
                 {
                     if (i > 0)
                     {
-                        result_.push_back(parameters_.field_delimiter());
+                        result_.push_back(options_.field_delimiter());
                     }
                     result_.insert(column_names_[i].data(),
                                   column_names_[i].length());
                 }
-                result_.insert(parameters_.line_delimiter().data(),
-                              parameters_.line_delimiter().length());
+                result_.insert(options_.line_delimiter().data(),
+                              options_.line_delimiter().length());
             }
             for (size_t i = 0; i < column_names_.size(); ++i)
             {
                 if (i > 0)
                 {
-                    result_.push_back(parameters_.field_delimiter());
+                    result_.push_back(options_.field_delimiter());
                 }
                 auto it = buffered_line_.find(column_names_[i]);
                 if (it != buffered_line_.end())
@@ -178,7 +178,7 @@ private:
                     it->second.clear();
                 }
             }
-            result_.insert(parameters_.line_delimiter().data(), parameters_.line_delimiter().length());
+            result_.insert(options_.line_delimiter().data(), options_.line_delimiter().length());
         }
         stack_.pop_back();
 
@@ -197,14 +197,14 @@ private:
                 {
                     if (i > 0)
                     {
-                        result_.push_back(parameters_.field_delimiter());
+                        result_.push_back(options_.field_delimiter());
                     }
                     result_.insert(column_names_[i].data(),column_names_[i].length());
                 }
                 if (column_names_.size() > 0)
                 {
-                    result_.insert(parameters_.line_delimiter().data(),
-                                  parameters_.line_delimiter().length());
+                    result_.insert(options_.line_delimiter().data(),
+                                  options_.line_delimiter().length());
                 }
             }
         }
@@ -215,8 +215,8 @@ private:
     {
         if (stack_.size() == 2)
         {
-            result_.insert(parameters_.line_delimiter().data(),
-                          parameters_.line_delimiter().length());
+            result_.insert(options_.line_delimiter().data(),
+                          options_.line_delimiter().length());
         }
         stack_.pop_back();
 
@@ -230,7 +230,7 @@ private:
         {
             stack_.back().name_ = string_type(name);
             buffered_line_[string_type(name)] = std::basic_string<CharT>();
-            if (stack_[0].count_ == 0 && parameters_.column_names().size() == 0)
+            if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
             {
                 column_names_.push_back(string_type(name));
             }
@@ -242,17 +242,17 @@ private:
     bool string_value(const CharT* s, size_t length, AnyWriter& result)
     {
         bool quote = false;
-        if (parameters_.quote_style() == quote_style_type::all || parameters_.quote_style() == quote_style_type::nonnumeric ||
-            (parameters_.quote_style() == quote_style_type::minimal &&
-            (std::char_traits<CharT>::find(s, length, parameters_.field_delimiter()) != nullptr || std::char_traits<CharT>::find(s, length, parameters_.quote_char()) != nullptr)))
+        if (options_.quote_style() == quote_style_type::all || options_.quote_style() == quote_style_type::nonnumeric ||
+            (options_.quote_style() == quote_style_type::minimal &&
+            (std::char_traits<CharT>::find(s, length, options_.field_delimiter()) != nullptr || std::char_traits<CharT>::find(s, length, options_.quote_char()) != nullptr)))
         {
             quote = true;
-            result.push_back(parameters_.quote_char());
+            result.push_back(options_.quote_char());
         }
-        escape_string(s, length, parameters_.quote_char(), parameters_.quote_escape_char(), result);
+        escape_string(s, length, options_.quote_char(), options_.quote_escape_char(), result);
         if (quote)
         {
-            result.push_back(parameters_.quote_char());
+            result.push_back(options_.quote_char());
         }
 
         return true;
@@ -551,7 +551,7 @@ private:
         {
             if (!stack_.back().is_object_ && stack_.back().count_ > 0)
             {
-                result.push_back(parameters_.field_delimiter());
+                result.push_back(options_.field_delimiter());
             }
         }
     }
@@ -569,7 +569,7 @@ private:
 
 template <class T,class CharT>
 typename std::enable_if<is_basic_json_class<T>::value,void>::type 
-encode_csv(const T& j, std::basic_string<CharT>& s, const basic_csv_options<CharT>& options = basic_csv_options<CharT>())
+encode_csv(const T& j, std::basic_string<CharT>& s, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::default_options())
 {
     typedef CharT char_type;
     basic_csv_encoder<char_type,jsoncons::string_result<std::basic_string<char_type>>> encoder(s,options);
@@ -578,7 +578,7 @@ encode_csv(const T& j, std::basic_string<CharT>& s, const basic_csv_options<Char
 
 template <class T,class CharT>
 typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
-encode_csv(const T& val, std::basic_string<CharT>& s, const basic_csv_options<CharT>& options = basic_csv_options<CharT>())
+encode_csv(const T& val, std::basic_string<CharT>& s, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::default_options())
 {
     typedef CharT char_type;
     basic_csv_encoder<char_type,jsoncons::string_result<std::basic_string<char_type>>> encoder(s,options);
@@ -587,7 +587,7 @@ encode_csv(const T& val, std::basic_string<CharT>& s, const basic_csv_options<Ch
 
 template <class T, class CharT>
 typename std::enable_if<is_basic_json_class<T>::value,void>::type 
-encode_csv(const T& j, std::basic_ostream<CharT>& os, const basic_csv_options<CharT>& options = basic_csv_options<CharT>())
+encode_csv(const T& j, std::basic_ostream<CharT>& os, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::default_options())
 {
     typedef CharT char_type;
     basic_csv_encoder<char_type,jsoncons::stream_result<char_type>> encoder(os,options);
@@ -596,7 +596,7 @@ encode_csv(const T& j, std::basic_ostream<CharT>& os, const basic_csv_options<Ch
 
 template <class T, class CharT>
 typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
-encode_csv(const T& val, std::basic_ostream<CharT>& os, const basic_csv_options<CharT>& options = basic_csv_options<CharT>())
+encode_csv(const T& val, std::basic_ostream<CharT>& os, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::default_options())
 {
     typedef CharT char_type;
     basic_csv_encoder<char_type,jsoncons::stream_result<char_type>> encoder(os,options);
