@@ -1,10 +1,8 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <string>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/csv/csv_reader.hpp>
-#include <jsoncons_ext/csv/csv_encoder.hpp>
+#include <jsoncons_ext/csv/csv.hpp>
 #include <fstream>
 
 namespace jc = jsoncons;
@@ -391,11 +389,11 @@ void csv_examples()
     decode_encode_csv_tasks();
 
     csv_decode_without_type_inference();
-    csv_source_to_json_value();
     csv_parser_type_inference();
 
     decode_csv_with_subfields();
     csv_source_to_cpp_object();
+    csv_source_to_json_value();
     std::cout << std::endl;
 }
 

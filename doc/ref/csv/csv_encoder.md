@@ -203,7 +203,7 @@ std::ifstream is(in_file);
 
 json_decoder<json> decoder;
 csv_options options;
-params.field_delimiter = '\t';
+options.field_delimiter = '\t';
 
 json_reader reader(is,decoder);
 reader.read();
@@ -253,7 +253,7 @@ int main()
     )");
 
     csv_options options;
-    params.column_names("author,title,price");
+    options.column_names("author,title,price");
 
     csv_encoder encoder(std::cout, options);
 

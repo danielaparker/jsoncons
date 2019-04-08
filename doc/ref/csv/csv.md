@@ -26,31 +26,31 @@ customer_name,has_coupon,phone_number,zip_code,sales_tax_rate,total_amount
 ```
 
 ```c++
-#include <fstream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>
+#include <fstream>
 
 using namespace jsoncons;
 using namespace jsoncons::csv;
 
 int main()
 {
-    csv_options options;
-    params.assume_header(true);
+    csv::csv_options options;
+    options.assume_header(true)
+           .mapping(csv::mapping_type::n_objects);
 
-    params.mapping(mapping_type::n_objects);
     std::ifstream is1("input/sales.csv");
-    ojson j1 = decode_csv<ojson>(is1,options);
+    jc::ojson j1 = csv::decode_csv<jc::ojson>(is1,options);
     std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
 
-    params.mapping(mapping_type::n_rows);
+    options.mapping(csv::mapping_type::n_rows);
     std::ifstream is2("input/sales.csv");
-    ojson j2 = decode_csv<ojson>(is2,options);
+    jc::ojson j2 = csv::decode_csv<jc::ojson>(is2,options);
     std::cout << "\n(2)\n"<< pretty_print(j2) << "\n";
 
-    params.mapping(mapping_type::m_columns);
+    options.mapping(csv::mapping_type::m_columns);
     std::ifstream is3("input/sales.csv");
-    ojson j3 = decode_csv<ojson>(is3,options);
+    jc::ojson j3 = csv::decode_csv<jc::ojson>(is3,options);
     std::cout << "\n(3)\n"<< pretty_print(j3) << "\n";
 }
 ```
@@ -115,6 +115,13 @@ Output:
 #### Decode a CSV source to a C++ object that satisfies [json_type_traits](../json_type_traits.md) requirements
 
 ```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/csv/csv.hpp>
+#include <iostream>
+
+namespace jc = jsoncons;
+namespace csv = jsoncons::csv;
+
 int main()
 {
     const std::string s = R"(Date,1Y,2Y,3Y,5Y

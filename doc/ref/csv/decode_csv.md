@@ -53,19 +53,19 @@ using namespace jsoncons::csv;
 int main()
 {
     csv_options options;
-    params.assume_header(true);
+    options.assume_header(true);
 
-    params.mapping(mapping_type::n_objects);
+    options.mapping(mapping_type::n_objects);
     std::ifstream is1("input/sales.csv");
     ojson j1 = decode_csv<ojson>(is1,options);
     std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
 
-    params.mapping(mapping_type::n_rows);
+    options.mapping(mapping_type::n_rows);
     std::ifstream is2("input/sales.csv");
     ojson j2 = decode_csv<ojson>(is2,options);
     std::cout << "\n(2)\n"<< pretty_print(j2) << "\n";
 
-    params.mapping(mapping_type::m_columns);
+    options.mapping(mapping_type::m_columns);
     std::ifstream is3("input/sales.csv");
     ojson j3 = decode_csv<ojson>(is3,options);
     std::cout << "\n(3)\n"<< pretty_print(j3) << "\n";
@@ -146,7 +146,7 @@ int main()
 )";
 
     csv_options options;
-    params.assume_header(true)
+    options.assume_header(true)
           .infer_types(false);
     ojson j = decode_csv<ojson>(s,options);
 
@@ -189,21 +189,21 @@ int main()
 )";
 
     csv_options options;
-    params.assume_header(true)
+    options.assume_header(true)
           .column_types("string,float,float,float,float");
 
     // mapping_type::n_objects
-    params.mapping(mapping_type::n_objects);
+    options.mapping(mapping_type::n_objects);
     ojson j1 = decode_csv<ojson>(s,options);
     std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
 
     // mapping_type::n_rows
-    params.mapping(mapping_type::n_rows);
+    options.mapping(mapping_type::n_rows);
     ojson j2 = decode_csv<ojson>(s,options);
     std::cout << "\n(2)\n"<< pretty_print(j2) << "\n";
 
     // mapping_type::m_columns
-    params.mapping(mapping_type::m_columns);
+    options.mapping(mapping_type::m_columns);
     ojson j3 = decode_csv<ojson>(s,options);
     std::cout << "\n(3)\n" << pretty_print(j3) << "\n";
 }
@@ -273,21 +273,21 @@ NY,LON,TOR;LON
     print_options.array_array_line_splits(line_split_kind::same_line);
 
     csv_options options1;
-    params1.assume_header(true)
+    options1.assume_header(true)
            .subfield_delimiter(';');
 
     json j1 = decode_csv<json>(s,options1);
     std::cout << "(1)\n" << pretty_print(j1,print_options) << "\n\n";
 
     csv_options options2;
-    params2.mapping(mapping_type::n_rows)
+    options2.mapping(mapping_type::n_rows)
            .subfield_delimiter(';');
 
     json j2 = decode_csv<json>(s,options2);
     std::cout << "(2)\n" << pretty_print(j2,print_options) << "\n\n";
 
     csv_options options3;
-    params3.assume_header(true)
+    options3.assume_header(true)
            .mapping(mapping_type::m_columns)
            .subfield_delimiter(';');
 

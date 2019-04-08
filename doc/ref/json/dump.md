@@ -78,7 +78,7 @@ int main()
     )");
 
     csv_options options;
-    params.column_names("author,title,price");
+    options.column_names("author,title,price");
 
     csv_encoder encoder(std::cout, options);
 
