@@ -10,6 +10,8 @@ Specifies options for encoding and decoding csv data. The `csv_options` class is
 #include <jsoncons_ext/csv/csv_options.hpp>
 ```
 
+![csv_options](./diagrams/csv_options.png)
+
 #### Constructors
 
     csv_options()
