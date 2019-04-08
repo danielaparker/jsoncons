@@ -147,15 +147,15 @@ Output:
         {
             "rater": "HikingAsylum.example.com",
             "assertion": "is-good",
-            "rated": "sk",
+            "rated": "Marilyn C",
             "rating": 0.9
         }
     ]
 }
 
 (2)
-sk, 0.9
+Marilyn C, 0.9
 
-(3) sk
+(3) Marilyn C
 ```
 

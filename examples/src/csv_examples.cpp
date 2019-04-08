@@ -38,20 +38,21 @@ void csv_source_to_json_value()
 
 void csv_source_to_cpp_object()
 {
-    const std::string s = R"(Date,1Y,2Y,3Y,5Y
+    const std::string input = R"(Date,1Y,2Y,3Y,5Y
 2017-01-09,0.0062,0.0075,0.0083,0.011
 2017-01-08,0.0063,0.0076,0.0084,0.0112
 2017-01-08,0.0063,0.0076,0.0084,0.0112
 )";
 
-    csv::csv_options options;
-    options.header_lines(1)
+    csv::csv_options ioptions;
+    ioptions.header_lines(1)
            .mapping(csv::mapping_type::n_rows);
 
     typedef std::vector<std::tuple<std::string,double,double,double,double>> table_type;
 
-    table_type table = csv::decode_csv<table_type>(s,options);
+    table_type table = csv::decode_csv<table_type>(input,ioptions);
 
+    std::cout << "(1)\n";
     for (const auto& row : table)
     {
         std::cout << std::get<0>(row) << "," 
@@ -60,6 +61,16 @@ void csv_source_to_cpp_object()
                   << std::get<3>(row) << "," 
                   << std::get<4>(row) << "\n";
     }
+    std::cout << "\n";
+
+    std::string output;
+
+    csv::csv_options ooptions;
+    ooptions.column_names("Date,1Y,2Y,3Y,5Y");
+    csv::encode_csv<table_type>(table, output, ooptions);
+
+    std::cout << "(2)\n";
+    std::cout << output << "\n";
 }
 
 void csv_decode_without_type_inference()
@@ -392,8 +403,8 @@ void csv_examples()
     csv_parser_type_inference();
 
     decode_csv_with_subfields();
-    csv_source_to_cpp_object();
     csv_source_to_json_value();
+    csv_source_to_cpp_object();
     std::cout << std::endl;
 }
 
