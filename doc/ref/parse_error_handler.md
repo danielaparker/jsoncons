@@ -21,11 +21,11 @@ will then report all warnings and errors through this interface.
 
     void error(std::error_code ec,
                const ser_context& context) throw (ser_error) = 0
-Called for recoverable errors. Calls `do_error`, if `do_error` returns `false`, throws a [ser_error](serialization_error.md), otherwise an attempt is made to recover.
+Called for recoverable errors. Calls `do_error`, if `do_error` returns `false`, throws a [ser_error](ser_error.md), otherwise an attempt is made to recover.
 
     void fatal_error(std::error_code ec,
                      const ser_context& context) throw (ser_error) = 0
-Called for unrecoverable errors. Calls `do_fatal_error` and throws a [ser_error](serialization_error.md).
+Called for unrecoverable errors. Calls `do_fatal_error` and throws a [ser_error](ser_error.md).
 
 #### Private virtual implementation methods
 

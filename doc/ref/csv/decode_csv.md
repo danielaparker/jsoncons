@@ -1,6 +1,6 @@
 ### jsoncons::csv::decode_csv
 
-Reads a `json` value from a CSV string or input stream.
+Decodes a [comma-separated variables (CSV)](https://en.wikipedia.org/wiki/Comma-separated_values) data format into a C++ object.
 
 #### Header
 ```c++
@@ -15,17 +15,19 @@ T decode_csv(std::basic_istream<CharT>& is,
              const basic_csv_options<CharT>& options = basic_csv_options<CharT>()); // (2)
 ```
 
-(1) Reads json value from CSV string using specified [parameters](csv_options.md)
+(1) Reads a CSV string value into a type T if T is an instantiation of [basic_json](../json.md) 
+or if T supports [json_type_traits](../json_type_traits.md).
 
-(2) Reads json value from CSV input stream using specified [parameters](csv_options.md)
+(2) Reads a CSV input stream into a type T if T is an instantiation of [basic_json](../json.md) 
+or if T supports [json_type_traits](../json_type_traits.md).
 
 #### Return value
 
-Returns a `Json` value
+Returns a value of type `T`.
 
 #### Exceptions
 
-Throws [ser_error](serialization_error.md) if parsing fails.
+Throws [ser_error](ser_error.md) if parsing fails.
 
 ### Examples
 

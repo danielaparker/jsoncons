@@ -1,6 +1,6 @@
 ### jsoncons::msgpack::decode_msgpack
 
-Decodes a [MessagePack](http://msgpack.org/index.html) data format to a json value.
+Decodes a [MessagePack](http://msgpack.org/index.html) data format into a C++ object.
 
 #### Header
 ```c++
@@ -13,9 +13,15 @@ template<class T>
 T decode_msgpack(std::istream& is); // (2)
 ```
 
+(1) Reads a MessagePack bytes buffer into a type T if T is an instantiation of [basic_json](../json.md) 
+or if T supports [json_type_traits](../json_type_traits.md).
+
+(2) Reads a MessagePack binary stream into a type T if T is an instantiation of [basic_json](../json.md) 
+or if T supports [json_type_traits](../json_type_traits.md).
+
 #### Exceptions
 
-Throws [ser_error](../serialization_error.md) if parsing fails.
+Throws [ser_error](../ser_error.md) if parsing fails.
 
 #### See also
 

@@ -11,7 +11,9 @@ Enhancements:
 
 - Added macro JSONCONS_TYPE_TRAITS_FRIEND
 
-- Generalized `csv_encode`/`csv_decode` functions to convert from/to any type T that implements `json_type_traits` 
+- Generalized the `csv_encode`, `bson_encode`, `cbor_encode`, `msgpack_encode` and `ubjson_encode` functions to convert from any type T that implements `json_type_traits` 
+
+- Generalized the `csv_decode`, `bson_decode`, `cbor_decode`, `msgpack_decode` and `ubjson_decode` functions to convert to any type T that implements `json_type_traits` 
 
 v0.121.1
 --------

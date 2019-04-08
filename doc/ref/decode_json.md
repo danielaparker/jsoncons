@@ -1,6 +1,6 @@
 ### jsoncons::decode_json
 
-Converts a JSON formatted string to a C++ object. `decode_json` will 
+Decodes a JSON data format to a C++ object. `decode_json` will 
 work for all C++ classes that have [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) defined.
 
 #### Header
@@ -28,9 +28,11 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
               const basic_json_decode_options<CharT>& options = basic_json_options<CharT>()); // (4)
 ```
 
-(1) Decode input stream to value `T`
+(1) Reads a JSON string value into a type T if T is an instantiation of [basic_json](../json.md) 
+or if T supports [json_type_traits](../json_type_traits.md).
 
-(2) Decode string to value `T`
+(2) Reads a JSON input stream into a type T if T is an instantiation of [basic_json](../json.md) 
+or if T supports [json_type_traits](../json_type_traits.md).
 
 Functions (1)-(2) perform encodings using the default json type `basic_json<CharT>`.
 Functions (3)-(4) are the same but perform encodings using the supplied `basic_json`.

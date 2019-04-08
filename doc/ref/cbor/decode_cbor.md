@@ -1,6 +1,6 @@
 ### jsoncons::cbor::decode_cbor
 
-Decodes a [Concise Binary Object Representation](http://cbor.io/) data format to a json value.
+Decodes a [Concise Binary Object Representation](http://cbor.io/) data format into a C++ object.
 
 #### Header
 ```c++
@@ -13,9 +13,15 @@ template<class T>
 T decode_cbor(std::istream& is); // (2)
 ```
 
+(1) Reads a CBOR bytes buffer into a type T if T is an instantiation of [basic_json](../json.md) 
+or if T supports [json_type_traits](../json_type_traits.md).
+
+(2) Reads a CBOR binary stream into a type T if T is an instantiation of [basic_json](../json.md) 
+or if T supports [json_type_traits](../json_type_traits.md).
+
 #### Exceptions
 
-Throws [ser_error](../serialization_error.md) if parsing fails.
+Throws [ser_error](../ser_error.md) if parsing fails.
 
 ### Examples
 

@@ -83,7 +83,7 @@ Returns `true` if the input in the source buffer has been exhausted, `false` oth
     void parse_some(json_content_handler& handler)
 Parses the source until a complete json text has been consumed or the source has been exhausted.
 Parse events are sent to the supplied `handler`.
-Throws [ser_error](serialization_error.md) if parsing fails.
+Throws [ser_error](ser_error.md) if parsing fails.
 
     void parse_some(json_content_handler<CharT>& handler,
                     std::error_code& ec)
@@ -94,7 +94,7 @@ Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
     void finish_parse(json_content_handler<CharT>& handler)
 Called after `source_exhausted()` is `true` and there is no more input. 
 Repeatedly calls `parse_some(handler)` until `finished()` returns `true`
-Throws [ser_error](serialization_error.md) if parsing fails.
+Throws [ser_error](ser_error.md) if parsing fails.
 
     void finish_parse(json_content_handler<CharT>& handler,
                    std::error_code& ec)
@@ -104,11 +104,11 @@ Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
 
     void skip_bom()
 Reads the next JSON text from the stream and reports JSON events to a [json_content_handler](json_content_handler.md), such as a [json_decoder](json_decoder.md).
-Throws [ser_error](serialization_error.md) if parsing fails.
+Throws [ser_error](ser_error.md) if parsing fails.
 
     void check_done()
 Throws if there are any unconsumed non-whitespace characters in the input.
-Throws [ser_error](serialization_error.md) if parsing fails.
+Throws [ser_error](ser_error.md) if parsing fails.
 
     void check_done(std::error_code& ec)
 Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
