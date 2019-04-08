@@ -1,6 +1,6 @@
 ### jsoncons::msgpack::encode_msgpack
 
-Encodes a json value to the [MessagePack](http://msgpack.org/index.html) data format.
+Encodes a C++ object into the [MessagePack](http://msgpack.org/index.html) data format.
 
 #### Header
 ```c++
@@ -12,6 +12,12 @@ void encode_msgpack(const T& jval, std::vector<uint8_t>& v); // (1)
 template<class T>
 void encode_msgpack(const T& jval, std::ostream& os); // (2)
 ```
+
+(1) Writes a value of type T into a bytes buffer in the MessagePack data format. Type T must be an instantiation of [basic_json](../json.md) 
+or support [json_type_traits](../json_type_traits.md). 
+
+(2) Writes a value of type T into a binary stream in the MessagePack data format. Type T must be an instantiation of [basic_json](../json.md) 
+or support [json_type_traits](../json_type_traits.md). 
 
 #### See also
 

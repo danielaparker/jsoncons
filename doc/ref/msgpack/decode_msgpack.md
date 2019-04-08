@@ -7,7 +7,7 @@ Decodes a [MessagePack](http://msgpack.org/index.html) data format into a C++ ob
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 
 template<class T>
-T decode_msgpack(const msgpack_view& v); // (1)
+T decode_msgpack(const std::vector<uint8_t>& v); // (1)
 
 template<class T>
 T decode_msgpack(std::istream& is); // (2)

@@ -1,6 +1,6 @@
 ### jsoncons::bson::decode_bson
 
-Decodes a [Binary JSON](http://bsonspec.org/) data format into a C++ object.
+Decodes a [Binary JSON (BSON)](http://bsonspec.org/) data format into a C++ object.
 
 #### Header
 ```c++

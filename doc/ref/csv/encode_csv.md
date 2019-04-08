@@ -1,25 +1,29 @@
 ### jsoncons::csv::encode_csv
 
-Serializes a json value as CSV to a string or an output stream.
+Encodes a C++ object into the CSV data format.
 
 #### Header
 ```c++
 #include <jsoncons_ext/csv/csv_encoder.hpp>
 
-template <class T, class CharT>
-void encode_csv(const T& j, 
-                std::basic_ostream<CharT>& os, 
+template <class T,class CharT>
+void encode_csv(const T& val, 
+                std::basic_string<CharT>& s, 
                 const basic_csv_options<CharT>& options = basic_csv_options<CharT>()); // (1)
 
-template <class T,class CharT>
-void encode_csv(const T& j, 
-                std::basic_string<CharT>& s, 
+template <class T, class CharT>
+void encode_csv(const T& val, 
+                std::basic_ostream<CharT>& os, 
                 const basic_csv_options<CharT>& options = basic_csv_options<CharT>()); // (2)
 ```
 
-(1) Serializes json value as CSV to an output stream using specified [serializing options](csv_options.md)
+(1) Writes a value of type T into a string in the CSV data format. Type T must be an instantiation of [basic_json](../json.md) 
+or support [json_type_traits](../json_type_traits.md). Uses the [encode options](csv_options.md)
+supplied or defaults.
 
-(2) Serializes json value as CSV to a string using specified [serializing options](csv_options.md)
+(2) Writes a value of type T into an output stream in the CSV data format. Type T must be an instantiation of [basic_json](../json.md) 
+or support [json_type_traits](../json_type_traits.md). Uses the [encode options](csv_options.md)
+supplied or defaults.
 
 ### Examples
 
