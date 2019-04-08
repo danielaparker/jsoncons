@@ -93,7 +93,7 @@ to be used when reading JSON.
 If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::big_decimal`.
 Defaults to `false`.
 
-    serializing_options& new_line_chars(const std::string& value)
+    json_options& new_line_chars(const std::string& value)
 Defaults to "\n"
 
     json_options & line_length_limit(size_t value)

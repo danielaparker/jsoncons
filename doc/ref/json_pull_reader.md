@@ -205,7 +205,7 @@ Advances to the next event. If a parsing error is encountered, throws a
 Advances to the next event. If a parsing error is encountered, sets `ec`.
 
     const ser_context& context() const override;
-Returns the current [context](serializing_context.md)
+Returns the current [context](ser_context.md)
 
 ### Examples
 

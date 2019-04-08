@@ -50,7 +50,7 @@ Get the next event. If a parsing error is encountered, throws a [ser_error](ser_
 Get the next event. If a parsing error is encountered, sets `ec`.
 
     virtual const ser_context& context() const = 0;
-Returns the current [context](serializing_context.md)
+Returns the current [context](ser_context.md)
 
 #### See also
 
