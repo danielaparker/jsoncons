@@ -201,7 +201,7 @@ public:
 private:
     enum class container_type {object, array};
 
-    class serialization_context
+    class encoding_context
     {
         container_type type_;
         size_t count_;
@@ -211,7 +211,7 @@ private:
         size_t begin_pos_;
         size_t data_pos_;
     public:
-        serialization_context(container_type type, line_split_kind split_lines, bool indent_once,
+        encoding_context(container_type type, line_split_kind split_lines, bool indent_once,
                               size_t begin_pos, size_t data_pos)
            : type_(type), count_(0), line_splits_(split_lines), indent_before_(indent_once), new_line_after_(false),
              begin_pos_(begin_pos), data_pos_(data_pos)
@@ -314,7 +314,7 @@ private:
     std::basic_string<CharT> new_line_chars_;
     Result result_;
 
-    std::vector<serialization_context> stack_;
+    std::vector<encoding_context> stack_;
     int indent_amount_;
     size_t column_;
     std::basic_string<CharT> colon_str_;
@@ -1058,12 +1058,12 @@ public:
 private:
     enum class container_type {object, array};
 
-    class serialization_context
+    class encoding_context
     {
         container_type type_;
         size_t count_;
     public:
-        serialization_context(container_type type)
+        encoding_context(container_type type)
            : type_(type), count_(0)
         {
         }
@@ -1102,7 +1102,7 @@ private:
     byte_string_chars_format byte_string_format_;
     big_integer_chars_format big_integer_format_;
 
-    std::vector<serialization_context> stack_;
+    std::vector<encoding_context> stack_;
     jsoncons::detail::print_double fp_;
     Result result_;
 
