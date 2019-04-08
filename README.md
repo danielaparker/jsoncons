@@ -962,5 +962,5 @@ The jsoncons implementation of the Grisu3 algorithm for printing floating-point 
 
 The implementation of the macro `JSONCONS_TYPE_TRAITS_DECL` follows the approach in [ThorsSerializer](https://github.com/Loki-Astari/ThorsSerializer)
 
-Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.txt)
+Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.md)
 
