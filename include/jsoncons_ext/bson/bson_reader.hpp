@@ -34,6 +34,16 @@ public:
     {
     }
 
+    void read()
+    {
+        std::error_code ec;
+        read(ec);
+        if (ec)
+        {
+            throw ser_error(ec,line_number(),column_number());
+        }
+    }
+
     void read(std::error_code& ec)
     {
         try

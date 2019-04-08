@@ -23,6 +23,24 @@ namespace jsoncons { namespace msgpack {
 
 template<class T>
 typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+encode_msgpack(const T& j, std::vector<uint8_t>& v)
+{
+    typedef typename T::char_type char_type;
+    msgpack_bytes_encoder encoder(v);
+    auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+    j.dump(adaptor);
+}
+
+template<class T>
+typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+encode_msgpack(const T& val, std::vector<uint8_t>& v)
+{
+    msgpack_bytes_encoder encoder(v);
+    write_to(json(), val, encoder);
+}
+
+template<class T>
+typename std::enable_if<is_basic_json_class<T>::value,void>::type 
 encode_msgpack(const T& j, std::ostream& os)
 {
     typedef typename T::char_type char_type;
@@ -32,13 +50,11 @@ encode_msgpack(const T& j, std::ostream& os)
 }
 
 template<class T>
-typename std::enable_if<is_basic_json_class<T>::value,void>::type 
-encode_msgpack(const T& j, std::vector<uint8_t>& v)
+typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+encode_msgpack(const T& val, std::ostream& os)
 {
-    typedef typename T::char_type char_type;
-    msgpack_bytes_encoder encoder(v);
-    auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
-    j.dump(adaptor);
+    msgpack_encoder encoder(os);
+    write_to(json(), val, encoder);
 }
 
 // decode_msgpack
@@ -60,6 +76,16 @@ decode_msgpack(const std::vector<uint8_t>& v)
 }
 
 template<class T>
+typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+decode_msgpack(const std::vector<uint8_t>& v)
+{
+    jsoncons::json_decoder<json> decoder;
+    basic_msgpack_reader<jsoncons::bytes_source> reader(v, decoder);
+    reader.read();
+    return decoder.get_result().template as<T>();
+}
+
+template<class T>
 typename std::enable_if<is_basic_json_class<T>::value,T>::type 
 decode_msgpack(std::istream& is)
 {
@@ -72,6 +98,16 @@ decode_msgpack(std::istream& is)
     {
         throw ser_error(ec,reader.line_number(),reader.column_number());
     }
+    return decoder.get_result();
+}
+
+template<class T>
+typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+decode_msgpack(std::istream& is)
+{
+    jsoncons::json_decoder<json> decoder;
+    msgpack_reader reader(is, decoder);
+    reader.read();
     return decoder.get_result();
 }
   

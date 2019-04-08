@@ -23,6 +23,24 @@ namespace jsoncons { namespace ubjson {
 
 template<class T>
 typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+encode_ubjson(const T& j, std::vector<uint8_t>& v)
+{
+    typedef typename T::char_type char_type;
+    ubjson_bytes_encoder encoder(v);
+    auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+    j.dump(adaptor);
+}
+
+template<class T>
+typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+encode_ubjson(const T& val, std::vector<uint8_t>& v)
+{
+    ubjson_bytes_encoder encoder(v);
+    write_to(json(), val, encoder);
+}
+
+template<class T>
+typename std::enable_if<is_basic_json_class<T>::value,void>::type 
 encode_ubjson(const T& j, std::ostream& os)
 {
     typedef typename T::char_type char_type;
@@ -32,13 +50,11 @@ encode_ubjson(const T& j, std::ostream& os)
 }
 
 template<class T>
-typename std::enable_if<is_basic_json_class<T>::value,void>::type 
-encode_ubjson(const T& j, std::vector<uint8_t>& v)
+typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+encode_ubjson(const T& val, std::ostream& os)
 {
-    typedef typename T::char_type char_type;
-    ubjson_bytes_encoder encoder(v);
-    auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
-    j.dump(adaptor);
+    ubjson_encoder encoder(os);
+    write_to(json(), val, encoder);
 }
 
 // decode_ubjson
@@ -50,13 +66,18 @@ decode_ubjson(const std::vector<uint8_t>& v)
     jsoncons::json_decoder<T> decoder;
     auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
     basic_ubjson_reader<jsoncons::bytes_source> reader(v, adaptor);
-    std::error_code ec;
-    reader.read(ec);
-    if (ec)
-    {
-        throw ser_error(ec,reader.line_number(),reader.column_number());
-    }
+    reader.read();
     return decoder.get_result();
+}
+
+template<class T>
+typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+decode_ubjson(const std::vector<uint8_t>& v)
+{
+    jsoncons::json_decoder<json> decoder;
+    basic_ubjson_reader<jsoncons::bytes_source> reader(v, decoder);
+    reader.read();
+    return decoder.get_result().template as<T>();
 }
 
 template<class T>
@@ -66,12 +87,17 @@ decode_ubjson(std::istream& is)
     jsoncons::json_decoder<T> decoder;
     auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
     ubjson_reader reader(is, adaptor);
-    std::error_code ec;
-    reader.read(ec);
-    if (ec)
-    {
-        throw ser_error(ec,reader.line_number(),reader.column_number());
-    }
+    reader.read();
+    return decoder.get_result();
+}
+
+template<class T>
+typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+decode_ubjson(std::istream& is)
+{
+    jsoncons::json_decoder<json> decoder;
+    ubjson_reader reader(is, decoder);
+    reader.read();
     return decoder.get_result();
 }
 
