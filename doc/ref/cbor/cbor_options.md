@@ -31,6 +31,11 @@ will encode strings the usual CBOR way.
 This option does not affect decode - jsoncons will always decode
 string references if present.
 
+#### Static member functions
+
+    static const cbor_options& default_options()
+Default CBOR encode and decode options.
+
 ### See also
 
 [cbor_decode_options](cbor_decode_options.md)

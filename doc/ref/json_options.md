@@ -113,6 +113,11 @@ For an array whose parent is an object, set whether that array is split on a new
     json_options& array_array_line_splits(line_split_kind value)
 For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind.md).
 
+#### Static member functions
+
+    static const basic_json_options<CharT>& default_options()
+Default JSON encode and decode options.
+
 ### See also
 
 [json_decode_options](json_decode_options.md)

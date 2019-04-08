@@ -99,6 +99,11 @@ mapping_type::n_rows, mapping_type::n_objects, mapping_type::m_columns. If assum
     basic_csv_options& max_lines(unsigned long value);
 Maximum number of lines to read. Default is unlimited.
 
+#### Static member functions
+
+    static const basic_csv_options<CharT>& default_options()
+Default CSV encode and decode options.
+
 ### See also
 
 [csv_decode_options](csv_decode_options.md)
