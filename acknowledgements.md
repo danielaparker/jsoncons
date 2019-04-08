@@ -9,28 +9,28 @@ and make_array template implementation.)
 system for posix systems, adding GCC to list of supported compilers, bug fixes, 
 Android fix)
 
-- Cory Fields (code cleanup)
+- [Cory Fields](https://github.com/theuni) for fixing warnings about unused variables
 
 - Vitaliy Gusev (reported error in json object operator[size_t i])
 
-- Alex Merry (reported errors with "typename" keyword experienced with gcc and providing 
-fixes for 0.95.)
+- [Alex Merry](https://github.com/amerry) for reporting errors with "typename" keyword experienced with gcc and providing 
+workaround for gcc 4.8 regex issues.
 
 - Ignatov Serguei (reported issues experienced with gcc for 0.95 and 
 0.96 candidate and helped fix them)
 
-- Milan Burda for fix for clang build error
+- [Milan Burda](https://github.com/miniak) for fix for clang build error
 
-- Peter Tissen, for reporting and suggesting a fix for get(name,default_val)
+- [Peter Tissen](https://github.com/Bigpet), for reporting and suggesting a fix for get(name,default_val)
 
 - Tom Bass for assistance with clang build errors
 
 - Andrey Alifanov and Amit Naik for failing test cases for JSON Path
 
-- Yuri Plaksyuk for contributing an extension to JsonPath to allow filter 
+- [Yuri Plaksyuk](https://github.com/yplaksyuk) for contributing an extension to JsonPath to allow filter 
 expressions over a single object. 
 
-- Nikolay Amiantov for fixing compilation errors and warnings by GCC and 
+- [Nikolay Amiantov](https://github.com/abbradar) for fixing compilation errors and warnings by GCC and 
 Clang, adding read support for std::array and, most appreciated,
 adding Travis CI configuration.
 
@@ -41,9 +41,8 @@ against an empty object
 
 - Stefano Sinigardi for contributing workaround for vs2017 platform issue
 
-- xezon for suggesting decode_csv and encode_csv functions, and
-ignore_empty_lines option. Also for fixes and improvements
-in string_view code. 
+- [xezon](https://github.com/danielaparker/jsoncons/pull/140) for proposing decode_csv and encode_csv functions, the
+ignore_empty_lines option, and fixes to mismatched allocator types. Also for fixes and improvements in string_view code. 
 
 - Vojtech Fried for contributing patches to JSONCONS_DEFINE_LITERAL 
 and to json::as_string to remove warnings
