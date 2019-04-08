@@ -13,8 +13,8 @@
  * Unicode Standard."
 */
 
-#ifndef UNICONS_UNICODE_TRAITS_HPP
-#define UNICONS_UNICODE_TRAITS_HPP
+#ifndef JSONCONS_UNICONS_UNICODE_TRAITS_HPP
+#define JSONCONS_UNICONS_UNICODE_TRAITS_HPP
 
 #if defined(__clang__) 
 #  define UNICONS_FALLTHROUGH [[clang::fallthrough]]
@@ -49,7 +49,7 @@
 #include <type_traits>
 #include <system_error>
 
-namespace unicons {
+namespace jsoncons { namespace unicons {
 
 /*
  * Magic values subtracted from a buffer value during UTF8 conversion.
@@ -239,20 +239,6 @@ std::error_code make_error_code(encoding_errc result)
 {
     return std::error_code(static_cast<int>(result),encoding_error_category());
 }
-}
-
-namespace std {
-    template<>
-    struct is_error_code_enum<unicons::conv_errc> : public true_type
-    {
-    };
-    template<>
-    struct is_error_code_enum<unicons::encoding_errc> : public true_type
-    {
-    };
-}
-
-namespace unicons {
 
 // utf8
 
@@ -1488,6 +1474,18 @@ skip_bom(Iterator first, Iterator last) UNICONS_NOEXCEPT
     }
 }
 
+} // unicons
+} // jsoncons
+
+namespace std {
+    template<>
+    struct is_error_code_enum<jsoncons::unicons::conv_errc> : public true_type
+    {
+    };
+    template<>
+    struct is_error_code_enum<jsoncons::unicons::encoding_errc> : public true_type
+    {
+    };
 }
 
 #endif

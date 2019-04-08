@@ -10,7 +10,7 @@
 #include <string> // std::string
 #include <sstream> // std::ostringstream
 #include <system_error> // std::error_code
-#include <jsoncons/detail/unicode_traits.hpp> // unicons::convert
+#include <jsoncons/unicode_traits.hpp> // unicons::convert
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons {
