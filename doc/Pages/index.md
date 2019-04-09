@@ -275,8 +275,8 @@ produces
 <div id="A4"/>
 ### Conversion between JSON and C++ objects
 
-jsoncons supports conversion between JSON text and C++ objects. The functions [decode_json](doc/ref/decode_json.md) 
-and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ objects and back. 
+jsoncons supports conversion between JSON text and C++ objects. The functions [decode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/decode_json.md) 
+and [encode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ objects and back. 
 Decode and encode work for all C++ classes that have 
 [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
 defined. The standard library containers are already supported, and you can specialize `json_type_traits`
@@ -807,137 +807,6 @@ Output:
     "country": "Canada",
     "postal_code": "M5H 2N2"
 }
-```
-
-<div id="A12"/>
-### Convert `json` value to user defined type and back
-
-In the json class, constructors, accessors and modifiers are templated, for example,
-```c++
-template <class T>
-json(const T& val)
-
-template<class T, class... Args>
-bool is(Args&&... args) const
-
-template<class T, class... Args>
-T as(Args&&... args) const
-
-template <class T>
-basic_json& operator=(const T& val)
-
-template <class T>
-void push_back(T&& val)
-
-template <class T>
-void insert_or_assign(const string_view_type& name, T&& val)
-```
-The implementations of these functions and operators make use of the class template `json_type_traits`
-
-If you want to use the json constructor, `is<T>`, `as<T>`, `operator=`, `push_back`, `insert`, and `insert_or_assign` to access or modify with a new type, you need to show `json` how to interact with that type, by extending `json_type_traits` in the `jsoncons` namespace.
-
-The functions [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) convert JSON 
-formatted strings or streams to C++ objects and back. [decode_json](doc/ref/decode_json.md) 
-and [encode_json](doc/ref/encode_json.md) will work for all C++ classes that have 
-[json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
-defined.
-
-```c++
-#include <iostream>
-#include <jsoncons/json.hpp>
-
-namespace jc = jsoncons;
-
-namespace ns {
-    struct book
-    {
-        std::string author;
-        std::string title;
-        double price;
-    };
-} // namespace ns
-
-namespace jsoncons {
-    template<class Json>
-    struct json_type_traits<Json, ns::book>
-    {
-        static bool is(const Json& j) noexcept
-        {
-            return j.is_object() && j.contains("author") && 
-                   j.contains("title") && j.contains("price");
-        }
-        static ns::book as(const Json& j)
-        {
-            ns::book val;
-            val.author = j["author"].template as<std::string>();
-            val.title = j["title"].template as<std::string>();
-            val.price = j["price"].template as<double>();
-            return val;
-        }
-        static Json to_json(const ns::book& val)
-        {
-            Json j;
-            j["author"] = val.author;
-            j["title"] = val.title;
-            j["price"] = val.price;
-            return j;
-        }
-    };
-} // namespace jsoncons
-
-int main()
-{
-    const std::string s = R"(
-    [
-        {
-            "author" : "Haruki Murakami",
-            "title" : "Kafka on the Shore",
-            "price" : 25.17
-        },
-        {
-            "author" : "Charles Bukowski",
-            "title" : "Pulp",
-            "price" : 22.48
-        }
-    ]
-    )";
-
-    std::vector<ns::book> book_list = jc::decode_json<std::vector<ns::book>>(s);
-
-    std::cout << "(1)\n";
-    for (const auto& item : book_list)
-    {
-        std::cout << item.author << ", " 
-                  << item.title << ", " 
-                  << item.price << "\n";
-    }
-
-    std::cout << "\n(2)\n";
-    jc::encode_json(book_list, std::cout, jc::indenting::indent);
-    std::cout << "\n\n";
-}
-```
-
-Output:
-
-```
-(1)
-Haruki Murakami, Kafka on the Shore, 25.17
-Charles Bukowski, Pulp, 22.48
-
-(2)
-[
-    {
-        "author": "Haruki Murakami",
-        "price": 25.17,
-        "title": "Kafka on the Shore"
-    },
-    {
-        "author": "Charles Bukowski",
-        "price": 22.48,
-        "title": "Pulp"
-    }
-]
 ```
 
 For more information, consult the latest [documentation](https://github.com/danielaparker/jsoncons/blob/master/doc/Home.md) and [roadmap](https://github.com/danielaparker/jsoncons/blob/master/Roadmap.md). 
