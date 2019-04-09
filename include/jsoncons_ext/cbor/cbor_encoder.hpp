@@ -80,11 +80,10 @@ private:
     size_t next_stringref_ = 0;
 public:
     explicit basic_cbor_encoder(result_type result)
-       : basic_cbor_encoder(std::forward<result_type>(result), cbor_options::default_options())
+       : result_(std::move(result)), options_(cbor_options::default_options())
     {
     }
-    basic_cbor_encoder(result_type result, 
-                          const cbor_encode_options& options)
+    basic_cbor_encoder(result_type result, const cbor_encode_options& options)
        : result_(std::move(result)), options_(options)
     {
         if (options.pack_strings())
