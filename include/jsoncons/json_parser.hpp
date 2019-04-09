@@ -163,16 +163,10 @@ class basic_json_parser : private ser_context
 
     default_parse_error_handler default_err_handler_;
 
+    const basic_json_decode_options<CharT>& options_;
+
     parse_error_handler& err_handler_;
-    bool is_str_to_nan_;
-    bool is_str_to_inf_;
-    bool is_str_to_neginf_;
-    string_type nan_to_str_;
-    string_type inf_to_str_;
-    string_type neginf_to_str_;
     int initial_stack_capacity_;
-    size_t max_nesting_depth_;
-    bool lossless_number;
     size_t nesting_depth_;
     uint32_t cp_;
     uint32_t cp2_;
@@ -213,16 +207,9 @@ public:
 
     basic_json_parser(const basic_json_decode_options<CharT>& options,
                       parse_error_handler& err_handler)
-       : err_handler_(err_handler),
-         is_str_to_nan_(options.is_str_to_nan()),
-         is_str_to_inf_(options.is_str_to_inf()),
-         is_str_to_neginf_(options.is_str_to_neginf()),
-         nan_to_str_(options.nan_to_str()),
-         inf_to_str_(options.inf_to_str()),
-         neginf_to_str_(options.neginf_to_str()),
+       : options_(options),
+         err_handler_(err_handler),
          initial_stack_capacity_(default_initial_stack_capacity_),
-         max_nesting_depth_(options.max_nesting_depth()),
-         lossless_number(options.lossless_number()),
          nesting_depth_(0), 
          cp_(0),
          cp2_(0),
@@ -258,12 +245,12 @@ public:
 #if !defined(JSONCONS_NO_DEPRECATED)
     size_t max_nesting_depth() const
     {
-        return max_nesting_depth_;
+        return options_.max_nesting_depth();
     }
 
     void max_nesting_depth(size_t value)
     {
-        max_nesting_depth_ = value;
+        options_.max_nesting_depth() = value;
     }
 #endif
     json_parse_state parent() const
@@ -365,7 +352,7 @@ public:
 
     void begin_object(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
-        if (++nesting_depth_ > max_nesting_depth_)
+        if (++nesting_depth_ > options_.max_nesting_depth())
         {
             continue_ = err_handler_.error(json_errc::max_depth_exceeded, *this);
             if (!continue_)
@@ -421,7 +408,7 @@ public:
 
     void begin_array(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
-        if (++nesting_depth_ > max_nesting_depth_)
+        if (++nesting_depth_ > options_.max_nesting_depth())
         {
             continue_ = err_handler_.error(json_errc::max_depth_exceeded, *this);
             if (!continue_)
@@ -555,15 +542,15 @@ public:
 
     void parse_some(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
-        if (is_str_to_nan_ || is_str_to_inf_ || is_str_to_neginf_)
+        if (options_.is_str_to_nan() || options_.is_str_to_inf() || options_.is_str_to_neginf())
         {
             jsoncons::detail::replacement_filter<CharT> h(handler,
-                                                          is_str_to_nan_,
-                                                          is_str_to_inf_,
-                                                          is_str_to_neginf_,
-                                                          nan_to_str_,
-                                                          inf_to_str_,
-                                                          neginf_to_str_);
+                                                          options_.is_str_to_nan(),
+                                                          options_.is_str_to_inf(),
+                                                          options_.is_str_to_neginf(),
+                                                          options_.nan_to_str(),
+                                                          options_.inf_to_str(),
+                                                          options_.neginf_to_str());
             parse_some_(h, ec);
         }
         else
@@ -2682,7 +2669,7 @@ private:
     {
         try
         {
-            if (lossless_number)
+            if (options_.lossless_number())
             {
                 continue_ = handler.string_value(string_buffer_, semantic_tag::big_decimal, *this);
             }

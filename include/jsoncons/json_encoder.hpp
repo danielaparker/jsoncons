@@ -287,31 +287,10 @@ private:
 
     size_t indent_size_;
 
-    bool is_nan_to_num_;
-    bool is_inf_to_num_;
-    bool is_neginf_to_num_;
-    bool is_nan_to_str_;
-    bool is_inf_to_str_;
-    bool is_neginf_to_str_;
+    const basic_json_encode_options<CharT>& options_;
 
-    std::basic_string<CharT> nan_to_num_;
-    std::basic_string<CharT> inf_to_num_;
-    std::basic_string<CharT> neginf_to_num_;
-    std::basic_string<CharT> nan_to_str_;
-    std::basic_string<CharT> inf_to_str_;
-    std::basic_string<CharT> neginf_to_str_;
-
-    bool escape_all_non_ascii_;
-    bool escape_solidus_;
-    byte_string_chars_format byte_string_format_;
-    big_integer_chars_format big_integer_format_;
-    line_split_kind object_object_line_splits_;
-    line_split_kind object_array_line_splits_;
-    line_split_kind array_array_line_splits_;
-    line_split_kind array_object_line_splits_;
     jsoncons::detail::print_double fp_;
-    size_t line_length_limit_;
-    std::basic_string<CharT> new_line_chars_;
+
     Result result_;
 
     std::vector<encoding_context> stack_;
@@ -334,33 +313,11 @@ public:
     }
 
     basic_json_encoder(result_type result, 
-                          const basic_json_encode_options<CharT>& options)
-       : indent_size_(options.indent_size()),
-         is_nan_to_num_(options.is_nan_to_num()),
-         is_inf_to_num_(options.is_inf_to_num()),
-         is_neginf_to_num_(options.is_neginf_to_num()),
-         is_nan_to_str_(options.is_nan_to_str()),
-         is_inf_to_str_(options.is_inf_to_str()),
-         is_neginf_to_str_(options.is_neginf_to_str()),
-         nan_to_num_(options.nan_to_num()),
-         inf_to_num_(options.inf_to_num()),
-         neginf_to_num_(options.neginf_to_num()),
-         nan_to_str_(options.nan_to_str()),
-         inf_to_str_(options.inf_to_str()),
-         neginf_to_str_(options.neginf_to_str()),
-         escape_all_non_ascii_(options.escape_all_non_ascii()),
-         escape_solidus_(options.escape_solidus()),
-         byte_string_format_(options.byte_string_format()),
-         big_integer_format_(options.big_integer_format()),
-         object_object_line_splits_(options.object_object_line_splits()),
-         object_array_line_splits_(options.object_array_line_splits()),
-         array_array_line_splits_(options.array_array_line_splits()),
-         array_object_line_splits_(options.array_object_line_splits()),
+                       const basic_json_encode_options<CharT>& options)
+       : options_(options),
          fp_(floating_point_options(options.floating_point_format(), 
                                     options.precision(),
                                     0)),
-         line_length_limit_(options.line_length_limit()),
-         new_line_chars_(options.new_line_chars()),
          result_(std::move(result)), 
          indent_amount_(0), 
          column_(0)
@@ -447,16 +404,16 @@ private:
         {
             if (stack_.back().is_object())
             {
-                switch (object_object_line_splits_)
+                switch (options_.object_object_line_splits())
                 {
                     case line_split_kind::same_line:
-                        if (column_ >= line_length_limit_)
+                        if (column_ >= options_.line_length_limit())
                         {
                             break_line();
                         }
                         break;
                     case line_split_kind::new_line:
-                        if (column_ >= line_length_limit_)
+                        if (column_ >= options_.line_length_limit())
                         {
                             break_line();
                         }
@@ -464,15 +421,15 @@ private:
                     default: // multi_line
                         break;
                 }
-                stack_.emplace_back(container_type::object,object_object_line_splits_, false,
+                stack_.emplace_back(container_type::object,options_.object_object_line_splits(), false,
                                     column_, column_+open_object_brace_str_.length());
             }
             else // array
             {
-                switch (array_object_line_splits_)
+                switch (options_.array_object_line_splits())
                 {
                     case line_split_kind::same_line:
-                        if (column_ >= line_length_limit_)
+                        if (column_ >= options_.line_length_limit())
                         {
                             //stack_.back().new_line_after(true);
                             new_line();
@@ -487,7 +444,7 @@ private:
                         new_line();
                         break;
                 }
-                stack_.emplace_back(container_type::object,array_object_line_splits_, false,
+                stack_.emplace_back(container_type::object,options_.array_object_line_splits(), false,
                                     column_, column_+open_object_brace_str_.length());
             }
         }
@@ -530,27 +487,27 @@ private:
         {
             if (stack_.back().is_object())
             {
-                switch (object_array_line_splits_)
+                switch (options_.object_array_line_splits())
                 {
                     case line_split_kind::same_line:
-                        stack_.emplace_back(container_type::array,object_array_line_splits_,false,
+                        stack_.emplace_back(container_type::array,options_.object_array_line_splits(),false,
                                             column_, column_ + open_array_bracket_str_.length());
                         break;
                     case line_split_kind::new_line:
                     {
-                        stack_.emplace_back(container_type::array,object_array_line_splits_,true,
+                        stack_.emplace_back(container_type::array,options_.object_array_line_splits(),true,
                                             column_, column_+open_array_bracket_str_.length());
                         break;
                     }
                     default: // multi_line
-                        stack_.emplace_back(container_type::array,object_array_line_splits_,true,
+                        stack_.emplace_back(container_type::array,options_.object_array_line_splits(),true,
                                             column_, column_+open_array_bracket_str_.length());
                         break;
                 }
             }
             else // array
             {
-                switch (array_array_line_splits_)
+                switch (options_.array_array_line_splits())
                 {
                 case line_split_kind::same_line:
                     if (stack_.back().is_multi_line())
@@ -558,19 +515,19 @@ private:
                         stack_.back().new_line_after(true);
                         new_line();
                     }
-                    stack_.emplace_back(container_type::array,array_array_line_splits_, false,
+                    stack_.emplace_back(container_type::array,options_.array_array_line_splits(), false,
                                         column_, column_+open_array_bracket_str_.length());
                     break;
                 case line_split_kind::new_line:
                     stack_.back().new_line_after(true);
                     new_line();
-                    stack_.emplace_back(container_type::array,array_array_line_splits_, false,
+                    stack_.emplace_back(container_type::array,options_.array_array_line_splits(), false,
                                         column_, column_+open_array_bracket_str_.length());
                     break;
                 default: // multi_line
                     stack_.back().new_line_after(true);
                     new_line();
-                    stack_.emplace_back(container_type::array,array_array_line_splits_, false,
+                    stack_.emplace_back(container_type::array,options_.array_array_line_splits(), false,
                                         column_, column_+open_array_bracket_str_.length());
                     //new_line();
                     break;
@@ -617,7 +574,7 @@ private:
             stack_.back().new_line_after(true);
             new_line();
         }
-        else if (stack_.back().count() > 0 && column_ >= line_length_limit_)
+        else if (stack_.back().count() > 0 && column_ >= options_.line_length_limit())
         {
             //stack_.back().new_line_after(true);
             new_line(stack_.back().data_pos());
@@ -628,7 +585,7 @@ private:
             stack_.back().set_position(column_);
         }
         result_.push_back('\"');
-        size_t length = jsoncons::detail::escape_string(name.data(), name.length(),escape_all_non_ascii_,escape_solidus_,result_);
+        size_t length = jsoncons::detail::escape_string(name.data(), name.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),result_);
         result_.push_back('\"');
         result_.insert(colon_str_.data(),colon_str_.length());
         column_ += (length+2+colon_str_.length());
@@ -643,7 +600,7 @@ private:
             {
                 begin_scalar_value();
             }
-            if (!stack_.back().is_multi_line() && column_ >= line_length_limit_)
+            if (!stack_.back().is_multi_line() && column_ >= options_.line_length_limit())
             {
                 break_line();
             }
@@ -664,7 +621,7 @@ private:
             {
                 begin_scalar_value();
             }
-            if (!stack_.back().is_multi_line() && column_ >= line_length_limit_)
+            if (!stack_.back().is_multi_line() && column_ >= options_.line_length_limit())
             {
                 break_line();
             }
@@ -678,7 +635,7 @@ private:
             default:
             {
                 result_.push_back('\"');
-                size_t length = jsoncons::detail::escape_string(sv.data(), sv.length(),escape_all_non_ascii_,escape_solidus_,result_);
+                size_t length = jsoncons::detail::escape_string(sv.data(), sv.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),result_);
                 result_.push_back('\"');
                 column_ += (length+2);
                 break;
@@ -699,7 +656,7 @@ private:
             {
                 begin_scalar_value();
             }
-            if (!stack_.back().is_multi_line() && column_ >= line_length_limit_)
+            if (!stack_.back().is_multi_line() && column_ >= options_.line_length_limit())
             {
                 break_line();
             }
@@ -722,7 +679,7 @@ private:
                 break;
         }
 
-        byte_string_chars_format format = jsoncons::detail::resolve_byte_string_chars_format(byte_string_format_, 
+        byte_string_chars_format format = jsoncons::detail::resolve_byte_string_chars_format(options_.byte_string_format(), 
                                                                                              encoding_hint, 
                                                                                              byte_string_chars_format::base64url);
         switch (format)
@@ -771,7 +728,7 @@ private:
             {
                 begin_scalar_value();
             }
-            if (!stack_.back().is_multi_line() && column_ >= line_length_limit_)
+            if (!stack_.back().is_multi_line() && column_ >= options_.line_length_limit())
             {
                 break_line();
             }
@@ -779,14 +736,14 @@ private:
 
         if ((std::isnan)(value))
         {
-            if (is_nan_to_num_)
+            if (options_.is_nan_to_num())
             {
-                result_.insert(nan_to_num_.data(), nan_to_num_.length());
-                column_ += nan_to_num_.length();
+                result_.insert(options_.nan_to_num().data(), options_.nan_to_num().length());
+                column_ += options_.nan_to_num().length();
             }
-            else if (is_nan_to_str_)
+            else if (options_.is_nan_to_str())
             {
-                do_string_value(nan_to_str_, semantic_tag::none, context);
+                do_string_value(options_.nan_to_str(), semantic_tag::none, context);
             }
             else
             {
@@ -796,14 +753,14 @@ private:
         }
         else if (value == std::numeric_limits<double>::infinity())
         {
-            if (is_inf_to_num_)
+            if (options_.is_inf_to_num())
             {
-                result_.insert(inf_to_num_.data(), inf_to_num_.length());
-                column_ += inf_to_num_.length();
+                result_.insert(options_.inf_to_num().data(), options_.inf_to_num().length());
+                column_ += options_.inf_to_num().length();
             }
-            else if (is_inf_to_str_)
+            else if (options_.is_inf_to_str())
             {
-                do_string_value(inf_to_str_, semantic_tag::none, context);
+                do_string_value(options_.inf_to_str(), semantic_tag::none, context);
             }
             else
             {
@@ -813,14 +770,14 @@ private:
         }
         else if (!(std::isfinite)(value))
         {
-            if (is_neginf_to_num_)
+            if (options_.is_neginf_to_num())
             {
-                result_.insert(neginf_to_num_.data(), neginf_to_num_.length());
-                column_ += neginf_to_num_.length();
+                result_.insert(options_.neginf_to_num().data(), options_.neginf_to_num().length());
+                column_ += options_.neginf_to_num().length();
             }
-            else if (is_neginf_to_str_)
+            else if (options_.is_neginf_to_str())
             {
-                do_string_value(neginf_to_str_, semantic_tag::none, context);
+                do_string_value(options_.neginf_to_str(), semantic_tag::none, context);
             }
             else
             {
@@ -848,7 +805,7 @@ private:
             {
                 begin_scalar_value();
             }
-            if (!stack_.back().is_multi_line() && column_ >= line_length_limit_)
+            if (!stack_.back().is_multi_line() && column_ >= options_.line_length_limit())
             {
                 break_line();
             }
@@ -869,7 +826,7 @@ private:
             {
                 begin_scalar_value();
             }
-            if (!stack_.back().is_multi_line() && column_ >= line_length_limit_)
+            if (!stack_.back().is_multi_line() && column_ >= options_.line_length_limit())
             {
                 break_line();
             }
@@ -888,7 +845,7 @@ private:
             {
                 begin_scalar_value();
             }
-            if (!stack_.back().is_multi_line() && column_ >= line_length_limit_)
+            if (!stack_.back().is_multi_line() && column_ >= options_.line_length_limit())
             {
                 break_line();
             }
@@ -928,7 +885,7 @@ private:
 
     void write_big_integer_value(const string_view_type& sv)
     {
-        switch (big_integer_format_)
+        switch (options_.big_integer_format())
         {
 #if !defined(JSONCONS_NO_DEPRECATED)
             case big_integer_chars_format::integer:
@@ -996,17 +953,17 @@ private:
 
     void indent()
     {
-        indent_amount_ += static_cast<int>(indent_size_);
+        indent_amount_ += static_cast<int>(options_.indent_size());
     }
 
     void unindent()
     {
-        indent_amount_ -= static_cast<int>(indent_size_);
+        indent_amount_ -= static_cast<int>(options_.indent_size());
     }
 
     void new_line()
     {
-        result_.insert(new_line_chars_.data(),new_line_chars_.length());
+        result_.insert(options_.new_line_chars().data(),options_.new_line_chars().length());
         for (int i = 0; i < indent_amount_; ++i)
         {
             result_.push_back(' ');
@@ -1016,7 +973,7 @@ private:
 
     void new_line(size_t len)
     {
-        result_.insert(new_line_chars_.data(),new_line_chars_.length());
+        result_.insert(options_.new_line_chars().data(),options_.new_line_chars().length());
         for (size_t i = 0; i < len; ++i)
         {
             result_.push_back(' ');
@@ -1084,23 +1041,7 @@ private:
         }
     };
 
-    bool is_nan_to_num_;
-    bool is_inf_to_num_;
-    bool is_neginf_to_num_;
-    bool is_nan_to_str_;
-    bool is_inf_to_str_;
-    bool is_neginf_to_str_;
-
-    std::basic_string<CharT> nan_to_num_;
-    std::basic_string<CharT> inf_to_num_;
-    std::basic_string<CharT> neginf_to_num_;
-    std::basic_string<CharT> nan_to_str_;
-    std::basic_string<CharT> inf_to_str_;
-    std::basic_string<CharT> neginf_to_str_;
-    bool escape_all_non_ascii_;
-    bool escape_solidus_;
-    byte_string_chars_format byte_string_format_;
-    big_integer_chars_format big_integer_format_;
+    const basic_json_encode_options<CharT>& options_;
 
     std::vector<encoding_context> stack_;
     jsoncons::detail::print_double fp_;
@@ -1117,22 +1058,7 @@ public:
 
     basic_json_compressed_encoder(result_type result, 
                                      const basic_json_encode_options<CharT>& options)
-       : is_nan_to_num_(options.is_nan_to_num()),
-         is_inf_to_num_(options.is_inf_to_num()),
-         is_neginf_to_num_(options.is_neginf_to_num()),
-         is_nan_to_str_(options.is_nan_to_str()),
-         is_inf_to_str_(options.is_inf_to_str()),
-         is_neginf_to_str_(options.is_neginf_to_str()),
-         nan_to_num_(options.nan_to_num()),
-         inf_to_num_(options.inf_to_num()),
-         neginf_to_num_(options.neginf_to_num()),
-         nan_to_str_(options.nan_to_str()),
-         inf_to_str_(options.inf_to_str()),
-         neginf_to_str_(options.neginf_to_str()),
-         escape_all_non_ascii_(options.escape_all_non_ascii()),
-         escape_solidus_(options.escape_solidus()),
-         byte_string_format_(options.byte_string_format()),
-         big_integer_format_(options.big_integer_format()),
+       : options_(options),
          fp_(floating_point_options(options.floating_point_format(), 
                                     options.precision(),
                                     0)),
@@ -1216,7 +1142,7 @@ private:
         }
 
         result_.push_back('\"');
-        jsoncons::detail::escape_string(name.data(), name.length(),escape_all_non_ascii_,escape_solidus_,result_);
+        jsoncons::detail::escape_string(name.data(), name.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),result_);
         result_.push_back('\"');
         result_.push_back(':');
         return true;
@@ -1240,7 +1166,7 @@ private:
 
     void write_big_integer_value(const string_view_type& sv)
     {
-        switch (big_integer_format_)
+        switch (options_.big_integer_format())
         {
             case big_integer_chars_format::number:
             {
@@ -1304,7 +1230,7 @@ private:
             default:
             {
                 result_.push_back('\"');
-                jsoncons::detail::escape_string(sv.data(), sv.length(),escape_all_non_ascii_,escape_solidus_,result_);
+                jsoncons::detail::escape_string(sv.data(), sv.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),result_);
                 result_.push_back('\"');
                 break;
             }
@@ -1343,7 +1269,7 @@ private:
                 break;
         }
 
-        byte_string_chars_format format = jsoncons::detail::resolve_byte_string_chars_format(byte_string_format_, 
+        byte_string_chars_format format = jsoncons::detail::resolve_byte_string_chars_format(options_.byte_string_format(), 
                                                                                    encoding_hint, 
                                                                                    byte_string_chars_format::base64url);
         switch (format)
@@ -1393,13 +1319,13 @@ private:
 
         if ((std::isnan)(value))
         {
-            if (is_nan_to_num_)
+            if (options_.is_nan_to_num())
             {
-                result_.insert(nan_to_num_.data(), nan_to_num_.length());
+                result_.insert(options_.nan_to_num().data(), options_.nan_to_num().length());
             }
-            else if (is_nan_to_str_)
+            else if (options_.is_nan_to_str())
             {
-                do_string_value(nan_to_str_, semantic_tag::none, context);
+                do_string_value(options_.nan_to_str(), semantic_tag::none, context);
             }
             else
             {
@@ -1408,13 +1334,13 @@ private:
         }
         else if (value == std::numeric_limits<double>::infinity())
         {
-            if (is_inf_to_num_)
+            if (options_.is_inf_to_num())
             {
-                result_.insert(inf_to_num_.data(), inf_to_num_.length());
+                result_.insert(options_.inf_to_num().data(), options_.inf_to_num().length());
             }
-            else if (is_inf_to_str_)
+            else if (options_.is_inf_to_str())
             {
-                do_string_value(inf_to_str_, semantic_tag::none, context);
+                do_string_value(options_.inf_to_str(), semantic_tag::none, context);
             }
             else
             {
@@ -1423,13 +1349,13 @@ private:
         }
         else if (!(std::isfinite)(value))
         {
-            if (is_neginf_to_num_)
+            if (options_.is_neginf_to_num())
             {
-                result_.insert(neginf_to_num_.data(), neginf_to_num_.length());
+                result_.insert(options_.neginf_to_num().data(), options_.neginf_to_num().length());
             }
-            else if (is_neginf_to_str_)
+            else if (options_.is_neginf_to_str())
             {
-                do_string_value(neginf_to_str_, semantic_tag::none, context);
+                do_string_value(options_.neginf_to_str(), semantic_tag::none, context);
             }
             else
             {

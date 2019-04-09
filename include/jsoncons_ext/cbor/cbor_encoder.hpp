@@ -69,7 +69,7 @@ private:
     };
     std::vector<stack_item> stack_;
     Result result_;
-    bool pack_strings_;
+    const cbor_encode_options& options_;
 
     // Noncopyable and nonmoveable
     basic_cbor_encoder(const basic_cbor_encoder&) = delete;
@@ -80,14 +80,14 @@ private:
     size_t next_stringref_ = 0;
 public:
     explicit basic_cbor_encoder(result_type result)
-       : result_(std::move(result)), pack_strings_(false)
+       : basic_cbor_encoder(std::forward<result_type>(result), cbor_options::default_options())
     {
     }
     basic_cbor_encoder(result_type result, 
                           const cbor_encode_options& options)
-       : result_(std::move(result)), pack_strings_(options.pack_strings())
+       : result_(std::move(result)), options_(options)
     {
-        if (pack_strings_)
+        if (options.pack_strings())
         {
             // tag(256)
             result_.push_back(0xd9);
@@ -294,7 +294,7 @@ private:
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Illegal unicode"));
         }
 
-        if (pack_strings_ && sv.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
+        if (options_.pack_strings() && sv.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
         {
             std::string s(sv);
             auto it = stringref_map_.find(s);
@@ -627,7 +627,7 @@ private:
             default:
                 break;
         }
-        if (pack_strings_ && b.length() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
+        if (options_.pack_strings() && b.length() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
         {
             auto it = bytestringref_map_.find(byte_string(b));
             if (it == bytestringref_map_.end())
