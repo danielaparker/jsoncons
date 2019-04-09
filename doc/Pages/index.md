@@ -6,7 +6,7 @@
 
 [Constructing json values in C++](#A3)
 
-[Converting to and from standard library containers](#A4)
+[Conversion between JSON and C++ objects](#A4)
 
 [Converting CSV files to json](#A5  )
 
@@ -21,8 +21,6 @@
 [Wide character support](#A10)
 
 [ojson and wojson](#A11)
-
-[Convert json to/from user defined type](#A12)
 
 <div id="A1"/>
 ### Preliminaries
@@ -275,65 +273,125 @@ produces
 }
 ```
 <div id="A4"/>
-### Converting to and from standard library containers
+### Conversion between JSON and C++ objects
 
-The jsoncons library supports converting to and from the standard library sequence and associative containers.
+jsoncons supports conversion between JSON text and C++ objects. The functions [decode_json](doc/ref/decode_json.md) 
+and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ objects and back. 
+Decode and encode work for all C++ classes that have 
+[json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
+defined. The standard library containers are already supported, and you can specialize `json_type_traits`
+for your own types in the `jsoncons` namespace. 
 
-```c++
-std::vector<int> v = {1,2,3,4};
-json j(v);
-std::cout << j << std::endl;
-```
-Output:
-```json
-[1,2,3,4]
-```
+`JSONCONS_TYPE_TRAITS_DECL` is a macro that simplifies the creation of the necessary boilerplate
+for your own types.
 
 ```c++
-json j = json::array{1,true,"last"};
-auto d = j.as<std::deque<std::string>>();
-for (auto x : d)
+#include <cassert>
+#include <iostream>
+#include <jsoncons/json.hpp>
+
+namespace jc = jsoncons;
+
+namespace ns {
+
+    struct reputon
+    {
+        std::string rater;
+        std::string assertion;
+        std::string rated;
+        double rating;
+
+        friend bool operator==(const reputon& lhs, const reputon& rhs)
+        {
+            return lhs.rater == rhs.rater &&
+                lhs.assertion == rhs.assertion &&
+                lhs.rated == rhs.rated &&
+                lhs.rating == rhs.rating;
+        }
+
+        friend bool operator!=(const reputon& lhs, const reputon& rhs)
+        {
+            return !(lhs == rhs);
+        };
+    };
+
+    class reputation_object
+    {
+        std::string application;
+        std::vector<reputon> reputons;
+
+        // Make json_type_traits specializations friends to give accesses to private members
+        JSONCONS_TYPE_TRAITS_FRIEND;
+    public:
+        reputation_object()
+        {
+        }
+        reputation_object(const std::string& application, const std::vector<reputon>& reputons)
+            : application(application), reputons(reputons)
+        {}
+
+        friend bool operator==(const reputation_object& lhs, const reputation_object& rhs)
+        {
+            if (lhs.application != rhs.application)
+            {
+                return false;
+            }
+            if (lhs.reputons.size() != rhs.reputons.size())
+            {
+                return false;
+            }
+            for (size_t i = 0; i < lhs.reputons.size(); ++i)
+            {
+                if (lhs.reputons[i] != rhs.reputons[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        friend bool operator!=(const reputation_object& lhs, const reputation_object& rhs)
+        {
+            return !(lhs == rhs);
+        };
+    };
+
+} // namespace ns
+
+// Declare the traits. Specify which data members need to be serialized.
+JSONCONS_TYPE_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
+JSONCONS_TYPE_TRAITS_DECL(ns::reputation_object, application, reputons);
+
+int main()
 {
-    std::cout << x << std::endl;
+    ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
+
+    std::string s;
+    jc::encode_json(val, s, jc::indenting::indent);
+    std::cout << s << "\n";
+
+    auto val2 = jc::decode_json<ns::reputation_object>(s);
+
+    assert(val2 == val);
 }
 ```
 Output:
 ```
-1
-true
-last
-```
-
-```c++
-{% raw %}
-std::map<std::string,int> m = {{"one",1},{"two",2},{"three",3}};
-json j(m);
-std::cout << j << std::endl;
-{% endraw %}
-```
-Output:
-```json
-{"one":1,"three":3,"two":2}
-```
-
-```c++
-json j;
-j["one"] = 1;
-j["two"] = 2;
-j["three"] = 3;
-
-auto um = j.as<std::unordered_map<std::string,int>>();
-for (const auto& x : um)
 {
-    std::cout << x.first << "=" << x.second << std::endl;
+    "application": "hiking",
+    "reputons": [
+        {
+            "assertion": "strong-hiker",
+            "rated": "Marilyn C",
+            "rater": "HikingAsylum.example.com",
+            "rating": 0.9
+        }
+    ]
 }
 ```
-Output:
-```
-one=1
-three=3
-two=2
-```
+
+See [type extensibility](doc/Tutorials/Type%20Extensibility.md)
+
 <div id="A5"/>
 ### Converting CSV files to json
 
