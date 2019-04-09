@@ -390,7 +390,7 @@ Output:
 }
 ```
 
-See [type extensibility](doc/Tutorials/Type%20Extensibility.md)
+See [type extensibility](https://github.com/danielaparker/jsoncons/blob/master/doc/Tutorials/Type%20Extensibility.md)
 
 <div id="A5"/>
 ### Converting CSV files to json
