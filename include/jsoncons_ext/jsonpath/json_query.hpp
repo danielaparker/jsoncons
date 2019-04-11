@@ -49,12 +49,12 @@ struct array_slice
     {
     }
 
-    size_t start(size_t size) const
+    size_t get_start(size_t size) const
     {
         return is_start_positive ? start_ : size - start_;
     }
 
-    size_t end(size_t size) const
+    size_t get_end(size_t size) const
     {
         if (is_end_defined)
         {
@@ -434,8 +434,8 @@ class jsonpath_evaluator : private ser_context
         {
             if (val.is_array())
             {
-                size_t start = slice_.start(val.size());
-                size_t end = slice_.end(val.size());
+                size_t start = slice_.get_start(val.size());
+                size_t end = slice_.get_end(val.size());
                 for (size_t j = start; j < end; j += slice_.step())
                 {
                     if (j < val.size())
@@ -450,8 +450,8 @@ class jsonpath_evaluator : private ser_context
         {
             if (val.is_array())
             {
-                size_t start = slice_.start(val.size());
-                size_t end = slice_.end(val.size());
+                size_t start = slice_.get_start(val.size());
+                size_t end = slice_.get_end(val.size());
 
                 size_t j = end + slice_.step() - 1;
                 while (j > (start+slice_.step()-1))
@@ -470,13 +470,6 @@ class jsonpath_evaluator : private ser_context
 
     default_parse_error_handler default_err_handler_;
     path_state state_;
-    size_t start_;
-    bool is_start_positive_;
-    size_t end_;
-    bool is_end_positive_;
-    bool is_end_defined_;
-    size_t step_;
-    bool is_step_positive_;
     bool recursive_descent_;
     node_set nodes_;
     std::vector<node_set> stack_;
@@ -495,9 +488,6 @@ class jsonpath_evaluator : private ser_context
 public:
     jsonpath_evaluator()
         : state_(path_state::start),
-          start_(0), is_start_positive_(true), 
-          end_(0), is_end_positive_(true), is_end_defined_(false),
-          step_(0), is_step_positive_(true),
           recursive_descent_(false),
           line_(0), column_(0),
           begin_input_(nullptr), end_input_(nullptr),
@@ -636,7 +626,7 @@ public:
 
         recursive_descent_ = false;
 
-        clear_index();
+        array_slice slice;
 
         while (p_ < end_input_)
         {
@@ -709,7 +699,7 @@ public:
                                 buffer.clear();
                                 transfer_nodes();
                             }
-                            start_ = 0;
+                            slice.start_ = 0;
                             state_ = path_state::left_bracket;
                             state_stack_.push_back(path_state::left_bracket);
                             break;
@@ -1060,7 +1050,7 @@ public:
                     }
                     break;                   
                 case ':':
-                    clear_index();
+                    slice = array_slice();
                     buffer.clear();
                     state_ = path_state::left_bracket_end;
                     ++p_;
@@ -1083,7 +1073,7 @@ public:
                     ++column_;
                     break;
                 default:
-                    clear_index();
+                    slice = array_slice();
                     buffer.clear();
                     buffer.push_back(*p_);
                     state_ = path_state::left_bracket_start;
@@ -1126,7 +1116,7 @@ public:
                     ++column_;
                     break;
                 default:
-                    clear_index();
+                    slice = array_slice();
                     buffer.clear();
                     buffer.push_back(*p_);
                     state_ = path_state::left_bracket_start;
@@ -1139,7 +1129,7 @@ public:
                 switch (*p_)
                 {
                 case ':':
-                    if (!try_string_to_index(buffer.data(), buffer.size(), &start_, &is_start_positive_))
+                    if (!try_string_to_index(buffer.data(), buffer.size(), &slice.start_, &slice.is_start_positive))
                     {
                         ec = jsonpath_errc::expected_index;
                         return;
@@ -1178,24 +1168,24 @@ public:
                 switch (*p_)
                 {
                 case '-':
-                    is_end_positive_ = false;
+                    slice.is_end_positive = false;
                     state_ = path_state::left_bracket_end2;
                     break;
                 case ':':
-                    step_ = 0;
+                    slice.step_ = 0;
                     state_ = path_state::left_bracket_step;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    is_end_defined_ = true;
-                    end_ = static_cast<size_t>(*p_-'0');
+                    slice.is_end_defined = true;
+                    slice.end_ = static_cast<size_t>(*p_-'0');
                     state_ = path_state::left_bracket_end2;
                     break;
                 case ',':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(array_slice(start_,is_start_positive_,end_,is_end_positive_,is_end_defined_,step_,is_step_positive_)));
+                    selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(array_slice(start_,is_start_positive_,end_,is_end_positive_,is_end_defined_,step_,is_step_positive_)));
+                    selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
                     apply_selectors();
                     state_ = path_state::expect_dot_or_left_bracket;
 
@@ -1214,19 +1204,19 @@ public:
                 switch (*p_)
                 {
                 case ':':
-                    step_ = 0;
+                    slice.step_ = 0;
                     state_ = path_state::left_bracket_step;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    is_end_defined_ = true;
-                    end_ = end_*10 + static_cast<size_t>(*p_-'0');
+                    slice.is_end_defined = true;
+                    slice.end_ = slice.end_*10 + static_cast<size_t>(*p_-'0');
                     break;
                 case ',':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(array_slice(start_,is_start_positive_,end_,is_end_positive_,is_end_defined_,step_,is_step_positive_)));
+                    selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(array_slice(start_,is_start_positive_,end_,is_end_positive_,is_end_defined_,step_,is_step_positive_)));
+                    selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
                     apply_selectors();
                     state_ = path_state::expect_dot_or_left_bracket;
                     JSONCONS_ASSERT(state_stack_.size() > 0 && state_stack_.back() == path_state::left_bracket);
@@ -1240,19 +1230,19 @@ public:
                 switch (*p_)
                 {
                 case '-':
-                    is_step_positive_ = false;
+                    slice.is_step_positive = false;
                     state_ = path_state::left_bracket_step2;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    step_ = static_cast<size_t>(*p_-'0');
+                    slice.step_ = static_cast<size_t>(*p_-'0');
                     state_ = path_state::left_bracket_step2;
                     break;
                 case ',':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(array_slice(start_,is_start_positive_,end_,is_end_positive_,is_end_defined_,step_,is_step_positive_)));
+                    selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(array_slice(start_,is_start_positive_,end_,is_end_positive_,is_end_defined_,step_,is_step_positive_)));
+                    selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
                     apply_selectors();
                     state_ = path_state::expect_dot_or_left_bracket;
                     JSONCONS_ASSERT(state_stack_.size() > 0 && state_stack_.back() == path_state::left_bracket);
@@ -1266,14 +1256,14 @@ public:
                 switch (*p_)
                 {
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    step_ = step_*10 + static_cast<size_t>(*p_-'0');
+                    slice.step_ = slice.step_*10 + static_cast<size_t>(*p_-'0');
                     break;
                 case ',':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(array_slice(start_,is_start_positive_,end_,is_end_positive_,is_end_defined_,step_,is_step_positive_)));
+                    selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(array_slice(start_,is_start_positive_,end_,is_end_positive_,is_end_defined_,step_,is_step_positive_)));
+                    selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
                     apply_selectors();
                     state_ = path_state::expect_dot_or_left_bracket;
                     JSONCONS_ASSERT(state_stack_.size() > 0 && state_stack_.back() == path_state::left_bracket);
@@ -1290,7 +1280,7 @@ public:
                     apply_unquoted_string(buffer);
                     buffer.clear();
                     transfer_nodes();
-                    start_ = 0;
+                    slice.start_ = 0;
                     state_ = path_state::left_bracket;
                     state_stack_.push_back(path_state::left_bracket);
                     break;
@@ -1398,17 +1388,6 @@ public:
         JSONCONS_ASSERT(state_stack_.size() == 0);
     }
 
-    void clear_index()
-    {
-        start_ = 0;
-        is_start_positive_ = true;
-        end_ = 0;
-        is_end_positive_ = true;
-        is_end_defined_ = false;
-        step_ = 1;
-        is_step_positive_ = true;
-    }
-
     void end_all()
     {
         for (size_t i = 0; i < stack_.back().size(); ++i)
@@ -1432,7 +1411,6 @@ public:
             }
 
         }
-        start_ = 0;
     }
 
     void apply_unquoted_string(const string_view_type& name)
@@ -1468,6 +1446,7 @@ public:
         else if (val.is_array())
         {
             size_t pos = 0;
+            bool is_start_positive_;
             if (try_string_to_index(name.data(),name.size(),&pos, &is_start_positive_))
             {
                 size_t index = is_start_positive_ ? pos : val.size() - pos;
@@ -1496,6 +1475,7 @@ public:
         {
             string_view_type sv = val.as_string_view();
             size_t pos = 0;
+            bool is_start_positive_;
             if (try_string_to_index(name.data(),name.size(),&pos, &is_start_positive_))
             {
                 auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), pos);
