@@ -319,6 +319,12 @@ class jsonpath_evaluator : private ser_context
                     {
                         std::cout << *ptr << "\n";
                     }
+                    std::cout << "--\n";
+                    e.evaluate(val, name_, ec);
+                    for (auto ptr : e.get_pointers())
+                    {
+                        std::cout << *ptr << "\n";
+                    }
                 }
                 std::cout << "-----------\n";
             }
@@ -600,7 +606,7 @@ public:
             ec = jsonpath_errc::unidentified_error;
         }
     }
-
+ 
     void evaluate(reference root, 
                   const char_type* path, 
                   size_t length,
@@ -1276,9 +1282,15 @@ public:
         }
         switch (state_)
         {
-        case path_state::unquoted_name: 
+            case path_state::unquoted_name: 
+                {
+                    apply_unquoted_string(buffer_);
+                    transfer_nodes();
+                }
+                break;
+            case path_state::function_name: 
             {
-                apply_unquoted_string(buffer_);
+                apply_unquoted_string(function_name);
                 transfer_nodes();
             }
             break;
