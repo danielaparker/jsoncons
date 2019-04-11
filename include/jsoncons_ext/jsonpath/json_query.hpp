@@ -241,7 +241,7 @@ class jsonpath_evaluator : private ser_context
             }
             else if (index.is_string())
             {
-                name_selector selector(index.as_string_view(),true);
+                name_selector selector(index.as_string_view());
                 selector.select(evaluator, node, path, val, nodes);
             }
         }
@@ -293,10 +293,9 @@ class jsonpath_evaluator : private ser_context
     {
     private:
         string_type name_;
-        bool positive_start_;
     public:
-        name_selector(const string_view_type& name, bool positive_start)
-            : name_(name), positive_start_(positive_start)
+        name_selector(const string_view_type& name)
+            : name_(name)
         {
         }
 
@@ -304,6 +303,7 @@ class jsonpath_evaluator : private ser_context
                     node_type&, const string_type& path, reference val,
                     node_set& nodes) override
         {
+            bool positive_start = true;
             if (val.is_object() && val.contains(name_))
             {
                 std::cout << "--- val: " << val << ", name: " << name_ << "\n";
@@ -336,9 +336,9 @@ class jsonpath_evaluator : private ser_context
             else if (val.is_array())
             {
                 size_t pos = 0;
-                if (try_string_to_index(name_.data(), name_.size(), &pos, &positive_start_))
+                if (try_string_to_index(name_.data(), name_.size(), &pos, &positive_start))
                 {
-                    size_t index = positive_start_ ? pos : val.size() - pos;
+                    size_t index = positive_start ? pos : val.size() - pos;
                     if (index < val.size())
                     {
                         nodes.emplace_back(PathCons()(path,index),std::addressof(val[index]));
@@ -354,9 +354,9 @@ class jsonpath_evaluator : private ser_context
             {
                 size_t pos = 0;
                 string_view_type sv = val.as_string_view();
-                if (try_string_to_index(name_.data(), name_.size(), &pos, &positive_start_))
+                if (try_string_to_index(name_.data(), name_.size(), &pos, &positive_start))
                 {
-                    size_t index = positive_start_ ? pos : sv.size() - pos;
+                    size_t index = positive_start ? pos : sv.size() - pos;
                     auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), index);
                     if (sequence.length() > 0)
                     {
@@ -1074,13 +1074,13 @@ public:
                     state_ = path_state::left_bracket_end;
                     break;
                 case ',':
-                    selectors_.push_back(make_unique_ptr<name_selector>(buffer_,positive_start_));
+                    selectors_.push_back(make_unique_ptr<name_selector>(buffer_));
                     //selectors_.push_back(make_unique_ptr<path_selector>(buffer_));
                     buffer_.clear();
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(make_unique_ptr<name_selector>(buffer_,positive_start_));
+                    selectors_.push_back(make_unique_ptr<name_selector>(buffer_));
                     buffer_.clear();
                     apply_selectors();
                     state_ = path_state::expect_dot_or_left_bracket;
@@ -1230,7 +1230,7 @@ public:
                 switch (*p_)
                 {
                 case '\'':
-                    selectors_.push_back(make_unique_ptr<name_selector>(buffer_,positive_start_));
+                    selectors_.push_back(make_unique_ptr<name_selector>(buffer_));
                     buffer_.clear();
                     state_ = path_state::expect_comma_or_right_bracket;
                     break;
@@ -1254,7 +1254,7 @@ public:
                 switch (*p_)
                 {
                 case '\"':
-                    selectors_.push_back(make_unique_ptr<name_selector>(buffer_,positive_start_));
+                    selectors_.push_back(make_unique_ptr<name_selector>(buffer_));
                     buffer_.clear();
                     state_ = path_state::expect_comma_or_right_bracket;
                     break;
