@@ -493,9 +493,7 @@ public:
             return;
         }
 
-        string_type s;
-        s.push_back('$');
-
+        string_type s = {'$'};
         node_set v;
         pointer ptr = create_temp(std::move(result));
         v.emplace_back(s,ptr);
@@ -575,6 +573,11 @@ public:
         column_ = 1;
         state_ = path_state::start;
 
+        string_type s = {'$'};
+        node_set v;
+        v.emplace_back(std::move(s),std::addressof(root));
+        stack_.push_back(v);
+
         recursive_descent_ = false;
 
         clear_index();
@@ -610,12 +613,6 @@ public:
                             break;
                         case '$':
                         {
-                            string_type s;
-                            s.push_back(*p_);
-                            node_set v;
-                            v.emplace_back(std::move(s),std::addressof(root));
-                            stack_.push_back(v);
-
                             state_ = path_state::expect_dot_or_left_bracket;
                             break;
                         }
@@ -646,6 +643,42 @@ public:
                         case '(':
                             state_ = path_state::expect_arg_or_right_round_bracket;
                             break;
+                        case '[':
+                        {
+                            apply_unquoted_string(function_name);
+                            transfer_nodes();
+                            start_ = 0;
+                            state_ = path_state::left_bracket;
+                            break;
+                        }
+                        case '.':
+                        {
+                            apply_unquoted_string(function_name);
+                            transfer_nodes();
+                            state_ = path_state::dot;
+                            break;
+                        }
+                        case ' ':case '\t':
+                        {
+                            apply_unquoted_string(function_name);
+                            transfer_nodes();
+                            state_ = path_state::expect_dot_or_left_bracket;
+                            break;
+                        }
+                        case '\'':
+                        {
+                            state_ = path_state::left_bracket_single_quoted_string;
+                            ++p_;
+                            ++column_;
+                            break;
+                        }
+                        case '\"':
+                        {
+                            state_ = path_state::left_bracket_double_quoted_string;
+                            ++p_;
+                            ++column_;
+                            break;
+                        }
                         default:
                             function_name.push_back(*p_);
                             break;

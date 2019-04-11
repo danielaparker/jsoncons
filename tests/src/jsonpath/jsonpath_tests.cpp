@@ -180,11 +180,13 @@ TEST_CASE("test_path")
     json root = json::parse(jsonpath_fixture::store_text());
 
     json result = json_query(root,"$.store.book");
+    json result2 = json_query(root,"store.book");
 
     json expected = json::array();
     expected.push_back(fixture.book());
 
     CHECK(result == expected);
+    CHECK(result2 == expected);
 
     //std::cout << pretty_print(result) << std::endl;
 }
