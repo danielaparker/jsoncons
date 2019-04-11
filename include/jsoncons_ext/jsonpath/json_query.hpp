@@ -191,6 +191,31 @@ class jsonpath_evaluator : private ser_context
                             node_type& node, const string_type& path, reference val, node_set& nodes) = 0;
     };
 
+    class path_selector final : public selector
+    {
+    private:
+         std::basic_string<char_type> path_;
+    public:
+        path_selector(const std::basic_string<char_type>& path)
+            : path_(path)
+        {
+            path_.insert(0,1,'$');
+        }
+
+        void select(jsonpath_evaluator&,
+                    node_type&, const string_type& path, reference val, 
+                    node_set& nodes) override
+        {
+            std::error_code ec;
+            jsonpath_evaluator<Json,JsonReference,PathCons> e;
+            e.evaluate(val, path_, ec);
+            for (auto ptr : e.get_pointers())
+            {
+                nodes.emplace_back(PathCons()(path,path_),ptr);
+            }
+        }
+    };
+
     class expr_selector final : public selector
     {
     private:
@@ -279,6 +304,25 @@ class jsonpath_evaluator : private ser_context
                     node_type&, const string_type& path, reference val,
                     node_set& nodes) override
         {
+            if (val.is_object() && val.contains(name_))
+            {
+                std::cout << "--- val: " << val << ", name: " << name_ << "\n";
+                std::error_code ec;
+                if (!ec)
+                {
+                    jsonpath_evaluator<Json,JsonReference,PathCons> e;
+                    std::basic_string<char_type> s(name_);
+                    s.insert(0, 1, '.');
+                    s.insert(0, 1, '$');
+                    e.evaluate(val, s, ec);
+                    for (auto ptr : e.get_pointers())
+                    {
+                        std::cout << *ptr << "\n";
+                    }
+                }
+                std::cout << "-----------\n";
+            }
+
             if (val.is_object() && val.contains(name_))
             {
                 nodes.emplace_back(PathCons()(path,name_),std::addressof(val.at(name_)));
@@ -992,6 +1036,7 @@ public:
                     break;
                 case ',':
                     selectors_.push_back(make_unique_ptr<name_selector>(buffer_,positive_start_));
+                    //selectors_.push_back(make_unique_ptr<path_selector>(buffer_));
                     buffer_.clear();
                     state_ = path_state::left_bracket;
                     break;
