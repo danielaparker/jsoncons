@@ -199,7 +199,6 @@ class jsonpath_evaluator : private ser_context
         path_selector(const std::basic_string<char_type>& path)
             : path_(path)
         {
-            path_.insert(0,1,'$');
         }
 
         void select(jsonpath_evaluator&,
@@ -209,9 +208,12 @@ class jsonpath_evaluator : private ser_context
             std::error_code ec;
             jsonpath_evaluator<Json,JsonReference,PathCons> e;
             e.evaluate(val, path_, ec);
-            for (auto ptr : e.get_pointers())
+            if (!ec)
             {
-                nodes.emplace_back(PathCons()(path,path_),ptr);
+                for (auto ptr : e.get_pointers())
+                {
+                    nodes.emplace_back(PathCons()(path,path_),ptr);
+                }
             }
         }
     };
@@ -304,30 +306,6 @@ class jsonpath_evaluator : private ser_context
                     node_set& nodes) override
         {
             bool positive_start = true;
-            if (val.is_object() && val.contains(name_))
-            {
-                std::cout << "--- val: " << val << ", name: " << name_ << "\n";
-                std::error_code ec;
-                if (!ec)
-                {
-                    jsonpath_evaluator<Json,JsonReference,PathCons> e;
-                    std::basic_string<char_type> s(name_);
-                    s.insert(0, 1, '.');
-                    s.insert(0, 1, '$');
-                    e.evaluate(val, s, ec);
-                    for (auto ptr : e.get_pointers())
-                    {
-                        std::cout << *ptr << "\n";
-                    }
-                    std::cout << "--\n";
-                    e.evaluate(val, name_, ec);
-                    for (auto ptr : e.get_pointers())
-                    {
-                        std::cout << *ptr << "\n";
-                    }
-                }
-                std::cout << "-----------\n";
-            }
 
             if (val.is_object() && val.contains(name_))
             {
@@ -465,7 +443,6 @@ class jsonpath_evaluator : private ser_context
 
     default_parse_error_handler default_err_handler_;
     path_state state_;
-    string_type buffer_;
     size_t start_;
     bool positive_start_;
     size_t end_;
@@ -613,6 +590,7 @@ public:
                   std::error_code& ec)
     {
         string_type function_name;
+        string_type buffer;
         path_state pre_line_break_state = path_state::start;
 
         begin_input_ = path;
@@ -676,7 +654,7 @@ public:
                                     return;
                                 default: // might be function, validate name later
                                     state_ = path_state::function_name;
-                                    function_name.push_back(*p_);
+                                    buffer.push_back(*p_);
                                     break;
                             }
                             break;
@@ -692,10 +670,13 @@ public:
                     {
                         case '(':
                             state_ = path_state::expect_arg_or_right_round_bracket;
+                            function_name = std::move(buffer);
+                            buffer.clear();
                             break;
                         case '[':
                         {
-                            apply_unquoted_string(function_name);
+                            apply_unquoted_string(buffer);
+                            buffer.clear();
                             transfer_nodes();
                             start_ = 0;
                             state_ = path_state::left_bracket;
@@ -703,14 +684,16 @@ public:
                         }
                         case '.':
                         {
-                            apply_unquoted_string(function_name);
+                            apply_unquoted_string(buffer);
+                            buffer.clear();
                             transfer_nodes();
                             state_ = path_state::dot;
                             break;
                         }
                         case ' ':case '\t':
                         {
-                            apply_unquoted_string(function_name);
+                            apply_unquoted_string(buffer);
+                            buffer.clear();
                             transfer_nodes();
                             state_ = path_state::expect_dot_or_left_bracket;
                             break;
@@ -730,7 +713,7 @@ public:
                             break;
                         }
                         default:
-                            function_name.push_back(*p_);
+                            buffer.push_back(*p_);
                             break;
                     }
                     ++p_;
@@ -743,22 +726,22 @@ public:
                         case '\t':
                             break;
                         case '$':
-                            buffer_.clear();
-                            buffer_.push_back(*p_);
+                            buffer.clear();
+                            buffer.push_back(*p_);
                             state_ = path_state::path_argument;
                             break;
                         case '\'':
-                            buffer_.clear();
-                            buffer_.push_back('\"');
+                            buffer.clear();
+                            buffer.push_back('\"');
                             state_ = path_state::single_quoted_argument;
                             break;
                         case '\"':
-                            buffer_.clear();
-                            buffer_.push_back('\"');
+                            buffer.clear();
+                            buffer.push_back('\"');
                             state_ = path_state::double_quoted_argument;
                             break;
                         default:
-                            buffer_.clear();
+                            buffer.clear();
                             state_ = path_state::unquoted_argument;
                             break;
                     }
@@ -771,7 +754,7 @@ public:
                         case ',':
                         {
                             jsonpath_evaluator<Json, JsonReference, PathCons> evaluator;
-                            evaluator.evaluate(root, buffer_, ec);
+                            evaluator.evaluate(root, buffer, ec);
                             if (ec)
                             {
                                 return;
@@ -783,7 +766,7 @@ public:
                         case ')':
                         {
                             jsonpath_evaluator<Json,JsonReference,PathCons> evaluator;
-                            evaluator.evaluate(root, buffer_, ec);
+                            evaluator.evaluate(root, buffer, ec);
                             if (ec)
                             {
                                 return;
@@ -800,7 +783,7 @@ public:
                             break;
                         }
                         default:
-                            buffer_.push_back(*p_);
+                            buffer.push_back(*p_);
                             break;
                     }
                     ++p_;
@@ -812,7 +795,7 @@ public:
                         case ',':
                             try
                             {
-                                auto val = Json::parse(buffer_);
+                                auto val = Json::parse(buffer);
                                 auto temp = create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
@@ -821,14 +804,14 @@ public:
                                 ec = jsonpath_errc::argument_parse_error;
                                 return;
                             }
-                            buffer_.clear();
+                            buffer.clear();
                             state_ = path_state::expect_arg_or_right_round_bracket;
                             break;
                         case ')':
                         {
                             try
                             {
-                                auto val = Json::parse(buffer_);
+                                auto val = Json::parse(buffer);
                                 auto temp = create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
@@ -846,7 +829,7 @@ public:
                             break;
                         }
                         default:
-                            buffer_.push_back(*p_);
+                            buffer.push_back(*p_);
                             break;
                     }
                     ++p_;
@@ -856,11 +839,11 @@ public:
                     switch (*p_)
                     {
                         case '\'':
-                            buffer_.push_back('\"');
+                            buffer.push_back('\"');
                             state_ = path_state::expect_more_args_or_right_round_bracket;
                             break;
                         default:
-                            buffer_.push_back(*p_);
+                            buffer.push_back(*p_);
                             break;
                     }
                     ++p_;
@@ -870,11 +853,11 @@ public:
                     switch (*p_)
                     {
                         case '\"':
-                            buffer_.push_back('\"');
+                            buffer.push_back('\"');
                             state_ = path_state::expect_more_args_or_right_round_bracket;
                             break;
                         default:
-                            buffer_.push_back(*p_);
+                            buffer.push_back(*p_);
                             break;
                     }
                     ++p_;
@@ -889,7 +872,7 @@ public:
                         case ',':
                             try
                             {
-                                auto val = Json::parse(buffer_);
+                                auto val = Json::parse(buffer);
                                 auto temp = create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
@@ -898,14 +881,14 @@ public:
                                 ec = jsonpath_errc::argument_parse_error;
                                 return;
                             }
-                            buffer_.clear();
+                            buffer.clear();
                             state_ = path_state::expect_arg_or_right_round_bracket;
                             break;
                         case ')':
                         {
                             try
                             {
-                                auto val = Json::parse(buffer_);
+                                auto val = Json::parse(buffer);
                                 auto temp = create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
@@ -962,7 +945,7 @@ public:
                         ++column_;
                         break;
                     default:
-                        buffer_.clear();
+                        buffer.clear();
                         state_ = path_state::unquoted_name;
                         break;
                     }
@@ -1033,6 +1016,7 @@ public:
                     break;                   
                 case ':':
                     clear_index();
+                    buffer.clear();
                     state_ = path_state::left_bracket_end;
                     ++p_;
                     ++column_;
@@ -1055,7 +1039,8 @@ public:
                     break;
                 default:
                     clear_index();
-                    buffer_.push_back(*p_);
+                    buffer.clear();
+                    buffer.push_back(*p_);
                     state_ = path_state::left_bracket_start;
                     ++p_;
                     ++column_;
@@ -1066,27 +1051,28 @@ public:
                 switch (*p_)
                 {
                 case ':':
-                    if (!try_string_to_index(buffer_.data(), buffer_.size(), &start_, &positive_start_))
+                    if (!try_string_to_index(buffer.data(), buffer.size(), &start_, &positive_start_))
                     {
                         ec = jsonpath_errc::expected_index;
                         return;
                     }
                     state_ = path_state::left_bracket_end;
                     break;
-                case ',':
-                    selectors_.push_back(make_unique_ptr<name_selector>(buffer_));
-                    //selectors_.push_back(make_unique_ptr<path_selector>(buffer_));
-                    buffer_.clear();
+                case ',': 
+                    //selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                    selectors_.push_back(make_unique_ptr<path_selector>(buffer));
+                    buffer.clear();
                     state_ = path_state::left_bracket;
                     break;
-                case ']':
-                    selectors_.push_back(make_unique_ptr<name_selector>(buffer_));
-                    buffer_.clear();
+                case ']': 
+                    //selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                    selectors_.push_back(make_unique_ptr<path_selector>(buffer));
+                    buffer.clear();
                     apply_selectors();
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 default:
-                    buffer_.push_back(*p_);
+                    buffer.push_back(*p_);
                     break;
                 }
                 ++p_;
@@ -1192,35 +1178,40 @@ public:
                 switch (*p_)
                 {
                 case '[':
-                    apply_unquoted_string(buffer_);
+                    apply_unquoted_string(buffer);
+                    buffer.clear();
                     transfer_nodes();
                     start_ = 0;
                     state_ = path_state::left_bracket;
                     break;
                 case '.':
-                    apply_unquoted_string(buffer_);
+                    apply_unquoted_string(buffer);
+                    buffer.clear();
                     transfer_nodes();
                     state_ = path_state::dot;
                     break;
                 case ' ':case '\t':
-                    apply_unquoted_string(buffer_);
+                    apply_unquoted_string(buffer);
+                    buffer.clear();
                     transfer_nodes();
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 case '\r':
-                    apply_unquoted_string(buffer_);
+                    apply_unquoted_string(buffer);
+                    buffer.clear();
                     transfer_nodes();
                     pre_line_break_state = path_state::expect_dot_or_left_bracket;
                     state_= path_state::cr;
                     break;
                 case '\n':
-                    apply_unquoted_string(buffer_);
+                    apply_unquoted_string(buffer);
+                    buffer.clear();
                     transfer_nodes();
                     pre_line_break_state = path_state::expect_dot_or_left_bracket;
                     state_= path_state::lf;
                     break;
                 default:
-                    buffer_.push_back(*p_);
+                    buffer.push_back(*p_);
                     break;
                 };
                 ++p_;
@@ -1230,21 +1221,21 @@ public:
                 switch (*p_)
                 {
                 case '\'':
-                    selectors_.push_back(make_unique_ptr<name_selector>(buffer_));
-                    buffer_.clear();
+                    selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                    buffer.clear();
                     state_ = path_state::expect_comma_or_right_bracket;
                     break;
                 case '\\':
-                    buffer_.push_back(*p_);
+                    buffer.push_back(*p_);
                     if (p_+1 < end_input_)
                     {
                         ++p_;
                         ++column_;
-                        buffer_.push_back(*p_);
+                        buffer.push_back(*p_);
                     }
                     break;
                 default:
-                    buffer_.push_back(*p_);
+                    buffer.push_back(*p_);
                     break;
                 };
                 ++p_;
@@ -1254,21 +1245,21 @@ public:
                 switch (*p_)
                 {
                 case '\"':
-                    selectors_.push_back(make_unique_ptr<name_selector>(buffer_));
-                    buffer_.clear();
+                    selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                    buffer.clear();
                     state_ = path_state::expect_comma_or_right_bracket;
                     break;
                 case '\\':
-                    buffer_.push_back(*p_);
+                    buffer.push_back(*p_);
                     if (p_+1 < end_input_)
                     {
                         ++p_;
                         ++column_;
-                        buffer_.push_back(*p_);
+                        buffer.push_back(*p_);
                     }
                     break;
                 default:
-                    buffer_.push_back(*p_);
+                    buffer.push_back(*p_);
                     break;
                 };
                 ++p_;
@@ -1283,25 +1274,20 @@ public:
         switch (state_)
         {
             case path_state::unquoted_name: 
-                {
-                    apply_unquoted_string(buffer_);
-                    transfer_nodes();
-                }
-                break;
             case path_state::function_name: 
             {
-                apply_unquoted_string(function_name);
+                apply_unquoted_string(buffer);
+                buffer.clear();
                 transfer_nodes();
             }
             break;
-        default:
-            break;
+            default:
+                break;
         }
     }
 
     void clear_index()
     {
-        buffer_.clear();
         start_ = 0;
         positive_start_ = true;
         end_ = 0;
@@ -1346,7 +1332,6 @@ public:
                 apply_unquoted_string(stack_.back()[i].path, *(stack_.back()[i].val_ptr), name);
             }
         }
-        buffer_.clear();
     }
 
     void apply_unquoted_string(const string_type& path, reference val, const string_view_type& name)

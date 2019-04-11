@@ -639,7 +639,7 @@ TEST_CASE("test_jsonpath_store_book_tests2")
     json expected1 = json::array();
     expected1.push_back("Nigel Rees");
     expected1.push_back("Evelyn Waugh");
-    CHECK(expected1 == result1);
+    CHECK(result1 == expected1);
 
     json result1b = json_query(root,"$.store.book[ ?((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) ].title");
     json expected1b = json::array();
@@ -652,12 +652,12 @@ TEST_CASE("test_jsonpath_store_book_tests2")
     json expected2 = json::array();
     expected2.push_back("Nigel Rees");
     expected2.push_back("Evelyn Waugh");
-    CHECK(expected2 == result2);
+    CHECK(result2 == expected2);
 
     json result3 = json_query(root,"$.store.book[ ?(((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) && (@.category == 'reference')) ].author");
     json expected3 = json::array();
     expected3.push_back("Nigel Rees");
-    CHECK(expected3 == result3);
+    CHECK(result3 == expected3);
 
     json result4 = json_query(root,"$.store.book[ ?(((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) && (@.category != 'fiction')) ].author");
     json expected4 = json::array();
@@ -688,7 +688,7 @@ TEST_CASE("test_jsonpath_store_book_regex")
     expected3.push_back("Evelyn Waugh");
     expected3.push_back("Herman Melville");
     expected3.push_back("J. R. R. Tolkien");
-    CHECK(expected3 == result3);
+    CHECK(result3 == expected3);
 
     json result4 = json_query(root,"$.store.book[ ?(@.author =~ /Evelyn.*?/)].author");
     json expected4 = json::array();
@@ -817,7 +817,7 @@ TEST_CASE("test_jsonpath_next_to_last_of_two_arrays")
     )");
     std::string path2 = "$..[0].author";
     json result2 = json_query(val, path2);
-    CHECK(expected2 == result2);
+    CHECK(result2 == expected2);
 
 }
 
@@ -919,7 +919,7 @@ TEST_CASE("test_jsonpath_aggregation3")
 )");
 
     json result2 = json_query(val, "$..['type','number']");
-    CHECK(expected2 == result2);
+    CHECK(result2 == expected2);
 }
 
 TEST_CASE("test_jsonpath_aggregation4")
@@ -958,7 +958,7 @@ TEST_CASE("test_jsonpath_aggregation4")
     //std::cout << test3 << std::endl;
 
     json result2 = json_query(val, "$.phoneNumbers..['type','number']");
-    CHECK(expected2 == result2);
+    CHECK(result2 == expected2);
 }
 
 TEST_CASE("test_jsonpath_string_indexation")
@@ -968,15 +968,15 @@ TEST_CASE("test_jsonpath_string_indexation")
 
     json expected1 = json::array(1,"I");
     json result1 = json_query(val, "$..about[0]");
-    CHECK(expected1 == result1);
+    CHECK(result1 == expected1);
 
     json expected2 = json::array(1,"\xe2\x82\xac");
     json result2 = json_query(val, "$..about[1]");
-    CHECK(expected2 == result2);
+    CHECK(result2 == expected2);
 
     json expected3 = json::array(1,"J");
     json result3 = json_query(val, "$..about[2]");
-    CHECK(expected3 == result3);
+    CHECK(result3 == expected3);
 
     json expected4 = json::array(1,3);
     json result4 = json_query(val, "$..about.length");
@@ -1016,7 +1016,7 @@ TEST_CASE("test_union_array_elements")
 ]
     )");
     json result1 = json_query(val, "$..book[-1]");
-    CHECK(expected1 == result1);
+    CHECK(result1 == expected1);
 
     json expected2 = json::parse(R"(
 [
@@ -1035,11 +1035,11 @@ TEST_CASE("test_union_array_elements")
 ]
     )");
     json result2 = json_query(val, "$..book[-1,-3]");
-    CHECK(expected2 == result2);
+    CHECK(result2 == expected2);
 
     json expected3 = expected2;
     json result3 = json_query(val, "$..book[-1,(@.length - 3)]");
-    CHECK(expected3 == result3);
+    CHECK(result3 == expected3);
 
     json expected4 = expected2;
     json result4 = json_query(val, "$..book[(@.length - 1),-3]");
@@ -1058,11 +1058,11 @@ TEST_CASE("test_array_slice_operator")
    "Evelyn Waugh"
 ]
     )");
-    CHECK(expected1 == result1);
+    CHECK(result1 == expected1);
 
     json result2 = json_query(root,"$..book[1:3:2].author");
     json expected2 = expected1;
-    CHECK(expected2 == result2);
+    CHECK(result2 == expected2);
 
     json result3 = json_query(root,"$..book[1:4:2].author");
     json expected3 = json::parse(R"(
@@ -1071,7 +1071,7 @@ TEST_CASE("test_array_slice_operator")
    "J. R. R. Tolkien"
 ]    
     )");
-    CHECK(expected3 == result3);
+    CHECK(result3 == expected3);
 
     json result4 = json_query(root,"$..book[1:4:2,0].author");
     json expected4 = json::parse(R"(
