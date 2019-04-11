@@ -23,6 +23,59 @@
 
 namespace jsoncons { namespace jsonpath {
 
+struct array_slice
+{
+    size_t start_;
+    bool is_start_positive;
+    size_t end_;
+    bool is_end_positive;
+    bool is_end_defined;
+    size_t step_;
+    bool is_step_positive;
+
+    array_slice()
+        : start_(0), is_start_positive(true), 
+          end_(0), is_end_positive(true), is_end_defined(false), 
+          step_(1), is_step_positive(true)
+    {
+    }
+
+    array_slice(size_t start, bool is_start_positive, 
+                size_t end, bool is_end_positive, bool is_end_defined,
+                size_t step, bool is_step_positive)
+        : start_(start), is_start_positive(is_start_positive), 
+          end_(end), is_end_positive(is_end_positive), is_end_defined(is_end_defined), 
+          step_(step), is_step_positive(is_step_positive)
+    {
+    }
+
+    size_t start(size_t size) const
+    {
+        return is_start_positive ? start_ : size - start_;
+    }
+
+    size_t end(size_t size) const
+    {
+        if (is_end_defined)
+        {
+            return is_end_positive ? end_ : size - end_;
+        }
+        else
+        {
+            return size;
+        }
+    }
+
+    size_t step() const
+    {
+        return step_;
+    }
+
+    array_slice(const array_slice&) = default;
+
+    array_slice& operator=(const array_slice&) = default;
+};
+
 // work around for std::make_unique not being available until C++14
 template<typename T, typename... Args>
 std::unique_ptr<T> make_unique_ptr(Args&&... args)
@@ -124,9 +177,10 @@ enum class path_state
     expect_dot_or_left_bracket,
     expect_unquoted_name_or_left_bracket,
     unquoted_name,
-    left_bracket_single_quoted_string,
-    left_bracket_double_quoted_string,
+    left_bracket_single_quoted,
+    left_bracket_double_quoted,
     left_bracket,
+    left_bracket_union,
     left_bracket_start,
     left_bracket_end,
     left_bracket_end2,
@@ -138,7 +192,7 @@ enum class path_state
     path_argument,
     unquoted_argument,
     single_quoted_argument,
-    double_quoted_argument,
+    dquote_argument,
     expect_more_args_or_right_round_bracket,
     dot
 };
@@ -305,7 +359,7 @@ class jsonpath_evaluator : private ser_context
                     node_type&, const string_type& path, reference val,
                     node_set& nodes) override
         {
-            bool positive_start = true;
+            bool is_start_positive = true;
 
             if (val.is_object() && val.contains(name_))
             {
@@ -314,9 +368,9 @@ class jsonpath_evaluator : private ser_context
             else if (val.is_array())
             {
                 size_t pos = 0;
-                if (try_string_to_index(name_.data(), name_.size(), &pos, &positive_start))
+                if (try_string_to_index(name_.data(), name_.size(), &pos, &is_start_positive))
                 {
-                    size_t index = positive_start ? pos : val.size() - pos;
+                    size_t index = is_start_positive ? pos : val.size() - pos;
                     if (index < val.size())
                     {
                         nodes.emplace_back(PathCons()(path,index),std::addressof(val[index]));
@@ -332,9 +386,9 @@ class jsonpath_evaluator : private ser_context
             {
                 size_t pos = 0;
                 string_view_type sv = val.as_string_view();
-                if (try_string_to_index(name_.data(), name_.size(), &pos, &positive_start))
+                if (try_string_to_index(name_.data(), name_.size(), &pos, &is_start_positive))
                 {
-                    size_t index = positive_start ? pos : sv.size() - pos;
+                    size_t index = is_start_positive ? pos : sv.size() - pos;
                     auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), index);
                     if (sequence.length() > 0)
                     {
@@ -355,21 +409,10 @@ class jsonpath_evaluator : private ser_context
     class array_slice_selector final : public selector
     {
     private:
-        size_t start_;
-        bool positive_start_;
-        size_t end_;
-        bool positive_end_;
-        bool undefined_end_;
-        size_t step_;
-        bool positive_step_;
+        array_slice slice_;
     public:
-        array_slice_selector(size_t start, bool positive_start, 
-                             size_t end, bool positive_end,
-                             size_t step, bool positive_step,
-                             bool undefined_end)
-            : start_(start), positive_start_(positive_start),
-              end_(end), positive_end_(positive_end),undefined_end_(undefined_end),
-              step_(step), positive_step_(positive_step) 
+        array_slice_selector(const array_slice& slice)
+            : slice_(slice) 
         {
         }
 
@@ -377,7 +420,7 @@ class jsonpath_evaluator : private ser_context
                     node_type&, const string_type& path, reference val,
                     node_set& nodes) override
         {
-            if (positive_step_)
+            if (slice_.is_step_positive)
             {
                 end_array_slice1(path, val, nodes);
             }
@@ -391,17 +434,9 @@ class jsonpath_evaluator : private ser_context
         {
             if (val.is_array())
             {
-                size_t start = positive_start_ ? start_ : val.size() - start_;
-                size_t end;
-                if (!undefined_end_)
-                {
-                    end = positive_end_ ? end_ : val.size() - end_;
-                }
-                else
-                {
-                    end = val.size();
-                }
-                for (size_t j = start; j < end; j += step_)
+                size_t start = slice_.start(val.size());
+                size_t end = slice_.end(val.size());
+                for (size_t j = start; j < end; j += slice_.step())
                 {
                     if (j < val.size())
                     {
@@ -415,21 +450,13 @@ class jsonpath_evaluator : private ser_context
         {
             if (val.is_array())
             {
-                size_t start = positive_start_ ? start_ : val.size() - start_;
-                size_t end;
-                if (!undefined_end_)
-                {
-                    end = positive_end_ ? end_ : val.size() - end_;
-                }
-                else
-                {
-                    end = val.size();
-                }
+                size_t start = slice_.start(val.size());
+                size_t end = slice_.end(val.size());
 
-                size_t j = end + step_ - 1;
-                while (j > (start+step_-1))
+                size_t j = end + slice_.step() - 1;
+                while (j > (start+slice_.step()-1))
                 {
-                    j -= step_;
+                    j -= slice_.step();
                     if (j < val.size())
                     {
                         nodes.emplace_back(PathCons()(path,j),std::addressof(val[j]));
@@ -444,12 +471,12 @@ class jsonpath_evaluator : private ser_context
     default_parse_error_handler default_err_handler_;
     path_state state_;
     size_t start_;
-    bool positive_start_;
+    bool is_start_positive_;
     size_t end_;
-    bool positive_end_;
-    bool undefined_end_;
+    bool is_end_positive_;
+    bool is_end_defined_;
     size_t step_;
-    bool positive_step_;
+    bool is_step_positive_;
     bool recursive_descent_;
     node_set nodes_;
     std::vector<node_set> stack_;
@@ -463,13 +490,14 @@ class jsonpath_evaluator : private ser_context
 
     typedef std::vector<pointer> argument_type;
     std::vector<argument_type> function_stack_;
+    std::vector<path_state> state_stack_;
 
 public:
     jsonpath_evaluator()
         : state_(path_state::start),
-          start_(0), positive_start_(true), 
-          end_(0), positive_end_(true), undefined_end_(false),
-          step_(0), positive_step_(true),
+          start_(0), is_start_positive_(true), 
+          end_(0), is_end_positive_(true), is_end_defined_(false),
+          step_(0), is_step_positive_(true),
           recursive_descent_(false),
           line_(0), column_(0),
           begin_input_(nullptr), end_input_(nullptr),
@@ -675,18 +703,25 @@ public:
                             break;
                         case '[':
                         {
-                            apply_unquoted_string(buffer);
-                            buffer.clear();
-                            transfer_nodes();
+                            if (buffer.size() > 0)
+                            {
+                                apply_unquoted_string(buffer);
+                                buffer.clear();
+                                transfer_nodes();
+                            }
                             start_ = 0;
                             state_ = path_state::left_bracket;
+                            state_stack_.push_back(path_state::left_bracket);
                             break;
                         }
                         case '.':
                         {
-                            apply_unquoted_string(buffer);
-                            buffer.clear();
-                            transfer_nodes();
+                            if (buffer.size() > 0)
+                            {
+                                apply_unquoted_string(buffer);
+                                buffer.clear();
+                                transfer_nodes();
+                            }
                             state_ = path_state::dot;
                             break;
                         }
@@ -700,14 +735,14 @@ public:
                         }
                         case '\'':
                         {
-                            state_ = path_state::left_bracket_single_quoted_string;
+                            state_ = path_state::left_bracket_single_quoted;
                             ++p_;
                             ++column_;
                             break;
                         }
                         case '\"':
                         {
-                            state_ = path_state::left_bracket_double_quoted_string;
+                            state_ = path_state::left_bracket_double_quoted;
                             ++p_;
                             ++column_;
                             break;
@@ -738,7 +773,7 @@ public:
                         case '\"':
                             buffer.clear();
                             buffer.push_back('\"');
-                            state_ = path_state::double_quoted_argument;
+                            state_ = path_state::dquote_argument;
                             break;
                         default:
                             buffer.clear();
@@ -849,7 +884,7 @@ public:
                     ++p_;
                     ++column_;
                     break;
-                case path_state::double_quoted_argument:
+                case path_state::dquote_argument:
                     switch (*p_)
                     {
                         case '\"':
@@ -939,7 +974,8 @@ public:
                         ++p_;
                         ++column_;
                         break;
-                    case '[':
+                        case '[':
+                            state_stack_.push_back(path_state::left_bracket);
                         state_ = path_state::left_bracket;
                         ++p_;
                         ++column_;
@@ -960,6 +996,7 @@ public:
                     break;
                 case '[':
                     state_ = path_state::left_bracket;
+                    state_stack_.push_back(path_state::left_bracket);
                     break;
                 default:
                     ec = jsonpath_errc::expected_separator;
@@ -973,10 +1010,18 @@ public:
                 {
                 case ',':
                     state_ = path_state::left_bracket;
+                    state_stack_.push_back(path_state::left_bracket_union);
                     break;
                 case ']':
                     apply_selectors();
                     state_ = path_state::expect_dot_or_left_bracket;
+
+                    if (state_stack_.back() == path_state::left_bracket_union)
+                    {
+                        state_stack_.pop_back();
+                    }
+                    JSONCONS_ASSERT(state_stack_.size() > 0 && state_stack_.back() == path_state::left_bracket);
+                    state_stack_.pop_back();
                     break;
                 case ' ':case '\t':
                     break;
@@ -1028,12 +1073,55 @@ public:
                     ++column_;
                     break;
                 case '\'':
-                    state_ = path_state::left_bracket_single_quoted_string;
+                    state_ = path_state::left_bracket_single_quoted;
                     ++p_;
                     ++column_;
                     break;
                 case '\"':
-                    state_ = path_state::left_bracket_double_quoted_string;
+                    state_ = path_state::left_bracket_double_quoted;
+                    ++p_;
+                    ++column_;
+                    break;
+                default:
+                    clear_index();
+                    buffer.clear();
+                    buffer.push_back(*p_);
+                    state_ = path_state::left_bracket_start;
+                    ++p_;
+                    ++column_;
+                    break;
+                }
+                break;
+            case path_state::left_bracket_union:
+                switch (*p_)
+                {
+                case ' ':case '\t':
+                    ++p_;
+                    ++column_;
+                    break;
+                    case '(':
+                        {
+                            jsonpath_filter_parser<Json> parser(line_,column_);
+                            auto result = parser.parse(root, p_,end_input_,&p_);
+                            line_ = parser.line();
+                            column_ = parser.column();
+                            selectors_.push_back(make_unique_ptr<expr_selector>(result));
+                            state_ = path_state::expect_comma_or_right_bracket;
+                        }
+                        break;
+                case '*':
+                    end_all();
+                    state_ = path_state::expect_comma_or_right_bracket;
+                    ++p_;
+                    ++column_;
+                    break;
+                case '\'':
+                    state_ = path_state::left_bracket_single_quoted;
+                    ++p_;
+                    ++column_;
+                    break;
+                case '\"':
+                    state_ = path_state::left_bracket_double_quoted;
                     ++p_;
                     ++column_;
                     break;
@@ -1051,7 +1139,7 @@ public:
                 switch (*p_)
                 {
                 case ':':
-                    if (!try_string_to_index(buffer.data(), buffer.size(), &start_, &positive_start_))
+                    if (!try_string_to_index(buffer.data(), buffer.size(), &start_, &is_start_positive_))
                     {
                         ec = jsonpath_errc::expected_index;
                         return;
@@ -1059,17 +1147,25 @@ public:
                     state_ = path_state::left_bracket_end;
                     break;
                 case ',': 
-                    //selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                    selectors_.push_back(make_unique_ptr<path_selector>(buffer));
+                    state_stack_.push_back(path_state::left_bracket_union);
+                    selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                    //selectors_.push_back(make_unique_ptr<path_selector>(buffer));
                     buffer.clear();
-                    state_ = path_state::left_bracket;
+                    state_ = path_state::left_bracket_union;
                     break;
                 case ']': 
-                    //selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                    selectors_.push_back(make_unique_ptr<path_selector>(buffer));
+                    selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                    //selectors_.push_back(make_unique_ptr<path_selector>(buffer));
                     buffer.clear();
                     apply_selectors();
                     state_ = path_state::expect_dot_or_left_bracket;
+
+                    if (state_stack_.back() == path_state::left_bracket_union)
+                    {
+                        state_stack_.pop_back();
+                    }
+                    JSONCONS_ASSERT(state_stack_.size() > 0 && state_stack_.back() == path_state::left_bracket);
+                    state_stack_.pop_back();
                     break;
                 default:
                     buffer.push_back(*p_);
@@ -1082,7 +1178,7 @@ public:
                 switch (*p_)
                 {
                 case '-':
-                    positive_end_ = false;
+                    is_end_positive_ = false;
                     state_ = path_state::left_bracket_end2;
                     break;
                 case ':':
@@ -1090,18 +1186,25 @@ public:
                     state_ = path_state::left_bracket_step;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    undefined_end_ = false;
+                    is_end_defined_ = true;
                     end_ = static_cast<size_t>(*p_-'0');
                     state_ = path_state::left_bracket_end2;
                     break;
                 case ',':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(make_unique_ptr<array_slice_selector>(array_slice(start_,is_start_positive_,end_,is_end_positive_,is_end_defined_,step_,is_step_positive_)));
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(make_unique_ptr<array_slice_selector>(array_slice(start_,is_start_positive_,end_,is_end_positive_,is_end_defined_,step_,is_step_positive_)));
                     apply_selectors();
                     state_ = path_state::expect_dot_or_left_bracket;
+
+                    if (state_stack_.back() == path_state::left_bracket_union)
+                    {
+                        state_stack_.pop_back();
+                    }
+                    JSONCONS_ASSERT(state_stack_.size() > 0 && state_stack_.back() == path_state::left_bracket);
+                    state_stack_.pop_back();
                     break;
                 }
                 ++p_;
@@ -1115,17 +1218,19 @@ public:
                     state_ = path_state::left_bracket_step;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    undefined_end_ = false;
+                    is_end_defined_ = true;
                     end_ = end_*10 + static_cast<size_t>(*p_-'0');
                     break;
                 case ',':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(make_unique_ptr<array_slice_selector>(array_slice(start_,is_start_positive_,end_,is_end_positive_,is_end_defined_,step_,is_step_positive_)));
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(make_unique_ptr<array_slice_selector>(array_slice(start_,is_start_positive_,end_,is_end_positive_,is_end_defined_,step_,is_step_positive_)));
                     apply_selectors();
                     state_ = path_state::expect_dot_or_left_bracket;
+                    JSONCONS_ASSERT(state_stack_.size() > 0 && state_stack_.back() == path_state::left_bracket);
+                    state_stack_.pop_back();
                     break;
                 }
                 ++p_;
@@ -1135,7 +1240,7 @@ public:
                 switch (*p_)
                 {
                 case '-':
-                    positive_step_ = false;
+                    is_step_positive_ = false;
                     state_ = path_state::left_bracket_step2;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
@@ -1143,13 +1248,15 @@ public:
                     state_ = path_state::left_bracket_step2;
                     break;
                 case ',':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(make_unique_ptr<array_slice_selector>(array_slice(start_,is_start_positive_,end_,is_end_positive_,is_end_defined_,step_,is_step_positive_)));
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(make_unique_ptr<array_slice_selector>(array_slice(start_,is_start_positive_,end_,is_end_positive_,is_end_defined_,step_,is_step_positive_)));
                     apply_selectors();
                     state_ = path_state::expect_dot_or_left_bracket;
+                    JSONCONS_ASSERT(state_stack_.size() > 0 && state_stack_.back() == path_state::left_bracket);
+                    state_stack_.pop_back();
                     break;
                 }
                 ++p_;
@@ -1162,13 +1269,15 @@ public:
                     step_ = step_*10 + static_cast<size_t>(*p_-'0');
                     break;
                 case ',':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(make_unique_ptr<array_slice_selector>(array_slice(start_,is_start_positive_,end_,is_end_positive_,is_end_defined_,step_,is_step_positive_)));
                     state_ = path_state::left_bracket;
                     break;
                 case ']':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    selectors_.push_back(make_unique_ptr<array_slice_selector>(array_slice(start_,is_start_positive_,end_,is_end_positive_,is_end_defined_,step_,is_step_positive_)));
                     apply_selectors();
                     state_ = path_state::expect_dot_or_left_bracket;
+                    JSONCONS_ASSERT(state_stack_.size() > 0 && state_stack_.back() == path_state::left_bracket);
+                    state_stack_.pop_back();
                     break;
                 }
                 ++p_;
@@ -1183,6 +1292,7 @@ public:
                     transfer_nodes();
                     start_ = 0;
                     state_ = path_state::left_bracket;
+                    state_stack_.push_back(path_state::left_bracket);
                     break;
                 case '.':
                     apply_unquoted_string(buffer);
@@ -1217,7 +1327,7 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case path_state::left_bracket_single_quoted_string: 
+            case path_state::left_bracket_single_quoted: 
                 switch (*p_)
                 {
                 case '\'':
@@ -1241,7 +1351,7 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case path_state::left_bracket_double_quoted_string: 
+            case path_state::left_bracket_double_quoted: 
                 switch (*p_)
                 {
                 case '\"':
@@ -1284,17 +1394,19 @@ public:
             default:
                 break;
         }
+
+        JSONCONS_ASSERT(state_stack_.size() == 0);
     }
 
     void clear_index()
     {
         start_ = 0;
-        positive_start_ = true;
+        is_start_positive_ = true;
         end_ = 0;
-        positive_end_ = true;
-        undefined_end_ = true;
+        is_end_positive_ = true;
+        is_end_defined_ = false;
         step_ = 1;
-        positive_step_ = true;
+        is_step_positive_ = true;
     }
 
     void end_all()
@@ -1356,9 +1468,9 @@ public:
         else if (val.is_array())
         {
             size_t pos = 0;
-            if (try_string_to_index(name.data(),name.size(),&pos, &positive_start_))
+            if (try_string_to_index(name.data(),name.size(),&pos, &is_start_positive_))
             {
-                size_t index = positive_start_ ? pos : val.size() - pos;
+                size_t index = is_start_positive_ ? pos : val.size() - pos;
                 if (index < val.size())
                 {
                     nodes_.emplace_back(PathCons()(path,index),std::addressof(val[index]));
@@ -1384,7 +1496,7 @@ public:
         {
             string_view_type sv = val.as_string_view();
             size_t pos = 0;
-            if (try_string_to_index(name.data(),name.size(),&pos, &positive_start_))
+            if (try_string_to_index(name.data(),name.size(),&pos, &is_start_positive_))
             {
                 auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), pos);
                 if (sequence.length() > 0)
