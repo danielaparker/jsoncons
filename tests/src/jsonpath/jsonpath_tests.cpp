@@ -1424,18 +1424,20 @@ TEST_CASE("jsonpath test 1")
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<std::string>() == std::string("reference"));
     }
+
+    SECTION("$[0].category")
+    {
+        json result = json_query(j,"$[0].category");
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<std::string>() == std::string("reference"));
+    }
     SECTION("0.category")
     {
         json result = json_query(j,"0.category");
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<std::string>() == std::string("reference"));
     }
-    /*SECTION("[0].category")
-    {
-        json result = json_query(j,"[0].category");
-        REQUIRE(result.size() == 1);
-        CHECK(result[0].as<std::string>() == std::string("reference"));
-    }*/
+
     SECTION("0['category']")
     {
         json result = json_query(j,"0['category']");
@@ -1448,7 +1450,6 @@ TEST_CASE("jsonpath test 1")
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<std::string>() == std::string("reference"));
     }
-
 }
 
 

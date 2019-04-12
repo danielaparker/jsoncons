@@ -631,6 +631,7 @@ public:
             switch (state_stack_.back())
             {
                 case path_state::cr:
+                {
                     ++line_;
                     column_ = 1;
                     switch (*p_)
@@ -645,18 +646,21 @@ public:
                         break;
                     }
                     break;
+                }
                 case path_state::lf:
                     ++line_;
                     column_ = 1;
                     state_stack_.pop_back();
                     break;
                 case path_state::start: 
+                {
                     switch (*p_)
                     {
                         case ' ':case '\t':
                             break;
                         case '$':
                         {
+                            std::cout << "path_state::start $\n";
                             state_stack_.push_back(path_state::dot_or_left_bracket);
                             break;
                         }
@@ -681,6 +685,7 @@ public:
                     ++p_;
                     ++column_;
                     break;
+                }
                 case path_state::path_or_function_name:
                     switch (*p_)
                     {
@@ -699,18 +704,22 @@ public:
                                 transfer_nodes();
                             }
                             slice.start_ = 0;
-                            state_stack_.back() = path_state::left_bracket;
+
+                            state_stack_.back() = path_state::dot_or_left_bracket;
+                            state_stack_.push_back(path_state::left_bracket);
                             break;
                         }
                         case '.':
                         {
+                            std::cout << "path_state::path_or_function_name .";
                             if (buffer.size() > 0)
                             {
                                 apply_unquoted_string(buffer);
                                 buffer.clear();
                                 transfer_nodes();
                             }
-                            state_stack_.back() = path_state::dot;
+                            state_stack_.back() = path_state::dot_or_left_bracket;
+                            state_stack_.push_back(path_state::dot);
                             break;
                         }
                         case ' ':case '\t':
@@ -956,7 +965,7 @@ public:
                         break;
                     }
                     break;
-                case path_state::unquoted_name_or_left_bracket:
+                case path_state::unquoted_name_or_left_bracket: // Can [ follow .?
                     switch (*p_)
                     {
                     case '.':
@@ -987,10 +996,12 @@ public:
                 case ' ':case '\t':
                     break;
                 case '.':
-                    state_stack_.back() = path_state::dot;
+                    //state_stack_.back() = path_state::dot;
+                    state_stack_.push_back(path_state::dot);
                     break;
                 case '[':
-                    state_stack_.back() = path_state::left_bracket;
+                        std::cout << "path_state::dot_or_left_bracket [";
+                    state_stack_.push_back(path_state::left_bracket);
                     break;
                 default:
                     ec = jsonpath_errc::expected_separator;
@@ -1007,14 +1018,7 @@ public:
                     break;
                 case ']':
                     apply_selectors();
-                    state_stack_.back() = path_state::dot_or_left_bracket;
-
-                    //if (state_stack_.back() == path_state::left_bracket_union)
-                    //{
-                    //   state_stack_.pop_back();
-                    //}
-                    //JSONCONS_ASSERT(state_stack_.size() > 0 && state_stack_.back() == path_state::left_bracket);
-                    //state_stack_.pop_back();
+                    state_stack_.pop_back();
                     break;
                 case ' ':case '\t':
                     break;
@@ -1153,13 +1157,7 @@ public:
                     //selectors_.push_back(make_unique_ptr<path_selector>(buffer));
                     buffer.clear();
                     apply_selectors();
-                    //state_stack_.push_back(path_state::dot_or_left_bracket);
-
-                    //if (state_stack_.back() == path_state::left_bracket_union)
-                    //{
-                    //    state_stack_.pop_back();
-                    //}
-                    //JSONCONS_ASSERT(state_stack_.size() > 0 && state_stack_.back() == path_state::left_bracket);
+                    JSONCONS_ASSERT(state_stack_.size() > 0);
                     state_stack_.pop_back();
                     break;
                 default:
@@ -1286,14 +1284,12 @@ public:
                     buffer.clear();
                     transfer_nodes();
                     slice.start_ = 0;
-                    state_stack_.pop_back();
-                    state_stack_.push_back(path_state::left_bracket);
+                    state_stack_.back() = path_state::left_bracket;
                     break;
                 case '.':
                     apply_unquoted_string(buffer);
                     buffer.clear();
                     transfer_nodes();
-                    //state_stack_.pop_back(); // path_state::dot;
                     state_stack_.back() = path_state::dot;
                     break;
                 case ' ':case '\t':
@@ -1386,12 +1382,12 @@ public:
                 break;
             }
             default:
-                state_stack_.pop_back(); // unquoted_name
                 break;
         }
+        JSONCONS_ASSERT(state_stack_.size() == 2);
+        state_stack_.pop_back(); 
 
         std::cout << "stack size: " << state_stack_.size() << " " << (int)state_stack_.back() << "\n";
-        JSONCONS_ASSERT(state_stack_.size() == 1);
         JSONCONS_ASSERT(state_stack_.back() == path_state::start);
         state_stack_.pop_back();
     }
