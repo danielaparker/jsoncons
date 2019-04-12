@@ -17,7 +17,7 @@
 
 using namespace jsoncons;
 using namespace jsoncons::jsonpath;
-
+#if 0
 const json complex_json = json::parse(R"(
 [
   {
@@ -1398,7 +1398,7 @@ TEST_CASE("test_array_array_nested")
 
     CHECK(result == expected);
 }
-
+#endif
 TEST_CASE("jsonpath test 1")
 {
     json j = json::parse(R"(
@@ -1418,8 +1418,36 @@ TEST_CASE("jsonpath test 1")
 ]
 )");
 
-    json result = json_query(j,"0.category",result_type::path);
-    std::cout << "result:" << result << "\n";
+    SECTION("$.0.category")
+    {
+        json result = json_query(j,"$.0.category");
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<std::string>() == std::string("reference"));
+    }
+    SECTION("0.category")
+    {
+        json result = json_query(j,"0.category");
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<std::string>() == std::string("reference"));
+    }
+    /*SECTION("[0].category")
+    {
+        json result = json_query(j,"[0].category");
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<std::string>() == std::string("reference"));
+    }*/
+    SECTION("0['category']")
+    {
+        json result = json_query(j,"0['category']");
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<std::string>() == std::string("reference"));
+    }
+    SECTION("0[\"category\"]")
+    {
+        json result = json_query(j,"0[\"category\"]");
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<std::string>() == std::string("reference"));
+    }
 
 }
 
