@@ -1414,10 +1414,24 @@ TEST_CASE("jsonpath test 1")
         "author": "Evelyn Waugh",
         "title": "Sword of Honour",
         "price": 12.99
+    },
+    {
+        "category": "fiction",
+        "author": "Herman Melville",
+        "title": "Moby Dick",
+        "isbn": "0-553-21311-3",
+        "price": 8.99
+    },
+    {
+        "category": "fiction",
+        "author": "J. R. R. Tolkien",
+        "title": "The Lord of the Rings",
+        "isbn": "0-395-19395-8",
+        "price": 22.99
     }
 ]
 )");
-
+#if 0
     SECTION("$.0.category")
     {
         json result = json_query(j,"$.0.category");
@@ -1449,6 +1463,43 @@ TEST_CASE("jsonpath test 1")
         json result = json_query(j,"0[\"category\"]");
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<std::string>() == std::string("reference"));
+    }
+    SECTION("count($.*)")
+    {
+        json result = json_query(j,"count($.*)");
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<int>() == 4);
+    }
+
+    SECTION("$.*")
+    {
+        json result = json_query(j,"$.*");
+        REQUIRE(result.size() == 4);
+        CHECK(result == j);
+    }
+
+    SECTION("$[-3].category")
+    {
+        json result = json_query(j,"$[-3].category");
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<std::string>() == std::string("fiction"));
+    }
+
+    SECTION("$[-2:].category")
+    {
+        json expected = json::parse(R"([ "Moby Dick", "The Lord of the Rings"])");
+        json result = json_query(j,"$[-2:].title");
+        REQUIRE(result.size() == 2);
+        CHECK(result == expected);
+    }
+#endif
+
+    SECTION("$[-1,-3].category")
+    {
+        json expected = json::parse(R"([ "Moby Dick", "Sword of Honour", "Sayings of the Century"])");
+        json result = json_query(j,"$[-1,-3,-4].title");
+        REQUIRE(result.size() == 3);
+        CHECK(result == expected);
     }
 }
 
