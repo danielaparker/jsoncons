@@ -10,6 +10,7 @@
 #include <array> // std::array
 #include <string>
 #include <vector>
+#include <cmath> // std::isfinite, std::isnan
 #include <limits> // std::numeric_limits
 #include <memory>
 #include <utility> // std::move
@@ -734,55 +735,58 @@ private:
             }
         }
 
-        if ((std::isnan)(value))
+        if (!std::isfinite(value))
         {
-            if (options_.is_nan_to_num())
+            if ((std::isnan)(value))
             {
-                result_.insert(options_.nan_to_num().data(), options_.nan_to_num().length());
-                column_ += options_.nan_to_num().length();
+                if (options_.is_nan_to_num())
+                {
+                    result_.insert(options_.nan_to_num().data(), options_.nan_to_num().length());
+                    column_ += options_.nan_to_num().length();
+                }
+                else if (options_.is_nan_to_str())
+                {
+                    do_string_value(options_.nan_to_str(), semantic_tag::none, context);
+                }
+                else
+                {
+                    result_.insert(null_k().data(), null_k().size());
+                    column_ += null_k().size();
+                }
             }
-            else if (options_.is_nan_to_str())
+            else if (value == std::numeric_limits<double>::infinity())
             {
-                do_string_value(options_.nan_to_str(), semantic_tag::none, context);
+                if (options_.is_inf_to_num())
+                {
+                    result_.insert(options_.inf_to_num().data(), options_.inf_to_num().length());
+                    column_ += options_.inf_to_num().length();
+                }
+                else if (options_.is_inf_to_str())
+                {
+                    do_string_value(options_.inf_to_str(), semantic_tag::none, context);
+                }
+                else
+                {
+                    result_.insert(null_k().data(), null_k().size());
+                    column_ += null_k().size();
+                }
             }
             else
             {
-                result_.insert(null_k().data(), null_k().size());
-                column_ += null_k().size();
-            }
-        }
-        else if (value == std::numeric_limits<double>::infinity())
-        {
-            if (options_.is_inf_to_num())
-            {
-                result_.insert(options_.inf_to_num().data(), options_.inf_to_num().length());
-                column_ += options_.inf_to_num().length();
-            }
-            else if (options_.is_inf_to_str())
-            {
-                do_string_value(options_.inf_to_str(), semantic_tag::none, context);
-            }
-            else
-            {
-                result_.insert(null_k().data(), null_k().size());
-                column_ += null_k().size();
-            }
-        }
-        else if (!(std::isfinite)(value))
-        {
-            if (options_.is_neginf_to_num())
-            {
-                result_.insert(options_.neginf_to_num().data(), options_.neginf_to_num().length());
-                column_ += options_.neginf_to_num().length();
-            }
-            else if (options_.is_neginf_to_str())
-            {
-                do_string_value(options_.neginf_to_str(), semantic_tag::none, context);
-            }
-            else
-            {
-                result_.insert(null_k().data(), null_k().size());
-                column_ += null_k().size();
+                if (options_.is_neginf_to_num())
+                {
+                    result_.insert(options_.neginf_to_num().data(), options_.neginf_to_num().length());
+                    column_ += options_.neginf_to_num().length();
+                }
+                else if (options_.is_neginf_to_str())
+                {
+                    do_string_value(options_.neginf_to_str(), semantic_tag::none, context);
+                }
+                else
+                {
+                    result_.insert(null_k().data(), null_k().size());
+                    column_ += null_k().size();
+                }
             }
         }
         else
@@ -1317,49 +1321,52 @@ private:
             result_.push_back(',');
         }
 
-        if ((std::isnan)(value))
+        if (!std::isfinite(value))
         {
-            if (options_.is_nan_to_num())
+            if ((std::isnan)(value))
             {
-                result_.insert(options_.nan_to_num().data(), options_.nan_to_num().length());
+                if (options_.is_nan_to_num())
+                {
+                    result_.insert(options_.nan_to_num().data(), options_.nan_to_num().length());
+                }
+                else if (options_.is_nan_to_str())
+                {
+                    do_string_value(options_.nan_to_str(), semantic_tag::none, context);
+                }
+                else
+                {
+                    result_.insert(null_k().data(), null_k().size());
+                }
             }
-            else if (options_.is_nan_to_str())
+            else if (value == std::numeric_limits<double>::infinity())
             {
-                do_string_value(options_.nan_to_str(), semantic_tag::none, context);
+                if (options_.is_inf_to_num())
+                {
+                    result_.insert(options_.inf_to_num().data(), options_.inf_to_num().length());
+                }
+                else if (options_.is_inf_to_str())
+                {
+                    do_string_value(options_.inf_to_str(), semantic_tag::none, context);
+                }
+                else
+                {
+                    result_.insert(null_k().data(), null_k().size());
+                }
             }
-            else
+            else 
             {
-                result_.insert(null_k().data(), null_k().size());
-            }
-        }
-        else if (value == std::numeric_limits<double>::infinity())
-        {
-            if (options_.is_inf_to_num())
-            {
-                result_.insert(options_.inf_to_num().data(), options_.inf_to_num().length());
-            }
-            else if (options_.is_inf_to_str())
-            {
-                do_string_value(options_.inf_to_str(), semantic_tag::none, context);
-            }
-            else
-            {
-                result_.insert(null_k().data(), null_k().size());
-            }
-        }
-        else if (!(std::isfinite)(value))
-        {
-            if (options_.is_neginf_to_num())
-            {
-                result_.insert(options_.neginf_to_num().data(), options_.neginf_to_num().length());
-            }
-            else if (options_.is_neginf_to_str())
-            {
-                do_string_value(options_.neginf_to_str(), semantic_tag::none, context);
-            }
-            else
-            {
-                result_.insert(null_k().data(), null_k().size());
+                if (options_.is_neginf_to_num())
+                {
+                    result_.insert(options_.neginf_to_num().data(), options_.neginf_to_num().length());
+                }
+                else if (options_.is_neginf_to_str())
+                {
+                    do_string_value(options_.neginf_to_str(), semantic_tag::none, context);
+                }
+                else
+                {
+                    result_.insert(null_k().data(), null_k().size());
+                }
             }
         }
         else

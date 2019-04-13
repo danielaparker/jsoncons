@@ -60,7 +60,7 @@ class.
 
 - [massimo morara](https://github.com/massimomorara) for reporting numerous issues
 
-- Alexander B, for uncovering a bug in how json_parser validated
+- [Alexander B](https://github.com/bas524), for uncovering a bug in how json_parser validated
 UTF-8 strings.
 
 - [zhskyy](https://github.com/zhskyy), for contributing __FILE__ and __LINE__ macros removed 
