@@ -1321,7 +1321,7 @@ private:
             result_.push_back(',');
         }
 
-        if (!std::isfinite(value))
+        if (JSONCONS_UNLIKELY(!std::isfinite(value)))
         {
             if ((std::isnan)(value))
             {
