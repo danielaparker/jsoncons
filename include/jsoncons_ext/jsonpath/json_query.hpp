@@ -139,7 +139,7 @@ bool try_string_to_index(const CharT *s, size_t length, size_t* value, bool* pos
             CharT c = s[i];
             switch (c)
             {
-            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                 {
                     size_t x = c - '0';
                     if (n > max_value_div_10)
@@ -153,11 +153,11 @@ bool try_string_to_index(const CharT *s, size_t length, size_t* value, bool* pos
                     }
 
                     n += x;
+                    break;
                 }
-                break;
-            default:
-                return false;
-                break;
+                default:
+                    return false;
+                    break;
             }
         }
         *value = n;
@@ -180,8 +180,8 @@ enum class path_state
     single_quoted_name,
     double_quoted_name,
     left_bracket,
-    left_bracket_union,
-    until_colon_or_comma_or_right_square_bracket,
+    until_colon_or_comma_or_right_bracket,
+    until_comma_or_right_bracket,
     slice_step_or_end,
     slice_end,
     slice_step,
@@ -999,112 +999,50 @@ public:
                         break;
                     }
                     break;
-            case path_state::dot_or_left_bracket: 
-                switch (*p_)
-                {
-                case ' ':case '\t':
-                    break;
-                case '.':
-                    state_stack_.push_back(path_state::dot);
-                    break;
-                case '[':
-                    state_stack_.push_back(path_state::left_bracket);
-                    break;
-                default:
-                    ec = jsonpath_errc::expected_separator;
-                    return;
-                };
-                ++p_;
-                ++column_;
-                break;
-            case path_state::comma_or_right_bracket:
-                switch (*p_)
-                {
-                case ',':
-                    state_stack_.push_back(path_state::left_bracket);
-                    break;
-                case ']':
-                    apply_selectors();
-                    state_stack_.pop_back();
-                    break;
-                case ' ':case '\t':
-                    break;
-                default:
-                    ec = jsonpath_errc::expected_right_bracket;
-                    return;
-                }
-                ++p_;
-                ++column_;
-                break;
-            case path_state::left_bracket:
-                switch (*p_)
-                {
-                case ' ':case '\t':
-                    ++p_;
-                    ++column_;
-                    break;
-                case '(':
+                case path_state::dot_or_left_bracket: 
+                    switch (*p_)
                     {
-                        jsonpath_filter_parser<Json> parser(line_,column_);
-                        auto result = parser.parse(root, p_,end_input_,&p_);
-                        line_ = parser.line();
-                        column_ = parser.column();
-                        selectors_.push_back(make_unique_ptr<expr_selector>(result));
-                        state_stack_.push_back(path_state::comma_or_right_bracket);
-                    }
+                    case ' ':case '\t':
+                        break;
+                    case '.':
+                        state_stack_.push_back(path_state::dot);
+                        break;
+                    case '[':
+                        state_stack_.push_back(path_state::left_bracket);
+                        break;
+                    default:
+                        ec = jsonpath_errc::expected_separator;
+                        return;
+                    };
+                    ++p_;
+                    ++column_;
                     break;
-                case '?':
+                case path_state::comma_or_right_bracket:
+                    switch (*p_)
                     {
-                        jsonpath_filter_parser<Json> parser(line_,column_);
-                        auto result = parser.parse(root,p_,end_input_,&p_);
-                        line_ = parser.line();
-                        column_ = parser.column();
-                        selectors_.push_back(make_unique_ptr<filter_selector>(result));
-                        state_stack_.push_back(path_state::comma_or_right_bracket);
+                    case ',':
+                        state_stack_.push_back(path_state::left_bracket);
+                        break;
+                    case ']':
+                        apply_selectors();
+                        state_stack_.pop_back();
+                        break;
+                    case ' ':case '\t':
+                        break;
+                    default:
+                        ec = jsonpath_errc::expected_right_bracket;
+                        return;
                     }
-                    break;                   
-                case ':':
-                    slice = array_slice();
-                    buffer.clear();
-                    state_stack_.push_back(path_state::slice_step_or_end);
                     ++p_;
                     ++column_;
                     break;
-                case '*':
-                    end_all();
-                    state_stack_.push_back(path_state::comma_or_right_bracket);
-                    ++p_;
-                    ++column_;
-                    break;
-                case '\'':
-                    state_stack_.back() = path_state::comma_or_right_bracket;  
-                    state_stack_.push_back(path_state::single_quoted_name);
-                    ++p_;
-                    ++column_;
-                    break;
-                case '\"':
-                    state_stack_.back() = path_state::comma_or_right_bracket;  
-                    state_stack_.push_back(path_state::double_quoted_name);
-                    ++p_;
-                    ++column_;
-                    break;
-                default:
-                    slice = array_slice();
-                    buffer.clear();
-                    buffer.push_back(*p_);
-                    state_stack_.back() = path_state::until_colon_or_comma_or_right_square_bracket;
-                    ++p_;
-                    ++column_;
-                    break;
-                }
-                break;
-            case path_state::left_bracket_union:
-                switch (*p_)
-                {
-                case ' ':case '\t':
-                    ++p_;
-                    ++column_;
-                    break;
+                case path_state::left_bracket:
+                    switch (*p_)
+                    {
+                    case ' ':case '\t':
+                        ++p_;
+                        ++column_;
+                        break;
                     case '(':
                         {
                             jsonpath_filter_parser<Json> parser(line_,column_);
@@ -1115,265 +1053,307 @@ public:
                             state_stack_.push_back(path_state::comma_or_right_bracket);
                         }
                         break;
-                case '*':
-                    end_all();
-                    state_stack_.push_back(path_state::comma_or_right_bracket);
-                    ++p_;
-                    ++column_;
-                    break;
-                case '\'':
-                    state_stack_.push_back(path_state::single_quoted_name);
-                    ++p_;
-                    ++column_;
-                    break;
-                case '\"':
-                    state_stack_.push_back(path_state::double_quoted_name);
-                    ++p_;
-                    ++column_;
-                    break;
-                default:
-                    std::cout << "left_bracket_union default\n";
-                    slice = array_slice();
-                    buffer.clear();
-                    buffer.push_back(*p_);
-                    state_stack_.push_back(path_state::until_colon_or_comma_or_right_square_bracket);
-                    ++p_;
-                    ++column_;
-                    break;
-                }
-                break;
-            case path_state::until_colon_or_comma_or_right_square_bracket:
-                switch (*p_)
-                {
-                case ':':
-                    if (!try_string_to_index(buffer.data(), buffer.size(), &slice.start_, &slice.is_start_positive))
-                    {
-                        ec = jsonpath_errc::expected_index;
-                        return;
-                    }
-                    state_stack_.back() = path_state::slice_step_or_end;
-                    break;
-                 case ',': 
-                    std::cout << "until_colon_or_comma_or_right_square_bracket\n";
-                    state_stack_.push_back(path_state::left_bracket_union);
-                    selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                    //selectors_.push_back(make_unique_ptr<path_selector>(buffer));
-                    buffer.clear();
-                    state_stack_.push_back(path_state::left_bracket_union);
-                    break;
-                case ']': 
-                    std::cout << "until_colon_or_comma_or_right_square_bracket ] pop\n";
-                    selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                    //selectors_.push_back(make_unique_ptr<path_selector>(buffer));
-                    buffer.clear();
-                    apply_selectors();
-                    JSONCONS_ASSERT(state_stack_.size() > 0);
-                    state_stack_.pop_back();
-                    break;
-                default:
-                    buffer.push_back(*p_);
-                    break;
-                }
-                ++p_;
-                ++column_;
-                break;
-            case path_state::slice_step_or_end:
-                switch (*p_)
-                {
-                case '-':
-                    slice.is_end_positive = false;
-                    state_stack_.push_back(path_state::slice_end);
-                    break;
-                case ':':
-                    slice.step_ = 0;
-                    state_stack_.push_back(path_state::slice_step);
-                    break;
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    slice.is_end_defined = true;
-                    slice.end_ = static_cast<size_t>(*p_-'0');
-                    state_stack_.back() = path_state::slice_end;
-                    break;
-                case ',':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
-                    state_stack_.pop_back();
-                    break;
-                case ']':
-                    std::cout << "slice_step_or_end ]";
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
-                    apply_selectors();
-                    JSONCONS_ASSERT(state_stack_.size() > 0);
-                    state_stack_.pop_back();
-                    break;
-                }
-                ++p_;
-                ++column_;
-                break;
-            case path_state::slice_end:
-                switch (*p_)
-                {
-                case ':':
-                    slice.step_ = 0;
-                    state_stack_.pop_back(); // = path_state::slice_step;
-                    break;
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    slice.is_end_defined = true;
-                    slice.end_ = slice.end_*10 + static_cast<size_t>(*p_-'0');
-                    break;
-                case ',':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
-                    state_stack_.pop_back(); // = path_state::left_bracket;
-                    break;
-                case ']':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
-                    apply_selectors();
-                    state_stack_.push_back(path_state::dot_or_left_bracket);
-                    JSONCONS_ASSERT(state_stack_.size() > 0 && state_stack_.back() == path_state::left_bracket);
-                    state_stack_.pop_back();
-                    break;
-                }
-                ++p_;
-                ++column_;
-                break;
-            case path_state::slice_step:
-                switch (*p_)
-                {
-                case '-':
-                    slice.is_step_positive = false;
-                    state_stack_.pop_back(); // = path_state::left_bracket_step2;
-                    break;
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    slice.step_ = static_cast<size_t>(*p_-'0');
-                    state_stack_.pop_back(); // = path_state::left_bracket_step2;
-                    break;
-                case ',':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
-                    state_stack_.pop_back(); // = path_state::left_bracket;
-                    break;
-                case ']':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
-                    apply_selectors();
-                    state_stack_.push_back(path_state::dot_or_left_bracket);
-                    JSONCONS_ASSERT(state_stack_.size() > 0 && state_stack_.back() == path_state::left_bracket);
-                    state_stack_.pop_back();
-                    break;
-                }
-                ++p_;
-                ++column_;
-                break;
-            case path_state::left_bracket_step2:
-                switch (*p_)
-                {
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    slice.step_ = slice.step_*10 + static_cast<size_t>(*p_-'0');
-                    break;
-                case ',':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
-                    state_stack_.pop_back(); // = path_state::left_bracket;
-                    break;
-                case ']':
-                    selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
-                    apply_selectors();
-                    state_stack_.push_back(path_state::dot_or_left_bracket);
-                    JSONCONS_ASSERT(state_stack_.size() > 0 && state_stack_.back() == path_state::left_bracket);
-                    state_stack_.pop_back();
-                    break;
-                }
-                ++p_;
-                ++column_;
-                break;
-            case path_state::unquoted_name: 
-                switch (*p_)
-                {
-                case '[':
-                    apply_unquoted_string(buffer);
-                    buffer.clear();
-                    transfer_nodes();
-                    slice.start_ = 0;
-                    state_stack_.back() = path_state::left_bracket;
-                    break;
-                case '.':
-                    apply_unquoted_string(buffer);
-                    buffer.clear();
-                    transfer_nodes();
-                    state_stack_.back() = path_state::dot;
-                    break;
-                case ' ':case '\t':
-                    apply_unquoted_string(buffer);
-                    buffer.clear();
-                    transfer_nodes();
-                    state_stack_.push_back(path_state::dot_or_left_bracket);
-                    break;
-                case '\r':
-                    apply_unquoted_string(buffer);
-                    buffer.clear();
-                    transfer_nodes();
-                    state_stack_.push_back(path_state::cr);
-                    break;
-                case '\n':
-                    apply_unquoted_string(buffer);
-                    buffer.clear();
-                    transfer_nodes();
-                    state_stack_.push_back(path_state::lf);
-                    break;
-                default:
-                    buffer.push_back(*p_);
-                    break;
-                };
-                ++p_;
-                ++column_;
-                break;
-            case path_state::single_quoted_name: 
-                switch (*p_)
-                {
-                case '\'':
-                    selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                    buffer.clear();
-                    state_stack_.pop_back();
-                    break;
-                case '\\':
-                    buffer.push_back(*p_);
-                    if (p_+1 < end_input_)
-                    {
+                    case '?':
+                        {
+                            jsonpath_filter_parser<Json> parser(line_,column_);
+                            auto result = parser.parse(root,p_,end_input_,&p_);
+                            line_ = parser.line();
+                            column_ = parser.column();
+                            selectors_.push_back(make_unique_ptr<filter_selector>(result));
+                            state_stack_.push_back(path_state::comma_or_right_bracket);
+                        }
+                        break;                   
+                    case ':':
+                        slice = array_slice();
+                        buffer.clear();
+                        state_stack_.push_back(path_state::slice_step_or_end);
                         ++p_;
                         ++column_;
-                        buffer.push_back(*p_);
-                    }
-                    break;
-                default:
-                    buffer.push_back(*p_);
-                    break;
-                };
-                ++p_;
-                ++column_;
-                break;
-            case path_state::double_quoted_name: 
-                switch (*p_)
-                {
-                case '\"':
-                    selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                    buffer.clear();
-                    state_stack_.pop_back();
-                    break;
-                case '\\':
-                    buffer.push_back(*p_);
-                    if (p_+1 < end_input_)
-                    {
+                        break;
+                    case '*':
+                        end_all();
+                        state_stack_.push_back(path_state::comma_or_right_bracket);
                         ++p_;
                         ++column_;
+                        break;
+                    case '\'':
+                        state_stack_.back() = path_state::comma_or_right_bracket;  
+                        state_stack_.push_back(path_state::single_quoted_name);
+                        ++p_;
+                        ++column_;
+                        break;
+                    case '\"':
+                        state_stack_.back() = path_state::comma_or_right_bracket;  
+                        state_stack_.push_back(path_state::double_quoted_name);
+                        ++p_;
+                        ++column_;
+                        break;
+                    default:
+                        slice = array_slice();
+                        buffer.clear();
                         buffer.push_back(*p_);
+                        state_stack_.back() = path_state::until_colon_or_comma_or_right_bracket;
+                        ++p_;
+                        ++column_;
+                        break;
                     }
                     break;
-                default:
-                    buffer.push_back(*p_);
+                case path_state::until_colon_or_comma_or_right_bracket:
+                    switch (*p_)
+                    {
+                    case ':':
+                        if (!try_string_to_index(buffer.data(), buffer.size(), &slice.start_, &slice.is_start_positive))
+                        {
+                            ec = jsonpath_errc::expected_index;
+                            return;
+                        }
+                        state_stack_.back() = path_state::slice_step_or_end;
+                        break;
+                     case ',': 
+                        std::cout << "until_colon_or_comma_or_right_bracket\n";
+                        selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                        //selectors_.push_back(make_unique_ptr<path_selector>(buffer));
+                        buffer.clear();
+                        state_stack_.back() = path_state::until_comma_or_right_bracket;
+                        break;
+                    case ']': 
+                        std::cout << "until_colon_or_comma_or_right_bracket ] pop\n";
+                        selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                        //selectors_.push_back(make_unique_ptr<path_selector>(buffer));
+                        buffer.clear();
+                        apply_selectors();
+                        JSONCONS_ASSERT(state_stack_.size() > 0);
+                        state_stack_.pop_back();
+                        break;
+                    default:
+                        buffer.push_back(*p_);
+                        break;
+                    }
+                    ++p_;
+                    ++column_;
                     break;
-                };
-                ++p_;
-                ++column_;
-                break;
-            default:
-                ++p_;
-                ++column_;
-                break;
+                case path_state::until_comma_or_right_bracket:
+                    switch (*p_)
+                    {
+                     case ',': 
+                        std::cout << "until_comma_or_right_bracket\n";
+                        selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                        //selectors_.push_back(make_unique_ptr<path_selector>(buffer));
+                        buffer.clear();
+                        break;
+                    case ']': 
+                        std::cout << "until_comma_or_right_bracket ] pop\n";
+                        selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                        //selectors_.push_back(make_unique_ptr<path_selector>(buffer));
+                        buffer.clear();
+                        apply_selectors();
+                        JSONCONS_ASSERT(state_stack_.size() > 0);
+                        state_stack_.pop_back();
+                        break;
+                    default:
+                        buffer.push_back(*p_);
+                        break;
+                    }
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::slice_step_or_end:
+                    switch (*p_)
+                    {
+                    case '-':
+                        slice.is_end_positive = false;
+                        state_stack_.push_back(path_state::slice_end);
+                        break;
+                    case ':':
+                        slice.step_ = 0;
+                        state_stack_.push_back(path_state::slice_step);
+                        break;
+                    case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                        slice.is_end_defined = true;
+                        slice.end_ = static_cast<size_t>(*p_-'0');
+                        state_stack_.back() = path_state::slice_end;
+                        break;
+                    case ',':
+                        selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
+                        state_stack_.pop_back();
+                        break;
+                    case ']':
+                        std::cout << "slice_step_or_end ]";
+                        selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
+                        apply_selectors();
+                        JSONCONS_ASSERT(state_stack_.size() > 0);
+                        state_stack_.pop_back();
+                        break;
+                    }
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::slice_end:
+                    switch (*p_)
+                    {
+                    case ':':
+                        slice.step_ = 0;
+                        state_stack_.pop_back(); // = path_state::slice_step;
+                        break;
+                    case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                        slice.is_end_defined = true;
+                        slice.end_ = slice.end_*10 + static_cast<size_t>(*p_-'0');
+                        break;
+                    case ',':
+                        selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
+                        state_stack_.pop_back(); // = path_state::left_bracket;
+                        break;
+                    case ']':
+                        selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
+                        apply_selectors();
+                        state_stack_.push_back(path_state::dot_or_left_bracket);
+                        JSONCONS_ASSERT(state_stack_.size() > 0 && state_stack_.back() == path_state::left_bracket);
+                        state_stack_.pop_back();
+                        break;
+                    }
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::slice_step:
+                    switch (*p_)
+                    {
+                    case '-':
+                        slice.is_step_positive = false;
+                        state_stack_.pop_back(); // = path_state::left_bracket_step2;
+                        break;
+                    case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                        slice.step_ = static_cast<size_t>(*p_-'0');
+                        state_stack_.pop_back(); // = path_state::left_bracket_step2;
+                        break;
+                    case ',':
+                        selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
+                        state_stack_.pop_back(); // = path_state::left_bracket;
+                        break;
+                    case ']':
+                        selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
+                        apply_selectors();
+                        state_stack_.push_back(path_state::dot_or_left_bracket);
+                        JSONCONS_ASSERT(state_stack_.size() > 0 && state_stack_.back() == path_state::left_bracket);
+                        state_stack_.pop_back();
+                        break;
+                    }
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::left_bracket_step2:
+                    switch (*p_)
+                    {
+                    case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                        slice.step_ = slice.step_*10 + static_cast<size_t>(*p_-'0');
+                        break;
+                    case ',':
+                        selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
+                        state_stack_.pop_back(); // = path_state::left_bracket;
+                        break;
+                    case ']':
+                        selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
+                        apply_selectors();
+                        state_stack_.push_back(path_state::dot_or_left_bracket);
+                        JSONCONS_ASSERT(state_stack_.size() > 0 && state_stack_.back() == path_state::left_bracket);
+                        state_stack_.pop_back();
+                        break;
+                    }
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::unquoted_name: 
+                    switch (*p_)
+                    {
+                    case '[':
+                        apply_unquoted_string(buffer);
+                        buffer.clear();
+                        transfer_nodes();
+                        slice.start_ = 0;
+                        state_stack_.back() = path_state::left_bracket;
+                        break;
+                    case '.':
+                        apply_unquoted_string(buffer);
+                        buffer.clear();
+                        transfer_nodes();
+                        state_stack_.back() = path_state::dot;
+                        break;
+                    case ' ':case '\t':
+                        apply_unquoted_string(buffer);
+                        buffer.clear();
+                        transfer_nodes();
+                        state_stack_.push_back(path_state::dot_or_left_bracket);
+                        break;
+                    case '\r':
+                        apply_unquoted_string(buffer);
+                        buffer.clear();
+                        transfer_nodes();
+                        state_stack_.push_back(path_state::cr);
+                        break;
+                    case '\n':
+                        apply_unquoted_string(buffer);
+                        buffer.clear();
+                        transfer_nodes();
+                        state_stack_.push_back(path_state::lf);
+                        break;
+                    default:
+                        buffer.push_back(*p_);
+                        break;
+                    };
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::single_quoted_name: 
+                    switch (*p_)
+                    {
+                    case '\'':
+                        selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                        buffer.clear();
+                        state_stack_.pop_back();
+                        break;
+                    case '\\':
+                        buffer.push_back(*p_);
+                        if (p_+1 < end_input_)
+                        {
+                            ++p_;
+                            ++column_;
+                            buffer.push_back(*p_);
+                        }
+                        break;
+                    default:
+                        buffer.push_back(*p_);
+                        break;
+                    };
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::double_quoted_name: 
+                    switch (*p_)
+                    {
+                    case '\"':
+                        selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                        buffer.clear();
+                        state_stack_.pop_back();
+                        break;
+                    case '\\':
+                        buffer.push_back(*p_);
+                        if (p_+1 < end_input_)
+                        {
+                            ++p_;
+                            ++column_;
+                            buffer.push_back(*p_);
+                        }
+                        break;
+                    default:
+                        buffer.push_back(*p_);
+                        break;
+                    };
+                    ++p_;
+                    ++column_;
+                    break;
+                default:
+                    ++p_;
+                    ++column_;
+                    break;
             }
         }
         switch (state_stack_.back())

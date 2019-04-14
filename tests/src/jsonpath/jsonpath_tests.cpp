@@ -1494,10 +1494,12 @@ TEST_CASE("jsonpath test 1")
     }
 #endif
 
-    SECTION("$[-1,-3].category")
+    SECTION("$[-1,-3,-4].category")
     {
-        json expected = json::parse(R"([ "Moby Dick", "Sword of Honour", "Sayings of the Century"])");
+        json expected = json::parse(R"([ "The Lord of the Rings", "Sword of Honour", "Sayings of the Century"])");
         json result = json_query(j,"$[-1,-3,-4].title");
+
+        std::cout << "result: " << result << "\n";
         REQUIRE(result.size() == 3);
         CHECK(result == expected);
     }
