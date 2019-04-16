@@ -17,7 +17,7 @@
 
 using namespace jsoncons;
 using namespace jsoncons::jsonpath;
-#if 0
+
 const json complex_json = json::parse(R"(
 [
   {
@@ -172,7 +172,7 @@ struct jsonpath_fixture
         return bicycle;
     }
 };
-
+#if 0
 TEST_CASE("test_path")
 {
     jsonpath_fixture fixture;
@@ -227,12 +227,24 @@ TEST_CASE("test_jsonpath_store_book_bicycle")
 
     json root = json::parse(jsonpath_fixture::store_text());
 
-    json result = json_query(root,"$['store']['book','bicycle']");
+    /* SECTION("one")
+    {
 
-    json expected = json::array();
-    expected.push_back(fixture.book());
-    expected.push_back(fixture.bicycle());
-    CHECK(result == expected);
+        json result = json_query(root,"$['store']['book']");
+        json expected = json::array();
+        expected.push_back(fixture.book());
+        CHECK(result == expected);
+    }*/
+
+    SECTION("two")
+    {
+
+        json result = json_query(root,"$['store']['book','bicycle']");
+        json expected = json::array();
+        expected.push_back(fixture.book());
+        expected.push_back(fixture.bicycle());
+        CHECK(result == expected);
+    }
 
     //std::cout << pretty_print(result) << std::endl;
 }
@@ -983,6 +995,8 @@ TEST_CASE("test_jsonpath_string_indexation")
     CHECK(result4 == expected4);
 }
 
+#endif
+
 TEST_CASE("test_union_array_elements")
 {
     json val = json::parse(R"(
@@ -1034,18 +1048,20 @@ TEST_CASE("test_union_array_elements")
     }
 ]
     )");
+#if 0
     json result2 = json_query(val, "$..book[-1,-3]");
     CHECK(result2 == expected2);
-
+#endif
     json expected3 = expected2;
     json result3 = json_query(val, "$..book[-1,(@.length - 3)]");
     CHECK(result3 == expected3);
-
+#if 0
     json expected4 = expected2;
     json result4 = json_query(val, "$..book[(@.length - 1),-3]");
     CHECK(result4 == expected4);
+#endif
 }
-
+#if 0
 TEST_CASE("test_array_slice_operator")
 {
     //jsonpath_fixture fixture;
@@ -1398,7 +1414,7 @@ TEST_CASE("test_array_array_nested")
 
     CHECK(result == expected);
 }
-#endif
+
 TEST_CASE("jsonpath test 1")
 {
     json j = json::parse(R"(
@@ -1431,14 +1447,13 @@ TEST_CASE("jsonpath test 1")
     }
 ]
 )");
-#if 0
+
     SECTION("$.0.category")
     {
         json result = json_query(j,"$.0.category");
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<std::string>() == std::string("reference"));
     }
-
     SECTION("$[0].category")
     {
         json result = json_query(j,"$[0].category");
@@ -1492,7 +1507,6 @@ TEST_CASE("jsonpath test 1")
         REQUIRE(result.size() == 2);
         CHECK(result == expected);
     }
-#endif
 
     SECTION("$[-1,-3,-4].category")
     {
@@ -1503,7 +1517,21 @@ TEST_CASE("jsonpath test 1")
         REQUIRE(result.size() == 3);
         CHECK(result == expected);
     }
-}
 
+    SECTION("count($.*)")
+    {
+        json result = json_query(j,"count($.*)");
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<int>() == 4);
+    }
+
+    SECTION("count($[*])")
+    {
+        json result = json_query(j,"count($[*])");
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<int>() == 4);
+    }
+}
+#endif
 
 

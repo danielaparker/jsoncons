@@ -59,7 +59,7 @@ TEST_CASE("jsonpath function tests")
     }
     )");
 
-    SECTION("sum")
+    SECTION("count")
     {
         json result = json_query(store,"count($.store.book[*])");
 
@@ -68,7 +68,7 @@ TEST_CASE("jsonpath function tests")
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<size_t>() == expected);
     }
-
+#if 0
     SECTION("keys")
     {
         json result = json_query(store,"keys($.store.book[0])[*]");
@@ -176,6 +176,7 @@ TEST_CASE("jsonpath function tests")
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<std::string>() == expected);
     }
+#endif
 #endif
 }
 
