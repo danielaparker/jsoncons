@@ -172,7 +172,7 @@ struct jsonpath_fixture
         return bicycle;
     }
 };
-#if 0
+
 TEST_CASE("test_path")
 {
     jsonpath_fixture fixture;
@@ -220,7 +220,6 @@ TEST_CASE("test_jsonpath_bracket_with_double_quotes")
     CHECK(result == expected);
     //    std::c/out << pretty_print(result) << std::endl;
 }
-
 TEST_CASE("test_jsonpath_store_book_bicycle")
 {
     jsonpath_fixture fixture;
@@ -995,8 +994,6 @@ TEST_CASE("test_jsonpath_string_indexation")
     CHECK(result4 == expected4);
 }
 
-#endif
-
 TEST_CASE("test_union_array_elements")
 {
     json val = json::parse(R"(
@@ -1048,20 +1045,16 @@ TEST_CASE("test_union_array_elements")
     }
 ]
     )");
-#if 0
     json result2 = json_query(val, "$..book[-1,-3]");
     CHECK(result2 == expected2);
-#endif
     json expected3 = expected2;
     json result3 = json_query(val, "$..book[-1,(@.length - 3)]");
     CHECK(result3 == expected3);
-#if 0
     json expected4 = expected2;
     json result4 = json_query(val, "$..book[(@.length - 1),-3]");
     CHECK(result4 == expected4);
-#endif
 }
-#if 0
+
 TEST_CASE("test_array_slice_operator")
 {
     //jsonpath_fixture fixture;
@@ -1108,7 +1101,6 @@ TEST_CASE("test_array_slice_operator")
 ]    
     )");
     CHECK(result5 == expected5);
-
 }
 
 TEST_CASE("test_replace")
@@ -1532,6 +1524,5 @@ TEST_CASE("jsonpath test 1")
         CHECK(result[0].as<int>() == 4);
     }
 }
-#endif
 
 
