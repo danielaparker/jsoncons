@@ -84,6 +84,10 @@ enum class jsonpath_errc
     invalid_filter_expected_primary,
     expected_index,
     expected_left_bracket_token,
+    expected_minus_or_digit_or_colon_or_comma_or_right_bracket,
+    expected_digit_or_colon_or_comma_or_right_bracket,
+    expected_minus_or_digit_or_comma_or_right_bracket,
+    expected_digit_or_comma_or_right_bracket,
     unexpected_operator,
     invalid_function_name,
     invalid_argument,
@@ -131,6 +135,14 @@ public:
                 return "Invalid path filter, expected primary expression.";
             case jsonpath_errc::expected_left_bracket_token:
                 return "Expected ?,',\",0-9,*";
+            case jsonpath_errc::expected_minus_or_digit_or_colon_or_comma_or_right_bracket:
+                return "Expected - or 0-9 or : or , or ]";
+            case jsonpath_errc::expected_minus_or_digit_or_comma_or_right_bracket:
+                return "Expected - or 0-9 or , or ]";
+            case jsonpath_errc::expected_digit_or_comma_or_right_bracket:
+                return "Expected - or 0-9 or , or ]";
+            case jsonpath_errc::expected_digit_or_colon_or_comma_or_right_bracket:
+                return "Expected 0-9 or : or , or ]";
             case jsonpath_errc::invalid_function_name:
                 return "Invalid function name";
             case jsonpath_errc::invalid_argument:
