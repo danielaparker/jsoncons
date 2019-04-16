@@ -1071,18 +1071,18 @@ public:
                             break;
                         case '*':
                             end_all();
-                            state_stack_.back() = path_state::unquoted_comma_or_right_bracket;
+                            state_stack_.back() = path_state::comma_or_right_bracket;
                             ++p_;
                             ++column_;
                             break;
                         case '\'':
-                            state_stack_.back() = path_state::unquoted_comma_or_right_bracket;
+                            state_stack_.back() = path_state::comma_or_right_bracket;
                             state_stack_.push_back(path_state::single_quoted_name);
                             ++p_;
                             ++column_;
                             break;
                         case '\"':
-                            state_stack_.back() = path_state::unquoted_comma_or_right_bracket;
+                            state_stack_.back() = path_state::comma_or_right_bracket;
                             state_stack_.push_back(path_state::double_quoted_name);
                             ++p_;
                             ++column_;
