@@ -1389,6 +1389,12 @@ public:
                 break;
         }
 
+        if (state_stack_.size() > 2)
+        {
+            ec = jsonpath_errc::unexpected_end_of_input;
+            return;
+        }
+
         JSONCONS_ASSERT(state_stack_.size() == 2);
         state_stack_.pop_back(); 
 

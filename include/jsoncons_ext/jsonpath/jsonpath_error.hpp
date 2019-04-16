@@ -94,7 +94,8 @@ enum class jsonpath_errc
     function_name_not_found,
     parse_error_in_filter,
     argument_parse_error,
-    unidentified_error
+    unidentified_error,
+    unexpected_end_of_input
 };
 
 class jsonpath_error_category_impl
@@ -155,6 +156,8 @@ public:
                 return "Could not parse JSON expression passed to JSONPath function";
             case jsonpath_errc::unidentified_error:
                 return "Unidentified error";
+            case jsonpath_errc::unexpected_end_of_input:
+                return "Unexpected end of jsonpath input";
             default:
                 return "Unknown jsonpath parser error";
         }
