@@ -63,7 +63,6 @@ void test_error_code(const json& root, const std::string& path, std::error_code 
         CHECK(e.column_number() == column);
     }
 }
-#if 0
 
 /*TEST_CASE("test_root_error")
 {
@@ -97,7 +96,7 @@ TEST_CASE("test_filter_error")
     std::string path = "$..book[?(.price<10)]";
     test_error_code(root, path, jsonpath_errc::parse_error_in_filter,1,17);
 }
-#endif
+
 TEST_CASE("jsonpath slice errors")
 {
     json root = json::parse(R"(
@@ -124,11 +123,24 @@ TEST_CASE("jsonpath slice errors")
         std::string path = "$.[1:1";
         test_error_code(root, path, jsonpath_errc::unexpected_end_of_input,1,7);
     }
-    //SECTION("$.[-]")
-    //{
-    //    std::string path = "$.[-]";
-    //    test_error_code(root, path, jsonpath_errc::unexpected_end_of_input,1,4);
-    //}
+
+    SECTION("$.[-:]")
+    {
+        std::string path = "$.[-:]";
+        test_error_code(root, path, jsonpath_errc::expected_slice_start,1,5);
+    }
+
+    SECTION("$.[-1:-]")
+    {
+        std::string path = "$.[-1:-]";
+        test_error_code(root, path, jsonpath_errc::expected_slice_end,1,8);
+    }
+
+    SECTION("$.[-1:-1:-]")
+    {
+        std::string path = "$.[-1:-1:-]";
+        test_error_code(root, path, jsonpath_errc::expected_slice_step,1,11);
+    }
 }
 
 

@@ -82,7 +82,9 @@ enum class jsonpath_errc
     invalid_filter_unsupported_operator,
     invalid_filter_expected_right_brace,
     invalid_filter_expected_primary,
-    expected_index,
+    expected_slice_start,
+    expected_slice_end,
+    expected_slice_step,
     expected_left_bracket_token,
     expected_minus_or_digit_or_colon_or_comma_or_right_bracket,
     expected_digit_or_colon_or_comma_or_right_bracket,
@@ -118,8 +120,12 @@ public:
                 return "Expected ]";
             case jsonpath_errc::expected_name:
                 return "Expected a name following a dot";
-            case jsonpath_errc::expected_index:
-                return "Expected index";
+            case jsonpath_errc::expected_slice_start:
+                return "Expected slice start";
+            case jsonpath_errc::expected_slice_end:
+                return "Expected slice end";
+            case jsonpath_errc::expected_slice_step:
+                return "Expected slice step";
             case jsonpath_errc::expected_separator:
                 return "Expected dot or left bracket separator";
             case jsonpath_errc::invalid_filter:

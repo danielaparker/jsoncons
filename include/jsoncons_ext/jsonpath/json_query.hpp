@@ -1103,7 +1103,7 @@ public:
                         case ':':
                             if (!try_string_to_index(buffer.data(), buffer.size(), &slice.start_, &slice.is_start_positive))
                             {
-                                ec = jsonpath_errc::expected_index;
+                                ec = jsonpath_errc::expected_slice_start;
                                 return;
                             }
                             state_stack_.back() = path_state::slice_end_or_end_step;
@@ -1220,10 +1220,20 @@ public:
                             slice.end_ = slice.end_*10 + static_cast<size_t>(*p_-'0');
                             break;
                         case ',':
+                            if (!slice.is_end_defined)
+                            {
+                                ec = jsonpath_errc::expected_slice_end;
+                                return;
+                            }
                             selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
                             state_stack_.back() = path_state::bracketed;
                             break;
                         case ']':
+                            if (!slice.is_end_defined)
+                            {
+                                ec = jsonpath_errc::expected_slice_end;
+                                return;
+                            }
                             selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
                             apply_selectors();
                             JSONCONS_ASSERT(state_stack_.size() > 0);
@@ -1263,6 +1273,11 @@ public:
                             state_stack_.back() = path_state::bracketed;
                             break;
                         case ']':
+                            if (slice.step_ == 0)
+                            {
+                                ec = jsonpath_errc::expected_slice_step;
+                                return;
+                            }
                             selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
                             apply_selectors();
                             state_stack_.pop_back();
