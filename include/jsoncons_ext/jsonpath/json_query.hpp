@@ -185,6 +185,7 @@ enum class path_state
     slice_end_or_end_step,
     slice_end,
     slice_step,
+    slice_step2,
     comma_or_right_bracket,
     path_or_function_name,
     function,
@@ -1240,9 +1241,22 @@ public:
                     {
                         case '-':
                             slice.is_step_positive = false;
+                            slice.step_ = 0;
+                            state_stack_.back() = path_state::slice_step2;
+                            ++p_;
+                            ++column_;
                             break;
+                        default:
+                            slice.step_ = 0;
+                            state_stack_.back() = path_state::slice_step2;
+                            break;
+                    }
+                    break;
+                case path_state::slice_step2:
+                    switch (*p_)
+                    {
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                            slice.step_ = static_cast<size_t>(*p_-'0');
+                            slice.step_ = slice.step_*10 + static_cast<size_t>(*p_-'0');
                             break;
                         case ',':
                             selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
