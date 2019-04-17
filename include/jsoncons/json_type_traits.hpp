@@ -1148,7 +1148,7 @@ namespace jsoncons \
             return j; \
         } \
     }; \
-} // jsoncons \
+} // jsoncons 
 
 
 #define JSONCONS_TYPE_TRAITS_DECL(ValueType,...) \
