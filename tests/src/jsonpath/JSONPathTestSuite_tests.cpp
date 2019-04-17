@@ -92,11 +92,15 @@ TEST_CASE("JSONPath Test Suite")
                 ojson result = json_query(document, pair.second);
                 CHECK(it->second == result);
             }
-            catch (const jsoncons::ser_error& e)
+            catch (const jsoncons::jsonpath::jsonpath_error& e)
             {
+                ojson result = json_query(document, pair.second);
                 std::cerr << pair.first << " " << pair.second << " " << e.what() << std::endl;
             }
-
+            catch (const std::exception& e)
+            {
+                std::cerr << e.what() << std::endl;
+            }
         }
         else
         {

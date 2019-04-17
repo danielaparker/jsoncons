@@ -172,8 +172,6 @@ bool try_string_to_index(const CharT *s, size_t length, size_t* value, bool* pos
 enum class path_state 
 {
     start,
-    cr,
-    lf,
     dot_or_left_bracket,
     unquoted_name_or_left_bracket,
     unquoted_name,
@@ -631,28 +629,6 @@ public:
         {
             switch (state_stack_.back())
             {
-                case path_state::cr:
-                {
-                    ++line_;
-                    column_ = 1;
-                    switch (*p_)
-                    {
-                    case '\n':
-                        state_stack_.pop_back();
-                        ++p_;
-                        ++column_;
-                        break;
-                    default:
-                        state_stack_.pop_back();
-                        break;
-                    }
-                    break;
-                }
-                case path_state::lf:
-                    ++line_;
-                    column_ = 1;
-                    state_stack_.pop_back();
-                    break;
                 case path_state::start: 
                 {
                     switch (*p_)
@@ -1317,17 +1293,21 @@ public:
                             apply_unquoted_string(buffer);
                             buffer.clear();
                             transfer_nodes();
-                            state_stack_.push_back(path_state::cr);
+                            if (p_+1 < end_input_ && *(p_+1) == '\n')
+                            {
+                                ++p_;
+                            }
+                            ++line_;
+                            column_ = 1;
                             ++p_;
-                            ++column_;
                             break;
                         case '\n':
                             apply_unquoted_string(buffer);
                             buffer.clear();
                             transfer_nodes();
-                            state_stack_.push_back(path_state::lf);
+                            ++line_;
+                            column_ = 1;
                             ++p_;
-                            ++column_;
                             break;
                         default:
                             buffer.push_back(*p_);
