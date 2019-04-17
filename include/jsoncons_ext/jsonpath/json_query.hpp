@@ -1399,10 +1399,10 @@ public:
 
     void end_all()
     {
-        for (size_t i = 0; i < stack_.back().size(); ++i)
+        for (const auto& node : stack_.back())
         {
-            const auto& path = stack_.back()[i].path;
-            pointer p = stack_.back()[i].val_ptr;
+            const auto& path = node.path;
+            pointer p = node.val_ptr;
 
             if (p->is_array())
             {
@@ -1426,9 +1426,9 @@ public:
     {
         if (name.length() > 0)
         {
-            for (size_t i = 0; i < stack_.back().size(); ++i)
+            for (const auto& node : stack_.back())
             {
-                apply_unquoted_string(stack_.back()[i].path, *(stack_.back()[i].val_ptr), name);
+                apply_unquoted_string(node.path, *(node.val_ptr), name);
             }
         }
     }
@@ -1507,9 +1507,8 @@ public:
     {
         if (selectors_.size() > 0)
         {
-            for (size_t i = 0; i < stack_.back().size(); ++i)
+            for (auto& node : stack_.back())
             {
-                node_type& node = stack_.back()[i];
                 apply_selectors(node, node.path, *(node.val_ptr));
             }
             selectors_.clear();
