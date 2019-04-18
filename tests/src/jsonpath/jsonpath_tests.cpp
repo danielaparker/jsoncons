@@ -1575,6 +1575,8 @@ TEST_CASE("jsonpath test 1")
         json result = json_query(j,"keys($[1])[*]");
         CHECK(result == expected);
     }
+#if !(defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ < 9))
+// GCC 4.8 has broken regex support: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631
     SECTION("$[?(tokenize(@.author,'\\\\s+')[1] == 'Waugh')].title")
     {
         json expected = json::array{"Sword of Honour"};
@@ -1592,6 +1594,7 @@ TEST_CASE("jsonpath test 1")
 
         CHECK(result == expected);
     }
+#endif
 }
 
 

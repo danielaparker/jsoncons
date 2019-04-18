@@ -212,7 +212,7 @@ public:
         auto it = functions_.find(name);
         if (it == functions_.end())
         {
-            std::cout << "Function name " << name << " not found\n";
+            //std::cout << "Function name " << name << " not found\n";
             ec = jsonpath_errc::function_name_not_found;
             return nullptr;
         }
