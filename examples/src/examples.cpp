@@ -555,8 +555,6 @@ int main()
  
         bson_examples();
 
-        jsonpath_examples();
-
         serialization_examples();
 
         jsonpointer_examples();
@@ -572,6 +570,8 @@ int main()
         cbor_examples();
 
         csv_examples();
+
+        jsonpath_examples();
     }
     catch (const std::exception& e)
     {

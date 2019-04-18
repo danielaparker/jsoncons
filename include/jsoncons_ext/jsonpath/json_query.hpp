@@ -670,6 +670,7 @@ public:
                                     ec = jsonpath_errc::expected_root;
                                     return;
                                 default: // might be function, validate name later
+                                    state_stack_.push_back(path_state::dot_or_left_bracket);
                                     state_stack_.push_back(path_state::path_or_function_name);
                                     buffer.push_back(*p_);
                                     break;
@@ -701,8 +702,7 @@ public:
                             }
                             slice.start_ = 0;
 
-                            state_stack_.back() = path_state::dot_or_left_bracket;
-                            state_stack_.push_back(path_state::bracketed);
+                            state_stack_.back() = path_state::bracketed;
                             break;
                         }
                         case '.':
@@ -713,8 +713,7 @@ public:
                                 buffer.clear();
                                 transfer_nodes();
                             }
-                            state_stack_.back() = path_state::dot_or_left_bracket;
-                            state_stack_.push_back(path_state::dot);
+                            state_stack_.back() = path_state::dot;
                             break;
                         }
                         case ' ':case '\t':
@@ -722,7 +721,7 @@ public:
                             apply_unquoted_string(buffer);
                             buffer.clear();
                             transfer_nodes();
-                            state_stack_.push_back(path_state::dot_or_left_bracket);
+                            state_stack_.pop_back();
                             break;
                         }
                         case '\'':
@@ -760,11 +759,13 @@ public:
                         case '\'':
                             buffer.clear();
                             buffer.push_back('\"');
+                            state_stack_.back() = path_state::more_args_or_right_round_bracket;
                             state_stack_.push_back(path_state::single_quoted_arg);
                             break;
                         case '\"':
                             buffer.clear();
                             buffer.push_back('\"');
+                            state_stack_.back() = path_state::more_args_or_right_round_bracket;
                             state_stack_.push_back(path_state::double_quoted_arg);
                             break;
                         case ')':
@@ -787,6 +788,7 @@ public:
                         }
                         default:
                             buffer.clear();
+                            state_stack_.back() = path_state::more_args_or_right_round_bracket;
                             state_stack_.push_back(path_state::unquoted_arg);
                             break;
                     }
@@ -805,34 +807,22 @@ public:
                                 return;
                             }
                             function_stack_.push_back(evaluator.get_pointers());
-                            state_stack_.push_back(path_state::arg_or_right_round_bracket);
+                            state_stack_.pop_back();
+                            ++p_;
+                            ++column_;
                             break;
                         }
                         case ')':
                         {
-                            jsonpath_evaluator<Json,JsonReference,PathCons> evaluator;
-                            evaluator.evaluate(root, buffer, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            function_stack_.push_back(evaluator.get_pointers());
-
-                            invoke_function(function_name, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-
                             state_stack_.pop_back();
                             break;
                         }
                         default:
                             buffer.push_back(*p_); // path_argument
+                            ++p_;
+                            ++column_;
                             break;
                     }
-                    ++p_;
-                    ++column_;
                     break;
                 case path_state::unquoted_arg:
                     switch (*p_)
@@ -855,14 +845,17 @@ public:
                             break;
                         case ')':
                         {
-                            jsonpath_evaluator<Json,JsonReference,PathCons> evaluator;
-                            evaluator.evaluate(root, buffer, ec);
-                            if (ec)
+                            try
                             {
+                                auto val = Json::parse(buffer);
+                                auto temp = create_temp(val);
+                                function_stack_.push_back(std::vector<pointer>{temp});
+                            }
+                            catch (const ser_error&)
+                            {
+                                ec = jsonpath_errc::argument_parse_error;
                                 return;
                             }
-                            function_stack_.push_back(evaluator.get_pointers());
-
                             invoke_function(function_name, ec);
                             if (ec)
                             {
@@ -946,7 +939,7 @@ public:
                             {
                                 return;
                             }
-                            state_stack_.push_back(path_state::dot_or_left_bracket);
+                            state_stack_.pop_back();
                             break;
                         }
                         default:

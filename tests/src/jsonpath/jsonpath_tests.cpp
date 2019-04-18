@@ -1568,6 +1568,30 @@ TEST_CASE("jsonpath test 1")
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<int>() == 4);
     }
+    SECTION("keys($[1])")
+    {
+        json expected = json::array{"author","category","price","title"};
+
+        json result = json_query(j,"keys($[1])[*]");
+        CHECK(result == expected);
+    }
+    SECTION("$[?(tokenize(@.author,'\\\\s+')[1] == 'Waugh')].title")
+    {
+        json expected = json::array{"Sword of Honour"};
+
+        json result = json_query(j,"$[?(tokenize(@.author,'\\\\s+')[1] == 'Waugh')].title");
+
+        CHECK(result == expected);
+    }
+
+    SECTION("tokenize($[0].author,'\\\\s+')")
+    {
+        json expected = json::parse("[[\"Nigel\",\"Rees\"]]");
+
+        json result = json_query(j,"tokenize($[0].author,'\\\\s+')");
+
+        CHECK(result == expected);
+    }
 }
 
 
