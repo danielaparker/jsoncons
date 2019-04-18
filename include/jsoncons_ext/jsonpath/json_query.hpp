@@ -11,11 +11,12 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <unordered_map>
 #include <type_traits> // std::is_const
 #include <limits> // std::numeric_limits
 #include <utility> // std::move
 #include <regex>
+#include <functional> // std::hash
+#include <unordered_set> // std::unordered_set
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_filter.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
@@ -207,6 +208,7 @@ class jsonpath_evaluator : private ser_context
     typedef typename Json::string_view_type string_view_type;
     typedef JsonReference reference;
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
+    typedef typename Json::const_pointer const_pointer;
 
     static string_view_type length_literal()
     {
@@ -226,13 +228,29 @@ class jsonpath_evaluator : private ser_context
         {
         }
         node_type(const node_type&) = default;
-        node_type(node_type&&) = default;
+        node_type(node_type&& other) = default;
 
         bool skip_contained_object;
         string_type path;
         pointer val_ptr;
     };
     typedef std::vector<node_type> node_set;
+
+    struct node_equal_to
+    {
+        bool operator()(const node_type& a, const node_type& b) const
+        {
+            return *(a.val_ptr) == *(b.val_ptr);
+        }
+    };
+
+    struct node_hash
+    {
+        std::size_t operator()(const node_type& a) const noexcept
+        {
+            return std::hash<pointer>()(a.val_ptr);
+        }
+    };
 
     class selector
     {
@@ -468,7 +486,8 @@ class jsonpath_evaluator : private ser_context
     function_table<Json,pointer> functions_;
 
     default_parse_error_handler default_err_handler_;
-    bool recursive_descent_;
+    bool is_recursive_descent_;
+    bool is_union_;
     node_set nodes_;
     std::vector<node_set> stack_;
     size_t line_;
@@ -485,7 +504,8 @@ class jsonpath_evaluator : private ser_context
 
 public:
     jsonpath_evaluator()
-        : recursive_descent_(false),
+        : is_recursive_descent_(false),
+          is_union_(false),
           line_(0), column_(0),
           begin_input_(nullptr), end_input_(nullptr),
           p_(nullptr)
@@ -621,7 +641,8 @@ public:
         v.emplace_back(std::move(s),std::addressof(root));
         stack_.push_back(v);
 
-        recursive_descent_ = false;
+        is_recursive_descent_ = false;
+        is_union_ = false;
 
         array_slice slice;
 
@@ -939,7 +960,7 @@ public:
                     switch (*p_)
                     {
                     case '.':
-                        recursive_descent_ = true;
+                        is_recursive_descent_ = true;
                         ++p_;
                         ++column_;
                         state_stack_.back() = path_state::unquoted_name_or_left_bracket;
@@ -996,6 +1017,7 @@ public:
                     switch (*p_)
                     {
                         case ',':
+                            is_union_ = true;
                             state_stack_.back() = path_state::bracketed;
                             break;
                         case ']':
@@ -1085,6 +1107,7 @@ public:
                             state_stack_.back() = path_state::slice_end_or_end_step;
                             break;
                         case ',': 
+                            is_union_ = true;
                             if (!buffer.empty())
                             {
                                 selectors_.push_back(make_unique_ptr<name_selector>(buffer));
@@ -1120,6 +1143,7 @@ public:
                     switch (*p_)
                     {
                          case ',': 
+                             is_union_ = true;
                             if (!buffer.empty())
                             {
                                 selectors_.push_back(make_unique_ptr<name_selector>(buffer));
@@ -1168,6 +1192,7 @@ public:
                             state_stack_.back() = path_state::slice_step;
                             break;
                         case ',':
+                            is_union_ = true;
                             selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
                             state_stack_.back() = path_state::bracketed;
                             break;
@@ -1196,6 +1221,7 @@ public:
                             slice.end_ = slice.end_*10 + static_cast<size_t>(*p_-'0');
                             break;
                         case ',':
+                            is_union_ = true;
                             if (!slice.is_end_defined)
                             {
                                 ec = jsonpath_errc::expected_slice_end;
@@ -1245,6 +1271,7 @@ public:
                             slice.step_ = slice.step_*10 + static_cast<size_t>(*p_-'0');
                             break;
                         case ',':
+                            is_union_ = true;
                             selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
                             state_stack_.back() = path_state::bracketed;
                             break;
@@ -1441,7 +1468,7 @@ public:
             {
                 nodes_.emplace_back(PathCons()(path,name),std::addressof(val.at(name)));
             }
-            if (recursive_descent_)
+            if (is_recursive_descent_)
             {
                 for (auto it = val.object_range().begin(); it != val.object_range().end(); ++it)
                 {
@@ -1469,7 +1496,7 @@ public:
                 pointer ptr = create_temp(val.size());
                 nodes_.emplace_back(PathCons()(path,name),ptr);
             }
-            if (recursive_descent_)
+            if (is_recursive_descent_)
             {
                 for (auto it = val.array_range().begin(); it != val.array_range().end(); ++it)
                 {
@@ -1522,7 +1549,7 @@ public:
         {
             selector->select(*this, node, path, val, nodes_);
         }
-        if (recursive_descent_)
+        if (is_recursive_descent_)
         {
             if (val.is_object())
             {
@@ -1549,9 +1576,18 @@ public:
 
     void transfer_nodes()
     {
-        stack_.push_back(nodes_);
+        if (is_union_)
+        {
+            std::unordered_set<node_type, node_hash, node_equal_to> temp(nodes_.begin(), nodes_.end());
+            stack_.push_back(std::vector<node_type>(temp.begin(),temp.end()));
+        }
+        else
+        {
+            stack_.push_back(std::move(nodes_));
+        }
         nodes_.clear();
-        recursive_descent_ = false;
+        is_recursive_descent_ = false;
+        is_union_ = false;
     }
 
     size_t line_number() const override

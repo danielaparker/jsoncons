@@ -239,10 +239,13 @@ TEST_CASE("test_jsonpath_store_book_bicycle")
     {
 
         json result = json_query(root,"$['store']['book','bicycle']");
-        json expected = json::array();
-        expected.push_back(fixture.book());
-        expected.push_back(fixture.bicycle());
-        CHECK(result == expected);
+        json expected1 = json::array();
+        expected1.push_back(fixture.book());
+        expected1.push_back(fixture.bicycle());
+        json expected2 = json::array();
+        expected2.push_back(fixture.bicycle());
+        expected2.push_back(fixture.book());
+        CHECK((result == expected1 || result == expected2));
     }
 
     //std::cout << pretty_print(result) << std::endl;
@@ -256,10 +259,13 @@ TEST_CASE("test_jsonpath_store_book_bicycle_unquoted")
 
     json result = json_query(root,"$[store][book,bicycle]");
 
-    json expected = json::array();
-    expected.push_back(fixture.book());
-    expected.push_back(fixture.bicycle());
-    CHECK(result == expected);
+    json expected1 = json::array();
+    expected1.push_back(fixture.book());
+    expected1.push_back(fixture.bicycle());
+    json expected2 = json::array();
+    expected2.push_back(fixture.bicycle());
+    expected2.push_back(fixture.book());
+    CHECK((result == expected1 || result == expected2));
 
     //std::cout << pretty_print(result) << std::endl;
 }
@@ -336,11 +342,16 @@ TEST_CASE("test_jsonpath_recursive_descent")
     CHECK(result2.size() == 1);
     CHECK(result2[0] == root["store"]["book"][3]);
 
-    json result3 = json_query(root,"$..book[0,1]");
-    //std::cout << pretty_print(result3) << std::endl;
-    CHECK(result3.size() == 2);
-    CHECK(result3[0] == root["store"]["book"][0]);
-    CHECK(result3[1] == root["store"]["book"][1]);
+    SECTION("$..book[0,1]")
+    {
+        json result = json_query(root,"$..book[0,1]");
+
+        json expected1 = json::array{root["store"]["book"][0],root["store"]["book"][1]};
+        json expected2 = json::array{root["store"]["book"][1],root["store"]["book"][0]};
+        //std::cout << pretty_print(result) << std::endl;
+        CHECK(result.size() == 2);
+        CHECK((result == expected1 || result == expected2));
+    }
 
     json result4 = json_query(root,"$..book[:2]");
     //std::cout << pretty_print(result4) << std::endl;
@@ -857,23 +868,31 @@ TEST_CASE("test_jsonpath_aggregation")
 }
     )");
 
-    json expected = json::parse(R"(
-["John","doe"]
-)");
+    SECTION("$['firstName','lastName']")
+    {
+        json expected1 = json::parse(R"(
+    ["John","doe"]
+    )");
+            json expected2 = json::parse(R"(
+        ["doe","John"]
+        )");
 
-    json result2 = json_query(val, "$['firstName','lastName']");
-    CHECK(expected == result2);
+        json result2 = json_query(val, "$['firstName','lastName']");
+        CHECK((result2 == expected1 || result2 == expected2));
 
-    json result3 = json_query(val, "$[\"firstName\",\"lastName\"]");
-    CHECK(expected == result3);
+        json result3 = json_query(val, "$[\"firstName\",\"lastName\"]");
+        CHECK((result3 == expected1 || result3 == expected2));
+    }
 
-    json expected4 = json::parse(R"(
-["John","Nara"]
-)");
-    std::string path4 = "$..['firstName','city']";
+    SECTION("$..['firstName','city']")
+    {
+        json expected1 = json::parse(R"(["John","Nara"])");
+        json expected2 = json::parse(R"(["Nara","John"])");
+        std::string path = "$..['firstName','city']";
 
-    json result4 = json_query(val, path4);
-    CHECK(result4 == expected4);
+        json result = json_query(val, path);
+        CHECK((result == expected1 || result == expected2));
+    }
 }
 
 TEST_CASE("test_jsonpath_aggregation2")
@@ -894,10 +913,9 @@ TEST_CASE("test_jsonpath_aggregation2")
 
     json result = json_query(val, "$..book[(@.length - 1),(@.length - 2)]");
 
-    json expected = json::parse(R"(
-[{"author": "Herman Melville"},{"author": "Evelyn Waugh"}]
-)");
-    CHECK(result == expected);
+    json expected1 = json::parse(R"([{"author": "Herman Melville"},{"author": "Evelyn Waugh"}])");
+    json expected2 = json::parse(R"([{"author": "Evelyn Waugh"},{"author": "Herman Melville"}])");
+    CHECK((result == expected1 || result == expected2));
 }
 
 TEST_CASE("test_jsonpath_aggregation3")
@@ -925,12 +943,14 @@ TEST_CASE("test_jsonpath_aggregation3")
 }
     )");
 
-    json expected2 = json::parse(R"(
-["iPhone","0123-4567-8888","home","0123-4567-8910"]
-)");
+    std::unordered_set<std::string> expected = {"iPhone","0123-4567-8888","home","0123-4567-8910"};
 
-    json result2 = json_query(val, "$..['type','number']");
-    CHECK(result2 == expected2);
+    json result = json_query(val, "$..['type','number']");
+    CHECK(result.size() == expected.size());
+    for (const auto& item : result.array_range())
+    {
+        CHECK(expected.count(item.as<std::string>()) == 1);
+    }
 }
 
 TEST_CASE("test_jsonpath_aggregation4")
@@ -958,9 +978,6 @@ TEST_CASE("test_jsonpath_aggregation4")
 }
     )");
 
-    json expected2 = json::parse(R"(
-["iPhone","0123-4567-8888","home","0123-4567-8910"]
-)");
     json test1 = json_query(val, "$.phoneNumbers");
     //std::cout << test1 << std::endl;
     json test2 = json_query(val, "$[phoneNumbers]");
@@ -968,8 +985,14 @@ TEST_CASE("test_jsonpath_aggregation4")
     json test3 = json_query(val, "$..['type']");
     //std::cout << test3 << std::endl;
 
+    std::unordered_set<std::string> expected = {"iPhone","0123-4567-8888","home","0123-4567-8910"};
+
     json result2 = json_query(val, "$.phoneNumbers..['type','number']");
-    CHECK(result2 == expected2);
+    CHECK(result2.size() == expected.size());
+    for (const auto& item : result2.array_range())
+    {
+        CHECK(expected.count(item.as<std::string>()) == 1);
+    }
 }
 
 TEST_CASE("test_jsonpath_string_indexation")
@@ -1029,6 +1052,8 @@ TEST_CASE("test_union_array_elements")
     json result1 = json_query(val, "$..book[-1]");
     CHECK(result1 == expected1);
 
+    std::unordered_set<std::string> expected = {"Kulik M","Tolstoy L","Herman Melville","Nigel Rees"};
+
     json expected2 = json::parse(R"(
 [
     {
@@ -1046,61 +1071,79 @@ TEST_CASE("test_union_array_elements")
 ]
     )");
     json result2 = json_query(val, "$..book[-1,-3]");
-    CHECK(result2 == expected2);
-    json expected3 = expected2;
+
+    CHECK(result2.size() == expected.size());
+    for (const auto& item : result2.array_range())
+    {
+        CHECK(expected.count(item["author"].as<std::string>()) == 1);
+    }
+
+    //CHECK(result2 == expected2);
+    //json expected3 = expected2;
     json result3 = json_query(val, "$..book[-1,(@.length - 3)]");
-    CHECK(result3 == expected3);
-    json expected4 = expected2;
+    CHECK(result3.size() == expected.size());
+    for (const auto& item : result3.array_range())
+    {
+        CHECK(expected.count(item["author"].as<std::string>()) == 1);
+    }
+    //CHECK(result3 == expected3);
+    //json expected4 = expected2;
     json result4 = json_query(val, "$..book[(@.length - 1),-3]");
-    CHECK(result4 == expected4);
+    CHECK(result4.size() == expected.size());
+    for (const auto& item : result4.array_range())
+    {
+        CHECK(expected.count(item["author"].as<std::string>()) == 1);
+    }
+    //CHECK(result4 == expected4);
 }
 
 TEST_CASE("test_array_slice_operator")
 {
-    //jsonpath_fixture fixture;
-
     json root = json::parse(jsonpath_fixture::store_text());
 
-    json result1 = json_query(root,"$..book[1:2].author");
-    json expected1 = json::parse(R"(
-[
-   "Evelyn Waugh"
-]
-    )");
-    CHECK(result1 == expected1);
+    SECTION("Array slice")
+    {
 
-    json result2 = json_query(root,"$..book[1:3:2].author");
-    json expected2 = expected1;
-    CHECK(result2 == expected2);
+        json result1 = json_query(root,"$..book[1:2].author");
+        json expected1 = json::parse(R"(
+    [
+       "Evelyn Waugh"
+    ]
+        )");
+        CHECK(result1 == expected1);
 
-    json result3 = json_query(root,"$..book[1:4:2].author");
-    json expected3 = json::parse(R"(
-[
-   "Evelyn Waugh",
-   "J. R. R. Tolkien"
-]    
-    )");
-    CHECK(result3 == expected3);
+        json result2 = json_query(root,"$..book[1:3:2].author");
+        json expected2 = expected1;
+        CHECK(result2 == expected2);
 
-    json result4 = json_query(root,"$..book[1:4:2,0].author");
-    json expected4 = json::parse(R"(
-[
-    "Evelyn Waugh",
-    "J. R. R. Tolkien",
-    "Nigel Rees"
-]    
-    )");
-    CHECK(result4 == expected4);
+        json result3 = json_query(root,"$..book[1:4:2].author");
+        json expected3 = json::parse(R"(
+    [
+       "Evelyn Waugh",
+       "J. R. R. Tolkien"
+    ]    
+        )");
+        CHECK(result3 == expected3);
+    }
 
-    json result5 = json_query(root,"$..book[1::2,0].author");
-    json expected5 = json::parse(R"(
-[
-    "Evelyn Waugh",
-    "J. R. R. Tolkien",
-    "Nigel Rees"
-]    
-    )");
-    CHECK(result5 == expected5);
+    SECTION("Union")
+    {
+        std::unordered_set<std::string> expected = {"Evelyn Waugh","J. R. R. Tolkien","Nigel Rees"};
+
+        json result1 = json_query(root,"$..book[1:4:2,0].author");
+        CHECK(result1.size() == expected.size());
+        for (const auto& item : result1.array_range())
+        {
+            CHECK(expected.count(item.as<std::string>()) == 1);
+        }
+
+        json result2 = json_query(root,"$..book[1::2,0].author");
+        CHECK(result2.size() == expected.size());
+        for (const auto& item : result2.array_range())
+        {
+            CHECK(expected.count(item.as<std::string>()) == 1);
+        }
+    }
 }
 
 TEST_CASE("test_replace")
@@ -1502,12 +1545,14 @@ TEST_CASE("jsonpath test 1")
 
     SECTION("$[-1,-3,-4].category")
     {
-        json expected = json::parse(R"([ "The Lord of the Rings", "Sword of Honour", "Sayings of the Century"])");
+        std::unordered_set<std::string> expected{"The Lord of the Rings", "Sword of Honour", "Sayings of the Century"};
         json result = json_query(j,"$[-1,-3,-4].title");
 
-        std::cout << "result: " << result << "\n";
-        REQUIRE(result.size() == 3);
-        CHECK(result == expected);
+        CHECK(result.size() == expected.size());
+        for (const auto& item : result.array_range())
+        {
+            CHECK(expected.count(item.as<std::string>()) == 1);
+        }
     }
 
     SECTION("count($.*)")

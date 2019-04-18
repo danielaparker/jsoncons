@@ -10,7 +10,6 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <unordered_map> // std::unordered_map
 #include <utility> // std::move
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
