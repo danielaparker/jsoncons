@@ -14,6 +14,7 @@
 #include <utility>
 #include <ctime>
 #include <new>
+#include <unordered_set> // std::unordered_set
 
 using namespace jsoncons;
 using namespace jsoncons::jsonpath;
