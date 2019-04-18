@@ -1,7 +1,11 @@
 master
 ------
 
-Changes to jsonpath
+Enhancements:
+
+- `basic_json` now supports operators `<`, `<=`, `>`, `>=` 
+
+Changes to jsonpath:
 
 - jsonpath unions now return distinct values (no duplicates)
 

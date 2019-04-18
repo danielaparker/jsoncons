@@ -256,12 +256,28 @@ Throws `std::runtime_error` if not an object.
 
 <table border="0">
   <tr>
-    <td><code>bool operator==(const json& rhs) const</code></td>
+    <td><code>friend bool operator==(const json& lhs, const json& rhs)</code></td>
     <td>Returns <code>true</true> if two json objects compare equal, <code>false</true> otherwise.</td> 
   </tr>
   <tr>
-    <td><code>bool operator!=(const json& rhs) const</code></td>
+    <td><code>friend bool operator!=(const json& lhs, const json& rhs)</code></td>
     <td>Returns <code>true</true> if two json objects do not compare equal, <code>false</true> otherwise.</td> 
+  </tr>
+  <tr>
+    <td><code>friend bool operator<(const json& lhs, const json& rhs)</code></td>
+    <td>Compares the contents of lhs and rhs lexicographically.</td> 
+  </tr>
+  <tr>
+    <td><code>friend bool operator<=(const json& lhs, const json& rhs)</code></td>
+    <td>Compares the contents of lhs and rhs lexicographically.</td> 
+  </tr>
+  <tr>
+    <td><code>friend bool operator>(const json& lhs, const json& rhs)</code></td>
+    <td>Compares the contents of lhs and rhs lexicographically.</td> 
+  </tr>
+  <tr>
+    <td><code>friend bool operator>=(const json& lhs, const json& rhs)</code></td>
+    <td>Compares the contents of lhs and rhs lexicographically.</td> 
   </tr>
 </table>
 
