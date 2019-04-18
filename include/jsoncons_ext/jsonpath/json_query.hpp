@@ -1,4 +1,4 @@
-// Copyright 2013 Daniel Parkerexpect_unquoted_name_or_left_bracket
+// Copyright 2013 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -16,7 +16,7 @@
 #include <utility> // std::move
 #include <regex>
 #include <functional> // std::hash
-#include <unordered_set> // std::unordered_set
+#include <set> // std::set
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_filter.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
@@ -236,19 +236,11 @@ class jsonpath_evaluator : private ser_context
     };
     typedef std::vector<node_type> node_set;
 
-    struct node_equal_to
+    struct node_less
     {
         bool operator()(const node_type& a, const node_type& b) const
         {
-            return *(a.val_ptr) == *(b.val_ptr);
-        }
-    };
-
-    struct node_hash
-    {
-        std::size_t operator()(const node_type& a) const noexcept
-        {
-            return std::hash<pointer>()(a.val_ptr);
+            return *(a.val_ptr) < *(b.val_ptr);
         }
     };
 
@@ -1571,7 +1563,7 @@ public:
     {
         if (is_union_)
         {
-            std::unordered_set<node_type, node_hash, node_equal_to> temp(nodes_.begin(), nodes_.end());
+            std::set<node_type, node_less> temp(nodes_.begin(), nodes_.end());
             stack_.push_back(std::vector<node_type>(temp.begin(),temp.end()));
         }
         else

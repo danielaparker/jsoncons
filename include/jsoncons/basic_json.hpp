@@ -1073,136 +1073,264 @@ public:
             }
             switch (get_storage_type())
             {
-            case storage_type::null_val:
-                switch (rhs.get_storage_type())
-                {
                 case storage_type::null_val:
-                    return true;
-                default:
-                    return false;
-                }
-                break;
-            case storage_type::empty_object_val:
-                switch (rhs.get_storage_type())
-                {
-                case storage_type::empty_object_val:
-                    return true;
-                case storage_type::object_val:
-                    return rhs.size() == 0;
-                default:
-                    return false;
-                }
-                break;
-            case storage_type::bool_val:
-                switch (rhs.get_storage_type())
-                {
-                case storage_type::bool_val:
-                    return bool_data_cast()->value() == rhs.bool_data_cast()->value();
-                default:
-                    return false;
-                }
-                break;
-            case storage_type::int64_val:
-                switch (rhs.get_storage_type())
-                {
-                case storage_type::int64_val:
-                    return int64_data_cast()->value() == rhs.int64_data_cast()->value();
-                case storage_type::uint64_val:
-                    return int64_data_cast()->value() >= 0 ? static_cast<uint64_t>(int64_data_cast()->value()) == rhs.uint64_data_cast()->value() : false;
-                case storage_type::double_val:
-                    return static_cast<double>(int64_data_cast()->value()) == rhs.double_data_cast()->value();
-                default:
-                    return false;
-                }
-                break;
-            case storage_type::uint64_val:
-                switch (rhs.get_storage_type())
-                {
-                case storage_type::int64_val:
-                    return rhs.int64_data_cast()->value() >= 0 ? uint64_data_cast()->value() == static_cast<uint64_t>(rhs.int64_data_cast()->value()) : false;
-                case storage_type::uint64_val:
-                    return uint64_data_cast()->value() == rhs.uint64_data_cast()->value();
-                case storage_type::double_val:
-                    return static_cast<double>(uint64_data_cast()->value()) == rhs.double_data_cast()->value();
-                default:
-                    return false;
-                }
-                break;
-            case storage_type::double_val:
-                switch (rhs.get_storage_type())
-                {
-                case storage_type::int64_val:
-                    return double_data_cast()->value() == static_cast<double>(rhs.int64_data_cast()->value());
-                case storage_type::uint64_val:
-                    return double_data_cast()->value() == static_cast<double>(rhs.uint64_data_cast()->value());
-                case storage_type::double_val:
-                    return double_data_cast()->value() == rhs.double_data_cast()->value();
-                default:
-                    return false;
-                }
-                break;
-            case storage_type::short_string_val:
-                switch (rhs.get_storage_type())
-                {
-                case storage_type::short_string_val:
-                    return as_string_view() == rhs.as_string_view();
-                case storage_type::long_string_val:
-                    return as_string_view() == rhs.as_string_view();
-                default:
-                    return false;
-                }
-                break;
-            case storage_type::byte_string_val:
-                switch (rhs.get_storage_type())
-                {
-                case storage_type::byte_string_val:
+                    switch (rhs.get_storage_type())
                     {
-                        return as_byte_string_view() == rhs.as_byte_string_view();
+                        case storage_type::null_val:
+                            return true;
+                        default:
+                            return false;
                     }
-                default:
-                    return false;
-                }
-                break;
-            case storage_type::long_string_val:
-                switch (rhs.get_storage_type())
-                {
-                case storage_type::short_string_val:
-                    return as_string_view() == rhs.as_string_view();
-                case storage_type::long_string_val:
-                    return as_string_view() == rhs.as_string_view();
-                default:
-                    return false;
-                }
-                break;
-            case storage_type::array_val:
-                switch (rhs.get_storage_type())
-                {
-                case storage_type::array_val:
-                    return array_data_cast()->value() == rhs.array_data_cast()->value();
-                default:
-                    return false;
-                }
-                break;
-            case storage_type::object_val:
-                switch (rhs.get_storage_type())
-                {
+                    break;
                 case storage_type::empty_object_val:
-                    return size() == 0;
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::empty_object_val:
+                            return true;
+                        case storage_type::object_val:
+                            return rhs.size() == 0;
+                        default:
+                            return false;
+                    }
+                    break;
+                case storage_type::bool_val:
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::bool_val:
+                            return bool_data_cast()->value() == rhs.bool_data_cast()->value();
+                        default:
+                            return false;
+                    }
+                    break;
+                case storage_type::int64_val:
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::int64_val:
+                            return int64_data_cast()->value() == rhs.int64_data_cast()->value();
+                        case storage_type::uint64_val:
+                            return int64_data_cast()->value() >= 0 ? static_cast<uint64_t>(int64_data_cast()->value()) == rhs.uint64_data_cast()->value() : false;
+                        case storage_type::double_val:
+                            return static_cast<double>(int64_data_cast()->value()) == rhs.double_data_cast()->value();
+                        default:
+                            return false;
+                    }
+                    break;
+                case storage_type::uint64_val:
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::int64_val:
+                            return rhs.int64_data_cast()->value() >= 0 ? uint64_data_cast()->value() == static_cast<uint64_t>(rhs.int64_data_cast()->value()) : false;
+                        case storage_type::uint64_val:
+                            return uint64_data_cast()->value() == rhs.uint64_data_cast()->value();
+                        case storage_type::double_val:
+                            return static_cast<double>(uint64_data_cast()->value()) == rhs.double_data_cast()->value();
+                        default:
+                            return false;
+                    }
+                    break;
+                case storage_type::double_val:
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::int64_val:
+                            return double_data_cast()->value() == static_cast<double>(rhs.int64_data_cast()->value());
+                        case storage_type::uint64_val:
+                            return double_data_cast()->value() == static_cast<double>(rhs.uint64_data_cast()->value());
+                        case storage_type::double_val:
+                            return double_data_cast()->value() == rhs.double_data_cast()->value();
+                        default:
+                            return false;
+                    }
+                    break;
+                case storage_type::short_string_val:
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::short_string_val:
+                            return as_string_view() == rhs.as_string_view();
+                        case storage_type::long_string_val:
+                            return as_string_view() == rhs.as_string_view();
+                        default:
+                            return false;
+                    }
+                    break;
+                case storage_type::long_string_val:
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::short_string_val:
+                            return as_string_view() == rhs.as_string_view();
+                        case storage_type::long_string_val:
+                            return as_string_view() == rhs.as_string_view();
+                        default:
+                            return false;
+                    }
+                    break;
+                case storage_type::byte_string_val:
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::byte_string_val:
+                        {
+                            return as_byte_string_view() == rhs.as_byte_string_view();
+                        }
+                        default:
+                            return false;
+                    }
+                    break;
+                case storage_type::array_val:
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::array_val:
+                            return array_data_cast()->value() == rhs.array_data_cast()->value();
+                        default:
+                            return false;
+                    }
+                    break;
                 case storage_type::object_val:
-                    return object_data_cast()->value() == rhs.object_data_cast()->value();
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::empty_object_val:
+                            return size() == 0;
+                        case storage_type::object_val:
+                            return object_data_cast()->value() == rhs.object_data_cast()->value();
+                        default:
+                            return false;
+                    }
+                    break;
                 default:
-                    return false;
-                }
-                break;
-            default:
-                JSONCONS_UNREACHABLE();
-                break;
+                    JSONCONS_UNREACHABLE();
+                    break;
             }
         }
 
         bool operator!=(const variant& rhs) const
         {
             return !(*this == rhs);
+        }
+
+        bool operator<(const variant& rhs) const
+        {
+            if (this == &rhs)
+            {
+                return false;
+            }
+            switch (get_storage_type())
+            {
+                case storage_type::null_val:
+                    return (int)get_storage_type() < (int)rhs.get_storage_type();
+                case storage_type::empty_object_val:
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::empty_object_val:
+                            return false;
+                        case storage_type::object_val:
+                            return rhs.size() != 0;
+                        default:
+                            return (int)get_storage_type() < (int)rhs.get_storage_type();
+                    }
+                    break;
+                case storage_type::bool_val:
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::bool_val:
+                            return bool_data_cast()->value() < rhs.bool_data_cast()->value();
+                        default:
+                            return (int)get_storage_type() < (int)rhs.get_storage_type();
+                    }
+                    break;
+                case storage_type::int64_val:
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::int64_val:
+                            return int64_data_cast()->value() < rhs.int64_data_cast()->value();
+                        case storage_type::uint64_val:
+                            return int64_data_cast()->value() >= 0 ? static_cast<uint64_t>(int64_data_cast()->value()) < rhs.uint64_data_cast()->value() : true;
+                        case storage_type::double_val:
+                            return static_cast<double>(int64_data_cast()->value()) < rhs.double_data_cast()->value();
+                        default:
+                            return (int)get_storage_type() < (int)rhs.get_storage_type();
+                    }
+                    break;
+                case storage_type::uint64_val:
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::int64_val:
+                            return rhs.int64_data_cast()->value() >= 0 ? uint64_data_cast()->value() < static_cast<uint64_t>(rhs.int64_data_cast()->value()) : true;
+                        case storage_type::uint64_val:
+                            return uint64_data_cast()->value() < rhs.uint64_data_cast()->value();
+                        case storage_type::double_val:
+                            return static_cast<double>(uint64_data_cast()->value()) < rhs.double_data_cast()->value();
+                        default:
+                            return (int)get_storage_type() < (int)rhs.get_storage_type();
+                    }
+                    break;
+                case storage_type::double_val:
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::int64_val:
+                            return double_data_cast()->value() < static_cast<double>(rhs.int64_data_cast()->value());
+                        case storage_type::uint64_val:
+                            return double_data_cast()->value() < static_cast<double>(rhs.uint64_data_cast()->value());
+                        case storage_type::double_val:
+                            return double_data_cast()->value() < rhs.double_data_cast()->value();
+                        default:
+                            return (int)get_storage_type() < (int)rhs.get_storage_type();
+                    }
+                    break;
+                case storage_type::short_string_val:
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::short_string_val:
+                            return as_string_view() < rhs.as_string_view();
+                        case storage_type::long_string_val:
+                            return as_string_view() < rhs.as_string_view();
+                        default:
+                            return (int)get_storage_type() < (int)rhs.get_storage_type();
+                    }
+                    break;
+                case storage_type::long_string_val:
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::short_string_val:
+                            return as_string_view() < rhs.as_string_view();
+                        case storage_type::long_string_val:
+                            return as_string_view() < rhs.as_string_view();
+                        default:
+                            return (int)get_storage_type() < (int)rhs.get_storage_type();
+                    }
+                    break;
+                case storage_type::byte_string_val:
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::byte_string_val:
+                        {
+                            return as_byte_string_view() < rhs.as_byte_string_view();
+                        }
+                        default:
+                            return (int)get_storage_type() < (int)rhs.get_storage_type();
+                    }
+                    break;
+                case storage_type::array_val:
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::array_val:
+                            return array_data_cast()->value() < rhs.array_data_cast()->value();
+                        default:
+                            return (int)get_storage_type() < (int)rhs.get_storage_type();
+                    }
+                    break;
+                case storage_type::object_val:
+                    switch (rhs.get_storage_type())
+                    {
+                        case storage_type::empty_object_val:
+                            return false;
+                        case storage_type::object_val:
+                            return object_data_cast()->value() < rhs.object_data_cast()->value();
+                        default:
+                            return (int)get_storage_type() < (int)rhs.get_storage_type();
+                    }
+                    break;
+                default:
+                    JSONCONS_UNREACHABLE();
+                    break;
+            }
         }
 
         template <class Alloc = allocator_type>
@@ -1775,6 +1903,11 @@ public:
         bool operator!=(const basic_json& val) const
         {
             return evaluate() != val;
+        }
+
+        bool operator<(const basic_json& val) const
+        {
+            return evaluate() < val;
         }
 
         basic_json& operator[](size_t i)
@@ -2755,14 +2888,19 @@ public:
         return *this;
     }
 
+    bool operator==(const basic_json& rhs) const
+    {
+        return var_ == rhs.var_;
+    }
+
     bool operator!=(const basic_json& rhs) const
     {
         return !(*this == rhs);
     }
 
-    bool operator==(const basic_json& rhs) const
+    bool operator<(const basic_json& rhs) const
     {
-        return var_ == rhs.var_;
+        return var_ < rhs.var_;
     }
 
     size_t size() const noexcept

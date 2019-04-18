@@ -136,6 +136,24 @@ public:
         return key_;
     }
 #endif
+
+    bool operator==(const key_value& kv) const
+    {
+        return key_ == kv.key_ && value_ == kv.value_;
+    }
+
+    bool operator<(const key_value& kv) const
+    {
+        if (key_ < kv.key_)
+        {
+            return true;
+        }
+        if (key_ == kv.key_ && value_ < kv.value_)
+        {
+            return true;
+        }
+        return false;
+    }
 };
 
 template <class KeyT, class ValueT>
@@ -431,6 +449,11 @@ public:
             }
         }
         return true;
+    }
+
+    bool operator<(const json_array<Json>& rhs) const
+    {
+        return elements_ < rhs.elements_;
     }
 private:
 
@@ -1135,6 +1158,11 @@ public:
         }
         return true;
     }
+
+    bool operator<(const json_object& rhs) const
+    {
+        return members_ < rhs.members_;
+    }
 private:
     json_object& operator=(const json_object&) = delete;
 };
@@ -1797,6 +1825,11 @@ public:
             }
         }
         return true;
+    }
+
+    bool operator<(const json_object& rhs) const
+    {
+        return members_ < rhs.members_;
     }
 private:
 
