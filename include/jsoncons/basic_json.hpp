@@ -1895,19 +1895,34 @@ public:
             return *this;
         }
 
-        bool operator==(const basic_json& val) const
+        bool operator==(const basic_json& rhs) const
         {
-            return evaluate() == val;
+            return evaluate() == rhs;
         }
 
-        bool operator!=(const basic_json& val) const
+        bool operator!=(const basic_json& rhs) const
         {
-            return evaluate() != val;
+            return evaluate() != rhs;
         }
 
-        bool operator<(const basic_json& val) const
+        bool operator<(const basic_json& rhs) const
         {
-            return evaluate() < val;
+            return evaluate() < rhs;
+        }
+
+        bool operator<=(const basic_json& rhs) const
+        {
+            return !(rhs < evaluate());
+        }
+
+        bool operator>(const basic_json& rhs) const
+        {
+            return !(evaluate() <= rhs);
+        }
+
+        bool operator>=(const basic_json& rhs) const
+        {
+            return !(evaluate() < rhs);
         }
 
         basic_json& operator[](size_t i)
@@ -2888,19 +2903,34 @@ public:
         return *this;
     }
 
-    bool operator==(const basic_json& rhs) const
+    friend bool operator==(const basic_json& lhs, const basic_json& rhs)
     {
-        return var_ == rhs.var_;
+        return lhs.var_ == rhs.var_;
     }
 
-    bool operator!=(const basic_json& rhs) const
+    friend bool operator!=(const basic_json& lhs, const basic_json& rhs)
     {
-        return !(*this == rhs);
+        return !(lhs == rhs);
     }
 
-    bool operator<(const basic_json& rhs) const
+    friend bool operator<(const basic_json& lhs, const basic_json& rhs) 
     {
-        return var_ < rhs.var_;
+        return lhs.var_ < rhs.var_;
+    }
+
+    friend bool operator<=(const basic_json& lhs, const basic_json& rhs)
+    {
+        return !(rhs < lhs);
+    }
+
+    friend bool operator>(const basic_json& lhs, const basic_json& rhs) 
+    {
+        return !(lhs <= rhs);
+    }
+
+    friend bool operator>=(const basic_json& lhs, const basic_json& rhs)
+    {
+        return !(lhs < rhs);
     }
 
     size_t size() const noexcept
