@@ -1,3 +1,10 @@
+master
+------
+
+Changes to jsonpath
+
+- jsonpath unions now return distinct values (no duplicates)
+
 v0.122.0
 --------
 
