@@ -252,35 +252,6 @@ Throws `std::runtime_error` if not an object.
   </tr>
 </table>
 
-#### Relational operators
-
-<table border="0">
-  <tr>
-    <td><code>friend bool operator==(const json& lhs, const json& rhs)</code></td>
-    <td>Returns <code>true</true> if two json objects compare equal, <code>false</true> otherwise.</td> 
-  </tr>
-  <tr>
-    <td><code>friend bool operator!=(const json& lhs, const json& rhs)</code></td>
-    <td>Returns <code>true</true> if two json objects do not compare equal, <code>false</true> otherwise.</td> 
-  </tr>
-  <tr>
-    <td><code>friend bool operator<(const json& lhs, const json& rhs)</code></td>
-    <td>Compares the contents of lhs and rhs lexicographically.</td> 
-  </tr>
-  <tr>
-    <td><code>friend bool operator<=(const json& lhs, const json& rhs)</code></td>
-    <td>Compares the contents of lhs and rhs lexicographically.</td> 
-  </tr>
-  <tr>
-    <td><code>friend bool operator>(const json& lhs, const json& rhs)</code></td>
-    <td>Compares the contents of lhs and rhs lexicographically.</td> 
-  </tr>
-  <tr>
-    <td><code>friend bool operator>=(const json& lhs, const json& rhs)</code></td>
-    <td>Compares the contents of lhs and rhs lexicographically.</td> 
-  </tr>
-</table>
-
 #### Serialization
 
 <table border="0">
@@ -291,6 +262,33 @@ Throws `std::runtime_error` if not an object.
 </table>
 
 #### Non member functions
+
+<table border="0">
+  <tr>
+    <td><code>bool operator==(const json& lhs, const json& rhs)</code></td>
+    <td>Returns <code>true</true> if two json objects compare equal, <code>false</true> otherwise.</td> 
+  </tr>
+  <tr>
+    <td><code>bool operator!=(const json& lhs, const json& rhs)</code></td>
+    <td>Returns <code>true</true> if two json objects do not compare equal, <code>false</true> otherwise.</td> 
+  </tr>
+  <tr>
+    <td><code>bool operator<(const json& lhs, const json& rhs)</code></td>
+    <td>Compares the contents of lhs and rhs lexicographically.</td> 
+  </tr>
+  <tr>
+    <td><code>bool operator<=(const json& lhs, const json& rhs)</code></td>
+    <td>Compares the contents of lhs and rhs lexicographically.</td> 
+  </tr>
+  <tr>
+    <td><code>bool operator>(const json& lhs, const json& rhs)</code></td>
+    <td>Compares the contents of lhs and rhs lexicographically.</td> 
+  </tr>
+  <tr>
+    <td><code>bool operator>=(const json& lhs, const json& rhs)</code></td>
+    <td>Compares the contents of lhs and rhs lexicographically.</td> 
+  </tr>
+</table>
 
     std::istream& operator>> (std::istream& os, json& val)
 Reads a `json` value from a stream.
