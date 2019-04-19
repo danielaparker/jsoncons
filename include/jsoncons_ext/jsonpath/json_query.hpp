@@ -169,7 +169,7 @@ bool try_string_to_index(const CharT *s, size_t length, size_t* value, bool* pos
         return false;
     }
 }
-
+ 
 enum class path_state 
 {
     start,
@@ -178,7 +178,7 @@ enum class path_state
     unquoted_name,
     single_quoted_name,
     double_quoted_name,
-    bracketed,
+    expr_or_filter_or_slice_or_key,
     unquoted_comma_or_right_bracket,
     string_comma_or_right_bracket,
     slice_end_or_end_step,
@@ -694,7 +694,7 @@ public:
                             }
                             slice.start_ = 0;
 
-                            state_stack_.back() = path_state::bracketed;
+                            state_stack_.back() = path_state::expr_or_filter_or_slice_or_key;
                             break;
                         }
                         case '.':
@@ -970,7 +970,7 @@ public:
                         ++column_;
                         break;
                     case '[':
-                        state_stack_.back() = path_state::bracketed;
+                        state_stack_.back() = path_state::expr_or_filter_or_slice_or_key;
                         ++p_;
                         ++column_;
                         break;
@@ -989,7 +989,7 @@ public:
                             state_stack_.push_back(path_state::dot);
                             break;
                         case '[':
-                            state_stack_.push_back(path_state::bracketed);
+                            state_stack_.push_back(path_state::expr_or_filter_or_slice_or_key);
                             break;
                         default:
                             ec = jsonpath_errc::expected_separator;
@@ -1003,7 +1003,7 @@ public:
                     {
                         case ',':
                             is_union_ = true;
-                            state_stack_.back() = path_state::bracketed;
+                            state_stack_.back() = path_state::expr_or_filter_or_slice_or_key;
                             break;
                         case ']':
                             apply_selectors();
@@ -1018,7 +1018,7 @@ public:
                     ++p_;
                     ++column_;
                     break;
-                case path_state::bracketed:
+                case path_state::expr_or_filter_or_slice_or_key:
                     switch (*p_)
                     {
                         case ' ':case '\t':
@@ -1099,7 +1099,7 @@ public:
                                 //selectors_.push_back(make_unique_ptr<path_selector>(buffer));
                                 buffer.clear();
                             }
-                            state_stack_.back() = path_state::bracketed;
+                            state_stack_.back() = path_state::expr_or_filter_or_slice_or_key;
                             break;
                         case ']': 
                             if (!buffer.empty())
@@ -1135,7 +1135,7 @@ public:
                                 //selectors_.push_back(make_unique_ptr<path_selector>(buffer));
                                 buffer.clear();
                             }
-                            state_stack_.back() = path_state::bracketed;
+                            state_stack_.back() = path_state::expr_or_filter_or_slice_or_key;
                             break;
                         case ']': 
                             if (!buffer.empty())
@@ -1179,7 +1179,7 @@ public:
                         case ',':
                             is_union_ = true;
                             selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
-                            state_stack_.back() = path_state::bracketed;
+                            state_stack_.back() = path_state::expr_or_filter_or_slice_or_key;
                             break;
                         case ']':
                             selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
@@ -1213,7 +1213,7 @@ public:
                                 return;
                             }
                             selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
-                            state_stack_.back() = path_state::bracketed;
+                            state_stack_.back() = path_state::expr_or_filter_or_slice_or_key;
                             break;
                         case ']':
                             if (!slice.is_end_defined)
@@ -1258,7 +1258,7 @@ public:
                         case ',':
                             is_union_ = true;
                             selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
-                            state_stack_.back() = path_state::bracketed;
+                            state_stack_.back() = path_state::expr_or_filter_or_slice_or_key;
                             break;
                         case ']':
                             if (slice.step_ == 0)
