@@ -23,7 +23,7 @@ TEST_CASE("test_default_nan_replacement")
     os << print(obj);
     std::string expected = R"({"field1":null,"field2":null,"field3":null})";
 
-    CHECK(expected == os.str());
+    CHECK(os.str() == expected);
 }
 
 TEST_CASE("test_write_nan_replacement")
@@ -40,7 +40,7 @@ TEST_CASE("test_write_nan_replacement")
     os << print(j, options);
     std::string expected = R"({"field1":null,"field2":1e9999,"field3":-1e9999})";
 
-    CHECK(expected == os.str());
+    CHECK(os.str() == expected);
 }
 
 TEST_CASE("test_read_write_read_nan_replacement")

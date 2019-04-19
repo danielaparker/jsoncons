@@ -45,7 +45,7 @@ void test_parse_ec(const std::string& text, std::error_code expected)
     //          << " and column " << reader.column_number() << std::endl;
 
     CHECK(ec);
-    CHECK(expected == ec);
+    CHECK(ec == expected);
 }
 
 TEST_CASE("test_parse_missing_separator")

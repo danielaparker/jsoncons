@@ -19,7 +19,6 @@
 using namespace jsoncons;
 using namespace jsoncons::jsonpath;
 
-#if 0
 const json complex_json = json::parse(R"(
 [
   {
@@ -1598,7 +1597,7 @@ TEST_CASE("jsonpath test 1")
     }
 #endif
 }
-#endif
+
 TEST_CASE("jsonpath array union test")
 {
     json root = json::parse(R"(

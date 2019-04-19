@@ -38,7 +38,7 @@ void check_insert_or_assign(json& example, const std::string& path, const json& 
     std::error_code ec;
     jsonpointer::insert_or_assign(example, path, value, ec);
     CHECK_FALSE(ec);
-    CHECK(expected == example);
+    CHECK(example == expected);
 }
 
 void check_replace(json& example, const std::string& path, const json& value, const json& expected)
@@ -46,7 +46,7 @@ void check_replace(json& example, const std::string& path, const json& value, co
     std::error_code ec;
     jsonpointer::replace(example, path, value, ec);
     CHECK_FALSE(ec);
-    CHECK(expected == example);
+    CHECK(example == expected);
 }
 
 void check_remove(json& example, const std::string& path, const json& expected)
@@ -54,7 +54,7 @@ void check_remove(json& example, const std::string& path, const json& expected)
     std::error_code ec;
     jsonpointer::remove(example, path, ec);
     CHECK_FALSE(ec);
-    CHECK(expected == example);
+    CHECK(example == expected);
 }
 
 TEST_CASE("get_with_const_ref_test")

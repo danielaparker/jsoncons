@@ -26,6 +26,6 @@ TEST_CASE("test_byte_string_serialization")
 
     //std::cout << expected << " " << os.str() << std::endl;
 
-    CHECK(expected == os.str());
+    CHECK(os.str() == expected);
 }
 

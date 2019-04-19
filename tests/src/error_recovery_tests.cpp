@@ -35,7 +35,7 @@ TEST_CASE("test_array_extra_comma")
     json expected = json::parse("[1,2,3]");
     json val = json::parse("[1,2,3,]", err_handler);
 
-    CHECK(expected == val);
+    CHECK(val == expected);
 }
 
 TEST_CASE("test_object_extra_comma")
@@ -58,7 +58,7 @@ TEST_CASE("test_object_extra_comma")
     )", 
     err_handler);
 
-    CHECK(expected == val);
+    CHECK(val == expected);
 }
 
 TEST_CASE("test_name_without_quotes")
