@@ -137,22 +137,42 @@ public:
     }
 #endif
 
-    bool operator==(const key_value& kv) const
+    friend bool operator==(const key_value& lhs, const key_value& rhs)
     {
-        return key_ == kv.key_ && value_ == kv.value_;
+        return lhs.key_ == rhs.key_ && lhs.value_ == rhs.value_;
     }
 
-    bool operator<(const key_value& kv) const
+    friend bool operator!=(const key_value& lhs, const key_value& rhs)
     {
-        if (key_ < kv.key_)
+        return !(lhs == rhs);
+    }
+
+    friend bool operator<(const key_value& lhs, const key_value& rhs)
+    {
+        if (lhs.key_ < rhs.key_)
         {
             return true;
         }
-        if (key_ == kv.key_ && value_ < kv.value_)
+        if (lhs.key_ == rhs.key_ && lhs.value_ < rhs.value_)
         {
             return true;
         }
         return false;
+    }
+
+    friend bool operator<=(const key_value& lhs, const key_value& rhs)
+    {
+        return !(rhs < lhs);
+    }
+
+    friend bool operator>(const key_value& lhs, const key_value& rhs) 
+    {
+        return !(lhs <= rhs);
+    }
+
+    friend bool operator>=(const key_value& lhs, const key_value& rhs)
+    {
+        return !(lhs < rhs);
     }
 };
 
@@ -437,18 +457,7 @@ public:
 
     bool operator==(const json_array<Json>& rhs) const
     {
-        if (size() != rhs.size())
-        {
-            return false;
-        }
-        for (size_t i = 0; i < size(); ++i)
-        {
-            if (elements_[i] != rhs.elements_[i])
-            {
-                return false;
-            }
-        }
-        return true;
+        return elements_ == rhs.elements_;
     }
 
     bool operator<(const json_array<Json>& rhs) const
@@ -1142,21 +1151,7 @@ public:
 
     bool operator==(const json_object& rhs) const
     {
-        if (size() != rhs.size())
-        {
-            return false;
-        }
-        for (auto it = members_.begin(); it != members_.end(); ++it)
-        {
-
-            auto rhs_it = std::lower_bound(rhs.begin(), rhs.end(), *it, 
-                                           [](const key_value_type& a, const key_value_type& b){return a.key().compare(b.key()) < 0;});
-            if (rhs_it == rhs.end() || rhs_it->key() != it->key() || rhs_it->value() != it->value())
-            {
-                return false;
-            }
-        }
-        return true;
+        return members_ == rhs.members_;
     }
 
     bool operator<(const json_object& rhs) const
@@ -1812,19 +1807,7 @@ public:
 
     bool operator==(const json_object& rhs) const
     {
-        if (size() != rhs.size())
-        {
-            return false;
-        }
-        for (auto it = members_.begin(); it != members_.end(); ++it)
-        {
-            auto rhs_it = rhs.find(it->key());
-            if (rhs_it == rhs.end() || rhs_it->key() != it->key() || rhs_it->value() != it->value())
-            {
-                return false;
-            }
-        }
-        return true;
+        return members_ == rhs.members_;
     }
 
     bool operator<(const json_object& rhs) const
