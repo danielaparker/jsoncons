@@ -568,21 +568,21 @@ public:
         {
             switch (state)
             {
-            case column_state::sequence:
+                case column_state::sequence:
                 {
                     switch (*p)
                     {
-                    case ' ': case '\t':case '\r': case '\n':
-                        ++p;
-                        break;
-                    default:
-                        buffer.clear();
-                        state = column_state::label;
-                        break;
+                        case ' ': case '\t':case '\r': case '\n':
+                            ++p;
+                            break;
+                        default:
+                            buffer.clear();
+                            state = column_state::label;
+                            break;
                     }
                     break;
                 }
-            case column_state::label:
+                case column_state::label:
                 {
                     switch (*p)
                     {
@@ -631,7 +631,7 @@ public:
         {
             switch (state)
             {
-            case column_state::sequence:
+                case column_state::sequence:
                 {
                     switch (*p)
                     {
@@ -676,11 +676,11 @@ public:
                     }
                     break;
                 }
-            case column_state::label:
+                case column_state::label:
                 {
                     switch (*p)
                     {
-                    case '*':
+                        case '*':
                         {
                             auto it = type_dictionary.find(buffer);
                             if (it != type_dictionary.end())
@@ -693,9 +693,9 @@ public:
                                 JSONCONS_ASSERT(false);
                             }
                             state = column_state::sequence;
+                            break;
                         }
-                        break;
-                    case ',':
+                        case ',':
                         {
                             auto it = type_dictionary.find(buffer);
                             if (it != type_dictionary.end())
@@ -709,9 +709,9 @@ public:
                             }
                             ++p;
                             state = column_state::sequence;
+                            break;
                         }
-                        break;
-                    case ']':
+                        case ']':
                         {
                             JSONCONS_ASSERT(depth > 0);
                             auto it = type_dictionary.find(buffer);
@@ -727,14 +727,14 @@ public:
                             --depth;
                             ++p;
                             state = column_state::sequence;
+                            break;
                         }
-                        break;
-                    default:
+                        default:
                         {
                             buffer.push_back(*p);
                             ++p;
+                            break;
                         }
-                        break;
                     }
                     break;
                 }

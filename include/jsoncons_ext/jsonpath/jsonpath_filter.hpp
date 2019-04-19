@@ -1411,7 +1411,7 @@ public:
             case filter_state::oper:
                 switch (*p)
                 {
-                case '~':
+                    case '~':
                     {
                         buffer.push_back(*p);
                         ++p;
@@ -1424,11 +1424,11 @@ public:
                         buffer.clear();
                         push_token(token<Json>(it->second));
                         state = filter_state::expect_regex;
+                        break;
                     }
-                    break;
-                case '=':
-                case '&':
-                case '|':
+                    case '=':
+                    case '&':
+                    case '|':
                     {
                         buffer.push_back(*p);
                         ++p;
@@ -1441,9 +1441,9 @@ public:
                         buffer.clear();
                         push_token(token<Json>(it->second));
                         state = filter_state::expect_path_or_value_or_unary_op;
+                        break;
                     }
-                    break;
-                default:
+                    default:
                     {
                         auto it = binary_operators_.find(buffer);
                         if (it == binary_operators_.end())
@@ -1453,8 +1453,8 @@ public:
                         buffer.clear();
                         push_token(token<Json>(it->second));
                         state = filter_state::expect_path_or_value_or_unary_op;
+                        break;
                     }
-                    break;
                 }
                 break;
             case filter_state::unquoted_text: 
@@ -1555,19 +1555,56 @@ public:
                 {
                     switch (*p)
                     {                   
-                    case '\\':
-                        buffer.push_back(*p);
-                        if (p+1 < end_expr)
-                        {
-                            ++p;
-                            ++column_;
+                        case '\\':
                             buffer.push_back(*p);
-                        }
-                        break;
-                    case '\'':
-                        buffer.push_back('\"');
-                        //if (buffer.length() > 0)
-                        {
+                            if (p+1 < end_expr)
+                            {
+                                ++p;
+                                ++column_;
+                                buffer.push_back(*p);
+                            }
+                            break;
+                        case '\'':
+                            buffer.push_back('\"');
+                            //if (buffer.length() > 0)
+                            {
+                                try
+                                {
+                                    auto val = Json::parse(buffer);
+                                    push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
+                                }
+                                catch (const ser_error&)
+                                {
+                                    throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
+                                }
+                                buffer.clear();
+                            }
+                            state = filter_state::expect_path_or_value_or_unary_op;
+                            break;
+
+                        default: 
+                            buffer.push_back(*p);
+                            break;
+                    }
+                }
+                ++p;
+                ++column_;
+                break;
+            case filter_state::double_quoted_text: 
+                {
+                    switch (*p)
+                    {                   
+                        case '\\':
+                            buffer.push_back(*p);
+                            if (p+1 < end_expr)
+                            {
+                                ++p;
+                                ++column_;
+                                buffer.push_back(*p);
+                            }
+                            break;
+                        case '\"':
+                            buffer.push_back(*p);
                             try
                             {
                                 auto val = Json::parse(buffer);
@@ -1578,49 +1615,12 @@ public:
                                 throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
                             }
                             buffer.clear();
-                        }
-                        state = filter_state::expect_path_or_value_or_unary_op;
-                        break;
+                            state = filter_state::expect_path_or_value_or_unary_op;
+                            break;
 
-                    default: 
-                        buffer.push_back(*p);
-                        break;
-                    }
-                }
-                ++p;
-                ++column_;
-                break;
-            case filter_state::double_quoted_text: 
-                {
-                    switch (*p)
-                    {                   
-                    case '\\':
-                        buffer.push_back(*p);
-                        if (p+1 < end_expr)
-                        {
-                            ++p;
-                            ++column_;
+                        default: 
                             buffer.push_back(*p);
-                        }
-                        break;
-                    case '\"':
-                        buffer.push_back(*p);
-                        try
-                        {
-                            auto val = Json::parse(buffer);
-                            push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
-                        }
-                        catch (const ser_error&)
-                        {
-                            throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
-                        }
-                        buffer.clear();
-                        state = filter_state::expect_path_or_value_or_unary_op;
-                        break;
-
-                    default: 
-                        buffer.push_back(*p);
-                        break;
+                            break;
                     }
                 }
                 ++p;
@@ -1779,17 +1779,54 @@ public:
             case filter_state::path: 
                 switch (*p)
                 {
-                case '<':
-                case '>':
-                case '!':
-                case '=':
-                case '&':
-                case '|':
-                case '+':
-                case '-':
-                case '*':
-                case '/':
-                    {
+                    case '<':
+                    case '>':
+                    case '!':
+                    case '=':
+                    case '&':
+                    case '|':
+                    case '+':
+                    case '-':
+                    case '*':
+                    case '/':
+                        {
+                            if (!path_mode_stack_.empty())
+                            {
+                                if (path_mode_stack_[0] == filter_path_mode::root_path)
+                                {
+                                    try
+                                    {
+                                        jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
+                                        evaluator.evaluate(root, buffer);
+                                        auto result = evaluator.get_values();
+                                        if (result.size() > 0)
+                                        {
+                                            push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(result[0]))));
+                                        }
+                                    }
+                                    catch (const jsonpath_error& e)
+                                    {
+                                        throw jsonpath_error(e.code(),line_,column_);
+                                    }
+                                }
+                                else
+                                {
+                                    push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
+                                }
+                                path_mode_stack_.pop_back();
+                            }
+                            else
+                            {
+                                push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
+                            }
+                            buffer.clear();
+                            buffer.push_back(*p);
+                            ++p;
+                            ++column_;
+                            state = filter_state::oper;
+                        }
+                        break;
+                    case ')':
                         if (!path_mode_stack_.empty())
                         {
                             if (path_mode_stack_[0] == filter_path_mode::root_path)
@@ -1803,6 +1840,7 @@ public:
                                     {
                                         push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(result[0]))));
                                     }
+                                    push_token(token<Json>(token_type::rparen));
                                 }
                                 catch (const jsonpath_error& e)
                                 {
@@ -1818,89 +1856,51 @@ public:
                         else
                         {
                             push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
+                            push_token(token<Json>(token_type::rparen));
                         }
                         buffer.clear();
-                        buffer.push_back(*p);
-                        ++p;
-                        ++column_;
-                        state = filter_state::oper;
-                    }
-                    break;
-                case ')':
-                    if (!path_mode_stack_.empty())
-                    {
-                        if (path_mode_stack_[0] == filter_path_mode::root_path)
+                        if (--depth == 0)
                         {
-                            try
-                            {
-                                jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
-                                evaluator.evaluate(root, buffer);
-                                auto result = evaluator.get_values();
-                                if (result.size() > 0)
-                                {
-                                    push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(result[0]))));
-                                }
-                                push_token(token<Json>(token_type::rparen));
-                            }
-                            catch (const jsonpath_error& e)
-                            {
-                                throw jsonpath_error(e.code(),line_,column_);
-                            }
+                            state = filter_state::done;
                         }
                         else
                         {
-                            push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
+                            state = filter_state::expect_path_or_value_or_unary_op;
                         }
-                        path_mode_stack_.pop_back();
-                    }
-                    else
+                        ++p;
+                        ++column_;
+                        break;
+                    default:
+                        buffer.push_back(*p);
+                        ++p;
+                        ++column_;
+                        break;
+                    };
+                    break;
+                case filter_state::expect_regex: 
+                    switch (*p)
                     {
-                        push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
-                        push_token(token<Json>(token_type::rparen));
-                    }
-                    buffer.clear();
-                    if (--depth == 0)
-                    {
-                        state = filter_state::done;
-                    }
-                    else
-                    {
-                        state = filter_state::expect_path_or_value_or_unary_op;
-                    }
+                    case '\r':
+                        push_state(state);
+                        state = filter_state::cr;
+                        break;
+                    case '\n':
+                        push_state(state);
+                        state = filter_state::lf;
+                        break;
+                    case ' ':case '\t':
+                        break;
+                    case '/':
+                        state = filter_state::regex;
+                        break;
+                    default: 
+                        throw jsonpath_error(jsonpath_errc::invalid_filter_expected_slash,line_,column_);
+                        break;
+                    };
                     ++p;
                     ++column_;
                     break;
-                default:
-                    buffer.push_back(*p);
-                    ++p;
-                    ++column_;
-                    break;
-                };
-                break;
-            case filter_state::expect_regex: 
-                switch (*p)
-                {
-                case '\r':
-                    push_state(state);
-                    state = filter_state::cr;
-                    break;
-                case '\n':
-                    push_state(state);
-                    state = filter_state::lf;
-                    break;
-                case ' ':case '\t':
-                    break;
-                case '/':
-                    state = filter_state::regex;
-                    break;
-                default: 
-                    throw jsonpath_error(jsonpath_errc::invalid_filter_expected_slash,line_,column_);
-                    break;
-                };
-                ++p;
-                ++column_;
-                break;
-            case filter_state::regex: 
+                case filter_state::regex: 
                 {
                     switch (*p)
                     {                   
@@ -1924,14 +1924,14 @@ public:
                         buffer.push_back(*p);
                         break;
                     }
+                    ++p;
+                    ++column_;
+                    break;
                 }
-                ++p;
-                ++column_;
-                break;
-            default:
-                ++p;
-                ++column_;
-                break;
+                default:
+                    ++p;
+                    ++column_;
+                    break;
             }
         }
         if (depth != 0)

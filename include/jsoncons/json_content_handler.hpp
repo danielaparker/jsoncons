@@ -134,19 +134,17 @@ public:
     {
         switch (encoding_hint)
         {
-            {
-                case byte_string_chars_format::base16:
-                    tag = semantic_tag::base16;
-                    break;
-                case byte_string_chars_format::base64:
-                    tag = semantic_tag::base64;
-                    break;
-                case byte_string_chars_format::base64url:
-                    tag = semantic_tag::base64url;
-                    break;
-                default:
-                    break;
-            }
+            case byte_string_chars_format::base16:
+                tag = semantic_tag::base16;
+                break;
+            case byte_string_chars_format::base64:
+                tag = semantic_tag::base64;
+                break;
+            case byte_string_chars_format::base64url:
+                tag = semantic_tag::base64url;
+                break;
+            default:
+                break;
         }
         return do_byte_string_value(b, tag, context);
     }
@@ -158,19 +156,17 @@ public:
     {
         switch (encoding_hint)
         {
-            {
-                case byte_string_chars_format::base16:
-                    tag = semantic_tag::base16;
-                    break;
-                case byte_string_chars_format::base64:
-                    tag = semantic_tag::base64;
-                    break;
-                case byte_string_chars_format::base64url:
-                    tag = semantic_tag::base64url;
-                    break;
-                default:
-                    break;
-            }
+            case byte_string_chars_format::base16:
+                tag = semantic_tag::base16;
+                break;
+            case byte_string_chars_format::base64:
+                tag = semantic_tag::base64;
+                break;
+            case byte_string_chars_format::base64url:
+                tag = semantic_tag::base64url;
+                break;
+            default:
+                break;
         }
         return do_byte_string_value(byte_string(p, size), tag, context);
     }

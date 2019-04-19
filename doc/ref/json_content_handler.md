@@ -67,7 +67,7 @@ Throws a [ser_error](ser_error.md) to indicate an error.
 
     bool string_value(const string_view_type& value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context()); ;
+                      const ser_context& context=null_ser_context());
 Writes a string value. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -119,7 +119,7 @@ Throws a [ser_error](ser_error.md) to indicate an error.
 
     bool int64_value(int64_t value, 
                      semantic_tag tag = semantic_tag::none, 
-                     const ser_context& context=null_ser_context()); ;
+                     const ser_context& context=null_ser_context());
 Writes a signed integer value. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.

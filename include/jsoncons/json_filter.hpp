@@ -18,7 +18,7 @@ template <class CharT>
 class basic_json_filter : public basic_json_content_handler<CharT>
 {
 public:
-    using typename basic_json_content_handler<CharT>::string_view_type                      ;
+    using typename basic_json_content_handler<CharT>::string_view_type;
 private:
     basic_json_content_handler<CharT>& to_handler_;
 

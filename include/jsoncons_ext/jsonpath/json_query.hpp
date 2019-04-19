@@ -944,40 +944,39 @@ public:
                 case path_state::dot:
                     switch (*p_)
                     {
-                    case '.':
-                        is_recursive_descent_ = true;
-                        ++p_;
-                        ++column_;
-                        state_stack_.back() = path_state::unquoted_name_or_left_bracket;
-                        break;
-                    default:
-                        state_stack_.back() = path_state::unquoted_name_or_left_bracket;
-                        break;
+                        case '.':
+                            is_recursive_descent_ = true;
+                            ++p_;
+                            ++column_;
+                            state_stack_.back() = path_state::unquoted_name_or_left_bracket;
+                            break;
+                        default:
+                            state_stack_.back() = path_state::unquoted_name_or_left_bracket;
+                            break;
                     }
                     break;
                 case path_state::unquoted_name_or_left_bracket: // Can [ follow .?
                     switch (*p_)
                     {
-                    case '.':
-                        ec = jsonpath_errc::expected_name;
-                        return;
-                    case '*':
-                        end_all();
-                        transfer_nodes();
-                        //state_stack_.push_back(path_state::dot_or_left_bracket);
-                        state_stack_.pop_back();
-                        ++p_;
-                        ++column_;
-                        break;
-                    case '[':
-                        state_stack_.back() = path_state::expr_or_filter_or_slice_or_key;
-                        ++p_;
-                        ++column_;
-                        break;
-                    default:
-                        buffer.clear();
-                        state_stack_.back() = path_state::unquoted_name;
-                        break;
+                        case '.':
+                            ec = jsonpath_errc::expected_name;
+                            return;
+                        case '*':
+                            end_all();
+                            transfer_nodes();
+                            state_stack_.pop_back();
+                            ++p_;
+                            ++column_;
+                            break;
+                        case '[':
+                            state_stack_.back() = path_state::expr_or_filter_or_slice_or_key;
+                            ++p_;
+                            ++column_;
+                            break;
+                        default:
+                            buffer.clear();
+                            state_stack_.back() = path_state::unquoted_name;
+                            break;
                     }
                     break;
                 case path_state::dot_or_left_bracket: 
@@ -1355,23 +1354,23 @@ public:
                 case path_state::double_quoted_name: 
                     switch (*p_)
                     {
-                    case '\"':
-                        selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                        buffer.clear();
-                        state_stack_.pop_back();
-                        break;
-                    case '\\':
-                        buffer.push_back(*p_);
-                        if (p_+1 < end_input_)
-                        {
-                            ++p_;
-                            ++column_;
+                        case '\"':
+                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            buffer.clear();
+                            state_stack_.pop_back();
+                            break;
+                        case '\\':
                             buffer.push_back(*p_);
-                        }
-                        break;
-                    default:
-                        buffer.push_back(*p_);
-                        break;
+                            if (p_+1 < end_input_)
+                            {
+                                ++p_;
+                                ++column_;
+                                buffer.push_back(*p_);
+                            }
+                            break;
+                        default:
+                            buffer.push_back(*p_);
+                            break;
                     };
                     ++p_;
                     ++column_;

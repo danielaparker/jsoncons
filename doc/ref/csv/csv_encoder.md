@@ -73,7 +73,7 @@ and uses the specified [csv options](csv_options.md).
 
     bool string_value(const string_view_type& value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context()); ;
+                      const ser_context& context=null_ser_context());
 
     bool byte_string_value(const byte_string_view& b, 
                            semantic_tag tag=semantic_tag::none, 
@@ -97,7 +97,7 @@ and uses the specified [csv options](csv_options.md).
 
     bool int64_value(int64_t value, 
                      semantic_tag tag = semantic_tag::none, 
-                     const ser_context& context=null_ser_context()); ;
+                     const ser_context& context=null_ser_context());
 
     bool uint64_value(uint64_t value, 
                       semantic_tag tag = semantic_tag::none, 

@@ -20,18 +20,18 @@ TEST_CASE("test_string_to_double")
     const char* s1 = "0.0";
     json j1 = json::parse(s1);
     double expected1 = 0.0;
-    CHECK( j1.as<double>() == expected1)               ;
+    CHECK( j1.as<double>() == expected1);
 
     const char* s2 = "0.123456789";
     json j2 = json::parse(s2);
     double expected2 = 0.123456789;
-    CHECK( j2.as<double>() == expected2)               ;
+    CHECK( j2.as<double>() == expected2);
 
     const char* s3 = "123456789.123456789";
     json j3 = json::parse(s3);
     char* end3 = nullptr;
     double expected3 = strtod(s3,&end3);
-    CHECK( j3.as<double>() == expected3)               ;
+    CHECK( j3.as<double>() == expected3);
 }
 
 TEST_CASE("test_exponent")
@@ -49,7 +49,7 @@ TEST_CASE("test_exponent")
     const char* s1 = "1.15507e+173";
     json j1 = json::parse(s1);
     double expected1 = 1.15507e+173;
-    CHECK( j1.as<double>() == expected1)               ;
+    CHECK( j1.as<double>() == expected1);
 
 }
 

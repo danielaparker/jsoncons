@@ -138,18 +138,18 @@ public:
                 case jsonpointer::detail::pointer_state::escaped: 
                     switch (*p_)
                     {
-                    case '0':
-                        buffer_.push_back('~');
-                        state_ = jsonpointer::detail::pointer_state::delim;
-                        break;
-                    case '1':
-                        buffer_.push_back('/');
-                        state_ = jsonpointer::detail::pointer_state::delim;
-                        break;
-                    default:
-                        ec = jsonpointer_errc::expected_0_or_1;
-                        done = true;
-                        break;
+                        case '0':
+                            buffer_.push_back('~');
+                            state_ = jsonpointer::detail::pointer_state::delim;
+                            break;
+                        case '1':
+                            buffer_.push_back('/');
+                            state_ = jsonpointer::detail::pointer_state::delim;
+                            break;
+                        default:
+                            ec = jsonpointer_errc::expected_0_or_1;
+                            done = true;
+                            break;
                     };
                     break;
                 default:

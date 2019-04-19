@@ -37,89 +37,95 @@ size_t escape_string(const CharT* s, size_t length,
         CharT c = *it;
         switch (c)
         {
-        case '\\':
-            result.push_back('\\');
-            result.push_back('\\');
-            count += 2;
-            break;
-        case '"':
-            result.push_back('\\');
-            result.push_back('\"');
-            count += 2;
-            break;
-        case '\b':
-            result.push_back('\\');
-            result.push_back('b');
-            count += 2;
-            break;
-        case '\f':
-            result.push_back('\\');
-            result.push_back('f');
-            count += 2;
-            break;
-        case '\n':
-            result.push_back('\\');
-            result.push_back('n');
-            count += 2;
-            break;
-        case '\r':
-            result.push_back('\\');
-            result.push_back('r');
-            count += 2;
-            break;
-        case '\t':
-            result.push_back('\\');
-            result.push_back('t');
-            count += 2;
-            break;
-        default:
-            if (escape_solidus && c == '/')
-            {
+            case '\\':
                 result.push_back('\\');
-                result.push_back('/');
+                result.push_back('\\');
                 count += 2;
-            }
-            else if (is_control_character(c) || escape_all_non_ascii)
-            {
-                // convert utf8 to codepoint
-                unicons::sequence_generator<const CharT*> g(it, end, unicons::conv_flags::strict);
-                if (g.done() || g.status() != unicons::conv_errc())
+                break;
+            case '"':
+                result.push_back('\\');
+                result.push_back('\"');
+                count += 2;
+                break;
+            case '\b':
+                result.push_back('\\');
+                result.push_back('b');
+                count += 2;
+                break;
+            case '\f':
+                result.push_back('\\');
+                result.push_back('f');
+                count += 2;
+                break;
+            case '\n':
+                result.push_back('\\');
+                result.push_back('n');
+                count += 2;
+                break;
+            case '\r':
+                result.push_back('\\');
+                result.push_back('r');
+                count += 2;
+                break;
+            case '\t':
+                result.push_back('\\');
+                result.push_back('t');
+                count += 2;
+                break;
+            default:
+                if (escape_solidus && c == '/')
                 {
-                    throw ser_error(json_errc::illegal_codepoint);
+                    result.push_back('\\');
+                    result.push_back('/');
+                    count += 2;
                 }
-                uint32_t cp = g.get().codepoint();
-                it += (g.get().length() - 1);
-                if (is_non_ascii_codepoint(cp) || is_control_character(c))
+                else if (is_control_character(c) || escape_all_non_ascii)
                 {
-                    if (cp > 0xFFFF)
+                    // convert utf8 to codepoint
+                    unicons::sequence_generator<const CharT*> g(it, end, unicons::conv_flags::strict);
+                    if (g.done() || g.status() != unicons::conv_errc())
                     {
-                        cp -= 0x10000;
-                        uint32_t first = (cp >> 10) + 0xD800;
-                        uint32_t second = ((cp & 0x03FF) + 0xDC00);
+                        throw ser_error(json_errc::illegal_codepoint);
+                    }
+                    uint32_t cp = g.get().codepoint();
+                    it += (g.get().length() - 1);
+                    if (is_non_ascii_codepoint(cp) || is_control_character(c))
+                    {
+                        if (cp > 0xFFFF)
+                        {
+                            cp -= 0x10000;
+                            uint32_t first = (cp >> 10) + 0xD800;
+                            uint32_t second = ((cp & 0x03FF) + 0xDC00);
 
-                        result.push_back('\\');
-                        result.push_back('u');
-                        result.push_back(to_hex_character(first >> 12 & 0x000F));
-                        result.push_back(to_hex_character(first >> 8 & 0x000F));
-                        result.push_back(to_hex_character(first >> 4 & 0x000F));
-                        result.push_back(to_hex_character(first & 0x000F));
-                        result.push_back('\\');
-                        result.push_back('u');
-                        result.push_back(to_hex_character(second >> 12 & 0x000F));
-                        result.push_back(to_hex_character(second >> 8 & 0x000F));
-                        result.push_back(to_hex_character(second >> 4 & 0x000F));
-                        result.push_back(to_hex_character(second & 0x000F));
-                        count += 12;
+                            result.push_back('\\');
+                            result.push_back('u');
+                            result.push_back(to_hex_character(first >> 12 & 0x000F));
+                            result.push_back(to_hex_character(first >> 8 & 0x000F));
+                            result.push_back(to_hex_character(first >> 4 & 0x000F));
+                            result.push_back(to_hex_character(first & 0x000F));
+                            result.push_back('\\');
+                            result.push_back('u');
+                            result.push_back(to_hex_character(second >> 12 & 0x000F));
+                            result.push_back(to_hex_character(second >> 8 & 0x000F));
+                            result.push_back(to_hex_character(second >> 4 & 0x000F));
+                            result.push_back(to_hex_character(second & 0x000F));
+                            count += 12;
+                        }
+                        else
+                        {
+                            result.push_back('\\');
+                            result.push_back('u');
+                            result.push_back(to_hex_character(cp >> 12 & 0x000F));
+                            result.push_back(to_hex_character(cp >> 8 & 0x000F));
+                            result.push_back(to_hex_character(cp >> 4 & 0x000F));
+                            result.push_back(to_hex_character(cp & 0x000F));
+                            count += 6;
+                        }
                     }
                     else
                     {
-                        result.push_back('\\');
-                        result.push_back('u');
-                        result.push_back(to_hex_character(cp >> 12 & 0x000F));
-                        result.push_back(to_hex_character(cp >> 8 & 0x000F));
-                        result.push_back(to_hex_character(cp >> 4 & 0x000F));
-                        result.push_back(to_hex_character(cp & 0x000F));
-                        count += 6;
+                        result.push_back(c);
+                        ++count;
                     }
                 }
                 else
@@ -127,13 +133,7 @@ size_t escape_string(const CharT* s, size_t length,
                     result.push_back(c);
                     ++count;
                 }
-            }
-            else
-            {
-                result.push_back(c);
-                ++count;
-            }
-            break;
+                break;
         }
     }
     return count;
@@ -510,28 +510,28 @@ private:
             {
                 switch (options_.array_array_line_splits())
                 {
-                case line_split_kind::same_line:
-                    if (stack_.back().is_multi_line())
-                    {
+                    case line_split_kind::same_line:
+                        if (stack_.back().is_multi_line())
+                        {
+                            stack_.back().new_line_after(true);
+                            new_line();
+                        }
+                        stack_.emplace_back(container_type::array,options_.array_array_line_splits(), false,
+                                            column_, column_+open_array_bracket_str_.length());
+                        break;
+                    case line_split_kind::new_line:
                         stack_.back().new_line_after(true);
                         new_line();
-                    }
-                    stack_.emplace_back(container_type::array,options_.array_array_line_splits(), false,
-                                        column_, column_+open_array_bracket_str_.length());
-                    break;
-                case line_split_kind::new_line:
-                    stack_.back().new_line_after(true);
-                    new_line();
-                    stack_.emplace_back(container_type::array,options_.array_array_line_splits(), false,
-                                        column_, column_+open_array_bracket_str_.length());
-                    break;
-                default: // multi_line
-                    stack_.back().new_line_after(true);
-                    new_line();
-                    stack_.emplace_back(container_type::array,options_.array_array_line_splits(), false,
-                                        column_, column_+open_array_bracket_str_.length());
-                    //new_line();
-                    break;
+                        stack_.emplace_back(container_type::array,options_.array_array_line_splits(), false,
+                                            column_, column_+open_array_bracket_str_.length());
+                        break;
+                    default: // multi_line
+                        stack_.back().new_line_after(true);
+                        new_line();
+                        stack_.emplace_back(container_type::array,options_.array_array_line_splits(), false,
+                                            column_, column_+open_array_bracket_str_.length());
+                        //new_line();
+                        break;
                 }
             }
         }

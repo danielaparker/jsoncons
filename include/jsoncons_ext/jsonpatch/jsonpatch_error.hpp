@@ -69,22 +69,22 @@ public:
     {
         switch (static_cast<jsonpatch_errc>(ev))
         {
-        case jsonpatch_errc::invalid_patch:
-            return "Invalid JSON Patch document";
-        case jsonpatch_errc::test_failed:
-            return "JSON Patch test operation failed";
-        case jsonpatch_errc::add_failed:
-            return "JSON Patch add operation failed";
-        case jsonpatch_errc::remove_failed:
-            return "JSON Patch remove operation failed";
-        case jsonpatch_errc::replace_failed:
-            return "JSON Patch replace operation failed";
-        case jsonpatch_errc::move_failed:
-            return "JSON Patch move operation failed";
-        case jsonpatch_errc::copy_failed:
-            return "JSON Patch copy operation failed";
-        default:
-            return "Unknown JSON Patch error";
+            case jsonpatch_errc::invalid_patch:
+                return "Invalid JSON Patch document";
+            case jsonpatch_errc::test_failed:
+                return "JSON Patch test operation failed";
+            case jsonpatch_errc::add_failed:
+                return "JSON Patch add operation failed";
+            case jsonpatch_errc::remove_failed:
+                return "JSON Patch remove operation failed";
+            case jsonpatch_errc::replace_failed:
+                return "JSON Patch replace operation failed";
+            case jsonpatch_errc::move_failed:
+                return "JSON Patch move operation failed";
+            case jsonpatch_errc::copy_failed:
+                return "JSON Patch copy operation failed";
+            default:
+                return "Unknown JSON Patch error";
         }
     }
 };

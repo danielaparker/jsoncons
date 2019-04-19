@@ -80,7 +80,7 @@ void serialization_example2()
     std::cout << pretty_print(val,options1) << std::endl;
 
     std::cout << "object_array_line_splits(line_split_kind::new_line)" << std::endl;
-    json_options options2 ;
+    json_options options2;
     options2 .object_array_line_splits(line_split_kind::new_line);
     std::cout << pretty_print(val,options2 ) << std::endl;
 
@@ -148,7 +148,7 @@ void serialization_example3()
         std::cout << pretty_print(val2) << std::endl;
      
         std::cout << "array_array_line_splits(line_split_kind::new_line)" << std::endl;
-        json_options options2 ;
+        json_options options2;
         options2 .array_array_line_splits(line_split_kind::new_line);
         std::cout << pretty_print(val2,options2 ) << std::endl;
 
@@ -200,7 +200,7 @@ void serialization_example4()
 
     std::cout << "object_array_line_splits(line_split_kind::new_line)" << std::endl;
     std::cout << "array_array_line_splits(line_split_kind::same_line)" << std::endl;
-    json_options options2 ;
+    json_options options2;
     options2 .object_array_line_splits(line_split_kind::new_line)
            .array_array_line_splits(line_split_kind::same_line);
     std::cout << pretty_print(val, options2 ) << std::endl;
@@ -235,7 +235,7 @@ void serialization_example4()
 
         std::string style2 = "array_array_line_splits(line_split_kind::new_line)";
         std::cout << style2 << std::endl;
-        json_options options2 ;
+        json_options options2;
         options2 .array_array_line_splits(line_split_kind::new_line);
         std::cout << pretty_print(val,options2 ) << std::endl;
 

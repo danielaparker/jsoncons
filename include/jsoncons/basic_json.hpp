@@ -825,42 +825,42 @@ public:
                 Destroy_();
                 switch (val.get_storage_type())
                 {
-                case storage_type::null_val:
-                    new(reinterpret_cast<void*>(&data_))null_data(*(val.null_data_cast()));
-                    break;
-                case storage_type::empty_object_val:
-                    new(reinterpret_cast<void*>(&data_))empty_object_data(*(val.empty_object_data_cast()));
-                    break;
-                case storage_type::bool_val:
-                    new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
-                    break;
-                case storage_type::int64_val:
-                    new(reinterpret_cast<void*>(&data_))int64_data(*(val.int64_data_cast()));
-                    break;
-                case storage_type::uint64_val:
-                    new(reinterpret_cast<void*>(&data_))uint64_data(*(val.uint64_data_cast()));
-                    break;
-                case storage_type::double_val:
-                    new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
-                    break;
-                case storage_type::short_string_val:
-                    new(reinterpret_cast<void*>(&data_))short_string_data(*(val.short_string_data_cast()));
-                    break;
-                case storage_type::long_string_val:
-                    new(reinterpret_cast<void*>(&data_))long_string_data(*(val.string_data_cast()));
-                    break;
-                case storage_type::byte_string_val:
-                    new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()));
-                    break;
-                case storage_type::array_val:
-                    new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()));
-                    break;
-                case storage_type::object_val:
-                    new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()));
-                    break;
-                default:
-                    JSONCONS_UNREACHABLE();
-                    break;
+                    case storage_type::null_val:
+                        new(reinterpret_cast<void*>(&data_))null_data(*(val.null_data_cast()));
+                        break;
+                    case storage_type::empty_object_val:
+                        new(reinterpret_cast<void*>(&data_))empty_object_data(*(val.empty_object_data_cast()));
+                        break;
+                    case storage_type::bool_val:
+                        new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
+                        break;
+                    case storage_type::int64_val:
+                        new(reinterpret_cast<void*>(&data_))int64_data(*(val.int64_data_cast()));
+                        break;
+                    case storage_type::uint64_val:
+                        new(reinterpret_cast<void*>(&data_))uint64_data(*(val.uint64_data_cast()));
+                        break;
+                    case storage_type::double_val:
+                        new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
+                        break;
+                    case storage_type::short_string_val:
+                        new(reinterpret_cast<void*>(&data_))short_string_data(*(val.short_string_data_cast()));
+                        break;
+                    case storage_type::long_string_val:
+                        new(reinterpret_cast<void*>(&data_))long_string_data(*(val.string_data_cast()));
+                        break;
+                    case storage_type::byte_string_val:
+                        new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()));
+                        break;
+                    case storage_type::array_val:
+                        new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()));
+                        break;
+                    case storage_type::object_val:
+                        new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()));
+                        break;
+                    default:
+                        JSONCONS_UNREACHABLE();
+                        break;
                 }
             }
             return *this;
@@ -964,12 +964,12 @@ public:
         {
             switch (get_storage_type())
             {
-            case storage_type::array_val:
-                return array_data_cast()->value().size();
-            case storage_type::object_val:
-                return object_data_cast()->value().size();
-            default:
-                return 0;
+                case storage_type::array_val:
+                    return array_data_cast()->value().size();
+                case storage_type::object_val:
+                    return object_data_cast()->value().size();
+                default:
+                    return 0;
             }
         }
 
@@ -1357,60 +1357,60 @@ public:
             variant temp(other);
             switch (get_storage_type())
             {
-            case storage_type::null_val:
-                new(reinterpret_cast<void*>(&(other.data_)))null_data(*null_data_cast());
-                break;
-            case storage_type::empty_object_val:
-                new(reinterpret_cast<void*>(&(other.data_)))empty_object_data(*empty_object_data_cast());
-                break;
-            case storage_type::bool_val:
-                new(reinterpret_cast<void*>(&(other.data_)))bool_data(*bool_data_cast());
-                break;
-            case storage_type::int64_val:
-                new(reinterpret_cast<void*>(&(other.data_)))int64_data(*int64_data_cast());
-                break;
-            case storage_type::uint64_val:
-                new(reinterpret_cast<void*>(&(other.data_)))uint64_data(*uint64_data_cast());
-                break;
-            case storage_type::double_val:
-                new(reinterpret_cast<void*>(&(other.data_)))double_data(*double_data_cast());
-                break;
-            case storage_type::short_string_val:
-                new(reinterpret_cast<void*>(&(other.data_)))short_string_data(*short_string_data_cast());
-                break;
-            case storage_type::long_string_val:
-                new(reinterpret_cast<void*>(&other.data_))long_string_data(std::move(*string_data_cast()));
-                break;
-            case storage_type::byte_string_val:
-                new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(*byte_string_data_cast()));
-                break;
-            case storage_type::array_val:
-                new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(*array_data_cast()));
-                break;
-            case storage_type::object_val:
-                new(reinterpret_cast<void*>(&(other.data_)))object_data(std::move(*object_data_cast()));
-                break;
-            default:
-                JSONCONS_UNREACHABLE();
-                break;
+                case storage_type::null_val:
+                    new(reinterpret_cast<void*>(&(other.data_)))null_data(*null_data_cast());
+                    break;
+                case storage_type::empty_object_val:
+                    new(reinterpret_cast<void*>(&(other.data_)))empty_object_data(*empty_object_data_cast());
+                    break;
+                case storage_type::bool_val:
+                    new(reinterpret_cast<void*>(&(other.data_)))bool_data(*bool_data_cast());
+                    break;
+                case storage_type::int64_val:
+                    new(reinterpret_cast<void*>(&(other.data_)))int64_data(*int64_data_cast());
+                    break;
+                case storage_type::uint64_val:
+                    new(reinterpret_cast<void*>(&(other.data_)))uint64_data(*uint64_data_cast());
+                    break;
+                case storage_type::double_val:
+                    new(reinterpret_cast<void*>(&(other.data_)))double_data(*double_data_cast());
+                    break;
+                case storage_type::short_string_val:
+                    new(reinterpret_cast<void*>(&(other.data_)))short_string_data(*short_string_data_cast());
+                    break;
+                case storage_type::long_string_val:
+                    new(reinterpret_cast<void*>(&other.data_))long_string_data(std::move(*string_data_cast()));
+                    break;
+                case storage_type::byte_string_val:
+                    new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(*byte_string_data_cast()));
+                    break;
+                case storage_type::array_val:
+                    new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(*array_data_cast()));
+                    break;
+                case storage_type::object_val:
+                    new(reinterpret_cast<void*>(&(other.data_)))object_data(std::move(*object_data_cast()));
+                    break;
+                default:
+                    JSONCONS_UNREACHABLE();
+                    break;
             }
             switch (temp.get_storage_type())
             {
-            case storage_type::long_string_val:
-                new(reinterpret_cast<void*>(&data_))long_string_data(std::move(*temp.string_data_cast()));
-                break;
-            case storage_type::byte_string_val:
-                new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*temp.byte_string_data_cast()));
-                break;
-            case storage_type::array_val:
-                new(reinterpret_cast<void*>(&(data_)))array_data(std::move(*temp.array_data_cast()));
-                break;
-            case storage_type::object_val:
-                new(reinterpret_cast<void*>(&(data_)))object_data(std::move(*temp.object_data_cast()));
-                break;
-            default:
-                std::swap(data_,temp.data_);
-                break;
+                case storage_type::long_string_val:
+                    new(reinterpret_cast<void*>(&data_))long_string_data(std::move(*temp.string_data_cast()));
+                    break;
+                case storage_type::byte_string_val:
+                    new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*temp.byte_string_data_cast()));
+                    break;
+                case storage_type::array_val:
+                    new(reinterpret_cast<void*>(&(data_)))array_data(std::move(*temp.array_data_cast()));
+                    break;
+                case storage_type::object_val:
+                    new(reinterpret_cast<void*>(&(data_)))object_data(std::move(*temp.object_data_cast()));
+                    break;
+                default:
+                    std::swap(data_,temp.data_);
+                    break;
             }
         }
     private:
