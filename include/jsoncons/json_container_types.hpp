@@ -137,22 +137,42 @@ public:
     }
 #endif
 
-    bool operator==(const key_value& kv) const
+    friend bool operator==(const key_value& lhs, const key_value& rhs)
     {
-        return key_ == kv.key_ && value_ == kv.value_;
+        return lhs.key_ == rhs.key_ && lhs.value_ == rhs.value_;
     }
 
-    bool operator<(const key_value& kv) const
+    friend bool operator!=(const key_value& lhs, const key_value& rhs)
     {
-        if (key_ < kv.key_)
+        return !(lhs == rhs);
+    }
+
+    friend bool operator<(const key_value& lhs, const key_value& rhs)
+    {
+        if (lhs.key_ < rhs.key_)
         {
             return true;
         }
-        if (key_ == kv.key_ && value_ < kv.value_)
+        if (lhs.key_ == rhs.key_ && lhs.value_ < rhs.value_)
         {
             return true;
         }
         return false;
+    }
+
+    friend bool operator<=(const key_value& lhs, const key_value& rhs)
+    {
+        return !(rhs < lhs);
+    }
+
+    friend bool operator>(const key_value& lhs, const key_value& rhs) 
+    {
+        return !(lhs <= rhs);
+    }
+
+    friend bool operator>=(const key_value& lhs, const key_value& rhs)
+    {
+        return !(lhs < rhs);
     }
 };
 
@@ -437,18 +457,7 @@ public:
 
     bool operator==(const json_array<Json>& rhs) const
     {
-        if (size() != rhs.size())
-        {
-            return false;
-        }
-        for (size_t i = 0; i < size(); ++i)
-        {
-            if (elements_[i] != rhs.elements_[i])
-            {
-                return false;
-            }
-        }
-        return true;
+        return elements_ == rhs.elements_;
     }
 
     bool operator<(const json_array<Json>& rhs) const
@@ -1142,21 +1151,7 @@ public:
 
     bool operator==(const json_object& rhs) const
     {
-        if (size() != rhs.size())
-        {
-            return false;
-        }
-        for (auto it = members_.begin(); it != members_.end(); ++it)
-        {
-
-            auto rhs_it = std::lower_bound(rhs.begin(), rhs.end(), *it, 
-                                           [](const key_value_type& a, const key_value_type& b){return a.key().compare(b.key()) < 0;});
-            if (rhs_it == rhs.end() || rhs_it->key() != it->key() || rhs_it->value() != it->value())
-            {
-                return false;
-            }
-        }
-        return true;
+        return members_ == rhs.members_;
     }
 
     bool operator<(const json_object& rhs) const
@@ -1640,22 +1635,41 @@ public:
 
     void merge(iterator hint, const json_object& source)
     {
+        size_t pos = hint - members_.begin();
         for (auto it = source.begin(); it != source.end(); ++it)
         {
             hint = try_emplace(hint, it->key(),it->value());
+            size_t newpos = hint - members_.begin();
+            if (newpos == pos)
+            {
+                ++hint;
+                pos = hint - members_.begin();
+            }
+            else
+            {
+                hint = members_.begin() + pos;
+            }
         }
     }
 
     void merge(iterator hint, json_object&& source)
     {
+        size_t pos = hint - members_.begin();
+
         auto it = std::make_move_iterator(source.begin());
         auto end = std::make_move_iterator(source.end());
         for (; it != end; ++it)
         {
-            auto pos = find(it->key());
-            if (pos == members_.end() )
+            hint = try_emplace(hint, it->key(), std::move(it->value()));
+            size_t newpos = hint - members_.begin();
+            if (newpos == pos)
             {
-                hint = try_emplace(hint, it->key(), std::move(it->value()));
+                ++hint;
+                pos = hint - members_.begin();
+            }
+            else
+            {
+                hint = members_.begin() + pos;
             }
         }
     }
@@ -1690,14 +1704,26 @@ public:
 
     void merge_or_update(iterator hint, const json_object& source)
     {
+        size_t pos = hint - members_.begin();
         for (auto it = source.begin(); it != source.end(); ++it)
         {
             hint = insert_or_assign(hint, it->key(),it->value());
+            size_t newpos = hint - members_.begin();
+            if (newpos == pos)
+            {
+                ++hint;
+                pos = hint - members_.begin();
+            }
+            else
+            {
+                hint = members_.begin() + pos;
+            }
         }
     }
 
     void merge_or_update(iterator hint, json_object&& source)
     {
+/*
         auto it = std::make_move_iterator(source.begin());
         auto end = std::make_move_iterator(source.end());
         for (; it != end; ++it)
@@ -1711,6 +1737,24 @@ public:
             {
                 pos->value(std::move(it->value()));
                 hint = pos;
+            }
+        }
+*/
+        size_t pos = hint - members_.begin();
+        auto it = std::make_move_iterator(source.begin());
+        auto end = std::make_move_iterator(source.end());
+        for (; it != end; ++it)
+        {
+            hint = insert_or_assign(hint, it->key(),std::move(it->value()));
+            size_t newpos = hint - members_.begin();
+            if (newpos == pos)
+            {
+                ++hint;
+                pos = hint - members_.begin();
+            }
+            else
+            {
+                hint = members_.begin() + pos;
             }
         }
     }
@@ -1753,7 +1797,7 @@ public:
             return std::make_pair(it,false);
         }
     }
-
+ 
     template <class A=allocator_type, class ... Args>
     typename std::enable_if<is_stateless<A>::value,iterator>::type
     try_emplace(iterator hint, const string_view_type& key, Args&&... args)
@@ -1812,19 +1856,7 @@ public:
 
     bool operator==(const json_object& rhs) const
     {
-        if (size() != rhs.size())
-        {
-            return false;
-        }
-        for (auto it = members_.begin(); it != members_.end(); ++it)
-        {
-            auto rhs_it = rhs.find(it->key());
-            if (rhs_it == rhs.end() || rhs_it->key() != it->key() || rhs_it->value() != it->value())
-            {
-                return false;
-            }
-        }
-        return true;
+        return members_ == rhs.members_;
     }
 
     bool operator<(const json_object& rhs) const
