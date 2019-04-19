@@ -109,7 +109,7 @@ const json expected = json::parse(R"(
 
     std::string path2 = "$.store.book['length']";
     json result2 = json_query(store, path, result_type::path);
-    CHECK(expected == result2);
+    CHECK(result2 == expected);
 }
 
 TEST_CASE("test_price_filter")

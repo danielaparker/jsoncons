@@ -19,6 +19,7 @@
 using namespace jsoncons;
 using namespace jsoncons::jsonpath;
 
+#if 0
 const json complex_json = json::parse(R"(
 [
   {
@@ -1597,5 +1598,37 @@ TEST_CASE("jsonpath test 1")
     }
 #endif
 }
+#endif
+TEST_CASE("jsonpath array union test")
+{
+    json root = json::parse(R"(
+[[1,2,3,4,1,2,3,4],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9]]
+)");
 
+    SECTION("Test 1")
+    {
+        json expected = json::parse(R"(
+[[0,1,2,3,4,5,6,7,8,9],[1,2,3,4,1,2,3,4]]
+)");
+        json result = json_query(root,"$[0,1,2]");
+        CHECK(result == expected);
+    }
 
+    SECTION("Test 2")
+    {
+        json expected = json::parse(R"(
+[1,2,3,4]
+)");
+        json result = json_query(root, "$[0][0:4,2:8]");
+        CHECK(result == expected);
+    }
+
+    SECTION("Test 3")
+    {
+        json expected = json::parse(R"(
+[1,4]
+)");
+        json result = json_query(root, "$[0][0,0,0,3]");
+        CHECK(result == expected);
+    }
+}

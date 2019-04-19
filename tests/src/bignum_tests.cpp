@@ -22,18 +22,18 @@ TEST_CASE("test_positive_bignum")
 
     std::string sx;
     x.dump(sx);
-    CHECK(expected == sx);
+    CHECK(sx == expected);
 
     bignum y(x);
     std::string sy;
     y.dump(sy);
-    CHECK(expected == sy);
+    CHECK(sy == expected);
 
     bignum z;
     z = x;
     std::string sz;
     y.dump(sz);
-    CHECK(expected == sz);
+    CHECK(sz == expected);
 }
 
 TEST_CASE("bignums are equal")
@@ -54,18 +54,18 @@ TEST_CASE("test_negative_bignum")
 
     std::string sx;
     x.dump(sx);
-    CHECK(expected == sx);
+    CHECK(sx == expected);
 
     bignum y(x);
     std::string sy;
     y.dump(sy);
-    CHECK(expected == sy);
+    CHECK(sy == expected);
 
     bignum z;
     z = x;
     std::string sz;
     y.dump(sz);
-    CHECK(expected == sz);
+    CHECK(sz == expected);
 
     int signum;
     std::vector<uint8_t> v;
