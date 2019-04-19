@@ -1635,22 +1635,41 @@ public:
 
     void merge(iterator hint, const json_object& source)
     {
+        size_t pos = hint - members_.begin();
         for (auto it = source.begin(); it != source.end(); ++it)
         {
             hint = try_emplace(hint, it->key(),it->value());
+            size_t newpos = hint - members_.begin();
+            if (newpos == pos)
+            {
+                ++hint;
+                pos = hint - members_.begin();
+            }
+            else
+            {
+                hint = members_.begin() + pos;
+            }
         }
     }
 
     void merge(iterator hint, json_object&& source)
     {
+        size_t pos = hint - members_.begin();
+
         auto it = std::make_move_iterator(source.begin());
         auto end = std::make_move_iterator(source.end());
         for (; it != end; ++it)
         {
-            auto pos = find(it->key());
-            if (pos == members_.end() )
+            hint = try_emplace(hint, it->key(), std::move(it->value()));
+            size_t newpos = hint - members_.begin();
+            if (newpos == pos)
             {
-                hint = try_emplace(hint, it->key(), std::move(it->value()));
+                ++hint;
+                pos = hint - members_.begin();
+            }
+            else
+            {
+                hint = members_.begin() + pos;
             }
         }
     }
@@ -1685,14 +1704,26 @@ public:
 
     void merge_or_update(iterator hint, const json_object& source)
     {
+        size_t pos = hint - members_.begin();
         for (auto it = source.begin(); it != source.end(); ++it)
         {
             hint = insert_or_assign(hint, it->key(),it->value());
+            size_t newpos = hint - members_.begin();
+            if (newpos == pos)
+            {
+                ++hint;
+                pos = hint - members_.begin();
+            }
+            else
+            {
+                hint = members_.begin() + pos;
+            }
         }
     }
 
     void merge_or_update(iterator hint, json_object&& source)
     {
+/*
         auto it = std::make_move_iterator(source.begin());
         auto end = std::make_move_iterator(source.end());
         for (; it != end; ++it)
@@ -1706,6 +1737,24 @@ public:
             {
                 pos->value(std::move(it->value()));
                 hint = pos;
+            }
+        }
+*/
+        size_t pos = hint - members_.begin();
+        auto it = std::make_move_iterator(source.begin());
+        auto end = std::make_move_iterator(source.end());
+        for (; it != end; ++it)
+        {
+            hint = insert_or_assign(hint, it->key(),std::move(it->value()));
+            size_t newpos = hint - members_.begin();
+            if (newpos == pos)
+            {
+                ++hint;
+                pos = hint - members_.begin();
+            }
+            else
+            {
+                hint = members_.begin() + pos;
             }
         }
     }
@@ -1748,7 +1797,7 @@ public:
             return std::make_pair(it,false);
         }
     }
-
+ 
     template <class A=allocator_type, class ... Args>
     typename std::enable_if<is_stateless<A>::value,iterator>::type
     try_emplace(iterator hint, const string_view_type& key, Args&&... args)

@@ -893,7 +893,7 @@ const json expected = json::parse(R"(
 
     j2.merge(j2.object_range().begin()+1,source);
     CHECK(j2.size() == 3);
-    CHECK(expected == j2);
+    CHECK(j2 == expected);
 
     //std::cout << j << std::endl;
 }
@@ -931,7 +931,7 @@ json expected = json::parse(R"(
 
     j2.merge(std::move(source2));
     CHECK(j2.size() == 3);
-    CHECK(expected == j2);
+    CHECK(j2 == expected);
 
     //std::cout << source << std::endl;
 }
@@ -969,7 +969,7 @@ const json expected = json::parse(R"(
 
     j2.merge_or_update(j2.object_range().begin()+1,source);
     CHECK(j2.size() == 3);
-    CHECK(expected == j2);
+    CHECK(j2 == expected);
 
     //std::cout << j << std::endl;
 }
@@ -1007,7 +1007,7 @@ json expected = json::parse(R"(
 
     j2.merge_or_update(std::move(source2));
     CHECK(j2.size() == 3);
-    CHECK(expected == j2);
+    CHECK(j2 == expected);
 
     //std::cout << source << std::endl;
 }
@@ -1025,7 +1025,6 @@ TEST_CASE("ojson parse_duplicate_names")
     CHECK(1 == oj2["first"].as<int>());
     CHECK(2 == oj2["second"].as<int>());
 }
-
 TEST_CASE("test_ojson_merge")
 {
 ojson j = ojson::parse(R"(
@@ -1035,29 +1034,39 @@ ojson j = ojson::parse(R"(
 }
 )");
 
-ojson j2 = j;
-
 const ojson source = ojson::parse(R"(
 {
     "a" : 2,
-    "c" : 3
-}
-)");
-const ojson expected = ojson::parse(R"(
-{
-    "a" : 1,
-    "b" : 2,
-    "c" : 3
+    "c" : 3,
+    "d" : 4,
+    "b" : 5,
+    "e" : 6
 }
 )");
 
-    j.merge(source);
-    CHECK(j.size() == 3);
-    CHECK(j == expected);
+    SECTION("merge j with source")
+    {
+        const ojson expected = ojson::parse(R"(
+        {
+            "a" : 1,
+            "b" : 2,
+            "c" : 3,
+            "d" : 4,
+            "e" : 6
+        }
+        )");
+        j.merge(source);
+        CHECK(j == expected);
+    }
 
-    j2.merge(j2.object_range().begin()+1,source);
-    CHECK(j2.size() == 3);
-    CHECK(expected == j2);
+    SECTION("merge j")
+    {
+        const ojson expected = ojson::parse(R"(
+{"a":1,"c":3,"d":4,"b":2,"e":6}
+        )");
+        j.merge(j.object_range().begin()+1,source);
+        CHECK(j == expected);
+    }
 
     //std::cout << j << std::endl;
 }
@@ -1070,7 +1079,6 @@ ojson j = ojson::parse(R"(
     "d" : [1,2,3]
 }
 )");
-ojson j2 = j;
 
 ojson source = ojson::parse(R"(
 {
@@ -1078,31 +1086,33 @@ ojson source = ojson::parse(R"(
     "c" : [4,5,6]
 }
 )");
+    SECTION("merge source into j")
+    {
+        ojson expected = ojson::parse(R"(
+        {
+            "a" : "1",
+            "d" : [1,2,3],
+            "c" : [4,5,6]
+        }
+        )");
 
-ojson source2 = ojson::parse(R"(
-{
-    "a" : "2",
-    "c" : [4,5,6]
-}
-)");
+        j.merge(std::move(source));
+        CHECK(j == expected);
+    }
+    SECTION("merge source into j at begin")
+    {
+        ojson expected = ojson::parse(R"(
+        {
+            "a" : "1",
+            "c" : [4,5,6],
+            "d" : [1,2,3]
+        }
+        )");
 
-//ojson source2 = source;
+        j.merge(j.object_range().begin(),std::move(source));
+        CHECK(j == expected);
+    }
 
-ojson expected = ojson::parse(R"(
-{
-    "d" : [1,2,3],
-    "a" : "1",
-    "c" : [4,5,6]
-}
-)");
-
-    j.merge(std::move(source));
-    CHECK(j.size() == 3);
-    CHECK(j == expected);
-
-    j2.merge(j2.object_range().begin(),std::move(source2));
-    CHECK(j2.size() == 3);
-    CHECK(expected == j2);
 
     //std::cout << "(1)\n" << j << std::endl;
     //std::cout << "(2)\n" << source << std::endl;
@@ -1117,29 +1127,38 @@ ojson j = ojson::parse(R"(
 }
 )");
 
-ojson j2 = j;
-
 const ojson source = ojson::parse(R"(
 {
     "a" : 2,
     "c" : 3
 }
 )");
-const ojson expected = ojson::parse(R"(
-{
-    "a" : 2,
-    "b" : 2,
-    "c" : 3
-}
-)");
 
-    j.merge_or_update(source);
-    CHECK(j.size() == 3);
-    CHECK(j == expected);
+    SECTION("merge_or_update source into j")
+    {
+        const ojson expected = ojson::parse(R"(
+        {
+            "a" : 2,
+            "b" : 2,
+            "c" : 3
+        }
+        )");
+        j.merge_or_update(source);
+        CHECK(j == expected);
+    }
 
-    j2.merge_or_update(j2.object_range().begin()+1,source);
-    CHECK(j2.size() == 3);
-    CHECK(expected == j2);
+    SECTION("merge_or_update source into j at pos 1")
+    {
+        const ojson expected = ojson::parse(R"(
+        {
+            "a" : 2,
+            "c" : 3,
+            "b" : 2
+        }
+        )");
+        j.merge_or_update(j.object_range().begin()+1,source);
+        CHECK(j == expected);
+    }
 
     //std::cout << j << std::endl;
 }
@@ -1152,7 +1171,6 @@ ojson j = ojson::parse(R"(
     "d" : [1,2,3]
 }
 )");
-ojson j2 = j;
 
 ojson source = ojson::parse(R"(
 {
@@ -1161,23 +1179,35 @@ ojson source = ojson::parse(R"(
 }
 )");
 
-ojson source2 = source;
+    SECTION("merge or update j from source")
+    {
+        ojson expected = ojson::parse(R"(
+        {
+            "a" : "2",
+            "d" : [1,2,3],
+            "c" : [4,5,6]
+        }
+        )");
 
-ojson expected = ojson::parse(R"(
-{
-    "d" : [1,2,3],
-    "a" : "2",
-    "c" : [4,5,6]
-}
-)");
+        j.merge_or_update(std::move(source));
+        CHECK(j == expected);
+    }
 
-    j.merge_or_update(std::move(source));
-    CHECK(j.size() == 3);
-    CHECK(j == expected);
+    SECTION("merge or update j from source at pos")
+    {
+        ojson expected = ojson::parse(R"(
+        {
+            "a" : "2",
+            "c" : [4,5,6],
+            "d" : [1,2,3]
+        }
+        )");
 
-    j2.merge_or_update(j2.object_range().begin(),std::move(source2));
-    CHECK(j2.size() == 3);
-    CHECK(expected == j2);
+        j.merge_or_update(j.object_range().begin(),std::move(source));
+        CHECK(j.size() == 3);
+        CHECK(j == expected);
+    }
+
 
     //std::cout << "(1)\n" << j << std::endl;
     //std::cout << "(2)\n" << source << std::endl;
