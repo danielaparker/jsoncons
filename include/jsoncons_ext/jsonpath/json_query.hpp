@@ -1582,10 +1582,8 @@ public:
     {
         if (state_stack_.back().is_union)
         {
-            std::set<node_type, node_less> temp(std::make_move_iterator(nodes_.begin()), 
-                                                std::make_move_iterator(nodes_.end()));
-            stack_.push_back(std::vector<node_type>(std::make_move_iterator(temp.begin()),
-                                                    std::make_move_iterator(temp.end())));
+            std::set<node_type, node_less> temp(nodes_.begin(), nodes_.end());
+            stack_.push_back(std::vector<node_type>(temp.begin(),temp.end()));
         }
         else
         {
