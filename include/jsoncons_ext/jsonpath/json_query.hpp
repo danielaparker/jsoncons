@@ -259,9 +259,18 @@ class jsonpath_evaluator : private ser_context
         {
         }
         node_type(const node_type&) = default;
-        node_type(node_type&& other) = default;
+        node_type(node_type&& other)
+            : skip_contained_object(other.skip_contained_object), path(std::move(other.path)), val_ptr(other.val_ptr)
+        {
+
+        }
         node_type& operator=(const node_type&) = default;
-        node_type& operator=(node_type&& other) = default;
+        node_type& operator=(node_type&& other) 
+        {
+            skip_contained_object = other.skip_contained_object;
+            path.swap(other.path);
+            val_ptr = other.val_ptr;
+        }
 
     };
     typedef std::vector<node_type> node_set;
