@@ -197,6 +197,33 @@ enum class path_state
     dot
 };
 
+struct state_item
+{
+    bool is_recursive_descent;
+    path_state state;
+    bool is_union;
+
+    state_item()
+        : state(path_state::start), is_recursive_descent(false), is_union(false)
+    {
+    }
+
+    state_item(path_state state)
+        : state(state), is_recursive_descent(false), is_union(false)
+    {
+    }
+
+    state_item(path_state state, const state_item& parent)
+        : state(state), 
+          is_recursive_descent(parent.is_recursive_descent), 
+          is_union(parent.is_union)
+    {
+    }
+
+    state_item(const state_item&) = default;
+    state_item& operator=(const state_item&) = default;
+};
+
 template<class Json,
          class JsonReference,
          class PathCons>
@@ -478,8 +505,6 @@ class jsonpath_evaluator : private ser_context
     function_table<Json,pointer> functions_;
 
     default_parse_error_handler default_err_handler_;
-    bool is_recursive_descent_;
-    bool is_union_;
     node_set nodes_;
     std::vector<node_set> stack_;
     size_t line_;
@@ -492,13 +517,11 @@ class jsonpath_evaluator : private ser_context
 
     typedef std::vector<pointer> argument_type;
     std::vector<argument_type> function_stack_;
-    std::vector<path_state> state_stack_;
+    std::vector<state_item> state_stack_;
 
 public:
     jsonpath_evaluator()
-        : is_recursive_descent_(false),
-          is_union_(false),
-          line_(0), column_(0),
+        : line_(0), column_(0),
           begin_input_(nullptr), end_input_(nullptr),
           p_(nullptr)
     {
@@ -616,7 +639,7 @@ public:
                   size_t length,
                   std::error_code& ec)
     {
-        state_stack_.push_back(path_state::start);
+        state_stack_.emplace_back(path_state::start);
 
         string_type function_name;
         string_type buffer;
@@ -633,14 +656,11 @@ public:
         v.emplace_back(std::move(s),std::addressof(root));
         stack_.push_back(v);
 
-        is_recursive_descent_ = false;
-        is_union_ = false;
-
         array_slice slice;
 
         while (p_ < end_input_)
         {
-            switch (state_stack_.back())
+            switch (state_stack_.back().state)
             {
                 case path_state::start: 
                 {
@@ -650,7 +670,7 @@ public:
                             break;
                         case '$':
                         {
-                            state_stack_.push_back(path_state::dot_or_left_bracket);
+                            state_stack_.emplace_back(path_state::dot_or_left_bracket, state_stack_.back());
                             break;
                         }
                         default:
@@ -662,8 +682,8 @@ public:
                                     ec = jsonpath_errc::expected_root;
                                     return;
                                 default: // might be function, validate name later
-                                    state_stack_.push_back(path_state::dot_or_left_bracket);
-                                    state_stack_.push_back(path_state::path_or_function_name);
+                                    state_stack_.emplace_back(path_state::dot_or_left_bracket, state_stack_.back());
+                                    state_stack_.emplace_back(path_state::path_or_function_name, state_stack_.back());
                                     buffer.push_back(*p_);
                                     break;
                             }
@@ -680,7 +700,7 @@ public:
                     switch (*p_)
                     {
                         case '(':
-                            state_stack_.back() = path_state::arg_or_right_round_bracket;
+                            state_stack_.back().state = path_state::arg_or_right_round_bracket;
                             function_name = std::move(buffer);
                             buffer.clear();
                             break;
@@ -694,7 +714,7 @@ public:
                             }
                             slice.start_ = 0;
 
-                            state_stack_.back() = path_state::expr_or_filter_or_slice_or_key;
+                            state_stack_.back().state = path_state::expr_or_filter_or_slice_or_key;
                             break;
                         }
                         case '.':
@@ -705,7 +725,7 @@ public:
                                 buffer.clear();
                                 transfer_nodes();
                             }
-                            state_stack_.back() = path_state::dot;
+                            state_stack_.back().state = path_state::dot;
                             break;
                         }
                         case ' ':case '\t':
@@ -718,14 +738,14 @@ public:
                         }
                         case '\'':
                         {
-                            state_stack_.push_back(path_state::single_quoted_name);
+                            state_stack_.emplace_back(path_state::single_quoted_name, state_stack_.back());
                             ++p_;
                             ++column_;
                             break;
                         }
                         case '\"':
                         {
-                            state_stack_.push_back(path_state::double_quoted_name);
+                            state_stack_.emplace_back(path_state::double_quoted_name, state_stack_.back());
                             ++p_;
                             ++column_;
                             break;
@@ -746,19 +766,19 @@ public:
                         case '$':
                             buffer.clear();
                             buffer.push_back(*p_);
-                            state_stack_.push_back(path_state::path_argument);
+                            state_stack_.emplace_back(path_state::path_argument, state_stack_.back());
                             break;
                         case '\'':
                             buffer.clear();
                             buffer.push_back('\"');
-                            state_stack_.back() = path_state::more_args_or_right_round_bracket;
-                            state_stack_.push_back(path_state::single_quoted_arg);
+                            state_stack_.back().state = path_state::more_args_or_right_round_bracket;
+                            state_stack_.emplace_back(path_state::single_quoted_arg, state_stack_.back());
                             break;
                         case '\"':
                             buffer.clear();
                             buffer.push_back('\"');
-                            state_stack_.back() = path_state::more_args_or_right_round_bracket;
-                            state_stack_.push_back(path_state::double_quoted_arg);
+                            state_stack_.back().state = path_state::more_args_or_right_round_bracket;
+                            state_stack_.emplace_back(path_state::double_quoted_arg, state_stack_.back());
                             break;
                         case ')':
                         {
@@ -780,8 +800,8 @@ public:
                         }
                         default:
                             buffer.clear();
-                            state_stack_.back() = path_state::more_args_or_right_round_bracket;
-                            state_stack_.push_back(path_state::unquoted_arg);
+                            state_stack_.back().state = path_state::more_args_or_right_round_bracket;
+                            state_stack_.emplace_back(path_state::unquoted_arg, state_stack_.back());
                             break;
                     }
                     ++p_;
@@ -945,13 +965,13 @@ public:
                     switch (*p_)
                     {
                         case '.':
-                            is_recursive_descent_ = true;
+                            state_stack_.back().is_recursive_descent = true;
                             ++p_;
                             ++column_;
-                            state_stack_.back() = path_state::unquoted_name_or_left_bracket;
+                            state_stack_.back().state = path_state::unquoted_name_or_left_bracket;
                             break;
                         default:
-                            state_stack_.back() = path_state::unquoted_name_or_left_bracket;
+                            state_stack_.back().state = path_state::unquoted_name_or_left_bracket;
                             break;
                     }
                     break;
@@ -969,13 +989,13 @@ public:
                             ++column_;
                             break;
                         case '[':
-                            state_stack_.back() = path_state::expr_or_filter_or_slice_or_key;
+                            state_stack_.back().state = path_state::expr_or_filter_or_slice_or_key;
                             ++p_;
                             ++column_;
                             break;
                         default:
                             buffer.clear();
-                            state_stack_.back() = path_state::unquoted_name;
+                            state_stack_.back().state = path_state::unquoted_name;
                             break;
                     }
                     break;
@@ -985,10 +1005,10 @@ public:
                         case ' ':case '\t':
                             break;
                         case '.':
-                            state_stack_.push_back(path_state::dot);
+                            state_stack_.emplace_back(path_state::dot, state_stack_.back());
                             break;
                         case '[':
-                            state_stack_.push_back(path_state::expr_or_filter_or_slice_or_key);
+                            state_stack_.emplace_back(path_state::expr_or_filter_or_slice_or_key, state_stack_.back());
                             break;
                         default:
                             ec = jsonpath_errc::expected_separator;
@@ -1001,8 +1021,8 @@ public:
                     switch (*p_)
                     {
                         case ',':
-                            is_union_ = true;
-                            state_stack_.back() = path_state::expr_or_filter_or_slice_or_key;
+                            state_stack_.back().is_union = true;
+                            state_stack_.back().state = path_state::expr_or_filter_or_slice_or_key;
                             break;
                         case ']':
                             apply_selectors();
@@ -1031,7 +1051,7 @@ public:
                             line_ = parser.line();
                             column_ = parser.column();
                             selectors_.push_back(make_unique_ptr<expr_selector>(result));
-                            state_stack_.back() = path_state::comma_or_right_bracket;
+                            state_stack_.back().state = path_state::comma_or_right_bracket;
                             break;
                         }
                         case '?':
@@ -1041,31 +1061,31 @@ public:
                             line_ = parser.line();
                             column_ = parser.column();
                             selectors_.push_back(make_unique_ptr<filter_selector>(result));
-                            state_stack_.back() = path_state::comma_or_right_bracket;
+                            state_stack_.back().state = path_state::comma_or_right_bracket;
                             break;                   
                         }
                         case ':':
                             slice = array_slice();
                             buffer.clear();
-                            state_stack_.back() = path_state::slice_end_or_end_step;
+                            state_stack_.back().state = path_state::slice_end_or_end_step;
                             ++p_;
                             ++column_;
                             break;
                         case '*':
                             end_all();
-                            state_stack_.back() = path_state::comma_or_right_bracket;
+                            state_stack_.back().state = path_state::comma_or_right_bracket;
                             ++p_;
                             ++column_;
                             break;
                         case '\'':
-                            state_stack_.back() = path_state::comma_or_right_bracket;
-                            state_stack_.push_back(path_state::single_quoted_name);
+                            state_stack_.back().state = path_state::comma_or_right_bracket;
+                            state_stack_.emplace_back(path_state::single_quoted_name, state_stack_.back());
                             ++p_;
                             ++column_;
                             break;
                         case '\"':
-                            state_stack_.back() = path_state::comma_or_right_bracket;
-                            state_stack_.push_back(path_state::double_quoted_name);
+                            state_stack_.back().state = path_state::comma_or_right_bracket;
+                            state_stack_.emplace_back(path_state::double_quoted_name, state_stack_.back());
                             ++p_;
                             ++column_;
                             break;
@@ -1073,7 +1093,7 @@ public:
                             slice = array_slice();
                             buffer.clear();
                             buffer.push_back(*p_);
-                            state_stack_.back() = path_state::unquoted_comma_or_right_bracket;
+                            state_stack_.back().state = path_state::unquoted_comma_or_right_bracket;
                             ++p_;
                             ++column_;
                             break;
@@ -1088,17 +1108,17 @@ public:
                                 ec = jsonpath_errc::expected_slice_start;
                                 return;
                             }
-                            state_stack_.back() = path_state::slice_end_or_end_step;
+                            state_stack_.back().state = path_state::slice_end_or_end_step;
                             break;
                         case ',': 
-                            is_union_ = true;
+                            state_stack_.back().is_union = true;
                             if (!buffer.empty())
                             {
                                 selectors_.push_back(make_unique_ptr<name_selector>(buffer));
                                 //selectors_.push_back(make_unique_ptr<path_selector>(buffer));
                                 buffer.clear();
                             }
-                            state_stack_.back() = path_state::expr_or_filter_or_slice_or_key;
+                            state_stack_.back().state = path_state::expr_or_filter_or_slice_or_key;
                             break;
                         case ']': 
                             if (!buffer.empty())
@@ -1111,10 +1131,10 @@ public:
                             state_stack_.pop_back();
                             break;
                         case '\'':
-                            state_stack_.push_back(path_state::single_quoted_name);
+                            state_stack_.emplace_back(path_state::single_quoted_name, state_stack_.back());
                             break;
                         case '\"':
-                            state_stack_.push_back(path_state::double_quoted_name);
+                            state_stack_.emplace_back(path_state::double_quoted_name, state_stack_.back());
                             break;
                         default:
                             buffer.push_back(*p_);
@@ -1127,14 +1147,14 @@ public:
                     switch (*p_)
                     {
                          case ',': 
-                             is_union_ = true;
+                             state_stack_.back().is_union = true;
                             if (!buffer.empty())
                             {
                                 selectors_.push_back(make_unique_ptr<name_selector>(buffer));
                                 //selectors_.push_back(make_unique_ptr<path_selector>(buffer));
                                 buffer.clear();
                             }
-                            state_stack_.back() = path_state::expr_or_filter_or_slice_or_key;
+                            state_stack_.back().state = path_state::expr_or_filter_or_slice_or_key;
                             break;
                         case ']': 
                             if (!buffer.empty())
@@ -1147,10 +1167,10 @@ public:
                             state_stack_.pop_back();
                             break;
                         case '\'':
-                            state_stack_.push_back(path_state::single_quoted_name);
+                            state_stack_.emplace_back(path_state::single_quoted_name, state_stack_.back());
                             break;
                         case '\"':
-                            state_stack_.push_back(path_state::double_quoted_name);
+                            state_stack_.emplace_back(path_state::double_quoted_name, state_stack_.back());
                             break;
                         default:
                             buffer.push_back(*p_);
@@ -1164,21 +1184,21 @@ public:
                     {
                         case '-':
                             slice.is_end_positive = false;
-                            state_stack_.back() = path_state::slice_end;
+                            state_stack_.back().state = path_state::slice_end;
                             break;
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                             slice.is_end_defined = true;
                             slice.end_ = static_cast<size_t>(*p_-'0');
-                            state_stack_.back() = path_state::slice_end;
+                            state_stack_.back().state = path_state::slice_end;
                             break;
                         case ':':
                             slice.step_ = 0;
-                            state_stack_.back() = path_state::slice_step;
+                            state_stack_.back().state = path_state::slice_step;
                             break;
                         case ',':
-                            is_union_ = true;
+                            state_stack_.back().is_union = true;
                             selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
-                            state_stack_.back() = path_state::expr_or_filter_or_slice_or_key;
+                            state_stack_.back().state = path_state::expr_or_filter_or_slice_or_key;
                             break;
                         case ']':
                             selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
@@ -1198,21 +1218,21 @@ public:
                     {
                         case ':':
                             slice.step_ = 0;
-                            state_stack_.back() = path_state::slice_step;
+                            state_stack_.back().state = path_state::slice_step;
                             break;
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                             slice.is_end_defined = true;
                             slice.end_ = slice.end_*10 + static_cast<size_t>(*p_-'0');
                             break;
                         case ',':
-                            is_union_ = true;
+                            state_stack_.back().is_union = true;
                             if (!slice.is_end_defined)
                             {
                                 ec = jsonpath_errc::expected_slice_end;
                                 return;
                             }
                             selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
-                            state_stack_.back() = path_state::expr_or_filter_or_slice_or_key;
+                            state_stack_.back().state = path_state::expr_or_filter_or_slice_or_key;
                             break;
                         case ']':
                             if (!slice.is_end_defined)
@@ -1238,13 +1258,13 @@ public:
                         case '-':
                             slice.is_step_positive = false;
                             slice.step_ = 0;
-                            state_stack_.back() = path_state::slice_step2;
+                            state_stack_.back().state = path_state::slice_step2;
                             ++p_;
                             ++column_;
                             break;
                         default:
                             slice.step_ = 0;
-                            state_stack_.back() = path_state::slice_step2;
+                            state_stack_.back().state = path_state::slice_step2;
                             break;
                     }
                     break;
@@ -1255,9 +1275,9 @@ public:
                             slice.step_ = slice.step_*10 + static_cast<size_t>(*p_-'0');
                             break;
                         case ',':
-                            is_union_ = true;
+                            state_stack_.back().is_union = true;
                             selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
-                            state_stack_.back() = path_state::expr_or_filter_or_slice_or_key;
+                            state_stack_.back().state = path_state::expr_or_filter_or_slice_or_key;
                             break;
                         case ']':
                             if (slice.step_ == 0)
@@ -1381,7 +1401,7 @@ public:
                     break;
             }
         }
-        switch (state_stack_.back())
+        switch (state_stack_.back().state)
         {
             case path_state::unquoted_name: 
             {
@@ -1404,7 +1424,7 @@ public:
         JSONCONS_ASSERT(state_stack_.size() == 2);
         state_stack_.pop_back(); 
 
-        JSONCONS_ASSERT(state_stack_.back() == path_state::start);
+        JSONCONS_ASSERT(state_stack_.back().state == path_state::start);
         state_stack_.pop_back();
     }
 
@@ -1452,7 +1472,7 @@ public:
             {
                 nodes_.emplace_back(PathCons()(path,name),std::addressof(val.at(name)));
             }
-            if (is_recursive_descent_)
+            if (state_stack_.back().is_recursive_descent)
             {
                 for (auto it = val.object_range().begin(); it != val.object_range().end(); ++it)
                 {
@@ -1480,7 +1500,7 @@ public:
                 pointer ptr = create_temp(val.size());
                 nodes_.emplace_back(PathCons()(path,name),ptr);
             }
-            if (is_recursive_descent_)
+            if (state_stack_.back().is_recursive_descent)
             {
                 for (auto it = val.array_range().begin(); it != val.array_range().end(); ++it)
                 {
@@ -1533,7 +1553,7 @@ public:
         {
             selector->select(*this, node, path, val, nodes_);
         }
-        if (is_recursive_descent_)
+        if (state_stack_.back().is_recursive_descent)
         {
             if (val.is_object())
             {
@@ -1560,7 +1580,7 @@ public:
 
     void transfer_nodes()
     {
-        if (is_union_)
+        if (state_stack_.back().is_union)
         {
             std::set<node_type, node_less> temp(nodes_.begin(), nodes_.end());
             stack_.push_back(std::vector<node_type>(temp.begin(),temp.end()));
@@ -1570,8 +1590,8 @@ public:
             stack_.push_back(std::move(nodes_));
         }
         nodes_.clear();
-        is_recursive_descent_ = false;
-        is_union_ = false;
+        state_stack_.back().is_recursive_descent = false;
+        state_stack_.back().is_union = false;
     }
 
     size_t line_number() const override
