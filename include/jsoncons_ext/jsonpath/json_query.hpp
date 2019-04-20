@@ -245,6 +245,10 @@ class jsonpath_evaluator : private ser_context
 
     struct node_type
     {
+        bool skip_contained_object;
+        string_type path;
+        pointer val_ptr;
+
         node_type() = default;
         node_type(const string_type& p, const pointer& valp)
             : skip_contained_object(false),path(p),val_ptr(valp)
@@ -256,10 +260,9 @@ class jsonpath_evaluator : private ser_context
         }
         node_type(const node_type&) = default;
         node_type(node_type&& other) = default;
+        node_type& operator=(const node_type&) = default;
+        node_type& operator=(node_type&& other) = default;
 
-        bool skip_contained_object;
-        string_type path;
-        pointer val_ptr;
     };
     typedef std::vector<node_type> node_set;
 
@@ -1583,7 +1586,7 @@ public:
         if (state_stack_.back().is_union)
         {
             std::set<node_type, node_less> temp(nodes_.begin(), nodes_.end());
-            stack_.push_back(std::vector<node_type>(temp.begin(),temp.end()));
+            stack_.push_back(std::vector<node_type>(std::make_move_iterator(temp.begin()),std::make_move_iterator(temp.end())));
         }
         else
         {
