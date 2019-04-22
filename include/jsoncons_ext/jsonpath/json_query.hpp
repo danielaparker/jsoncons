@@ -179,7 +179,7 @@ enum class path_state
     single_quoted_name,
     double_quoted_name,
     expr_or_filter_or_slice_or_key,
-    unquoted_comma_or_right_bracket,
+    unquoted_name_in_brackets,
     string_comma_or_right_bracket,
     slice_end_or_end_step,
     slice_end,
@@ -188,12 +188,12 @@ enum class path_state
     comma_or_right_bracket,
     path_or_function_name,
     function,
-    arg_or_right_round_bracket,
+    arg_or_right_paren,
     path_argument,
     unquoted_arg,
     single_quoted_arg,
     double_quoted_arg,
-    more_args_or_right_round_bracket,
+    more_args_or_right_paren,
     dot
 };
 
@@ -712,7 +712,7 @@ public:
                     switch (*p_)
                     {
                         case '(':
-                            state_stack_.back().state = path_state::arg_or_right_round_bracket;
+                            state_stack_.back().state = path_state::arg_or_right_paren;
                             function_name = std::move(buffer);
                             buffer.clear();
                             break;
@@ -769,7 +769,7 @@ public:
                     ++p_;
                     ++column_;
                     break;
-                case path_state::arg_or_right_round_bracket:
+                case path_state::arg_or_right_paren:
                     switch (*p_)
                     {
                         case ' ':
@@ -783,13 +783,13 @@ public:
                         case '\'':
                             buffer.clear();
                             buffer.push_back('\"');
-                            state_stack_.back().state = path_state::more_args_or_right_round_bracket;
+                            state_stack_.back().state = path_state::more_args_or_right_paren;
                             state_stack_.emplace_back(path_state::single_quoted_arg, state_stack_.back());
                             break;
                         case '\"':
                             buffer.clear();
                             buffer.push_back('\"');
-                            state_stack_.back().state = path_state::more_args_or_right_round_bracket;
+                            state_stack_.back().state = path_state::more_args_or_right_paren;
                             state_stack_.emplace_back(path_state::double_quoted_arg, state_stack_.back());
                             break;
                         case ')':
@@ -812,7 +812,7 @@ public:
                         }
                         default:
                             buffer.clear();
-                            state_stack_.back().state = path_state::more_args_or_right_round_bracket;
+                            state_stack_.back().state = path_state::more_args_or_right_paren;
                             state_stack_.emplace_back(path_state::unquoted_arg, state_stack_.back());
                             break;
                     }
@@ -864,7 +864,7 @@ public:
                                 return;
                             }
                             buffer.clear();
-                            //state_ = path_state::arg_or_right_round_bracket;
+                            //state_ = path_state::arg_or_right_paren;
                             state_stack_.pop_back();
                             break;
                         case ')':
@@ -923,7 +923,7 @@ public:
                     ++p_;
                     ++column_;
                     break;
-                case path_state::more_args_or_right_round_bracket:
+                case path_state::more_args_or_right_paren:
                     switch (*p_)
                     {
                         case ' ':
@@ -942,7 +942,7 @@ public:
                                 return;
                             }
                             buffer.clear();
-                            //state_ = path_state::arg_or_right_round_bracket;
+                            //state_ = path_state::arg_or_right_paren;
                             state_stack_.pop_back();
                             break;
                         case ')':
@@ -1105,13 +1105,13 @@ public:
                             slice = array_slice();
                             buffer.clear();
                             buffer.push_back(*p_);
-                            state_stack_.back().state = path_state::unquoted_comma_or_right_bracket;
+                            state_stack_.back().state = path_state::unquoted_name_in_brackets;
                             ++p_;
                             ++column_;
                             break;
                     }
                     break;
-                case path_state::unquoted_comma_or_right_bracket:
+                case path_state::unquoted_name_in_brackets:
                     switch (*p_)
                     {
                         case ':':
@@ -1127,7 +1127,6 @@ public:
                             if (!buffer.empty())
                             {
                                 selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                                //selectors_.push_back(make_unique_ptr<path_selector>(buffer));
                                 buffer.clear();
                             }
                             state_stack_.back().state = path_state::expr_or_filter_or_slice_or_key;
@@ -1141,12 +1140,6 @@ public:
                             apply_selectors();
                             JSONCONS_ASSERT(state_stack_.size() > 0);
                             state_stack_.pop_back();
-                            break;
-                        case '\'':
-                            state_stack_.emplace_back(path_state::single_quoted_name, state_stack_.back());
-                            break;
-                        case '\"':
-                            state_stack_.emplace_back(path_state::double_quoted_name, state_stack_.back());
                             break;
                         default:
                             buffer.push_back(*p_);
