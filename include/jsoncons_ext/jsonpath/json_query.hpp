@@ -1105,7 +1105,8 @@ public:
                             slice = array_slice();
                             buffer.clear();
                             buffer.push_back(*p_);
-                            state_stack_.back().state = path_state::unquoted_name_in_brackets;
+                            state_stack_.back().state = path_state::comma_or_right_bracket;
+                            state_stack_.push_back(path_state::unquoted_name_in_brackets);
                             ++p_;
                             ++column_;
                             break;
@@ -1120,33 +1121,26 @@ public:
                                 ec = jsonpath_errc::expected_slice_start;
                                 return;
                             }
+                            state_stack_.pop_back();
                             state_stack_.back().state = path_state::slice_end_or_end_step;
+                            ++p_;
+                            ++column_;
                             break;
                         case ',': 
-                            state_stack_.back().is_union = true;
-                            if (!buffer.empty())
-                            {
-                                selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                                buffer.clear();
-                            }
-                            state_stack_.back().state = path_state::expr_or_filter_or_slice_or_key;
-                            break;
                         case ']': 
                             if (!buffer.empty())
                             {
                                 selectors_.push_back(make_unique_ptr<name_selector>(buffer));
                                 buffer.clear();
                             }
-                            apply_selectors();
-                            JSONCONS_ASSERT(state_stack_.size() > 0);
                             state_stack_.pop_back();
                             break;
                         default:
                             buffer.push_back(*p_);
+                            ++p_;
+                            ++column_;
                             break;
                     }
-                    ++p_;
-                    ++column_;
                     break;
                 case path_state::string_comma_or_right_bracket:
                     switch (*p_)

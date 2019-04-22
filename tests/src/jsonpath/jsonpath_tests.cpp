@@ -1597,13 +1597,11 @@ TEST_CASE("jsonpath test 1")
     }
 #endif
 }
-
 TEST_CASE("jsonpath array union test")
 {
     json root = json::parse(R"(
 [[1,2,3,4,1,2,3,4],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9]]
 )");
-
     SECTION("Test 1")
     {
         json expected = json::parse(R"(
@@ -1630,4 +1628,16 @@ TEST_CASE("jsonpath array union test")
         json result = json_query(root, "$[0][0,0,0,3]");
         CHECK(result == expected);
     }
+#if 0
+    SECTION("Test 4")
+    {
+        json expected = json::parse(R"(
+[[0,1,2,3,4,5,6,7,8,9],[1,2,3,4,1,2,3,4]]
+)");
+        json result = json_query(root,"$[0.0,1.1,2.2]");
+
+        std::cout << result << "\n";
+        //CHECK(result == expected);
+    }
+#endif
 }
