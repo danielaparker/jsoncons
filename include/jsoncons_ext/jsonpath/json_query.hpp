@@ -174,7 +174,7 @@ enum class path_state
 {
     start,
     dot_or_left_bracket,
-    unquoted_name_or_left_bracket,
+    name_or_left_bracket,
     unquoted_name,
     single_quoted_name,
     double_quoted_name,
@@ -723,9 +723,9 @@ public:
                         {
                             if (buffer.size() > 0)
                             {
-                                apply_unquoted_string(buffer);
+                                selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                                apply_selectors();
                                 buffer.clear();
-                                transfer_nodes();
                             }
                             slice.start_ = 0;
 
@@ -736,18 +736,18 @@ public:
                         {
                             if (buffer.size() > 0)
                             {
-                                apply_unquoted_string(buffer);
+                                selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                                apply_selectors();
                                 buffer.clear();
-                                transfer_nodes();
                             }
                             state_stack_.back().state = path_state::dot;
                             break;
                         }
                         case ' ':case '\t':
                         {
-                            apply_unquoted_string(buffer);
+                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            apply_selectors();
                             buffer.clear();
-                            transfer_nodes();
                             state_stack_.pop_back();
                             break;
                         }
@@ -988,19 +988,20 @@ public:
                             state_stack_.back().is_recursive_descent = true;
                             ++p_;
                             ++column_;
-                            state_stack_.back().state = path_state::unquoted_name_or_left_bracket;
+                            state_stack_.back().state = path_state::name_or_left_bracket;
                             break;
                         default:
-                            state_stack_.back().state = path_state::unquoted_name_or_left_bracket;
+                            state_stack_.back().state = path_state::name_or_left_bracket;
                             break;
                     }
                     break;
-                case path_state::unquoted_name_or_left_bracket: // Can [ follow .?
+                case path_state::name_or_left_bracket: // Can [ follow .?
                     switch (*p_)
                     {
-                        case '.':
-                            ec = jsonpath_errc::expected_name;
-                            return;
+                        case ' ':case '\t':
+                            ++p_;
+                            ++column_;
+                            break;
                         case '*':
                             end_all();
                             transfer_nodes();
@@ -1013,6 +1014,9 @@ public:
                             ++p_;
                             ++column_;
                             break;
+                        case '.':
+                            ec = jsonpath_errc::expected_name;
+                            return;
                         default:
                             buffer.clear();
                             state_stack_.back().state = path_state::unquoted_name;
@@ -1354,30 +1358,30 @@ public:
                     switch (*p_)
                     {
                         case '[':
-                            apply_unquoted_string(buffer);
+                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            apply_selectors();
                             buffer.clear();
-                            transfer_nodes();
                             slice.start_ = 0;
                             state_stack_.pop_back();
                             break;
                         case '.':
-                            apply_unquoted_string(buffer);
+                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            apply_selectors();
                             buffer.clear();
-                            transfer_nodes();
                             state_stack_.pop_back();
                             break;
                         case ' ':case '\t':
-                            apply_unquoted_string(buffer);
+                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            apply_selectors();
                             buffer.clear();
-                            transfer_nodes();
                             state_stack_.pop_back();
                             ++p_;
                             ++column_;
                             break;
                         case '\r':
-                            apply_unquoted_string(buffer);
+                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            apply_selectors();
                             buffer.clear();
-                            transfer_nodes();
                             if (p_+1 < end_input_ && *(p_+1) == '\n')
                             {
                                 ++p_;
@@ -1387,9 +1391,9 @@ public:
                             ++p_;
                             break;
                         case '\n':
-                            apply_unquoted_string(buffer);
+                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            apply_selectors();
                             buffer.clear();
-                            transfer_nodes();
                             ++line_;
                             column_ = 1;
                             ++p_;
@@ -1459,9 +1463,9 @@ public:
         {
             case path_state::unquoted_name: 
             {
-                apply_unquoted_string(buffer);
+                selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                apply_selectors();
                 buffer.clear();
-                transfer_nodes();
                 state_stack_.pop_back(); // unquoted_name
                 break;
             }
@@ -1504,87 +1508,6 @@ public:
                 }
             }
 
-        }
-    }
-
-    void apply_unquoted_string(const string_view_type& name)
-    {
-        if (name.length() > 0)
-        {
-            for (const auto& node : stack_.back())
-            {
-                apply_unquoted_string(node.path, *(node.val_ptr), name);
-            }
-        }
-    }
-
-    void apply_unquoted_string(const string_type& path, reference val, const string_view_type& name)
-    {
-        if (val.is_object())
-        {
-            if (val.contains(name))
-            {
-                nodes_.emplace_back(PathCons()(path,name),std::addressof(val.at(name)));
-            }
-            if (state_stack_.back().is_recursive_descent)
-            {
-                for (auto it = val.object_range().begin(); it != val.object_range().end(); ++it)
-                {
-                    if (it->value().is_object() || it->value().is_array())
-                    {
-                        apply_unquoted_string(path, it->value(), name);
-                    }
-                }
-            }
-        }
-        else if (val.is_array())
-        {
-            size_t pos = 0;
-            bool is_start_positive_;
-            if (try_string_to_index(name.data(),name.size(),&pos, &is_start_positive_))
-            {
-                size_t index = is_start_positive_ ? pos : val.size() - pos;
-                if (index < val.size())
-                {
-                    nodes_.emplace_back(PathCons()(path,index),std::addressof(val[index]));
-                }
-            }
-            else if (name == length_literal() && val.size() > 0)
-            {
-                pointer ptr = create_temp(val.size());
-                nodes_.emplace_back(PathCons()(path,name),ptr);
-            }
-            if (state_stack_.back().is_recursive_descent)
-            {
-                for (auto it = val.array_range().begin(); it != val.array_range().end(); ++it)
-                {
-                    if (it->is_object() || it->is_array())
-                    {
-                        apply_unquoted_string(path, *it, name);
-                    }
-                }
-            }
-        }
-        else if (val.is_string())
-        {
-            string_view_type sv = val.as_string_view();
-            size_t pos = 0;
-            bool is_start_positive_;
-            if (try_string_to_index(name.data(),name.size(),&pos, &is_start_positive_))
-            {
-                auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), pos);
-                if (sequence.length() > 0)
-                {
-                    pointer ptr = create_temp(sequence.begin(),sequence.length());
-                    nodes_.emplace_back(PathCons()(path,pos),ptr);
-                }
-            }
-            else if (name == length_literal() && sv.size() > 0)
-            {
-                size_t count = unicons::u32_length(sv.begin(),sv.end());
-                pointer ptr = create_temp(count);
-                nodes_.emplace_back(PathCons()(path,name),ptr);
-            }
         }
     }
 
