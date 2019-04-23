@@ -331,6 +331,7 @@ TEST_CASE("test_jsonpath_recursive_descent")
     json result1 = json_query(root,"$..book[2]");
     //std::cout << pretty_print(result1) << std::endl;
     CHECK(result1.size() == 1);
+
     CHECK(result1[0] == root["store"]["book"][2]);
 
     json result1a = json_query(root,"$..book.2");
@@ -1695,3 +1696,4 @@ TEST_CASE("jsonpath object union test")
         CHECK(result == expected);
     }
 }
+
