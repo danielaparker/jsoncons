@@ -103,43 +103,43 @@ TEST_CASE("jsonpath slice errors")
 [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
 )");
 
-    SECTION("$.[")
+    SECTION("$[")
     {
-        std::string path = "$.[";
+        std::string path = "$[";
+        test_error_code(root, path, jsonpath_errc::unexpected_end_of_input,1,3);
+    }
+    SECTION("$[1")
+    {
+        std::string path = "$[1";
         test_error_code(root, path, jsonpath_errc::unexpected_end_of_input,1,4);
     }
-    SECTION("$.[1")
+    SECTION("$[1:")
     {
-        std::string path = "$.[1";
+        std::string path = "$[1:";
         test_error_code(root, path, jsonpath_errc::unexpected_end_of_input,1,5);
     }
-    SECTION("$.[1:")
+    SECTION("$[1:1")
     {
-        std::string path = "$.[1:";
+        std::string path = "$[1:1";
         test_error_code(root, path, jsonpath_errc::unexpected_end_of_input,1,6);
     }
-    SECTION("$.[1:1")
+
+    SECTION("$[-:]")
     {
-        std::string path = "$.[1:1";
-        test_error_code(root, path, jsonpath_errc::unexpected_end_of_input,1,7);
+        std::string path = "$[-:]";
+        test_error_code(root, path, jsonpath_errc::expected_slice_start,1,4);
     }
 
-    SECTION("$.[-:]")
+    SECTION("$[-1:-]")
     {
-        std::string path = "$.[-:]";
-        test_error_code(root, path, jsonpath_errc::expected_slice_start,1,5);
+        std::string path = "$[-1:-]";
+        test_error_code(root, path, jsonpath_errc::expected_slice_end,1,7);
     }
 
-    SECTION("$.[-1:-]")
+    SECTION("$[-1:-1:-]")
     {
-        std::string path = "$.[-1:-]";
-        test_error_code(root, path, jsonpath_errc::expected_slice_end,1,8);
-    }
-
-    SECTION("$.[-1:-1:-]")
-    {
-        std::string path = "$.[-1:-1:-]";
-        test_error_code(root, path, jsonpath_errc::expected_slice_step,1,11);
+        std::string path = "$[-1:-1:-]";
+        test_error_code(root, path, jsonpath_errc::expected_slice_step,1,10);
     }
 }
 

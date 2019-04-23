@@ -268,7 +268,7 @@ void query_cbor()
 
     // Query with JSONPath
     std::cout << "(4)\n";
-    json result = jsonpath::json_query(other,"$.[?(@ < 1.5)]");
+    json result = jsonpath::json_query(other,"$[?(@ < 1.5)]");
     std::cout << pretty_print(result) << "\n\n";
 }
 

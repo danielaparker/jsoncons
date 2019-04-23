@@ -165,7 +165,7 @@ TEST_CASE("jsonpath function tests")
     SECTION("tokenize in filter")
     {
         json j = json::parse("[\"The cat sat on the mat\",\"The cat on the mat\"]");
-        json result = json_query(j,"$.[?(tokenize(@,'\\\\s+')[2]=='sat')]");
+        json result = json_query(j,"$[?(tokenize(@,'\\\\s+')[2]=='sat')]");
 
         CHECK(result[0] == j[0]);
     }
