@@ -180,7 +180,6 @@ enum class path_state
     double_quoted_name,
     expr_or_filter_or_slice_or_key,
     unquoted_name_in_brackets,
-    string_comma_or_right_bracket,
     slice_end_or_end_step,
     slice_end,
     slice_step,
@@ -291,33 +290,6 @@ class jsonpath_evaluator : private ser_context
         }
         virtual void select(jsonpath_evaluator& evaluator,
                             node_type& node, const string_type& path, reference val, node_set& nodes) = 0;
-    };
-
-    class path_selector final : public selector
-    {
-    private:
-         std::basic_string<char_type> path_;
-    public:
-        path_selector(const std::basic_string<char_type>& path)
-            : path_(path)
-        {
-        }
-
-        void select(jsonpath_evaluator&,
-                    node_type&, const string_type& path, reference val, 
-                    node_set& nodes) override
-        {
-            std::error_code ec;
-            jsonpath_evaluator<Json,JsonReference,PathCons> e;
-            e.evaluate(val, path_, ec);
-            if (!ec)
-            {
-                for (auto ptr : e.get_pointers())
-                {
-                    nodes.emplace_back(PathCons()(path,path_),ptr);
-                }
-            }
-        }
     };
 
     class expr_selector final : public selector
@@ -1141,42 +1113,6 @@ public:
                             ++column_;
                             break;
                     }
-                    break;
-                case path_state::string_comma_or_right_bracket:
-                    switch (*p_)
-                    {
-                         case ',': 
-                             state_stack_.back().is_union = true;
-                            if (!buffer.empty())
-                            {
-                                selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                                //selectors_.push_back(make_unique_ptr<path_selector>(buffer));
-                                buffer.clear();
-                            }
-                            state_stack_.back().state = path_state::expr_or_filter_or_slice_or_key;
-                            break;
-                        case ']': 
-                            if (!buffer.empty())
-                            {
-                                selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                                buffer.clear();
-                            }
-                            apply_selectors();
-                            JSONCONS_ASSERT(state_stack_.size() > 0);
-                            state_stack_.pop_back();
-                            break;
-                        case '\'':
-                            state_stack_.emplace_back(path_state::single_quoted_name, state_stack_.back());
-                            break;
-                        case '\"':
-                            state_stack_.emplace_back(path_state::double_quoted_name, state_stack_.back());
-                            break;
-                        default:
-                            buffer.push_back(*p_);
-                            break;
-                    }
-                    ++p_;
-                    ++column_;
                     break;
                 case path_state::slice_end_or_end_step:
                     switch (*p_)
