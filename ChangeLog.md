@@ -8,6 +8,13 @@ Enhancements:
 Changes to jsonpath:
 
 - jsonpath unions now return distinct values (no duplicates)
+- a single dot immediately followed by a left bracket now results in an error (illegal JSONPath)
+
+Enhancements to jsonpath
+
+- Union of completely separate paths are allowed, e.g.
+
+    $.[firstName,address.city]
 
 v0.122.0
 --------
