@@ -7,13 +7,13 @@ It provides functions for search and "search and replace" using JSONPath express
 [json_query](json_query.md)
 
 [json_replace](json_replace.md)
-
-The [Jayway JSONPath Evaluator](https://jsonpath.herokuapp.com/) and [JSONPATH Expression Tester](https://jsonpath.curiousconcept.com/)
-are good online evaluators for checking JSONPath expressions.
     
 ### Stefan Goessner's JSONPath
 
 [JSONPath](http://goessner.net/articles/JsonPath/) is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document. 
+
+The [Jayway JSONPath Evaluator](https://jsonpath.herokuapp.com/) and [JSONPATH Expression Tester](https://jsonpath.curiousconcept.com/)
+are good online evaluators for checking JSONPath expressions.
 
 #### Differences with Stefan Goessner's implementations
 
