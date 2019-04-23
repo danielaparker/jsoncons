@@ -195,7 +195,9 @@ enum class path_state
     more_args_or_right_paren,
     dot,
     path,
-    path2
+    path2,
+    path_single_quoted,
+    path_double_quoted
 };
 
 struct state_item
@@ -903,6 +905,11 @@ public:
                             buffer.push_back('\"');
                             state_stack_.pop_back();
                             break;
+                        case '\"':
+                            buffer.push_back('\\');
+                            buffer.push_back('\"');
+                            state_stack_.pop_back();
+                            break;
                         default:
                             buffer.push_back(*p_);
                             break;
@@ -1158,6 +1165,14 @@ public:
                 case path_state::path:
                     switch (*p_)
                     {
+                        case '\'':
+                            buffer.push_back(*p_);
+                            state_stack_.push_back(path_state::path_single_quoted);
+                            break;
+                        case '\"':
+                            buffer.push_back(*p_);
+                            state_stack_.push_back(path_state::path_double_quoted);
+                            break;
                         case ',': 
                         case ']': 
                             if (!buffer.empty())
@@ -1173,6 +1188,52 @@ public:
                             ++column_;
                             break;
                     }
+                    break;
+                case path_state::path_double_quoted:
+                    switch (*p_)
+                    {
+                        case '\"': 
+                            buffer.push_back(*p_);
+                            state_stack_.pop_back();
+                            break;
+                        case '\\':
+                            buffer.push_back(*p_);
+                            if (p_+1 < end_input_)
+                            {
+                                ++p_;
+                                ++column_;
+                                buffer.push_back(*p_);
+                            }
+                            break;
+                        default:
+                            buffer.push_back(*p_);
+                            break;
+                    }
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::path_single_quoted:
+                    switch (*p_)
+                    {
+                        case '\'': 
+                            buffer.push_back(*p_);
+                            state_stack_.pop_back();
+                            break;
+                        case '\\':
+                            buffer.push_back(*p_);
+                            if (p_+1 < end_input_)
+                            {
+                                ++p_;
+                                ++column_;
+                                buffer.push_back(*p_);
+                            }
+                            break;
+                        default:
+                            buffer.push_back(*p_);
+                            break;
+                    }
+                    ++p_;
+                    ++column_;
                     break;
                 case path_state::path2:
                     switch (*p_)

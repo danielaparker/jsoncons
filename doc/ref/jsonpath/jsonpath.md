@@ -15,6 +15,15 @@ are good online evaluators for checking JSONPath expressions.
 
 [JSONPath](http://goessner.net/articles/JsonPath/) is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document. 
 
+#### Differences with Stefan Goessner's implementations
+
+- Stefan Goessner's implemention returns `false` in case of no match, but in a note he suggests an alternative is to return an empty array. 
+  The `jsoncons` implementation takes that alternative and returns an empty array in case of no match.
+- Names inside of square brackets may be double-quoted
+- Unions produce real unions with no duplicates instead of concatenated results
+- Union of completely separate paths are allowed, e.g.
+    $.[firstName,address.city]
+
 #### Paths
 
 JSONPath uses paths to select a set of nodes in a JSON value. Paths can use the dot-notation
