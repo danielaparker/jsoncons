@@ -175,6 +175,7 @@ enum class path_state
     start,
     dot_or_left_bracket,
     name_or_left_bracket,
+    name,
     unquoted_name,
     single_quoted_name,
     double_quoted_name,
@@ -991,16 +992,58 @@ public:
                             state_stack_.back().state = path_state::name_or_left_bracket;
                             break;
                         default:
-                            state_stack_.back().state = path_state::name_or_left_bracket;
+                            state_stack_.back().state = path_state::name;
                             break;
                     }
                     break;
-                case path_state::name_or_left_bracket: // Can [ follow .?
+                case path_state::name_or_left_bracket: 
                     switch (*p_)
                     {
                         case ' ':case '\t':
                             ++p_;
                             ++column_;
+                            break;
+                        case '\r':
+                            if (p_+1 < end_input_ && *(p_+1) == '\n')
+                                ++p_;
+                            ++line_;
+                            column_ = 1;
+                            ++p_;
+                            break;
+                        case '\n':
+                            ++line_;
+                            column_ = 1;
+                            ++p_;
+                            break;
+                        case '[': // [ can follow ..
+                            state_stack_.back().state = path_state::expr_or_filter_or_slice_or_key;
+                            ++p_;
+                            ++column_;
+                            break;
+                        default:
+                            buffer.clear();
+                            state_stack_.back().state = path_state::name;
+                            break;
+                    }
+                    break;
+                case path_state::name: 
+                    switch (*p_)
+                    {
+                        case ' ':case '\t':
+                            ++p_;
+                            ++column_;
+                            break;
+                        case '\r':
+                            if (p_+1 < end_input_ && *(p_+1) == '\n')
+                                ++p_;
+                            ++line_;
+                            column_ = 1;
+                            ++p_;
+                            break;
+                        case '\n':
+                            ++line_;
+                            column_ = 1;
+                            ++p_;
                             break;
                         case '*':
                             end_all();
@@ -1009,11 +1052,7 @@ public:
                             ++p_;
                             ++column_;
                             break;
-                        case '[':
-                            state_stack_.back().state = path_state::expr_or_filter_or_slice_or_key;
-                            ++p_;
-                            ++column_;
-                            break;
+                        case '[': 
                         case '.':
                             ec = jsonpath_errc::expected_name;
                             return;
@@ -1027,6 +1066,18 @@ public:
                     switch (*p_)
                     {
                         case ' ':case '\t':
+                            break;
+                        case '\r':
+                            if (p_+1 < end_input_ && *(p_+1) == '\n')
+                                ++p_;
+                            ++line_;
+                            column_ = 1;
+                            ++p_;
+                            break;
+                        case '\n':
+                            ++line_;
+                            column_ = 1;
+                            ++p_;
                             break;
                         case '.':
                             state_stack_.emplace_back(path_state::dot, state_stack_.back());

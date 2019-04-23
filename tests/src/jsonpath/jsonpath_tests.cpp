@@ -1669,28 +1669,28 @@ TEST_CASE("jsonpath object union test")
     SECTION("Test 1")
     {
         json expected = json::parse(R"(["John","Nara"])");
-        std::string path = "$.[firstName,address.city]";
+        std::string path = "$[firstName,address.city]";
         json result = json_query(root,path);
         CHECK(result == expected);
     }
     SECTION("Test 2")
     {
         json expected = json::parse(R"(["John","Nara"])");
-        std::string path = "$.[firstName,address[city]]";
+        std::string path = "$[firstName,address[city]]";
         json result = json_query(root,path);
         CHECK(result == expected);
     }
     SECTION("Test 3")
     {
         json expected = json::parse(R"(["John","Nara"])");
-        std::string path = "$.[firstName,address['city']]";
+        std::string path = "$[firstName,address['city']]";
         json result = json_query(root,path);
         CHECK(result == expected);
     }
     SECTION("Test 4")
     {
         json expected = json::parse(R"(["John","Nara"])");
-        std::string path = R"($.[firstName,address["city"]])";
+        std::string path = R"($[firstName,address["city"]])";
         json result = json_query(root,path);
         CHECK(result == expected);
     }
