@@ -194,7 +194,8 @@ enum class path_state
     double_quoted_arg,
     more_args_or_right_paren,
     dot,
-    path
+    path,
+    path2
 };
 
 struct state_item
@@ -1132,6 +1133,12 @@ public:
                             ++p_;
                             ++column_;
                             break;
+                        case '[':
+                            buffer.push_back(*p_);
+                            state_stack_.back().state = path_state::path2;
+                            ++p_;
+                            ++column_;
+                            break;
                         case ',': 
                         case ']': 
                             if (!buffer.empty())
@@ -1166,6 +1173,20 @@ public:
                             ++column_;
                             break;
                     }
+                    break;
+                case path_state::path2:
+                    switch (*p_)
+                    {
+                        case ']': 
+                            buffer.push_back(*p_);
+                            state_stack_.back() = path_state::path;
+                            break;
+                        default:
+                            buffer.push_back(*p_);
+                            break;
+                    }
+                    ++p_;
+                    ++column_;
                     break;
                 case path_state::slice_end_or_end_step:
                     switch (*p_)

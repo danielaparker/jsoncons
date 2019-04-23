@@ -1634,9 +1634,11 @@ TEST_CASE("jsonpath array union test")
         json expected = json::parse(R"(
 [1,2]
 )");
-        json result = json_query(root,"$[0.0,1.1,2.2]");
+        //json result1 = json_query(root,"$[0.0,1.1,2.2]");
+        json result2 = json_query(root,"$[0[0],1[1],2[2]]");
 
-        CHECK(result == expected);
+        //CHECK(result1 == expected);
+        CHECK(result2 == expected);
     }
 
 }
