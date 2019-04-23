@@ -193,7 +193,8 @@ enum class path_state
     single_quoted_arg,
     double_quoted_arg,
     more_args_or_right_paren,
-    dot
+    dot,
+    path
 };
 
 struct state_item
@@ -290,6 +291,33 @@ class jsonpath_evaluator : private ser_context
         }
         virtual void select(jsonpath_evaluator& evaluator,
                             node_type& node, const string_type& path, reference val, node_set& nodes) = 0;
+    };
+
+    class path_selector final : public selector
+    {
+    private:
+         std::basic_string<char_type> path_;
+    public:
+        path_selector(const std::basic_string<char_type>& path)
+            : path_(path)
+        {
+        }
+
+        void select(jsonpath_evaluator&,
+                    node_type&, const string_type& path, reference val, 
+                    node_set& nodes) override
+        {
+            std::error_code ec;
+            jsonpath_evaluator<Json,JsonReference,PathCons> e;
+            e.evaluate(val, path_, ec);
+            if (!ec)
+            {
+                for (auto ptr : e.get_pointers())
+                {
+                    nodes.emplace_back(PathCons()(path,path_),ptr);
+                }
+            }
+        }
     };
 
     class expr_selector final : public selector
@@ -1098,11 +1126,36 @@ public:
                             ++p_;
                             ++column_;
                             break;
+                        case '.':
+                            buffer.push_back(*p_);
+                            state_stack_.back().state = path_state::path;
+                            ++p_;
+                            ++column_;
+                            break;
                         case ',': 
                         case ']': 
                             if (!buffer.empty())
                             {
                                 selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                                buffer.clear();
+                            }
+                            state_stack_.pop_back();
+                            break;
+                        default:
+                            buffer.push_back(*p_);
+                            ++p_;
+                            ++column_;
+                            break;
+                    }
+                    break;
+                case path_state::path:
+                    switch (*p_)
+                    {
+                        case ',': 
+                        case ']': 
+                            if (!buffer.empty())
+                            {
+                                selectors_.push_back(make_unique_ptr<path_selector>(buffer));
                                 buffer.clear();
                             }
                             state_stack_.pop_back();

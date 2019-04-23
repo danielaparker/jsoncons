@@ -1632,12 +1632,11 @@ TEST_CASE("jsonpath array union test")
     SECTION("Test 4")
     {
         json expected = json::parse(R"(
-[[0,1,2,3,4,5,6,7,8,9],[1,2,3,4,1,2,3,4]]
+[1,2]
 )");
         json result = json_query(root,"$[0.0,1.1,2.2]");
 
-        std::cout << result << "\n";
-        //CHECK(result == expected);
+        CHECK(result == expected);
     }
 
 }
