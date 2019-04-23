@@ -23,7 +23,7 @@ are good online evaluators for checking JSONPath expressions.
   The `jsoncons` implementation takes that alternative and returns an empty array in case of no match.
 - Names inside of square brackets may be double-quoted
 - Unions produce real unions with no duplicates instead of concatenated results
-- Union of completely separate paths are allowed, e.g.
+- Union of completely separate paths are allowed, e.g.  
     $.[firstName,address.city]
 
 #### Paths
