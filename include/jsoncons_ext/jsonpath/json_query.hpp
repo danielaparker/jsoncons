@@ -1262,7 +1262,7 @@ public:
                             slice = array_slice();
                             buffer.clear();
                             state_stack_.back().state = path_state::comma_or_right_bracket;
-                            state_stack_.push_back(path_state::slice_end_or_end_step);
+                            state_stack_.emplace_back(path_state::slice_end_or_end_step, state_stack_.back());
                             ++p_;
                             ++column_;
                             break;
@@ -1289,7 +1289,7 @@ public:
                             buffer.clear();
                             buffer.push_back(*p_);
                             state_stack_.back().state = path_state::comma_or_right_bracket;
-                            state_stack_.push_back(path_state::bracketed_unquoted_name);
+                            state_stack_.emplace_back(path_state::bracketed_unquoted_name, state_stack_.back());
                             ++p_;
                             ++column_;
                             break;
@@ -1359,11 +1359,11 @@ public:
                     {
                         case '\'':
                             buffer.push_back(*p_);
-                            state_stack_.push_back(path_state::path_single_quoted);
+                            state_stack_.emplace_back(path_state::path_single_quoted, state_stack_.back());
                             break;
                         case '\"':
                             buffer.push_back(*p_);
-                            state_stack_.push_back(path_state::path_double_quoted);
+                            state_stack_.emplace_back(path_state::path_double_quoted, state_stack_.back());
                             break;
                         case ',': 
                         case ']': 
