@@ -183,7 +183,7 @@ TEST_CASE("test_path")
     json result1 = json_query(root,"$.store.book");
     json result2 = json_query(root,"store.book");
     json result3 = json_query(root,"$.'store'.'book'");
-    json result4 = json_query(root,"$.\"store\".\"book\"");
+    json result4 = json_query(root,"\"store\".\"book\"");
 
     json expected = json::array();
     expected.push_back(fixture.book());
@@ -1706,4 +1706,3 @@ TEST_CASE("jsonpath object union test")
         CHECK(result == expected);
     }
 }
-

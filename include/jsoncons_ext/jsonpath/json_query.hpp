@@ -686,10 +686,14 @@ public:
                     switch (*p_)
                     {
                         case ' ':case '\t':
+                            ++p_;
+                            ++column_;
                             break;
                         case '$':
                         {
                             state_stack_.emplace_back(path_state::dot_or_left_bracket, state_stack_.back());
+                            ++p_;
+                            ++column_;
                             break;
                         }
                         default:
@@ -703,7 +707,6 @@ public:
                                 default: // might be function, validate name later
                                     state_stack_.emplace_back(path_state::dot_or_left_bracket, state_stack_.back());
                                     state_stack_.emplace_back(path_state::path_or_function_name, state_stack_.back());
-                                    buffer.push_back(*p_);
                                     break;
                             }
                             break;
@@ -711,8 +714,6 @@ public:
 
                         return;
                     };
-                    ++p_;
-                    ++column_;
                     break;
                 }
                 case path_state::path_or_function_name:
@@ -757,16 +758,14 @@ public:
                         }
                         case '\'':
                         {
-                            state_stack_.emplace_back(path_state::single_quoted_name, state_stack_.back());
-                            ++p_;
-                            ++column_;
+                            buffer.clear();
+                            state_stack_.back().state = path_state::single_quoted_name2;
                             break;
                         }
                         case '\"':
                         {
-                            state_stack_.emplace_back(path_state::double_quoted_name, state_stack_.back());
-                            ++p_;
-                            ++column_;
+                            buffer.clear();
+                            state_stack_.back().state = path_state::double_quoted_name2;
                             break;
                         }
                         default:
