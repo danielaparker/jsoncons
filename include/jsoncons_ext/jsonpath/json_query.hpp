@@ -1,4 +1,4 @@
-// Copyright 2013 Daniel Parker
+// Copyright 2013 Daniel Parkerpath_single_quoted
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -1360,10 +1360,14 @@ public:
                         case '\'':
                             buffer.push_back(*p_);
                             state_stack_.emplace_back(path_state::path_single_quoted, state_stack_.back());
+                            ++p_;
+                            ++column_;
                             break;
                         case '\"':
                             buffer.push_back(*p_);
                             state_stack_.emplace_back(path_state::path_double_quoted, state_stack_.back());
+                            ++p_;
+                            ++column_;
                             break;
                         case ',': 
                         case ']': 
