@@ -186,8 +186,8 @@ namespace ns {
 } // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_TYPE_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
-JSONCONS_TYPE_TRAITS_DECL(ns::reputation_object, application, reputons);
+JSONCONS_MEMEBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
+JSONCONS_MEMEBER_TRAITS_DECL(ns::reputation_object, application, reputons);
 
 void reputons_extensibility_example()
 {

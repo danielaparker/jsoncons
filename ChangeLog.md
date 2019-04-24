@@ -1,9 +1,9 @@
 master
 ------
 
-Enhancements:
+Nonbreaking change to names (old name still works)
 
-- `basic_json` now supports operators `<`, `<=`, `>`, `>=` 
+- The name JSONCONS_TYPE_TRAITS_DECL has been deprecated and changed to JSONCONS_MEMBER_TRAITS_DECL
 
 Changes to jsonpath:
 
@@ -15,6 +15,10 @@ Enhancements to jsonpath
 - Union of completely separate paths are allowed, e.g.
 
     $.[firstName,address.city]
+
+Other enhancements:
+
+- `basic_json` now supports operators `<`, `<=`, `>`, `>=` 
 
 v0.122.0
 --------
