@@ -179,7 +179,9 @@ enum class path_state
     unquoted_name,
     unquoted_name2,
     single_quoted_name,
+    single_quoted_name2,
     double_quoted_name,
+    double_quoted_name2,
     expr_or_filter_or_slice_or_key,
     unquoted_name_in_brackets,
     slice_end_or_end_step,
@@ -1053,6 +1055,16 @@ public:
                             ++p_;
                             ++column_;
                             break;
+                        case '\'':
+                            state_stack_.back().state = path_state::single_quoted_name2;
+                            ++p_;
+                            ++column_;
+                            break;
+                        case '\"':
+                            state_stack_.back().state = path_state::double_quoted_name2;
+                            ++p_;
+                            ++column_;
+                            break;
                         case '[': 
                         case '.':
                             ec = jsonpath_errc::expected_name;
@@ -1486,11 +1498,61 @@ public:
                     ++p_;
                     ++column_;
                     break;
+                case path_state::single_quoted_name2:
+                    switch (*p_)
+                    {
+                        case '\'':
+                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            apply_selectors();
+                            buffer.clear();
+                            state_stack_.pop_back();
+                            break;
+                        case '\\':
+                            buffer.push_back(*p_);
+                            if (p_+1 < end_input_)
+                            {
+                                ++p_;
+                                ++column_;
+                                buffer.push_back(*p_);
+                            }
+                            break;
+                        default:
+                            buffer.push_back(*p_);
+                            break;
+                    };
+                    ++p_;
+                    ++column_;
+                    break;
                 case path_state::double_quoted_name: 
                     switch (*p_)
                     {
                         case '\"':
                             selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            buffer.clear();
+                            state_stack_.pop_back();
+                            break;
+                        case '\\':
+                            buffer.push_back(*p_);
+                            if (p_+1 < end_input_)
+                            {
+                                ++p_;
+                                ++column_;
+                                buffer.push_back(*p_);
+                            }
+                            break;
+                        default:
+                            buffer.push_back(*p_);
+                            break;
+                    };
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::double_quoted_name2: 
+                    switch (*p_)
+                    {
+                        case '\"':
+                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            apply_selectors();
                             buffer.clear();
                             state_stack_.pop_back();
                             break;

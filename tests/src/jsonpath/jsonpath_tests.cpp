@@ -180,14 +180,18 @@ TEST_CASE("test_path")
 
     json root = json::parse(jsonpath_fixture::store_text());
 
-    json result = json_query(root,"$.store.book");
+    json result1 = json_query(root,"$.store.book");
     json result2 = json_query(root,"store.book");
+    json result3 = json_query(root,"$.'store'.'book'");
+    json result4 = json_query(root,"$.\"store\".\"book\"");
 
     json expected = json::array();
     expected.push_back(fixture.book());
 
-    CHECK(result == expected);
+    CHECK(result1 == expected);
     CHECK(result2 == expected);
+    CHECK(result3 == expected);
+    CHECK(result4 == expected);
 
     //std::cout << pretty_print(result) << std::endl;
 }
@@ -1488,6 +1492,12 @@ TEST_CASE("jsonpath test 1")
     SECTION("$.0.category")
     {
         json result = json_query(j,"$.0.category");
+        REQUIRE(result.size() == 1);
+        CHECK(result[0].as<std::string>() == std::string("reference"));
+    }
+    SECTION("$.0.'category'")
+    {
+        json result = json_query(j,"$.0.'category'");
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<std::string>() == std::string("reference"));
     }
