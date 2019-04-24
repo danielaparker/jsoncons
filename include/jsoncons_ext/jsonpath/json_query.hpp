@@ -179,11 +179,12 @@ enum class path_state
     unquoted_name,
     unquoted_name2,
     single_quoted_name,
-    single_quoted_name2,
     double_quoted_name,
-    double_quoted_name2,
+    bracketed_unquoted_name,
+    bracketed_single_quoted_name,
+    bracketed_double_quoted_name,
+    bracketed_dot_or_left_bracket_or_comma_or_right_bracket,
     expr_or_filter_or_slice_or_key,
-    unquoted_name_in_brackets,
     slice_end_or_end_step,
     slice_end,
     slice_step,
@@ -759,13 +760,13 @@ public:
                         case '\'':
                         {
                             buffer.clear();
-                            state_stack_.back().state = path_state::single_quoted_name2;
+                            state_stack_.back().state = path_state::single_quoted_name;
                             break;
                         }
                         case '\"':
                         {
                             buffer.clear();
-                            state_stack_.back().state = path_state::double_quoted_name2;
+                            state_stack_.back().state = path_state::double_quoted_name;
                             break;
                         }
                         default:
@@ -1055,12 +1056,12 @@ public:
                             ++column_;
                             break;
                         case '\'':
-                            state_stack_.back().state = path_state::single_quoted_name2;
+                            state_stack_.back().state = path_state::single_quoted_name;
                             ++p_;
                             ++column_;
                             break;
                         case '\"':
-                            state_stack_.back().state = path_state::double_quoted_name2;
+                            state_stack_.back().state = path_state::double_quoted_name;
                             ++p_;
                             ++column_;
                             break;
@@ -1100,6 +1101,112 @@ public:
                         default:
                             ec = jsonpath_errc::expected_separator;
                             return;
+                    };
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::unquoted_name: 
+                    switch (*p_)
+                    {
+                        case '[':
+                        case '.':
+                        case ' ':case '\t':
+                        case '\r':
+                        case '\n':
+                            state_stack_.back().state = path_state::unquoted_name2;
+                            break;
+                        default:
+                            buffer.push_back(*p_);
+                            ++p_;
+                            ++column_;
+                            break;
+                    };
+                    break;
+                case path_state::unquoted_name2: 
+                    switch (*p_)
+                    {
+                        case '[':
+                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            apply_selectors();
+                            buffer.clear();
+                            slice.start_ = 0;
+                            state_stack_.pop_back();
+                            break;
+                        case '.':
+                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            apply_selectors();
+                            buffer.clear();
+                            state_stack_.pop_back();
+                            break;
+                        case ' ':case '\t':
+                            ++p_;
+                            ++column_;
+                            break;
+                        case '\r':
+                            if (p_+1 < end_input_ && *(p_+1) == '\n')
+                            {
+                                ++p_;
+                            }
+                            ++line_;
+                            column_ = 1;
+                            ++p_;
+                            break;
+                        case '\n':
+                            ++line_;
+                            column_ = 1;
+                            ++p_;
+                            break;
+                        default:
+                            ec = jsonpath_errc::expected_name;
+                            return;
+                    };
+                    break;
+                case path_state::single_quoted_name:
+                    switch (*p_)
+                    {
+                        case '\'':
+                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            apply_selectors();
+                            buffer.clear();
+                            state_stack_.pop_back();
+                            break;
+                        case '\\':
+                            buffer.push_back(*p_);
+                            if (p_+1 < end_input_)
+                            {
+                                ++p_;
+                                ++column_;
+                                buffer.push_back(*p_);
+                            }
+                            break;
+                        default:
+                            buffer.push_back(*p_);
+                            break;
+                    };
+                    ++p_;
+                    ++column_;
+                    break;
+                case path_state::double_quoted_name: 
+                    switch (*p_)
+                    {
+                        case '\"':
+                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            apply_selectors();
+                            buffer.clear();
+                            state_stack_.pop_back();
+                            break;
+                        case '\\':
+                            buffer.push_back(*p_);
+                            if (p_+1 < end_input_)
+                            {
+                                ++p_;
+                                ++column_;
+                                buffer.push_back(*p_);
+                            }
+                            break;
+                        default:
+                            buffer.push_back(*p_);
+                            break;
                     };
                     ++p_;
                     ++column_;
@@ -1167,13 +1274,13 @@ public:
                             break;
                         case '\'':
                             state_stack_.back().state = path_state::comma_or_right_bracket;
-                            state_stack_.emplace_back(path_state::single_quoted_name, state_stack_.back());
+                            state_stack_.emplace_back(path_state::bracketed_single_quoted_name, state_stack_.back());
                             ++p_;
                             ++column_;
                             break;
                         case '\"':
                             state_stack_.back().state = path_state::comma_or_right_bracket;
-                            state_stack_.emplace_back(path_state::double_quoted_name, state_stack_.back());
+                            state_stack_.emplace_back(path_state::bracketed_double_quoted_name, state_stack_.back());
                             ++p_;
                             ++column_;
                             break;
@@ -1182,13 +1289,13 @@ public:
                             buffer.clear();
                             buffer.push_back(*p_);
                             state_stack_.back().state = path_state::comma_or_right_bracket;
-                            state_stack_.push_back(path_state::unquoted_name_in_brackets);
+                            state_stack_.push_back(path_state::bracketed_unquoted_name);
                             ++p_;
                             ++column_;
                             break;
                     }
                     break;
-                case path_state::unquoted_name_in_brackets:
+                case path_state::bracketed_unquoted_name:
                     switch (*p_)
                     {
                         case ':':
@@ -1198,6 +1305,26 @@ public:
                                 return;
                             }
                             state_stack_.back().state = path_state::slice_end_or_end_step;
+                            ++p_;
+                            ++column_;
+                            break;
+                        case '.':
+                        case '[':
+                        case ',': 
+                        case ']': 
+                            state_stack_.back().state = path_state::bracketed_dot_or_left_bracket_or_comma_or_right_bracket;
+                            break;
+                        default:
+                            buffer.push_back(*p_);
+                            ++p_;
+                            ++column_;
+                            break;
+                    }
+                    break;
+                case path_state::bracketed_dot_or_left_bracket_or_comma_or_right_bracket:
+                    switch (*p_)
+                    {
+                        case ' ':case '\t':
                             ++p_;
                             ++column_;
                             break;
@@ -1223,10 +1350,8 @@ public:
                             state_stack_.pop_back();
                             break;
                         default:
-                            buffer.push_back(*p_);
-                            ++p_;
-                            ++column_;
-                            break;
+                            ec = jsonpath_errc::expected_right_bracket;
+                            return;
                     }
                     break;
                 case path_state::path:
@@ -1417,63 +1542,7 @@ public:
                             return;
                     }
                     break;
-                case path_state::unquoted_name: 
-                    switch (*p_)
-                    {
-                        case '[':
-                        case '.':
-                        case ' ':case '\t':
-                        case '\r':
-                        case '\n':
-                            state_stack_.back().state = path_state::unquoted_name2;
-                            break;
-                        default:
-                            buffer.push_back(*p_);
-                            ++p_;
-                            ++column_;
-                            break;
-                    };
-                    break;
-                case path_state::unquoted_name2: 
-                    switch (*p_)
-                    {
-                        case '[':
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                            apply_selectors();
-                            buffer.clear();
-                            slice.start_ = 0;
-                            state_stack_.pop_back();
-                            break;
-                        case '.':
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                            apply_selectors();
-                            buffer.clear();
-                            state_stack_.pop_back();
-                            break;
-                        case ' ':case '\t':
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '\r':
-                            if (p_+1 < end_input_ && *(p_+1) == '\n')
-                            {
-                                ++p_;
-                            }
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
-                            break;
-                        case '\n':
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
-                            break;
-                        default:
-                            ec = jsonpath_errc::expected_name;
-                            return;
-                    };
-                    break;
-                case path_state::single_quoted_name:
+                case path_state::bracketed_single_quoted_name:
                     switch (*p_)
                     {
                         case '\'':
@@ -1497,61 +1566,11 @@ public:
                     ++p_;
                     ++column_;
                     break;
-                case path_state::single_quoted_name2:
-                    switch (*p_)
-                    {
-                        case '\'':
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                            apply_selectors();
-                            buffer.clear();
-                            state_stack_.pop_back();
-                            break;
-                        case '\\':
-                            buffer.push_back(*p_);
-                            if (p_+1 < end_input_)
-                            {
-                                ++p_;
-                                ++column_;
-                                buffer.push_back(*p_);
-                            }
-                            break;
-                        default:
-                            buffer.push_back(*p_);
-                            break;
-                    };
-                    ++p_;
-                    ++column_;
-                    break;
-                case path_state::double_quoted_name: 
+                case path_state::bracketed_double_quoted_name: 
                     switch (*p_)
                     {
                         case '\"':
                             selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                            buffer.clear();
-                            state_stack_.pop_back();
-                            break;
-                        case '\\':
-                            buffer.push_back(*p_);
-                            if (p_+1 < end_input_)
-                            {
-                                ++p_;
-                                ++column_;
-                                buffer.push_back(*p_);
-                            }
-                            break;
-                        default:
-                            buffer.push_back(*p_);
-                            break;
-                    };
-                    ++p_;
-                    ++column_;
-                    break;
-                case path_state::double_quoted_name2: 
-                    switch (*p_)
-                    {
-                        case '\"':
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                            apply_selectors();
                             buffer.clear();
                             state_stack_.pop_back();
                             break;

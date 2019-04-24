@@ -1,7 +1,7 @@
 master
 ------
 
-Nonbreaking change to names (old name still works)
+Non-breaking change to names (old name still works)
 
 - The name JSONCONS_TYPE_TRAITS_DECL has been deprecated and changed to JSONCONS_MEMBER_TRAITS_DECL
 
