@@ -1705,4 +1705,18 @@ TEST_CASE("jsonpath object union test")
         json result = json_query(root,path);
         CHECK(result == expected);
     }
+    SECTION("Test 5")
+    {
+        json expected = json::parse(R"(["John","Nara"])");
+        std::string path = R"($['firstName','address'["city"]])";
+        json result = json_query(root,path);
+        CHECK(result == expected);
+    }
+    SECTION("Test 6")
+    {
+        json expected = json::parse(R"(["John","Nara"])");
+        std::string path = R"($["firstName","address"["city"]])";
+        json result = json_query(root,path);
+        CHECK(result == expected);
+    }
 }

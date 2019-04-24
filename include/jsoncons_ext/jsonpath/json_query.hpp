@@ -1546,9 +1546,7 @@ public:
                     switch (*p_)
                     {
                         case '\'':
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                            buffer.clear();
-                            state_stack_.pop_back();
+                            state_stack_.back().state = path_state::bracketed_dot_or_left_bracket_or_comma_or_right_bracket;
                             break;
                         case '\\':
                             buffer.push_back(*p_);
@@ -1570,9 +1568,7 @@ public:
                     switch (*p_)
                     {
                         case '\"':
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                            buffer.clear();
-                            state_stack_.pop_back();
+                            state_stack_.back().state = path_state::bracketed_dot_or_left_bracket_or_comma_or_right_bracket;
                             break;
                         case '\\':
                             buffer.push_back(*p_);
