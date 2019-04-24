@@ -29,11 +29,33 @@ are good online evaluators for checking JSONPath expressions.
 
 #### Paths
 
-JSONPath uses paths to select a set of nodes in a JSON value. Paths can use the dot-notation
+JSONPath uses paths to select a set of nodes in a JSON value. Paths can use the dot-notation or the bracket-notation.
+
+Using the dot notation to select all titles:
 
     $.store.book.0.title
 
-or the bracket-notation 
+or
+
+    $. store . book . 0 . title
+
+or
+
+    store.book.0.title
+
+or
+
+    $.'store'.'book'.0.'title'
+
+or
+
+    $."store"."book".0."title"
+
+Note that the jsoncons implementation allows quote delimiters in the dot-notation,
+and that the `$.` is optional. Unquoted names cannot contain spaces, spaces before
+and after the name are ignored. 
+
+Using the bracket-notation to select all titles: 
 
 
     $[store][book][0][title]

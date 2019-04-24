@@ -75,9 +75,11 @@ TEST_CASE("store")
     SECTION("test_path")
     {
         json result1 = json_query(store,"$.store.book");
-        json result2 = json_query(store,"store.book");
-        json result3 = json_query(store,"$.'store'.'book'");
-        json result4 = json_query(store,"\"store\".\"book\"");
+        json result2 = json_query(store,"$. store . book ");
+        json result3 = json_query(store,"store.book");
+        json result4 = json_query(store," store . book ");
+        json result5 = json_query(store,"$.'store'.'book'");
+        json result6 = json_query(store,"\"store\".\"book\"");
 
         json expected = json::array();
         expected.push_back(book_list);
@@ -86,6 +88,8 @@ TEST_CASE("store")
         CHECK(result2 == expected);
         CHECK(result3 == expected);
         CHECK(result4 == expected);
+        CHECK(result5 == expected);
+        CHECK(result6 == expected);
     }
 
         //std::cout << pretty_print(result) << std::endl;
