@@ -183,7 +183,7 @@ enum class path_state
     bracketed_unquoted_name,
     bracketed_single_quoted_name,
     bracketed_double_quoted_name,
-    bracketed_dot_or_left_bracket_or_comma_or_right_bracket,
+    bracketed_name_or_path,
     expr_or_filter_or_slice_or_key,
     slice_end_or_end_step,
     slice_end,
@@ -1312,7 +1312,7 @@ public:
                         case '[':
                         case ',': 
                         case ']': 
-                            state_stack_.back().state = path_state::bracketed_dot_or_left_bracket_or_comma_or_right_bracket;
+                            state_stack_.back().state = path_state::bracketed_name_or_path;
                             break;
                         default:
                             buffer.push_back(*p_);
@@ -1321,7 +1321,7 @@ public:
                             break;
                     }
                     break;
-                case path_state::bracketed_dot_or_left_bracket_or_comma_or_right_bracket:
+                case path_state::bracketed_name_or_path:
                     switch (*p_)
                     {
                         case ' ':case '\t':
@@ -1546,7 +1546,7 @@ public:
                     switch (*p_)
                     {
                         case '\'':
-                            state_stack_.back().state = path_state::bracketed_dot_or_left_bracket_or_comma_or_right_bracket;
+                            state_stack_.back().state = path_state::bracketed_name_or_path;
                             break;
                         case '\\':
                             buffer.push_back(*p_);
@@ -1568,7 +1568,7 @@ public:
                     switch (*p_)
                     {
                         case '\"':
-                            state_stack_.back().state = path_state::bracketed_dot_or_left_bracket_or_comma_or_right_bracket;
+                            state_stack_.back().state = path_state::bracketed_name_or_path;
                             break;
                         case '\\':
                             buffer.push_back(*p_);
