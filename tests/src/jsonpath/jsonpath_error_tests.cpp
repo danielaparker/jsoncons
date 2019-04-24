@@ -58,6 +58,10 @@ void test_error_code(const json& root, const std::string& path, std::error_code 
     }
     catch (const jsonpath_error& e)
     {
+        if (e.code() != value)
+        {
+            std::cout << path << "\n";
+        }
         CHECK(e.code() == value);
         CHECK(e.line_number() == line);
         CHECK(e.column_number() == column);
@@ -67,14 +71,14 @@ void test_error_code(const json& root, const std::string& path, std::error_code 
 /*TEST_CASE("test_root_error")
 {
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "..*", jsonpath_errc::expected_root,1,1);
+    test_error_code(root, "..*", jsonpath_errc::expected_root,1,1);`
 }*/
 
 TEST_CASE("test_right_bracket_error")
 {
 
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "$['store']['book'[*]", jsonpath_errc::expected_right_bracket,1,18);
+    test_error_code(root, "$['store']['book'[*]", jsonpath_errc::unexpected_end_of_input,1,21);
 }
 
 TEST_CASE("test_dot_dot_dot")
