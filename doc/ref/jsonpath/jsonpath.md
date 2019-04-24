@@ -10,7 +10,8 @@ It provides functions for search and "search and replace" using JSONPath express
     
 ### Stefan Goessner's JSONPath
 
-[JSONPath](http://goessner.net/articles/JsonPath/) is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document. 
+[JSONPath](http://goessner.net/articles/JsonPath/), a vaguely standardized syntax for querying JSON, is a creation of Stefan Goessner. 
+JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document. 
 
 The [Jayway JSONPath Evaluator](https://jsonpath.herokuapp.com/) and [JSONPATH Expression Tester](https://jsonpath.curiousconcept.com/)
 are good online evaluators for checking JSONPath expressions.
@@ -21,7 +22,7 @@ are good online evaluators for checking JSONPath expressions.
 
 - Stefan Goessner's implemention returns `false` in case of no match, but in a note he suggests an alternative is to return an empty array. 
   The `jsoncons` implementation takes that alternative and returns an empty array in case of no match.
-- Names inside of square brackets may be double-quoted
+- Names in both the dot notation and the bracket notation may be unquoted (no spaces), single-quoted, or double-quoted.
 - Unions produce real unions with no duplicates instead of concatenated results
 - Union of completely separate paths are allowed, e.g.
 
