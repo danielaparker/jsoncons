@@ -1,7 +1,6 @@
 ### jsonpath extension
 
-The jsonpath extension implements [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/).  
-
+The jsonpath extension implements [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/).
 It provides functions for search and "search and replace" using JSONPath expressions:
 
 [json_query](json_query.md)
