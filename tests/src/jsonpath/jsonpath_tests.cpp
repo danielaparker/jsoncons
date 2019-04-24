@@ -21,7 +21,7 @@ using namespace jsoncons::jsonpath;
 
 TEST_CASE("store")
 {
-    const json store = json::parse(R"(
+    json store = json::parse(R"(
     {
         "store": {
             "book": [
@@ -60,51 +60,27 @@ TEST_CASE("store")
     }
     )");
 
+    json book_list = store["store"]["book"];
+    json bicycle = store["store"]["bicycle"];
+
     struct jsonpath_fixture
     {
-        static const char* store_text()
-        {
-            static const char* text = "{ \"store\": {\"book\": [ { \"category\": \"reference\",\"author\": \"Nigel Rees\",\"title\": \"Sayings of the Century\",\"price\": 8.95},{ \"category\": \"fiction\",\"author\": \"Evelyn Waugh\",\"title\": \"Sword of Honour\",\"price\": 12.99},{ \"category\": \"fiction\",\"author\": \"Herman Melville\",\"title\": \"Moby Dick\",\"isbn\": \"0-553-21311-3\",\"price\": 8.99},{ \"category\": \"fiction\",\"author\": \"J. R. R. Tolkien\",\"title\": \"The Lord of the Rings\",\"isbn\": \"0-395-19395-8\",\"price\": 22.99}],\"bicycle\": {\"color\": \"red\",\"price\": 19.95}}}";
-            return text;
-        }
         static const char* store_text_empty_isbn()
         {
             static const char* text = "{ \"store\": {\"book\": [ { \"category\": \"reference\",\"author\": \"Nigel Rees\",\"title\": \"Sayings of the Century\",\"price\": 8.95},{ \"category\": \"fiction\",\"author\": \"Evelyn Waugh\",\"title\": \"Sword of Honour\",\"price\": 12.99},{ \"category\": \"fiction\",\"author\": \"Herman Melville\",\"title\": \"Moby Dick\",\"isbn\": \"0-553-21311-3\",\"price\": 8.99},{ \"category\": \"fiction\",\"author\": \"J. R. R. Tolkien\",\"title\": \"The Lord of the Rings\",\"isbn\": \"\",\"price\": 22.99}],\"bicycle\": {\"color\": \"red\",\"price\": 19.95}}}";
             return text;
         }
-        static const char* book_text()
-        {
-            static const char* text = "{ \"category\": \"reference\",\"author\": \"Nigel Rees\",\"title\": \"Sayings of the Century\",\"price\": 8.95}";
-            return text;
-        }
-
-        json book()
-        {
-            json root = json::parse(jsonpath_fixture::store_text());
-            json book = root["store"]["book"];
-            return book;
-        }
-
-        json bicycle()
-        {
-            json root = json::parse(jsonpath_fixture::store_text());
-            json bicycle = root["store"]["bicycle"];
-            return bicycle;
-        }
     };
-    jsonpath_fixture fixture;
-
-    json root = json::parse(jsonpath_fixture::store_text());
 
     SECTION("test_path")
     {
-        json result1 = json_query(root,"$.store.book");
-        json result2 = json_query(root,"store.book");
-        json result3 = json_query(root,"$.'store'.'book'");
-        json result4 = json_query(root,"\"store\".\"book\"");
+        json result1 = json_query(store,"$.store.book");
+        json result2 = json_query(store,"store.book");
+        json result3 = json_query(store,"$.'store'.'book'");
+        json result4 = json_query(store,"\"store\".\"book\"");
 
         json expected = json::array();
-        expected.push_back(fixture.book());
+        expected.push_back(book_list);
 
         CHECK(result1 == expected);
         CHECK(result2 == expected);
@@ -115,10 +91,10 @@ TEST_CASE("store")
         //std::cout << pretty_print(result) << std::endl;
     SECTION("test_jsonpath_store_book2")
     {
-        json result = json_query(root,"$['store']['book']");
+        json result = json_query(store,"$['store']['book']");
 
         json expected = json::array();
-        expected.push_back(fixture.book());
+        expected.push_back(book_list);
 
         CHECK(result == expected);
         //    std::c/out << pretty_print(result) << std::endl;
@@ -126,10 +102,10 @@ TEST_CASE("store")
 
     SECTION("test_jsonpath_bracket_with_double_quotes")
     {
-        json result = json_query(root,"$[\"store\"][\"book\"]");
+        json result = json_query(store,"$[\"store\"][\"book\"]");
 
         json expected = json::array();
-        expected.push_back(fixture.book());
+        expected.push_back(book_list);
 
         CHECK(result == expected);
         //    std::c/out << pretty_print(result) << std::endl;
@@ -139,22 +115,22 @@ TEST_CASE("store")
         /* SECTION("one")
         {
 
-            json result = json_query(root,"$['store']['book']");
+            json result = json_query(store,"$['store']['book']");
             json expected = json::array();
-            expected.push_back(fixture.book());
+            expected.push_back(book_list);
             CHECK(result == expected);
         }*/
 
         SECTION("two")
         {
 
-            json result = json_query(root,"$['store']['book','bicycle']");
+            json result = json_query(store,"$['store']['book','bicycle']");
             json expected1 = json::array();
-            expected1.push_back(fixture.book());
-            expected1.push_back(fixture.bicycle());
+            expected1.push_back(book_list);
+            expected1.push_back(bicycle);
             json expected2 = json::array();
-            expected2.push_back(fixture.bicycle());
-            expected2.push_back(fixture.book());
+            expected2.push_back(bicycle);
+            expected2.push_back(book_list);
             CHECK((result == expected1 || result == expected2));
         }
 
@@ -163,14 +139,14 @@ TEST_CASE("store")
 
     SECTION("test_jsonpath_store_book_bicycle_unquoted")
     {
-        json result = json_query(root,"$[store][book,bicycle]");
+        json result = json_query(store,"$[store][book,bicycle]");
 
         json expected1 = json::array();
-        expected1.push_back(fixture.book());
-        expected1.push_back(fixture.bicycle());
+        expected1.push_back(book_list);
+        expected1.push_back(bicycle);
         json expected2 = json::array();
-        expected2.push_back(fixture.bicycle());
-        expected2.push_back(fixture.book());
+        expected2.push_back(bicycle);
+        expected2.push_back(book_list);
         CHECK((result == expected1 || result == expected2));
 
         //std::cout << pretty_print(result) << std::endl;
@@ -178,7 +154,7 @@ TEST_CASE("store")
 
     SECTION("test_jsonpath_store_book_union")
     {
-        json result = json_query(root,"$['store']..['author','title']");
+        json result = json_query(store,"$['store']..['author','title']");
 
         json expected = json::parse(R"(
     [
@@ -196,8 +172,8 @@ TEST_CASE("store")
 
     SECTION("test_jsonpath_store_book_star")
     {
-        json result = json_query(root,"$['store']['book'][*]");
-        json expected = fixture.book();
+        json result = json_query(store,"$['store']['book'][*]");
+        json expected = book_list;
 
         //std::cout << pretty_print(result) << std::endl;
         CHECK(result == expected);
@@ -205,11 +181,10 @@ TEST_CASE("store")
 
     SECTION("test_store_dotdot_price")
     {
-        json result = json_query(root,"$.store..price");
+        json result = json_query(store,"$.store..price");
 
         json expected = json::array();
-        expected.push_back(fixture.bicycle()["price"]);
-        json book_list = fixture.book();
+        expected.push_back(bicycle["price"]);
         for (size_t i = 0; i < book_list.size(); ++i)
         {
             expected.push_back(book_list[i]["price"]);
@@ -222,62 +197,62 @@ TEST_CASE("store")
 
     SECTION("test_jsonpath_recursive_descent")
     {
-        json result1 = json_query(root,"$..book[2]");
+        json result1 = json_query(store,"$..book[2]");
         //std::cout << pretty_print(result1) << std::endl;
         CHECK(result1.size() == 1);
 
-        CHECK(result1[0] == root["store"]["book"][2]);
+        CHECK(result1[0] == store["store"]["book"][2]);
 
-        json result1a = json_query(root,"$..book.2");
+        json result1a = json_query(store,"$..book.2");
         //std::cout << pretty_print(result1a) << std::endl;
         CHECK(result1a.size() == 1);
-        CHECK(result1a[0] == root["store"]["book"][2]);
+        CHECK(result1a[0] == store["store"]["book"][2]);
 
-        json result2 = json_query(root,"$..book[-1:]");
+        json result2 = json_query(store,"$..book[-1:]");
         //std::cout << pretty_print(result2) << std::endl;
         CHECK(result2.size() == 1);
-        CHECK(result2[0] == root["store"]["book"][3]);
+        CHECK(result2[0] == store["store"]["book"][3]);
 
         SECTION("$..book[0,1]")
         {
-            json result = json_query(root,"$..book[0,1]");
+            json result = json_query(store,"$..book[0,1]");
 
-            json expected1 = json::array{root["store"]["book"][0],root["store"]["book"][1]};
-            json expected2 = json::array{root["store"]["book"][1],root["store"]["book"][0]};
+            json expected1 = json::array{store["store"]["book"][0],store["store"]["book"][1]};
+            json expected2 = json::array{store["store"]["book"][1],store["store"]["book"][0]};
             //std::cout << pretty_print(result) << std::endl;
             CHECK(result.size() == 2);
             CHECK((result == expected1 || result == expected2));
         }
 
-        json result4 = json_query(root,"$..book[:2]");
+        json result4 = json_query(store,"$..book[:2]");
         //std::cout << pretty_print(result4) << std::endl;
         CHECK(result4.size() == 2);
-        CHECK(result4[0] == root["store"]["book"][0]);
-        CHECK(result4[1] == root["store"]["book"][1]);
+        CHECK(result4[0] == store["store"]["book"][0]);
+        CHECK(result4[1] == store["store"]["book"][1]);
 
-        json result5 = json_query(root,"$..book[1:2]");
+        json result5 = json_query(store,"$..book[1:2]");
         //std::cout << pretty_print(result5) << std::endl;
         CHECK(result5.size() == 1);
-        CHECK(result5[0] == root["store"]["book"][1]);
+        CHECK(result5[0] == store["store"]["book"][1]);
 
-        json result6 = json_query(root,"$..book[-2:]");
+        json result6 = json_query(store,"$..book[-2:]");
         //std::cout << pretty_print(result6) << std::endl;
         CHECK(result6.size() == 2);
-        CHECK(result6[0] == root["store"]["book"][2]);
-        CHECK(result6[1] == root["store"]["book"][3]);
+        CHECK(result6[0] == store["store"]["book"][2]);
+        CHECK(result6[1] == store["store"]["book"][3]);
 
-        json result7 = json_query(root,"$..book[2:]");
+        json result7 = json_query(store,"$..book[2:]");
         //std::cout << pretty_print(result7) << std::endl;
         CHECK(result7.size() == 2);
-        CHECK(result7[0] == root["store"]["book"][2]);
-        CHECK(result7[1] == root["store"]["book"][3]);
+        CHECK(result7[0] == store["store"]["book"][2]);
+        CHECK(result7[1] == store["store"]["book"][3]);
     }
 
     SECTION("test_jsonpath_filter1")
     {
-        json result = json_query(root,"$..book[?(@.price<10)]");
+        json result = json_query(store,"$..book[?(@.price<10)]");
         //std::cout << pretty_print(result) << std::endl;
-        json books = fixture.book();
+        json books = book_list;
         json expected = json::array();
         for (size_t i = 0; i < books.size(); ++i)
         {
@@ -292,10 +267,10 @@ TEST_CASE("store")
 
     SECTION("test_jsonpath_filter2")
     {
-        json result = json_query(root,"$..book[?(10 > @.price)]");
+        json result = json_query(store,"$..book[?(10 > @.price)]");
 
         //std::cout << pretty_print(result) << std::endl;
-        json books = fixture.book();
+        json books = book_list;
         json expected = json::array();
         for (size_t i = 0; i < books.size(); ++i)
         {
@@ -310,10 +285,10 @@ TEST_CASE("store")
      
     SECTION("test_jsonpath_filter_category_eq_reference")
     {
-        json result = json_query(root,"$..book[?(@.category == 'reference')]");
+        json result = json_query(store,"$..book[?(@.category == 'reference')]");
 
         //std::cout << pretty_print(result) << std::endl;
-        json books = fixture.book();
+        json books = book_list;
         json expected = json::array();
         for (size_t i = 0; i < books.size(); ++i)
         {
@@ -330,9 +305,9 @@ TEST_CASE("store")
 
     SECTION("test_jsonpath_filter3")
     {
-        json result = json_query(root,"$..book[?((@.price > 8) && (@.price < 12))]");
+        json result = json_query(store,"$..book[?((@.price > 8) && (@.price < 12))]");
 
-        json books = fixture.book();
+        json books = book_list;
 
         json expected = json::array();
         for (size_t i = 0; i < books.size(); ++i)
@@ -351,7 +326,7 @@ TEST_CASE("store")
 
     SECTION("test_jsonpath_book_isbn")
     {
-        json books = fixture.book();
+        json books = book_list;
         for (size_t i = 0; i < books.size(); ++i)
         {
             bool has_isbn = books[i].contains("isbn");
@@ -368,9 +343,10 @@ TEST_CASE("store")
 
     SECTION("test_jsonpath_book_empty_isbn")
     {
-        json root2 = json::parse(jsonpath_fixture::store_text_empty_isbn());
+        const char* empty_isbn = "{ \"store\": {\"book\": [ { \"category\": \"reference\",\"author\": \"Nigel Rees\",\"title\": \"Sayings of the Century\",\"price\": 8.95},{ \"category\": \"fiction\",\"author\": \"Evelyn Waugh\",\"title\": \"Sword of Honour\",\"price\": 12.99},{ \"category\": \"fiction\",\"author\": \"Herman Melville\",\"title\": \"Moby Dick\",\"isbn\": \"0-553-21311-3\",\"price\": 8.99},{ \"category\": \"fiction\",\"author\": \"J. R. R. Tolkien\",\"title\": \"The Lord of the Rings\",\"isbn\": \"\",\"price\": 22.99}],\"bicycle\": {\"color\": \"red\",\"price\": 19.95}}}";
+        json root2 = json::parse(empty_isbn);
 
-        json books = fixture.book();
+        json books = book_list;
         for (size_t i = 0; i < books.size(); ++i)
         {
             bool has_isbn = books[i].contains("isbn");
@@ -387,9 +363,9 @@ TEST_CASE("store")
 
     SECTION("test_jsonpath_filter4")
     {
-        json result = json_query(root,"$..book[?(@.isbn)]");
+        json result = json_query(store,"$..book[?(@.isbn)]");
 
-        json books = fixture.book();
+        json books = book_list;
 
         json expected = json::array();
         for (size_t i = 0; i < books.size(); ++i)
@@ -406,19 +382,19 @@ TEST_CASE("store")
     }
     SECTION("test_jsonpath_array_length")
     {
-        json result = json_query(root,"$..book.length");
+        json result = json_query(store,"$..book.length");
 
         //std::cout << pretty_print(result) << std::endl;
 
         CHECK(1 == result.size());
-        CHECK(root["store"]["book"].size() == result[0].as<size_t>());
+        CHECK(store["store"]["book"].size() == result[0].as<size_t>());
     }
      
     SECTION("test_jsonpath_book_category")
     {
-        json root2 = json::parse(jsonpath_fixture::book_text());
+        json book = book_list[0];
 
-        json result = json_query(root2,"$.category");
+        json result = json_query(book,"$.category");
 
         CHECK(1 == result.size());
         CHECK("reference" == result[0].as<std::string>());
@@ -426,7 +402,7 @@ TEST_CASE("store")
 
     SECTION("test_jsonpath_book_filter_false")
     {
-        json result = json_query(root,"$..book[?(false)]");
+        json result = json_query(store,"$..book[?(false)]");
         //std::cout << pretty_print(result) << std::endl;
         
         json expected = json::array();
@@ -436,7 +412,7 @@ TEST_CASE("store")
 
     SECTION("test_jsonpath_book_filter_false_and_false")
     {
-        json result = json_query(root,"$..book[?(false && false)]");
+        json result = json_query(store,"$..book[?(false && false)]");
         //std::cout << pretty_print(result) << std::endl;
         
         json expected = json::array();
@@ -446,7 +422,7 @@ TEST_CASE("store")
 
     SECTION("test_jsonpath_book_filter_false_or_false")
     {
-        json result = json_query(root,"$..book[?(false || false)]");
+        json result = json_query(store,"$..book[?(false || false)]");
         //std::cout << pretty_print(result) << std::endl;
         
         json expected = json::array();
@@ -456,18 +432,17 @@ TEST_CASE("store")
 
     SECTION("test_jsonpath_book_filter_false_or_true")
     {
-        json result = json_query(root,"$..book[?(false || true)]");
+        json result = json_query(store,"$..book[?(false || true)]");
         //std::cout << pretty_print(result) << std::endl;
         
-        CHECK(result == fixture.book());
+        CHECK(result == book_list);
     }
 
     SECTION("test_jsonpath_store_book_authors")
     {
-        json result = json_query(root,"$.store.book[?(@.price < 10)].author");
+        json result = json_query(store,"$.store.book[?(@.price < 10)].author");
 
         json expected = json::array();
-        json book_list = fixture.book();
         for (size_t i = 0; i < book_list.size(); ++i)
         {
             json book = book_list[i];
@@ -477,7 +452,7 @@ TEST_CASE("store")
             }
         }
 
-        //json expected = fixture.book();
+        //json expected = book_list;
 
         //std::cout << pretty_print(result) << std::endl;
 
@@ -486,52 +461,52 @@ TEST_CASE("store")
 
     SECTION("test_jsonpath_store_book_tests")
     {
-        json result1 = json_query(root,"$.store.book[ ?(@.category == @.category) ]");
-        CHECK(fixture.book() == result1);
+        json result1 = json_query(store,"$.store.book[ ?(@.category == @.category) ]");
+        CHECK(book_list == result1);
 
-        json result2 = json_query(root,"$.store.book[ ?(@.category == @['category']) ]");
-        CHECK(fixture.book() == result2);
+        json result2 = json_query(store,"$.store.book[ ?(@.category == @['category']) ]");
+        CHECK(book_list == result2);
 
-        json result3 = json_query(root,"$.store.book[ ?(@ == @) ]");
-        CHECK(fixture.book() == result3);
+        json result3 = json_query(store,"$.store.book[ ?(@ == @) ]");
+        CHECK(book_list == result3);
 
-        json result4 = json_query(root,"$.store.book[ ?(@.category != @.category) ]");
+        json result4 = json_query(store,"$.store.book[ ?(@.category != @.category) ]");
         json expected4 = json::array();
         CHECK(result4 == expected4);
     }
 
     SECTION("test_jsonpath_store_book_tests2")
     {
-        json result1 = json_query(root,"$.store.book[ ?((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) ].author");
+        json result1 = json_query(store,"$.store.book[ ?((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) ].author");
         json expected1 = json::array();
         expected1.push_back("Nigel Rees");
         expected1.push_back("Evelyn Waugh");
         CHECK(result1 == expected1);
 
-        json result1b = json_query(root,"$.store.book[ ?((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) ].title");
+        json result1b = json_query(store,"$.store.book[ ?((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) ].title");
         json expected1b = json::array();
         expected1b.push_back("Sayings of the Century");
         expected1b.push_back("Sword of Honour");
         //std::cout << result1b << std::endl;
         CHECK(expected1b == result1b);
 
-        json result2 = json_query(root,"$.store.book[ ?(((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) && (@.price < 15)) ].author");
+        json result2 = json_query(store,"$.store.book[ ?(((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) && (@.price < 15)) ].author");
         json expected2 = json::array();
         expected2.push_back("Nigel Rees");
         expected2.push_back("Evelyn Waugh");
         CHECK(result2 == expected2);
 
-        json result3 = json_query(root,"$.store.book[ ?(((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) && (@.category == 'reference')) ].author");
+        json result3 = json_query(store,"$.store.book[ ?(((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) && (@.category == 'reference')) ].author");
         json expected3 = json::array();
         expected3.push_back("Nigel Rees");
         CHECK(result3 == expected3);
 
-        json result4 = json_query(root,"$.store.book[ ?(((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) && (@.category != 'fiction')) ].author");
+        json result4 = json_query(store,"$.store.book[ ?(((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) && (@.category != 'fiction')) ].author");
         json expected4 = json::array();
         expected4.push_back("Nigel Rees");
         CHECK(result4 == expected4);
 
-        json result5 = json_query(root,"$.store.book[?('a' == 'a')].author");
+        json result5 = json_query(store,"$.store.book[?('a' == 'a')].author");
         json expected5 = json::array();
         expected5.push_back("Nigel Rees");
         expected5.push_back("Evelyn Waugh");
@@ -539,7 +514,7 @@ TEST_CASE("store")
         expected5.push_back("J. R. R. Tolkien");
         CHECK(result5 == expected5);
 
-        json result6 = json_query(root,"$.store.book[?('a' == 'b')].author");
+        json result6 = json_query(store,"$.store.book[?('a' == 'b')].author");
         json expected6 = json::array();
         CHECK(result6 == expected6);
     }
@@ -548,19 +523,19 @@ TEST_CASE("store")
     // GCC 4.8 has broken regex support: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631
     SECTION("test_jsonpath_store_book_regex")
     {
-        json result3 = json_query(root,"$.store.book[ ?(@.category =~ /fic.*?/)].author");
+        json result3 = json_query(store,"$.store.book[ ?(@.category =~ /fic.*?/)].author");
         json expected3 = json::array();
         expected3.push_back("Evelyn Waugh");
         expected3.push_back("Herman Melville");
         expected3.push_back("J. R. R. Tolkien");
         CHECK(result3 == expected3);
 
-        json result4 = json_query(root,"$.store.book[ ?(@.author =~ /Evelyn.*?/)].author");
+        json result4 = json_query(store,"$.store.book[ ?(@.author =~ /Evelyn.*?/)].author");
         json expected4 = json::array();
         expected4.push_back("Evelyn Waugh");
         CHECK(result4 == expected4);
 
-        json result5 = json_query(root,"$.store.book[ ?(!(@.author =~ /Evelyn.*?/))].author");
+        json result5 = json_query(store,"$.store.book[ ?(!(@.author =~ /Evelyn.*?/))].author");
         json expected5 = json::array();
         expected5.push_back("Nigel Rees");
         expected5.push_back("Herman Melville");
@@ -571,23 +546,23 @@ TEST_CASE("store")
 
     SECTION("test_jsonpath_everything")
     {
-        json result = json_query(root,"$.store.*");
+        json result = json_query(store,"$.store.*");
         //std::cout << result << std::endl;
      
         json expected = json::array();
-        expected.push_back(fixture.bicycle());
-        expected.push_back(fixture.book());
+        expected.push_back(bicycle);
+        expected.push_back(book_list);
 
         CHECK(result == expected);
     }
 
     SECTION("test_jsonpath_everything_in_store")
     {
-        json result = json_query(root,"$..*");
+        json result = json_query(store,"$..*");
         //std::cout << result << std::endl;
      
         json expected = json::array();
-        expected.push_back(root["store"]);
+        expected.push_back(store["store"]);
 
         CHECK(result == expected);
     }
@@ -597,7 +572,7 @@ TEST_CASE("store")
         SECTION("Array slice")
         {
 
-            json result1 = json_query(root,"$..book[1:2].author");
+            json result1 = json_query(store,"$..book[1:2].author");
             json expected1 = json::parse(R"(
         [
            "Evelyn Waugh"
@@ -605,11 +580,11 @@ TEST_CASE("store")
             )");
             CHECK(result1 == expected1);
 
-            json result2 = json_query(root,"$..book[1:3:2].author");
+            json result2 = json_query(store,"$..book[1:3:2].author");
             json expected2 = expected1;
             CHECK(result2 == expected2);
 
-            json result3 = json_query(root,"$..book[1:4:2].author");
+            json result3 = json_query(store,"$..book[1:4:2].author");
             json expected3 = json::parse(R"(
         [
            "Evelyn Waugh",
@@ -623,14 +598,14 @@ TEST_CASE("store")
         {
             std::unordered_set<std::string> expected = {"Evelyn Waugh","J. R. R. Tolkien","Nigel Rees"};
 
-            json result1 = json_query(root,"$..book[1:4:2,0].author");
+            json result1 = json_query(store,"$..book[1:4:2,0].author");
             CHECK(result1.size() == expected.size());
             for (const auto& item : result1.array_range())
             {
                 CHECK(expected.count(item.as<std::string>()) == 1);
             }
 
-            json result2 = json_query(root,"$..book[1::2,0].author");
+            json result2 = json_query(store,"$..book[1::2,0].author");
             CHECK(result2.size() == expected.size());
             for (const auto& item : result2.array_range())
             {
@@ -1244,10 +1219,9 @@ TEST_CASE("complex json")
     ]
     )");
 
-    json result = json_query(complex_json,"$..[?(@.result.length == 4)]");
-
     SECTION("test_select_length_4_2")
     {
+        json result = json_query(complex_json,"$..[?(@.result.length == 4)]");
         json expected = json::parse(R"(
     [{"result":[1,2,3,4]},{"result":[1,2,3,4]}]
         )");
