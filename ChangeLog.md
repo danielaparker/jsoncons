@@ -1,6 +1,10 @@
 master
 ------
 
+Warning fix:
+
+- Removed redundant macro continuation character [#176](https://github.com/danielaparker/jsoncons/pull/176)
+
 Non-breaking change to names (old name still works)
 
 - The name JSONCONS_TYPE_TRAITS_DECL has been deprecated and changed to JSONCONS_MEMBER_TRAITS_DECL
@@ -15,6 +19,8 @@ Enhancements to jsonpath
 - Union of completely separate paths are allowed, e.g.
 
     $.[firstName,address.city]
+
+- Names in the dot notation may be single or double quoted
 
 Other enhancements:
 
