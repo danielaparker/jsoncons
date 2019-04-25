@@ -129,7 +129,7 @@ int main()
 
     // Querying a CBOR value for a nested data item with jsonpointer
     std::error_code ec;
-    auto const& rated = jsonpointer::get(j2, "/reputons/0/rated", ec);
+    const auto& rated = jsonpointer::get(j2, "/reputons/0/rated", ec);
     if (!ec)
     {
         std::cout << "(3) " << rated.as_string() << "\n";
