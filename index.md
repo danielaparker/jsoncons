@@ -282,7 +282,7 @@ Decode and encode work for all C++ classes that have
 defined. The standard library containers are already supported, and you can specialize `json_type_traits`
 for your own types in the `jsoncons` namespace. 
 
-`JSONCONS_TYPE_TRAITS_DECL` is a macro that simplifies the creation of the necessary boilerplate
+`JSONCONS_MEMEBER_TRAITS_DECL` is a macro that simplifies the creation of the necessary boilerplate
 for your own types.
 
 ```c++
@@ -359,8 +359,8 @@ namespace ns {
 } // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_TYPE_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
-JSONCONS_TYPE_TRAITS_DECL(ns::reputation_object, application, reputons);
+JSONCONS_MEMEBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
+JSONCONS_MEMEBER_TRAITS_DECL(ns::reputation_object, application, reputons);
 
 int main()
 {
