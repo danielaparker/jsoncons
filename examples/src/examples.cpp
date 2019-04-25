@@ -572,9 +572,9 @@ int main()
 
         csv_examples();
 
-        jsonpath_examples();
-
         ubjson_examples();
+
+        jsonpath_examples();
     }
     catch (const std::exception& e)
     {

@@ -104,6 +104,13 @@ TEST_CASE("store")
         //    std::c/out << pretty_print(result) << std::endl;
     }
 
+    SECTION("$.store[book[3].title,book[?(@.price > 10)].title]")
+    {
+        json result = json_query(store,"$.store[book[3].title,book[?(@.price > 10)].title]");
+        json expected = json::parse(R"(["Sword of Honour","The Lord of the Rings"])");
+        CHECK(result == expected);
+    }
+
     SECTION("test_jsonpath_bracket_with_double_quotes")
     {
         json result = json_query(store,"$[\"store\"][\"book\"]");

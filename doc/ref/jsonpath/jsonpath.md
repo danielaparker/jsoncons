@@ -51,6 +51,7 @@ or
 
     $."store"."book".0."title"
 
+The leading `$` represents the root JSON value.
 Note that the jsoncons implementation allows quote delimiters in the dot-notation,
 and that the `$.` is optional. Unquoted names cannot contain spaces, spaces before
 and after the name are ignored. 
@@ -68,9 +69,9 @@ or
 
     $["store"]["book"][0]["title"]
 
-The leading `$` represents the root JSON value.
+Union of completely separate paths:
 
-Stefan Goessner's original implementation supports unquoted or single quoted names inside of square brackets. Support for double quoted names inside of square brackets is a jsoncons extension.
+    $.store[book[3].title,book[?(@.price > 10)].title]
 
 JSONPath|       Description
 --------|--------------------------------

@@ -1,0 +1,22 @@
+Select the first and second name (union):
+
+name[first, second]
+Select an employee from an array based on index:
+
+employees[5]
+Select a subset of employees from an array according to index
+
+employees[1,2,5,9]
+Select employees 1 through 3 using the slice operation
+
+employees[1:3]
+Union of two ranges of employees
+
+employees[1:3, 9:12]
+Union of a range and a number of individual indicies
+
+employees[1:3, 9, 12]
+
+Union of completely separate paths:
+
+[employee[5].name, company.name, wageTiers[compensation > 10000]]
