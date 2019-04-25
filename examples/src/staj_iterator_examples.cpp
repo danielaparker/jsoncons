@@ -32,7 +32,7 @@ const std::string object_example = R"(
    {
        "rater": "HikingAsylum.array_example.com",
        "assertion": "is-good",
-       "rated": "sk",
+       "rated": "Marilyn C",
        "rating": 0.90
      }
    ]

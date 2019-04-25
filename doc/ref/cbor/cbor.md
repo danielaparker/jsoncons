@@ -122,8 +122,8 @@ int main()
     std::cout << "(2)\n";
     for (auto element : reputons.array_range())
     {
-        std::cout << element.at("rated").as_string() << ", ";
-        std::cout << element.at("rating").as_double() << "\n";
+        std::cout << element.at("rated").as<std::string>() << ", ";
+        std::cout << element.at("rating").as<double>() << "\n";
     }
     std::cout << std::endl;
 

@@ -43,7 +43,7 @@ int main()
        {
            "rater": "HikingAsylum.example.com",
            "assertion": "is-good",
-           "rated": "sk",
+           "rated": "Marilyn C",
            "rating": 0.90
          }
        ]
@@ -65,7 +65,7 @@ Output:
         {
             "rater": "HikingAsylum.example.com",
             "assertion": "is-good",
-            "rated": "sk",
+            "rated": "Marilyn C",
             "rating": 0.9
         }
     ]
@@ -90,7 +90,7 @@ int main()
        {
            "rater": "HikingAsylum.example.com",
            "assertion": "is-good",
-           "rated": "sk",
+           "rated": "Marilyn C",
            "rating": 0.90
          }
        ]
@@ -117,7 +117,7 @@ Output:
     "reputons": [
         {
             "assertion": "is-good",
-            "rated": "sk",
+            "rated": "Marilyn C",
             "rater": "HikingAsylum.example.com",
             "rating": 0.9
         }

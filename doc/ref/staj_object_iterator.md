@@ -92,7 +92,7 @@ const std::string example = R"(
    {
        "rater": "HikingAsylum.array_example.com",
        "assertion": "is-good",
-       "rated": "sk",
+       "rated": "Marilyn C",
        "rating": 0.90
      }
    ]
@@ -122,7 +122,7 @@ reputons:
 [
     {
         "assertion": "is-good",
-        "rated": "sk",
+        "rated": "Marilyn C",
         "rater": "HikingAsylum.array_example.com",
         "rating": 0.90
     }

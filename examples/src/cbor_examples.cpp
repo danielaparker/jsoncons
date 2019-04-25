@@ -93,7 +93,7 @@ void cbor_reputon_example()
        {
            "rater": "HikingAsylum.example.com",
            "assertion": "is-good",
-           "rated": "sk",
+           "rated": "Marilyn C",
            "rating": 0.90
          }
        ]
@@ -115,8 +115,8 @@ void cbor_reputon_example()
     std::cout << "(2)\n";
     for (auto element : reputons.array_range())
     {
-        std::cout << element.at("rated").as_string() << ", ";
-        std::cout << element.at("rating").as_double() << "\n";
+        std::cout << element.at("rated").as<std::string>() << ", ";
+        std::cout << element.at("rating").as<double>() << "\n";
     }
     std::cout << std::endl;
 

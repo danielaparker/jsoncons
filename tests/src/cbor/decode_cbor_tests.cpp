@@ -26,7 +26,7 @@ TEST_CASE("cbor_view_test")
        {
            "rater": "HikingAsylum.example.com",
            "assertion": "is-good",
-           "rated": "sk",
+           "rated": "Marilyn C",
            "rating": 0.90
          }
        ]
@@ -80,7 +80,7 @@ TEST_CASE("jsonpointer_test")
        {
            "rater": "HikingAsylum.example.com",
            "assertion": "is-good",
-           "rated": "sk",
+           "rated": "Marilyn C",
            "rating": 0.90
          }
        ]
