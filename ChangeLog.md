@@ -18,7 +18,7 @@ Enhancements to jsonpath
 
 - Union of completely separate paths are allowed, e.g.
 
-    $.[firstName,address.city]
+    $[firstName,address.city]
 
 - Names in the dot notation may be single or double quoted
 
