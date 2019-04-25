@@ -24,8 +24,6 @@ booleans, numbers, strings, arrays, objects - plus byte strings. In addition, js
 supports semantic tagging of date-time values, timestamp values, big numbers, 
 decimal fractions and binary encodings. This allows it to preserve these type semantics when parsing 
 JSON-like data formats such as CBOR that have them.
- 
-Planned new features are listed on the [roadmap](Roadmap.md)
 
 jsoncons is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
 
