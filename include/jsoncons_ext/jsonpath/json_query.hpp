@@ -184,6 +184,7 @@ enum class path_state
     bracketed_single_quoted_name,
     bracketed_double_quoted_name,
     bracketed_name_or_path,
+    bracketed_star_or_path,
     expr_or_filter_or_slice_or_key,
     slice_end_or_end_step,
     slice_end,
@@ -216,7 +217,7 @@ struct state_item
     {
     }
 
-    state_item(path_state state)
+    explicit state_item(path_state state)
         : state(state), is_recursive_descent(false), is_union(false)
     {
     }
@@ -749,6 +750,13 @@ public:
                             state_stack_.back().state = path_state::dot;
                             break;
                         }
+                        case '*':
+                        {
+                            end_all();
+                            transfer_nodes();
+                            state_stack_.back().state = path_state::dot;
+                            break;
+                        }
                         case ' ':case '\t':
                         {
                             selectors_.push_back(make_unique_ptr<name_selector>(buffer));
@@ -1267,8 +1275,8 @@ public:
                             ++column_;
                             break;
                         case '*':
-                            end_all();
                             state_stack_.back().state = path_state::comma_or_right_bracket;
+                            state_stack_.emplace_back(path_state::bracketed_star_or_path, state_stack_.back());
                             ++p_;
                             ++column_;
                             break;
@@ -1347,6 +1355,37 @@ public:
                                 selectors_.push_back(make_unique_ptr<name_selector>(buffer));
                                 buffer.clear();
                             }
+                            state_stack_.pop_back();
+                            break;
+                        default:
+                            ec = jsonpath_errc::expected_right_bracket;
+                            return;
+                    }
+                    break;
+                case path_state::bracketed_star_or_path:
+                    switch (*p_)
+                    {
+                        case ' ':case '\t':
+                            ++p_;
+                            ++column_;
+                            break;
+                        case '.':
+                            buffer.push_back('*');
+                            buffer.push_back(*p_);
+                            state_stack_.back().state = path_state::path;
+                            ++p_;
+                            ++column_;
+                            break;
+                        case '[':
+                            buffer.push_back('*');
+                            buffer.push_back(*p_);
+                            state_stack_.back().state = path_state::path2;
+                            ++p_;
+                            ++column_;
+                            break;
+                        case ',': 
+                        case ']': 
+                            end_all();
                             state_stack_.pop_back();
                             break;
                         default:

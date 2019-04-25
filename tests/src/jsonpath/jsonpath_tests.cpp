@@ -1573,21 +1573,28 @@ TEST_CASE("jsonpath object union test")
   ]
 }    )");
 
-    SECTION("Test 1")
+    SECTION("$[firstName,address.city]")
     {
         json expected = json::parse(R"(["John","Nara"])");
         std::string path = "$[firstName,address.city]";
         json result = json_query(root,path);
         CHECK(result == expected);
     }
-    SECTION("Test 2")
+    SECTION("$[firstName,*.city]")
+    {
+        json expected = json::parse(R"(["John","Nara"])");
+        std::string path = "$[firstName,*.city]";
+        json result = json_query(root,path);
+        CHECK(result == expected);
+    }
+    SECTION("$[firstName,address[city]]")
     {
         json expected = json::parse(R"(["John","Nara"])");
         std::string path = "$[firstName,address[city]]";
         json result = json_query(root,path);
         CHECK(result == expected);
     }
-    SECTION("Test 3")
+    SECTION("$[firstName,address['city']]")
     {
         json expected = json::parse(R"(["John","Nara"])");
         std::string path = "$[firstName,address['city']]";
@@ -1608,21 +1615,21 @@ TEST_CASE("jsonpath object union test")
         json result = json_query(root,path);
         CHECK(result == expected);
     }
-    SECTION("Test 4")
+    SECTION(R"($[firstName,address["city"]])")
     {
         json expected = json::parse(R"(["John","Nara"])");
         std::string path = R"($[firstName,address["city"]])";
         json result = json_query(root,path);
         CHECK(result == expected);
     }
-    SECTION("Test 5")
+    SECTION(R"($['firstName','address'["city"]])")
     {
         json expected = json::parse(R"(["John","Nara"])");
         std::string path = R"($['firstName','address'["city"]])";
         json result = json_query(root,path);
         CHECK(result == expected);
     }
-    SECTION("Test 6")
+    SECTION(R"($["firstName","address"["city"]])")
     {
         json expected = json::parse(R"(["John","Nara"])");
         std::string path = R"($["firstName","address"["city"]])";
