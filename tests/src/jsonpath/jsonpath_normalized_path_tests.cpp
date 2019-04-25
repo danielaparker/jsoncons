@@ -190,3 +190,62 @@ TEST_CASE("normalized path test")
     }
 }
 
+TEST_CASE("jsonpath object union normalized path test")
+{
+    json test = json::parse(R"(
+    {
+      "books": [
+        {"title": "b1", "chapters":[{"subtitle":"b1c1"}]},
+        {"title": "b2", "chapters":[{"subtitle":"b2c1"}]}
+      ]
+    } )");
+
+
+    SECTION("$..[chapters[?(@.subtitle == 'b2c1')],chapters[?(@.subtitle == 'b2c1')]]")
+    {
+        json expected = json::parse(R"([{"subtitle":"b2c1"}])");
+        json expected_path = json::parse(R"(["$['books'][1]['chapters[?(@.subtitle == 'b2c1')]']"])"); 
+
+        std::string path = "$..[chapters[?(@.subtitle == 'b2c1')],chapters[?(@.subtitle == 'b2c1')]]";
+        json result = json_query(test, path);
+        CHECK(result == expected);
+
+        json path_result = json_query(test, path, result_type::path);
+
+        CHECK(path_result == expected_path);
+    }
+}
+
+TEST_CASE("jsonpath array union normalized path test")
+{
+    json root = json::parse(R"(
+[[1,2,3,4,1,2,3,4],[0,1,2,3,4,5,6,7,8,9],[0,1,2,3,4,5,6,7,8,9]]
+)");
+
+    SECTION("$[0,1,2]")
+    {
+        json expected = json::parse(R"([[0,1,2,3,4,5,6,7,8,9],[1,2,3,4,1,2,3,4]])");
+        json expected_path = json::parse(R"( ["$[1]","$[0]"])"); 
+
+        std::string path = "$[0,1,2]";
+        json result = json_query(root, path);
+        CHECK(result == expected);
+
+        json path_result = json_query(root, path, result_type::path);
+        CHECK(path_result == expected_path);
+    }
+
+    SECTION("$[0][0:4,2:8]")
+    {
+        json expected = json::parse(R"([1,2,3,4])");
+        json expected_path = json::parse(R"(["$[0][0]","$[0][1]","$[0][2]","$[0][3]"])"); 
+
+        std::string path = "$[0][0:4,2:8]";
+        json result = json_query(root, path);
+        CHECK(result == expected);
+
+        json path_result = json_query(root, path, result_type::path);
+        CHECK(path_result == expected_path);
+    }
+}
+
