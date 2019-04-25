@@ -92,7 +92,7 @@ void cbor_reputon_example()
        "reputons": [
        {
            "rater": "HikingAsylum.example.com",
-           "assertion": "is-good",
+           "assertion": "strong-hiker",
            "rated": "Marilyn C",
            "rating": 0.90
          }
@@ -100,11 +100,11 @@ void cbor_reputon_example()
     }
     )");
 
-    // Encoding a basic_json value to a CBOR value
+    // Encode a basic_json value to a CBOR value
     std::vector<uint8_t> data;
     cbor::encode_cbor(j1, data);
 
-    // Decoding a CBOR value to a basic_json value
+    // Decode a CBOR value to a basic_json value
     ojson j2 = cbor::decode_cbor<ojson>(data);
     std::cout << "(1)\n" << pretty_print(j2) << "\n\n";
 
@@ -120,7 +120,7 @@ void cbor_reputon_example()
     }
     std::cout << std::endl;
 
-    // Querying a CBOR value for a nested data item with jsonpointer
+    // Get a CBOR value for a nested data item with jsonpointer
     std::error_code ec;
     auto const& rated = jsonpointer::get(j2, "/reputons/0/rated", ec);
     if (!ec)

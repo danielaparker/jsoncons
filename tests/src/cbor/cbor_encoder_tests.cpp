@@ -27,7 +27,7 @@ json j = json::parse(R"(
    "reputons": [
    {
        "rater": "HikingAsylum.example.com",
-       "assertion": "is-good",
+       "assertion": "strong-hiker",
        "rated": "Marilyn C",
        "rating": 0.90
      }

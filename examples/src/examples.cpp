@@ -31,6 +31,7 @@ void msgpack_examples();
 void jsonpointer_examples();
 void jsonpatch_examples();
 void cbor_examples();
+void ubjson_examples();
 void json_parser_examples();
 void byte_string_examples();
 void pull_parser_examples();
@@ -457,7 +458,7 @@ void get_example()
        "reputons": [
        {
            "rater": "HikingAsylum.example.com",
-           "assertion": "is-good",
+           "assertion": "strong-hiker",
            "rated": "Marilyn C",
            "rating": 0.90
          }
@@ -572,6 +573,8 @@ int main()
         csv_examples();
 
         jsonpath_examples();
+
+        ubjson_examples();
     }
     catch (const std::exception& e)
     {
