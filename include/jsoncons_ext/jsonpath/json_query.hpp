@@ -1722,11 +1722,13 @@ public:
             }
             else if (val.is_array())
             {
-                for (auto& elem : val.array_range())
+                auto first = val.array_range().begin();
+                auto last = val.array_range().end();
+                for (auto it = first; it != last; ++it)
                 {
-                    if (elem.is_object() || elem.is_array())
+                    if (it->is_object() || it->is_array())
                     {
-                        apply_selectors(node,path, elem);
+                        apply_selectors(node,PathCons()(path,it - first), *it);
                     }
                 }
             }
