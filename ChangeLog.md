@@ -1,3 +1,10 @@
+v0.123.1
+--------
+
+Bug fix:
+
+- Fixed issue [#177](https://github.com/danielaparker/jsoncons/issues/177) concerning incorrect normalized path returned. 
+
 v0.123.0
 --------
 

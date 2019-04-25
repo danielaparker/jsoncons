@@ -73,7 +73,7 @@ Union of a subset of book titles identified by index:
 
     $.store[book[0].title,book[1].title,book[3].title]
 
-Union of completely separate paths:
+Union of third book title and all book titles with price > 10:
 
     $.store[book[3].title,book[?(@.price > 10)].title]
 
