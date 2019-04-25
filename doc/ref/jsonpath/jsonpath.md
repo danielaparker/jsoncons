@@ -69,6 +69,10 @@ or
 
     $["store"]["book"][0]["title"]
 
+Union of a subset of book titles identified by index:
+
+    $.store[book[0].title,book[1].title,book[3].title]
+
 Union of completely separate paths:
 
     $.store[book[3].title,book[?(@.price > 10)].title]
