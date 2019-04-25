@@ -84,8 +84,8 @@ JSONPath|       Description
 `.` or `[]`|    Child operator
 `..`    |Recursive descent. JSONPath borrows this syntax from [E4X](https://en.wikipedia.org/wiki/ECMAScript_for_XML).
 `*` |   Wildcard. All objects/elements regardless their names.
-`[]`    |Subscript operator. In JSON it is the native array operator.
-`[,]`   |JSONPath allows alternate names or array indices as a set.
+`[]`    |Subscript operator. 
+`[,]`   |Union.
 `[start:end:step]`      |Array slice operator borrowed from [ES4](http://wiki.ecmascript.org/doku.php?id=proposals:slice_syntax&s=array+slice).
 `()`    |Filter expression.
 `?()`   |Applies a filter expression.
