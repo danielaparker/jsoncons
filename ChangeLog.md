@@ -1,9 +1,11 @@
 v0.123.1
 --------
 
-Bug fix:
+jsonpath bug fixes:
 
-- Fixed issue [#177](https://github.com/danielaparker/jsoncons/issues/177) concerning incorrect normalized path returned. 
+- Fixed bug in construction of normalized paths [#177](https://github.com/danielaparker/jsoncons/issues/177). 
+
+- Fixed bug in jsonpath recursive descent with filters which could result in too many values being returned
 
 v0.123.0
 --------

@@ -1671,13 +1671,13 @@ TEST_CASE("jsonpath object union test 1")
         //std::cout << pretty_print(result) << "\n\n";
         //CHECK(result == expected);
     }
-    SECTION(R"($..["firstName","address"["city"]])")
+    SECTION(R"($..[?(@.firstName == 'John')][?(@.lastName == 'Doe')])")
     {
         json expected = json::parse(R"(["John","Nara"])");
         std::string path = R"($..[?(@.firstName == 'John')][?(@.lastName == 'Doe')])";
         json result = json_query(root,path);
-        //std::cout << pretty_print(result) << "\n\n";
-        //CHECK(result == expected);
+        REQUIRE(result.size() == 1);
+        CHECK(result[0] == root[1]);
     }
 }
 
@@ -1698,20 +1698,20 @@ TEST_CASE("jsonpath object union test")
 
     SECTION(R"($..["firstName","address"["city"]])")
     {
-        json expected = json::parse(R"(["John","Nara"])");
+        json expected = json::parse(R"([{"firstName":"John","lastName":"Smith"},{"firstName":"John","lastName":"Doe"}])");
         std::string path = R"($..[?(@.firstName == 'John')])";
         json result = json_query(root,path);
-        std::cout << pretty_print(result) << "\n\n";
-        //CHECK(result == expected);
+        //std::cout << result << "\n\n";
+        CHECK(result == expected);
     }
 
     SECTION(R"($..["firstName","address"["city"]])")
     {
-        json expected = json::parse(R"(["John","Nara"])");
+        json expected = json::parse(R"([{"firstName":"John","lastName":"Doe"}])");
         std::string path = R"($[?(@.firstName == 'John')][?(@.lastName == 'Doe')])";
         json result = json_query(root,path);
-        std::cout << pretty_print(result) << "\n\n";
-        //CHECK(result == expected);
+        //std::cout << result << "\n\n";
+        CHECK(result == expected);
     }
 }
 

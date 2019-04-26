@@ -290,10 +290,10 @@ class jsonpath_evaluator : private ser_context
         }
     };
 
-    class selector
+    class selector_base
     {
     public:
-        virtual ~selector()
+        virtual ~selector_base()
         {
         }
         virtual void select(jsonpath_evaluator& evaluator,
@@ -305,7 +305,7 @@ class jsonpath_evaluator : private ser_context
         }
     };
 
-    class path_selector final : public selector
+    class path_selector final : public selector_base
     {
     private:
          std::basic_string<char_type> path_;
@@ -332,7 +332,7 @@ class jsonpath_evaluator : private ser_context
         }
     };
 
-    class expr_selector final : public selector
+    class expr_selector final : public selector_base
     {
     private:
          jsonpath_filter_expr<Json> result_;
@@ -363,7 +363,7 @@ class jsonpath_evaluator : private ser_context
         }
     };
 
-    class filter_selector final : public selector
+    class filter_selector final : public selector_base
     {
     private:
          jsonpath_filter_expr<Json> result_;
@@ -405,7 +405,7 @@ class jsonpath_evaluator : private ser_context
         }
     };
 
-    class name_selector final : public selector
+    class name_selector final : public selector_base
     {
     private:
         string_type name_;
@@ -466,7 +466,7 @@ class jsonpath_evaluator : private ser_context
         }
     };
 
-    class array_slice_selector final : public selector
+    class array_slice_selector final : public selector_base
     {
     private:
         array_slice slice_;
@@ -536,7 +536,7 @@ class jsonpath_evaluator : private ser_context
     const char_type* begin_input_;
     const char_type* end_input_;
     const char_type* p_;
-    std::vector<std::unique_ptr<selector>> selectors_;
+    std::vector<std::unique_ptr<selector_base>> selectors_;
     std::vector<std::unique_ptr<Json>> temp_json_values_;
 
     typedef std::vector<pointer> argument_type;
@@ -1700,23 +1700,17 @@ public:
             for (auto& node : stack_.back())
             {
                 //std::cout << "apply selector to:\n" << pretty_print(*(node.val_ptr)) << "\n";
-                apply_selectors(node.path, *(node.val_ptr));
+                for (auto& selector : selectors_)
+                {
+                    apply_selector(node.path, *(node.val_ptr), *selector, true);
+                }
             }
             selectors_.clear();
         }
         transfer_nodes();
     }
 
-    void apply_selectors(const string_type& path, reference val)
-    {
-        //std::cout << "apply_selectors 1\n";
-        for (auto& selector : selectors_)
-        {
-            apply_selector(path, val, *selector, true);
-        }
-    }
-
-    void apply_selector(const string_type& path, reference val, selector& selector, bool process)
+    void apply_selector(const string_type& path, reference val, selector_base& selector, bool process)
     {
         if (process)
         {
