@@ -254,29 +254,27 @@ class jsonpath_evaluator : private ser_context
 
     struct node_type
     {
-        bool skip_contained_object;
         string_type path;
         pointer val_ptr;
 
         node_type() = default;
         node_type(const string_type& p, const pointer& valp)
-            : skip_contained_object(false),path(p),val_ptr(valp)
+            : path(p),val_ptr(valp)
         {
         }
         node_type(string_type&& p, pointer&& valp)
-            : skip_contained_object(false),path(std::move(p)),val_ptr(valp)
+            : path(std::move(p)),val_ptr(valp)
         {
         }
         node_type(const node_type&) = default;
         node_type(node_type&& other)
-            : skip_contained_object(other.skip_contained_object), path(std::move(other.path)), val_ptr(other.val_ptr)
+            : path(std::move(other.path)), val_ptr(other.val_ptr)
         {
 
         }
         node_type& operator=(const node_type&) = default;
         node_type& operator=(node_type&& other) 
         {
-            skip_contained_object = other.skip_contained_object;
             path.swap(other.path);
             val_ptr = other.val_ptr;
         }
@@ -299,7 +297,12 @@ class jsonpath_evaluator : private ser_context
         {
         }
         virtual void select(jsonpath_evaluator& evaluator,
-                            node_type& node, const string_type& path, reference val, node_set& nodes) = 0;
+                            const string_type& path, reference val, node_set& nodes) = 0;
+
+        virtual bool is_filter() const
+        {
+            return false;
+        }
     };
 
     class path_selector final : public selector
@@ -313,7 +316,7 @@ class jsonpath_evaluator : private ser_context
         }
 
         void select(jsonpath_evaluator&,
-                    node_type&, const string_type& path, reference val, 
+                    const string_type& path, reference val, 
                     node_set& nodes) override
         {
             std::error_code ec;
@@ -340,7 +343,7 @@ class jsonpath_evaluator : private ser_context
         }
 
         void select(jsonpath_evaluator& evaluator,
-                    node_type& node, const string_type& path, reference val, 
+                    const string_type& path, reference val, 
                     node_set& nodes) override
         {
             auto index = result_.eval(val);
@@ -355,7 +358,7 @@ class jsonpath_evaluator : private ser_context
             else if (index.is_string())
             {
                 name_selector selector(index.as_string_view());
-                selector.select(evaluator, node, path, val, nodes);
+                selector.select(evaluator, path, val, nodes);
             }
         }
     };
@@ -370,13 +373,19 @@ class jsonpath_evaluator : private ser_context
         {
         }
 
+        bool is_filter() const override
+        {
+            return true;
+        }
+
         void select(jsonpath_evaluator&,
-                    node_type& node, const string_type& path, reference val, 
+                    const string_type& path, reference val, 
                     node_set& nodes) override
         {
+            //std::cout << "filter_selector select ";
             if (val.is_array())
             {
-                node.skip_contained_object =true;
+                //std::cout << "from array \n";
                 for (size_t i = 0; i < val.size(); ++i)
                 {
                     if (result_.exists(val[i]))
@@ -387,16 +396,10 @@ class jsonpath_evaluator : private ser_context
             }
             else if (val.is_object())
             {
-                if (!node.skip_contained_object)
+                //std::cout << "from object \n";
+                if (result_.exists(val))
                 {
-                    if (result_.exists(val))
-                    {
-                        nodes.emplace_back(path, std::addressof(val));
-                    }
-                }
-                else
-                {
-                    node.skip_contained_object = false;
+                    nodes.emplace_back(path, std::addressof(val));
                 }
             }
         }
@@ -413,7 +416,7 @@ class jsonpath_evaluator : private ser_context
         }
 
         void select(jsonpath_evaluator& evaluator,
-                    node_type&, const string_type& path, reference val,
+                    const string_type& path, reference val,
                     node_set& nodes) override
         {
             bool is_start_positive = true;
@@ -474,7 +477,7 @@ class jsonpath_evaluator : private ser_context
         }
 
         void select(jsonpath_evaluator&,
-                    node_type&, const string_type& path, reference val,
+                    const string_type& path, reference val,
                     node_set& nodes) override
         {
             if (slice_.is_step_positive)
@@ -1691,44 +1694,65 @@ public:
 
     void apply_selectors()
     {
+        //std::cout << "apply_selectors count: " << selectors_.size() << "\n";
         if (selectors_.size() > 0)
         {
             for (auto& node : stack_.back())
             {
-                apply_selectors(node, node.path, *(node.val_ptr));
+                //std::cout << "apply selector to:\n" << pretty_print(*(node.val_ptr)) << "\n";
+                apply_selectors(node.path, *(node.val_ptr));
             }
             selectors_.clear();
         }
         transfer_nodes();
     }
 
-    void apply_selectors(node_type& node, const string_type& path, reference val)
+    void apply_selectors(const string_type& path, reference val)
     {
-        for (const auto& selector : selectors_)
+        //std::cout << "apply_selectors 1\n";
+        for (auto& selector : selectors_)
         {
-            selector->select(*this, node, path, val, nodes_);
+            apply_selector(path, val, *selector, true);
         }
+    }
+
+    void apply_selector(const string_type& path, reference val, selector& selector, bool process)
+    {
+        if (process)
+        {
+            selector.select(*this, path, val, nodes_);
+        }
+        //std::cout << "*it: " << val << "\n";
+        //std::cout << "apply_selectors 1 done\n";
         if (state_stack_.back().is_recursive_descent)
         {
+            //std::cout << "is_recursive_descent\n";
             if (val.is_object())
             {
+                //std::cout << "is_object\n";
                 for (auto& nvp : val.object_range())
                 {
-                    if (nvp.value().is_object() || nvp.value().is_array())
+                    if (nvp.value().is_array() || nvp.value().is_object())
                     {                        
-                        apply_selectors(node,PathCons()(path,nvp.key()),nvp.value());
-                    }
+                        apply_selector(PathCons()(path,nvp.key()), nvp.value(), selector, true);
+                    } 
                 }
             }
             else if (val.is_array())
             {
+                //std::cout << "is_array\n";
                 auto first = val.array_range().begin();
                 auto last = val.array_range().end();
                 for (auto it = first; it != last; ++it)
                 {
-                    if (it->is_object() || it->is_array())
+                    if (it->is_array())
                     {
-                        apply_selectors(node,PathCons()(path,it - first), *it);
+                        apply_selector(PathCons()(path,it - first), *it,selector, true);
+                        //std::cout << "*it: " << *it << "\n";
+                    }
+                    else if (it->is_object())
+                    {
+                        apply_selector(PathCons()(path,it - first), *it, selector, !selector.is_filter());
                     }
                 }
             }
