@@ -219,6 +219,7 @@ Output:
 ["Sword of Honour"]
 (13)
 ["author","category","price","title"]
+```
 
 #### Return normalized path expressions
 
