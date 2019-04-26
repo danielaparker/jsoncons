@@ -81,6 +81,12 @@ TEST_CASE("test_right_bracket_error")
     test_error_code(root, "$['store']['book'[*]", jsonpath_errc::unexpected_end_of_input,1,21);
 }
 
+TEST_CASE("jsonpath missing dot")
+{
+    json root = json::parse(jsonpath_fixture::store_text());
+    test_error_code(root, "$.store.book[?(@category == 'fiction')][?(@.price < 15)].title", jsonpath_errc::expected_separator,1,17);
+}
+
 TEST_CASE("test_dot_dot_dot")
 {
 

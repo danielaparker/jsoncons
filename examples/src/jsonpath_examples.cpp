@@ -52,7 +52,7 @@ void json_query_examples()
     std::cout << "(9)\n" << pretty_print(result9) << "\n";
 
     // Intersection of book titles with category fiction and price < 15
-    jc::json result10 = jp::json_query(booklist, "$.store.book[?(@category == 'fiction')][?(@.price < 15)].title");
+    jc::json result10 = jp::json_query(booklist, "$.store.book[?(@.category == 'fiction')][?(@.price < 15)].title");
     std::cout << "(10)\n" << pretty_print(result10) << "\n";
 
     // Normalized path expressions
