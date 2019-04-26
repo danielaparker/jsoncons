@@ -545,10 +545,27 @@ class jsonpath_evaluator : private ser_context
 
 public:
     jsonpath_evaluator()
-        : line_(0), column_(0),
+        : line_(1), column_(1),
           begin_input_(nullptr), end_input_(nullptr),
           p_(nullptr)
     {
+    }
+
+    jsonpath_evaluator(size_t line, size_t column)
+        : line_(line), column_(column),
+          begin_input_(nullptr), end_input_(nullptr),
+          p_(nullptr)
+    {
+    }
+
+    size_t line_number() const
+    {
+        return line_;
+    }
+
+    size_t column_number() const
+    {
+        return column_;
     }
 
     Json get_values() const
@@ -671,9 +688,6 @@ public:
         begin_input_ = path;
         end_input_ = path + length;
         p_ = begin_input_;
-
-        line_ = 1;
-        column_ = 1;
 
         string_type s = {'$'};
         node_set v;
@@ -1768,17 +1782,6 @@ public:
         state_stack_.back().is_recursive_descent = false;
         state_stack_.back().is_union = false;
     }
-
-    size_t line_number() const override
-    {
-        return line_;
-    }
-
-    size_t column_number() const override
-    {
-        return column_;
-    }
-
 };
 
 }

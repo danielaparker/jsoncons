@@ -693,16 +693,18 @@ class path_term final : public term<Json>
     typedef typename Json::string_type string_type;
 
     string_type path_;
+    size_t line_;
+    size_t column_;
     Json nodes_;
 public:
-    path_term(const string_type& path)
-        : path_(path)
+    path_term(const string_type& path, size_t line, size_t column)
+        : path_(path), line_(line), column_(column)
     {
     }
 
     void initialize(const Json& current_node) override
     {
-        jsonpath_evaluator<Json,const Json&,VoidPathConstructor<Json>> evaluator;
+        jsonpath_evaluator<Json,const Json&,VoidPathConstructor<Json>> evaluator(line_,column_);
         evaluator.evaluate(current_node, path_);
         nodes_ = evaluator.get_values();
     }
@@ -1004,45 +1006,26 @@ class jsonpath_filter_expr
 {
 public:
     std::vector<token<Json>> tokens_;
-    size_t line_;
-    size_t column_;
 public:
     jsonpath_filter_expr()
-        : line_(0), column_(0)
     {
     }
 
-    jsonpath_filter_expr(const std::vector<token<Json>>& tokens, size_t line, size_t column)
-        : tokens_(tokens), line_(line), column_(column)
+    jsonpath_filter_expr(const std::vector<token<Json>>& tokens)
+        : tokens_(tokens)
     {
     }
 
     Json eval(const Json& current_node)
     {
-        try
-        {
-            auto t = evaluate(current_node, tokens_);
-
-            return t.operand().get_single_node();
-
-        }
-        catch (const jsonpath_error& e)
-        {
-            throw jsonpath_error(e.code(),line_,column_);
-        }
+        auto t = evaluate(current_node, tokens_);
+        return t.operand().get_single_node();
     }
 
     bool exists(const Json& current_node)
     {
-        try
-        {
-            auto t = evaluate(current_node,tokens_);
-            return t.operand().accept_single_node();
-        }
-        catch (const jsonpath_error& e)
-        {
-            throw jsonpath_error(e.code(),line_,column_);
-        }
+        auto t = evaluate(current_node,tokens_);
+        return t.operand().accept_single_node();
     }
 };
 
@@ -1196,6 +1179,8 @@ public:
         state_stack_.clear();
 
         string_type buffer;
+        size_t buffer_line = 1;
+        size_t buffer_column = 1;
 
         int depth = 0;
         filter_state state = filter_state::start;
@@ -1412,6 +1397,7 @@ public:
                             throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_);
                         }
                         buffer.clear();
+                        buffer_line = buffer_column = 1;
                         push_token(token<Json>(it->second));
                         state = filter_state::expect_regex;
                         break;
@@ -1429,6 +1415,7 @@ public:
                             throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_);
                         }
                         buffer.clear();
+                        buffer_line = buffer_column = 1;
                         push_token(token<Json>(it->second));
                         state = filter_state::expect_path_or_value_or_unary_op;
                         break;
@@ -1441,6 +1428,7 @@ public:
                             throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_);
                         }
                         buffer.clear();
+                        buffer_line = buffer_column = 1;
                         push_token(token<Json>(it->second));
                         state = filter_state::expect_path_or_value_or_unary_op;
                         break;
@@ -1464,6 +1452,7 @@ public:
                                     throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
                                 }
                                 buffer.clear();
+                                buffer_line = buffer_column = 1;
                             }
                             ++p;
                             ++column_;
@@ -1500,6 +1489,7 @@ public:
                                         throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
                                     }
                                     buffer.clear();
+                                    buffer_line = buffer_column = 1;
                                 }
                                 buffer.push_back(*p);
                                 state = filter_state::oper;
@@ -1520,6 +1510,7 @@ public:
                                     throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
                                 }
                                 buffer.clear();
+                                buffer_line = buffer_column = 1;
                             }
                             push_token(token<Json>(token_type::rparen));
                             if (--depth == 0)
@@ -1568,6 +1559,7 @@ public:
                                     throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
                                 }
                                 buffer.clear();
+                                buffer_line = buffer_column = 1;
                             }
                             state = filter_state::expect_path_or_value_or_unary_op;
                             break;
@@ -1605,6 +1597,7 @@ public:
                                 throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
                             }
                             buffer.clear();
+                            buffer_line = buffer_column = 1;
                             state = filter_state::expect_path_or_value_or_unary_op;
                             break;
 
@@ -1652,6 +1645,8 @@ public:
                         break;
                     }
                     case '@':
+                        buffer_line = line_;
+                        buffer_column = column_;
                         buffer.push_back('$');
                         state = filter_state::path;
                         ++p;
@@ -1792,32 +1787,26 @@ public:
                             {
                                 if (path_mode_stack_[0] == filter_path_mode::root_path)
                                 {
-                                    try
+                                    jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator(buffer_line,buffer_column);
+                                    evaluator.evaluate(root, buffer);
+                                    auto result = evaluator.get_values();
+                                    if (result.size() > 0)
                                     {
-                                        jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
-                                        evaluator.evaluate(root, buffer);
-                                        auto result = evaluator.get_values();
-                                        if (result.size() > 0)
-                                        {
-                                            push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(result[0]))));
-                                        }
-                                    }
-                                    catch (const jsonpath_error& e)
-                                    {
-                                        throw jsonpath_error(e.code(),line_,column_);
+                                        push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(result[0]))));
                                     }
                                 }
                                 else
                                 {
-                                    push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
+                                    push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer, buffer_line, buffer_column)));
                                 }
                                 path_mode_stack_.pop_back();
                             }
                             else
                             {
-                                push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
+                                push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer, buffer_line, buffer_column)));
                             }
                             buffer.clear();
+                            buffer_line = buffer_column = 1;
                             buffer.push_back(*p);
                             ++p;
                             ++column_;
@@ -1829,34 +1818,28 @@ public:
                         {
                             if (path_mode_stack_[0] == filter_path_mode::root_path)
                             {
-                                try
+                                jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator(buffer_line,buffer_column);
+                                evaluator.evaluate(root, buffer);
+                                auto result = evaluator.get_values();
+                                if (result.size() > 0)
                                 {
-                                    jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
-                                    evaluator.evaluate(root, buffer);
-                                    auto result = evaluator.get_values();
-                                    if (result.size() > 0)
-                                    {
-                                        push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(result[0]))));
-                                    }
-                                    push_token(token<Json>(token_type::rparen));
+                                    push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(result[0]))));
                                 }
-                                catch (const jsonpath_error& e)
-                                {
-                                    throw jsonpath_error(e.code(),line_,column_);
-                                }
+                                push_token(token<Json>(token_type::rparen));
                             }
                             else
                             {
-                                push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
+                                push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer, buffer_line, buffer_column)));
                             }
                             path_mode_stack_.pop_back();
                         }
                         else
                         {
-                            push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
+                            push_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer, buffer_line, buffer_column)));
                             push_token(token<Json>(token_type::rparen));
                         }
                         buffer.clear();
+                        buffer_line = buffer_column = 1;
                         if (--depth == 0)
                         {
                             state = filter_state::done;
@@ -1918,6 +1901,7 @@ public:
                                 }
                                 push_token(token<Json>(token_type::operand,std::make_shared<regex_term<Json>>(buffer,flags)));
                                 buffer.clear();
+                                buffer_line = buffer_column = 1;
                             }
                             state = filter_state::expect_path_or_value_or_unary_op;
                             break;
@@ -1942,7 +1926,7 @@ public:
         }
         *end_ptr = p;
 
-        return jsonpath_filter_expr<Json>(output_stack_,line_,column_);
+        return jsonpath_filter_expr<Json>(output_stack_);
     }
 };
 
