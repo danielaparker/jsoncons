@@ -39,29 +39,37 @@ void json_query_examples()
     jc::json result6 = jp::json_query(booklist, "$['store']['book']..['author','title']");
     std::cout << "(6)\n" << pretty_print(result6) << "\n";
 
-    // Union of a subset of book titles identified by index
-    jc::json result7 = jp::json_query(booklist, "$.store[book[0].title,book[1].title,book[3].title]");
+    // Union of two ranges of book titles
+    jc::json result7 = jp::json_query(booklist, "$..book[1:2,2:4].title");
     std::cout << "(7)\n" << pretty_print(result7) << "\n";
 
-    // Union of third book title and all book titles with price > 10
-    jc::json result8 = jp::json_query(booklist, "$.store[book[3].title,book[?(@.price > 10)].title]");
+    // Union of a subset of book titles identified by index
+    jc::json result8 = jp::json_query(booklist, "$.store[book[0].title,book[1].title,book[3].title]");
     std::cout << "(8)\n" << pretty_print(result8) << "\n";
 
-    // Normalized path expressions
-    jc::json result9 = jp::json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]", jp::result_type::path);
+    // Union of third book title and all book titles with price > 10
+    jc::json result9 = jp::json_query(booklist, "$.store[book[3].title,book[?(@.price > 10)].title]");
     std::cout << "(9)\n" << pretty_print(result9) << "\n";
 
+    // Intersection of book titles with category fiction and price < 15
+    jc::json result10 = jp::json_query(booklist, "$.store.book[?(@.category == 'fiction')][?(@.price < 15)].title");
+    std::cout << "(10)\n" << pretty_print(result10) << "\n";
+
+    // Normalized path expressions
+    jc::json result11 = jp::json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]", jp::result_type::path);
+    std::cout << "(11)\n" << pretty_print(result11) << "\n";
+
     // All titles whose author's second name is 'Waugh'
-    jc::json result10 = jp::json_query(booklist,"$.store.book[?(tokenize(@.author,'\\\\s+')[1] == 'Waugh')].title");
-    std::cout << "(10)\n" << result10 << "\n";
+    jc::json result12 = jp::json_query(booklist,"$.store.book[?(tokenize(@.author,'\\\\s+')[1] == 'Waugh')].title");
+    std::cout << "(12)\n" << result12 << "\n";
 
     // All keys in the second book
-    jc::json result11 = jp::json_query(booklist,"keys($.store.book[1])[*]");
-    std::cout << "(11)\n" << result11 << "\n";
+    jc::json result13 = jp::json_query(booklist,"keys($.store.book[1])[*]");
+    std::cout << "(13)\n" << result13 << "\n";
 }
 
 void json_replace_example1()
-{
+{ 
     std::ifstream is("./input/booklist.json");
     jc::json booklist = jc::json::parse(is);
 

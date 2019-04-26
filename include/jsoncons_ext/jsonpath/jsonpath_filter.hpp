@@ -107,8 +107,6 @@ enum class filter_path_mode
 enum class filter_state
 {
     start,
-    cr,
-    lf,
     expect_right_round_bracket,
     expect_oper_or_right_round_bracket,
     expect_path_or_value_or_unary_op,
@@ -1205,50 +1203,34 @@ public:
         {
             switch (state)
             {
-            case filter_state::cr:
-                ++line_;
-                column_ = 1;
-                switch (*p)
-                {
-                case '\n':
-                    state = pop_state();
-                    ++p;
-                    ++column_;
-                    break;
-                default:
-                    state = pop_state();
-                    break;
-                }
-                break;
-            case filter_state::lf:
-                ++line_;
-                column_ = 1;
-                state = pop_state();
-                break;
-            case filter_state::start:
-                switch (*p)
-                {
-                case '\r':
-                    push_state(state);
-                    state = filter_state::cr;
-                    break;
-                case '\n':
-                    push_state(state);
-                    state = filter_state::lf;
-                    break;
-                case '(':
-                    state = filter_state::expect_path_or_value_or_unary_op;
-                    ++depth;
-                    push_token(token<Json>(token_type::lparen));
-                    break;
-                case ')':
-                    state = filter_state::expect_path_or_value_or_unary_op;
-                    push_token(token<Json>(token_type::rparen));
-                    if (--depth == 0)
+                case filter_state::start:
+                    switch (*p)
                     {
-                        state = filter_state::done;
-                    }
-                    break;
+                        case '\r':
+                            if (p+1 < end_expr && *(p+1) == '\n')
+                                ++p;
+                            ++line_;
+                            column_ = 1;
+                            ++p;
+                            break;
+                        case '\n':
+                            ++line_;
+                            column_ = 1;
+                            ++p;
+                            break;
+                        case '(':
+                            state = filter_state::expect_path_or_value_or_unary_op;
+                            ++depth;
+                            push_token(token<Json>(token_type::lparen));
+                            break;
+                        case ')':
+                            state = filter_state::expect_path_or_value_or_unary_op;
+                            push_token(token<Json>(token_type::rparen));
+                            if (--depth == 0)
+                            {
+                                state = filter_state::done;
+                            }
+                            break;
                 }
                 ++p;
                 ++column_;
@@ -1261,12 +1243,16 @@ public:
                         case ' ':case '\t':
                             break;
                         case '\r':
-                            push_state(state);
-                            state = filter_state::cr;
+                            if (p+1 < end_expr && *(p+1) == '\n')
+                                ++p;
+                            ++line_;
+                            column_ = 1;
+                            ++p;
                             break;
                         case '\n':
-                            push_state(state);
-                            state = filter_state::lf;
+                            ++line_;
+                            column_ = 1;
+                            ++p;
                             break;
                         case '$':
                             buffer.push_back(*p);
@@ -1302,12 +1288,16 @@ public:
                     switch (*p)
                     {
                         case '\r':
-                            push_state(state);
-                            state = filter_state::cr;
+                            if (p+1 < end_expr && *(p+1) == '\n')
+                                ++p;
+                            ++line_;
+                            column_ = 1;
+                            ++p;
                             break;
                         case '\n':
-                            push_state(state);
-                            state = filter_state::lf;
+                            ++line_;
+                            column_ = 1;
+                            ++p;
                             break;
                         case ' ':case '\t':
                             break;
@@ -1630,13 +1620,15 @@ public:
                 switch (*p)
                 {
                     case '\r':
-                        push_state(state);
-                        state = filter_state::cr;
+                        if (p+1 < end_expr && *(p+1) == '\n')
+                            ++p;
+                        ++line_;
+                        column_ = 1;
                         ++p;
                         break;
                     case '\n':
-                        push_state(state);
-                        state = filter_state::lf;
+                        ++line_;
+                        column_ = 1;
                         ++p;
                         break;
                     case ' ':case '\t':
@@ -1702,13 +1694,15 @@ public:
                 switch (*p)
                 {
                     case '\r':
-                        push_state(state);
-                        state = filter_state::cr;
+                        if (p+1 < end_expr && *(p+1) == '\n')
+                            ++p;
+                        ++line_;
+                        column_ = 1;
                         ++p;
                         break;
                     case '\n':
-                        push_state(state);
-                        state = filter_state::lf;
+                        ++line_;
+                        column_ = 1;
                         ++p;
                         break;
                     case ' ':case '\t':
@@ -1749,12 +1743,16 @@ public:
                 switch (*p)
                 {
                     case '\r':
-                        push_state(state);
-                        state = filter_state::cr;
+                        if (p+1 < end_expr && *(p+1) == '\n')
+                            ++p;
+                        ++line_;
+                        column_ = 1;
+                        ++p;
                         break;
                     case '\n':
-                        push_state(state);
-                        state = filter_state::lf;
+                        ++line_;
+                        column_ = 1;
+                        ++p;
                         break;
                     case ' ':case '\t':
                         break;
@@ -1880,22 +1878,26 @@ public:
                 case filter_state::expect_regex: 
                     switch (*p)
                     {
-                    case '\r':
-                        push_state(state);
-                        state = filter_state::cr;
-                        break;
-                    case '\n':
-                        push_state(state);
-                        state = filter_state::lf;
-                        break;
-                    case ' ':case '\t':
-                        break;
-                    case '/':
-                        state = filter_state::regex;
-                        break;
-                    default: 
-                        throw jsonpath_error(jsonpath_errc::invalid_filter_expected_slash,line_,column_);
-                        break;
+                        case '\r':
+                            if (p+1 < end_expr && *(p+1) == '\n')
+                                ++p;
+                            ++line_;
+                            column_ = 1;
+                            ++p;
+                            break;
+                        case '\n':
+                            ++line_;
+                            column_ = 1;
+                            ++p;
+                            break;
+                        case ' ':case '\t':
+                            break;
+                        case '/':
+                            state = filter_state::regex;
+                            break;
+                        default: 
+                            throw jsonpath_error(jsonpath_errc::invalid_filter_expected_slash,line_,column_);
+                            break;
                     };
                     ++p;
                     ++column_;
@@ -1904,25 +1906,25 @@ public:
                 {
                     switch (*p)
                     {                   
-                    case '/':
-                        //if (buffer.length() > 0)
-                        {
-                            std::regex::flag_type flags = std::regex_constants::ECMAScript; 
-                            if (p+1  < end_expr && *(p+1) == 'i')
+                        case '/':
+                            //if (buffer.length() > 0)
                             {
-                                ++p;
-                                ++column_;
-                                flags |= std::regex_constants::icase;
+                                std::regex::flag_type flags = std::regex_constants::ECMAScript; 
+                                if (p+1  < end_expr && *(p+1) == 'i')
+                                {
+                                    ++p;
+                                    ++column_;
+                                    flags |= std::regex_constants::icase;
+                                }
+                                push_token(token<Json>(token_type::operand,std::make_shared<regex_term<Json>>(buffer,flags)));
+                                buffer.clear();
                             }
-                            push_token(token<Json>(token_type::operand,std::make_shared<regex_term<Json>>(buffer,flags)));
-                            buffer.clear();
-                        }
-                        state = filter_state::expect_path_or_value_or_unary_op;
-                        break;
+                            state = filter_state::expect_path_or_value_or_unary_op;
+                            break;
 
-                    default: 
-                        buffer.push_back(*p);
-                        break;
+                        default: 
+                            buffer.push_back(*p);
+                            break;
                     }
                     ++p;
                     ++column_;
