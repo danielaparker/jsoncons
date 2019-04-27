@@ -1122,7 +1122,7 @@ struct json_type_traits<Json, std::valarray<T>>
                                          
 #define JSONCONS_AS_LAST(TC, JV, Type, V)
 
-#define JSONCONS_MEMEBER_TRAITS_DECL_BASE(Count, ValueType, ...)  \
+#define JSONCONS_MEMBER_TRAITS_DECL_BASE(Count, ValueType, ...)  \
 namespace jsoncons \
 { \
     template<class Json> \
@@ -1150,15 +1150,15 @@ namespace jsoncons \
     }; \
 } // jsoncons 
 
-#define JSONCONS_MEMEBER_TRAITS_DECL(ValueType,...) \
-    JSONCONS_MEMEBER_TRAITS_DECL_BASE(0, ValueType, __VA_ARGS__)
+#define JSONCONS_MEMBER_TRAITS_DECL(ValueType,...) \
+    JSONCONS_MEMBER_TRAITS_DECL_BASE(0, ValueType, __VA_ARGS__)
 
 #define JSONCONS_TYPE_TRAITS_FRIEND \
     template <class JSON,class T,class Enable> \
     friend struct jsoncons::json_type_traits;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-#define JSONCONS_TYPE_TRAITS_DECL JSONCONS_MEMEBER_TRAITS_DECL
+#define JSONCONS_TYPE_TRAITS_DECL JSONCONS_MEMBER_TRAITS_DECL
 #endif
 
 #endif

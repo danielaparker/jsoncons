@@ -217,7 +217,7 @@ Decode and encode work for all C++ classes that have
 defined. The standard library containers are already supported, and you can specialize `json_type_traits`
 for your own types in the `jsoncons` namespace. 
 
-`JSONCONS_MEMEBER_TRAITS_DECL` is a macro that simplifies the creation of the necessary boilerplate
+`JSONCONS_MEMBER_TRAITS_DECL` is a macro that simplifies the creation of the necessary boilerplate
 for your own types.
 
 ```c++
@@ -294,8 +294,8 @@ namespace ns {
 } // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_MEMEBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
-JSONCONS_MEMEBER_TRAITS_DECL(ns::reputation_object, application, reputons);
+JSONCONS_MEMBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
+JSONCONS_MEMBER_TRAITS_DECL(ns::reputation_object, application, reputons);
 
 int main()
 {
@@ -958,7 +958,7 @@ A big thanks to Milo Yip, author of [RapidJSON](http://rapidjson.org/), for rais
 
 The jsoncons implementation of the Grisu3 algorithm for printing floating-point numbers follows Florian Loitsch's MIT licensed [grisu3_59_56 implementation](http://florian.loitsch.com/publications), with minor modifications. 
 
-The implementation of the macro `JSONCONS_MEMEBER_TRAITS_DECL` draws on a similar macro in [ThorsSerializer](https://github.com/Loki-Astari/ThorsSerializer)
+The implementation of the macro `JSONCONS_MEMBER_TRAITS_DECL` draws on a similar macro in [ThorsSerializer](https://github.com/Loki-Astari/ThorsSerializer)
 
 Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.md)
 

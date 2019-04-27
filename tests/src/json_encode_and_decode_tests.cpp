@@ -151,7 +151,7 @@ struct book
 
 } // namespace ns
 
-JSONCONS_MEMEBER_TRAITS_DECL(ns::book,author,title,price);
+JSONCONS_MEMBER_TRAITS_DECL(ns::book,author,title,price);
     
 TEST_CASE("book_conversion_test")
 {
@@ -228,8 +228,8 @@ namespace ns {
 } // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_MEMEBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
-JSONCONS_MEMEBER_TRAITS_DECL(ns::reputation_object, application, reputons);
+JSONCONS_MEMBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
+JSONCONS_MEMBER_TRAITS_DECL(ns::reputation_object, application, reputons);
 
 TEST_CASE("reputation_object")
 {

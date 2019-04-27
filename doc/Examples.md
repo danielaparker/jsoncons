@@ -44,7 +44,7 @@
 ### Convert
 
 [Convert JSON to/from C++ objects by specializing json_type_traits](#G1)  
-[Using JSONCONS_MEMEBER_TRAITS_DECL to generate the json_type_traits](#G2)  
+[Using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits](#G2)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G3)
 
 ### Search and Replace
@@ -674,9 +674,9 @@ Charles Bukowski, Pulp, 22.48
 
 <div id="G2"/>
 
-#### Using JSONCONS_MEMEBER_TRAITS_DECL to generate the json_type_traits 
+#### Using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits 
 
-`JSONCONS_MEMEBER_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
+`JSONCONS_MEMBER_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
 for your own types.
 
 ```c++
@@ -753,8 +753,8 @@ namespace ns {
 } // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_MEMEBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
-JSONCONS_MEMEBER_TRAITS_DECL(ns::reputation_object, application, reputons);
+JSONCONS_MEMBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
+JSONCONS_MEMBER_TRAITS_DECL(ns::reputation_object, application, reputons);
 
 int main()
 {

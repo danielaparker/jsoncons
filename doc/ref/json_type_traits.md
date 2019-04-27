@@ -43,7 +43,7 @@ which inherits from [false_type](http://www.cplusplus.com/reference/type_traits/
 This traits class may be specialized for a user-defined type with a [true_type](http://www.cplusplus.com/reference/type_traits/true_type/) value to
 inform the `jsoncons` library that the type is already specialized.  
 
-`JSONCONS_MEMEBER_TRAITS_DECL` is a macro that simplifies the creation of the necessary boilerplate
+`JSONCONS_MEMBER_TRAITS_DECL` is a macro that simplifies the creation of the necessary boilerplate
 for your own types. If used, it must be placed outside any namespace blocks.
 
 ### Specializations
@@ -308,9 +308,9 @@ Charles Bukowski, Women: A Novel, 12
 {"1":2,"3":4}
 ```
 
-#### Using JSONCONS_MEMEBER_TRAITS_DECL to generate the json_type_traits 
+#### Using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits 
 
-`JSONCONS_MEMEBER_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
+`JSONCONS_MEMBER_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
 for your own types.
 
 ```c++
@@ -387,8 +387,8 @@ namespace ns {
 } // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_MEMEBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
-JSONCONS_MEMEBER_TRAITS_DECL(ns::reputation_object, application, reputons);
+JSONCONS_MEMBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
+JSONCONS_MEMBER_TRAITS_DECL(ns::reputation_object, application, reputons);
 
 int main()
 {
