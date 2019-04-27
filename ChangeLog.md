@@ -1,3 +1,10 @@
+v0.123.2
+--------
+
+defect fix:
+
+- Fixed name of JSONCONS_MEMBER_TRAITS_DECL
+
 v0.123.1
 --------
 
