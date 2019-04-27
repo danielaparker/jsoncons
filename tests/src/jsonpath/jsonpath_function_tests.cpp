@@ -16,7 +16,6 @@
 #include <new>
 
 using namespace jsoncons;
-using namespace jsoncons::jsonpath;
 
 TEST_CASE("jsonpath function tests")
 {
@@ -61,7 +60,7 @@ TEST_CASE("jsonpath function tests")
 
     SECTION("count")
     {
-        json result = json_query(store,"count($.store.book[*])");
+        json result = jsonpath::json_query(store,"count($.store.book[*])");
 
         size_t expected = 4;
 

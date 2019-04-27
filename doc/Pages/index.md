@@ -290,7 +290,7 @@ for your own types.
 #include <iostream>
 #include <jsoncons/json.hpp>
 
-namespace jc = jsoncons;
+using namespace jsoncons;
 
 namespace ns {
 
@@ -367,10 +367,10 @@ int main()
     ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
 
     std::string s;
-    jc::encode_json(val, s, jc::indenting::indent);
+    encode_json(val, s, indenting::indent);
     std::cout << s << "\n";
 
-    auto val2 = jc::decode_json<ns::reputation_object>(s);
+    auto val2 = decode_json<ns::reputation_object>(s);
 
     assert(val2 == val);
 }
@@ -415,23 +415,22 @@ You can read the `CSV` file into a `json` value with the `decode_csv` function.
 #include <jsoncons_ext/csv/csv_encoder.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::csv;
 
 int main()
 {
     std::ifstream is("input/tasks.csv");
 
-    csv_options options;
+    csv::csv_options options;
     options.assume_header(true)
            .trim(true)
            .ignore_empty_values(true) 
            .column_types("integer,string,string,string");
-    ojson tasks = decode_csv<ojson>(is, options);
+    ojson tasks = csv::decode_csv<ojson>(is, options);
 
     std::cout << "(1)\n" << pretty_print(tasks) << "\n\n";
 
     std::cout << "(2)\n";
-    encode_csv(tasks, std::cout);
+    csv::encode_csv(tasks, std::cout);
 }
 ```
 Output:

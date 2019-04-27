@@ -32,7 +32,6 @@ Throws [ser_error](../ser_error.md) if parsing fails.
 #include <jsoncons_ext/cbor/cbor.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::cbor;
 
 int main()
 {
@@ -51,9 +50,9 @@ int main()
     )");
 
     std::vector<uint8_t> v;
-    encode_cbor(j1, v);
+    cbor::encode_cbor(j1, v);
 
-    ojson j2 = decode_cbor<ojson>(v);
+    ojson j2 = cbor::decode_cbor<ojson>(v);
     std::cout << pretty_print(j2) << std::endl;
 }
 ```
@@ -79,7 +78,6 @@ Output:
 #include <jsoncons_ext/cbor/cbor.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::cbor;
 
 int main()
 {
@@ -99,13 +97,13 @@ int main()
 
     std::ofstream os;
     os.open("./output/store.cbor", std::ios::binary | std::ios::out);
-    encode_cbor(j,os);
+    cbor::encode_cbor(j,os);
 
     std::vector<uint8_t> v;
     std::ifstream is;
     is.open("./output/store.cbor", std::ios::binary | std::ios::in);
 
-    json j2 = decode_cbor<json>(is);
+    json j2 = cbor::decode_cbor<json>(is);
 
     std::cout << pretty_print(j2) << std::endl; 
 }

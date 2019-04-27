@@ -46,7 +46,6 @@ Example file (book.json):
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::msgpack;
 
 int main()
 {
@@ -56,18 +55,18 @@ int main()
 
     // Encode ojson to MessagePack
     std::vector<uint8_t> v;
-    encode_msgpack(j1, v);
+    msgpack::encode_msgpack(j1, v);
 
     // Decode MessagePack to ojson 
-    ojson j2 = decode_msgpack<ojson>(v);
+    ojson j2 = msgpack::decode_msgpack<ojson>(v);
 
     std::cout << pretty_print(j2) << std::endl;
 
     // or to json (now alphabetically sorted)
-    json j3 = decode_msgpack<json>(v);
+    json j3 = msgpack::decode_msgpack<json>(v);
 
     // or to wjson (converts from utf8 to wide characters)
-    wjson j4 = decode_msgpack<wjson>(v);
+    wjson j4 = msgpack::decode_msgpack<wjson>(v);
 }
 ```
 Output:

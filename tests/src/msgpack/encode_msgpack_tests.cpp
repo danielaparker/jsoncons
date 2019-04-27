@@ -14,13 +14,12 @@
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::msgpack;
 
 void check_encode_msgpack(const std::vector<uint8_t>& expected, 
                           const json& j)
 {
     std::vector<uint8_t> result;
-    encode_msgpack(j, result);
+    msgpack::encode_msgpack(j, result);
     if (result.size() != expected.size())
     {
         std::cout << std::hex << (int)expected[0] << " " << std::hex << (int)result[0] << std::endl;

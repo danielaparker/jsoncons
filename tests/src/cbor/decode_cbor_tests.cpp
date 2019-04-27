@@ -15,7 +15,6 @@
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::cbor;
 
 TEST_CASE("cbor_view_test")
 {
@@ -34,9 +33,9 @@ TEST_CASE("cbor_view_test")
     )");
  
     std::vector<uint8_t> c;
-    encode_cbor(j1, c);
+    cbor::encode_cbor(j1, c);
 
-    json v = decode_cbor<json>(c); 
+    json v = cbor::decode_cbor<json>(c); 
     CHECK(v.is_object());
     CHECK_FALSE(v.is_array());
 
@@ -88,9 +87,9 @@ TEST_CASE("jsonpointer_test")
     )");
 
     std::vector<uint8_t> v;
-    encode_cbor(j, v);
+    cbor::encode_cbor(j, v);
 
-    json jdoc = decode_cbor<json>(v);
+    json jdoc = cbor::decode_cbor<json>(v);
     std::string s;
     jdoc.dump(s);
     json j1 = json::parse(s);
@@ -114,7 +113,7 @@ TEST_CASE("jsonpointer_test")
 TEST_CASE("as_string_test")
 {
     std::vector<uint8_t> v;
-    jsoncons::cbor::cbor_bytes_encoder encoder(v);
+    cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array(10);
     encoder.bool_value(true);
     encoder.bool_value(false);
@@ -129,7 +128,7 @@ TEST_CASE("as_string_test")
     encoder.end_array();
     encoder.flush();
 
-    json j = decode_cbor<json>(v);
+    json j = cbor::decode_cbor<json>(v);
 
     std::string s0;
     j[0].dump(s0);
@@ -193,7 +192,7 @@ TEST_CASE("as_string_test")
 TEST_CASE("dump cbor to string test")
 {
     std::vector<uint8_t> v;
-    cbor_bytes_encoder encoder(v);
+    cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     bignum n(-1, bytes.data(), bytes.size());
@@ -203,7 +202,7 @@ TEST_CASE("dump cbor to string test")
     encoder.end_array();
     encoder.flush();
 
-    json j = decode_cbor<json>(v);
+    json j = cbor::decode_cbor<json>(v);
 
     std::string s0;
     j.dump(s0);
@@ -235,7 +234,7 @@ TEST_CASE("dump cbor to string test")
 TEST_CASE("test_dump_to_stream")
 {
     std::vector<uint8_t> v;
-    cbor_bytes_encoder encoder(v);
+    cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     bignum n(-1, bytes.data(), bytes.size());
@@ -245,7 +244,7 @@ TEST_CASE("test_dump_to_stream")
     encoder.end_array();
     encoder.flush();
 
-    json j = decode_cbor<json>(v);
+    json j = cbor::decode_cbor<json>(v);
 
     std::ostringstream os0;
     j.dump(os0);
@@ -285,7 +284,7 @@ TEST_CASE("test_indefinite_length_object_iterator")
     encoder.string_value("Ontario");
     encoder.end_object(); 
     encoder.flush();
-    json bv2 = decode_cbor<json>(v);
+    json bv2 = cbor::decode_cbor<json>(v);
 
     auto it2 = bv2.object_range().begin();
     CHECK_FALSE((it2 == bv2.object_range().end()));
@@ -302,7 +301,7 @@ TEST_CASE("test_indefinite_length_array_iterator")
     encoder.string_value("Ontario");
     encoder.end_array(); 
     encoder.flush();
-    json j = decode_cbor<json>(v);
+    json j = cbor::decode_cbor<json>(v);
 
     CHECK(j.size() == 2);
 
@@ -322,7 +321,7 @@ TEST_CASE("cbor array comparison test")
     serializer1.string_value("Vancouver");
     serializer1.end_array(); 
     serializer1.flush();
-    json j1 = decode_cbor<json>(v1);
+    json j1 = cbor::decode_cbor<json>(v1);
 
     std::vector<uint8_t> v2;
     cbor::cbor_bytes_encoder serializer2(v2);
@@ -331,7 +330,7 @@ TEST_CASE("cbor array comparison test")
     serializer2.string_value("Vancouver");
     serializer2.end_array(); 
     serializer2.flush();
-    json j2 = decode_cbor<json>(v2);
+    json j2 = cbor::decode_cbor<json>(v2);
 
     std::vector<uint8_t> v3;
     cbor::cbor_bytes_encoder serializer3(v3);
@@ -340,7 +339,7 @@ TEST_CASE("cbor array comparison test")
     serializer3.string_value("Montreal");
     serializer3.end_array(); 
     serializer3.flush();
-    json j3 = decode_cbor<json>(v3);
+    json j3 = cbor::decode_cbor<json>(v3);
 
     SECTION("operator== test")
     {
@@ -374,7 +373,7 @@ TEST_CASE("cbor object comparison")
     serializer1.date_time_value("2018-05-07 12:41:07-07:00");
     serializer1.end_object(); 
     serializer1.flush();
-    json j1 = decode_cbor<json>(v);
+    json j1 = cbor::decode_cbor<json>(v);
 
     //std::cout << pretty_print(j1) << "\n";
  
@@ -391,7 +390,7 @@ TEST_CASE("cbor object comparison")
     serializer2.date_time_value("2018-10-18 12:41:07-07:00");
     serializer2.end_object(); 
     serializer2.flush();
-    json j2 = decode_cbor<json>(buf2);
+    json j2 = cbor::decode_cbor<json>(buf2);
     REQUIRE(j2.size() == j1.size());
 
     std::vector<uint8_t> buf3;
@@ -409,7 +408,7 @@ TEST_CASE("cbor object comparison")
     serializer3.byte_string_value(jsoncons::byte_string{});
     serializer3.end_object(); 
     serializer3.flush();
-    json j3 = decode_cbor<json>(buf3);
+    json j3 = cbor::decode_cbor<json>(buf3);
 
     SECTION("contains")
     {
@@ -467,7 +466,7 @@ TEST_CASE("cbor member tests")
 
     encoder.end_object(); 
     encoder.flush();
-    json j = decode_cbor<json>(v);
+    json j = cbor::decode_cbor<json>(v);
 
     SECTION("contains")
     {
@@ -506,7 +505,7 @@ TEST_CASE("cbor conversion tests")
     encoder.end_array();
     encoder.flush();
 
-    json j = decode_cbor<json>(v);
+    json j = cbor::decode_cbor<json>(v);
     REQUIRE(j.size() == 1);
 
     auto range1 = j.array_range();
@@ -580,7 +579,7 @@ TEST_CASE("cbor array as<> test")
     //}
     //std::cout << "\n\n";
 
-    json j = decode_cbor<json>(v); // a non-owning view of the CBOR v
+    json j = cbor::decode_cbor<json>(v); // a non-owning view of the CBOR v
 
     CHECK(j.size() == 8);
 
@@ -638,7 +637,7 @@ TEST_CASE("cbor bigfloat tests")
                                   0x03 // 3 
                                  };
 
-        json j = decode_cbor<json>(v);
+        json j = cbor::decode_cbor<json>(v);
         std::string s = j.as<std::string>();
         CHECK(s == std::string("1.5"));
     }
@@ -650,7 +649,7 @@ TEST_CASE("cbor bigfloat tests")
                                   0x22 // -3 
                                  };
 
-        json j = decode_cbor<json>(v);
+        json j = cbor::decode_cbor<json>(v);
         std::string s = j.as<std::string>();
         CHECK(s == std::string("-1.5"));
     }

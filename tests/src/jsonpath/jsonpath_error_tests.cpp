@@ -14,7 +14,6 @@
 #include <new>
 
 using namespace jsoncons;
-using namespace jsoncons::jsonpath;
 
 struct jsonpath_fixture
 {
@@ -51,12 +50,12 @@ struct jsonpath_fixture
 
 void test_error_code(const json& root, const std::string& path, std::error_code value, size_t line, size_t column)
 {
-    REQUIRE_THROWS_AS(json_query(root,path),jsonpath_error);
+    REQUIRE_THROWS_AS(jsonpath::json_query(root,path),jsonpath::jsonpath_error);
     try
     {
-        json result = json_query(root,path);
+        json result = jsonpath::json_query(root,path);
     }
-    catch (const jsonpath_error& e)
+    catch (const jsonpath::jsonpath_error& e)
     {
         if (e.code() != value)
         {
@@ -78,33 +77,33 @@ TEST_CASE("test_right_bracket_error")
 {
 
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "$['store']['book'[*]", jsonpath_errc::unexpected_end_of_input,1,21);
+    test_error_code(root, "$['store']['book'[*]", jsonpath::jsonpath_errc::unexpected_end_of_input,1,21);
 }
 
 TEST_CASE("jsonpath missing dot")
 {
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "$.store.book[?(@category == 'fiction')][?(@.price < 15)].title", jsonpath_errc::expected_separator,1,17);
+    test_error_code(root, "$.store.book[?(@category == 'fiction')][?(@.price < 15)].title", jsonpath::jsonpath_errc::expected_separator,1,17);
 }
 
 TEST_CASE("test_dot_dot_dot")
 {
 
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "$.store...price", jsonpath_errc::expected_name,1,10);
+    test_error_code(root, "$.store...price", jsonpath::jsonpath_errc::expected_name,1,10);
 }
 
 TEST_CASE("test_dot_star_name")
 {
 
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "$.store.*price", jsonpath_errc::expected_separator,1,10);
+    test_error_code(root, "$.store.*price", jsonpath::jsonpath_errc::expected_separator,1,10);
 }
 TEST_CASE("test_filter_error")
 {
     json root = json::parse(jsonpath_fixture::store_text());
     std::string path = "$..book[?(.price<10)]";
-    test_error_code(root, path, jsonpath_errc::parse_error_in_filter,1,17);
+    test_error_code(root, path, jsonpath::jsonpath_errc::parse_error_in_filter,1,17);
 }
 
 TEST_CASE("jsonpath slice errors")
@@ -116,40 +115,40 @@ TEST_CASE("jsonpath slice errors")
     SECTION("$[")
     {
         std::string path = "$[";
-        test_error_code(root, path, jsonpath_errc::unexpected_end_of_input,1,3);
+        test_error_code(root, path, jsonpath::jsonpath_errc::unexpected_end_of_input,1,3);
     }
     SECTION("$[1")
     {
         std::string path = "$[1";
-        test_error_code(root, path, jsonpath_errc::unexpected_end_of_input,1,4);
+        test_error_code(root, path, jsonpath::jsonpath_errc::unexpected_end_of_input,1,4);
     }
     SECTION("$[1:")
     {
         std::string path = "$[1:";
-        test_error_code(root, path, jsonpath_errc::unexpected_end_of_input,1,5);
+        test_error_code(root, path, jsonpath::jsonpath_errc::unexpected_end_of_input,1,5);
     }
     SECTION("$[1:1")
     {
         std::string path = "$[1:1";
-        test_error_code(root, path, jsonpath_errc::unexpected_end_of_input,1,6);
+        test_error_code(root, path, jsonpath::jsonpath_errc::unexpected_end_of_input,1,6);
     }
 
     SECTION("$[-:]")
     {
         std::string path = "$[-:]";
-        test_error_code(root, path, jsonpath_errc::expected_slice_start,1,4);
+        test_error_code(root, path, jsonpath::jsonpath_errc::expected_slice_start,1,4);
     }
 
     SECTION("$[-1:-]")
     {
         std::string path = "$[-1:-]";
-        test_error_code(root, path, jsonpath_errc::expected_slice_end,1,7);
+        test_error_code(root, path, jsonpath::jsonpath_errc::expected_slice_end,1,7);
     }
 
     SECTION("$[-1:-1:-]")
     {
         std::string path = "$[-1:-1:-]";
-        test_error_code(root, path, jsonpath_errc::expected_slice_step,1,10);
+        test_error_code(root, path, jsonpath::jsonpath_errc::expected_slice_step,1,10);
     }
 }
 

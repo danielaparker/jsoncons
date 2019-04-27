@@ -16,7 +16,6 @@
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::csv;
 using namespace jsoncons::literals;
 
 TEST_CASE("test_n_objects")
@@ -27,7 +26,7 @@ NY,LON,TOR;LON
 "NY";"LON","TOR","LON"
 "NY","LON","TOR";"LON"
 )";
-    csv_options options;
+    csv::csv_options options;
     options.assume_header(true)
            .subfield_delimiter(';');
 
@@ -58,7 +57,7 @@ NY,LON,TOR;LON
 
     try
     {
-        json j = decode_csv<json>(s,options);
+        json j = csv::decode_csv<json>(s,options);
         CHECK(j == expected);
         //std::cout << pretty_print(j) << std::endl;
     }
@@ -76,8 +75,8 @@ NY,LON,TOR;LON
 "NY";"LON","TOR","LON"
 "NY","LON","TOR";"LON"
 )";
-    csv_options options;
-    options.mapping(mapping_type::n_rows)
+    csv::csv_options options;
+    options.mapping(csv::mapping_type::n_rows)
            .subfield_delimiter(';');
 
     json expected = R"(
@@ -100,7 +99,7 @@ NY,LON,TOR;LON
 
     try
     {
-        json j = decode_csv<json>(s,options);
+        json j = csv::decode_csv<json>(s,options);
         CHECK(j == expected);
         //std::cout << pretty_print(j) << std::endl;
     }
@@ -118,9 +117,9 @@ NY,LON,TOR;LON
 "NY";"LON","TOR","LON"
 "NY","LON","TOR";"LON"
 )";
-    csv_options options;
+    csv::csv_options options;
     options.assume_header(true)
-           .mapping(mapping_type::m_columns)
+           .mapping(csv::mapping_type::m_columns)
            .subfield_delimiter(';');
 
     json expected = R"(
@@ -139,7 +138,7 @@ NY,LON,TOR;LON
 
     try
     {
-        json j = decode_csv<json>(s,options);
+        json j = csv::decode_csv<json>(s,options);
         CHECK(j == expected);
         //std::cout << pretty_print(j) << std::endl;
     }

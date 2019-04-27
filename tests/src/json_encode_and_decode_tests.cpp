@@ -10,46 +10,46 @@
 #include <ctime>
 #include <cstdint>
 
-namespace jc = jsoncons;
+using namespace jsoncons;
 
 TEST_CASE("encode and decode json")
 {
-    jc::json j(std::make_pair(false,std::string("foo")));
+    json j(std::make_pair(false,std::string("foo")));
 
     SECTION("string test")
     {
         std::string s;
-        jc::encode_json(j, s);
-        jc::json result = jc::decode_json<jc::json>(s);
+        encode_json(j, s);
+        json result = decode_json<json>(s);
         CHECK(result == j);
     }
 
     SECTION("stream test")
     {
         std::stringstream ss;
-        jc::encode_json(j, ss);
-        jc::json result = jc::decode_json<jc::json>(ss);
+        encode_json(j, ss);
+        json result = decode_json<json>(ss);
         CHECK(result == j);
     }
 }
 
 TEST_CASE("encode and decode wjson")
 {
-    jc::wjson j(std::make_pair(false,std::wstring(L"foo")));
+    wjson j(std::make_pair(false,std::wstring(L"foo")));
 
     SECTION("string test")
     {
         std::wstring s;
-        jc::encode_json(j, s);
-        jc::wjson result = jc::decode_json<jc::wjson>(s);
+        encode_json(j, s);
+        wjson result = decode_json<wjson>(s);
         CHECK(result == j);
     }
 
     SECTION("stream test")
     {
         std::wstringstream ss;
-        jc::encode_json(j, ss);
-        jc::wjson result = jc::decode_json<jc::wjson>(ss);
+        encode_json(j, ss);
+        wjson result = decode_json<wjson>(ss);
         CHECK(result == j);
     }
 }
@@ -158,7 +158,7 @@ TEST_CASE("book_conversion_test")
     ns::book book_list{"Haruki Murakami", "Kafka on the Shore", 25.17};
 
     std::string s;
-    jc::encode_json(book_list, s, jc::indenting::indent);
+    encode_json(book_list, s, indenting::indent);
 
     std::cout << "s: " << s << "\n";
 
@@ -238,100 +238,100 @@ TEST_CASE("reputation_object")
     SECTION("1")
     {
         std::string s;
-        jc::encode_json(val, s);
-        auto val2 = jc::decode_json<ns::reputation_object>(s);
+        encode_json(val, s);
+        auto val2 = decode_json<ns::reputation_object>(s);
         CHECK(val2 == val);
     }
 
     SECTION("2")
     {
         std::string s;
-        jc::encode_json(val, s, jc::indenting::indent);
-        auto val2 = jc::decode_json<ns::reputation_object>(s);
+        encode_json(val, s, indenting::indent);
+        auto val2 = decode_json<ns::reputation_object>(s);
         CHECK(val2 == val);
     }
 
     SECTION("3")
     {
         std::string s;
-        jc::json_options options;
-        jc::encode_json(val, s, options, jc::indenting::indent);
-        auto val2 = jc::decode_json<ns::reputation_object>(s, options);
+        json_options options;
+        encode_json(val, s, options, indenting::indent);
+        auto val2 = decode_json<ns::reputation_object>(s, options);
         CHECK(val2 == val);
     }
 
     SECTION("4")
     {
         std::string s;
-        jc::encode_json(jc::ojson(), val, s);
-        auto val2 = jc::decode_json<ns::reputation_object>(jc::ojson(), s);
+        encode_json(ojson(), val, s);
+        auto val2 = decode_json<ns::reputation_object>(ojson(), s);
         CHECK(val2 == val);
     }
 
     SECTION("5")
     {
         std::string s;
-        jc::encode_json(jc::ojson(), val, s, jc::indenting::indent);
-        auto val2 = jc::decode_json<ns::reputation_object>(jc::ojson(), s);
+        encode_json(ojson(), val, s, indenting::indent);
+        auto val2 = decode_json<ns::reputation_object>(ojson(), s);
         CHECK(val2 == val);
     }
 
     SECTION("6")
     {
         std::string s;
-        jc::json_options options;
-        jc::encode_json(jc::ojson(), val, s, options, jc::indenting::indent);
-        auto val2 = jc::decode_json<ns::reputation_object>(jc::ojson(), s, options);
+        json_options options;
+        encode_json(ojson(), val, s, options, indenting::indent);
+        auto val2 = decode_json<ns::reputation_object>(ojson(), s, options);
         CHECK(val2 == val);
     }
 
     SECTION("os 1")
     {
         std::stringstream os;
-        jc::encode_json(val, os);
-        auto val2 = jc::decode_json<ns::reputation_object>(os);
+        encode_json(val, os);
+        auto val2 = decode_json<ns::reputation_object>(os);
         CHECK(val2 == val);
     }
 
     SECTION("os 2")
     {
         std::stringstream os;
-        jc::encode_json(val, os, jc::indenting::indent);
-        auto val2 = jc::decode_json<ns::reputation_object>(os);
+        encode_json(val, os, indenting::indent);
+        auto val2 = decode_json<ns::reputation_object>(os);
         CHECK(val2 == val);
     }
 
     SECTION("os 3")
     {
         std::stringstream os;
-        jc::json_options options;
-        jc::encode_json(val, os, options, jc::indenting::indent);
-        auto val2 = jc::decode_json<ns::reputation_object>(os, options);
+        json_options options;
+        encode_json(val, os, options, indenting::indent);
+        auto val2 = decode_json<ns::reputation_object>(os, options);
         CHECK(val2 == val);
     }
 
     SECTION("os 4")
     {
         std::stringstream os;
-        jc::encode_json(jc::ojson(), val, os);
-        auto val2 = jc::decode_json<ns::reputation_object>(jc::ojson(), os);
+        encode_json(ojson(), val, os);
+        auto val2 = decode_json<ns::reputation_object>(ojson(), os);
         CHECK(val2 == val);
     }
 
     SECTION("os 5")
     {
         std::stringstream os;
-        jc::encode_json(jc::ojson(), val, os, jc::indenting::indent);
-        auto val2 = jc::decode_json<ns::reputation_object>(jc::ojson(), os);
+        encode_json(ojson(), val, os, indenting::indent);
+        auto val2 = decode_json<ns::reputation_object>(ojson(), os);
         CHECK(val2 == val);
     }
 
     SECTION("os 6")
     {
         std::stringstream os;
-        jc::json_options options;
-        jc::encode_json(jc::ojson(), val, os, options, jc::indenting::indent);
-        auto val2 = jc::decode_json<ns::reputation_object>(jc::ojson(), os, options);
+        json_options options;
+        encode_json(ojson(), val, os, options, indenting::indent);
+        auto val2 = decode_json<ns::reputation_object>(ojson(), os, options);
         CHECK(val2 == val);
     }
 

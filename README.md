@@ -225,7 +225,7 @@ for your own types.
 #include <iostream>
 #include <jsoncons/json.hpp>
 
-namespace jc = jsoncons;
+using namespace jsoncons;
 
 namespace ns {
 
@@ -302,10 +302,10 @@ int main()
     ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
 
     std::string s;
-    jc::encode_json(val, s, jc::indenting::indent);
+    encode_json(val, s, indenting::indent);
     std::cout << s << "\n";
 
-    auto val2 = jc::decode_json<ns::reputation_object>(s);
+    auto val2 = decode_json<ns::reputation_object>(s);
 
     assert(val2 == val);
 }

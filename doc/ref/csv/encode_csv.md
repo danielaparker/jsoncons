@@ -35,7 +35,6 @@ supplied or defaults.
 #include <jsoncons_ext/csv/csv_encoder.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::csv;
 
 int main()
 {
@@ -58,7 +57,7 @@ int main()
     ]
     )");
 
-    encode_csv(books, std::cout);
+    csv::encode_csv(books, std::cout);
 }
 ```
 Output:

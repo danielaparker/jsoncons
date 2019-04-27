@@ -14,7 +14,6 @@
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::cbor;
 
 TEST_CASE("cbor_test_floating_point")
 {
@@ -23,9 +22,9 @@ TEST_CASE("cbor_test_floating_point")
     j1["max float"] = (std::numeric_limits<float>::max)();
 
     std::vector<uint8_t> v;
-    encode_cbor(j1, v);
+    cbor::encode_cbor(j1, v);
 
-    json j2 = decode_cbor<json>(v);
+    json j2 = cbor::decode_cbor<json>(v);
 
     CHECK(j1 == j2);
 } 
@@ -87,9 +86,9 @@ TEST_CASE("cbor_test")
     j1["An array"] = ja;
 
     std::vector<uint8_t> v;
-    encode_cbor(j1, v);
+    cbor::encode_cbor(j1, v);
 
-    json j2 = decode_cbor<json>(v);
+    json j2 = cbor::decode_cbor<json>(v);
 
     CHECK(j1 == j2);
 } 
@@ -153,9 +152,9 @@ TEST_CASE("cbor_test2")
     j1[L"An array"] = ja;
 
     std::vector<uint8_t> v;
-    encode_cbor(j1, v);
+    cbor::encode_cbor(j1, v);
 
-    wjson j2 = decode_cbor<wjson>(v);
+    wjson j2 = cbor::decode_cbor<wjson>(v);
 
     CHECK(j1 == j2);
 }
@@ -177,9 +176,9 @@ ojson j1 = ojson::parse(R"(
 )");
 
     std::vector<uint8_t> v;
-    encode_cbor(j1, v);
+    cbor::encode_cbor(j1, v);
 
-    ojson j2 = decode_cbor<ojson>(v);
+    ojson j2 = cbor::decode_cbor<ojson>(v);
     CHECK(j1 == j2);
     //std::cout << pretty_print(j2) << std::endl;
 }

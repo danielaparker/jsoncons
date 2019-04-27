@@ -11,12 +11,11 @@
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::bson;
 
 TEST_CASE("serialize object to bson")
 {
     std::vector<uint8_t> v;
-    bson_bytes_encoder encoder(v);
+    bson::bson_bytes_encoder encoder(v);
 
     encoder.begin_object();
     encoder.name("null");
@@ -26,7 +25,7 @@ TEST_CASE("serialize object to bson")
 
     try
     {
-        json result = decode_bson<json>(v);
+        json result = bson::decode_bson<json>(v);
         std::cout << result << std::endl;
     }
     catch (const std::exception& e)
@@ -52,9 +51,9 @@ namespace jsoncons { namespace bson {
         test_equal(v, expected);
         try
         {
-            json j = decode_bson<json>(v);
+            json j = bson::decode_bson<json>(v);
             std::vector<uint8_t> u;
-            encode_bson(j, u);
+            bson::encode_bson(j, u);
             test_equal(v,u);
         }
         catch (const std::exception& e)
@@ -69,7 +68,7 @@ TEST_CASE("serialize to bson")
     SECTION("array")
     {
         std::vector<uint8_t> v;
-        bson_bytes_encoder encoder(v);
+        bson::bson_bytes_encoder encoder(v);
 
         encoder.begin_array();
         encoder.int64_value((std::numeric_limits<int64_t>::max)());
@@ -126,7 +125,7 @@ TEST_CASE("serialize to bson")
     SECTION("object")
     {
         std::vector<uint8_t> v;
-        bson_bytes_encoder encoder(v);
+        bson::bson_bytes_encoder encoder(v);
 
         encoder.begin_object();
         encoder.name("0");
@@ -191,7 +190,7 @@ TEST_CASE("serialize to bson")
     SECTION("outer object")
     {
         std::vector<uint8_t> v;
-        bson_bytes_encoder encoder(v);
+        bson::bson_bytes_encoder encoder(v);
 
         encoder.begin_object();
         encoder.name("a");
@@ -220,7 +219,7 @@ TEST_CASE("serialize to bson")
     SECTION("outer array")
     {
         std::vector<uint8_t> v;
-        bson_bytes_encoder encoder(v);
+        bson::bson_bytes_encoder encoder(v);
 
         encoder.begin_array();
         encoder.begin_object();

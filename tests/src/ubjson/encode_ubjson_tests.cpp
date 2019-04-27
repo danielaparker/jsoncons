@@ -14,12 +14,11 @@
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::ubjson;
 
 void check_encode_ubjson(const std::vector<uint8_t>& expected, const json& j)
 {
     std::vector<uint8_t> result;
-    encode_ubjson(j, result);
+    ubjson::encode_ubjson(j, result);
     if (result.size() != expected.size())
     {
         std::cout << std::hex << (int)expected[0] << " " << std::hex << (int)result[0] << std::endl;
@@ -137,7 +136,7 @@ TEST_CASE("encode_ubjson_arrays_and_maps")
 TEST_CASE("encode indefinite length ubjson arrays and maps")
 {
     std::vector<uint8_t> v;
-    ubjson_bytes_encoder encoder(v);
+    ubjson::ubjson_bytes_encoder encoder(v);
 
     SECTION("[\"Hello\"]")
     {

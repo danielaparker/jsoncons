@@ -11,11 +11,10 @@
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::bson;
 
 void check_decode_bson(const std::vector<uint8_t>& v, const json& expected)
 {
-    json result = decode_bson<json>(v);
+    json result = bson::decode_bson<json>(v);
     REQUIRE(result == expected);
 
     std::string s;
@@ -24,7 +23,7 @@ void check_decode_bson(const std::vector<uint8_t>& v, const json& expected)
         s.push_back(c);
     }
     std::istringstream is(s);
-    json j2 = decode_bson<json>(is);
+    json j2 = bson::decode_bson<json>(is);
     REQUIRE(j2 == expected);
 }
 

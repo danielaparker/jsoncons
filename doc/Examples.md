@@ -579,7 +579,7 @@ for your own types in the `jsoncons` namespace.
 #include <iostream>
 #include <jsoncons/json.hpp>
 
-namespace jc = jsoncons;
+using namespace jsoncons;
 
 namespace ns {
     struct book
@@ -636,7 +636,7 @@ int main()
     ]
     )";
 
-    std::vector<ns::book> book_list = jc::decode_json<std::vector<ns::book>>(s);
+    std::vector<ns::book> book_list = decode_json<std::vector<ns::book>>(s);
 
     std::cout << "(1)\n";
     for (const auto& item : book_list)
@@ -647,7 +647,7 @@ int main()
     }
 
     std::cout << "\n(2)\n";
-    jc::encode_json(book_list, std::cout, jc::indenting::indent);
+    encode_json(book_list, std::cout, indenting::indent);
     std::cout << "\n\n";
 }
 ```
@@ -684,7 +684,7 @@ for your own types.
 #include <iostream>
 #include <jsoncons/json.hpp>
 
-namespace jc = jsoncons;
+using namespace jsoncons;
 
 namespace ns {
 
@@ -761,10 +761,10 @@ int main()
     ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
 
     std::string s;
-    jc::encode_json(val, s, jc::indenting::indent);
+    encode_json(val, s, indenting::indent);
     std::cout << s << "\n";
 
-    auto val2 = jc::decode_json<ns::reputation_object>(s);
+    auto val2 = decode_json<ns::reputation_object>(s);
 
     assert(val2 == val);
 }
@@ -1008,18 +1008,18 @@ namespace jc=jsoncons;
 
 int main()
 {
-    jc::byte_string bs = {'H','e','l','l','o'};
+    byte_string bs = {'H','e','l','l','o'};
 
     // default suggested encoding (base64url)
-    jc::json j1(bs);
+    json j1(bs);
     std::cout << "(1) "<< j1 << "\n\n";
 
     // base64 suggested encoding
-    jc::json j2(bs, jc::semantic_tag::base64);
+    json j2(bs, semantic_tag::base64);
     std::cout << "(2) "<< j2 << "\n\n";
 
     // base16 suggested encoding
-    jc::json j3(bs, jc::semantic_tag::base16);
+    json j3(bs, semantic_tag::base16);
     std::cout << "(3) "<< j3 << "\n\n";
 }
 ```
@@ -1217,32 +1217,32 @@ namespace jc=jsoncons;
 
 int main()
 {
-    jc::json j;
-    j["ByteString"] = jc::byte_string({'H','e','l','l','o'});
-    j["EncodedByteString"] = jc::json("SGVsbG8=", jc::semantic_tag::base64);
+    json j;
+    j["ByteString"] = byte_string({'H','e','l','l','o'});
+    j["EncodedByteString"] = json("SGVsbG8=", semantic_tag::base64);
 
     std::cout << "(1)\n";
     std::cout << pretty_print(j) << "\n\n";
 
     // Retrieve a byte string as a jsoncons::byte_string
-    jc::byte_string bs1 = j["ByteString"].as<jc::byte_string>();
+    byte_string bs1 = j["ByteString"].as<byte_string>();
     std::cout << "(2) " << bs1 << "\n\n";
 
     // or alternatively as a std::vector<uint8_t>
     std::vector<uint8_t> v = j["ByteString"].as<std::vector<uint8_t>>();
 
     // Retrieve a byte string from a text string containing base64 character values
-    jc::byte_string bs2 = j["EncodedByteString"].as<jc::byte_string>();
+    byte_string bs2 = j["EncodedByteString"].as<byte_string>();
     std::cout << "(3) " << bs2 << "\n\n";
 
     // Retrieve a byte string view  to access the memory that's holding the byte string
-    jc::byte_string_view bsv3 = j["ByteString"].as<jc::byte_string_view>();
+    byte_string_view bsv3 = j["ByteString"].as<byte_string_view>();
     std::cout << "(4) " << bsv3 << "\n\n";
 
     // Can't retrieve a byte string view of a text string 
     try
     {
-        jc::byte_string_view bsv4 = j["EncodedByteString"].as<jc::byte_string_view>();
+        byte_string_view bsv4 = j["EncodedByteString"].as<byte_string_view>();
     }
     catch (const std::exception& e)
     {

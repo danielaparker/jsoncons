@@ -14,12 +14,11 @@
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::msgpack;
 
 TEST_CASE("serialize array to msgpack")
 {
     std::vector<uint8_t> v;
-    msgpack_bytes_encoder encoder(v);
+    msgpack::msgpack_bytes_encoder encoder(v);
     //encoder.begin_object(1);
     encoder.begin_array(3);
     encoder.bool_value(true);
@@ -31,7 +30,7 @@ TEST_CASE("serialize array to msgpack")
 
     try
     {
-        json result = decode_msgpack<json>(v);
+        json result = msgpack::decode_msgpack<json>(v);
         std::cout << result << std::endl;
     }
     catch (const std::exception& e)
@@ -44,7 +43,7 @@ TEST_CASE("Too many and too few items in MessagePack object or array")
 {
     std::error_code ec{};
     std::vector<uint8_t> v;
-    msgpack_bytes_encoder encoder(v);
+    msgpack::msgpack_bytes_encoder encoder(v);
 
     SECTION("Too many items in array")
     {
@@ -56,7 +55,7 @@ TEST_CASE("Too many and too few items in MessagePack object or array")
         CHECK(encoder.string_value("cat"));
         CHECK(encoder.string_value("feline"));
         CHECK(encoder.end_array());
-        REQUIRE_THROWS_WITH(encoder.end_array(), msgpack_error_category_impl().message((int)msgpack_errc::too_many_items).c_str());
+        REQUIRE_THROWS_WITH(encoder.end_array(), msgpack::msgpack_error_category_impl().message((int)msgpack::msgpack_errc::too_many_items).c_str());
         encoder.flush();
     }
     SECTION("Too few items in array")
@@ -69,7 +68,7 @@ TEST_CASE("Too many and too few items in MessagePack object or array")
         CHECK(encoder.string_value("cat"));
         CHECK(encoder.string_value("feline"));
         CHECK(encoder.end_array());
-        REQUIRE_THROWS_WITH(encoder.end_array(), msgpack_error_category_impl().message((int)msgpack_errc::too_few_items).c_str());
+        REQUIRE_THROWS_WITH(encoder.end_array(), msgpack::msgpack_error_category_impl().message((int)msgpack::msgpack_errc::too_few_items).c_str());
         encoder.flush();
     }
     SECTION("Too many items in object")
@@ -86,7 +85,7 @@ TEST_CASE("Too many and too few items in MessagePack object or array")
         CHECK(encoder.string_value("cat"));
         CHECK(encoder.string_value("feline"));
         CHECK(encoder.end_array());
-        REQUIRE_THROWS_WITH(encoder.end_object(), msgpack_error_category_impl().message((int)msgpack_errc::too_many_items).c_str());
+        REQUIRE_THROWS_WITH(encoder.end_object(), msgpack::msgpack_error_category_impl().message((int)msgpack::msgpack_errc::too_many_items).c_str());
         encoder.flush();
     }
     SECTION("Too few items in object")
@@ -103,7 +102,7 @@ TEST_CASE("Too many and too few items in MessagePack object or array")
         CHECK(encoder.string_value("cat"));
         CHECK(encoder.string_value("feline"));
         CHECK(encoder.end_array());
-        REQUIRE_THROWS_WITH(encoder.end_object(), msgpack_error_category_impl().message((int)msgpack_errc::too_few_items).c_str());
+        REQUIRE_THROWS_WITH(encoder.end_object(), msgpack::msgpack_error_category_impl().message((int)msgpack::msgpack_errc::too_few_items).c_str());
         encoder.flush();
     }
 }

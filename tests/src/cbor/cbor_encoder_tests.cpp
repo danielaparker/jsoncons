@@ -17,7 +17,6 @@
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::cbor;
 
 TEST_CASE("test_serialize_to_stream")
 {
@@ -37,13 +36,13 @@ json j = json::parse(R"(
 
     std::ofstream os;
     os.open("./output/store.cbor", std::ios::binary | std::ios::out);
-    encode_cbor(j,os);
+    cbor::encode_cbor(j,os);
 
     std::vector<uint8_t> v;
     std::ifstream is;
     is.open("./output/store.cbor", std::ios::binary | std::ios::in);
 
-    json j2 = decode_cbor<json>(is);
+    json j2 = cbor::decode_cbor<json>(is);
 
     //std::cout << pretty_print(j2) << std::endl; 
 
@@ -53,7 +52,7 @@ json j = json::parse(R"(
 TEST_CASE("serialize array to cbor")
 {
     std::vector<uint8_t> v;
-    cbor_bytes_encoder encoder(v);
+    cbor::cbor_bytes_encoder encoder(v);
     //encoder.begin_object(1);
     encoder.begin_array(3);
     encoder.bool_value(true);
@@ -65,7 +64,7 @@ TEST_CASE("serialize array to cbor")
 
     try
     {
-        json result = decode_cbor<json>(v);
+        json result = cbor::decode_cbor<json>(v);
         //std::cout << result << std::endl;
     }
     catch (const std::exception& e)
@@ -77,7 +76,7 @@ TEST_CASE("serialize array to cbor")
 TEST_CASE("test_serialize_indefinite_length_array")
 {
     std::vector<uint8_t> v;
-    cbor_bytes_encoder encoder(v);
+    cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array();
     encoder.begin_array(4);
     encoder.bool_value(true);
@@ -90,7 +89,7 @@ TEST_CASE("test_serialize_indefinite_length_array")
 
     try
     {
-        json result = decode_cbor<json>(v);
+        json result = cbor::decode_cbor<json>(v);
         //std::cout << result << std::endl;
     }
     catch (const std::exception& e)
@@ -101,7 +100,7 @@ TEST_CASE("test_serialize_indefinite_length_array")
 TEST_CASE("test_serialize_bignum")
 {
     std::vector<uint8_t> v;
-    cbor_bytes_encoder encoder(v);
+    cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -114,7 +113,7 @@ TEST_CASE("test_serialize_bignum")
 
     try
     {
-        json result = decode_cbor<json>(v);
+        json result = cbor::decode_cbor<json>(v);
         CHECK(result[0].as<std::string>() == std::string("18446744073709551616"));
     }
     catch (const std::exception& e)
@@ -126,7 +125,7 @@ TEST_CASE("test_serialize_bignum")
 TEST_CASE("test_serialize_negative_bignum1")
 {
     std::vector<uint8_t> v;
-    cbor_bytes_encoder encoder(v);
+    cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -139,7 +138,7 @@ TEST_CASE("test_serialize_negative_bignum1")
 
     try
     {
-        json result = decode_cbor<json>(v);
+        json result = cbor::decode_cbor<json>(v);
         CHECK(result[0].as<std::string>() == std::string("-18446744073709551617"));
     }
     catch (const std::exception& e)
@@ -151,7 +150,7 @@ TEST_CASE("test_serialize_negative_bignum1")
 TEST_CASE("test_serialize_negative_bignum2")
 {
     std::vector<uint8_t> v;
-    cbor_bytes_encoder encoder(v);
+    cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -164,7 +163,7 @@ TEST_CASE("test_serialize_negative_bignum2")
 
     try
     {
-        json result = decode_cbor<json>(v);
+        json result = cbor::decode_cbor<json>(v);
         json_options options;
         options.big_integer_format(big_integer_chars_format::number);
         std::string text;
@@ -180,7 +179,7 @@ TEST_CASE("test_serialize_negative_bignum2")
 TEST_CASE("test_serialize_negative_bignum3")
 {
     std::vector<uint8_t> v;
-    cbor_bytes_encoder encoder(v);
+    cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -194,7 +193,7 @@ TEST_CASE("test_serialize_negative_bignum3")
 
     try
     {
-        json result = decode_cbor<json>(v);
+        json result = cbor::decode_cbor<json>(v);
         json_options options;
         options.big_integer_format(big_integer_chars_format::base64url);
         std::string text;
@@ -212,12 +211,12 @@ TEST_CASE("serialize big_decimal to cbor")
     SECTION("-1 184467440737095516160")
     {
         std::vector<uint8_t> v;
-        cbor_bytes_encoder encoder(v);
+        cbor::cbor_bytes_encoder encoder(v);
         encoder.string_value("18446744073709551616.0", semantic_tag::big_decimal);
         encoder.flush();
         try
         {
-            json result = decode_cbor<json>(v);
+            json result = cbor::decode_cbor<json>(v);
             CHECK(result.as<std::string>() == std::string("1.84467440737095516160e+19"));
         }
         catch (const std::exception& e)
@@ -228,12 +227,12 @@ TEST_CASE("serialize big_decimal to cbor")
     SECTION("18446744073709551616e-5")
     {
         std::vector<uint8_t> v;
-        cbor_bytes_encoder encoder(v);
+        cbor::cbor_bytes_encoder encoder(v);
         encoder.string_value("18446744073709551616e-5", semantic_tag::big_decimal);
         encoder.flush();
         try
         {
-            json result = decode_cbor<json>(v);
+            json result = cbor::decode_cbor<json>(v);
             CHECK(result.as<std::string>() == std::string("184467440737095.51616"));
         }
         catch (const std::exception& e)
@@ -244,12 +243,12 @@ TEST_CASE("serialize big_decimal to cbor")
     SECTION("-18446744073709551616e-5")
     {
         std::vector<uint8_t> v;
-        cbor_bytes_encoder encoder(v);
+        cbor::cbor_bytes_encoder encoder(v);
         encoder.string_value("-18446744073709551616e-5", semantic_tag::big_decimal);
         encoder.flush();
         try
         {
-            json result = decode_cbor<json>(v);
+            json result = cbor::decode_cbor<json>(v);
             CHECK(result.as<std::string>() == std::string("-184467440737095.51616"));
         }
         catch (const std::exception& e)
@@ -260,12 +259,12 @@ TEST_CASE("serialize big_decimal to cbor")
     SECTION("-18446744073709551616e5")
     {
         std::vector<uint8_t> v;
-        cbor_bytes_encoder encoder(v);
+        cbor::cbor_bytes_encoder encoder(v);
         encoder.string_value("-18446744073709551616e5", semantic_tag::big_decimal);
         encoder.flush();
         try
         {
-            json result = decode_cbor<json>(v);
+            json result = cbor::decode_cbor<json>(v);
             CHECK(result.as<std::string>() == std::string("-1.8446744073709551616e+24"));
         }
         catch (const std::exception& e)
@@ -279,7 +278,7 @@ TEST_CASE("Too many and too few items in CBOR map or array")
 {
     std::error_code ec{};
     std::vector<uint8_t> v;
-    cbor_bytes_encoder encoder(v);
+    cbor::cbor_bytes_encoder encoder(v);
 
     SECTION("Too many items in array")
     {
@@ -291,7 +290,7 @@ TEST_CASE("Too many and too few items in CBOR map or array")
         CHECK(encoder.string_value("cat"));
         CHECK(encoder.string_value("feline"));
         CHECK(encoder.end_array());
-        REQUIRE_THROWS_WITH(encoder.end_array(), cbor_error_category_impl().message((int)cbor_errc::too_many_items).c_str());
+        REQUIRE_THROWS_WITH(encoder.end_array(), cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::too_many_items).c_str());
         encoder.flush();
     }
     SECTION("Too few items in array")
@@ -304,7 +303,7 @@ TEST_CASE("Too many and too few items in CBOR map or array")
         CHECK(encoder.string_value("cat"));
         CHECK(encoder.string_value("feline"));
         CHECK(encoder.end_array());
-        REQUIRE_THROWS_WITH(encoder.end_array(), cbor_error_category_impl().message((int)cbor_errc::too_few_items).c_str());
+        REQUIRE_THROWS_WITH(encoder.end_array(), cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::too_few_items).c_str());
         encoder.flush();
     }
     SECTION("Too many items in map")
@@ -321,7 +320,7 @@ TEST_CASE("Too many and too few items in CBOR map or array")
         CHECK(encoder.string_value("cat"));
         CHECK(encoder.string_value("feline"));
         CHECK(encoder.end_array());
-        REQUIRE_THROWS_WITH(encoder.end_object(), cbor_error_category_impl().message((int)cbor_errc::too_many_items).c_str());
+        REQUIRE_THROWS_WITH(encoder.end_object(), cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::too_many_items).c_str());
         encoder.flush();
     }
     SECTION("Too few items in map")
@@ -338,7 +337,7 @@ TEST_CASE("Too many and too few items in CBOR map or array")
         CHECK(encoder.string_value("cat"));
         CHECK(encoder.string_value("feline"));
         CHECK(encoder.end_array());
-        REQUIRE_THROWS_WITH(encoder.end_object(), cbor_error_category_impl().message((int)cbor_errc::too_few_items).c_str());
+        REQUIRE_THROWS_WITH(encoder.end_object(), cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::too_few_items).c_str());
         encoder.flush();
     }
     SECTION("Just enough items")
@@ -376,11 +375,11 @@ TEST_CASE("encode stringref")
   ]
 )");
 
-    cbor_options options;
+    cbor::cbor_options options;
     options.pack_strings(true);
     std::vector<uint8_t> buf;
 
-    encode_cbor(j, buf, options);
+    cbor::encode_cbor(j, buf, options);
 
     //for (auto c : buf)
     //{
@@ -389,6 +388,6 @@ TEST_CASE("encode stringref")
     //}
     //std::cout << "\n";
 
-    ojson j2 = decode_cbor<ojson>(buf);
+    ojson j2 = cbor::decode_cbor<ojson>(buf);
     CHECK(j2 == j);
 }

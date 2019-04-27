@@ -8,7 +8,7 @@
 #include <iomanip>
 #include <jsoncons/json.hpp>
 
-namespace jc = jsoncons;
+using namespace jsoncons;
 
 namespace ns {
     struct book
@@ -104,7 +104,7 @@ void book_extensibility_example2()
     ]
     )";
 
-    std::vector<ns::book> book_list = jc::decode_json<std::vector<ns::book>>(s);
+    std::vector<ns::book> book_list = decode_json<std::vector<ns::book>>(s);
 
     std::cout << "(1)\n";
     for (const auto& item : book_list)
@@ -115,7 +115,7 @@ void book_extensibility_example2()
     }
 
     std::cout << "\n(2)\n";
-    jc::encode_json(book_list, std::cout, jc::indenting::indent);
+    encode_json(book_list, std::cout, indenting::indent);
     std::cout << "\n\n";
 }
 
@@ -194,10 +194,10 @@ void reputons_extensibility_example()
     ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
 
     std::string s;
-    jc::encode_json(val, s, jc::indenting::indent);
+    encode_json(val, s, indenting::indent);
     std::cout << s << "\n";
 
-    auto val2 = jc::decode_json<ns::reputation_object>(s);
+    auto val2 = decode_json<ns::reputation_object>(s);
 
     assert(val2 == val);
 }

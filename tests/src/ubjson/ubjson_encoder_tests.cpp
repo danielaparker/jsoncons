@@ -19,7 +19,7 @@ using namespace jsoncons::ubjson;
 TEST_CASE("serialize array to ubjson")
 {
     std::vector<uint8_t> v;
-    ubjson_bytes_encoder encoder(v);
+    ubjson::ubjson_bytes_encoder encoder(v);
     encoder.begin_array(3);
     encoder.bool_value(true);
     encoder.bool_value(false);
@@ -42,7 +42,7 @@ TEST_CASE("Too many and too few items in UBJSON object or array")
 {
     std::error_code ec{};
     std::vector<uint8_t> v;
-    ubjson_bytes_encoder encoder(v);
+    ubjson::ubjson_bytes_encoder encoder(v);
 
     SECTION("Too many items in array")
     {

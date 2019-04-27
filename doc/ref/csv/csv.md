@@ -31,7 +31,6 @@ customer_name,has_coupon,phone_number,zip_code,sales_tax_rate,total_amount
 #include <fstream>
 
 using namespace jsoncons;
-using namespace jsoncons::csv;
 
 int main()
 {
@@ -40,17 +39,17 @@ int main()
            .mapping(csv::mapping_type::n_objects);
 
     std::ifstream is1("input/sales.csv");
-    jc::ojson j1 = csv::decode_csv<jc::ojson>(is1,options);
+    ojson j1 = csv::decode_csv<ojson>(is1,options);
     std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
 
     options.mapping(csv::mapping_type::n_rows);
     std::ifstream is2("input/sales.csv");
-    jc::ojson j2 = csv::decode_csv<jc::ojson>(is2,options);
+    ojson j2 = csv::decode_csv<ojson>(is2,options);
     std::cout << "\n(2)\n"<< pretty_print(j2) << "\n";
 
     options.mapping(csv::mapping_type::m_columns);
     std::ifstream is3("input/sales.csv");
-    jc::ojson j3 = csv::decode_csv<jc::ojson>(is3,options);
+    ojson j3 = csv::decode_csv<ojson>(is3,options);
     std::cout << "\n(3)\n"<< pretty_print(j3) << "\n";
 }
 ```
@@ -119,8 +118,7 @@ Output:
 #include <jsoncons_ext/csv/csv.hpp>
 #include <iostream>
 
-namespace jc = jsoncons;
-namespace csv = jsoncons::csv;
+using namespace jsoncons;
 
 int main()
 {

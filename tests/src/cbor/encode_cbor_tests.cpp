@@ -14,7 +14,6 @@
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::cbor;
 
 // test vectors from tinycbor https://github.com/01org/tinycbor tst_encoder.cpp
 // MIT license
@@ -22,7 +21,7 @@ using namespace jsoncons::cbor;
 void check_encode_cbor(const std::vector<uint8_t>& expected, const json& j)
 {
     std::vector<uint8_t> result;
-    encode_cbor(j,result);
+    cbor::encode_cbor(j,result);
     REQUIRE(result.size() == expected.size());
     for (size_t i = 0; i < expected.size(); ++i)
     {

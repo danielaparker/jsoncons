@@ -48,26 +48,25 @@ customer_name,has_coupon,phone_number,zip_code,sales_tax_rate,total_amount
 #include <jsoncons_ext/csv/csv_reader.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::csv;
 
 int main()
 {
-    csv_options options;
+    csv::csv_options options;
     options.assume_header(true);
 
-    options.mapping(mapping_type::n_objects);
+    options.mapping(csv::mapping_type::n_objects);
     std::ifstream is1("input/sales.csv");
-    ojson j1 = decode_csv<ojson>(is1,options);
+    ojson j1 = csv::decode_csv<ojson>(is1,options);
     std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
 
-    options.mapping(mapping_type::n_rows);
+    options.mapping(csv::mapping_type::n_rows);
     std::ifstream is2("input/sales.csv");
-    ojson j2 = decode_csv<ojson>(is2,options);
+    ojson j2 = csv::decode_csv<ojson>(is2,options);
     std::cout << "\n(2)\n"<< pretty_print(j2) << "\n";
 
-    options.mapping(mapping_type::m_columns);
+    options.mapping(csv::mapping_type::m_columns);
     std::ifstream is3("input/sales.csv");
-    ojson j3 = decode_csv<ojson>(is3,options);
+    ojson j3 = csv::decode_csv<ojson>(is3,options);
     std::cout << "\n(3)\n"<< pretty_print(j3) << "\n";
 }
 ```
@@ -136,7 +135,6 @@ Output:
 #include <jsoncons_ext/csv/csv_reader.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::csv;
 
 int main()
 {
@@ -145,10 +143,10 @@ int main()
 00000002,"Brown,Sarah",sales,89000.00
 )";
 
-    csv_options options;
+    csv::csv_options options;
     options.assume_header(true)
           .infer_types(false);
-    ojson j = decode_csv<ojson>(s,options);
+    ojson j = csv::decode_csv<ojson>(s,options);
 
     std::cout << pretty_print(j) << std::endl;
 }
@@ -178,7 +176,6 @@ Output:
 #include <jsoncons_ext/csv/csv_reader.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::csv;
 
 int main()
 {
@@ -188,23 +185,23 @@ int main()
 2017-01-08,0.0063,0.0076,0.0084,0.0112
 )";
 
-    csv_options options;
+    csv::csv_options options;
     options.assume_header(true)
           .column_types("string,float,float,float,float");
 
     // mapping_type::n_objects
-    options.mapping(mapping_type::n_objects);
-    ojson j1 = decode_csv<ojson>(s,options);
+    options.mapping(csv::mapping_type::n_objects);
+    ojson j1 = csv::decode_csv<ojson>(s,options);
     std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
 
     // mapping_type::n_rows
-    options.mapping(mapping_type::n_rows);
-    ojson j2 = decode_csv<ojson>(s,options);
+    options.mapping(csv::mapping_type::n_rows);
+    ojson j2 = csv::decode_csv<ojson>(s,options);
     std::cout << "\n(2)\n"<< pretty_print(j2) << "\n";
 
     // mapping_type::m_columns
-    options.mapping(mapping_type::m_columns);
-    ojson j3 = decode_csv<ojson>(s,options);
+    options.mapping(csv::mapping_type::m_columns);
+    ojson j3 = csv::decode_csv<ojson>(s,options);
     std::cout << "\n(3)\n" << pretty_print(j3) << "\n";
 }
 ```
@@ -259,7 +256,6 @@ Output:
 #include <jsoncons_ext/csv/csv_reader.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::csv;
 
 int main()
 {
@@ -272,26 +268,26 @@ NY,LON,TOR;LON
     json_options print_options;
     print_options.array_array_line_splits(line_split_kind::same_line);
 
-    csv_options options1;
+    csv::csv_options options1;
     options1.assume_header(true)
            .subfield_delimiter(';');
 
-    json j1 = decode_csv<json>(s,options1);
+    json j1 = csv::decode_csv<json>(s,options1);
     std::cout << "(1)\n" << pretty_print(j1,print_options) << "\n\n";
 
-    csv_options options2;
-    options2.mapping(mapping_type::n_rows)
+    csv::csv_options options2;
+    options2.mapping(csv::mapping_type::n_rows)
            .subfield_delimiter(';');
 
-    json j2 = decode_csv<json>(s,options2);
+    json j2 = csv::decode_csv<json>(s,options2);
     std::cout << "(2)\n" << pretty_print(j2,print_options) << "\n\n";
 
-    csv_options options3;
+    csv::csv_options options3;
     options3.assume_header(true)
-           .mapping(mapping_type::m_columns)
+           .mapping(csv::mapping_type::m_columns)
            .subfield_delimiter(';');
 
-    json j3 = decode_csv<json>(s,options3);
+    json j3 = csv::decode_csv<json>(s,options3);
     std::cout << "(3)\n" << pretty_print(j3,print_options) << "\n\n";
 }
 ```

@@ -15,11 +15,10 @@
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::ubjson;
 
 void check_decode_ubjson(const std::vector<uint8_t>& v, const json& expected)
 {
-    json j1 = decode_ubjson<json>(v);
+    json j1 = ubjson::decode_ubjson<json>(v);
     REQUIRE(j1 == expected);
 
     std::string s;
@@ -28,7 +27,7 @@ void check_decode_ubjson(const std::vector<uint8_t>& v, const json& expected)
         s.push_back(c);
     }
     std::istringstream is(s);
-    json j2 = decode_ubjson<json>(is);
+    json j2 = ubjson::decode_ubjson<json>(is);
     REQUIRE(j2 == expected);
 }
 
@@ -140,7 +139,7 @@ TEST_CASE("decode_ubjson_arrays_and_maps")
 TEST_CASE("decode indefinite length ubjson arrays and maps")
 {
     std::vector<uint8_t> v;
-    ubjson_bytes_encoder encoder(v);
+    ubjson::ubjson_bytes_encoder encoder(v);
 
     SECTION("[\"Hello\"]")
     {
