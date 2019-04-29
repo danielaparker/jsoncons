@@ -1,6 +1,7 @@
 // Copyright 2017 Daniel Parker
 // Distributed under Boost license
 
+#include "example_types.hpp"
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/ubjson/ubjson.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
@@ -11,7 +12,7 @@
 
 using namespace jsoncons;
 
-void ubjson_reputon_example()
+void to_from_ubjson_using_basic_json()
 {
     ojson j1 = ojson::parse(R"(
     {
@@ -58,10 +59,25 @@ void ubjson_reputon_example()
     std::cout << std::endl;
 }
 
+void to_from_ubjson_using_example_type()
+{
+    ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
+
+    // Encode a ns::reputation_object value to a UBJSON value
+    std::vector<uint8_t> data;
+    ubjson::encode_ubjson(val, data);
+
+    // Decode a UBJSON value to a ns::reputation_object value
+    ns::reputation_object val2 = ubjson::decode_ubjson<ns::reputation_object>(data);
+
+    assert(val2 == val);
+}
+
 void ubjson_examples()
 {
     std::cout << "\nubjson examples\n\n";
-    ubjson_reputon_example();
+    to_from_ubjson_using_basic_json();
+    to_from_ubjson_using_example_type();
 
     std::cout << std::endl;
 }

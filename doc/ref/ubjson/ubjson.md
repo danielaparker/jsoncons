@@ -1,6 +1,8 @@
 ### ubjson extension
 
-The ubjson extension implements decode from and encode to the [Universal Binary JSON Specification](http://ubjson.org/) data format.
+The ubjson extension implements encode to and decode from the [Universal Binary JSON Specification](http://ubjson.org/) data format.
+You can either encode to/decode from a variant-like structure, [basic_json](../json.md), or encode to/decode from your own
+data structures using [json_type_traits](../json_type_traits.md).
 
 [decode_ubjson](decode_ubjson.md)
 
@@ -25,6 +27,8 @@ array         |                  | array
 object        |                  | object
 
 ### Examples
+
+#### encode to/decode from UBJSON using basic_json
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -101,6 +105,7 @@ Marilyn C, 0.9
 (3) Marilyn C
 ```
 
+#### encode to/decode from UBJSON using your own data structures
 
 
 

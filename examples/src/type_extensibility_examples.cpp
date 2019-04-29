@@ -1,6 +1,7 @@
 // Copyright 2016 Daniel Parker
 // Distributed under Boost license
 
+#include "example_types.hpp"
 #include <cassert>
 #include <string>
 #include <vector>
@@ -9,44 +10,6 @@
 #include <jsoncons/json.hpp>
 
 using namespace jsoncons;
-
-namespace ns {
-    struct book
-    {
-        std::string author;
-        std::string title;
-        double price;
-    };
-} // namespace ns
-
-namespace jsoncons {
-
-    template<class Json>
-    struct json_type_traits<Json, ns::book>
-    {
-        static bool is(const Json& j) noexcept
-        {
-            return j.is_object() && j.contains("author") && 
-                   j.contains("title") && j.contains("price");
-        }
-        static ns::book as(const Json& j)
-        {
-            ns::book val;
-            val.author = j["author"].template as<std::string>();
-            val.title = j["title"].template as<std::string>();
-            val.price = j["price"].template as<double>();
-            return val;
-        }
-        static Json to_json(const ns::book& val)
-        {
-            Json j;
-            j["author"] = val.author;
-            j["title"] = val.title;
-            j["price"] = val.price;
-            return j;
-        }
-    };
-} // namespace jsoncons
 
 void book_extensibility_example()
 {
@@ -118,76 +81,6 @@ void book_extensibility_example2()
     encode_json(book_list, std::cout, indenting::indent);
     std::cout << "\n\n";
 }
-
-namespace ns {
-
-    struct reputon
-    {
-        std::string rater;
-        std::string assertion;
-        std::string rated;
-        double rating;
-
-        friend bool operator==(const reputon& lhs, const reputon& rhs)
-        {
-            return lhs.rater == rhs.rater &&
-                lhs.assertion == rhs.assertion &&
-                lhs.rated == rhs.rated &&
-                lhs.rating == rhs.rating;
-        }
-
-        friend bool operator!=(const reputon& lhs, const reputon& rhs)
-        {
-            return !(lhs == rhs);
-        };
-    };
-
-    class reputation_object
-    {
-        std::string application;
-        std::vector<reputon> reputons;
-
-        // Make json_type_traits specializations friends to give accesses to private members
-        JSONCONS_TYPE_TRAITS_FRIEND;
-    public:
-        reputation_object()
-        {
-        }
-        reputation_object(const std::string& application, const std::vector<reputon>& reputons)
-            : application(application), reputons(reputons)
-        {}
-
-        friend bool operator==(const reputation_object& lhs, const reputation_object& rhs)
-        {
-            if (lhs.application != rhs.application)
-            {
-                return false;
-            }
-            if (lhs.reputons.size() != rhs.reputons.size())
-            {
-                return false;
-            }
-            for (size_t i = 0; i < lhs.reputons.size(); ++i)
-            {
-                if (lhs.reputons[i] != rhs.reputons[i])
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        friend bool operator!=(const reputation_object& lhs, const reputation_object& rhs)
-        {
-            return !(lhs == rhs);
-        };
-    };
-
-} // namespace ns
-
-// Declare the traits. Specify which data members need to be serialized.
-JSONCONS_MEMBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
-JSONCONS_MEMBER_TRAITS_DECL(ns::reputation_object, application, reputons);
 
 void reputons_extensibility_example()
 {
