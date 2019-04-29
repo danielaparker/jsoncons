@@ -63,11 +63,11 @@ void to_from_ubjson_using_example_type()
 {
     ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
 
-    // Encode a ns::reputation_object value to a UBJSON value
+    // Encode a ns::reputation_object value to UBJSON
     std::vector<uint8_t> data;
     ubjson::encode_ubjson(val, data);
 
-    // Decode a UBJSON value to a ns::reputation_object value
+    // Decode UBJSON to a ns::reputation_object value
     ns::reputation_object val2 = ubjson::decode_ubjson<ns::reputation_object>(data);
 
     assert(val2 == val);
