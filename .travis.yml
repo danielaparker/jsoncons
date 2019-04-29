@@ -7,8 +7,8 @@ services:
 
 matrix:
   include:
-    #- os=centos
-    #    env: OS_TYPE=centos OS_VERSION=6 ANSIBLE_VERSION=1.9.2
+    - os=centos
+        env: OS_TYPE=centos OS_VERSION=6 ANSIBLE_VERSION=1.9.2
 
     - os: linux
       addons:
@@ -207,11 +207,11 @@ before_install:
         export CXX=clang++ CC=clang;
       fi
 
-    - sudo apt-get upgrade lxc-docker
-    - echo 'DOCKER_OPTS="-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock -s devicemapper"' | sudo tee /etc/default/docker > /dev/null
-    - sudo service docker restart
-    - sleep 5
-    - sudo docker pull weldpua2008/docker-ansible:${OS_TYPE}${OS_VERSION}_v${ANSIBLE_VERSION}
+  - sudo apt-get update
+  - echo 'DOCKER_OPTS="-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock -s devicemapper"' | sudo tee /etc/default/docker > /dev/null
+  - sudo service docker restart
+  - sleep 5
+  - sudo docker pull centos:centos${OS_VERSION}
 
 
 install:
