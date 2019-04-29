@@ -1109,18 +1109,16 @@ struct json_type_traits<Json, std::valarray<T>>
 #define JSONCONS_REP_OF_4(Act, TC, JV, P1, V, P2, ...)     JSONCONS_GENERATE(Act, TC, JV, P1, V ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_3(Act, TC, JV, P1, V, __VA_ARGS__))
 #define JSONCONS_REP_OF_3(Act, TC, JV, P1, V, P2, ...)     JSONCONS_GENERATE(Act, TC, JV, P1, V ,P2); JSONCONS_EXPAND(JSONCONS_REP_OF_2(Act, TC, JV, P1, V, __VA_ARGS__)) 
 #define JSONCONS_REP_OF_2(Act, TC, JV, P1, V, P2, ...)     JSONCONS_GENERATE(Act, TC, JV, P1, V, P2); JSONCONS_EXPAND(JSONCONS_REP_OF_1(Act, TC, JV, P1, V, __VA_ARGS__)) 
-#define JSONCONS_REP_OF_1(Act, TC, JV, P1, V, P2)          JSONCONS_GENERATE(Act, TC, JV, P1, V, P2);
-#define JSONCONS_REP_OF_0(Act, TC, JV, P1, V)              Act(TC, JV, P1, V) ## _LAST 
+#define JSONCONS_REP_OF_1(Act, TC, JV, P1, V, P2)          Act ## _LAST(TC, JV, P1, V, P2)
 
 #define JSONCONS_IS(TC, JV, Type, V, Member) JSONCONS_EXPAND(V = V && (JV).contains(JSONCONS_QUOTE(Member)));
-#define JSONCONS_IS_LAST(TC, JV, Type, V)
+#define JSONCONS_IS_LAST(TC, JV, Type, V, Member) JSONCONS_EXPAND(V = V && (JV).contains(JSONCONS_QUOTE(Member)));
 
 #define JSONCONS_TO_JSON(TC, JV, Type, V, Member) (JV).try_emplace(JSONCONS_QUOTE(Member), V.Member);
-#define JSONCONS_TO_JSON_LAST(TC, JV, Type, V)
+#define JSONCONS_TO_JSON_LAST(TC, JV, Type, V, Member) (JV).try_emplace(JSONCONS_QUOTE(Member), V.Member);
 
 #define JSONCONS_AS(TC, JV, Type, V, Member) if ((JV).contains(JSONCONS_QUOTE(Member))) {val.Member = (JV).at(JSONCONS_QUOTE(Member)).template as<decltype(V.Member)>();}
-                                         
-#define JSONCONS_AS_LAST(TC, JV, Type, V)
+#define JSONCONS_AS_LAST(TC, JV, Type, V, Member) if ((JV).contains(JSONCONS_QUOTE(Member))) {val.Member = (JV).at(JSONCONS_QUOTE(Member)).template as<decltype(V.Member)>();}
 
 #define JSONCONS_MEMBER_TRAITS_DECL_BASE(Count, ValueType, ...)  \
 namespace jsoncons \
@@ -1133,7 +1131,7 @@ namespace jsoncons \
         { \
             bool val = j.is_object(); \
             JSONCONS_REP_N(JSONCONS_IS, Count, j, ValueType, val, __VA_ARGS__)\
-            return j.is_object(); \
+            return val; \
         } \
         static ValueType as(const Json& j) \
         { \
@@ -1149,7 +1147,7 @@ namespace jsoncons \
         } \
     }; \
 } // jsoncons 
-
+ 
 #define JSONCONS_MEMBER_TRAITS_DECL(ValueType,...) \
     JSONCONS_MEMBER_TRAITS_DECL_BASE(0, ValueType, __VA_ARGS__)
 
