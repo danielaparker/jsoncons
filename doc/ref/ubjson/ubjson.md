@@ -28,7 +28,7 @@ object        |                  | object
 
 ### Examples
 
-#### encode to/decode from UBJSON using basic_json
+#### encode/decode UBJSON from/to basic_json
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -53,11 +53,11 @@ int main()
     }
     )");
 
-    // Encode a basic_json value to a UBJSON value
+    // Encode a basic_json value to UBJSON
     std::vector<uint8_t> data;
     ubjson::encode_ubjson(j1, data);
 
-    // Decode a UBJSON value to a basic_json value
+    // Decode UBJSON to a basic_json value
     ojson j2 = ubjson::decode_ubjson<ojson>(data);
     std::cout << "(1)\n" << pretty_print(j2) << "\n\n";
 
@@ -105,7 +105,7 @@ Marilyn C, 0.9
 (3) Marilyn C
 ```
 
-#### encode to/decode from UBJSON using your own data structures
+#### encode/decode UBJSON from/to your own data structures
 
 ```c++
 #include <jsoncons/json.hpp>

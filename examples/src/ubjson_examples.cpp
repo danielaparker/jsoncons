@@ -28,11 +28,11 @@ void to_from_ubjson_using_basic_json()
     }
     )");
 
-    // Encode a basic_json value to a UBJSON value
+    // Encode a basic_json value to UBJSON
     std::vector<uint8_t> data;
     ubjson::encode_ubjson(j1, data);
 
-    // Decode a UBJSON value to a basic_json value
+    // Decode UBJSON to a basic_json value
     ojson j2 = ubjson::decode_ubjson<ojson>(data);
     std::cout << "(1)\n" << pretty_print(j2) << "\n\n";
 
