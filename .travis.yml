@@ -2,14 +2,8 @@ language: cpp
 dist: trusty
 sudo: required
 
-services:
-  - docker
-
 matrix:
   include:
-    - os: centos
-        env: OS_TYPE=centos OS_VERSION=6 ANSIBLE_VERSION=1.9.2
-
     - os: linux
       addons:
         apt:
@@ -206,14 +200,6 @@ before_install:
       elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
         export CXX=clang++ CC=clang;
       fi
-
-  - sudo apt-get update
-  - echo 'DOCKER_OPTS="-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock -s devicemapper"' | sudo tee /etc/default/docker > /dev/null
-  - sudo service docker restart
-  - sleep 5
-  - sudo docker pull centos:centos${OS_VERSION}
-
-
 install:
     # get CMake (only for systems with brew - macOS)
     - |
