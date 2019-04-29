@@ -23,12 +23,20 @@ namespace jsoncons_member_traits_decl_tests {
         std::string title;
         double price;
     };
+    struct book2
+    {
+        std::string author;
+        std::string title;
+        double price;
+        std::string isbn;
+    };
 
 } // namespace jsoncons_member_traits_decl_tests
  
 namespace ns = jsoncons_member_traits_decl_tests;
 
 JSONCONS_MEMBER_TRAITS_DECL(ns::book,author,title,price);
+JSONCONS_MEMBER_TRAITS_DECL(ns::book2,author,title,price,isbn);
 
 TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
 {
@@ -47,6 +55,7 @@ TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
         json j = decode_json<json>(s);
 
         REQUIRE(j.is<ns::book>() == true);
+        REQUIRE(j.is<ns::book2>() == false);
 
         CHECK(j["author"].as<std::string>() == author);
         CHECK(j["title"].as<std::string>() == title);
@@ -57,6 +66,10 @@ TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
         CHECK(j == j2);
 
         ns::book val = j.as<ns::book>();
+
+        CHECK(val.author == book.author);
+        CHECK(val.title == book.title);
+        CHECK(val.price == Approx(book.price).epsilon(0.001));
     }
 }
 
