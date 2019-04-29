@@ -80,7 +80,7 @@ std::error_code make_error_code(ubjson_errc e)
 }}
 
 namespace std {
-    template<> inline
+    template<>
     struct is_error_code_enum<jsoncons::ubjson::ubjson_errc> : public true_type
     {
     };
