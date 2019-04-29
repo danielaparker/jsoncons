@@ -107,5 +107,73 @@ Marilyn C, 0.9
 
 #### encode to/decode from UBJSON using your own data structures
 
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/ubjson/ubjson.hpp>
+namespace ns {
+    struct reputon
+    {
+        std::string rater;
+        std::string assertion;
+        std::string rated;
+        double rating;
 
+        friend bool operator==(const reputon& lhs, const reputon& rhs)
+        {
+            return lhs.rater == rhs.rater && lhs.assertion == rhs.assertion && 
+                   lhs.rated == rhs.rated && lhs.rating == rhs.rating;
+        }
+
+        friend bool operator!=(const reputon& lhs, const reputon& rhs)
+        {
+            return !(lhs == rhs);
+        };
+    };
+
+    class reputation_object
+    {
+        std::string application;
+        std::vector<reputon> reputons;
+
+        // Make json_type_traits specializations friends to give accesses to private members
+        JSONCONS_TYPE_TRAITS_FRIEND;
+    public:
+        reputation_object()
+        {
+        }
+        reputation_object(const std::string& application, const std::vector<reputon>& reputons)
+            : application(application), reputons(reputons)
+        {}
+
+        friend bool operator==(const reputation_object& lhs, const reputation_object& rhs)
+        {
+            return (lhs.application == rhs.application) && (lhs.reputons == rhs.reputons);
+        }
+
+        friend bool operator!=(const reputation_object& lhs, const reputation_object& rhs)
+        {
+            return !(lhs == rhs);
+        };
+    };
+
+} // ns
+
+// Declare the traits. Specify which data members need to be serialized.
+JSONCONS_MEMBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
+JSONCONS_MEMBER_TRAITS_DECL(ns::reputation_object, application, reputons);
+
+int main()
+{
+    ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
+
+    // Encode a ns::reputation_object value to a UBJSON value
+    std::vector<uint8_t> data;
+    ubjson::encode_ubjson(val, data);
+
+    // Decode a UBJSON value to a ns::reputation_object value
+    ns::reputation_object val2 = ubjson::decode_ubjson<ns::reputation_object>(data);
+
+    assert(val2 == val);
+}
+```
 

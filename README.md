@@ -238,10 +238,8 @@ namespace ns {
 
         friend bool operator==(const reputon& lhs, const reputon& rhs)
         {
-            return lhs.rater == rhs.rater &&
-                lhs.assertion == rhs.assertion &&
-                lhs.rated == rhs.rated &&
-                lhs.rating == rhs.rating;
+            return lhs.rater == rhs.rater && lhs.assertion == rhs.assertion && 
+                   lhs.rated == rhs.rated && lhs.rating == rhs.rating;
         }
 
         friend bool operator!=(const reputon& lhs, const reputon& rhs)
@@ -267,22 +265,7 @@ namespace ns {
 
         friend bool operator==(const reputation_object& lhs, const reputation_object& rhs)
         {
-            if (lhs.application != rhs.application)
-            {
-                return false;
-            }
-            if (lhs.reputons.size() != rhs.reputons.size())
-            {
-                return false;
-            }
-            for (size_t i = 0; i < lhs.reputons.size(); ++i)
-            {
-                if (lhs.reputons[i] != rhs.reputons[i])
-                {
-                    return false;
-                }
-            }
-            return true;
+            return (lhs.application == rhs.application) && (lhs.reputons == rhs.reputons);
         }
 
         friend bool operator!=(const reputation_object& lhs, const reputation_object& rhs)
@@ -290,6 +273,7 @@ namespace ns {
             return !(lhs == rhs);
         };
     };
+
 
 } // namespace ns
 
