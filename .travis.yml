@@ -7,7 +7,7 @@ services:
 
 matrix:
   include:
-    - os=centos
+    - os: centos
         env: OS_TYPE=centos OS_VERSION=6 ANSIBLE_VERSION=1.9.2
 
     - os: linux
