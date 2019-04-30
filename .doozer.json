@@ -13,7 +13,7 @@
       	"./bootstrap",
       	"make -j8",
       	"cd",
-        "cmake-3.14.0/bin/cmake /project/repo/checkout -DBUILD_TESTS=ON"
+        "cmake-3.14.0/bin/cmake /project/repo/checkout -DBUILD_TESTS=ON"]
     }
   }
 }
