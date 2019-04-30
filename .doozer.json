@@ -2,8 +2,7 @@
   "targets": {
     "centos7-x86_64": {
       "buildenv": "centos7-x86_64",
-      "builddeps": ["build-essential", 
-                    "gcc-c++", "make", "wget"],
+      "builddeps": ["gcc-c++", "make", "wget"],
       "buildcmd": [
         "rpm -q centos-release",
         "g++ --version",
