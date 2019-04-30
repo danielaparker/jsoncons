@@ -14,7 +14,7 @@
       	"./bootstrap",
       	"make -j8",
       	"cd",
-        "cmake-3.14.0/bin/cmake . -DBUILD_TESTS=ON", "make -j2 test_jsoncons", "cd tests", "./test_jsoncons;"]
+        "cmake-3.14.0/bin/cmake /project/repo/checkout -DBUILD_TESTS=ON", "make -j2 test_jsoncons", "cd tests", "./test_jsoncons;"]
     }
   }
 }
