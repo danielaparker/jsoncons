@@ -1,8 +1,8 @@
 ## cbor extension
 
 The cbor extension implements decode from and encode to the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/).
-It supports decoding a CBOR value to a basic_json value and
-encoding a basic_json value to a CBOR value.
+You can either parse into or serialize from a variant-like structure, [basic_json](../json.md), or your own
+data structures, using [json_type_traits](../json_type_traits.md).
 
 [decode_cbor](decode_cbor.md)
 
