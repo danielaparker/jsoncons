@@ -9,7 +9,7 @@ It provides functions for search and "search and replace" using JSONPath express
     
 ### Stefan Goessner's JSONPath
 
-[JSONPath](http://goessner.net/articles/JsonPath/), a vaguely standardized syntax for querying JSON, is a creation of Stefan Goessner. 
+[JSONPath](http://goessner.net/articles/JsonPath/), a loosely standardized syntax for querying JSON, is a creation of Stefan Goessner. 
 JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document. 
 
 The [Jayway JSONPath Evaluator](https://jsonpath.herokuapp.com/) and [JSONPATH Expression Tester](https://jsonpath.curiousconcept.com/)
