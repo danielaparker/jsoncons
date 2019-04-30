@@ -4,7 +4,7 @@
       "buildenv": "centos7-x86_64",
       "builddeps": ["/usr/bin/cmake3", 
                     "gcc-c++", "make"],
-      "buildcmd": ["cmake3 . -DBUILD_TESTS=ON", "make -j2 test_jsoncons"]
+      "buildcmd": ["cmake . -DBUILD_TESTS=ON", "make -j2 test_jsoncons", "cd tests", "./test_jsoncons;"]
     }
   }
 }
