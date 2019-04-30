@@ -1,0 +1,11 @@
+{ 
+  "targets": {
+    "centos7-x86_64": {
+      "buildenv": "centos7-x86_64",
+      "builddeps": ["/usr/bin/cmake3", 
+                    "gcc-c++", "make"],
+                    make -j2 test_jsoncons],
+      "buildcmd": [cmake3 . -DBUILD_TESTS=ON,]
+    }
+  }
+}
