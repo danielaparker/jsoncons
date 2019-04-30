@@ -51,9 +51,9 @@ or
 
     $."store"."book".0."title"
 
-The leading `$` represents the root JSON value.
-Note that the jsoncons implementation allows quote delimiters in the dot-notation,
-and that the `$.` is optional. Unquoted names cannot contain spaces, spaces before
+The leading `$` represents the root JSON value. The jsoncons implementation
+allows the `$.` to be omitted, and allows single and double quoted as well as
+unquoted names. Unquoted names must not contain spaces, and spaces before
 and after the name are ignored. 
 
 Using the bracket-notation to select all titles: 
