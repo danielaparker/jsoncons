@@ -3,6 +3,9 @@
     "centos7-x86_64": {
       "buildenv": "centos7-x86_64",
       "builddeps": ["gcc-c++", "make", "wget"],
+      "environment": {
+         "CXXFLAGS": "-std=c++11"
+      },
       "buildcmd": [
         "rpm -q centos-release",
         "g++ --version",
