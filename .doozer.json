@@ -1,19 +1,5 @@
 { 
-  "targets": {
-    "macOS": {
-      "buildenv": "osx",
-      "builddeps": ["build-essential","cmake"],
-      "environment": {
-         "CXXFLAGS": "-std=c++11"
-      },
-      "buildcmd": [
-        "./cmake . -DBUILD_TESTS=ON",
-      	"./cmake --build . --target test_jsoncons",
-        "cd tests",
-        "./test_jsoncons;"
-        ]
-    },
-
+  "targets": 
  "raspbian-jessie": {
       "buildenv": "raspbian-jessie",
       "builddeps": ["build-essential", "wget"],
