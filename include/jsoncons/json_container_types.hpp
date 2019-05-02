@@ -1923,7 +1923,7 @@ private:
                     --count;
                 }
             }
-            auto it2 = index_.erase(it);
+            index_.erase(it);
         }
     }
 

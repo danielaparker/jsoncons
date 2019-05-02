@@ -208,8 +208,8 @@ enum class path_state
 
 struct state_item
 {
-    bool is_recursive_descent;
     path_state state;
+    bool is_recursive_descent;
     bool is_union;
 
     state_item()
