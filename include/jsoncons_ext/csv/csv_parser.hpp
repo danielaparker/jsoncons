@@ -1042,7 +1042,6 @@ private:
         bool is_negative = false;
         int precision = 0;
         uint8_t decimal_places = 0;
-        chars_format format = chars_format::general;
 
         auto last = value.end();
 
@@ -1172,7 +1171,6 @@ private:
                 }
                 case numeric_check_state::fraction1:
                 {
-                    format = chars_format::fixed;
                     switch (*p)
                     {
                     case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
@@ -1208,7 +1206,6 @@ private:
                 }
                 case numeric_check_state::exp1:
                 {
-                    format = chars_format::scientific;
                     switch (*p)
                     {
                     case '-':

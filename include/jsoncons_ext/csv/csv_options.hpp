@@ -159,8 +159,7 @@ class basic_csv_options : public virtual basic_csv_decode_options<CharT>,
     bool trim_trailing_inside_quotes_;
     bool unquoted_empty_value_is_null_;
     CharT field_delimiter_;
-    bool has_subfield_delimiter_;
-    CharT subfield_delimiter_;
+    std::pair<CharT,bool> subfield_delimiter_;
     CharT quote_char_;
     CharT quote_escape_char_;
     CharT comment_starter_;
@@ -198,8 +197,7 @@ public:
         trim_trailing_inside_quotes_(false),
         unquoted_empty_value_is_null_(false),
         field_delimiter_(','),
-        has_subfield_delimiter_(false),
-        subfield_delimiter_(','),
+        subfield_delimiter_(std::make_pair(',',false)),
         quote_char_('\"'),
         quote_escape_char_('\"'),
         comment_starter_('\0'),
@@ -441,8 +439,7 @@ public:
 
     std::pair<CharT,bool> subfield_delimiter() const override
     {
-        //return std::make_pair(subfield_delimiter_,has_subfield_delimiter_);
-        return std::pair<CharT,bool>(subfield_delimiter_,has_subfield_delimiter_);
+        return subfield_delimiter_;
     }
 
     basic_csv_options& field_delimiter(CharT value)
@@ -453,8 +450,7 @@ public:
 
     basic_csv_options& subfield_delimiter(CharT value)
     {
-        has_subfield_delimiter_ = true;
-        subfield_delimiter_ = value;
+        subfield_delimiter_ = std::make_pair(value,true);
         return *this;
     }
 

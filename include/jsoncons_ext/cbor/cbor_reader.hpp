@@ -584,7 +584,6 @@ private:
             return;
         }
         jsoncons::cbor::detail::cbor_major_type major_type;
-        uint8_t info;
         int c = source_.peek();
         switch (c)
         {
@@ -593,7 +592,6 @@ private:
                 return;
             default:
                 major_type = get_major_type((uint8_t)c);
-                info = get_additional_information_value((uint8_t)c);
                 break;
         }
         switch (major_type)
