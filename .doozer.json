@@ -9,15 +9,15 @@
       "buildcmd": [
         "rpm -q centos-release",
         "g++ --version",
-      	"pwd",
+      	"cd",
       	"wget https://github.com/Kitware/CMake/releases/download/v3.14.0/cmake-3.14.0.tar.gz",
       	"tar xfz cmake-3.14.0.tar.gz",
       	"cd cmake-3.14.0",
       	"./bootstrap",
       	"make -j8",
-      	"pwd",
-        "cmake-3.14.0/bin/cmake . -DBUILD_TESTS=ON",
-      	"make -j2 test_jsoncons",
+      	"cd",
+        "./cmake-3.14.0/bin/cmake . -DBUILD_TESTS=ON",
+      	"./cmake-3.14.0/bin/cmake --build . --target test_jsoncons",
         "cd tests",
         "./test_jsoncons;"
         ]        
