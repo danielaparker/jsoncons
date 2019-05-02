@@ -23,51 +23,6 @@
         "./test_jsoncons;"
         ]        
     },
-    "raspbian-jessie": {
-      "buildenv": "raspbian-jessie",
-      "builddeps": ["build-essential", "wget"],
-      "environment": {
-         "CXXFLAGS": "-std=c++11 -Wall -g3 -fsanitize=address"
-      },
-      "buildcmd": [
-      	"uname -a",
-        "cat /etc/os-release",
-        "g++ --version",
-      	"wget https://github.com/Kitware/CMake/releases/download/v3.14.0/cmake-3.14.0.tar.gz",
-      	"tar xfz cmake-3.14.0.tar.gz",
-      	"cd cmake-3.14.0",
-      	"./bootstrap",
-      	"make -j8",
-        "cd",
-        "cmake-3.14.0/bin/cmake . -DBUILD_TESTS=ON",
-      	"cmake-3.14.0/bin/cmake --build . --target test_jsoncons",
-        "cd tests",
-        "./test_jsoncons;"
-      ]
-    },
-    "xenial-armhf": {
-      "buildenv": "xenial-armhf",
-      "builddeps": ["build-essential", "wget"],
-      "environment": {
-         "CXXFLAGS": "-std=c++11 -Wall -g3 -fsanitize=address"
-      },
-      "buildcmd": [
-        "uname -a",
-        "lsb_release -a",
-        "g++ --version",
-        "cd",
-        "wget --no-check-certificate https://github.com/Kitware/CMake/releases/download/v3.14.0/cmake-3.14.0.tar.gz",
-        "tar xfz cmake-3.14.0.tar.gz",
-        "cd cmake-3.14.0",
-        "./bootstrap",
-      	"make -j8",
-        "cd",
-        "cmake-3.14.0/bin/cmake . -DBUILD_TESTS=ON",
-      	"cmake-3.14.0/bin/cmake --build . --target test_jsoncons",
-        "cd tests",
-        "./test_jsoncons;"
-      ]
-    },
     "fedora24-x86_64": {
       "buildenv": "fedora24-x86_64",
       "builddeps": ["cmake", "make", "gcc gcc-c++"],
