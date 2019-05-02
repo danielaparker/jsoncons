@@ -1,22 +1,26 @@
 { 
   "targets": {
-    "macOS": {
-      "buildenv": "osx",
-      "homebrew": {
-          "formulae": []
-      },
+    "centos7-x86_64": {
+      "buildenv": "centos7-x86_64",
+      "builddeps": ["gcc-c++", "make", "wget"],
       "environment": {
          "CXXFLAGS": "-std=c++11"
       },
       "buildcmd": [
-        "cmake . -DBUILD_TESTS=ON",
-      	"cmake --build . --target test_jsoncons",
+        "rpm -q centos-release",
+        "g++ --version",
+      	"wget https://github.com/Kitware/CMake/releases/download/v3.14.0/cmake-3.14.0.tar.gz",
+      	"tar xfz cmake-3.14.0.tar.gz",
+      	"cd cmake-3.14.0",
+      	"./bootstrap",
+      	"make -j8",
+        "./cmake-3.14.0/bin/cmake . -DBUILD_TESTS=ON",
+      	"./cmake-3.14.0/bin/cmake --build . --target test_jsoncons",
         "cd tests",
         "./test_jsoncons;"
-        ]
+        ]        
     },
-
- "raspbian-jessie": {
+    "raspbian-jessie": {
       "buildenv": "raspbian-jessie",
       "builddeps": ["build-essential", "wget"],
       "environment": {
@@ -73,25 +77,6 @@
         "cd tests",
         "./test_jsoncons;"
       ]
-    },    "centos7-x86_64": {
-      "buildenv": "centos7-x86_64",
-      "builddeps": ["gcc-c++", "make", "wget"],
-      "environment": {
-         "CXXFLAGS": "-std=c++11"
-      },
-      "buildcmd": [
-        "rpm -q centos-release",
-        "g++ --version",
-      	"wget https://github.com/Kitware/CMake/releases/download/v3.14.0/cmake-3.14.0.tar.gz",
-      	"tar xfz cmake-3.14.0.tar.gz",
-      	"cd cmake-3.14.0",
-      	"./bootstrap",
-      	"make -j8",
-        "./cmake-3.14.0/bin/cmake . -DBUILD_TESTS=ON",
-      	"./cmake-3.14.0/bin/cmake --build . --target test_jsoncons",
-        "cd tests",
-        "./test_jsoncons;"
-        ]        
     }
   }
 }
