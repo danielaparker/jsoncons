@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+#include <utility> // std::pair
 #include <unordered_map> // std::unordered_map
 #include <limits> // std::numeric_limits
 #include <cwchar>
