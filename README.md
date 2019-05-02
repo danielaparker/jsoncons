@@ -52,15 +52,15 @@ _"really good"_ _"awesome project"_ _"very solid and very dependable"_ _"great j
 
 jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It is tested in continuous integration on [AppVeyor](https://ci.appveyor.com/project/danielaparker/jsoncons), [Travis](https://travis-ci.org/danielaparker/jsoncons), and [doozer](https://doozer.io/).
 
-| Compiler                | Version                   |Architecture | Operating System | Notes |
-|-------------------------|---------------------------|-------------|------------------|-------|
-| Microsoft Visual Studio | vs2015 (MSVC 19.0.24241.7)| x86,x64     | Windows 10       |       |
-|                         | vs2017                    | x86,x64     | Windows 10       |       |
-| g++                     | 4.8 and above             | x64         | Ubuntu           |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
-|                         | 4.8.5                     | x64         | CentOS 7.6       |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
-|                         | 6.3.1 (Red Hat 6.3.1-1)   | x64         | fedora           |       |
-| clang                   | 3.8 and above             | x64         | Ubuntu           |       |
-| clang xcode             | 6.4 and above             | x64         | OSX              |       |
+| Compiler                | Version                   |Architecture | Operating System  | Notes |
+|-------------------------|---------------------------|-------------|-------------------|-------|
+| Microsoft Visual Studio | vs2015 (MSVC 19.0.24241.7)| x86,x64     | Windows 10        |       |
+|                         | vs2017                    | x86,x64     | Windows 10        |       |
+| g++                     | 4.8 and above             | x64         | Ubuntu            |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
+|                         | 4.8.5                     | x64         | CentOS 7.6        |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
+|                         | 6.3.1 (Red Hat 6.3.1-1)   | x64         | Fedora release 24 |       |
+| clang                   | 3.8 and above             | x64         | Ubuntu            |       |
+| clang xcode             | 6.4 and above             | x64         | OSX               |       |
 
 It is also cross compiled for ARMv8-A architecture on Travis using clang and executed using the emulator qemu. 
 
