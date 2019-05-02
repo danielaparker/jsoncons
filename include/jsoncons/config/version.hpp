@@ -17,36 +17,22 @@ namespace jsoncons {
 
 struct versioning_info
 {
-    versioning_info(unsigned int major,
-                    unsigned int minor,
-                    unsigned int patch)
-       : major_(major),
-         minor_(minor),
-         patch_(patch)
-    {}
-
-    unsigned int const major_;
-    unsigned int const minor_;
-    unsigned int const patch_;
+    unsigned int const major;
+    unsigned int const minor;
+    unsigned int const patch;
 
     friend std::ostream& operator<<(std::ostream& os, const versioning_info& ver)
     {
-        os << ver.major_ << '.'
-           << ver.minor_ << '.'
-           << ver.patch_;
+        os << ver.major << '.'
+           << ver.minor << '.'
+           << ver.patch;
         return os;
     }
-
-    versioning_info(const versioning_info&) = default;
-    versioning_info() = delete;
-    versioning_info& operator=(const versioning_info&) = delete;
 }; 
 
-inline
-versioning_info version()
+constexpr versioning_info version()
 {
-    static versioning_info ver(JSONCONS_VERSION_MAJOR, JSONCONS_VERSION_MINOR, JSONCONS_VERSION_PATCH);
-    return ver;
+    return versioning_info{JSONCONS_VERSION_MAJOR, JSONCONS_VERSION_MINOR, JSONCONS_VERSION_PATCH};
 }
 
 }
