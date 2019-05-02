@@ -3,7 +3,7 @@
     "macOS": {
       "buildenv": "osx",
       "homebrew": {
-          "formulae": ["cmake"]
+          "formulae": []
       },
       "environment": {
          "CXXFLAGS": "-std=c++11"
