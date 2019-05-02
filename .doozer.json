@@ -4,7 +4,7 @@
       "buildenv": "centos7-x86_64",
       "builddeps": ["gcc-c++", "make", "wget"],
       "environment": {
-         "CXXFLAGS": "-std=c++11"
+         "CXXFLAGS": "-std=c++11 -Wall -g3 -fsanitize=address"
       },
       "buildcmd": [
       	"uname -a",
@@ -27,7 +27,7 @@
       "buildenv": "raspbian-jessie",
       "builddeps": ["build-essential", "wget"],
       "environment": {
-         "CXXFLAGS": "-std=c++11"
+         "CXXFLAGS": "-std=c++11 -Wall -g3 -fsanitize=address"
       },
       "buildcmd": [
       	"uname -a",
@@ -49,7 +49,7 @@
       "buildenv": "xenial-armhf",
       "builddeps": ["build-essential", "wget"],
       "environment": {
-         "CXXFLAGS": "-std=c++11"
+         "CXXFLAGS": "-std=c++11 -Wall -g3 -fsanitize=address"
       },
       "buildcmd": [
         "uname -a",
@@ -72,7 +72,7 @@
       "buildenv": "fedora24-x86_64",
       "builddeps": ["cmake", "make", "gcc gcc-c++"],
       "environment": {
-         "CXXFLAGS": "-std=c++11"
+         "CXXFLAGS": "-std=c++11 -Wall -g3 -fsanitize=address"
       },
       "buildcmd": [
       	"uname -a",

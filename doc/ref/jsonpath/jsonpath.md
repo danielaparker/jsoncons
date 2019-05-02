@@ -25,7 +25,7 @@ are good online evaluators for checking JSONPath expressions.
 - Unions produce real unions with no duplicates instead of concatenated results
 - Union of completely separate paths are allowed, e.g.
 
-    $[firstName,address.city]
+    $..[firstName,address.city]
 
 #### Paths
 

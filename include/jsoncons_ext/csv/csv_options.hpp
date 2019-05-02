@@ -441,7 +441,8 @@ public:
 
     std::pair<CharT,bool> subfield_delimiter() const override
     {
-        return std::make_pair(subfield_delimiter_,has_subfield_delimiter_);
+        //return std::make_pair(subfield_delimiter_,has_subfield_delimiter_);
+        return std::pair<CharT,bool>(subfield_delimiter_,has_subfield_delimiter_);
     }
 
     basic_csv_options& field_delimiter(CharT value)

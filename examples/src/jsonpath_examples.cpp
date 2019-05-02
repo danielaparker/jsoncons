@@ -228,7 +228,7 @@ void jsonpath_union()
   ]
 }    )");
 
-    std::string path = "$[firstName,address.city]";
+    std::string path = "$..[firstName,address.city]";
     json result = jsonpath::json_query(root,path);
 
     std::cout << result << "\n";
