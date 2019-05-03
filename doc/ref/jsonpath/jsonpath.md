@@ -58,7 +58,6 @@ and after the name are ignored.
 
 Select the first (indexed 0) book using the bracket-notation: 
 
-
     $[store][book][0]
 
 or 
@@ -71,9 +70,7 @@ or
 
 Recursively select all book titles under '$.store':
 
-
     $.'store'..'title'
-
 
 Union of a subset of books identified by index:
 
