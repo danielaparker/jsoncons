@@ -1,6 +1,6 @@
 ### csv extension
 
-The csv extension implements reading (writing) JSON from (to) CSV files
+The csv extension implements decode from and encode to the [CSV format](https://www.rfc-editor.org/rfc/rfc4180.txt)
 You can either parse into or serialize from a variant-like structure, [basic_json](../json.md), or your own
 data structures, using [json_type_traits](../json_type_traits.md).
 

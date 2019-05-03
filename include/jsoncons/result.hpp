@@ -169,7 +169,7 @@ public:
         else
         {
             os_->write((char*)begin_buffer_, buffer_length());
-            os_->write((char*)s,length);
+            os_->write((const char*)s,length);
             p_ = begin_buffer_;
         }
     }
