@@ -68,7 +68,7 @@ or
 
     $["store"]["book"][0]
 
-Recursively select all book titles under '$.store':
+Recursively select all book titles under `'$.store'`:
 
     $.'store'..'title'
 
