@@ -31,7 +31,7 @@ are good online evaluators for checking JSONPath expressions.
 
 JSONPath uses paths to select a set of nodes in a JSON value. Paths can use the dot-notation or the bracket-notation.
 
-Using the dot notation to select all titles:
+Using the dot notation to select the first (0'th) book title:
 
     $.store.book.0.title
 
@@ -56,7 +56,7 @@ allows the `$.` to be omitted, and allows single and double quoted as well as
 unquoted names. Unquoted names must not contain spaces, and spaces before
 and after the name are ignored. 
 
-Using the bracket-notation to select all titles: 
+Using the bracket-notation to select the first book title: 
 
 
     $[store][book][0][title]
