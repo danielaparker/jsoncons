@@ -31,51 +31,51 @@ are good online evaluators for checking JSONPath expressions.
 
 JSONPath uses paths to select a set of nodes in a JSON value. Paths can use the dot-notation or the bracket-notation.
 
-Using the dot notation to select the first (0'th) book title:
+Using the dot notation to select the first (at index 0) book:
 
-    $.store.book.0.title
-
-or
-
-    $. store . book . 0 . title
+    $.store.book.0
 
 or
 
-    store.book.0.title
+    $. store . book . 0 
 
 or
 
-    $.'store'.'book'.0.'title'
+    store.book.0
 
 or
 
-    $."store"."book".0."title"
+    $.'store'.'book'.0
+
+or
+
+    $."store"."book".0
 
 The leading `$` represents the root JSON value. The jsoncons implementation
 allows the `$.` to be omitted, and allows single and double quoted as well as
 unquoted names. Unquoted names must not contain spaces, and spaces before
 and after the name are ignored. 
 
-Using the bracket-notation to select the first book title: 
+Using the bracket-notation to select the first book: 
 
 
-    $[store][book][0][title]
+    $[store][book][0]
 
 or 
 
-    $['store']['book'][0]['title']
+    $['store']['book'][0]
 
 or
 
-    $["store"]["book"][0]["title"]
+    $["store"]["book"][0]
 
-Union of a subset of book titles identified by index:
+Union of a subset of books identified by index:
 
-    $.store[book[0].title,book[1].title,book[3].title]
+    $.store[book[0],book[1],book[3]]
 
-Union of third book title and all book titles with price > 10:
+Union of fourth book and all books with price > 10:
 
-    $.store[book[3].title,book[?(@.price > 10)].title]
+    $.store[book[3],book[?(@.price > 10)]]
 
 JSONPath|       Description
 --------|--------------------------------
