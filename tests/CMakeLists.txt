@@ -22,6 +22,13 @@ OPTION(CROSS_COMPILE_ARM "cross compile for ARM targets" OFF)
 OPTION(JSONCONS_SANITIZE "sanitize" OFF)
 option(JSONCONS_VALGRIND "Execute tests with valgrind" OFF)
 
+if(JSONCONS_VALGRIND)
+    find_program(CMAKE_MEMORYCHECK_COMMAND valgrind)
+    message(STATUS "Executing test suite with Valgrind (${CMAKE_MEMORYCHECK_COMMAND})")
+    set(memcheck_command "${CMAKE_MEMORYCHECK_COMMAND} ${CMAKE_MEMORYCHECK_COMMAND_OPTIONS} --error-exitcode=1 --leak-check=full")
+    separate_arguments(memcheck_command)
+endif()
+
 include (CTest)
 
 # Note: to compile on ARM (or cross compile), you may need to add the following:
@@ -44,10 +51,10 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
         include_directories(/usr/${ARM_ARCH_DIRECTORY}/include/c++/${ARM_GCC_VER}/)
         include_directories(/usr/${ARM_ARCH_DIRECTORY}/include/)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=${TARGET_ARCH} -Wunused-parameter -Wextra -Wreorder -std=c++11")
-        if (JSONCONS_SANITIZE)
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O2 -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer")
-        endif()
     endif()
+endif()
+if (JSONCONS_SANITIZE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O2 -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer")
 endif()
 
 if(MSVC)
