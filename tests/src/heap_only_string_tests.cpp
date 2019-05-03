@@ -34,9 +34,3 @@ TEST_CASE("test_heap_only_string_wchar_t")
     jsoncons::detail::heap_only_string_factory<wchar_t,std::allocator<wchar_t>>::destroy(s);
 }
 
-TEST_CASE("test valgrind")
-{
-    double* val = new double[10];
-}
-
-
