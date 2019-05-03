@@ -98,7 +98,7 @@ public:
 
     virtual CharT field_delimiter() const = 0;
 
-    virtual std::pair<CharT,bool> subfield_delimiter() const = 0;
+    virtual const std::pair<CharT,bool>& subfield_delimiter() const = 0;
 
     virtual string_type line_delimiter() const = 0;
 
@@ -131,7 +131,7 @@ public:
 
     virtual CharT field_delimiter() const = 0;
 
-    virtual std::pair<CharT,bool> subfield_delimiter() const = 0;
+    virtual const std::pair<CharT,bool>& subfield_delimiter() const = 0;
 
     virtual string_type line_delimiter() const = 0;
 
@@ -438,7 +438,7 @@ public:
         return field_delimiter_;
     }
 
-    std::pair<CharT,bool> subfield_delimiter() const override
+    const std::pair<CharT,bool>& subfield_delimiter() const override
     {
         return subfield_delimiter_;
     }
