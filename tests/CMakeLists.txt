@@ -19,7 +19,7 @@ string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 ################
 
 OPTION(CROSS_COMPILE_ARM "cross compile for ARM targets" OFF)
-OPTION(SANITIZE "sanitize" OFF)
+OPTION(JSONCONS_SANITIZE "sanitize" OFF)
 option(JSONCONS_VALGRIND "Execute tests with valgrind" OFF)
 
 include (CTest)
@@ -44,7 +44,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
         include_directories(/usr/${ARM_ARCH_DIRECTORY}/include/c++/${ARM_GCC_VER}/)
         include_directories(/usr/${ARM_ARCH_DIRECTORY}/include/)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=${TARGET_ARCH} -Wunused-parameter -Wextra -Wreorder -std=c++11")
-        if (SANITIZE)
+        if (JSONCONS_SANITIZE)
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O2 -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer")
         endif()
     endif()

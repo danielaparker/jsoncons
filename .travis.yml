@@ -22,7 +22,7 @@ matrix:
           packages:
             - g++-4.9
             - libgmp-dev
-      env: COMPILER=gcc VERSION=4.9 SANITIZE=1 CXXFLAGS="-std=c++11" 
+      env: COMPILER=gcc VERSION=4.9 JSONCONS_SANITIZE=1 CXXFLAGS="-std=c++11" 
 
     - os: linux
       addons:
@@ -31,7 +31,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-      env: COMPILER=gcc VERSION=5 SANITIZE=1 CXXFLAGS="-std=gnu++11" 
+      env: COMPILER=gcc VERSION=5 JSONCONS_SANITIZE=1 CXXFLAGS="-std=gnu++11" 
 
     - os: linux
       addons:
@@ -40,7 +40,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: COMPILER=gcc VERSION=6 SANITIZE=1
+      env: COMPILER=gcc VERSION=6 JSONCONS_SANITIZE=1
 
     - os: linux
       addons:
@@ -49,7 +49,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
-      env: COMPILER=gcc VERSION=7 SANITIZE=1
+      env: COMPILER=gcc VERSION=7 JSONCONS_SANITIZE=1
 
     - os: linux
       addons:
@@ -58,7 +58,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-8
-      env: COMPILER=gcc VERSION=8 SANITIZE=1 CXXFLAGS="-std=c++17" -Werror -Wall -Wextra -Wimplicit-fallthrough -pedantic -Wcast-align -Wcast-qual" 
+      env: COMPILER=gcc VERSION=8 JSONCONS_SANITIZE=1 CXXFLAGS="-std=c++17 -Werror -Wall -Wextra -Wimplicit-fallthrough -pedantic -Wcast-align -Wcast-qual" 
 
     - os: linux
       addons:
@@ -67,7 +67,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-8
-      env: COMPILER=gcc VERSION=8 SANITIZE=1 CXXFLAGS="-std=c++17 -DJSONCONS_HAS_STRING_VIEW" 
+      env: COMPILER=gcc VERSION=8 JSONCONS_SANITIZE=1 CXXFLAGS="-std=c++17 -DJSONCONS_HAS_STRING_VIEW" 
 
     - os: linux
       addons:
@@ -76,7 +76,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-8
-      env: COMPILER=gcc VERSION=8 SANITIZE=1 CXXFLAGS="-std=gnu++17" -Wall -Wextra -Wimplicit-fallthrough" 
+      env: COMPILER=gcc VERSION=8 JSONCONS_SANITIZE=1 CXXFLAGS="-std=gnu++17 -Wall -Wextra -Wimplicit-fallthrough" 
 
     - os: linux
       addons:
@@ -115,7 +115,7 @@ matrix:
             - g++-7
             - valgrind
             - ninja-build
-      env: COMPILER=clang VERSION=5.0 SANITIZE=1 JSONCONS_VALGRIND=1 CXXFLAGS="-std=gnu++11" 
+      env: COMPILER=clang VERSION=5.0 JSONCONS_SANITIZE=1 JSONCONS_VALGRIND=1 CXXFLAGS="-std=gnu++11" 
 
     - os: linux
       addons:
@@ -126,7 +126,7 @@ matrix:
           packages:
             - clang-6.0
             - g++-7
-      env: COMPILER=clang VERSION=6.0 SANITIZE=1  CXXFLAGS="-std=c++11 -Wall -Wextra -Wimplicit-fallthrough"
+      env: COMPILER=clang VERSION=6.0 JSONCONS_SANITIZE=1  CXXFLAGS="-std=c++11 -Wall -Wextra -Wimplicit-fallthrough"
 
     - os: linux
       addons:
