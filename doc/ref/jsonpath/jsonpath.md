@@ -31,7 +31,7 @@ are good online evaluators for checking JSONPath expressions.
 
 JSONPath uses paths to select a set of nodes in a JSON value. Paths can use the dot-notation or the bracket-notation.
 
-Using the dot notation to select the first (at index 0) book:
+Select the first (indexed 0) book using the dot notation:
 
     $.store.book.0
 
@@ -56,7 +56,7 @@ allows the `$.` to be omitted, and allows single and double quoted as well as
 unquoted names. Unquoted names must not contain spaces, and spaces before
 and after the name are ignored. 
 
-Using the bracket-notation to select the first book: 
+Select the first (indexed 0) book using the bracket-notation: 
 
 
     $[store][book][0]
@@ -69,11 +69,17 @@ or
 
     $["store"]["book"][0]
 
+Recursively select all book titles under '$.store':
+
+
+    $.'store'..'title'
+
+
 Union of a subset of books identified by index:
 
     $.store[book[0],book[1],book[3]]
 
-Union of fourth book and all books with price > 10:
+Union of the fourth book and all books with price > 10:
 
     $.store[book[3],book[?(@.price > 10)]]
 
