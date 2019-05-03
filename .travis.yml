@@ -113,7 +113,9 @@ matrix:
           packages:
             - clang-5.0
             - g++-7
-      env: COMPILER=clang VERSION=5.0 SANITIZE=1 CXXFLAGS="-std=gnu++11" 
+            - valgrind
+            - ninja-build
+      env: COMPILER=clang VERSION=5.0 SANITIZE=1 JSONCONS_VALGRIND=1 CXXFLAGS="-std=gnu++11" 
 
     - os: linux
       addons:
@@ -226,6 +228,9 @@ install:
     - make -j2 test_jsoncons
     - cd tests
 script:
+    - if [[ "$JSONCONS_VALGRIND" == 1 ]]; then
+        ctest -T memcheck;
+      fi
     - if [[ "$CROSS_COMPILE" == 1 ]]; then
         if [[ "$ARM_ARCH_DIR" == "aarch64-linux-gnu" ]]; then
           qemu-aarch64 -L /usr/aarch64-linux-gnu/ ./test_jsoncons ;

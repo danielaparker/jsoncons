@@ -20,6 +20,9 @@ string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
 OPTION(CROSS_COMPILE_ARM "cross compile for ARM targets" OFF)
 OPTION(SANITIZE "sanitize" OFF)
+option(JSONCONS_VALGRIND "Execute tests with valgrind" OFF)
+
+include (CTest)
 
 # Note: to compile on ARM (or cross compile), you may need to add the following:
 # -DTARGET_ARCH="armv8-a -mfpu=neon -mfloat-abi=softfp -target arm-linux-gnueabi"
