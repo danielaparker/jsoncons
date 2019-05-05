@@ -206,6 +206,7 @@ TEST_CASE("order preserving insert_or_assign")
 
     SECTION("insert_or_assign at pos")
     {
+        auto it = o.find("a");
         auto it2 = o.insert_or_assign(it,"d",3);
         CHECK_FALSE((it2 == o.end()));
 
@@ -229,7 +230,6 @@ TEST_CASE("order preserving insert_or_assign")
     {
         REQUIRE(o.size() == 3);
 
-        auto it = o.find("a");
         o.try_emplace("d",7);
         o.try_emplace("d",8);
 
