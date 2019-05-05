@@ -206,8 +206,8 @@ TEST_CASE("order preserving insert_or_assign")
 
     SECTION("insert_or_assign at pos")
     {
-        auto it = o.find("a");
         auto it2 = o.insert_or_assign(it,"d",3);
+        CHECK_FALSE((it2 == o.end()));
 
         auto it3 = o.begin();
         CHECK(it3->key() == std::string("b"));
