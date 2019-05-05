@@ -1153,7 +1153,7 @@ namespace jsoncons \
 
 #define JSONCONS_TYPE_TRAITS_FRIEND \
     template <class JSON,class T,class Enable> \
-    friend struct jsoncons::json_type_traits;
+    friend struct jsoncons::json_type_traits
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 #define JSONCONS_TYPE_TRAITS_DECL JSONCONS_MEMBER_TRAITS_DECL
