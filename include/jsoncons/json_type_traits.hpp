@@ -1152,6 +1152,48 @@ namespace jsoncons \
 #define JSONCONS_MEMBER_TRAITS_DECL(ValueType,...) \
     JSONCONS_MEMBER_TRAITS_DECL_BASE(0, ValueType, __VA_ARGS__)
 
+#define JSONCONS_IS2(TC, JV, Type, V, Member) JSONCONS_EXPAND(V = V && (JV).contains(JSONCONS_QUOTE(Member)));
+#define JSONCONS_IS2_LAST(TC, JV, Type, V, Member) JSONCONS_EXPAND(V = V && (JV).contains(JSONCONS_QUOTE(Member)));
+
+#define JSONCONS_TO_JSON2(TC, JV, Type, V, Member) (JV).try_emplace(JSONCONS_QUOTE(Member), V.Member() );
+#define JSONCONS_TO_JSON2_LAST(TC, JV, Type, V, Member) (JV).try_emplace(JSONCONS_QUOTE(Member), V.Member() );
+
+#define JSONCONS_AS2(TC, JV, Type, V, Member) (JV).at(JSONCONS_QUOTE(Member)).template as<typename std::decay<decltype(std::declval<Type>().Member())>::type>(),
+#define JSONCONS_AS2_LAST(TC, JV, Type, V, Member) (JV).at(JSONCONS_QUOTE(Member)).template as<typename std::decay<decltype(std::declval<Type>().Member())>::type>()
+ 
+#define JSONCONS_ACONS_TRAITS_DECL_BASE(Count, ValueType, ...)  \
+namespace jsoncons \
+{ \
+    template<class Json> \
+    struct json_type_traits<Json, ValueType> \
+    { \
+        typedef typename Json::allocator_type allocator_type; \
+        static bool is(const Json& j) noexcept \
+        { \
+            bool val = j.is_object(); \
+            JSONCONS_REP_N(JSONCONS_IS2, Count, j, ValueType, val, __VA_ARGS__)\
+            return val; \
+        } \
+        static ValueType as(const Json& j) \
+        { \
+            ValueType val( \
+            JSONCONS_REP_N(JSONCONS_AS2, Count, j, ValueType, void(), __VA_ARGS__) \
+            ); \
+            return val; \
+        } \
+        static Json to_json(const ValueType& val, allocator_type allocator=allocator_type()) \
+        { \
+            Json j(allocator); \
+            JSONCONS_REP_N(JSONCONS_TO_JSON2, Count, j, ValueType, val, __VA_ARGS__) \
+            return j; \
+        } \
+    }; \
+} \
+  /**/
+
+#define JSONCONS_ACONS_TRAITS_DECL(ValueType,...) \
+    JSONCONS_ACONS_TRAITS_DECL_BASE(0, ValueType, __VA_ARGS__)
+
 #define JSONCONS_TYPE_TRAITS_FRIEND \
     template <class JSON,class T,class Enable> \
     friend struct jsoncons::json_type_traits
@@ -1161,4 +1203,3 @@ namespace jsoncons \
 #endif
 
 #endif
-
