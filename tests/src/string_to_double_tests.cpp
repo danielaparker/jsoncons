@@ -38,9 +38,9 @@ TEST_CASE("test_exponent")
 {
     jsoncons::detail::string_to_double reader;
     const char* begin = "1.15507e-173";
-    const char* endptr = begin + strlen(begin);
+    char* endptr = nullptr;
     const double value1 = 1.15507e-173;
-    const double value2 = strtod((char*) begin, (char**)&endptr );
+    const double value2 = strtod(begin, &endptr );
     const double value3 = reader(begin,endptr-begin);
 
     CHECK(value1 == value2);
