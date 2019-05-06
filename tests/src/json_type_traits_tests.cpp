@@ -30,7 +30,7 @@ struct json_type_traits<Json, own_vector> {
         return j;
     }
 };
-};
+}
 
 TEST_CASE("test_trait_type_erasure")
 {
