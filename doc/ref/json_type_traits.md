@@ -371,8 +371,8 @@ namespace ns {
 } // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_MEMBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating);
-JSONCONS_MEMBER_TRAITS_DECL(ns::reputation_object, application, reputons);
+JSONCONS_MEMBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
+JSONCONS_MEMBER_TRAITS_DECL(ns::reputation_object, application, reputons)
 
 int main()
 {
