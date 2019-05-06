@@ -180,17 +180,17 @@ class basic_json_encoder final : public basic_json_content_handler<CharT>
 {
     static const std::array<CharT, 4>& null_k()
     {
-        static constexpr std::array<CharT,4> k{'n','u','l','l'};
+        static constexpr std::array<CharT,4> k({'n','u','l','l'});
         return k;
     }
     static const std::array<CharT, 4>& true_k()
     {
-        static constexpr std::array<CharT,4> k{'t','r','u','e'};
+        static constexpr std::array<CharT,4> k({'t','r','u','e'});
         return k;
     }
     static const std::array<CharT, 5>& false_k()
     {
-        static constexpr std::array<CharT,5> k{'f','a','l','s','e'};
+        static constexpr std::array<CharT,5> k({'f','a','l','s','e'});
         return k;
     }
 public:

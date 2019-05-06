@@ -179,7 +179,7 @@ TEST_CASE("JSONCONS_ACONS_TRAITS_DECL tests")
         CHECK(book.title() == a_title);
         CHECK(book.price() == Approx(a_price).epsilon(0.001));
     }
-    /* SECTION("as 2")
+    SECTION("as 2")
     {
         json j;
         j["author"] = an_author;
@@ -191,5 +191,5 @@ TEST_CASE("JSONCONS_ACONS_TRAITS_DECL tests")
         CHECK(book.author() == an_author);
         CHECK(book.title() == a_title);
         CHECK(book.price() == Approx(a_price).epsilon(0.001));
-    }*/
+    }
 }
