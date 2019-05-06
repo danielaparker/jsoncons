@@ -36,7 +36,7 @@ namespace jsoncons_member_traits_decl_tests {
 namespace ns = jsoncons_member_traits_decl_tests;
 
 JSONCONS_MEMBER_TRAITS_DECL(ns::book,author,title,price)
-JSONCONS_MEMBER_TRAITS_DECL(ns::book2,author,title,price,isbn);
+JSONCONS_MEMBER_TRAITS_DECL(ns::reputation_object, application, reputons)
 
 TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
 {
