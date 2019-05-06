@@ -70,7 +70,9 @@ namespace json_type_traits_macros_tests {
  
 namespace ns = json_type_traits_macros_tests;
 
+#if !defined(_MSC_VER) && (_MSC_VER > 1900 || MSC_VER < 1920)
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::book3, author, title, price)
+#endif
 JSONCONS_MEMBER_TRAITS_DECL(ns::book,author,title,price)
 JSONCONS_MEMBER_TRAITS_DECL(ns::book2,author,title,price,isbn)
 
@@ -99,8 +101,6 @@ TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
 
         json j2(book);
 
-        std::cout << pretty_print(j2) << "\n";
-
         CHECK(j == j2);
 
         ns::book val = j.as<ns::book>();
@@ -111,6 +111,7 @@ TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
     }
 }
 
+#if !defined(_MSC_VER) && (_MSC_VER > 1900 || MSC_VER < 1920)
 TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
@@ -127,29 +128,17 @@ TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_DECL tests")
         bool val = j.is<ns::book3>();
         CHECK(val == true);
     }
-    SECTION("to_json")
-    {
-        ns::book3 book(an_author,a_title,a_price);
-
-        json j;
-
-        JSONCONS_TO_JSON2(1,j,ns::book3,book,author);
-        CHECK(j["author"].as<std::string>() == an_author);
-    }
     SECTION("to_json (2)")
     {
         ns::book3 book(an_author,a_title,a_price);
 
         json j(book);
 
-        std::cout << pretty_print(j) << "\n";
-
         CHECK(j["author"].as<std::string>() == an_author);
         CHECK(j["title"].as<std::string>() == a_title);
         CHECK(j["price"].as<double>() == Approx(a_price).epsilon(0.001));
     }
 
-#if 0
     SECTION("as")
     {
         json j;
@@ -167,7 +156,7 @@ TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_DECL tests")
         CHECK(book.title() == a_title);
         CHECK(book.price() == Approx(a_price).epsilon(0.001));
     }
-#endif
+
     SECTION("as 2")
     {
         json j;
@@ -177,8 +166,9 @@ TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_DECL tests")
 
         ns::book3 book = j.as<ns::book3>();
 
-        //CHECK(book.author() == an_author);
-        //CHECK(book.title() == a_title);
-        //CHECK(book.price() == Approx(a_price).epsilon(0.001));
+        CHECK(book.author() == an_author);
+        CHECK(book.title() == a_title);
+        CHECK(book.price() == Approx(a_price).epsilon(0.001));
     }
 }
+#endif
