@@ -118,7 +118,7 @@ TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_DECL tests")
     std::string a_title = "Kafka on the Shore";
     double a_price = 25.17;
 
-    SECTION("is 2")
+    SECTION("is")
     {
         json j;
         j["author"] = an_author;
@@ -128,7 +128,7 @@ TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_DECL tests")
         bool val = j.is<ns::book3>();
         CHECK(val == true);
     }
-    SECTION("to_json (2)")
+    SECTION("to_json")
     {
         ns::book3 book(an_author,a_title,a_price);
 
@@ -140,24 +140,6 @@ TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_DECL tests")
     }
 
     SECTION("as")
-    {
-        json j;
-        j["author"] = an_author;
-        j["title"] = a_title;
-        j["price"] = a_price;
- 
-        ns::book3 book(
-            JSONCONS_AS2(1,j,ns::book3,void(),author)
-            JSONCONS_AS2(1,j,ns::book3,void(),title)
-            JSONCONS_AS2_LAST(1,j,ns::book3,void(),price)
-        );
-
-        CHECK(book.author() == an_author);
-        CHECK(book.title() == a_title);
-        CHECK(book.price() == Approx(a_price).epsilon(0.001));
-    }
-
-    SECTION("as 2")
     {
         json j;
         j["author"] = an_author;
