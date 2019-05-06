@@ -38,23 +38,6 @@
         "cd tests",
         "./test_jsoncons;"
       ]
-    },
-    "xenial-armhf": {
-      "buildenv": "xenial-armhf",
-      "builddeps": ["build-essential", "wget", "cmake", "make"],
-      "environment": {
-         "CXXFLAGS": "-std=c++11"
-      },
-      "buildcmd": [
-        "uname -a",
-        "lsb_release -a",
-        "g++ --version",
-        "cd",
-        "cmake . -DBUILD_TESTS=ON",
-      	"cmake --build . --target test_jsoncons",
-        "cd tests",
-        "./test_jsoncons;"
-      ]
     }
   }
 }

@@ -71,6 +71,8 @@ TEST_CASE("json insert(first,last) test")
         CHECK(it++->key() == "b");
         CHECK(it++->key() == "c");
     }
+
+    // Fails with xenial-armhf
 /*
     SECTION("move map into json")
     {
