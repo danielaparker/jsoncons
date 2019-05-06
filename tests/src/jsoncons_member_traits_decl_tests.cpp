@@ -73,18 +73,17 @@ namespace jsoncons_member_traits_decl_tests {
  
 namespace ns = jsoncons_member_traits_decl_tests;
 
+JSONCONS_ACONS_TRAITS_DECL(ns::book3, author, title, price)
 JSONCONS_MEMBER_TRAITS_DECL(ns::book,author,title,price)
 JSONCONS_MEMBER_TRAITS_DECL(ns::book2,author,title,price,isbn)
-JSONCONS_ACONS_TRAITS_DECL(ns::book3,author,title,price)
-
 
 TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
 {
-    std::string author = "Haruki Murakami"; 
-    std::string title = "Kafka on the Shore";
-    double price = 25.17;
+    std::string an_author = "Haruki Murakami"; 
+    std::string a_title = "Kafka on the Shore";
+    double a_price = 25.17;
 
-    ns::book book{author, title, price};
+    ns::book book{an_author, a_title, a_price};
 
     SECTION("book")
     {
@@ -97,9 +96,9 @@ TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
         REQUIRE(j.is<ns::book>() == true);
         REQUIRE(j.is<ns::book2>() == false);
 
-        CHECK(j["author"].as<std::string>() == author);
-        CHECK(j["title"].as<std::string>() == title);
-        CHECK(j["price"].as<double>() == Approx(price).epsilon(0.001));
+        CHECK(j["author"].as<std::string>() == an_author);
+        CHECK(j["title"].as<std::string>() == a_title);
+        CHECK(j["price"].as<double>() == Approx(a_price).epsilon(0.001));
 
         json j2(book);
 
