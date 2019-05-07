@@ -70,9 +70,7 @@ namespace json_type_traits_macros_tests {
  
 namespace ns = json_type_traits_macros_tests;
 
-#if !defined(_MSC_VER) && (_MSC_VER > 1900 || MSC_VER < 1920)
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::book3, author, title, price)
-#endif
 JSONCONS_MEMBER_TRAITS_DECL(ns::book,author,title,price)
 JSONCONS_MEMBER_TRAITS_DECL(ns::book2,author,title,price,isbn)
 
@@ -111,7 +109,6 @@ TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
     }
 }
 
-#if !defined(_MSC_VER) && (_MSC_VER > 1900 || MSC_VER < 1920)
 TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
@@ -153,4 +150,4 @@ TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_DECL tests")
         CHECK(book.price() == Approx(a_price).epsilon(0.001));
     }
 }
-#endif
+
