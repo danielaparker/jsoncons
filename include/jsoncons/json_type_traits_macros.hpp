@@ -92,7 +92,7 @@
 #define JSONCONS_REP_OF_4(Call, TC, JVal, TVal, P2, ...)     JSONCONS_GENERATE(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_3(Call, TC, JVal, TVal, __VA_ARGS__))
 #define JSONCONS_REP_OF_3(Call, TC, JVal, TVal, P2, ...)     JSONCONS_GENERATE(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_2(Call, TC, JVal, TVal, __VA_ARGS__)) 
 #define JSONCONS_REP_OF_2(Call, TC, JVal, TVal, P2, ...)     JSONCONS_GENERATE(Call, TC, JVal, TVal, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_1(Call, TC, JVal, TVal, __VA_ARGS__)) 
-#define JSONCONS_REP_OF_1(Call, TC, JVal, TVal, P2)          Call ## _LAST(TC, JVal, TVal, P2)
+#define JSONCONS_REP_OF_1(Call, TC, JVal, TVal, P2)          JSONCONS_EXPAND(Call ## _LAST(TC, JVal, TVal, P2))
 
 #define JSONCONS_IS(TC, JVal, TVal, Member) if (!(JVal).contains(JSONCONS_QUOTE(Member))) return false;
 #define JSONCONS_IS_LAST(TC, JVal, TVal, Member) if (!(JVal).contains(JSONCONS_QUOTE(Member))) return false;
