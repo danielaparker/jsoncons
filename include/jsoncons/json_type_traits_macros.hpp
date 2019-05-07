@@ -39,8 +39,8 @@
 
 #define JSONCONS_GENERATE(Call, TC, JVal, TVal, P2)          Call(TC, JVal, TVal, P2)
 
-#define JSONCONS_REP_N(Call, TC, JVal, TVal, ...)            JSONCONS_EXPAND(JSONCONS_REP_OF_N(Call, TC, JVal, TVal, JSONCONS_NARGS(__VA_ARGS__), __VA_ARGS__))
-#define JSONCONS_REP_OF_N(Call, TC, JVal, TVal, Count, ...)  JSONCONS_EXPAND(JSONCONS_REP_OF_N_(Call, TC, JVal, TVal, Count, __VA_ARGS__))
+#define JSONCONS_REP_N(Call, TC, JVal, TVal, ...)            JSONCONS_REP_OF_N(Call, TC, JVal, TVal, JSONCONS_NARGS(__VA_ARGS__), __VA_ARGS__)
+#define JSONCONS_REP_OF_N(Call, TC, JVal, TVal, Count, ...)  JSONCONS_REP_OF_N_(Call, TC, JVal, TVal, Count, __VA_ARGS__)
 #define JSONCONS_REP_OF_N_(Call, TC, JVal, TVal, Count, ...) JSONCONS_EXPAND(JSONCONS_REP_OF_ ## Count(Call, TC, JVal, TVal, __VA_ARGS__))
 
 #define JSONCONS_REP_OF_50(Call, TC, JVal, TVal, P2, ...)    JSONCONS_GENERATE(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_49(Call, TC, JVal, TVal, __VA_ARGS__))
