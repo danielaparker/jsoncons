@@ -103,7 +103,7 @@
 #define JSONCONS_AS(TC, JVal, TVal, Member) if ((JVal).contains(JSONCONS_QUOTE(Member))) {val.Member = (JVal).at(JSONCONS_QUOTE(Member)).template as<decltype(TVal.Member)>();}
 #define JSONCONS_AS_LAST(TC, JVal, TVal, Member) if ((JVal).contains(JSONCONS_QUOTE(Member))) {val.Member = (JVal).at(JSONCONS_QUOTE(Member)).template as<decltype(TVal.Member)>();}
 
-#define JSONCONS_MEMBER_TRAITS_DECL_BASE(Count, ValueType, ...)  \
+#define JSONCONS_MEMBER_TRAITS_DECL(ValueType, ...)  \
 namespace jsoncons \
 { \
     template<class Json> \
@@ -114,28 +114,25 @@ namespace jsoncons \
         static bool is(const Json& j) noexcept \
         { \
             if (!j.is_object()) return false; \
-            JSONCONS_REP_N(JSONCONS_IS, Count, j, void(), __VA_ARGS__)\
+            JSONCONS_REP_N(JSONCONS_IS, 0, j, void(), __VA_ARGS__)\
             return true; \
         } \
         static ValueType as(const Json& j) \
         { \
             ValueType val{}; \
-            JSONCONS_REP_N(JSONCONS_AS, Count, j, val, __VA_ARGS__) \
+            JSONCONS_REP_N(JSONCONS_AS, 0, j, val, __VA_ARGS__) \
             return val; \
         } \
         static Json to_json(const ValueType& val, allocator_type allocator=allocator_type()) \
         { \
             Json j(allocator); \
-            JSONCONS_REP_N(JSONCONS_TO_JSON, Count, j, val, __VA_ARGS__) \
+            JSONCONS_REP_N(JSONCONS_TO_JSON, 0, j, val, __VA_ARGS__) \
             return j; \
         } \
     }; \
 } \
   /**/
  
-#define JSONCONS_MEMBER_TRAITS_DECL(ValueType,...) \
-    JSONCONS_MEMBER_TRAITS_DECL_BASE(0, ValueType, __VA_ARGS__)
-
 #define JSONCONS_IS2(TC, JVal, TVal, Member) if (!(JVal).contains(JSONCONS_QUOTE(Member))) return false;
 #define JSONCONS_IS2_LAST(TC, JVal, TVal, Member) if (!(JVal).contains(JSONCONS_QUOTE(Member))) return false;
 
@@ -145,7 +142,7 @@ namespace jsoncons \
 #define JSONCONS_AS2(TC, JVal, TVal, Member) (JVal).at(JSONCONS_QUOTE(Member)).template as<typename std::decay<decltype(std::declval<value_type>().Member())>::type>(),
 #define JSONCONS_AS2_LAST(TC, JVal, TVal, Member) (JVal).at(JSONCONS_QUOTE(Member)).template as<typename std::decay<decltype(std::declval<value_type>().Member())>::type>()
  
-#define JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(Count, ValueType, ...)  \
+#define JSONCONS_GETTER_CTOR_TRAITS_DECL(ValueType, ...)  \
 namespace jsoncons \
 { \
     template<class Json> \
@@ -156,28 +153,25 @@ namespace jsoncons \
         static bool is(const Json& j) noexcept \
         { \
             if (!j.is_object()) return false; \
-            JSONCONS_REP_N(JSONCONS_IS2, Count, j, void(), __VA_ARGS__)\
+            JSONCONS_REP_N(JSONCONS_IS2, 0, j, void(), __VA_ARGS__)\
             return true; \
         } \
         static value_type as(const Json& j) \
         { \
             value_type val( \
-            JSONCONS_REP_N(JSONCONS_AS2, Count, j, void(), __VA_ARGS__) \
+            JSONCONS_REP_N(JSONCONS_AS2, 0, j, void(), __VA_ARGS__) \
             ); \
             return val; \
         } \
         static Json to_json(const value_type& val, allocator_type allocator=allocator_type()) \
         { \
             Json j(allocator); \
-            JSONCONS_REP_N(JSONCONS_TO_JSON2, Count, j, val, __VA_ARGS__) \
+            JSONCONS_REP_N(JSONCONS_TO_JSON2, 0, j, val, __VA_ARGS__) \
             return j; \
         } \
     }; \
 } \
   /**/
-
-#define JSONCONS_GETTER_CTOR_TRAITS_DECL(ValueType,...) \
-    JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(0, ValueType, __VA_ARGS__)
 
 #define JSONCONS_TYPE_TRAITS_FRIEND \
     template <class JSON,class T,class Enable> \
