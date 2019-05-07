@@ -37,7 +37,7 @@
 
 #define JSONCONS_QUOTE(A) JSONCONS_EXPAND(#A)
 
-#define JSONCONS_GENERATE(Call, TC, JVal, TVal, P2)         JSONCONS_EXPAND(JSONCONS_EXPAND(Call(TC, JVal, TVal, P2)))
+#define JSONCONS_GENERATE(Call, TC, JVal, TVal, P2)          Call(TC, JVal, TVal, P2)
 
 #define JSONCONS_REP_N(Call, TC, JVal, TVal, ...)            JSONCONS_EXPAND(JSONCONS_REP_OF_N(Call, TC, JVal, TVal, JSONCONS_NARGS(__VA_ARGS__), __VA_ARGS__))
 #define JSONCONS_REP_OF_N(Call, TC, JVal, TVal, Count, ...)  JSONCONS_EXPAND(JSONCONS_REP_OF_N_(Call, TC, JVal, TVal, Count, __VA_ARGS__))
@@ -159,14 +159,14 @@ namespace jsoncons \
             JSONCONS_REP_N(JSONCONS_IS2, Count, j, void(), __VA_ARGS__)\
             return true; \
         } \
-        static ValueType as(const Json& j) \
+        static value_type as(const Json& j) \
         { \
-            ValueType val{ \
+            value_type val( \
             JSONCONS_REP_N(JSONCONS_AS2, Count, j, void(), __VA_ARGS__) \
-            }; \
+            ); \
             return val; \
         } \
-        static Json to_json(const ValueType& val, allocator_type allocator=allocator_type()) \
+        static Json to_json(const value_type& val, allocator_type allocator=allocator_type()) \
         { \
             Json j(allocator); \
             JSONCONS_REP_N(JSONCONS_TO_JSON2, Count, j, val, __VA_ARGS__) \
