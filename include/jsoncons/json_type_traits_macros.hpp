@@ -142,6 +142,9 @@ namespace jsoncons \
 #define JSONCONS_AS2(TC, JVal, TVal, Member) (JVal).at(JSONCONS_QUOTE(Member)).template as<typename std::decay<decltype(std::declval<value_type>().Member())>::type>(),
 #define JSONCONS_AS2_LAST(TC, JVal, TVal, Member) (JVal).at(JSONCONS_QUOTE(Member)).template as<typename std::decay<decltype(std::declval<value_type>().Member())>::type>()
  
+	#define LEFT_PARENTHESIS (
+	#define RIGHT_PARENTHESIS )
+
 #define JSONCONS_GETTER_CTOR_TRAITS_DECL(ValueType, ...)  \
 namespace jsoncons \
 { \
@@ -158,10 +161,7 @@ namespace jsoncons \
         } \
         static value_type as(const Json& j) \
         { \
-            value_type val( \
-            JSONCONS_REP_N(JSONCONS_AS2, 0, j, void(), __VA_ARGS__) \
-            ); \
-            return val; \
+            return value_type LEFT_PARENTHESIS JSONCONS_REP_N(JSONCONS_AS2, 0, j, void(), __VA_ARGS__) RIGHT_PARENTHESIS; \
         } \
         static Json to_json(const value_type& val, allocator_type allocator=allocator_type()) \
         { \
