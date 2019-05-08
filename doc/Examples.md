@@ -480,8 +480,6 @@ for your own types in the `jsoncons` namespace.
 #include <iostream>
 #include <jsoncons/json.hpp>
 
-using namespace jsoncons;
-
 namespace jsoncons {
 
     template<class Json>
@@ -525,6 +523,8 @@ JSONCONS_MEMBER_TRAITS_DECL(ns::book, author, title, price)
 which expands to the code above.
 
 ```c++
+using namespace jsoncons; // for convenience
+
 int main()
 {
     const std::string s = R"(
