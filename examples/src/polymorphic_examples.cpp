@@ -101,12 +101,13 @@ JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, 
 namespace jsoncons {
 
 template<class Json>
-struct json_type_traits<Json, std::shared_ptr<ns::Employee>> {
-	static bool is(const Json& j) noexcept
+struct json_type_traits<Json, std::shared_ptr<ns::Employee>> 
+{
+    static bool is(const Json& j) noexcept
     { 
         return j.is<ns::HourlyEmployee>() || j.is<ns::CommissionedEmployee>();
     }
-	static std::shared_ptr<ns::Employee> as(const Json& j)
+    static std::shared_ptr<ns::Employee> as(const Json& j)
     {   
         if (j.at("type").as<std::string>() == "Hourly")
         {
@@ -121,7 +122,7 @@ struct json_type_traits<Json, std::shared_ptr<ns::Employee>> {
             throw std::runtime_error("Not an employee");
         }
     }
-	static Json to_json(const std::shared_ptr<ns::Employee>& ptr)
+    static Json to_json(const std::shared_ptr<ns::Employee>& ptr)
     {
         if (ns::HourlyEmployee* p = dynamic_cast<ns::HourlyEmployee*>(ptr.get()))
         {
