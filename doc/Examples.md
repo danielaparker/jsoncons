@@ -18,7 +18,7 @@
 [Escape all non-ascii characters](#B3)  
 [Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.](#B4)
 
-### Decode to C++ data structures, encode from C++ data structures
+### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
 [Convert JSON to/from C++ objects by specializing json_type_traits](#G1)  
 [A simple example using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits](#G2)  
@@ -464,7 +464,7 @@ Graham Greene
 
 See [json_pull_reader](doc/ref/json_pull_reader.md) 
 
-### Decode to C++ data structures, encode from C++ data structures
+### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
 <div id="G1"/>
 
