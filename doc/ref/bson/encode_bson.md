@@ -1,6 +1,6 @@
 ### jsoncons::bson::encode_bson
 
-Encodes a C++ object to the [Binary JSON (BSON)](http://bsonspec.org/) data format.
+Encodes a C++ data structure to the [Binary JSON (BSON)](http://bsonspec.org/) data format.
 
 #### Header
 ```c++

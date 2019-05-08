@@ -1,6 +1,6 @@
 ### jsoncons::ubjson::encode_ubjson
 
-Encodes a C++ object to the [Universal Binary JSON Specification (UBJSON)](http://ubjsonspec.org/) data format.
+Encodes a C++ data structure to the [Universal Binary JSON Specification (UBJSON)](http://ubjsonspec.org/) data format.
 
 #### Header
 ```c++

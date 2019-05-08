@@ -1,6 +1,6 @@
 ### jsoncons::ubjson::decode_ubjson
 
-Decodes a [Universal Binary JSON Specification (JSON)](http://ubjson.org/) data format into a C++ object.
+Decodes a [Universal Binary JSON Specification (JSON)](http://ubjson.org/) data format into a C++ data structure.
 
 #### Header
 ```c++

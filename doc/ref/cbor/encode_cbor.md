@@ -1,6 +1,6 @@
 ### jsoncons::cbor::encode_cbor
 
-Encodes a C++ object to the [Concise Binary Object Representation](http://cbor.io/) data format.
+Encodes a C++ data structure to the [Concise Binary Object Representation](http://cbor.io/) data format.
 
 #### Header
 ```c++

@@ -8,7 +8,7 @@ data formats such as [CBOR](http://cbor.io/). It supports
 
 - Serializing the tree model into different JSON-like text or binary formats.
 
-- Converting from JSON-like text or binary formats to C++ objects and back via [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md).
+- Converting from JSON-like text or binary formats to C++ data structures and back via [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md).
 
 - Streaming JSON read and write events, somewhat analogously to SAX (push parsing) and StAX (pull parsing) in the XML world. 
 

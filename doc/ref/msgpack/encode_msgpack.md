@@ -1,6 +1,6 @@
 ### jsoncons::msgpack::encode_msgpack
 
-Encodes a C++ object into the [MessagePack](http://msgpack.org/index.html) data format.
+Encodes a C++ data structure into the [MessagePack](http://msgpack.org/index.html) data format.
 
 #### Header
 ```c++

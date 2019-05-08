@@ -1,6 +1,6 @@
 ### jsoncons::csv::encode_csv
 
-Encodes a C++ object into the CSV data format.
+Encodes a C++ data structure into the CSV data format.
 
 #### Header
 ```c++

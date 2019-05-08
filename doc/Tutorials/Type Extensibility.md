@@ -29,7 +29,7 @@ struct json_type_traits;
 If you want to use the json constructor, `is<T>`, `as<T>`, `operator=`, `push_back`, and `insert_or_assign` to access or modify with a new type, you need to show `json` how to interact with that type, by extending `json_type_traits` in the `jsoncons` namespace.
 
 Note that the json::is<T>() and json::as<T>() functions accept template packs, which they forward to the `json_type_traits` `is` and `as` functions.
-This allows user defined `json_type_traits` implementations to resolve, for instance, a name into a C++ object
+This allows user defined `json_type_traits` implementations to resolve, for instance, a name into a C++ data structure
 looked up from a registry, as illustrated in Example 2 below.
 
 ### Example 1. Convert to/from user defined type

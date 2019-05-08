@@ -1,6 +1,6 @@
 ### jsoncons::cbor::decode_cbor
 
-Decodes a [Concise Binary Object Representation](http://cbor.io/) data format into a C++ object.
+Decodes a [Concise Binary Object Representation](http://cbor.io/) data format into a C++ data structure.
 
 #### Header
 ```c++

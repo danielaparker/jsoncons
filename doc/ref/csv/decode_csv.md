@@ -1,6 +1,6 @@
 ### jsoncons::csv::decode_csv
 
-Decodes a [comma-separated variables (CSV)](https://en.wikipedia.org/wiki/Comma-separated_values) data format into a C++ object.
+Decodes a [comma-separated variables (CSV)](https://en.wikipedia.org/wiki/Comma-separated_values) data format into a C++ data structure.
 
 #### Header
 ```c++

@@ -1,6 +1,6 @@
 ### jsoncons::msgpack::decode_msgpack
 
-Decodes a [MessagePack](http://msgpack.org/index.html) data format into a C++ object.
+Decodes a [MessagePack](http://msgpack.org/index.html) data format into a C++ data structure.
 
 #### Header
 ```c++

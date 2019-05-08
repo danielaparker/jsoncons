@@ -1,6 +1,6 @@
 ### jsoncons::encode_json
 
-Serializes a C++ object to a JSON formatted string or stream. `encode_json` will work for all types that
+Encode a C++ data structure to a JSON formatted string or stream. `encode_json` will work for all types that
 have [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) defined.
 
 #### Header
@@ -83,7 +83,7 @@ Functions (6)-(10) are the same but perform encodings using the supplied `basic_
 <table>
   <tr>
     <td>val</td>
-    <td>C++ object</td> 
+    <td>C++ data structure</td> 
   </tr>
   <tr>
     <td>handler</td>

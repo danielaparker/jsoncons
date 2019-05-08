@@ -113,7 +113,7 @@ Output:
 }
 ```
 
-#### Convert a CSV source to a C++ object that satisfies [json_type_traits](../json_type_traits.md) requirements, and back
+#### Convert a CSV source to a C++ data structure that satisfies [json_type_traits](../json_type_traits.md) requirements, and back
 
 ```c++
 #include <jsoncons/json.hpp>

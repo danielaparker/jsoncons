@@ -6,7 +6,7 @@
 
 [Constructing json values in C++](#A3)
 
-[Conversion between JSON and C++ objects](#A4)
+[Conversion between JSON and C++ data structures](#A4)
 
 [Converting CSV files to json](#A5  )
 
@@ -33,7 +33,7 @@ data formats such as [CBOR](http://cbor.io/). It supports
 
 - Serializing the tree model into different JSON-like text or binary formats.
 
-- Converting from JSON-like text or binary formats to C++ objects and back via [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md).
+- Converting from JSON-like text or binary formats to C++ data structures and back via [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md).
 
 - Streaming JSON read and write events, somewhat analogously to SAX (push parsing) and StAX (pull parsing) in the XML world. 
 
@@ -273,10 +273,10 @@ produces
 }
 ```
 <div id="A4"/>
-### Conversion between JSON and C++ objects
+### Conversion between JSON and C++ data structures
 
-jsoncons supports conversion between JSON text and C++ objects. The functions [decode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/decode_json.md) 
-and [encode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ objects and back. 
+jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/decode_json.md) 
+and [encode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
 [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
 defined. The standard library containers are already supported, and you can specialize `json_type_traits`

@@ -20,7 +20,7 @@
 
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
-[Convert JSON to/from C++ objects by specializing json_type_traits](#G1)  
+[Convert JSON to/from C++ data structures by specializing json_type_traits](#G1)  
 [A simple example using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits](#G2)  
 [A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#G3)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G4)
@@ -468,9 +468,9 @@ See [json_pull_reader](doc/ref/json_pull_reader.md)
 
 <div id="G1"/>
 
-#### Convert JSON to/from C++ objects by specializing json_type_traits
-jsoncons supports conversion between JSON text and C++ objects. The functions [decode_json](doc/ref/decode_json.md) 
-and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ objects and back. 
+#### Convert JSON to/from C++ data structures by specializing json_type_traits
+jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](doc/ref/decode_json.md) 
+and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
 [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
 defined. The standard library containers are already supported, and you can specialize `json_type_traits`
