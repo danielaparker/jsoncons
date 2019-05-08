@@ -674,7 +674,7 @@ Output:
 #### A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits
 
 `JSONCONS_GETTER_CTOR_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
-from getter functions and a constructor.
+from member getter functions and a constructor.
 
 ```c++
 #include <cassert>

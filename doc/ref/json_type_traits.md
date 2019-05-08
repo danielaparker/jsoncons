@@ -44,7 +44,10 @@ This traits class may be specialized for a user-defined type with a [true_type](
 inform the `jsoncons` library that the type is already specialized.  
 
 `JSONCONS_MEMBER_TRAITS_DECL` is a macro that simplifies the creation of the necessary boilerplate
-for your own types. If used, it must be placed outside any namespace blocks.
+from member data. If used, it must be placed outside any namespace blocks.
+
+`JSONCONS_GETTER_CTOR_TRAITS_DECL` is a macro that simplifies the creation of the necessary boilerplate
+from getter functions and a constructor. If used, it must be placed outside any namespace blocks.
 
 ### Specializations
 
