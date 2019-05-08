@@ -38,6 +38,7 @@ void pull_parser_examples();
 void data_model_examples();
 void staj_iterator_examples();
 void bson_examples();
+void polymorphic_examples();
 
 void comment_example()
 {
@@ -575,6 +576,8 @@ int main()
         ubjson_examples();
 
         jsonpath_examples();
+
+        polymorphic_examples();
     }
     catch (const std::exception& e)
     {
