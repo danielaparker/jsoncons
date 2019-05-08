@@ -637,7 +637,6 @@ namespace ns {
         };
     };
 
-
 } // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized.
