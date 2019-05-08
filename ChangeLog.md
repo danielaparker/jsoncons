@@ -1,3 +1,13 @@
+master
+------
+
+- Fixed "pedantic" warnings
+
+- Added doozer tests for CentOS 7.6 and Fedora release 24
+
+- New macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` that can be used to generate the `json_type_traits` boilerplate
+from getter functions and a constructor.
+
 v0.123.2
 --------
 
