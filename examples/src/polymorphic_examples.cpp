@@ -146,19 +146,27 @@ struct json_type_traits<Json, std::shared_ptr<ns::Employee>> {
 
 void employee_polymorphic_example()
 {
-    std::shared_ptr<ns::Employee> p = std::make_shared<ns::CommissionedEmployee>("John", "Smith", 30000, 0.25, 1000);
+    std::vector<std::shared_ptr<ns::Employee>> v;
 
-    json j(p);
-    assert(!j.is<ns::HourlyEmployee>());
-    assert(j.is<ns::CommissionedEmployee>());
+    v.push_back(std::make_shared<ns::HourlyEmployee>("John", "Smith", 40.0, 1000));
+    v.push_back(std::make_shared<ns::CommissionedEmployee>("Jane", "Doe", 30000, 0.25, 1000));
 
-    std::cout << pretty_print(j) << "\n";
+    json j(v);
+    std::cout << pretty_print(j) << "\n\n";
 
-    auto p2 = j.as<std::shared_ptr<ns::Employee>>();
+    assert(j[0].is<ns::HourlyEmployee>());
+    assert(!j[0].is<ns::CommissionedEmployee>());
+    assert(!j[1].is<ns::HourlyEmployee>());
+    assert(j[1].is<ns::CommissionedEmployee>());
 
-    assert(p2->firstName() == p->firstName());
-    assert(p2->lastName() == p->lastName());
-    assert(p2->calculatePay() == p->calculatePay());
+
+    for (size_t i = 0; i < j.size(); ++i)
+    {
+        auto p = j[i].as<std::shared_ptr<ns::Employee>>();
+        assert(p->firstName() == v[i]->firstName());
+        assert(p->lastName() == v[i]->lastName());
+        assert(p->calculatePay() == v[i]->calculatePay());
+    }
 }
 
 void polymorphic_examples()

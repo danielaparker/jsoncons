@@ -18,6 +18,13 @@
 [Escape all non-ascii characters](#B3)  
 [Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.](#B4)
 
+### Decode to C++ data structures, encode from C++ data structures
+
+[Convert JSON to/from C++ objects by specializing json_type_traits](#G1)  
+[A simple example using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits](#G2)  
+[A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#G3)  
+[Convert JSON numbers to/from boost multiprecision numbers](#G4)
+
 ### Construct
 
 [Construct a json object](#C1)  
@@ -40,13 +47,6 @@
 
 [Iterate over a json array](#D1)  
 [Iterate over a json object](#D2)  
-
-### Convert
-
-[Convert JSON to/from C++ objects by specializing json_type_traits](#G1)  
-[Using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits](#G2)  
-[Using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#G4)  
-[Convert JSON numbers to/from boost multiprecision numbers](#G3)
 
 ### Search and Replace
 
@@ -464,107 +464,7 @@ Graham Greene
 
 See [json_pull_reader](doc/ref/json_pull_reader.md) 
 
-### Encode
-
-<div id="B1"/>
-
-#### Encode a json value to a string
-
-```
-std::string s;
-
-j.dump(s); // compressed
-
-j.dump(s, indenting::indent); // pretty print
-```
-
-<div id="B2"/>
-
-#### Encode a json value to a stream
-
-```
-j.dump(std::cout); // compressed
-
-j.dump(std::cout, indenting::indent); // pretty print
-```
-or
-```
-std::cout << j << std::endl; // compressed
-
-std::cout << pretty_print(j) << std::endl; // pretty print
-```
-
-<div id="B3"/>
-
-#### Escape all non-ascii characters
-
-```
-json_options options;
-options.escape_all_non_ascii(true);
-
-j.dump(std::cout, options); // compressed
-
-j.dump(std::cout, options, indenting::indent); // pretty print
-```
-or
-```
-std::cout << print(j, options) << std::endl; // compressed
-
-std::cout << pretty_print(j, options) << std::endl; // pretty print
-```
-
-<div id="B4"/>
-
-#### Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.
-
-Set the serializing options for `nan` and `inf` to distinct string values.
-
-```c++
-json j;
-j["field1"] = std::sqrt(-1.0);
-j["field2"] = 1.79e308 * 1000;
-j["field3"] = -1.79e308 * 1000;
-
-json_options options;
-options.nan_to_str("NaN")
-       .inf_to_str("Inf"); 
-
-std::ostringstream os;
-os << pretty_print(j, options);
-
-std::cout << "(1)\n" << os.str() << std::endl;
-
-json j2 = json::parse(os.str(),options);
-
-std::cout << "\n(2) " << j2["field1"].as<double>() << std::endl;
-std::cout << "(3) " << j2["field2"].as<double>() << std::endl;
-std::cout << "(4) " << j2["field3"].as<double>() << std::endl;
-
-std::cout << "\n(5)\n" << pretty_print(j2,options) << std::endl;
-```
-
-Output:
-```json
-(1)
-{
-    "field1": "NaN",
-    "field2": "Inf",
-    "field3": "-Inf"
-}
-
-(2) nan
-(3) inf
-(4) -inf
-
-(5)
-{
-    "field1": "NaN",
-    "field2": "Inf",
-    "field3": "-Inf"
-}
-```
-
-### Convert
+### Decode to C++ data structures, encode from C++ data structures
 
 <div id="G1"/>
 
@@ -675,10 +575,10 @@ Charles Bukowski, Pulp, 22.48
 
 <div id="G2"/>
 
-#### Using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits 
+#### A simple example using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits 
 
 `JSONCONS_MEMBER_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
-for your own types.
+from member data.
 
 ```c++
 #include <cassert>
@@ -769,16 +669,17 @@ Output:
 }
 ```
 
-<div id="G4"/>
+<div id="G3"/>
 
-#### Using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits
+#### A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits
 
-`JSONCONS_MEMBER_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
-for your own types.
+`JSONCONS_GETTER_CTOR_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
+from getter functions and a constructor.
 
 ```c++
 #include <cassert>
 #include <iostream>
+#include <vector>
 #include <jsoncons/json.hpp>
 
 using namespace jsoncons;
@@ -918,34 +819,51 @@ struct json_type_traits<Json, std::shared_ptr<ns::Employee>> {
 
 int main()
 {
-    std::shared_ptr<ns::Employee> p = std::make_shared<ns::CommissionedEmployee>("John", "Smith", 30000, 0.25, 1000);
+    std::vector<std::shared_ptr<ns::Employee>> v;
 
-    json j(p);
-    assert(!j.is<ns::HourlyEmployee>());
-    assert(j.is<ns::CommissionedEmployee>());
+    v.push_back(std::make_shared<ns::HourlyEmployee>("John", "Smith", 40.0, 1000));
+    v.push_back(std::make_shared<ns::CommissionedEmployee>("Jane", "Doe", 30000, 0.25, 1000));
 
-    std::cout << pretty_print(j) << "\n";
+    json j(v);
+    std::cout << pretty_print(j) << "\n\n";
 
-    auto p2 = j.as<std::shared_ptr<ns::Employee>>();
+    assert(j[0].is<ns::HourlyEmployee>());
+    assert(!j[0].is<ns::CommissionedEmployee>());
+    assert(!j[1].is<ns::HourlyEmployee>());
+    assert(j[1].is<ns::CommissionedEmployee>());
 
-    assert(p2->firstName() == p->firstName());
-    assert(p2->lastName() == p->lastName());
-    assert(p2->calculatePay() == p->calculatePay());
+
+    for (size_t i = 0; i < j.size(); ++i)
+    {
+        auto p = j[i].as<std::shared_ptr<ns::Employee>>();
+        assert(p->firstName() == v[i]->firstName());
+        assert(p->lastName() == v[i]->lastName());
+        assert(p->calculatePay() == v[i]->calculatePay());
+    }
 }
 ```
 Output:
 ```
-{
-    "baseSalary": 30000.0,
-    "commission": 0.25,
-    "firstName": "John",
-    "lastName": "Smith",
-    "sales": 1000,
-    "type": "Commissioned"
-}
+[
+    {
+        "firstName": "John",
+        "hours": 1000,
+        "lastName": "Smith",
+        "type": "Hourly",
+        "wage": 40.0
+    },
+    {
+        "baseSalary": 30000.0,
+        "commission": 0.25,
+        "firstName": "Jane",
+        "lastName": "Doe",
+        "sales": 1000,
+        "type": "Commissioned"
+    }
+]
 ```
 
-<div id="G3"/>
+<div id="G4"/>
 
 #### Convert JSON numbers to/from boost multiprecision numbers
 
@@ -1006,6 +924,106 @@ Output:
 ```
 (1) 100000000000000000000000000000000.1234
 (2) 100000000000000000000000000000000.1234
+```
+
+### Encode
+
+<div id="B1"/>
+
+#### Encode a json value to a string
+
+```
+std::string s;
+
+j.dump(s); // compressed
+
+j.dump(s, indenting::indent); // pretty print
+```
+
+<div id="B2"/>
+
+#### Encode a json value to a stream
+
+```
+j.dump(std::cout); // compressed
+
+j.dump(std::cout, indenting::indent); // pretty print
+```
+or
+```
+std::cout << j << std::endl; // compressed
+
+std::cout << pretty_print(j) << std::endl; // pretty print
+```
+
+<div id="B3"/>
+
+#### Escape all non-ascii characters
+
+```
+json_options options;
+options.escape_all_non_ascii(true);
+
+j.dump(std::cout, options); // compressed
+
+j.dump(std::cout, options, indenting::indent); // pretty print
+```
+or
+```
+std::cout << print(j, options) << std::endl; // compressed
+
+std::cout << pretty_print(j, options) << std::endl; // pretty print
+```
+
+<div id="B4"/>
+
+#### Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.
+
+Set the serializing options for `nan` and `inf` to distinct string values.
+
+```c++
+json j;
+j["field1"] = std::sqrt(-1.0);
+j["field2"] = 1.79e308 * 1000;
+j["field3"] = -1.79e308 * 1000;
+
+json_options options;
+options.nan_to_str("NaN")
+       .inf_to_str("Inf"); 
+
+std::ostringstream os;
+os << pretty_print(j, options);
+
+std::cout << "(1)\n" << os.str() << std::endl;
+
+json j2 = json::parse(os.str(),options);
+
+std::cout << "\n(2) " << j2["field1"].as<double>() << std::endl;
+std::cout << "(3) " << j2["field2"].as<double>() << std::endl;
+std::cout << "(4) " << j2["field3"].as<double>() << std::endl;
+
+std::cout << "\n(5)\n" << pretty_print(j2,options) << std::endl;
+```
+
+Output:
+```json
+(1)
+{
+    "field1": "NaN",
+    "field2": "Inf",
+    "field3": "-Inf"
+}
+
+(2) nan
+(3) inf
+(4) -inf
+
+(5)
+{
+    "field1": "NaN",
+    "field2": "Inf",
+    "field3": "-Inf"
+}
 ```
 
 ### Construct
