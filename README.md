@@ -213,7 +213,7 @@ The library includes four instantiations of `basic_json`:
 
 ### Encode C++ data structures to JSON, decode JSON to C++ data structures
 
-jsoncons supports conversion between JSON text and C++ objects. The functions [encode_json](doc/ref/encode_json.md) 
+jsoncons supports conversion between C++ data structures and JSON. The functions [encode_json](doc/ref/encode_json.md) 
 and [decode_json](doc/ref/decode_json.md) convert C++ data structures to JSON formatted strings or streams and back. 
 Encode and decode work for all C++ classes that have 
 [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
