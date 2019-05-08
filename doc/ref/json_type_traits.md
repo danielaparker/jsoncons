@@ -70,6 +70,17 @@ STL associative container e.g. std::map|`true` if object and each `mapped_type` 
 
 ### Examples
 
+[Convert from and to standard library sequence containers](#A1)  
+[Convert from and to standard library associative containers](#A2)  
+[Convert from and to std::tuple](#A3)  
+[Extend json_type_traits to support `boost::gregorian` dates.](#A4)  
+[Specialize json_type_traits to support a book class.](#A5)  
+[Using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits](#A6)  
+[A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#A7)  
+[Specialize json_type_traits for a container type that the jsoncons library also supports](#A8)  
+
+<div id="A1"/> 
+
 #### Convert from and to standard library sequence containers
 
 ```c++
@@ -82,6 +93,8 @@ Output:
 ```
 (1) [1,2,3,4]
 ```
+
+<div id="A2"/> 
 
 #### Convert from and to standard library associative containers
 
@@ -96,6 +109,8 @@ Output:
 {"one":1,"three":3,"two":2}
 ```
 
+<div id="A3"/> 
+
 #### Convert from and to std::tuple
 
 ```c++
@@ -108,6 +123,92 @@ Output:
 ```
 [false,1,"foo"]
 ```
+
+<div id="A4"/> 
+
+#### Extend json_type_traits to support `boost::gregorian` dates.
+
+```c++
+#include <jsoncons/json.hpp>
+#include "boost/date_time/gregorian/gregorian.hpp"
+
+namespace jsoncons 
+{
+    template <class Json>
+    struct json_type_traits<Json,boost::gregorian::date>
+    {
+        static const bool is_assignable = true;
+
+        static bool is(const Json& val) noexcept
+        {
+            if (!val.is_string())
+            {
+                return false;
+            }
+            std::string s = val.template as<std::string>();
+            try
+            {
+                boost::gregorian::from_simple_string(s);
+                return true;
+            }
+            catch (...)
+            {
+                return false;
+            }
+        }
+
+        static boost::gregorian::date as(const Json& val)
+        {
+            std::string s = val.template as<std::string>();
+            return boost::gregorian::from_simple_string(s);
+        }
+
+        static Json to_json(boost::gregorian::date val)
+        {
+            return Json(to_iso_extended_string(val));
+        }
+    };
+}
+```
+```c++
+namespace ns
+{
+    using jsoncons::json;
+    using boost::gregorian::date;
+
+    json deal = json::parse(R"(
+    {
+        "Maturity":"2014-10-14",
+        "ObservationDates": ["2014-02-14","2014-02-21"]
+    }
+    )");
+
+    deal["ObservationDates"].push_back(date(2014,2,28));    
+
+    date maturity = deal["Maturity"].as<date>();
+    std::cout << "Maturity: " << maturity << std::endl << std::endl;
+
+    std::cout << "Observation dates: " << std::endl << std::endl;
+
+    for (auto observation_date: deal["ObservationDates"].array_range())
+    {
+        std::cout << observation_date << std::endl;
+    }
+    std::cout << std::endl;
+}
+```
+Output:
+```
+Maturity: 2014-Oct-14
+
+Observation dates:
+
+2014-Feb-14
+2014-Feb-21
+2014-Feb-28
+```
+
+<div id="A5"/> 
 
 #### Specialize json_type_traits to support a book class.
 
@@ -224,6 +325,8 @@ Charles Bukowski, Pulp, 22.48
 ]
 ```
 
+<div id="A6"/> 
+
 #### Using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits 
 
 `JSONCONS_MEMBER_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
@@ -318,87 +421,7 @@ Output:
 }
 ```
 
-#### Extend json_type_traits to support `boost::gregorian` dates.
-
-```c++
-#include <jsoncons/json.hpp>
-#include "boost/date_time/gregorian/gregorian.hpp"
-
-namespace jsoncons 
-{
-    template <class Json>
-    struct json_type_traits<Json,boost::gregorian::date>
-    {
-        static const bool is_assignable = true;
-
-        static bool is(const Json& val) noexcept
-        {
-            if (!val.is_string())
-            {
-                return false;
-            }
-            std::string s = val.template as<std::string>();
-            try
-            {
-                boost::gregorian::from_simple_string(s);
-                return true;
-            }
-            catch (...)
-            {
-                return false;
-            }
-        }
-
-        static boost::gregorian::date as(const Json& val)
-        {
-            std::string s = val.template as<std::string>();
-            return boost::gregorian::from_simple_string(s);
-        }
-
-        static Json to_json(boost::gregorian::date val)
-        {
-            return Json(to_iso_extended_string(val));
-        }
-    };
-}
-```
-```c++
-namespace ns
-{
-    using jsoncons::json;
-    using boost::gregorian::date;
-
-    json deal = json::parse(R"(
-    {
-        "Maturity":"2014-10-14",
-        "ObservationDates": ["2014-02-14","2014-02-21"]
-    }
-    )");
-
-    deal["ObservationDates"].push_back(date(2014,2,28));    
-
-    date maturity = deal["Maturity"].as<date>();
-    std::cout << "Maturity: " << maturity << std::endl << std::endl;
-
-    std::cout << "Observation dates: " << std::endl << std::endl;
-
-    for (auto observation_date: deal["ObservationDates"].array_range())
-    {
-        std::cout << observation_date << std::endl;
-    }
-    std::cout << std::endl;
-}
-```
-Output:
-```
-Maturity: 2014-Oct-14
-
-Observation dates:
-
-2014-Feb-14
-2014-Feb-21
-2014-Feb-28
-```
+<div id="A7"/> 
 
 #### A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits
 
@@ -591,6 +614,8 @@ Output:
     }
 ]
 ```
+
+<div id="A8"/> 
 
 #### Specialize json_type_traits for a container type that the jsoncons library also supports
 
