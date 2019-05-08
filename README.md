@@ -197,7 +197,7 @@ The library includes four instantiations of `basic_json`:
 
 ## More examples
 
-[Conversion between JSON and C++ objects](#E1)  
+[Decode to C++ data structures, encode from C++ data structures](#E1)  
 
 [Playing around with CBOR, JSON, and CSV](#E2)  
 
@@ -211,7 +211,7 @@ The library includes four instantiations of `basic_json`:
 
 <div id="E1"/> 
 
-### Conversion between JSON and C++ objects
+### Decode to C++ data structures, encode from C++ data structures
 
 jsoncons supports conversion between JSON text and C++ objects. The functions [decode_json](doc/ref/decode_json.md) 
 and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ objects and back. 
@@ -221,7 +221,7 @@ defined. The standard library containers are already supported, and you can spec
 for your own types in the `jsoncons` namespace. 
 
 `JSONCONS_MEMBER_TRAITS_DECL` is a macro that simplifies the creation of the necessary boilerplate
-for your own types.
+from member data. It must be placed outside any namespace blocks.
 
 ```c++
 #include <cassert>
