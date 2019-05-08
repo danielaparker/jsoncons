@@ -482,20 +482,13 @@ for your own types in the `jsoncons` namespace.
 
 using namespace jsoncons;
 
-namespace ns {
-    struct book
-    {
-        std::string author;
-        std::string title;
-        double price;
-    };
-} // namespace ns
-
-// Specialize json_type_traits for your type in the jsoncons namespace
 namespace jsoncons {
+
     template<class Json>
     struct json_type_traits<Json, ns::book>
     {
+        typedef typename Json::allocator_type allocator_type;
+
         static bool is(const Json& j) noexcept
         {
             return j.is_object() && j.contains("author") && 
@@ -504,22 +497,34 @@ namespace jsoncons {
         static ns::book as(const Json& j)
         {
             ns::book val;
-            val.author = j["author"].template as<std::string>();
-            val.title = j["title"].template as<std::string>();
-            val.price = j["price"].template as<double>();
+            val.author = j.at("author").template as<std::string>();
+            val.title = j.at("title").template as<std::string>();
+            val.price = j.at("price").template as<double>();
             return val;
         }
-        static Json to_json(const ns::book& val)
+        static Json to_json(const ns::book& val, 
+                            allocator_type allocator=allocator_type())
         {
-            Json j;
-            j["author"] = val.author;
-            j["title"] = val.title;
-            j["price"] = val.price;
+            Json j(allocator);
+            j.try_emplace("author", val.author);
+            j.try_emplace("title", val.title);
+            j.try_emplace("price", val.price);
             return j;
         }
     };
 } // namespace jsoncons
+```
 
+To save typing and enhance readability, the jsoncons library defines macros, 
+so we could have written
+
+```c++
+JSONCONS_MEMBER_TRAITS_DECL(ns::book, author, title, price)
+```
+
+which expands to the code above.
+
+```c++
 int main()
 {
     const std::string s = R"(
@@ -674,7 +679,7 @@ Output:
 #### A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits
 
 `JSONCONS_GETTER_CTOR_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
-from member getter functions and a constructor.
+from getter functions and a constructor.
 
 ```c++
 #include <cassert>

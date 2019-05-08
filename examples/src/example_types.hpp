@@ -21,6 +21,8 @@ namespace jsoncons {
     template<class Json>
     struct json_type_traits<Json, ns::book>
     {
+        typedef typename Json::allocator_type allocator_type;
+
         static bool is(const Json& j) noexcept
         {
             return j.is_object() && j.contains("author") && 
@@ -34,9 +36,10 @@ namespace jsoncons {
             val.price = j.at("price").template as<double>();
             return val;
         }
-        static Json to_json(const ns::book& val)
+        static Json to_json(const ns::book& val, 
+                            allocator_type allocator=allocator_type())
         {
-            Json j;
+            Json j(allocator);
             j.try_emplace("author", val.author);
             j.try_emplace("title", val.title);
             j.try_emplace("price", val.price);
