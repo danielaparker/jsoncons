@@ -109,189 +109,107 @@ Output:
 [false,1,"foo"]
 ```
 
-#### Extend json_type_traits to support `boost::gregorian` dates.
-
-```c++
-#include <jsoncons/json.hpp>
-#include "boost/date_time/gregorian/gregorian.hpp"
-
-namespace jsoncons 
-{
-    template <class Json>
-    struct json_type_traits<Json,boost::gregorian::date>
-    {
-        static const bool is_assignable = true;
-
-        static bool is(const Json& val) noexcept
-        {
-            if (!val.is_string())
-            {
-                return false;
-            }
-            std::string s = val.template as<std::string>();
-            try
-            {
-                boost::gregorian::from_simple_string(s);
-                return true;
-            }
-            catch (...)
-            {
-                return false;
-            }
-        }
-
-        static boost::gregorian::date as(const Json& val)
-        {
-            std::string s = val.template as<std::string>();
-            return boost::gregorian::from_simple_string(s);
-        }
-
-        static Json to_json(boost::gregorian::date val)
-        {
-            return Json(to_iso_extended_string(val));
-        }
-    };
-}
-```
-```c++
-namespace my_ns
-{
-    using jsoncons::json;
-    using boost::gregorian::date;
-
-    json deal = json::parse(R"(
-    {
-        "Maturity":"2014-10-14",
-        "ObservationDates": ["2014-02-14","2014-02-21"]
-    }
-    )");
-
-    deal["ObservationDates"].push_back(date(2014,2,28));    
-
-    date maturity = deal["Maturity"].as<date>();
-    std::cout << "Maturity: " << maturity << std::endl << std::endl;
-
-    std::cout << "Observation dates: " << std::endl << std::endl;
-
-    for (auto observation_date: deal["ObservationDates"].array_range())
-    {
-        std::cout << observation_date << std::endl;
-    }
-    std::cout << std::endl;
-}
-```
-Output:
-```
-Maturity: 2014-Oct-14
-
-Observation dates:
-
-2014-Feb-14
-2014-Feb-21
-2014-Feb-28
-```
-
 #### Specialize json_type_traits to support a book class.
 
 ```c++
-#include <cassert>
-#include <string>
-#include <vector>
-#include <list>
+#include <iostream>
 #include <jsoncons/json.hpp>
+#include <vector>
+#include <string>
 
-struct book
-{
-    std::string author;
-    std::string title;
-    double price;
-};
-
-namespace jsoncons
-{
-    template<class Json>
-    struct json_type_traits<Json, book>
+namespace ns {
+    struct book
     {
+        std::string author;
+        std::string title;
+        double price;
+    };
+} // namespace ns
+
+namespace jsoncons {
+
+    template<class Json>
+    struct json_type_traits<Json, ns::book>
+    {
+        typedef typename Json::allocator_type allocator_type;
+
         static bool is(const Json& j) noexcept
         {
-            return j.is_object() &&
-                   j.contains("author") && 
-                   j.contains("title") && 
-                   j.contains("price");
+            return j.is_object() && j.contains("author") && 
+                   j.contains("title") && j.contains("price");
         }
-        static book as(const Json& j)
+        static ns::book as(const Json& j)
         {
-            book val;
-            val.author = j["author"].template as<std::string>();
-            val.title = j["title"].template as<std::string>();
-            val.price = j["price"].template as<double>();
+            ns::book val;
+            val.author = j.at("author").template as<std::string>();
+            val.title = j.at("title").template as<std::string>();
+            val.price = j.at("price").template as<double>();
             return val;
         }
-        static Json to_json(const book& val)
+        static Json to_json(const ns::book& val, 
+                            allocator_type allocator=allocator_type())
         {
-            Json j;
-            j["author"] = val.author;
-            j["title"] = val.title;
-            j["price"] = val.price;
+            Json j(allocator);
+            j.try_emplace("author", val.author);
+            j.try_emplace("title", val.title);
+            j.try_emplace("price", val.price);
             return j;
         }
     };
-} // jsoncons
+} // namespace jsoncons
+```
 
-using jsoncons::json;
+To save typing and enhance readability, the jsoncons library defines macros, 
+so we could have written
+
+```c++
+JSONCONS_MEMBER_TRAITS_DECL(ns::book, author, title, price)
+```
+
+which expands to the code above.
+
+```c++
+using namespace jsoncons; // for convenience
 
 int main()
 {
-    book book1{"Haruki Murakami", "Kafka on the Shore", 25.17};
+    const std::string s = R"(
+    [
+        {
+            "author" : "Haruki Murakami",
+            "title" : "Kafka on the Shore",
+            "price" : 25.17
+        },
+        {
+            "author" : "Charles Bukowski",
+            "title" : "Pulp",
+            "price" : 22.48
+        }
+    ]
+    )";
 
-    json j = book1;
+    std::vector<ns::book> book_list = decode_json<std::vector<ns::book>>(s);
 
-    std::cout << "(1) " << std::boolalpha << j.is<book>() << "\n\n";
-
-    std::cout << "(2) " << pretty_print(j) << "\n\n";
-
-    book temp = j.as<book>();
-    std::cout << "(3) " << temp.author << "," 
-                        << temp.title << "," 
-                        << temp.price << "\n\n";
-
-    book book2{"Charles Bukowski", "Women: A Novel", 12.0};
-
-    std::vector<book> book_array{book1, book2};
-
-    json ja = book_array;
-
-    std::cout << "(4) " << std::boolalpha 
-                        << ja.is<std::vector<book>>() << "\n\n";
-
-    std::cout << "(5)\n" << pretty_print(ja) << "\n\n";
-
-    auto book_list = ja.as<std::list<book>>();
-
-    std::cout << "(6)" << std::endl;
-    for (auto b : book_list)
+    std::cout << "(1)\n";
+    for (const auto& item : book_list)
     {
-        std::cout << b.author << ", " 
-                  << b.title << ", " 
-                  << b.price << std::endl;
+        std::cout << item.author << ", " 
+                  << item.title << ", " 
+                  << item.price << "\n";
     }
+
+    std::cout << "\n(2)\n";
+    encode_json(book_list, std::cout, indenting::indent);
+    std::cout << "\n\n";
 }
 ```
 Output:
 ```
-(1) true
+(1)
+Haruki Murakami, Kafka on the Shore, 25.17
+Charles Bukowski, Pulp, 22.48
 
-(2) {
-    "author": "Haruki Murakami",
-    "price": 25.17,
-    "title": "Kafka on the Shore"
-}
-
-(3) Haruki Murakami,Kafka on the Shore,25
-
-(4) true
-
-(5)
+(2)
 [
     {
         "author": "Haruki Murakami",
@@ -300,15 +218,10 @@ Output:
     },
     {
         "author": "Charles Bukowski",
-        "price": 12.0,
-        "title": "Women: A Novel"
+        "price": 22.48,
+        "title": "Pulp"
     }
 ]
-
-(6)
-Haruki Murakami, Kafka on the Shore, 25
-Charles Bukowski, Women: A Novel, 12
-{"1":2,"3":4}
 ```
 
 #### Using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits 
@@ -403,6 +316,280 @@ Output:
         }
     ]
 }
+```
+
+#### Extend json_type_traits to support `boost::gregorian` dates.
+
+```c++
+#include <jsoncons/json.hpp>
+#include "boost/date_time/gregorian/gregorian.hpp"
+
+namespace jsoncons 
+{
+    template <class Json>
+    struct json_type_traits<Json,boost::gregorian::date>
+    {
+        static const bool is_assignable = true;
+
+        static bool is(const Json& val) noexcept
+        {
+            if (!val.is_string())
+            {
+                return false;
+            }
+            std::string s = val.template as<std::string>();
+            try
+            {
+                boost::gregorian::from_simple_string(s);
+                return true;
+            }
+            catch (...)
+            {
+                return false;
+            }
+        }
+
+        static boost::gregorian::date as(const Json& val)
+        {
+            std::string s = val.template as<std::string>();
+            return boost::gregorian::from_simple_string(s);
+        }
+
+        static Json to_json(boost::gregorian::date val)
+        {
+            return Json(to_iso_extended_string(val));
+        }
+    };
+}
+```
+```c++
+namespace ns
+{
+    using jsoncons::json;
+    using boost::gregorian::date;
+
+    json deal = json::parse(R"(
+    {
+        "Maturity":"2014-10-14",
+        "ObservationDates": ["2014-02-14","2014-02-21"]
+    }
+    )");
+
+    deal["ObservationDates"].push_back(date(2014,2,28));    
+
+    date maturity = deal["Maturity"].as<date>();
+    std::cout << "Maturity: " << maturity << std::endl << std::endl;
+
+    std::cout << "Observation dates: " << std::endl << std::endl;
+
+    for (auto observation_date: deal["ObservationDates"].array_range())
+    {
+        std::cout << observation_date << std::endl;
+    }
+    std::cout << std::endl;
+}
+```
+Output:
+```
+Maturity: 2014-Oct-14
+
+Observation dates:
+
+2014-Feb-14
+2014-Feb-21
+2014-Feb-28
+```
+
+#### A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits
+
+`JSONCONS_GETTER_CTOR_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
+from getter functions and a constructor.
+
+```c++
+#include <cassert>
+#include <iostream>
+#include <vector>
+#include <jsoncons/json.hpp>
+
+using namespace jsoncons;
+
+namespace ns {
+
+class Employee
+{
+    std::string firstName_;
+    std::string lastName_;
+public:
+    Employee(const std::string& firstName, const std::string& lastName)
+        : firstName_(firstName), lastName_(lastName)
+    {
+    }
+    virtual ~Employee() = default;
+
+    virtual double calculatePay() const = 0;
+
+    const std::string& firstName() const {return firstName_;}
+    const std::string& lastName() const {return lastName_;}
+};
+
+class HourlyEmployee : public Employee
+{
+    double wage_;
+    unsigned hours_;
+public:
+    HourlyEmployee(const std::string& firstName, const std::string& lastName, 
+                   double wage, unsigned hours)
+        : Employee(firstName, lastName), 
+          wage_(wage), hours_(hours)
+    {
+    }
+    HourlyEmployee(const HourlyEmployee&) = default;
+    HourlyEmployee(HourlyEmployee&&) = default;
+    HourlyEmployee& operator=(const HourlyEmployee&) = default;
+    HourlyEmployee& operator=(HourlyEmployee&&) = default;
+
+    double wage() const {return wage_;}
+
+    unsigned hours() const {return hours_;}
+
+    double calculatePay() const override
+    {
+        return wage_*hours_;
+    }
+};
+
+class CommissionedEmployee : public Employee
+{
+    double baseSalary_;
+    double commission_;
+    unsigned sales_;
+public:
+    CommissionedEmployee(const std::string& firstName, const std::string& lastName, 
+                         double baseSalary, double commission, unsigned sales)
+        : Employee(firstName, lastName), 
+          baseSalary_(baseSalary), commission_(commission), sales_(sales)
+    {
+    }
+    CommissionedEmployee(const CommissionedEmployee&) = default;
+    CommissionedEmployee(CommissionedEmployee&&) = default;
+    CommissionedEmployee& operator=(const CommissionedEmployee&) = default;
+    CommissionedEmployee& operator=(CommissionedEmployee&&) = default;
+
+    double baseSalary() const
+    {
+        return baseSalary_;
+    }
+
+    double commission() const
+    {
+        return commission_;
+    }
+
+    unsigned sales() const
+    {
+        return sales_;
+    }
+
+    double calculatePay() const override
+    {
+        return baseSalary_ + commission_*sales_;
+    }
+};
+} // ns
+
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, hours)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
+
+namespace jsoncons {
+
+template<class Json>
+struct json_type_traits<Json, std::shared_ptr<ns::Employee>> {
+	static bool is(const Json& j) noexcept
+    { 
+        return j.is<ns::HourlyEmployee>() || j.is<ns::CommissionedEmployee>();
+    }
+	static std::shared_ptr<ns::Employee> as(const Json& j)
+    {   
+        if (j.at("type").as<std::string>() == "Hourly")
+        {
+            return std::make_shared<ns::HourlyEmployee>(j.as<ns::HourlyEmployee>());
+        }
+        else if (j.at("type").as<std::string>() == "Commissioned")
+        {
+            return std::make_shared<ns::CommissionedEmployee>(j.as<ns::CommissionedEmployee>());
+        }
+        else
+        {
+            throw std::runtime_error("Not an employee");
+        }
+    }
+	static Json to_json(const std::shared_ptr<ns::Employee>& ptr)
+    {
+        if (ns::HourlyEmployee* p = dynamic_cast<ns::HourlyEmployee*>(ptr.get()))
+        {
+            Json j(*p);
+            j.try_emplace("type","Hourly");
+            return j;
+        }
+        else if (ns::CommissionedEmployee* p = dynamic_cast<ns::CommissionedEmployee*>(ptr.get()))
+        {
+            Json j(*p);
+            j.try_emplace("type","Commissioned");
+            return j;
+        }
+        else
+        {
+            throw std::runtime_error("Not an employee");
+        }
+	}
+};
+
+} // jsoncons
+
+int main()
+{
+    std::vector<std::shared_ptr<ns::Employee>> v;
+
+    v.push_back(std::make_shared<ns::HourlyEmployee>("John", "Smith", 40.0, 1000));
+    v.push_back(std::make_shared<ns::CommissionedEmployee>("Jane", "Doe", 30000, 0.25, 1000));
+
+    json j(v);
+    std::cout << pretty_print(j) << "\n\n";
+
+    assert(j[0].is<ns::HourlyEmployee>());
+    assert(!j[0].is<ns::CommissionedEmployee>());
+    assert(!j[1].is<ns::HourlyEmployee>());
+    assert(j[1].is<ns::CommissionedEmployee>());
+
+
+    for (size_t i = 0; i < j.size(); ++i)
+    {
+        auto p = j[i].as<std::shared_ptr<ns::Employee>>();
+        assert(p->firstName() == v[i]->firstName());
+        assert(p->lastName() == v[i]->lastName());
+        assert(p->calculatePay() == v[i]->calculatePay());
+    }
+}
+```
+Output:
+```
+[
+    {
+        "firstName": "John",
+        "hours": 1000,
+        "lastName": "Smith",
+        "type": "Hourly",
+        "wage": 40.0
+    },
+    {
+        "baseSalary": 30000.0,
+        "commission": 0.25,
+        "firstName": "Jane",
+        "lastName": "Doe",
+        "sales": 1000,
+        "type": "Commissioned"
+    }
+]
 ```
 
 #### Specialize json_type_traits for a container type that the jsoncons library also supports

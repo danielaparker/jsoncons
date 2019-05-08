@@ -479,6 +479,17 @@ for your own types in the `jsoncons` namespace.
 ```c++
 #include <iostream>
 #include <jsoncons/json.hpp>
+#include <vector>
+#include <string>
+
+namespace ns {
+    struct book
+    {
+        std::string author;
+        std::string title;
+        double price;
+    };
+} // namespace ns
 
 namespace jsoncons {
 
