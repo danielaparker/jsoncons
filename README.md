@@ -228,8 +228,6 @@ from member data. It must be placed outside any namespace blocks.
 #include <iostream>
 #include <jsoncons/json.hpp>
 
-using namespace jsoncons;
-
 namespace ns {
 
     struct reputon
@@ -283,6 +281,8 @@ namespace ns {
 // Declare the traits. Specify which data members need to be serialized.
 JSONCONS_MEMBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
 JSONCONS_MEMBER_TRAITS_DECL(ns::reputation_object, application, reputons)
+
+using namespace jsoncons; // for convenience
 
 int main()
 {
