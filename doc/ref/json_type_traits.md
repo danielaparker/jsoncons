@@ -632,12 +632,13 @@ struct own_vector : std::vector<int64_t> { using  std::vector<int64_t>::vector; 
 namespace jsoncons {
 
 template<class Json>
-struct json_type_traits<Json, own_vector> {
-	static bool is(const Json& j) noexcept
+struct json_type_traits<Json, own_vector> 
+{
+    static bool is(const Json& j) noexcept
     { 
         return j.is_object() && j.size() % 2 == 0;
     }
-	static own_vector as(const Json& j)
+    static own_vector as(const Json& j)
     {   
         own_vector v;
         for (auto& item : j.object_range())
@@ -648,7 +649,7 @@ struct json_type_traits<Json, own_vector> {
         }
         return v;
     }
-	static Json to_json(const own_vector& val){
+    static Json to_json(const own_vector& val){
 		Json j;
 		for(size_t i=0;i<val.size();i+=2){
 			j[std::to_string(val[i])] = val[i + 1];
