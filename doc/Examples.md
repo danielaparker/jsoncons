@@ -465,7 +465,7 @@ Graham Greene
 
 See [json_pull_reader](doc/ref/json_pull_reader.md) 
 
-<div id="ToFromDataStructures"/>
+<div id="G0"/>
 
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 

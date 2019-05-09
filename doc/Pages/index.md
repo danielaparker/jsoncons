@@ -390,7 +390,7 @@ Output:
 }
 ```
 
-See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md#ToFromDataStructures)
+See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md#G0)
 
 <div id="A5"/>
 ### Converting CSV files to json
