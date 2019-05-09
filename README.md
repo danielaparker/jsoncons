@@ -312,7 +312,7 @@ Output:
 }
 ```
 
-See [type extensibility](doc/Tutorials/Type%20Extensibility.md)
+See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md#G1)
 
 <div id="E2"/> 
 

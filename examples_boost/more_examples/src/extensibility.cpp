@@ -78,6 +78,8 @@ namespace jsoncons
     template <class Json,class T>
     struct json_type_traits<Json,boost::numeric::ublas::matrix<T>>
     {
+        typedef typename Json::allocator_type allocator_type;
+
         static bool is(const Json& val) noexcept
         {
             if (!val.is_array())
@@ -137,7 +139,8 @@ namespace jsoncons
             }
         }
 
-        static Json to_json(const boost::numeric::ublas::matrix<T>& val)
+        static Json to_json(const boost::numeric::ublas::matrix<T>& val,
+                            allocator_type allocator = allocator_type())
         {
             Json a = Json::template make_array<2>(val.size1(), val.size2(), T());
             for (size_t i = 0; i < val.size1(); ++i)
