@@ -140,7 +140,7 @@ struct json_type_traits<Json, std::shared_ptr<ns::Employee>>
         {
             throw std::runtime_error("Not an employee");
         }
-	}
+    }
 };
 
 } // jsoncons
