@@ -78,6 +78,7 @@ STL associative container e.g. std::map|`true` if object and each `mapped_type` 
 [Using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits](#A6)  
 [A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#A7)  
 [Specialize json_type_traits for a container type that the jsoncons library also supports](#A8)  
+[Convert JSON to/from boost matrix](#A9)
 
 <div id="A1"/> 
 
@@ -679,4 +680,147 @@ Output:
 ```
 {"1":2,"3":4}
 ```
+
+<div id="A9"/>
+
+#### Convert JSON to/from boost matrix
+
+```c++
+#include <jsoncons/json.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+
+namespace jsoncons {
+
+    template <class Json,class T>
+    struct json_type_traits<Json,boost::numeric::ublas::matrix<T>>
+    {
+        static bool is(const Json& val) noexcept
+        {
+            if (!val.is_array())
+            {
+                return false;
+            }
+            if (val.size() > 0)
+            {
+                size_t n = val[0].size();
+                for (const auto& a: val.array_range())
+                {
+                    if (!(a.is_array() && a.size() == n))
+                    {
+                        return false;
+                    }
+                    for (auto x: a.array_range())
+                    {
+                        if (!x.template is<T>())
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        static boost::numeric::ublas::matrix<T> as(const Json& val)
+        {
+            if (val.is_array() && val.size() > 0)
+            {
+                size_t m = val.size();
+                size_t n = 0;
+                for (const auto& a : val.array_range())
+                {
+                    if (a.size() > n)
+                    {
+                        n = a.size();
+                    }
+                }
+
+                boost::numeric::ublas::matrix<T> A(m,n,T());
+                for (size_t i = 0; i < m; ++i)
+                {
+                    const auto& a = val[i];
+                    for (size_t j = 0; j < a.size(); ++j)
+                    {
+                        A(i,j) = a[j].template as<T>();
+                    }
+                }
+                return A;
+            }
+            else
+            {
+                boost::numeric::ublas::matrix<T> A;
+                return A;
+            }
+        }
+
+        static Json to_json(const boost::numeric::ublas::matrix<T>& val)
+        {
+            Json a = Json::template make_array<2>(val.size1(), val.size2(), T());
+            for (size_t i = 0; i < val.size1(); ++i)
+            {
+                for (size_t j = 0; j < val.size1(); ++j)
+                {
+                    a[i][j] = val(i,j);
+                }
+            }
+            return a;
+        }
+    };
+} // jsoncons
+
+using namespace jsoncons;
+using boost::numeric::ublas::matrix;
+
+int main()
+{
+    matrix<double> A(2, 2);
+    A(0, 0) = 1.1;
+    A(0, 1) = 2.1;
+    A(1, 0) = 3.1;
+    A(1, 1) = 4.1;
+
+    json a = A;
+
+    std::cout << "(1) " << std::boolalpha << a.is<matrix<double>>() << "\n\n";
+
+    std::cout << "(2) " << std::boolalpha << a.is<matrix<int>>() << "\n\n";
+
+    std::cout << "(3) \n\n" << pretty_print(a) << "\n\n";
+
+    matrix<double> B = a.as<matrix<double>>();
+
+    std::cout << "(4) \n\n";
+    for (size_t i = 0; i < B.size1(); ++i)
+    {
+        for (size_t j = 0; j < B.size2(); ++j)
+        {
+            if (j > 0)
+            {
+                std::cout << ",";
+            }
+            std::cout << B(i, j);
+        }
+        std::cout << "\n";
+    }
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+(1) true
+
+(2) false
+
+(3)
+
+[
+    [1.1,2.1],
+    [3.1,4.1]
+]
+
+(4)
+
+1.1,2.1
+3.1,4.1
+``` 
 
