@@ -17,10 +17,10 @@
 namespace jsoncons { namespace csv {
 
 namespace detail {
-    JSONCONS_DEFINE_LITERAL(string_literal,"string")
-    JSONCONS_DEFINE_LITERAL(integer_literal,"integer")
-    JSONCONS_DEFINE_LITERAL(float_literal,"float")
-    JSONCONS_DEFINE_LITERAL(boolean_literal,"boolean")
+    JSONCONS_STRING_LITERAL(string,'s','t','r','i','n','g')
+    JSONCONS_STRING_LITERAL(integer,'i','n','t','e','g','e','r')
+    JSONCONS_STRING_LITERAL(float,'f','l','o','a','t')
+    JSONCONS_STRING_LITERAL(boolean,'b','o','o','l','e','a','n')
 }
 
 enum class csv_column_type

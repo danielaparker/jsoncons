@@ -6,7 +6,7 @@
 
 #ifndef JSONCONS_JSONPATH_FILTER_HPP
 #define JSONCONS_JSONPATH_FILTER_HPP
-
+ 
 #include <string>
 #include <map> // std::map
 #include <vector>
@@ -20,19 +20,19 @@
 
 namespace jsoncons { namespace jsonpath { namespace detail {
 
-JSONCONS_DEFINE_LITERAL(eqtilde_literal,"=~")
-JSONCONS_DEFINE_LITERAL(star_literal,"*")
-JSONCONS_DEFINE_LITERAL(forwardslash_literal,"/")
-JSONCONS_DEFINE_LITERAL(plus_literal,"+")
-JSONCONS_DEFINE_LITERAL(minus_literal,"-")
-JSONCONS_DEFINE_LITERAL(lt_literal,"<")
-JSONCONS_DEFINE_LITERAL(lte_literal,"<=")
-JSONCONS_DEFINE_LITERAL(gt_literal,">")
-JSONCONS_DEFINE_LITERAL(gte_literal,">=")
-JSONCONS_DEFINE_LITERAL(eq_literal,"==")
-JSONCONS_DEFINE_LITERAL(ne_literal,"!=")
-JSONCONS_DEFINE_LITERAL(ampamp_literal,"&&")
-JSONCONS_DEFINE_LITERAL(pipepipe_literal,"||")
+JSONCONS_STRING_LITERAL(eqtilde,'=','~')
+JSONCONS_STRING_LITERAL(star,'*')
+JSONCONS_STRING_LITERAL(forwardslash,'/')
+JSONCONS_STRING_LITERAL(plus,'+')
+JSONCONS_STRING_LITERAL(minus,'-')
+JSONCONS_STRING_LITERAL(lt,'<')
+JSONCONS_STRING_LITERAL(lte,'<','=')
+JSONCONS_STRING_LITERAL(gt,'>')
+JSONCONS_STRING_LITERAL(gte,'>','=')
+JSONCONS_STRING_LITERAL(eq,'=','=')
+JSONCONS_STRING_LITERAL(ne,'!', '=')
+JSONCONS_STRING_LITERAL(ampamp,'&','&')
+JSONCONS_STRING_LITERAL(pipepipe,'|','|')
 
 template<class Json>
 struct PathConstructor

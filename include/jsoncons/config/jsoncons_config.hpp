@@ -85,18 +85,6 @@
 #define JSONCONS_HAS_FOPEN_S
 #endif
 
-namespace jsoncons
-{
-
-#define JSONCONS_DEFINE_LITERAL( name, lit ) \
-template<class CharT> CharT const* name(); \
-template<> inline char const * name<char>() { return lit; } \
-template<> inline wchar_t const* name<wchar_t>() { return L ## lit; } \
-template<> inline char16_t const* name<char16_t>() { return u ## lit; } \
-template<> inline char32_t const* name<char32_t>() { return U ## lit; }
-
-}
-
 #if !defined(JSONCONS_HAS_STRING_VIEW)
 #include <jsoncons/detail/string_view.hpp>
 namespace jsoncons {
@@ -105,7 +93,7 @@ using basic_string_view = jsoncons::detail::basic_string_view<CharT, Traits>;
 using string_view = basic_string_view<char, std::char_traits<char>>;
 using wstring_view = basic_string_view<wchar_t, std::char_traits<wchar_t>>;
 }
-#else
+#else 
 #include <string_view>
 namespace jsoncons {
 template <class CharT, class Traits = std::char_traits<CharT>>
@@ -114,5 +102,13 @@ using string_view = std::string_view;
 using wstring_view = std::wstring_view;
 }
 #endif
+ 
+#define JSONCONS_STRING_LITERAL(name, ...) \
+    template <class CharT> \
+    const std::basic_string<CharT>& name##_literal() {\
+        static const CharT s[] = { __VA_ARGS__};\
+        static const std::basic_string<CharT> sv(s, sizeof(s) / sizeof(CharT));\
+        return sv;\
+    }
 
 #endif

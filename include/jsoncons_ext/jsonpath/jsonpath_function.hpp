@@ -16,14 +16,14 @@
 
 namespace jsoncons { namespace jsonpath {
 
-JSONCONS_DEFINE_LITERAL(keys_literal,"keys")
-JSONCONS_DEFINE_LITERAL(avg_literal,"avg")
-JSONCONS_DEFINE_LITERAL(max_literal,"max")
-JSONCONS_DEFINE_LITERAL(min_literal,"min")
-JSONCONS_DEFINE_LITERAL(sum_literal,"sum")
-JSONCONS_DEFINE_LITERAL(prod_literal,"prod")
-JSONCONS_DEFINE_LITERAL(count_literal,"count")
-JSONCONS_DEFINE_LITERAL(tokenize_literal,"tokenize")
+JSONCONS_STRING_LITERAL(keys,'k','e','y','s')
+JSONCONS_STRING_LITERAL(avg,'a','v','g')
+JSONCONS_STRING_LITERAL(max,'m','a','x')
+JSONCONS_STRING_LITERAL(min,'m','i','n')
+JSONCONS_STRING_LITERAL(sum,'s','u','m')
+JSONCONS_STRING_LITERAL(prod,'p','r','o','d')
+JSONCONS_STRING_LITERAL(count,'c','o','u','n','t')
+JSONCONS_STRING_LITERAL(tokenize,'t','o','k','e','n','i','z','e')
 
 template <class Json, class JsonPointer>
 class function_table

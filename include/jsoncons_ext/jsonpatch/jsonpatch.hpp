@@ -21,16 +21,16 @@ namespace jsoncons { namespace jsonpatch {
 
 namespace detail {
 
-    JSONCONS_DEFINE_LITERAL(test_literal,"test")
-    JSONCONS_DEFINE_LITERAL(add_literal,"add")
-    JSONCONS_DEFINE_LITERAL(remove_literal,"remove")
-    JSONCONS_DEFINE_LITERAL(replace_literal,"replace")
-    JSONCONS_DEFINE_LITERAL(move_literal,"move")
-    JSONCONS_DEFINE_LITERAL(copy_literal,"copy")
-    JSONCONS_DEFINE_LITERAL(op_literal,"op")
-    JSONCONS_DEFINE_LITERAL(path_literal,"path")
-    JSONCONS_DEFINE_LITERAL(from_literal,"from")
-    JSONCONS_DEFINE_LITERAL(value_literal,"value")
+    JSONCONS_STRING_LITERAL(test,'t','e','s','t')
+    JSONCONS_STRING_LITERAL(add,'a','d','d')
+    JSONCONS_STRING_LITERAL(remove,'r','e','m','o','v','e')
+    JSONCONS_STRING_LITERAL(replace,'r','e','p','l','a','c','e')
+    JSONCONS_STRING_LITERAL(move,'m','o','v','e')
+    JSONCONS_STRING_LITERAL(copy,'c','o','p','y')
+    JSONCONS_STRING_LITERAL(op,'o','p')
+    JSONCONS_STRING_LITERAL(path,'p','a','t','h')
+    JSONCONS_STRING_LITERAL(from,'f','r','o','m')
+    JSONCONS_STRING_LITERAL(value,'v','a','l','u','e')
 
     enum class op_type {add,remove,replace};
     enum class state_type {begin,abort,commit};

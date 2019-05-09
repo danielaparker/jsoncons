@@ -233,6 +233,8 @@ struct state_item
     state_item& operator=(const state_item&) = default;
 };
 
+JSONCONS_STRING_LITERAL(length, 'l', 'e', 'n', 'g', 't', 'h')
+
 template<class Json,
          class JsonReference,
          class PathCons>
@@ -245,12 +247,6 @@ class jsonpath_evaluator : private ser_context
     typedef JsonReference reference;
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
     typedef typename Json::const_pointer const_pointer;
-
-    static string_view_type length_literal()
-    {
-        static constexpr std::array<char_type, 6> length_k{ 'l','e','n','g','t','h' };
-        return string_view_type{ length_k.data(),length_k.size() };
-    }
 
     struct node_type
     {
@@ -436,7 +432,7 @@ class jsonpath_evaluator : private ser_context
                         nodes.emplace_back(PathCons()(path,index),std::addressof(val[index]));
                     }
                 }
-                else if (name_ == length_literal() && val.size() > 0)
+                else if (name_ == length_literal<char_type>() && val.size() > 0)
                 {
                     pointer ptr = evaluator.create_temp(val.size());
                     nodes.emplace_back(PathCons()(path, name_), ptr);
@@ -456,7 +452,7 @@ class jsonpath_evaluator : private ser_context
                         nodes.emplace_back(PathCons()(path, index), ptr);
                     }
                 }
-                else if (name_ == length_literal() && sv.size() > 0)
+                else if (name_ == length_literal<char_type>() && sv.size() > 0)
                 {
                     size_t count = unicons::u32_length(sv.begin(),sv.end());
                     pointer ptr = evaluator.create_temp(count);
