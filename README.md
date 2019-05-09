@@ -312,7 +312,7 @@ Output:
 }
 ```
 
-See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md#G1)
+See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md#ToFromDataStructures)
 
 <div id="E2"/> 
 
