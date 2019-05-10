@@ -701,7 +701,7 @@ public:
                     switch (*p_)
                     {
                         case ' ':case '\t':case '\r':case '\n':
-                            skip_space_character();
+                            advance_past_space_character();
                             break;
                         case '$':
                         {
@@ -739,7 +739,7 @@ public:
                             apply_selectors();
                             buffer.clear();
                             state_stack_.pop_back();
-                            skip_space_character();
+                            advance_past_space_character();
                             break;
                         }
                         case '(':
@@ -813,7 +813,7 @@ public:
                     switch (*p_)
                     {
                         case ' ':case '\t':case '\r':case '\n':
-                            skip_space_character();
+                            advance_past_space_character();
                             break;
                         case '$':
                             buffer.clear();
@@ -980,7 +980,7 @@ public:
                     switch (*p_)
                     {
                         case ' ':case '\t':case '\r':case '\n':
-                            skip_space_character();
+                            advance_past_space_character();
                             break;
                         case ',':
                             try
@@ -1046,7 +1046,7 @@ public:
                     switch (*p_)
                     {
                         case ' ':case '\t':case '\r':case '\n':
-                            skip_space_character();
+                            advance_past_space_character();
                             break;
                         case '[': // [ can follow ..
                             state_stack_.back().state = path_state::wildcard_or_rpath_or_slice_or_filter;
@@ -1063,7 +1063,7 @@ public:
                     switch (*p_)
                     {
                         case ' ':case '\t':case '\r':case '\n':
-                            skip_space_character();
+                            advance_past_space_character();
                             break;
                         case '*':
                             end_all();
@@ -1096,7 +1096,7 @@ public:
                     switch (*p_)
                     {
                         case ' ':case '\t':case '\r':case '\n':
-                            skip_space_character();
+                            advance_past_space_character();
                             break;
                         case '.':
                             state_stack_.emplace_back(path_state::dot, state_stack_.back());
@@ -1134,7 +1134,7 @@ public:
                     switch (*p_)
                     {
                         case ' ':case '\t':case '\r':case '\n':
-                            skip_space_character();
+                            advance_past_space_character();
                             break;
                         case '[':
                             selectors_.push_back(make_unique_ptr<name_selector>(buffer));
@@ -1208,7 +1208,7 @@ public:
                     switch (*p_)
                     {
                         case ' ':case '\t':case '\r':case '\n':
-                            skip_space_character();
+                            advance_past_space_character();
                             break;
                         case ',':
                             state_stack_.back().is_union = true;
@@ -1231,7 +1231,7 @@ public:
                     switch (*p_)
                     {
                         case ' ':case '\t':case '\r':case '\n':
-                            skip_space_character();
+                            advance_past_space_character();
                             break;
                         case '(':
                         {
@@ -1320,7 +1320,7 @@ public:
                     switch (*p_)
                     {
                         case ' ':case '\t':case '\r':case '\n':
-                            skip_space_character();
+                            advance_past_space_character();
                             break;
                         case '.':
                             buffer.push_back(*p_);
@@ -1352,7 +1352,7 @@ public:
                     switch (*p_)
                     {
                         case ' ':case '\t':case '\r':case '\n':
-                            skip_space_character();
+                            advance_past_space_character();
                             break;
                         case '.':
                             buffer.push_back('*');
@@ -1751,7 +1751,7 @@ public:
         state_stack_.back().is_union = false;
     }
 
-    void skip_space_character()
+    void advance_past_space_character()
     {
         switch (*p_)
         {
