@@ -39,7 +39,7 @@ DoubleQuotedNameCharacter = ? any unicode character except an unescaped '"' (dou
 
 Slice = [ SignedInteger ] ":" [ SignedInteger ] [ ":" [ NonZeroSignedInteger ] ]
 
-Filter = "?(" Filter-Expr ")"
+Filter = "?(" FilterExpr ")"
 
 Union = RelativePathOrFilter /  "," RelativePathOrFilter *("," RelativePathOrFilter)
 
