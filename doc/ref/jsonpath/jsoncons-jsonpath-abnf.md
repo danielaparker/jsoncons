@@ -41,6 +41,8 @@ Slice = [ SignedInteger ] ":" [ SignedInteger ] [ ":" [ NonZeroSignedInteger ] ]
 
 Filter = "?(" Filter-Expr ")"
 
-Union = RelativePath "," RelativePath *("," RelativePath)
+Union = RelativePathOrFilter /  "," RelativePathOrFilter *("," RelativePathOrFilter)
+
+RelativePathOrFilter = RelativePath / Filter
 ```
 
