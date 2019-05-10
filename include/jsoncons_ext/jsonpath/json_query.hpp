@@ -184,8 +184,8 @@ enum class path_state
     bracketed_single_quoted_name,
     bracketed_double_quoted_name,
     bracketed_name_or_path,
-    bracketed_star_or_path,
-    expr_or_filter_or_slice_or_key,
+    bracketed_wildcard_or_path,
+    wildcard_or_rpath_or_slice_or_filter,
     slice_end_or_end_step,
     slice_end,
     slice_step,
@@ -749,7 +749,7 @@ public:
                             }
                             slice.start_ = 0;
 
-                            state_stack_.back().state = path_state::expr_or_filter_or_slice_or_key;
+                            state_stack_.back().state = path_state::wildcard_or_rpath_or_slice_or_filter;
                             break;
                         }
                         case '.':
@@ -1040,7 +1040,7 @@ public:
                             ++p_;
                             break;
                         case '[': // [ can follow ..
-                            state_stack_.back().state = path_state::expr_or_filter_or_slice_or_key;
+                            state_stack_.back().state = path_state::wildcard_or_rpath_or_slice_or_filter;
                             ++p_;
                             ++column_;
                             break;
@@ -1117,7 +1117,7 @@ public:
                             state_stack_.emplace_back(path_state::dot, state_stack_.back());
                             break;
                         case '[':
-                            state_stack_.emplace_back(path_state::expr_or_filter_or_slice_or_key, state_stack_.back());
+                            state_stack_.emplace_back(path_state::wildcard_or_rpath_or_slice_or_filter, state_stack_.back());
                             break;
                         default:
                             ec = jsonpath_errc::expected_separator;
@@ -1237,7 +1237,7 @@ public:
                     {
                         case ',':
                             state_stack_.back().is_union = true;
-                            state_stack_.back().state = path_state::expr_or_filter_or_slice_or_key;
+                            state_stack_.back().state = path_state::wildcard_or_rpath_or_slice_or_filter;
                             break;
                         case ']':
                             apply_selectors();
@@ -1252,7 +1252,7 @@ public:
                     ++p_;
                     ++column_;
                     break;
-                case path_state::expr_or_filter_or_slice_or_key:
+                case path_state::wildcard_or_rpath_or_slice_or_filter:
                     switch (*p_)
                     {
                         case ' ':case '\t':
@@ -1289,7 +1289,7 @@ public:
                             break;
                         case '*':
                             state_stack_.back().state = path_state::comma_or_right_bracket;
-                            state_stack_.emplace_back(path_state::bracketed_star_or_path, state_stack_.back());
+                            state_stack_.emplace_back(path_state::bracketed_wildcard_or_path, state_stack_.back());
                             ++p_;
                             ++column_;
                             break;
@@ -1375,7 +1375,7 @@ public:
                             return;
                     }
                     break;
-                case path_state::bracketed_star_or_path:
+                case path_state::bracketed_wildcard_or_path:
                     switch (*p_)
                     {
                         case ' ':case '\t':

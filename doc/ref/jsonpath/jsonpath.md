@@ -17,11 +17,14 @@ are good online evaluators for checking JSONPath expressions.
 
 ### jsoncons JSONPath
 
+The jsoncons implementation follows these [ABNF rules](jsoncons-jsonpath-abnf.md).
+
 #### Differences with Stefan Goessner's implementations
 
 - Stefan Goessner's implemention returns `false` in case of no match, but in a note he suggests an alternative is to return an empty array. 
   The `jsoncons` implementation takes that alternative and returns an empty array in case of no match.
 - Names in both the dot notation and the bracket notation may be unquoted (no spaces), single-quoted, or double-quoted.
+- Wildcards are allowed in the dot notation
 - Unions produce real unions with no duplicates instead of concatenated results
 - Union of completely separate paths are allowed, e.g.
 
