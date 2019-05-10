@@ -1,44 +1,46 @@
 ```
-path = absolute-path / relative-path
+Path = AbsolutePath / RelativePath
 
-absolute-path = root *additional-element
+AbsolutePath = Root *AdditionalElements
 
-root = "$"
+Root = "$"
 
-relative-path = sp (name / wildcard) sp *additional-element
+RelativePath = S NameOrWildcard S *AdditionalElements
 
-sp = *( WSP / CR / LF )
+NameOrWildcard = Name / Wildcard
 
-additional-element = ("." sp name sp) / ("." wildcard) / predicate
+S = *( WSP / CR / LF )
 
-predicate = "[" expr "]"
+AdditionalElements = ("." / "..") NameOrWildcard / Predicate
 
-name = unquoted-name / single-quoted-name / double-quoted-name
+Predicate = "[" Expr "]"
 
-expr = wildcard / relative-path / slice / union / filter
+Name = UnquotedName / SingleQuotedName / DoubleQuotedName
 
-wildcard = "*"
+Expr = Wildcard / RelativePath / Slice / Union / Filter
 
-name = unquoted-name / single-quoted-name / double-quoted-name
+Wildcard = "*"
 
-unquoted-name = unquoted-name-character *additional-unquoted-name-character
+Name = UnquotedName / SingleQuotedName / DoubleQuotedName
 
-single-quoted-name = "'" *single_quoted-name-character "'"
+UnquotedName = UnquotedNameCharacter *AdditionalUnquotedNameCharacter
 
-double-quoted-name = '"' *double_quoted-name-character  '"'
+SingleQuotedName = "'" *SingleQuotedNameCharacter "'"
 
-unquoted-name-character = ? any unicode character except *, spaces, '.' and '[' ?
+DoubleQuotedName = '"' *DoubleQuotedNameCharacter  '"'
 
-additional-unquoted-name-character = ? any unicode character except spaces, '.' and '[' ?
+UnquotedNameCharacter = ? any unicode character except *, spaces, '.' and '[' ?
 
-single-quoted-name-character = ? any unicode character except an unescaped "'" (single quote) ?
+AdditionalUnquotedNameCharacter = ? any unicode character except spaces, '.' and '[' ?
 
-double-quoted-name-character = ? any unicode character except an unescaped '"' (double quote) ?
+SingleQuotedNameCharacter = ? any unicode character except an unescaped "'" (single quote) ?
 
-slice = [ signed-integer ] ":" [ signed-integer ] [ ":" [ non-zero-signed-integer ] ]
+DoubleQuotedNameCharacter = ? any unicode character except an unescaped '"' (double quote) ?
 
-filter = "?(" filter-expr ")"
+Slice = [ SignedInteger ] ":" [ SignedInteger ] [ ":" [ NonZeroSignedInteger ] ]
 
-union = relative-path "," relative-path *("," relative-path)
+Filter = "?(" Filter-Expr ")"
+
+Union = RelativePath "," RelativePath *("," RelativePath)
 ```
 
