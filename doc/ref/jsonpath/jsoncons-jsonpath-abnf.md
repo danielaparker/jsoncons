@@ -1,12 +1,15 @@
+```
 path = absolute-path / relative-path
 
 absolute-path = root *additional-element
 
 root = "$"
 
-relative-path = name *additional-element
+relative-path = sp name sp *additional-element
 
-additional-element = ("." name) / ("." wildcard) / predicate
+sp = *( WSP / CR / LF )
+
+additional-element = ("." sp name sp) / ("." wildcard) / predicate
 
 predicate = "[" expr "]"
 
@@ -37,4 +40,5 @@ slice = [ signed-integer ] ":" [ signed-integer ] [ ":" [ non-zero-signed-intege
 filter = "?(" filter-expr ")"
 
 union = relative-path "," relative-path *("," relative-path)
+```
 
