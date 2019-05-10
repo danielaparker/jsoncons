@@ -205,6 +205,12 @@ public:
 
 // string_source
 
+template <class CharT, class T, class Enable=void>
+struct is_string_sourceable : std::false_type {};
+
+template <class CharT, class T>
+struct is_string_sourceable<CharT,T,typename std::enable_if<std::is_convertible<typename T::value_type, CharT>::value>::type> : std::true_type {};
+
 template <class CharT>
 class string_source 
 {
@@ -231,12 +237,9 @@ public:
         std::swap(eof_,val.eof_);
     }
 
-    string_source(const string_view_type& s)
-        : data_(s.data()), input_ptr_(s.data()), input_end_(s.data()+s.size()), eof_(s.size() == 0)
-    {
-    }
-
-    string_source(const std::basic_string<value_type>& s)
+    template <class Source>
+    string_source(const Source& s,
+                  typename std::enable_if<is_string_sourceable<value_type,typename std::decay<Source>::type>::value>::type* = 0)
         : data_(s.data()), input_ptr_(s.data()), input_end_(s.data()+s.size()), eof_(s.size() == 0)
     {
     }
@@ -519,6 +522,12 @@ public:
     }
 };
 
+template <class T, class Enable=void>
+struct is_bytes_sourceable : std::false_type {};
+
+template <class T>
+struct is_bytes_sourceable<T,typename std::enable_if<std::is_convertible<typename T::value_type,uint8_t>::value>::type> : std::true_type {};
+
 class bytes_source 
 {
 public:
@@ -536,7 +545,9 @@ private:
 public:
     bytes_source(bytes_source&&) = default;
 
-    bytes_source(const std::vector<value_type>& s)
+    template <class Source>
+    bytes_source(const Source& s,
+                 typename std::enable_if<is_bytes_sourceable<typename std::decay<Source>::type>::value>::type* = 0)
         : data_(s.data()), 
           input_ptr_(s.data()), 
           input_end_(s.data()+s.size()), 

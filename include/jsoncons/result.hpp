@@ -232,7 +232,7 @@ public:
 
     void insert(const value_type* s, size_t length)
     {
-        s_->append(s,length);
+        s_->insert(s_->end(), s, s+length);
     }
 
     void push_back(value_type ch)
