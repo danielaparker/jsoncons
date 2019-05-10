@@ -16,7 +16,7 @@
 #include <memory> // std::addressof
 #include <cstring> // std::memcpy
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/detail/type_traits_helper.hpp>
+#include <jsoncons/detail/type_traits.hpp>
 
 namespace jsoncons { 
 

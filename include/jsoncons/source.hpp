@@ -209,7 +209,7 @@ template <class CharT, class T, class Enable=void>
 struct is_string_sourceable : std::false_type {};
 
 template <class CharT, class T>
-struct is_string_sourceable<CharT,T,typename std::enable_if<std::is_convertible<typename T::value_type, CharT>::value>::type> : std::true_type {};
+struct is_string_sourceable<CharT,T,typename std::enable_if<std::is_same<typename T::value_type, CharT>::value>::type> : std::true_type {};
 
 template <class CharT>
 class string_source 
@@ -526,7 +526,7 @@ template <class T, class Enable=void>
 struct is_bytes_sourceable : std::false_type {};
 
 template <class T>
-struct is_bytes_sourceable<T,typename std::enable_if<std::is_convertible<typename T::value_type,uint8_t>::value>::type> : std::true_type {};
+struct is_bytes_sourceable<T,typename std::enable_if<std::is_same<typename T::value_type,uint8_t>::value>::type> : std::true_type {};
 
 class bytes_source 
 {

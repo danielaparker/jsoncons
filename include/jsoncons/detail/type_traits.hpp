@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_TYPE_TRAITS_HELPER_HPP
-#define JSONCONS_DETAIL_TYPE_TRAITS_HELPER_HPP
+#ifndef JSONCONS_DETAIL_TYPE_TRAITS_HPP
+#define JSONCONS_DETAIL_TYPE_TRAITS_HPP
 
 #include <stdexcept>
 #include <string>
