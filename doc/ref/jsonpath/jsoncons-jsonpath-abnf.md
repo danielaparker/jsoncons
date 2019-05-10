@@ -11,7 +11,7 @@ NameOrWildcard = Name / Wildcard
 
 S = *( WSP / CR / LF )
 
-AdditionalElements = ("." / "..") NameOrWildcard / Predicate
+AdditionalElements = (("." / "..") NameOrWildcard) / Predicate
 
 Predicate = "[" Expr "]"
 
