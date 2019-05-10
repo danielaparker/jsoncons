@@ -594,7 +594,7 @@ public:
         return result;
     }
 
-    void invoke_function(const string_type& function_name, std::error_code& ec)
+    void call_function(const string_type& function_name, std::error_code& ec)
     {
         auto f = functions_.get(function_name, ec);
         if (ec)
@@ -848,7 +848,7 @@ public:
                             }
                             function_stack_.push_back(evaluator.get_pointers());
 
-                            invoke_function(function_name, ec);
+                            call_function(function_name, ec);
                             if (ec)
                             {
                                 return;
@@ -928,7 +928,7 @@ public:
                                 ec = jsonpath_errc::argument_parse_error;
                                 return;
                             }
-                            invoke_function(function_name, ec);
+                            call_function(function_name, ec);
                             if (ec)
                             {
                                 return;
@@ -1013,7 +1013,7 @@ public:
                                 ec = jsonpath_errc::argument_parse_error;
                                 return;
                             }
-                            invoke_function(function_name, ec);
+                            call_function(function_name, ec);
                             if (ec)
                             {
                                 return;
