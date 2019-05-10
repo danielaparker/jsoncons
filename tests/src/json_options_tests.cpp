@@ -404,3 +404,21 @@ TEST_CASE("array_object with/without line_length_limit")
     }
 }
 
+TEST_CASE("json_options tests")
+{
+    SECTION("pad_inside_array_brackets")
+    {
+        std::string s = R"({
+    "foo": [ 1, 2 ]
+})";
+
+        json j = json::parse(s);
+
+        json_options options;
+        options.pad_inside_array_brackets(true);
+
+        std::ostringstream os;
+        j.dump(os, options, indenting::indent);
+        CHECK(os.str() == s);
+    }
+}

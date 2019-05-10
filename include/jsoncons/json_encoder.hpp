@@ -355,8 +355,8 @@ public:
         }
         if (options.pad_inside_object_braces())
         {
-            open_object_brace_str_ = std::basic_string<CharT>('{', ' ');
-            close_object_brace_str_ = std::basic_string<CharT>(' ', '}');
+            open_object_brace_str_ = std::basic_string<CharT>({'{', ' '});
+            close_object_brace_str_ = std::basic_string<CharT>({' ', '}'});
         }
         else
         {
@@ -365,8 +365,8 @@ public:
         }
         if (options.pad_inside_array_brackets())
         {
-            open_array_bracket_str_ = std::basic_string<CharT>('[', ' ');
-            close_array_bracket_str_ = std::basic_string<CharT>(' ', ']');
+            open_array_bracket_str_ = std::basic_string<CharT>({'[', ' '});
+            close_array_bracket_str_ = std::basic_string<CharT>({' ', ']'});
         }
         else
         {
