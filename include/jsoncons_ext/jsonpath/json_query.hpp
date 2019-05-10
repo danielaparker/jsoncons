@@ -700,21 +700,8 @@ public:
                 {
                     switch (*p_)
                     {
-                        case ' ':case '\t':
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '\r':
-                            if (p_+1 < end_input_ && *(p_+1) == '\n')
-                                ++p_;
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
-                            break;
-                        case '\n':
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
+                        case ' ':case '\t':case '\r':case '\n':
+                            skip_space_character();
                             break;
                         case '$':
                         {
@@ -746,18 +733,21 @@ public:
                 case path_state::path_or_function_name:
                     switch (*p_)
                     {
-                        case ' ':case '\t':
+                        case ' ':case '\t':case '\r':case '\n':
                         {
                             selectors_.push_back(make_unique_ptr<name_selector>(buffer));
                             apply_selectors();
                             buffer.clear();
                             state_stack_.pop_back();
+                            skip_space_character();
                             break;
                         }
                         case '(':
                             state_stack_.back().state = path_state::arg_or_right_paren;
                             function_name = std::move(buffer);
                             buffer.clear();
+                            ++p_;
+                            ++column_;
                             break;
                         case '[':
                         {
@@ -770,6 +760,8 @@ public:
                             slice.start_ = 0;
 
                             state_stack_.back().state = path_state::wildcard_or_rpath_or_slice_or_filter;
+                            ++p_;
+                            ++column_;
                             break;
                         }
                         case '.':
@@ -781,6 +773,8 @@ public:
                                 buffer.clear();
                             }
                             state_stack_.back().state = path_state::dot;
+                            ++p_;
+                            ++column_;
                             break;
                         }
                         case '*':
@@ -788,46 +782,38 @@ public:
                             end_all();
                             transfer_nodes();
                             state_stack_.back().state = path_state::dot;
+                            ++p_;
+                            ++column_;
                             break;
                         }
                         case '\'':
                         {
                             buffer.clear();
                             state_stack_.back().state = path_state::single_quoted_name;
+                            ++p_;
+                            ++column_;
                             break;
                         }
                         case '\"':
                         {
                             buffer.clear();
                             state_stack_.back().state = path_state::double_quoted_name;
+                            ++p_;
+                            ++column_;
                             break;
                         }
                         default:
                             buffer.push_back(*p_);
+                            ++p_;
+                            ++column_;
                             break;
                     }
-                    ++p_;
-                    ++column_;
                     break;
                 case path_state::arg_or_right_paren:
                     switch (*p_)
                     {
-                        case ' ':
-                        case '\t':
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '\r':
-                            if (p_+1 < end_input_ && *(p_+1) == '\n')
-                                ++p_;
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
-                            break;
-                        case '\n':
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
+                        case ' ':case '\t':case '\r':case '\n':
+                            skip_space_character();
                             break;
                         case '$':
                             buffer.clear();
@@ -993,22 +979,8 @@ public:
                 case path_state::more_args_or_right_paren:
                     switch (*p_)
                     {
-                        case ' ':
-                        case '\t':
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '\r':
-                            if (p_+1 < end_input_ && *(p_+1) == '\n')
-                                ++p_;
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
-                            break;
-                        case '\n':
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
+                        case ' ':case '\t':case '\r':case '\n':
+                            skip_space_character();
                             break;
                         case ',':
                             try
@@ -1073,21 +1045,8 @@ public:
                 case path_state::name_or_left_bracket: 
                     switch (*p_)
                     {
-                        case ' ':case '\t':
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '\r':
-                            if (p_+1 < end_input_ && *(p_+1) == '\n')
-                                ++p_;
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
-                            break;
-                        case '\n':
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
+                        case ' ':case '\t':case '\r':case '\n':
+                            skip_space_character();
                             break;
                         case '[': // [ can follow ..
                             state_stack_.back().state = path_state::wildcard_or_rpath_or_slice_or_filter;
@@ -1103,21 +1062,8 @@ public:
                 case path_state::name: 
                     switch (*p_)
                     {
-                        case ' ':case '\t':
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '\r':
-                            if (p_+1 < end_input_ && *(p_+1) == '\n')
-                                ++p_;
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
-                            break;
-                        case '\n':
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
+                        case ' ':case '\t':case '\r':case '\n':
+                            skip_space_character();
                             break;
                         case '*':
                             end_all();
@@ -1149,21 +1095,8 @@ public:
                 case path_state::dot_or_left_bracket: 
                     switch (*p_)
                     {
-                        case ' ':case '\t':
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '\r':
-                            if (p_+1 < end_input_ && *(p_+1) == '\n')
-                                ++p_;
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
-                            break;
-                        case '\n':
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
+                        case ' ':case '\t':case '\r':case '\n':
+                            skip_space_character();
                             break;
                         case '.':
                             state_stack_.emplace_back(path_state::dot, state_stack_.back());
@@ -1200,23 +1133,8 @@ public:
                 case path_state::unquoted_name2: 
                     switch (*p_)
                     {
-                        case ' ':case '\t':
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '\r':
-                            if (p_+1 < end_input_ && *(p_+1) == '\n')
-                            {
-                                ++p_;
-                            }
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
-                            break;
-                        case '\n':
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
+                        case ' ':case '\t':case '\r':case '\n':
+                            skip_space_character();
                             break;
                         case '[':
                             selectors_.push_back(make_unique_ptr<name_selector>(buffer));
@@ -1289,21 +1207,8 @@ public:
                 case path_state::comma_or_right_bracket:
                     switch (*p_)
                     {
-                        case ' ':case '\t':
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '\r':
-                            if (p_+1 < end_input_ && *(p_+1) == '\n')
-                                ++p_;
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
-                            break;
-                        case '\n':
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
+                        case ' ':case '\t':case '\r':case '\n':
+                            skip_space_character();
                             break;
                         case ',':
                             state_stack_.back().is_union = true;
@@ -1325,21 +1230,8 @@ public:
                 case path_state::wildcard_or_rpath_or_slice_or_filter:
                     switch (*p_)
                     {
-                        case ' ':case '\t':
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '\r':
-                            if (p_+1 < end_input_ && *(p_+1) == '\n')
-                                ++p_;
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
-                            break;
-                        case '\n':
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
+                        case ' ':case '\t':case '\r':case '\n':
+                            skip_space_character();
                             break;
                         case '(':
                         {
@@ -1427,21 +1319,8 @@ public:
                 case path_state::bracketed_name_or_path:
                     switch (*p_)
                     {
-                        case ' ':case '\t':
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '\r':
-                            if (p_+1 < end_input_ && *(p_+1) == '\n')
-                                ++p_;
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
-                            break;
-                        case '\n':
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
+                        case ' ':case '\t':case '\r':case '\n':
+                            skip_space_character();
                             break;
                         case '.':
                             buffer.push_back(*p_);
@@ -1472,21 +1351,8 @@ public:
                 case path_state::bracketed_wildcard_or_path:
                     switch (*p_)
                     {
-                        case ' ':case '\t':
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '\r':
-                            if (p_+1 < end_input_ && *(p_+1) == '\n')
-                                ++p_;
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
-                            break;
-                        case '\n':
-                            ++line_;
-                            column_ = 1;
-                            ++p_;
+                        case ' ':case '\t':case '\r':case '\n':
+                            skip_space_character();
                             break;
                         case '.':
                             buffer.push_back('*');
@@ -1883,6 +1749,31 @@ public:
         nodes_.clear();
         state_stack_.back().is_recursive_descent = false;
         state_stack_.back().is_union = false;
+    }
+
+    void skip_space_character()
+    {
+        switch (*p_)
+        {
+            case ' ':case '\t':
+                ++p_;
+                ++column_;
+                break;
+            case '\r':
+                if (p_+1 < end_input_ && *(p_+1) == '\n')
+                    ++p_;
+                ++line_;
+                column_ = 1;
+                ++p_;
+                break;
+            case '\n':
+                ++line_;
+                column_ = 1;
+                ++p_;
+                break;
+            default:
+                break;
+        }
     }
 };
 
