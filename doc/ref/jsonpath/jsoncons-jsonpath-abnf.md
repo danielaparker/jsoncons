@@ -5,7 +5,7 @@ absolute-path = root *additional-element
 
 root = "$"
 
-relative-path = sp name sp *additional-element
+relative-path = sp (name / wildcard) sp *additional-element
 
 sp = *( WSP / CR / LF )
 
