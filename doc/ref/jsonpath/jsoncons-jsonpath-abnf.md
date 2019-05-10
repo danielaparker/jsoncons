@@ -17,7 +17,7 @@ Predicate = "[" Expr "]"
 
 Name = UnquotedName / SingleQuotedName / DoubleQuotedName
 
-Expr = Wildcard / RelativePath / Slice / Union / Filter
+Expr = RelativePath / Slice / Union / Filter
 
 Wildcard = "*"
 
