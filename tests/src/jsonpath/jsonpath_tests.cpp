@@ -68,12 +68,21 @@ TEST_CASE("store")
 
         REQUIRE(result1.size() == 1);
         CHECK(result1[0] == store);
-
         REQUIRE(result2.size() == 1);
         CHECK(result2[0] == store["store"]);
-
         REQUIRE(result3.size() == 1);
         CHECK(result3[0] == store["store"]);
+
+        json result4 = jsonpath::json_query(store,"$ ");
+        json result5 = jsonpath::json_query(store,"$ \n.\n * ");
+        json result6 = jsonpath::json_query(store,"$ .. * ");
+
+        REQUIRE(result4.size() == 1);
+        CHECK(result4[0] == store);
+        REQUIRE(result5.size() == 1);
+        CHECK(result5[0] == store["store"]);
+        REQUIRE(result6.size() == 1);
+        CHECK(result6[0] == store["store"]);
     }
 
     SECTION("test_path")
