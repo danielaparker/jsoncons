@@ -421,4 +421,18 @@ TEST_CASE("json_options tests")
         j.dump(os, options, indenting::indent);
         CHECK(os.str() == s);
     }
+    SECTION("pad_inside_object_braces")
+    {
+        std::string s = R"([{ "foo": 1 }])";
+
+        json j = json::parse(s);
+
+        json_options options;
+        options.pad_inside_object_braces(true)
+               .array_object_split_lines(line_split_kind::same_line);
+
+        std::ostringstream os;
+        j.dump(os, options, indenting::indent);
+        CHECK(os.str() == s);
+    }
 }
