@@ -19,7 +19,7 @@ are good online evaluators for checking JSONPath expressions.
 
 The jsoncons implementation follows these [ABNF rules](jsoncons-jsonpath-abnf.md).
 
-#### Differences with Stefan Goessner's implementations
+#### Differences with Stefan Goessner's implementation
 
 - Stefan Goessner's implemention returns `false` in case of no match, but in a note he suggests an alternative is to return an empty array. 
   The `jsoncons` implementation takes that alternative and returns an empty array in case of no match.
