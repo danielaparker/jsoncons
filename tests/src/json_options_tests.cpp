@@ -429,7 +429,7 @@ TEST_CASE("json_options tests")
 
         json_options options;
         options.pad_inside_object_braces(true)
-               .array_object_split_lines(line_split_kind::same_line);
+               .array_object_line_splits(line_split_kind::same_line);
 
         std::ostringstream os;
         j.dump(os, options, indenting::indent);
