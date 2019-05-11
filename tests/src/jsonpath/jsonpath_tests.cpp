@@ -18,7 +18,70 @@
 
 using namespace jsoncons;
 
-TEST_CASE("store")
+TEST_CASE("jsonpath name tests")
+{
+    ojson example = ojson::parse(R"(
+    {
+        "\\\\" : "1",
+        "*" : "2",
+        "\\\"" : "3"
+    }
+    )");
+
+    SECTION("test 1")
+    {
+        ojson expected = ojson::array();
+        expected.push_back(example.at("\\\\"));
+
+        ojson result1 = jsonpath::json_query(example,"$.\\\\");
+        ojson result2 = jsonpath::json_query(example, "$. \\\\ ");
+        ojson result3 = jsonpath::json_query(example,"$[\\\\]");
+        ojson result4 = jsonpath::json_query(example, "$['\\\\\\\\']");
+        ojson result5 = jsonpath::json_query(example, "$[\"\\\\\\\\\"]");
+
+        CHECK(result1 == expected);
+        CHECK(result2 == expected);
+        CHECK(result3 == expected);
+        CHECK(result4 == expected);
+        CHECK(result5 == expected);
+
+        REQUIRE_THROWS_AS(jsonpath::json_query(example,"$.'\\'"),jsonpath::jsonpath_error);
+    }
+
+    SECTION("test 2")
+    {
+        ojson expected = ojson::array();
+        expected.push_back(example.at("\\\\"));
+        expected.push_back(example.at("*"));
+        expected.push_back(example.at("\\\""));
+
+        ojson result1 = jsonpath::json_query(example,"$.*");
+        ojson result2 = jsonpath::json_query(example, "$. * ");
+        ojson result3 = jsonpath::json_query(example, "$[*]");
+        ojson result4 = jsonpath::json_query(example, "$ [*] ");
+        ojson result5 = jsonpath::json_query(example, "$ [ * ] ");
+
+        CHECK(result1 == expected);
+        CHECK(result2 == expected);
+        CHECK(result3 == expected);
+        CHECK(result4 == expected);
+        CHECK(result5 == expected);
+    }
+
+    SECTION("test 3")
+    {
+        ojson expected = ojson::array();
+        expected.push_back(example.at("*"));
+
+        ojson result1 = jsonpath::json_query(example, "$['*']");
+        ojson result2 = jsonpath::json_query(example, "$ [\"*\"] ");
+
+        CHECK(result1 == expected);
+        CHECK(result2 == expected);
+    }
+}
+
+TEST_CASE("jsonpath store tests")
 {
     json store = json::parse(R"(
     {

@@ -1164,12 +1164,16 @@ public:
                             state_stack_.pop_back();
                             break;
                         case '\\':
-                            buffer.push_back(*p_);
                             if (p_+1 < end_input_)
                             {
                                 ++p_;
                                 ++column_;
                                 buffer.push_back(*p_);
+                            }
+                            else
+                            {
+                                ec = jsonpath_errc::unexpected_end_of_input;
+                                return;
                             }
                             break;
                         default:
@@ -1189,12 +1193,16 @@ public:
                             state_stack_.pop_back();
                             break;
                         case '\\':
-                            buffer.push_back(*p_);
                             if (p_+1 < end_input_)
                             {
                                 ++p_;
                                 ++column_;
                                 buffer.push_back(*p_);
+                            }
+                            else
+                            {
+                                ec = jsonpath_errc::unexpected_end_of_input;
+                                return;
                             }
                             break;
                         default:
@@ -1417,12 +1425,16 @@ public:
                             state_stack_.pop_back();
                             break;
                         case '\\':
-                            buffer.push_back(*p_);
                             if (p_+1 < end_input_)
                             {
                                 ++p_;
                                 ++column_;
                                 buffer.push_back(*p_);
+                            }
+                            else
+                            {
+                                ec = jsonpath_errc::unexpected_end_of_input;
+                                return;
                             }
                             break;
                         default:
@@ -1440,12 +1452,16 @@ public:
                             state_stack_.pop_back();
                             break;
                         case '\\':
-                            buffer.push_back(*p_);
                             if (p_+1 < end_input_)
                             {
                                 ++p_;
                                 ++column_;
                                 buffer.push_back(*p_);
+                            }
+                            else
+                            {
+                                ec = jsonpath_errc::unexpected_end_of_input;
+                                return;
                             }
                             break;
                         default:
@@ -1577,12 +1593,16 @@ public:
                             state_stack_.back().state = path_state::bracketed_name_or_path;
                             break;
                         case '\\':
-                            buffer.push_back(*p_);
                             if (p_+1 < end_input_)
                             {
                                 ++p_;
                                 ++column_;
                                 buffer.push_back(*p_);
+                            }
+                            else
+                            {
+                                ec = jsonpath_errc::unexpected_end_of_input;
+                                return;
                             }
                             break;
                         default:
@@ -1599,12 +1619,16 @@ public:
                             state_stack_.back().state = path_state::bracketed_name_or_path;
                             break;
                         case '\\':
-                            buffer.push_back(*p_);
                             if (p_+1 < end_input_)
                             {
                                 ++p_;
                                 ++column_;
                                 buffer.push_back(*p_);
+                            }
+                            else
+                            {
+                                ec = jsonpath_errc::unexpected_end_of_input;
+                                return;
                             }
                             break;
                         default:

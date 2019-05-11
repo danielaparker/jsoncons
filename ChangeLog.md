@@ -3,7 +3,9 @@ master
 
 - Fixed bug in `json_encoder` with `pad_inside_array_brackets` and `pad_inside_object_braces` options
 
-- Fixed "pedantic" warnings
+- Fixed issue with escape character in jsonpath quoted names.
+
+- Fixed pedantic level compiler warnings
 
 - Added doozer tests for CentOS 7.6 and Fedora release 24
 

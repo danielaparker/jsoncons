@@ -1,7 +1,7 @@
 ```
 Path = AbsolutePath / RelativePath
 
-AbsolutePath = Root *AdditionalElements
+AbsolutePath = Root S *AdditionalElements
 
 Root = "$"
 
@@ -13,7 +13,7 @@ S = *( WSP / CR / LF )
 
 AdditionalElements = (("." / "..") NameOrWildcard) / Predicate
 
-Predicate = "[" Expr "]"
+Predicate = "[" S Expr S "]"
 
 Name = UnquotedName / SingleQuotedName / DoubleQuotedName
 
