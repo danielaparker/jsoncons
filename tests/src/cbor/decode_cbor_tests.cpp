@@ -315,12 +315,12 @@ TEST_CASE("test_indefinite_length_array_iterator")
 TEST_CASE("cbor array comparison test")
 {
     std::vector<uint8_t> v1;
-    cbor::cbor_bytes_encoder serializer1(v1);
-    serializer1.begin_array(); // indefinite length array
-    serializer1.string_value("Toronto");
-    serializer1.string_value("Vancouver");
-    serializer1.end_array(); 
-    serializer1.flush();
+    cbor::cbor_bytes_encoder encoder1(v1);
+    encoder1.begin_array(); // indefinite length array
+    encoder1.string_value("Toronto");
+    encoder1.string_value("Vancouver");
+    encoder1.end_array(); 
+    encoder1.flush();
     json j1 = cbor::decode_cbor<json>(v1);
 
     std::vector<uint8_t> v2;
@@ -363,16 +363,16 @@ TEST_CASE("cbor array comparison test")
 TEST_CASE("cbor object comparison")
 {
     std::vector<uint8_t> v;
-    cbor::cbor_bytes_encoder serializer1(v);
-    serializer1.begin_object(); // indefinite length array
-    serializer1.name("City");
-    serializer1.string_value("Montreal");
-    serializer1.name("Amount");
-    serializer1.big_decimal_value("273.15");
-    serializer1.name("Date");
-    serializer1.date_time_value("2018-05-07 12:41:07-07:00");
-    serializer1.end_object(); 
-    serializer1.flush();
+    cbor::cbor_bytes_encoder encoder1(v);
+    encoder1.begin_object(); // indefinite length array
+    encoder1.name("City");
+    encoder1.string_value("Montreal");
+    encoder1.name("Amount");
+    encoder1.big_decimal_value("273.15");
+    encoder1.name("Date");
+    encoder1.date_time_value("2018-05-07 12:41:07-07:00");
+    encoder1.end_object(); 
+    encoder1.flush();
     json j1 = cbor::decode_cbor<json>(v);
 
     //std::cout << pretty_print(j1) << "\n";

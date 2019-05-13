@@ -176,11 +176,11 @@ int main()
 
     json_encoder encoder(std::cout, jsoncons::indenting::indent); 
 
-    serializer.begin_object();       
-    serializer.write_name("Employees");       
+    encoder.begin_object();       
+    encoder.write_name("Employees");       
     encode_json(employees, encoder);
-    serializer.end_object();       
-    serializer.flush();       
+    encoder.end_object();       
+    encoder.flush();       
 }
 ```
 Output:
