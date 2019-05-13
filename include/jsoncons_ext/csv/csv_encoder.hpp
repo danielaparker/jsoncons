@@ -159,10 +159,10 @@ private:
                     {
                         result_.push_back(options_.field_delimiter());
                     }
-                    result_.insert(column_names_[i].data(),
+                    result_.append(column_names_[i].data(),
                                   column_names_[i].length());
                 }
-                result_.insert(options_.line_delimiter().data(),
+                result_.append(options_.line_delimiter().data(),
                               options_.line_delimiter().length());
             }
             for (size_t i = 0; i < column_names_.size(); ++i)
@@ -174,11 +174,11 @@ private:
                 auto it = buffered_line_.find(column_names_[i]);
                 if (it != buffered_line_.end())
                 {
-                    result_.insert(it->second.data(),it->second.length());
+                    result_.append(it->second.data(),it->second.length());
                     it->second.clear();
                 }
             }
-            result_.insert(options_.line_delimiter().data(), options_.line_delimiter().length());
+            result_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
         }
         stack_.pop_back();
 
@@ -199,11 +199,11 @@ private:
                     {
                         result_.push_back(options_.field_delimiter());
                     }
-                    result_.insert(column_names_[i].data(),column_names_[i].length());
+                    result_.append(column_names_[i].data(),column_names_[i].length());
                 }
                 if (column_names_.size() > 0)
                 {
-                    result_.insert(options_.line_delimiter().data(),
+                    result_.append(options_.line_delimiter().data(),
                                   options_.line_delimiter().length());
                 }
             }
@@ -215,7 +215,7 @@ private:
     {
         if (stack_.size() == 2)
         {
-            result_.insert(options_.line_delimiter().data(),
+            result_.append(options_.line_delimiter().data(),
                           options_.line_delimiter().length());
         }
         stack_.pop_back();
@@ -475,15 +475,15 @@ private:
 
         if ((std::isnan)(val))
         {
-            result.insert(null_k().data(), null_k().size());
+            result.append(null_k().data(), null_k().size());
         }
         else if (val == std::numeric_limits<double>::infinity())
         {
-            result.insert(null_k().data(), null_k().size());
+            result.append(null_k().data(), null_k().size());
         }
         else if (!(std::isfinite)(val))
         {
-            result.insert(null_k().data(), null_k().size());
+            result.append(null_k().data(), null_k().size());
         }
         else
         {
@@ -501,7 +501,7 @@ private:
 
         std::basic_ostringstream<CharT> ss;
         ss << val;
-        result.insert(ss.str().data(),ss.str().length());
+        result.append(ss.str().data(),ss.str().length());
 
         end_value();
     }
@@ -513,7 +513,7 @@ private:
 
         std::basic_ostringstream<CharT> ss;
         ss << val;
-        result.insert(ss.str().data(),ss.str().length());
+        result.append(ss.str().data(),ss.str().length());
 
         end_value();
     }
@@ -525,11 +525,11 @@ private:
 
         if (val)
         {
-            result.insert(true_k().data(), true_k().size());
+            result.append(true_k().data(), true_k().size());
         }
         else
         {
-            result.insert(false_k().data(), false_k().size());
+            result.append(false_k().data(), false_k().size());
         }
 
         end_value();
@@ -539,7 +539,7 @@ private:
     bool accept_null_value(AnyWriter& result) 
     {
         begin_value(result);
-        result.insert(null_k().data(), null_k().size());
+        result.append(null_k().data(), null_k().size());
         end_value();
         return true;
     }

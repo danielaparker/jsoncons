@@ -397,7 +397,7 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            result_.insert(comma_str_.data(),comma_str_.length());
+            result_.append(comma_str_.data(),comma_str_.length());
             column_ += comma_str_.length();
         }
 
@@ -456,7 +456,7 @@ private:
         }
         indent();
         
-        result_.insert(open_object_brace_str_.data(), open_object_brace_str_.length());
+        result_.append(open_object_brace_str_.data(), open_object_brace_str_.length());
         column_ += open_object_brace_str_.length();
         return true;
     }
@@ -470,7 +470,7 @@ private:
             new_line();
         }
         stack_.pop_back();
-        result_.insert(close_object_brace_str_.data(), close_object_brace_str_.length());
+        result_.append(close_object_brace_str_.data(), close_object_brace_str_.length());
         column_ += close_object_brace_str_.length();
 
         end_value();
@@ -481,7 +481,7 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            result_.insert(comma_str_.data(),comma_str_.length());
+            result_.append(comma_str_.data(),comma_str_.length());
             column_ += comma_str_.length();
         }
         if (!stack_.empty())
@@ -541,7 +541,7 @@ private:
                                 column_, column_+open_array_bracket_str_.length());
         }
         indent();
-        result_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
+        result_.append(open_array_bracket_str_.data(), open_array_bracket_str_.length());
         column_ += open_array_bracket_str_.length();
         return true;
     }
@@ -555,7 +555,7 @@ private:
             new_line();
         }
         stack_.pop_back();
-        result_.insert(close_array_bracket_str_.data(), close_array_bracket_str_.length());
+        result_.append(close_array_bracket_str_.data(), close_array_bracket_str_.length());
         column_ += close_array_bracket_str_.length();
         end_value();
         return true;
@@ -566,7 +566,7 @@ private:
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().count() > 0)
         {
-            result_.insert(comma_str_.data(),comma_str_.length());
+            result_.append(comma_str_.data(),comma_str_.length());
             column_ += comma_str_.length();
         }
 
@@ -588,7 +588,7 @@ private:
         result_.push_back('\"');
         size_t length = jsoncons::detail::escape_string(name.data(), name.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),result_);
         result_.push_back('\"');
-        result_.insert(colon_str_.data(),colon_str_.length());
+        result_.append(colon_str_.data(),colon_str_.length());
         column_ += (length+2+colon_str_.length());
         return true;
     }
@@ -607,7 +607,7 @@ private:
             }
         }
 
-        result_.insert(null_k().data(), null_k().size());
+        result_.append(null_k().data(), null_k().size());
         column_ += null_k().size();
 
         end_value();
@@ -741,7 +741,7 @@ private:
             {
                 if (options_.is_nan_to_num())
                 {
-                    result_.insert(options_.nan_to_num().data(), options_.nan_to_num().length());
+                    result_.append(options_.nan_to_num().data(), options_.nan_to_num().length());
                     column_ += options_.nan_to_num().length();
                 }
                 else if (options_.is_nan_to_str())
@@ -750,7 +750,7 @@ private:
                 }
                 else
                 {
-                    result_.insert(null_k().data(), null_k().size());
+                    result_.append(null_k().data(), null_k().size());
                     column_ += null_k().size();
                 }
             }
@@ -758,7 +758,7 @@ private:
             {
                 if (options_.is_inf_to_num())
                 {
-                    result_.insert(options_.inf_to_num().data(), options_.inf_to_num().length());
+                    result_.append(options_.inf_to_num().data(), options_.inf_to_num().length());
                     column_ += options_.inf_to_num().length();
                 }
                 else if (options_.is_inf_to_str())
@@ -767,7 +767,7 @@ private:
                 }
                 else
                 {
-                    result_.insert(null_k().data(), null_k().size());
+                    result_.append(null_k().data(), null_k().size());
                     column_ += null_k().size();
                 }
             }
@@ -775,7 +775,7 @@ private:
             {
                 if (options_.is_neginf_to_num())
                 {
-                    result_.insert(options_.neginf_to_num().data(), options_.neginf_to_num().length());
+                    result_.append(options_.neginf_to_num().data(), options_.neginf_to_num().length());
                     column_ += options_.neginf_to_num().length();
                 }
                 else if (options_.is_neginf_to_str())
@@ -784,7 +784,7 @@ private:
                 }
                 else
                 {
-                    result_.insert(null_k().data(), null_k().size());
+                    result_.append(null_k().data(), null_k().size());
                     column_ += null_k().size();
                 }
             }
@@ -857,12 +857,12 @@ private:
 
         if (value)
         {
-            result_.insert(true_k().data(), true_k().size());
+            result_.append(true_k().data(), true_k().size());
             column_ += true_k().size();
         }
         else
         {
-            result_.insert(false_k().data(), false_k().size());
+            result_.append(false_k().data(), false_k().size());
             column_ += false_k().size();
         }
 
@@ -876,7 +876,7 @@ private:
         {
             if (stack_.back().count() > 0)
             {
-                result_.insert(comma_str_.data(),comma_str_.length());
+                result_.append(comma_str_.data(),comma_str_.length());
                 column_ += comma_str_.length();
             }
             if (stack_.back().is_multi_line() || stack_.back().is_indent_once())
@@ -896,7 +896,7 @@ private:
 #endif
             case big_integer_chars_format::number:
             {
-                result_.insert(sv.data(),sv.size());
+                result_.append(sv.data(),sv.size());
                 column_ += sv.size();
                 break;
             }
@@ -939,7 +939,7 @@ private:
             default:
             {
                 result_.push_back('\"');
-                result_.insert(sv.data(),sv.size());
+                result_.append(sv.data(),sv.size());
                 result_.push_back('\"');
                 column_ += (sv.size() + 2);
                 break;
@@ -967,7 +967,7 @@ private:
 
     void new_line()
     {
-        result_.insert(options_.new_line_chars().data(),options_.new_line_chars().length());
+        result_.append(options_.new_line_chars().data(),options_.new_line_chars().length());
         for (int i = 0; i < indent_amount_; ++i)
         {
             result_.push_back(' ');
@@ -977,7 +977,7 @@ private:
 
     void new_line(size_t len)
     {
-        result_.insert(options_.new_line_chars().data(),options_.new_line_chars().length());
+        result_.append(options_.new_line_chars().data(),options_.new_line_chars().length());
         for (size_t i = 0; i < len; ++i)
         {
             result_.push_back(' ');
@@ -1159,7 +1159,7 @@ private:
             result_.push_back(',');
         }
 
-        result_.insert(null_k().data(), null_k().size());
+        result_.append(null_k().data(), null_k().size());
 
         if (!stack_.empty())
         {
@@ -1174,7 +1174,7 @@ private:
         {
             case big_integer_chars_format::number:
             {
-                result_.insert(sv.data(),sv.size());
+                result_.append(sv.data(),sv.size());
                 break;
             }
             case big_integer_chars_format::base64:
@@ -1212,7 +1212,7 @@ private:
             default:
             {
                 result_.push_back('\"');
-                result_.insert(sv.data(),sv.size());
+                result_.append(sv.data(),sv.size());
                 result_.push_back('\"');
                 break;
             }
@@ -1327,7 +1327,7 @@ private:
             {
                 if (options_.is_nan_to_num())
                 {
-                    result_.insert(options_.nan_to_num().data(), options_.nan_to_num().length());
+                    result_.append(options_.nan_to_num().data(), options_.nan_to_num().length());
                 }
                 else if (options_.is_nan_to_str())
                 {
@@ -1335,14 +1335,14 @@ private:
                 }
                 else
                 {
-                    result_.insert(null_k().data(), null_k().size());
+                    result_.append(null_k().data(), null_k().size());
                 }
             }
             else if (value == std::numeric_limits<double>::infinity())
             {
                 if (options_.is_inf_to_num())
                 {
-                    result_.insert(options_.inf_to_num().data(), options_.inf_to_num().length());
+                    result_.append(options_.inf_to_num().data(), options_.inf_to_num().length());
                 }
                 else if (options_.is_inf_to_str())
                 {
@@ -1350,14 +1350,14 @@ private:
                 }
                 else
                 {
-                    result_.insert(null_k().data(), null_k().size());
+                    result_.append(null_k().data(), null_k().size());
                 }
             }
             else 
             {
                 if (options_.is_neginf_to_num())
                 {
-                    result_.insert(options_.neginf_to_num().data(), options_.neginf_to_num().length());
+                    result_.append(options_.neginf_to_num().data(), options_.neginf_to_num().length());
                 }
                 else if (options_.is_neginf_to_str())
                 {
@@ -1365,7 +1365,7 @@ private:
                 }
                 else
                 {
-                    result_.insert(null_k().data(), null_k().size());
+                    result_.append(null_k().data(), null_k().size());
                 }
             }
         }
@@ -1422,11 +1422,11 @@ private:
 
         if (value)
         {
-            result_.insert(true_k().data(), true_k().size());
+            result_.append(true_k().data(), true_k().size());
         }
         else
         {
-            result_.insert(false_k().data(), false_k().size());
+            result_.append(false_k().data(), false_k().size());
         }
 
         if (!stack_.empty())

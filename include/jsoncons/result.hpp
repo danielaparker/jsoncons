@@ -68,7 +68,7 @@ public:
         p_ = buffer_.data();
     }
 
-    void insert(const CharT* s, size_t length)
+    void append(const CharT* s, size_t length)
     {
         size_t diff = end_buffer_ - p_;
         if (diff >= length)
@@ -158,7 +158,7 @@ public:
         p_ = buffer_.data();
     }
 
-    void insert(const uint8_t* s, size_t length)
+    void append(const uint8_t* s, size_t length)
     {
         size_t diff = end_buffer_ - p_;
         if (diff >= length)
@@ -230,7 +230,7 @@ public:
     {
     }
 
-    void insert(const value_type* s, size_t length)
+    void append(const value_type* s, size_t length)
     {
         s_->insert(s_->end(), s, s+length);
     }
@@ -268,7 +268,7 @@ public:
     {
     }
 
-    void insert(const uint8_t* s, size_t length)
+    void append(const uint8_t* s, size_t length)
     {
         s_.insert(s_.end(), s, s+length);
     }

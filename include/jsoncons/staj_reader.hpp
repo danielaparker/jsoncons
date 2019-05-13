@@ -127,40 +127,40 @@ public:
             break;
         case staj_event_type::int64_value:
         {
-            jsoncons::string_result<T> writer(s);
-            jsoncons::detail::print_integer(value_.int64_value_, writer);
+            jsoncons::string_result<T> result(s);
+            jsoncons::detail::print_integer(value_.int64_value_, result);
             break;
         }
         case staj_event_type::uint64_value:
         {
-            jsoncons::string_result<T> writer(s);
-            jsoncons::detail::print_uinteger(value_.uint64_value_, writer);
+            jsoncons::string_result<T> result(s);
+            jsoncons::detail::print_uinteger(value_.uint64_value_, result);
             break;
         }
         case staj_event_type::double_value:
         {
-            jsoncons::string_result<T> writer(s);
+            jsoncons::string_result<T> result(s);
             jsoncons::detail::print_double f{ floating_point_options() };
-            f(value_.double_value_, writer);
+            f(value_.double_value_, result);
             break;
         }
         case staj_event_type::bool_value:
         {
-            jsoncons::string_result<T> writer(s);
+            jsoncons::string_result<T> result(s);
             if (value_.bool_value_)
             {
-                writer.insert(true_k().data(),true_k().size());
+                result.append(true_k().data(),true_k().size());
             }
             else
             {
-                writer.insert(false_k().data(),false_k().size());
+                result.append(false_k().data(),false_k().size());
             }
             break;
         }
         case staj_event_type::null_value:
         {
-            jsoncons::string_result<T> writer(s);
-            writer.insert(null_k().data(),null_k().size());
+            jsoncons::string_result<T> result(s);
+            result.append(null_k().data(),null_k().size());
             break;
         }
         default:

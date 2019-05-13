@@ -23,7 +23,7 @@ namespace jsoncons { namespace detail {
 // print_integer
 
 template<class Result> 
-size_t print_integer(int64_t value, Result& writer)
+size_t print_integer(int64_t value, Result& result)
 {
     typedef typename Result::value_type char_type;
 
@@ -40,12 +40,12 @@ size_t print_integer(int64_t value, Result& writer)
     count += (p-buf);
     if (value < 0)
     {
-        writer.push_back('-');
+        result.push_back('-');
         ++count;
     }
     while (--p >= buf)
     {
-        writer.push_back(*p);
+        result.push_back(*p);
     }
 
     return count;
@@ -54,7 +54,7 @@ size_t print_integer(int64_t value, Result& writer)
 // print_uinteger
 
 template<class Result>
-size_t print_uinteger(uint64_t value, Result& writer)
+size_t print_uinteger(uint64_t value, Result& result)
 {
     typedef typename Result::value_type char_type;
 
@@ -70,7 +70,7 @@ size_t print_uinteger(uint64_t value, Result& writer)
     count += (p-buf);
     while (--p >= buf)
     {
-        writer.push_back(*p);
+        result.push_back(*p);
     }
     return count;
 }
@@ -78,7 +78,7 @@ size_t print_uinteger(uint64_t value, Result& writer)
 // print_double
 
 template <class Result>
-void dump_buffer(const char* buffer, size_t length, char decimal_point, Result& writer)
+void dump_buffer(const char* buffer, size_t length, char decimal_point, Result& result)
 {
     const char* sbeg = buffer;
     const char* send = sbeg + length;
@@ -91,26 +91,26 @@ void dump_buffer(const char* buffer, size_t length, char decimal_point, Result& 
             switch (*q)
             {
                 case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':case '+':
-                    writer.push_back(*q);
+                    result.push_back(*q);
                     break;
                 case 'e':
                 case 'E':
-                    writer.push_back('e');
+                    result.push_back('e');
                     needs_dot = false;
                     break;
                 default:
                     if (*q == decimal_point)
                     {
                         needs_dot = false;
-                        writer.push_back('.');
+                        result.push_back('.');
                     }
                     break;
             }
         }
         if (needs_dot)
         {
-            writer.push_back('.');
-            writer.push_back('0');
+            result.push_back('.');
+            result.push_back('0');
             needs_dot = true;
         }
     }
@@ -213,7 +213,7 @@ public:
     }
 
     template <class Result>
-    size_t operator()(double val, Result& writer)
+    size_t operator()(double val, Result& result)
     {
         size_t count = 0;
 
@@ -242,7 +242,7 @@ public:
                 {
                     JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
                 }
-                dump_buffer(number_buffer, length, decimal_point_, writer);
+                dump_buffer(number_buffer, length, decimal_point_, result);
             }
             break;
         case chars_format::scientific:
@@ -252,7 +252,7 @@ public:
                 {
                     JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
                 }
-                dump_buffer(number_buffer, length, decimal_point_, writer);
+                dump_buffer(number_buffer, length, decimal_point_, result);
             }
             break;
         case chars_format::general:
@@ -265,11 +265,11 @@ public:
                     {
                         JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
                     }
-                    dump_buffer(number_buffer, length, decimal_point_, writer);
+                    dump_buffer(number_buffer, length, decimal_point_, result);
                 }
                 else
                 {
-                    if (!dtoa(val, decimal_point_, writer))
+                    if (!dtoa(val, decimal_point_, result))
                     {
                         JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
                     }
