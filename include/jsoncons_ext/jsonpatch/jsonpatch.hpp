@@ -117,7 +117,7 @@ namespace detail {
                 std::basic_ostringstream<char_type> ss; 
                 ss << path << '/' << i;
                 auto temp_diff = from_diff(source[i],target[i],ss.str());
-                result.append(result.array_range().end(),temp_diff.array_range().begin(),temp_diff.array_range().end());
+                result.insert(result.array_range().end(),temp_diff.array_range().begin(),temp_diff.array_range().end());
             }
             // Element in source, not in target - remove
             for (size_t i = target.size(); i < source.size(); ++i)
@@ -154,7 +154,7 @@ namespace detail {
                 if (it != target.object_range().end())
                 {
                     auto temp_diff = from_diff(a.value(),it->value(),ss.str());
-                    result.append(result.array_range().end(),temp_diff.array_range().begin(),temp_diff.array_range().end());
+                    result.insert(result.array_range().end(),temp_diff.array_range().begin(),temp_diff.array_range().end());
                 }
                 else
                 {
