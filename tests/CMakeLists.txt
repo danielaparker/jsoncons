@@ -7,8 +7,10 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     set(JSONCONS_INCLUDE_DIR ${jsoncons_INCLUDE_DIRS})
 endif ()
 
+if(NOT CMAKE_BUILD_TYPE)
 message(STATUS "Forcing tests build type to Release")
 set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+endif()
 
 include(CheckCXXCompilerFlag)
 
