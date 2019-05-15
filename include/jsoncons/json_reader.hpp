@@ -86,7 +86,7 @@ private:
             unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            throw ser_error(result.ec,context.line_number(),context.column_number());
+            throw ser_error(result.ec,context.line(),context.column());
         }
         return other_handler_.name(target, context);
     }
@@ -99,7 +99,7 @@ private:
             unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            throw ser_error(result.ec,context.line_number(),context.column_number());
+            throw ser_error(result.ec,context.line(),context.column());
         }
         return other_handler_.string_value(target, tag, context);
     }
@@ -273,7 +273,7 @@ public:
         read_next(ec);
         if (ec)
         {
-            throw ser_error(ec,parser_.line_number(),parser_.column_number());
+            throw ser_error(ec,parser_.line(),parser_.column());
         }
     }
 
@@ -338,18 +338,18 @@ public:
         check_done(ec);
         if (ec)
         {
-            throw ser_error(ec,parser_.line_number(),parser_.column_number());
+            throw ser_error(ec,parser_.line(),parser_.column());
         }
     }
 
-    size_t line_number() const
+    size_t line() const
     {
-        return parser_.line_number();
+        return parser_.line();
     }
 
-    size_t column_number() const
+    size_t column() const
     {
-        return parser_.column_number();
+        return parser_.column();
     }
 
     void check_done(std::error_code& ec)

@@ -62,7 +62,7 @@ void test_error_code(const json& root, const std::string& path, std::error_code 
             std::cout << path << "\n";
         }
         CHECK(e.code() == value);
-        CHECK(e.line_number() == line);
+        CHECK(e.line() == line);
         CHECK(e.column_number() == column);
     }
 }

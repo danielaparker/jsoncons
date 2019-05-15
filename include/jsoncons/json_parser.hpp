@@ -148,7 +148,7 @@ enum class json_parse_state : uint8_t
 };
 
 template <class CharT, class Allocator = std::allocator<char>>
-class basic_json_parser : private ser_context
+class basic_json_parser : public ser_context
 {
     typedef std::basic_string<CharT> string_type;
     typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
@@ -2588,12 +2588,12 @@ escape_u9:
     }
 #endif
 
-    size_t line_number() const override
+    size_t line() const override
     {
         return line_;
     }
 
-    size_t column_number() const override
+    size_t column() const override
     {
         return column_;
     }

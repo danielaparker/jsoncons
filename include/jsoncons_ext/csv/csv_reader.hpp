@@ -118,7 +118,7 @@ public:
         read(ec);
         if (ec)
         {
-            throw ser_error(ec,parser_.line_number(),parser_.column_number());
+            throw ser_error(ec,parser_.line(),parser_.column());
         }
     }
 

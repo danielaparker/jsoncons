@@ -394,7 +394,7 @@ private:
 };
 
 template<class J,class JReference>
-class jsonpointer_evaluator : private ser_context
+class jsonpointer_evaluator : public ser_context
 {
     typedef typename handle_type<J,JReference>::type type;
     typedef typename J::string_type string_type;
@@ -748,12 +748,12 @@ public:
 
     // ser_context
 
-    size_t line_number() const override
+    size_t line() const override
     {
         return line_;
     }
 
-    size_t column_number() const override
+    size_t column() const override
     {
         return column_;
     }

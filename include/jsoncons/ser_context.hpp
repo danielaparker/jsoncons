@@ -14,17 +14,29 @@ class ser_context
 public:
     virtual ~ser_context() = default;
 
-    virtual size_t line_number() const = 0;
+    virtual size_t line() const = 0;
 
-    virtual size_t column_number() const = 0; 
+    virtual size_t column() const = 0; 
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    size_t line_number() const
+    {
+        return line();
+    }
+
+    size_t column_number() const 
+    {
+        return column();
+    }
+#endif
 };
 
 class null_ser_context : public ser_context
 {
 private:
-    size_t line_number() const override { return 0; }
+    size_t line() const override { return 0; }
 
-    size_t column_number() const override { return 0; }
+    size_t column() const override { return 0; }
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)

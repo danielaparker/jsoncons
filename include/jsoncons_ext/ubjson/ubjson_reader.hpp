@@ -40,7 +40,7 @@ public:
         read(ec);
         if (ec)
         {
-            throw ser_error(ec,line_number(),column_number());
+            throw ser_error(ec,line(),column());
         }
     }
 
@@ -56,12 +56,12 @@ public:
         }
     }
 
-    size_t line_number() const override
+    size_t line() const override
     {
         return 0;
     }
 
-    size_t column_number() const override
+    size_t column() const override
     {
         return source_.position();
     }

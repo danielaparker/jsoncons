@@ -18,7 +18,7 @@
 
 #### Member functions
 
-    size_t line_number() const noexcept
+    size_t line() const noexcept
 Returns the line number to the end of the text where the exception occurred.
 Line numbers start at 1.
 

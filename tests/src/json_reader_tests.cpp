@@ -41,7 +41,7 @@ void test_json_reader_ec(const std::string& text, std::error_code expected)
     reader.read(ec);
     //std::cerr << text << std::endl;
     //std::cerr << ec.message() 
-    //          << " at line " << reader.line_number() 
+    //          << " at line " << reader.line() 
     //          << " and column " << reader.column_number() << std::endl;
 
     CHECK(ec);

@@ -130,15 +130,27 @@ public:
         }
     }
 
-    size_t line_number() const noexcept
+    size_t line() const noexcept
     {
         return line_number_;
     }
 
-    size_t column_number() const noexcept
+    size_t column() const noexcept
     {
         return column_number_;
     }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    size_t line_number() const noexcept
+    {
+        return line();
+    }
+
+    size_t column_number() const noexcept
+    {
+        return column();
+    }
+#endif
 private:
     std::string buffer_;
     size_t line_number_;

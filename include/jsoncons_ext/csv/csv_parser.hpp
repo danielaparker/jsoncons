@@ -54,7 +54,7 @@ enum class csv_state_type
 };
 
 template<class CharT,class Allocator=std::allocator<CharT>>
-class basic_csv_parser : private ser_context
+class basic_csv_parser : public ser_context
 {
     typedef basic_string_view<CharT> string_view_type;
     typedef CharT char_type;
@@ -687,12 +687,12 @@ all_csv_states:
         input_ptr_ = begin_input_;
     }
 
-    size_t line_number() const override
+    size_t line() const override
     {
         return line_;
     }
 
-    size_t column_number() const override
+    size_t column() const override
     {
         return column_;
     }

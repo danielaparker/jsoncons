@@ -70,7 +70,7 @@ decode_msgpack(const std::vector<uint8_t>& v)
     reader.read(ec);
     if (ec)
     {
-        throw ser_error(ec,reader.line_number(),reader.column_number());
+        throw ser_error(ec,reader.line(),reader.column());
     }
     return decoder.get_result();
 }
@@ -96,7 +96,7 @@ decode_msgpack(std::istream& is)
     reader.read(ec);
     if (ec)
     {
-        throw ser_error(ec,reader.line_number(),reader.column_number());
+        throw ser_error(ec,reader.line(),reader.column());
     }
     return decoder.get_result();
 }

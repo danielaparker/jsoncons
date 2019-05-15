@@ -449,7 +449,7 @@ public:
         accept(handler, ec);
         if (ec)
         {
-            throw ser_error(ec,parser_.line_number(),parser_.column_number());
+            throw ser_error(ec,parser_.line(),parser_.column());
         }
     }
 
@@ -540,7 +540,7 @@ public:
         next(ec);
         if (ec)
         {
-            throw ser_error(ec,parser_.line_number(),parser_.column_number());
+            throw ser_error(ec,parser_.line(),parser_.column());
         }
     }
 
@@ -620,7 +620,7 @@ public:
         check_done(ec);
         if (ec)
         {
-            throw ser_error(ec,parser_.line_number(),parser_.column_number());
+            throw ser_error(ec,parser_.line(),parser_.column());
         }
     }
 
@@ -671,14 +671,14 @@ public:
         return eof_;
     }
 
-    size_t line_number() const override
+    size_t line() const override
     {
-        return parser_.line_number();
+        return parser_.line();
     }
 
-    size_t column_number() const override
+    size_t column() const override
     {
-        return parser_.column_number();
+        return parser_.column();
     }
 private:
 };

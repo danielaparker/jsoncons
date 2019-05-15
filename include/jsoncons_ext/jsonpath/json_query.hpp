@@ -238,7 +238,7 @@ JSONCONS_STRING_LITERAL(length, 'l', 'e', 'n', 'g', 't', 'h')
 template<class Json,
          class JsonReference,
          class PathCons>
-class jsonpath_evaluator : private ser_context
+class jsonpath_evaluator : public ser_context
 {
     typedef typename Json::char_type char_type;
     typedef typename Json::char_traits_type char_traits_type;
@@ -554,12 +554,12 @@ public:
     {
     }
 
-    size_t line_number() const
+    size_t line() const
     {
         return line_;
     }
 
-    size_t column_number() const
+    size_t column() const
     {
         return column_;
     }
