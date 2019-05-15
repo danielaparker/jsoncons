@@ -66,6 +66,17 @@ public:
     {
         return column_number_;
     }
+#if !defined(JSONCONS_NO_DEPRECATED)
+    size_t line_number() const noexcept
+    {
+        return line();
+    }
+
+    size_t column_number() const noexcept
+    {
+        return column();
+    }
+#endif
 };
 
 enum class jsonpath_errc 
