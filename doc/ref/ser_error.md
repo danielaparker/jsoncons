@@ -28,7 +28,7 @@ std::exception
 Returns the line number to the end of the text where the exception occurred.
 Line numbers start at 1.
 
-    size_t column_number() const noexcept
+    size_t column() const noexcept
 Returns the column number to the end of the text where the exception occurred.
 Column numbers start at 1.
 

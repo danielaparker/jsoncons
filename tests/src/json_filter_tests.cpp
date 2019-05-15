@@ -66,7 +66,7 @@ private:
             {
                 warnings.push_back(warning{std::string(s),
                                    context.line(),
-                                   context.column_number()});
+                                   context.column()});
             }
         }
         else

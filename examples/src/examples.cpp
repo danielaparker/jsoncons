@@ -431,7 +431,7 @@ void validation_example()
     {
         std::cout << ec.message() 
                   << " on line " << reader.line()
-                  << " and column " << reader.column_number()
+                  << " and column " << reader.column()
                   << std::endl;
     }
 }

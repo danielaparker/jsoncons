@@ -137,7 +137,7 @@ Override (2) sets `ec` to a [json_errc](jsoncons::json_errc.md) if there are any
 
     size_t line() const
 
-    size_t column_number() const
+    size_t column() const
 
 ### Examples
 
@@ -182,8 +182,8 @@ if (!ec)
 else
 {
     std::cerr << ec.message() 
-              << " at line " << reader.line_number() 
-              << " and column " << reader.column_number() << std::endl;
+              << " at line " << reader.line() 
+              << " and column " << reader.column() << std::endl;
 }
 ```
 Output:

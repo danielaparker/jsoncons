@@ -50,7 +50,7 @@ private:
             {
                 std::cerr << "Incomplete name \"" << s
                    << "\" at line " << context.line()
-                   << " and column " << context.column_number() << std::endl;
+                   << " and column " << context.column() << std::endl;
             }
         }
         else

@@ -14,7 +14,7 @@ Provides contextual information for serializing and deserializing JSON and JSON-
 Returns the line number for the text being parsed.
 Line numbers start at 1.
 
-    virtual size_t column_number() const = 0; 
+    virtual size_t column() const = 0; 
 Returns the column number to the end of the text being parsed.
 Column numbers start at 1.
     

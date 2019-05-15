@@ -42,7 +42,7 @@ void test_parse_ec(const std::string& text, std::error_code expected)
     //std::cerr << text << std::endl;
     //std::cerr << ec.message() 
     //          << " at line " << reader.line() 
-    //          << " and column " << reader.column_number() << std::endl;
+    //          << " and column " << reader.column() << std::endl;
 
     CHECK(ec);
     CHECK(ec == expected);
