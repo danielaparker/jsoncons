@@ -83,18 +83,6 @@ and uses the specified [csv options](csv_options.md).
                            semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=null_ser_context()); 
 
-    bool bigint_value(const string_view_type& s, 
-                           const ser_context& context=null_ser_context());  
-
-    bool bigdec_value(const string_view_type& s, 
-                           const ser_context& context=null_ser_context());  
-
-    bool datetime_value(const string_view_type& s, 
-                         const ser_context& context=null_ser_context());  
-
-    bool timestamp_value(int64_t val, 
-                         const ser_context& context=null_ser_context());  
-
     bool int64_value(int64_t value, 
                      semantic_tag tag = semantic_tag::none, 
                      const ser_context& context=null_ser_context());

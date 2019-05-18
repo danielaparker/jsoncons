@@ -1,3 +1,31 @@
+master
+------
+
+CMake build fix
+
+- The CMAKE_BUILD_TYPE variable is now left alone if already set
+
+Non-breaking changes to lighten `semantic_tag` names
+
+- The `semantic_tag` enum values `big_integer`, `big_decimal`, `big_float` and `date_time` 
+  have been deprecated (still work) and renamed to `bigint`, `bigdec`, `bigfloat` and `datetime`.
+
+- The `json_content_handler` functions `big_integer_value`, `big_decimal_value`, `date_time_value`
+  and `timestamp_value` have been deprecated (still work.) Calls to these functions should be replaced 
+  by calls to `string_value` with `semantic_tag::bigint`, `semantic_tag::bigdec`, and `semantic_tag::datetime`,
+  and by calls to `int64_vaue` with `semantic_tag::timestamp`.
+
+- The enum type `big_integer_chars_format` has been deprecated (still works) and renamed to 
+  `bigint_chars_format`. 
+
+- The `json_options` modifier `big_integer_format` has been deprecated (still works) and renamed to
+  `bigint_format`.
+
+Non-breaking changes to `ser_context`, `ser_error` and `jsonpath_error`
+
+- The function names `line_number` and `column_number` have been deprecated (still work) and
+  renamed to `line` and `column`.
+
 v0.124.0
 --------
 

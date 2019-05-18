@@ -89,34 +89,6 @@ line and column number is provided in the [context](ser_context.md) parameter.
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 Throws a [ser_error](ser_error.md) to indicate an error. 
 
-    bool bigint_value(const string_view_type& s, 
-                      const ser_context& context=null_ser_context());  
-Writes a bignum using the decimal string representation of a bignum. Contextual information including
-line and column number is provided in the [context](ser_context.md) parameter. 
-Returns `true` if the producer should continue streaming events, `false` otherwise.
-Throws a [ser_error](ser_error.md) to indicate an error. 
-
-    bool bigdec_value(const string_view_type& s, 
-                       const ser_context& context=null_ser_context());  
-Writes a decimal value using the decimal string representation. Contextual information including
-line and column number is provided in the [context](ser_context.md) parameter. 
-Returns `true` if the producer should continue streaming events, `false` otherwise.
-Throws a [ser_error](ser_error.md) to indicate an error. 
-
-    bool datetime_value(const string_view_type& s, 
-                         const ser_context& context=null_ser_context());  
-Writes a date-time value using the string representation. Contextual information including
-line and column number is provided in the [context](ser_context.md) parameter. 
-Returns `true` if the producer should continue streaming events, `false` otherwise.
-Throws a [ser_error](ser_error.md) to indicate an error. 
-
-    bool timestamp_value(int64_t val, 
-                          const ser_context& context=null_ser_context());  
-Writes an epoch time value using the integer representation. Contextual information including
-line and column number is provided in the [context](ser_context.md) parameter. 
-Returns `true` if the producer should continue streaming events, `false` otherwise.
-Throws a [ser_error](ser_error.md) to indicate an error. 
-
     bool int64_value(int64_t value, 
                      semantic_tag tag = semantic_tag::none, 
                      const ser_context& context=null_ser_context());
