@@ -77,6 +77,7 @@ enum class bigint_chars_format : uint8_t {number, base10, base64, base64url
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 typedef bigint_chars_format bignum_chars_format;
+typedef bigint_chars_format big_integer_chars_format;
 #endif
 
 enum class byte_string_chars_format : uint8_t {none=0,base16,base64,base64url};
@@ -288,6 +289,7 @@ public:
     basic_json_options<CharT>&  bigint_format(bigint_chars_format value) {bigint_format_ = value; return *this;}
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+    basic_json_options<CharT>&  big_integer_format(bigint_chars_format value) {bigint_format_ = value; return *this;}
     bignum_chars_format bignum_format() const {return bigint_format_;}
     basic_json_options<CharT>&  bignum_format(bignum_chars_format value) {bigint_format_ = value; return *this;}
 #endif

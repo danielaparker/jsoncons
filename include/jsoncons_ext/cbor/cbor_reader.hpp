@@ -1294,7 +1294,7 @@ private:
                         bignum n(1, v.data(), v.size());
                         buffer_.clear();
                         n.dump(buffer_);
-                        handler_.bigint_value(buffer_, *this);
+                        handler_.string_value(buffer_, semantic_tag::bigint, *this);
                         break;
                     }
                 case 0x3:
@@ -1302,7 +1302,7 @@ private:
                         bignum n(-1, v.data(), v.size());
                         buffer_.clear();
                         n.dump(buffer_);
-                        handler_.bigint_value(buffer_, *this);
+                        handler_.string_value(buffer_, semantic_tag::bigint, *this);
                         break;
                     }
                 case 0x15:

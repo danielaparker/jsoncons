@@ -122,9 +122,9 @@ TEST_CASE("as_string_test")
     encoder.byte_string_value(byte_string{'H','e','l','l','o'});
     encoder.int64_value(-100);
     encoder.uint64_value(100);
-    encoder.bigint_value("18446744073709551616");
+    encoder.string_value("18446744073709551616", semantic_tag::bigint);
     encoder.double_value(10.5);
-    encoder.bigint_value("-18446744073709551617");
+    encoder.string_value("-18446744073709551617", semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
 
@@ -198,7 +198,7 @@ TEST_CASE("dump cbor to string test")
     bignum n(-1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    encoder.bigint_value(s);
+    encoder.string_value(s, semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
 
@@ -240,7 +240,7 @@ TEST_CASE("test_dump_to_stream")
     bignum n(-1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    encoder.bigint_value(s);
+    encoder.string_value(s, semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
 
@@ -368,9 +368,9 @@ TEST_CASE("cbor object comparison")
     encoder1.name("City");
     encoder1.string_value("Montreal");
     encoder1.name("Amount");
-    encoder1.bigdec_value("273.15");
+    encoder1.string_value("273.15", semantic_tag::bigdec);
     encoder1.name("Date");
-    encoder1.datetime_value("2018-05-07 12:41:07-07:00");
+    encoder1.string_value("2018-05-07 12:41:07-07:00", semantic_tag::datetime) ;
     encoder1.end_object(); 
     encoder1.flush();
     json j1 = cbor::decode_cbor<json>(v);
@@ -385,9 +385,9 @@ TEST_CASE("cbor object comparison")
     serializer2.name("City");
     serializer2.string_value("Toronto");
     serializer2.name("Amount");
-    serializer2.bigdec_value("273.15");
+    serializer2.string_value("273.15", semantic_tag::bigdec);
     serializer2.name("Date");
-    serializer2.datetime_value("2018-10-18 12:41:07-07:00");
+    serializer2.string_value("2018-10-18 12:41:07-07:00", semantic_tag::datetime) ;
     serializer2.end_object(); 
     serializer2.flush();
     json j2 = cbor::decode_cbor<json>(buf2);
@@ -460,9 +460,9 @@ TEST_CASE("cbor member tests")
     encoder.name("City");
     encoder.string_value("Montreal");
     encoder.name("Amount");
-    encoder.bigdec_value("273.15");
+    encoder.string_value("273.15", semantic_tag::bigdec);
     encoder.name("Date");
-    encoder.datetime_value("2018-05-07 12:41:07-07:00");
+    encoder.string_value("2018-05-07 12:41:07-07:00", semantic_tag::datetime) ;
 
     encoder.end_object(); 
     encoder.flush();
@@ -499,8 +499,8 @@ TEST_CASE("cbor conversion tests")
     encoder.begin_array(4); // a fixed length array
     encoder.string_value("foo");
     encoder.byte_string_value(byte_string{'P','u','s','s'}); // no suggested conversion
-    encoder.bigint_value("-18446744073709551617");
-    encoder.bigdec_value("273.15");
+    encoder.string_value("-18446744073709551617", semantic_tag::bigint);
+    encoder.string_value("273.15", semantic_tag::bigdec);
     encoder.end_array();
     encoder.end_array();
     encoder.flush();
@@ -534,10 +534,10 @@ TEST_CASE("cbor array as<> test")
     encoder.begin_array(); // indefinite length outer array
     encoder.string_value("foo");
     encoder.byte_string_value(byte_string({'b','a','r'}));
-    encoder.bigint_value("-18446744073709551617");
-    encoder.bigdec_value("273.15");
-    encoder.datetime_value("2015-05-07 12:41:07-07:00");
-    encoder.timestamp_value(1431027667);
+    encoder.string_value("-18446744073709551617", semantic_tag::bigint);
+    encoder.string_value("273.15", semantic_tag::bigdec);
+    encoder.string_value("2015-05-07 12:41:07-07:00", semantic_tag::datetime) ;
+    encoder.int64_value(1431027667, semantic_tag::timestamp);
     encoder.int64_value(-1431027667, semantic_tag::timestamp);
     encoder.double_value(1431027667.5, semantic_tag::timestamp);
     encoder.end_array();

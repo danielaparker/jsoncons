@@ -22,7 +22,7 @@ namespace readme
         encoder.begin_array(3); // a fixed length array
         encoder.string_value("foo");
         encoder.byte_string_value(byte_string{'P','u','s','s'}); // no suggested conversion
-        encoder.bigint_value("-18446744073709551617");
+        encoder.string_value("-18446744073709551617", semantic_tag::bigint);
         encoder.end_array();
         encoder.end_array();
         encoder.flush();

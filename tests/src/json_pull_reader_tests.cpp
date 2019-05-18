@@ -130,7 +130,7 @@ TEST_CASE("json_pull_reader string_value as bignum test")
     CHECK(reader.done());
 }
 
-TEST_CASE("json_pull_reader bigint_value as bignum")
+TEST_CASE("json_pull_reader bigint value as bignum")
 {
     std::string s = "-18446744073709551617";
     std::istringstream is(s);

@@ -107,7 +107,7 @@ TEST_CASE("test_serialize_bignum")
     bignum n(1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    encoder.bigint_value(s);
+    encoder.string_value(s, semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
 
@@ -132,7 +132,7 @@ TEST_CASE("test_serialize_negative_bignum1")
     bignum n(-1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    encoder.bigint_value(s);
+    encoder.string_value(s, semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
 
@@ -157,7 +157,7 @@ TEST_CASE("test_serialize_negative_bignum2")
     bignum n(-1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    encoder.bigint_value(s);
+    encoder.string_value(s, semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
 
@@ -187,7 +187,7 @@ TEST_CASE("test_serialize_negative_bignum3")
     bignum n(-1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    encoder.bigint_value(s);
+    encoder.string_value(s, semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
 
@@ -345,8 +345,8 @@ TEST_CASE("Too many and too few items in CBOR map or array")
         CHECK(encoder.begin_array(4)); // a fixed length array
         CHECK(encoder.string_value("foo"));
         CHECK(encoder.byte_string_value(byte_string{'P','u','s','s'})); // no suggested conversion
-        CHECK(encoder.bigint_value("-18446744073709551617"));
-        CHECK(encoder.bigdec_value("273.15"));
+        CHECK(encoder.string_value("-18446744073709551617", semantic_tag::bigint));
+        CHECK(encoder.string_value("273.15", semantic_tag::bigdec));
         CHECK(encoder.end_array());
         CHECK_FALSE(ec);
         encoder.flush();

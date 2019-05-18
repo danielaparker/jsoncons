@@ -405,13 +405,13 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
     encoder.begin_array(); // indefinite length outer array
     encoder.string_value("foo");
     encoder.byte_string_value(byte_string{'b','a','r'});
-    encoder.bigint_value("-18446744073709551617");
-    encoder.bigdec_value("-273.15");
-    encoder.bigdec_value("273.15");
-    encoder.bigdec_value("18446744073709551616.15");
-    encoder.bigdec_value("-18446744073709551617.15");
-    encoder.datetime_value("2018-10-19 12:41:07-07:00");
-    encoder.timestamp_value(1431027667);
+    encoder.string_value("-18446744073709551617", semantic_tag::bigint);
+    encoder.string_value("-273.15", semantic_tag::bigdec);
+    encoder.string_value("273.15", semantic_tag::bigdec);
+    encoder.string_value("18446744073709551616.15", semantic_tag::bigdec);
+    encoder.string_value("-18446744073709551617.15", semantic_tag::bigdec);
+    encoder.string_value("2018-10-19 12:41:07-07:00", semantic_tag::datetime) ;
+    encoder.int64_value(1431027667, semantic_tag::timestamp);
     encoder.int64_value(-1431027667, semantic_tag::timestamp);
     encoder.double_value(1431027667.5, semantic_tag::timestamp);
     encoder.end_array();

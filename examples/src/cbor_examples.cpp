@@ -54,9 +54,9 @@ void serialize_to_cbor_stream()
     cbor::cbor_encoder encoder(os);
 
     encoder.begin_array(3); // array of length 3
-    encoder.bigint_value("-18446744073709551617");
-    encoder.bigdec_value("184467440737095516.16");
-    encoder.timestamp_value(1431027667);
+    encoder.string_value("-18446744073709551617", semantic_tag::bigint);
+    encoder.string_value("184467440737095516.16", semantic_tag::bigdec);
+    encoder.int64_value(1431027667, semantic_tag::timestamp);
     encoder.end_array();
     encoder.flush();
 
