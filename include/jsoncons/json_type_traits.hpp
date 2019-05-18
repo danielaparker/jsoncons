@@ -968,7 +968,7 @@ public:
     {
         std::basic_string<typename Json::char_type> s;
         val.dump(s);
-        return Json(s,semantic_tag::big_integer);
+        return Json(s,semantic_tag::bigint);
     }
 };
 

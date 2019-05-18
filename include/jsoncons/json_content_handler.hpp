@@ -25,15 +25,15 @@ enum class semantic_tag : uint8_t
 {
     none = 0,
     undefined,
-    date_time,
+    datetime,
     timestamp,
-    big_integer,
-    big_decimal,
+    bigint,
+    bigdec,
     base16,
     base64,
     base64url,
     uri,
-    big_float
+    bigfloat
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -172,19 +172,19 @@ public:
     }
 #endif
 
-    bool big_integer_value(const string_view_type& s, const ser_context& context=null_ser_context()) 
+    bool bigint_value(const string_view_type& s, const ser_context& context=null_ser_context()) 
     {
-        return do_string_value(s, semantic_tag::big_integer, context);
+        return do_string_value(s, semantic_tag::bigint, context);
     }
 
-    bool big_decimal_value(const string_view_type& s, const ser_context& context=null_ser_context()) 
+    bool bigdec_value(const string_view_type& s, const ser_context& context=null_ser_context()) 
     {
-        return do_string_value(s, semantic_tag::big_decimal, context);
+        return do_string_value(s, semantic_tag::bigdec, context);
     }
 
-    bool date_time_value(const string_view_type& s, const ser_context& context=null_ser_context()) 
+    bool datetime_value(const string_view_type& s, const ser_context& context=null_ser_context()) 
     {
-        return do_string_value(s, semantic_tag::date_time, context);
+        return do_string_value(s, semantic_tag::datetime, context);
     }
 
     bool timestamp_value(int64_t val, const ser_context& context=null_ser_context()) 
@@ -275,12 +275,12 @@ public:
 
     bool bignum_value(const string_view_type& s, const ser_context& context=null_ser_context()) 
     {
-        return do_string_value(s, semantic_tag::big_integer, context);
+        return do_string_value(s, semantic_tag::bigint, context);
     }
 
     bool decimal_value(const string_view_type& s, const ser_context& context=null_ser_context()) 
     {
-        return do_string_value(s, semantic_tag::big_decimal, context);
+        return do_string_value(s, semantic_tag::bigdec, context);
     }
 
     bool epoch_time_value(int64_t val, const ser_context& context=null_ser_context()) 

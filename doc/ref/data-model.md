@@ -30,9 +30,9 @@ uint64        | timestamp        | unsigned integer | 1 (epoch-based date/time)
 double        |                  | half-precision float, float, or double |&#160;
 double        | timestamp        | double | 1 (epoch-based date/time)
 string        |                  | string |&#160;
-string        | big_integer      | byte string | 2 (positive bignum) or 3 (negative bignum)  
-string        | big_decimal      | array | 4 (decimal fraction)
-string        | date_time        | string | 0 (date/time string) 
+string        | bigint      | byte string | 2 (positive bignum) or 3 (negative bignum)  
+string        | bigdec      | array | 4 (decimal fraction)
+string        | datetime        | string | 0 (date/time string) 
 string        | uri              | string | 32 (uri)
 string        | base64url        | string | 33 (base64url)
 string        | base64           | string | 34 (base64)
@@ -41,7 +41,7 @@ byte_string   | base64url        | byte string | 21 (Expected conversion to base
 byte_string   | base64           | byte string | 22 (Expected conversion to base64 encoding)
 byte_string   | base16           | byte string | 23 (Expected conversion to base16 encoding)
 array         |                  | array |&#160;
-array         | big_float        | array |&#160; | 5 (bigfloat)
+array         | bigfloat        | array |&#160; | 5 (bigfloat)
 object        |                  | map |&#160;
 
 ### Examples
@@ -60,9 +60,9 @@ int main()
 
     j.emplace_back("foo");
     j.emplace_back(byte_string{ 'b','a','r' });
-    j.emplace_back("-18446744073709551617", semantic_tag::big_integer);
-    j.emplace_back("273.15", semantic_tag::big_decimal);
-    j.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag::date_time);
+    j.emplace_back("-18446744073709551617", semantic_tag::bigint);
+    j.emplace_back("273.15", semantic_tag::bigdec);
+    j.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag::datetime);
     j.emplace_back(1431027667, semantic_tag::timestamp);
     j.emplace_back(-1431027667, semantic_tag::timestamp);
     j.emplace_back(1431027667.5, semantic_tag::timestamp);
@@ -139,9 +139,9 @@ void main()
     encoder.begin_array(); // indefinite length outer array
     encoder.string_value("foo");
     encoder.byte_string_value(byte_string({'b','a','r'}));
-    encoder.big_integer_value("-18446744073709551617");
+    encoder.bigint_value("-18446744073709551617");
     encoder.decimal_value("273.15");
-    encoder.date_time_value("2018-10-19 12:41:07-07:00");
+    encoder.datetime_value("2018-10-19 12:41:07-07:00");
     encoder.epoch_time_value(1431027667);
     encoder.int64_value(-1431027667, semantic_tag::timestamp);
     encoder.double_value(1431027667.5, semantic_tag::timestamp);

@@ -43,9 +43,9 @@ Overrides [floating point format](chars_format.md) when serializing json.
 The default, for a floating point value that was previously decoded from json text, is to preserve the original format when serializing.
 The default, for a floating point value that was directly inserted into a json value, to serialize with [chars_format::general](chars_format.md). 
 
-    virtual big_integer_chars_format big_integer_format() const = 0 
-Overrides [bignum format](big_integer_chars_format.md) when serializing json.
-The default is [big_integer_chars_format::base10](big_integer_chars_format.md). 
+    virtual bigint_chars_format bigint_format() const = 0 
+Overrides [bignum format](bigint_chars_format.md) when serializing json.
+The default is [bigint_chars_format::base10](bigint_chars_format.md). 
 
     virtual byte_string_chars_format byte_string_format() const = 0 
 Overrides [byte string format](byte_string_chars_format.md) when serializing json.

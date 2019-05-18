@@ -89,21 +89,21 @@ line and column number is provided in the [context](ser_context.md) parameter.
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 Throws a [ser_error](ser_error.md) to indicate an error. 
 
-    bool big_integer_value(const string_view_type& s, 
+    bool bigint_value(const string_view_type& s, 
                       const ser_context& context=null_ser_context());  
 Writes a bignum using the decimal string representation of a bignum. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 Throws a [ser_error](ser_error.md) to indicate an error. 
 
-    bool big_decimal_value(const string_view_type& s, 
+    bool bigdec_value(const string_view_type& s, 
                        const ser_context& context=null_ser_context());  
 Writes a decimal value using the decimal string representation. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 Throws a [ser_error](ser_error.md) to indicate an error. 
 
-    bool date_time_value(const string_view_type& s, 
+    bool datetime_value(const string_view_type& s, 
                          const ser_context& context=null_ser_context());  
 Writes a date-time value using the string representation. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 

@@ -336,7 +336,7 @@ int main()
     encoder.begin_array(3); // a fixed length array
     encoder.string_value("foo");
     encoder.byte_string_value(byte_string{'P','u','s','s'}); // no suggested conversion
-    encoder.big_integer_value("-18446744073709551617");
+    encoder.bigint_value("-18446744073709551617");
     encoder.end_array();
     encoder.end_array();
     encoder.flush();
@@ -383,7 +383,7 @@ int main()
     // Print JSON representation with different options
     json_options options;
     options.byte_string_format(byte_string_chars_format::base64)
-           .big_integer_format(big_integer_chars_format::base64url);
+           .bigint_format(bigint_chars_format::base64url);
     std::cout << "(5)\n";
     std::cout << pretty_print(j, options) << "\n\n";
 
@@ -392,7 +392,7 @@ int main()
     json another_array = json::array(); 
     another_array.emplace_back(byte_string({'P','u','s','s'}),
                                semantic_tag::base64); // suggested conversion to base64
-    another_array.emplace_back("273.15", semantic_tag::big_decimal);
+    another_array.emplace_back("273.15", semantic_tag::bigdec);
     another_array.emplace(another_array.array_range().begin(),"bar"); // place at front
 
     j.push_back(std::move(another_array));
@@ -514,11 +514,11 @@ int main()
 
     j.emplace_back(0.000071);
 
-    j.emplace_back("-18446744073709551617",semantic_tag::big_integer);
+    j.emplace_back("-18446744073709551617",semantic_tag::bigint);
 
-    j.emplace_back("1.23456789012345678901234567890", semantic_tag::big_decimal);
+    j.emplace_back("1.23456789012345678901234567890", semantic_tag::bigdec);
 
-    j.emplace_back(json::array({-1,3}), semantic_tag::big_float);
+    j.emplace_back(json::array({-1,3}), semantic_tag::bigfloat);
 
     // Encode to JSON
     std::cout << "(1)\n";

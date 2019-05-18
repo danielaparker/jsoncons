@@ -13,9 +13,9 @@ void data_model_example1()
 
     j.emplace_back("foo");
     j.emplace_back(byte_string{ 'b','a','r' });
-    j.emplace_back("-18446744073709551617", semantic_tag::big_integer);
-    j.emplace_back("273.15", semantic_tag::big_decimal);
-    j.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag::date_time);
+    j.emplace_back("-18446744073709551617", semantic_tag::bigint);
+    j.emplace_back("273.15", semantic_tag::bigdec);
+    j.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag::datetime);
     j.emplace_back(1431027667, semantic_tag::timestamp);
     j.emplace_back(-1431027667, semantic_tag::timestamp);
     j.emplace_back(1431027667.5, semantic_tag::timestamp);
@@ -66,9 +66,9 @@ void data_model_example2()
     encoder.begin_array(); // indefinite length outer array
     encoder.string_value("foo");
     encoder.byte_string_value(byte_string{'b','a','r'});
-    encoder.big_integer_value("-18446744073709551617");
-    encoder.big_decimal_value("273.15");
-    encoder.date_time_value("2018-10-19 12:41:07-07:00");
+    encoder.bigint_value("-18446744073709551617");
+    encoder.bigdec_value("273.15");
+    encoder.datetime_value("2018-10-19 12:41:07-07:00");
     encoder.timestamp_value(1431027667);
     encoder.int64_value(-1431027667, semantic_tag::timestamp);
     encoder.double_value(1431027667.5, semantic_tag::timestamp);

@@ -94,7 +94,7 @@ json j = json::parse(is);
 
 By default, jsoncons parses a number with an exponent or fractional part
 into a double precision floating point number. If you wish, you can
-keep the number as a string with semantic tagging `big_decimal`, 
+keep the number as a string with semantic tagging `bigdec`, 
 using the `lossless_number` option. You can then put it into a `float`, 
 `double`, a boost multiprecision number, or whatever other type you want. 
 
@@ -898,7 +898,7 @@ namespace jsoncons
 
         static bool is(const Json& val) noexcept
         {
-            if (!(val.is_string() && val.semantic_tag() == semantic_tag::big_decimal))
+            if (!(val.is_string() && val.semantic_tag() == semantic_tag::bigdec))
             {
                 return false;
             }
@@ -915,7 +915,7 @@ namespace jsoncons
 
         static Json to_json(multiprecision_type val)
         {
-            return Json(val.str(), semantic_tag::big_decimal);
+            return Json(val.str(), semantic_tag::bigdec);
         }
     };
 }
@@ -1295,7 +1295,7 @@ double price = j["price"].as<double>();
 #### Retrieve a big integer that's been parsed as a string
 
 If an integer exceeds the range of an `int64_t` or `uint64_t`, jsoncons parses it as a string 
-with semantic tagging `big_integer`.
+with semantic tagging `bigint`.
 
 ```c++
 #include <jsoncons/json.hpp>

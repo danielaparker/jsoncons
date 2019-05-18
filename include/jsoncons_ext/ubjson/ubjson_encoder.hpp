@@ -208,8 +208,8 @@ private:
     {
         switch (tag)
         {
-            case semantic_tag::big_integer:
-            case semantic_tag::big_decimal:
+            case semantic_tag::bigint:
+            case semantic_tag::bigdec:
             {
                 result_.push_back(jsoncons::ubjson::detail::ubjson_format::high_precision_number_type);
                 break;

@@ -20,8 +20,8 @@ int64         |                  | uint8_t or integer
 uint64        |                  | uint8_t or integer
 double        |                  | float 32 or float 64
 string        |                  | string
-string        | big_integer      | high precision number type
-string        | big_decimal      | high precision number type
+string        | bigint      | high precision number type
+string        | bigdec      | high precision number type
 byte_string   |                  | array of uint8_t
 array         |                  | array 
 object        |                  | object

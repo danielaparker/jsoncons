@@ -923,7 +923,7 @@ private:
                     {
                         if (options_.lossless_number())
                         {
-                            handler.string_value(value,semantic_tag::big_decimal, *this);
+                            handler.string_value(value,semantic_tag::bigdec, *this);
                         }
                         else
                         {
@@ -1266,7 +1266,7 @@ private:
                     }
                     else
                     {
-                        handler.string_value(value, semantic_tag::big_integer, *this);
+                        handler.string_value(value, semantic_tag::bigint, *this);
                     }
                 }
                 else
@@ -1278,7 +1278,7 @@ private:
                     }
                     else
                     {
-                        handler.string_value(value, semantic_tag::big_integer, *this);
+                        handler.string_value(value, semantic_tag::bigint, *this);
                     }
                 }
                 break;
@@ -1288,7 +1288,7 @@ private:
             {
                 if (options_.lossless_number())
                 {
-                    handler.string_value(value,semantic_tag::big_decimal, *this);
+                    handler.string_value(value,semantic_tag::bigdec, *this);
                 }
                 else
                 {

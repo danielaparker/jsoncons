@@ -2620,7 +2620,7 @@ private:
         }
         else
         {
-            continue_ = handler.string_value(string_buffer_, semantic_tag::big_integer, *this);
+            continue_ = handler.string_value(string_buffer_, semantic_tag::bigint, *this);
         }
         after_value(ec);
     }
@@ -2634,7 +2634,7 @@ private:
         }
         else
         {
-            continue_ = handler.string_value(string_buffer_, semantic_tag::big_integer, *this);
+            continue_ = handler.string_value(string_buffer_, semantic_tag::bigint, *this);
         }
         after_value(ec);
     }
@@ -2645,7 +2645,7 @@ private:
         {
             if (options_.lossless_number())
             {
-                continue_ = handler.string_value(string_buffer_, semantic_tag::big_decimal, *this);
+                continue_ = handler.string_value(string_buffer_, semantic_tag::bigdec, *this);
             }
             else
             {

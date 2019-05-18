@@ -199,7 +199,7 @@ TEST_CASE("test_cbor_parsing")
                      0x82, // Array of length 2
                        0x21, // -2 
                          0x19, 0x6a, 0xb3 // 27315 
-                  },json(json::array({-2,27315}),semantic_tag::big_float));
+                  },json(json::array({-2,27315}),semantic_tag::bigfloat));
 
     SECTION("maps with definite length")
     {
@@ -245,9 +245,9 @@ TEST_CASE("test_cbor_parsing")
     check_parse_cbor({0xc2,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
                   json(bignum(1,{0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00})));
 
-    // date_time
+    // datetime
     check_parse_cbor({0xc0,0x78,0x19,'2','0','1','5','-','0','5','-','0','7',' ','1','2',':','4','1',':','0','7','-','0','7',':','0','0'},
-                  json("2015-05-07 12:41:07-07:00", semantic_tag::date_time));
+                  json("2015-05-07 12:41:07-07:00", semantic_tag::datetime));
 
     // epoch_time
     check_parse_cbor({0xc1,0x1a,0x55,0x4b,0xbf,0xd3},
@@ -261,38 +261,38 @@ TEST_CASE("cbor decimal fraction")
                    0x21, // -2
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("273.15", semantic_tag::big_decimal));
+                  json("273.15", semantic_tag::bigdec));
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x22, // -3
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("27.315", semantic_tag::big_decimal));
+                  json("27.315", semantic_tag::bigdec));
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x23, // -4
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("2.7315", semantic_tag::big_decimal));
+                  json("2.7315", semantic_tag::bigdec));
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x24, // -5
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("0.27315", semantic_tag::big_decimal));
+                  json("0.27315", semantic_tag::bigdec));
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x25, // -6
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("0.027315", semantic_tag::big_decimal));
+                  json("0.027315", semantic_tag::bigdec));
 
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x04, // 4
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("273150000.0", semantic_tag::big_decimal));
+                  json("273150000.0", semantic_tag::bigdec));
 }
 
 TEST_CASE("test_decimal_as_string")
@@ -405,12 +405,12 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
     encoder.begin_array(); // indefinite length outer array
     encoder.string_value("foo");
     encoder.byte_string_value(byte_string{'b','a','r'});
-    encoder.big_integer_value("-18446744073709551617");
-    encoder.big_decimal_value("-273.15");
-    encoder.big_decimal_value("273.15");
-    encoder.big_decimal_value("18446744073709551616.15");
-    encoder.big_decimal_value("-18446744073709551617.15");
-    encoder.date_time_value("2018-10-19 12:41:07-07:00");
+    encoder.bigint_value("-18446744073709551617");
+    encoder.bigdec_value("-273.15");
+    encoder.bigdec_value("273.15");
+    encoder.bigdec_value("18446744073709551616.15");
+    encoder.bigdec_value("-18446744073709551617.15");
+    encoder.datetime_value("2018-10-19 12:41:07-07:00");
     encoder.timestamp_value(1431027667);
     encoder.int64_value(-1431027667, semantic_tag::timestamp);
     encoder.double_value(1431027667.5, semantic_tag::timestamp);
@@ -420,12 +420,12 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
     json expected = json::array();
     expected.emplace_back("foo");
     expected.emplace_back(byte_string{ 'b','a','r' });
-    expected.emplace_back("-18446744073709551617", semantic_tag::big_integer);
-    expected.emplace_back("-273.15", semantic_tag::big_decimal);
-    expected.emplace_back("273.15", semantic_tag::big_decimal);
-    expected.emplace_back("1.844674407370955161615e+19", semantic_tag::big_decimal);
-    expected.emplace_back("-1.844674407370955161715e+19", semantic_tag::big_decimal);
-    expected.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag::date_time);
+    expected.emplace_back("-18446744073709551617", semantic_tag::bigint);
+    expected.emplace_back("-273.15", semantic_tag::bigdec);
+    expected.emplace_back("273.15", semantic_tag::bigdec);
+    expected.emplace_back("1.844674407370955161615e+19", semantic_tag::bigdec);
+    expected.emplace_back("-1.844674407370955161715e+19", semantic_tag::bigdec);
+    expected.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag::datetime);
     expected.emplace_back(1431027667, semantic_tag::timestamp);
     expected.emplace_back(-1431027667, semantic_tag::timestamp);
     expected.emplace_back(1431027667.5, semantic_tag::timestamp);

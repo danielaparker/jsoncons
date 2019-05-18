@@ -74,13 +74,13 @@ Constructs a new encoder that writes to the specified result.
                            semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=null_ser_context()); 
 
-    bool big_integer_value(const string_view_type& s, 
+    bool bigint_value(const string_view_type& s, 
                            const ser_context& context=null_ser_context());  
 
-    bool big_decimal_value(const string_view_type& s, 
+    bool bigdec_value(const string_view_type& s, 
                            const ser_context& context=null_ser_context());  
 
-    bool date_time_value(const string_view_type& s, 
+    bool datetime_value(const string_view_type& s, 
                          const ser_context& context=null_ser_context());  
 
     bool timestamp_value(int64_t val, 
@@ -172,8 +172,8 @@ int main()
     cbor::cbor_encoder encoder(os);
 
     encoder.begin_array(3); // array of length 3
-    encoder.big_integer_value("-18446744073709551617");
-    encoder.big_decimal_value("184467440737095516.16");
+    encoder.bigint_value("-18446744073709551617");
+    encoder.bigdec_value("184467440737095516.16");
     encoder.timestamp_value(1431027667);
     encoder.end_array();
     encoder.flush();

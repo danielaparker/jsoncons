@@ -17,26 +17,26 @@ data structures, using [json_type_traits](../json_type_traits.md).
 All tags not explicitly mentioned below are ignored.
 
 0 (standard date/time string)  
-CBOR standard date/time strings are decoded into jsoncons strings tagged with `semantic_tag::date_time`.
-jsoncons strings tagged with `semantic_tag::date_time` are encoded into CBOR standard date/time strings.
+CBOR standard date/time strings are decoded into jsoncons strings tagged with `semantic_tag::datetime`.
+jsoncons strings tagged with `semantic_tag::datetime` are encoded into CBOR standard date/time strings.
 
 1 (epoch time)  
 CBOR epoch times are decoded into jsoncons int64_t, uint64_t and double and tagged with `semantic_tag::timestamp`. 
 jsoncons int64_t, uint64_t and double tagged with `semantic_tag::timestamp` are encoded into CBOR epoch time.
 
 2,3 (positive and negative bignum)  
-CBOR positive and negative bignums are decoded into jsoncons strings and tagged with `semantic_tag::big_integer`.
-jsoncons strings tagged with `semantic_tag::big_integer` are encoded into CBOR positive or negative bignums.
+CBOR positive and negative bignums are decoded into jsoncons strings and tagged with `semantic_tag::bigint`.
+jsoncons strings tagged with `semantic_tag::bigint` are encoded into CBOR positive or negative bignums.
 
 4 (decimal fratction)  
-CBOR decimal fractions are decoded into jsoncons strings tagged with `semantic_tag::big_decimal`.
-jsoncons strings tagged with `semantic_tag::big_decimal` are encoded into CBOR decimal fractions.
+CBOR decimal fractions are decoded into jsoncons strings tagged with `semantic_tag::bigdec`.
+jsoncons strings tagged with `semantic_tag::bigdec` are encoded into CBOR decimal fractions.
 
 5 (bigfloat)  
 CBOR bigfloats are decoded into a jsoncons array that contains a base-2 exponent and a mantissa, 
-and tagged with `semantic_tag::big_float`. The exponent is represented as an int64_t or uint64_t,
-while the mantissa can be an int64_t or uint64_t, or a string tagged with `semantic_tag::big_integer`.
-jsoncons arrays tagged with `semantic_tag::big_float` are encoded into CBOR bigfloats.
+and tagged with `semantic_tag::bigfloat`. The exponent is represented as an int64_t or uint64_t,
+while the mantissa can be an int64_t or uint64_t, or a string tagged with `semantic_tag::bigint`.
+jsoncons arrays tagged with `semantic_tag::bigfloat` are encoded into CBOR bigfloats.
 
 21, 22, 23 (byte string expected conversion is base64url, base64 or base16)  
 CBOR byte strings tagged with 21, 22 and 23 are decoded into jsoncons byte strings tagged with
@@ -69,9 +69,9 @@ uint64        | timestamp        | unsigned integer | 1 (epoch-based date/time)
 double        |                  | half-precision float, float, or double |&#160;
 double        | timestamp        | double | 1 (epoch-based date/time)
 string        |                  | string |&#160;
-string        | big_integer      | byte string | 2 (positive bignum) or 2 (negative bignum)  
-string        | big_decimal      | array | 4 (decimal fraction)
-string        | date_time        | string | 0 (date/time string) 
+string        | bigint      | byte string | 2 (positive bignum) or 2 (negative bignum)  
+string        | bigdec      | array | 4 (decimal fraction)
+string        | datetime        | string | 0 (date/time string) 
 string        | uri              | string | 32 (uri)
 string        | base64url        | string | 33 (base64url)
 string        | base64           | string | 34 (base64)

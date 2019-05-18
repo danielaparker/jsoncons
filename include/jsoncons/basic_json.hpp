@@ -732,11 +732,11 @@ public:
 
             if (s.length() <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag::big_integer, s.data(), static_cast<uint8_t>(s.length()));
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag::bigint, s.data(), static_cast<uint8_t>(s.length()));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag::big_integer, s.data(), s.length(), char_allocator_type());
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag::bigint, s.data(), s.length(), char_allocator_type());
             }
         }
 
@@ -747,11 +747,11 @@ public:
 
             if (s.length() <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag::big_integer, s.data(), static_cast<uint8_t>(s.length()));
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag::bigint, s.data(), static_cast<uint8_t>(s.length()));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag::big_integer, s.data(), s.length(), char_allocator_type(allocator));
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag::bigint, s.data(), s.length(), char_allocator_type(allocator));
             }
         }
         variant(const object& val, semantic_tag tag)
@@ -2193,9 +2193,9 @@ public:
         }
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-        bool is_date_time() const noexcept
+        bool is_datetime() const noexcept
         {
-            return evaluate().is_date_time();
+            return evaluate().is_datetime();
         }
 
         bool is_epoch_time() const noexcept
@@ -3327,10 +3327,10 @@ public:
                 return true;
             case storage_type::short_string_val:
             case storage_type::long_string_val:
-                return var_.get_semantic_tag() == semantic_tag::big_integer ||
-                       var_.get_semantic_tag() == semantic_tag::big_decimal;
+                return var_.get_semantic_tag() == semantic_tag::bigint ||
+                       var_.get_semantic_tag() == semantic_tag::bigdec;
             case storage_type::array_val:
-                return var_.get_semantic_tag() == semantic_tag::big_float;
+                return var_.get_semantic_tag() == semantic_tag::bigfloat;
             default:
                 return false;
         }
@@ -3445,7 +3445,7 @@ public:
         {
         case storage_type::short_string_val:
         case storage_type::long_string_val:
-            if (var_.get_semantic_tag() == semantic_tag::big_integer)
+            if (var_.get_semantic_tag() == semantic_tag::bigint)
             {
                 return static_cast<bool>(var_.as_bignum());
             }
@@ -3551,7 +3551,7 @@ public:
             case storage_type::uint64_val:
                 return static_cast<double>(var_.uint64_data_cast()->value());
             case storage_type::array_val:
-                if (get_semantic_tag() == semantic_tag::big_float)
+                if (get_semantic_tag() == semantic_tag::bigfloat)
                 {
                     jsoncons::detail::string_to_double to_double;
                     string_type s = as_string();
@@ -3645,7 +3645,7 @@ public:
             case storage_type::array_val:
             {
                 string_type s(allocator);
-                if (get_semantic_tag() == semantic_tag::big_float)
+                if (get_semantic_tag() == semantic_tag::bigfloat)
                 {
                     JSONCONS_ASSERT(size() == 2);
                     int64_t exp = at(0).template as_integer<int64_t>();
@@ -3712,9 +3712,9 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-    bool is_date_time() const noexcept
+    bool is_datetime() const noexcept
     {
-        return var_.get_semantic_tag() == semantic_tag::date_time;
+        return var_.get_semantic_tag() == semantic_tag::datetime;
     }
 
     bool is_epoch_time() const noexcept

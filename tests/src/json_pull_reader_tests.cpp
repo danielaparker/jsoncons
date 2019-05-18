@@ -130,7 +130,7 @@ TEST_CASE("json_pull_reader string_value as bignum test")
     CHECK(reader.done());
 }
 
-TEST_CASE("json_pull_reader big_integer_value as bignum")
+TEST_CASE("json_pull_reader bigint_value as bignum")
 {
     std::string s = "-18446744073709551617";
     std::istringstream is(s);
@@ -139,7 +139,7 @@ TEST_CASE("json_pull_reader big_integer_value as bignum")
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == staj_event_type::string_value);
-    CHECK(reader.current().get_semantic_tag() == semantic_tag::big_integer);
+    CHECK(reader.current().get_semantic_tag() == semantic_tag::bigint);
     bignum c = reader.current().as<bignum>();
     CHECK(bool(bignum(s) == c));
     reader.next();

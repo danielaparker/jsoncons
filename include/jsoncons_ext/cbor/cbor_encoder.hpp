@@ -197,7 +197,7 @@ private:
 
     bool do_begin_array(size_t length, semantic_tag tag, const ser_context&) override
     {
-        if (length == 2 && tag == semantic_tag::big_float)
+        if (length == 2 && tag == semantic_tag::bigfloat)
         {
             result_.push_back(0xc5);
         }
@@ -543,18 +543,18 @@ private:
     {
         switch (tag)
         {
-            case semantic_tag::big_integer:
+            case semantic_tag::bigint:
             {
                 write_bignum(sv);
                 end_value();
                 break;
             }
-            case semantic_tag::big_decimal:
+            case semantic_tag::bigdec:
             {
                 write_decimal_value(sv, context);
                 break;
             }
-            case semantic_tag::date_time:
+            case semantic_tag::datetime:
             {
                 result_.push_back(0xc0);
                 write_string(sv);

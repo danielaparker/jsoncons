@@ -107,7 +107,7 @@ TEST_CASE("test_serialize_bignum")
     bignum n(1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    encoder.big_integer_value(s);
+    encoder.bigint_value(s);
     encoder.end_array();
     encoder.flush();
 
@@ -132,7 +132,7 @@ TEST_CASE("test_serialize_negative_bignum1")
     bignum n(-1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    encoder.big_integer_value(s);
+    encoder.bigint_value(s);
     encoder.end_array();
     encoder.flush();
 
@@ -157,7 +157,7 @@ TEST_CASE("test_serialize_negative_bignum2")
     bignum n(-1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    encoder.big_integer_value(s);
+    encoder.bigint_value(s);
     encoder.end_array();
     encoder.flush();
 
@@ -165,7 +165,7 @@ TEST_CASE("test_serialize_negative_bignum2")
     {
         json result = cbor::decode_cbor<json>(v);
         json_options options;
-        options.big_integer_format(big_integer_chars_format::number);
+        options.bigint_format(bigint_chars_format::number);
         std::string text;
         result.dump(text,options);
         CHECK(text == std::string("[-18446744073709551617]"));
@@ -187,7 +187,7 @@ TEST_CASE("test_serialize_negative_bignum3")
     bignum n(-1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    encoder.big_integer_value(s);
+    encoder.bigint_value(s);
     encoder.end_array();
     encoder.flush();
 
@@ -195,7 +195,7 @@ TEST_CASE("test_serialize_negative_bignum3")
     {
         json result = cbor::decode_cbor<json>(v);
         json_options options;
-        options.big_integer_format(big_integer_chars_format::base64url);
+        options.bigint_format(bigint_chars_format::base64url);
         std::string text;
         result.dump(text,options);
         CHECK(text == std::string("[\"~AQAAAAAAAAAA\"]"));
@@ -206,13 +206,13 @@ TEST_CASE("test_serialize_negative_bignum3")
     }
 } 
 
-TEST_CASE("serialize big_decimal to cbor")
+TEST_CASE("serialize bigdec to cbor")
 {
     SECTION("-1 184467440737095516160")
     {
         std::vector<uint8_t> v;
         cbor::cbor_bytes_encoder encoder(v);
-        encoder.string_value("18446744073709551616.0", semantic_tag::big_decimal);
+        encoder.string_value("18446744073709551616.0", semantic_tag::bigdec);
         encoder.flush();
         try
         {
@@ -228,7 +228,7 @@ TEST_CASE("serialize big_decimal to cbor")
     {
         std::vector<uint8_t> v;
         cbor::cbor_bytes_encoder encoder(v);
-        encoder.string_value("18446744073709551616e-5", semantic_tag::big_decimal);
+        encoder.string_value("18446744073709551616e-5", semantic_tag::bigdec);
         encoder.flush();
         try
         {
@@ -244,7 +244,7 @@ TEST_CASE("serialize big_decimal to cbor")
     {
         std::vector<uint8_t> v;
         cbor::cbor_bytes_encoder encoder(v);
-        encoder.string_value("-18446744073709551616e-5", semantic_tag::big_decimal);
+        encoder.string_value("-18446744073709551616e-5", semantic_tag::bigdec);
         encoder.flush();
         try
         {
@@ -260,7 +260,7 @@ TEST_CASE("serialize big_decimal to cbor")
     {
         std::vector<uint8_t> v;
         cbor::cbor_bytes_encoder encoder(v);
-        encoder.string_value("-18446744073709551616e5", semantic_tag::big_decimal);
+        encoder.string_value("-18446744073709551616e5", semantic_tag::bigdec);
         encoder.flush();
         try
         {
@@ -345,8 +345,8 @@ TEST_CASE("Too many and too few items in CBOR map or array")
         CHECK(encoder.begin_array(4)); // a fixed length array
         CHECK(encoder.string_value("foo"));
         CHECK(encoder.byte_string_value(byte_string{'P','u','s','s'})); // no suggested conversion
-        CHECK(encoder.big_integer_value("-18446744073709551617"));
-        CHECK(encoder.big_decimal_value("273.15"));
+        CHECK(encoder.bigint_value("-18446744073709551617"));
+        CHECK(encoder.bigdec_value("273.15"));
         CHECK(encoder.end_array());
         CHECK_FALSE(ec);
         encoder.flush();

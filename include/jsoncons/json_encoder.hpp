@@ -630,8 +630,8 @@ private:
 
         switch (tag)
         {
-            case semantic_tag::big_integer:
-                write_big_integer_value(sv);
+            case semantic_tag::bigint:
+                write_bigint_value(sv);
                 break;
             default:
             {
@@ -887,20 +887,20 @@ private:
         }
     }
 
-    void write_big_integer_value(const string_view_type& sv)
+    void write_bigint_value(const string_view_type& sv)
     {
-        switch (options_.big_integer_format())
+        switch (options_.bigint_format())
         {
 #if !defined(JSONCONS_NO_DEPRECATED)
-            case big_integer_chars_format::integer:
+            case bigint_chars_format::integer:
 #endif
-            case big_integer_chars_format::number:
+            case bigint_chars_format::number:
             {
                 result_.append(sv.data(),sv.size());
                 column_ += sv.size();
                 break;
             }
-            case big_integer_chars_format::base64:
+            case bigint_chars_format::base64:
             {
                 bignum n(sv.data(), sv.length());
                 int signum;
@@ -918,7 +918,7 @@ private:
                 column_ += (length+2);
                 break;
             }
-            case big_integer_chars_format::base64url:
+            case bigint_chars_format::base64url:
             {
                 bignum n(sv.data(), sv.length());
                 int signum;
@@ -1168,16 +1168,16 @@ private:
         return true;
     }
 
-    void write_big_integer_value(const string_view_type& sv)
+    void write_bigint_value(const string_view_type& sv)
     {
-        switch (options_.big_integer_format())
+        switch (options_.bigint_format())
         {
-            case big_integer_chars_format::number:
+            case bigint_chars_format::number:
             {
                 result_.append(sv.data(),sv.size());
                 break;
             }
-            case big_integer_chars_format::base64:
+            case bigint_chars_format::base64:
             {
                 bignum n(sv.data(), sv.length());
                 int signum;
@@ -1193,7 +1193,7 @@ private:
                 result_.push_back('\"');
                 break;
             }
-            case big_integer_chars_format::base64url:
+            case bigint_chars_format::base64url:
             {
                 bignum n(sv.data(), sv.length());
                 int signum;
@@ -1228,8 +1228,8 @@ private:
 
         switch (tag)
         {
-            case semantic_tag::big_integer:
-                write_big_integer_value(sv);
+            case semantic_tag::bigint:
+                write_bigint_value(sv);
                 break;
             default:
             {

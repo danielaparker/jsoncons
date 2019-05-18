@@ -82,7 +82,7 @@ Quote character. Default is quote character "
 Infer null, true, false, integers and floating point values in the CSV source. Default is `true`.
 
     basic_csv_options& lossless_number(bool value); 
-If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::big_decimal`. Default is `false`.
+If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`. Default is `false`.
 
     basic_csv_options& quote_escape_char(CharT value);
 Character to escape quote character (by default the quote character is doubled). Default is quote character `"`.

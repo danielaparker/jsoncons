@@ -22,13 +22,13 @@ TEST_CASE("json(string_view)")
     CHECK(j.as_string_view() == sv);
 }
 
-TEST_CASE("json(string, semantic_tag::date_time)")
+TEST_CASE("json(string, semantic_tag::datetime)")
 {
     std::string s("2015-05-07 12:41:07-07:00");
 
-    json j(s, semantic_tag::date_time);
+    json j(s, semantic_tag::datetime);
 
-    CHECK(j.get_semantic_tag() == semantic_tag::date_time);
+    CHECK(j.get_semantic_tag() == semantic_tag::datetime);
     CHECK(j.as<std::string>() == s);
 }
 

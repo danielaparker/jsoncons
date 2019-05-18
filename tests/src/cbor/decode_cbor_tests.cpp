@@ -122,9 +122,9 @@ TEST_CASE("as_string_test")
     encoder.byte_string_value(byte_string{'H','e','l','l','o'});
     encoder.int64_value(-100);
     encoder.uint64_value(100);
-    encoder.big_integer_value("18446744073709551616");
+    encoder.bigint_value("18446744073709551616");
     encoder.double_value(10.5);
-    encoder.big_integer_value("-18446744073709551617");
+    encoder.bigint_value("-18446744073709551617");
     encoder.end_array();
     encoder.flush();
 
@@ -198,7 +198,7 @@ TEST_CASE("dump cbor to string test")
     bignum n(-1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    encoder.big_integer_value(s);
+    encoder.bigint_value(s);
     encoder.end_array();
     encoder.flush();
 
@@ -211,21 +211,21 @@ TEST_CASE("dump cbor to string test")
 
     std::string s1;
     json_options options1;
-    options1.big_integer_format(big_integer_chars_format::number);
+    options1.bigint_format(bigint_chars_format::number);
     j.dump(s1,options1);
     CHECK("[-18446744073709551617]" == s1);
     //std::cout << s1 << std::endl;
 
     std::string s2;
     json_options options2;
-    options2.big_integer_format(big_integer_chars_format::base10);
+    options2.bigint_format(bigint_chars_format::base10);
     j.dump(s2,options2);
     CHECK("[\"-18446744073709551617\"]" == s2);
     //std::cout << s2 << std::endl;
 
     std::string s3;
     json_options options3;
-    options3.big_integer_format(big_integer_chars_format::base64url);
+    options3.bigint_format(bigint_chars_format::base64url);
     j.dump(s3,options3);
     CHECK("[\"~AQAAAAAAAAAA\"]" == s3);
     //std::cout << s3 << std::endl;
@@ -240,7 +240,7 @@ TEST_CASE("test_dump_to_stream")
     bignum n(-1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    encoder.big_integer_value(s);
+    encoder.bigint_value(s);
     encoder.end_array();
     encoder.flush();
 
@@ -253,21 +253,21 @@ TEST_CASE("test_dump_to_stream")
 
     std::ostringstream os1;
     json_options options1;
-    options1.big_integer_format(big_integer_chars_format::number);
+    options1.bigint_format(bigint_chars_format::number);
     j.dump(os1,options1);
     CHECK("[-18446744073709551617]" == os1.str());
     //std::cout << os1.str() << std::endl;
 
     std::ostringstream os2;
     json_options options2;
-    options2.big_integer_format(big_integer_chars_format::base10);
+    options2.bigint_format(bigint_chars_format::base10);
     j.dump(os2,options2);
     CHECK("[\"-18446744073709551617\"]" == os2.str());
     //std::cout << os2.str() << std::endl;
 
     std::ostringstream os3;
     json_options options3;
-    options3.big_integer_format(big_integer_chars_format::base64url);
+    options3.bigint_format(bigint_chars_format::base64url);
     j.dump(os3,options3);
     CHECK("[\"~AQAAAAAAAAAA\"]" == os3.str());
     //std::cout << os3.str() << std::endl;
@@ -368,9 +368,9 @@ TEST_CASE("cbor object comparison")
     encoder1.name("City");
     encoder1.string_value("Montreal");
     encoder1.name("Amount");
-    encoder1.big_decimal_value("273.15");
+    encoder1.bigdec_value("273.15");
     encoder1.name("Date");
-    encoder1.date_time_value("2018-05-07 12:41:07-07:00");
+    encoder1.datetime_value("2018-05-07 12:41:07-07:00");
     encoder1.end_object(); 
     encoder1.flush();
     json j1 = cbor::decode_cbor<json>(v);
@@ -385,9 +385,9 @@ TEST_CASE("cbor object comparison")
     serializer2.name("City");
     serializer2.string_value("Toronto");
     serializer2.name("Amount");
-    serializer2.big_decimal_value("273.15");
+    serializer2.bigdec_value("273.15");
     serializer2.name("Date");
-    serializer2.date_time_value("2018-10-18 12:41:07-07:00");
+    serializer2.datetime_value("2018-10-18 12:41:07-07:00");
     serializer2.end_object(); 
     serializer2.flush();
     json j2 = cbor::decode_cbor<json>(buf2);
@@ -460,9 +460,9 @@ TEST_CASE("cbor member tests")
     encoder.name("City");
     encoder.string_value("Montreal");
     encoder.name("Amount");
-    encoder.big_decimal_value("273.15");
+    encoder.bigdec_value("273.15");
     encoder.name("Date");
-    encoder.date_time_value("2018-05-07 12:41:07-07:00");
+    encoder.datetime_value("2018-05-07 12:41:07-07:00");
 
     encoder.end_object(); 
     encoder.flush();
@@ -499,8 +499,8 @@ TEST_CASE("cbor conversion tests")
     encoder.begin_array(4); // a fixed length array
     encoder.string_value("foo");
     encoder.byte_string_value(byte_string{'P','u','s','s'}); // no suggested conversion
-    encoder.big_integer_value("-18446744073709551617");
-    encoder.big_decimal_value("273.15");
+    encoder.bigint_value("-18446744073709551617");
+    encoder.bigdec_value("273.15");
     encoder.end_array();
     encoder.end_array();
     encoder.flush();
@@ -534,9 +534,9 @@ TEST_CASE("cbor array as<> test")
     encoder.begin_array(); // indefinite length outer array
     encoder.string_value("foo");
     encoder.byte_string_value(byte_string({'b','a','r'}));
-    encoder.big_integer_value("-18446744073709551617");
-    encoder.big_decimal_value("273.15");
-    encoder.date_time_value("2015-05-07 12:41:07-07:00");
+    encoder.bigint_value("-18446744073709551617");
+    encoder.bigdec_value("273.15");
+    encoder.datetime_value("2015-05-07 12:41:07-07:00");
     encoder.timestamp_value(1431027667);
     encoder.int64_value(-1431027667, semantic_tag::timestamp);
     encoder.double_value(1431027667.5, semantic_tag::timestamp);
@@ -590,7 +590,7 @@ TEST_CASE("cbor array as<> test")
         CHECK(j[1].is<byte_string_view>());
         CHECK(j[2].is<bignum>());
         CHECK(j[3].is_string());
-        CHECK(j[3].get_semantic_tag() == semantic_tag::big_decimal);
+        CHECK(j[3].get_semantic_tag() == semantic_tag::bigdec);
         CHECK(j[4].is<std::string>());
         CHECK(j[5].is<int>());
         CHECK(j[5].is<unsigned int>());

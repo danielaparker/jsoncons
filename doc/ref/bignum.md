@@ -214,13 +214,13 @@ int main()
 
     std::cout << "(4) ";
     json_options options1;
-    options1.big_integer_format(big_integer_chars_format::number);
+    options1.bigint_format(bigint_chars_format::number);
     j.dump(std::cout, options1);
     std::cout << "\n\n";
 
     std::cout << "(5) ";
     json_options options2;
-    options2.big_integer_format(big_integer_chars_format::base64url);
+    options2.bigint_format(bigint_chars_format::base64url);
     j.dump(std::cout, options2);
     std::cout << "\n\n";
 }
@@ -257,13 +257,13 @@ int main()
 
     std::cout << "(2) ";
     json_options options1;
-    options1.big_integer_format(big_integer_chars_format::number);
+    options1.bigint_format(bigint_chars_format::number);
     j.dump(std::cout, options1);
     std::cout << "\n\n";
 
     std::cout << "(3) ";
     json_options options2;
-    options2.big_integer_format(big_integer_chars_format::base64url);
+    options2.bigint_format(bigint_chars_format::base64url);
     j.dump(std::cout, options2);
     std::cout << "\n\n";
 }

@@ -8,7 +8,7 @@
 #include <utility>
 #include <ctime>
 #include <cassert>
-#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/datetime/gregorian/gregorian.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
@@ -54,7 +54,7 @@ namespace jsoncons
 
         static bool is(const Json& val) noexcept
         {
-            if (!(val.is_string() && val.get_semantic_tag() == semantic_tag::big_decimal))
+            if (!(val.is_string() && val.get_semantic_tag() == semantic_tag::bigdec))
             {
                 return false;
             }
@@ -71,7 +71,7 @@ namespace jsoncons
 
         static Json to_json(multiprecision_type val)
         {
-            return Json(val.str(), semantic_tag::big_decimal);
+            return Json(val.str(), semantic_tag::bigdec);
         }
     };
 

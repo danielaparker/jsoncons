@@ -444,7 +444,7 @@ private:
                     {
                         return;
                     }
-                    handler_.string_value(s, semantic_tag::big_decimal);
+                    handler_.string_value(s, semantic_tag::bigdec);
                     tags_.pop_back();
                 }
                 else
@@ -473,7 +473,7 @@ private:
             switch (t)
             {
                 case 0x05:
-                    tag = semantic_tag::big_float;
+                    tag = semantic_tag::bigfloat;
                     break;
                 case 0x100: // 256 (stringref-namespace)
                     stringref_map = std::make_shared<stringref_map_type>();
@@ -1264,7 +1264,7 @@ private:
             switch (tags_.back())
             {
                 case 0:
-                    tag = semantic_tag::date_time;
+                    tag = semantic_tag::datetime;
                     break;
                 case 32:
                     tag = semantic_tag::uri;
@@ -1294,7 +1294,7 @@ private:
                         bignum n(1, v.data(), v.size());
                         buffer_.clear();
                         n.dump(buffer_);
-                        handler_.big_integer_value(buffer_, *this);
+                        handler_.bigint_value(buffer_, *this);
                         break;
                     }
                 case 0x3:
@@ -1302,7 +1302,7 @@ private:
                         bignum n(-1, v.data(), v.size());
                         buffer_.clear();
                         n.dump(buffer_);
-                        handler_.big_integer_value(buffer_, *this);
+                        handler_.bigint_value(buffer_, *this);
                         break;
                     }
                 case 0x15:

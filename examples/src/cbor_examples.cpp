@@ -54,8 +54,8 @@ void serialize_to_cbor_stream()
     cbor::cbor_encoder encoder(os);
 
     encoder.begin_array(3); // array of length 3
-    encoder.big_integer_value("-18446744073709551617");
-    encoder.big_decimal_value("184467440737095516.16");
+    encoder.bigint_value("-18446744073709551617");
+    encoder.bigdec_value("184467440737095516.16");
     encoder.timestamp_value(1431027667);
     encoder.end_array();
     encoder.flush();
@@ -209,11 +209,11 @@ void query_cbor()
 
     j.emplace_back(0.000071);
 
-    j.emplace_back("-18446744073709551617",semantic_tag::big_integer);
+    j.emplace_back("-18446744073709551617",semantic_tag::bigint);
 
-    j.emplace_back("1.23456789012345678901234567890", semantic_tag::big_decimal);
+    j.emplace_back("1.23456789012345678901234567890", semantic_tag::bigdec);
 
-    j.emplace_back(json::array({-1,3}), semantic_tag::big_float);
+    j.emplace_back(json::array({-1,3}), semantic_tag::bigfloat);
 
     // Encode to JSON
     std::cout << "(1)\n";

@@ -5,15 +5,15 @@ enum class semantic_tag : uint8_t
 {
     none = 0,
     undefined,
-    date_time,
+    datetime,
     timestamp,
-    big_integer,
-    big_decimal,
+    bigint,
+    bigdec,
     base16,
     base64,
     base64url,
     uri,
-    big_float
+    bigfloat
 };
 ```
 

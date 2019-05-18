@@ -49,9 +49,9 @@ Default is `false`
     json_options & pad_inside_array_brackets(bool value)
 Default is `false`
 
-    json_options& big_integer_format(big_integer_chars_format value)
-Overrides [bignum format](big_integer_chars_format.md) when serializing json.
-The default is [big_integer_chars_format::base10](big_integer_chars_format.md). 
+    json_options& bigint_format(bigint_chars_format value)
+Overrides [bignum format](bigint_chars_format.md) when serializing json.
+The default is [bigint_chars_format::base10](bigint_chars_format.md). 
 
     json_options& byte_string_format(byte_string_chars_format value)
 Overrides [byte string format](byte_string_chars_format.md) when serializing json.
@@ -90,7 +90,7 @@ Sets a string replacement for negative infinity when writing JSON, and indicate 
 to be used when reading JSON.
 
     json_options& lossless_number(bool value); 
-If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::big_decimal`.
+If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`.
 Defaults to `false`.
 
     json_options& new_line_chars(const std::string& value)
@@ -165,7 +165,7 @@ Output:
 
 By default, jsoncons parses a number with an exponent or fractional part
 into a double precision floating point number. If you wish, you can
-keep the number as a string with semantic tagging `big_decimal`, 
+keep the number as a string with semantic tagging `bigdec`, 
 using the `lossless_number` option. You can then put it into a `float`, 
 `double`, a boost multiprecision number, or whatever other type you want. 
 
