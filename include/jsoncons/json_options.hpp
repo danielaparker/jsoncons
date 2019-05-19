@@ -71,7 +71,7 @@ enum class line_split_kind  : uint8_t {same_line,new_line,multi_line};
 
 enum class bigint_chars_format : uint8_t {number, base10, base64, base64url
 #if !defined(JSONCONS_NO_DEPRECATED)
-,string,integer
+,integer = number
 #endif
 };
 

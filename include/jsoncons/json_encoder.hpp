@@ -891,9 +891,6 @@ private:
     {
         switch (options_.bigint_format())
         {
-#if !defined(JSONCONS_NO_DEPRECATED)
-            case bigint_chars_format::integer:
-#endif
             case bigint_chars_format::number:
             {
                 result_.append(sv.data(),sv.size());

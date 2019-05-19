@@ -35,10 +35,10 @@ enum class semantic_tag : uint8_t
     base64url = 0x09,
     uri = 0x0a
 #if !defined(JSONCONS_NO_DEPRECATED)
-    , big_integer = 0x04
-    , big_decimal = 0x05
-    , big_float = 0x06
-    , date_time = 0x02
+    , big_integer = bigint
+    , big_decimal = bigdec
+    , big_float = bigfloat
+    , date_time = datetime
 #endif
 };
 

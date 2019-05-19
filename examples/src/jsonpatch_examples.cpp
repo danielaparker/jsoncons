@@ -4,20 +4,19 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
-using namespace jsoncons::literals;
-namespace jp = jsoncons::jsonpatch;
+using namespace jsoncons;
 
 void jsonpatch_add_add()
 {
     // Apply a JSON Patch
 
-    jsoncons::json doc = R"(
+    json doc = R"(
         { "foo": "bar"}
     )"_json;
 
-    jsoncons::json doc2 = doc;
+    json doc2 = doc;
 
-    jsoncons::json patch = R"(
+    json patch = R"(
         [
             { "op": "add", "path": "/baz", "value": "qux" },
             { "op": "add", "path": "/foo", "value": [ "bar", "baz" ] }
@@ -25,28 +24,28 @@ void jsonpatch_add_add()
     )"_json;
 
     std::error_code ec;
-    jp::apply_patch(doc, patch, ec);
+    jsonpatch::apply_patch(doc, patch, ec);
 
     std::cout << "(1)\n" << pretty_print(doc) << std::endl;
 
     // Create a JSON Patch
 
-    auto patch2 = jp::from_diff(doc2,doc);
+    auto patch2 = jsonpatch::from_diff(doc2,doc);
 
     std::cout << "(2)\n" << pretty_print(patch2) << std::endl;
 
-    jp::apply_patch(doc2,patch2,ec);
+    jsonpatch::apply_patch(doc2,patch2,ec);
 
     std::cout << "(3)\n" << pretty_print(doc2) << std::endl;
 }
 
 void jsonpatch_add_add_add_failed1()
 {
-    jsoncons::json target = R"(
+    json target = R"(
         { "foo": "bar"}
     )"_json;
 
-    jsoncons::json patch = R"(
+    json patch = R"(
         [
             { "op": "add", "path": "/baz", "value": "qux" },
             { "op": "add", "path": "/foo", "value": [ "bar", "baz" ] },
@@ -56,9 +55,9 @@ void jsonpatch_add_add_add_failed1()
 
     try
     {
-        jp::apply_patch(target, patch);
+        jsonpatch::apply_patch(target, patch);
     }
-    catch (const jp::jsonpatch_error& e)
+    catch (const jsonpatch::jsonpatch_error& e)
     {
         std::cout << "(1) " << e.what() << std::endl;
         std::cout << "(2) " << target << std::endl;
@@ -67,11 +66,11 @@ void jsonpatch_add_add_add_failed1()
 
 void jsonpatch_add_add_add_failed2()
 {
-    jsoncons::json target = R"(
+    json target = R"(
         { "foo": "bar"}
     )"_json;
 
-    jsoncons::json patch = R"(
+    json patch = R"(
         [
             { "op": "add", "path": "/baz", "value": "qux" },
             { "op": "add", "path": "/foo", "value": [ "bar", "baz" ] },
@@ -80,7 +79,7 @@ void jsonpatch_add_add_add_failed2()
     )"_json;
 
     std::error_code ec;
-    jp::apply_patch(target, patch, ec);
+    jsonpatch::apply_patch(target, patch, ec);
 
     std::cout << "(1) " << std::error_code(ec).message() << std::endl;
     std::cout << "(2) " << target << std::endl;
@@ -88,18 +87,18 @@ void jsonpatch_add_add_add_failed2()
 
 void create_a_json_patch()
 {
-    jsoncons::json source = R"(
+    json source = R"(
         {"/": 9, "foo": "bar"}
     )"_json;
 
-    jsoncons::json target = R"(
+    json target = R"(
         { "baz":"qux", "foo": [ "bar", "baz" ]}
     )"_json;
 
-    auto patch = jp::from_diff(source, target);
+    auto patch = jsonpatch::from_diff(source, target);
 
     std::error_code ec;
-    jp::apply_patch(source, patch, ec);
+    jsonpatch::apply_patch(source, patch, ec);
 
     std::cout << "(1)\n" << pretty_print(patch) << std::endl;
     std::cout << "(2)\n" << pretty_print(source) << std::endl;

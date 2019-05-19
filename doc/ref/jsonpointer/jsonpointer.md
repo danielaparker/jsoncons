@@ -56,11 +56,11 @@ When applied to a JSON array, the character `-` indicates one past the last elem
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-namespace jp = jsoncons::jsonpointer;
+using namespace jsoncons;
 
 int main()
 {
-    auto j = jsoncons::json::parse(R"(
+    auto j = json::parse(R"(
     [
       { "category": "reference",
         "author": "Nigel Rees",
@@ -78,17 +78,17 @@ int main()
     // Using exceptions to report errors
     try
     {
-        jsoncons::json result = jp::get(j, "/1/author");
+        json result = jsonpointer::get(j, "/1/author");
         std::cout << "(1) " << result << std::endl;
     }
-    catch (const jp::jsonpointer_error& e)
+    catch (const jsonpointer::jsonpointer_error& e)
     {
         std::cout << e.what() << std::endl;
     }
 
     // Using error codes to report errors
     std::error_code ec;
-    const jsoncons::json& result = jp::get(j, "/0/title", ec);
+    const json& result = jsonpointer::get(j, "/0/title", ec);
 
     if (ec)
     {
@@ -112,18 +112,18 @@ Output:
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-namespace jp = jsoncons::jsonpointer;
+using namespace jsoncons;
 
 int main()
 {
-    auto j = jsoncons::json::parse(R"(
+    auto j = json::parse(R"(
        {
           "a/b": ["bar", "baz"],
           "m~n": ["foo", "qux"]
        }
     )");
 
-    jp::address addr;
+    jsonpointer::address addr;
     addr /= "m~n";
     addr /= "1";
 
@@ -136,7 +136,7 @@ int main()
     }
     std::cout << "\n";
 
-    jsoncons::json item = jp::get(j, addr);
+    json item = jsonpointer::get(j, addr);
     std::cout << "(3) " << item << "\n";
 }
 ```
