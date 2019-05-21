@@ -19,6 +19,7 @@ enum class cbor_errc
     unexpected_eof,
     source_error,
     invalid_decimal,
+    invalid_bigfloat,
     invalid_utf8_text_string,
     too_many_items,
     too_few_items,
@@ -44,6 +45,8 @@ public:
                 return "Source error";
             case cbor_errc::invalid_decimal:
                 return "Invalid decimal";
+            case cbor_errc::invalid_bigfloat:
+                return "Invalid bigfloat";
             case cbor_errc::invalid_utf8_text_string:
                 return "Illegal UTF-8 encoding in text string";
             case cbor_errc::too_many_items:

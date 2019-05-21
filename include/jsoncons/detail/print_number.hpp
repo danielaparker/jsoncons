@@ -20,6 +20,110 @@
 
 namespace jsoncons { namespace detail {
 
+
+// fast_exponent
+template <class Result>
+void fill_base16_exponent(int K, Result& result)
+{
+    if (K < 0)
+    {
+        result.push_back('-');
+        K = -K;
+    }
+    else
+    {
+        result.push_back('+'); // compatibility with sprintf
+    }
+    if (K >= 256)
+    {
+        result.push_back((char)('0' + K / 256)); K %= 256;
+        result.push_back((char)('0' + K / 16)); K %= 16;
+        result.push_back((char)('0' + K));
+    } 
+    else if (K >= 16)
+    {
+        result.push_back((char)('0' + K / 16)); K %= 16;
+        result.push_back((char)('0' + K));
+    } 
+    else
+    {
+        result.push_back('0'); // compatibility with sprintf
+        result.push_back((char)('0' + K));
+    }
+}
+
+template <class Result>
+void prettify_hexfloat_string(const char *buffer, size_t length, int k, int min_exp, int max_exp, Result& result)
+{
+    int nb_digits = (int)length;
+    int offset;
+    /* v = buffer * 10^k
+       kk is such that 10^(kk-1) <= v < 10^kk
+       this way kk gives the position of the decimal point.
+    */
+    int kk = nb_digits + k;
+
+    if (nb_digits <= kk && kk <= max_exp)
+    {
+        /* the first digits are already in. Add some 0s and call it a day. */
+        /* the max_exp is a personal choice. Only 16 digits could possibly be relevant.
+         * Basically we want to print 12340000000 rather than 1234.0e7 or 1.234e10 */
+        for (int i = 0; i < nb_digits; ++i)
+        {
+            result.push_back(buffer[i]);
+        }
+        for (int i = nb_digits; i < kk; ++i)
+        {
+            result.push_back('0');
+        }
+        result.push_back('.');
+        result.push_back('0');
+    } 
+    else if (0 < kk && kk <= max_exp)
+    {
+        /* comma number. Just insert a '.' at the correct location. */
+        for (int i = 0; i < kk; ++i)
+        {
+            result.push_back(buffer[i]);
+        }
+        result.push_back('.');
+        for (int i = kk; i < nb_digits; ++i)
+        {
+            result.push_back(buffer[i]);
+        }
+    } 
+    else if (min_exp < kk && kk <= 0)
+    {
+        offset = 2 - kk;
+
+        result.push_back('0');
+        result.push_back('.');
+        for (int i = 2; i < offset; ++i) 
+            result.push_back('0');
+        for (int i = 0; i < nb_digits; ++i)
+        {
+            result.push_back(buffer[i]);
+        }
+    } 
+    else if (nb_digits == 1)
+    {
+        result.push_back(buffer[0]);
+        result.push_back('p');
+        fill_base16_exponent(kk - 1, result);
+    } 
+    else
+    {
+        result.push_back(buffer[0]);
+        result.push_back('.');
+        for (int i = 1; i < nb_digits; ++i)
+        {
+            result.push_back(buffer[i]);
+        }
+        result.push_back('p');
+        fill_base16_exponent(kk - 1, result);
+    }
+}
+
 // print_integer
 
 template<class Result> 

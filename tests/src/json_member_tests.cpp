@@ -12,6 +12,21 @@
 
 using namespace jsoncons;
 
+TEST_CASE("json constructor")
+{
+    SECTION("json(string, semantic_tag::bigfloat)")
+    {
+        std::string s("-0x1.4p+3");
+
+        json j(s, semantic_tag::bigfloat);
+
+        CHECK(j.get_semantic_tag() == semantic_tag::bigfloat);
+
+        std::cout << j.as<double>() << "\n";
+    }
+}
+
+#if 0
 TEST_CASE("json(string_view)")
 {
     json::string_view_type sv("Hello world.");
@@ -31,6 +46,7 @@ TEST_CASE("json(string, semantic_tag::datetime)")
     CHECK(j.get_semantic_tag() == semantic_tag::datetime);
     CHECK(j.as<std::string>() == s);
 }
+
 
 TEST_CASE("json(string, semantic_tag::timestamp)")
 {
@@ -98,3 +114,4 @@ TEST_CASE("json get_allocator() tests")
         CHECK(j.get_allocator() == alloc);
     }
 }
+#endif
