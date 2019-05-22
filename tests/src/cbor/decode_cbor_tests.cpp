@@ -522,7 +522,7 @@ TEST_CASE("cbor conversion tests")
     it2++;
     CHECK(bool(it2->as_bignum() == bignum{"-18446744073709551617"}));
     it2++;
-    CHECK(bool(it2->as_string() == bignum{"273.15"}));
+    CHECK(bool(it2->as_string() == std::string{"273.15"}));
     it2++;
     CHECK((it2 == range2.end()));
 }
