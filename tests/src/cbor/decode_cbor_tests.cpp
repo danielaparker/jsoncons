@@ -15,7 +15,7 @@
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-#if 0
+
 TEST_CASE("cbor_view_test")
 {
     ojson j1 = ojson::parse(R"(
@@ -626,7 +626,7 @@ TEST_CASE("cbor array as<> test")
         CHECK(it++->is<double>());
     }
 }
-#endif
+
 TEST_CASE("cbor bigfloat tests")
 {
     SECTION("1.5")
@@ -638,7 +638,6 @@ TEST_CASE("cbor bigfloat tests")
                                  };
 
         json j = cbor::decode_cbor<json>(v);
-        std::cout << "j: " << j << "\n";
 
         //std::string s = j.as<std::string>();
 

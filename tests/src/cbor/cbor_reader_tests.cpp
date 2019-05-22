@@ -199,7 +199,7 @@ TEST_CASE("test_cbor_parsing")
                      0x82, // Array of length 2
                        0x21, // -2 
                          0x19, 0x6a, 0xb3 // 27315 
-                  },json(json::array({-2,27315}),semantic_tag::bigfloat));
+                  },json("0x6AB3p-2",semantic_tag::bigfloat));
 
     SECTION("maps with definite length")
     {

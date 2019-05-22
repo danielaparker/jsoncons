@@ -827,7 +827,7 @@ public:
     }
 
     template <typename Ch, typename Traits, typename Alloc>
-    void to_hex_string(std::basic_string<Ch,Traits,Alloc>& data) const
+    void dump_hex_string(std::basic_string<Ch,Traits,Alloc>& data) const
     {
         basic_bignum<Allocator> v(*this);
 
@@ -850,14 +850,14 @@ public:
             uint64_t r;
             if ( p10 == 1 )
             {
-                while ( p10 <= (std::numeric_limits<uint64_t>::max)()/10 )
+                while ( p10 <= (std::numeric_limits<uint64_t>::max)()/16 )
                 {
-                    p10 *= 10;
+                    p10 *= 16;
                     ip10++;
                 }
-            }                     // p10 is max unsigned power of 10
+            }                     // p10 is max unsigned power of 16
             basic_bignum<Allocator> R;
-            basic_bignum<Allocator> LP10 = p10; // LP10 = p10 = ::pow(10, ip10)
+            basic_bignum<Allocator> LP10 = p10; // LP10 = p10 = ::pow(16, ip10)
             if ( v.neg_ )
             {
                 data[0] = '-';
@@ -869,8 +869,9 @@ public:
                 r = (R.length() ? R.data_[0] : 0);
                 for ( size_t j=0; j < ip10; j++ )
                 {
-                    data[--n] = char(r % 10 + '0');
-                    r /= 10;
+                    uint8_t c = r % 16;
+                    data[--n] = (c < 10) ? ('0' + c) : ('A' - 10 + c);
+                    r /= 16;
                     if ( r + v.length() == 0 )
                         break;
                 }

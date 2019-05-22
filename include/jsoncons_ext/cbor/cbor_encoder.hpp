@@ -28,6 +28,7 @@ template<class Result=jsoncons::binary_stream_result>
 class basic_cbor_encoder final : public basic_json_content_handler<char>
 {
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
+    enum class hexfloat_parse_state { start, expect_0, expect_x, integer, exp1, exp2, fraction1 };
 
 public:
     typedef char char_type;
@@ -539,6 +540,150 @@ private:
         do_end_array(context);
     }
 
+    void write_hexfloat_value(const string_view_type& sv, const ser_context& context)
+    {
+        hexfloat_parse_state state = hexfloat_parse_state::start;
+        std::basic_string<char> s;
+        std::basic_string<char> exponent;
+        int64_t scale = 0;
+
+        for (auto c : sv)
+        {
+            switch (state)
+            {
+                case hexfloat_parse_state::start:
+                {
+                    switch (c)
+                    {
+                        case '-':
+                            s.push_back(c);
+                            state = hexfloat_parse_state::expect_0;
+                            break;
+                        case '0':
+                            state = hexfloat_parse_state::expect_x;
+                            break;
+                        default:
+                            throw std::invalid_argument("Invalid hexfloat string");
+                    }
+                    break;
+                }
+                case hexfloat_parse_state::expect_0:
+                {
+                    switch (c)
+                    {
+                        case '0':
+                            state = hexfloat_parse_state::expect_x;
+                            break;
+                        default:
+                            throw std::invalid_argument("Invalid hexfloat string");
+                    }
+                    break;
+                }
+                case hexfloat_parse_state::expect_x:
+                {
+                    switch (c)
+                    {
+                        case 'x':
+                            state = hexfloat_parse_state::integer;
+                            break;
+                        default:
+                            throw std::invalid_argument("Invalid hexfloat string");
+                    }
+                    break;
+                }
+                case hexfloat_parse_state::integer:
+                {
+                    switch (c)
+                    {
+                        case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+                            s.push_back(c);
+                            state = hexfloat_parse_state::integer;
+                            break;
+                        case 'p': case 'P':
+                            state = hexfloat_parse_state::exp1;
+                            break;
+                        case '.':
+                            state = hexfloat_parse_state::fraction1;
+                            break;
+                        default:
+                            throw std::invalid_argument("Invalid hexfloat string");
+                    }
+                    break;
+                }
+                case hexfloat_parse_state::exp1:
+                {
+                    switch (c)
+                    {
+                        case '+':
+                            state = hexfloat_parse_state::exp2;
+                            break;
+                        case '-':
+                            exponent.push_back(c);
+                            state = hexfloat_parse_state::exp2;
+                            break;
+                        case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+                            exponent.push_back(c);
+                            state = hexfloat_parse_state::exp2;
+                            break;
+                        default:
+                            throw std::invalid_argument("Invalid hexfloat string");
+                    }
+                    break;
+                }
+                case hexfloat_parse_state::exp2:
+                {
+                    switch (c)
+                    {
+                        case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+                            exponent.push_back(c);
+                            break;
+                        default:
+                            throw std::invalid_argument("Invalid hexfloat string");
+                    }
+                    break;
+                }
+                case hexfloat_parse_state::fraction1:
+                {
+                    switch (c)
+                    {
+                        case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+                            s.push_back(c);
+                            scale -= 4;
+                            break;
+                        default:
+                            throw std::invalid_argument("Invalid hexfloat string");
+                    }
+                    break;
+                }
+            }
+        }
+
+        result_.push_back(0xc5);
+        do_begin_array((size_t)2, semantic_tag::none, context);
+        if (exponent.length() > 0)
+        {
+            auto result = jsoncons::detail::to_integer<int64_t>(exponent.data(), exponent.length());
+            if (result.overflow)
+            {
+                throw std::invalid_argument("Invalid hexfloat string");
+            }
+            scale += result.value;
+        }
+        do_int64_value(scale, semantic_tag::none, context);
+
+        auto result = jsoncons::detail::to_integer<int64_t>(s.data(),s.length());
+        if (!result.overflow)
+        {
+            do_int64_value(result.value, semantic_tag::none, context);
+        }
+        else
+        {
+            write_bignum(s);
+            end_value();
+        }
+        do_end_array(context);
+    }
+
     bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context& context) override
     {
         switch (tag)
@@ -552,6 +697,11 @@ private:
             case semantic_tag::bigdec:
             {
                 write_decimal_value(sv, context);
+                break;
+            }
+            case semantic_tag::bigfloat:
+            {
+                write_hexfloat_value(sv, context);
                 break;
             }
             case semantic_tag::datetime:

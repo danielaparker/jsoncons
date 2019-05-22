@@ -82,11 +82,11 @@ struct type_wrapper<const T&>
 };
 
 inline
-unsigned char to_hex_character(unsigned char c)
+char to_hex_character(uint8_t c)
 {
     JSONCONS_ASSERT(c <= 0xF);
 
-    return (c < 10) ? ('0' + c) : ('A' - 10 + c);
+    return (char)((c < 10) ? ('0' + c) : ('A' - 10 + c));
 }
 
 inline

@@ -34,6 +34,15 @@ TEST_CASE("test_positive_bignum")
     std::string sz;
     y.dump(sz);
     CHECK(sz == expected);
+
+    SECTION("dump_hex_string")
+    {
+        std::string exp = "10000000000000000";
+        std::string s;
+        x.dump_hex_string(s);
+        CHECK(s == exp);
+    }
+
 }
 
 TEST_CASE("bignums are equal")
@@ -75,6 +84,15 @@ TEST_CASE("test_negative_bignum")
     for (size_t i = 0; i < v.size(); ++i)
     {
         REQUIRE(v[i] == b[i]);
+    }
+
+    SECTION("dump_hex_string")
+    {
+        std::string exp = "-10000000000000001";
+        std::string s;
+        x.dump_hex_string(s);
+        //std::cout << "bignum: " << expected << ", s: " << s << "\n";
+        CHECK(s == exp);
     }
 }
 
@@ -274,3 +292,35 @@ TEST_CASE("times 10")
     }
 }
 
+TEST_CASE("bignum div")
+{
+    SECTION("bignum")
+    {
+        bignum big_pos = bignum("18364494661702398480");
+        bignum small_pos = bignum("65535");
+        bignum res_pos = bignum("280224226164681");
+        bignum big_neg = -big_pos;
+        bignum small_neg = -small_pos;
+        bignum res_neg = -res_pos;
+
+        CHECK((big_neg / big_neg) == bignum(1));
+        CHECK((big_neg / small_neg) == res_pos);
+        CHECK((big_neg / small_pos) == res_neg);
+        CHECK((big_neg / big_pos) == bignum(-1));
+
+        CHECK((small_neg / big_neg) == bignum(0));
+        CHECK((small_neg / small_neg) == bignum(1));
+        CHECK((small_neg / small_pos) == bignum(-1));
+        CHECK((small_neg / big_pos) == bignum(0));
+
+        CHECK((small_pos / big_neg) == bignum(0));
+        CHECK((small_pos / small_neg) == bignum(-1));
+        CHECK((small_pos / small_pos) == bignum(1));
+        CHECK((small_pos / big_pos) == bignum(0));
+
+        CHECK((big_pos / big_neg) == bignum(-1));
+        CHECK((big_pos / small_neg) == res_neg);
+        CHECK((big_pos / small_pos) == res_pos);
+        CHECK((big_pos / big_pos) == bignum(1));
+    }
+}

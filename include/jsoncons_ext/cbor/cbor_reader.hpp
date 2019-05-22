@@ -1152,8 +1152,7 @@ private:
                 {
                     return s;
                 }
-                jsoncons::string_result<std::string> writer(s);
-                jsoncons::detail::print_uinteger(val, writer);
+                jsoncons::detail::print_uinteger(val, s);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -1163,8 +1162,7 @@ private:
                 {
                     return s;
                 }
-                jsoncons::string_result<std::string> writer(s);
-                jsoncons::detail::print_integer(val, writer);
+                jsoncons::detail::print_integer(val, s);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
@@ -1282,9 +1280,9 @@ private:
                 {
                     return s;
                 }
-                jsoncons::string_result<std::string> writer(s);
-                jsoncons::detail::uinteger_to_hex_string(val, writer);
-                std::cout << "uinteger_to_hex_string: " << val << ", " << s << "\n";
+                s.push_back('0');
+                s.push_back('x');
+                jsoncons::detail::uinteger_to_hex_string(val, s);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -1294,9 +1292,10 @@ private:
                 {
                     return s;
                 }
-                jsoncons::string_result<std::string> writer(s);
-                jsoncons::detail::integer_to_hex_string(val, writer);
-                std::cout << "integer_to_hex_string: " << val << ", " << s << "\n";
+                s.push_back('-');
+                s.push_back('0');
+                s.push_back('x');
+                jsoncons::detail::uinteger_to_hex_string(static_cast<uint64_t>(-val), s);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
@@ -1322,13 +1321,19 @@ private:
                     }
                     if (tag == 2)
                     {
+                        s.push_back('-');
+                        s.push_back('0');
+                        s.push_back('x');
                         bignum n(1, v.data(), v.size());
-                        n.to_hex_string(s);
+                        n.dump_hex_string(s);
                     }
                     else if (tag == 3)
                     {
+                        s.push_back('-');
+                        s.push_back('0');
                         bignum n(-1, v.data(), v.size());
-                        n.to_hex_string(s);
+                        n.dump_hex_string(s);
+                        s[2] = 'x';
                     }
                 }
                 break;
@@ -1340,25 +1345,17 @@ private:
             }
         }
 
-        std::string result;
-        if (s.size() > 0)
+        s.push_back('p');
+        if (exponent >=0)
         {
-            if (s[0] == '-')
-            {
-                result.push_back('-');
-                result.push_back('0');
-                result.push_back('x');
-                jsoncons::detail::prettify_hexfloat_string(s.c_str()+1, s.size()-1, (int)exponent, -4, 17, result);
-            }
-            else
-            {
-                result.push_back('0');
-                result.push_back('x');
-                jsoncons::detail::prettify_hexfloat_string(s.c_str(), s.size(), (int)exponent, -4, 17, result);
-            }
+            jsoncons::detail::uinteger_to_hex_string(static_cast<uint64_t>(exponent), s);
         }
-        std::cout << "s: " << s << ", exponent: " << std::dec << exponent << ", result: " << result << "\n";
-        return result;
+        else
+        {
+            s.push_back('-');
+            jsoncons::detail::uinteger_to_hex_string(static_cast<uint64_t>(-exponent), s);
+        }
+        return s;
     }
 
     static jsoncons::cbor::detail::cbor_major_type get_major_type(uint8_t type)
