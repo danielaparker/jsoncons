@@ -1283,7 +1283,8 @@ private:
                     return s;
                 }
                 jsoncons::string_result<std::string> writer(s);
-                jsoncons::detail::print_uinteger(val, writer);
+                jsoncons::detail::uinteger_to_hex_string(val, writer);
+                std::cout << "uinteger_to_hex_string: " << val << ", " << s << "\n";
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -1294,7 +1295,8 @@ private:
                     return s;
                 }
                 jsoncons::string_result<std::string> writer(s);
-                jsoncons::detail::print_integer(val, writer);
+                jsoncons::detail::integer_to_hex_string(val, writer);
+                std::cout << "integer_to_hex_string: " << val << ", " << s << "\n";
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
@@ -1321,12 +1323,12 @@ private:
                     if (tag == 2)
                     {
                         bignum n(1, v.data(), v.size());
-                        n.dump(s);
+                        n.to_hex_string(s);
                     }
                     else if (tag == 3)
                     {
                         bignum n(-1, v.data(), v.size());
-                        n.dump(s);
+                        n.to_hex_string(s);
                     }
                 }
                 break;
