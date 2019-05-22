@@ -1357,7 +1357,7 @@ private:
                 jsoncons::detail::prettify_hexfloat_string(s.c_str(), s.size(), (int)exponent, -4, 17, result);
             }
         }
-        //std::cout << "s: " << s << ", exponent: " << std::dec << exponent << ", result: " << result << "\n";
+        std::cout << "s: " << s << ", exponent: " << std::dec << exponent << ", result: " << result << "\n";
         return result;
     }
 

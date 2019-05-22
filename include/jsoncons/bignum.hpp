@@ -826,6 +826,61 @@ public:
         data.resize(i);
     }
 
+    template <typename Ch, typename Traits, typename Alloc>
+    void to_hex_string(std::basic_string<Ch,Traits,Alloc>& data) const
+    {
+        basic_bignum<Allocator> v(*this);
+
+        int len = int(uint32_t(v.length()) * basic_bignum<Allocator>::basic_type_bits / 3) + 2;
+        data.resize(len);
+
+        int n = len;
+        int i = 0;
+                                      // 1/3 > ln(2)/ln(10)
+        static uint64_t p10 = 1;
+        static uint64_t ip10 = 0;
+
+        if ( v.length() == 0 )
+        {
+            data[0] = '0';
+            i = 1;
+        }
+        else
+        {
+            uint64_t r;
+            if ( p10 == 1 )
+            {
+                while ( p10 <= (std::numeric_limits<uint64_t>::max)()/10 )
+                {
+                    p10 *= 10;
+                    ip10++;
+                }
+            }                     // p10 is max unsigned power of 10
+            basic_bignum<Allocator> R;
+            basic_bignum<Allocator> LP10 = p10; // LP10 = p10 = ::pow(10, ip10)
+            if ( v.neg_ )
+            {
+                data[0] = '-';
+                i = 1;
+            }
+            do
+            {
+                v.divide( LP10, v, R, true );
+                r = (R.length() ? R.data_[0] : 0);
+                for ( size_t j=0; j < ip10; j++ )
+                {
+                    data[--n] = char(r % 10 + '0');
+                    r /= 10;
+                    if ( r + v.length() == 0 )
+                        break;
+                }
+            } while ( v.length() );
+            while ( n < len )
+                data[i++] = data[n++];
+        }
+        data.resize(i);
+    }
+
 //  Global Operators
 
     friend bool operator==( const basic_bignum<Allocator>& x, const basic_bignum<Allocator>& y )

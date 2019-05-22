@@ -19,8 +19,7 @@
 #include <jsoncons/detail/parse_number.hpp>
 
 namespace jsoncons { namespace detail {
-
-
+ 
 // fast_exponent
 template <class Result>
 void fill_base16_exponent(int K, Result& result)
@@ -42,7 +41,7 @@ void fill_base16_exponent(int K, Result& result)
     } 
     else if (K >= 16)
     {
-        result.push_back((char)('0' + K / 16)); K %= 16;
+        result.push_back((char)('0' + K / 16)); K %= 16; 
         result.push_back((char)('0' + K));
     } 
     else
@@ -171,6 +170,61 @@ size_t print_uinteger(uint64_t value, Result& result)
         *p++ = static_cast<char_type>(48 + value % 10);
     } 
     while (value /= 10);
+    count += (p-buf);
+    while (--p >= buf)
+    {
+        result.push_back(*p);
+    }
+    return count;
+}
+
+// print_integer
+
+template<class Result> 
+size_t integer_to_hex_string(int64_t value, Result& result)
+{
+    typedef typename Result::value_type char_type;
+
+    size_t count = 0;
+
+    char_type buf[255];
+    uint64_t u = (value < 0) ? static_cast<uint64_t>(-value) : static_cast<uint64_t>(value);
+    char_type* p = buf;
+    do
+    {
+        *p++ = to_hex_character(u%16);
+    }
+    while (u /= 16);
+    count += (p-buf);
+    if (value < 0)
+    {
+        result.push_back('-');
+        ++count;
+    }
+    while (--p >= buf)
+    {
+        result.push_back(*p);
+    }
+
+    return count;
+}
+
+// print_uinteger
+
+template<class Result>
+size_t uinteger_to_hex_string(uint64_t value, Result& result)
+{
+    typedef typename Result::value_type char_type;
+
+    size_t count = 0;
+
+    char_type buf[255];
+    char_type* p = buf;
+    do
+    {
+        *p++ = to_hex_character(value % 16);
+    } 
+    while (value /= 16);
     count += (p-buf);
     while (--p >= buf)
     {

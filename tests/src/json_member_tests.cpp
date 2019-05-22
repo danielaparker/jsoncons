@@ -14,9 +14,25 @@ using namespace jsoncons;
 
 TEST_CASE("json constructor")
 {
-    SECTION("json(string, semantic_tag::bigfloat)")
+    SECTION("json(string, semantic_tag::bigfloat) 2")
     {
-        std::string s("-0x1.4p+3");
+        std::string s("0x3p-1");
+
+        std::cout << "Test\n";
+        std::cout << std::fixed << 0x102.800000p-1 << "\n";
+        std::cout << std::fixed << 0x1028p-5 << "\n";
+
+        std::cout << std::fixed << 0x1.800000p+0 << "\n";
+        std::cout << std::fixed << 0x18p-4 << "\n";
+
+        std::cout << std::hexfloat << 0x3p-1 << "\n";
+        std::cout << std::fixed << 0x3p-1 << "\n";
+        std::cout << std::hexfloat << 0x3p1 << "\n";
+        std::cout << std::hexfloat << 0x30p-2 << "\n";
+        std::cout << std::hexfloat << 1.5 << "\n";
+        std::cout << std::hexfloat << 15e-1 << "\n";
+        std::cout << std::hexfloat << 0x1.4p0 << "\n";
+        std::cout << std::hexfloat << 0x14p-16 << "\n";
 
         json j(s, semantic_tag::bigfloat);
 
