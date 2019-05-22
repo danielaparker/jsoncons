@@ -15,6 +15,7 @@
 #include <type_traits> // std::enable_if
 #include <exception>
 #include <jsoncons/config/jsoncons_config.hpp>
+#include <cctype>
 
 namespace jsoncons { namespace detail {
 
@@ -78,7 +79,7 @@ bool is_uinteger(const CharT* s, size_t length)
 
 template <class T, class CharT>
 typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,to_integer_result<T>>::type
-to_integer(const CharT* s, size_t length)
+base10_to_integer(const CharT* s, size_t length)
 {
     static_assert(std::numeric_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
@@ -144,7 +145,7 @@ to_integer(const CharT* s, size_t length)
 
 template <class T, class CharT>
 typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value,to_integer_result<T>>::type
-to_integer(const CharT* s, size_t length)
+base10_to_integer(const CharT* s, size_t length)
 {
     static_assert(std::numeric_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
@@ -164,6 +165,145 @@ to_integer(const CharT* s, size_t length)
             break;
         }
         n = n * 10;
+        if (n > max_value - x)
+        {
+            overflow = true;
+            break;
+        }
+
+        n += x;
+    }
+
+    return to_integer_result<T>({ n,overflow });
+}
+
+// base16_to_integer
+
+template <class T, class CharT>
+typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,to_integer_result<T>>::type
+base16_to_integer(const CharT* s, size_t length)
+{
+    static_assert(std::numeric_limits<T>::is_specialized, "Integer type not specialized");
+    JSONCONS_ASSERT(length > 0);
+
+    T n = 0;
+    bool overflow = false;
+    const CharT* end = s + length; 
+    if (*s == '-')
+    {
+        static const T min_value = (std::numeric_limits<T>::lowest)();
+        static const T min_value_div_16 = min_value / 16;
+        ++s;
+        for (; s < end; ++s)
+        {
+            CharT c = *s;
+            T x = 0;
+            switch (c)
+            {
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                    x = c - '0';
+                    break;
+                case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+                    x = c - ('a' - 10);
+                    break;
+                case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
+                    x = c - ('A' - 10);
+                    break;
+                default:
+                    throw std::runtime_error("Invalid hex digit");
+            }
+            if (n < min_value_div_16)
+            {
+                overflow = true;
+                break;
+            }
+            n = n * 16;
+            if (n < min_value + x)
+            {
+                overflow = true;
+                break;
+            }
+            n -= x;
+        }
+    }
+    else
+    {
+        static const T max_value = (std::numeric_limits<T>::max)();
+        static const T max_value_div_16 = max_value / 16;
+        for (; s < end; ++s)
+        {
+            CharT c = *s;
+            T x = 0;
+            switch (c)
+            {
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                    x = c - '0';
+                    break;
+                case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+                    x = c - ('a' - 10);
+                    break;
+                case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
+                    x = c - ('A' - 10);
+                    break;
+                default:
+                    throw std::runtime_error("Invalid hex digit");
+            }
+            if (n > max_value_div_16)
+            {
+                overflow = true;
+                break;
+            }
+            n = n * 16;
+            if (n > max_value - x)
+            {
+                overflow = true;
+                break;
+            }
+
+            n += x;
+        }
+    }
+
+    return to_integer_result<T>({ n,overflow });
+}
+
+template <class T, class CharT>
+typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value,to_integer_result<T>>::type
+base16_to_integer(const CharT* s, size_t length)
+{
+    static_assert(std::numeric_limits<T>::is_specialized, "Integer type not specialized");
+    JSONCONS_ASSERT(length > 0);
+
+    T n = 0;
+    bool overflow = false;
+    const CharT* end = s + length; 
+
+    static const T max_value = (std::numeric_limits<T>::max)();
+    static const T max_value_div_16 = max_value / 16;
+    for (; s < end; ++s)
+    {
+        CharT c = *s;
+        T x = *s;
+        switch (c)
+        {
+            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                x = c - '0';
+                break;
+            case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+                x = c - ('a' - 10);
+                break;
+            case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
+                x = c - ('A' - 10);
+                break;
+            default:
+                throw std::runtime_error("Invalid hex digit");
+        }
+        if (n > max_value_div_16)
+        {
+            overflow = true;
+            break;
+        }
+        n = n * 16;
         if (n > max_value - x)
         {
             overflow = true;

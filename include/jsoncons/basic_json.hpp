@@ -3489,7 +3489,7 @@ public:
                 {
                     JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an integer"));
                 }
-                auto result = jsoncons::detail::to_integer<T>(as_string_view().data(), as_string_view().length());
+                auto result = jsoncons::detail::base10_to_integer<T>(as_string_view().data(), as_string_view().length());
                 if (result.overflow)
                 {
                     JSONCONS_THROW(json_runtime_error<std::runtime_error>("Integer overflow"));

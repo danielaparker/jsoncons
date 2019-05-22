@@ -154,6 +154,20 @@ public:
         initialize(data, length);
     }
 
+    template <typename CharT, typename CharTraits, typename UserAllocator>
+    basic_bignum(const std::basic_string<CharT,CharTraits,UserAllocator>& s, uint8_t base)
+        : values_{0,0}
+    {
+        initialize(s.data(), s.length(), base);
+    }
+
+    template <typename CharT>
+    basic_bignum(const CharT* data, size_t length, uint8_t base)
+        : values_{0,0}
+    {
+        initialize(data, length, base);
+    }
+
     basic_bignum(int signum, std::initializer_list<uint8_t> l)
         : values_{0,0}
     {
@@ -1508,6 +1522,53 @@ private:
         for (size_t i = 0; i < length; i++)
         {
             v = (v * 10) + (uint64_t)(data[i] - '0');
+        }
+
+        if ( neg )
+        {
+            v.neg_ = true;
+        }
+        initialize( v );
+    }
+
+    template <typename CharT>
+    void initialize(const CharT* data, size_t length, uint8_t base)
+    {
+        bool neg = false;
+
+        const CharT* end = data+length;
+        while (data != end && isspace(*data))
+        {
+            ++data;
+            --length;
+        }
+
+        if ( *data == '-' )
+        {
+            neg = true;
+            data++;
+            --length;
+        }
+
+        basic_bignum<Allocator> v = 0;
+        for (size_t i = 0; i < length; i++)
+        {
+            CharT c = data[i];
+            switch (c)
+            {
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                    v = (v * base) + (uint64_t)(c - '0');
+                    break;
+                case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+                    v = (v * base) + (uint64_t)(c - ('a' - 10));
+                    break;
+                case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
+                    v = (v * base) + (uint64_t)(c - ('A' - 10));
+                    break;
+                default:
+                    throw std::runtime_error("Invalid digit in base");
+            }
+
         }
 
         if ( neg )

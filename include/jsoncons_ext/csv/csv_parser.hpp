@@ -1259,7 +1259,7 @@ private:
             {
                 if (is_negative)
                 {
-                    auto result = jsoncons::detail::to_integer<int64_t>(value.data(), value.length());
+                    auto result = jsoncons::detail::base10_to_integer<int64_t>(value.data(), value.length());
                     if (!result.overflow)
                     {
                         handler.int64_value(result.value, semantic_tag::none, *this);
@@ -1271,7 +1271,7 @@ private:
                 }
                 else
                 {
-                    auto result = jsoncons::detail::to_integer<uint64_t>(value.data(), value.length());
+                    auto result = jsoncons::detail::base10_to_integer<uint64_t>(value.data(), value.length());
                     if (!result.overflow)
                     {
                         handler.uint64_value(result.value, semantic_tag::none, *this);

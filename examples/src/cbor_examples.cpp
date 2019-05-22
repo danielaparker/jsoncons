@@ -213,7 +213,7 @@ void query_cbor()
 
     j.emplace_back("1.23456789012345678901234567890", semantic_tag::bigdec);
 
-    j.emplace_back(json::array({-1,3}), semantic_tag::bigfloat);
+    j.emplace_back("0x3p-1", semantic_tag::bigfloat);
 
     // Encode to JSON
     std::cout << "(1)\n";
