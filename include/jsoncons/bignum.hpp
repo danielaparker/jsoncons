@@ -93,7 +93,7 @@ public:
     }
 
     basic_bignum(const basic_bignum<Allocator>& n)
-        : basic_bignum_base<Allocator>(n.allocator()), values_{0,0}, neg_(n.neg_), length_(n.length_)
+        : basic_bignum_base<Allocator>(n.allocator()), neg_(n.neg_), length_(n.length_)
     {
         if (!n.dynamic_)
         {
@@ -111,26 +111,10 @@ public:
         }
     }
 
-    basic_bignum(basic_bignum<Allocator>&& n)
-        : values_{0,0}, data_(values_), neg_(n.neg_), dynamic_(false), length_(n.length_)
+    basic_bignum(basic_bignum<Allocator>&& other)
+        : basic_bignum_base<Allocator>(other.allocator()), neg_(other.neg_), dynamic_(false), length_(other.length_)
     {
-        if (n.dynamic_)
-        {
-            data_ = n.data_;
-            dynamic_ = true;
-
-            n.data_ = n.values_;
-            n.dynamic_ = false;
-            n.length_ = 0;
-            n.neg_ = false;
-        }
-        else
-        {
-            values_[0] = n.data_[0];
-            values_[1] = n.data_[1];
-            data_ = values_;
-            dynamic_ = false;
-        }
+        initialize(std::move(other));
     }
 
     template <typename CharT>
@@ -1449,6 +1433,30 @@ private:
         }
     }
 
+    void initialize(basic_bignum<Allocator>&& other)
+    {
+        neg_ = other.neg_;
+        length_ = other.length_;
+        dynamic_ = other.dynamic_;
+
+        if (other.dynamic_)
+        {
+            capacity_ = other.capacity_;
+            data_ = other.data_;
+
+            other.data_ = other.values_;
+            other.dynamic_ = false;
+            other.length_ = 0;
+            other.neg_ = false;
+        }
+        else
+        {
+            values_[0] = other.data_[0];
+            values_[1] = other.data_[1];
+            data_ = values_;
+        }
+    }
+
     void reduce()
     {
         uint64_t* p = end() - 1;
@@ -1528,7 +1536,7 @@ private:
         {
             v.neg_ = true;
         }
-        initialize( v );
+        initialize(std::move(v));
     }
 
     template <typename CharT>
@@ -1575,7 +1583,7 @@ private:
         {
             v.neg_ = true;
         }
-        initialize( v );
+        initialize(std::move(v));
     }
 };
 
