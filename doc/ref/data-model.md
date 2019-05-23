@@ -13,8 +13,8 @@ booleans, numbers, strings, arrays, objects - plus byte strings. It has
 - array
 - object
 
-In addition, jsoncons supports semantic tagging of date-time values, timestamp values, big numbers, 
-decimal fractions and binary encodings. This allows it to preserve these type semantics when parsing 
+In addition, jsoncons supports semantic tagging of date-time values, timestamp values, big integers, 
+big decimals, bigfloats and binary encodings. This allows it to preserve these type semantics when parsing 
 JSON-like data formats such as CBOR that have them, for example, the mappings between the jsoncons
 and CBOR data items are shown below:
 
@@ -41,7 +41,6 @@ byte_string   |                  | byte string |&#160;
 byte_string   | base64url        | byte string | 21 (Expected conversion to base64url encoding)
 byte_string   | base64           | byte string | 22 (Expected conversion to base64 encoding)
 byte_string   | base16           | byte string | 23 (Expected conversion to base16 encoding)
-array         |bigfloat          | array | 5 (bigfloat)
 array         |                  | array |&#160;
 object        |                  | map |&#160;
 

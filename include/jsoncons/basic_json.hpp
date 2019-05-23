@@ -3328,9 +3328,12 @@ public:
             case storage_type::short_string_val:
             case storage_type::long_string_val:
                 return var_.get_semantic_tag() == semantic_tag::bigint ||
-                       var_.get_semantic_tag() == semantic_tag::bigdec;
+                       var_.get_semantic_tag() == semantic_tag::bigdec ||
+                       var_.get_semantic_tag() == semantic_tag::bigfloat;
+#if !defined(JSONCONS_NO_DEPRECATED)
             case storage_type::array_val:
                 return var_.get_semantic_tag() == semantic_tag::bigfloat;
+#endif
             default:
                 return false;
         }
@@ -3546,6 +3549,7 @@ public:
                 return static_cast<double>(var_.int64_data_cast()->value());
             case storage_type::uint64_val:
                 return static_cast<double>(var_.uint64_data_cast()->value());
+#if !defined(JSONCONS_NO_DEPRECATED)
             case storage_type::array_val:
                 if (get_semantic_tag() == semantic_tag::bigfloat)
                 {
@@ -3557,6 +3561,7 @@ public:
                 {
                     JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
                 }
+#endif
             default:
                 JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
         }
@@ -3641,6 +3646,7 @@ public:
             case storage_type::array_val:
             {
                 string_type s(allocator);
+#if !defined(JSONCONS_NO_DEPRECATED)
                 if (get_semantic_tag() == semantic_tag::bigfloat)
                 {
                     JSONCONS_ASSERT(size() == 2);
@@ -3677,6 +3683,7 @@ public:
                     }
                 }
                 else
+#endif
                 {
                     basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s,options);
                     dump(encoder);

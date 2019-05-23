@@ -21,8 +21,8 @@ built on top of its incremental parser.
 
 The [jsoncons data model](doc/ref/data-model.md) supports the familiar JSON types - nulls,
 booleans, numbers, strings, arrays, objects - plus byte strings. In addition, jsoncons 
-supports semantic tagging of date-time values, timestamp values, big numbers, 
-decimal fractions and binary encodings. This allows it to preserve these type semantics when parsing 
+supports semantic tagging of date-time values, timestamp values, big integers, 
+big decimals, bigfloats and binary encodings. This allows it to preserve these type semantics when parsing 
 JSON-like data formats such as CBOR that have them.
 
 jsoncons is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
