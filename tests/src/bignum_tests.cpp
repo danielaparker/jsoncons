@@ -295,7 +295,7 @@ TEST_CASE("times 10")
 
 TEST_CASE("bignum div")
 {
-#if defined(_MSC_VER) && _MSC_VER >= 1900
+#if defined(_MSC_VER) && _MSC_VER >= 1910
     SECTION("bignum")
     {
         bignum big_pos = bignum("18364494661702398480");
