@@ -49,14 +49,7 @@ jsoncons strings that consist of the following parts
 - nonempty sequence of hexadecimal digits optionally containing a decimal-point character
 - (optional) p or P followed with optional minus or plus sign and nonempty sequence of decimal digits
 
-and are tagged with `semantic_tag::bigfloat` are encoded into CBOR bignums.
-
-jsoncons arrays that contain
-
-- an int64_t or a uint64_t (defines base-2 exponent)
-- an int64_t or a uint64_t or a string tagged with `semantic_tag::bigint` (defines the mantissa)
-
-and are tagged with `semantic_tag::bigfloat` are encoded into CBOR bigfloats.
+and tagged with `semantic_tag::bigfloat` are encoded into CBOR bignums.
 
 21, 22, 23 (byte string expected conversion is base64url, base64 or base16)  
 CBOR byte strings tagged with 21, 22 and 23 are decoded into jsoncons byte strings tagged with
@@ -100,7 +93,6 @@ byte_string   |                  | byte string |&#160;
 byte_string   | base64url        | byte string | 21 (Expected conversion to base64url encoding)
 byte_string   | base64           | byte string | 22 (Expected conversion to base64 encoding)
 byte_string   | base16           | byte string | 23 (Expected conversion to base16 encoding)
-array         |bigfloat          | array | 5 (bigfloat)
 array         |                  | array |&#160;
 object        |                  | map |&#160;
 
