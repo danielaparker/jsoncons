@@ -1272,7 +1272,7 @@ private:
                 else
                 {
                     auto result = jsoncons::detail::to_integer<uint64_t>(value.data(), value.length());
-                    if (result.ec == to_integer_errc())
+                    if (result.ec == jsoncons::detail::to_integer_errc())
                     {
                         handler.uint64_value(result.value, semantic_tag::none, *this);
                     }
