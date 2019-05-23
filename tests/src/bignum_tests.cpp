@@ -303,24 +303,24 @@ TEST_CASE("bignum div")
         bignum small_neg = -small_pos;
         bignum res_neg = -res_pos;
 
-        CHECK((big_neg / big_neg) == bignum(1));
-        CHECK((big_neg / small_neg) == res_pos);
-        CHECK((big_neg / small_pos) == res_neg);
-        CHECK((big_neg / big_pos) == bignum(-1));
+        CHECK(bool(big_neg / big_neg) == bignum(1));
+        CHECK(bool(big_neg / small_neg) == res_pos);
+        CHECK(bool(big_neg / small_pos) == res_neg);
+        CHECK(bool(big_neg / big_pos) == bignum(-1));
 
-        CHECK((small_neg / big_neg) == bignum(0));
-        CHECK((small_neg / small_neg) == bignum(1));
-        CHECK((small_neg / small_pos) == bignum(-1));
-        CHECK((small_neg / big_pos) == bignum(0));
+        CHECK(bool(small_neg / big_neg) == bignum(0));
+        CHECK(bool(small_neg / small_neg) == bignum(1));
+        CHECK(bool(small_neg / small_pos) == bignum(-1));
+        CHECK(bool(small_neg / big_pos) == bignum(0));
 
-        CHECK((small_pos / big_neg) == bignum(0));
-        CHECK((small_pos / small_neg) == bignum(-1));
-        CHECK((small_pos / small_pos) == bignum(1));
-        CHECK((small_pos / big_pos) == bignum(0));
+        CHECK(bool(small_pos / big_neg) == bignum(0));
+        CHECK(bool(small_pos / small_neg) == bignum(-1));
+        CHECK(bool(small_pos / small_pos) == bignum(1));
+        CHECK(bool(small_pos / big_pos) == bignum(0));
 
-        CHECK((big_pos / big_neg) == bignum(-1));
-        CHECK((big_pos / small_neg) == res_neg);
-        CHECK((big_pos / small_pos) == res_pos);
-        CHECK((big_pos / big_pos) == bignum(1));
+        CHECK(bool(big_pos / big_neg) == bignum(-1));
+        CHECK(bool(big_pos / small_neg) == res_neg);
+        CHECK(bool(big_pos / small_pos) == res_pos);
+        CHECK(bool(big_pos / big_pos) == bignum(1));
     }
 }
