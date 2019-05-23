@@ -1532,7 +1532,7 @@ private:
                     v = (v * 10) + (uint64_t)(c - '0');
                     break;
                 default:
-                    throw std::runtime_error(std::string("Invalid digit ") + "\'" + c + "\'");
+                    throw std::runtime_error(std::string("Invalid digit ") + "\'" + (char)c + "\'");
             }
         }
 
@@ -1580,11 +1580,11 @@ private:
                     d = (uint64_t)(c - ('A' - 10));
                     break;
                 default:
-                    throw std::runtime_error(std::string("Invalid digit in base ") + std::to_string(base) + ": \'" + c + "\'");
+                    throw std::runtime_error(std::string("Invalid digit in base ") + std::to_string(base) + ": \'" + (char)c + "\'");
             }
             if (d >= base)
             {
-                throw std::runtime_error(std::string("Invalid digit in base ") + std::to_string(base) + ": \'" + c + "\'");
+                throw std::runtime_error(std::string("Invalid digit in base ") + std::to_string(base) + ": \'" + (char)c + "\'");
             }
             v = (v * base) + d;
         }

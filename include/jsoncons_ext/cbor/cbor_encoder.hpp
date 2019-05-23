@@ -517,25 +517,29 @@ private:
         do_begin_array((size_t)2, semantic_tag::none, context);
         if (exponent.length() > 0)
         {
-            auto result = jsoncons::detail::base10_to_integer<int64_t>(exponent.data(), exponent.length());
-            if (result.overflow)
+            auto result = jsoncons::detail::to_integer<int64_t>(exponent.data(), exponent.length());
+            if (result.ec != jsoncons::detail::to_integer_errc())
             {
-                throw std::invalid_argument("Invalid decimal string");
+                JSONCONS_THROW(json_runtime_error<std::invalid_argument>(make_error_code(result.ec).message()));
             }
             scale += result.value;
         }
         do_int64_value(scale, semantic_tag::none, context);
 
-        auto result = jsoncons::detail::base10_to_integer<int64_t>(s.data(),s.length());
-        if (!result.overflow)
+        auto result = jsoncons::detail::to_integer<int64_t>(s.data(),s.length());
+        if (result.ec == jsoncons::detail::to_integer_errc())
         {
             do_int64_value(result.value, semantic_tag::none, context);
         }
-        else
+        else if (result.ec == jsoncons::detail::to_integer_errc::overflow)
         {
             bignum n(s.data(), s.length());
             write_bignum(n);
             end_value();
+        }
+        else
+        {
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>(make_error_code(result.ec).message()));
         }
         do_end_array(context);
     }
@@ -663,24 +667,28 @@ private:
         if (exponent.length() > 0)
         {
             auto result = jsoncons::detail::base16_to_integer<int64_t>(exponent.data(), exponent.length());
-            if (result.overflow)
+            if (result.ec != jsoncons::detail::to_integer_errc())
             {
-                throw std::invalid_argument("Invalid hexfloat string");
+                JSONCONS_THROW(json_runtime_error<std::invalid_argument>(make_error_code(result.ec).message()));
             }
             scale += result.value;
         }
         do_int64_value(scale, semantic_tag::none, context);
 
         auto result = jsoncons::detail::base16_to_integer<int64_t>(s.data(),s.length());
-        if (!result.overflow)
+        if (result.ec == jsoncons::detail::to_integer_errc())
         {
             do_int64_value(result.value, semantic_tag::none, context);
         }
-        else
+        else if (result.ec == jsoncons::detail::to_integer_errc::overflow)
         {
             bignum n(s.data(), s.length(), 16);
             write_bignum(n);
             end_value();
+        }
+        else
+        {
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>(make_error_code(result.ec).message()));
         }
         do_end_array(context);
     }

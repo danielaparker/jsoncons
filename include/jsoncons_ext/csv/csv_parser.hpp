@@ -1259,7 +1259,7 @@ private:
             {
                 if (is_negative)
                 {
-                    auto result = jsoncons::detail::base10_to_integer<int64_t>(value.data(), value.length());
+                    auto result = jsoncons::detail::to_integer<int64_t>(value.data(), value.length());
                     if (!result.overflow)
                     {
                         handler.int64_value(result.value, semantic_tag::none, *this);
@@ -1271,14 +1271,18 @@ private:
                 }
                 else
                 {
-                    auto result = jsoncons::detail::base10_to_integer<uint64_t>(value.data(), value.length());
-                    if (!result.overflow)
+                    auto result = jsoncons::detail::to_integer<uint64_t>(value.data(), value.length());
+                    if (result.ec == to_integer_errc())
                     {
                         handler.uint64_value(result.value, semantic_tag::none, *this);
                     }
-                    else
+                    else if (result.ec == to_integer_errc::overflow)
                     {
                         handler.string_value(value, semantic_tag::bigint, *this);
+                    }
+                    else
+                    {
+                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>(make_error_code(result.ec).message()));
                     }
                 }
                 break;

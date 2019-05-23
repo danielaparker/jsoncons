@@ -234,14 +234,10 @@ private:
             case staj_event_type::name:
             case staj_event_type::string_value:
             {
-                if (!jsoncons::detail::is_integer(value_.string_data_, length_))
+                auto result = jsoncons::detail::to_integer<int64_t>(value_.string_data_, length_);
+                if (result.ec != jsoncons::detail::to_integer_errc())
                 {
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an integer"));
-                }
-                auto result = jsoncons::detail::base10_to_integer<int64_t>(value_.string_data_, length_);
-                if (result.overflow)
-                {
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Integer overflow"));
+                    JSONCONS_THROW(json_runtime_error<std::runtime_error>(make_error_code(result.ec).message()));
                 }
                 value = result.value;
                 break;
@@ -272,14 +268,10 @@ private:
             case staj_event_type::name:
             case staj_event_type::string_value:
             {
-                if (!jsoncons::detail::is_uinteger(value_.string_data_, length_))
+                auto result = jsoncons::detail::to_integer<uint64_t>(value_.string_data_, length_);
+                if (result.ec != jsoncons::detail::to_integer_errc())
                 {
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an integer"));
-                }
-                auto result = jsoncons::detail::base10_to_integer<uint64_t>(value_.string_data_, length_);
-                if (result.overflow)
-                {
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Integer overflow"));
+                    JSONCONS_THROW(json_runtime_error<std::runtime_error>(make_error_code(result.ec).message()));
                 }
                 value = result.value;
                 break;

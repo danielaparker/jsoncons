@@ -2613,12 +2613,12 @@ private:
 
     void end_negative_value(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
-        auto result = jsoncons::detail::base10_to_integer<int64_t>(string_buffer_.data(), string_buffer_.length());
-        if (!result.overflow)
+        auto result = jsoncons::detail::to_integer<int64_t>(string_buffer_.data(), string_buffer_.length());
+        if (result.ec == jsoncons::detail::to_integer_errc())
         {
             continue_ = handler.int64_value(result.value, semantic_tag::none, *this);
         }
-        else
+        else // Must be overflow
         {
             continue_ = handler.string_value(string_buffer_, semantic_tag::bigint, *this);
         }
@@ -2627,12 +2627,12 @@ private:
 
     void end_positive_value(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
-        auto result = jsoncons::detail::base10_to_integer<uint64_t>(string_buffer_.data(), string_buffer_.length());
-        if (!result.overflow)
+        auto result = jsoncons::detail::to_integer<uint64_t>(string_buffer_.data(), string_buffer_.length());
+        if (result.ec == jsoncons::detail::to_integer_errc())
         {
             continue_ = handler.uint64_value(result.value, semantic_tag::none, *this);
         }
-        else
+        else // Must be overflow
         {
             continue_ = handler.string_value(string_buffer_, semantic_tag::bigint, *this);
         }

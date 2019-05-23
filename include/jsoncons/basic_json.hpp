@@ -3485,14 +3485,10 @@ public:
         case storage_type::short_string_val:
         case storage_type::long_string_val:
             {
-                if (!jsoncons::detail::is_integer(as_string_view().data(), as_string_view().length()))
+                auto result = jsoncons::detail::to_integer<T>(as_string_view().data(), as_string_view().length());
+                if (result.ec != jsoncons::detail::to_integer_errc())
                 {
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an integer"));
-                }
-                auto result = jsoncons::detail::base10_to_integer<T>(as_string_view().data(), as_string_view().length());
-                if (result.overflow)
-                {
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Integer overflow"));
+                    JSONCONS_THROW(json_runtime_error<std::runtime_error>(make_error_code(result.ec).message()));
                 }
                 return result.value;
             }
