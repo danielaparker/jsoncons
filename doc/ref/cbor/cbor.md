@@ -33,10 +33,30 @@ CBOR decimal fractions are decoded into jsoncons strings tagged with `semantic_t
 jsoncons strings tagged with `semantic_tag::bigdec` are encoded into CBOR decimal fractions.
 
 5 (bigfloat)  
-CBOR bigfloats are decoded into a jsoncons array that contains a base-2 exponent and a mantissa, 
-and tagged with `semantic_tag::bigfloat`. The exponent is represented as an int64_t or uint64_t,
-while the mantissa can be an int64_t or uint64_t, or a string tagged with `semantic_tag::bigint`.
-jsoncons arrays tagged with `semantic_tag::bigfloat` are encoded into CBOR bigfloats.
+CBOR bigfloats are decoded into a jsoncons string that consists of the following parts
+
+- (optional) minus sign
+- 0x
+- nonempty sequence of hexadecimal digits (defines mantissa)
+- p followed with optional minus or plus sign and nonempty sequence of hexadecimal digits (defines base-2 exponent)
+
+and tagged with `semantic_tag::bigfloat`. 
+
+jsoncons strings that consist of the following parts
+
+- (optional) plus or minus sign
+- 0x or 0X
+- nonempty sequence of hexadecimal digits optionally containing a decimal-point character
+- (optional) p or P followed with optional minus or plus sign and nonempty sequence of decimal digits
+
+and are tagged with `semantic_tag::bigfloat` are encoded into CBOR bignums.
+
+jsoncons arrays that contain
+
+- an int64_t or a uint64_t (defines base-2 exponent)
+- an int64_t or a uint64_t or a string tagged with `semantic_tag::bigint` (defines the mantissa)
+
+and are tagged with `semantic_tag::bigfloat` are encoded into CBOR bigfloats.
 
 21, 22, 23 (byte string expected conversion is base64url, base64 or base16)  
 CBOR byte strings tagged with 21, 22 and 23 are decoded into jsoncons byte strings tagged with
@@ -71,6 +91,7 @@ double        | timestamp        | double | 1 (epoch-based date/time)
 string        |                  | string |&#160;
 string        | bigint      | byte string | 2 (positive bignum) or 2 (negative bignum)  
 string        | bigdec      | array | 4 (decimal fraction)
+string        | bigfloat      | array | 5 (bigfloat)
 string        | datetime        | string | 0 (date/time string) 
 string        | uri              | string | 32 (uri)
 string        | base64url        | string | 33 (base64url)
@@ -79,6 +100,7 @@ byte_string   |                  | byte string |&#160;
 byte_string   | base64url        | byte string | 21 (Expected conversion to base64url encoding)
 byte_string   | base64           | byte string | 22 (Expected conversion to base64 encoding)
 byte_string   | base16           | byte string | 23 (Expected conversion to base16 encoding)
+array         |bigfloat          | array | 5 (bigfloat)
 array         |                  | array |&#160;
 object        |                  | map |&#160;
 

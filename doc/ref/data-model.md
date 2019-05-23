@@ -30,8 +30,9 @@ uint64        | timestamp        | unsigned integer | 1 (epoch-based date/time)
 double        |                  | half-precision float, float, or double |&#160;
 double        | timestamp        | double | 1 (epoch-based date/time)
 string        |                  | string |&#160;
-string        | bigint      | byte string | 2 (positive bignum) or 3 (negative bignum)  
+string        | bigint      | byte string | 2 (positive bignum) or 2 (negative bignum)  
 string        | bigdec      | array | 4 (decimal fraction)
+string        | bigfloat      | array | 5 (bigfloat)
 string        | datetime        | string | 0 (date/time string) 
 string        | uri              | string | 32 (uri)
 string        | base64url        | string | 33 (base64url)
@@ -40,8 +41,8 @@ byte_string   |                  | byte string |&#160;
 byte_string   | base64url        | byte string | 21 (Expected conversion to base64url encoding)
 byte_string   | base64           | byte string | 22 (Expected conversion to base64 encoding)
 byte_string   | base16           | byte string | 23 (Expected conversion to base16 encoding)
+array         |bigfloat          | array | 5 (bigfloat)
 array         |                  | array |&#160;
-array         | bigfloat        | array |&#160; | 5 (bigfloat)
 object        |                  | map |&#160;
 
 ### Examples

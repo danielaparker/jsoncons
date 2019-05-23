@@ -588,6 +588,7 @@ private:
                     switch (c)
                     {
                         case 'x':
+                        case 'X':
                             state = hexfloat_parse_state::integer;
                             break;
                         default:
