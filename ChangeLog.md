@@ -1,3 +1,24 @@
+master
+------
+
+CBOR bigfloats are now decoded into a jsoncons string that consists of the following parts
+
+- (optional) minus sign
+- 0x
+- nonempty sequence of hexadecimal digits (defines mantissa)
+- p followed with optional minus or plus sign and nonempty sequence of hexadecimal digits (defines base-2 exponent)
+
+and tagged with `semantic_tag::bigfloat` (before they were decoded into a jsoncons array and tagged with `semantic_tag::bigfloat`)
+
+jsoncons strings that consist of the following parts
+
+- (optional) plus or minus sign
+- 0x or 0X
+- nonempty sequence of hexadecimal digits optionally containing a decimal-point character
+- (optional) p or P followed with optional minus or plus sign and nonempty sequence of decimal digits
+
+and are tagged with `semantic_tag::bigfloat` are encoded now into CBOR bignums.
+
 v0.125.0
 --------
 
