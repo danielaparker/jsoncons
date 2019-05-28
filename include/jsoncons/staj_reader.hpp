@@ -40,9 +40,9 @@ enum class staj_event_type
     double_value
 };
 
-JSONCONS_STRING_LITERAL(null,'n','u','l','l');
-JSONCONS_STRING_LITERAL(true,'t','r','u','e');
-JSONCONS_STRING_LITERAL(false,'f','a','l','s','e');
+JSONCONS_STRING_LITERAL(null,'n','u','l','l')
+JSONCONS_STRING_LITERAL(true,'t','r','u','e')
+JSONCONS_STRING_LITERAL(false,'f','a','l','s','e')
 
 template<class CharT>
 class basic_staj_event
