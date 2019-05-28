@@ -40,25 +40,13 @@ enum class staj_event_type
     double_value
 };
 
+JSONCONS_STRING_LITERAL(null,'n','u','l','l');
+JSONCONS_STRING_LITERAL(true,'t','r','u','e');
+JSONCONS_STRING_LITERAL(false,'f','a','l','s','e');
+
 template<class CharT>
 class basic_staj_event
 {
-    static const std::array<CharT, 4>& null_k()
-    {
-        static constexpr std::array<CharT,4> k{'n','u','l','l'};
-        return k;
-    }
-    static const std::array<CharT, 4>& true_k()
-    {
-        static constexpr std::array<CharT,4> k{'t','r','u','e'};
-        return k;
-    }
-    static const std::array<CharT, 5>& false_k()
-    {
-        static constexpr std::array<CharT,5> k{'f','a','l','s','e'};
-        return k;
-    }
-
     staj_event_type event_type_;
     semantic_tag semantic_tag_;
     union
@@ -149,18 +137,18 @@ public:
             jsoncons::string_result<T> result(s);
             if (value_.bool_value_)
             {
-                result.append(true_k().data(),true_k().size());
+                result.append(true_literal<CharT>().data(),true_literal<CharT>().size());
             }
             else
             {
-                result.append(false_k().data(),false_k().size());
+                result.append(false_literal<CharT>().data(),false_literal<CharT>().size());
             }
             break;
         }
         case staj_event_type::null_value:
         {
             jsoncons::string_result<T> result(s);
-            result.append(null_k().data(),null_k().size());
+            result.append(null_literal<CharT>().data(),null_literal<CharT>().size());
             break;
         }
         default:
