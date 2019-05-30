@@ -929,7 +929,7 @@ json expected = json::parse(R"(
 
     json source2 = source;
 
-    j.merge(std::forward<Source>(source));
+    j.merge(std::move(source));
     CHECK(j.size() == 3);
     CHECK(j == expected);
 
@@ -1005,7 +1005,7 @@ json expected = json::parse(R"(
 
     json source2 = source;
 
-    j.merge_or_update(std::forward<Source>(source));
+    j.merge_or_update(std::move(source));
     CHECK(j.size() == 3);
     CHECK(j == expected);
 
@@ -1100,7 +1100,7 @@ ojson source = ojson::parse(R"(
         }
         )");
 
-        j.merge(std::forward<Source>(source));
+        j.merge(std::move(source));
         CHECK(j == expected);
     }
     SECTION("merge source into j at begin")
@@ -1113,7 +1113,7 @@ ojson source = ojson::parse(R"(
         }
         )");
 
-        j.merge(j.object_range().begin(),std::forward<Source>(source));
+        j.merge(j.object_range().begin(),std::move(source));
         CHECK(j == expected);
     }
 
@@ -1193,7 +1193,7 @@ ojson source = ojson::parse(R"(
         }
         )");
 
-        j.merge_or_update(std::forward<Source>(source));
+        j.merge_or_update(std::move(source));
         CHECK(j == expected);
     }
 
@@ -1207,7 +1207,7 @@ ojson source = ojson::parse(R"(
         }
         )");
 
-        j.merge_or_update(j.object_range().begin(),std::forward<Source>(source));
+        j.merge_or_update(j.object_range().begin(),std::move(source));
         CHECK(j.size() == 3);
         CHECK(j == expected);
     }
