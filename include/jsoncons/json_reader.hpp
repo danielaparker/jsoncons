@@ -136,12 +136,12 @@ private:
     }
 };
 
-template<class CharT,class Source,class Allocator=std::allocator<char>>
+template<class CharT,class Src,class Allocator=std::allocator<char>>
 class basic_json_reader 
 {
 public:
     typedef CharT char_type;
-    typedef Source source_type;
+    typedef Src source_type;
     typedef basic_string_view<CharT> string_view_type;
     typedef Allocator allocator_type;
 private:

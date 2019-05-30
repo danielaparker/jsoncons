@@ -20,14 +20,14 @@
 
 namespace jsoncons { namespace bson {
 
-template <class Source>
+template <class Src>
 class basic_bson_reader : public ser_context
 {
-    Source source_;
+    Src source_;
     json_content_handler& handler_;
     size_t nesting_depth_;
 public:
-    basic_bson_reader(Source source, json_content_handler& handler)
+    basic_bson_reader(Src source, json_content_handler& handler)
        : source_(std::move(source)),
          handler_(handler), 
          nesting_depth_(0)

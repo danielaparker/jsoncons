@@ -19,15 +19,15 @@
 
 namespace jsoncons { namespace ubjson {
 
-template <class Source>
+template <class Src>
 class basic_ubjson_reader : public ser_context
 {
-    Source source_;
+    Src source_;
     json_content_handler& handler_;
     size_t nesting_depth_;
     std::string buffer_;
 public:
-    basic_ubjson_reader(Source source, json_content_handler& handler)
+    basic_ubjson_reader(Src source, json_content_handler& handler)
        : source_(std::move(source)),
          handler_(handler), 
          nesting_depth_(0)

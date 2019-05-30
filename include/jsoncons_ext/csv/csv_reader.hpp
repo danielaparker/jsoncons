@@ -26,7 +26,7 @@
 
 namespace jsoncons { namespace csv {
 
-template<class CharT,class Source,class Allocator=std::allocator<char>>
+template<class CharT,class Src,class Allocator=std::allocator<char>>
 class basic_csv_reader 
 {
     struct stack_item
@@ -48,7 +48,7 @@ class basic_csv_reader
     default_parse_error_handler default_err_handler_;
 
     basic_csv_parser<CharT,Allocator> parser_;
-    Source source_;
+    Src source_;
     std::vector<CharT,char_allocator_type> buffer_;
     size_t buffer_length_;
     size_t buffer_position_;
@@ -62,7 +62,7 @@ public:
       \param is The input stream to read from
     */
 
-    basic_csv_reader(Source source,
+    basic_csv_reader(Src source,
                      basic_json_content_handler<CharT>& handler)
 
        : basic_csv_reader(std::move(source), 
@@ -72,7 +72,7 @@ public:
     {
     }
 
-    basic_csv_reader(Source source,
+    basic_csv_reader(Src source,
                      basic_json_content_handler<CharT>& handler,
                      const basic_csv_options<CharT>& options)
 
@@ -83,7 +83,7 @@ public:
     {
     }
 
-    basic_csv_reader(Source source,
+    basic_csv_reader(Src source,
                      basic_json_content_handler<CharT>& handler,
                      parse_error_handler& err_handler)
         : basic_csv_reader(std::move(source), 
@@ -93,7 +93,7 @@ public:
     {
     }
 
-    basic_csv_reader(Source source,
+    basic_csv_reader(Src source,
                      basic_json_content_handler<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options,
                      parse_error_handler& err_handler)

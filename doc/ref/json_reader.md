@@ -3,7 +3,7 @@
 ```c++
 template<
     class CharT,
-    class Source,
+    class Src,
     class Allocator=std::allocator<char>
 >
 class basic_json_reader 
@@ -34,7 +34,7 @@ wjson_string_reader    |basic_json_reader<wchar_t, jsoncons::string_source<wchar
 Type                       |Definition
 ---------------------------|------------------------------
 char_type                  |CharT
-source_type                |Source
+source_type                |Src
 string_view_type           |
 
 #### Constructors
