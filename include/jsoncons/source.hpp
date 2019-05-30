@@ -46,13 +46,6 @@ public:
     basic_null_istream(basic_null_istream&&) = default;
 
     basic_null_istream& operator=(basic_null_istream&&) = default;
-
-    static basic_null_istream& instance()
-    {
-        static basic_null_istream<CharT> is{};
-        return is;
-    }
-
 };
 
 // text sources
@@ -64,6 +57,7 @@ public:
     typedef CharT value_type;
     typedef std::char_traits<CharT> traits_type;
 private:
+    basic_null_istream<CharT> null_is_;
     std::basic_istream<CharT>* is_;
     std::basic_streambuf<CharT>* sbuf_;
     size_t position_;
@@ -73,7 +67,7 @@ private:
     stream_source& operator=(const stream_source&) = delete;
 public:
     stream_source()
-        : is_(&basic_null_istream<CharT>::instance()), sbuf_(basic_null_istream<CharT>::instance().rdbuf()), position_(0)
+        : is_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0)
     {
     }
 
@@ -82,13 +76,24 @@ public:
     {
     }
 
-    stream_source(stream_source&&) = default;
+    stream_source(stream_source&& other)
+    {
+        std::swap(is_,other.is_);
+        std::swap(sbuf_,other.sbuf_);
+        std::swap(position_,other.position_);
+    }
 
     ~stream_source()
     {
     }
 
-    stream_source& operator=(stream_source&&) = default;
+    stream_source& operator=(stream_source&& other)
+    {
+        std::swap(is_,other.is_);
+        std::swap(sbuf_,other.sbuf_);
+        std::swap(position_,other.position_);
+        return *this;
+    }
 
     bool eof() const
     {
@@ -414,6 +419,7 @@ public:
     typedef uint8_t value_type;
     typedef byte_traits traits_type;
 private:
+    basic_null_istream<char> null_is_;
     std::istream* is_;
     std::streambuf* sbuf_;
     size_t position_;
@@ -423,7 +429,7 @@ private:
     binary_stream_source& operator=(const binary_stream_source&) = delete;
 public:
     binary_stream_source()
-        : is_(&basic_null_istream<char>::instance()), sbuf_(basic_null_istream<char>::instance().rdbuf()), position_(0)
+        : is_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0)
     {
     }
 
@@ -432,13 +438,24 @@ public:
     {
     }
 
-    binary_stream_source(binary_stream_source&&) = default;
+    binary_stream_source(binary_stream_source&& other) 
+    {
+        std::swap(is_,other.is_);
+        std::swap(sbuf_,other.sbuf_);
+        std::swap(position_,other.position_);
+    }
 
     ~binary_stream_source()
     {
     }
 
-    binary_stream_source& operator=(binary_stream_source&&) = default;
+    binary_stream_source& operator=(binary_stream_source&& other) 
+    {
+        std::swap(is_,other.is_);
+        std::swap(sbuf_,other.sbuf_);
+        std::swap(position_,other.position_);
+        return *this;
+    }
 
     bool eof() const
     {
