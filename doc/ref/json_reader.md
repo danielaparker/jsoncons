@@ -39,30 +39,38 @@ string_view_type           |
 
 #### Constructors
 
-    explicit basic_json_reader(source_type source); // (1)
+    template <class Source>
+    explicit basic_json_reader(Source&& source); // (1)
 
-    basic_json_reader(source_type source, 
+    template <class Source>
+    basic_json_reader(Source&& source, 
                       const basic_json_decode_options<CharT>& options); // (2)
 
-    basic_json_reader(source_type source,
+    template <class Source>
+    basic_json_reader(Source&& source,
                       parse_error_handler& err_handler); // (3)
 
-    basic_json_reader(source_type source, 
+    template <class Source>
+    basic_json_reader(Source&& source, 
                       const basic_json_decode_options<CharT>& options,
                       parse_error_handler& err_handler); // (4)
 
-    basic_json_reader(source_type source, 
+    template <class Source>
+    basic_json_reader(Source&& source, 
                       basic_json_content_handler<CharT>& handler); // (5)
 
-    basic_json_reader(source_type source, 
+    template <class Source>
+    basic_json_reader(Source&& source, 
                       basic_json_content_handler<CharT>& handler,
                       const basic_json_decode_options<CharT>& options); // (6)
 
-    basic_json_reader(source_type source,
+    template <class Source>
+    basic_json_reader(Source&& source,
                       basic_json_content_handler<CharT>& handler,
                       parse_error_handler& err_handler); // (7)
 
-    basic_json_reader(source_type source,
+    template <class Source>
+    basic_json_reader(Source&& source,
                       basic_json_content_handler<CharT>& handler, 
                       const basic_json_decode_options<CharT>& options,
                       parse_error_handler& err_handler); // (8)

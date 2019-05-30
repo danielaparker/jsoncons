@@ -90,8 +90,9 @@ class basic_cbor_reader : public ser_context
     std::vector<uint64_t> tags_; 
     std::vector<parse_state> state_stack_;
 public:
-    basic_cbor_reader(Src source, json_content_handler& handler)
-       : source_(std::move(source)),
+    template <class Source>
+    basic_cbor_reader(Source&& source, json_content_handler& handler)
+       : source_(std::forward<Source>(source)),
          handler_(handler)
     {
     }

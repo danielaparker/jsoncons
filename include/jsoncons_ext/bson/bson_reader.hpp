@@ -27,8 +27,9 @@ class basic_bson_reader : public ser_context
     json_content_handler& handler_;
     size_t nesting_depth_;
 public:
-    basic_bson_reader(Src source, json_content_handler& handler)
-       : source_(std::move(source)),
+    template <class Source>
+    basic_bson_reader(Source&& source, json_content_handler& handler)
+       : source_(std::forward<Source>(source)),
          handler_(handler), 
          nesting_depth_(0)
     {

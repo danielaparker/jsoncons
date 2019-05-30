@@ -167,78 +167,86 @@ private:
     basic_json_reader& operator=(const basic_json_reader&) = delete;
 
 public:
-    explicit basic_json_reader(source_type source)
-        : basic_json_reader(std::move(source),
+    template <class Source>
+    explicit basic_json_reader(Source&& source)
+        : basic_json_reader(std::forward<Source>(source),
                             default_content_handler_,
                             basic_json_options<CharT>::default_options(),
                             default_err_handler_)
     {
     }
 
-    basic_json_reader(source_type source, 
+    template <class Source>
+    basic_json_reader(Source&& source, 
                       const basic_json_decode_options<CharT>& options)
-        : basic_json_reader(std::move(source),
+        : basic_json_reader(std::forward<Source>(source),
                             default_content_handler_,
                             options,
                             default_err_handler_)
     {
     }
 
-    basic_json_reader(source_type source,
+    template <class Source>
+    basic_json_reader(Source&& source,
                       parse_error_handler& err_handler)
-        : basic_json_reader(std::move(source),
+        : basic_json_reader(std::forward<Source>(source),
                             default_content_handler_,
                             basic_json_options<CharT>::default_options(),
                             err_handler)
     {
     }
 
-    basic_json_reader(source_type source, 
+    template <class Source>
+    basic_json_reader(Source&& source, 
                       const basic_json_decode_options<CharT>& options,
                       parse_error_handler& err_handler)
-        : basic_json_reader(std::move(source),
+        : basic_json_reader(std::forward<Source>(source),
                             default_content_handler_,
                             options,
                             err_handler)
     {
     }
 
-    basic_json_reader(source_type source, 
+    template <class Source>
+    basic_json_reader(Source&& source, 
                       basic_json_content_handler<CharT>& handler)
-        : basic_json_reader(std::move(source),
+        : basic_json_reader(std::forward<Source>(source),
                             handler,
                             basic_json_options<CharT>::default_options(),
                             default_err_handler_)
     {
     }
 
-    basic_json_reader(source_type source, 
+    template <class Source>
+    basic_json_reader(Source&& source, 
                       basic_json_content_handler<CharT>& handler,
                       const basic_json_decode_options<CharT>& options)
-        : basic_json_reader(std::move(source),
+        : basic_json_reader(std::forward<Source>(source),
                             handler,
                             options,
                             default_err_handler_)
     {
     }
 
-    basic_json_reader(source_type source,
+    template <class Source>
+    basic_json_reader(Source&& source,
                       basic_json_content_handler<CharT>& handler,
                       parse_error_handler& err_handler)
-        : basic_json_reader(std::move(source),
+        : basic_json_reader(std::forward<Source>(source),
                             handler,
                             basic_json_options<CharT>::default_options(),
                             err_handler)
     {
     }
 
-    basic_json_reader(source_type source,
+    template <class Source>
+    basic_json_reader(Source&& source,
                       basic_json_content_handler<CharT>& handler, 
                       const basic_json_decode_options<CharT>& options,
                       parse_error_handler& err_handler)
        : handler_(handler),
          parser_(options,err_handler),
-         source_(std::move(source)),
+         source_(std::forward<Source>(source)),
          eof_(false),
          buffer_length_(default_max_buffer_length),
          begin_(true)
