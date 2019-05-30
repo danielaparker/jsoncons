@@ -20,6 +20,41 @@
 
 namespace jsoncons { 
 
+template <class CharT>
+class basic_null_istream : public std::basic_istream<CharT>
+{
+    class null_buffer : public std::basic_streambuf<CharT>
+    {
+    public:
+        using typename std::basic_streambuf<CharT>::int_type;
+        using typename std::basic_streambuf<CharT>::traits_type;
+
+        null_buffer() = default;
+        null_buffer(const null_buffer&) = default;
+        null_buffer& operator=(const null_buffer&) = default;
+
+        int_type overflow( int_type ch = traits_type::eof() ) override
+        {
+            return ch;
+        }
+    } nb_;
+public:
+    basic_null_istream()
+      : std::basic_istream<CharT>(&nb_)
+    {
+    }
+    basic_null_istream(basic_null_istream&&) = default;
+
+    basic_null_istream& operator=(basic_null_istream&&) = default;
+
+    static basic_null_istream& instance()
+    {
+        static basic_null_istream<CharT> is{};
+        return is;
+    }
+
+};
+
 // text sources
 
 template <class CharT>
@@ -37,12 +72,17 @@ private:
     stream_source(const stream_source&) = delete;
     stream_source& operator=(const stream_source&) = delete;
 public:
-    stream_source(stream_source&&) = default;
+    stream_source()
+        : is_(&basic_null_istream<CharT>::instance()), sbuf_(basic_null_istream<CharT>::instance().rdbuf()), position_(0)
+    {
+    }
 
     stream_source(std::basic_istream<CharT>& is)
         : is_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0)
     {
     }
+
+    stream_source(stream_source&&) = default;
 
     ~stream_source()
     {
@@ -228,13 +268,9 @@ private:
     string_source(const string_source&) = delete;
     string_source& operator=(const string_source&) = delete;
 public:
-    string_source(string_source&& val) 
-        : data_(nullptr), input_ptr_(nullptr), input_end_(nullptr), eof_(true)
+    string_source()
+        : data_(nullptr), input_ptr_(nullptr), input_end_(nullptr), eof_(true)  
     {
-        std::swap(data_,val.data_);
-        std::swap(input_ptr_,val.input_ptr_);
-        std::swap(input_end_,val.input_end_);
-        std::swap(eof_,val.eof_);
     }
 
     template <class Source>
@@ -247,6 +283,15 @@ public:
     string_source(const value_type* data, size_t size)
         : data_(data), input_ptr_(data), input_end_(data+size), eof_(size == 0)  
     {
+    }
+
+    string_source(string_source&& val) 
+        : data_(nullptr), input_ptr_(nullptr), input_end_(nullptr), eof_(true)
+    {
+        std::swap(data_,val.data_);
+        std::swap(input_ptr_,val.input_ptr_);
+        std::swap(input_end_,val.input_end_);
+        std::swap(eof_,val.eof_);
     }
 
     string_source& operator=(string_source&& val)
@@ -377,12 +422,17 @@ private:
     binary_stream_source(const binary_stream_source&) = delete;
     binary_stream_source& operator=(const binary_stream_source&) = delete;
 public:
-    binary_stream_source(binary_stream_source&&) = default;
+    binary_stream_source()
+        : is_(&basic_null_istream<char>::instance()), sbuf_(basic_null_istream<char>::instance().rdbuf()), position_(0)
+    {
+    }
 
     binary_stream_source(std::istream& is)
         : is_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0)
     {
     }
+
+    binary_stream_source(binary_stream_source&&) = default;
 
     ~binary_stream_source()
     {
@@ -544,7 +594,10 @@ private:
     bytes_source(const bytes_source&) = delete;
     bytes_source& operator=(const bytes_source&) = delete;
 public:
-    bytes_source(bytes_source&&) = default;
+    bytes_source()
+        : data_(nullptr), input_ptr_(nullptr), input_end_(nullptr), eof_(true)  
+    {
+    }
 
     template <class Source>
     bytes_source(const Source& s,
@@ -563,6 +616,8 @@ public:
           eof_(size == 0)  
     {
     }
+
+    bytes_source(bytes_source&&) = default;
 
     bytes_source& operator=(bytes_source&&) = default;
 
