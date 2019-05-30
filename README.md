@@ -16,7 +16,7 @@ Compared to other JSON libraries, jsoncons has been designed to handle very larg
 SAX style parsers and serializers. Its [json parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_parser.md) is an 
 incremental parser that can be fed its input in chunks, and does not require an entire file to be loaded in memory at one time. 
 Its tree model is more compact than most, and can be made more compact still with a user-supplied
-allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_pull_reader.md),
+allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_cursor.md),
 built on top of its incremental parser.  
 
 The [jsoncons data model](doc/ref/data-model.md) supports the familiar JSON types - nulls,
@@ -640,7 +640,7 @@ The example JSON text, `book_catalog.json`, is used by the examples below.
 ```c++
 std::ifstream is("book_catalog.json");
 
-json_pull_reader reader(is);
+json_cursor reader(is);
 
 for (; !reader.done(); reader.next())
 {
@@ -762,7 +762,7 @@ public:
 std::ifstream is("book_catalog.json");
 
 author_filter filter;
-json_pull_reader reader(is, filter);
+json_cursor reader(is, filter);
 
 for (; !reader.done(); reader.next())
 {
@@ -781,7 +781,7 @@ Haruki Murakami
 Graham Greene
 ```
 
-See [json_pull_reader](doc/ref/json_pull_reader.md) 
+See [json_cursor](doc/ref/json_cursor.md) 
 
 ### Iterate over a json stream with staj iterators
 
@@ -805,7 +805,7 @@ int main()
 {
     std::istringstream is(example);
 
-    json_pull_reader reader(is);
+    json_cursor reader(is);
 
     staj_array_iterator<json> it(reader);
 

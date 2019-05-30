@@ -13,7 +13,7 @@
 #include <memory>
 #include <istream> // std::basic_istream
 #include <jsoncons/json_conversion_traits.hpp>
-#include <jsoncons/json_pull_reader.hpp>
+#include <jsoncons/json_cursor.hpp>
 
 namespace jsoncons {
 
@@ -35,7 +35,7 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_json(const std::basic_string<CharT>& s,
             const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options())
 {
-    basic_json_pull_reader<CharT> reader(s, options);
+    basic_json_cursor<CharT> reader(s, options);
     T val;
     read_from(basic_json<CharT>(), reader, val);
     return val;
@@ -57,7 +57,7 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_json(std::basic_istream<CharT>& is,
             const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options())
 {
-    basic_json_pull_reader<CharT> reader(is, options);
+    basic_json_cursor<CharT> reader(is, options);
     T val;
     read_from(basic_json<CharT>(), reader, val);
     return val;
@@ -68,7 +68,7 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
               const std::basic_string<CharT>& s,
               const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options())
 {
-    basic_json_pull_reader<CharT> reader(s, options);
+    basic_json_cursor<CharT> reader(s, options);
     T val;
     read_from(j, reader, val);
     return val;
@@ -79,7 +79,7 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
               std::basic_istream<CharT>& is,
               const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options())
 {
-    basic_json_pull_reader<CharT> reader(is, options);
+    basic_json_cursor<CharT> reader(is, options);
     T val;
     read_from(j, reader, val);
     return val;

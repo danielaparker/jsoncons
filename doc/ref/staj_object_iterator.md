@@ -103,7 +103,7 @@ int main()
 {
     std::istringstream is(object_example);
 
-    json_pull_reader reader(is);
+    json_cursor reader(is);
 
     staj_object_iterator<json> it(reader);
 

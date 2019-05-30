@@ -1,6 +1,10 @@
 master
 ------
 
+Name change
+
+- The name `json_pull_reader` has been deprecated (still works) and renamed to `json_cursor` 
+
 Changes to bigfloat mapping
 
 In previous versions, jsoncons arrays that contained

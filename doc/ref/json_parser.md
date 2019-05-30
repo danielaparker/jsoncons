@@ -26,7 +26,7 @@ no more input, `finish_parse` may be called.
 non-whitespace characters, which would normally be considered an error.  
 
 `json_parser` is used by the push parser [json_reader](json_reader.md),
-and by the pull parser [json_pull_reader](json_pull_reader.md).
+and by the pull parser [json_cursor](json_cursor.md).
 
 `json_parser` is noncopyable and nonmoveable.
 

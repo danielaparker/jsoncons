@@ -6,7 +6,7 @@
 #endif
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <jsoncons/json_pull_reader.hpp>
+#include <jsoncons/json_cursor.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <sstream>
 #include <vector>
@@ -43,7 +43,7 @@ TEST_CASE("array_iterator test")
 
     std::istringstream is(s);
 
-    json_pull_reader reader(is);
+    json_cursor reader(is);
 
     staj_array_iterator<json> it(reader);
 
@@ -67,7 +67,7 @@ TEST_CASE("object_iterator test")
 
     std::istringstream is(s);
 
-    json_pull_reader reader(is);
+    json_cursor reader(is);
 
     staj_object_iterator<json> it(reader);
 
