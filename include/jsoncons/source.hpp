@@ -255,6 +255,7 @@ public:
         std::swap(input_ptr_,val.input_ptr_);
         std::swap(input_end_,val.input_end_);
         std::swap(eof_,val.eof_);
+        return *this;
     }
 
     bool eof() const
