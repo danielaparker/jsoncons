@@ -112,7 +112,7 @@ uses the specified [options](json_decode_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
 Note: It is the programmer's responsibility to ensure that `basic_json_reader` does not outlive any source, 
-content handler, and error handler passed in the constuctor.
+content handler, and error handler passed in the constuctor, as `basic_json_reader` holds pointers to but does not own these resources.
 
 #### Parameters
 

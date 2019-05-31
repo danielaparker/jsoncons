@@ -126,13 +126,14 @@ and a specified [parse_error_handler](parse_error_handler.md).
 Constructors (8)-(14) read from a character sequence or stream and set `ec`
 if a parsing error is encountered while processing the initial event.
 
+Note: It is the programmer's responsibility to ensure that `basic_json_cursor` does not outlive any source, 
+content handler, and error handler passed in the constuctor, as `basic_json_cursor` holds pointers to but does not own these resources.
+
 #### Parameters
 
 `source` - a value from which a `jsoncons::basic_string_view<char_type>` is constructible, 
 or a value from which a `source_type` is constructible. In the case that a `jsoncons::basic_string_view<char_type>` is constructible
 from `source`, `source` is dispatched immediately to the parser. Otherwise, the `json_cursor` reads from a `source_type` in chunks. 
-
-Note: It is the programmer's responsibility to ensure that `json_cursor` does not outlive an error handler passed in the constuctor.
 
 #### Member functions
 
