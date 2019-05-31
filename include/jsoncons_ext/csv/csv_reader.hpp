@@ -51,7 +51,6 @@ class basic_csv_reader
     Src source_;
     std::vector<CharT,char_allocator_type> buffer_;
     size_t buffer_length_;
-    size_t buffer_position_;
     bool eof_;
     bool begin_;
 public:
@@ -106,7 +105,6 @@ public:
          parser_(handler, options, err_handler),
          source_(std::forward<Source>(source)),
          buffer_length_(default_max_buffer_length),
-         buffer_position_(0),
          eof_(false),
          begin_(true)
     {
@@ -121,6 +119,7 @@ public:
                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        :
          parser_(handler, options, err_handler),
+         buffer_length_(0),
          eof_(false),
          begin_(false)
     {

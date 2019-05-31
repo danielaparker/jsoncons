@@ -208,7 +208,7 @@ TEST_CASE("json_reader read from string test")
 )";
 
     json_decoder<json> decoder;
-    json_string_reader reader(s, decoder);
+    json_reader reader(s, decoder);
     reader.read();
     json j = decoder.get_result();
 

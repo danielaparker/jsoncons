@@ -39,7 +39,7 @@ TEST_CASE("test_parse_small_string1")
     json_decoder<json> decoder;
     try
     {
-        json_string_reader reader(input,decoder);
+        json_reader reader(input,decoder);
         reader.read_next();
     }
     catch (const std::exception&)
@@ -55,7 +55,7 @@ TEST_CASE("test_parse_small_string2")
     json_decoder<json> decoder;
     try
     {
-        json_string_reader reader(input, decoder);
+        json_reader reader(input, decoder);
         reader.read_next();
     }
     catch (const std::exception&)

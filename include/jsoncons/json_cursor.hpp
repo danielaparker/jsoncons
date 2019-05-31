@@ -133,7 +133,7 @@ private:
     }
 };
 
-template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=std::allocator<CharT>>
+template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
 class basic_json_cursor : public basic_staj_reader<CharT>, private virtual ser_context
 {
 public:
@@ -153,9 +153,9 @@ private:
     basic_json_parser<CharT,Allocator> parser_;
     basic_staj_filter<CharT>& filter_;
     source_type source_;
-    bool eof_;
     std::vector<CharT,char_allocator_type> buffer_;
     size_t buffer_length_;
+    bool eof_;
     bool begin_;
 
     // Noncopyable and nonmoveable
@@ -235,8 +235,8 @@ public:
        : parser_(options,err_handler),
          filter_(filter),
          source_(source),
-         eof_(false),
          buffer_length_(default_max_buffer_length),
+         eof_(false),
          begin_(true)
     {
         buffer_.reserve(buffer_length_);
@@ -254,6 +254,7 @@ public:
                       typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : parser_(options,err_handler),
          filter_(filter),
+         buffer_length_(0),
          eof_(false),
          begin_(false)
     {

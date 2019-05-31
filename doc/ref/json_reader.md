@@ -3,7 +3,7 @@
 ```c++
 template<
     class CharT,
-    class Src,
+    class Src=jsoncons::stream_source<CharT>,
     class Allocator=std::allocator<char>
 >
 class basic_json_reader 
@@ -24,10 +24,8 @@ Four specializations for common character types and result types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-json_reader            |basic_json_reader<char,jsoncons::stream_source<char>>
-json_string_reader     |basic_json_reader<char,jsoncons::string_source<char>>
-wjson_reader           |basic_json_reader<wchar_t, jsoncons::stream_source<wchar_t>>
-wjson_string_reader    |basic_json_reader<wchar_t, jsoncons::string_source<wchar_t>>
+json_reader            |basic_json_reader<char>
+wjson_reader           |basic_json_reader<wchar_t>
 
 #### Member types
 
@@ -154,7 +152,7 @@ Override (2) sets `ec` to a [json_errc](jsoncons::json_errc.md) if there are any
 std::string input = R"({"field1"{}})";    
 
 json_decoder<json> decoder;
-json_string_reader reader(is,decoder);
+json_reader reader(input,decoder);
 
 try
 {

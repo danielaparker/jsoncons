@@ -157,9 +157,9 @@ private:
     basic_json_parser<CharT,Allocator> parser_;
 
     source_type source_;
-    bool eof_;
     std::vector<CharT,char_allocator_type> buffer_;
     size_t buffer_length_;
+    bool eof_;
     bool begin_;
 
     // Noncopyable and nonmoveable
@@ -243,15 +243,38 @@ public:
     basic_json_reader(Source&& source,
                       basic_json_content_handler<CharT>& handler, 
                       const basic_json_decode_options<CharT>& options,
-                      parse_error_handler& err_handler)
+                      parse_error_handler& err_handler,
+                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : handler_(handler),
          parser_(options,err_handler),
          source_(std::forward<Source>(source)),
-         eof_(false),
          buffer_length_(default_max_buffer_length),
+         eof_(false),
          begin_(true)
     {
         buffer_.reserve(buffer_length_);
+    }
+
+    template <class Source>
+    basic_json_reader(Source&& source,
+                      basic_json_content_handler<CharT>& handler, 
+                      const basic_json_decode_options<CharT>& options,
+                      parse_error_handler& err_handler,
+                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
+       : handler_(handler),
+         parser_(options,err_handler),
+         buffer_length_(0),
+         eof_(false),
+         begin_(false)
+    {
+        basic_string_view<CharT> sv(std::forward<Source>(source));
+        auto result = unicons::skip_bom(sv.begin(), sv.end());
+        if (result.ec != unicons::encoding_errc())
+        {
+            throw ser_error(result.ec,parser_.line(),parser_.column());
+        }
+        size_t offset = result.it - sv.begin();
+        parser_.update(sv.data()+offset,sv.size()-offset);
     }
 
     size_t buffer_length() const
@@ -479,9 +502,11 @@ private:
 };
 
 typedef basic_json_reader<char> json_reader;
-typedef basic_json_reader<char,jsoncons::string_source<char>> json_string_reader;
 typedef basic_json_reader<wchar_t> wjson_reader;
+#if !defined(JSONCONS_NO_DEPRECATED)
+typedef basic_json_reader<char,jsoncons::string_source<char>> json_string_reader;
 typedef basic_json_reader<wchar_t, jsoncons::string_source<wchar_t>> wjson_string_reader;
+#endif
 
 }
 

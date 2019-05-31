@@ -151,7 +151,7 @@ std::string s = R"(
 }
 )";
 
-json_string_reader reader(s);
+json_reader reader(s);
 
 // or,
 // std::stringstream is(s);
