@@ -297,9 +297,7 @@ TEST_CASE("json_cursor object_value test")
         }
     )";
 
-    std::istringstream is(s);
-
-    json_cursor reader(is);
+    json_cursor reader(s);
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == staj_event_type::begin_object);
