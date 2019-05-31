@@ -136,7 +136,7 @@ private:
     }
 };
 
-template<class CharT,class Src,class Allocator=std::allocator<char>>
+template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
 class basic_json_reader 
 {
 public:
@@ -478,9 +478,9 @@ private:
     }
 };
 
-typedef basic_json_reader<char,jsoncons::stream_source<char>> json_reader;
+typedef basic_json_reader<char> json_reader;
 typedef basic_json_reader<char,jsoncons::string_source<char>> json_string_reader;
-typedef basic_json_reader<wchar_t, jsoncons::stream_source<wchar_t>> wjson_reader;
+typedef basic_json_reader<wchar_t> wjson_reader;
 typedef basic_json_reader<wchar_t, jsoncons::string_source<wchar_t>> wjson_string_reader;
 
 }

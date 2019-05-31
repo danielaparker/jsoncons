@@ -26,7 +26,7 @@
 
 namespace jsoncons { namespace csv {
 
-template<class CharT,class Src,class Allocator=std::allocator<char>>
+template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
 class basic_csv_reader 
 {
     struct stack_item
@@ -294,9 +294,9 @@ decode_csv(std::basic_istream<CharT>& is, const basic_csv_options<CharT>& option
     return decoder.get_result().template as<T>();
 }
 
-typedef basic_csv_reader<char,jsoncons::stream_source<char>> csv_reader;
+typedef basic_csv_reader<char> csv_reader;
 typedef basic_csv_reader<char,jsoncons::string_source<char>> csv_string_reader;
-typedef basic_csv_reader<wchar_t,jsoncons::stream_source<wchar_t>> wcsv_reader;
+typedef basic_csv_reader<wchar_t> wcsv_reader;
 typedef basic_csv_reader<wchar_t,jsoncons::string_source<wchar_t>> wcsv_string_reader;
 
 }}

@@ -133,7 +133,7 @@ private:
     }
 };
 
-template<class CharT,class Src,class Allocator=std::allocator<CharT>>
+template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=std::allocator<CharT>>
 class basic_json_cursor : public basic_staj_reader<CharT>, private virtual ser_context
 {
 public:
@@ -650,14 +650,14 @@ public:
 private:
 };
 
-typedef basic_json_cursor<char,jsoncons::stream_source<char>,std::allocator<char>> json_cursor;
-typedef basic_json_cursor<wchar_t,jsoncons::stream_source<wchar_t>, std::allocator<wchar_t>> wjson_cursor;
+typedef basic_json_cursor<char> json_cursor;
+typedef basic_json_cursor<wchar_t> wjson_cursor;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class CharT,class Src,class Allocator=std::allocator<CharT>>
 using basic_json_pull_reader = basic_json_cursor<CharT,Src,Allocator>;
-typedef basic_json_cursor<char,jsoncons::stream_source<char>,std::allocator<char>> json_pull_reader;
-typedef basic_json_cursor<wchar_t,jsoncons::stream_source<wchar_t>, std::allocator<wchar_t>> wjson_pull_reader;
+typedef basic_json_cursor<char> json_pull_reader;
+typedef basic_json_cursor<wchar_t> wjson_pull_reader;
 
 template<class CharT,class Src,class Allocator=std::allocator<CharT>>
 using basic_json_stream_reader = basic_json_cursor<CharT,Src,Allocator>;
@@ -665,11 +665,11 @@ using basic_json_stream_reader = basic_json_cursor<CharT,Src,Allocator>;
 template<class CharT,class Src,class Allocator=std::allocator<CharT>>
 using basic_json_staj_reader = basic_json_cursor<CharT,Src,Allocator>;
 
-typedef basic_json_cursor<char,jsoncons::stream_source<char>,std::allocator<char>> json_stream_reader;
-typedef basic_json_cursor<wchar_t,jsoncons::stream_source<wchar_t>, std::allocator<wchar_t>> wjson_stream_reader;
+typedef basic_json_cursor<char> json_stream_reader;
+typedef basic_json_cursor<wchar_t> wjson_stream_reader;
 
-typedef basic_json_cursor<char,jsoncons::stream_source<char>,std::allocator<char>> json_staj_reader;
-typedef basic_json_cursor<wchar_t,jsoncons::stream_source<wchar_t>, std::allocator<wchar_t>> wjson_staj_reader;
+typedef basic_json_cursor<char> json_staj_reader;
+typedef basic_json_cursor<wchar_t> wjson_staj_reader;
 #endif
 
 }
