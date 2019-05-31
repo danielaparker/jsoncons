@@ -242,19 +242,26 @@ public:
         }
     }
 
-    basic_json_cursor(const string_view_type& s, 
+    template <class Source>
+    basic_json_cursor(Source&& source, 
                       basic_staj_filter<CharT>& filter,
                       const basic_json_decode_options<CharT>& options,
-                      parse_error_handler& err_handler)
+                      parse_error_handler& err_handler,
+                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : parser_(options,err_handler),
          is_(null_is_),
          filter_(filter),
          eof_(false),
-         buffer_(s.begin(), s.end()),
-         buffer_length_(s.length()),
-         begin_(true)
+         begin_(false)
     {
-        parser_.update(buffer_.data(),buffer_.size());
+        basic_string_view<CharT> sv(std::forward<Source>(source));
+        auto result = unicons::skip_bom(sv.begin(), sv.end());
+        if (result.ec != unicons::encoding_errc())
+        {
+            throw ser_error(result.ec,parser_.line(),parser_.column());
+        }
+        size_t offset = result.it - sv.begin();
+        parser_.update(sv.data()+offset,sv.size()-offset);
         if (!done())
         {
             next();
@@ -349,20 +356,28 @@ public:
         }
     }
 
-    basic_json_cursor(const string_view_type& s, 
+    template <class Source>
+    basic_json_cursor(Source&& source, 
                       basic_staj_filter<CharT>& filter,
                       const basic_json_decode_options<CharT>& options,
                       parse_error_handler& err_handler,
-                      std::error_code& ec)
+                      std::error_code& ec,
+                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : parser_(options,err_handler),
          is_(null_is_),
          filter_(filter),
          eof_(false),
-         buffer_(s.begin(), s.end()),
-         buffer_length_(s.length()),
-         begin_(true)
+         begin_(false)
     {
-        parser_.update(buffer_.data(),buffer_.size());
+        basic_string_view<CharT> sv(std::forward<Source>(source));
+        auto result = unicons::skip_bom(sv.begin(), sv.end());
+        if (result.ec != unicons::encoding_errc())
+        {
+            ec = result.ec;
+            return;
+        }
+        size_t offset = result.it - sv.begin();
+        parser_.update(sv.data()+offset,sv.size()-offset);
         if (!done())
         {
             next(ec);
