@@ -33,16 +33,14 @@ TEST_CASE("n_objects_test")
           //.column_types("string,float,float,float,float");
 
     options.mapping(csv::mapping_type::n_rows);
-    std::istringstream is1(bond_yields);
-    csv::csv_reader reader1(is1,decoder,options);
+    csv::csv_reader reader1(bond_yields,decoder,options);
     reader1.read();
     ojson val1 = decoder.get_result();
     //std::cout << "\n(1)\n"<< pretty_print(val1) << "\n";
     CHECK(val1.size() == 4);
 
     options.mapping(csv::mapping_type::n_objects);
-    std::istringstream is2(bond_yields);
-    csv::csv_reader reader2(is2,decoder,options);
+    csv::csv_reader reader2(bond_yields,decoder,options);
     reader2.read();
     ojson val2 = decoder.get_result();
     //std::cout << "\n(2)\n"<< pretty_print(val2) << "\n";

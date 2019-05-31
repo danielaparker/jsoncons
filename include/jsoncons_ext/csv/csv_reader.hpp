@@ -100,7 +100,8 @@ public:
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options,
-                     parse_error_handler& err_handler)
+                     parse_error_handler& err_handler,
+                     typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        :
          parser_(handler, options, err_handler),
          source_(std::forward<Source>(source)),
@@ -110,6 +111,27 @@ public:
          begin_(true)
     {
         buffer_.reserve(buffer_length_);
+    }
+
+    template <class Source>
+    basic_csv_reader(Source&& source,
+                     basic_json_content_handler<CharT>& handler,
+                     const basic_csv_decode_options<CharT>& options,
+                     parse_error_handler& err_handler,
+                     typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
+       :
+         parser_(handler, options, err_handler),
+         eof_(false),
+         begin_(false)
+    {
+        basic_string_view<CharT> sv(std::forward<Source>(source));
+        auto result = unicons::skip_bom(sv.begin(), sv.end());
+        if (result.ec != unicons::encoding_errc())
+        {
+            throw ser_error(result.ec,parser_.line(),parser_.column());
+        }
+        size_t offset = result.it - sv.begin();
+        parser_.update(sv.data()+offset,sv.size()-offset);
     }
 
     ~basic_csv_reader()
@@ -295,9 +317,12 @@ decode_csv(std::basic_istream<CharT>& is, const basic_csv_options<CharT>& option
 }
 
 typedef basic_csv_reader<char> csv_reader;
-typedef basic_csv_reader<char,jsoncons::string_source<char>> csv_string_reader;
 typedef basic_csv_reader<wchar_t> wcsv_reader;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+typedef basic_csv_reader<char,jsoncons::string_source<char>> csv_string_reader;
 typedef basic_csv_reader<wchar_t,jsoncons::string_source<wchar_t>> wcsv_string_reader;
+#endif
 
 }}
 
