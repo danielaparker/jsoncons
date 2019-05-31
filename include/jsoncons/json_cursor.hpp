@@ -372,6 +372,7 @@ public:
        : parser_(options,err_handler),
          filter_(filter),
          eof_(false),
+         buffer_length_(0),
          begin_(false)
     {
         basic_string_view<CharT> sv(std::forward<Source>(source));
