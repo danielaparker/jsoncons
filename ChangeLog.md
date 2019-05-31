@@ -1,6 +1,15 @@
 master
 ------
 
+Enhancements
+
+- The `json_reader` and `csv_reader` constructors have been generalized to take either a value 
+from which a `jsoncons::string_view` is constructible (e.g. std::string), or a value from which 
+a `source_type` is constructible (e.g. std::istream). 
+
+- With this enhancement, the convenience typedefs `json_string_reader` and `csv_string_reader` are no 
+longer needed, and have been deprecated.
+
 Name change
 
 - The name `json_pull_reader` has been deprecated (still works) and renamed to `json_cursor` 
