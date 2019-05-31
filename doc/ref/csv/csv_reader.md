@@ -5,9 +5,16 @@ typedef basic_csv_reader<char,stream_source<char>> csv_reader
 ```
 
 The `csv_reader` class is an instantiation of the `basic_csv_reader` class template that uses `char` as the character type
-and `text_stream_reader` as the input source. It reads a [CSV file](http://tools.ietf.org/html/rfc4180) and produces JSON parse events.
+and `stream_source<char>` as the input source. It reads a [CSV file](http://tools.ietf.org/html/rfc4180) and produces JSON parse events.
 
 `csv_reader` is noncopyable and nonmoveable.
+
+#### Member types
+
+Type                       |Definition
+---------------------------|------------------------------
+char_type                  |CharT
+source_type                |Src
 
 #### Header
 ```c++
@@ -15,39 +22,51 @@ and `text_stream_reader` as the input source. It reads a [CSV file](http://tools
 ```
 #### Constructors
 
-    csv_reader(jsoncons::stream_source source,
-               json_content_handler& handler)
-Constructs a `csv_reader` that is associated with an input stream
-`is` of CSV text and a [json_content_handler](../json_content_handler.md) that receives
+    template <class Source>
+    basic_csv_reader(Source&& source,
+                     basic_json_content_handler<CharT>& handler); // (1)
+
+
+    template <class Source>
+    basic_csv_reader(Source&& source,
+                     basic_json_content_handler<CharT>& handler,
+                     const basic_csv_options<CharT>& options); // (2)
+
+    template <class Source>
+    basic_csv_reader(Source&& source,
+                     basic_json_content_handler<CharT>& handler,
+                     parse_error_handler& err_handler); // (3)
+
+    template <class Source>
+    basic_csv_reader(Source&& source,
+                     basic_json_content_handler<CharT>& handler,
+                     const basic_csv_decode_options<CharT>& options,
+                     parse_error_handler& err_handler); // (4)
+
+(1) Constructs a `csv_reader` that reads from a character sequence or stream `source`
+and a [json_content_handler](../json_content_handler.md) that receives
 JSON events. Uses default [csv_options](csv_options.md).
-You must ensure that the input stream and input handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
+You must ensure that the source and input handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
-    csv_reader(jsoncons::stream_source source,
-               json_content_handler& handler,
-               const csv_options& options)
-Constructs a `csv_reader` that is associated with an input stream
-`is` of CSV text, a [json_content_handler](../json_content_handler.md) that receives
+(2) Constructs a `csv_reader` that  that reads from a character sequence or stream `source`, a [json_content_handler](../json_content_handler.md) that receives
 JSON events, and [csv_options](csv_options.md).
-You must ensure that the input stream and input handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
+You must ensure that the source and input handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
-    csv_reader(jsoncons::stream_source source,
-               json_content_handler& handler,
-               parse_error_handler& err_handler)
-Constructs a `csv_reader` that is associated with an input stream
-`is` of CSV text, a [json_content_handler](../json_content_handler.md) that receives
+(3) Constructs a `csv_reader` that reads from a character sequence or stream `source`, a [json_content_handler](../json_content_handler.md) that receives
 JSON events and the specified [parse_error_handler](../parse_error_handler.md).
 Uses default [csv_options](csv_options.md).
-You must ensure that the input stream, input handler, and error handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
+You must ensure that the source, input handler, and error handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
-    csv_reader(jsoncons::stream_source source,
-               json_content_handler& handler,
-               const csv_options& options,
-               parse_error_handler& err_handler)
-Constructs a `csv_reader` that is associated with an input stream
-`is` of CSV text, a [json_content_handler](../json_content_handler.md) that receives
+(4) Constructs a `csv_reader` that reads from a character sequence or stream `source`, a [json_content_handler](../json_content_handler.md) that receives
 JSON events, [csv_options](csv_options.md),
 and the specified [parse_error_handler](../parse_error_handler.md).
-You must ensure that the input stream, input handler, and error handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
+You must ensure that the source, input handler, and error handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
+
+#### Parameters
+
+`source` - a value from which a `jsoncons::basic_string_view<char_type>` is constructible, 
+or a value from which a `source_type` is constructible. In the case that a `jsoncons::basic_string_view<char_type>` is constructible
+from `source`, `source` is dispatched immediately to the parser. Otherwise, the `csv_reader` reads from a `source_type` in chunks. 
 
 #### Member functions
 

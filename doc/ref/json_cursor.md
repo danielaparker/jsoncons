@@ -1,7 +1,7 @@
 ### jsoncons::json_cursor
 
 ```c++
-typedef basic_json_cursor<char,std::allocator<char>> json_cursor
+typedef basic_json_cursor<char> json_cursor
 ```
 
 A pull parser for parsing json events. A typical application will 
@@ -21,156 +21,116 @@ function to advance to the next event, until `done()` returns `true`.
 
 #### Constructors
 
-    json_cursor(std::istream& is); // (1)
+    template <class Source>
+    basic_json_cursor(Source&& source); // (1)
 
-    json_cursor(std::istream& is,
-                     staj_filter& filter); // (2)
+    template <class Source>
+    basic_json_cursor(Source&& source,
+                      basic_staj_filter<CharT>& filter); // (2)
 
-    json_cursor(std::istream& is, 
-                     const json_decode_options& options); // (3)
+    template <class Source>
+    basic_json_cursor(Source&& source,
+                      parse_error_handler& err_handler); // (3)
 
-    json_cursor(std::istream& is,
-                     staj_filter& filter, 
-                     const json_decode_options& options); // (4)
+    template <class Source>
+    basic_json_cursor(Source&& source,
+                      basic_staj_filter<CharT>& filter,
+                      parse_error_handler& err_handler); // (4)
 
-    json_cursor(std::istream& is, 
-                     parse_error_handler& err_handler); // (5)
+    template <class Source>
+    basic_json_cursor(Source&& source, 
+                      const basic_json_decode_options<CharT>& options); // (5)
 
-    json_cursor(std::istream& is,
-                     staj_filter& filter, 
-                     parse_error_handler& err_handler); // (6)
+    template <class Source>
+    basic_json_cursor(Source&& source,
+                      basic_staj_filter<CharT>& filter, 
+                      const basic_json_decode_options<CharT>& options); // (6)
 
-    json_cursor(std::istream& is, 
-                     const json_decode_options& options,
-                     parse_error_handler& err_handler); // (7)
+    template <class Source>
+    basic_json_cursor(Source&& source, 
+                      basic_staj_filter<CharT>& filter,
+                      const basic_json_decode_options<CharT>& options,
+                      parse_error_handler& err_handler); // (7)
 
-Constructors (1)-(7) read from a `std::istream` and throw a 
+Constructors (1)-(7) read from a character sequence or stream and throw a 
 [ser_error](ser_error.md) if a parsing error is encountered 
 while processing the initial event.
 
-(1) Constructs a `json_cursor` that reads from an input stream `is` of 
-JSON text, uses default [json_decode_options](json_decode_options.md)
+(1) Constructs a `json_cursor` that reads from a character sequence or stream `source`, uses default [json_decode_options](json_decode_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(2) Constructs a `json_cursor` that reads from an input stream `is` of 
-JSON text, applies a [staj_filter](staj_filter.md) to the events, uses default [json_decode_options](json_decode_options.md)
+(2) Constructs a `json_cursor` that reads from a character sequence or stream `source`, applies a [staj_filter](staj_filter.md) to the JSON events, uses default [json_decode_options](json_decode_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(3) Constructs a `json_cursor` that reads from an input stream `is` of JSON text, 
+(3) Constructs a `json_cursor` that reads from a character sequence or stream `source`, 
 uses the specified [json_decode_options](json_decode_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(4) Constructs a `json_cursor` that reads from an input stream `is` of JSON text, 
-applies a [staj_filter](staj_filter.md) to the events, 
+(4) Constructs a `json_cursor` that reads from a character sequence or stream `source`, 
+applies a [staj_filter](staj_filter.md) to the JSON events, 
 uses the specified [json_decode_options](json_decode_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(5) Constructs a `json_cursor` that reads from an input stream `is` of JSON text, 
+(5) Constructs a `json_cursor` that reads from a character sequence or stream `source`, 
 uses default [json_decode_options](json_decode_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
-(6) Constructs a `json_cursor` that reads from an input stream `is` of JSON text, 
-applies a [staj_filter](staj_filter.md) to the events, 
+(6) Constructs a `json_cursor` that reads from a character sequence or stream `source`, 
+applies a [staj_filter](staj_filter.md) to the JSON events, 
 uses default [json_decode_options](json_decode_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
-(7) Constructs a `json_cursor` that reads from an input stream `is` of JSON text, 
-applies a [staj_filter](staj_filter.md), 
+(7) Constructs a `json_cursor` that reads from a character sequence or stream `source`, 
+applies a [staj_filter](staj_filter.md) to the JSON events, 
 uses the specified [json_decode_options](json_decode_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
-    json_cursor(std::istream& is,
-                     std::error_code& ec); // (8)
+    template <class Source>
+    basic_json_cursor(Source&& source,
+                      std::error_code& ec); // (8)
 
-    json_cursor(std::istream& is,
-                     staj_filter& filter,
-                     std::error_code& ec); // (9)
+    template <class Source>
+    basic_json_cursor(Source&& source,
+                      basic_staj_filter<CharT>& filter,
+                      std::error_code& ec) // (9)
 
-    json_cursor(std::istream& is, 
-                     const json_decode_options& options,
-                     std::error_code& ec); // (10)
+    template <class Source>
+    basic_json_cursor(Source&& source,
+                      parse_error_handler& err_handler,
+                      std::error_code& ec) // (10)
 
-    json_cursor(std::istream& is,
-                     staj_filter& filter, 
-                     const json_decode_options& options,
-                     std::error_code& ec); // (11)
+    template <class Source>
+    basic_json_cursor(Source&& source,
+                      basic_staj_filter<CharT>& filter,
+                      parse_error_handler& err_handler,
+                      std::error_code& ec) // (11)
 
-    json_cursor(std::istream& is, 
-                     parse_error_handler& err_handler,
-                     std::error_code& ec); // (12)
+    template <class Source>
+    basic_json_cursor(Source&& source, 
+                      const basic_json_decode_options<CharT>& options,
+                      std::error_code& ec) // (12)
 
-    json_cursor(std::istream& is,
-                     staj_filter& filter, 
-                     parse_error_handler& err_handler,
-                     std::error_code& ec); // (13)
+    template <class Source>
+    basic_json_cursor(Source&& source,
+                      basic_staj_filter<CharT>& filter, 
+                      const basic_json_decode_options<CharT>& options,
+                      std::error_code& ec) // (13)
 
-    json_cursor(std::istream& is, 
-                     const json_decode_options& options,
-                     parse_error_handler& err_handler,
-                     std::error_code& ec); // (14)
+    template <class Source>
+    basic_json_cursor(Source&& source, 
+                      basic_staj_filter<CharT>& filter,
+                      const basic_json_decode_options<CharT>& options,
+                      parse_error_handler& err_handler,
+                      std::error_code& ec) // (14)
 
-Constructors (8)-(14) read from a `std::istream` and set `ec`
+Constructors (8)-(14) read from a character sequence or stream and set `ec`
 if a parsing error is encountered while processing the initial event.
 
-    json_cursor(string_view_type& s); // (15)
+#### Parameters
 
-    json_cursor(string_view_type& s, 
-                     staj_filter& filter); // (16)
-
-    json_cursor(string_view_type& s, 
-                     const json_decode_options& options); // (17)
-
-    json_cursor(string_view_type& s,
-                     staj_filter& filter, 
-                     const json_decode_options& options); // (18)
-
-    json_cursor(string_view_type& s, 
-                     parse_error_handler& err_handler); // (19)
-
-    json_cursor(string_view_type& s,
-                     staj_filter& filter, 
-                     parse_error_handler& err_handler); // (20)
-
-    json_cursor(string_view_type& s, 
-                     const json_decode_options& options,
-                     parse_error_handler& err_handler); // (21)
-
-Constructors (15)-(21) read from a `string_view_type` and throw a 
-[ser_error](ser_error.md) if a parsing error s encountered 
-while processing the initial event.
-
-    json_cursor(std::string_view_type& s,
-                     std::error_code& ec); // (22)
-
-    json_cursor(std::string_view_type& s,
-                     staj_filter& filter,
-                     std::error_code& ec); // (23)
-
-    json_cursor(std::string_view_type& s, 
-                     const json_decode_options& options,
-                     std::error_code& ec); // (24)
-
-    json_cursor(std::string_view_type& s,
-                     staj_filter& filter, 
-                     const json_decode_options& options,
-                     std::error_code& ec); // (25)
-
-    json_cursor(std::string_view_type& s, 
-                     parse_error_handler& err_handler,
-                     std::error_code& ec); // (26)
-
-    json_cursor(std::string_view_type& s,
-                     staj_filter& filter, 
-                     parse_error_handler& err_handler,
-                     std::error_code& ec); // (27)
-
-    json_cursor(std::string_view_type& s, 
-                     const json_decode_options& options,
-                     parse_error_handler& err_handler,
-                     std::error_code& ec); // (28)
-
-Constructors (22)-(28) read from a `string_view_type` and set `ec` 
-if a parsing error is encountered while processing the initial event.
+`source` - a value from which a `jsoncons::basic_string_view<char_type>` is constructible, 
+or a value from which a `source_type` is constructible. In the case that a `jsoncons::basic_string_view<char_type>` is constructible
+from `source`, `source` is dispatched immediately to the parser. Otherwise, the `json_cursor` reads from a `source_type` in chunks. 
 
 Note: It is the programmer's responsibility to ensure that `json_cursor` does not outlive an error handler passed in the constuctor.
 
