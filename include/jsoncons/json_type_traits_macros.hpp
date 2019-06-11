@@ -103,6 +103,9 @@
 #define JSONCONS_AS(TC, JVal, TVal, Member) if ((JVal).contains(JSONCONS_QUOTE(Member))) {val.Member = (JVal).at(JSONCONS_QUOTE(Member)).template as<decltype(TVal.Member)>();}
 #define JSONCONS_AS_LAST(TC, JVal, TVal, Member) if ((JVal).contains(JSONCONS_QUOTE(Member))) {val.Member = (JVal).at(JSONCONS_QUOTE(Member)).template as<decltype(TVal.Member)>();}
 
+#define JSONCONS_EXACT_AS(TC, JVal, TVal, Member) {val.Member = (JVal).at(JSONCONS_QUOTE(Member)).template as<decltype(TVal.Member)>();}
+#define JSONCONS_EXACT_AS_LAST(TC, JVal, TVal, Member) {val.Member = (JVal).at(JSONCONS_QUOTE(Member)).template as<decltype(TVal.Member)>();}
+
 #define JSONCONS_MEMBER_TRAITS_DECL(ValueType, ...)  \
 namespace jsoncons \
 { \
@@ -121,6 +124,36 @@ namespace jsoncons \
         { \
             ValueType val{}; \
             JSONCONS_REP_N(JSONCONS_AS, 0, j, val, __VA_ARGS__) \
+            return val; \
+        } \
+        static Json to_json(const ValueType& val, allocator_type allocator=allocator_type()) \
+        { \
+            Json j(allocator); \
+            JSONCONS_REP_N(JSONCONS_TO_JSON, 0, j, val, __VA_ARGS__) \
+            return j; \
+        } \
+    }; \
+} \
+  /**/
+
+#define JSONCONS_EXACT_MEMBER_TRAITS_DECL(ValueType, ...)  \
+namespace jsoncons \
+{ \
+    template<class Json> \
+    struct json_type_traits<Json, ValueType> \
+    { \
+        typedef ValueType value_type; \
+        typedef typename Json::allocator_type allocator_type; \
+        static bool is(const Json& j) noexcept \
+        { \
+            if (!j.is_object()) return false; \
+            JSONCONS_REP_N(JSONCONS_IS, 0, j, void(), __VA_ARGS__)\
+            return true; \
+        } \
+        static ValueType as(const Json& j) \
+        { \
+            ValueType val{}; \
+            JSONCONS_REP_N(JSONCONS_EXACT_AS, 0, j, val, __VA_ARGS__) \
             return val; \
         } \
         static Json to_json(const ValueType& val, allocator_type allocator=allocator_type()) \
