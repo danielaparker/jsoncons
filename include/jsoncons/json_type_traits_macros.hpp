@@ -136,7 +136,7 @@ namespace jsoncons \
 } \
   /**/
 
-#define JSONCONS_EXACT_MEMBER_TRAITS_DECL(ValueType, ...)  \
+#define JSONCONS_STRICT_MEMBER_TRAITS_DECL(ValueType, ...)  \
 namespace jsoncons \
 { \
     template<class Json> \
