@@ -261,6 +261,27 @@ public:
         }
     }
 
+    basic_staj_object_iterator& operator=(const basic_staj_object_iterator& other)
+    {
+        reader_ = other.reader_;
+        if (other.kvp_)
+        {
+            kvp_ = ::new(memory_)value_type(*other.kvp_);
+        }
+        else
+        {
+            kvp_ = nullptr;
+        }
+        return *this;
+    }
+
+    basic_staj_object_iterator& operator=(basic_staj_object_iterator&& other)
+    {
+        reader_ = other.reader_;
+        std::swap(kvp_,other.kvp_);
+        return *this;
+    }
+
     const value_type& operator*() const
     {
         return *kvp_;
