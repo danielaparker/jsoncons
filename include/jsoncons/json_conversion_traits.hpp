@@ -23,17 +23,18 @@
 namespace jsoncons {
 
 template <class T, class CharT, class Json>
-void read_from(const Json& j, basic_staj_reader<CharT>& reader, T& val, std::error_code& ec);
+T read_from(const Json& j, basic_staj_reader<CharT>& reader, std::error_code& ec);
 
 template <class T, class CharT, class Json>
-void read_from(const Json& j, basic_staj_reader<CharT>& reader, T& val)
+T read_from(const Json& j, basic_staj_reader<CharT>& reader)
 {
     std::error_code ec;
-    read_from(j, reader, val, ec);
+    T val = read_from<T>(j, reader, ec);
     if (ec)
     {
         throw ser_error(ec, reader.context().line(), reader.context().column());
     }
+    return val;
 }
 
 template <class T, class CharT, class Json>
@@ -179,9 +180,9 @@ struct json_conversion_traits<T,
 };
 
 template <class T, class CharT, class Json>
-void read_from(const Json&, basic_staj_reader<CharT>& reader, T& val, std::error_code& ec)
+T read_from(const Json&, basic_staj_reader<CharT>& reader, std::error_code& ec)
 {
-    val = json_conversion_traits<T>::template decode<CharT,Json>(reader,ec);
+    return json_conversion_traits<T>::template decode<CharT,Json>(reader,ec);
 }
 
 template <class T, class CharT, class Json>

@@ -36,8 +36,7 @@ decode_json(const std::basic_string<CharT>& s,
             const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options())
 {
     basic_json_cursor<CharT> reader(s, options);
-    T val;
-    read_from(basic_json<CharT>(), reader, val);
+    T val = read_from<T>(basic_json<CharT>(), reader);
     return val;
 }
 
@@ -58,8 +57,7 @@ decode_json(std::basic_istream<CharT>& is,
             const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options())
 {
     basic_json_cursor<CharT> reader(is, options);
-    T val;
-    read_from(basic_json<CharT>(), reader, val);
+    T val = read_from<T>(basic_json<CharT>(), reader);
     return val;
 }
 
@@ -69,8 +67,7 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
               const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options())
 {
     basic_json_cursor<CharT> reader(s, options);
-    T val;
-    read_from(j, reader, val);
+    T val = read_from<T>(j, reader);
     return val;
 }
 
@@ -80,8 +77,7 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
               const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options())
 {
     basic_json_cursor<CharT> reader(is, options);
-    T val;
-    read_from(j, reader, val);
+    T val = read_from<T>(j, reader);
     return val;
 }
 

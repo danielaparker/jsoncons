@@ -192,10 +192,11 @@ namespace ns {
 
         // Make json_type_traits specializations friends to give accesses to private members
         JSONCONS_TYPE_TRAITS_FRIEND;
-    public:
+
         reputation_object()
         {
         }
+    public:
         reputation_object(const std::string& application, const std::vector<reputon>& reputons)
             : application(application), reputons(reputons)
         {}
