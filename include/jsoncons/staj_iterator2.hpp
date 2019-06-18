@@ -7,7 +7,6 @@
 #ifndef JSONCONS_STAJ_ITERATOR_HPP
 #define JSONCONS_STAJ_ITERATOR_HPP
 
-#include <new> // placement new
 #include <memory>
 #include <string>
 #include <stdexcept>
@@ -26,8 +25,14 @@ class basic_staj_array_iterator
     typedef CharT char_type;
 
     basic_staj_reader<char_type>* reader_;
-    unsigned char memory_[sizeof(T)];
-    T* valuep_;
+
+    class Proxy {  // needed for operator->
+       const T x;
+       friend class basic_staj_array_iterator;
+       Proxy( const T& xx ) : x(xx) {}
+    public:
+       const T* operator->() const { return &x; }
+    };
 public:
     typedef T value_type;
     typedef std::ptrdiff_t difference_type;
@@ -36,12 +41,12 @@ public:
     typedef std::input_iterator_tag iterator_category;
 
     basic_staj_array_iterator() noexcept
-        : reader_(nullptr), valuep_(nullptr)
+        : reader_(nullptr)
     {
     }
 
     basic_staj_array_iterator(basic_staj_reader<char_type>& reader)
-        : reader_(std::addressof(reader)), valuep_(nullptr)
+        : reader_(std::addressof(reader))
     {
         if (reader_->current().event_type() == staj_event_type::begin_array)
         {
@@ -55,7 +60,7 @@ public:
 
     basic_staj_array_iterator(basic_staj_reader<char_type>& reader,
                         std::error_code& ec)
-        : reader_(std::addressof(reader)), valuep_(nullptr)
+        : reader_(std::addressof(reader))
     {
         if (reader_->current().event_type() == staj_event_type::begin_array)
         {
@@ -71,58 +76,14 @@ public:
         }
     }
 
-    basic_staj_array_iterator(const basic_staj_array_iterator& other)
-        : reader_(other.reader_), valuep_(nullptr)
+    const T operator*() const
     {
-        if (other.valuep_)
-        {
-            valuep_ = ::new(memory_)T(*other.valuep_);
-        }
+        return read_from<T>(Json(), *reader_);
     }
 
-    basic_staj_array_iterator(basic_staj_array_iterator&& other)
-        : reader_(other.reader_), valuep_(other.valuep_)
+    const Proxy operator->() const
     {
-        other.valuep_ = nullptr;
-    }
-
-    ~basic_staj_array_iterator()
-    {
-        if (valuep_)
-        {
-            valuep_->~T();
-        }
-    }
-
-    basic_staj_array_iterator& operator=(const basic_staj_array_iterator& other)
-    {
-        reader_ = other.reader_;
-        if (other.valuep_)
-        {
-            valuep_ = ::new(memory_)T(*other.valuep_);
-        }
-        else
-        {
-            valuep_ = nullptr;
-        }
-        return *this;
-    }
-
-    basic_staj_array_iterator& operator=(basic_staj_array_iterator&& other)
-    {
-        reader_ = other.reader_;
-        std::swap(valuep_,other.valuep_);
-        return *this;
-    }
-
-    const T& operator*() const
-    {
-        return *valuep_;
-    }
-
-    const T* operator->() const
-    {
-        return valuep_;
+        return Proxy(read_from<T>(Json(), *reader_));
     }
 
     basic_staj_array_iterator& operator++()
@@ -197,18 +158,25 @@ public:
     typedef std::input_iterator_tag iterator_category;
 
 private:
+    class Proxy {  // needed for operator->
+       const value_type x;
+       friend class basic_staj_object_iterator;
+       Proxy( const value_type& xx ) : x(xx) {}
+    public:
+       const value_type* operator->() const { return &x; }
+    };
+
     basic_staj_reader<char_type>* reader_;
-    unsigned char memory_[sizeof(value_type)];
-    value_type* kvp_;
+    key_type key_;
 public:
 
     basic_staj_object_iterator() noexcept
-        : reader_(nullptr), kvp_(nullptr)
+        : reader_(nullptr)
     {
     }
 
     basic_staj_object_iterator(basic_staj_reader<char_type>& reader)
-        : reader_(std::addressof(reader)), kvp_(nullptr)
+        : reader_(std::addressof(reader))
     {
         if (reader_->current().event_type() == staj_event_type::begin_object)
         {
@@ -222,7 +190,7 @@ public:
 
     basic_staj_object_iterator(basic_staj_reader<char_type>& reader, 
                          std::error_code& ec)
-        : reader_(std::addressof(reader)), kvp_(nullptr)
+        : reader_(std::addressof(reader))
     {
         if (reader_->current().event_type() == staj_event_type::begin_object)
         {
@@ -238,37 +206,14 @@ public:
         }
     }
 
-    basic_staj_object_iterator(const basic_staj_object_iterator& other)
-        : reader_(other.reader_), kvp_(nullptr)
+    const value_type operator*() const
     {
-        if (other.kvp_)
-        {
-            kvp_ = ::new(memory_)value_type(*other.kvp_);
-        }
+        return value_type(key_,read_from<T>(Json(), *reader_));
     }
 
-    basic_staj_object_iterator(basic_staj_object_iterator&& other)
-        : reader_(other.reader_), kvp_(other.kvp_)
+    const Proxy operator->() const
     {
-        other.kvp_ = nullptr;
-    }
-
-    ~basic_staj_object_iterator()
-    {
-        if (kvp_)
-        {
-            kvp_->~value_type();
-        }
-    }
-
-    const value_type& operator*() const
-    {
-        return *kvp_;
-    }
-
-    const value_type* operator->() const
-    {
-        return kvp_;
+        return Proxy(value_type(key_,read_from<T>(Json(), *reader_)));
     }
 
     basic_staj_object_iterator& operator++()
@@ -354,14 +299,6 @@ void basic_staj_array_iterator<T,CharT,Json>::next()
     if (!done())
     {
         reader_->next();
-        if (!done())
-        {
-            if (valuep_)
-            {
-                valuep_->~T();
-            }
-            valuep_ = ::new(memory_)T(read_from<T>(Json(), *reader_));
-        }
     }
 }
 
@@ -375,14 +312,6 @@ void basic_staj_array_iterator<T,CharT,Json>::next(std::error_code& ec)
         {
             return;
         }
-        if (!done())
-        {
-            if (valuep_)
-            {
-                valuep_->~T();
-            }
-            valuep_ = ::new(memory_)T(read_from<T>(Json(), *reader_, ec));
-        }
     }
 }
 
@@ -393,16 +322,8 @@ void basic_staj_object_iterator<T,CharT,Json>::next()
     if (!done())
     {
         JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::name);
-        auto key = reader_->current(). template as<key_type>();
+        key_ =reader_->current(). template as<key_type>();
         reader_->next();
-        if (!done())
-        {
-            if (kvp_)
-            {
-                kvp_->~value_type();
-            }
-            kvp_ = ::new(memory_)value_type(std::move(key),read_from<T>(Json(), *reader_));
-        }
     }
 }
 
@@ -417,19 +338,11 @@ void basic_staj_object_iterator<T,CharT,Json>::next(std::error_code& ec)
     if (!done())
     {
         JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::name);
-        auto key = reader_->current(). template as<key_type>();
+        key_ =reader_->current(). template as<key_type>();
         reader_->next(ec);
         if (ec)
         {
             return;
-        }
-        if (!done())
-        {
-            if (kvp_)
-            {
-                kvp_->~value_type();
-            }
-            kvp_ = ::new(memory_)value_type(std::move(key),read_from<T>(Json(), *reader_, ec));
         }
     }
 }

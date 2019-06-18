@@ -36,8 +36,6 @@ namespace json_type_traits_macros_tests {
         std::string title_;
         double price_;
     public:
-        book3() = default;
-
         book3(const std::string& author,
               const std::string& title,
               double price)
