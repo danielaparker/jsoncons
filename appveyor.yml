@@ -32,6 +32,12 @@ environment:
 
     - platform: vs
       vsversion: 2017
+      arch: x86
+      FLAGS: ""
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+
+    - platform: vs
+      vsversion: 2017
       arch: x64
       FLAGS: "/permissive- /std:c++latest /utf-8"
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
