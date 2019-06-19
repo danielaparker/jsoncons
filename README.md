@@ -77,6 +77,7 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 - [Quick guide](http://danielaparker.github.io/jsoncons)
 - [Examples](doc/Examples.md)
 - [Reference](doc/Home.md)
+- [Roadmap](Roadmap.md)
 
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](doc/ref/deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
 
