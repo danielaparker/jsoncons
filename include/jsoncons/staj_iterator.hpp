@@ -81,9 +81,12 @@ public:
     }
 
     basic_staj_array_iterator(basic_staj_array_iterator&& other)
-        : reader_(other.reader_), valuep_(other.valuep_)
+        : reader_(other.reader_), valuep_(nullptr)
     {
-        other.valuep_ = nullptr;
+        if (other.valuep_)
+        {
+            valuep_ = ::new(memory_)T(std::move(*other.valuep_));
+        }
     }
 
     ~basic_staj_array_iterator()
@@ -111,7 +114,14 @@ public:
     basic_staj_array_iterator& operator=(basic_staj_array_iterator&& other)
     {
         reader_ = other.reader_;
-        std::swap(valuep_,other.valuep_);
+        if (other.valuep_)
+        {
+            valuep_ = ::new(memory_)T(std::move(*other.valuep_));
+        }
+        else
+        {
+            valuep_ = nullptr;
+        }
         return *this;
     }
 
@@ -197,8 +207,8 @@ public:
     typedef std::input_iterator_tag iterator_category;
 
 private:
-    basic_staj_reader<char_type>* reader_;
     unsigned char memory_[sizeof(value_type)];
+    basic_staj_reader<char_type>* reader_;
     value_type* kvp_;
 public:
 
@@ -248,9 +258,12 @@ public:
     }
 
     basic_staj_object_iterator(basic_staj_object_iterator&& other)
-        : reader_(other.reader_), kvp_(other.kvp_)
+        : reader_(other.reader_), kvp_(nullptr)
     {
-        other.kvp_ = nullptr;
+        if (other.kvp_)
+        {
+            kvp_ = ::new(memory_)value_type(std::move(*other.kvp_));
+        }
     }
 
     ~basic_staj_object_iterator()
@@ -278,7 +291,14 @@ public:
     basic_staj_object_iterator& operator=(basic_staj_object_iterator&& other)
     {
         reader_ = other.reader_;
-        std::swap(kvp_,other.kvp_);
+        if (other.kvp_)
+        {
+            kvp_ = ::new(memory_)value_type(std::move(*other.kvp_));
+        }
+        else
+        {
+            kvp_ = nullptr;
+        }
         return *this;
     }
 
@@ -334,9 +354,11 @@ private:
         return reader_->done() || reader_->current().event_type() == staj_event_type::end_object;
     }
 
+
     void next();
 
     void next(std::error_code& ec);
+
 };
 
 template <class T,class CharT,class Json>
@@ -414,7 +436,7 @@ void basic_staj_object_iterator<T,CharT,Json>::next()
     if (!done())
     {
         JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::name);
-        auto key = reader_->current(). template as<key_type>();
+        key_type key = reader_->current(). template as<key_type>();
         reader_->next();
         if (!done())
         {
