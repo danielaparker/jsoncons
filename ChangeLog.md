@@ -3,6 +3,21 @@ master
 
 Enhancements
 
+- New macro `JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL`, that, when decoding to a C++ object, 
+  requires all data members declared for the object to be present in the JSON (or other supported
+  format.)
+
+- Types that are specialized in `json_type_traits` are no longer required to have a public default
+  constructor. In particular, types that are specialized using `JSONCONS_MEMBER_TRAITS_DECL`
+  or `JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL` may have a private default constructor + `JSONCONS_TYPE_TRAITS_FRIEND`, 
+  and types that are specialized with `JSONCONS_GETTER_CTOR_TRAITS_DECL` are not required to have a default
+  constructor at all.
+
+version 126.0
+-------------
+
+Enhancements
+
 - The `json_reader` and `csv_reader` constructors have been generalized to take either a value 
 from which a `jsoncons::string_view` is constructible (e.g. std::string), or a value from which 
 a `source_type` is constructible (e.g. std::istream). 
