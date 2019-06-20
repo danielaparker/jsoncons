@@ -168,7 +168,7 @@ TEST_CASE("csv_test_empty_values_with_defaults")
     reader.read();
     json val = decoder.get_result();
 
-    std::cout << pretty_print(val) << std::endl;
+    //std::cout << pretty_print(val) << std::endl;
 
     CHECK(val[0]["bool-f"].as<bool>() == false);
     CHECK(val[0]["bool-f"].is<bool>());
@@ -962,10 +962,10 @@ TEST_CASE("csv_test1_repeat2")
 {
     csv::csv_options options1;
     options1.column_types("[integer,string]*");
-    for (auto x : options1.column_types())
-    {
-        std::cout << (int)x.col_type << " " << x.level << " " << x.rep_count << std::endl;
-    }
+    //for (auto x : options1.column_types())
+    //{
+    //    std::cout << (int)x.col_type << " " << x.level << " " << x.rep_count << std::endl;
+    //}
 }
 
 TEST_CASE("empty_line_test_1")
@@ -988,9 +988,17 @@ WLF,WALLIS & FUTUNA ISLANDS
     csv::csv_reader reader(is,decoder,options);
     reader.read();
     json j = decoder.get_result();
-    CHECK(j.size() == 4);
+    REQUIRE(j.size() == 4);
+    CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW"));
+    CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA"));
+    CHECK(j[1]["country_code"].as<std::string>() == std::string("ATF"));
+    CHECK(j[1]["name"].as<std::string>() == std::string("FRENCH SOUTHERN TERRITORIES, D.R. OF"));
+    CHECK(j[2]["country_code"].as<std::string>() == std::string("VUT"));
+    CHECK(j[2]["name"].as<std::string>() == std::string("VANUATU"));
+    CHECK(j[3]["country_code"].as<std::string>() == std::string("WLF"));
+    CHECK(j[3]["name"].as<std::string>() == std::string("WALLIS & FUTUNA ISLANDS"));
 
-    std::cout << pretty_print(j) << std::endl;
+    //std::cout << pretty_print(j) << std::endl;
 }
 
 TEST_CASE("empty_line_test_2")
@@ -1016,14 +1024,22 @@ WLF,WALLIS & FUTUNA ISLANDS
     json j = decoder.get_result();
     CHECK(j.size() == 5);
 
-    std::cout << pretty_print(j) << std::endl;
+    CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW"));
+    CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA"));
+    CHECK(j[1]["country_code"].as<std::string>() == std::string("")); // ok, no delimiter
+    CHECK(j[2]["country_code"].as<std::string>() == std::string("ATF"));
+    CHECK(j[2]["name"].as<std::string>() == std::string("FRENCH SOUTHERN TERRITORIES, D.R. OF"));
+    CHECK(j[3]["country_code"].as<std::string>() == std::string("VUT"));
+    CHECK(j[3]["name"].as<std::string>() == std::string("VANUATU"));
+    CHECK(j[4]["country_code"].as<std::string>() == std::string("WLF"));
+    CHECK(j[4]["name"].as<std::string>() == std::string("WALLIS & FUTUNA ISLANDS"));
 }
 
 TEST_CASE("line_with_one_space")
 {
     std::string input = R"(country_code,name
 ABW,ARUBA
-\t
+ 
 ATF,"FRENCH SOUTHERN TERRITORIES, D.R. OF"
 VUT,VANUATU
 WLF,WALLIS & FUTUNA ISLANDS
@@ -1040,8 +1056,17 @@ WLF,WALLIS & FUTUNA ISLANDS
     reader.read();
     json j = decoder.get_result();
     CHECK(j.size() == 5);
+    CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW"));
+    CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA"));
+    CHECK(j[1]["country_code"].as<std::string>() == std::string(" ")); // ok, one space, no delimiter
+    CHECK(j[2]["country_code"].as<std::string>() == std::string("ATF"));
+    CHECK(j[2]["name"].as<std::string>() == std::string("FRENCH SOUTHERN TERRITORIES, D.R. OF"));
+    CHECK(j[3]["country_code"].as<std::string>() == std::string("VUT"));
+    CHECK(j[3]["name"].as<std::string>() == std::string("VANUATU"));
+    CHECK(j[4]["country_code"].as<std::string>() == std::string("WLF"));
+    CHECK(j[4]["name"].as<std::string>() == std::string("WALLIS & FUTUNA ISLANDS"));
 
-    std::cout << pretty_print(j) << std::endl;
+    //std::cout << pretty_print(j) << std::endl;
 }
 
 TEST_CASE("line_with_one_space_and_trim")
@@ -1066,8 +1091,16 @@ WLF,WALLIS & FUTUNA ISLANDS
     reader.read();
     json j = decoder.get_result();
     CHECK(j.size() == 4);
+    CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW"));
+    CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA"));
+    CHECK(j[1]["country_code"].as<std::string>() == std::string("ATF"));
+    CHECK(j[1]["name"].as<std::string>() == std::string("FRENCH SOUTHERN TERRITORIES, D.R. OF"));
+    CHECK(j[2]["country_code"].as<std::string>() == std::string("VUT"));
+    CHECK(j[2]["name"].as<std::string>() == std::string("VANUATU"));
+    CHECK(j[3]["country_code"].as<std::string>() == std::string("WLF"));
+    CHECK(j[3]["name"].as<std::string>() == std::string("WALLIS & FUTUNA ISLANDS"));
 
-    std::cout << pretty_print(j) << std::endl;
+    //std::cout << pretty_print(j) << std::endl;
 }
 
 TEST_CASE("test_decode_csv_from_string")
