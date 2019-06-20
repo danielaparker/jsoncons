@@ -461,6 +461,40 @@ private:
     }
 };
 
+template<class CharT>
+bool staj_to_saj_event(const basic_staj_event<CharT>& staj_ev,
+                       basic_json_content_handler<CharT>& handler,
+                       const ser_context& context)
+{
+    switch (staj_ev.event_type())
+    {
+        case staj_event_type::begin_array:
+            return handler.begin_array(semantic_tag::none, context);
+        case staj_event_type::end_array:
+            return handler.end_array(context);
+        case staj_event_type::begin_object:
+            return handler.begin_object(semantic_tag::none, context);
+        case staj_event_type::end_object:
+            return handler.end_object(context);
+        case staj_event_type::name:
+            return handler.name(staj_ev.template as<jsoncons::basic_string_view<CharT>>(), context);
+        case staj_event_type::string_value:
+            return handler.string_value(staj_ev.template as<jsoncons::basic_string_view<CharT>>(), semantic_tag::none, context);
+        case staj_event_type::null_value:
+            return handler.null_value(semantic_tag::none, context);
+        case staj_event_type::bool_value:
+            return handler.bool_value(staj_ev.template as<bool>(), semantic_tag::none, context);
+        case staj_event_type::int64_value:
+            return handler.int64_value(staj_ev.template as<int64_t>(), semantic_tag::none, context);
+        case staj_event_type::uint64_value:
+            return handler.uint64_value(staj_ev.template as<uint64_t>(), semantic_tag::none, context);
+        case staj_event_type::double_value:
+            return handler.double_value(staj_ev.template as<double>(), semantic_tag::none, context);
+        default:
+            return false;
+    }
+}
+
 // basic_staj_filter
 
 template<class CharT>
@@ -470,7 +504,7 @@ public:
 
     virtual ~basic_staj_filter() = default;
 
-    virtual bool accept(const basic_staj_event<CharT>& event, const ser_context& context) = 0;
+    virtual bool accept(const basic_staj_event<CharT>& staj_ev, const ser_context& context) = 0;
 };
 
 // basic_default_staj_filter

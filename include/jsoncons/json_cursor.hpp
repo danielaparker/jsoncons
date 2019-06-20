@@ -316,76 +316,9 @@ public:
     void read_to(basic_json_content_handler<CharT>& handler,
                 std::error_code& ec) override
     {
-        switch (event_handler_.event().event_type())
+        if (!staj_to_saj_event(event_handler_.event(), handler, *this))
         {
-            case staj_event_type::begin_array:
-                if (!handler.begin_array(semantic_tag::none, *this))
-                {
-                    return;
-                }
-                break;
-            case staj_event_type::end_array:
-                if (!handler.end_array(*this))
-                {
-                    return;
-                }
-                break;
-            case staj_event_type::begin_object:
-                if (!handler.begin_object(semantic_tag::none, *this))
-                {
-                    return;
-                }
-                break;
-            case staj_event_type::end_object:
-                if (!handler.end_object(*this))
-                {
-                    return;
-                }
-                break;
-            case staj_event_type::name:
-                if (!handler.name(event_handler_.event().template as<jsoncons::basic_string_view<CharT>>(), *this))
-                {
-                    return;
-                }
-                break;
-            case staj_event_type::string_value:
-                if (!handler.string_value(event_handler_.event().template as<jsoncons::basic_string_view<CharT>>(), semantic_tag::none, *this))
-                {
-                    return;
-                }
-                break;
-            case staj_event_type::null_value:
-                if (!handler.null_value(semantic_tag::none, *this))
-                {
-                    return;
-                }
-                break;
-            case staj_event_type::bool_value:
-                if (!handler.bool_value(event_handler_.event().template as<bool>(), semantic_tag::none, *this))
-                {
-                    return;
-                }
-                break;
-            case staj_event_type::int64_value:
-                if (!handler.int64_value(event_handler_.event().template as<int64_t>(), semantic_tag::none, *this))
-                {
-                    return;
-                }
-                break;
-            case staj_event_type::uint64_value:
-                if (!handler.uint64_value(event_handler_.event().template as<uint64_t>(), semantic_tag::none, *this))
-                {
-                    return;
-                }
-                break;
-            case staj_event_type::double_value:
-                if (!handler.double_value(event_handler_.event().template as<double>(), semantic_tag::none, *this))
-                {
-                    return;
-                }
-                break;
-            default:
-                break;
+            return;
         }
         do
         {
