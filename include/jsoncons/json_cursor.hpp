@@ -25,114 +25,6 @@
 
 namespace jsoncons {
 
-template <class CharT>
-class basic_staj_event_handler final : public basic_json_content_handler<CharT>
-{
-public:
-    using typename basic_json_content_handler<CharT>::string_view_type;
-private:
-    basic_staj_event<CharT> event_;
-public:
-    basic_staj_event_handler()
-        : event_(staj_event_type::null_value)
-    {
-    }
-
-    basic_staj_event_handler(staj_event_type event_type)
-        : event_(event_type)
-    {
-    }
-
-    const basic_staj_event<CharT>& event() const
-    {
-        return event_;
-    }
-private:
-
-    bool do_begin_object(semantic_tag, const ser_context&) override
-    {
-        event_ = basic_staj_event<CharT>(staj_event_type::begin_object);
-        return false;
-    }
-
-    bool do_end_object(const ser_context&) override
-    {
-        event_ = basic_staj_event<CharT>(staj_event_type::end_object);
-        return false;
-    }
-
-    bool do_begin_array(semantic_tag, const ser_context&) override
-    {
-        event_ = basic_staj_event<CharT>(staj_event_type::begin_array);
-        return false;
-    }
-
-    bool do_end_array(const ser_context&) override
-    {
-        event_ = basic_staj_event<CharT>(staj_event_type::end_array);
-        return false;
-    }
-
-    bool do_name(const string_view_type& name, const ser_context&) override
-    {
-        event_ = basic_staj_event<CharT>(name.data(), name.length(), staj_event_type::name);
-        return false;
-    }
-
-    bool do_null_value(semantic_tag, const ser_context&) override
-    {
-        event_ = basic_staj_event<CharT>(staj_event_type::null_value);
-        return false;
-    }
-
-    bool do_bool_value(bool value, semantic_tag, const ser_context&) override
-    {
-        event_ = basic_staj_event<CharT>(value);
-        return false;
-    }
-
-    bool do_string_value(const string_view_type& s, semantic_tag tag, const ser_context&) override
-    {
-        event_ = basic_staj_event<CharT>(s.data(), s.length(), staj_event_type::string_value, tag);
-        return false;
-    }
-
-    bool do_byte_string_value(const byte_string_view&, 
-                              semantic_tag,
-                              const ser_context&) override
-    {
-        JSONCONS_UNREACHABLE();
-    }
-
-    bool do_int64_value(int64_t value, 
-                        semantic_tag tag,
-                        const ser_context&) override
-    {
-        event_ = basic_staj_event<CharT>(value, tag);
-        return false;
-    }
-
-    bool do_uint64_value(uint64_t value, 
-                         semantic_tag tag, 
-                         const ser_context&) override
-    {
-        event_ = basic_staj_event<CharT>(value, tag);
-        return false;
-    }
-
-    bool do_double_value(double value, 
-                         semantic_tag tag, 
-                         const ser_context&) override
-    {
-        event_ = basic_staj_event<CharT>(value, tag);
-        return false;
-    }
-
-    void do_flush() override
-    {
-    }
-};
-
 template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
 class basic_json_cursor : public basic_staj_reader<CharT>, private virtual ser_context
 {
@@ -146,7 +38,7 @@ private:
     basic_staj_event_handler<CharT> event_handler_;
     default_parse_error_handler default_err_handler_;
 
-    default_basic_staj_filter<CharT> default_filter_;
+    basic_default_staj_filter<CharT> default_filter_;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
 
@@ -411,17 +303,17 @@ public:
         return event_handler_.event();
     }
 
-    void accept(basic_json_content_handler<CharT>& handler) override
+    void read_to(basic_json_content_handler<CharT>& handler) override
     {
         std::error_code ec;
-        accept(handler, ec);
+        read_to(handler, ec);
         if (ec)
         {
             throw ser_error(ec,parser_.line(),parser_.column());
         }
     }
 
-    void accept(basic_json_content_handler<CharT>& handler,
+    void read_to(basic_json_content_handler<CharT>& handler,
                 std::error_code& ec) override
     {
         switch (event_handler_.event().event_type())

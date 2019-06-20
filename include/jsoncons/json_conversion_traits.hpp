@@ -53,7 +53,7 @@ struct json_conversion_traits
     static T decode(basic_staj_reader<CharT>& reader, std::error_code& ec)
     {
         json_decoder<Json> decoder;
-        reader.accept(decoder, ec);
+        reader.read_to(decoder, ec);
         return decoder.get_result().template as<T>();
     }
 
