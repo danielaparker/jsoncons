@@ -65,21 +65,27 @@ private:
         Json value_;
     };
 
-    enum class container_type {root_t, array_t, object_t};
+    enum class structure_type {root_t, array_t, object_t};
 
-    struct structure_offset
+    struct structure_info
     {
+        structure_type type_;
         size_t offset_;
-        container_type type_;
+
+        structure_info(structure_type type, size_t offset)
+            : type_(type), offset_(offset)
+        {
+        }
+
     };
 
     typedef Allocator allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<stack_item> stack_item_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<structure_offset> size_t_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<structure_info> size_t_allocator_type;
 
 
-    std::vector<stack_item,stack_item_allocator_type> stack_;
-    std::vector<structure_offset,size_t_allocator_type> stack_offsets_;
+    std::vector<stack_item,stack_item_allocator_type> item_stack_;
+    std::vector<structure_info,size_t_allocator_type> structure_stack_;
     bool is_valid_;
 
 public:
@@ -90,9 +96,9 @@ public:
           is_valid_(false) 
 
     {
-        stack_.reserve(1000);
-        stack_offsets_.reserve(100);
-        stack_offsets_.push_back({0,container_type::root_t});
+        item_stack_.reserve(1000);
+        structure_stack_.reserve(100);
+        structure_stack_.emplace_back(structure_type::root_t, 0);
     }
 
     bool is_valid() const
@@ -121,44 +127,44 @@ private:
 
     bool do_begin_object(semantic_tag tag, const ser_context&) override
     {
-        switch (stack_offsets_.back().type_)
+        switch (structure_stack_.back().type_)
         {
-            case container_type::object_t:
-                stack_.back().value_ = Json(object(object_allocator_), tag);
+            case structure_type::object_t:
+                item_stack_.back().value_ = Json(object(object_allocator_), tag);
                 break;
-            case container_type::array_t:
-                stack_.emplace_back(std::false_type(), object(object_allocator_), tag);
+            case structure_type::array_t:
+                item_stack_.emplace_back(std::false_type(), object(object_allocator_), tag);
                 break;
-            case container_type::root_t:
-                stack_.clear();
+            case structure_type::root_t:
+                item_stack_.clear();
                 is_valid_ = false;
-                stack_.emplace_back(std::false_type(), object(object_allocator_), tag);
+                item_stack_.emplace_back(std::false_type(), object(object_allocator_), tag);
                 break;
         }
-        stack_offsets_.push_back({stack_.size()-1,container_type::object_t});
+        structure_stack_.emplace_back(structure_type::object_t, item_stack_.size()-1);
         return true;
     }
 
     bool do_end_object(const ser_context&) override
     {
-        JSONCONS_ASSERT(stack_offsets_.size() > 0);
-        JSONCONS_ASSERT(stack_offsets_.back().type_ == container_type::object_t);
-        const size_t structure_index = stack_offsets_.back().offset_;
-        JSONCONS_ASSERT(stack_.size() > structure_index);
-        const size_t count = stack_.size() - (structure_index + 1);
-        auto first = stack_.begin() + (structure_index+1);
+        JSONCONS_ASSERT(structure_stack_.size() > 0);
+        JSONCONS_ASSERT(structure_stack_.back().type_ == structure_type::object_t);
+        const size_t structure_index = structure_stack_.back().offset_;
+        JSONCONS_ASSERT(item_stack_.size() > structure_index);
+        const size_t count = item_stack_.size() - (structure_index + 1);
+        auto first = item_stack_.begin() + (structure_index+1);
         auto last = first + count;
-        stack_[structure_index].value_.object_value().insert(
+        item_stack_[structure_index].value_.object_value().insert(
             std::make_move_iterator(first),
             std::make_move_iterator(last),
             [](stack_item&& val){return key_value_type(std::move(val.name_), std::move(val.value_));}
         );
-        stack_.erase(stack_.begin()+structure_index+1, stack_.end());
-        stack_offsets_.pop_back();
-        if (stack_offsets_.back().type_ == container_type::root_t)
+        item_stack_.erase(item_stack_.begin()+structure_index+1, item_stack_.end());
+        structure_stack_.pop_back();
+        if (structure_stack_.back().type_ == structure_type::root_t)
         {
-            result_.swap(stack_.front().value_);
-            stack_.pop_back();
+            result_.swap(item_stack_.front().value_);
+            item_stack_.pop_back();
             is_valid_ = true;
             return false;
         }
@@ -167,46 +173,46 @@ private:
 
     bool do_begin_array(semantic_tag tag, const ser_context&) override
     {
-        switch (stack_offsets_.back().type_)
+        switch (structure_stack_.back().type_)
         {
-            case container_type::object_t:
-                stack_.back().value_ = Json(array(array_allocator_), tag);
+            case structure_type::object_t:
+                item_stack_.back().value_ = Json(array(array_allocator_), tag);
                 break;
-            case container_type::array_t:
-                stack_.emplace_back(std::false_type(), array(array_allocator_), tag);
+            case structure_type::array_t:
+                item_stack_.emplace_back(std::false_type(), array(array_allocator_), tag);
                 break;
-            case container_type::root_t:
-                stack_.clear();
+            case structure_type::root_t:
+                item_stack_.clear();
                 is_valid_ = false;
-                stack_.emplace_back(std::false_type(), array(array_allocator_), tag);
+                item_stack_.emplace_back(std::false_type(), array(array_allocator_), tag);
                 break;
         }
-        stack_offsets_.push_back({stack_.size()-1,container_type::array_t});
+        structure_stack_.emplace_back(structure_type::array_t, item_stack_.size()-1);
         return true;
     }
 
     bool do_end_array(const ser_context&) override
     {
-        JSONCONS_ASSERT(stack_offsets_.size() > 0);
-        JSONCONS_ASSERT(stack_offsets_.back().type_ == container_type::array_t);
-        const size_t structure_index = stack_offsets_.back().offset_;
-        JSONCONS_ASSERT(stack_.size() > structure_index);
-        const size_t count = stack_.size() - (structure_index + 1);
-        auto first = stack_.begin() + (structure_index+1);
+        JSONCONS_ASSERT(structure_stack_.size() > 0);
+        JSONCONS_ASSERT(structure_stack_.back().type_ == structure_type::array_t);
+        const size_t structure_index = structure_stack_.back().offset_;
+        JSONCONS_ASSERT(item_stack_.size() > structure_index);
+        const size_t count = item_stack_.size() - (structure_index + 1);
+        auto first = item_stack_.begin() + (structure_index+1);
         auto last = first + count;
-        auto& j = stack_[structure_index].value_;
+        auto& j = item_stack_[structure_index].value_;
         j.reserve(count);
         while (first != last)
         {
             j.push_back(std::move(first->value_));
             ++first;
         }
-        stack_.erase(stack_.begin()+structure_index+1, stack_.end());
-        stack_offsets_.pop_back();
-        if (stack_offsets_.back().type_ == container_type::root_t)
+        item_stack_.erase(item_stack_.begin()+structure_index+1, item_stack_.end());
+        structure_stack_.pop_back();
+        if (structure_stack_.back().type_ == structure_type::root_t)
         {
-            result_.swap(stack_.front().value_);
-            stack_.pop_back();
+            result_.swap(item_stack_.front().value_);
+            item_stack_.pop_back();
             is_valid_ = true;
             return false;
         }
@@ -215,21 +221,21 @@ private:
 
     bool do_name(const string_view_type& name, const ser_context&) override
     {
-        stack_.emplace_back(std::true_type(), name.data(), name.length(), string_allocator_);
+        item_stack_.emplace_back(std::true_type(), name.data(), name.length(), string_allocator_);
         return true;
     }
 
     bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context&) override
     {
-        switch (stack_offsets_.back().type_)
+        switch (structure_stack_.back().type_)
         {
-            case container_type::object_t:
-                stack_.back().value_ = Json(sv, tag, string_allocator_);
+            case structure_type::object_t:
+                item_stack_.back().value_ = Json(sv, tag, string_allocator_);
                 break;
-            case container_type::array_t:
-                stack_.emplace_back(std::false_type(), sv, tag, string_allocator_);
+            case structure_type::array_t:
+                item_stack_.emplace_back(std::false_type(), sv, tag, string_allocator_);
                 break;
-            case container_type::root_t:
+            case structure_type::root_t:
                 result_ = Json(sv, tag, string_allocator_);
                 is_valid_ = true;
                 return false;
@@ -239,15 +245,15 @@ private:
 
     bool do_byte_string_value(const byte_string_view& b, semantic_tag tag, const ser_context&) override
     {
-        switch (stack_offsets_.back().type_)
+        switch (structure_stack_.back().type_)
         {
-            case container_type::object_t:
-                stack_.back().value_ = Json(b, tag, byte_allocator_);
+            case structure_type::object_t:
+                item_stack_.back().value_ = Json(b, tag, byte_allocator_);
                 break;
-            case container_type::array_t:
-                stack_.emplace_back(std::false_type(), b, tag, byte_allocator_);
+            case structure_type::array_t:
+                item_stack_.emplace_back(std::false_type(), b, tag, byte_allocator_);
                 break;
-            case container_type::root_t:
+            case structure_type::root_t:
                 result_ = Json(b, tag, byte_allocator_);
                 is_valid_ = true;
                 return false;
@@ -259,15 +265,15 @@ private:
                         semantic_tag tag, 
                         const ser_context&) override
     {
-        switch (stack_offsets_.back().type_)
+        switch (structure_stack_.back().type_)
         {
-            case container_type::object_t:
-                stack_.back().value_ = Json(value,tag);
+            case structure_type::object_t:
+                item_stack_.back().value_ = Json(value,tag);
                 break;
-            case container_type::array_t:
-                stack_.emplace_back(std::false_type(), value, tag);
+            case structure_type::array_t:
+                item_stack_.emplace_back(std::false_type(), value, tag);
                 break;
-            case container_type::root_t:
+            case structure_type::root_t:
                 result_ = Json(value,tag);
                 is_valid_ = true;
                 return false;
@@ -279,15 +285,15 @@ private:
                          semantic_tag tag, 
                          const ser_context&) override
     {
-        switch (stack_offsets_.back().type_)
+        switch (structure_stack_.back().type_)
         {
-            case container_type::object_t:
-                stack_.back().value_ = Json(value,tag);
+            case structure_type::object_t:
+                item_stack_.back().value_ = Json(value,tag);
                 break;
-            case container_type::array_t:
-                stack_.emplace_back(std::false_type(), value, tag);
+            case structure_type::array_t:
+                item_stack_.emplace_back(std::false_type(), value, tag);
                 break;
-            case container_type::root_t:
+            case structure_type::root_t:
                 result_ = Json(value,tag);
                 is_valid_ = true;
                 return false;
@@ -299,15 +305,15 @@ private:
                          semantic_tag tag,   
                          const ser_context&) override
     {
-        switch (stack_offsets_.back().type_)
+        switch (structure_stack_.back().type_)
         {
-            case container_type::object_t:
-                stack_.back().value_ = Json(value, tag);
+            case structure_type::object_t:
+                item_stack_.back().value_ = Json(value, tag);
                 break;
-            case container_type::array_t:
-                stack_.emplace_back(std::false_type(), value, tag);
+            case structure_type::array_t:
+                item_stack_.emplace_back(std::false_type(), value, tag);
                 break;
-            case container_type::root_t:
+            case structure_type::root_t:
                 result_ = Json(value, tag);
                 is_valid_ = true;
                 return false;
@@ -317,15 +323,15 @@ private:
 
     bool do_bool_value(bool value, semantic_tag tag, const ser_context&) override
     {
-        switch (stack_offsets_.back().type_)
+        switch (structure_stack_.back().type_)
         {
-            case container_type::object_t:
-                stack_.back().value_ = Json(value, tag);
+            case structure_type::object_t:
+                item_stack_.back().value_ = Json(value, tag);
                 break;
-            case container_type::array_t:
-                stack_.emplace_back(std::false_type(), value, tag);
+            case structure_type::array_t:
+                item_stack_.emplace_back(std::false_type(), value, tag);
                 break;
-            case container_type::root_t:
+            case structure_type::root_t:
                 result_ = Json(value, tag);
                 is_valid_ = true;
                 return false;
@@ -335,15 +341,15 @@ private:
 
     bool do_null_value(semantic_tag tag, const ser_context&) override
     {
-        switch (stack_offsets_.back().type_)
+        switch (structure_stack_.back().type_)
         {
-            case container_type::object_t:
-                stack_.back().value_ = Json(null_type(),tag);
+            case structure_type::object_t:
+                item_stack_.back().value_ = Json(null_type(),tag);
                 break;
-            case container_type::array_t:
-                stack_.emplace_back(std::false_type(), null_type(), tag);
+            case structure_type::array_t:
+                item_stack_.emplace_back(std::false_type(), null_type(), tag);
                 break;
-            case container_type::root_t:
+            case structure_type::root_t:
                 result_ = Json(null_type(), tag);
                 is_valid_ = true;
                 return false;
