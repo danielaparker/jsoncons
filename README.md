@@ -93,10 +93,9 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 ### Overview
 
-jsoncons allows you to work with JSON data in a number of ways:
+jsoncons allows you to work with JSON and JSON-like data formats in a number of ways:
 
-- As a variant-like structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json.md), 
-that can accomodate any valid JSON data
+- As a variant-like structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json.md) 
 
 - As a strongly typed C++ data structure
 
