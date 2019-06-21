@@ -21,7 +21,8 @@
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
 [Convert JSON to/from C++ data structures by specializing json_type_traits](#G1)  
-[A simple example using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits](#G2)  
+[Macros to generate the json_type_traits from data members](#G5)  
+[An example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#G2)  
 [A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#G3)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G4)
 
@@ -592,12 +593,85 @@ Charles Bukowski, Pulp, 22.48
 ]
 ```
 
+<div id="G5"/>
+
+#### [Macros to generate the json_type_traits from data members](#G5)  
+
+```c++
+#include <iostream>
+#include <jsoncons/json.hpp>
+#include <vector>
+#include <string>
+
+namespace ns {
+
+    class Person
+    {
+    public:
+        Person(const std::string& name, const std::string& surname,
+               const std::string& ssn, unsigned int age)
+           : name(name), surname(surname), ssn(ssn), age(age) { }
+
+    private:
+        // Make json_type_traits specializations friends to give accesses to private members
+        JSONCONS_TYPE_TRAITS_FRIEND;
+
+        Person() : age(0) {}
+
+        std::string name;
+        std::string surname;
+        std::string ssn;
+        unsigned int age;
+    };
+
+} // namespace ns
+
+// Declare the traits. Specify which data members need to be serialized.
+JSONCONS_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
+```
+int main()
+{
+    try
+    {
+        // Incomplete JSON data: field ssn missing
+        std::string data = R"({"name":"Rod","surname":"Bro","age":30})";
+        auto person = jsoncons::decode_json<ns::Person>(data);
+
+        std::string s;
+        jsoncons::encode_json(person, s, indenting::indent);
+        std::cout << s << "\n";
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << "";
+    }
+}
+```
+Output:
+```
+{
+    "age": 30,
+    "name": "Rod",
+    "ssn": "",
+    "surname": "Bro"
+}
+```
+
+If all members of the JSON data must be present, use
+```
+JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
+```
+instead. This will result in an exception being thrown with the message
+```
+Key 'ssn' not found
+```
+
 <div id="G2"/>
 
-#### A simple example using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits 
+#### An example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits 
 
-`JSONCONS_MEMBER_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
-from member data.
+The macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` simplifies the creation of some necessary boilerplate
+from getter functions and a constructor. It must be placed outside any namespace blocks.
 
 ```c++
 #include <cassert>

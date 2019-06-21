@@ -95,6 +95,24 @@ void reputons_extensibility_example()
     assert(val2 == val);
 }
 
+void person_extensibility_example()
+{
+    try
+    {
+        //Incomplete json string: field ssn missing
+        std::string data = R"({"name":"Rod","surname":"Bro","age":30})";
+        auto person = jsoncons::decode_json<ns::Person>(data);
+
+        std::string s;
+        jsoncons::encode_json(person, s, indenting::indent);
+        std::cout << s << "\n";
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << "";
+    }
+}
+
 //own vector will always be of an even length 
 struct own_vector : std::vector<int64_t> { using  std::vector<int64_t>::vector; };
 
@@ -157,6 +175,8 @@ void type_extensibility_examples()
     book_extensibility_example2();
 
     reputons_extensibility_example();
+
+    person_extensibility_example();
 
     std::cout << std::endl;
 }

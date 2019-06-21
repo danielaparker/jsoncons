@@ -14,43 +14,33 @@ namespace ns {
         std::string title;
         double price;
     };
-} // namespace ns
 
-namespace jsoncons {
-
-    template<class Json>
-    struct json_type_traits<Json, ns::book>
+    class Person
     {
-        typedef typename Json::allocator_type allocator_type;
+    public:
+        Person(const std::string& name, const std::string& surname,
+               const std::string& ssn, unsigned int age)
+           : name(name), surname(surname), ssn(ssn), age(age) { }
 
-        static bool is(const Json& j) noexcept
+        bool operator==(const Person& rhs) const
         {
-            return j.is_object() && j.contains("author") && 
-                   j.contains("title") && j.contains("price");
+            return name == rhs.name && surname == rhs.surname && ssn == rhs.ssn &&
+                   age == rhs.age;
         }
-        static ns::book as(const Json& j)
-        {
-            ns::book val;
-            val.author = j.at("author").template as<std::string>();
-            val.title = j.at("title").template as<std::string>();
-            val.price = j.at("price").template as<double>();
-            return val;
-        }
-        static Json to_json(const ns::book& val, 
-                            allocator_type allocator=allocator_type())
-        {
-            Json j(allocator);
-            j.try_emplace("author", val.author);
-            j.try_emplace("title", val.title);
-            j.try_emplace("price", val.price);
-            return j;
-        }
+        bool operator!=(const Person& rhs) const { return !(rhs == *this); }
+
+    private:
+        // Make json_type_traits specializations friends to give accesses to private members
+        JSONCONS_TYPE_TRAITS_FRIEND;
+
+        Person() : age(0) {}
+
+        std::string name;
+        std::string surname;
+        std::string ssn;
+        unsigned int age;
     };
-} // namespace jsoncons
 
-// reputon example
-
-namespace ns {
     class reputon
     {
     public:
@@ -110,11 +100,45 @@ namespace ns {
         std::string application_;
         std::vector<reputon> reputons_;
     };
-
 } // namespace ns
+
+namespace jsoncons {
+
+    template<class Json>
+    struct json_type_traits<Json, ns::book>
+    {
+        typedef typename Json::allocator_type allocator_type;
+
+        static bool is(const Json& j) noexcept
+        {
+            return j.is_object() && j.contains("author") && 
+                   j.contains("title") && j.contains("price");
+        }
+        static ns::book as(const Json& j)
+        {
+            ns::book val;
+            val.author = j.at("author").template as<std::string>();
+            val.title = j.at("title").template as<std::string>();
+            val.price = j.at("price").template as<double>();
+            return val;
+        }
+        static Json to_json(const ns::book& val, 
+                            allocator_type allocator=allocator_type())
+        {
+            Json j(allocator);
+            j.try_emplace("author", val.author);
+            j.try_emplace("title", val.title);
+            j.try_emplace("price", val.price);
+            return j;
+        }
+    };
+} // namespace jsoncons
 
 // Declare the traits. Specify which data members need to be serialized.
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputation_object, application, reputons)
+
+// Declare the traits. Specify which data members need to be serialized.
+JSONCONS_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
 
 #endif

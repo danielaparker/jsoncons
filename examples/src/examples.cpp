@@ -563,8 +563,6 @@ int main()
 
         byte_string_examples();
 
-        type_extensibility_examples();
-
         cbor_examples();
 
         csv_examples();
@@ -578,6 +576,8 @@ int main()
         json_cursor_examples();
 
         readme_examples();
+
+        type_extensibility_examples();
     }
     catch (const std::exception& e)
     {
