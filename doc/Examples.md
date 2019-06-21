@@ -21,10 +21,10 @@
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
 [Convert JSON to/from C++ data structures by specializing json_type_traits](#G1)  
-[Macros to generate the json_type_traits from data members](#G5)  
-[An example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#G2)  
-[A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#G3)  
-[Convert JSON numbers to/from boost multiprecision numbers](#G4)
+[Macros to generate the json_type_traits from data members](#G2)  
+[An example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#G3)  
+[A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#G4)  
+[Convert JSON numbers to/from boost multiprecision numbers](#G5)
 
 ### Construct
 
@@ -593,7 +593,7 @@ Charles Bukowski, Pulp, 22.48
 ]
 ```
 
-<div id="G5"/>
+<div id="G2"/>
 
 #### [Macros to generate the json_type_traits from data members](#G5)  
 
@@ -661,12 +661,12 @@ If all members of the JSON data must be present, use
 ```
 JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
 ```
-instead. This will result in an exception being thrown with the message
+instead. This will cause an exception to be thrown with the message
 ```
 Key 'ssn' not found
 ```
 
-<div id="G2"/>
+<div id="G3"/>
 
 #### An example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits 
 
@@ -775,7 +775,7 @@ Output:
 }
 ```
 
-<div id="G3"/>
+<div id="G4"/>
 
 #### A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits
 
@@ -970,7 +970,7 @@ Output:
 ]
 ```
 
-<div id="G4"/>
+<div id="G5"/>
 
 #### Convert JSON numbers to/from boost multiprecision numbers
 
