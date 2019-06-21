@@ -275,92 +275,88 @@ produces
 <div id="A4"/>
 ### Conversion between JSON and C++ data structures
 
-jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/decode_json.md) 
-and [encode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
+jsoncons supports mapping JSON data into C++ data structures. 
+The functions [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) 
+convert strings or streams of JSON data to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
-[json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
-defined. The standard library containers are already supported, and you can specialize `json_type_traits`
-for your own types in the `jsoncons` namespace. 
-
-`JSONCONS_MEMBER_TRAITS_DECL` is a macro that simplifies the creation of the necessary boilerplate
-for your own types.
+[json_type_traits](doc/ref/json_type_traits.md) 
+defined. The standard library containers are already supported, 
+and your own types will be supported too if you specialize `json_type_traits`
+in the `jsoncons` namespace. 
 
 ```c++
 #include <cassert>
 #include <iostream>
 #include <jsoncons/json.hpp>
 
-using namespace jsoncons;
-
 namespace ns {
-
-    struct reputon
+    class reputon
     {
-        std::string rater;
-        std::string assertion;
-        std::string rated;
-        double rating;
+    public:
+        reputon(const std::string& rater,
+                const std::string& assertion,
+                const std::string& rated,
+                double rating)
+            : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating)
+        {
+        }
+
+        const std::string& rater() const {return rater_;}
+        const std::string& assertion() const {return assertion_;}
+        const std::string& rated() const {return rated_;}
+        double rating() const {return rating_;}
 
         friend bool operator==(const reputon& lhs, const reputon& rhs)
         {
-            return lhs.rater == rhs.rater &&
-                lhs.assertion == rhs.assertion &&
-                lhs.rated == rhs.rated &&
-                lhs.rating == rhs.rating;
+            return lhs.rater_ == rhs.rater_ && lhs.assertion_ == rhs.assertion_ && 
+                   lhs.rated_ == rhs.rated_ && lhs.rating_ == rhs.rating_;
         }
 
         friend bool operator!=(const reputon& lhs, const reputon& rhs)
         {
             return !(lhs == rhs);
         };
+
+    private:
+        std::string rater_;
+        std::string assertion_;
+        std::string rated_;
+        double rating_;
     };
 
     class reputation_object
     {
-        std::string application;
-        std::vector<reputon> reputons;
-
-        // Make json_type_traits specializations friends to give accesses to private members
-        JSONCONS_TYPE_TRAITS_FRIEND;
     public:
-        reputation_object()
-        {
-        }
-        reputation_object(const std::string& application, const std::vector<reputon>& reputons)
-            : application(application), reputons(reputons)
+        reputation_object(const std::string& application, 
+                          const std::vector<reputon>& reputons)
+            : application_(application), 
+              reputons_(reputons)
         {}
+
+        const std::string& application() const { return application_;}
+        const std::vector<reputon>& reputons() const { return reputons_;}
 
         friend bool operator==(const reputation_object& lhs, const reputation_object& rhs)
         {
-            if (lhs.application != rhs.application)
-            {
-                return false;
-            }
-            if (lhs.reputons.size() != rhs.reputons.size())
-            {
-                return false;
-            }
-            for (size_t i = 0; i < lhs.reputons.size(); ++i)
-            {
-                if (lhs.reputons[i] != rhs.reputons[i])
-                {
-                    return false;
-                }
-            }
-            return true;
+            return (lhs.application_ == rhs.application_) && (lhs.reputons_ == rhs.reputons_);
         }
 
         friend bool operator!=(const reputation_object& lhs, const reputation_object& rhs)
         {
             return !(lhs == rhs);
         };
+    private:
+        std::string application_;
+        std::vector<reputon> reputons_;
     };
 
 } // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_MEMBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
-JSONCONS_MEMBER_TRAITS_DECL(ns::reputation_object, application, reputons)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputation_object, application, reputons)
+
+using namespace jsoncons;
 
 int main()
 {
@@ -390,7 +386,10 @@ Output:
 }
 ```
 
-See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md#G1)
+The macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` simplifies the creation of some necessary boilerplate
+from getter functions and a constructor. It must be placed outside any namespace blocks.
+
+See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md#G1) for other ways of specializing `json_type_traits`.
 
 <div id="A5"/>
 ### Converting CSV files to json

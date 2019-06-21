@@ -176,6 +176,7 @@ and your own types will be supported too if you specialize `json_type_traits`
 in the `jsoncons` namespace. 
 
 ```c++
+#include <cassert>
 #include <iostream>
 #include <jsoncons/json.hpp>
 

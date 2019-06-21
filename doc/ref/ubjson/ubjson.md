@@ -108,59 +108,77 @@ Marilyn C, 0.9
 #### encode/decode UBJSON from/to your own data structures
 
 ```c++
+#include <cassert>
+#include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/ubjson/ubjson.hpp>
+
 namespace ns {
-    struct reputon
+    class reputon
     {
-        std::string rater;
-        std::string assertion;
-        std::string rated;
-        double rating;
+    public:
+        reputon(const std::string& rater,
+                const std::string& assertion,
+                const std::string& rated,
+                double rating)
+            : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating)
+        {
+        }
+
+        const std::string& rater() const {return rater_;}
+        const std::string& assertion() const {return assertion_;}
+        const std::string& rated() const {return rated_;}
+        double rating() const {return rating_;}
 
         friend bool operator==(const reputon& lhs, const reputon& rhs)
         {
-            return lhs.rater == rhs.rater && lhs.assertion == rhs.assertion && 
-                   lhs.rated == rhs.rated && lhs.rating == rhs.rating;
+            return lhs.rater_ == rhs.rater_ && lhs.assertion_ == rhs.assertion_ && 
+                   lhs.rated_ == rhs.rated_ && lhs.rating_ == rhs.rating_;
         }
 
         friend bool operator!=(const reputon& lhs, const reputon& rhs)
         {
             return !(lhs == rhs);
         };
+
+    private:
+        std::string rater_;
+        std::string assertion_;
+        std::string rated_;
+        double rating_;
     };
 
     class reputation_object
     {
-        std::string application;
-        std::vector<reputon> reputons;
-
-        // Make json_type_traits specializations friends to give accesses to private members
-        JSONCONS_TYPE_TRAITS_FRIEND;
     public:
-        reputation_object()
-        {
-        }
-        reputation_object(const std::string& application, const std::vector<reputon>& reputons)
-            : application(application), reputons(reputons)
+        reputation_object(const std::string& application, 
+                          const std::vector<reputon>& reputons)
+            : application_(application), 
+              reputons_(reputons)
         {}
+
+        const std::string& application() const { return application_;}
+        const std::vector<reputon>& reputons() const { return reputons_;}
 
         friend bool operator==(const reputation_object& lhs, const reputation_object& rhs)
         {
-            return (lhs.application == rhs.application) && (lhs.reputons == rhs.reputons);
+            return (lhs.application_ == rhs.application_) && (lhs.reputons_ == rhs.reputons_);
         }
 
         friend bool operator!=(const reputation_object& lhs, const reputation_object& rhs)
         {
             return !(lhs == rhs);
         };
+    private:
+        std::string application_;
+        std::vector<reputon> reputons_;
     };
 
-} // ns
+} // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_MEMBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
-JSONCONS_MEMBER_TRAITS_DECL(ns::reputation_object, application, reputons)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputation_object, application, reputons)
 
 int main()
 {
