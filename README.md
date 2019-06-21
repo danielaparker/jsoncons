@@ -137,10 +137,11 @@ int main()
     const json& v = j["reputons"]; 
 
     // Iterate over reputons array value
+    std::cout << "(3)\n";
     for (const auto& item : v.array_range())
     {
         // Access rated as string and rating as double
-        std::cout << "(3) " << item["rated"].as<std::string>() << ", " << item["rating"].as<double>() << "\n";
+        std::cout << item["rated"].as<std::string>() << ", " << item["rating"].as<double>() << "\n";
     }
 }
 ```
@@ -161,7 +162,8 @@ Output:
 
 (2) true
 
-(3) Marilyn C, 0.9
+(3)
+Marilyn C, 0.9
 ```
 
 #### As a strongly typed C++ data structure
