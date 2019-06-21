@@ -100,7 +100,7 @@ that can accomodate any valid JSON data
 
 - As a strongly typed C++ data structure
 
-- As a stream of JSON events
+- As a stream of json events
 
 #### As a variant-like structure
 
