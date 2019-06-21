@@ -332,5 +332,139 @@ TEST_CASE("json_cursor object_value test")
     CHECK(reader.done());
 }
 
+class remove_mark_filter : public staj_filter
+{
+    bool reject_next_ = false;
+public:
+    bool accept(const staj_event& event, const ser_context&) override
+    {
+        if (event.event_type()  == staj_event_type::name &&
+            event.as<jsoncons::string_view>() == "mark")
+        {
+            reject_next_ = true;
+            return false;
+        }
+        else if (reject_next_)
+        {
+            reject_next_ = false;
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+};
+
+TEST_CASE("json_filtered_staj_reader tests")
+{
+    std::string s = R"(
+    [
+        {
+            "enrollmentNo" : 100,
+            "firstName" : "Tom",
+            "lastName" : "Cochrane",
+            "mark" : 55              
+        },
+        {
+            "enrollmentNo" : 101,
+            "firstName" : "Catherine",
+            "lastName" : "Smith",
+            "mark" : 95},
+        {
+            "enrollmentNo" : 102,
+            "firstName" : "William",
+            "lastName" : "Skeleton",
+            "mark" : 60              
+        }
+    ]
+    )";
+
+    json_cursor cursor(s);
+    remove_mark_filter filter;
+    
+    filtered_staj_reader reader(cursor, filter);
+
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::begin_array);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::begin_object);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::uint64_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::end_object);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::begin_object);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::uint64_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::end_object);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::begin_object);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::uint64_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::end_object);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == staj_event_type::end_array);
+    reader.next();
+    CHECK(reader.done());
+}
+
 
 

@@ -443,7 +443,8 @@ public:
 std::ifstream is("book_catalog.json");
 
 author_filter filter;
-json_cursor reader(is, filter);
+json_cursor cursor(is);
+filtered_staj_reader reader(cursor, filter);
 
 for (; !reader.done(); reader.next())
 {

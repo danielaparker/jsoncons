@@ -543,6 +543,64 @@ public:
     virtual const ser_context& context() const = 0;
 };
 
+template<class CharT>
+class basic_filtered_staj_reader : public basic_staj_reader<CharT>
+{
+    basic_staj_reader<CharT>* reader_;
+    basic_staj_filter<CharT>* filter_;
+public:
+    basic_filtered_staj_reader(basic_staj_reader<CharT>& reader, 
+                               basic_staj_filter<CharT>& filter)
+        : reader_(std::addressof(reader)), filter_(std::addressof(filter))
+    {
+    }
+
+    bool done() const override
+    {
+        return reader_->done();
+    }
+
+    const basic_staj_event<CharT>& current() const override
+    {
+        return reader_->current();
+    }
+
+    void read_to(basic_json_content_handler<CharT>& handler) override
+    {
+        reader_->read_to(handler);
+    }
+
+    void read_to(basic_json_content_handler<CharT>& handler,
+                std::error_code& ec) override
+    {
+        reader_->read_to(handler, ec);
+    }
+
+    void next() override
+    {
+        std::error_code ec;
+        next(ec);
+        if (ec)
+        {
+            throw ser_error(ec,reader_->context().line(),reader_->context().column());
+        }
+    }
+
+    void next(std::error_code& ec) override
+    {
+        do
+        {
+            reader_->next(ec);
+        } 
+        while (!ec && !done() && !filter_->accept(reader_->current(), reader_->context()));
+    }
+
+    const ser_context& context() const override
+    {
+        return reader_->context();
+    }
+};
+
 typedef basic_staj_event<char> staj_event;
 typedef basic_staj_event<wchar_t> wstaj_event;
 
@@ -551,6 +609,9 @@ typedef basic_staj_reader<wchar_t> wstaj_reader;
 
 typedef basic_staj_filter<char> staj_filter;
 typedef basic_staj_filter<wchar_t> wstaj_filter;
+
+typedef basic_filtered_staj_reader<char> filtered_staj_reader;
+typedef basic_filtered_staj_reader<wchar_t> wfiltered_staj_reader;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 

@@ -761,9 +761,10 @@ public:
 
 ```c++
 std::ifstream is("book_catalog.json");
+json_cursor cursor(is);
 
 author_filter filter;
-json_cursor reader(is, filter);
+filtered_staj_reader reader(cursor, filter);
 
 for (; !reader.done(); reader.next())
 {

@@ -113,10 +113,10 @@ public:
 // Filtering the stream
 void filtering_a_json_stream()
 {
-    std::istringstream is(example);
+    json_cursor cursor(example);
 
     author_filter filter;
-    json_cursor reader(is, filter);
+    filtered_staj_reader reader(cursor, filter);
 
     for (; !reader.done(); reader.next())
     {
@@ -130,9 +130,9 @@ void filtering_a_json_stream()
     }
 }
 
-void pull_parser_examples()
+void json_cursor_examples()
 {
-    std::cout << "\nPull parser examples\n\n";
+    std::cout << "\njson_cursor examples\n\n";
 
     reading_a_json_stream();
     std::cout << "\n";
