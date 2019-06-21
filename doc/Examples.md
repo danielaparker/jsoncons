@@ -416,7 +416,7 @@ class author_filter : public staj_filter
 {
     bool accept_next_ = false;
 public:
-    bool accept(const staj_event& event, const ser_context&) override
+    bool accept(const staj_event& event) override
     {
         if (event.event_type()  == staj_event_type::name &&
             event.as<jsoncons::string_view>() == "author")
