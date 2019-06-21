@@ -41,22 +41,19 @@ Constructors (1)-(4) read from a character sequence or stream and throw a
 [ser_error](ser_error.md) if a parsing error is encountered 
 while processing the initial event.
 
-(1) Constructs a `json_cursor` that reads from a character sequence or stream `source`, uses default [json_decode_options](json_decode_options.md)
+(1) Constructs a `json_cursor` that reads from a character sequence or stream `source`, 
+uses default [json_decode_options](json_decode_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
 (2) Constructs a `json_cursor` that reads from a character sequence or stream `source`, 
-uses the specified [json_decode_options](json_decode_options.md)
-and a default [parse_error_handler](parse_error_handler.md).
+uses default [json_decode_options](json_decode_options.md)
+and a specified [parse_error_handler](parse_error_handler.md).
 
 (3) Constructs a `json_cursor` that reads from a character sequence or stream `source`, 
 uses the specified [json_decode_options](json_decode_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
 (4) Constructs a `json_cursor` that reads from a character sequence or stream `source`, 
-uses default [json_decode_options](json_decode_options.md)
-and a specified [parse_error_handler](parse_error_handler.md).
-
-(5) Constructs a `json_cursor` that reads from a character sequence or stream `source`, 
 uses the specified [json_decode_options](json_decode_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
