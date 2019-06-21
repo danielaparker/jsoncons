@@ -100,7 +100,7 @@ that can accomodate any valid JSON data
 
 - As a strongly typed C++ data structure
 
-- As a stream of json events
+- As a stream of parse events
 
 #### As a variant-like structure
 
@@ -282,7 +282,7 @@ Marilyn C, 0.9
 
 See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md#G1)
 
-#### As a stream of json events
+#### As a stream of parse events
 
 ```c++
 #include <iostream>
