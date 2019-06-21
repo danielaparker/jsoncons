@@ -282,9 +282,12 @@ Marilyn C, 0.9
 
 See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md#G1)
 
-#### As a stream of JSON events
+#### As a stream of json events
 
 ```c++
+#include <iostream>
+#include <jsoncons/json.hpp>
+
 int main()
 {
     // Some JSON input data
@@ -395,9 +398,67 @@ The library includes four instantiations of `basic_json`:
 
 ## More examples
 
+[Constructing JSON values](#E1)  
+
 [Playing around with CBOR, JSON, and CSV](#E2)  
 
 [Query CBOR with JSONPath](#E3)  
+
+<div id="E1"/> 
+
+```c++
+#include <iostream>
+#include <fstream>
+#include <jsoncons/json.hpp>
+
+// For convenience
+using jsoncons::json;
+
+int main()
+{
+    json color_spaces = json::array();
+    color_spaces.push_back("sRGB");
+    color_spaces.push_back("AdobeRGB");
+    color_spaces.push_back("ProPhoto RGB");
+
+    json image_sizing; // empty object
+    image_sizing["Resize To Fit"] = true; // a boolean 
+    image_sizing["Resize Unit"] = "pixels"; // a string
+    image_sizing["Resize What"] = "long_edge"; // a string
+    image_sizing["Dimension 1"] = 9.84; // a double
+    
+    json export_settings;
+
+    // create "File Format Options" as an object and put "Color Spaces" in it
+    export_settings["File Format Options"]["Color Spaces"] = std::move(color_spaces); 
+
+    export_settings["Image Sizing"] = std::move(image_sizing);
+
+    // Pretty print
+    std::cout << pretty_print(export_settings) << "\n\n";
+}
+```
+Output:
+```json
+{
+    "File Format Options": {
+        "Color Spaces": ["sRGB","AdobeRGB","ProPhoto RGB"],
+        "Image Formats": ["JPEG","PSD","TIFF","DNG"]
+    },
+    "File Settings": {
+        "Color Space": "sRGB",
+        "Image Format": "JPEG",
+        "Limit File Size": true,
+        "Limit File Size To": 10000
+    },
+    "Image Sizing": {
+        "Dimension 1": 9.84,
+        "Resize To Fit": true,
+        "Resize Unit": "pixels",
+        "Resize What": "long_edge"
+    }
+}
+```
 
 <div id="E2"/> 
 
