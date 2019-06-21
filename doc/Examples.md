@@ -21,7 +21,7 @@
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
 [Convert JSON to/from C++ data structures by specializing json_type_traits](#G1)  
-[Macros to generate the json_type_traits from data members](#G2)  
+[Mapping to C++ data structures with and without defaults allowed](#G2)  
 [An example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#G3)  
 [A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#G4)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G5)
@@ -473,6 +473,7 @@ See [json_cursor](doc/ref/json_cursor.md)
 <div id="G1"/>
 
 #### Convert JSON to/from C++ data structures by specializing json_type_traits
+
 jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](doc/ref/decode_json.md) 
 and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
@@ -595,7 +596,7 @@ Charles Bukowski, Pulp, 22.48
 
 <div id="G2"/>
 
-#### [Macros to generate the json_type_traits from data members](#G5)  
+#### Mapping to C++ data structures with and without defaults allowed
 
 ```c++
 #include <iostream>
