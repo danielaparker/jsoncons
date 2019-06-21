@@ -171,8 +171,9 @@ The functions [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/en
 convert strings or streams of JSON data to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
 [json_type_traits](doc/ref/json_type_traits.md) 
-defined. The standard library containers are already supported, and you can specialize `json_type_traits`
-for your own types in the `jsoncons` namespace. 
+defined. The standard library containers are already supported, 
+and your own types will also be supported if you specialize `json_type_traits`
+in the `jsoncons` namespace. 
 
 ```c++
 #include <iostream>
@@ -278,8 +279,10 @@ Marilyn C, 0.9
     ]
 }
 ```
+The macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` simplifies the creation of some necessary boilerplate
+from getter functions and a constructor. It must be placed outside any namespace blocks.
 
-See [examples](doc/Examples.md#G1)
+See [examples](doc/Examples.md#G1) for other ways of specializing `json_type_traits`.
 
 #### As a stream of parse events
 
