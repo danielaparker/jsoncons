@@ -172,7 +172,7 @@ convert strings or streams of JSON data to C++ data structures and back.
 Decode and encode work for all C++ classes that have 
 [json_type_traits](doc/ref/json_type_traits.md) 
 defined. The standard library containers are already supported, 
-and your own types will also be supported if you specialize `json_type_traits`
+and your own types will be supported too if you specialize `json_type_traits`
 in the `jsoncons` namespace. 
 
 ```c++
