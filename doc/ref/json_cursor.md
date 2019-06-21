@@ -127,7 +127,7 @@ Returns the current [context](ser_context.md)
 
 ### Examples
 
-The example JSON text, `book_catalog.json`, is used by the examples below.
+The example JSON text, `book_catalog.json`, is used in the example below.
 
 ```json
 [ 
@@ -249,68 +249,10 @@ end_object
 end_array
 ```
 
-#### Filtering a JSON stream
-
-```c++
-#include <jsoncons/json_cursor.hpp>
-#include <string>
-#include <fstream>
-
-using namespace jsoncons;
-
-class author_filter : public staj_filter
-{
-    bool accept_next_ = false;
-public:
-    bool accept(const staj_event& event, const ser_context&) override
-    {
-        if (event.event_type()  == staj_event_type::name &&
-            event.as<jsoncons::string_view>() == "author")
-        {
-            accept_next_ = true;
-            return false;
-        }
-        else if (accept_next_)
-        {
-            accept_next_ = false;
-            return true;
-        }
-        else
-        {
-            accept_next_ = false;
-            return false;
-        }
-    }
-};
-
-int main()
-{
-    std::ifstream is("book_catalog.json");
-    json_cursor cursor(is);
-
-    author_filter filter;
-    filtered_staj_reader reader(cursor, filter);
-
-    for (; !reader.done(); reader.next())
-    {
-        const auto& event = reader.current();
-        switch (event.event_type())
-        {
-            case staj_event_type::string_value:
-                std::cout << event.as<jsoncons::string_view>() << "\n";
-                break;
-        }
-    }
-}
-```
-Output:
-```
-Haruki Murakami
-Graham Greene
-```
-
 #### See also
 
+- [staj_reader](staj_reader.md) 
+- [filtered_staj_reader](filtered_staj_reader.md) 
 - [staj_array_iterator](staj_array_iterator.md) 
 - [staj_object_iterator](staj_object_iterator.md)
 

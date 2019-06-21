@@ -1,6 +1,11 @@
 master
 ------
 
+Changes to json_cursor
+
+- `json_cursor` no longer has a constructor that accepts a `staj_filter`.
+  Use a `filtered_staj_reader` instead.
+
 Enhancements
 
 - New macro `JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL`, that, when decoding to a C++ object, 

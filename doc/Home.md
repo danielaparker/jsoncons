@@ -33,6 +33,8 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 [json_cursor](ref/json_cursor.md)  
 [staj_reader](ref/staj_reader.md)  
+[filtered_staj_reader](ref/filtered_staj_reader.md)  
+[staj_filter](ref/staj_filter.md)  
 [staj_object_iterator](ref/staj_object_iterator.md)  
 [staj_array_iterator](ref/staj_array_iterator.md)  
 
