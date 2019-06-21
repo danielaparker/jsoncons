@@ -8,15 +8,15 @@ data formats such as [CBOR](http://cbor.io/). It supports
 
 - Serializing the tree model into different JSON-like text or binary formats.
 
-- Converting from JSON-like text or binary formats to C++ data structures and back via [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md).
+- Converting from JSON-like text or binary formats to C++ data structures and back via [json_type_traits](doc/ref/json_type_traits.md).
 
 - Streaming JSON read and write events, somewhat analogously to SAX (push parsing) and StAX (pull parsing) in the XML world. 
 
 Compared to other JSON libraries, jsoncons has been designed to handle very large JSON texts. At its heart are
-SAX style parsers and serializers. Its [json parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_parser.md) is an 
+SAX style parsers and serializers. Its [json parser](doc/ref/json_parser.md) is an 
 incremental parser that can be fed its input in chunks, and does not require an entire file to be loaded in memory at one time. 
 Its tree model is more compact than most, and can be made more compact still with a user-supplied
-allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_cursor.md),
+allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](doc/ref/json_cursor.md),
 built on top of its incremental parser.  
 
 The [jsoncons data model](doc/ref/data-model.md) supports the familiar JSON types - nulls,
@@ -95,7 +95,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 jsoncons allows you to work with JSON and JSON-like data formats in a number of ways:
 
-- As a variant-like structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json.md) 
+- As a variant-like structure, [basic_json](doc/ref/json.md) 
 
 - As a strongly typed C++ data structure
 
@@ -167,10 +167,10 @@ Output:
 #### As a strongly typed C++ data structure
 
 jsoncons supports mapping JSON data into C++ data structures. 
-The functions [encode_json](doc/ref/encode_json.md) 
-and [decode_json](doc/ref/decode_json.md) convert C++ data structures to JSON formatted strings or streams and back. 
-Encode and decode work for all C++ classes that have 
-[json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
+The functions [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) 
+convert JSON data to C++ data structures and back. 
+Decode and encode work for all C++ classes that have 
+[json_type_traits](doc/ref/json_type_traits.md) 
 defined. The standard library containers are already supported, and you can specialize `json_type_traits`
 for your own types in the `jsoncons` namespace. 
 
@@ -279,7 +279,7 @@ Marilyn C, 0.9
 }
 ```
 
-See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md#G1)
+See [examples](doc/Examples.md#G1)
 
 #### As a stream of parse events
 
