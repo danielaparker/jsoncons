@@ -628,7 +628,7 @@ namespace ns {
 
 // Declare the traits. Specify which data members need to be serialized.
 JSONCONS_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
-```
+
 int main()
 {
     try
