@@ -23,7 +23,7 @@
 [Convert JSON to/from C++ data structures by specializing json_type_traits](#G1)  
 [Mapping to C++ data structures with and without defaults allowed](#G2)  
 [An example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#G3)  
-[A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#G4)  
+[A polymorphic example](#G4)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G5)
 
 ### Construct
@@ -782,7 +782,7 @@ Output:
 
 <div id="G4"/>
 
-#### A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits
+#### A polymorphic example
 
 `JSONCONS_GETTER_CTOR_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
 from getter functions and a constructor.
