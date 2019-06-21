@@ -1,6 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
+#include "example_types.hpp"
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
@@ -12,6 +13,143 @@
 namespace readme
 {
     using namespace jsoncons;    
+
+    void as_a_variant_like_structure()
+    {
+        // Some JSON input data
+        std::string data = R"(
+            {
+               "application": "hiking",
+               "reputons": [
+               {
+                   "rater": "HikingAsylum.example.com",
+                   "assertion": "strong-hiker",
+                   "rated": "Marilyn C",
+                   "rating": 0.90
+                 }
+               ]
+            }
+        )";
+
+        // Parse the string of data into a json value
+        json j = json::parse(data);
+
+        // Pretty print
+        std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+
+        // Does object member reputons exist?
+        std::cout << "(2) " << std::boolalpha << j.contains("reputons") << "\n\n";
+
+        // Get a reference to reputons array value
+        const json& v = j["reputons"]; 
+
+        // Iterate over reputons array value
+        std::cout << "(3)\n";
+        for (const auto& item : v.array_range())
+        {
+            // Access rated as string and rating as double
+            std::cout << item["rated"].as<std::string>() << ", " << item["rating"].as<double>() << "\n";
+        }
+    }
+
+    void as_a_strongly_typed_cpp_structure()
+    {
+        // Some JSON input data
+        std::string data = R"(
+            {
+               "application": "hiking",
+               "reputons": [
+               {
+                   "rater": "HikingAsylum.example.com",
+                   "assertion": "strong-hiker",
+                   "rated": "Marilyn C",
+                   "rating": 0.90
+                 }
+               ]
+            }
+        )";
+
+        // Decode the string of data into a c++ structure
+        ns::reputation_object v = decode_json<ns::reputation_object>(data);
+
+        // Iterate over reputons array value
+        std::cout << "(1)\n";
+        for (const auto& item : v.reputons())
+        {
+            std::cout << item.rated() << ", " << item.rating() << "\n";
+        }
+
+        // Encode the c++ structure into a string
+        std::string s;
+        encode_json<ns::reputation_object>(v, s, indenting::indent);
+        std::cout << "(2)\n";
+        std::cout << s << "\n";
+    }
+
+    void as_a_stream_of_json_events()
+    {
+        // Some JSON input data
+        std::string data = R"(
+            {
+               "application": "hiking",
+               "reputons": [
+               {
+                   "rater": "HikingAsylum.example.com",
+                   "assertion": "strong-hiker",
+                   "rated": "Marilyn C",
+                   "rating": 0.90
+                 }
+               ]
+            }
+        )";
+
+        json_cursor reader(data);
+        for (; !reader.done(); reader.next())
+        {
+            const auto& event = reader.current();
+            switch (event.event_type())
+            {
+                case staj_event_type::begin_array:
+                    std::cout << "begin_array\n";
+                    break;
+                case staj_event_type::end_array:
+                    std::cout << "end_array\n";
+                    break;
+                case staj_event_type::begin_object:
+                    std::cout << "begin_object\n";
+                    break;
+                case staj_event_type::end_object:
+                    std::cout << "end_object\n";
+                    break;
+                case staj_event_type::name:
+                    // If underlying type is string, can return as string_view
+                    std::cout << "name: " << event.as<jsoncons::string_view>() << "\n";
+                    break;
+                case staj_event_type::string_value:
+                    std::cout << "string_value: " << event.as<jsoncons::string_view>() << "\n";
+                    break;
+                case staj_event_type::null_value:
+                    std::cout << "null_value: " << event.as<std::string>() << "\n";
+                    break;
+                case staj_event_type::bool_value:
+                    std::cout << "bool_value: " << event.as<std::string>() << "\n";
+                    break;
+                case staj_event_type::int64_value:
+                    std::cout << "int64_value: " << event.as<std::string>() << "\n";
+                    break;
+                case staj_event_type::uint64_value:
+                    std::cout << "uint64_value: " << event.as<std::string>() << "\n";
+                    break;
+                case staj_event_type::double_value:
+                    // Return as string, could also use event.as<double>()
+                    std::cout << "double_value: " << event.as<std::string>() << "\n";
+                    break;
+                default:
+                    std::cout << "Unhandled event type\n";
+                    break;
+            }
+        }
+    }
 
     void playing_around()
     {
@@ -147,6 +285,9 @@ void readme_examples()
 {
     std::cout << "\nReadme examples\n\n";
 
+    readme::as_a_variant_like_structure();
+    readme::as_a_strongly_typed_cpp_structure();
+    readme::as_a_stream_of_json_events();
     readme::playing_around();
 
     std::cout << std::endl;
