@@ -60,6 +60,8 @@ class basic_staj_event
     } value_;
     size_t length_;
 public:
+    typedef basic_string_view<CharT> string_view_type;
+
     basic_staj_event(staj_event_type event_type, semantic_tag tag = semantic_tag::none)
         : event_type_(event_type), tag_(tag), length_(0)
     {
@@ -94,12 +96,20 @@ public:
         value_.double_value_ = value;
     }
 
-    basic_staj_event(const CharT* data, size_t length,
+    basic_staj_event(const string_view_type& s,
         staj_event_type event_type,
         semantic_tag tag = semantic_tag::none)
-        : event_type_(event_type), tag_(tag), length_(length)
+        : event_type_(event_type), tag_(tag), length_(s.length())
     {
-        value_.string_data_ = data;
+        value_.string_data_ = s.data();
+    }
+
+    basic_staj_event(const byte_string_view& s,
+        staj_event_type event_type,
+        semantic_tag tag = semantic_tag::none)
+        : event_type_(event_type), tag_(tag), length_(s.length())
+    {
+        value_.byte_string_data_ = s.data();
     }
 
     template<class T, class CharT_ = CharT>
@@ -403,7 +413,7 @@ private:
 
     bool do_name(const string_view_type& name, const ser_context&) override
     {
-        event_ = basic_staj_event<CharT>(name.data(), name.length(), staj_event_type::name);
+        event_ = basic_staj_event<CharT>(name, staj_event_type::name);
         return false;
     }
 
@@ -421,15 +431,16 @@ private:
 
     bool do_string_value(const string_view_type& s, semantic_tag tag, const ser_context&) override
     {
-        event_ = basic_staj_event<CharT>(s.data(), s.length(), staj_event_type::string_value, tag);
+        event_ = basic_staj_event<CharT>(s, staj_event_type::string_value, tag);
         return false;
     }
 
-    bool do_byte_string_value(const byte_string_view&, 
-                              semantic_tag,
+    bool do_byte_string_value(const byte_string_view& s, 
+                              semantic_tag tag,
                               const ser_context&) override
     {
-        JSONCONS_UNREACHABLE();
+        event_ = basic_staj_event<CharT>(s, staj_event_type::byte_string_value, tag);
+        return false;
     }
 
     bool do_int64_value(int64_t value, 
@@ -585,7 +596,7 @@ private:
 
     bool do_name(const string_view_type& name, const ser_context& context) override
     {
-        if (filter_->accept(basic_staj_event<CharT>(name.data(), name.length(), staj_event_type::name), context))
+        if (filter_->accept(basic_staj_event<CharT>(name, staj_event_type::name), context))
         {
             return to_handler_->name(name, context);
         }
@@ -621,7 +632,7 @@ private:
 
     bool do_string_value(const string_view_type& s, semantic_tag tag, const ser_context& context) override
     {
-        if (filter_->accept(basic_staj_event<CharT>(s.data(), s.length(), staj_event_type::string_value, tag), context))
+        if (filter_->accept(basic_staj_event<CharT>(s, staj_event_type::string_value, tag), context))
         {
             return to_handler_->string_value(s, tag, context);
         }
@@ -631,11 +642,18 @@ private:
         }
     }
 
-    bool do_byte_string_value(const byte_string_view&, 
-                              semantic_tag,
-                              const ser_context&) override
+    bool do_byte_string_value(const byte_string_view& s, 
+                              semantic_tag tag,
+                              const ser_context& context) override
     {
-        JSONCONS_UNREACHABLE();
+        if (filter_->accept(basic_staj_event<CharT>(s, staj_event_type::byte_string_value, tag), context))
+        {
+            return to_handler_->byte_string_value(s, tag, context);
+        }
+        else
+        {
+            return true;
+        }
     }
 
     bool do_int64_value(int64_t value, 
