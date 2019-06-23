@@ -344,27 +344,27 @@ for (; !reader.done(); reader.next())
             std::cout << "end_object\n";
             break;
         case staj_event_type::name:
-            // If underlying type is string, can return as string_view
+            // Or std::string_view, if supported
             std::cout << "name: " << event.get<jsoncons::string_view>() << "\n";
             break;
         case staj_event_type::string_value:
+            // Or std::string_view, if supported
             std::cout << "string_value: " << event.get<jsoncons::string_view>() << "\n";
             break;
         case staj_event_type::null_value:
-            std::cout << "null_value: " << event.get<std::string>() << "\n";
+            std::cout << "null_value: " << "\n";
             break;
         case staj_event_type::bool_value:
-            std::cout << "bool_value: " << event.get<std::string>() << "\n";
+            std::cout << "bool_value: " << std::boolalpha << event.get<bool>() << "\n";
             break;
         case staj_event_type::int64_value:
-            std::cout << "int64_value: " << event.get<std::string>() << "\n";
+            std::cout << "int64_value: " << event.get<int64_t>() << "\n";
             break;
         case staj_event_type::uint64_value:
-            std::cout << "uint64_value: " << event.get<std::string>() << "\n";
+            std::cout << "uint64_value: " << event.get<uint64_t>() << "\n";
             break;
         case staj_event_type::double_value:
-            // Return as string, could also use event.get<double>()
-            std::cout << "double_value: " << event.get<std::string>() << "\n";
+            std::cout << "double_value: " << event.get<double>() << "\n";
             break;
         default:
             std::cout << "Unhandled event type\n";
@@ -387,7 +387,7 @@ string_value: Vintage
 name: date
 string_value: 1993-03-02
 name: price
-double_value: 18.90
+double_value: 19
 end_object
 begin_object
 name: author
@@ -401,7 +401,7 @@ string_value: Vintage Classics
 name: date
 string_value: 2005-09-21
 name: price
-double_value: 15.74
+double_value: 16
 end_object
 end_array
 ```

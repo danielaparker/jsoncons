@@ -8,7 +8,7 @@ Changes to staj streaming classes
 
 - The `staj_event` function `as<T>` has been deprecated and renamed to `get<T>`. 
 
-- The `staj_event` function `accept` has been deprecated and renamed to `read_to`. 
+- The `staj_event` function `accept` has been renamed to `read_to`. 
 
 Enhancements
 
