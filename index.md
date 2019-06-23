@@ -45,7 +45,7 @@ JSON-like data formats such as CBOR that have them.
 
 jsoncons allows you to work with JSON and JSON-like data formats in a number of ways:
 
-- As a variant-like structure, [basic_json](doc/ref/json.md) 
+- As a variant-like structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json.md) 
 
 - As a strongly typed C++ data structure
 
@@ -119,10 +119,10 @@ Marilyn C, 0.9
 #### As a strongly typed C++ data structure
 
 jsoncons supports mapping JSON data into C++ data structures. 
-The functions [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) 
+The functions [decode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/decode_json.md) and [encode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/encode_json.md) 
 convert strings or streams of JSON data to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
-[json_type_traits](doc/ref/json_type_traits.md) 
+[json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
 defined. The standard library containers are already supported, 
 and your own types will be supported too if you specialize `json_type_traits`
 in the `jsoncons` namespace. 
@@ -235,7 +235,7 @@ Marilyn C, 0.9
 The macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` simplifies the creation of some necessary boilerplate
 from getter functions and a constructor. It must be placed outside any namespace blocks.
 
-See [examples](doc/Examples.md#G1) for other ways of specializing `json_type_traits`.
+See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md#G1) for other ways of specializing `json_type_traits`.
 
 #### As a stream of parse events
 
