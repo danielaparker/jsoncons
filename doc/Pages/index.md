@@ -1,6 +1,6 @@
 # jsoncons: a C++ library for json construction
 
-[Preliminaries](#A1)
+[Introduction](#A1)
 
 [Reading JSON text from a file](#A2)
 
