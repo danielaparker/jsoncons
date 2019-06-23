@@ -1,5 +1,5 @@
-master
-------
+version 0.127.0
+---------------
 
 Changes to staj streaming classes
 
@@ -22,8 +22,8 @@ Enhancements
   and types that are specialized with `JSONCONS_GETTER_CTOR_TRAITS_DECL` are not required to have a default
   constructor at all.
 
-version 126.0
--------------
+version 0.126.0
+---------------
 
 Enhancements
 
