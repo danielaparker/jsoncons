@@ -17,14 +17,14 @@ A JSON-like data event.
 | end_object        |                        | |
 | begin_array       |                        | |
 | end_array         |                        | |
-| name              | "foo"                  | `as<std::string>()`, `as<jsoncons::string_view>`, `as<std::string_view>()` |
-| string_value      | "1000"                 | `as<std::string>()`, `as<jsoncons::string_view>`, `as<std::string_view>()`, `as<int>()`, `as<unsigned>()` |
-| byte_string_value | 0x660x6F0x6F           | `as<std::string>()`, `as<jsoncons::byte_string>()` |
-| int64_value       | -1000                  | `as<std::string>()`, `as<int>()`, `as<long>`, `as<int64_t>()` |
-| uint64_value      | 1000                   | `as<std::string>()`, `as<int>()`, `as<unsigned>()`, `as<int64_t>()`, `as<uint64_t>()` |
-| double_value      | 125.72                 | `as<std::string>()`, `as<double>()` |
-| bool_value        | true                   | `as<std::string>()`, `as<bool>()` |
-| null_value        |                        | `as<std::string>()` |
+| name              | "foo"                  | `get<std::string>()`, `get<jsoncons::string_view>`, `get<std::string_view>()` |
+| string_value      | "1000"                 | `get<std::string>()`, `get<jsoncons::string_view>`, `get<std::string_view>()`, `get<int>()`, `get<unsigned>()` |
+| byte_string_value | 0x660x6F0x6F           | `get<std::string>()`, `get<jsoncons::byte_string>()` |
+| int64_value       | -1000                  | `get<std::string>()`, `get<int>()`, `get<long>`, `get<int64_t>()` |
+| uint64_value      | 1000                   | `get<std::string>()`, `get<int>()`, `get<unsigned>()`, `get<int64_t>()`, `get<uint64_t>()` |
+| double_value      | 125.72                 | `get<std::string>()`, `get<double>()` |
+| bool_value        | true                   | `get<std::string>()`, `get<bool>()` |
+| null_value        |                        | `get<std::string>()` |
 
 #### Member functions
 
@@ -35,6 +35,6 @@ Returns a [staj_event_type](staj_event_type.md) for this event.
 Returns a [semantic_tag](semantic_tag.md) for this event.
 
     template <class T, class... Args>
-    T as(Args&&... args) const;
+    T get(Args&&... args) const;
 Attempts to convert the json value to the template value type.
 

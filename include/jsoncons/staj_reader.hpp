@@ -114,7 +114,7 @@ public:
 
     template<class T, class CharT_ = CharT>
     typename std::enable_if<jsoncons::detail::is_string_like<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
-        as() const
+        get() const
     {
         T s;
         switch (event_type_)
@@ -169,7 +169,7 @@ public:
 
     template<class T, class CharT_ = CharT>
     typename std::enable_if<jsoncons::detail::is_string_view_like<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
-        as() const
+        get() const
     {
         T s;
         switch (event_type_)
@@ -186,38 +186,46 @@ public:
 
     template<class T>
     typename std::enable_if<jsoncons::detail::is_integer_like<T>::value, T>::type
-        as() const
+        get() const
     {
         return static_cast<T>(as_int64());
     }
 
     template<class T>
     typename std::enable_if<jsoncons::detail::is_uinteger_like<T>::value, T>::type
-        as() const
+        get() const
     {
         return static_cast<T>(as_uint64());
     }
 
     template<class T>
     typename std::enable_if<jsoncons::detail::is_floating_point_like<T>::value, T>::type
-        as() const
+        get() const
     {
         return static_cast<T>(as_double());
     }
 
     template<class T, class UserAllocator = std::allocator<uint8_t>>
     typename std::enable_if<std::is_same<T, basic_bignum<UserAllocator>>::value, T>::type
-        as() const
+        get() const
     {
         return as_bignum<UserAllocator>();
     }
 
     template<class T>
     typename std::enable_if<std::is_same<T, bool>::value, T>::type
-        as() const
+        get() const
     {
         return as_bool();
     }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    template<class T>
+    T as() const
+    {
+        return get<T>();
+    }
+#endif
 
     staj_event_type event_type() const noexcept { return event_type_; }
 
@@ -473,34 +481,34 @@ private:
 };
 
 template<class CharT>
-bool staj_to_saj_event(const basic_staj_event<CharT>& staj_ev,
+bool staj_to_saj_event(const basic_staj_event<CharT>& ev,
                        basic_json_content_handler<CharT>& handler,
                        const ser_context& context)
 {
-    switch (staj_ev.event_type())
+    switch (ev.event_type())
     {
         case staj_event_type::begin_array:
-            return handler.begin_array(semantic_tag::none, context);
+            return handler.begin_array(ev.get_semantic_tag(), context);
         case staj_event_type::end_array:
             return handler.end_array(context);
         case staj_event_type::begin_object:
-            return handler.begin_object(semantic_tag::none, context);
+            return handler.begin_object(ev.get_semantic_tag(), context);
         case staj_event_type::end_object:
             return handler.end_object(context);
         case staj_event_type::name:
-            return handler.name(staj_ev.template as<jsoncons::basic_string_view<CharT>>(), context);
+            return handler.name(ev.template get<jsoncons::basic_string_view<CharT>>(), context);
         case staj_event_type::string_value:
-            return handler.string_value(staj_ev.template as<jsoncons::basic_string_view<CharT>>(), semantic_tag::none, context);
+            return handler.string_value(ev.template get<jsoncons::basic_string_view<CharT>>(), ev.get_semantic_tag(), context);
         case staj_event_type::null_value:
-            return handler.null_value(semantic_tag::none, context);
+            return handler.null_value(ev.get_semantic_tag(), context);
         case staj_event_type::bool_value:
-            return handler.bool_value(staj_ev.template as<bool>(), semantic_tag::none, context);
+            return handler.bool_value(ev.template get<bool>(), ev.get_semantic_tag(), context);
         case staj_event_type::int64_value:
-            return handler.int64_value(staj_ev.template as<int64_t>(), semantic_tag::none, context);
+            return handler.int64_value(ev.template get<int64_t>(), ev.get_semantic_tag(), context);
         case staj_event_type::uint64_value:
-            return handler.uint64_value(staj_ev.template as<uint64_t>(), semantic_tag::none, context);
+            return handler.uint64_value(ev.template get<uint64_t>(), ev.get_semantic_tag(), context);
         case staj_event_type::double_value:
-            return handler.double_value(staj_ev.template as<double>(), semantic_tag::none, context);
+            return handler.double_value(ev.template get<double>(), ev.get_semantic_tag(), context);
         default:
             return false;
     }

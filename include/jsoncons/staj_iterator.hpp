@@ -436,7 +436,7 @@ void basic_staj_object_iterator<T,CharT,Json>::next()
     if (!done())
     {
         JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::name);
-        key_type key = reader_->current(). template as<key_type>();
+        key_type key = reader_->current(). template get<key_type>();
         reader_->next();
         if (!done())
         {
@@ -460,7 +460,7 @@ void basic_staj_object_iterator<T,CharT,Json>::next(std::error_code& ec)
     if (!done())
     {
         JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::name);
-        auto key = reader_->current(). template as<key_type>();
+        auto key = reader_->current(). template get<key_type>();
         reader_->next(ec);
         if (ec)
         {

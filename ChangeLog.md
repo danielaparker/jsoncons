@@ -1,10 +1,14 @@
 master
 ------
 
-Changes to json_cursor
+Changes to staj streaming classes
 
 - `json_cursor` no longer has a constructor that accepts a `staj_filter`.
   Use a `filtered_staj_reader` instead.
+
+- The `staj_event` function `as<T>` has been deprecated and renamed to `get<T>`. 
+
+- The `staj_event` function `accept` has been deprecated and renamed to `read_to`. 
 
 Enhancements
 

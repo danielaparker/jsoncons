@@ -123,26 +123,26 @@ namespace readme
                     break;
                 case staj_event_type::name:
                     // If underlying type is string, can return as string_view
-                    std::cout << "name: " << event.as<jsoncons::string_view>() << "\n";
+                    std::cout << "name: " << event.get<jsoncons::string_view>() << "\n";
                     break;
                 case staj_event_type::string_value:
-                    std::cout << "string_value: " << event.as<jsoncons::string_view>() << "\n";
+                    std::cout << "string_value: " << event.get<jsoncons::string_view>() << "\n";
                     break;
                 case staj_event_type::null_value:
-                    std::cout << "null_value: " << event.as<std::string>() << "\n";
+                    std::cout << "null_value: " << event.get<std::string>() << "\n";
                     break;
                 case staj_event_type::bool_value:
-                    std::cout << "bool_value: " << event.as<std::string>() << "\n";
+                    std::cout << "bool_value: " << event.get<std::string>() << "\n";
                     break;
                 case staj_event_type::int64_value:
-                    std::cout << "int64_value: " << event.as<std::string>() << "\n";
+                    std::cout << "int64_value: " << event.get<std::string>() << "\n";
                     break;
                 case staj_event_type::uint64_value:
-                    std::cout << "uint64_value: " << event.as<std::string>() << "\n";
+                    std::cout << "uint64_value: " << event.get<std::string>() << "\n";
                     break;
                 case staj_event_type::double_value:
-                    // Return as string, could also use event.as<double>()
-                    std::cout << "double_value: " << event.as<std::string>() << "\n";
+                    // Return as string, could also use event.get<double>()
+                    std::cout << "double_value: " << event.get<std::string>() << "\n";
                     break;
                 default:
                     std::cout << "Unhandled event type\n";
