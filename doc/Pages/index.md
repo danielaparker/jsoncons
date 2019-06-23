@@ -23,7 +23,7 @@
 [ojson and wojson](#A11)
 
 <div id="A1"/>
-### Preliminaries
+### Introduction
 
 jsoncons is a C++, header-only library for constructing [JSON](http://www.json.org) and JSON-like
 data formats such as [CBOR](http://cbor.io/). It supports 
@@ -39,30 +39,296 @@ data formats such as [CBOR](http://cbor.io/). It supports
 
 The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. 
 
-To install the librray, download the [latest release](https://github.com/danielaparker/jsoncons/releases) and unpack the zip file. Copy the directory `include/jsoncons` to your `include` directory. If you wish to use extensions, copy `include/jsoncons_ext` as well. 
-
-Or, download the latest code on [master](https://github.com/danielaparker/jsoncons/archive/master.zip).
-
-Compared to other JSON libraries, jsoncons has been designed to handle very large JSON texts. At its heart are
-SAX style parsers and serializers. Its [json parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_parser.md) is an 
-incremental parser that can be fed its input in chunks, and does not require an entire file to be loaded in memory at one time. 
-Its tree model is more compact than most, and can be made more compact still with a user-supplied
-allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_cursor.md),
-built on top of its incremental parser.  
-
 The [jsoncons data model](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/data-model.md) supports the familiar JSON types - nulls,
 booleans, numbers, strings, arrays, objects - plus byte strings. In addition, jsoncons 
 supports semantic tagging of date-time values, timestamp values, big integers, 
 big decimals, bigfloats and binary encodings. This allows it to preserve these type semantics when parsing 
 JSON-like data formats such as CBOR that have them.
 
-The jsoncons classes and functions are in namespace `jsoncons`. You need to include the header file
-```c++ 
-#include <jsoncons/json.hpp>
-```
-and, for convenience,
+jsoncons allows you to work with JSON and JSON-like data formats in a number of ways:
+
+- As a variant-like structure, [basic_json](doc/ref/json.md) 
+
+- As a strongly typed C++ data structure
+
+- As a stream of parse events
+
+#### As a variant-like structure
+
 ```c++
-using jsoncons::json;
+#include <iostream>
+#include <jsoncons/json.hpp>
+
+int main()
+{
+    // Some JSON input data
+    std::string data = R"(
+        {
+           "application": "hiking",
+           "reputons": [
+           {
+               "rater": "HikingAsylum.example.com",
+               "assertion": "strong-hiker",
+               "rated": "Marilyn C",
+               "rating": 0.90
+             }
+           ]
+        }
+    )";
+
+    // Parse the string of data into a json value
+    json j = json::parse(data);
+
+    // Pretty print
+    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+
+    // Does object member reputons exist?
+    std::cout << "(2) " << std::boolalpha << j.contains("reputons") << "\n\n";
+
+    // Get a reference to reputons array value
+    const json& v = j["reputons"]; 
+
+    // Iterate over reputons array value
+    std::cout << "(3)\n";
+    for (const auto& item : v.array_range())
+    {
+        // Access rated as string and rating as double
+        std::cout << item["rated"].as<std::string>() << ", " << item["rating"].as<double>() << "\n";
+    }
+}
+```
+Output:
+```
+(1)
+{
+    "application": "hiking",
+    "reputons": [
+        {
+            "assertion": "strong-hiker",
+            "rated": "Marilyn C",
+            "rater": "HikingAsylum.example.com",
+            "rating": 0.9
+        }
+    ]
+}
+
+(2) true
+
+(3)
+Marilyn C, 0.9
+```
+
+#### As a strongly typed C++ data structure
+
+jsoncons supports mapping JSON data into C++ data structures. 
+The functions [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) 
+convert strings or streams of JSON data to C++ data structures and back. 
+Decode and encode work for all C++ classes that have 
+[json_type_traits](doc/ref/json_type_traits.md) 
+defined. The standard library containers are already supported, 
+and your own types will be supported too if you specialize `json_type_traits`
+in the `jsoncons` namespace. 
+
+```c++
+#include <cassert>
+#include <iostream>
+#include <jsoncons/json.hpp>
+
+namespace ns {
+    class reputon
+    {
+    public:
+        reputon(const std::string& rater,
+                const std::string& assertion,
+                const std::string& rated,
+                double rating)
+            : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating)
+        {
+        }
+
+        const std::string& rater() const {return rater_;}
+        const std::string& assertion() const {return assertion_;}
+        const std::string& rated() const {return rated_;}
+        double rating() const {return rating_;}
+
+    private:
+        std::string rater_;
+        std::string assertion_;
+        std::string rated_;
+        double rating_;
+    };
+
+    class reputation_object
+    {
+    public:
+        reputation_object(const std::string& application, 
+                          const std::vector<reputon>& reputons)
+            : application_(application), 
+              reputons_(reputons)
+        {}
+
+        const std::string& application() const { return application_;}
+        const std::vector<reputon>& reputons() const { return reputons_;}
+    private:
+        std::string application_;
+        std::vector<reputon> reputons_;
+    };
+
+} // namespace ns
+
+// Declare the traits. Specify which data members need to be serialized.
+
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputation_object, application, reputons)
+
+using namespace jsoncons; // for convenience
+
+int main()
+{
+    // Some JSON input data
+    std::string data = R"(
+        {
+           "application": "hiking",
+           "reputons": [
+           {
+               "rater": "HikingAsylum.example.com",
+               "assertion": "strong-hiker",
+               "rated": "Marilyn C",
+               "rating": 0.90
+             }
+           ]
+        }
+    )";
+
+    // Decode the string of data into a c++ structure
+    ns::reputation_object v = decode_json<ns::reputation_object>(data);
+
+    // Iterate over reputons array value
+    std::cout << "(1)\n";
+    for (const auto& item : v.reputons())
+    {
+        std::cout << item.rated() << ", " << item.rating() << "\n";
+    }
+
+    // Encode the c++ structure into a string
+    std::string s;
+    encode_json<ns::reputation_object>(v, s, indenting::indent);
+    std::cout << "(2)\n";
+    std::cout << s << "\n";
+}
+```
+Output:
+```
+(1)
+Marilyn C, 0.9
+(2)
+{
+    "application": "hiking",
+    "reputons": [
+        {
+            "assertion": "strong-hiker",
+            "rated": "Marilyn C",
+            "rater": "HikingAsylum.example.com",
+            "rating": 0.9
+        }
+    ]
+}
+```
+The macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` simplifies the creation of some necessary boilerplate
+from getter functions and a constructor. It must be placed outside any namespace blocks.
+
+See [examples](doc/Examples.md#G1) for other ways of specializing `json_type_traits`.
+
+#### As a stream of parse events
+
+```c++
+#include <iostream>
+#include <jsoncons/json.hpp>
+
+int main()
+{
+    // Some JSON input data
+    std::string data = R"(
+        {
+           "application": "hiking",
+           "reputons": [
+           {
+               "rater": "HikingAsylum.example.com",
+               "assertion": "strong-hiker",
+               "rated": "Marilyn C",
+               "rating": 0.90
+             }
+           ]
+        }
+    )";
+
+    json_cursor reader(data);
+    for (; !reader.done(); reader.next())
+    {
+        const auto& event = reader.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::begin_array:
+                std::cout << "begin_array\n";
+                break;
+            case staj_event_type::end_array:
+                std::cout << "end_array\n";
+                break;
+            case staj_event_type::begin_object:
+                std::cout << "begin_object\n";
+                break;
+            case staj_event_type::end_object:
+                std::cout << "end_object\n";
+                break;
+            case staj_event_type::name:
+                // Or std::string_view, if supported
+                std::cout << "name: " << event.get<jsoncons::string_view>() << "\n";
+                break;
+            case staj_event_type::string_value:
+                // Or std::string_view, if supported
+                std::cout << "string_value: " << event.get<jsoncons::string_view>() << "\n";
+                break;
+            case staj_event_type::null_value:
+                std::cout << "null_value: " << "\n";
+                break;
+            case staj_event_type::bool_value:
+                std::cout << "bool_value: " << std::boolalpha << event.get<bool>() << "\n";
+                break;
+            case staj_event_type::int64_value:
+                std::cout << "int64_value: " << event.get<int64_t>() << "\n";
+                break;
+            case staj_event_type::uint64_value:
+                std::cout << "uint64_value: " << event.get<uint64_t>() << "\n";
+                break;
+            case staj_event_type::double_value:
+                std::cout << "double_value: " << event.get<double>() << "\n";
+                break;
+            default:
+                std::cout << "Unhandled event type\n";
+                break;
+        }
+    }
+}
+```
+Output:
+```
+begin_object
+name: application
+string_value: hiking
+name: reputons
+begin_array
+begin_object
+name: rater
+string_value: HikingAsylum.example.com
+name: assertion
+string_value: strong-hiker
+name: rated
+string_value: Marilyn C
+name: rating
+double_value: 0.9
+end_object
+end_array
+end_object
 ```
 
 <div id="A2"/>
