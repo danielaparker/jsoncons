@@ -43,7 +43,31 @@ supports semantic tagging of date-time values, timestamp values, big integers,
 big decimals, bigfloats and binary encodings. This allows it to preserve these type semantics when parsing 
 JSON-like data formats such as CBOR that have them.
 
-jsoncons allows you to work with JSON and JSON-like data formats in a number of ways:
+For the examples below you need to include some header files and construct a string of JSON data:
+
+```c++
+#include <jsoncons/json.hpp>
+#include <iostream>
+#include <cassert>
+
+using namespace jsoncons; // for convenience
+
+std::string data = R"(
+    {
+       "application": "hiking",
+       "reputons": [
+       {
+           "rater": "HikingAsylum.example.com",
+           "assertion": "strong-hiker",
+           "rated": "Marilyn C",
+           "rating": 0.90
+         }
+       ]
+    }
+)";
+```
+
+jsoncons allows you to work with the data in a number of ways:
 
 - As a variant-like structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json.md) 
 
@@ -54,26 +78,9 @@ jsoncons allows you to work with JSON and JSON-like data formats in a number of 
 #### As a variant-like structure
 
 ```c++
-#include <iostream>
-#include <jsoncons/json.hpp>
 
 int main()
 {
-    // Some JSON input data
-    std::string data = R"(
-        {
-           "application": "hiking",
-           "reputons": [
-           {
-               "rater": "HikingAsylum.example.com",
-               "assertion": "strong-hiker",
-               "rated": "Marilyn C",
-               "rating": 0.90
-             }
-           ]
-        }
-    )";
-
     // Parse the string of data into a json value
     json j = json::parse(data);
 
@@ -128,10 +135,6 @@ and your own types will be supported too if you specialize `json_type_traits`
 in the `jsoncons` namespace. 
 
 ```c++
-#include <cassert>
-#include <iostream>
-#include <jsoncons/json.hpp>
-
 namespace ns {
     class reputon
     {
@@ -179,25 +182,8 @@ namespace ns {
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputation_object, application, reputons)
 
-using namespace jsoncons; // for convenience
-
 int main()
 {
-    // Some JSON input data
-    std::string data = R"(
-        {
-           "application": "hiking",
-           "reputons": [
-           {
-               "rater": "HikingAsylum.example.com",
-               "assertion": "strong-hiker",
-               "rated": "Marilyn C",
-               "rating": 0.90
-             }
-           ]
-        }
-    )";
-
     // Decode the string of data into a c++ structure
     ns::reputation_object v = decode_json<ns::reputation_object>(data);
 
@@ -240,26 +226,8 @@ See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Example
 #### As a stream of parse events
 
 ```c++
-#include <iostream>
-#include <jsoncons/json.hpp>
-
 int main()
 {
-    // Some JSON input data
-    std::string data = R"(
-        {
-           "application": "hiking",
-           "reputons": [
-           {
-               "rater": "HikingAsylum.example.com",
-               "assertion": "strong-hiker",
-               "rated": "Marilyn C",
-               "rating": 0.90
-             }
-           ]
-        }
-    )";
-
     json_cursor reader(data);
     for (; !reader.done(); reader.next())
     {
