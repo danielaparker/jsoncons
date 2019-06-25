@@ -93,7 +93,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 ### Overview
 
-For the examples below you need to include some header files and define a string of JSON data:
+For the examples below you need to include some header files and construct a string of JSON data:
 
 ```c++
 #include <jsoncons/json.hpp>
