@@ -93,7 +93,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 ### Overview
 
-For the examples below we include some header files and define a string of JSON data:
+For the examples below you need to include some header files and define a string of JSON data:
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -117,7 +117,7 @@ std::string data = R"(
 )";
 ```
 
-jsoncons allows us to work with the JSON data in a number of ways:
+jsoncons allows you to work with the JSON data in a number of ways:
 
 - As a variant-like structure, [basic_json](doc/ref/json.md) 
 
