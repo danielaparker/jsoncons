@@ -17,6 +17,13 @@ using namespace jsoncons;
 
 namespace json_type_traits_macros_tests {
 
+    template <typename XTYPE>
+    struct myStruct
+    {
+          XTYPE typeContent;
+          std::string someString;
+    };
+
     struct book
     {
         std::string author;
@@ -71,6 +78,7 @@ namespace ns = json_type_traits_macros_tests;
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::book3, author, title, price)
 JSONCONS_MEMBER_TRAITS_DECL(ns::book,author,title,price)
 JSONCONS_MEMBER_TRAITS_DECL(ns::book2,author,title,price,isbn)
+JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(1,ns::myStruct,typeContent,someString)
 
 TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
 {
@@ -146,6 +154,29 @@ TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_DECL tests")
         CHECK(book.author() == an_author);
         CHECK(book.title() == a_title);
         CHECK(book.price() == Approx(a_price).epsilon(0.001));
+    }
+}
+
+TEST_CASE("JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL tests")
+{
+    SECTION("myStruct<std::pair<int,int>>")
+    {
+        typedef ns::myStruct<std::pair<int, int>> value_type;
+
+        value_type val;
+        val.typeContent = std::make_pair(1,2);
+        val.someString = "A string";
+
+        std::string s;
+        encode_json(val, s, indenting::indent);
+
+        auto val2 = decode_json<value_type>(s);
+
+        CHECK(val2.typeContent.first == val.typeContent.first);
+        CHECK(val2.typeContent.second == val.typeContent.second);
+        CHECK(val2.someString == val.someString);
+
+        //std::cout << val.typeContent.first << ", " << val.typeContent.second << ", " << val.someString << "\n";
     }
 }
 
