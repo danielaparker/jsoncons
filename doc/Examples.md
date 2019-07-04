@@ -600,9 +600,9 @@ Charles Bukowski, Pulp, 22.48
 
 #### Mapping to C++ data structures with and without defaults allowed
 
-The macros `JSONCONS_MEMBER_TRAITS_DECL` and `JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL` both generate
+The macros `JSONCONS_MEMBER_TRAITS_DECL` and `JSONCONS_STRICT_MEMBER_TRAITS_DECL` both generate
 the `json_type_traits` boilerplate from member data. The difference is that `JSONCONS_MEMBER_TRAITS_DECL`
-does not require all data members to be present in the JSON data, while `JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL` does.
+does not require all data members to be present in the JSON data, while `JSONCONS_STRICT_MEMBER_TRAITS_DECL` does.
 
 ```c++
 #include <iostream>
@@ -666,7 +666,7 @@ Output:
 
 If all members of the JSON data must be present, use
 ```
-JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
+JSONCONS_STRICT_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
 ```
 instead. This will cause an exception to be thrown with the message
 ```

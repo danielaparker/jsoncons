@@ -47,7 +47,7 @@ inform the `jsoncons` library that the type is already specialized.
 from member data. It must be placed outside any namespace blocks. When decoding to a C++ object, any data members
 declared for the object that are not present in the JSON will remain with default values.
 
-`JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL` is a macro that simplifies the creation of the necessary boilerplate
+`JSONCONS_STRICT_MEMBER_TRAITS_DECL` is a macro that simplifies the creation of the necessary boilerplate
 from member data. It must be placed outside any namespace blocks. When decoding to a C++ object, all data members 
 declared for the object must be present in the JSON.
 

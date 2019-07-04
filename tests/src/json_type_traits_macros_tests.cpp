@@ -17,11 +17,33 @@ using namespace jsoncons;
 
 namespace json_type_traits_macros_tests {
 
-    template <typename XTYPE>
+    template <typename T1>
     struct myStruct
     {
-          XTYPE typeContent;
+          T1 typeContent;
           std::string someString;
+    };
+
+    template <typename T1>
+    struct myStruct2
+    {
+          T1 typeContent;
+          std::string someString;
+    };
+
+    template <typename T1>
+    struct myStruct3
+    {
+        T1 typeContent_;
+        std::string someString_;
+    public:
+        myStruct3(T1 typeContent, const std::string& someString)
+            : typeContent_(typeContent), someString_(someString)
+        {
+        }
+
+        const T1& typeContent() const {return typeContent_;}
+        const std::string& someString() const {return someString_;}
     };
 
     struct book
@@ -79,6 +101,8 @@ JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::book3, author, title, price)
 JSONCONS_MEMBER_TRAITS_DECL(ns::book,author,title,price)
 JSONCONS_MEMBER_TRAITS_DECL(ns::book2,author,title,price,isbn)
 JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(1,ns::myStruct,typeContent,someString)
+JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL(1,ns::myStruct2,typeContent,someString)
+JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL(1,ns::myStruct3,typeContent,someString)
 
 TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
 {
@@ -175,6 +199,27 @@ TEST_CASE("JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL tests")
         CHECK(val2.typeContent.first == val.typeContent.first);
         CHECK(val2.typeContent.second == val.typeContent.second);
         CHECK(val2.someString == val.someString);
+
+        //std::cout << val.typeContent.first << ", " << val.typeContent.second << ", " << val.someString << "\n";
+    }
+}
+
+TEST_CASE("JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL tests")
+{
+    SECTION("myStruct<std::pair<int,int>>")
+    {
+        typedef ns::myStruct3<std::pair<int, int>> value_type;
+
+        value_type val(std::make_pair(1,2), "A string");
+
+        std::string s;
+        encode_json(val, s, indenting::indent);
+
+        auto val2 = decode_json<value_type>(s);
+
+        CHECK(val2.typeContent().first == val.typeContent().first);
+        CHECK(val2.typeContent().second == val.typeContent().second);
+        CHECK(val2.someString() == val.someString());
 
         //std::cout << val.typeContent.first << ", " << val.typeContent.second << ", " << val.someString << "\n";
     }
