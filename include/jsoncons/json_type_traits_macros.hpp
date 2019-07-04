@@ -37,8 +37,8 @@
 
 #define JSONCONS_QUOTE(A) JSONCONS_EXPAND(#A)
 
-#define JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, P2) Call(TC, JVal, TVal, P2)
-
+#define JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, P2) Call(TC, JVal, TVal, P2) 
+ 
 #define JSONCONS_REP_N(Call, TC, JVal, TVal, ...)            JSONCONS_REP_OF_N(Call, TC, JVal, TVal, JSONCONS_NARGS(__VA_ARGS__), __VA_ARGS__)
 #define JSONCONS_REP_OF_N(Call, TC, JVal, TVal, Count, ...)  JSONCONS_REP_OF_N_(Call, TC, JVal, TVal, Count, __VA_ARGS__)
 #define JSONCONS_REP_OF_N_(Call, TC, JVal, TVal, Count, ...) JSONCONS_EXPAND(JSONCONS_REP_OF_ ## Count(Call, TC, JVal, TVal, __VA_ARGS__))
@@ -209,8 +209,7 @@ namespace jsoncons \
 
 #define JSONCONS_EXPAND_CALL2(Call, Expr, Id) JSONCONS_EXPAND(Call(Expr, Id))
 
-#define JSONCONS_TEMPLATE_REP_OF_N(Call, Expr, Count)  JSONCONS_TEMPLATE_REP_OF_N_(Call, Expr, Count)
-#define JSONCONS_TEMPLATE_REP_OF_N_(Call, Expr, Count) JSONCONS_TEMPLATE_REP_OF_ ## Count(Call, Expr)
+#define JSONCONS_TEMPLATE_REP_OF_N(Call, Expr, Count)  JSONCONS_TEMPLATE_REP_OF_ ## Count(Call, Expr)
 
 #define JSONCONS_TEMPLATE_REP_OF_50(Call, Expr)     JSONCONS_EXPAND_CALL2(Call, Expr, 50) JSONCONS_TEMPLATE_REP_OF_49(Call, Expr)
 #define JSONCONS_TEMPLATE_REP_OF_49(Call, Expr)     JSONCONS_EXPAND_CALL2(Call, Expr, 49) JSONCONS_TEMPLATE_REP_OF_48(Call, Expr)
@@ -262,6 +261,7 @@ namespace jsoncons \
 #define JSONCONS_TEMPLATE_REP_OF_3(Call, Expr)      JSONCONS_EXPAND_CALL2(Call, Expr, 3) JSONCONS_TEMPLATE_REP_OF_2(Call, Expr)
 #define JSONCONS_TEMPLATE_REP_OF_2(Call, Expr)      JSONCONS_EXPAND_CALL2(Call, Expr, 2) JSONCONS_TEMPLATE_REP_OF_1(Call, Expr)
 #define JSONCONS_TEMPLATE_REP_OF_1(Call, Expr)      JSONCONS_EXPAND_CALL2(Call ## _LAST, Expr, 1) 
+#define JSONCONS_TEMPLATE_REP_OF_0(Call, Expr)
 
 #define JSONCONS_GENERATE_TEMPLATE_PARAMS(Call, Count) JSONCONS_TEMPLATE_REP_OF_N(Call, , Count)
 #define JSONCONS_GENERATE_TEMPLATE_ARGS(Call, Count) < JSONCONS_TEMPLATE_REP_OF_N(Call, , Count)
