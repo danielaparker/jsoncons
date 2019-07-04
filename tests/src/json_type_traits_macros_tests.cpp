@@ -17,6 +17,13 @@ using namespace jsoncons;
 
 namespace json_type_traits_macros_tests {
 
+    template <typename T1, typename T2>
+    struct A
+    {
+          T1 aT1;
+          T2 aT2;
+    };
+
     template <typename T1>
     struct myStruct
     {
@@ -92,7 +99,6 @@ namespace json_type_traits_macros_tests {
             return price_;
         }
     };
-
 } // namespace jsoncons_member_traits_decl_tests
  
 namespace ns = json_type_traits_macros_tests;
@@ -103,6 +109,7 @@ JSONCONS_MEMBER_TRAITS_DECL(ns::book2,author,title,price,isbn)
 JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(1,ns::myStruct,typeContent,someString)
 JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL(1,ns::myStruct2,typeContent,someString)
 JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL(1,ns::myStruct3,typeContent,someString)
+JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(2,ns::A,aT1,aT2)
 
 TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
 {
@@ -199,6 +206,24 @@ TEST_CASE("JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL tests")
         CHECK(val2.typeContent.first == val.typeContent.first);
         CHECK(val2.typeContent.second == val.typeContent.second);
         CHECK(val2.someString == val.someString);
+
+        //std::cout << val.typeContent.first << ", " << val.typeContent.second << ", " << val.someString << "\n";
+    }
+    SECTION("A<int,double>")
+    {
+        typedef ns::A<int,double> value_type;
+
+        value_type val;
+        val.aT1 = 1;
+        val.aT2 = 2;
+
+        std::string s;
+        encode_json(val, s, indenting::indent);
+
+        auto val2 = decode_json<value_type>(s);
+
+        CHECK(val2.aT1 == val.aT1);
+        CHECK(val2.aT2 == val.aT2);
 
         //std::cout << val.typeContent.first << ", " << val.typeContent.second << ", " << val.someString << "\n";
     }
