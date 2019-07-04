@@ -218,8 +218,8 @@ Marilyn C, 0.9
     ]
 }
 ```
-The macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` simplifies the creation of some necessary boilerplate
-from getter functions and a constructor. It must be placed outside any namespace blocks.
+The macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` generates the code to specialize `json_type_traits` from getter functions 
+and a constructor. It must be used outside any namespace blocks.
 
 See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md#G1) for other ways of specializing `json_type_traits`.
 

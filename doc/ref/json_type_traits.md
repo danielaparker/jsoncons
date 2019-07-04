@@ -43,17 +43,28 @@ which inherits from [false_type](http://www.cplusplus.com/reference/type_traits/
 This traits class may be specialized for a user-defined type with a [true_type](http://www.cplusplus.com/reference/type_traits/true_type/) value to
 inform the `jsoncons` library that the type is already specialized.  
 
-`JSONCONS_MEMBER_TRAITS_DECL` is a macro that simplifies the creation of the necessary boilerplate
-from member data. It must be placed outside any namespace blocks. When decoding to a C++ object, any data members
-declared for the object that are not present in the JSON will remain with default values.
+The `jsoncons` library provides a number of macros that can be used to generate the code to specialize `json_type_traits`
+for a user-defined class.
 
-`JSONCONS_STRICT_MEMBER_TRAITS_DECL` is a macro that simplifies the creation of the necessary boilerplate
-from member data. It must be placed outside any namespace blocks. When decoding to a C++ object, all data members 
-declared for the object must be present in the JSON.
+- `JSONCONS_MEMBER_TRAITS_DECL`(class_name,member_name1,member_name2,...)
+- `JSONCONS_STRICT_MEMBER_TRAITS_DECL`(class_name,member_name1,member_name2,...)
+- `JSONCONS_GETTER_CTOR_TRAITS_DECL`(class_name,getter_name1,getter_name2,...)
+- `JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL`(num_template_params,class_name,member_name1,member_name2,...)
+- `JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL`(num_template_params,class_name,member_name1,member_name2,...)
+- `JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL`(num_template_params,class_name,getter_name1,getter_name2,...)
 
-`JSONCONS_GETTER_CTOR_TRAITS_DECL` is a macro that simplifies the creation of the necessary boilerplate
-from getter functions and a constructor. It must be placed outside any namespace blocks. When decoding, all data members 
-in the C++ object must be present in the JSON.
+These macros must be used at global scope, outside any namespace blocks, and `class_name` must be a fully namespace qualified name.
+
+`JSONCONS_MEMBER_TRAITS_DECL` and `JSONCONS_STRICT_MEMBER_TRAITS_DECL` generate the code to specialize 
+`json_type_traits` from member data. When decoding to a C++ data structure, `JSONCONS_MEMBER_TRAITS_DECL` allows member names
+not present in the JSON to have default values, while `JSONCONS_STRICT_MEMBER_TRAITS_DECL` requires all member names
+to be present in the JSON.
+
+`JSONCONS_GETTER_CTOR_TRAITS_DECL` generates the code to specialize `json_type_traits` from getter functions 
+and a constructor. When decoding to a C++ data strucure, all data members in the C++ object must be present in the JSON.
+
+`JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL`, `JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL` and `JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL`
+are for specializing `json_type_traits` for template types. The parameter `num_template_params` gives the number of template parameters. 
 
 ### Specializations
 

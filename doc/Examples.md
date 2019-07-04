@@ -601,8 +601,8 @@ Charles Bukowski, Pulp, 22.48
 #### Mapping to C++ data structures with and without defaults allowed
 
 The macros `JSONCONS_MEMBER_TRAITS_DECL` and `JSONCONS_STRICT_MEMBER_TRAITS_DECL` both generate
-the `json_type_traits` boilerplate from member data. The difference is that `JSONCONS_MEMBER_TRAITS_DECL`
-does not require all data members to be present in the JSON data, while `JSONCONS_STRICT_MEMBER_TRAITS_DECL` does.
+the code to specialize `json_type_traits` from member data. The difference is that `JSONCONS_MEMBER_TRAITS_DECL`
+does not require all member names to be present in the JSON data, while `JSONCONS_STRICT_MEMBER_TRAITS_DECL` does.
 
 ```c++
 #include <iostream>
@@ -677,8 +677,8 @@ Key 'ssn' not found
 
 #### An example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits 
 
-The macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` simplifies the creation of some necessary boilerplate
-from getter functions and a constructor. It must be placed outside any namespace blocks.
+The macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` generates the code to specialize `json_type_traits` from getter functions 
+and a constructor. It must be used outside any namespace blocks.
 
 ```c++
 #include <cassert>
