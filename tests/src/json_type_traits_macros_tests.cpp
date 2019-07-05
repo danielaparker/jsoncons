@@ -12,104 +12,9 @@
 #include <utility>
 #include <ctime>
 #include <cstdint>
+#include "data_structures.hpp"
 
 using namespace jsoncons;
-
-namespace json_type_traits_macros_tests {
-
-    template <typename T1, typename T2>
-    struct A
-    {
-          T1 aT1;
-          T2 aT2;
-    };
-
-    template <typename T1>
-    struct myStruct
-    {
-          T1 typeContent;
-          std::string someString;
-    };
-
-    template <typename T1>
-    struct myStruct2
-    {
-          T1 typeContent;
-          std::string someString;
-    };
-
-    template <typename T1>
-    struct myStruct3
-    {
-        T1 typeContent_;
-        std::string someString_;
-    public:
-        myStruct3(T1 typeContent, const std::string& someString)
-            : typeContent_(typeContent), someString_(someString)
-        {
-        }
-
-        const T1& typeContent() const {return typeContent_;}
-        const std::string& someString() const {return someString_;}
-    };
-
-    struct book
-    {
-        std::string author;
-        std::string title;
-        double price;
-    };
-    struct book2
-    {
-        std::string author;
-        std::string title;
-        double price;
-        std::string isbn;
-    };
-    class book3
-    {
-        std::string author_;
-        std::string title_;
-        double price_;
-    public:
-        book3(const std::string& author,
-              const std::string& title,
-              double price)
-            : author_(author), title_(title), price_(price)
-        {
-        }
-
-        book3(const book3&) = default;
-        book3(book3&&) = default;
-        book3& operator=(const book3&) = default;
-        book3& operator=(book3&&) = default;
-
-        const std::string& author() const
-        {
-            return author_;
-        }
-
-        const std::string& title() const
-        {
-            return title_;
-        }
-
-        double price() const
-        {
-            return price_;
-        }
-    };
-} // namespace jsoncons_member_traits_decl_tests
- 
-namespace ns = json_type_traits_macros_tests;
-
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::book3, author, title, price)
-JSONCONS_MEMBER_TRAITS_DECL(ns::book,author,title,price)
-JSONCONS_MEMBER_TRAITS_DECL(ns::book2,author,title,price,isbn)
-JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(1,ns::myStruct,typeContent,someString)
-JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL(1,ns::myStruct2,typeContent,someString)
-JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL(1,ns::myStruct3,typeContent,someString)
-JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(2,ns::A,aT1,aT2)
 
 TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
 {
@@ -265,6 +170,50 @@ TEST_CASE("JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL tests")
         CHECK(val2.someString() == val.someString());
 
         //std::cout << val.typeContent.first << ", " << val.typeContent.second << ", " << val.someString << "\n";
+    }
+}
+
+TEST_CASE("JSONCONS_ENUM_TRAITS_DECL tests")
+{
+    SECTION("float_format default")
+    {
+        ns::float_format val{ns::float_format::hex};
+
+        std::string s;
+        encode_json(val,s);
+
+        auto val2 = decode_json<ns::float_format>(s);
+        CHECK(val2 == val);
+    }
+    SECTION("float_format hex")
+    {
+        ns::float_format val{ns::float_format()};
+
+        std::string s;
+        encode_json(val,s);
+
+        auto val2 = decode_json<ns::float_format>(s);
+        CHECK(val2 == val);
+    }
+    SECTION("float_format default L")
+    {
+        ns::float_format val{ns::float_format::hex};
+
+        std::wstring s;
+        encode_json(val,s);
+
+        auto val2 = decode_json<ns::float_format>(s);
+        CHECK(val2 == val);
+    }
+    SECTION("float_format hex L")
+    {
+        ns::float_format val{ns::float_format::hex};
+
+        std::wstring s;
+        encode_json(val,s);
+
+        auto val2 = decode_json<ns::float_format>(s);
+        CHECK(val2 == val);
     }
 }
 

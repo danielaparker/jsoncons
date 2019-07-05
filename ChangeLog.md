@@ -14,6 +14,8 @@ New macros
 `JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL`, `JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL` and `JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL`
 are for specializing `json_type_traits` for template types. The parameter `num_template_params` gives the number of template parameters. 
 
+- `JSONCONS_ENUM_TRAITS_DECL(enum_type_name,value1,value2,...)`
+
 version 0.127.0
 ---------------
 
