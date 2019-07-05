@@ -27,7 +27,7 @@
 #include <functional>
 #include <memory>
 
-// This follows https://github.com/Loki-Astari/ThorsSerializer/blob/master/src/Serialize/Traits.h
+// This draws on https://github.com/Loki-Astari/ThorsSerializer/blob/master/src/Serialize/Traits.h
 
 #define JSONCONS_EXPAND(X) X    
 
@@ -105,36 +105,6 @@
 
 #define JSONCONS_MAND_AS(TC, JVal, TVal, Member) {val.Member = (JVal).at(JSONCONS_QUOTE(Member)).template as<decltype(TVal.Member)>();}
 #define JSONCONS_MAND_AS_LAST(TC, JVal, TVal, Member) {val.Member = (JVal).at(JSONCONS_QUOTE(Member)).template as<decltype(TVal.Member)>();}
-
-#define JSONCONS_MEMBER_TRAITS_DECL(ValueType, ...)  \
-namespace jsoncons \
-{ \
-    template<class Json> \
-    struct json_type_traits<Json, ValueType> \
-    { \
-        typedef ValueType value_type; \
-        typedef typename Json::allocator_type allocator_type; \
-        static bool is(const Json& j) noexcept \
-        { \
-            if (!j.is_object()) return false; \
-            JSONCONS_REP_N(JSONCONS_IS, 0, j, void(), __VA_ARGS__)\
-            return true; \
-        } \
-        static ValueType as(const Json& j) \
-        { \
-            ValueType val{}; \
-            JSONCONS_REP_N(JSONCONS_AS, 0, j, val, __VA_ARGS__) \
-            return val; \
-        } \
-        static Json to_json(const ValueType& val, allocator_type allocator=allocator_type()) \
-        { \
-            Json j(allocator); \
-            JSONCONS_REP_N(JSONCONS_TO_JSON, 0, j, val, __VA_ARGS__) \
-            return j; \
-        } \
-    }; \
-} \
-  /**/
 
 #define JSONCONS_STRICT_MEMBER_TRAITS_DECL(ValueType, ...)  \
 namespace jsoncons \
@@ -270,13 +240,13 @@ namespace jsoncons \
 #define JSONCONS_GENERATE_TEMPLATE_ARG(Expr, Id) T ## Id,
 #define JSONCONS_GENERATE_TEMPLATE_ARG_LAST(Ex, Id) T ## Id 
 
-#define JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(TCount, ValueType, ...)  \
+#define JSONCONS_MEMBER_TRAITS_DECL_BASE(NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
 { \
-    template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, TCount)> \
-    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, TCount)> \
+    template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, NumTemplateParams)> \
+    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams)> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, TCount) value_type; \
+        typedef ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams) value_type; \
         typedef typename Json::allocator_type allocator_type; \
         static bool is(const Json& j) noexcept \
         { \
@@ -300,13 +270,21 @@ namespace jsoncons \
 } \
   /**/
 
-#define JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL(TCount, ValueType, ...)  \
+#define JSONCONS_MEMBER_TRAITS_DECL(ValueType, ...)  \
+    JSONCONS_MEMBER_TRAITS_DECL_BASE(0, ValueType, __VA_ARGS__) \
+  /**/
+
+#define JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
+    JSONCONS_MEMBER_TRAITS_DECL_BASE(NumTemplateParams, ValueType, __VA_ARGS__) \
+  /**/
+
+#define JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
 { \
-    template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, TCount)> \
-    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, TCount)> \
+    template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, NumTemplateParams)> \
+    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams)> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, TCount) value_type; \
+        typedef ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams) value_type; \
         typedef typename Json::allocator_type allocator_type; \
         static bool is(const Json& j) noexcept \
         { \
@@ -330,13 +308,13 @@ namespace jsoncons \
 } \
   /**/
  
-#define JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL(TCount, ValueType, ...)  \
+#define JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
 { \
-    template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, TCount)> \
-    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, TCount)> \
+    template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, NumTemplateParams)> \
+    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams)> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, TCount) value_type; \
+        typedef ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams) value_type; \
         typedef typename Json::allocator_type allocator_type; \
         static bool is(const Json& j) noexcept \
         { \
