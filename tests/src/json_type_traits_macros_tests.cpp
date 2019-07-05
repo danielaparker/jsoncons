@@ -236,9 +236,9 @@ TEST_CASE("JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL tests")
         val.aT2 = L"sss";
 
         std::wstring s;
-        encode_json(wjson(), val, s, indenting::indent);
+        encode_json(val, s, indenting::indent);
 
-        auto val2 = decode_json<value_type>(wjson(), s);
+        auto val2 = decode_json<value_type>(s);
 
         CHECK(val2.aT1 == val.aT1);
         CHECK(val2.aT2 == val.aT2);
