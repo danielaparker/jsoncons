@@ -227,6 +227,24 @@ TEST_CASE("JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL tests")
 
         //std::cout << val.typeContent.first << ", " << val.typeContent.second << ", " << val.someString << "\n";
     }
+    SECTION("A<int,wstring>")
+    {
+        typedef ns::A<int,std::wstring> value_type;
+
+        value_type val;
+        val.aT1 = 1;
+        val.aT2 = L"sss";
+
+        std::wstring s;
+        encode_json(wjson(), val, s, indenting::indent);
+
+        auto val2 = decode_json<value_type>(wjson(), s);
+
+        CHECK(val2.aT1 == val.aT1);
+        CHECK(val2.aT2 == val.aT2);
+
+        //std::cout << val.typeContent.first << ", " << val.typeContent.second << ", " << val.someString << "\n";
+    }
 }
 
 TEST_CASE("JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL tests")
