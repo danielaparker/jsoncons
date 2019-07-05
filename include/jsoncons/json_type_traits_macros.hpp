@@ -35,85 +35,85 @@
 #define JSONCONS_NARG_(...) JSONCONS_EXPAND( JSONCONS_ARG_N(__VA_ARGS__) )
 #define JSONCONS_ARG_N(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, e48, e49, e50, N, ...) N
 
-#define JSONCONS_QUOTE(A) JSONCONS_EXPAND(#A)
+#define JSONCONS_QUOTE(Prefix, A) JSONCONS_EXPAND(Prefix ## #A)
 
-#define JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, P2) Call(TC, JVal, TVal, P2) 
+#define JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) Call(TC, JVal, TVal, Prefix, P2) 
  
-#define JSONCONS_REP_N(Call, TC, JVal, TVal, ...)            JSONCONS_REP_OF_N(Call, TC, JVal, TVal, JSONCONS_NARGS(__VA_ARGS__), __VA_ARGS__)
-#define JSONCONS_REP_OF_N(Call, TC, JVal, TVal, Count, ...)  JSONCONS_REP_OF_N_(Call, TC, JVal, TVal, Count, __VA_ARGS__)
-#define JSONCONS_REP_OF_N_(Call, TC, JVal, TVal, Count, ...) JSONCONS_EXPAND(JSONCONS_REP_OF_ ## Count(Call, TC, JVal, TVal, __VA_ARGS__))
+#define JSONCONS_REP_N(Call, TC, JVal, TVal, Prefix, ...)            JSONCONS_REP_OF_N(Call, TC, JVal, TVal, Prefix, JSONCONS_NARGS(__VA_ARGS__), __VA_ARGS__)
+#define JSONCONS_REP_OF_N(Call, TC, JVal, TVal, Prefix, Count, ...)  JSONCONS_REP_OF_N_(Call, TC, JVal, TVal, Prefix, Count, __VA_ARGS__)
+#define JSONCONS_REP_OF_N_(Call, TC, JVal, TVal, Prefix, Count, ...) JSONCONS_EXPAND(JSONCONS_REP_OF_ ## Count(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
 
-#define JSONCONS_REP_OF_50(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_49(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_49(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_48(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_48(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_47(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_47(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_46(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_46(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_45(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_45(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_44(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_44(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_43(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_43(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_42(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_42(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_41(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_41(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_40(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_40(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_39(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_39(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_38(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_38(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_37(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_37(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_36(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_36(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_35(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_35(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_34(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_34(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_33(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_33(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_32(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_32(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_31(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_31(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_30(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_30(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_29(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_29(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_28(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_28(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_27(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_27(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_26(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_26(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_25(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_25(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_24(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_24(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_23(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_23(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_22(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_22(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_21(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_21(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_20(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_20(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_19(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_19(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_18(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_18(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_17(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_17(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_16(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_16(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_15(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_15(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_14(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_14(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_13(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_13(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_12(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_12(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_11(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_11(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_10(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_10(Call, TC, JVal, TVal, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_9(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_9(Call, TC, JVal, TVal, P2, ...)     JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_8(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_8(Call, TC, JVal, TVal, P2, ...)     JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_7(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_7(Call, TC, JVal, TVal, P2, ...)     JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_6(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_6(Call, TC, JVal, TVal, P2, ...)     JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_5(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_5(Call, TC, JVal, TVal, P2, ...)     JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_4(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_4(Call, TC, JVal, TVal, P2, ...)     JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_3(Call, TC, JVal, TVal, __VA_ARGS__))
-#define JSONCONS_REP_OF_3(Call, TC, JVal, TVal, P2, ...)     JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal ,P2) JSONCONS_EXPAND(JSONCONS_REP_OF_2(Call, TC, JVal, TVal, __VA_ARGS__)) 
-#define JSONCONS_REP_OF_2(Call, TC, JVal, TVal, P2, ...)     JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_1(Call, TC, JVal, TVal, __VA_ARGS__)) 
-#define JSONCONS_REP_OF_1(Call, TC, JVal, TVal, P2)          JSONCONS_EXPAND(Call ## _LAST(TC, JVal, TVal, P2))
+#define JSONCONS_REP_OF_50(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_49(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_49(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_48(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_48(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_47(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_47(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_46(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_46(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_45(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_45(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_44(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_44(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_43(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_43(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_42(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_42(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_41(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_41(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_40(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_40(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_39(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_39(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_38(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_38(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_37(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_37(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_36(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_36(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_35(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_35(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_34(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_34(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_33(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_33(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_32(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_32(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_31(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_31(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_30(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_30(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_29(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_29(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_28(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_28(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_27(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_27(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_26(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_26(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_25(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_25(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_24(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_24(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_23(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_23(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_22(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_22(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_21(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_21(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_20(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_20(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_19(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_19(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_18(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_18(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_17(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_17(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_16(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_16(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_15(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_15(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_14(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_14(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_13(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_13(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_12(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_12(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_11(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_11(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_10(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_10(Call, TC, JVal, TVal, Prefix, P2, ...)    JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_9(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_9(Call, TC, JVal, TVal, Prefix, P2, ...)     JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_8(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_8(Call, TC, JVal, TVal, Prefix, P2, ...)     JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_7(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_7(Call, TC, JVal, TVal, Prefix, P2, ...)     JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_6(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_6(Call, TC, JVal, TVal, Prefix, P2, ...)     JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_5(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_5(Call, TC, JVal, TVal, Prefix, P2, ...)     JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_4(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_4(Call, TC, JVal, TVal, Prefix, P2, ...)     JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_3(Call, TC, JVal, TVal, Prefix, __VA_ARGS__))
+#define JSONCONS_REP_OF_3(Call, TC, JVal, TVal, Prefix, P2, ...)     JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_2(Call, TC, JVal, TVal, Prefix, __VA_ARGS__)) 
+#define JSONCONS_REP_OF_2(Call, TC, JVal, TVal, Prefix, P2, ...)     JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_1(Call, TC, JVal, TVal, Prefix, __VA_ARGS__)) 
+#define JSONCONS_REP_OF_1(Call, TC, JVal, TVal, Prefix, P2)          JSONCONS_EXPAND(Call ## _LAST(TC, JVal, TVal, Prefix, P2))
 
-#define JSONCONS_IS(TC, JVal, TVal, Member) if (!(JVal).contains(JSONCONS_QUOTE(Member))) return false;
-#define JSONCONS_IS_LAST(TC, JVal, TVal, Member) if (!(JVal).contains(JSONCONS_QUOTE(Member))) return false;
+#define JSONCONS_IS(TC, JVal, TVal, Prefix, Member) if (!(JVal).contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+#define JSONCONS_IS_LAST(TC, JVal, TVal, Prefix, Member) if (!(JVal).contains(JSONCONS_QUOTE(Prefix, Member))) return false;
 
-#define JSONCONS_TO_JSON(TC, JVal, TVal, Member) (JVal).try_emplace(JSONCONS_QUOTE(Member), TVal.Member);
-#define JSONCONS_TO_JSON_LAST(TC, JVal, TVal, Member) (JVal).try_emplace(JSONCONS_QUOTE(Member), TVal.Member);
+#define JSONCONS_TO_JSON(TC, JVal, TVal, Prefix, Member) (JVal).try_emplace(JSONCONS_QUOTE(Prefix, Member), TVal.Member);
+#define JSONCONS_TO_JSON_LAST(TC, JVal, TVal, Prefix, Member) (JVal).try_emplace(JSONCONS_QUOTE(Prefix, Member), TVal.Member);
 
-#define JSONCONS_AS(TC, JVal, TVal, Member) if ((JVal).contains(JSONCONS_QUOTE(Member))) {val.Member = (JVal).at(JSONCONS_QUOTE(Member)).template as<decltype(TVal.Member)>();}
-#define JSONCONS_AS_LAST(TC, JVal, TVal, Member) if ((JVal).contains(JSONCONS_QUOTE(Member))) {val.Member = (JVal).at(JSONCONS_QUOTE(Member)).template as<decltype(TVal.Member)>();}
+#define JSONCONS_AS(TC, JVal, TVal, Prefix, Member) if ((JVal).contains(JSONCONS_QUOTE(Prefix, Member))) {val.Member = (JVal).at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(TVal.Member)>();}
+#define JSONCONS_AS_LAST(TC, JVal, TVal, Prefix, Member) if ((JVal).contains(JSONCONS_QUOTE(Prefix, Member))) {val.Member = (JVal).at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(TVal.Member)>();}
 
-#define JSONCONS_MAND_AS(TC, JVal, TVal, Member) {val.Member = (JVal).at(JSONCONS_QUOTE(Member)).template as<decltype(TVal.Member)>();}
-#define JSONCONS_MAND_AS_LAST(TC, JVal, TVal, Member) {val.Member = (JVal).at(JSONCONS_QUOTE(Member)).template as<decltype(TVal.Member)>();}
+#define JSONCONS_MAND_AS(TC, JVal, TVal, Prefix, Member) {val.Member = (JVal).at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(TVal.Member)>();}
+#define JSONCONS_MAND_AS_LAST(TC, JVal, TVal, Prefix, Member) {val.Member = (JVal).at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(TVal.Member)>();}
  
-#define JSONCONS_IS2(TC, JVal, TVal, Member) if (!(JVal).contains(JSONCONS_QUOTE(Member))) return false;
-#define JSONCONS_IS2_LAST(TC, JVal, TVal, Member) if (!(JVal).contains(JSONCONS_QUOTE(Member))) return false;
+#define JSONCONS_IS2(TC, JVal, TVal, Prefix, Member) if (!(JVal).contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+#define JSONCONS_IS2_LAST(TC, JVal, TVal, Prefix, Member) if (!(JVal).contains(JSONCONS_QUOTE(Prefix, Member))) return false;
 
-#define JSONCONS_TO_JSON2(TC, JVal, TVal, Member) (JVal).try_emplace(JSONCONS_QUOTE(Member), TVal.Member() );
-#define JSONCONS_TO_JSON2_LAST(TC, JVal, TVal, Member) (JVal).try_emplace(JSONCONS_QUOTE(Member), TVal.Member() );
+#define JSONCONS_TO_JSON2(TC, JVal, TVal, Prefix, Member) (JVal).try_emplace(JSONCONS_QUOTE(Prefix, Member), TVal.Member() );
+#define JSONCONS_TO_JSON2_LAST(TC, JVal, TVal, Prefix, Member) (JVal).try_emplace(JSONCONS_QUOTE(Prefix, Member), TVal.Member() );
 
-#define JSONCONS_AS2(TC, JVal, TVal, Member) ((JVal).at(JSONCONS_QUOTE(Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>(),
-#define JSONCONS_AS2_LAST(TC, JVal, TVal, Member) ((JVal).at(JSONCONS_QUOTE(Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()
+#define JSONCONS_AS2(TC, JVal, TVal, Prefix, Member) ((JVal).at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>(),
+#define JSONCONS_AS2_LAST(TC, JVal, TVal, Prefix, Member) ((JVal).at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()
 
 #define JSONCONS_TYPE_TRAITS_FRIEND \
     template <class JSON,class T,class Enable> \
@@ -193,19 +193,19 @@ namespace jsoncons \
         static bool is(const Json& j) noexcept \
         { \
             if (!j.is_object()) return false; \
-            JSONCONS_REP_N(JSONCONS_IS, 0, j, void(), __VA_ARGS__)\
+            JSONCONS_REP_N(JSONCONS_IS, 0, j, void(), , __VA_ARGS__)\
             return true; \
         } \
         static value_type as(const Json& j) \
         { \
             value_type val{}; \
-            JSONCONS_REP_N(JSONCONS_AS, 0, j, val, __VA_ARGS__) \
+            JSONCONS_REP_N(JSONCONS_AS, 0, j, val, , __VA_ARGS__) \
             return val; \
         } \
         static Json to_json(const value_type& val, allocator_type allocator=allocator_type()) \
         { \
             Json j(allocator); \
-            JSONCONS_REP_N(JSONCONS_TO_JSON, 0, j, val, __VA_ARGS__) \
+            JSONCONS_REP_N(JSONCONS_TO_JSON, 0, j, val, , __VA_ARGS__) \
             return j; \
         } \
     }; \
@@ -231,19 +231,19 @@ namespace jsoncons \
         static bool is(const Json& j) noexcept \
         { \
             if (!j.is_object()) return false; \
-            JSONCONS_REP_N(JSONCONS_IS, 0, j, void(), __VA_ARGS__)\
+            JSONCONS_REP_N(JSONCONS_IS, 0, j, void(), , __VA_ARGS__)\
             return true; \
         } \
         static value_type as(const Json& j) \
         { \
             value_type val{}; \
-            JSONCONS_REP_N(JSONCONS_MAND_AS, 0, j, val, __VA_ARGS__) \
+            JSONCONS_REP_N(JSONCONS_MAND_AS, 0, j, val, , __VA_ARGS__) \
             return val; \
         } \
         static Json to_json(const value_type& val, allocator_type allocator=allocator_type()) \
         { \
             Json j(allocator); \
-            JSONCONS_REP_N(JSONCONS_TO_JSON, 0, j, val, __VA_ARGS__) \
+            JSONCONS_REP_N(JSONCONS_TO_JSON, 0, j, val, , __VA_ARGS__) \
             return j; \
         } \
     }; \
@@ -269,17 +269,17 @@ namespace jsoncons \
         static bool is(const Json& j) noexcept \
         { \
             if (!j.is_object()) return false; \
-            JSONCONS_REP_N(JSONCONS_IS2, 0, j, void(), __VA_ARGS__)\
+            JSONCONS_REP_N(JSONCONS_IS2, 0, j, void(), , __VA_ARGS__)\
             return true; \
         } \
         static value_type as(const Json& j) \
         { \
-            return value_type ( JSONCONS_REP_N(JSONCONS_AS2, 0, j, void(), __VA_ARGS__) ); \
+            return value_type ( JSONCONS_REP_N(JSONCONS_AS2, 0, j, void(),, __VA_ARGS__) ); \
         } \
         static Json to_json(const value_type& val, allocator_type allocator=allocator_type()) \
         { \
             Json j(allocator); \
-            JSONCONS_REP_N(JSONCONS_TO_JSON2, 0, j, val, __VA_ARGS__) \
+            JSONCONS_REP_N(JSONCONS_TO_JSON2, 0, j, val,, __VA_ARGS__) \
             return j; \
         } \
     }; \
