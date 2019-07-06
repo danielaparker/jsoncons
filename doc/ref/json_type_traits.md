@@ -67,6 +67,8 @@ and a constructor. When decoding to a C++ data strucure, all data members in the
 `JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL`, `JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL` and `JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL`
 are for specializing `json_type_traits` for template types. The parameter `num_template_params` gives the number of template parameters. 
 
+`JSONCONS_ENUM_TRAITS_DECL` allows you to encode and decode an enum type as a string.
+
 ### Specializations
 
 `T`|`j.is<T>()`|`j.as<T>()`|j is assignable from `T`

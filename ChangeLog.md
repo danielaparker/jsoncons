@@ -21,6 +21,8 @@ are for specializing `json_type_traits` for template types. The parameter `num_t
 
 - `JSONCONS_ENUM_TRAITS_DECL(enum_type_name,value1,value2,...)`
 
+`JSONCONS_ENUM_TRAITS_DECL` allows you to encode and decode an enum type as a string.
+
 version 0.127.0
 ---------------
 
