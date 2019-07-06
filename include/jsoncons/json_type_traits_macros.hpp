@@ -388,7 +388,7 @@ namespace jsoncons \
         static bool is(const Json& j) noexcept \
         { \
             if (!j.is_string()) return false; \
-            const string_view s = j.as<string_view>(); \
+            const string_view s = j.template as<string_view>(); \
             auto it = std::find_if(get_values().first, get_values().second, \
                                    [&](const mapped_type& item) -> bool \
             { \
@@ -402,7 +402,7 @@ namespace jsoncons \
             { \
                 JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
             } \
-            const string_view s = j.as<string_view>(); \
+            const string_view s = j.template as<string_view>(); \
             auto it = std::find_if(get_values().first, get_values().second, \
                                    [&](const mapped_type& item) -> bool \
             { \
@@ -460,7 +460,7 @@ namespace jsoncons \
         static bool is(const Json& j) noexcept \
         { \
             if (!j.is_string()) return false; \
-            const wstring_view s = j.as<wstring_view>(); \
+            const wstring_view s = j.template as<wstring_view>(); \
             auto it = std::find_if(get_values().first, get_values().second, \
                                    [&](const mapped_type& item) -> bool \
             { \
@@ -474,7 +474,7 @@ namespace jsoncons \
             { \
                 JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
             } \
-            const wstring_view s = j.as<wstring_view>(); \
+            const wstring_view s = j.template as<wstring_view>(); \
             auto it = std::find_if(get_values().first, get_values().second, \
                                    [&](const mapped_type& item) -> bool \
             { \

@@ -5,6 +5,11 @@ Changes
 
 - `JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL` macro renamed to `JSONCONS_STRICT_MEMBER_TRAITS_DECL`
 
+Defect fix:
+
+- This version fixes a defect in the macros `JSONCONS_MEMBER_TRAITS_DECL` etc. which meant that 
+  the generated `json_traits_type` specializations were not compatible with `wchar_t` sources and results.
+
 New macros
 
 - `JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(num_template_params,class_name,member_name1,member_name2,...)`
