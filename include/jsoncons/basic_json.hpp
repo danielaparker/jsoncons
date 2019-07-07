@@ -1606,6 +1606,7 @@ public:
     class json_proxy 
     {
     private:
+        friend class basic_json<CharT,ImplementationPolicy,Allocator>;
 
         ParentT& parent_;
         const char_type* data_;
@@ -1613,8 +1614,8 @@ public:
 
         json_proxy() = delete;
 
-        json_proxy(const json_proxy& other) = delete;
-        json_proxy(json_proxy&& other) = delete;
+        json_proxy(const json_proxy& other) = default;
+        json_proxy(json_proxy&& other) = default;
         json_proxy& operator = (const json_proxy& other) = delete; 
         json_proxy& operator = (json_proxy&& other) = delete; 
 
