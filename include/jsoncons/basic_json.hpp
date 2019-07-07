@@ -1612,7 +1612,11 @@ public:
         size_t length_;
 
         json_proxy() = delete;
+
+        json_proxy(const json_proxy& other) = delete;
+        json_proxy(json_proxy&& other) = delete;
         json_proxy& operator = (const json_proxy& other) = delete; 
+        json_proxy& operator = (json_proxy&& other) = delete; 
 
         json_proxy(ParentT& parent, const char_type* data, size_t length)
             : parent_(parent), data_(data), length_(length)
@@ -1686,6 +1690,10 @@ public:
 
         size_t size() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return 0;
+            }
             return evaluate().size();
         }
 
@@ -1716,6 +1724,10 @@ public:
 
         bool is_null() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_null();
         }
 
@@ -1753,60 +1765,108 @@ public:
 
         bool is_string() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_string();
         }
 
         bool is_string_view() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_string_view();
         }
 
         bool is_byte_string() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_byte_string();
         }
 
         bool is_byte_string_view() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_byte_string_view();
         }
 
         bool is_bignum() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_bignum();
         }
 
         bool is_number() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_number();
         }
         bool is_bool() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_bool();
         }
 
         bool is_object() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_object();
         }
 
         bool is_array() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_array();
         }
 
         bool is_int64() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_int64();
         }
 
         bool is_uint64() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_uint64();
         }
 
         bool is_double() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_double();
         }
 
@@ -2195,11 +2255,19 @@ public:
 
         bool is_datetime() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_datetime();
         }
 
         bool is_epoch_time() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_epoch_time();
         }
 
@@ -2236,11 +2304,19 @@ public:
 
         bool is_integer() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_int64();
         }
 
         bool is_uinteger() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_uint64();
         }
 
@@ -2266,6 +2342,10 @@ public:
 
         string_type to_string(const char_allocator_type& allocator = char_allocator_type()) const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().to_string(allocator);
         }
         void write(basic_json_content_handler<char_type>& handler) const
@@ -2409,11 +2489,19 @@ public:
 
         bool is_ulonglong() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_ulonglong();
         }
 
         bool is_longlong() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().is_longlong();
         }
 
@@ -2463,10 +2551,18 @@ public:
         }
         bool is_empty() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return empty();
         }
         bool is_numeric() const noexcept
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return is_number();
         }
 #endif
