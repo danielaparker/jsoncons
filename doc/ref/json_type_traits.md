@@ -54,7 +54,7 @@ for a user-defined class.
 - `JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL`(num_template_params,class_name,member_name1,member_name2,...)
 - `JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL`(num_template_params,class_name,getter_name1,getter_name2,...)
 
-These macros must be used at global scope, outside any namespace blocks, and `class_name` must be a fully namespace qualified name.
+These macro declarations must be placed at global scope, outside any namespace blocks, and `class_name` must be a fully namespace qualified name.
 
 `JSONCONS_MEMBER_TRAITS_DECL` and `JSONCONS_STRICT_MEMBER_TRAITS_DECL` generate the code to specialize 
 `json_type_traits` from member data. When decoding to a C++ data structure, `JSONCONS_MEMBER_TRAITS_DECL` allows member names

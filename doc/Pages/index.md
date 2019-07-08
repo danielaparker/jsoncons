@@ -219,8 +219,15 @@ Marilyn C, 0.9
     ]
 }
 ```
-The macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` generates the code to specialize `json_type_traits` from getter functions 
-and a constructor. It must be used outside any namespace blocks.
+This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS_DECL`
+and `JSONCONS_GETTER_CTOR_TRAITS_DECL` to specialize the 
+[json_type_traits](doc/ref/json_type_traits.md) for the enum type
+`ns::hiking_experience` and the classes `ns::hiking_reputon` and 
+`ns::hiking_reputation`.
+The macro `JSONCONS_ENUM_TRAITS_DECL` generates the code from
+the enum values, and the macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` 
+generates the code from getter functions and a constructor. 
+These macro declarations must be placed outside any namespace blocks.
 
 See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md#G1) for other ways of specializing `json_type_traits`.
 
