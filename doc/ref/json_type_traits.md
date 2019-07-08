@@ -61,7 +61,7 @@ These macro declarations must be placed at global scope, outside any namespace b
 not present in the JSON to have default values, while `JSONCONS_STRICT_MEMBER_TRAITS_DECL` requires all member names
 to be present in the JSON.
 
-`JSONCONS_GETTER_CTOR_TRAITS_DECL` generates the code to specialize `json_type_traits` from getter functions 
+`JSONCONS_GETTER_CTOR_TRAITS_DECL` generates the code to specialize `json_type_traits` from the getter functions 
 and a constructor. When decoding to a C++ data strucure, all data members in the C++ object must be present in the JSON.
 
 `JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL`, `JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL` and `JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL`
@@ -460,7 +460,7 @@ Output:
 #### A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits
 
 `JSONCONS_GETTER_CTOR_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
-from getter functions and a constructor.
+from the getter functions and a constructor.
 
 ```c++
 #include <cassert>

@@ -678,8 +678,15 @@ Key 'ssn' not found
 
 #### An example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits 
 
-The macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` generates the code to specialize `json_type_traits` from getter functions 
-and a constructor. It must be used outside any namespace blocks.
+This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS_DECL`
+and `JSONCONS_GETTER_CTOR_TRAITS_DECL` to specialize the 
+[json_type_traits](doc/ref/json_type_traits.md) for the enum type
+`ns::hiking_experience` and the classes `ns::hiking_reputon` and 
+`ns::hiking_reputation`.
+The macro `JSONCONS_ENUM_TRAITS_DECL` generates the code from
+the enum values, and the macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` 
+generates the code from the getter functions and a constructor. 
+These macro declarations must be placed outside any namespace blocks.
 
 ```c++
 #include <cassert>
@@ -835,7 +842,7 @@ int main()
 #### A polymorphic example
 
 `JSONCONS_GETTER_CTOR_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
-from getter functions and a constructor.
+from the getter functions and a constructor.
 
 ```c++
 #include <cassert>
