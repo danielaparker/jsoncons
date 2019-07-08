@@ -148,7 +148,7 @@ TEST_CASE("book_conversion_test")
 
 TEST_CASE("hiking_reputation")
 {
-    ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum.example.com",ns::hiking_experience::advanced,"Marilyn C",0.9} });
+    ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum",ns::hiking_experience::advanced,"Marilyn C",0.9} });
 
     SECTION("1")
     {

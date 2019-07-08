@@ -361,17 +361,17 @@ for your own types.
 namespace ns {
     enum class hiking_experience {beginner,intermediate,advanced};
 
-    class reputon
+    class hiking_reputon
     {
         std::string rater_;
         hiking_experience assertion_;
         std::string rated_;
         double rating_;
     public:
-        reputon(const std::string& rater,
-                hiking_experience assertion,
-                const std::string& rated,
-                double rating)
+        hiking_reputon(const std::string& rater,
+                       hiking_experience assertion,
+                       const std::string& rated,
+                       double rating)
             : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating)
         {
         }
@@ -381,38 +381,38 @@ namespace ns {
         const std::string& rated() const {return rated_;}
         double rating() const {return rating_;}
 
-        friend bool operator==(const reputon& lhs, const reputon& rhs)
+        friend bool operator==(const hiking_reputon& lhs, const hiking_reputon& rhs)
         {
             return lhs.rater_ == rhs.rater_ && lhs.assertion_ == rhs.assertion_ && 
                    lhs.rated_ == rhs.rated_ && lhs.rating_ == rhs.rating_;
         }
 
-        friend bool operator!=(const reputon& lhs, const reputon& rhs)
+        friend bool operator!=(const hiking_reputon& lhs, const hiking_reputon& rhs)
         {
             return !(lhs == rhs);
         };
     };
 
-    class reputation_object
+    class hiking_reputation
     {
         std::string application_;
-        std::vector<reputon> reputons_;
+        std::vector<hiking_reputon> reputons_;
     public:
-        reputation_object(const std::string& application, 
-                          const std::vector<reputon>& reputons)
+        hiking_reputation(const std::string& application, 
+                          const std::vector<hiking_reputon>& reputons)
             : application_(application), 
               reputons_(reputons)
         {}
 
         const std::string& application() const { return application_;}
-        const std::vector<reputon>& reputons() const { return reputons_;}
+        const std::vector<hiking_reputon>& reputons() const { return reputons_;}
 
-        friend bool operator==(const reputation_object& lhs, const reputation_object& rhs)
+        friend bool operator==(const hiking_reputation& lhs, const hiking_reputation& rhs)
         {
             return (lhs.application_ == rhs.application_) && (lhs.reputons_ == rhs.reputons_);
         }
 
-        friend bool operator!=(const reputation_object& lhs, const reputation_object& rhs)
+        friend bool operator!=(const hiking_reputation& lhs, const hiking_reputation& rhs)
         {
             return !(lhs == rhs);
         };
@@ -424,18 +424,18 @@ using namespace jsoncons; // for convenience
 
 // Declare the traits. Specify which data members need to be serialized.
 JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputation_object, application, reputons)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputation, application, reputons)
 
 int main()
 {
-    ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com",ns::hiking_experience::advanced,"Marilyn C",0.90} });
+    ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum",ns::hiking_experience::advanced,"Marilyn C",0.90} });
 
     std::string s;
     encode_json(val, s, indenting::indent);
     std::cout << s << "\n";
 
-    auto val2 = decode_json<ns::reputation_object>(s);
+    auto val2 = decode_json<ns::hiking_reputation>(s);
 
     assert(val2 == val);
 }
@@ -446,9 +446,9 @@ Output:
     "application": "hiking",
     "reputons": [
         {
-            "assertion": ns::hiking_experience::advanced,
+            "assertion": "advanced",
             "rated": "Marilyn C",
-            "rater": "HikingAsylum.example.com",
+            "rater": "HikingAsylum",
             "rating": 0.9
         }
     ]

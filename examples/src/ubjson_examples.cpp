@@ -19,8 +19,8 @@ void to_from_ubjson_using_basic_json()
        "application": "hiking",
        "reputons": [
        {
-           "rater": "HikingAsylum.example.com",
-           "assertion": ns::hiking_experience::advanced,
+           "rater": "HikingAsylum",
+           "assertion": "advanced",
            "rated": "Marilyn C",
            "rating": 0.90
          }
@@ -61,7 +61,7 @@ void to_from_ubjson_using_basic_json()
 
 void to_from_ubjson_using_example_type()
 {
-    ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum.example.com",ns::hiking_experience::advanced,"Marilyn C",0.90} });
+    ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum",ns::hiking_experience::advanced,"Marilyn C",0.90} });
 
     // Encode a ns::hiking_reputation value to UBJSON
     std::vector<uint8_t> data;

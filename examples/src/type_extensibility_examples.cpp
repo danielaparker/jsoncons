@@ -82,7 +82,7 @@ void book_extensibility_example2()
 
 void reputons_extensibility_example()
 {
-    ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum.example.com",ns::hiking_experience::advanced,"Marilyn C",0.90} });
+    ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum",ns::hiking_experience::advanced,"Marilyn C",0.90} });
 
     std::string s;
     encode_json(val, s, indenting::indent);

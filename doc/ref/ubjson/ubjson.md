@@ -44,8 +44,8 @@ int main()
        "application": "hiking",
        "reputons": [
        {
-           "rater": "HikingAsylum.example.com",
-           "assertion": ns::hiking_experience::advanced,
+           "rater": "HikingAsylum",
+           "assertion": "advanced",
            "rated": "Marilyn C",
            "rating": 0.90
          }
@@ -91,8 +91,8 @@ Output:
     "application": "hiking",
     "reputons": [
         {
-            "rater": "HikingAsylum.example.com",
-            "assertion": ns::hiking_experience::advanced,
+            "rater": "HikingAsylum",
+            "assertion": "advanced",
             "rated": "Marilyn C",
             "rating": 0.9
         }
@@ -117,17 +117,17 @@ namespace ns {
 
     enum class hiking_experience {beginner,intermediate,advanced};
 
-    class reputon
+    class hiking_reputon
     {
         std::string rater_;
         hiking_experience assertion_;
         std::string rated_;
         double rating_;
     public:
-        reputon(const std::string& rater,
-                hiking_experience assertion,
-                const std::string& rated,
-                double rating)
+        hiking_reputon(const std::string& rater,
+                       hiking_experience assertion,
+                       const std::string& rated,
+                       double rating)
             : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating)
         {
         }
@@ -137,13 +137,13 @@ namespace ns {
         const std::string& rated() const {return rated_;}
         double rating() const {return rating_;}
 
-        friend bool operator==(const reputon& lhs, const reputon& rhs)
+        friend bool operator==(const hiking_reputon& lhs, const hiking_reputon& rhs)
         {
             return lhs.rater_ == rhs.rater_ && lhs.assertion_ == rhs.assertion_ && 
                    lhs.rated_ == rhs.rated_ && lhs.rating_ == rhs.rating_;
         }
 
-        friend bool operator!=(const reputon& lhs, const reputon& rhs)
+        friend bool operator!=(const hiking_reputon& lhs, const hiking_reputon& rhs)
         {
             return !(lhs == rhs);
         };
@@ -152,16 +152,16 @@ namespace ns {
     class hiking_reputation
     {
         std::string application_;
-        std::vector<reputon> reputons_;
+        std::vector<hiking_reputon> reputons_;
     public:
         hiking_reputation(const std::string& application, 
-                          const std::vector<reputon>& reputons)
+                          const std::vector<hiking_reputon>& reputons)
             : application_(application), 
               reputons_(reputons)
         {}
 
         const std::string& application() const { return application_;}
-        const std::vector<reputon>& reputons() const { return reputons_;}
+        const std::vector<hiking_reputon>& reputons() const { return reputons_;}
 
         friend bool operator==(const hiking_reputation& lhs, const hiking_reputation& rhs)
         {
@@ -183,7 +183,7 @@ JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputation, application, reputons)
 
 int main()
 {
-    ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum.example.com",ns::hiking_experience::advanced,"Marilyn C",0.90} });
+    ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum",ns::hiking_experience::advanced,"Marilyn C",0.90} });
 
     // Encode a ns::hiking_reputation value to UBJSON
     std::vector<uint8_t> data;

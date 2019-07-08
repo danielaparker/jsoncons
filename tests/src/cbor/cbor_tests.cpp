@@ -166,8 +166,8 @@ ojson j1 = ojson::parse(R"(
    "application": "hiking",
    "reputons": [
    {
-       "rater": "HikingAsylum.example.com",
-       "assertion": ns::hiking_experience::advanced,
+       "rater": "HikingAsylum",
+       "assertion": "advanced",
        "rated": "Marilyn C",
        "rating": 0.90
      }
