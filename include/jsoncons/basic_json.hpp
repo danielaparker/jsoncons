@@ -1761,6 +1761,10 @@ public:
         template<class T, class... Args>
         bool is(Args&&... args) const
         {
+            if (!parent_.contains(string_view_type(data_,length_)))
+            {
+                return false;
+            }
             return evaluate().template is<T>(std::forward<Args>(args)...);
         }
 

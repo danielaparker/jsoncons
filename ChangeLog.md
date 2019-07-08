@@ -3,13 +3,20 @@ master
 
 Changes
 
-- `JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL` macro renamed to `JSONCONS_STRICT_MEMBER_TRAITS_DECL`
+- `JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL` macro name deprecated and replaced with `JSONCONS_STRICT_MEMBER_TRAITS_DECL`
+- basic_json function name `get_semantic_tag()` deprecated and replaced with `tag()` 
+- staj_reader function name `get_semantic_tag()` deprecated and replaced with `tag()` 
 
-Defect fix:
+Defect fixes:
 
 - This version fixes a defect in the macros `JSONCONS_MEMBER_TRAITS_DECL` etc. which meant that 
   the generated `json_traits_type` specializations were not compatible with `wchar_t` sources and results.
 
+- This version fixes a defect when the `operator[](const string_view_type& key)` is applied to a non const
+`basic_json`, which returns a proxy where the member associated with the key may or may not exist, 
+and an accessor declared `noexcept` is called in the case that it doesn't. In particular, the
+accessors `is_xxx` and `is<T>` now return `false` in this case.
+ 
 New macros
 
 - `JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(num_template_params,class_name,member_name1,member_name2,...)`
