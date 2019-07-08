@@ -225,11 +225,12 @@ public:
     {
         return get<T>();
     }
+    semantic_tag get_semantic_tag() const noexcept { return tag_; }
 #endif
 
     staj_event_type event_type() const noexcept { return event_type_; }
 
-    semantic_tag get_semantic_tag() const noexcept { return tag_; }
+    semantic_tag tag() const noexcept { return tag_; }
 private:
 
     int64_t as_int64() const
@@ -488,27 +489,27 @@ bool staj_to_saj_event(const basic_staj_event<CharT>& ev,
     switch (ev.event_type())
     {
         case staj_event_type::begin_array:
-            return handler.begin_array(ev.get_semantic_tag(), context);
+            return handler.begin_array(ev.tag(), context);
         case staj_event_type::end_array:
             return handler.end_array(context);
         case staj_event_type::begin_object:
-            return handler.begin_object(ev.get_semantic_tag(), context);
+            return handler.begin_object(ev.tag(), context);
         case staj_event_type::end_object:
             return handler.end_object(context);
         case staj_event_type::name:
             return handler.name(ev.template get<jsoncons::basic_string_view<CharT>>(), context);
         case staj_event_type::string_value:
-            return handler.string_value(ev.template get<jsoncons::basic_string_view<CharT>>(), ev.get_semantic_tag(), context);
+            return handler.string_value(ev.template get<jsoncons::basic_string_view<CharT>>(), ev.tag(), context);
         case staj_event_type::null_value:
-            return handler.null_value(ev.get_semantic_tag(), context);
+            return handler.null_value(ev.tag(), context);
         case staj_event_type::bool_value:
-            return handler.bool_value(ev.template get<bool>(), ev.get_semantic_tag(), context);
+            return handler.bool_value(ev.template get<bool>(), ev.tag(), context);
         case staj_event_type::int64_value:
-            return handler.int64_value(ev.template get<int64_t>(), ev.get_semantic_tag(), context);
+            return handler.int64_value(ev.template get<int64_t>(), ev.tag(), context);
         case staj_event_type::uint64_value:
-            return handler.uint64_value(ev.template get<uint64_t>(), ev.get_semantic_tag(), context);
+            return handler.uint64_value(ev.template get<uint64_t>(), ev.tag(), context);
         case staj_event_type::double_value:
-            return handler.double_value(ev.template get<double>(), ev.get_semantic_tag(), context);
+            return handler.double_value(ev.template get<double>(), ev.tag(), context);
         default:
             return false;
     }

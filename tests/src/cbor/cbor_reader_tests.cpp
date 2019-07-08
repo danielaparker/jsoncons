@@ -42,7 +42,7 @@ void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
         }
 
         REQUIRE(result == expected);
-        CHECK(result.get_semantic_tag() == expected.get_semantic_tag());
+        CHECK(result.tag() == expected.tag());
 
         std::string s;
         for (auto c : v)
@@ -435,7 +435,7 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
     REQUIRE(j == expected);
     for (size_t i = 0; i < j.size(); ++i)
     {
-        CHECK(j[i].get_semantic_tag() == expected[i].get_semantic_tag()); 
+        CHECK(j[i].tag() == expected[i].tag()); 
     }
 }
 

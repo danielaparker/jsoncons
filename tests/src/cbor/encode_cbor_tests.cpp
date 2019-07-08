@@ -124,12 +124,12 @@ TEST_CASE("cbor_arrays_and_maps")
 
     // big float
     json j("0x6AB3p-2", semantic_tag::bigfloat);
-    CHECK(j.get_semantic_tag() == semantic_tag::bigfloat);
+    CHECK(j.tag() == semantic_tag::bigfloat);
     json j2 = j;
-    CHECK(j2.get_semantic_tag() == semantic_tag::bigfloat);
+    CHECK(j2.tag() == semantic_tag::bigfloat);
     json j3;
     j3 = j;
-    CHECK(j3.get_semantic_tag() == semantic_tag::bigfloat);
+    CHECK(j3.tag() == semantic_tag::bigfloat);
 
     check_encode_cbor({ 0xc5, // Tag 5 
                          0x82, // Array of length 2

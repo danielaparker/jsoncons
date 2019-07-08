@@ -156,7 +156,7 @@ Returns the allocator associated with the json value.
   </tr>
 </table>
 
-    semantic_tag get_semantic_tag() const
+    semantic_tag tag() const
 Returns the [semantic_tag](semantic_tag.md) associated with this value
 
     json& operator[](size_t i)
