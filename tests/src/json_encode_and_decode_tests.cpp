@@ -148,7 +148,7 @@ TEST_CASE("book_conversion_test")
 
 TEST_CASE("reputation_object")
 {
-    ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
+    ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com",ns::hiking_experience::advanced,"Marilyn C",0.9} });
 
     SECTION("1")
     {
@@ -249,7 +249,6 @@ TEST_CASE("reputation_object")
         auto val2 = decode_json<ns::reputation_object>(ojson(), os, options);
         CHECK(val2 == val);
     }
-
 }
 
 

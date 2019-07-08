@@ -98,10 +98,12 @@ namespace ns {
 
     enum class float_format {scientific = 1,fixed = 2,hex = 4,general = fixed | scientific};
 
+    enum class hiking_experience {beginner,intermediate,advanced};
+
     struct reputon
     {
         std::string rater;
-        std::string assertion;
+        hiking_experience assertion;
         std::string rated;
         double rating;
 
@@ -156,6 +158,7 @@ JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL(1,ns::MyStruct2,typeContent,someStri
 JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL(1,ns::MyStruct3,typeContent,someString)
 JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
 
+JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
 JSONCONS_MEMBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
 JSONCONS_MEMBER_TRAITS_DECL(ns::reputation_object, application, reputons)
 
