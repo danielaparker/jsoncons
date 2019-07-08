@@ -95,9 +95,9 @@ TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_DECL tests")
 
 TEST_CASE("JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL tests")
 {
-    SECTION("myStruct<std::pair<int,int>>")
+    SECTION("MyStruct<std::pair<int,int>>")
     {
-        typedef ns::myStruct<std::pair<int, int>> value_type;
+        typedef ns::MyStruct<std::pair<int, int>> value_type;
 
         value_type val;
         val.typeContent = std::make_pair(1,2);
@@ -114,9 +114,9 @@ TEST_CASE("JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL tests")
 
         //std::cout << val.typeContent.first << ", " << val.typeContent.second << ", " << val.someString << "\n";
     }
-    SECTION("A<int,double>")
+    SECTION("TemplatedStruct<int,double>")
     {
-        typedef ns::A<int,double> value_type;
+        typedef ns::TemplatedStruct<int,double> value_type;
 
         value_type val;
         val.aT1 = 1;
@@ -132,9 +132,9 @@ TEST_CASE("JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL tests")
 
         //std::cout << val.typeContent.first << ", " << val.typeContent.second << ", " << val.someString << "\n";
     }
-    SECTION("A<int,wstring>")
+    SECTION("TemplatedStruct<int,wstring>")
     {
-        typedef ns::A<int,std::wstring> value_type;
+        typedef ns::TemplatedStruct<int,std::wstring> value_type;
 
         value_type val;
         val.aT1 = 1;
@@ -154,9 +154,9 @@ TEST_CASE("JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL tests")
 
 TEST_CASE("JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL tests")
 {
-    SECTION("myStruct<std::pair<int,int>>")
+    SECTION("MyStruct<std::pair<int,int>>")
     {
-        typedef ns::myStruct3<std::pair<int, int>> value_type;
+        typedef ns::MyStruct3<std::pair<int, int>> value_type;
 
         value_type val(std::make_pair(1,2), "A string");
 

@@ -23,8 +23,9 @@
 [Convert JSON to/from C++ data structures by specializing json_type_traits](#G1)  
 [Mapping to C++ data structures with and without defaults allowed](#G2)  
 [An example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#G3)  
-[A polymorphic example](#G4)  
-[Convert JSON numbers to/from boost multiprecision numbers](#G5)
+[Serializing a templated class with the `JSONCONS_TEMPLATE_xxx` macros](#G4)  
+[A polymorphic example](#G5)  
+[Convert JSON numbers to/from boost multiprecision numbers](#G6)
 
 ### Construct
 
@@ -784,6 +785,53 @@ Output:
 
 <div id="G4"/>
 
+#### Serializing a templated class with the `JSONCONS_TEMPLATE_xxx` macros
+
+```c++
+#include <cassert>
+#include <jsoncons/json.hpp>
+
+namespace ns {
+    template <typename T1, typename T2>
+    struct TemplatedStruct
+    {
+          T1 aT1;
+          T2 aT2;
+
+          friend bool operator==(const TemplatedStruct& lhs, const TemplatedStruct& rhs)
+          {
+              return lhs.aT1 == rhs.aT1 && lhs.aT2 == rhs.aT2;  
+          }
+
+          friend bool operator!=(const TemplatedStruct& lhs, const TemplatedStruct& rhs)
+          {
+              return !(lhs == rhs);
+          }
+    };
+
+} // namespace ns
+
+// Declare the traits. Specify which data members need to be serialized.
+JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
+
+using namespace jsoncons; // for convenience
+
+int main()
+{
+    typedef ns::TemplatedStruct<int,std::wstring> value_type;
+
+    value_type val{1, L"sss"};
+
+    std::wstring s;
+    encode_json(val, s);
+
+    auto val2 = decode_json<value_type>(s);
+    assert(val2 == val);
+}
+```
+
+<div id="G5"/>
+
 #### A polymorphic example
 
 `JSONCONS_GETTER_CTOR_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
@@ -977,7 +1025,7 @@ Output:
 ]
 ```
 
-<div id="G5"/>
+<div id="G6"/>
 
 #### Convert JSON numbers to/from boost multiprecision numbers
 

@@ -573,11 +573,11 @@ int main()
 
         polymorphic_examples();
 
-        type_extensibility_examples();
-
         readme_examples();
 
         json_cursor_examples();
+
+        type_extensibility_examples();
     }
     catch (const std::exception& e)
     {

@@ -8,33 +8,33 @@
 namespace ns {
 
     template <typename T1, typename T2>
-    struct A
+    struct TemplatedStruct
     {
           T1 aT1;
           T2 aT2;
     };
 
     template <typename T1>
-    struct myStruct
+    struct MyStruct
     {
           T1 typeContent;
           std::string someString;
     };
 
     template <typename T1>
-    struct myStruct2
+    struct MyStruct2
     {
           T1 typeContent;
           std::string someString;
     };
 
     template <typename T1>
-    struct myStruct3
+    struct MyStruct3
     {
         T1 typeContent_;
         std::string someString_;
     public:
-        myStruct3(T1 typeContent, const std::string& someString)
+        MyStruct3(T1 typeContent, const std::string& someString)
             : typeContent_(typeContent), someString_(someString)
         {
         }
@@ -151,10 +151,10 @@ JSONCONS_ENUM_TRAITS_DECL(ns::float_format, scientific, fixed, hex, general)
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::book3, author, title, price)
 JSONCONS_MEMBER_TRAITS_DECL(ns::book,author,title,price)
 JSONCONS_MEMBER_TRAITS_DECL(ns::book2,author,title,price,isbn)
-JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(1,ns::myStruct,typeContent,someString)
-JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL(1,ns::myStruct2,typeContent,someString)
-JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL(1,ns::myStruct3,typeContent,someString)
-JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(2,ns::A,aT1,aT2)
+JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(1,ns::MyStruct,typeContent,someString)
+JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL(1,ns::MyStruct2,typeContent,someString)
+JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL(1,ns::MyStruct3,typeContent,someString)
+JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
 
 JSONCONS_MEMBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
 JSONCONS_MEMBER_TRAITS_DECL(ns::reputation_object, application, reputons)

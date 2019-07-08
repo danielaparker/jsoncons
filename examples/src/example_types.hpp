@@ -100,6 +100,24 @@ namespace ns {
         std::string application_;
         std::vector<reputon> reputons_;
     };
+
+    template <typename T1, typename T2>
+    struct TemplatedStruct
+    {
+          T1 aT1;
+          T2 aT2;
+
+          friend bool operator==(const TemplatedStruct& lhs, const TemplatedStruct& rhs)
+          {
+              return lhs.aT1 == rhs.aT1 && lhs.aT2 == rhs.aT2;  
+          }
+
+          friend bool operator!=(const TemplatedStruct& lhs, const TemplatedStruct& rhs)
+          {
+              return !(lhs == rhs);
+          }
+    };
+
 } // namespace ns
 
 namespace jsoncons {
@@ -140,5 +158,7 @@ JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputation_object, application, reputons)
 
 // Declare the traits. Specify which data members need to be serialized.
 JSONCONS_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
+
+JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
 
 #endif
