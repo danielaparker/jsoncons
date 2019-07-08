@@ -113,7 +113,7 @@ int main()
        "reputons": [
        {
            "rater": "HikingAsylum.example.com",
-           "assertion": "strong-hiker",
+           "assertion": ns::hiking_experience::advanced,
            "rated": "Marilyn C",
            "rating": 0.90
          }
@@ -160,7 +160,7 @@ Output:
     "reputons": [
         {
             "rater": "HikingAsylum.example.com",
-            "assertion": "strong-hiker",
+            "assertion": ns::hiking_experience::advanced,
             "rated": "Marilyn C",
             "rating": 0.9
         }

@@ -359,11 +359,17 @@ for your own types.
 #include <jsoncons/json.hpp>
 
 namespace ns {
+    enum class hiking_experience {beginner,intermediate,advanced};
+
     class reputon
     {
+        std::string rater_;
+        hiking_experience assertion_;
+        std::string rated_;
+        double rating_;
     public:
         reputon(const std::string& rater,
-                const std::string& assertion,
+                hiking_experience assertion,
                 const std::string& rated,
                 double rating)
             : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating)
@@ -371,7 +377,7 @@ namespace ns {
         }
 
         const std::string& rater() const {return rater_;}
-        const std::string& assertion() const {return assertion_;}
+        hiking_experience assertion() const {return assertion_;}
         const std::string& rated() const {return rated_;}
         double rating() const {return rating_;}
 
@@ -385,16 +391,12 @@ namespace ns {
         {
             return !(lhs == rhs);
         };
-
-    private:
-        std::string rater_;
-        std::string assertion_;
-        std::string rated_;
-        double rating_;
     };
 
     class reputation_object
     {
+        std::string application_;
+        std::vector<reputon> reputons_;
     public:
         reputation_object(const std::string& application, 
                           const std::vector<reputon>& reputons)
@@ -414,9 +416,6 @@ namespace ns {
         {
             return !(lhs == rhs);
         };
-    private:
-        std::string application_;
-        std::vector<reputon> reputons_;
     };
 
 } // namespace ns
@@ -424,12 +423,13 @@ namespace ns {
 using namespace jsoncons; // for convenience
 
 // Declare the traits. Specify which data members need to be serialized.
+JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputation_object, application, reputons)
 
 int main()
 {
-    ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
+    ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com",ns::hiking_experience::advanced,"Marilyn C",0.90} });
 
     std::string s;
     encode_json(val, s, indenting::indent);
@@ -446,7 +446,7 @@ Output:
     "application": "hiking",
     "reputons": [
         {
-            "assertion": "strong-hiker",
+            "assertion": ns::hiking_experience::advanced,
             "rated": "Marilyn C",
             "rater": "HikingAsylum.example.com",
             "rating": 0.9

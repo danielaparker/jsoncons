@@ -459,7 +459,7 @@ void get_example()
        "reputons": [
        {
            "rater": "HikingAsylum.example.com",
-           "assertion": "strong-hiker",
+           "assertion": ns::hiking_experience::advanced,
            "rated": "Marilyn C",
            "rating": 0.90
          }
@@ -567,17 +567,17 @@ int main()
 
         csv_examples();
 
-        ubjson_examples();
-
         jsonpath_examples();
 
         polymorphic_examples();
 
-        readme_examples();
-
         json_cursor_examples();
 
+        ubjson_examples();
+
         type_extensibility_examples();
+
+        readme_examples();
     }
     catch (const std::exception& e)
     {

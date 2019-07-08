@@ -41,7 +41,7 @@ int main()
        "reputons": [
        {
            "rater": "HikingAsylum.example.com",
-           "assertion": "strong-hiker",
+           "assertion": ns::hiking_experience::advanced,
            "rated": "Marilyn C",
            "rating": 0.90
          }
@@ -63,7 +63,7 @@ Output:
     "reputons": [
         {
             "rater": "HikingAsylum.example.com",
-            "assertion": "strong-hiker",
+            "assertion": ns::hiking_experience::advanced,
             "rated": "Marilyn C",
             "rating": 0.9
         }
@@ -87,7 +87,7 @@ int main()
        "reputons": [
        {
            "rater": "HikingAsylum.example.com",
-           "assertion": "strong-hiker",
+           "assertion": ns::hiking_experience::advanced,
            "rated": "Marilyn C",
            "rating": 0.90
          }
@@ -114,7 +114,7 @@ Output:
     "application": "hiking",
     "reputons": [
         {
-            "assertion": "strong-hiker",
+            "assertion": ns::hiking_experience::advanced,
             "rated": "Marilyn C",
             "rater": "HikingAsylum.example.com",
             "rating": 0.9

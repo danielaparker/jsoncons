@@ -108,7 +108,7 @@ std::string data = R"(
        "reputons": [
        {
            "rater": "HikingAsylum.example.com",
-           "assertion": "strong-hiker",
+           "assertion": ns::hiking_experience::advanced,
            "rated": "Marilyn C",
            "rating": 0.90
          }
@@ -159,7 +159,7 @@ Output:
     "application": "hiking",
     "reputons": [
         {
-            "assertion": "strong-hiker",
+            "assertion": ns::hiking_experience::advanced,
             "rated": "Marilyn C",
             "rater": "HikingAsylum.example.com",
             "rating": 0.9
@@ -186,11 +186,17 @@ in the `jsoncons` namespace.
 
 ```c++
 namespace ns {
+    enum class hiking_experience {beginner,intermediate,advanced};
+
     class reputon
     {
+        std::string rater_;
+        hiking_experience assertion_;
+        std::string rated_;
+        double rating_;
     public:
         reputon(const std::string& rater,
-                const std::string& assertion,
+                hiking_experience assertion,
                 const std::string& rated,
                 double rating)
             : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating)
@@ -198,21 +204,28 @@ namespace ns {
         }
 
         const std::string& rater() const {return rater_;}
-        const std::string& assertion() const {return assertion_;}
+        hiking_experience assertion() const {return assertion_;}
         const std::string& rated() const {return rated_;}
         double rating() const {return rating_;}
 
-    private:
-        std::string rater_;
-        std::string assertion_;
-        std::string rated_;
-        double rating_;
+        friend bool operator==(const reputon& lhs, const reputon& rhs)
+        {
+            return lhs.rater_ == rhs.rater_ && lhs.assertion_ == rhs.assertion_ && 
+                   lhs.rated_ == rhs.rated_ && lhs.rating_ == rhs.rating_;
+        }
+
+        friend bool operator!=(const reputon& lhs, const reputon& rhs)
+        {
+            return !(lhs == rhs);
+        };
     };
 
-    class reputation_object
+    class hiking_reputation
     {
+        std::string application_;
+        std::vector<reputon> reputons_;
     public:
-        reputation_object(const std::string& application, 
+        hiking_reputation(const std::string& application, 
                           const std::vector<reputon>& reputons)
             : application_(application), 
               reputons_(reputons)
@@ -220,22 +233,30 @@ namespace ns {
 
         const std::string& application() const { return application_;}
         const std::vector<reputon>& reputons() const { return reputons_;}
-    private:
-        std::string application_;
-        std::vector<reputon> reputons_;
+
+        friend bool operator==(const hiking_reputation& lhs, const hiking_reputation& rhs)
+        {
+            return (lhs.application_ == rhs.application_) && (lhs.reputons_ == rhs.reputons_);
+        }
+
+        friend bool operator!=(const hiking_reputation& lhs, const hiking_reputation& rhs)
+        {
+            return !(lhs == rhs);
+        };
     };
 
 } // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized.
 
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputation_object, application, reputons)
+JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputation, application, reputons)
 
 int main()
 {
     // Decode the string of data into a c++ structure
-    ns::reputation_object v = decode_json<ns::reputation_object>(data);
+    ns::hiking_reputation v = decode_json<ns::hiking_reputation>(data);
 
     // Iterate over reputons array value
     std::cout << "(1)\n";
@@ -246,7 +267,7 @@ int main()
 
     // Encode the c++ structure into a string
     std::string s;
-    encode_json<ns::reputation_object>(v, s, indenting::indent);
+    encode_json<ns::hiking_reputation>(v, s, indenting::indent);
     std::cout << "(2)\n";
     std::cout << s << "\n";
 }
@@ -260,7 +281,7 @@ Marilyn C, 0.9
     "application": "hiking",
     "reputons": [
         {
-            "assertion": "strong-hiker",
+            "assertion": ns::hiking_experience::advanced,
             "rated": "Marilyn C",
             "rater": "HikingAsylum.example.com",
             "rating": 0.9

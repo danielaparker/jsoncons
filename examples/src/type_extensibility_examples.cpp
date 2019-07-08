@@ -82,13 +82,13 @@ void book_extensibility_example2()
 
 void reputons_extensibility_example()
 {
-    ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
+    ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum.example.com",ns::hiking_experience::advanced,"Marilyn C",0.90} });
 
     std::string s;
     encode_json(val, s, indenting::indent);
     std::cout << s << "\n";
 
-    auto val2 = decode_json<ns::reputation_object>(s);
+    auto val2 = decode_json<ns::hiking_reputation>(s);
 
     assert(val2 == val);
 }

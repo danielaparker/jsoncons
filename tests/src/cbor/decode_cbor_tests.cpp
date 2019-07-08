@@ -24,7 +24,7 @@ TEST_CASE("cbor_view_test")
        "reputons": [
        {
            "rater": "HikingAsylum.example.com",
-           "assertion": "strong-hiker",
+           "assertion": ns::hiking_experience::advanced,
            "rated": "Marilyn C",
            "rating": 0.90
          }
@@ -78,7 +78,7 @@ TEST_CASE("jsonpointer_test")
        "reputons": [
        {
            "rater": "HikingAsylum.example.com",
-           "assertion": "strong-hiker",
+           "assertion": ns::hiking_experience::advanced,
            "rated": "Marilyn C",
            "rating": 0.90
          }

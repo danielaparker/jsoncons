@@ -100,47 +100,47 @@ namespace ns {
 
     enum class hiking_experience {beginner,intermediate,advanced};
 
-    struct reputon
+    struct hiking_reputon
     {
         std::string rater;
         hiking_experience assertion;
         std::string rated;
         double rating;
 
-        friend bool operator==(const reputon& lhs, const reputon& rhs)
+        friend bool operator==(const hiking_reputon& lhs, const hiking_reputon& rhs)
         {
             return lhs.rater == rhs.rater && lhs.assertion == rhs.assertion && 
                    lhs.rated == rhs.rated && lhs.rating == rhs.rating;
         }
 
-        friend bool operator!=(const reputon& lhs, const reputon& rhs)
+        friend bool operator!=(const hiking_reputon& lhs, const hiking_reputon& rhs)
         {
             return !(lhs == rhs);
         };
     };
 
-    class reputation_object
+    class hiking_reputation
     {
         std::string application;
-        std::vector<reputon> reputons;
+        std::vector<hiking_reputon> reputons;
 
         // Make json_type_traits specializations friends to give accesses to private members
         JSONCONS_TYPE_TRAITS_FRIEND;
 
-        reputation_object()
+        hiking_reputation()
         {
         }
     public:
-        reputation_object(const std::string& application, const std::vector<reputon>& reputons)
+        hiking_reputation(const std::string& application, const std::vector<hiking_reputon>& reputons)
             : application(application), reputons(reputons)
         {}
 
-        friend bool operator==(const reputation_object& lhs, const reputation_object& rhs)
+        friend bool operator==(const hiking_reputation& lhs, const hiking_reputation& rhs)
         {
             return (lhs.application == rhs.application) && (lhs.reputons == rhs.reputons);
         }
 
-        friend bool operator!=(const reputation_object& lhs, const reputation_object& rhs)
+        friend bool operator!=(const hiking_reputation& lhs, const hiking_reputation& rhs)
         {
             return !(lhs == rhs);
         };
@@ -159,7 +159,7 @@ JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL(1,ns::MyStruct3,typeContent,someString
 JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
 
 JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
-JSONCONS_MEMBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
-JSONCONS_MEMBER_TRAITS_DECL(ns::reputation_object, application, reputons)
+JSONCONS_MEMBER_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
+JSONCONS_MEMBER_TRAITS_DECL(ns::hiking_reputation, application, reputons)
 
 #endif
