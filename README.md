@@ -207,17 +207,6 @@ namespace ns {
         hiking_experience assertion() const {return assertion_;}
         const std::string& rated() const {return rated_;}
         double rating() const {return rating_;}
-
-        friend bool operator==(const hiking_reputon& lhs, const hiking_reputon& rhs)
-        {
-            return lhs.rater_ == rhs.rater_ && lhs.assertion_ == rhs.assertion_ && 
-                   lhs.rated_ == rhs.rated_ && lhs.rating_ == rhs.rating_;
-        }
-
-        friend bool operator!=(const hiking_reputon& lhs, const hiking_reputon& rhs)
-        {
-            return !(lhs == rhs);
-        };
     };
 
     class hiking_reputation
@@ -233,16 +222,6 @@ namespace ns {
 
         const std::string& application() const { return application_;}
         const std::vector<hiking_reputon>& reputons() const { return reputons_;}
-
-        friend bool operator==(const hiking_reputation& lhs, const hiking_reputation& rhs)
-        {
-            return (lhs.application_ == rhs.application_) && (lhs.reputons_ == rhs.reputons_);
-        }
-
-        friend bool operator!=(const hiking_reputation& lhs, const hiking_reputation& rhs)
-        {
-            return !(lhs == rhs);
-        };
     };
 
 } // namespace ns
