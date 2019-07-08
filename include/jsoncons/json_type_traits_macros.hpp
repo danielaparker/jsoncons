@@ -373,6 +373,7 @@ namespace jsoncons \
     template<typename Json> \
     struct json_type_traits<Json, EnumType, typename std::enable_if<std::is_same<typename Json::char_type,char>::value>::type> \
     { \
+        static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
         typedef EnumType value_type; \
         typedef typename Json::allocator_type allocator_type; \
         typedef std::pair<EnumType,std::string> mapped_type; \
@@ -445,6 +446,7 @@ namespace jsoncons \
     template<typename Json> \
     struct json_type_traits<Json, EnumType, typename std::enable_if<std::is_same<typename Json::char_type,wchar_t>::value>::type> \
     { \
+        static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
         typedef EnumType value_type; \
         typedef typename Json::allocator_type allocator_type; \
         typedef std::pair<EnumType,std::wstring> mapped_type; \
