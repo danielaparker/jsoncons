@@ -1759,7 +1759,7 @@ public:
         }
 
         template<class T, class... Args>
-        bool is(Args&&... args) const
+        bool is(Args&&... args) const noexcept
         {
             if (!parent_.contains(string_view_type(data_,length_)))
             {
@@ -3353,7 +3353,7 @@ public:
     }
 
     template<class T, class... Args>
-    bool is(Args&&... args) const
+    bool is(Args&&... args) const noexcept
     {
         return json_type_traits<basic_json,T>::is(*this,std::forward<Args>(args)...);
     }
