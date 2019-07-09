@@ -295,7 +295,7 @@ begin_object
 name: rater
 string_value: HikingAsylum
 name: assertion
-string_value: strong-hiker
+string_value: advanced
 name: rated
 string_value: Marilyn C
 name: rating
