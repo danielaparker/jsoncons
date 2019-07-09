@@ -328,12 +328,12 @@ namespace jsoncons \
         { \
             if (!j.is_string()) return false; \
             const string_view_type s = j.template as<string_view_type>(); \
-            auto it = std::find_if(get_values().first, get_values().second, \
+            auto first = get_values().first; \
+            auto last = get_values().second; \
+            auto it = std::find_if(first, last, \
                                    [&](const mapped_type& item) -> bool \
-            { \
-                return item.second == s; \
-            }); \
-            return it != get_values().second; \
+                                   { return item.second == s; }); \
+            return it != last; \
         } \
         static value_type as(const Json& j) \
         { \
@@ -342,12 +342,12 @@ namespace jsoncons \
                 JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
             } \
             const string_view_type s = j.template as<string_view_type>(); \
-            auto it = std::find_if(get_values().first, get_values().second, \
+            auto first = get_values().first; \
+            auto last = get_values().second; \
+            auto it = std::find_if(first, last, \
                                    [&](const mapped_type& item) -> bool \
-            { \
-                return item.second == s; \
-            }); \
-            if (it == get_values().second) \
+                                   { return item.second == s; }); \
+            if (it == last) \
             { \
                 if (s.empty()) \
                 { \
@@ -363,12 +363,12 @@ namespace jsoncons \
         static Json to_json(value_type val, allocator_type allocator=allocator_type()) \
         { \
             static constexpr CharT empty_string[] = {0}; \
-            auto it = std::find_if(get_values().first, get_values().second, \
+            auto first = get_values().first; \
+            auto last = get_values().second; \
+            auto it = std::find_if(first, last, \
                                    [val](const mapped_type& item) -> bool \
-            { \
-                return item.first == val; \
-            }); \
-            if (it == get_values().second) \
+                                   { return item.first == val; }); \
+            if (it == last) \
             { \
                 if (val == value_type()) \
                 { \
