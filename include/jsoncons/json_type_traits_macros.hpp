@@ -367,7 +367,7 @@ JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(NumTemplateParams, ValueType, __VA_ARGS__)
 #define JSONCONS_ENUM_PAIR(TC, JVal, TVal, Prefix, Member) {value_type::Member, JSONCONS_QUOTE(Prefix,Member)},
 #define JSONCONS_ENUM_PAIR_LAST(TC, JVal, TVal, Prefix, Member) {value_type::Member, JSONCONS_QUOTE(Prefix,Member)}
 
-#define JSONCONS_ENUM_TRAITS_DECL_BASE(EnumType,CharT,Prefix, ...)  \
+#define JSONCONS_ENUM_TRAITS_DECL_BASE(CharT,Prefix,EnumType, ...)  \
 namespace jsoncons \
 { \
     template<typename Json> \
@@ -449,8 +449,8 @@ namespace jsoncons \
     /**/
 
 #define JSONCONS_ENUM_TRAITS_DECL(EnumType, ...)  \
-    JSONCONS_ENUM_TRAITS_DECL_BASE(EnumType,char,,__VA_ARGS__) \
-    JSONCONS_ENUM_TRAITS_DECL_BASE(EnumType,wchar_t,L,__VA_ARGS__) \
+    JSONCONS_ENUM_TRAITS_DECL_BASE(char,,EnumType,__VA_ARGS__) \
+    JSONCONS_ENUM_TRAITS_DECL_BASE(wchar_t,L,EnumType,__VA_ARGS__) \
     /**/
 
 #if !defined(JSONCONS_NO_DEPRECATED)
