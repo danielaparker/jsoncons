@@ -371,7 +371,7 @@ namespace jsoncons \
             { \
                 if (val == value_type()) \
                 { \
-                    return Json(Prefix ""); \
+                    return Json( Prefix"" ); \
                 } \
                 else \
                 { \
