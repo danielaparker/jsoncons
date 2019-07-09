@@ -327,9 +327,15 @@ namespace jsoncons \
         static bool is(const Json& j) noexcept \
         { \
             if (!j.is_string()) return false; \
-            const string_view_type s = j.template as<string_view_type>(); \
             auto first = get_values().first; \
             auto last = get_values().second; \
+            const string_view_type s = j.template as<string_view_type>(); \
+            if (s.empty() && std::find_if(first, last, \
+                                          [](const mapped_type& item) -> bool \
+                                          { return item.first == value_type(); }) == last) \
+            { \
+                return true; \
+            } \
             auto it = std::find_if(first, last, \
                                    [&](const mapped_type& item) -> bool \
                                    { return item.second == s; }); \
@@ -344,6 +350,12 @@ namespace jsoncons \
             const string_view_type s = j.template as<string_view_type>(); \
             auto first = get_values().first; \
             auto last = get_values().second; \
+            if (s.empty() && std::find_if(first, last, \
+                                          [](const mapped_type& item) -> bool \
+                                          { return item.first == value_type(); }) == last) \
+            { \
+                return value_type(); \
+            } \
             auto it = std::find_if(first, last, \
                                    [&](const mapped_type& item) -> bool \
                                    { return item.second == s; }); \
