@@ -48,17 +48,6 @@ private:
         Json value_;
 
         template <class... Args>
-        stack_item(std::true_type, Args&& ... args)
-            : name_(std::forward<Args>(args)...)
-        {
-        }
-        template <class... Args>
-        stack_item(std::false_type, Args&& ... args)
-            : value_(std::forward<Args>(args)...)
-        {
-        }
-
-        template <class... Args>
         stack_item(string_type&& name, Args&& ... args)
             : name_(std::move(name)), value_(std::forward<Args>(args)...)
         {
@@ -133,18 +122,12 @@ private:
 
     bool do_begin_object(semantic_tag tag, const ser_context&) override
     {
-        switch (structure_stack_.back().type_)
+        if (structure_stack_.back().type_ == structure_type::root_t)
         {
-            case structure_type::object_t:
-            case structure_type::array_t:
-                item_stack_.emplace_back(std::forward<string_type>(name_), object(object_allocator_), tag);
-                break;
-            case structure_type::root_t:
-                item_stack_.clear();
-                is_valid_ = false;
-                item_stack_.emplace_back(std::false_type(), object(object_allocator_), tag);
-                break;
+            item_stack_.clear();
+            is_valid_ = false;
         }
+        item_stack_.emplace_back(std::forward<string_type>(name_), object(object_allocator_), tag);
         structure_stack_.emplace_back(structure_type::object_t, item_stack_.size()-1);
         return true;
     }
@@ -177,18 +160,12 @@ private:
 
     bool do_begin_array(semantic_tag tag, const ser_context&) override
     {
-        switch (structure_stack_.back().type_)
+        if (structure_stack_.back().type_ == structure_type::root_t)
         {
-            case structure_type::object_t:
-            case structure_type::array_t:
-                item_stack_.emplace_back(std::forward<string_type>(name_), array(array_allocator_), tag);
-                break;
-            case structure_type::root_t:
-                item_stack_.clear();
-                is_valid_ = false;
-                item_stack_.emplace_back(std::false_type(), array(array_allocator_), tag);
-                break;
+            item_stack_.clear();
+            is_valid_ = false;
         }
+        item_stack_.emplace_back(std::forward<string_type>(name_), array(array_allocator_), tag);
         structure_stack_.emplace_back(structure_type::array_t, item_stack_.size()-1);
         return true;
     }
@@ -224,7 +201,6 @@ private:
     bool do_name(const string_view_type& name, const ser_context&) override
     {
         name_ = string_type(name.data(),name.length());
-        //item_stack_.emplace_back(std::true_type(), name.data(), name.length(), string_allocator_);
         return true;
     }
 
