@@ -362,6 +362,7 @@ namespace jsoncons \
         } \
         static Json to_json(value_type val, allocator_type allocator=allocator_type()) \
         { \
+            static constexpr CharT empty_string[] = Prefix""; \
             auto it = std::find_if(get_values().first, get_values().second, \
                                    [val](const mapped_type& item) -> bool \
             { \
@@ -371,7 +372,7 @@ namespace jsoncons \
             { \
                 if (val == value_type()) \
                 { \
-                    return Prefix""; \
+                    return Json(empty_string); \
                 } \
                 else \
                 { \

@@ -1666,7 +1666,6 @@ public:
         }
     public:
 
-        friend class basic_json<CharT,ImplementationPolicy,Allocator>;
         typedef json_proxy<ParentT> proxy_type;
 
         range<object_iterator> object_range()
