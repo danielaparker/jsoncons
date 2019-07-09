@@ -136,8 +136,6 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_type::object_t:
-                item_stack_.back().value_ = Json(object(object_allocator_), tag);
-                break;
             case structure_type::array_t:
                 item_stack_.emplace_back(std::forward<string_type>(name_), object(object_allocator_), tag);
                 break;
@@ -182,8 +180,6 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_type::object_t:
-                item_stack_.back().value_ = Json(array(array_allocator_), tag);
-                break;
             case structure_type::array_t:
                 item_stack_.emplace_back(std::forward<string_type>(name_), array(array_allocator_), tag);
                 break;
@@ -228,7 +224,7 @@ private:
     bool do_name(const string_view_type& name, const ser_context&) override
     {
         name_ = string_type(name.data(),name.length());
-        item_stack_.emplace_back(std::true_type(), name.data(), name.length(), string_allocator_);
+        //item_stack_.emplace_back(std::true_type(), name.data(), name.length(), string_allocator_);
         return true;
     }
 
@@ -237,8 +233,6 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_type::object_t:
-                item_stack_.back().value_ = Json(sv, tag, string_allocator_);
-                break;
             case structure_type::array_t:
                 item_stack_.emplace_back(std::forward<string_type>(name_), sv, tag, string_allocator_);
                 break;
@@ -255,8 +249,6 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_type::object_t:
-                item_stack_.back().value_ = Json(b, tag, byte_allocator_);
-                break;
             case structure_type::array_t:
                 item_stack_.emplace_back(std::forward<string_type>(name_), b, tag, byte_allocator_);
                 break;
@@ -275,8 +267,6 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_type::object_t:
-                item_stack_.back().value_ = Json(value,tag);
-                break;
             case structure_type::array_t:
                 item_stack_.emplace_back(std::forward<string_type>(name_), value, tag);
                 break;
@@ -295,8 +285,6 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_type::object_t:
-                item_stack_.back().value_ = Json(value,tag);
-                break;
             case structure_type::array_t:
                 item_stack_.emplace_back(std::forward<string_type>(name_), value, tag);
                 break;
@@ -315,8 +303,6 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_type::object_t:
-                item_stack_.back().value_ = Json(value, tag);
-                break;
             case structure_type::array_t:
                 item_stack_.emplace_back(std::forward<string_type>(name_), value, tag);
                 break;
@@ -333,8 +319,6 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_type::object_t:
-                item_stack_.back().value_ = Json(value, tag);
-                break;
             case structure_type::array_t:
                 item_stack_.emplace_back(std::forward<string_type>(name_), value, tag);
                 break;
@@ -351,8 +335,6 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_type::object_t:
-                item_stack_.back().value_ = Json(null_type(),tag);
-                break;
             case structure_type::array_t:
                 item_stack_.emplace_back(std::forward<string_type>(name_), null_type(), tag);
                 break;
