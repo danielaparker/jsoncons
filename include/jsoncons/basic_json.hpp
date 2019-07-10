@@ -4319,12 +4319,14 @@ public:
         return parse(string_view_type(s,length),err_handler);
     }
 
+    JSONCONS_DEPRECATED("Instead, use parse(std::basic_istream<char_type>&)")
     static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename)
     {
         parse_error_handler_type err_handler;
         return parse_file(filename,err_handler);
     }
 
+    JSONCONS_DEPRECATED("Instead, use parse(std::basic_istream<char_type>&, parse_error_handler&)")
     static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename,
                                  parse_error_handler& err_handler)
     {
@@ -4332,29 +4334,36 @@ public:
         return parse(is,err_handler);
     }
 
+    JSONCONS_DEPRECATED("Instead, use parse(std::basic_istream<char_type>&)")
     static basic_json parse_stream(std::basic_istream<char_type>& is)
     {
         return parse(is);
     }
+    JSONCONS_DEPRECATED("Instead, use parse(std::basic_istream<char_type>&, parse_error_handler&)")
     static basic_json parse_stream(std::basic_istream<char_type>& is, parse_error_handler& err_handler)
     {
         return parse(is,err_handler);
     }
 
+    JSONCONS_DEPRECATED("Instead, use parse(const string_view_type&)")
     static basic_json parse_string(const string_type& s)
     {
         return parse(s);
     }
 
+    JSONCONS_DEPRECATED("Instead, use parse(parse(const string_view_type&, parse_error_handler&)")
     static basic_json parse_string(const string_type& s, parse_error_handler& err_handler)
     {
         return parse(s,err_handler);
     }
 
+    JSONCONS_DEPRECATED("Instead, use basic_json(double)")
     basic_json(double val, uint8_t)
         : var_(val, semantic_tag::none)
     {
     }
+
+    JSONCONS_DEPRECATED("Instead, use basic_json(double,semantic_tag)")
     basic_json(double val, 
                const floating_point_options&,
                semantic_tag tag = semantic_tag::none)
@@ -4362,6 +4371,7 @@ public:
     {
     }
 
+    JSONCONS_DEPRECATED("Instead, use basic_json(const byte_string_view& ,semantic_tag)")
     basic_json(const byte_string_view& bs, 
                byte_string_chars_format encoding_hint,
                semantic_tag tag = semantic_tag::none)
