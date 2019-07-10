@@ -98,7 +98,6 @@ For the examples below you need to include some header files and construct a str
 ```c++
 #include <jsoncons/json.hpp>
 #include <iostream>
-#include <cassert>
 
 using namespace jsoncons; // for convenience
 
@@ -627,7 +626,9 @@ bar,UHVzcw==,273.15
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <iostream>
 #include <iomanip>
+#include <cassert>
 
 using namespace jsoncons; // For convenience
 

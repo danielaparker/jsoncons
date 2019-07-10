@@ -22,7 +22,7 @@
 
 [Convert JSON to/from C++ data structures by specializing json_type_traits](#G1)  
 [Mapping to C++ data structures with and without defaults allowed](#G2)  
-[An example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#G3)  
+[An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL](#G3)  
 [Serializing a templated class with the `JSONCONS_TEMPLATE_xxx` macros](#G4)  
 [A polymorphic example](#G5)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G6)
@@ -676,7 +676,7 @@ Key 'ssn' not found
 
 <div id="G3"/>
 
-#### An example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits 
+#### An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL
 
 This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS_DECL`
 and `JSONCONS_GETTER_CTOR_TRAITS_DECL` to specialize the 
@@ -818,7 +818,7 @@ namespace ns {
 
 } // namespace ns
 
-// Declare the traits. Specify which data members need to be serialized.
+// Declare the traits. Specify the number of template parameters and which data members need to be serialized.
 JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
 
 using namespace jsoncons; // for convenience
