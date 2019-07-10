@@ -2403,7 +2403,7 @@ public:
             return evaluate().as_ulonglong();
         }
 
-        JSONCONS_DEPRECATED("Instead, use as_uint64()")
+        JSONCONS_DEPRECATED("Instead, use as<uint64_t>()")
         uint64_t as_uinteger() const
         {
             return evaluate().as_uinteger();
@@ -4400,16 +4400,19 @@ public:
         : var_(first,last,allocator)
     {
     }
+    JSONCONS_DEPRECATED("Instead, use dump(basic_json_content_handler<char_type>&)")
     void dump_fragment(basic_json_content_handler<char_type>& handler) const
     {
         dump(handler);
     }
 
+    JSONCONS_DEPRECATED("Instead, use dump(basic_json_content_handler<char_type>&)")
     void dump_body(basic_json_content_handler<char_type>& handler) const
     {
         dump(handler);
     }
 
+    JSONCONS_DEPRECATED("Instead, use dump(std::basic_ostream<char_type>&, indenting)")
     void dump(std::basic_ostream<char_type>& os, bool pprint) const
     {
         if (pprint)
@@ -4424,6 +4427,7 @@ public:
         }
     }
 
+    JSONCONS_DEPRECATED("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, indenting)")
     void dump(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, bool pprint) const
     {
         if (pprint)
@@ -4438,45 +4442,55 @@ public:
         }
     }
 
+    JSONCONS_DEPRECATED("Instead, use dump(basic_json_content_handler<char_type>&)")
     void write_body(basic_json_content_handler<char_type>& handler) const
     {
         dump(handler);
     }
+
+    JSONCONS_DEPRECATED("Instead, use dump(basic_json_content_handler<char_type>&)")
     void write(basic_json_content_handler<char_type>& handler) const
     {
         dump(handler);
     }
 
+    JSONCONS_DEPRECATED("Instead, use dump(std::basic_ostream<char_type>&)")
     void write(std::basic_ostream<char_type>& os) const
     {
         dump(os);
     }
 
+    JSONCONS_DEPRECATED("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)")
     void write(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options) const
     {
         dump(os,options);
     }
 
+    JSONCONS_DEPRECATED("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, indenting)")
     void write(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, bool pprint) const
     {
         dump(os,options,pprint);
     }
 
+    JSONCONS_DEPRECATED("Instead, use dump(basic_json_content_handler<char_type>&)")
     void to_stream(basic_json_content_handler<char_type>& handler) const
     {
         dump(handler);
     }
 
+    JSONCONS_DEPRECATED("Instead, use dump(std::basic_ostream<char_type>&)")
     void to_stream(std::basic_ostream<char_type>& os) const
     {
         dump(os);
     }
 
+    JSONCONS_DEPRECATED("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)")
     void to_stream(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options) const
     {
         dump(os,options);
     }
 
+    JSONCONS_DEPRECATED("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, indenting)")
     void to_stream(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, bool pprint) const
     {
         dump(os,options,pprint ? indenting::indent : indenting::no_indent);
@@ -4504,32 +4518,38 @@ public:
         }
     }
 
+    JSONCONS_DEPRECATED("Instead, use tag() == semantic_tag::datetime")
     bool is_datetime() const noexcept
     {
         return var_.tag() == semantic_tag::datetime;
     }
 
+    JSONCONS_DEPRECATED("Instead, use tag() == semantic_tag::timestamp")
     bool is_epoch_time() const noexcept
     {
         return var_.tag() == semantic_tag::timestamp;
     }
 
+    JSONCONS_DEPRECATED("Instead, use contains(const string_view_type&)")
     bool has_key(const string_view_type& name) const
     {
         return contains(name);
     }
 
+    JSONCONS_DEPRECATED("Instead, use is_int64()")
     bool is_integer() const noexcept
     {
         return var_.type() == storage_type::int64_val || (var_.type() == storage_type::uint64_val&& (as_integer<uint64_t>() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
     }
 
+    JSONCONS_DEPRECATED("Instead, use is_uint64()")
     bool is_uinteger() const noexcept
     {
         return var_.type() == storage_type::uint64_val || (var_.type() == storage_type::int64_val&& as_integer<int64_t>() >= 0);
     }
 
-    int64_t as_uinteger() const
+    JSONCONS_DEPRECATED("Instead, use as<uint64_t>()")
+    uint64_t as_uinteger() const
     {
         return as_integer<uint64_t>();
     }
