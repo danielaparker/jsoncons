@@ -2876,19 +2876,6 @@ public:
     {
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    basic_json(double val, uint8_t)
-        : var_(val, semantic_tag::none)
-    {
-    }
-    basic_json(double val, 
-               const floating_point_options&,
-               semantic_tag tag = semantic_tag::none)
-        : var_(val, tag)
-    {
-    }
-#endif
-
     basic_json(double val, semantic_tag tag)
         : var_(val, tag)
     {
@@ -2937,32 +2924,6 @@ public:
     {
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-    basic_json(const byte_string_view& bs, 
-               byte_string_chars_format encoding_hint,
-               semantic_tag tag = semantic_tag::none)
-        : var_(bs, tag)
-    {
-        switch (encoding_hint)
-        {
-            {
-                case byte_string_chars_format::base16:
-                    var_ = variant(bs, semantic_tag::base16);
-                    break;
-                case byte_string_chars_format::base64:
-                    var_ = variant(bs, semantic_tag::base64);
-                    break;
-                case byte_string_chars_format::base64url:
-                    var_ = variant(bs, semantic_tag::base64url);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-#endif
-
     explicit basic_json(const byte_string_view& bs, 
                         semantic_tag tag = semantic_tag::none)
         : var_(bs, tag)
@@ -2985,15 +2946,6 @@ public:
     : var_(bs, byte_allocator_type(allocator))
     {
     }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-    template<class InputIterator>
-    basic_json(InputIterator first, InputIterator last, const Allocator& allocator = Allocator())
-        : var_(first,last,allocator)
-    {
-    }
-#endif
 
     ~basic_json()
     {
@@ -3220,89 +3172,6 @@ public:
         return s;
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    void dump_fragment(basic_json_content_handler<char_type>& handler) const
-    {
-        dump(handler);
-    }
-
-    void dump_body(basic_json_content_handler<char_type>& handler) const
-    {
-        dump(handler);
-    }
-
-    void dump(std::basic_ostream<char_type>& os, bool pprint) const
-    {
-        if (pprint)
-        {
-            basic_json_encoder<char_type> encoder(os);
-            dump(encoder);
-        }
-        else
-        {
-            basic_json_compressed_encoder<char_type> encoder(os);
-            dump(encoder);
-        }
-    }
-
-    void dump(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, bool pprint) const
-    {
-        if (pprint)
-        {
-            basic_json_encoder<char_type> encoder(os, options);
-            dump(encoder);
-        }
-        else
-        {
-            basic_json_compressed_encoder<char_type> encoder(os, options);
-            dump(encoder);
-        }
-    }
-
-    void write_body(basic_json_content_handler<char_type>& handler) const
-    {
-        dump(handler);
-    }
-    void write(basic_json_content_handler<char_type>& handler) const
-    {
-        dump(handler);
-    }
-
-    void write(std::basic_ostream<char_type>& os) const
-    {
-        dump(os);
-    }
-
-    void write(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options) const
-    {
-        dump(os,options);
-    }
-
-    void write(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, bool pprint) const
-    {
-        dump(os,options,pprint);
-    }
-
-    void to_stream(basic_json_content_handler<char_type>& handler) const
-    {
-        dump(handler);
-    }
-
-    void to_stream(std::basic_ostream<char_type>& os) const
-    {
-        dump(os);
-    }
-
-    void to_stream(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options) const
-    {
-        dump(os,options);
-    }
-
-    void to_stream(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, bool pprint) const
-    {
-        dump(os,options,pprint ? indenting::indent : indenting::no_indent);
-    }
-#endif
     bool is_null() const noexcept
     {
         return var_.type() == storage_type::null_val;
@@ -3635,30 +3504,6 @@ public:
         }
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    size_t precision() const
-    {
-        switch (var_.type())
-        {
-        case storage_type::double_val:
-            return 0;
-        default:
-            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a double"));
-        }
-    }
-
-    size_t decimal_places() const
-    {
-        switch (var_.type())
-        {
-        case storage_type::double_val:
-            return 0;
-        default:
-            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a double"));
-        }
-    }
-#endif
-
     double as_double() const
     {
         switch (var_.type())
@@ -3839,50 +3684,6 @@ public:
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a cstring"));
         }
     }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-    bool is_datetime() const noexcept
-    {
-        return var_.tag() == semantic_tag::datetime;
-    }
-
-    bool is_epoch_time() const noexcept
-    {
-        return var_.tag() == semantic_tag::timestamp;
-    }
-
-    bool has_key(const string_view_type& name) const
-    {
-        return contains(name);
-    }
-
-    bool is_integer() const noexcept
-    {
-        return var_.type() == storage_type::int64_val || (var_.type() == storage_type::uint64_val&& (as_integer<uint64_t>() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
-    }
-
-    bool is_uinteger() const noexcept
-    {
-        return var_.type() == storage_type::uint64_val || (var_.type() == storage_type::int64_val&& as_integer<int64_t>() >= 0);
-    }
-
-    int64_t as_uinteger() const
-    {
-        return as_integer<uint64_t>();
-    }
-
-    size_t double_precision() const
-    {
-        switch (var_.type())
-        {
-        case storage_type::double_val:
-            return 0;
-        default:
-            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a double"));
-        }
-    }
-#endif
 
     basic_json& at(const string_view_type& name)
     {
@@ -4548,6 +4349,190 @@ public:
     static basic_json parse_string(const string_type& s, parse_error_handler& err_handler)
     {
         return parse(s,err_handler);
+    }
+
+    basic_json(double val, uint8_t)
+        : var_(val, semantic_tag::none)
+    {
+    }
+    basic_json(double val, 
+               const floating_point_options&,
+               semantic_tag tag = semantic_tag::none)
+        : var_(val, tag)
+    {
+    }
+
+    basic_json(const byte_string_view& bs, 
+               byte_string_chars_format encoding_hint,
+               semantic_tag tag = semantic_tag::none)
+        : var_(bs, tag)
+    {
+        switch (encoding_hint)
+        {
+            {
+                case byte_string_chars_format::base16:
+                    var_ = variant(bs, semantic_tag::base16);
+                    break;
+                case byte_string_chars_format::base64:
+                    var_ = variant(bs, semantic_tag::base64);
+                    break;
+                case byte_string_chars_format::base64url:
+                    var_ = variant(bs, semantic_tag::base64url);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    template<class InputIterator>
+    basic_json(InputIterator first, InputIterator last, const Allocator& allocator = Allocator())
+        : var_(first,last,allocator)
+    {
+    }
+    void dump_fragment(basic_json_content_handler<char_type>& handler) const
+    {
+        dump(handler);
+    }
+
+    void dump_body(basic_json_content_handler<char_type>& handler) const
+    {
+        dump(handler);
+    }
+
+    void dump(std::basic_ostream<char_type>& os, bool pprint) const
+    {
+        if (pprint)
+        {
+            basic_json_encoder<char_type> encoder(os);
+            dump(encoder);
+        }
+        else
+        {
+            basic_json_compressed_encoder<char_type> encoder(os);
+            dump(encoder);
+        }
+    }
+
+    void dump(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, bool pprint) const
+    {
+        if (pprint)
+        {
+            basic_json_encoder<char_type> encoder(os, options);
+            dump(encoder);
+        }
+        else
+        {
+            basic_json_compressed_encoder<char_type> encoder(os, options);
+            dump(encoder);
+        }
+    }
+
+    void write_body(basic_json_content_handler<char_type>& handler) const
+    {
+        dump(handler);
+    }
+    void write(basic_json_content_handler<char_type>& handler) const
+    {
+        dump(handler);
+    }
+
+    void write(std::basic_ostream<char_type>& os) const
+    {
+        dump(os);
+    }
+
+    void write(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options) const
+    {
+        dump(os,options);
+    }
+
+    void write(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, bool pprint) const
+    {
+        dump(os,options,pprint);
+    }
+
+    void to_stream(basic_json_content_handler<char_type>& handler) const
+    {
+        dump(handler);
+    }
+
+    void to_stream(std::basic_ostream<char_type>& os) const
+    {
+        dump(os);
+    }
+
+    void to_stream(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options) const
+    {
+        dump(os,options);
+    }
+
+    void to_stream(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, bool pprint) const
+    {
+        dump(os,options,pprint ? indenting::indent : indenting::no_indent);
+    }
+
+    size_t precision() const
+    {
+        switch (var_.type())
+        {
+        case storage_type::double_val:
+            return 0;
+        default:
+            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a double"));
+        }
+    }
+
+    size_t decimal_places() const
+    {
+        switch (var_.type())
+        {
+        case storage_type::double_val:
+            return 0;
+        default:
+            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a double"));
+        }
+    }
+
+    bool is_datetime() const noexcept
+    {
+        return var_.tag() == semantic_tag::datetime;
+    }
+
+    bool is_epoch_time() const noexcept
+    {
+        return var_.tag() == semantic_tag::timestamp;
+    }
+
+    bool has_key(const string_view_type& name) const
+    {
+        return contains(name);
+    }
+
+    bool is_integer() const noexcept
+    {
+        return var_.type() == storage_type::int64_val || (var_.type() == storage_type::uint64_val&& (as_integer<uint64_t>() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
+    }
+
+    bool is_uinteger() const noexcept
+    {
+        return var_.type() == storage_type::uint64_val || (var_.type() == storage_type::int64_val&& as_integer<int64_t>() >= 0);
+    }
+
+    int64_t as_uinteger() const
+    {
+        return as_integer<uint64_t>();
+    }
+
+    size_t double_precision() const
+    {
+        switch (var_.type())
+        {
+        case storage_type::double_val:
+            return 0;
+        default:
+            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a double"));
+        }
     }
 
     JSONCONS_DEPRECATED("Instead, use insert(const_array_iterator, T&&)")

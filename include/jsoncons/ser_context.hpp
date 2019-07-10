@@ -42,10 +42,10 @@ private:
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef ser_context parsing_context;
-typedef ser_context serializing_context;
-typedef null_ser_context null_parsing_context;
-typedef null_ser_context null_serializing_context;
+JSONCONS_DEPRECATED("Instead, use ser_context") typedef ser_context parsing_context;
+JSONCONS_DEPRECATED("Instead, use ser_context") typedef ser_context serializing_context;
+JSONCONS_DEPRECATED("Instead, use null_ser_context") typedef null_ser_context null_parsing_context;
+JSONCONS_DEPRECATED("Instead, use null_ser_context") typedef null_ser_context null_serializing_context;
 #endif
 
 }

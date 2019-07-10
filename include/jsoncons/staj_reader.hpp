@@ -826,14 +826,14 @@ using basic_stream_reader = basic_staj_reader<CharT>;
 template<class CharT>
 using basic_stream_filter = basic_staj_filter<CharT>;
 
-typedef basic_staj_event<char> stream_event;
-typedef basic_staj_event<wchar_t> wstream_event;
+JSONCONS_DEPRECATED("Instead, use staj_event") typedef basic_staj_event<char> stream_event;
+JSONCONS_DEPRECATED("Instead, use wstaj_event") typedef basic_staj_event<wchar_t> wstream_event;
 
-typedef basic_staj_reader<char> stream_reader;
-typedef basic_staj_reader<wchar_t> wstream_reader;
+JSONCONS_DEPRECATED("Instead, use staj_reader") typedef basic_staj_reader<char> stream_reader;
+JSONCONS_DEPRECATED("Instead, use wstaj_reader") typedef basic_staj_reader<wchar_t> wstream_reader;
 
-typedef basic_staj_filter<char> stream_filter;
-typedef basic_staj_filter<wchar_t> wstream_filter;
+JSONCONS_DEPRECATED("Instead, use staj_filter") typedef basic_staj_filter<char> stream_filter;
+JSONCONS_DEPRECATED("Instead, use wstaj_reader") typedef basic_staj_filter<wchar_t> wstream_filter;
 
 #endif
 
