@@ -31,27 +31,30 @@ public:
     {
     }
 
+    basic_json_content_handler<CharT>& to_handler()
+    {
+        return to_handler_;
+    }
+
 #if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED("Instead, use to_handler") 
     basic_json_content_handler<CharT>& input_handler()
     {
         return to_handler_;
     }
 
+    JSONCONS_DEPRECATED("Instead, use to_handler") 
     basic_json_content_handler<CharT>& downstream_handler()
     {
         return to_handler_;
     }
 
+    JSONCONS_DEPRECATED("Instead, use to_handler") 
     basic_json_content_handler<CharT>& destination_handler()
     {
         return to_handler_;
     }
 #endif
-
-    basic_json_content_handler<CharT>& to_handler()
-    {
-        return to_handler_;
-    }
 
 private:
     void do_flush() override

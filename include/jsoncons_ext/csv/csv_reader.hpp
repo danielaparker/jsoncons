@@ -177,11 +177,13 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
+    JSONCONS_DEPRECATED("Instead, use buffer_length()")
     size_t buffer_capacity() const
     {
         return buffer_length_;
     }
 
+    JSONCONS_DEPRECATED("Instead, use buffer_length(size_t)")
     void buffer_capacity(size_t length)
     {
         buffer_length_ = length;

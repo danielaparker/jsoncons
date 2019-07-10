@@ -288,11 +288,13 @@ public:
         buffer_.reserve(buffer_length_);
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED("Instead, use max_nesting_depth() on options")
     size_t max_nesting_depth() const
     {
         return parser_.max_nesting_depth();
     }
 
+    JSONCONS_DEPRECATED("Instead, use max_nesting_depth(size_t) on options")
     void max_nesting_depth(size_t depth)
     {
         parser_.max_nesting_depth(depth);

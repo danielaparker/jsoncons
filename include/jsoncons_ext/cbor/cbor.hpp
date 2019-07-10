@@ -117,6 +117,7 @@ decode_cbor(std::istream& is)
   
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class Json>
+JSONCONS_DEPRECATED("Instead, use encode_cbor(const T&, std::vector<uint8_t>&)")
 std::vector<uint8_t> encode_cbor(const Json& j)
 {
     std::vector<uint8_t> v;
