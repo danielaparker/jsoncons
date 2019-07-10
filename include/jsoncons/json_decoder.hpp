@@ -108,6 +108,7 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED("Instead, use get_result()")
     Json& root()
     {
         return result_;
