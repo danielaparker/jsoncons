@@ -5138,11 +5138,11 @@ typedef basic_json<char, preserve_order_policy, std::allocator<char>> ojson;
 typedef basic_json<wchar_t, preserve_order_policy, std::allocator<wchar_t>> wojson;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_json<wchar_t, preserve_order_policy, std::allocator<wchar_t>> owjson;
-typedef json_decoder<json> json_deserializer;
-typedef json_decoder<wjson> wjson_deserializer;
-typedef json_decoder<ojson> ojson_deserializer;
-typedef json_decoder<wojson> wojson_deserializer;
+JSONCONS_DEPRECATED("Instead, use wojson") typedef basic_json<wchar_t, preserve_order_policy, std::allocator<wchar_t>> owjson;
+JSONCONS_DEPRECATED("Instead, use json_decoder<json>") typedef json_decoder<json> json_deserializer;
+JSONCONS_DEPRECATED("Instead, use json_decoder<wjson>") typedef json_decoder<wjson> wjson_deserializer;
+JSONCONS_DEPRECATED("Instead, use json_decoder<ojson>") typedef json_decoder<ojson> ojson_deserializer;
+JSONCONS_DEPRECATED("Instead, use json_decoder<wojson>") typedef json_decoder<wojson> wojson_deserializer;
 #endif
 
 inline namespace literals {
