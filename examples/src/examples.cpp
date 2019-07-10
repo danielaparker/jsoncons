@@ -262,9 +262,6 @@ void json_constructor_examples()
     json j6(x); // A double value
     std::cout << "(6) " << j6 << std::endl;
 
-    json j7(x,4); // A double value with specified precision
-    std::cout << "(7) " << j7 << std::endl;
-
     json j8("Hello"); // A text string
     std::cout << "(8) " << j8 << std::endl;
 
