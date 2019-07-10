@@ -1603,44 +1603,43 @@ public:
     };
 
     template <class ParentT>
-    class json_proxy 
+    class proxy 
     {
     private:
         friend class basic_json<CharT,ImplementationPolicy,Allocator>;
 
         ParentT& parent_;
-        const char_type* data_;
-        size_t length_;
+        string_view_type key_;
 
-        json_proxy() = delete;
+        proxy() = delete;
 
-        json_proxy(const json_proxy& other) = default;
-        json_proxy(json_proxy&& other) = default;
-        json_proxy& operator = (const json_proxy& other) = delete; 
-        json_proxy& operator = (json_proxy&& other) = delete; 
+        proxy(const proxy& other) = default;
+        proxy(proxy&& other) = default;
+        proxy& operator = (const proxy& other) = delete; 
+        proxy& operator = (proxy&& other) = delete; 
 
-        json_proxy(ParentT& parent, const char_type* data, size_t length)
-            : parent_(parent), data_(data), length_(length)
+        proxy(ParentT& parent, const string_view_type& key)
+            : parent_(parent), key_(key)
         {
         }
 
         basic_json& evaluate() 
         {
-            return parent_.evaluate(string_view_type(data_,length_));
+            return parent_.evaluate(key_);
         }
 
         const basic_json& evaluate() const
         {
-            return parent_.evaluate(string_view_type(data_,length_));
+            return parent_.evaluate(key_);
         }
 
         basic_json& evaluate_with_default()
         {
             basic_json& val = parent_.evaluate_with_default();
-            auto it = val.find(string_view_type(data_,length_));
+            auto it = val.find(key_);
             if (it == val.object_range().end())
             {
-                it = val.insert_or_assign(val.object_range().begin(),string_view_type(data_,length_),object(val.object_value().get_allocator()));            
+                it = val.insert_or_assign(val.object_range().begin(),key_,object(val.object_value().get_allocator()));            
             }
             return it->value();
         }
@@ -1666,7 +1665,7 @@ public:
         }
     public:
 
-        typedef json_proxy<ParentT> proxy_type;
+        typedef proxy<ParentT> proxy_type;
 
         range<object_iterator> object_range()
         {
@@ -1690,7 +1689,7 @@ public:
 
         size_t size() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return 0;
             }
@@ -1724,7 +1723,7 @@ public:
 
         bool is_null() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1760,7 +1759,7 @@ public:
         template<class T, class... Args>
         bool is(Args&&... args) const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1769,7 +1768,7 @@ public:
 
         bool is_string() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1778,7 +1777,7 @@ public:
 
         bool is_string_view() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1787,7 +1786,7 @@ public:
 
         bool is_byte_string() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1796,7 +1795,7 @@ public:
 
         bool is_byte_string_view() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1805,7 +1804,7 @@ public:
 
         bool is_bignum() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1814,7 +1813,7 @@ public:
 
         bool is_number() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1822,7 +1821,7 @@ public:
         }
         bool is_bool() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1831,7 +1830,7 @@ public:
 
         bool is_object() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1840,7 +1839,7 @@ public:
 
         bool is_array() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1849,7 +1848,7 @@ public:
 
         bool is_int64() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1858,7 +1857,7 @@ public:
 
         bool is_uint64() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1867,7 +1866,7 @@ public:
 
         bool is_double() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1953,9 +1952,9 @@ public:
         }
 
         template <class T>
-        json_proxy& operator=(T&& val) 
+        proxy& operator=(T&& val) 
         {
-            parent_.evaluate_with_default().insert_or_assign(string_view_type(data_,length_), std::forward<T>(val));
+            parent_.evaluate_with_default().insert_or_assign(key_, std::forward<T>(val));
             return *this;
         }
 
@@ -1999,9 +1998,9 @@ public:
             return evaluate().at(i);
         }
 
-        json_proxy<proxy_type> operator[](const string_view_type& key)
+        proxy<proxy_type> operator[](const string_view_type& key)
         {
-            return json_proxy<proxy_type>(*this,key.data(),key.length());
+            return proxy<proxy_type>(*this,key.data(),key.length());
         }
 
         const basic_json& operator[](const string_view_type& name) const
@@ -2260,7 +2259,7 @@ public:
             evaluate_with_default().swap(val);
         }
 
-        friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_proxy& o)
+        friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const proxy& o)
         {
             o.dump(os);
             return os;
@@ -2276,7 +2275,7 @@ public:
         JSONCONS_DEPRECATED("Instead, use tag() == semantic_tag::datetime")
         bool is_datetime() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -2286,7 +2285,7 @@ public:
         JSONCONS_DEPRECATED("Instead, use tag() == semantic_tag::timestamp")
         bool is_epoch_time() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -2330,7 +2329,7 @@ public:
         JSONCONS_DEPRECATED("Instead, use is_int64()")
         bool is_integer() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -2340,7 +2339,7 @@ public:
         JSONCONS_DEPRECATED("Instead, use is_uint64()")
         bool is_uinteger() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -2350,7 +2349,7 @@ public:
         JSONCONS_DEPRECATED("Instead, use is<unsigned long long>()")
         bool is_ulonglong() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -2360,7 +2359,7 @@ public:
         JSONCONS_DEPRECATED("Instead, use is<long long>()")
         bool is_longlong() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -2424,7 +2423,7 @@ public:
         JSONCONS_DEPRECATED("Instead, use dump(std::basic_string<char_type,char_traits_type,SAllocator>&)")
         string_type to_string(const char_allocator_type& allocator = char_allocator_type()) const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -2605,7 +2604,7 @@ public:
         JSONCONS_DEPRECATED("Instead, use empty()")
         bool is_empty() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -2614,7 +2613,7 @@ public:
         JSONCONS_DEPRECATED("Instead, use is_number()")
         bool is_numeric() const noexcept
         {
-            if (!parent_.contains(string_view_type(data_,length_)))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -2843,14 +2842,14 @@ public:
     }
 
     template <class ParentT>
-    basic_json(const json_proxy<ParentT>& proxy)
-        : var_(proxy.evaluate().var_)
+    basic_json(const proxy<ParentT>& other)
+        : var_(other.evaluate().var_)
     {
     }
 
     template <class ParentT>
-    basic_json(const json_proxy<ParentT>& proxy, const Allocator& allocator)
-        : var_(proxy.evaluate().var_,allocator)
+    basic_json(const proxy<ParentT>& other, const Allocator& allocator)
+        : var_(other.evaluate().var_,allocator)
     {
     }
 
@@ -3037,7 +3036,7 @@ public:
         return at(i);
     }
 
-    json_proxy<basic_json> operator[](const string_view_type& name)
+    proxy<basic_json> operator[](const string_view_type& name)
     {
         switch (var_.type())
         {
@@ -3045,7 +3044,7 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_type::object_val:
-            return json_proxy<basic_json>(*this, name.data(),name.length());
+            return proxy<basic_json>(*this, name);
             break;
         default:
             JSONCONS_THROW(not_an_object(name.data(),name.length()));
