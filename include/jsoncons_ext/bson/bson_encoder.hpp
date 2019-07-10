@@ -333,8 +333,8 @@ typedef basic_bson_encoder<jsoncons::bytes_result> bson_bytes_encoder;
 template<class Result=jsoncons::binary_stream_result>
 using basic_bson_serializer = basic_bson_encoder<Result>; 
 
-typedef basic_bson_encoder<jsoncons::binary_stream_result> bson_serializer;
-typedef basic_bson_encoder<jsoncons::bytes_result> bson_buffer_serializer;
+JSONCONS_DEPRECATED("Instead, use bson_encoder") typedef bson_encoder bson_serializer;
+JSONCONS_DEPRECATED("Instead, use bson_bytes_encoder")  typedef bson_bytes_encoder bson_buffer_serializer;
 
 #endif
 

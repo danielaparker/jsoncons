@@ -749,6 +749,7 @@ typedef basic_msgpack_reader<jsoncons::binary_stream_source> msgpack_reader;
 typedef basic_msgpack_reader<jsoncons::bytes_source> msgpack_bytes_reader;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+JSONCONS_DEPRECATED("Instead, use msgpack_bytes_reader")
 typedef msgpack_bytes_reader msgpack_buffer_reader;
 #endif
 

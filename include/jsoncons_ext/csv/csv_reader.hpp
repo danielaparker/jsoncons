@@ -319,8 +319,8 @@ typedef basic_csv_reader<char> csv_reader;
 typedef basic_csv_reader<wchar_t> wcsv_reader;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_csv_reader<char,jsoncons::string_source<char>> csv_string_reader;
-typedef basic_csv_reader<wchar_t,jsoncons::string_source<wchar_t>> wcsv_string_reader;
+JSONCONS_DEPRECATED("Instead, use csv_reader") typedef csv_reader csv_string_reader;
+JSONCONS_DEPRECATED("Instead, use wcsv_reader") typedef wcsv_reader wcsv_string_reader;
 #endif
 
 }}

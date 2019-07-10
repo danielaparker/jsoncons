@@ -288,8 +288,8 @@ private:
 typedef basic_bson_reader<jsoncons::binary_stream_source> bson_reader;
 typedef basic_bson_reader<jsoncons::bytes_source> bson_bytes_reader;
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-typedef bson_bytes_reader bson_buffer_reader;
+#if !defined(JSONCONS_NO_DEPRECATED) 
+JSONCONS_DEPRECATED("Instead, use bson_bytes_reader") typedef bson_bytes_reader bson_buffer_reader;
 #endif
 
 }}
