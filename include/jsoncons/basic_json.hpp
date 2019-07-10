@@ -2257,11 +2257,13 @@ public:
         }
 #if !defined(JSONCONS_NO_DEPRECATED)
 
+        JSONCONS_DEPRECATED("Instead, use tag()")
         semantic_tag get_semantic_tag() const
         {
             return evaluate().tag();
         }
 
+        JSONCONS_DEPRECATED("Instead, use tag() == semantic_tag::datetime")
         bool is_datetime() const noexcept
         {
             if (!parent_.contains(string_view_type(data_,length_)))
@@ -2271,6 +2273,7 @@ public:
             return evaluate().is_datetime();
         }
 
+        JSONCONS_DEPRECATED("Instead, use tag() == semantic_tag::timestamp")
         bool is_epoch_time() const noexcept
         {
             if (!parent_.contains(string_view_type(data_,length_)))
@@ -2281,36 +2284,40 @@ public:
         }
 
         template <class T>
+        JSONCONS_DEPRECATED("Instead, use push_back(T&&)")
         void add(T&& val)
         {
             evaluate_with_default().add(std::forward<T>(val));
         }
 
         template <class T>
-        array_iterator add(const_array_iterator pos, T&& val)
+        JSONCONS_DEPRECATED("Instead, use insert(const_array_iterator, T&&)")
+            array_iterator add(const_array_iterator pos, T&& val)
         {
             return evaluate_with_default().add(pos, std::forward<T>(val));
         }
 
-       // set
-
         template <class T>
+        JSONCONS_DEPRECATED("Instead, use insert_or_assign(const string_view_type&, T&&)")
         std::pair<object_iterator,bool> set(const string_view_type& name, T&& val)
         {
             return evaluate().set(name,std::forward<T>(val));
         }
 
         template <class T>
+        JSONCONS_DEPRECATED("Instead, use insert_or_assign(object_iterator, const string_view_type&, T&&)")
         object_iterator set(object_iterator hint, const string_view_type& name, T&& val)
         {
             return evaluate().set(hint, name, std::forward<T>(val));
         }
 
+        JSONCONS_DEPRECATED("Instead, use contains(const string_view_type&)")
         bool has_key(const string_view_type& name) const
         {
-            return evaluate().has_key(name);
+            return evaluate().contains(name);
         }
 
+        JSONCONS_DEPRECATED("Instead, use is_int64()")
         bool is_integer() const noexcept
         {
             if (!parent_.contains(string_view_type(data_,length_)))
@@ -2320,6 +2327,7 @@ public:
             return evaluate().is_int64();
         }
 
+        JSONCONS_DEPRECATED("Instead, use is_uint64()")
         bool is_uinteger() const noexcept
         {
             if (!parent_.contains(string_view_type(data_,length_)))
@@ -2329,21 +2337,25 @@ public:
             return evaluate().is_uint64();
         }
 
+        JSONCONS_DEPRECATED("Instead, use is<unsigned long long>()")
         unsigned long long as_ulonglong() const
         {
             return evaluate().as_ulonglong();
         }
 
+        JSONCONS_DEPRECATED("Instead, use as_uint64()")
         uint64_t as_uinteger() const
         {
             return evaluate().as_uinteger();
         }
 
+        JSONCONS_DEPRECATED("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, indenting)")
         void dump(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, bool pprint) const
         {
             evaluate().dump(os,options,pprint);
         }
 
+        JSONCONS_DEPRECATED("Instead, use dump(std::basic_ostream<char_type>&, indenting)")
         void dump(std::basic_ostream<char_type>& os, bool pprint) const
         {
             evaluate().dump(os, pprint);
