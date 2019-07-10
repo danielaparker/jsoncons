@@ -19,11 +19,13 @@ public:
     virtual size_t column() const = 0; 
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED("Instead, use line()")
     size_t line_number() const
     {
         return line();
     }
 
+    JSONCONS_DEPRECATED("Instead, use column()")
     size_t column_number() const 
     {
         return column();

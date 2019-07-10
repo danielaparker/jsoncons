@@ -449,21 +449,25 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
+    JSONCONS_DEPRECATED("Instead, use buffer_length()")
     size_t buffer_capacity() const
     {
         return buffer_length_;
     }
 
+    JSONCONS_DEPRECATED("Instead, use buffer_length(size_t)")
     void buffer_capacity(size_t length)
     {
         buffer_length_ = length;
         buffer_.reserve(buffer_length_);
     }
+    JSONCONS_DEPRECATED("Instead, use max_nesting_depth()")
     size_t max_depth() const
     {
         return parser_.max_nesting_depth();
     }
 
+    JSONCONS_DEPRECATED("Instead, use max_nesting_depth(size_t)")
     void max_depth(size_t depth)
     {
         parser_.max_nesting_depth(depth);

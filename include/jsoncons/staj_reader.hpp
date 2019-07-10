@@ -221,6 +221,7 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     template<class T>
+    JSONCONS_DEPRECATED("Instead, use get<T>()")
     T as() const
     {
         return get<T>();
