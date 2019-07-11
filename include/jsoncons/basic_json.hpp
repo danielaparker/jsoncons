@@ -2000,7 +2000,7 @@ public:
 
         proxy<proxy_type> operator[](const string_view_type& key)
         {
-            return proxy<proxy_type>(*this,key.data(),key.length());
+            return proxy<proxy_type>(*this,key);
         }
 
         const basic_json& operator[](const string_view_type& name) const
