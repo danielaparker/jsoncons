@@ -177,7 +177,7 @@ Throws `std::out_of_range` if the object does not have a member with the specifi
 
     object_iterator find(const string_view_type& name)
     const_object_iterator find(const string_view_type& name) const
-Returns an object iterator to a member whose name compares equal to `name`. If there is no such member, returns `end_member()`.
+Returns an object iterator to a member whose name compares equal to `name`. If there is no such member, returns `object_range.end()`.
 Throws `std::runtime_error` if not an object.
 
     json& at(const string_view_type& name)
