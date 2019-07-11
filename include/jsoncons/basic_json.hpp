@@ -1606,7 +1606,7 @@ public:
     class proxy 
     {
     private:
-        friend class json_type;
+        friend json_type;
 
         ParentT& parent_;
         string_view_type key_;
