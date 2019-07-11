@@ -164,8 +164,9 @@ Returns the [semantic_tag](semantic_tag.md) associated with this value
 Returns a reference to the value at position i in a json object or array.
 Throws `std::runtime_error` if not an object or array.
 
-    json& operator[](const string_view_type& name)
-Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. 
+    proxy<json> operator[](const string_view_type& name)
+Returns a proxy to a keyed value. `proxy<json>` supports conversion to `json&`. If written to, 
+inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. 
 Throws `std::runtime_error` if not an object.
 If read, throws `std::out_of_range` if the object does not have a member with the specified name.  
 
