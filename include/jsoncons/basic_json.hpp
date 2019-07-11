@@ -108,14 +108,14 @@ public:
     typedef typename ImplementationPolicy::parse_error_handler_type parse_error_handler_type;
 
     typedef CharT char_type;
-    typedef typename std::char_traits<char_type> char_traits_type;
+    typedef std::char_traits<char_type> char_traits_type;
     typedef basic_string_view<char_type,char_traits_type> string_view_type;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
 
-    typedef std::basic_string<CharT,char_traits_type,char_allocator_type> key_type;
+    typedef std::basic_string<char_type,char_traits_type,char_allocator_type> key_type;
 
-    typedef basic_json<CharT,ImplementationPolicy,Allocator> json_type;
+    typedef basic_json<char_type,ImplementationPolicy,Allocator> json_type;
 
     typedef json_type& reference;
     typedef const json_type& const_reference;
@@ -135,11 +135,11 @@ public:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
     using byte_string_storage_type = typename implementation_policy::template sequence_container_type<uint8_t, byte_allocator_type>;
 
-    typedef json_array<basic_json> array;
+    typedef json_array<json_type> array;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type> key_value_allocator_type;
 
-    typedef json_object<key_type,basic_json> object;
+    typedef json_object<key_type,json_type> object;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
@@ -727,7 +727,7 @@ public:
 
         variant(const basic_bignum<byte_allocator_type>& n)
         {
-            std::basic_string<CharT> s;
+            std::basic_string<char_type> s;
             n.dump(s);
 
             if (s.length() <= short_string_data::max_length)
@@ -742,7 +742,7 @@ public:
 
         variant(const basic_bignum<byte_allocator_type>& n, const Allocator& allocator)
         {
-            std::basic_string<CharT> s;
+            std::basic_string<char_type> s;
             n.dump(s);
 
             if (s.length() <= short_string_data::max_length)
@@ -1606,7 +1606,7 @@ public:
     class proxy 
     {
     private:
-        friend class basic_json<CharT,ImplementationPolicy,Allocator>;
+        friend class json_type;
 
         ParentT& parent_;
         string_view_type key_;
@@ -1623,19 +1623,19 @@ public:
         {
         }
 
-        basic_json& evaluate() 
+        json_type& evaluate() 
         {
             return parent_.evaluate(key_);
         }
 
-        const basic_json& evaluate() const
+        const json_type& evaluate() const
         {
             return parent_.evaluate(key_);
         }
 
-        basic_json& evaluate_with_default()
+        json_type& evaluate_with_default()
         {
-            basic_json& val = parent_.evaluate_with_default();
+            json_type& val = parent_.evaluate_with_default();
             auto it = val.find(key_);
             if (it == val.object_range().end())
             {
@@ -1644,22 +1644,22 @@ public:
             return it->value();
         }
 
-        basic_json& evaluate(size_t index)
+        json_type& evaluate(size_t index)
         {
             return evaluate().at(index);
         }
 
-        const basic_json& evaluate(size_t index) const
+        const json_type& evaluate(size_t index) const
         {
             return evaluate().at(index);
         }
 
-        basic_json& evaluate(const string_view_type& index)
+        json_type& evaluate(const string_view_type& index)
         {
             return evaluate().at(index);
         }
 
-        const basic_json& evaluate(const string_view_type& index) const
+        const json_type& evaluate(const string_view_type& index) const
         {
             return evaluate().at(index);
         }
@@ -1888,14 +1888,14 @@ public:
             return evaluate().as_bignum();
         }
 
-        template <class SAllocator=std::allocator<CharT>>
-        std::basic_string<CharT,std::char_traits<CharT>,SAllocator> as_string() const 
+        template <class SAllocator=std::allocator<char_type>>
+        std::basic_string<char_type,char_traits_type,SAllocator> as_string() const 
         {
             return evaluate().as_string();
         }
 
-        template <class SAllocator=std::allocator<CharT>>
-        std::basic_string<CharT,std::char_traits<CharT>,SAllocator> as_string(const SAllocator& allocator) const 
+        template <class SAllocator=std::allocator<char_type>>
+        std::basic_string<char_type,char_traits_type,SAllocator> as_string(const SAllocator& allocator) const 
         {
             return evaluate().as_string(allocator);
         }
@@ -1906,14 +1906,14 @@ public:
             return evaluate().template as_byte_string<BAllocator>();
         }
 
-        template <class SAllocator=std::allocator<CharT>>
-        std::basic_string<CharT,std::char_traits<CharT>,SAllocator> as_string(const basic_json_options<char_type>& options) const
+        template <class SAllocator=std::allocator<char_type>>
+        std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_options<char_type>& options) const
         {
             return evaluate().as_string(options);
         }
 
-        template <class SAllocator=std::allocator<CharT>>
-        std::basic_string<CharT,std::char_traits<CharT>,SAllocator> as_string(const basic_json_options<char_type>& options,
+        template <class SAllocator=std::allocator<char_type>>
+        std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_options<char_type>& options,
                               const SAllocator& allocator) const
         {
             return evaluate().as_string(options,allocator);
@@ -1959,42 +1959,42 @@ public:
             return *this;
         }
 
-        bool operator==(const basic_json& rhs) const
+        bool operator==(const json_type& rhs) const
         {
             return evaluate() == rhs;
         }
 
-        bool operator!=(const basic_json& rhs) const
+        bool operator!=(const json_type& rhs) const
         {
             return evaluate() != rhs;
         }
 
-        bool operator<(const basic_json& rhs) const
+        bool operator<(const json_type& rhs) const
         {
             return evaluate() < rhs;
         }
 
-        bool operator<=(const basic_json& rhs) const
+        bool operator<=(const json_type& rhs) const
         {
             return !(rhs < evaluate());
         }
 
-        bool operator>(const basic_json& rhs) const
+        bool operator>(const json_type& rhs) const
         {
             return !(evaluate() <= rhs);
         }
 
-        bool operator>=(const basic_json& rhs) const
+        bool operator>=(const json_type& rhs) const
         {
             return !(evaluate() < rhs);
         }
 
-        basic_json& operator[](size_t i)
+        json_type& operator[](size_t i)
         {
             return evaluate_with_default().at(i);
         }
 
-        const basic_json& operator[](size_t i) const
+        const json_type& operator[](size_t i) const
         {
             return evaluate().at(i);
         }
@@ -2004,27 +2004,27 @@ public:
             return proxy<proxy_type>(*this,key);
         }
 
-        const basic_json& operator[](const string_view_type& name) const
+        const json_type& operator[](const string_view_type& name) const
         {
             return at(name);
         }
 
-        basic_json& at(const string_view_type& name)
+        json_type& at(const string_view_type& name)
         {
             return evaluate().at(name);
         }
 
-        const basic_json& at(const string_view_type& name) const
+        const json_type& at(const string_view_type& name) const
         {
             return evaluate().at(name);
         }
 
-        const basic_json& at(size_t index)
+        const json_type& at(size_t index)
         {
             return evaluate().at(index);
         }
 
-        const basic_json& at(size_t index) const
+        const json_type& at(size_t index) const
         {
             return evaluate().at(index);
         }
@@ -2045,8 +2045,8 @@ public:
             return evaluate().template get_with_default<T>(name,default_val);
         }
 
-        template <class T = std::basic_string<CharT>>
-        T get_with_default(const string_view_type& name, const CharT* default_val) const
+        template <class T = std::basic_string<char_type>>
+        T get_with_default(const string_view_type& name, const char_type* default_val) const
         {
             return evaluate().template get_with_default<T>(name,default_val);
         }
@@ -2093,46 +2093,46 @@ public:
 
         // merge
 
-        void merge(const basic_json& source)
+        void merge(const json_type& source)
         {
             return evaluate().merge(source);
         }
 
-        void merge(basic_json&& source)
+        void merge(json_type&& source)
         {
-            return evaluate().merge(std::forward<basic_json>(source));
+            return evaluate().merge(std::forward<json_type>(source));
         }
 
-        void merge(object_iterator hint, const basic_json& source)
+        void merge(object_iterator hint, const json_type& source)
         {
             return evaluate().merge(hint, source);
         }
 
-        void merge(object_iterator hint, basic_json&& source)
+        void merge(object_iterator hint, json_type&& source)
         {
-            return evaluate().merge(hint, std::forward<basic_json>(source));
+            return evaluate().merge(hint, std::forward<json_type>(source));
         }
 
         // merge_or_update
 
-        void merge_or_update(const basic_json& source)
+        void merge_or_update(const json_type& source)
         {
             return evaluate().merge_or_update(source);
         }
 
-        void merge_or_update(basic_json&& source)
+        void merge_or_update(json_type&& source)
         {
-            return evaluate().merge_or_update(std::forward<basic_json>(source));
+            return evaluate().merge_or_update(std::forward<json_type>(source));
         }
 
-        void merge_or_update(object_iterator hint, const basic_json& source)
+        void merge_or_update(object_iterator hint, const json_type& source)
         {
             return evaluate().merge_or_update(hint, source);
         }
 
-        void merge_or_update(object_iterator hint, basic_json&& source)
+        void merge_or_update(object_iterator hint, json_type&& source)
         {
-            return evaluate().merge_or_update(hint, std::forward<basic_json>(source));
+            return evaluate().merge_or_update(hint, std::forward<json_type>(source));
         }
 
         template <class T>
@@ -2168,7 +2168,7 @@ public:
         }
 
         template <class... Args> 
-        basic_json& emplace_back(Args&&... args)
+        json_type& emplace_back(Args&&... args)
         {
             return evaluate_with_default().emplace_back(std::forward<Args>(args)...);
         }
@@ -2203,27 +2203,27 @@ public:
             evaluate_with_default().insert(tag, first, last);
         }
 
-        template <class SAllocator=std::allocator<CharT>>
+        template <class SAllocator=std::allocator<char_type>>
         void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
         {
             evaluate().dump(s);
         }
 
-        template <class SAllocator=std::allocator<CharT>>
+        template <class SAllocator=std::allocator<char_type>>
         void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
                   indenting line_indent) const
         {
             evaluate().dump(s, line_indent);
         }
 
-        template <class SAllocator=std::allocator<CharT>>
+        template <class SAllocator=std::allocator<char_type>>
         void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
                   const basic_json_options<char_type>& options) const
         {
             evaluate().dump(s,options);
         }
 
-        template <class SAllocator=std::allocator<CharT>>
+        template <class SAllocator=std::allocator<char_type>>
         void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
                   const basic_json_options<char_type>& options,
                   indenting line_indent) const
@@ -2255,7 +2255,7 @@ public:
         {
             evaluate().dump(os,options,line_indent);
         }
-        void swap(basic_json& val)
+        void swap(json_type& val)
         {
             evaluate_with_default().swap(val);
         }
@@ -2421,9 +2421,9 @@ public:
             evaluate().dump(os, pprint);
         }
 
-        template <class SAllocator=std::allocator<CharT>>
+        template <class SAllocator=std::allocator<char_type>>
         JSONCONS_DEPRECATED("Instead, use dump(std::basic_string<char_type,char_traits_type,SAllocator>&)")
-        std::basic_string<CharT,std::char_traits<CharT>,SAllocator> to_string(const SAllocator& allocator = SAllocator()) const noexcept
+        std::basic_string<char_type,char_traits_type,SAllocator> to_string(const SAllocator& allocator = SAllocator()) const noexcept
         {
             if (!parent_.contains(key_))
             {
@@ -2455,9 +2455,9 @@ public:
             evaluate().write(os,options,pprint);
         }
 
-        template <class SAllocator=std::allocator<CharT>>
+        template <class SAllocator=std::allocator<char_type>>
         JSONCONS_DEPRECATED("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)")
-        std::basic_string<CharT,std::char_traits<CharT>,SAllocator> to_string(const basic_json_options<char_type>& options, char_allocator_type& allocator = char_allocator_type()) const
+        std::basic_string<char_type,char_traits_type,SAllocator> to_string(const basic_json_options<char_type>& options, char_allocator_type& allocator = char_allocator_type()) const
         {
             return evaluate().to_string(options,allocator);
         }
@@ -2572,13 +2572,13 @@ public:
 
         template <class T>
         JSONCONS_DEPRECATED("Instead, use get_with_default(const string_view_type&, T&&)")
-        basic_json get(const string_view_type& name, T&& default_val) const
+        json_type get(const string_view_type& name, T&& default_val) const
         {
             return evaluate().get(name,std::forward<T>(default_val));
         }
 
         JSONCONS_DEPRECATED("Instead, use at(const string_view_type&)")
-        const basic_json& get(const string_view_type& name) const
+        const json_type& get(const string_view_type& name) const
         {
             return evaluate().get(name);
         }
@@ -2625,15 +2625,15 @@ public:
 #endif
     };
 
-    static basic_json parse(std::basic_istream<char_type>& is)
+    static json_type parse(std::basic_istream<char_type>& is)
     {
         parse_error_handler_type err_handler;
         return parse(is,err_handler);
     }
 
-    static basic_json parse(std::basic_istream<char_type>& is, parse_error_handler& err_handler)
+    static json_type parse(std::basic_istream<char_type>& is, parse_error_handler& err_handler)
     {
-        json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> handler;
+        json_decoder<json_type> handler;
         basic_json_reader<char_type,stream_source<char_type>> reader(is, handler, err_handler);
         reader.read_next();
         reader.check_done();
@@ -2644,15 +2644,15 @@ public:
         return handler.get_result();
     }
 
-    static basic_json parse(const string_view_type& s)
+    static json_type parse(const string_view_type& s)
     {
         parse_error_handler_type err_handler;
         return parse(s,err_handler);
     }
 
-    static basic_json parse(const string_view_type& s, parse_error_handler& err_handler)
+    static json_type parse(const string_view_type& s, parse_error_handler& err_handler)
     {
-        json_decoder<basic_json> decoder;
+        json_decoder<json_type> decoder;
         basic_json_parser<char_type> parser(err_handler);
 
         auto result = unicons::skip_bom(s.begin(), s.end());
@@ -2672,15 +2672,15 @@ public:
         return decoder.get_result();
     }
 
-    static basic_json parse(std::basic_istream<char_type>& is, const basic_json_options<CharT>& options)
+    static json_type parse(std::basic_istream<char_type>& is, const basic_json_options<char_type>& options)
     {
         parse_error_handler_type err_handler;
         return parse(is,options,err_handler);
     }
 
-    static basic_json parse(std::basic_istream<char_type>& is, const basic_json_options<CharT>& options, parse_error_handler& err_handler)
+    static json_type parse(std::basic_istream<char_type>& is, const basic_json_options<char_type>& options, parse_error_handler& err_handler)
     {
-        json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> handler;
+        json_decoder<json_type> handler;
         basic_json_reader<char_type,stream_source<char_type>> reader(is, handler, options, err_handler);
         reader.read_next();
         reader.check_done();
@@ -2691,15 +2691,15 @@ public:
         return handler.get_result();
     }
 
-    static basic_json parse(const string_view_type& s, const basic_json_options<CharT>& options)
+    static json_type parse(const string_view_type& s, const basic_json_options<char_type>& options)
     {
         parse_error_handler_type err_handler;
         return parse(s,options,err_handler);
     }
 
-    static basic_json parse(const string_view_type& s, const basic_json_options<CharT>& options, parse_error_handler& err_handler)
+    static json_type parse(const string_view_type& s, const basic_json_options<char_type>& options, parse_error_handler& err_handler)
     {
-        json_decoder<basic_json> decoder;
+        json_decoder<json_type> decoder;
         basic_json_parser<char_type> parser(options,err_handler);
 
         auto result = unicons::skip_bom(s.begin(), s.end());
@@ -2719,55 +2719,55 @@ public:
         return decoder.get_result();
     }
 
-    static basic_json make_array()
+    static json_type make_array()
     {
-        return basic_json(array());
+        return json_type(array());
     }
 
-    static basic_json make_array(const array& a)
+    static json_type make_array(const array& a)
     {
-        return basic_json(a);
+        return json_type(a);
     }
 
-    static basic_json make_array(const array& a, allocator_type allocator)
+    static json_type make_array(const array& a, allocator_type allocator)
     {
-        return basic_json(variant(a, semantic_tag::none, allocator));
+        return json_type(variant(a, semantic_tag::none, allocator));
     }
 
-    static basic_json make_array(std::initializer_list<basic_json> init, const Allocator& allocator = Allocator())
+    static json_type make_array(std::initializer_list<json_type> init, const Allocator& allocator = Allocator())
     {
         return array(std::move(init),allocator);
     }
 
-    static basic_json make_array(size_t n, const Allocator& allocator = Allocator())
+    static json_type make_array(size_t n, const Allocator& allocator = Allocator())
     {
         return array(n,allocator);
     }
 
     template <class T>
-    static basic_json make_array(size_t n, const T& val, const Allocator& allocator = Allocator())
+    static json_type make_array(size_t n, const T& val, const Allocator& allocator = Allocator())
     {
-        return basic_json::array(n, val,allocator);
+        return json_type::array(n, val,allocator);
     }
 
     template <size_t dim>
-    static typename std::enable_if<dim==1,basic_json>::type make_array(size_t n)
+    static typename std::enable_if<dim==1,json_type>::type make_array(size_t n)
     {
         return array(n);
     }
 
     template <size_t dim, class T>
-    static typename std::enable_if<dim==1,basic_json>::type make_array(size_t n, const T& val, const Allocator& allocator = Allocator())
+    static typename std::enable_if<dim==1,json_type>::type make_array(size_t n, const T& val, const Allocator& allocator = Allocator())
     {
         return array(n,val,allocator);
     }
 
     template <size_t dim, typename... Args>
-    static typename std::enable_if<(dim>1),basic_json>::type make_array(size_t n, Args... args)
+    static typename std::enable_if<(dim>1),json_type>::type make_array(size_t n, Args... args)
     {
         const size_t dim1 = dim - 1;
 
-        basic_json val = make_array<dim1>(std::forward<Args>(args)...);
+        json_type val = make_array<dim1>(std::forward<Args>(args)...);
         val.resize(n);
         for (size_t i = 0; i < n; ++i)
         {
@@ -2776,9 +2776,9 @@ public:
         return val;
     }
 
-    static const basic_json& null()
+    static const json_type& null()
     {
-        static basic_json a_null = basic_json(null_type(), semantic_tag::none);
+        static json_type a_null = json_type(null_type(), semantic_tag::none);
         return a_null;
     }
 
@@ -2794,22 +2794,22 @@ public:
     {
     }
 
-    basic_json(const basic_json& val)
+    basic_json(const json_type& val)
         : var_(val.var_)
     {
     }
 
-    basic_json(const basic_json& val, const Allocator& allocator)
+    basic_json(const json_type& val, const Allocator& allocator)
         : var_(val.var_,allocator)
     {
     }
 
-    basic_json(basic_json&& other) noexcept
+    basic_json(json_type&& other) noexcept
         : var_(std::move(other.var_))
     {
     }
 
-    basic_json(basic_json&& other, const Allocator&) noexcept
+    basic_json(json_type&& other, const Allocator&) noexcept
         : var_(std::move(other.var_) /*,allocator*/ )
     {
     }
@@ -2858,13 +2858,13 @@ public:
 
     template <class T>
     basic_json(const T& val)
-        : var_(json_type_traits<basic_json,T>::to_json(val).var_)
+        : var_(json_type_traits<json_type,T>::to_json(val).var_)
     {
     }
 
     template <class T>
     basic_json(const T& val, const Allocator& allocator)
-        : var_(json_type_traits<basic_json,T>::to_json(val,allocator).var_)
+        : var_(json_type_traits<json_type,T>::to_json(val,allocator).var_)
     {
     }
 
@@ -2953,7 +2953,7 @@ public:
     {
     }
 
-    basic_json& operator=(const basic_json& rhs)
+    json_type& operator=(const json_type& rhs)
     {
         if (this != &rhs)
         {
@@ -2962,7 +2962,7 @@ public:
         return *this;
     }
 
-    basic_json& operator=(basic_json&& rhs) noexcept
+    json_type& operator=(json_type&& rhs) noexcept
     {
         if (this !=&rhs)
         {
@@ -2972,44 +2972,44 @@ public:
     }
 
     template <class T>
-    basic_json& operator=(const T& val)
+    json_type& operator=(const T& val)
     {
-        var_ = json_type_traits<basic_json,T>::to_json(val).var_;
+        var_ = json_type_traits<json_type,T>::to_json(val).var_;
         return *this;
     }
 
-    basic_json& operator=(const char_type* s)
+    json_type& operator=(const char_type* s)
     {
         var_ = variant(s, char_traits_type::length(s), semantic_tag::none);
         return *this;
     }
 
-    friend bool operator==(const basic_json& lhs, const basic_json& rhs)
+    friend bool operator==(const json_type& lhs, const json_type& rhs)
     {
         return lhs.var_ == rhs.var_;
     }
 
-    friend bool operator!=(const basic_json& lhs, const basic_json& rhs)
+    friend bool operator!=(const json_type& lhs, const json_type& rhs)
     {
         return !(lhs == rhs);
     }
 
-    friend bool operator<(const basic_json& lhs, const basic_json& rhs) 
+    friend bool operator<(const json_type& lhs, const json_type& rhs) 
     {
         return lhs.var_ < rhs.var_;
     }
 
-    friend bool operator<=(const basic_json& lhs, const basic_json& rhs)
+    friend bool operator<=(const json_type& lhs, const json_type& rhs)
     {
         return !(rhs < lhs);
     }
 
-    friend bool operator>(const basic_json& lhs, const basic_json& rhs) 
+    friend bool operator>(const json_type& lhs, const json_type& rhs) 
     {
         return !(lhs <= rhs);
     }
 
-    friend bool operator>=(const basic_json& lhs, const basic_json& rhs)
+    friend bool operator>=(const json_type& lhs, const json_type& rhs)
     {
         return !(lhs < rhs);
     }
@@ -3029,17 +3029,17 @@ public:
         }
     }
 
-    basic_json& operator[](size_t i)
+    json_type& operator[](size_t i)
     {
         return at(i);
     }
 
-    const basic_json& operator[](size_t i) const
+    const json_type& operator[](size_t i) const
     {
         return at(i);
     }
 
-    proxy<basic_json> operator[](const string_view_type& name)
+    proxy<json_type> operator[](const string_view_type& name)
     {
         switch (var_.type())
         {
@@ -3047,7 +3047,7 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_type::object_val:
-            return proxy<basic_json>(*this, name);
+            return proxy<json_type>(*this, name);
             break;
         default:
             JSONCONS_THROW(not_an_object(name.data(),name.length()));
@@ -3055,12 +3055,12 @@ public:
         }
     }
 
-    const basic_json& operator[](const string_view_type& name) const
+    const json_type& operator[](const string_view_type& name) const
     {
         return at(name);
     }
 
-    template <class SAllocator=std::allocator<CharT>>
+    template <class SAllocator=std::allocator<char_type>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
@@ -3068,7 +3068,7 @@ public:
         dump(encoder);
     }
 
-    template <class SAllocator=std::allocator<CharT>>
+    template <class SAllocator=std::allocator<char_type>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, indenting line_indent) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
@@ -3084,7 +3084,7 @@ public:
         }
     }
 
-    template <class SAllocator=std::allocator<CharT>>
+    template <class SAllocator=std::allocator<char_type>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
               const basic_json_options<char_type>& options) const
     {
@@ -3093,7 +3093,7 @@ public:
         dump(encoder);
     }
 
-    template <class SAllocator=std::allocator<CharT>>
+    template <class SAllocator=std::allocator<char_type>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
               const basic_json_options<char_type>& options, 
               indenting line_indent) const
@@ -3157,8 +3157,8 @@ public:
         }
     }
 
-    template <class SAllocator=std::allocator<CharT>>
-    std::basic_string<CharT,std::char_traits<CharT>,SAllocator> to_string(const char_allocator_type& allocator=SAllocator()) const noexcept
+    template <class SAllocator=std::allocator<char_type>>
+    std::basic_string<char_type,char_traits_type,SAllocator> to_string(const char_allocator_type& allocator=SAllocator()) const noexcept
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         string_type s(allocator);
@@ -3167,8 +3167,8 @@ public:
         return s;
     }
 
-    template <class SAllocator=std::allocator<CharT>>
-    std::basic_string<CharT,std::char_traits<CharT>,SAllocator> to_string(const basic_json_options<char_type>& options,
+    template <class SAllocator=std::allocator<char_type>>
+    std::basic_string<char_type,char_traits_type,SAllocator> to_string(const basic_json_options<char_type>& options,
                                                                           const SAllocator& allocator=SAllocator()) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
@@ -3251,7 +3251,7 @@ public:
     template<class T, class... Args>
     bool is(Args&&... args) const noexcept
     {
-        return json_type_traits<basic_json,T>::is(*this,std::forward<Args>(args)...);
+        return json_type_traits<json_type,T>::is(*this,std::forward<Args>(args)...);
     }
 
     bool is_string() const noexcept
@@ -3434,14 +3434,14 @@ public:
     template<class T, class... Args>
     T as(Args&&... args) const
     {
-        return json_type_traits<basic_json,T>::as(*this,std::forward<Args>(args)...);
+        return json_type_traits<json_type,T>::as(*this,std::forward<Args>(args)...);
     }
 /*
     template<class T>
     typename std::enable_if<std::is_same<string_type,T>::value,T>::type 
     as(const char_allocator_type& allocator) const
     {
-        return json_type_traits<basic_json,T>::as(*this,allocator);
+        return json_type_traits<json_type,T>::as(*this,allocator);
     }
 */
     bool as_bool() const 
@@ -3457,7 +3457,7 @@ public:
 
             try
             {
-                basic_json j = basic_json::parse(as_string_view());
+                json_type j = json_type::parse(as_string_view());
                 return j.as_bool();
             }
             catch (...)
@@ -3566,26 +3566,26 @@ public:
         return var_.as_bignum();
     }
 
-    template <class SAllocator=std::allocator<CharT>>
-    std::basic_string<CharT,std::char_traits<CharT>,SAllocator> as_string() const 
+    template <class SAllocator=std::allocator<char_type>>
+    std::basic_string<char_type,char_traits_type,SAllocator> as_string() const 
     {
         return as_string(basic_json_options<char_type>(),SAllocator());
     }
 
-    template <class SAllocator=std::allocator<CharT>>
-    std::basic_string<CharT,std::char_traits<CharT>,SAllocator> as_string(const SAllocator& allocator) const 
+    template <class SAllocator=std::allocator<char_type>>
+    std::basic_string<char_type,char_traits_type,SAllocator> as_string(const SAllocator& allocator) const 
     {
         return as_string(basic_json_options<char_type>(),allocator);
     }
 
-    template <class SAllocator=std::allocator<CharT>>
-    std::basic_string<CharT,std::char_traits<CharT>,SAllocator> as_string(const basic_json_options<char_type>& options) const 
+    template <class SAllocator=std::allocator<char_type>>
+    std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_options<char_type>& options) const 
     {
         return as_string(options,SAllocator());
     }
 
-    template <class SAllocator=std::allocator<CharT>>
-    std::basic_string<CharT,std::char_traits<CharT>,SAllocator> as_string(const basic_json_options<char_type>& options,
+    template <class SAllocator=std::allocator<char_type>>
+    std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_options<char_type>& options,
                           const SAllocator& allocator) const 
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
@@ -3692,7 +3692,7 @@ public:
         }
     }
 
-    basic_json& at(const string_view_type& name)
+    json_type& at(const string_view_type& name)
     {
         switch (var_.type())
         {
@@ -3715,31 +3715,31 @@ public:
         }
     }
 
-    basic_json& evaluate() 
+    json_type& evaluate() 
     {
         return *this;
     }
 
-    basic_json& evaluate_with_default() 
+    json_type& evaluate_with_default() 
     {
         return *this;
     }
 
-    const basic_json& evaluate() const
+    const json_type& evaluate() const
     {
         return *this;
     }
-    basic_json& evaluate(const string_view_type& name) 
+    json_type& evaluate(const string_view_type& name) 
     {
         return at(name);
     }
 
-    const basic_json& evaluate(const string_view_type& name) const
+    const json_type& evaluate(const string_view_type& name) const
     {
         return at(name);
     }
 
-    const basic_json& at(const string_view_type& name) const
+    const json_type& at(const string_view_type& name) const
     {
         switch (var_.type())
         {
@@ -3762,7 +3762,7 @@ public:
         }
     }
 
-    basic_json& at(size_t i)
+    json_type& at(size_t i)
     {
         switch (var_.type())
         {
@@ -3779,7 +3779,7 @@ public:
         }
     }
 
-    const basic_json& at(size_t i) const
+    const json_type& at(size_t i) const
     {
         switch (var_.type())
         {
@@ -3854,8 +3854,8 @@ public:
         }
     }
 
-    template<class T = std::basic_string<CharT>>
-    T get_with_default(const string_view_type& name, const CharT* default_val) const
+    template<class T = std::basic_string<char_type>>
+    T get_with_default(const string_view_type& name, const char_type* default_val) const
     {
         switch (var_.type())
         {
@@ -4023,7 +4023,7 @@ public:
 
     // merge
 
-    void merge(const basic_json& source)
+    void merge(const json_type& source)
     {
         switch (var_.type())
         {
@@ -4039,7 +4039,7 @@ public:
         }
     }
 
-    void merge(basic_json&& source)
+    void merge(json_type&& source)
     {
         switch (var_.type())
         {
@@ -4055,7 +4055,7 @@ public:
         }
     }
 
-    void merge(object_iterator hint, const basic_json& source)
+    void merge(object_iterator hint, const json_type& source)
     {
         switch (var_.type())
         {
@@ -4071,7 +4071,7 @@ public:
         }
     }
 
-    void merge(object_iterator hint, basic_json&& source)
+    void merge(object_iterator hint, json_type&& source)
     {
         switch (var_.type())
         {
@@ -4089,7 +4089,7 @@ public:
 
     // merge_or_update
 
-    void merge_or_update(const basic_json& source)
+    void merge_or_update(const json_type& source)
     {
         switch (var_.type())
         {
@@ -4105,7 +4105,7 @@ public:
         }
     }
 
-    void merge_or_update(basic_json&& source)
+    void merge_or_update(json_type&& source)
     {
         switch (var_.type())
         {
@@ -4121,7 +4121,7 @@ public:
         }
     }
 
-    void merge_or_update(object_iterator hint, const basic_json& source)
+    void merge_or_update(object_iterator hint, const json_type& source)
     {
         switch (var_.type())
         {
@@ -4137,7 +4137,7 @@ public:
         }
     }
 
-    void merge_or_update(object_iterator hint, basic_json&& source)
+    void merge_or_update(object_iterator hint, json_type&& source)
     {
         switch (var_.type())
         {
@@ -4265,7 +4265,7 @@ public:
     }
 
     template <class... Args> 
-    basic_json& emplace_back(Args&&... args)
+    json_type& emplace_back(Args&&... args)
     {
         switch (var_.type())
         {
@@ -4288,12 +4288,12 @@ public:
         return var_.tag();
     }
 
-    void swap(basic_json& b)
+    void swap(json_type& b)
     {
         var_.swap(b.var_);
     }
 
-    friend void swap(basic_json& a, basic_json& b)
+    friend void swap(json_type& a, json_type& b)
     {
         a.swap(b);
     }
@@ -4315,51 +4315,51 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-    static basic_json parse(const char_type* s, size_t length)
+    static json_type parse(const char_type* s, size_t length)
     {
         parse_error_handler_type err_handler;
         return parse(s,length,err_handler);
     }
 
-    static basic_json parse(const char_type* s, size_t length, parse_error_handler& err_handler)
+    static json_type parse(const char_type* s, size_t length, parse_error_handler& err_handler)
     {
         return parse(string_view_type(s,length),err_handler);
     }
 
     JSONCONS_DEPRECATED("Instead, use parse(std::basic_istream<char_type>&)")
-    static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename)
+    static json_type parse_file(const std::basic_string<char_type,char_traits_type>& filename)
     {
         parse_error_handler_type err_handler;
         return parse_file(filename,err_handler);
     }
 
     JSONCONS_DEPRECATED("Instead, use parse(std::basic_istream<char_type>&, parse_error_handler&)")
-    static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename,
+    static json_type parse_file(const std::basic_string<char_type,char_traits_type>& filename,
                                  parse_error_handler& err_handler)
     {
-        std::basic_ifstream<CharT> is(filename);
+        std::basic_ifstream<char_type> is(filename);
         return parse(is,err_handler);
     }
 
     JSONCONS_DEPRECATED("Instead, use parse(std::basic_istream<char_type>&)")
-    static basic_json parse_stream(std::basic_istream<char_type>& is)
+    static json_type parse_stream(std::basic_istream<char_type>& is)
     {
         return parse(is);
     }
     JSONCONS_DEPRECATED("Instead, use parse(std::basic_istream<char_type>&, parse_error_handler&)")
-    static basic_json parse_stream(std::basic_istream<char_type>& is, parse_error_handler& err_handler)
+    static json_type parse_stream(std::basic_istream<char_type>& is, parse_error_handler& err_handler)
     {
         return parse(is,err_handler);
     }
 
     JSONCONS_DEPRECATED("Instead, use parse(const string_view_type&)")
-    static basic_json parse_string(const string_view_type& s)
+    static json_type parse_string(const string_view_type& s)
     {
         return parse(s);
     }
 
     JSONCONS_DEPRECATED("Instead, use parse(parse(const string_view_type&, parse_error_handler&)")
-    static basic_json parse_string(const string_view_type& s, parse_error_handler& err_handler)
+    static json_type parse_string(const string_view_type& s, parse_error_handler& err_handler)
     {
         return parse(s,err_handler);
     }
@@ -4573,15 +4573,15 @@ public:
     }
 
     JSONCONS_DEPRECATED("Instead, use insert(const_array_iterator, T&&)")
-    void add(size_t index, const basic_json& value)
+    void add(size_t index, const json_type& value)
     {
         evaluate_with_default().add(index, value);
     }
 
     JSONCONS_DEPRECATED("Instead, use insert(const_array_iterator, T&&)")
-    void add(size_t index, basic_json&& value)
+    void add(size_t index, json_type&& value)
     {
-        evaluate_with_default().add(index, std::forward<basic_json>(value));
+        evaluate_with_default().add(index, std::forward<json_type>(value));
     }
 
     template <class T>
@@ -4674,13 +4674,13 @@ public:
 
     template<class T>
     JSONCONS_DEPRECATED("Instead, use get_with_default(const string_view_type&, T&&)")
-    basic_json get(const string_view_type& name, T&& default_val) const
+    json_type get(const string_view_type& name, T&& default_val) const
     {
         switch (var_.type())
         {
         case storage_type::empty_object_val:
             {
-                return basic_json(std::forward<T>(default_val));
+                return json_type(std::forward<T>(default_val));
             }
         case storage_type::object_val:
             {
@@ -4691,7 +4691,7 @@ public:
                 }
                 else
                 {
-                    return basic_json(std::forward<T>(default_val));
+                    return json_type(std::forward<T>(default_val));
                 }
             }
         default:
@@ -4702,9 +4702,9 @@ public:
     }
 
     JSONCONS_DEPRECATED("Instead, use at(const string_view_type&)")
-    const basic_json& get(const string_view_type& name) const
+    const json_type& get(const string_view_type& name) const
     {
-        static const basic_json a_null = null_type();
+        static const json_type a_null = null_type();
 
         switch (var_.type())
         {
@@ -4873,43 +4873,43 @@ public:
 
     template<int size>
     JSONCONS_DEPRECATED("Instead, use make_array()")
-    static typename std::enable_if<size==1,basic_json>::type make_multi_array()
+    static typename std::enable_if<size==1,json_type>::type make_multi_array()
     {
         return make_array();
     }
     template<size_t size>
     JSONCONS_DEPRECATED("Instead, use make_array(size_t)")
-    static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n)
+    static typename std::enable_if<size==1,json_type>::type make_multi_array(size_t n)
     {
         return make_array(n);
     }
     template<size_t size,typename T>
     JSONCONS_DEPRECATED("Instead, use make_array(size_t, T)")
-    static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n, T val)
+    static typename std::enable_if<size==1,json_type>::type make_multi_array(size_t n, T val)
     {
         return make_array(n,val);
     }
     template<size_t size>
     JSONCONS_DEPRECATED("Instead, use make_array(size_t, size_t)")
-    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n)
+    static typename std::enable_if<size==2,json_type>::type make_multi_array(size_t m, size_t n)
     {
         return make_array<2>(m, n);
     }
     template<size_t size,typename T>
     JSONCONS_DEPRECATED("Instead, use make_array(size_t, size_t, T)")
-    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n, T val)
+    static typename std::enable_if<size==2,json_type>::type make_multi_array(size_t m, size_t n, T val)
     {
         return make_array<2>(m, n, val);
     }
     template<size_t size>
     JSONCONS_DEPRECATED("Instead, use make_array(size_t, size_t, size_t)")
-    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k)
+    static typename std::enable_if<size==3,json_type>::type make_multi_array(size_t m, size_t n, size_t k)
     {
         return make_array<3>(m, n, k);
     }
     template<size_t size,typename T>
     JSONCONS_DEPRECATED("Instead, use make_array(size_t, size_t, size_t, T)")
-    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k, T val)
+    static typename std::enable_if<size==3,json_type>::type make_multi_array(size_t m, size_t n, size_t k, T val)
     {
         return make_array<3>(m, n, k, val);
     }
@@ -4946,7 +4946,7 @@ public:
 
     range<object_iterator> object_range()
     {
-        static basic_json empty_object = object();
+        static json_type empty_object = object();
         switch (var_.type())
         {
         case storage_type::empty_object_val:
@@ -4960,7 +4960,7 @@ public:
 
     range<const_object_iterator> object_range() const
     {
-        static const basic_json empty_object = object();
+        static const json_type empty_object = object();
         switch (var_.type())
         {
         case storage_type::empty_object_val:
@@ -5038,7 +5038,7 @@ public:
         switch (var_.type())
         {
         case storage_type::empty_object_val:
-            const_cast<basic_json*>(this)->create_object_implicitly(); // HERE
+            const_cast<json_type*>(this)->create_object_implicitly(); // HERE
             JSONCONS_FALLTHROUGH;
         case storage_type::object_val:
             return var_.object_data_cast()->value();
@@ -5110,15 +5110,15 @@ private:
         }
     }
 
-    friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const basic_json& o)
+    friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_type& o)
     {
         o.dump(os);
         return os;
     }
 
-    friend std::basic_istream<char_type>& operator<<(std::basic_istream<char_type>& is, basic_json& o)
+    friend std::basic_istream<char_type>& operator<<(std::basic_istream<char_type>& is, json_type& o)
     {
-        json_decoder<basic_json> handler;
+        json_decoder<json_type> handler;
         basic_json_reader<char_type,stream_source<char_type>> reader(is, handler);
         reader.read_next();
         reader.check_done();

@@ -473,7 +473,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
 template <class Json>
 Json from_diff(const Json& source, const Json& target)
 {
-    typedef std::basic_string<typename Json::char_type> path;
+    std::basic_string<typename Json::char_type> path;
     return jsoncons::jsonpatch::detail::from_diff(source, target, path);
 }
 

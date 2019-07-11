@@ -37,15 +37,18 @@ Member type                         |Definition
 `char_type`|CharT
 `implementation_policy'|ImplementationPolicy
 `allocator_type`|Allocator
-`json_type`|basic_json<char_type,implementation_policy,allocator_type>
-`reference`|json_type&
-`const_reference`|const json_type&
-`pointer`|json_type*
-`const_pointer`|const json_type*
-`string_view_type`|basic_string_view<char_type>
-`key_value_type`|key_value<string_type,json_type>
-`object`|basic_json object type
-`array`|basic_json array type
+`char_traits_type`|`std::char_traits<char_type>`
+`char_allocator_type`|`std::allocator_traits<allocator_type>::rebind_alloc<char_type>`
+`json_type`|`basic_json<char_type,implementation_policy,allocator_type>`
+`reference`|`json_type&`
+`const_reference`|`const json_type&`
+`pointer`|`json_type*`
+`const_pointer`|`const json_type*`
+`string_view_type`|`basic_string_view<char_type>`
+`key_type`|std::basic_string<char_type,char_traits_type,char_allocator_type>
+`key_value_type`|`key_value<key_type,json_type>`
+`object`|`json_object<key_type,json_type>`
+`array`|`json_array<json_type>`
 `object_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to [key_value_type](basic_json/key_value.md)
 `const_object_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to const [key_value_type](basic_json/key_value.md)
 `array_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `basic_json`
