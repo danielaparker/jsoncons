@@ -2203,27 +2203,27 @@ public:
             evaluate_with_default().insert(tag, first, last);
         }
 
-        template <class SAllocator>
+        template <class SAllocator=std::allocator<CharT>>
         void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
         {
             evaluate().dump(s);
         }
 
-        template <class SAllocator>
+        template <class SAllocator=std::allocator<CharT>>
         void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
                   indenting line_indent) const
         {
             evaluate().dump(s, line_indent);
         }
 
-        template <class SAllocator>
+        template <class SAllocator=std::allocator<CharT>>
         void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
                   const basic_json_options<char_type>& options) const
         {
             evaluate().dump(s,options);
         }
 
-        template <class SAllocator>
+        template <class SAllocator=std::allocator<CharT>>
         void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
                   const basic_json_options<char_type>& options,
                   indenting line_indent) const
@@ -3060,7 +3060,7 @@ public:
         return at(name);
     }
 
-    template <class SAllocator>
+    template <class SAllocator=std::allocator<CharT>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
@@ -3068,7 +3068,7 @@ public:
         dump(encoder);
     }
 
-    template <class SAllocator>
+    template <class SAllocator=std::allocator<CharT>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, indenting line_indent) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
@@ -3084,7 +3084,7 @@ public:
         }
     }
 
-    template <class SAllocator>
+    template <class SAllocator=std::allocator<CharT>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
               const basic_json_options<char_type>& options) const
     {
@@ -3093,7 +3093,7 @@ public:
         dump(encoder);
     }
 
-    template <class SAllocator>
+    template <class SAllocator=std::allocator<CharT>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
               const basic_json_options<char_type>& options, 
               indenting line_indent) const
@@ -3167,7 +3167,7 @@ public:
         return s;
     }
 
-    template <class SAllocator>
+    template <class SAllocator=std::allocator<CharT>>
     std::basic_string<CharT,std::char_traits<CharT>,SAllocator> to_string(const basic_json_options<char_type>& options,
                                                                           const SAllocator& allocator=SAllocator()) const
     {
