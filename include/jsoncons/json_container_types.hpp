@@ -32,7 +32,7 @@ class key_value
 public:
     typedef KeyT key_type;
     typedef ValueT value_type;
-    typedef typename KeyT::allocator_type allocator_type;
+    typedef typename ValueT::allocator_type allocator_type;
     typedef typename value_type::string_view_type string_view_type;
 private:
     key_type key_;

@@ -124,12 +124,11 @@ public:
     typedef key_value<key_type,basic_json> key_value_type;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    typedef basic_json value_type;
-    //typedef string_type key_type;
-    typedef key_value_type kvp_type;
-    typedef key_value_type member_type;
-    typedef jsoncons::null_type null_type;
-    //typedef basic_json<char_type,ImplementationPolicy,Allocator> json_type;
+    JSONCONS_DEPRECATED("instead, use basic_json<char_type,implementation_policy,allocator_type>") typedef basic_json value_type;
+    JSONCONS_DEPRECATED("instead, use basic_json<char_type,implementation_policy,allocator_type>") typedef basic_json json_type;
+    JSONCONS_DEPRECATED("instead, use basic_string<char_type>") typedef std::basic_string<char_type> string_type;
+    JSONCONS_DEPRECATED("instead, use key_value_type") typedef key_value_type kvp_type;
+    JSONCONS_DEPRECATED("instead, use key_value_type") typedef key_value_type member_type;
 #endif
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
@@ -4315,12 +4314,14 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
+    JSONCONS_DEPRECATED("Instead, use parse(const string_view_type&)")
     static basic_json parse(const char_type* s, size_t length)
     {
         parse_error_handler_type err_handler;
         return parse(s,length,err_handler);
     }
 
+    JSONCONS_DEPRECATED("Instead, use parse(const string_view_type&, parse_error_handler)")
     static basic_json parse(const char_type* s, size_t length, parse_error_handler& err_handler)
     {
         return parse(string_view_type(s,length),err_handler);
