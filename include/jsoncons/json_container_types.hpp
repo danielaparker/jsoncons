@@ -78,9 +78,9 @@ public:
     {
     }
 
-    string_view_type key() const
+    const key_type& key() const
     {
-        return string_view_type(key_.data(),key_.size());
+        return key_;
     }
 
     value_type& value()
@@ -546,9 +546,9 @@ public:
             members_.emplace_back(get_key_value<KeyT,Json>()(*s));
         }
         std::stable_sort(members_.begin(),members_.end(),
-                         [](const key_value_type& a, const key_value_type& b){return a.key().compare(b.key()) < 0;});
+                         [](const key_value_type& a, const key_value_type& b) -> bool {return a.key().compare(b.key()) < 0;});
         auto it = std::unique(members_.begin(), members_.end(),
-                              [](const key_value_type& a, const key_value_type& b){ return !(a.key().compare(b.key()));});
+                              [](const key_value_type& a, const key_value_type& b) -> bool { return !(a.key().compare(b.key()));});
         members_.erase(it, members_.end());
     }
 
@@ -565,9 +565,9 @@ public:
             members_.emplace_back(get_key_value<KeyT,Json>()(*s));
         }
         std::stable_sort(members_.begin(),members_.end(),
-                         [](const key_value_type& a, const key_value_type& b){return a.key().compare(b.key()) < 0;});
+                         [](const key_value_type& a, const key_value_type& b) -> bool {return a.key().compare(b.key()) < 0;});
         auto it = std::unique(members_.begin(), members_.end(),
-                              [](const key_value_type& a, const key_value_type& b){ return !(a.key().compare(b.key()));});
+                              [](const key_value_type& a, const key_value_type& b) -> bool { return !(a.key().compare(b.key()));});
         members_.erase(it, members_.end());
     }
 
@@ -669,7 +669,7 @@ public:
     iterator find(const string_view_type& name)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                   [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                   [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
         auto result = (it != members_.end() && it->key() == name) ? it : members_.end();
         return result;
     }
@@ -678,7 +678,7 @@ public:
     {
         auto it = std::lower_bound(members_.begin(),members_.end(), 
                                    name, 
-                                   [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});
+                                   [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});
         auto result = (it != members_.end() && it->key() == name) ? it : members_.end();
         return result;
     }
@@ -707,7 +707,7 @@ public:
     void erase(const string_view_type& name) 
     {
         auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                   [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                   [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
         if (it != members_.end() && it->key() == name)
         {
             members_.erase(it);
@@ -724,9 +724,9 @@ public:
             members_.emplace_back(convert(*s));
         }
         std::stable_sort(members_.begin(),members_.end(),
-                         [](const key_value_type& a, const key_value_type& b){return a.key().compare(b.key()) < 0;});
+                         [](const key_value_type& a, const key_value_type& b) -> bool {return a.key().compare(b.key()) < 0;});
         auto it = std::unique(members_.begin(), members_.end(),
-                              [](const key_value_type& a, const key_value_type& b){ return !(a.key().compare(b.key()));});
+                              [](const key_value_type& a, const key_value_type& b) -> bool { return !(a.key().compare(b.key()));});
         members_.erase(it, members_.end());
     }
 
@@ -764,7 +764,7 @@ public:
     {
         bool inserted;
         auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                   [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                   [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
         if (it == members_.end())
         {
             members_.emplace_back(key_type(name.begin(),name.end()), 
@@ -793,7 +793,7 @@ public:
     {
         bool inserted;
         auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                   [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                   [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
         if (it == members_.end())
         {
             members_.emplace_back(key_type(name.begin(),name.end(), get_allocator()), 
@@ -824,7 +824,7 @@ public:
     {
         bool inserted;
         auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                   [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                   [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
         if (it == members_.end())
         {
             members_.emplace_back(key_type(name.begin(),name.end()), 
@@ -852,7 +852,7 @@ public:
     {
         bool inserted;
         auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                   [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                   [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
         if (it == members_.end())
         {
             members_.emplace_back(key_type(name.begin(),name.end(), get_allocator()), 
@@ -883,12 +883,12 @@ public:
         if (hint != members_.end() && hint->key() <= name)
         {
             it = std::lower_bound(hint,members_.end(), name, 
-                                  [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                  [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
         }
         else
         {
             it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                  [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                  [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
         }
 
         if (it == members_.end())
@@ -918,12 +918,12 @@ public:
         if (hint != members_.end() && hint->key() <= name)
         {
             it = std::lower_bound(hint,members_.end(), name, 
-                                  [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                  [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
         }
         else
         {
             it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                  [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                  [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
         }
 
         if (it == members_.end())
@@ -954,12 +954,12 @@ public:
         if (hint != members_.end() && hint->key() <= name)
         {
             it = std::lower_bound(hint,members_.end(), name, 
-                                  [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                  [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
         }
         else
         {
             it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                  [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                  [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
         }
 
         if (it == members_.end())
@@ -989,12 +989,12 @@ public:
         if (hint != members_.end() && hint->key() <= name)
         {
             it = std::lower_bound(hint,members_.end(), name, 
-                                  [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                  [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
         }
         else
         {
             it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                  [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                  [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
         }
 
         if (it == members_.end())
@@ -1033,7 +1033,7 @@ public:
         for (; it != end; ++it)
         {
             auto pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
-                                        [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});   
+                                        [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});   
             if (pos == members_.end() )
             {
                 members_.emplace_back(*it);
@@ -1063,12 +1063,12 @@ public:
             if (hint != members_.end() && hint->key() <= it->key())
             {
                 pos = std::lower_bound(hint,members_.end(), it->key(), 
-                                      [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                      [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
             }
             else
             {
                 pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
-                                      [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                      [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
             }
             if (pos == members_.end() )
             {
@@ -1099,7 +1099,7 @@ public:
         for (; it != end; ++it)
         {
             auto pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
-                                        [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});   
+                                        [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});   
             if (pos == members_.end() )
             {
                 members_.emplace_back(*it);
@@ -1129,12 +1129,12 @@ public:
             if (hint != members_.end() && hint->key() <= it->key())
             {
                 pos = std::lower_bound(hint,members_.end(), it->key(), 
-                                      [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                      [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
             }
             else
             {
                 pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
-                                      [](const key_value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
+                                      [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
             }
             if (pos == members_.end() )
             {
@@ -1404,7 +1404,7 @@ public:
     iterator find(const string_view_type& name)
     {
         auto it = std::lower_bound(index_.begin(),index_.end(), name, 
-                                    [&](size_t i, const string_view_type& k){return members_.at(i).key().compare(k) < 0;});        
+                                    [&](size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
         if (it != index_.end() && members_.at(*it).key() == name)
         {
             return members_.begin() + *it;
@@ -1418,7 +1418,7 @@ public:
     const_iterator find(const string_view_type& name) const
     {
         auto it = std::lower_bound(index_.begin(),index_.end(), name, 
-                                    [&](size_t i, const string_view_type& k){return members_.at(i).key().compare(k) < 0;});        
+                                    [&](size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
         if (it != index_.end() && members_.at(*it).key() == name)
         {
             return members_.begin() + *it;
@@ -1870,7 +1870,7 @@ private:
         JSONCONS_ASSERT(pos <= index_.size());
 
         auto it = std::lower_bound(index_.begin(),index_.end(), key, 
-                                    [&](size_t i, const string_view_type& k){return members_.at(i).key().compare(k) < 0;});        
+                                    [&](size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
 
         if (it == index_.end())
         {
@@ -1909,7 +1909,7 @@ private:
     void erase_index_entry(const string_view_type& key)
     {
         auto it = std::lower_bound(index_.begin(),index_.end(), key, 
-                                   [&](size_t i, const string_view_type& k){return members_.at(i).key().compare(k) < 0;});        
+                                   [&](size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
 
         if (it != index_.end() && members_.at(*it).key() != key)
         {
@@ -1951,7 +1951,7 @@ private:
             index_.push_back(i);
         }
         std::stable_sort(index_.begin(),index_.end(),
-                         [&](size_t a, size_t b){return members_.at(a).key().compare(members_.at(b).key()) < 0;});
+                         [&](size_t a, size_t b) -> bool {return members_.at(a).key().compare(members_.at(b).key()) < 0;});
     }
 
     json_object& operator=(const json_object&) = delete;
