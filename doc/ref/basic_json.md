@@ -1,4 +1,4 @@
-### jsoncons::json
+### jsoncons::basic_json
 
 #### Header
 ```c++
@@ -38,19 +38,18 @@ Member type                         |Definition
 `implementation_policy'|ImplementationPolicy
 `allocator_type`|Allocator
 `char_traits_type`|`std::char_traits<char_type>`
-`char_allocator_type`|`std::allocator_traits<allocator_type>::rebind_alloc<char_type>`
-`json_type`|`basic_json<char_type,implementation_policy,allocator_type>`
-`reference`|`json_type&`
-`const_reference`|`const json_type&`
-`pointer`|`json_type*`
-`const_pointer`|`const json_type*`
+`char_allocator_type`|`allocator_type` rebound to `char_type`
+`reference`|`basic_json&`
+`const_reference`|`const basic_json&`
+`pointer`|`basic_json*`
+`const_pointer`|`const basic_json*`
 `string_view_type`|`basic_string_view<char_type>`
 `key_type`|std::basic_string<char_type,char_traits_type,char_allocator_type>
-`key_value_type`|`key_value<key_type,json_type>`
-`object`|`json_object<key_type,json_type>`
-`array`|`json_array<json_type>`
-`object_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to [key_value_type](basic_json/key_value.md)
-`const_object_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to const [key_value_type](basic_json/key_value.md)
+`key_value_type`|`key_value<key_type,basic_json>`
+`object`|`json_object<key_type,basic_json>`
+`array`|`json_array<basic_json>`
+`object_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to [key_value_type](json/key_value.md)
+`const_object_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to const [key_value_type](json/key_value.md)
 `array_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `basic_json`
 `const_array_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `const basic_json`
 
@@ -58,11 +57,11 @@ Member type                         |Definition
 
 <table border="0">
   <tr>
-    <td><a href="basic_json/parse.md">parse</a></td>
+    <td><a href="json/parse.md">parse</a></td>
     <td>Parses JSON.</td> 
   </tr>
   <tr>
-    <td><a href="basic_json/make_array.md">make_array</a></td>
+    <td><a href="json/make_array.md">make_array</a></td>
     <td>Makes a multidimensional basic_json array.</td> 
   </tr>
   <tr>
@@ -74,15 +73,15 @@ Member type                         |Definition
 ### Member functions
 <table border="0">
   <tr>
-    <td><a href="basic_json/constructor.md">(constructor)</a></td>
+    <td><a href="json/constructor.md">(constructor)</a></td>
     <td>constructs the basic_json value</td> 
   </tr>
   <tr>
-    <td><a href="basic_json/destructor.md">(destructor)</a></td>
+    <td><a href="json/destructor.md">(destructor)</a></td>
     <td>destructs the basic_json value</td> 
   </tr>
   <tr>
-    <td><a href="basic_json/operator=.md">operator=</a></td>
+    <td><a href="json/operator=.md">operator=</a></td>
     <td>assigns values</td> 
   </tr>
 </table>
@@ -94,11 +93,11 @@ Returns the allocator associated with the basic_json value.
 
 <table border="0">
   <tr>
-    <td><a href="basic_json/array_range.md">array_range</a></td>
+    <td><a href="json/array_range.md">array_range</a></td>
     <td>Returns a "range" that supports a range-based for loop over the elements of a `basic_json` array.</td> 
   </tr>
   <tr>
-    <td><a href="basic_json/object_range.md">obect_range</a></td>
+    <td><a href="json/object_range.md">obect_range</a></td>
     <td>Returns a "range" that supports a range-based for loop over the key-value pairs of a `basic_json` object.</td> 
   </tr>
 </table>
@@ -148,11 +147,11 @@ Returns the allocator associated with the basic_json value.
     <td>Returns the number of object members that match `key`</td> 
   </tr>
   <tr>
-    <td><a href="basic_json/is.md">is</a></td>
+    <td><a href="json/is.md">is</a></td>
     <td>Checks if a basic_json value matches a type.</td> 
   </tr>
   <tr>
-    <td><a href="basic_json/as.md">as</a></td>
+    <td><a href="json/as.md">as</a></td>
     <td>Attempts to convert a basic_json value to a value of a type.</td> 
   </tr>
 </table>
@@ -213,39 +212,39 @@ Throws `std::runtime_error` if not an object.
     <td>Remove all elements from an array or members from an object, otherwise do nothing</td> 
   </tr>
   <tr>
-    <td><a href="basic_json/erase.md">erase</a></td>
+    <td><a href="json/erase.md">erase</a></td>
     <td>Erases array elements and object members</td> 
   </tr>
   <tr>
-    <td><a href="basic_json/push_back.md">push_back</a></td>
+    <td><a href="json/push_back.md">push_back</a></td>
     <td>Adds a value to the end of a basic_json array</td> 
   </tr>
   <tr>
-    <td><a href="basic_json/insert.md">insert</a></td>
+    <td><a href="json/insert.md">insert</a></td>
     <td>Inserts elements</td> 
   </tr>
   <tr>
-    <td><a href="basic_json/emplace_back.md">emplace_back</a></td>
+    <td><a href="json/emplace_back.md">emplace_back</a></td>
     <td>Constructs a value in place at the end of a basic_json array</td> 
   </tr>
   <tr>
-    <td><a href="basic_json/emplace.md">emplace</a></td>
+    <td><a href="json/emplace.md">emplace</a></td>
     <td>Constructs a value in place before a specified position in a basic_json array</td> 
   </tr>
   <tr>
-    <td><a href="basic_json/try_emplace.md">try_emplace</a></td>
+    <td><a href="json/try_emplace.md">try_emplace</a></td>
     <td>Constructs a key-value pair in place in a basic_json object if the key does not exist, does nothing if the key exists</td> 
   </tr>
   <tr>
-    <td><a href="basic_json/insert_or_assign.md">insert_or_assign</a></td>
+    <td><a href="json/insert_or_assign.md">insert_or_assign</a></td>
     <td>Inserts a key-value pair in a basic_json object if the key does not exist, or assigns a new value if the key already exists</td> 
   </tr>
   <tr>
-    <td><a href="basic_json/merge.md">merge</a></td>
+    <td><a href="json/merge.md">merge</a></td>
     <td>Inserts another basic_json object's key-value pairs into a basic_json object, if they don't already exist.</td>
   </tr>
   <tr>
-    <td><a href="basic_json/merge_or_update.md">merge_or_update</a></td>
+    <td><a href="json/merge_or_update.md">merge_or_update</a></td>
     <td>Inserts another basic_json object's key-value pairs into a basic_json object, or assigns them if they already exist.</td>
   </tr>
   <tr>
@@ -258,7 +257,7 @@ Throws `std::runtime_error` if not an object.
 
 <table border="0">
   <tr>
-    <td><a href="basic_json/dump.md"</a>dump</td>
+    <td><a href="json/dump.md"</a>dump</td>
     <td>Serializes basic_json value to a string, stream, or output handler.</td> 
   </tr>
 </table>
