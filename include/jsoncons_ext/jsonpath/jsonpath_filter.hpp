@@ -39,7 +39,7 @@ struct PathConstructor
 {
     typedef typename Json::char_type char_type;
     typedef typename Json::string_view_type string_view_type;
-    typedef typename Json::string_type string_type;
+    typedef std::basic_string<char_type> string_type;
 
     string_type operator()(const string_type& path, size_t index) const
     {
@@ -78,8 +78,8 @@ template<class Json>
 struct VoidPathConstructor
 {
     typedef typename Json::char_type char_type;
+    typedef std::basic_string<char_type> string_type;
     typedef typename Json::string_view_type string_view_type;
-    typedef typename Json::string_type string_type;
 
     string_type operator()(const string_type&, size_t) const
     {
@@ -140,8 +140,8 @@ template <class Json>
 class term
 {
 public:
-    typedef typename Json::string_type string_type;
     typedef typename Json::char_type char_type;
+    typedef std::basic_string<char_type> string_type;
 
     virtual ~term() {}
 
@@ -669,7 +669,7 @@ template <class Json>
 class regex_term final : public term<Json>
 {
     typedef typename Json::char_type char_type;
-    typedef typename Json::string_type string_type;
+    typedef std::basic_string<char_type> string_type;
     const std::basic_regex<char_type> pattern_;
 public:
     regex_term(const string_type& pattern, std::regex::flag_type flags)
@@ -690,7 +690,8 @@ public:
 template <class Json>
 class path_term final : public term<Json>
 {
-    typedef typename Json::string_type string_type;
+    typedef typename Json::char_type char_type;
+    typedef std::basic_string<char_type> string_type;
 
     string_type path_;
     size_t line_;
@@ -1032,9 +1033,9 @@ public:
 template <class Json>
 class jsonpath_filter_parser
 {
-    typedef typename Json::string_type string_type;
-    typedef typename Json::string_view_type string_view_type;
     typedef typename Json::char_type char_type;
+    typedef std::basic_string<char_type> string_type;
+    typedef typename Json::string_view_type string_view_type;
 
     std::vector<token<Json>> output_stack_;
     std::vector<token<Json>> operator_stack_;

@@ -397,8 +397,8 @@ template<class J,class JReference>
 class jsonpointer_evaluator : public ser_context
 {
     typedef typename handle_type<J,JReference>::type type;
-    typedef typename J::string_type string_type;
-    typedef typename string_type::value_type char_type;
+    typedef typename J::char_type char_type;
+    typedef typename std::basic_string<char_type> string_type;
     typedef typename J::string_view_type string_view_type;
     using reference = JReference;
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JReference>::type>::value,typename J::const_pointer,typename J::pointer>::type;
@@ -762,7 +762,7 @@ public:
 }
 
 template<class J>
-typename J::string_type normalized_path(const J& root, const typename J::string_view_type& path)
+std::basic_string<typename J::char_type> normalized_path(const J& root, const typename J::string_view_type& path)
 {
     jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
     return evaluator.normalized_path(root,path);

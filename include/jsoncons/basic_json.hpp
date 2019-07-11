@@ -113,7 +113,7 @@ public:
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
 
-    typedef std::basic_string<CharT,char_traits_type,char_allocator_type> string_type;
+    typedef std::basic_string<CharT,char_traits_type,char_allocator_type> key_type;
 
     typedef basic_json<CharT,ImplementationPolicy,Allocator> json_type;
 
@@ -122,11 +122,11 @@ public:
     typedef json_type* pointer;
     typedef const json_type* const_pointer;
 
-    typedef key_value<string_type,json_type> key_value_type;
+    typedef key_value<key_type,json_type> key_value_type;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     typedef json_type value_type;
-    typedef string_type key_type;
+    //typedef string_type key_type;
     typedef key_value_type kvp_type;
     typedef key_value_type member_type;
     typedef jsoncons::null_type null_type;
@@ -139,7 +139,7 @@ public:
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type> key_value_allocator_type;
 
-    typedef json_object<string_type,basic_json> object;
+    typedef json_object<key_type,basic_json> object;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
@@ -1889,13 +1889,13 @@ public:
         }
 
         template <class SAllocator=std::allocator<CharT>>
-        string_type as_string() const 
+        std::basic_string<CharT,std::char_traits<CharT>,SAllocator> as_string() const 
         {
             return evaluate().as_string();
         }
 
         template <class SAllocator=std::allocator<CharT>>
-        string_type as_string(const SAllocator& allocator) const 
+        std::basic_string<CharT,std::char_traits<CharT>,SAllocator> as_string(const SAllocator& allocator) const 
         {
             return evaluate().as_string(allocator);
         }
@@ -1907,13 +1907,13 @@ public:
         }
 
         template <class SAllocator=std::allocator<CharT>>
-        string_type as_string(const basic_json_options<char_type>& options) const
+        std::basic_string<CharT,std::char_traits<CharT>,SAllocator> as_string(const basic_json_options<char_type>& options) const
         {
             return evaluate().as_string(options);
         }
 
         template <class SAllocator=std::allocator<CharT>>
-        string_type as_string(const basic_json_options<char_type>& options,
+        std::basic_string<CharT,std::char_traits<CharT>,SAllocator> as_string(const basic_json_options<char_type>& options,
                               const SAllocator& allocator) const
         {
             return evaluate().as_string(options,allocator);
@@ -1924,13 +1924,14 @@ public:
         {
             return evaluate().template as<T>(std::forward<Args>(args)...);
         }
-
+/*
         template<class T>
         typename std::enable_if<std::is_same<string_type,T>::value,T>::type 
         as(const char_allocator_type& allocator) const
         {
             return evaluate().template as<T>(allocator);
         }
+*/
         bool as_bool() const
         {
             return evaluate().as_bool();
@@ -2420,8 +2421,9 @@ public:
             evaluate().dump(os, pprint);
         }
 
+        template <class SAllocator=std::allocator<CharT>>
         JSONCONS_DEPRECATED("Instead, use dump(std::basic_string<char_type,char_traits_type,SAllocator>&)")
-        string_type to_string(const char_allocator_type& allocator = char_allocator_type()) const noexcept
+        std::basic_string<CharT,std::char_traits<CharT>,SAllocator> to_string(const SAllocator& allocator = SAllocator()) const noexcept
         {
             if (!parent_.contains(key_))
             {
@@ -2453,8 +2455,9 @@ public:
             evaluate().write(os,options,pprint);
         }
 
+        template <class SAllocator=std::allocator<CharT>>
         JSONCONS_DEPRECATED("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)")
-        string_type to_string(const basic_json_options<char_type>& options, char_allocator_type& allocator = char_allocator_type()) const
+        std::basic_string<CharT,std::char_traits<CharT>,SAllocator> to_string(const basic_json_options<char_type>& options, char_allocator_type& allocator = char_allocator_type()) const
         {
             return evaluate().to_string(options,allocator);
         }
@@ -2581,7 +2584,7 @@ public:
         }
 
         JSONCONS_DEPRECATED("Instead, use contains(const string_view_type&)")
-        bool has_member(const string_type& name) const
+        bool has_member(const string_view_type& name) const
         {
             return evaluate().has_member(name);
         }
@@ -3154,17 +3157,21 @@ public:
         }
     }
 
-    string_type to_string(const char_allocator_type& allocator=char_allocator_type()) const noexcept
+    template <class SAllocator=std::allocator<CharT>>
+    std::basic_string<CharT,std::char_traits<CharT>,SAllocator> to_string(const char_allocator_type& allocator=SAllocator()) const noexcept
     {
+        typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         string_type s(allocator);
         basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s);
         dump(encoder);
         return s;
     }
 
-    string_type to_string(const basic_json_options<char_type>& options,
-                          const char_allocator_type& allocator=char_allocator_type()) const
+    template <class SAllocator>
+    std::basic_string<CharT,std::char_traits<CharT>,SAllocator> to_string(const basic_json_options<char_type>& options,
+                                                                          const SAllocator& allocator=SAllocator()) const
     {
+        typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         string_type s(allocator);
         basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s,options);
         dump(encoder);
@@ -3429,14 +3436,14 @@ public:
     {
         return json_type_traits<basic_json,T>::as(*this,std::forward<Args>(args)...);
     }
-
+/*
     template<class T>
     typename std::enable_if<std::is_same<string_type,T>::value,T>::type 
     as(const char_allocator_type& allocator) const
     {
         return json_type_traits<basic_json,T>::as(*this,allocator);
     }
-
+*/
     bool as_bool() const 
     {
         switch (var_.type())
@@ -3525,7 +3532,7 @@ public:
                 if (tag() == semantic_tag::bigfloat)
                 {
                     jsoncons::detail::string_to_double to_double;
-                    string_type s = as_string();
+                    auto s = as_string();
                     return to_double(s.c_str(), s.length());
                 }
                 else
@@ -3560,27 +3567,28 @@ public:
     }
 
     template <class SAllocator=std::allocator<CharT>>
-    string_type as_string() const 
+    std::basic_string<CharT,std::char_traits<CharT>,SAllocator> as_string() const 
     {
         return as_string(basic_json_options<char_type>(),SAllocator());
     }
 
     template <class SAllocator=std::allocator<CharT>>
-    string_type as_string(const SAllocator& allocator) const 
+    std::basic_string<CharT,std::char_traits<CharT>,SAllocator> as_string(const SAllocator& allocator) const 
     {
         return as_string(basic_json_options<char_type>(),allocator);
     }
 
     template <class SAllocator=std::allocator<CharT>>
-    string_type as_string(const basic_json_options<char_type>& options) const 
+    std::basic_string<CharT,std::char_traits<CharT>,SAllocator> as_string(const basic_json_options<char_type>& options) const 
     {
         return as_string(options,SAllocator());
     }
 
     template <class SAllocator=std::allocator<CharT>>
-    string_type as_string(const basic_json_options<char_type>& options,
+    std::basic_string<CharT,std::char_traits<CharT>,SAllocator> as_string(const basic_json_options<char_type>& options,
                           const SAllocator& allocator) const 
     {
+        typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         switch (var_.type())
         {
             case storage_type::short_string_val:
@@ -4216,7 +4224,7 @@ public:
         {
         case storage_type::empty_object_val:
         case storage_type::object_val:
-            return object_value().insert(first, last, get_key_value<string_type,json_type>());
+            return object_value().insert(first, last, get_key_value<key_type,json_type>());
             break;
         default:
             {
@@ -4232,7 +4240,7 @@ public:
         {
         case storage_type::empty_object_val:
         case storage_type::object_val:
-            return object_value().insert(tag, first, last, get_key_value<string_type,json_type>());
+            return object_value().insert(tag, first, last, get_key_value<key_type,json_type>());
             break;
         default:
             {
@@ -4345,13 +4353,13 @@ public:
     }
 
     JSONCONS_DEPRECATED("Instead, use parse(const string_view_type&)")
-    static basic_json parse_string(const string_type& s)
+    static basic_json parse_string(const string_view_type& s)
     {
         return parse(s);
     }
 
     JSONCONS_DEPRECATED("Instead, use parse(parse(const string_view_type&, parse_error_handler&)")
-    static basic_json parse_string(const string_type& s, parse_error_handler& err_handler)
+    static basic_json parse_string(const string_view_type& s, parse_error_handler& err_handler)
     {
         return parse(s,err_handler);
     }
@@ -4811,7 +4819,7 @@ public:
     }
 
     JSONCONS_DEPRECATED("Instead, use contains(const string_view_type&)")
-    bool has_member(const string_type& name) const
+    bool has_member(const string_view_type& name) const
     {
         switch (var_.type())
         {
@@ -5147,9 +5155,9 @@ std::basic_istream<typename Json::char_type>& operator>>(std::basic_istream<type
 }
 
 typedef basic_json<char,sorted_policy,std::allocator<char>> json;
-typedef basic_json<wchar_t,sorted_policy,std::allocator<wchar_t>> wjson;
+typedef basic_json<wchar_t,sorted_policy,std::allocator<char>> wjson;
 typedef basic_json<char, preserve_order_policy, std::allocator<char>> ojson;
-typedef basic_json<wchar_t, preserve_order_policy, std::allocator<wchar_t>> wojson;
+typedef basic_json<wchar_t, preserve_order_policy, std::allocator<char>> wojson;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED("Instead, use wojson") typedef basic_json<wchar_t, preserve_order_policy, std::allocator<wchar_t>> owjson;

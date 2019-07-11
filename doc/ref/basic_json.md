@@ -1,0 +1,396 @@
+### jsoncons::json
+
+#### Header
+```c++
+#include <jsoncons/json.hpp>
+```
+
+```c++
+template< 
+    class CharT,
+    class ImplementationPolicy = sorted_policy,
+    class Allocator = std::allocator<char>> class basic_json;
+```
+
+The class `basic_json` resembles a union. A `basic_json` holds a data item of one of its alternative types:
+null, bool, int64_t, uint64_t, double, text string, byte string, array, and object. The data item may be tagged with a 
+[semantic_tag](semantic_tag.md) that provides additional information about the data item.
+
+When assigned a new `basic_json` value, the old value is overwritten. The type of the new value may be different from the old value. 
+
+The definition of the character type of text strings is supplied via the `CharT` template parameter.
+Implementation policies for arrays and objects are provided via the `ImplementationPolicy` template parameter.
+A custom allocator may be supplied with the `Allocator` template parameter, which a `basic_json` will
+rebind to internal data structures. 
+
+Several typedefs for common character types and implementation policies are provided:
+
+Type                |Definition
+--------------------|------------------------------
+[json](json.md)     |basic_json<char,sorted_policy,std::allocator<char>>
+[ojson](ojson.md)   |basic_json<char, preserve_order_policy, std::allocator<char>>
+[wjson](wjson.md)   |basic_json<wchar_t,sorted_policy,std::allocator<char>>
+[wojson](wojson.md) |basic_json<wchar_t, preserve_order_policy, std::allocator<char>>
+
+Member type                         |Definition
+------------------------------------|------------------------------
+`char_type`|CharT
+`implementation_policy'|ImplementationPolicy
+`allocator_type`|Allocator
+`json_type`|basic_json<char_type,implementation_policy,allocator_type>
+`reference`|json_type&
+`const_reference`|const json_type&
+`pointer`|json_type*
+`const_pointer`|const json_type*
+`string_view_type`|basic_string_view<char_type>
+`key_value_type`|key_value<string_type,json_type>
+`object`|basic_json object type
+`array`|basic_json array type
+`object_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to [key_value_type](basic_json/key_value.md)
+`const_object_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to const [key_value_type](basic_json/key_value.md)
+`array_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `basic_json`
+`const_array_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `const basic_json`
+
+### Static member functions
+
+<table border="0">
+  <tr>
+    <td><a href="basic_json/parse.md">parse</a></td>
+    <td>Parses JSON.</td> 
+  </tr>
+  <tr>
+    <td><a href="basic_json/make_array.md">make_array</a></td>
+    <td>Makes a multidimensional basic_json array.</td> 
+  </tr>
+  <tr>
+    <td><a>const basic_json& null()</a></td>
+    <td>Returns a null value</td> 
+  </tr>
+</table>
+
+### Member functions
+<table border="0">
+  <tr>
+    <td><a href="basic_json/constructor.md">(constructor)</a></td>
+    <td>constructs the basic_json value</td> 
+  </tr>
+  <tr>
+    <td><a href="basic_json/destructor.md">(destructor)</a></td>
+    <td>destructs the basic_json value</td> 
+  </tr>
+  <tr>
+    <td><a href="basic_json/operator=.md">operator=</a></td>
+    <td>assigns values</td> 
+  </tr>
+</table>
+
+    allocator_type get_allocator() const
+Returns the allocator associated with the basic_json value.
+
+#### Ranges and Iterators
+
+<table border="0">
+  <tr>
+    <td><a href="basic_json/array_range.md">array_range</a></td>
+    <td>Returns a "range" that supports a range-based for loop over the elements of a `basic_json` array.</td> 
+  </tr>
+  <tr>
+    <td><a href="basic_json/object_range.md">obect_range</a></td>
+    <td>Returns a "range" that supports a range-based for loop over the key-value pairs of a `basic_json` object.</td> 
+  </tr>
+</table>
+
+#### Capacity
+
+<table border="0">
+  <tr>
+    <td><a>size_t size() const noexcept</a></td>
+    <td>Returns the number of elements in a basic_json array, or the number of members in a basic_json object, or `zero`</td> 
+  </tr>
+  <tr>
+    <td><a>bool empty() const noexcept</a></td>
+    <td>Returns <code>true</code> if a basic_json string, object or array has no elements, otherwise <code>false</code></td> 
+  </tr>
+  <tr>
+    <td><a>size_t capacity() const</a></td>
+    <td>Returns the size of the storage space currently allocated for a basic_json object or array</td> 
+  </tr>
+  <tr>
+    <td><a>void reserve(size_t n)</a></td>
+    <td>Increases the capacity of a basic_json object or array to allow at least `n` members or elements</td> 
+  </tr>
+  <tr>
+    <td><a>void resize(size_t n)</a></td>
+    <td>Resizes a basic_json array so that it contains `n` elements</td> 
+  </tr>
+  <tr>
+    <td><a>void resize(size_t n, const basic_json& val)</a></td>
+    <td>Resizes a basic_json array so that it contains `n` elements that are initialized to `val`</td> 
+  </tr>
+  <tr>
+    <td><a>void shrink_to_fit()</a></td>
+    <td>Requests the removal of unused capacity</td> 
+  </tr>
+</table>
+
+#### Accessors
+
+<table border="0">
+  <tr>
+    <td><code>bool contains(const string_view_type& key) const</code></td>
+    <td>Returns <code>true</code> if an object has a member with the given `key`, otherwise <code>false</code></td> 
+  </tr>
+  <tr>
+    <td><code>bool count(const string_view_type& key) const</code></td>
+    <td>Returns the number of object members that match `key`</td> 
+  </tr>
+  <tr>
+    <td><a href="basic_json/is.md">is</a></td>
+    <td>Checks if a basic_json value matches a type.</td> 
+  </tr>
+  <tr>
+    <td><a href="basic_json/as.md">as</a></td>
+    <td>Attempts to convert a basic_json value to a value of a type.</td> 
+  </tr>
+</table>
+
+    semantic_tag tag() const
+Returns the [semantic_tag](semantic_tag.md) associated with this value
+
+    basic_json& operator[](size_t i)
+    const basic_json& operator[](size_t i) const
+Returns a reference to the value at position i in a basic_json object or array.
+Throws `std::runtime_error` if not an object or array.
+
+    proxy<basic_json> operator[](const string_view_type& name)
+Returns a proxy to a keyed value. `proxy<basic_json>` supports conversion to `basic_json&`. If written to, 
+inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. 
+Throws `std::runtime_error` if not an object.
+If read, throws `std::out_of_range` if the object does not have a member with the specified name.  
+
+    const basic_json& operator[](const string_view_type& name) const
+If `name` matches the name of a member in the basic_json object, returns a reference to the basic_json object, otherwise throws.
+Throws `std::runtime_error` if not an object.
+Throws `std::out_of_range` if the object does not have a member with the specified name.  
+
+    object_iterator find(const string_view_type& name)
+    const_object_iterator find(const string_view_type& name) const
+Returns an object iterator to a member whose name compares equal to `name`. If there is no such member, returns `object_range.end()`.
+Throws `std::runtime_error` if not an object.
+
+    basic_json& at(const string_view_type& name)
+    const basic_json& at(const string_view_type& name) const
+Returns a reference to the value with the specifed name in a basic_json object.
+Throws `std::runtime_error` if not an object.
+Throws `std::out_of_range` if the object does not have a member with the specified name.  
+
+    basic_json& at(size_t i)
+    const basic_json& at(size_t i) const
+Returns a reference to the element at index `i` in a basic_json array.  
+Throws `std::runtime_error` if not an array.
+Throws `std::out_of_range` if the index is outside the bounds of the array.  
+
+    template <class T>
+    T get_with_default(const string_view_type& name, 
+                       const T& default_val) const
+If `name` matches the name of a member in the basic_json object, returns the member value converted to the default's data type, otherwise returns `default_val`.
+Throws `std::runtime_error` if not an object.
+
+    template <class T = std::string>
+    T get_with_default(const string_view_type& name, 
+                       const char_type* default_val) const
+Make `get_with_default` do the right thing for string literals. 
+Throws `std::runtime_error` if not an object. 
+
+#### Modifiers
+
+<table border="0">
+  <tr>
+    <td><a>void clear()</a></td>
+    <td>Remove all elements from an array or members from an object, otherwise do nothing</td> 
+  </tr>
+  <tr>
+    <td><a href="basic_json/erase.md">erase</a></td>
+    <td>Erases array elements and object members</td> 
+  </tr>
+  <tr>
+    <td><a href="basic_json/push_back.md">push_back</a></td>
+    <td>Adds a value to the end of a basic_json array</td> 
+  </tr>
+  <tr>
+    <td><a href="basic_json/insert.md">insert</a></td>
+    <td>Inserts elements</td> 
+  </tr>
+  <tr>
+    <td><a href="basic_json/emplace_back.md">emplace_back</a></td>
+    <td>Constructs a value in place at the end of a basic_json array</td> 
+  </tr>
+  <tr>
+    <td><a href="basic_json/emplace.md">emplace</a></td>
+    <td>Constructs a value in place before a specified position in a basic_json array</td> 
+  </tr>
+  <tr>
+    <td><a href="basic_json/try_emplace.md">try_emplace</a></td>
+    <td>Constructs a key-value pair in place in a basic_json object if the key does not exist, does nothing if the key exists</td> 
+  </tr>
+  <tr>
+    <td><a href="basic_json/insert_or_assign.md">insert_or_assign</a></td>
+    <td>Inserts a key-value pair in a basic_json object if the key does not exist, or assigns a new value if the key already exists</td> 
+  </tr>
+  <tr>
+    <td><a href="basic_json/merge.md">merge</a></td>
+    <td>Inserts another basic_json object's key-value pairs into a basic_json object, if they don't already exist.</td>
+  </tr>
+  <tr>
+    <td><a href="basic_json/merge_or_update.md">merge_or_update</a></td>
+    <td>Inserts another basic_json object's key-value pairs into a basic_json object, or assigns them if they already exist.</td>
+  </tr>
+  <tr>
+    <td><a>void swap(basic_json& val)</a></td>
+    <td>Exchanges the content of the <code>basic_json</code> value with the content of <code>val</code>, which is another <code>basic_json</code> value</td>
+  </tr>
+</table>
+
+#### Serialization
+
+<table border="0">
+  <tr>
+    <td><a href="basic_json/dump.md"</a>dump</td>
+    <td>Serializes basic_json value to a string, stream, or output handler.</td> 
+  </tr>
+</table>
+
+#### Non member functions
+
+<table border="0">
+  <tr>
+    <td><code>bool operator==(const basic_json& lhs, const basic_json& rhs)</code></td>
+    <td>Returns <code>true</true> if two basic_json objects compare equal, <code>false</true> otherwise.</td> 
+  </tr>
+  <tr>
+    <td><code>bool operator!=(const basic_json& lhs, const basic_json& rhs)</code></td>
+    <td>Returns <code>true</true> if two basic_json objects do not compare equal, <code>false</true> otherwise.</td> 
+  </tr>
+  <tr>
+    <td><code>bool operator<(const basic_json& lhs, const basic_json& rhs)</code></td>
+    <td>Compares the contents of lhs and rhs lexicographically.</td> 
+  </tr>
+  <tr>
+    <td><code>bool operator<=(const basic_json& lhs, const basic_json& rhs)</code></td>
+    <td>Compares the contents of lhs and rhs lexicographically.</td> 
+  </tr>
+  <tr>
+    <td><code>bool operator>(const basic_json& lhs, const basic_json& rhs)</code></td>
+    <td>Compares the contents of lhs and rhs lexicographically.</td> 
+  </tr>
+  <tr>
+    <td><code>bool operator>=(const basic_json& lhs, const basic_json& rhs)</code></td>
+    <td>Compares the contents of lhs and rhs lexicographically.</td> 
+  </tr>
+</table>
+
+    std::istream& operator>> (std::istream& os, basic_json& val)
+Reads a `basic_json` value from a stream.
+
+    std::ostream& operator<< (std::ostream& os, const basic_json& val)
+Inserts basic_json value into stream.
+
+    std::ostream& print(const basic_json& val)  
+    std::ostream& print(const basic_json& val, const json_options<CharT>& options)  
+Inserts basic_json value into stream using the specified [json_options](json_options.md) if supplied.
+
+    std::ostream& pretty_print(const basic_json& val)  
+    std::ostream& pretty_print(const basic_json& val, const json_options<CharT>& options)  
+Inserts basic_json value into stream using the specified [json_options](json_options.md) if supplied.
+
+    void swap(basic_json& a, basic_json& b)
+Exchanges the values of `a` and `b`
+
+#### Deprecated names
+
+As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro JSONCONS_NO_DEPRECATED, which is recommended for new code.
+
+#### See also
+
+- [ojson](ojson.md) constructs a basic_json value that preserves the original name-value insertion order
+
+- [wjson](wjson.md) constructs a wide character basic_json value that sorts name-value members alphabetically
+
+- [wojson](wojson.md) constructs a wide character basic_json value that preserves the original name-value insertion order
+
+### Examples
+  
+#### Accessors and defaults
+```c++
+basic_json val;
+
+val["field1"] = 1;
+val["field3"] = "Toronto";
+
+double x1 = obj.contains("field1") ? val["field1"].as<double>() : 10.0;
+double x2 = obj.contains("field2") ? val["field2"].as<double>() : 20.0;
+
+std::string x3 = obj.get_with_default("field3","Montreal");
+std::string x4 = obj.get_with_default("field4","San Francisco");
+
+std::cout << "x1=" << x1 << '\n';
+std::cout << "x2=" << x2 << '\n';
+std::cout << "x3=" << x3 << '\n';
+std::cout << "x4=" << x4 << '\n';
+```
+Output:
+```c++
+x1=1
+x2=20
+x3=Toronto
+x4=San Francisco
+```
+#### Nulls
+```c++
+basic_json obj;
+obj["field1"] = basic_json::null();
+std::cout << obj << std::endl;
+```
+Output: 
+```basic_json
+{"field1":null}
+```
+#### Constructing basic_json structures
+```c++
+basic_json root;
+
+root["persons"] = basic_json::array();
+
+basic_json person;
+person["first_name"] = "John";
+person["last_name"] = "Smith";
+person["birth_date"] = "1972-01-30";
+
+basic_json address;
+address["city"] = "Toronto";
+address["country"] = "Canada";
+
+person["address"] = std::move(address);
+
+root["persons"].push_back(std::move(person));
+
+std::cout << pretty_print(root) << std::endl;
+```
+Output:
+```c++
+{
+    "persons":
+    [
+        {
+            "address":
+            {
+                "city":"Toronto",
+                "country":"Canada"
+            },
+            "birth_date":"1972-01-30",
+            "first_name":"John",
+            "last_name":"Smith"
+        }
+    ]
+}
+```
