@@ -115,31 +115,31 @@ public:
 
     typedef std::basic_string<char_type,char_traits_type,char_allocator_type> key_type;
 
-    typedef basic_json<char_type,ImplementationPolicy,Allocator> json_type;
 
-    typedef json_type& reference;
-    typedef const json_type& const_reference;
-    typedef json_type* pointer;
-    typedef const json_type* const_pointer;
+    typedef basic_json& reference;
+    typedef const basic_json& const_reference;
+    typedef basic_json* pointer;
+    typedef const basic_json* const_pointer;
 
-    typedef key_value<key_type,json_type> key_value_type;
+    typedef key_value<key_type,basic_json> key_value_type;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    typedef json_type value_type;
+    typedef basic_json value_type;
     //typedef string_type key_type;
     typedef key_value_type kvp_type;
     typedef key_value_type member_type;
     typedef jsoncons::null_type null_type;
+    //typedef basic_json<char_type,ImplementationPolicy,Allocator> json_type;
 #endif
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
     using byte_string_storage_type = typename implementation_policy::template sequence_container_type<uint8_t, byte_allocator_type>;
 
-    typedef json_array<json_type> array;
+    typedef json_array<basic_json> array;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type> key_value_allocator_type;
 
-    typedef json_object<key_type,json_type> object;
+    typedef json_object<key_type,basic_json> object;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
@@ -1606,7 +1606,7 @@ public:
     class proxy 
     {
     private:
-        friend json_type;
+        friend class basic_json<char_type,implementation_policy,allocator_type>;
 
         ParentT& parent_;
         string_view_type key_;
@@ -1623,19 +1623,19 @@ public:
         {
         }
 
-        json_type& evaluate() 
+        basic_json& evaluate() 
         {
             return parent_.evaluate(key_);
         }
 
-        const json_type& evaluate() const
+        const basic_json& evaluate() const
         {
             return parent_.evaluate(key_);
         }
 
-        json_type& evaluate_with_default()
+        basic_json& evaluate_with_default()
         {
-            json_type& val = parent_.evaluate_with_default();
+            basic_json& val = parent_.evaluate_with_default();
             auto it = val.find(key_);
             if (it == val.object_range().end())
             {
@@ -1644,22 +1644,22 @@ public:
             return it->value();
         }
 
-        json_type& evaluate(size_t index)
+        basic_json& evaluate(size_t index)
         {
             return evaluate().at(index);
         }
 
-        const json_type& evaluate(size_t index) const
+        const basic_json& evaluate(size_t index) const
         {
             return evaluate().at(index);
         }
 
-        json_type& evaluate(const string_view_type& index)
+        basic_json& evaluate(const string_view_type& index)
         {
             return evaluate().at(index);
         }
 
-        const json_type& evaluate(const string_view_type& index) const
+        const basic_json& evaluate(const string_view_type& index) const
         {
             return evaluate().at(index);
         }
@@ -1959,42 +1959,42 @@ public:
             return *this;
         }
 
-        bool operator==(const json_type& rhs) const
+        bool operator==(const basic_json& rhs) const
         {
             return evaluate() == rhs;
         }
 
-        bool operator!=(const json_type& rhs) const
+        bool operator!=(const basic_json& rhs) const
         {
             return evaluate() != rhs;
         }
 
-        bool operator<(const json_type& rhs) const
+        bool operator<(const basic_json& rhs) const
         {
             return evaluate() < rhs;
         }
 
-        bool operator<=(const json_type& rhs) const
+        bool operator<=(const basic_json& rhs) const
         {
             return !(rhs < evaluate());
         }
 
-        bool operator>(const json_type& rhs) const
+        bool operator>(const basic_json& rhs) const
         {
             return !(evaluate() <= rhs);
         }
 
-        bool operator>=(const json_type& rhs) const
+        bool operator>=(const basic_json& rhs) const
         {
             return !(evaluate() < rhs);
         }
 
-        json_type& operator[](size_t i)
+        basic_json& operator[](size_t i)
         {
             return evaluate_with_default().at(i);
         }
 
-        const json_type& operator[](size_t i) const
+        const basic_json& operator[](size_t i) const
         {
             return evaluate().at(i);
         }
@@ -2004,27 +2004,27 @@ public:
             return proxy<proxy_type>(*this,key);
         }
 
-        const json_type& operator[](const string_view_type& name) const
+        const basic_json& operator[](const string_view_type& name) const
         {
             return at(name);
         }
 
-        json_type& at(const string_view_type& name)
+        basic_json& at(const string_view_type& name)
         {
             return evaluate().at(name);
         }
 
-        const json_type& at(const string_view_type& name) const
+        const basic_json& at(const string_view_type& name) const
         {
             return evaluate().at(name);
         }
 
-        const json_type& at(size_t index)
+        const basic_json& at(size_t index)
         {
             return evaluate().at(index);
         }
 
-        const json_type& at(size_t index) const
+        const basic_json& at(size_t index) const
         {
             return evaluate().at(index);
         }
@@ -2093,46 +2093,46 @@ public:
 
         // merge
 
-        void merge(const json_type& source)
+        void merge(const basic_json& source)
         {
             return evaluate().merge(source);
         }
 
-        void merge(json_type&& source)
+        void merge(basic_json&& source)
         {
-            return evaluate().merge(std::forward<json_type>(source));
+            return evaluate().merge(std::forward<basic_json>(source));
         }
 
-        void merge(object_iterator hint, const json_type& source)
+        void merge(object_iterator hint, const basic_json& source)
         {
             return evaluate().merge(hint, source);
         }
 
-        void merge(object_iterator hint, json_type&& source)
+        void merge(object_iterator hint, basic_json&& source)
         {
-            return evaluate().merge(hint, std::forward<json_type>(source));
+            return evaluate().merge(hint, std::forward<basic_json>(source));
         }
 
         // merge_or_update
 
-        void merge_or_update(const json_type& source)
+        void merge_or_update(const basic_json& source)
         {
             return evaluate().merge_or_update(source);
         }
 
-        void merge_or_update(json_type&& source)
+        void merge_or_update(basic_json&& source)
         {
-            return evaluate().merge_or_update(std::forward<json_type>(source));
+            return evaluate().merge_or_update(std::forward<basic_json>(source));
         }
 
-        void merge_or_update(object_iterator hint, const json_type& source)
+        void merge_or_update(object_iterator hint, const basic_json& source)
         {
             return evaluate().merge_or_update(hint, source);
         }
 
-        void merge_or_update(object_iterator hint, json_type&& source)
+        void merge_or_update(object_iterator hint, basic_json&& source)
         {
-            return evaluate().merge_or_update(hint, std::forward<json_type>(source));
+            return evaluate().merge_or_update(hint, std::forward<basic_json>(source));
         }
 
         template <class T>
@@ -2168,7 +2168,7 @@ public:
         }
 
         template <class... Args> 
-        json_type& emplace_back(Args&&... args)
+        basic_json& emplace_back(Args&&... args)
         {
             return evaluate_with_default().emplace_back(std::forward<Args>(args)...);
         }
@@ -2255,7 +2255,7 @@ public:
         {
             evaluate().dump(os,options,line_indent);
         }
-        void swap(json_type& val)
+        void swap(basic_json& val)
         {
             evaluate_with_default().swap(val);
         }
@@ -2572,13 +2572,13 @@ public:
 
         template <class T>
         JSONCONS_DEPRECATED("Instead, use get_with_default(const string_view_type&, T&&)")
-        json_type get(const string_view_type& name, T&& default_val) const
+        basic_json get(const string_view_type& name, T&& default_val) const
         {
             return evaluate().get(name,std::forward<T>(default_val));
         }
 
         JSONCONS_DEPRECATED("Instead, use at(const string_view_type&)")
-        const json_type& get(const string_view_type& name) const
+        const basic_json& get(const string_view_type& name) const
         {
             return evaluate().get(name);
         }
@@ -2625,15 +2625,15 @@ public:
 #endif
     };
 
-    static json_type parse(std::basic_istream<char_type>& is)
+    static basic_json parse(std::basic_istream<char_type>& is)
     {
         parse_error_handler_type err_handler;
         return parse(is,err_handler);
     }
 
-    static json_type parse(std::basic_istream<char_type>& is, parse_error_handler& err_handler)
+    static basic_json parse(std::basic_istream<char_type>& is, parse_error_handler& err_handler)
     {
-        json_decoder<json_type> handler;
+        json_decoder<basic_json> handler;
         basic_json_reader<char_type,stream_source<char_type>> reader(is, handler, err_handler);
         reader.read_next();
         reader.check_done();
@@ -2644,15 +2644,15 @@ public:
         return handler.get_result();
     }
 
-    static json_type parse(const string_view_type& s)
+    static basic_json parse(const string_view_type& s)
     {
         parse_error_handler_type err_handler;
         return parse(s,err_handler);
     }
 
-    static json_type parse(const string_view_type& s, parse_error_handler& err_handler)
+    static basic_json parse(const string_view_type& s, parse_error_handler& err_handler)
     {
-        json_decoder<json_type> decoder;
+        json_decoder<basic_json> decoder;
         basic_json_parser<char_type> parser(err_handler);
 
         auto result = unicons::skip_bom(s.begin(), s.end());
@@ -2672,15 +2672,15 @@ public:
         return decoder.get_result();
     }
 
-    static json_type parse(std::basic_istream<char_type>& is, const basic_json_options<char_type>& options)
+    static basic_json parse(std::basic_istream<char_type>& is, const basic_json_options<char_type>& options)
     {
         parse_error_handler_type err_handler;
         return parse(is,options,err_handler);
     }
 
-    static json_type parse(std::basic_istream<char_type>& is, const basic_json_options<char_type>& options, parse_error_handler& err_handler)
+    static basic_json parse(std::basic_istream<char_type>& is, const basic_json_options<char_type>& options, parse_error_handler& err_handler)
     {
-        json_decoder<json_type> handler;
+        json_decoder<basic_json> handler;
         basic_json_reader<char_type,stream_source<char_type>> reader(is, handler, options, err_handler);
         reader.read_next();
         reader.check_done();
@@ -2691,15 +2691,15 @@ public:
         return handler.get_result();
     }
 
-    static json_type parse(const string_view_type& s, const basic_json_options<char_type>& options)
+    static basic_json parse(const string_view_type& s, const basic_json_options<char_type>& options)
     {
         parse_error_handler_type err_handler;
         return parse(s,options,err_handler);
     }
 
-    static json_type parse(const string_view_type& s, const basic_json_options<char_type>& options, parse_error_handler& err_handler)
+    static basic_json parse(const string_view_type& s, const basic_json_options<char_type>& options, parse_error_handler& err_handler)
     {
-        json_decoder<json_type> decoder;
+        json_decoder<basic_json> decoder;
         basic_json_parser<char_type> parser(options,err_handler);
 
         auto result = unicons::skip_bom(s.begin(), s.end());
@@ -2719,55 +2719,55 @@ public:
         return decoder.get_result();
     }
 
-    static json_type make_array()
+    static basic_json make_array()
     {
-        return json_type(array());
+        return basic_json(array());
     }
 
-    static json_type make_array(const array& a)
+    static basic_json make_array(const array& a)
     {
-        return json_type(a);
+        return basic_json(a);
     }
 
-    static json_type make_array(const array& a, allocator_type allocator)
+    static basic_json make_array(const array& a, allocator_type allocator)
     {
-        return json_type(variant(a, semantic_tag::none, allocator));
+        return basic_json(variant(a, semantic_tag::none, allocator));
     }
 
-    static json_type make_array(std::initializer_list<json_type> init, const Allocator& allocator = Allocator())
+    static basic_json make_array(std::initializer_list<basic_json> init, const Allocator& allocator = Allocator())
     {
         return array(std::move(init),allocator);
     }
 
-    static json_type make_array(size_t n, const Allocator& allocator = Allocator())
+    static basic_json make_array(size_t n, const Allocator& allocator = Allocator())
     {
         return array(n,allocator);
     }
 
     template <class T>
-    static json_type make_array(size_t n, const T& val, const Allocator& allocator = Allocator())
+    static basic_json make_array(size_t n, const T& val, const Allocator& allocator = Allocator())
     {
-        return json_type::array(n, val,allocator);
+        return basic_json::array(n, val,allocator);
     }
 
     template <size_t dim>
-    static typename std::enable_if<dim==1,json_type>::type make_array(size_t n)
+    static typename std::enable_if<dim==1,basic_json>::type make_array(size_t n)
     {
         return array(n);
     }
 
     template <size_t dim, class T>
-    static typename std::enable_if<dim==1,json_type>::type make_array(size_t n, const T& val, const Allocator& allocator = Allocator())
+    static typename std::enable_if<dim==1,basic_json>::type make_array(size_t n, const T& val, const Allocator& allocator = Allocator())
     {
         return array(n,val,allocator);
     }
 
     template <size_t dim, typename... Args>
-    static typename std::enable_if<(dim>1),json_type>::type make_array(size_t n, Args... args)
+    static typename std::enable_if<(dim>1),basic_json>::type make_array(size_t n, Args... args)
     {
         const size_t dim1 = dim - 1;
 
-        json_type val = make_array<dim1>(std::forward<Args>(args)...);
+        basic_json val = make_array<dim1>(std::forward<Args>(args)...);
         val.resize(n);
         for (size_t i = 0; i < n; ++i)
         {
@@ -2776,9 +2776,9 @@ public:
         return val;
     }
 
-    static const json_type& null()
+    static const basic_json& null()
     {
-        static json_type a_null = json_type(null_type(), semantic_tag::none);
+        static basic_json a_null = basic_json(null_type(), semantic_tag::none);
         return a_null;
     }
 
@@ -2794,22 +2794,22 @@ public:
     {
     }
 
-    basic_json(const json_type& val)
+    basic_json(const basic_json& val)
         : var_(val.var_)
     {
     }
 
-    basic_json(const json_type& val, const Allocator& allocator)
+    basic_json(const basic_json& val, const Allocator& allocator)
         : var_(val.var_,allocator)
     {
     }
 
-    basic_json(json_type&& other) noexcept
+    basic_json(basic_json&& other) noexcept
         : var_(std::move(other.var_))
     {
     }
 
-    basic_json(json_type&& other, const Allocator&) noexcept
+    basic_json(basic_json&& other, const Allocator&) noexcept
         : var_(std::move(other.var_) /*,allocator*/ )
     {
     }
@@ -2858,13 +2858,13 @@ public:
 
     template <class T>
     basic_json(const T& val)
-        : var_(json_type_traits<json_type,T>::to_json(val).var_)
+        : var_(json_type_traits<basic_json,T>::to_json(val).var_)
     {
     }
 
     template <class T>
     basic_json(const T& val, const Allocator& allocator)
-        : var_(json_type_traits<json_type,T>::to_json(val,allocator).var_)
+        : var_(json_type_traits<basic_json,T>::to_json(val,allocator).var_)
     {
     }
 
@@ -2953,7 +2953,7 @@ public:
     {
     }
 
-    json_type& operator=(const json_type& rhs)
+    basic_json& operator=(const basic_json& rhs)
     {
         if (this != &rhs)
         {
@@ -2962,7 +2962,7 @@ public:
         return *this;
     }
 
-    json_type& operator=(json_type&& rhs) noexcept
+    basic_json& operator=(basic_json&& rhs) noexcept
     {
         if (this !=&rhs)
         {
@@ -2972,44 +2972,44 @@ public:
     }
 
     template <class T>
-    json_type& operator=(const T& val)
+    basic_json& operator=(const T& val)
     {
-        var_ = json_type_traits<json_type,T>::to_json(val).var_;
+        var_ = json_type_traits<basic_json,T>::to_json(val).var_;
         return *this;
     }
 
-    json_type& operator=(const char_type* s)
+    basic_json& operator=(const char_type* s)
     {
         var_ = variant(s, char_traits_type::length(s), semantic_tag::none);
         return *this;
     }
 
-    friend bool operator==(const json_type& lhs, const json_type& rhs)
+    friend bool operator==(const basic_json& lhs, const basic_json& rhs)
     {
         return lhs.var_ == rhs.var_;
     }
 
-    friend bool operator!=(const json_type& lhs, const json_type& rhs)
+    friend bool operator!=(const basic_json& lhs, const basic_json& rhs)
     {
         return !(lhs == rhs);
     }
 
-    friend bool operator<(const json_type& lhs, const json_type& rhs) 
+    friend bool operator<(const basic_json& lhs, const basic_json& rhs) 
     {
         return lhs.var_ < rhs.var_;
     }
 
-    friend bool operator<=(const json_type& lhs, const json_type& rhs)
+    friend bool operator<=(const basic_json& lhs, const basic_json& rhs)
     {
         return !(rhs < lhs);
     }
 
-    friend bool operator>(const json_type& lhs, const json_type& rhs) 
+    friend bool operator>(const basic_json& lhs, const basic_json& rhs) 
     {
         return !(lhs <= rhs);
     }
 
-    friend bool operator>=(const json_type& lhs, const json_type& rhs)
+    friend bool operator>=(const basic_json& lhs, const basic_json& rhs)
     {
         return !(lhs < rhs);
     }
@@ -3029,17 +3029,17 @@ public:
         }
     }
 
-    json_type& operator[](size_t i)
+    basic_json& operator[](size_t i)
     {
         return at(i);
     }
 
-    const json_type& operator[](size_t i) const
+    const basic_json& operator[](size_t i) const
     {
         return at(i);
     }
 
-    proxy<json_type> operator[](const string_view_type& name)
+    proxy<basic_json> operator[](const string_view_type& name)
     {
         switch (var_.type())
         {
@@ -3047,7 +3047,7 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_type::object_val:
-            return proxy<json_type>(*this, name);
+            return proxy<basic_json>(*this, name);
             break;
         default:
             JSONCONS_THROW(not_an_object(name.data(),name.length()));
@@ -3055,7 +3055,7 @@ public:
         }
     }
 
-    const json_type& operator[](const string_view_type& name) const
+    const basic_json& operator[](const string_view_type& name) const
     {
         return at(name);
     }
@@ -3251,7 +3251,7 @@ public:
     template<class T, class... Args>
     bool is(Args&&... args) const noexcept
     {
-        return json_type_traits<json_type,T>::is(*this,std::forward<Args>(args)...);
+        return json_type_traits<basic_json,T>::is(*this,std::forward<Args>(args)...);
     }
 
     bool is_string() const noexcept
@@ -3434,14 +3434,14 @@ public:
     template<class T, class... Args>
     T as(Args&&... args) const
     {
-        return json_type_traits<json_type,T>::as(*this,std::forward<Args>(args)...);
+        return json_type_traits<basic_json,T>::as(*this,std::forward<Args>(args)...);
     }
 /*
     template<class T>
     typename std::enable_if<std::is_same<string_type,T>::value,T>::type 
     as(const char_allocator_type& allocator) const
     {
-        return json_type_traits<json_type,T>::as(*this,allocator);
+        return json_type_traits<basic_json,T>::as(*this,allocator);
     }
 */
     bool as_bool() const 
@@ -3457,7 +3457,7 @@ public:
 
             try
             {
-                json_type j = json_type::parse(as_string_view());
+                basic_json j = basic_json::parse(as_string_view());
                 return j.as_bool();
             }
             catch (...)
@@ -3692,7 +3692,7 @@ public:
         }
     }
 
-    json_type& at(const string_view_type& name)
+    basic_json& at(const string_view_type& name)
     {
         switch (var_.type())
         {
@@ -3715,31 +3715,31 @@ public:
         }
     }
 
-    json_type& evaluate() 
+    basic_json& evaluate() 
     {
         return *this;
     }
 
-    json_type& evaluate_with_default() 
+    basic_json& evaluate_with_default() 
     {
         return *this;
     }
 
-    const json_type& evaluate() const
+    const basic_json& evaluate() const
     {
         return *this;
     }
-    json_type& evaluate(const string_view_type& name) 
+    basic_json& evaluate(const string_view_type& name) 
     {
         return at(name);
     }
 
-    const json_type& evaluate(const string_view_type& name) const
+    const basic_json& evaluate(const string_view_type& name) const
     {
         return at(name);
     }
 
-    const json_type& at(const string_view_type& name) const
+    const basic_json& at(const string_view_type& name) const
     {
         switch (var_.type())
         {
@@ -3762,7 +3762,7 @@ public:
         }
     }
 
-    json_type& at(size_t i)
+    basic_json& at(size_t i)
     {
         switch (var_.type())
         {
@@ -3779,7 +3779,7 @@ public:
         }
     }
 
-    const json_type& at(size_t i) const
+    const basic_json& at(size_t i) const
     {
         switch (var_.type())
         {
@@ -4023,7 +4023,7 @@ public:
 
     // merge
 
-    void merge(const json_type& source)
+    void merge(const basic_json& source)
     {
         switch (var_.type())
         {
@@ -4039,7 +4039,7 @@ public:
         }
     }
 
-    void merge(json_type&& source)
+    void merge(basic_json&& source)
     {
         switch (var_.type())
         {
@@ -4055,7 +4055,7 @@ public:
         }
     }
 
-    void merge(object_iterator hint, const json_type& source)
+    void merge(object_iterator hint, const basic_json& source)
     {
         switch (var_.type())
         {
@@ -4071,7 +4071,7 @@ public:
         }
     }
 
-    void merge(object_iterator hint, json_type&& source)
+    void merge(object_iterator hint, basic_json&& source)
     {
         switch (var_.type())
         {
@@ -4089,7 +4089,7 @@ public:
 
     // merge_or_update
 
-    void merge_or_update(const json_type& source)
+    void merge_or_update(const basic_json& source)
     {
         switch (var_.type())
         {
@@ -4105,7 +4105,7 @@ public:
         }
     }
 
-    void merge_or_update(json_type&& source)
+    void merge_or_update(basic_json&& source)
     {
         switch (var_.type())
         {
@@ -4121,7 +4121,7 @@ public:
         }
     }
 
-    void merge_or_update(object_iterator hint, const json_type& source)
+    void merge_or_update(object_iterator hint, const basic_json& source)
     {
         switch (var_.type())
         {
@@ -4137,7 +4137,7 @@ public:
         }
     }
 
-    void merge_or_update(object_iterator hint, json_type&& source)
+    void merge_or_update(object_iterator hint, basic_json&& source)
     {
         switch (var_.type())
         {
@@ -4224,7 +4224,7 @@ public:
         {
         case storage_type::empty_object_val:
         case storage_type::object_val:
-            return object_value().insert(first, last, get_key_value<key_type,json_type>());
+            return object_value().insert(first, last, get_key_value<key_type,basic_json>());
             break;
         default:
             {
@@ -4240,7 +4240,7 @@ public:
         {
         case storage_type::empty_object_val:
         case storage_type::object_val:
-            return object_value().insert(tag, first, last, get_key_value<key_type,json_type>());
+            return object_value().insert(tag, first, last, get_key_value<key_type,basic_json>());
             break;
         default:
             {
@@ -4265,7 +4265,7 @@ public:
     }
 
     template <class... Args> 
-    json_type& emplace_back(Args&&... args)
+    basic_json& emplace_back(Args&&... args)
     {
         switch (var_.type())
         {
@@ -4288,12 +4288,12 @@ public:
         return var_.tag();
     }
 
-    void swap(json_type& b)
+    void swap(basic_json& b)
     {
         var_.swap(b.var_);
     }
 
-    friend void swap(json_type& a, json_type& b)
+    friend void swap(basic_json& a, basic_json& b)
     {
         a.swap(b);
     }
@@ -4315,26 +4315,26 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-    static json_type parse(const char_type* s, size_t length)
+    static basic_json parse(const char_type* s, size_t length)
     {
         parse_error_handler_type err_handler;
         return parse(s,length,err_handler);
     }
 
-    static json_type parse(const char_type* s, size_t length, parse_error_handler& err_handler)
+    static basic_json parse(const char_type* s, size_t length, parse_error_handler& err_handler)
     {
         return parse(string_view_type(s,length),err_handler);
     }
 
     JSONCONS_DEPRECATED("Instead, use parse(std::basic_istream<char_type>&)")
-    static json_type parse_file(const std::basic_string<char_type,char_traits_type>& filename)
+    static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename)
     {
         parse_error_handler_type err_handler;
         return parse_file(filename,err_handler);
     }
 
     JSONCONS_DEPRECATED("Instead, use parse(std::basic_istream<char_type>&, parse_error_handler&)")
-    static json_type parse_file(const std::basic_string<char_type,char_traits_type>& filename,
+    static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename,
                                  parse_error_handler& err_handler)
     {
         std::basic_ifstream<char_type> is(filename);
@@ -4342,24 +4342,24 @@ public:
     }
 
     JSONCONS_DEPRECATED("Instead, use parse(std::basic_istream<char_type>&)")
-    static json_type parse_stream(std::basic_istream<char_type>& is)
+    static basic_json parse_stream(std::basic_istream<char_type>& is)
     {
         return parse(is);
     }
     JSONCONS_DEPRECATED("Instead, use parse(std::basic_istream<char_type>&, parse_error_handler&)")
-    static json_type parse_stream(std::basic_istream<char_type>& is, parse_error_handler& err_handler)
+    static basic_json parse_stream(std::basic_istream<char_type>& is, parse_error_handler& err_handler)
     {
         return parse(is,err_handler);
     }
 
     JSONCONS_DEPRECATED("Instead, use parse(const string_view_type&)")
-    static json_type parse_string(const string_view_type& s)
+    static basic_json parse_string(const string_view_type& s)
     {
         return parse(s);
     }
 
     JSONCONS_DEPRECATED("Instead, use parse(parse(const string_view_type&, parse_error_handler&)")
-    static json_type parse_string(const string_view_type& s, parse_error_handler& err_handler)
+    static basic_json parse_string(const string_view_type& s, parse_error_handler& err_handler)
     {
         return parse(s,err_handler);
     }
@@ -4573,15 +4573,15 @@ public:
     }
 
     JSONCONS_DEPRECATED("Instead, use insert(const_array_iterator, T&&)")
-    void add(size_t index, const json_type& value)
+    void add(size_t index, const basic_json& value)
     {
         evaluate_with_default().add(index, value);
     }
 
     JSONCONS_DEPRECATED("Instead, use insert(const_array_iterator, T&&)")
-    void add(size_t index, json_type&& value)
+    void add(size_t index, basic_json&& value)
     {
-        evaluate_with_default().add(index, std::forward<json_type>(value));
+        evaluate_with_default().add(index, std::forward<basic_json>(value));
     }
 
     template <class T>
@@ -4674,13 +4674,13 @@ public:
 
     template<class T>
     JSONCONS_DEPRECATED("Instead, use get_with_default(const string_view_type&, T&&)")
-    json_type get(const string_view_type& name, T&& default_val) const
+    basic_json get(const string_view_type& name, T&& default_val) const
     {
         switch (var_.type())
         {
         case storage_type::empty_object_val:
             {
-                return json_type(std::forward<T>(default_val));
+                return basic_json(std::forward<T>(default_val));
             }
         case storage_type::object_val:
             {
@@ -4691,7 +4691,7 @@ public:
                 }
                 else
                 {
-                    return json_type(std::forward<T>(default_val));
+                    return basic_json(std::forward<T>(default_val));
                 }
             }
         default:
@@ -4702,9 +4702,9 @@ public:
     }
 
     JSONCONS_DEPRECATED("Instead, use at(const string_view_type&)")
-    const json_type& get(const string_view_type& name) const
+    const basic_json& get(const string_view_type& name) const
     {
-        static const json_type a_null = null_type();
+        static const basic_json a_null = null_type();
 
         switch (var_.type())
         {
@@ -4873,43 +4873,43 @@ public:
 
     template<int size>
     JSONCONS_DEPRECATED("Instead, use make_array()")
-    static typename std::enable_if<size==1,json_type>::type make_multi_array()
+    static typename std::enable_if<size==1,basic_json>::type make_multi_array()
     {
         return make_array();
     }
     template<size_t size>
     JSONCONS_DEPRECATED("Instead, use make_array(size_t)")
-    static typename std::enable_if<size==1,json_type>::type make_multi_array(size_t n)
+    static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n)
     {
         return make_array(n);
     }
     template<size_t size,typename T>
     JSONCONS_DEPRECATED("Instead, use make_array(size_t, T)")
-    static typename std::enable_if<size==1,json_type>::type make_multi_array(size_t n, T val)
+    static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n, T val)
     {
         return make_array(n,val);
     }
     template<size_t size>
     JSONCONS_DEPRECATED("Instead, use make_array(size_t, size_t)")
-    static typename std::enable_if<size==2,json_type>::type make_multi_array(size_t m, size_t n)
+    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n)
     {
         return make_array<2>(m, n);
     }
     template<size_t size,typename T>
     JSONCONS_DEPRECATED("Instead, use make_array(size_t, size_t, T)")
-    static typename std::enable_if<size==2,json_type>::type make_multi_array(size_t m, size_t n, T val)
+    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n, T val)
     {
         return make_array<2>(m, n, val);
     }
     template<size_t size>
     JSONCONS_DEPRECATED("Instead, use make_array(size_t, size_t, size_t)")
-    static typename std::enable_if<size==3,json_type>::type make_multi_array(size_t m, size_t n, size_t k)
+    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k)
     {
         return make_array<3>(m, n, k);
     }
     template<size_t size,typename T>
     JSONCONS_DEPRECATED("Instead, use make_array(size_t, size_t, size_t, T)")
-    static typename std::enable_if<size==3,json_type>::type make_multi_array(size_t m, size_t n, size_t k, T val)
+    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k, T val)
     {
         return make_array<3>(m, n, k, val);
     }
@@ -4946,7 +4946,7 @@ public:
 
     range<object_iterator> object_range()
     {
-        static json_type empty_object = object();
+        static basic_json empty_object = object();
         switch (var_.type())
         {
         case storage_type::empty_object_val:
@@ -4960,7 +4960,7 @@ public:
 
     range<const_object_iterator> object_range() const
     {
-        static const json_type empty_object = object();
+        static const basic_json empty_object = object();
         switch (var_.type())
         {
         case storage_type::empty_object_val:
@@ -5038,7 +5038,7 @@ public:
         switch (var_.type())
         {
         case storage_type::empty_object_val:
-            const_cast<json_type*>(this)->create_object_implicitly(); // HERE
+            const_cast<basic_json*>(this)->create_object_implicitly(); // HERE
             JSONCONS_FALLTHROUGH;
         case storage_type::object_val:
             return var_.object_data_cast()->value();
@@ -5110,15 +5110,15 @@ private:
         }
     }
 
-    friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_type& o)
+    friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const basic_json& o)
     {
         o.dump(os);
         return os;
     }
 
-    friend std::basic_istream<char_type>& operator<<(std::basic_istream<char_type>& is, json_type& o)
+    friend std::basic_istream<char_type>& operator<<(std::basic_istream<char_type>& is, basic_json& o)
     {
-        json_decoder<json_type> handler;
+        json_decoder<basic_json> handler;
         basic_json_reader<char_type,stream_source<char_type>> reader(is, handler);
         reader.read_next();
         reader.check_done();
