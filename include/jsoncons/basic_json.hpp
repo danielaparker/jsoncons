@@ -1923,14 +1923,6 @@ public:
         {
             return evaluate().template as<T>(std::forward<Args>(args)...);
         }
-/*
-        template<class T>
-        typename std::enable_if<std::is_same<string_type,T>::value,T>::type 
-        as(const char_allocator_type& allocator) const
-        {
-            return evaluate().template as<T>(allocator);
-        }
-*/
         bool as_bool() const
         {
             return evaluate().as_bool();
@@ -3435,14 +3427,7 @@ public:
     {
         return json_type_traits<basic_json,T>::as(*this,std::forward<Args>(args)...);
     }
-/*
-    template<class T>
-    typename std::enable_if<std::is_same<string_type,T>::value,T>::type 
-    as(const char_allocator_type& allocator) const
-    {
-        return json_type_traits<basic_json,T>::as(*this,allocator);
-    }
-*/
+
     bool as_bool() const 
     {
         switch (var_.type())
