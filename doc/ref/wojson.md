@@ -9,7 +9,7 @@ typedef basic_json<wchar_t,
 ```
 The `wojson` class is an instantiation of the [basic_json](basic_json.md) class template that uses `wchar_t` as the character type. The original insertion order of an object's name/value pairs is preserved. 
 
-`wojson` behaves similarly to [wjson](wjson.md), with these provisos:
+`wojson` behaves similarly to [wjson](wjson.md), with these particularities:
 
 - `wojson`, like `wjson`, supports object member `insert_or_assign` methods that take an `object_iterator` as the first parameter. But while with `wjson` that parameter is just a hint that allows optimization, with `wojson` it is the actual location where to insert the member.
 

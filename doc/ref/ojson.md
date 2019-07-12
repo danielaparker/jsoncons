@@ -10,7 +10,7 @@ typedef basic_json<char,
 The `ojson` class is an instantiation of the [basic_json](basic_json.md) class template that uses `char` as the character type. The original insertion order of an object's name/value pairs is preserved. 
 
 
-`ojson` behaves similarly to [json](json.md), with these provisos:
+`ojson` behaves similarly to [json](json.md), with these particularities:
 
 - `ojson`, like `json`, supports object member `insert_or_assign` methods that take an `object_iterator` as the first parameter. But while with `json` that parameter is just a hint that allows optimization, with `ojson` it is the actual location where to insert the member.
 
