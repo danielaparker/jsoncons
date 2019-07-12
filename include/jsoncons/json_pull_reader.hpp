@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_CURSOR_HPP
-#define JSONCONS_JSON_CURSOR_HPP
+#ifndef JSONCONS_JSON_PULL_READER_HPP
+#define JSONCONS_JSON_PULL_READER_HPP
 
 #include <memory> // std::allocator
 #include <string>
