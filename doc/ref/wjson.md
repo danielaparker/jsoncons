@@ -1,11 +1,8 @@
 ### jsoncons::wjson
 
-#### Header
 ```c++
 #include <jsoncons/json.hpp>
-```
 
-```c++
 typedef basic_json<wchar_t,
                    ImplementationPolicy = sorted_policy,
                    Allocator = std::allocator<wchar_t>> wjson

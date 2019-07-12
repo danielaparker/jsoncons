@@ -1,11 +1,8 @@
 ### jsoncons::basic_json
 
-#### Header
 ```c++
 #include <jsoncons/json.hpp>
-```
 
-```c++
 template< 
     class CharT,
     class ImplementationPolicy = sorted_policy,
