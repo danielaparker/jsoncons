@@ -101,7 +101,7 @@ class basic_json
 {
 public:
 
-    typedef Allocator allocator_type;
+    typedef Allocator allocator_type; 
 
     typedef ImplementationPolicy implementation_policy;
 
@@ -1664,7 +1664,7 @@ public:
         }
     public:
 
-        typedef proxy<ParentT> proxy_type;
+        typedef proxy<typename ParentT::proxy_type> proxy_type;
 
         range<object_iterator> object_range()
         {
@@ -1990,9 +1990,9 @@ public:
             return evaluate().at(i);
         }
 
-        proxy<proxy_type> operator[](const string_view_type& key)
+        proxy_type operator[](const string_view_type& key)
         {
-            return proxy<proxy_type>(*this,key);
+            return proxy_type(*this,key);
         }
 
         const basic_json& operator[](const string_view_type& name) const
@@ -2616,6 +2616,8 @@ public:
 #endif
     };
 
+    typedef proxy<basic_json> proxy_type;
+
     static basic_json parse(std::basic_istream<char_type>& is)
     {
         parse_error_handler_type err_handler;
@@ -3030,7 +3032,7 @@ public:
         return at(i);
     }
 
-    proxy<basic_json> operator[](const string_view_type& name)
+    proxy_type operator[](const string_view_type& name)
     {
         switch (var_.type())
         {
@@ -3038,7 +3040,7 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_type::object_val:
-            return proxy<basic_json>(*this, name);
+            return proxy_type(*this, name);
             break;
         default:
             JSONCONS_THROW(not_an_object(name.data(),name.length()));
