@@ -24,10 +24,10 @@ Several typedefs for common character types and policies for ordering an object'
 
 Type                |Definition
 --------------------|------------------------------
-[json](json.md)     |basic_json<char,sorted_policy,std::allocator<char>>
-[ojson](ojson.md)   |basic_json<char, preserve_order_policy, std::allocator<char>>
-[wjson](wjson.md)   |basic_json<wchar_t,sorted_policy,std::allocator<char>>
-[wojson](wojson.md) |basic_json<wchar_t, preserve_order_policy, std::allocator<char>>
+[json](json.md)     |`basic_json<char,sorted_policy,std::allocator<char>>`
+[ojson](ojson.md)   |`basic_json<char, preserve_order_policy, std::allocator<char>>`
+[wjson](wjson.md)   |`basic_json<wchar_t,sorted_policy,std::allocator<char>>`
+[wojson](wojson.md) |`basic_json<wchar_t, preserve_order_policy, std::allocator<char>>`
 
 Member type                         |Definition
 ------------------------------------|------------------------------
