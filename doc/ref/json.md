@@ -1,11 +1,16 @@
 ### jsoncons::json
 
+#### Header
+```c++
+#include <jsoncons/json.hpp>
+```
+
 ```c++
 typedef basic_json<char,
                    ImplementationPolicy = sorted_policy,
                    Allocator = std::allocator<char>> json
 ```
-The class `json` is an instantiation of the `basic_json` class template that uses `char` as the character type. 
+The class `json` is an instantiation of the [basic_json](basic_json.md) class template that uses `char` as the character type. 
 The order of an object's name/value pairs is not preserved, they are sorted alphabetically by name. 
 If you want to preserve the original insertion order, use [ojson](ojson.md) instead.
 

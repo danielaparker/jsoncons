@@ -308,7 +308,3 @@ Inserts basic_json value into stream using the specified [json_options](json_opt
     void swap(basic_json& a, basic_json& b)
 Exchanges the values of `a` and `b`
 
-#### Deprecated names
-
-As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro JSONCONS_NO_DEPRECATED, which is recommended for new code.
-
