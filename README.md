@@ -366,7 +366,7 @@ template<
     class ImplementationPolicy = sorted_policy,
     class Allocator = std::allocator<char>> class basic_json;
 ```
-The library includes four instantiations of `basic_json`:
+Several typedefs for common character types and policies for ordering an object's name/value pairs are provided:
 
 - [json](doc/ref/json.md) constructs a utf8 character json value that sorts name-value members alphabetically
 
