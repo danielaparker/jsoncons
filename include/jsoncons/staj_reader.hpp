@@ -185,6 +185,22 @@ public:
     }
 
     template<class T>
+    typename std::enable_if<std::is_same<T, byte_string_view>::value, T>::type
+        get() const
+    {
+        T s;
+        switch (event_type_)
+        {
+        case staj_event_type::byte_string_value:
+            s = T(value_.byte_string_data_, length_);
+            break;
+        default:
+            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a byte_string"));
+        }
+        return s;
+    }
+
+    template<class T>
     typename std::enable_if<jsoncons::detail::is_integer_like<T>::value, T>::type
         get() const
     {
@@ -528,7 +544,9 @@ bool staj_to_saj_event(const basic_staj_event<CharT>& ev,
         case staj_event_type::name:
             return handler.name(ev.template get<jsoncons::basic_string_view<CharT>>(), context);
         case staj_event_type::string_value:
-            return handler.string_value(ev.template get<jsoncons::basic_string_view<CharT>>(), ev.tag(), context);
+            return handler.string_value(ev.template get<basic_string_view<CharT>>(), ev.tag(), context);
+        case staj_event_type::byte_string_value:
+            return handler.byte_string_value(ev.template get<byte_string_view>(), ev.tag(), context);
         case staj_event_type::null_value:
             return handler.null_value(ev.tag(), context);
         case staj_event_type::bool_value:
