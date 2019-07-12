@@ -1,13 +1,13 @@
 ### jsoncons::decode_json
 
+```c++
+#include <jsoncons/json.hpp>
+```
+
 Decodes a JSON data format to a C++ data structure. `decode_json` will 
 work for all C++ classes that have [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) defined.
 
-#### Header
-
 ```c++
-#include <jsoncons/json.hpp>
-
 template <class T, class CharT>
 T decode_json(std::basic_istream<CharT>& is,
               const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options()); // (1)
@@ -28,10 +28,10 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
               const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options()); // (4)
 ```
 
-(1) Reads a JSON string value into a type T if T is an instantiation of [basic_json](../json.md) 
+(1) Reads a JSON string value into a type T if T is an instantiation of [basic_json](../basic_json.md) 
 or if T supports [json_type_traits](../json_type_traits.md).
 
-(2) Reads a JSON input stream into a type T if T is an instantiation of [basic_json](../json.md) 
+(2) Reads a JSON input stream into a type T if T is an instantiation of [basic_json](../basic_json.md) 
 or if T supports [json_type_traits](../json_type_traits.md).
 
 Functions (1)-(2) perform encodings using the default json type `basic_json<CharT>`.

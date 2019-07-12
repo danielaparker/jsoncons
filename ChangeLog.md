@@ -1,3 +1,45 @@
+master
+------
+
+Changes:
+
+- The long since deprecated `basic_json` member type `null_type` has been removed.
+  Instead, use `jsoncons::null_type`.
+
+- The return type of `key_value::key()` has been changed from `string_view_type` to `key_type`.
+
+version 0.128.0
+---------------
+
+Changes
+
+- `JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL` macro name deprecated and replaced with `JSONCONS_STRICT_MEMBER_TRAITS_DECL`
+- basic_json function name `get_semantic_tag()` deprecated and replaced with `tag()` 
+- staj_reader function name `get_semantic_tag()` deprecated and replaced with `tag()` 
+
+Defect fixes:
+
+- This version fixes a defect in the macros `JSONCONS_MEMBER_TRAITS_DECL` etc. which meant that 
+  the generated `json_traits_type` specializations were not compatible with `wchar_t` sources and results.
+
+- This version fixes a defect when the `operator[](const string_view_type& key)` is applied to a non const
+`basic_json`, which returns a proxy where the member associated with the key may or may not exist, 
+and an accessor declared `noexcept` is called in the case that it doesn't. In particular, the
+accessors `is_xxx` and `is<T>` now return `false` in this case.
+ 
+New macros
+
+- `JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(num_template_params,class_name,member_name1,member_name2,...)`
+- `JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL(num_template_params,class_name,member_name1,member_name2,...)`
+- `JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL(num_template_params,class_name,getter_name1,getter_name2,...)`
+
+`JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL`, `JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL` and `JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL`
+are for specializing `json_type_traits` for template types. The parameter `num_template_params` gives the number of template parameters. 
+
+- `JSONCONS_ENUM_TRAITS_DECL(enum_type_name,value1,value2,...)`
+
+`JSONCONS_ENUM_TRAITS_DECL` allows you to encode and decode an enum type as a string.
+
 version 0.127.0
 ---------------
 

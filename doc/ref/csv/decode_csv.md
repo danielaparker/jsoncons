@@ -2,7 +2,6 @@
 
 Decodes a [comma-separated variables (CSV)](https://en.wikipedia.org/wiki/Comma-separated_values) data format into a C++ data structure.
 
-#### Header
 ```c++
 #include <jsoncons_ext/csv/csv_reader.hpp>
 
@@ -15,10 +14,10 @@ T decode_csv(std::basic_istream<CharT>& is,
              const basic_csv_options<CharT>& options = basic_csv_options<CharT>::default_options())); // (2)
 ```
 
-(1) Reads a CSV string value into a type T if T is an instantiation of [basic_json](../json.md) 
+(1) Reads a CSV string value into a type T if T is an instantiation of [basic_json](../basic_json.md) 
 or if T supports [json_type_traits](../json_type_traits.md).
 
-(2) Reads a CSV input stream into a type T if T is an instantiation of [basic_json](../json.md) 
+(2) Reads a CSV input stream into a type T if T is an instantiation of [basic_json](../basic_json.md) 
 or if T supports [json_type_traits](../json_type_traits.md).
 
 #### Return value

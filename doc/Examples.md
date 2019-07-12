@@ -22,9 +22,10 @@
 
 [Convert JSON to/from C++ data structures by specializing json_type_traits](#G1)  
 [Mapping to C++ data structures with and without defaults allowed](#G2)  
-[An example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#G3)  
-[A polymorphic example](#G4)  
-[Convert JSON numbers to/from boost multiprecision numbers](#G5)
+[An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL](#G3)  
+[Serializing a templated class with the `JSONCONS_TEMPLATE_xxx` macros](#G4)  
+[A polymorphic example](#G5)  
+[Convert JSON numbers to/from boost multiprecision numbers](#G6)
 
 ### Construct
 
@@ -600,9 +601,9 @@ Charles Bukowski, Pulp, 22.48
 
 #### Mapping to C++ data structures with and without defaults allowed
 
-The macros `JSONCONS_MEMBER_TRAITS_DECL` and `JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL` both generate
-the `json_type_traits` boilerplate from member data. The difference is that `JSONCONS_MEMBER_TRAITS_DECL`
-does not require all data members to be present in the JSON data, while `JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL` does.
+The macros `JSONCONS_MEMBER_TRAITS_DECL` and `JSONCONS_STRICT_MEMBER_TRAITS_DECL` both generate
+the code to specialize `json_type_traits` from member data. The difference is that `JSONCONS_MEMBER_TRAITS_DECL`
+does not require all member names to be present in the JSON data, while `JSONCONS_STRICT_MEMBER_TRAITS_DECL` does.
 
 ```c++
 #include <iostream>
@@ -666,7 +667,7 @@ Output:
 
 If all members of the JSON data must be present, use
 ```
-JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
+JSONCONS_STRICT_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
 ```
 instead. This will cause an exception to be thrown with the message
 ```
@@ -675,10 +676,17 @@ Key 'ssn' not found
 
 <div id="G3"/>
 
-#### An example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits 
+#### An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL
 
-The macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` simplifies the creation of some necessary boilerplate
-from getter functions and a constructor. It must be placed outside any namespace blocks.
+This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS_DECL`
+and `JSONCONS_GETTER_CTOR_TRAITS_DECL` to specialize the 
+[json_type_traits](doc/ref/json_type_traits.md) for the enum type
+`ns::hiking_experience` and the classes `ns::hiking_reputon` and 
+`ns::hiking_reputation`.
+The macro `JSONCONS_ENUM_TRAITS_DECL` generates the code from
+the enum values, and the macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` 
+generates the code from the getter functions and a constructor. 
+These macro declarations must be placed outside any namespace blocks.
 
 ```c++
 #include <cassert>
@@ -686,83 +694,83 @@ from getter functions and a constructor. It must be placed outside any namespace
 #include <jsoncons/json.hpp>
 
 namespace ns {
-    class reputon
+    enum class hiking_experience {beginner,intermediate,advanced};
+
+    class hiking_reputon
     {
+        std::string rater_;
+        hiking_experience assertion_;
+        std::string rated_;
+        double rating_;
     public:
-        reputon(const std::string& rater,
-                const std::string& assertion,
-                const std::string& rated,
-                double rating)
+        hiking_reputon(const std::string& rater,
+                       hiking_experience assertion,
+                       const std::string& rated,
+                       double rating)
             : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating)
         {
         }
 
         const std::string& rater() const {return rater_;}
-        const std::string& assertion() const {return assertion_;}
+        hiking_experience assertion() const {return assertion_;}
         const std::string& rated() const {return rated_;}
         double rating() const {return rating_;}
 
-        friend bool operator==(const reputon& lhs, const reputon& rhs)
+        friend bool operator==(const hiking_reputon& lhs, const hiking_reputon& rhs)
         {
             return lhs.rater_ == rhs.rater_ && lhs.assertion_ == rhs.assertion_ && 
                    lhs.rated_ == rhs.rated_ && lhs.rating_ == rhs.rating_;
         }
 
-        friend bool operator!=(const reputon& lhs, const reputon& rhs)
+        friend bool operator!=(const hiking_reputon& lhs, const hiking_reputon& rhs)
         {
             return !(lhs == rhs);
         };
-
-    private:
-        std::string rater_;
-        std::string assertion_;
-        std::string rated_;
-        double rating_;
     };
 
-    class reputation_object
+    class hiking_reputation
     {
+        std::string application_;
+        std::vector<hiking_reputon> reputons_;
     public:
-        reputation_object(const std::string& application, 
-                          const std::vector<reputon>& reputons)
+        hiking_reputation(const std::string& application, 
+                          const std::vector<hiking_reputon>& reputons)
             : application_(application), 
               reputons_(reputons)
         {}
 
         const std::string& application() const { return application_;}
-        const std::vector<reputon>& reputons() const { return reputons_;}
+        const std::vector<hiking_reputon>& reputons() const { return reputons_;}
 
-        friend bool operator==(const reputation_object& lhs, const reputation_object& rhs)
+        friend bool operator==(const hiking_reputation& lhs, const hiking_reputation& rhs)
         {
             return (lhs.application_ == rhs.application_) && (lhs.reputons_ == rhs.reputons_);
         }
 
-        friend bool operator!=(const reputation_object& lhs, const reputation_object& rhs)
+        friend bool operator!=(const hiking_reputation& lhs, const hiking_reputation& rhs)
         {
             return !(lhs == rhs);
         };
-    private:
-        std::string application_;
-        std::vector<reputon> reputons_;
     };
 
 } // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputation_object, application, reputons)
+JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputation, application, reputons)
 
 using namespace jsoncons; // for convenience
 
 int main()
 {
-    ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
+    ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum",ns::hiking_experience::advanced,"Marilyn C",0.90} });
 
     std::string s;
     encode_json(val, s, indenting::indent);
     std::cout << s << "\n";
 
-    auto val2 = decode_json<ns::reputation_object>(s);
+    auto val2 = decode_json<ns::hiking_reputation>(s);
 
     assert(val2 == val);
 }
@@ -773,9 +781,9 @@ Output:
     "application": "hiking",
     "reputons": [
         {
-            "assertion": "strong-hiker",
+            "assertion": "advanced",
             "rated": "Marilyn C",
-            "rater": "HikingAsylum.example.com",
+            "rater": "HikingAsylum",
             "rating": 0.9
         }
     ]
@@ -784,10 +792,57 @@ Output:
 
 <div id="G4"/>
 
+#### Serializing a templated class with the `JSONCONS_TEMPLATE_xxx` macros
+
+```c++
+#include <cassert>
+#include <jsoncons/json.hpp>
+
+namespace ns {
+    template <typename T1, typename T2>
+    struct TemplatedStruct
+    {
+          T1 aT1;
+          T2 aT2;
+
+          friend bool operator==(const TemplatedStruct& lhs, const TemplatedStruct& rhs)
+          {
+              return lhs.aT1 == rhs.aT1 && lhs.aT2 == rhs.aT2;  
+          }
+
+          friend bool operator!=(const TemplatedStruct& lhs, const TemplatedStruct& rhs)
+          {
+              return !(lhs == rhs);
+          }
+    };
+
+} // namespace ns
+
+// Declare the traits. Specify the number of template parameters and which data members need to be serialized.
+JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
+
+using namespace jsoncons; // for convenience
+
+int main()
+{
+    typedef ns::TemplatedStruct<int,std::wstring> value_type;
+
+    value_type val{1, L"sss"};
+
+    std::wstring s;
+    encode_json(val, s);
+
+    auto val2 = decode_json<value_type>(s);
+    assert(val2 == val);
+}
+```
+
+<div id="G5"/>
+
 #### A polymorphic example
 
 `JSONCONS_GETTER_CTOR_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
-from getter functions and a constructor.
+from the getter functions and a constructor.
 
 ```c++
 #include <cassert>
@@ -977,7 +1032,7 @@ Output:
 ]
 ```
 
-<div id="G5"/>
+<div id="G6"/>
 
 #### Convert JSON numbers to/from boost multiprecision numbers
 
@@ -1466,8 +1521,8 @@ int main()
        "application": "hiking",
        "reputons": [
        {
-           "rater": "HikingAsylum.example.com",
-           "assertion": "strong-hiker",
+           "rater": "HikingAsylum",
+           "assertion": "advanced",
            "rated": "Marilyn C",
            "rating": 0.90
          }

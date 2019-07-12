@@ -1054,8 +1054,8 @@ typedef basic_cbor_encoder<jsoncons::bytes_result> cbor_bytes_serializer;
 template<class Result=jsoncons::binary_stream_result>
 using basic_cbor_serializer = basic_cbor_encoder<Result>; 
 
-typedef basic_cbor_encoder<jsoncons::binary_stream_result> cbor_serializer;
-typedef basic_cbor_encoder<jsoncons::bytes_result> cbor_buffer_serializer;
+JSONCONS_DEPRECATED("Instead, use cbor_encoder") typedef cbor_encoder cbor_serializer;
+JSONCONS_DEPRECATED("Instead, use cbor_bytes_encoder") typedef cbor_bytes_encoder cbor_buffer_serializer;
 #endif
 
 }}

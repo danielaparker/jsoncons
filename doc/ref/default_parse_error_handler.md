@@ -1,12 +1,10 @@
 ### jsoncons::default_parse_error_handler
 
 ```c++
+#include <jsoncons/parse_error_handler.hpp>
+
 class default_parse_error_handler;
 ```
-
-#### Header
-
-    #include <jsoncons/parse_error_handler.hpp>
 
 #### Base class
 

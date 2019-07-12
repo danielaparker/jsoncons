@@ -221,15 +221,17 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     template<class T>
+    JSONCONS_DEPRECATED("Instead, use get<T>()")
     T as() const
     {
         return get<T>();
     }
+    semantic_tag get_semantic_tag() const noexcept { return tag_; }
 #endif
 
     staj_event_type event_type() const noexcept { return event_type_; }
 
-    semantic_tag get_semantic_tag() const noexcept { return tag_; }
+    semantic_tag tag() const noexcept { return tag_; }
 private:
 
     int64_t as_int64() const
@@ -488,27 +490,27 @@ bool staj_to_saj_event(const basic_staj_event<CharT>& ev,
     switch (ev.event_type())
     {
         case staj_event_type::begin_array:
-            return handler.begin_array(ev.get_semantic_tag(), context);
+            return handler.begin_array(ev.tag(), context);
         case staj_event_type::end_array:
             return handler.end_array(context);
         case staj_event_type::begin_object:
-            return handler.begin_object(ev.get_semantic_tag(), context);
+            return handler.begin_object(ev.tag(), context);
         case staj_event_type::end_object:
             return handler.end_object(context);
         case staj_event_type::name:
             return handler.name(ev.template get<jsoncons::basic_string_view<CharT>>(), context);
         case staj_event_type::string_value:
-            return handler.string_value(ev.template get<jsoncons::basic_string_view<CharT>>(), ev.get_semantic_tag(), context);
+            return handler.string_value(ev.template get<jsoncons::basic_string_view<CharT>>(), ev.tag(), context);
         case staj_event_type::null_value:
-            return handler.null_value(ev.get_semantic_tag(), context);
+            return handler.null_value(ev.tag(), context);
         case staj_event_type::bool_value:
-            return handler.bool_value(ev.template get<bool>(), ev.get_semantic_tag(), context);
+            return handler.bool_value(ev.template get<bool>(), ev.tag(), context);
         case staj_event_type::int64_value:
-            return handler.int64_value(ev.template get<int64_t>(), ev.get_semantic_tag(), context);
+            return handler.int64_value(ev.template get<int64_t>(), ev.tag(), context);
         case staj_event_type::uint64_value:
-            return handler.uint64_value(ev.template get<uint64_t>(), ev.get_semantic_tag(), context);
+            return handler.uint64_value(ev.template get<uint64_t>(), ev.tag(), context);
         case staj_event_type::double_value:
-            return handler.double_value(ev.template get<double>(), ev.get_semantic_tag(), context);
+            return handler.double_value(ev.template get<double>(), ev.tag(), context);
         default:
             return false;
     }
@@ -824,14 +826,14 @@ using basic_stream_reader = basic_staj_reader<CharT>;
 template<class CharT>
 using basic_stream_filter = basic_staj_filter<CharT>;
 
-typedef basic_staj_event<char> stream_event;
-typedef basic_staj_event<wchar_t> wstream_event;
+JSONCONS_DEPRECATED("Instead, use staj_event") typedef basic_staj_event<char> stream_event;
+JSONCONS_DEPRECATED("Instead, use wstaj_event") typedef basic_staj_event<wchar_t> wstream_event;
 
-typedef basic_staj_reader<char> stream_reader;
-typedef basic_staj_reader<wchar_t> wstream_reader;
+JSONCONS_DEPRECATED("Instead, use staj_reader") typedef basic_staj_reader<char> stream_reader;
+JSONCONS_DEPRECATED("Instead, use wstaj_reader") typedef basic_staj_reader<wchar_t> wstream_reader;
 
-typedef basic_staj_filter<char> stream_filter;
-typedef basic_staj_filter<wchar_t> wstream_filter;
+JSONCONS_DEPRECATED("Instead, use staj_filter") typedef basic_staj_filter<char> stream_filter;
+JSONCONS_DEPRECATED("Instead, use wstaj_reader") typedef basic_staj_filter<wchar_t> wstream_filter;
 
 #endif
 

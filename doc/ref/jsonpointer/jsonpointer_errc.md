@@ -1,12 +1,10 @@
 ### jsoncons::jsonpointer::jsonpointer_errc
 
-The constant integer values scoped by `jsonpointer_errc` define the values for jsonpointer error codes.
-
-#### Header
-
 ```c++
 #include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
 ```
+
+The constant integer values scoped by `jsonpointer_errc` define the values for jsonpointer error codes.
 
 ### Member constants
 

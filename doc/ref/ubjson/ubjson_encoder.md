@@ -1,16 +1,14 @@
 ### jsoncons::ubjson::basic_ubjson_encoder
 
 ```c++
+#include <jsoncons_ext/ubjson/ubjson_encoder.hpp>
+
 template<
     class Result>
 > class basic_ubjson_encoder : public jsoncons::json_content_handler
 ```
 
 `basic_ubjson_encoder` is noncopyable and nonmoveable.
-
-#### Header
-
-    #include <jsoncons_ext/ubjson/ubjson_encoder.hpp>
 
 ![ubjson_encoder](./diagrams/ubjson_encoder.png)
 

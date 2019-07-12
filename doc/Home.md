@@ -1,18 +1,13 @@
 All core jsoncons classes and functions are in namespace `jsoncons`.  
 
-#### Unpacked Representation
+#### Variant-like Data Structure
 
-[json](ref/json.md)  
+[basic_json](ref/basic_json.md)  
 [json_parser](ref/json_parser.md)  
 [json_reader](ref/json_reader.md)  
 [json_decoder](ref/json_decoder.md)  
 
-[ojson](ref/ojson.md)  
-
-[wjson](ref/wjson.md)  
 [wjson_reader](ref/wjson_reader.md)  
-
-[wojson](ref/wojson.md)  
 
 #### C++/JSON Conversion
 

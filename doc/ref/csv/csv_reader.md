@@ -1,6 +1,8 @@
 ### jsoncons::csv::csv_reader
 
 ```c++
+#include <jsoncons_ext/csv/csv_reader.hpp>
+
 typedef basic_csv_reader<char,stream_source<char>> csv_reader
 ```
 
@@ -16,10 +18,6 @@ Type                       |Definition
 char_type                  |CharT
 source_type                |Src
 
-#### Header
-```c++
-#include <jsoncons_ext/csv/csv_reader.hpp>
-```
 #### Constructors
 
     template <class Source>

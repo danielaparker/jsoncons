@@ -1,6 +1,8 @@
 ### jsoncons::json_cursor
 
 ```c++
+#include <jsoncons/json_cursor.hpp>
+
 typedef basic_json_cursor<char> json_cursor
 ```
 
@@ -9,11 +11,6 @@ repeatedly process the `current()` event and call the `next()`
 function to advance to the next event, until `done()` returns `true`.
 
 `json_cursor` is noncopyable and nonmoveable.
-
-#### Header
-```c++
-#include <jsoncons/json_cursor.hpp>
-```
 
 ### Implemented interfaces
 

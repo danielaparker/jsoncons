@@ -38,7 +38,8 @@ namespace detail {
     template <class Json>
     struct operation_unwinder
     {
-        typedef typename Json::string_type string_type;
+        typedef typename Json::char_type char_type;
+        typedef std::basic_string<char_type> string_type;
         typedef typename Json::string_view_type string_view_type;
 
         struct entry
@@ -98,7 +99,7 @@ namespace detail {
     };
 
     template <class Json>
-    Json from_diff(const Json& source, const Json& target, const typename Json::string_type& path)
+    Json from_diff(const Json& source, const Json& target, const typename Json::string_view_type& path)
     {
         typedef typename Json::char_type char_type;
 
@@ -197,7 +198,7 @@ template <class Json>
 void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
 {
     typedef typename Json::char_type char_type;
-    typedef typename Json::string_type string_type;
+    typedef std::basic_string<char_type> string_type;
     typedef typename Json::string_view_type string_view_type;
 
    jsoncons::jsonpatch::detail::operation_unwinder<Json> unwinder(target);
@@ -472,7 +473,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
 template <class Json>
 Json from_diff(const Json& source, const Json& target)
 {
-    typename Json::string_type path;
+    std::basic_string<typename Json::char_type> path;
     return jsoncons::jsonpatch::detail::from_diff(source, target, path);
 }
 

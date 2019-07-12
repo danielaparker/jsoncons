@@ -1,15 +1,13 @@
 ### jsoncons::json_content_handler
 
 ```c++
+#include <jsoncons/json_content_handler.hpp>
+
 typedef basic_json_content_handler<char> json_content_handler
 ```
 
 Defines an interface for receiving JSON events. The `json_content_handler` class is an instantiation of the `basic_json_content_handler` class template that uses `char` as the character type. 
 
-#### Header
-```c++
-#include <jsoncons/json_content_handler.hpp>
-```
 #### Member types
 
 Member type                         |Definition

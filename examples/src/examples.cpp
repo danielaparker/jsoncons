@@ -262,9 +262,6 @@ void json_constructor_examples()
     json j6(x); // A double value
     std::cout << "(6) " << j6 << std::endl;
 
-    json j7(x,4); // A double value with specified precision
-    std::cout << "(7) " << j7 << std::endl;
-
     json j8("Hello"); // A text string
     std::cout << "(8) " << j8 << std::endl;
 
@@ -458,8 +455,8 @@ void get_example()
        "application": "hiking",
        "reputons": [
        {
-           "rater": "HikingAsylum.example.com",
-           "assertion": "strong-hiker",
+           "rater": "HikingAsylum",
+           "assertion": "advanced",
            "rated": "Marilyn C",
            "rating": 0.90
          }
@@ -567,17 +564,17 @@ int main()
 
         csv_examples();
 
-        ubjson_examples();
-
         jsonpath_examples();
 
         polymorphic_examples();
 
+        json_cursor_examples();
+
+        ubjson_examples();
+
         type_extensibility_examples();
 
         readme_examples();
-
-        json_cursor_examples();
     }
     catch (const std::exception& e)
     {

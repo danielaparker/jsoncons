@@ -1,21 +1,21 @@
 ### jsoncons::jsonpath_error
 
-#### Header
-
-    #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
+```c++
+#include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
+```
 
 `jsoncons::jsonpath::jsonpath_error` defines an exception type for reporting failures in jsonpath queries.
 
 ![jsonpath_error](./diagrams/jsonpath_error.png)
 
 #### Constructors
+```c++
+jsonpath_error(std::error_code ec);
 
-    jsonpath_error(std::error_code ec);
+jsonpath_error(std::error_code ec, size_t line, size_t column);
 
-    jsonpath_error(std::error_code ec, size_t line, size_t column);
-
-    jsonpath_error(const jsonpath_error& other);
-
+jsonpath_error(const jsonpath_error& other);
+```
 #### Member functions
 
     size_t line() const noexcept

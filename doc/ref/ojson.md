@@ -1,21 +1,16 @@
 ### jsoncons::ojson
 
 ```c++
+#include <jsoncons/json.hpp>
+
 typedef basic_json<char,
                    ImplementationPolicy = original_order_policy,
                    Allocator = std::allocator<char>> ojson
 ```
-The `ojson` class is an instantiation of the `basic_json` class template that uses `char` as the character type. The original insertion order of an object's name/value pairs is preserved. 
+The `ojson` class is an instantiation of the [basic_json](basic_json.md) class template that uses `char` as the character type. The original insertion order of an object's name/value pairs is preserved. 
 
-The `jsoncons` library will always rebind the supplied allocator from the template parameter to internal data structures.
 
-#### Header
-
-    #include <jsoncons/json.hpp>
-
-#### Interface
-
-The interface is the same as [json](json.md), with these provisos:
+`ojson` behaves similarly to [json](json.md), with these particularities:
 
 - `ojson`, like `json`, supports object member `insert_or_assign` methods that take an `object_iterator` as the first parameter. But while with `json` that parameter is just a hint that allows optimization, with `ojson` it is the actual location where to insert the member.
 

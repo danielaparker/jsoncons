@@ -9,6 +9,7 @@
 #include <utility>
 #include <ctime>
 #include <cstdint>
+#include "data_structures.hpp"
 
 using namespace jsoncons;
 
@@ -133,25 +134,6 @@ TEST_CASE("convert_tuple_test")
     }
 }
 #endif
-
-namespace ns {
-
-struct book
-{
-    std::string author;
-    std::string title;
-    double price;
-
-    friend std::ostream& operator<<(std::ostream& os, const book& b)
-    {
-        std::cout << "author: " << b.author << ", title: " << b.title << ", price: " << b.price << "\n";
-        return os;
-    }
-};
-
-} // namespace ns
-
-JSONCONS_MEMBER_TRAITS_DECL(ns::book,author,title,price)
     
 TEST_CASE("book_conversion_test")
 {
@@ -164,69 +146,15 @@ TEST_CASE("book_conversion_test")
 
 }
 
-namespace ns {
-
-    struct reputon
-    {
-        std::string rater;
-        std::string assertion;
-        std::string rated;
-        double rating;
-
-        friend bool operator==(const reputon& lhs, const reputon& rhs)
-        {
-            return lhs.rater == rhs.rater && lhs.assertion == rhs.assertion && 
-                   lhs.rated == rhs.rated && lhs.rating == rhs.rating;
-        }
-
-        friend bool operator!=(const reputon& lhs, const reputon& rhs)
-        {
-            return !(lhs == rhs);
-        };
-    };
-
-    class reputation_object
-    {
-        std::string application;
-        std::vector<reputon> reputons;
-
-        // Make json_type_traits specializations friends to give accesses to private members
-        JSONCONS_TYPE_TRAITS_FRIEND;
-
-        reputation_object()
-        {
-        }
-    public:
-        reputation_object(const std::string& application, const std::vector<reputon>& reputons)
-            : application(application), reputons(reputons)
-        {}
-
-        friend bool operator==(const reputation_object& lhs, const reputation_object& rhs)
-        {
-            return (lhs.application == rhs.application) && (lhs.reputons == rhs.reputons);
-        }
-
-        friend bool operator!=(const reputation_object& lhs, const reputation_object& rhs)
-        {
-            return !(lhs == rhs);
-        };
-    };
-
-} // namespace ns
-
-// Declare the traits. Specify which data members need to be serialized.
-JSONCONS_MEMBER_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
-JSONCONS_MEMBER_TRAITS_DECL(ns::reputation_object, application, reputons)
-
-TEST_CASE("reputation_object")
+TEST_CASE("hiking_reputation")
 {
-    ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
+    ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum",ns::hiking_experience::advanced,"Marilyn C",0.9} });
 
     SECTION("1")
     {
         std::string s;
         encode_json(val, s);
-        auto val2 = decode_json<ns::reputation_object>(s);
+        auto val2 = decode_json<ns::hiking_reputation>(s);
         CHECK(val2 == val);
     }
 
@@ -234,7 +162,7 @@ TEST_CASE("reputation_object")
     {
         std::string s;
         encode_json(val, s, indenting::indent);
-        auto val2 = decode_json<ns::reputation_object>(s);
+        auto val2 = decode_json<ns::hiking_reputation>(s);
         CHECK(val2 == val);
     }
 
@@ -243,7 +171,7 @@ TEST_CASE("reputation_object")
         std::string s;
         json_options options;
         encode_json(val, s, options, indenting::indent);
-        auto val2 = decode_json<ns::reputation_object>(s, options);
+        auto val2 = decode_json<ns::hiking_reputation>(s, options);
         CHECK(val2 == val);
     }
 
@@ -251,7 +179,7 @@ TEST_CASE("reputation_object")
     {
         std::string s;
         encode_json(ojson(), val, s);
-        auto val2 = decode_json<ns::reputation_object>(ojson(), s);
+        auto val2 = decode_json<ns::hiking_reputation>(ojson(), s);
         CHECK(val2 == val);
     }
 
@@ -259,7 +187,7 @@ TEST_CASE("reputation_object")
     {
         std::string s;
         encode_json(ojson(), val, s, indenting::indent);
-        auto val2 = decode_json<ns::reputation_object>(ojson(), s);
+        auto val2 = decode_json<ns::hiking_reputation>(ojson(), s);
         CHECK(val2 == val);
     }
 
@@ -268,7 +196,7 @@ TEST_CASE("reputation_object")
         std::string s;
         json_options options;
         encode_json(ojson(), val, s, options, indenting::indent);
-        auto val2 = decode_json<ns::reputation_object>(ojson(), s, options);
+        auto val2 = decode_json<ns::hiking_reputation>(ojson(), s, options);
         CHECK(val2 == val);
     }
 
@@ -276,7 +204,7 @@ TEST_CASE("reputation_object")
     {
         std::stringstream os;
         encode_json(val, os);
-        auto val2 = decode_json<ns::reputation_object>(os);
+        auto val2 = decode_json<ns::hiking_reputation>(os);
         CHECK(val2 == val);
     }
 
@@ -284,7 +212,7 @@ TEST_CASE("reputation_object")
     {
         std::stringstream os;
         encode_json(val, os, indenting::indent);
-        auto val2 = decode_json<ns::reputation_object>(os);
+        auto val2 = decode_json<ns::hiking_reputation>(os);
         CHECK(val2 == val);
     }
 
@@ -293,7 +221,7 @@ TEST_CASE("reputation_object")
         std::stringstream os;
         json_options options;
         encode_json(val, os, options, indenting::indent);
-        auto val2 = decode_json<ns::reputation_object>(os, options);
+        auto val2 = decode_json<ns::hiking_reputation>(os, options);
         CHECK(val2 == val);
     }
 
@@ -301,7 +229,7 @@ TEST_CASE("reputation_object")
     {
         std::stringstream os;
         encode_json(ojson(), val, os);
-        auto val2 = decode_json<ns::reputation_object>(ojson(), os);
+        auto val2 = decode_json<ns::hiking_reputation>(ojson(), os);
         CHECK(val2 == val);
     }
 
@@ -309,7 +237,7 @@ TEST_CASE("reputation_object")
     {
         std::stringstream os;
         encode_json(ojson(), val, os, indenting::indent);
-        auto val2 = decode_json<ns::reputation_object>(ojson(), os);
+        auto val2 = decode_json<ns::hiking_reputation>(ojson(), os);
         CHECK(val2 == val);
     }
 
@@ -318,10 +246,9 @@ TEST_CASE("reputation_object")
         std::stringstream os;
         json_options options;
         encode_json(ojson(), val, os, options, indenting::indent);
-        auto val2 = decode_json<ns::reputation_object>(ojson(), os, options);
+        auto val2 = decode_json<ns::hiking_reputation>(ojson(), os, options);
         CHECK(val2 == val);
     }
-
 }
 
 

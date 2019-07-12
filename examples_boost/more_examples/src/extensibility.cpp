@@ -54,7 +54,7 @@ namespace jsoncons
 
         static bool is(const Json& val) noexcept
         {
-            if (!(val.is_string() && val.get_semantic_tag() == semantic_tag::bigdec))
+            if (!(val.is_string() && val.tag() == semantic_tag::bigdec))
             {
                 return false;
             }

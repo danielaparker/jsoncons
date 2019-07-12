@@ -177,11 +177,13 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
+    JSONCONS_DEPRECATED("Instead, use buffer_length()")
     size_t buffer_capacity() const
     {
         return buffer_length_;
     }
 
+    JSONCONS_DEPRECATED("Instead, use buffer_length(size_t)")
     void buffer_capacity(size_t length)
     {
         buffer_length_ = length;
@@ -319,8 +321,8 @@ typedef basic_csv_reader<char> csv_reader;
 typedef basic_csv_reader<wchar_t> wcsv_reader;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_csv_reader<char,jsoncons::string_source<char>> csv_string_reader;
-typedef basic_csv_reader<wchar_t,jsoncons::string_source<wchar_t>> wcsv_string_reader;
+JSONCONS_DEPRECATED("Instead, use csv_reader") typedef csv_reader csv_string_reader;
+JSONCONS_DEPRECATED("Instead, use wcsv_reader") typedef wcsv_reader wcsv_string_reader;
 #endif
 
 }}

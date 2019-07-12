@@ -31,7 +31,7 @@ const std::string object_example = R"(
    "reputons": [
    {
        "rater": "HikingAsylum.array_example.com",
-       "assertion": "strong-hiker",
+       "assertion": "advanced",
        "rated": "Marilyn C",
        "rating": 0.90
      }

@@ -391,8 +391,9 @@ typedef basic_json_cursor<wchar_t> wjson_cursor;
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class CharT,class Src,class Allocator=std::allocator<CharT>>
 using basic_json_pull_reader = basic_json_cursor<CharT,Src,Allocator>;
-typedef basic_json_cursor<char> json_pull_reader;
-typedef basic_json_cursor<wchar_t> wjson_pull_reader;
+
+JSONCONS_DEPRECATED("Instead, use json_cursor") typedef json_cursor json_pull_reader;
+JSONCONS_DEPRECATED("Instead, use wjson_cursor") typedef wjson_cursor wjson_pull_reader;
 
 template<class CharT,class Src,class Allocator=std::allocator<CharT>>
 using basic_json_stream_reader = basic_json_cursor<CharT,Src,Allocator>;
@@ -400,11 +401,11 @@ using basic_json_stream_reader = basic_json_cursor<CharT,Src,Allocator>;
 template<class CharT,class Src,class Allocator=std::allocator<CharT>>
 using basic_json_staj_reader = basic_json_cursor<CharT,Src,Allocator>;
 
-typedef basic_json_cursor<char> json_stream_reader;
-typedef basic_json_cursor<wchar_t> wjson_stream_reader;
+JSONCONS_DEPRECATED("Instead, use json_cursor") typedef json_cursor json_stream_reader;
+JSONCONS_DEPRECATED("Instead, use wjson_cursor") typedef wjson_cursor wjson_stream_reader;
 
-typedef basic_json_cursor<char> json_staj_reader;
-typedef basic_json_cursor<wchar_t> wjson_staj_reader;
+JSONCONS_DEPRECATED("Instead, use json_cursor") typedef json_cursor json_staj_reader;
+JSONCONS_DEPRECATED("Instead, use wjson_cursor") typedef wjson_cursor wjson_staj_reader;
 #endif
 
 }

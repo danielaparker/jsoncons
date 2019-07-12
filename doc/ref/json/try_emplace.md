@@ -1,4 +1,4 @@
-### jsoncons::json::try_emplace
+### jsoncons::basic_json::try_emplace
 
 ```c++
 template <class T>

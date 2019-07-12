@@ -2,7 +2,6 @@
 
 Returns a `json` array of values or normalized path expressions selected from a root `json` structure.
 
-#### Header
 ```c++
 #include <jsoncons/jsonpath/json_query.hpp>
 

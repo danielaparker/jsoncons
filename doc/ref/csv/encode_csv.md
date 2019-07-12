@@ -2,7 +2,6 @@
 
 Encodes a C++ data structure into the CSV data format.
 
-#### Header
 ```c++
 #include <jsoncons_ext/csv/csv_encoder.hpp>
 
@@ -17,11 +16,11 @@ void encode_csv(const T& val,
                 const basic_csv_options<CharT>& options = basic_csv_options<CharT>::default_options())); // (2)
 ```
 
-(1) Writes a value of type T into a string in the CSV data format. Type T must be an instantiation of [basic_json](../json.md) 
+(1) Writes a value of type T into a string in the CSV data format. Type T must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). Uses the [encode options](csv_options.md)
 supplied or defaults.
 
-(2) Writes a value of type T into an output stream in the CSV data format. Type T must be an instantiation of [basic_json](../json.md) 
+(2) Writes a value of type T into an output stream in the CSV data format. Type T must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). Uses the [encode options](csv_options.md)
 supplied or defaults.
 

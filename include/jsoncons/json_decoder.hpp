@@ -26,11 +26,11 @@ public:
     using typename basic_json_content_handler<char_type>::string_view_type;
 
     typedef typename Json::key_value_type key_value_type;
-    typedef typename Json::string_type string_type;
+    typedef typename Json::key_type key_type;
     typedef typename Json::array array;
     typedef typename Json::object object;
     typedef typename Json::allocator_type json_allocator_type;
-    typedef typename string_type::allocator_type json_string_allocator;
+    typedef typename key_type::allocator_type json_string_allocator;
     typedef typename array::allocator_type json_array_allocator;
     typedef typename object::allocator_type json_object_allocator;
     typedef typename std::allocator_traits<json_allocator_type>:: template rebind_alloc<uint8_t> json_byte_allocator_type;
@@ -44,14 +44,12 @@ private:
 
     struct stack_item
     {
+        key_type name_;
+        Json value_;
+
         template <class... Args>
-        stack_item(std::true_type, Args&& ... args)
-            : name_(std::forward<Args>(args)...)
-        {
-        }
-        template <class... Args>
-        stack_item(std::false_type, Args&& ... args)
-            : value_(std::forward<Args>(args)...)
+        stack_item(key_type&& name, Args&& ... args)
+            : name_(std::move(name)), value_(std::forward<Args>(args)...)
         {
         }
 
@@ -60,9 +58,6 @@ private:
         stack_item(stack_item&&) = default;
         stack_item& operator=(const stack_item&) = default;
         stack_item& operator=(stack_item&&) = default;
-
-        string_type name_;
-        Json value_;
     };
 
     enum class structure_type {root_t, array_t, object_t};
@@ -83,7 +78,7 @@ private:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<stack_item> stack_item_allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<structure_info> size_t_allocator_type;
 
-
+    key_type name_;
     std::vector<stack_item,stack_item_allocator_type> item_stack_;
     std::vector<structure_info,size_t_allocator_type> structure_stack_;
     bool is_valid_;
@@ -113,6 +108,7 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED("Instead, use get_result()")
     Json& root()
     {
         return result_;
@@ -127,20 +123,12 @@ private:
 
     bool do_begin_object(semantic_tag tag, const ser_context&) override
     {
-        switch (structure_stack_.back().type_)
+        if (structure_stack_.back().type_ == structure_type::root_t)
         {
-            case structure_type::object_t:
-                item_stack_.back().value_ = Json(object(object_allocator_), tag);
-                break;
-            case structure_type::array_t:
-                item_stack_.emplace_back(std::false_type(), object(object_allocator_), tag);
-                break;
-            case structure_type::root_t:
-                item_stack_.clear();
-                is_valid_ = false;
-                item_stack_.emplace_back(std::false_type(), object(object_allocator_), tag);
-                break;
+            item_stack_.clear();
+            is_valid_ = false;
         }
+        item_stack_.emplace_back(std::forward<key_type>(name_), object(object_allocator_), tag);
         structure_stack_.emplace_back(structure_type::object_t, item_stack_.size()-1);
         return true;
     }
@@ -173,20 +161,12 @@ private:
 
     bool do_begin_array(semantic_tag tag, const ser_context&) override
     {
-        switch (structure_stack_.back().type_)
+        if (structure_stack_.back().type_ == structure_type::root_t)
         {
-            case structure_type::object_t:
-                item_stack_.back().value_ = Json(array(array_allocator_), tag);
-                break;
-            case structure_type::array_t:
-                item_stack_.emplace_back(std::false_type(), array(array_allocator_), tag);
-                break;
-            case structure_type::root_t:
-                item_stack_.clear();
-                is_valid_ = false;
-                item_stack_.emplace_back(std::false_type(), array(array_allocator_), tag);
-                break;
+            item_stack_.clear();
+            is_valid_ = false;
         }
+        item_stack_.emplace_back(std::forward<key_type>(name_), array(array_allocator_), tag);
         structure_stack_.emplace_back(structure_type::array_t, item_stack_.size()-1);
         return true;
     }
@@ -221,7 +201,7 @@ private:
 
     bool do_name(const string_view_type& name, const ser_context&) override
     {
-        item_stack_.emplace_back(std::true_type(), name.data(), name.length(), string_allocator_);
+        name_ = key_type(name.data(),name.length());
         return true;
     }
 
@@ -230,10 +210,8 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_type::object_t:
-                item_stack_.back().value_ = Json(sv, tag, string_allocator_);
-                break;
             case structure_type::array_t:
-                item_stack_.emplace_back(std::false_type(), sv, tag, string_allocator_);
+                item_stack_.emplace_back(std::forward<key_type>(name_), sv, tag, string_allocator_);
                 break;
             case structure_type::root_t:
                 result_ = Json(sv, tag, string_allocator_);
@@ -248,10 +226,8 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_type::object_t:
-                item_stack_.back().value_ = Json(b, tag, byte_allocator_);
-                break;
             case structure_type::array_t:
-                item_stack_.emplace_back(std::false_type(), b, tag, byte_allocator_);
+                item_stack_.emplace_back(std::forward<key_type>(name_), b, tag, byte_allocator_);
                 break;
             case structure_type::root_t:
                 result_ = Json(b, tag, byte_allocator_);
@@ -268,10 +244,8 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_type::object_t:
-                item_stack_.back().value_ = Json(value,tag);
-                break;
             case structure_type::array_t:
-                item_stack_.emplace_back(std::false_type(), value, tag);
+                item_stack_.emplace_back(std::forward<key_type>(name_), value, tag);
                 break;
             case structure_type::root_t:
                 result_ = Json(value,tag);
@@ -288,10 +262,8 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_type::object_t:
-                item_stack_.back().value_ = Json(value,tag);
-                break;
             case structure_type::array_t:
-                item_stack_.emplace_back(std::false_type(), value, tag);
+                item_stack_.emplace_back(std::forward<key_type>(name_), value, tag);
                 break;
             case structure_type::root_t:
                 result_ = Json(value,tag);
@@ -308,10 +280,8 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_type::object_t:
-                item_stack_.back().value_ = Json(value, tag);
-                break;
             case structure_type::array_t:
-                item_stack_.emplace_back(std::false_type(), value, tag);
+                item_stack_.emplace_back(std::forward<key_type>(name_), value, tag);
                 break;
             case structure_type::root_t:
                 result_ = Json(value, tag);
@@ -326,10 +296,8 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_type::object_t:
-                item_stack_.back().value_ = Json(value, tag);
-                break;
             case structure_type::array_t:
-                item_stack_.emplace_back(std::false_type(), value, tag);
+                item_stack_.emplace_back(std::forward<key_type>(name_), value, tag);
                 break;
             case structure_type::root_t:
                 result_ = Json(value, tag);
@@ -344,10 +312,8 @@ private:
         switch (structure_stack_.back().type_)
         {
             case structure_type::object_t:
-                item_stack_.back().value_ = Json(null_type(),tag);
-                break;
             case structure_type::array_t:
-                item_stack_.emplace_back(std::false_type(), null_type(), tag);
+                item_stack_.emplace_back(std::forward<key_type>(name_), null_type(), tag);
                 break;
             case structure_type::root_t:
                 result_ = Json(null_type(), tag);

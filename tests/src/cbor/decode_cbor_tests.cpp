@@ -23,8 +23,8 @@ TEST_CASE("cbor_view_test")
        "application": "hiking",
        "reputons": [
        {
-           "rater": "HikingAsylum.example.com",
-           "assertion": "strong-hiker",
+           "rater": "HikingAsylum",
+           "assertion": "advanced",
            "rated": "Marilyn C",
            "rating": 0.90
          }
@@ -77,8 +77,8 @@ TEST_CASE("jsonpointer_test")
        "application": "hiking",
        "reputons": [
        {
-           "rater": "HikingAsylum.example.com",
-           "assertion": "strong-hiker",
+           "rater": "HikingAsylum",
+           "assertion": "advanced",
            "rated": "Marilyn C",
            "rating": 0.90
          }
@@ -590,7 +590,7 @@ TEST_CASE("cbor array as<> test")
         CHECK(j[1].is<byte_string_view>());
         CHECK(j[2].is<bignum>());
         CHECK(j[3].is_string());
-        CHECK(j[3].get_semantic_tag() == semantic_tag::bigdec);
+        CHECK(j[3].tag() == semantic_tag::bigdec);
         CHECK(j[4].is<std::string>());
         CHECK(j[5].is<int>());
         CHECK(j[5].is<unsigned int>());

@@ -1,6 +1,8 @@
 ### jsoncons::bson::basic_msgpack_encoder
 
 ```c++
+#include <jsoncons_ext/bson/msgpack_encoder.hpp>
+
 template<
     class Result>
 > class basic_msgpack_encoder : public jsoncons::json_content_handler
@@ -8,9 +10,6 @@ template<
 
 `basic_msgpack_encoder` is noncopyable.
 
-#### Header
-
-    #include <jsoncons_ext/bson/msgpack_encoder.hpp>
 
 ![msgpack_encoder](./diagrams/msgpack_encoder.png)
 

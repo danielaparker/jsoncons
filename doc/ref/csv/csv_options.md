@@ -1,14 +1,11 @@
 ### jsoncons::csv::csv_options
 
 ```c++
+#include <jsoncons_ext/csv/csv_options.hpp>
+
 typedef basic_csv_options<char> csv_options
 ```
 Specifies options for encoding and decoding csv data. The `csv_options` class is an instantiation of the `basic_csv_options` class template that uses `char` as the character type.
-
-#### Header
-```c++
-#include <jsoncons_ext/csv/csv_options.hpp>
-```
 
 ![csv_options](./diagrams/csv_options.png)
 

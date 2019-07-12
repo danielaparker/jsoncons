@@ -1,13 +1,10 @@
 ### jsoncons::json_decoder
 
 ```c++
+#include <jsoncons/json_decoder.hpp>
+
 template <class Json>
 json_decoder
-```
-
-#### Header
-```c++
-#include <jsoncons/json_decoder.hpp>
 ```
 
 ![json_decoder](./diagrams/json_decoder.png)

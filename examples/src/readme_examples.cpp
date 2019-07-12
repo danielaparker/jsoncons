@@ -22,8 +22,8 @@ namespace readme
                "application": "hiking",
                "reputons": [
                {
-                   "rater": "HikingAsylum.example.com",
-                   "assertion": "strong-hiker",
+                   "rater": "HikingAsylum",
+                   "assertion": "advanced",
                    "rated": "Marilyn C",
                    "rating": 0.90
                  }
@@ -60,8 +60,8 @@ namespace readme
                "application": "hiking",
                "reputons": [
                {
-                   "rater": "HikingAsylum.example.com",
-                   "assertion": "strong-hiker",
+                   "rater": "HikingAsylum",
+                   "assertion": "advanced",
                    "rated": "Marilyn C",
                    "rating": 0.90
                  }
@@ -70,7 +70,7 @@ namespace readme
         )";
 
         // Decode the string of data into a c++ structure
-        ns::reputation_object v = decode_json<ns::reputation_object>(data);
+        ns::hiking_reputation v = decode_json<ns::hiking_reputation>(data);
 
         // Iterate over reputons array value
         std::cout << "(1)\n";
@@ -81,7 +81,7 @@ namespace readme
 
         // Encode the c++ structure into a string
         std::string s;
-        encode_json<ns::reputation_object>(v, s, indenting::indent);
+        encode_json<ns::hiking_reputation>(v, s, indenting::indent);
         std::cout << "(2)\n";
         std::cout << s << "\n";
     }
@@ -94,8 +94,8 @@ namespace readme
                "application": "hiking",
                "reputons": [
                {
-                   "rater": "HikingAsylum.example.com",
-                   "assertion": "strong-hiker",
+                   "rater": "HikingAsylum",
+                   "assertion": "advanced",
                    "rated": "Marilyn C",
                    "rating": 0.90
                  }

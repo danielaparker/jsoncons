@@ -1,12 +1,9 @@
 ### jsoncons::staj_filter
 
 ```c++
-typedef basic_staj_filter<char> staj_filter;
-```
-
-#### Header
-```c++
 #include <jsoncons/staj_reader.hpp>
+
+typedef basic_staj_filter<char> staj_filter;
 ```
 
 #### Destructor

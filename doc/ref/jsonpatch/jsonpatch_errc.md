@@ -1,12 +1,10 @@
 ### jsoncons::jsonpatch::jsonpatch_errc
 
-The constant integer values scoped by `jsonpatch_errc` define the values for jsonpatch error codes.
-
-#### Header
-
 ```c++
 #include <jsoncons_ext/jsonpatch/jsonpatch_error.hpp>
 ```
+
+The constant integer values scoped by `jsonpatch_errc` define the values for jsonpatch error codes.
 
 ### Member constants
 

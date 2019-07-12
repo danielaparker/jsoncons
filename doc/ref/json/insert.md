@@ -1,4 +1,4 @@
-### jsoncons::json::insert
+### jsoncons::basic_json::insert
 
 ```c++
 template <class T>

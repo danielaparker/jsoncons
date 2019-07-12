@@ -1,6 +1,8 @@
 ### jsoncons::csv::basic_csv_encoder
 
 ```c++
+#include <jsoncons_ext/csv/csv_encoder.hpp>
+
 template<
     class CharT,
     class Result
@@ -9,10 +11,6 @@ template<
 ```
 
 `basic_csv_encoder` and `basic_json_compressed_encoder` are noncopyable and nonmoveable.
-
-#### Header
-
-    #include <jsoncons_ext/csv/csv_encoder.hpp>
 
 ![csv_encoder](./diagrams/csv_encoder.png)
 

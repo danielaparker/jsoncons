@@ -79,9 +79,9 @@ std::error_code make_error_code(cbor_errc e)
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-typedef ser_error cbor_error;
-typedef ser_error cbor_decode_error;
-typedef cbor_errc cbor_reader_errc;
+JSONCONS_DEPRECATED("Instead, use ser_error") typedef ser_error cbor_error;
+JSONCONS_DEPRECATED("Instead, use ser_error") typedef ser_error cbor_decode_error;
+JSONCONS_DEPRECATED("Instead, use ser_error") typedef ser_error cbor_reader_errc;
 #endif
 
 }}

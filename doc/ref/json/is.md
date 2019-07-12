@@ -1,4 +1,4 @@
-### jsoncons::json::is
+### jsoncons::basic_json::is
 
 ```c++
 template <class T, class... Args>

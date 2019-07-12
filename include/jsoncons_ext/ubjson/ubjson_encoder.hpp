@@ -425,8 +425,8 @@ typedef basic_ubjson_encoder<jsoncons::bytes_result> ubjson_bytes_encoder;
 template<class Result=jsoncons::binary_stream_result>
 using basic_ubjson_serializer = basic_ubjson_encoder<Result>; 
 
-typedef basic_ubjson_encoder<jsoncons::binary_stream_result> ubjson_serializer;
-typedef basic_ubjson_encoder<jsoncons::bytes_result> ubjson_buffer_serializer;
+JSONCONS_DEPRECATED("Instead, use ubjson_encoder") typedef ubjson_encoder ubjson_serializer;
+JSONCONS_DEPRECATED("Instead, use ubjson_bytes_encoder") typedef ubjson_bytes_encoder ubjson_buffer_serializer;
 #endif
 
 }}

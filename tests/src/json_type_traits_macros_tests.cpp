@@ -12,65 +12,9 @@
 #include <utility>
 #include <ctime>
 #include <cstdint>
+#include "data_structures.hpp"
 
 using namespace jsoncons;
-
-namespace json_type_traits_macros_tests {
-
-    struct book
-    {
-        std::string author;
-        std::string title;
-        double price;
-    };
-    struct book2
-    {
-        std::string author;
-        std::string title;
-        double price;
-        std::string isbn;
-    };
-    class book3
-    {
-        std::string author_;
-        std::string title_;
-        double price_;
-    public:
-        book3(const std::string& author,
-              const std::string& title,
-              double price)
-            : author_(author), title_(title), price_(price)
-        {
-        }
-
-        book3(const book3&) = default;
-        book3(book3&&) = default;
-        book3& operator=(const book3&) = default;
-        book3& operator=(book3&&) = default;
-
-        const std::string& author() const
-        {
-            return author_;
-        }
-
-        const std::string& title() const
-        {
-            return title_;
-        }
-
-        double price() const
-        {
-            return price_;
-        }
-    };
-
-} // namespace jsoncons_member_traits_decl_tests
- 
-namespace ns = json_type_traits_macros_tests;
-
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::book3, author, title, price)
-JSONCONS_MEMBER_TRAITS_DECL(ns::book,author,title,price)
-JSONCONS_MEMBER_TRAITS_DECL(ns::book2,author,title,price,isbn)
 
 TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
 {
@@ -146,6 +90,130 @@ TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_DECL tests")
         CHECK(book.author() == an_author);
         CHECK(book.title() == a_title);
         CHECK(book.price() == Approx(a_price).epsilon(0.001));
+    }
+}
+
+TEST_CASE("JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL tests")
+{
+    SECTION("MyStruct<std::pair<int,int>>")
+    {
+        typedef ns::MyStruct<std::pair<int, int>> value_type;
+
+        value_type val;
+        val.typeContent = std::make_pair(1,2);
+        val.someString = "A string";
+
+        std::string s;
+        encode_json(val, s, indenting::indent);
+
+        auto val2 = decode_json<value_type>(s);
+
+        CHECK(val2.typeContent.first == val.typeContent.first);
+        CHECK(val2.typeContent.second == val.typeContent.second);
+        CHECK(val2.someString == val.someString);
+
+        //std::cout << val.typeContent.first << ", " << val.typeContent.second << ", " << val.someString << "\n";
+    }
+    SECTION("TemplatedStruct<int,double>")
+    {
+        typedef ns::TemplatedStruct<int,double> value_type;
+
+        value_type val;
+        val.aT1 = 1;
+        val.aT2 = 2;
+
+        std::string s;
+        encode_json(val, s, indenting::indent);
+
+        auto val2 = decode_json<value_type>(s);
+
+        CHECK(val2.aT1 == val.aT1);
+        CHECK(val2.aT2 == val.aT2);
+
+        //std::cout << val.typeContent.first << ", " << val.typeContent.second << ", " << val.someString << "\n";
+    }
+    SECTION("TemplatedStruct<int,wstring>")
+    {
+        typedef ns::TemplatedStruct<int,std::wstring> value_type;
+
+        value_type val;
+        val.aT1 = 1;
+        val.aT2 = L"sss";
+
+        std::wstring s;
+        encode_json(val, s, indenting::indent);
+
+        auto val2 = decode_json<value_type>(s);
+
+        CHECK(val2.aT1 == val.aT1);
+        CHECK(val2.aT2 == val.aT2);
+
+        //std::cout << val.typeContent.first << ", " << val.typeContent.second << ", " << val.someString << "\n";
+    }
+}
+
+TEST_CASE("JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL tests")
+{
+    SECTION("MyStruct<std::pair<int,int>>")
+    {
+        typedef ns::MyStruct3<std::pair<int, int>> value_type;
+
+        value_type val(std::make_pair(1,2), "A string");
+
+        std::string s;
+        encode_json(val, s, indenting::indent);
+
+        auto val2 = decode_json<value_type>(s);
+
+        CHECK(val2.typeContent().first == val.typeContent().first);
+        CHECK(val2.typeContent().second == val.typeContent().second);
+        CHECK(val2.someString() == val.someString());
+
+        //std::cout << val.typeContent.first << ", " << val.typeContent.second << ", " << val.someString << "\n";
+    }
+}
+
+TEST_CASE("JSONCONS_ENUM_TRAITS_DECL tests")
+{
+    SECTION("float_format default")
+    {
+        ns::float_format val{ns::float_format::hex};
+
+        std::string s;
+        encode_json(val,s);
+
+        auto val2 = decode_json<ns::float_format>(s);
+        CHECK(val2 == val);
+    }
+    SECTION("float_format hex")
+    {
+        ns::float_format val{ns::float_format()};
+
+        std::string s;
+        encode_json(val,s);
+
+        auto val2 = decode_json<ns::float_format>(s);
+        CHECK(val2 == val);
+    }
+    SECTION("float_format default L")
+    {
+        ns::float_format val{ns::float_format::hex};
+
+        std::wstring s;
+        encode_json(val,s);
+
+        auto val2 = decode_json<ns::float_format>(s);
+        CHECK(val2 == val);
+    }
+    SECTION("float_format hex L")
+    {
+        ns::float_format val{ns::float_format::hex};
+
+        std::wstring s;
+        encode_json(val,s);
+
+        auto val2 = decode_json<ns::float_format>(s);
+        CHECK(val2 == val);
     }
 }
 

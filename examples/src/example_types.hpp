@@ -41,65 +41,82 @@ namespace ns {
         unsigned int age;
     };
 
-    class reputon
+    enum class hiking_experience {beginner,intermediate,advanced};
+
+    class hiking_reputon
     {
+        std::string rater_;
+        hiking_experience assertion_;
+        std::string rated_;
+        double rating_;
     public:
-        reputon(const std::string& rater,
-                const std::string& assertion,
-                const std::string& rated,
-                double rating)
+        hiking_reputon(const std::string& rater,
+                       hiking_experience assertion,
+                       const std::string& rated,
+                       double rating)
             : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating)
         {
         }
 
         const std::string& rater() const {return rater_;}
-        const std::string& assertion() const {return assertion_;}
+        hiking_experience assertion() const {return assertion_;}
         const std::string& rated() const {return rated_;}
         double rating() const {return rating_;}
 
-        friend bool operator==(const reputon& lhs, const reputon& rhs)
+        friend bool operator==(const hiking_reputon& lhs, const hiking_reputon& rhs)
         {
             return lhs.rater_ == rhs.rater_ && lhs.assertion_ == rhs.assertion_ && 
                    lhs.rated_ == rhs.rated_ && lhs.rating_ == rhs.rating_;
         }
 
-        friend bool operator!=(const reputon& lhs, const reputon& rhs)
+        friend bool operator!=(const hiking_reputon& lhs, const hiking_reputon& rhs)
         {
             return !(lhs == rhs);
         };
-
-    private:
-        std::string rater_;
-        std::string assertion_;
-        std::string rated_;
-        double rating_;
     };
 
-    class reputation_object
+    class hiking_reputation
     {
+        std::string application_;
+        std::vector<hiking_reputon> reputons_;
     public:
-        reputation_object(const std::string& application, 
-                          const std::vector<reputon>& reputons)
+        hiking_reputation(const std::string& application, 
+                          const std::vector<hiking_reputon>& reputons)
             : application_(application), 
               reputons_(reputons)
         {}
 
         const std::string& application() const { return application_;}
-        const std::vector<reputon>& reputons() const { return reputons_;}
+        const std::vector<hiking_reputon>& reputons() const { return reputons_;}
 
-        friend bool operator==(const reputation_object& lhs, const reputation_object& rhs)
+        friend bool operator==(const hiking_reputation& lhs, const hiking_reputation& rhs)
         {
             return (lhs.application_ == rhs.application_) && (lhs.reputons_ == rhs.reputons_);
         }
 
-        friend bool operator!=(const reputation_object& lhs, const reputation_object& rhs)
+        friend bool operator!=(const hiking_reputation& lhs, const hiking_reputation& rhs)
         {
             return !(lhs == rhs);
         };
-    private:
-        std::string application_;
-        std::vector<reputon> reputons_;
     };
+
+    template <typename T1, typename T2>
+    struct TemplatedStruct
+    {
+          T1 aT1;
+          T2 aT2;
+
+          friend bool operator==(const TemplatedStruct& lhs, const TemplatedStruct& rhs)
+          {
+              return lhs.aT1 == rhs.aT1 && lhs.aT2 == rhs.aT2;  
+          }
+
+          friend bool operator!=(const TemplatedStruct& lhs, const TemplatedStruct& rhs)
+          {
+              return !(lhs == rhs);
+          }
+    };
+
 } // namespace ns
 
 namespace jsoncons {
@@ -135,10 +152,13 @@ namespace jsoncons {
 } // namespace jsoncons
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputation_object, application, reputons)
+JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputation, application, reputons)
 
 // Declare the traits. Specify which data members need to be serialized.
 JSONCONS_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
+
+JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
 
 #endif

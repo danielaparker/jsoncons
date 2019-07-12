@@ -1,21 +1,15 @@
 ### jsoncons::wojson
 
 ```c++
+#include <jsoncons/json.hpp>
+
 typedef basic_json<wchar_t,
                    ImplementationPolicy = original_order_policy,
                    Allocator = std::allocator<wchar_t>> wojson
 ```
-The `wojson` class is an instantiation of the `basic_json` class template that uses `wchar_t` as the character type. The original insertion order of an object's name/value pairs is preserved. 
+The `wojson` class is an instantiation of the [basic_json](basic_json.md) class template that uses `wchar_t` as the character type. The original insertion order of an object's name/value pairs is preserved. 
 
-The `jsoncons` library will always rebind the supplied allocator from the template parameter to internal data structures.
-
-#### Header
-```c++
-#include <jsoncons/json.hpp>
-```
-#### Interface
-
-The interface is the same as [wjson](wjson.md), substituting wide character instantiations of classes - `std::wstring`, `std::wistream`, etc. - for utf8 character ones.
+`wojson` behaves similarly to [wjson](wjson.md), with these particularities:
 
 - `wojson`, like `wjson`, supports object member `insert_or_assign` methods that take an `object_iterator` as the first parameter. But while with `wjson` that parameter is just a hint that allows optimization, with `wojson` it is the actual location where to insert the member.
 

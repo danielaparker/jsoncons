@@ -1,6 +1,8 @@
 ### jsoncons::basic_json_encoder
 
 ```c++
+#include <jsoncons/json_encoder.hpp>
+
 template<
     class CharT,
     class Result>
@@ -13,10 +15,6 @@ template<
 ```
 
 `basic_json_encoder` and `basic_json_compressed_encoder` are noncopyable and nonmoveable.
-
-#### Header
-
-    #include <jsoncons/json_encoder.hpp>
 
 ![json_encoder](./diagrams/json_encoder.png)
 

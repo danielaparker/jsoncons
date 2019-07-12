@@ -1,15 +1,12 @@
 ### jsoncons::staj_event
 
 ```c++
+#include <jsoncons/staj_reader.hpp>
+
 typedef basic_staj_event<char> staj_event;
 ```
 
-#### Header
-```c++
-#include <jsoncons/staj_reader.hpp>
-
 A JSON-like data event.
-```
 
 | Event type        | Sample data | Valid accessors |
 |-------------------|------------------------|-----------------|
@@ -31,7 +28,7 @@ A JSON-like data event.
     staj_event_type event_type() const noexcept;
 Returns a [staj_event_type](staj_event_type.md) for this event.
 
-    semantic_tag get_semantic_tag() const noexcept;
+    semantic_tag tag() const noexcept;
 Returns a [semantic_tag](semantic_tag.md) for this event.
 
     template <class T, class... Args>

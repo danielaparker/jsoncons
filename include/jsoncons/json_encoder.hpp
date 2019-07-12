@@ -1453,17 +1453,17 @@ using basic_json_serializer = basic_json_encoder<CharT,Result>;
 template<class CharT,class Result=jsoncons::stream_result<CharT>>
 using basic_json_compressed_serializer = basic_json_compressed_encoder<CharT,Result>; 
 
-typedef basic_json_serializer<char,jsoncons::stream_result<char>> json_serializer;
-typedef basic_json_serializer<wchar_t,jsoncons::stream_result<wchar_t>> wjson_encoder;
+JSONCONS_DEPRECATED("Instead, use json_encoder") typedef basic_json_encoder<char,jsoncons::stream_result<char>> json_serializer;
+JSONCONS_DEPRECATED("Instead, use wjson_encoder") typedef basic_json_encoder<wchar_t,jsoncons::stream_result<wchar_t>> wjson_serializer;
 
-typedef basic_json_compressed_serializer<char,jsoncons::stream_result<char>> json_compressed_serializer;
-typedef basic_json_compressed_serializer<wchar_t,jsoncons::stream_result<wchar_t>> wjson_compressed_serializer;
+JSONCONS_DEPRECATED("Instead, use json_compressed_encoder")  typedef basic_json_compressed_encoder<char,jsoncons::stream_result<char>> json_compressed_serializer;
+JSONCONS_DEPRECATED("Instead, use wjson_compressed_encoder") typedef basic_json_compressed_encoder<wchar_t,jsoncons::stream_result<wchar_t>> wjson_compressed_serializer;
 
-typedef basic_json_serializer<char,jsoncons::string_result<std::string>> json_string_serializer;
-typedef basic_json_serializer<wchar_t,jsoncons::string_result<std::wstring>> wjson_string_serializer;
+JSONCONS_DEPRECATED("Instead, use json_string_encoder")  typedef basic_json_encoder<char,jsoncons::string_result<std::string>> json_string_serializer;
+JSONCONS_DEPRECATED("Instead, use wjson_string_encoder") typedef basic_json_encoder<wchar_t,jsoncons::string_result<std::wstring>> wjson_string_serializer;
 
-typedef basic_json_compressed_serializer<char,jsoncons::string_result<std::string>> json_compressed_string_serializer;
-typedef basic_json_compressed_serializer<wchar_t,jsoncons::string_result<std::wstring>> wjson_compressed_string_serializer;
+JSONCONS_DEPRECATED("Instead, use json_compressed_string_encoder")  typedef basic_json_compressed_encoder<char,jsoncons::string_result<std::string>> json_compressed_string_serializer;
+JSONCONS_DEPRECATED("Instead, use wjson_compressed_string_encoder") typedef basic_json_compressed_encoder<wchar_t,jsoncons::string_result<std::wstring>> wjson_compressed_string_serializer;
 #endif
 
 }

@@ -610,8 +610,8 @@ typedef basic_csv_encoder<char,jsoncons::string_result<std::string>> csv_string_
 template<class CharT, class Result = jsoncons::stream_result<CharT>, class Allocator = std::allocator<CharT>>
 using basic_csv_serializer = basic_csv_encoder<CharT,Result,Allocator>;
 
-typedef basic_csv_serializer<char> csv_serializer;
-typedef basic_csv_serializer<char,jsoncons::string_result<std::string>> csv_string_serializer;
+JSONCONS_DEPRECATED("Instead, use csv_encoder") typedef csv_encoder csv_serializer;
+JSONCONS_DEPRECATED("Instead, use csv_string_encoder") typedef csv_string_encoder csv_string_serializer;
 #endif
 
 }}

@@ -1,7 +1,7 @@
 ## cbor extension
 
 The cbor extension implements decode from and encode to the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/).
-You can either parse into or serialize from a variant-like structure, [basic_json](../json.md), or your own
+You can either parse into or serialize from a variant-like structure, [basic_json](../basic_json.md), or your own
 data structures, using [json_type_traits](../json_type_traits.md).
 
 [decode_cbor](decode_cbor.md)
@@ -112,8 +112,8 @@ int main()
        "application": "hiking",
        "reputons": [
        {
-           "rater": "HikingAsylum.example.com",
-           "assertion": "strong-hiker",
+           "rater": "HikingAsylum",
+           "assertion": "advanced",
            "rated": "Marilyn C",
            "rating": 0.90
          }
@@ -159,8 +159,8 @@ Output:
     "application": "hiking",
     "reputons": [
         {
-            "rater": "HikingAsylum.example.com",
-            "assertion": "strong-hiker",
+            "rater": "HikingAsylum",
+            "assertion": "advanced",
             "rated": "Marilyn C",
             "rating": 0.9
         }

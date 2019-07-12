@@ -242,11 +242,13 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED("Instead, use basic_json_options<CharT>::max_nesting_depth()")
     size_t max_nesting_depth() const
     {
         return options_.max_nesting_depth();
     }
 
+    JSONCONS_DEPRECATED("Instead, use basic_json_options<CharT>::max_nesting_depth(size_t)")
     void max_nesting_depth(size_t value)
     {
         options_.max_nesting_depth() = value;
@@ -2562,6 +2564,7 @@ escape_u9:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
+    JSONCONS_DEPRECATED("Instead, use finish_parse(basic_json_content_handler<CharT>&)")
     void end_parse(basic_json_content_handler<CharT>& handler)
     {
         std::error_code ec;
@@ -2572,6 +2575,7 @@ escape_u9:
         }
     }
 
+    JSONCONS_DEPRECATED("Instead, use finish_parse(basic_json_content_handler<CharT>&, std::error_code&)")
     void end_parse(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
         while (!finished())
@@ -2580,6 +2584,7 @@ escape_u9:
         }
     }
 
+    JSONCONS_DEPRECATED("Instead, use update(const CharT*, size_t)")
     void set_source(const CharT* data, size_t length)
     {
         begin_input_ = data;

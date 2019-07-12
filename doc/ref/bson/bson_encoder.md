@@ -1,16 +1,14 @@
 ### jsoncons::bson::basic_bson_encoder
 
 ```c++
+#include <jsoncons_ext/bson/bson_encoder.hpp>
+
 template<
     class Result>
 > class basic_bson_encoder : public jsoncons::json_content_handler
 ```
 
 `basic_bson_encoder` is noncopyable.
-
-#### Header
-
-    #include <jsoncons_ext/bson/bson_encoder.hpp>
 
 ![bson_encoder](./diagrams/bson_encoder.png)
 

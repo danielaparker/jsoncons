@@ -1,15 +1,12 @@
 ### jsoncons::json_encode_options
 
 ```c++
+#include <jsoncons/json_options.hpp>
+
 typedef basic_json_encode_options<char> json_encode_options
 ```
 
 An abstract class that defines accessors for JSON encoding options. The `json_encode_options` class is an instantiation of the `basic_json_encode_options` class template that uses `char` as the character type.
-
-#### Header
-```c++
-#include <jsoncons/json_options.hpp>
-```
 
 #### Implementing classes
 

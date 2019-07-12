@@ -13,8 +13,6 @@ using namespace jsoncons;
 
 void book_extensibility_example()
 {
-    using jsoncons::json;
-
     ns::book book1{"Haruki Murakami", "Kafka on the Shore", 25.17};
 
     json j = book1;
@@ -84,13 +82,13 @@ void book_extensibility_example2()
 
 void reputons_extensibility_example()
 {
-    ns::reputation_object val("hiking", { ns::reputon{"HikingAsylum.example.com","strong-hiker","Marilyn C",0.90} });
+    ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum",ns::hiking_experience::advanced,"Marilyn C",0.90} });
 
     std::string s;
     encode_json(val, s, indenting::indent);
     std::cout << s << "\n";
 
-    auto val2 = decode_json<ns::reputation_object>(s);
+    auto val2 = decode_json<ns::hiking_reputation>(s);
 
     assert(val2 == val);
 }
@@ -152,14 +150,25 @@ struct is_json_type_traits_declared<own_vector> : public std::true_type
 
 void own_vector_extensibility_example()
 {
-    using jsoncons::json;
-
     json j = json::object{ {"1",2},{"3",4} };
     assert(j.is<own_vector>());
     auto v = j.as<own_vector>();
     json j2 = v;
 
     std::cout << j2 << "\n";
+}
+
+void templated_struct_example()
+{
+    typedef ns::TemplatedStruct<int,std::wstring> value_type;
+
+    value_type val{1, L"sss"};
+
+    std::wstring s;
+    encode_json(val, s);
+
+    auto val2 = decode_json<value_type>(s);
+    assert(val2 == val);
 }
 
 void type_extensibility_examples()
@@ -177,6 +186,8 @@ void type_extensibility_examples()
     reputons_extensibility_example();
 
     person_extensibility_example();
+
+    templated_struct_example();
 
     std::cout << std::endl;
 }

@@ -28,7 +28,7 @@ TEST_CASE("json(string, semantic_tag::datetime)")
 
     json j(s, semantic_tag::datetime);
 
-    CHECK(j.get_semantic_tag() == semantic_tag::datetime);
+    CHECK(j.tag() == semantic_tag::datetime);
     CHECK(j.as<std::string>() == s);
 }
 
@@ -40,7 +40,7 @@ TEST_CASE("json(string, semantic_tag::timestamp)")
         int t = 10000;
         json j(t, semantic_tag::timestamp);
 
-        CHECK(j.get_semantic_tag() == semantic_tag::timestamp);
+        CHECK(j.tag() == semantic_tag::timestamp);
         CHECK(j.as<int>() == t);
     }
     SECTION("negative integer")
@@ -48,7 +48,7 @@ TEST_CASE("json(string, semantic_tag::timestamp)")
         int t = -10000;
         json j(t, semantic_tag::timestamp);
 
-        CHECK(j.get_semantic_tag() == semantic_tag::timestamp);
+        CHECK(j.tag() == semantic_tag::timestamp);
         CHECK(j.as<int>() == t);
     }
     SECTION("floating point")
@@ -56,7 +56,7 @@ TEST_CASE("json(string, semantic_tag::timestamp)")
         double t = 10000.1;
         json j(t, semantic_tag::timestamp);
 
-        CHECK(j.get_semantic_tag() == semantic_tag::timestamp);
+        CHECK(j.tag() == semantic_tag::timestamp);
         CHECK(j.as<double>() == t);
     }
 

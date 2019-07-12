@@ -1,4 +1,4 @@
-### jsoncons::json::key_value 
+### jsoncons::key_value 
 
 ```c++
 template <class KeyT, class ValueT>
@@ -11,11 +11,13 @@ class key_value
 
 Member type                         |Definition
 ------------------------------------|------------------------------
-`string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 [string view](http://en.cppreference.com/w/cpp/string/basic_string_view) if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise proxied.  
+`key_type`        |KeyT
+`value_type`      |ValueT
+`string_view_type`|ValueT::string_view_type
 
 #### Accessors
     
-    string_view_type key() const
+    const key_type& key() const
 
     const json& value() const
 

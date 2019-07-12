@@ -1,7 +1,7 @@
-### `jsoncons::json::json`
+### `jsoncons::basic_json::basic_json`
 
 ```c++
-~json();
+~basic_json();
 ```
 
 Destroys all values and deletes all memory allocated for strings, arrays, and objects.

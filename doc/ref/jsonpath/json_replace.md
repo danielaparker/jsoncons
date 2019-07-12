@@ -2,12 +2,9 @@
 
 Searches for all values that match a JSONPath expression and replaces them with the specified value
 
-#### Header
 ```c++
 #include <jsoncons/jsonpath/json_query.hpp>
-```
 
-```c++
 template<class Json, class T>
 void json_replace(Json& root, 
                   const typename Json::string_view_type& path, 

@@ -2,7 +2,6 @@
 
 Selects a `json` value.
 
-#### Header
 ```c++
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 

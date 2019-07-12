@@ -2,7 +2,6 @@
 
 Create a JSON Patch from a diff of two json documents.
 
-#### Header
 ```c++
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 

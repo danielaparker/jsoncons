@@ -1,16 +1,14 @@
 ### jsoncons::json_filter
 
 ```c++
+#include <jsoncons/json_filter.hpp>
+
 typedef basic_json_filter<char> json_filter
 ```
 
 The `json_filter` class is an instantiation of the `basic_json_filter` class template that uses `char` as the character type.
 
 `json_filter` is noncopyable and nonmoveable.
-
-#### Header
-
-    #include <jsoncons/json_filter.hpp>
 
 ![json_filter](./diagrams/json_filter.png)
 

@@ -1,11 +1,10 @@
 ### jsoncons::csv::csv_encode_options
 
-An abstract class that defines accessors for CSV encode options.
-
-#### Header
 ```c++
 #include <jsoncons/csv/csv_options.hpp>
 ```
+
+An abstract class that defines accessors for CSV encode options.
 
 #### Implementing classes
 

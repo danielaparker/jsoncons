@@ -1,11 +1,8 @@
 ### jsoncons::staj_event_type
 
-#### Header
 ```c++
 #include <jsoncons/staj_reader.hpp>
-```
 
-```c++
 enum class staj_event_type
 {
     begin_object,

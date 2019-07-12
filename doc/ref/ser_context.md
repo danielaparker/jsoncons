@@ -1,14 +1,12 @@
 ### jsoncons::ser_context
 
 ```c++
+#include <jsoncons/parse_error_handler.hpp>
+
 class ser_context;
 ```
 
 Provides contextual information for serializing and deserializing JSON and JSON-like data formats. This information may be used for error reporting.
-
-#### Header
-
-    #include <jsoncons/parse_error_handler.hpp>
 
     virtual size_t line() const = 0;
 Returns the line number for the text being parsed.

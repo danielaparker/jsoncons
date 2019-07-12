@@ -1,6 +1,8 @@
 ### jsoncons::parse_error_handler
 
 ```c++
+#include <jsoncons/json_error_handler.hpp>
+
 class parse_error_handler;
 ```
 
@@ -8,10 +10,6 @@ When parsing JSON text with [json_reader](json_reader.md), if you need to implem
 customized error handling, you must implement this abstract class
 and pass it in the constructor of [json_reader](json_reader.md). The `read` method 
 will then report all warnings and errors through this interface.
-
-#### Header
-
-    #include <jsoncons/json_error_handler.hpp>
 
 #### Destructor
 

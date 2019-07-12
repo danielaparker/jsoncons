@@ -98,7 +98,6 @@ For the examples below you need to include some header files and construct a str
 ```c++
 #include <jsoncons/json.hpp>
 #include <iostream>
-#include <cassert>
 
 using namespace jsoncons; // for convenience
 
@@ -107,8 +106,8 @@ std::string data = R"(
        "application": "hiking",
        "reputons": [
        {
-           "rater": "HikingAsylum.example.com",
-           "assertion": "strong-hiker",
+           "rater": "HikingAsylum",
+           "assertion": "advanced",
            "rated": "Marilyn C",
            "rating": 0.90
          }
@@ -119,7 +118,7 @@ std::string data = R"(
 
 jsoncons allows you to work with the data in a number of ways:
 
-- As a variant-like structure, [basic_json](doc/ref/json.md) 
+- As a variant-like structure, [basic_json](doc/ref/basic_json.md) 
 
 - As a strongly typed C++ data structure
 
@@ -159,9 +158,9 @@ Output:
     "application": "hiking",
     "reputons": [
         {
-            "assertion": "strong-hiker",
+            "assertion": "advanced",
             "rated": "Marilyn C",
-            "rater": "HikingAsylum.example.com",
+            "rater": "HikingAsylum",
             "rating": 0.9
         }
     ]
@@ -186,56 +185,56 @@ in the `jsoncons` namespace.
 
 ```c++
 namespace ns {
-    class reputon
+    enum class hiking_experience {beginner,intermediate,advanced};
+
+    class hiking_reputon
     {
+        std::string rater_;
+        hiking_experience assertion_;
+        std::string rated_;
+        double rating_;
     public:
-        reputon(const std::string& rater,
-                const std::string& assertion,
-                const std::string& rated,
-                double rating)
+        hiking_reputon(const std::string& rater,
+                       hiking_experience assertion,
+                       const std::string& rated,
+                       double rating)
             : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating)
         {
         }
 
         const std::string& rater() const {return rater_;}
-        const std::string& assertion() const {return assertion_;}
+        hiking_experience assertion() const {return assertion_;}
         const std::string& rated() const {return rated_;}
         double rating() const {return rating_;}
-
-    private:
-        std::string rater_;
-        std::string assertion_;
-        std::string rated_;
-        double rating_;
     };
 
-    class reputation_object
+    class hiking_reputation
     {
+        std::string application_;
+        std::vector<hiking_reputon> reputons_;
     public:
-        reputation_object(const std::string& application, 
-                          const std::vector<reputon>& reputons)
+        hiking_reputation(const std::string& application, 
+                          const std::vector<hiking_reputon>& reputons)
             : application_(application), 
               reputons_(reputons)
         {}
 
         const std::string& application() const { return application_;}
-        const std::vector<reputon>& reputons() const { return reputons_;}
-    private:
-        std::string application_;
-        std::vector<reputon> reputons_;
+        const std::vector<hiking_reputon>& reputons() const { return reputons_;}
     };
 
 } // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized.
 
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputon, rater, assertion, rated, rating)
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::reputation_object, application, reputons)
+JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputation, application, reputons)
 
 int main()
 {
     // Decode the string of data into a c++ structure
-    ns::reputation_object v = decode_json<ns::reputation_object>(data);
+    ns::hiking_reputation v = decode_json<ns::hiking_reputation>(data);
 
     // Iterate over reputons array value
     std::cout << "(1)\n";
@@ -246,7 +245,7 @@ int main()
 
     // Encode the c++ structure into a string
     std::string s;
-    encode_json<ns::reputation_object>(v, s, indenting::indent);
+    encode_json<ns::hiking_reputation>(v, s, indenting::indent);
     std::cout << "(2)\n";
     std::cout << s << "\n";
 }
@@ -260,16 +259,23 @@ Marilyn C, 0.9
     "application": "hiking",
     "reputons": [
         {
-            "assertion": "strong-hiker",
+            "assertion": "advanced",
             "rated": "Marilyn C",
-            "rater": "HikingAsylum.example.com",
+            "rater": "HikingAsylum",
             "rating": 0.9
         }
     ]
 }
 ```
-The macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` simplifies the creation of some necessary boilerplate
-from getter functions and a constructor. It must be placed outside any namespace blocks.
+This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS_DECL`
+and `JSONCONS_GETTER_CTOR_TRAITS_DECL` to specialize the 
+[json_type_traits](doc/ref/json_type_traits.md) for the enum type
+`ns::hiking_experience` and the classes `ns::hiking_reputon` and 
+`ns::hiking_reputation`.
+The macro `JSONCONS_ENUM_TRAITS_DECL` generates the code from
+the enum values, and the macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` 
+generates the code from the getter functions and a constructor. 
+These macro declarations must be placed outside any namespace blocks.
 
 See [examples](doc/Examples.md#G1) for other ways of specializing `json_type_traits`.
 
@@ -335,9 +341,9 @@ name: reputons
 begin_array
 begin_object
 name: rater
-string_value: HikingAsylum.example.com
+string_value: HikingAsylum
 name: assertion
-string_value: strong-hiker
+string_value: advanced
 name: rated
 string_value: Marilyn C
 name: rating
@@ -349,17 +355,18 @@ end_object
 
 ## About jsoncons::basic_json
 
-The jsoncons library provides a `basic_json` class template, which is the generalization of a `json` value for different 
+The jsoncons library provides a [basic_json](doc/ref/basic_json.md) class template, which is the generalization of a `json` value for different 
 character types, different policies for ordering name-value pairs, etc. A `basic_json` provides a tree model
 of JSON-like data formats, and defines an interface for accessing and modifying that data.
-Despite its name, it is not JSON specific.
+Despite its name, it is not only JSON.
 
 ```c++
-typedef basic_json<char,
-                   ImplementationPolicy = sorted_policy,
-                   Allocator = std::allocator<char>> json;
+template< 
+    class CharT,
+    class ImplementationPolicy = sorted_policy,
+    class Allocator = std::allocator<char>> class basic_json;
 ```
-The library includes four instantiations of `basic_json`:
+Several typedefs for common character types and policies for ordering an object's name/value pairs are provided:
 
 - [json](doc/ref/json.md) constructs a utf8 character json value that sorts name-value members alphabetically
 
@@ -620,7 +627,9 @@ bar,UHVzcw==,273.15
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <iostream>
 #include <iomanip>
+#include <cassert>
 
 using namespace jsoncons; // For convenience
 
