@@ -35,8 +35,8 @@ public:
 private:
     static const size_t default_max_buffer_length = 16384;
 
+    basic_default_staj_filter<CharT> default_filter_;
     basic_staj_event_handler<CharT> event_handler_;
-    default_parse_error_handler default_err_handler_;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
 
@@ -55,38 +55,26 @@ public:
     typedef basic_string_view<CharT> string_view_type;
 
     // Constructors that throw parse exceptions
-    template <class Source>
-    basic_json_pull_reader(Source&& source)
-        : basic_json_pull_reader(std::forward<Source>(source),
-                            basic_json_options<CharT>::default_options(),
-                            default_err_handler_)
-    {
-    }
 
     template <class Source>
-    basic_json_pull_reader(Source&& source,
-                      parse_error_handler& err_handler)
-        : basic_json_pull_reader(std::forward<Source>(source),
-                            basic_json_options<CharT>::default_options(),
-                            err_handler)
+    basic_json_pull_reader(Source&& source, 
+                           const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options(),
+                           parse_error_handler& err_handler = default_parse_error_handler::get_instance())
+        : basic_json_pull_reader(std::forward<Source>(source), 
+                                 default_filter_,
+                                 options,
+                                 err_handler)
     {
     }
 
     template <class Source>
     basic_json_pull_reader(Source&& source, 
-                      const basic_json_decode_options<CharT>& options)
-        : basic_json_pull_reader(std::forward<Source>(source),
-                            options,
-                            default_err_handler_)
-    {
-    }
-
-    template <class Source>
-    basic_json_pull_reader(Source&& source, 
-                      const basic_json_decode_options<CharT>& options,
-                      parse_error_handler& err_handler,
-                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
-       : parser_(options,err_handler),
+                           basic_staj_filter<CharT>& filter,
+                           const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options(),
+                           parse_error_handler& err_handler = default_parse_error_handler::get_instance(),
+                           typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
+       : event_handler_(filter),
+         parser_(options,err_handler),
          source_(source),
          buffer_length_(default_max_buffer_length),
          eof_(false),
@@ -101,10 +89,12 @@ public:
 
     template <class Source>
     basic_json_pull_reader(Source&& source, 
-                      const basic_json_decode_options<CharT>& options,
-                      parse_error_handler& err_handler,
-                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
-       : parser_(options,err_handler),
+                           basic_staj_filter<CharT>& filter,
+                           const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options(),
+                           parse_error_handler& err_handler = default_parse_error_handler::get_instance(),
+                           typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
+       : event_handler_(filter),
+         parser_(options,err_handler),
          buffer_length_(0),
          eof_(false),
          begin_(false)
@@ -123,43 +113,65 @@ public:
         }
     }
 
+
     // Constructors that set parse error codes
     template <class Source>
     basic_json_pull_reader(Source&& source,
-                      std::error_code& ec)
-        : basic_json_pull_reader(std::forward<Source>(source),basic_json_options<CharT>::default_options(),default_err_handler_,ec)
+                           std::error_code& ec)
+        : basic_json_pull_reader(std::forward<Source>(source),
+                                 default_filter_,
+                                 basic_json_options<CharT>::default_options(),
+                                 default_parse_error_handler::get_instance(),
+                                 ec)
+    {
+    }
+
+    template <class Source>
+    basic_json_pull_reader(Source&& source, 
+                           const basic_json_decode_options<CharT>& options,
+                           std::error_code& ec)
+        : basic_json_pull_reader(std::forward<Source>(source),
+                                 default_filter_,
+                                 options,
+                                 default_parse_error_handler::get_instance(),
+                                 ec)
     {
     }
 
     template <class Source>
     basic_json_pull_reader(Source&& source,
-                      parse_error_handler& err_handler,
-                      std::error_code& ec)
+                           basic_staj_filter<CharT>& filter,
+                           std::error_code& ec)
         : basic_json_pull_reader(std::forward<Source>(source),
-                            basic_json_options<CharT>::default_options(),
-                            err_handler,
-                            ec)
+                                 filter,
+                                 basic_json_options<CharT>::default_options(),
+                                 default_parse_error_handler::get_instance(),
+                                 ec)
     {
     }
 
     template <class Source>
     basic_json_pull_reader(Source&& source, 
-                      const basic_json_decode_options<CharT>& options,
-                      std::error_code& ec)
+                           basic_staj_filter<CharT>& filter,
+                           const basic_json_decode_options<CharT>& options,
+                           std::error_code& ec)
         : basic_json_pull_reader(std::forward<Source>(source),
-                            options,
-                            default_err_handler_,
-                            ec)
+                                 filter,
+                                 options,
+                                 default_parse_error_handler::get_instance(),
+                                 ec)
     {
     }
 
     template <class Source>
     basic_json_pull_reader(Source&& source, 
-                      const basic_json_decode_options<CharT>& options,
-                      parse_error_handler& err_handler,
-                      std::error_code& ec,
-                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
-       : parser_(options,err_handler),
+                           basic_staj_filter<CharT>& filter,
+                           const basic_json_decode_options<CharT>& options,
+                           parse_error_handler& err_handler,
+                           std::error_code& ec,
+                           typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
+       : event_handler_(filter),
+         parser_(options,err_handler),
          source_(source),
          eof_(false),
          buffer_length_(default_max_buffer_length),
@@ -174,11 +186,13 @@ public:
 
     template <class Source>
     basic_json_pull_reader(Source&& source, 
-                      const basic_json_decode_options<CharT>& options,
-                      parse_error_handler& err_handler,
-                      std::error_code& ec,
-                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
-       : parser_(options,err_handler),
+                           basic_staj_filter<CharT>& filter,
+                           const basic_json_decode_options<CharT>& options,
+                           parse_error_handler& err_handler,
+                           std::error_code& ec,
+                           typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
+       : event_handler_(filter),
+         parser_(options,err_handler),
          eof_(false),
          buffer_length_(0),
          begin_(false)

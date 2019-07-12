@@ -44,6 +44,12 @@ private:
 
 class default_parse_error_handler : public parse_error_handler
 {
+public:
+    static parse_error_handler& get_instance()
+    {
+        static default_parse_error_handler handler;
+        return handler;
+    }
 private:
     bool do_error(std::error_code code,
                   const ser_context&) noexcept override

@@ -160,8 +160,6 @@ class basic_json_parser : public ser_context
     static const size_t initial_string_buffer_capacity_ = 1024;
     static const int default_initial_stack_capacity_ = 100;
 
-    default_parse_error_handler default_err_handler_;
-
     const basic_json_decode_options<CharT>& options_;
 
     parse_error_handler& err_handler_;
@@ -190,7 +188,7 @@ class basic_json_parser : public ser_context
 
 public:
     basic_json_parser()
-        : basic_json_parser(basic_json_options<CharT>::default_options(), default_err_handler_)
+        : basic_json_parser(basic_json_options<CharT>::default_options(), default_parse_error_handler::get_instance())
     {
     }
 
@@ -200,7 +198,7 @@ public:
     }
 
     basic_json_parser(const basic_json_decode_options<CharT>& options)
-        : basic_json_parser(options, default_err_handler_)
+        : basic_json_parser(options, default_parse_error_handler::get_instance())
     {
     }
 

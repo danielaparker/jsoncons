@@ -113,10 +113,9 @@ public:
 // Filtering the stream
 void filtering_a_json_stream()
 {
-    json_pull_reader cursor(example);
 
     author_filter filter;
-    filtered_staj_reader reader(cursor, filter);
+    json_pull_reader reader(example, filter);
 
     for (; !reader.done(); reader.next())
     {

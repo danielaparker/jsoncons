@@ -45,8 +45,6 @@ class basic_csv_reader
     basic_csv_reader(const basic_csv_reader&) = delete; 
     basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
 
-    default_parse_error_handler default_err_handler_;
-
     basic_csv_parser<CharT,Allocator> parser_;
     Src source_;
     std::vector<CharT,char_allocator_type> buffer_;
@@ -68,7 +66,7 @@ public:
        : basic_csv_reader(std::forward<Source>(source), 
                           handler, 
                           basic_csv_options<CharT>::default_options(), 
-                          default_err_handler_)
+                          default_parse_error_handler::get_instance())
     {
     }
 
@@ -80,7 +78,7 @@ public:
         : basic_csv_reader(std::forward<Source>(source), 
                            handler, 
                            options, 
-                           default_err_handler_)
+                           default_parse_error_handler::get_instance())
     {
     }
 

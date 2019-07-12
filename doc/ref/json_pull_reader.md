@@ -19,62 +19,53 @@ function to advance to the next event, until `done()` returns `true`.
 #### Constructors
 
     template <class Source>
-    basic_json_pull_reader(Source&& source); // (1)
+    basic_json_pull_reader(Source&& source, 
+                           const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options(),
+                           parse_error_handler& err_handler = default_parse_error_handler::get_instance()); // (1)
+
+    template <class Source>
+    basic_json_pull_reader(Source&& source, 
+                           basic_staj_filter<CharT>& filter,
+                           const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options(),
+                           parse_error_handler& err_handler = default_parse_error_handler::get_instance()); // (2)
+
+Constructors (1)-(2) read from a character sequence or stream and throw a 
+[ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
 
     template <class Source>
     basic_json_pull_reader(Source&& source,
-                      parse_error_handler& err_handler); // (2)
+                           std::error_code& ec); // (3)
 
     template <class Source>
     basic_json_pull_reader(Source&& source, 
-                      const basic_json_decode_options<CharT>& options); // (3)
+                           const basic_json_decode_options<CharT>& options,
+                           std::error_code& ec) // (4)
 
     template <class Source>
     basic_json_pull_reader(Source&& source, 
-                      const basic_json_decode_options<CharT>& options,
-                      parse_error_handler& err_handler); // (4)
-
-Constructors (1)-(4) read from a character sequence or stream and throw a 
-[ser_error](ser_error.md) if a parsing error is encountered 
-while processing the initial event.
-
-(1) Constructs a `json_pull_reader` that reads from a character sequence or stream `source`, 
-uses default [json_decode_options](json_decode_options.md)
-and a default [parse_error_handler](parse_error_handler.md).
-
-(2) Constructs a `json_pull_reader` that reads from a character sequence or stream `source`, 
-uses default [json_decode_options](json_decode_options.md)
-and a specified [parse_error_handler](parse_error_handler.md).
-
-(3) Constructs a `json_pull_reader` that reads from a character sequence or stream `source`, 
-uses the specified [json_decode_options](json_decode_options.md)
-and a default [parse_error_handler](parse_error_handler.md).
-
-(4) Constructs a `json_pull_reader` that reads from a character sequence or stream `source`, 
-uses the specified [json_decode_options](json_decode_options.md)
-and a specified [parse_error_handler](parse_error_handler.md).
+                           const basic_json_decode_options<CharT>& options,
+                           parse_error_handler& err_handler,
+                           std::error_code& ec) // (5)
 
     template <class Source>
     basic_json_pull_reader(Source&& source,
-                      std::error_code& ec); // (5)
-
-    template <class Source>
-    basic_json_pull_reader(Source&& source,
-                      parse_error_handler& err_handler,
-                      std::error_code& ec) // (6)
+                           basic_staj_filter<CharT>& filter,
+                           std::error_code& ec); // (6)
 
     template <class Source>
     basic_json_pull_reader(Source&& source, 
-                      const basic_json_decode_options<CharT>& options,
-                      std::error_code& ec) // (7)
+                           basic_staj_filter<CharT>& filter,
+                           const basic_json_decode_options<CharT>& options,
+                           std::error_code& ec) // (7)
 
     template <class Source>
     basic_json_pull_reader(Source&& source, 
-                      const basic_json_decode_options<CharT>& options,
-                      parse_error_handler& err_handler,
-                      std::error_code& ec) // (8)
+                           basic_staj_filter<CharT>& filter,
+                           const basic_json_decode_options<CharT>& options,
+                           parse_error_handler& err_handler,
+                           std::error_code& ec) // (8)
 
-Constructors (5)-(8) read from a character sequence or stream and set `ec`
+Constructors (3)-(8) read from a character sequence or stream and set `ec`
 if a parsing error is encountered while processing the initial event.
 
 Note: It is the programmer's responsibility to ensure that `basic_json_pull_reader` does not outlive any source, 
@@ -240,10 +231,68 @@ end_object
 end_array
 ```
 
+#### Filtering a JSON stream
+
+```c++
+#include <jsoncons/json_pull_reader.hpp>
+#include <string>
+#include <fstream>
+
+using namespace jsoncons;
+
+class author_filter : public staj_filter
+{
+    bool accept_next_ = false;
+public:
+    bool accept(const staj_event& event, const ser_context&) override
+    {
+        if (event.event_type()  == staj_event_type::name &&
+            event.as<jsoncons::string_view>() == "author")
+        {
+            accept_next_ = true;
+            return false;
+        }
+        else if (accept_next_)
+        {
+            accept_next_ = false;
+            return true;
+        }
+        else
+        {
+            accept_next_ = false;
+            return false;
+        }
+    }
+};
+
+int main()
+{
+    std::ifstream is("book_catalog.json");
+
+    author_filter filter;
+    json_pull_reader reader(is, filter);
+
+    for (; !reader.done(); reader.next())
+    {
+        const auto& event = reader.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::string_value:
+                std::cout << event.as<jsoncons::string_view>() << "\n";
+                break;
+        }
+    }
+}
+```
+Output:
+```
+Haruki Murakami
+Graham Greene
+```
+
 #### See also
 
 - [staj_reader](staj_reader.md) 
-- [filtered_staj_reader](filtered_staj_reader.md) 
 - [staj_array_iterator](staj_array_iterator.md) 
 - [staj_object_iterator](staj_object_iterator.md)
 

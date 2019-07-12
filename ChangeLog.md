@@ -8,6 +8,12 @@ Changes:
 
 - The return type of `key_value::key()` has been changed from `string_view_type` to `key_type`.
 
+- The name `json_cursor` has been deprecated (still works) and renamed to `json_pull_reader`
+  (this reverts a change made in 0.126.0) 
+
+- The class `filtered_staj_reader` has been deprecated, instead, use a filter in the constructor of `json_pull_reader`.
+  (this reverts a change made in 0.127.0) 
+
 version 0.128.0
 ---------------
 

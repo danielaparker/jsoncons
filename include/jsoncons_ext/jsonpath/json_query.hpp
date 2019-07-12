@@ -524,7 +524,6 @@ class jsonpath_evaluator : public ser_context
 
     function_table<Json,pointer> functions_;
 
-    default_parse_error_handler default_err_handler_;
     node_set nodes_;
     std::vector<node_set> stack_;
     size_t line_;

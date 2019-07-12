@@ -356,7 +356,7 @@ public:
     }
 };
 
-TEST_CASE("json_filtered_staj_reader tests")
+TEST_CASE("json_pull_reader with filter tests")
 {
     std::string s = R"(
     [
@@ -380,10 +380,8 @@ TEST_CASE("json_filtered_staj_reader tests")
     ]
     )";
 
-    json_pull_reader cursor(s);
     remove_mark_filter filter;
-    
-    filtered_staj_reader reader(cursor, filter);
+    json_pull_reader reader(s, filter);
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == staj_event_type::begin_array);

@@ -150,7 +150,6 @@ private:
     static const size_t default_max_buffer_length = 16384;
 
     basic_null_json_content_handler<CharT> default_content_handler_;
-    default_parse_error_handler default_err_handler_;
 
     basic_json_content_handler<CharT>& handler_;
 
@@ -172,7 +171,7 @@ public:
         : basic_json_reader(std::forward<Source>(source),
                             default_content_handler_,
                             basic_json_options<CharT>::default_options(),
-                            default_err_handler_)
+                            default_parse_error_handler::get_instance())
     {
     }
 
@@ -182,7 +181,7 @@ public:
         : basic_json_reader(std::forward<Source>(source),
                             default_content_handler_,
                             options,
-                            default_err_handler_)
+                            default_parse_error_handler::get_instance())
     {
     }
 
@@ -213,7 +212,7 @@ public:
         : basic_json_reader(std::forward<Source>(source),
                             handler,
                             basic_json_options<CharT>::default_options(),
-                            default_err_handler_)
+                            default_parse_error_handler::get_instance())
     {
     }
 
@@ -224,7 +223,7 @@ public:
         : basic_json_reader(std::forward<Source>(source),
                             handler,
                             options,
-                            default_err_handler_)
+                            default_parse_error_handler::get_instance())
     {
     }
 

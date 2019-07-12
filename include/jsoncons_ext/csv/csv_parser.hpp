@@ -69,7 +69,6 @@ class basic_csv_parser : public ser_context
 
     static const int default_depth = 3;
 
-    default_parse_error_handler default_err_handler_;
     csv_state_type state_;
     int top_;
     std::vector<csv_mode_type,csv_mode_allocator_type> stack_;
@@ -98,13 +97,17 @@ class basic_csv_parser : public ser_context
 
 public:
     basic_csv_parser(basic_json_content_handler<CharT>& handler)
-       : basic_csv_parser(handler, basic_csv_options<CharT>::default_options(), default_err_handler_)
+       : basic_csv_parser(handler, 
+                          basic_csv_options<CharT>::default_options(), 
+                          default_parse_error_handler::get_instance())
     {
     }
 
     basic_csv_parser(basic_json_content_handler<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options)
-        : basic_csv_parser(handler, options, default_err_handler_)
+        : basic_csv_parser(handler, 
+                           options, 
+                           default_parse_error_handler::get_instance())
     {
     }
 

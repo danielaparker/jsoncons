@@ -430,8 +430,8 @@ public:
     {
     }
 
-    basic_staj_event_handler(staj_event_type event_type)
-        : filter_(&base_filter_), event_(event_type)
+    basic_staj_event_handler(basic_staj_filter<CharT>& filter)
+        : filter_(std::addressof(filter)), event_(staj_event_type::null_value)
     {
     }
 
@@ -759,6 +759,7 @@ public:
     virtual const ser_context& context() const = 0;
 };
 
+#if !defined(JSONCONS_NO_DEPRECATED)
 template<class CharT>
 class basic_filtered_staj_reader : public basic_staj_reader<CharT>
 {
@@ -822,6 +823,7 @@ public:
         return reader_->context();
     }
 };
+#endif
 
 typedef basic_staj_event<char> staj_event;
 typedef basic_staj_event<wchar_t> wstaj_event;
@@ -832,12 +834,11 @@ typedef basic_staj_reader<wchar_t> wstaj_reader;
 typedef basic_staj_filter<char> staj_filter;
 typedef basic_staj_filter<wchar_t> wstaj_filter;
 
-typedef basic_filtered_staj_reader<char> filtered_staj_reader;
-typedef basic_filtered_staj_reader<wchar_t> wfiltered_staj_reader;
-
 #if !defined(JSONCONS_NO_DEPRECATED)
+JSONCONS_DEPRECATED("Instead, use json_pull_reader with staj_filter") typedef basic_filtered_staj_reader<char> filtered_staj_reader;
+JSONCONS_DEPRECATED("Instead, use wjson_pull_reader with wstaj_filter") typedef basic_filtered_staj_reader<wchar_t> wfiltered_staj_reader;
 
-typedef staj_event_type stream_event_type;
+JSONCONS_DEPRECATED("Instead, use staj_event_type") typedef staj_event_type stream_event_type;
 
 template<class CharT>
 using basic_stream_event = basic_staj_event<CharT>;
