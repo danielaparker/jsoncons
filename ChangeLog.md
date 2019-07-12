@@ -1,3 +1,13 @@
+master
+------
+
+Changes:
+
+- The long since deprecated `basic_json` member type `null_type` has been removed.
+  Instead, use `jsoncons::null_type`.
+
+- The return type of `key_value::key()` has been changed from `string_view_type` to `key_type`.
+
 version 0.128.0
 ---------------
 
