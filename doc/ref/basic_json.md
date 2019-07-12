@@ -153,7 +153,7 @@ Returns the allocator associated with the basic_json value.
     <td>Attempts to convert a basic_json value to a value of a type.</td> 
   </tr>
   <tr>
-    <td><a href="json/square_bracket_operator.md">operator[]</a></td>
+    <td><a href="json/operator_at.md">operator[]</a></td>
     <td>Access or insert specified element.</td> 
   </tr>
 </table>
