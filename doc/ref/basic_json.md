@@ -10,7 +10,7 @@ template<
 ```
 
 The class `basic_json` resembles a union. A `basic_json` holds a data item of one of its alternative types:
-null, bool, int64_t, uint64_t, double, text string, byte string, array, and object. The data item may be tagged with a 
+null, `bool`, `int64_t`, `uint64_t`, `double`, text string, byte string, array, and object. The data item may be tagged with a 
 [semantic_tag](semantic_tag.md) that provides additional information about the data item.
 
 When assigned a new `basic_json` value, the old value is overwritten. The type of the new value may be different from the old value. 
