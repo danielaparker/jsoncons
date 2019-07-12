@@ -358,12 +358,13 @@ end_object
 The jsoncons library provides a [basic_json](doc/ref/basic_json.md) class template, which is the generalization of a `json` value for different 
 character types, different policies for ordering name-value pairs, etc. A `basic_json` provides a tree model
 of JSON-like data formats, and defines an interface for accessing and modifying that data.
-Despite its name, it is not JSON specific.
+Despite its name, it is not only JSON.
 
 ```c++
-typedef basic_json<char,
-                   ImplementationPolicy = sorted_policy,
-                   Allocator = std::allocator<char>> json;
+template< 
+    class CharT,
+    class ImplementationPolicy = sorted_policy,
+    class Allocator = std::allocator<char>> class basic_json;
 ```
 The library includes four instantiations of `basic_json`:
 
