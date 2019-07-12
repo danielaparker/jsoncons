@@ -255,34 +255,6 @@ public:
         read_next(ec);
     }
 
-    void read_buffer(std::error_code& ec)
-    {
-        buffer_.clear();
-        buffer_.resize(buffer_length_);
-        size_t count = source_.read(buffer_.data(), buffer_length_);
-        buffer_.resize(static_cast<size_t>(count));
-        if (buffer_.size() == 0)
-        {
-            eof_ = true;
-        }
-        else if (begin_)
-        {
-            auto result = unicons::skip_bom(buffer_.begin(), buffer_.end());
-            if (result.ec != unicons::encoding_errc())
-            {
-                ec = result.ec;
-                return;
-            }
-            size_t offset = result.it - buffer_.begin();
-            parser_.update(buffer_.data()+offset,buffer_.size()-offset);
-            begin_ = false;
-        }
-        else
-        {
-            parser_.update(buffer_.data(),buffer_.size());
-        }
-    }
-
     void read_next(std::error_code& ec)
     {
         read_next(event_handler_, ec);
@@ -293,80 +265,14 @@ public:
         parser_.restart();
         while (!parser_.stopped())
         {
-            if (parser_.source_exhausted())
-            {
-                if (!source_.eof())
-                {
-                    read_buffer(ec);
-                    if (ec) return;
-                }
-                else
-                {
-                    eof_ = true;
-                }
-            }
-            parser_.parse_some(handler, ec);
+            parser_.parse(handler, ec);
             if (ec) return;
-        }
-    }
-
-    void check_done()
-    {
-        std::error_code ec;
-        check_done(ec);
-        if (ec)
-        {
-            throw ser_error(ec,parser_.line(),parser_.column());
         }
     }
 
     const ser_context& context() const override
     {
         return *this;
-    }
-
-    void check_done(std::error_code& ec)
-    {
-        try
-        {
-            if (source_.is_error())
-            {
-                ec = json_errc::source_error;
-                return;
-            }   
-            if (eof_)
-            {
-                parser_.check_done(ec);
-                if (ec) return;
-            }
-            else
-            {
-                while (!eof_)
-                {
-                    if (parser_.source_exhausted())
-                    {
-                        if (!source_.eof())
-                        {
-                            read_buffer(ec);     
-                            if (ec) return;
-                        }
-                        else
-                        {
-                            eof_ = true;
-                        }
-                    }
-                    if (!eof_)
-                    {
-                        parser_.check_done(ec);
-                        if (ec) return;
-                    }
-                }
-            }
-        }
-        catch (const ser_error& e)
-        {
-            ec = e.code();
-        }
     }
 
     bool eof() const
@@ -386,27 +292,7 @@ public:
 private:
 };
 
-typedef basic_cbor_cursor<char> json_cursor;
-typedef basic_cbor_cursor<wchar_t> wjson_cursor;
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-template<class CharT,class Src,class Allocator=std::allocator<CharT>>
-using basic_json_pull_reader = basic_cbor_cursor<CharT,Src,Allocator>;
-typedef basic_cbor_cursor<char> json_pull_reader;
-typedef basic_cbor_cursor<wchar_t> wjson_pull_reader;
-
-template<class CharT,class Src,class Allocator=std::allocator<CharT>>
-using basic_json_stream_reader = basic_cbor_cursor<CharT,Src,Allocator>;
-
-template<class CharT,class Src,class Allocator=std::allocator<CharT>>
-using basic_json_staj_reader = basic_cbor_cursor<CharT,Src,Allocator>;
-
-typedef basic_cbor_cursor<char> json_stream_reader;
-typedef basic_cbor_cursor<wchar_t> wjson_stream_reader;
-
-typedef basic_cbor_cursor<char> json_staj_reader;
-typedef basic_cbor_cursor<wchar_t> wjson_staj_reader;
-#endif
+typedef basic_cbor_cursor<char> cbor_cursor;
 
 } // namespace cbor
 } // namespace jsoncons
