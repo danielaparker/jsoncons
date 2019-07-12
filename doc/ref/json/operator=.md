@@ -1,13 +1,13 @@
-### `jsoncons::json::operator=`
+### `jsoncons::basic_json::operator=`
 
 ```c++
-json& operator=(const json& rhs);
-json& operator=(json&& rhs) noexcept; // (1)
+basic_json& operator=(const basic_json& rhs);
+basic_json& operator=(basic_json&& rhs) noexcept; // (1)
 
 template <class T>
-json& operator=(const T& rhs); // (2)
+basic_json& operator=(const T& rhs); // (2)
 
-json& operator=(const char_type* rhs); // (3)
+basic_json& operator=(const char_type* rhs); // (3)
 ```
 
 (1) Assigns a new `json` value to a `json` variable, replacing it's current contents.

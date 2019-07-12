@@ -28,10 +28,10 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
               const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options()); // (4)
 ```
 
-(1) Reads a JSON string value into a type T if T is an instantiation of [basic_json](../json.md) 
+(1) Reads a JSON string value into a type T if T is an instantiation of [basic_json](../basic_json.md) 
 or if T supports [json_type_traits](../json_type_traits.md).
 
-(2) Reads a JSON input stream into a type T if T is an instantiation of [basic_json](../json.md) 
+(2) Reads a JSON input stream into a type T if T is an instantiation of [basic_json](../basic_json.md) 
 or if T supports [json_type_traits](../json_type_traits.md).
 
 Functions (1)-(2) perform encodings using the default json type `basic_json<CharT>`.

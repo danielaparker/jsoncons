@@ -15,11 +15,11 @@ void encode_cbor(const T& val, std::ostream& os,
                  const cbor_encode_options& options = cbor_options::default_options()); // (2)
 ```
 
-(1) Writes a value of type T into a bytes buffer in the CBOR data format. Type T must be an instantiation of [basic_json](../json.md) 
+(1) Writes a value of type T into a bytes buffer in the CBOR data format. Type T must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). Uses the [encode options](cbor_options.md)
 supplied or defaults.
 
-(2) Writes a value of type T into a binary stream in the CBOR data format. Type T must be an instantiation of [basic_json](../json.md) 
+(2) Writes a value of type T into a binary stream in the CBOR data format. Type T must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). Uses the [encode options](cbor_options.md)
 supplied or defaults.
 

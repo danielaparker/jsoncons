@@ -1,22 +1,22 @@
-### jsoncons::json::make_array
+### jsoncons::basic_json::make_array
 
 ```c++
 template <class T>
-static json make_array(size_ n, const T& val)
+static basic_json make_array(size_ n, const T& val)
 
 template <class T>
-static json make_array(size_ n, const T& val, 
-                       const allocator_type& alloc = allocator_type())
+static basic_json make_array(size_ n, const T& val, 
+                             const allocator_type& alloc = allocator_type())
 
 template <size_t N>
-static json make_array(size_t size1 ... size_t sizeN)
+static basic_json make_array(size_t size1 ... size_t sizeN)
 
 template <size_t N,typename T>
-static json make_array(size_t size1 ... size_t sizeN, const T& val)
+static basic_json make_array(size_t size1 ... size_t sizeN, const T& val)
 
 template <size_t N,typename T>
-static json make_array(size_t size1 ... size_t sizeN, const T& val, 
-                       const allocator_type& alloc)
+static basic_json make_array(size_t size1 ... size_t sizeN, const T& val, 
+                             const allocator_type& alloc)
 ```
 Makes a multidimensional array with the number of dimensions specified as a template parameter. The size of each dimension is passed as a parameter, and optionally an inital value. If no initial value, the default is an empty json object. The elements may be accessed using familiar C++ native array syntax.
 

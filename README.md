@@ -355,7 +355,7 @@ end_object
 
 ## About jsoncons::basic_json
 
-The jsoncons library provides a `basic_json` class template, which is the generalization of a `json` value for different 
+The jsoncons library provides a [basic_json](doc/ref/basic_json.md) class template, which is the generalization of a `json` value for different 
 character types, different policies for ordering name-value pairs, etc. A `basic_json` provides a tree model
 of JSON-like data formats, and defines an interface for accessing and modifying that data.
 Despite its name, it is not JSON specific.

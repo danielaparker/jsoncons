@@ -1,6 +1,6 @@
 ## Examples
 
-The examples below illustrate the use of the [json](../ref/json.md) class and [json_query](../ref/jsonpath/json_query.md) function.
+The examples below illustrate the use of the [json](../ref/basic_json.md) class and [json_query](../ref/jsonpath/json_query.md) function.
 
 ### json construction
 

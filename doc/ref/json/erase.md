@@ -1,4 +1,4 @@
-### `jsoncons::json::erase`
+### `jsoncons::basic_json::erase`
 
 ```c++
 void erase(const_array_iterator pos); // (1)

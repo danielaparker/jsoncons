@@ -1,4 +1,4 @@
-### jsoncons::json::array_range
+### jsoncons::basic_json::array_range
 
 ```c++
 range<array_iterator> array_range();

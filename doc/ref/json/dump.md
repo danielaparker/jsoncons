@@ -1,4 +1,4 @@
-### `jsoncons::json::dump`
+### `jsoncons::basic_json::dump`
 
 ```c++
 template <class SAllocator>
@@ -19,11 +19,11 @@ void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
 
 void dump(std::ostream& os) const; // (5)
 
-void dump(std::ostream<CharT> os, indenting line_indent) const; // (6)
+void dump(std::ostream<char_type>& os, indenting line_indent) const; // (6)
 
-void dump(std::ostream<CharT> os, const json_options& options) const; // (7)
+void dump(std::ostream<char_type>& os, const json_options& options) const; // (7)
 
-void dump(std::ostream<CharT> os, const json_options& options, indenting line_indent) const; // (8)
+void dump(std::ostream<char_type>& os, const json_options& options, indenting line_indent) const; // (8)
 
 void dump(basic_json_content_handler<char_type>& content_handler) const; // (9)
 ```

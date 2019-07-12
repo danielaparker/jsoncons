@@ -13,10 +13,10 @@ template<class T>
 T decode_bson(std::istream& is); // (2)
 ```
 
-(1) Reads a BSON bytes buffer into a type T if T is an instantiation of [basic_json](../json.md) 
+(1) Reads a BSON bytes buffer into a type T if T is an instantiation of [basic_json](../basic_json.md) 
 or if T supports [json_type_traits](../json_type_traits.md).
 
-(2) Reads a BSON binary stream into a type T if T is an instantiation of [basic_json](../json.md) 
+(2) Reads a BSON binary stream into a type T if T is an instantiation of [basic_json](../basic_json.md) 
 or if T supports [json_type_traits](../json_type_traits.md).
 
 #### Exceptions
