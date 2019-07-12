@@ -2,7 +2,6 @@
 
 Decodes a [Binary JSON (BSON)](http://bsonspec.org/) data format into a C++ data structure.
 
-#### Header
 ```c++
 #include <jsoncons_ext/bson/bson.hpp>
 

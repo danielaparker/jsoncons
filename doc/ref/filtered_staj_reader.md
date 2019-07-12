@@ -1,12 +1,9 @@
 ### jsoncons::filtered_staj_reader
 
 ```c++
-typedef basic_filtered_staj_reader<char> filtered_staj_reader
-```
-
-#### Header
-```c++
 #include <jsoncons/staj_reader.hpp>
+
+typedef basic_filtered_staj_reader<char> filtered_staj_reader
 ```
 
 ### Implemented interfaces

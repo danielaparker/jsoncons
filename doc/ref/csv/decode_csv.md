@@ -2,7 +2,6 @@
 
 Decodes a [comma-separated variables (CSV)](https://en.wikipedia.org/wiki/Comma-separated_values) data format into a C++ data structure.
 
-#### Header
 ```c++
 #include <jsoncons_ext/csv/csv_reader.hpp>
 

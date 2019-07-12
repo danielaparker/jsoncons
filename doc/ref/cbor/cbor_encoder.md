@@ -1,16 +1,14 @@
 ### jsoncons::cbor::basic_cbor_encoder
 
 ```c++
+#include <jsoncons_ext/cbor/cbor_encoder.hpp>
+
 template<
     class Result>
 > class basic_cbor_encoder : public jsoncons::json_content_handler
 ```
 
 `basic_cbor_encoder` is noncopyable
-
-#### Header
-
-    #include <jsoncons_ext/cbor/cbor_encoder.hpp>
 
 ![cbor_encoder](./diagrams/cbor_encoder.png)
 

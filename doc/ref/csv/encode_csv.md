@@ -2,7 +2,6 @@
 
 Encodes a C++ data structure into the CSV data format.
 
-#### Header
 ```c++
 #include <jsoncons_ext/csv/csv_encoder.hpp>
 

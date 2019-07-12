@@ -1,15 +1,12 @@
 ### jsoncons::csv::csv_decode_options
 
 ```c++
+#include <jsoncons/csv/csv_options.hpp>
+
 typedef basic_csv_decode_options<char> csv_decode_options
 ```
 
 An abstract class that defines accessors for CSV decode options.
-
-#### Header
-```c++
-#include <jsoncons/csv/csv_options.hpp>
-```
 
 #### Implementing classes
 

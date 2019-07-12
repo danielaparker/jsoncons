@@ -1,8 +1,11 @@
 ### jsoncons::json_parser
 
 ```c++
+#include <jsoncons/json_parser.hpp>
+
 typedef basic_json_parser<char> json_parser
 ```
+
 `json_parser` is an incremental json parser. It can be fed its input
 in chunks, and does not require an entire file to be loaded in memory
 at one time.
@@ -30,10 +33,6 @@ and by the pull parser [json_cursor](json_cursor.md).
 
 `json_parser` is noncopyable and nonmoveable.
 
-#### Header
-```c++
-#include <jsoncons/json_parser.hpp>
-```
 #### Constructors
 
     json_parser(); // (1)

@@ -2,7 +2,6 @@
 
 Removes a `json` element.
 
-#### Header
 ```c++
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 

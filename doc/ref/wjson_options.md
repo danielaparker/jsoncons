@@ -1,15 +1,11 @@
 ### jsoncons::wjson_options
 
 ```c++
+#include <jsoncons/json_options.hpp>
+
 typedef basic_json_options<wchar_t> wjson_options
 ```
 The wjson_options class is an instantiation of the basic_json_options class template that uses `wchar_t` as the character type.
-
-#### Header
-
-```c++
-#include <jsoncons/json_options.hpp>
-```
 
 #### Interface
 

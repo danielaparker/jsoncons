@@ -2,7 +2,6 @@
 
 Encodes a C++ data structure into the [MessagePack](http://msgpack.org/index.html) data format.
 
-#### Header
 ```c++
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 

@@ -1,6 +1,8 @@
 ### jsoncons::basic_json_reader
 
 ```c++
+#include <jsoncons/json_reader.hpp>
+
 template<
     class CharT,
     class Src=jsoncons::stream_source<CharT>,
@@ -14,11 +16,6 @@ A `basic_json_reader` can read a sequence of JSON texts from a stream, using `re
 which omits the check for unconsumed non-whitespace characters. 
 
 `basic_json_reader` is noncopyable and nonmoveable.
-
-#### Header
-```c++
-#include <jsoncons/json_reader.hpp>
-```
 
 Four specializations for common character types and result types are defined:
 

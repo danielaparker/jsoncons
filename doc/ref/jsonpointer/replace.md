@@ -2,7 +2,6 @@
 
 Replace a `json` element or member.
 
-#### Header
 ```c++
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 

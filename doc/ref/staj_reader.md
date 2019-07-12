@@ -1,12 +1,9 @@
 ### jsoncons::staj_reader
 
 ```c++
-typedef basic_staj_reader<char> staj_reader
-```
-
-#### Header
-```c++
 #include <jsoncons/staj_reader.hpp>
+
+typedef basic_staj_reader<char> staj_reader
 ```
 
 The `staj_reader` interface supports forward, read-only, access to JSON and JSON-like data formats.

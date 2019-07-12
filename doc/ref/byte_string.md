@@ -1,14 +1,11 @@
 ### jsoncons::byte_string
 
 ```c++
+#include <jsoncons/byte_string.hpp>
+
 typedef basic_byte_string<Allocator = std::allocator<uint8_t>> byte_string;
 ```
 The `byte_string` class is an instantiation of the `basic_byte_string` class template that uses `std::allocator<uint8_t>` as the allocator type.
-
-#### Header
-```c++
-#include <jsoncons/byte_string.hpp>
-```
 
 #### Member types
 

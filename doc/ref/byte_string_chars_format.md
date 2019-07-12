@@ -1,12 +1,9 @@
 ### jsoncons::byte_string_chars_format
 
 ```c++
-enum class byte_string_chars_format : uint8_t {base16, base64, base64url};
-```
-
-#### Header
-```c++
 #include <jsoncons/json_options.hpp>
+
+enum class byte_string_chars_format : uint8_t {base16, base64, base64url};
 ```
 
 Specifies byte string formatting. 

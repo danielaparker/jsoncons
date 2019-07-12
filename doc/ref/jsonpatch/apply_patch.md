@@ -1,8 +1,5 @@
 ### jsoncons::jsonpatch::apply_patch
 
-Applies a patch to a `json` document.
-
-#### Header
 ```c++
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
@@ -12,6 +9,8 @@ void apply_patch(Json& target, const Json& patch); // (1)
 template <class Json>
 void apply_patch(Json& target, const Json& patch, std::error_code& ec); // (2)
 ```
+
+Applies a patch to a `json` document.
 
 #### Return value
 

@@ -1,15 +1,12 @@
 ### jsoncons::staj_event
 
 ```c++
+#include <jsoncons/staj_reader.hpp>
+
 typedef basic_staj_event<char> staj_event;
 ```
 
-#### Header
-```c++
-#include <jsoncons/staj_reader.hpp>
-
 A JSON-like data event.
-```
 
 | Event type        | Sample data | Valid accessors |
 |-------------------|------------------------|-----------------|

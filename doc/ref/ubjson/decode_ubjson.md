@@ -2,7 +2,6 @@
 
 Decodes a [Universal Binary JSON Specification (JSON)](http://ubjson.org/) data format into a C++ data structure.
 
-#### Header
 ```c++
 #include <jsoncons_ext/ubjson/ubjson.hpp>
 

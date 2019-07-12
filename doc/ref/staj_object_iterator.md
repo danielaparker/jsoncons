@@ -1,13 +1,10 @@
 ### jsoncons::staj_object_iterator
 
 ```c++
+#include <jsoncons/staj_iterator.hpp>
+
 template <class T>
 using staj_object_iterator = basic_staj_object_iterator<T,char,basic_json<char>>;
-```
-
-#### Header
-```c++
-#include <jsoncons/staj_iterator.hpp>
 ```
 
 A `staj_object_iterator` is an [InputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) that

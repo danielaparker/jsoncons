@@ -1,12 +1,10 @@
 ### jsoncons::jsonpointer::basic_pointer
 
 ```
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
 template <class CharT>
 class basic_pointer
-```
-#### Header
-```c++
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 ```
 
 Two specializations for common character types are defined:
@@ -26,11 +24,6 @@ string_type | `std::basic_string<char_type>`
 string_view_type | `jsoncons::basic_string_view<char_type>`
 const_iterator | A constant [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) with a `value_type` of `std::basic_string<char_type>`
 iterator    | An alias to `const_iterator`
-
-#### Header
-```c++
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-```
 
 #### Constructors
 

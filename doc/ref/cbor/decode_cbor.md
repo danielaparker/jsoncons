@@ -2,7 +2,6 @@
 
 Decodes a [Concise Binary Object Representation](http://cbor.io/) data format into a C++ data structure.
 
-#### Header
 ```c++
 #include <jsoncons_ext/cbor/cbor.hpp>
 

@@ -1,13 +1,13 @@
 ### jsoncons::decode_json
 
+```c++
+#include <jsoncons/json.hpp>
+```
+
 Decodes a JSON data format to a C++ data structure. `decode_json` will 
 work for all C++ classes that have [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) defined.
 
-#### Header
-
 ```c++
-#include <jsoncons/json.hpp>
-
 template <class T, class CharT>
 T decode_json(std::basic_istream<CharT>& is,
               const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options()); // (1)
