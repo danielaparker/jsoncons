@@ -26,7 +26,7 @@
 namespace jsoncons {
 
 template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
-class basic_json_cursor : public basic_staj_reader<CharT>, private virtual ser_context
+class basic_json_pull_reader : public basic_staj_reader<CharT>, private virtual ser_context
 {
 public:
     typedef Src source_type;
@@ -48,41 +48,41 @@ private:
     bool begin_;
 
     // Noncopyable and nonmoveable
-    basic_json_cursor(const basic_json_cursor&) = delete;
-    basic_json_cursor& operator=(const basic_json_cursor&) = delete;
+    basic_json_pull_reader(const basic_json_pull_reader&) = delete;
+    basic_json_pull_reader& operator=(const basic_json_pull_reader&) = delete;
 
 public:
     typedef basic_string_view<CharT> string_view_type;
 
     // Constructors that throw parse exceptions
     template <class Source>
-    basic_json_cursor(Source&& source)
-        : basic_json_cursor(std::forward<Source>(source),
+    basic_json_pull_reader(Source&& source)
+        : basic_json_pull_reader(std::forward<Source>(source),
                             basic_json_options<CharT>::default_options(),
                             default_err_handler_)
     {
     }
 
     template <class Source>
-    basic_json_cursor(Source&& source,
+    basic_json_pull_reader(Source&& source,
                       parse_error_handler& err_handler)
-        : basic_json_cursor(std::forward<Source>(source),
+        : basic_json_pull_reader(std::forward<Source>(source),
                             basic_json_options<CharT>::default_options(),
                             err_handler)
     {
     }
 
     template <class Source>
-    basic_json_cursor(Source&& source, 
+    basic_json_pull_reader(Source&& source, 
                       const basic_json_decode_options<CharT>& options)
-        : basic_json_cursor(std::forward<Source>(source),
+        : basic_json_pull_reader(std::forward<Source>(source),
                             options,
                             default_err_handler_)
     {
     }
 
     template <class Source>
-    basic_json_cursor(Source&& source, 
+    basic_json_pull_reader(Source&& source, 
                       const basic_json_decode_options<CharT>& options,
                       parse_error_handler& err_handler,
                       typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
@@ -100,7 +100,7 @@ public:
     }
 
     template <class Source>
-    basic_json_cursor(Source&& source, 
+    basic_json_pull_reader(Source&& source, 
                       const basic_json_decode_options<CharT>& options,
                       parse_error_handler& err_handler,
                       typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
@@ -125,17 +125,17 @@ public:
 
     // Constructors that set parse error codes
     template <class Source>
-    basic_json_cursor(Source&& source,
+    basic_json_pull_reader(Source&& source,
                       std::error_code& ec)
-        : basic_json_cursor(std::forward<Source>(source),basic_json_options<CharT>::default_options(),default_err_handler_,ec)
+        : basic_json_pull_reader(std::forward<Source>(source),basic_json_options<CharT>::default_options(),default_err_handler_,ec)
     {
     }
 
     template <class Source>
-    basic_json_cursor(Source&& source,
+    basic_json_pull_reader(Source&& source,
                       parse_error_handler& err_handler,
                       std::error_code& ec)
-        : basic_json_cursor(std::forward<Source>(source),
+        : basic_json_pull_reader(std::forward<Source>(source),
                             basic_json_options<CharT>::default_options(),
                             err_handler,
                             ec)
@@ -143,10 +143,10 @@ public:
     }
 
     template <class Source>
-    basic_json_cursor(Source&& source, 
+    basic_json_pull_reader(Source&& source, 
                       const basic_json_decode_options<CharT>& options,
                       std::error_code& ec)
-        : basic_json_cursor(std::forward<Source>(source),
+        : basic_json_pull_reader(std::forward<Source>(source),
                             options,
                             default_err_handler_,
                             ec)
@@ -154,7 +154,7 @@ public:
     }
 
     template <class Source>
-    basic_json_cursor(Source&& source, 
+    basic_json_pull_reader(Source&& source, 
                       const basic_json_decode_options<CharT>& options,
                       parse_error_handler& err_handler,
                       std::error_code& ec,
@@ -173,7 +173,7 @@ public:
     }
 
     template <class Source>
-    basic_json_cursor(Source&& source, 
+    basic_json_pull_reader(Source&& source, 
                       const basic_json_decode_options<CharT>& options,
                       parse_error_handler& err_handler,
                       std::error_code& ec,
@@ -385,27 +385,27 @@ public:
 private:
 };
 
-typedef basic_json_cursor<char> json_cursor;
-typedef basic_json_cursor<wchar_t> wjson_cursor;
+typedef basic_json_pull_reader<char> json_pull_reader;
+typedef basic_json_pull_reader<wchar_t> wjson_pull_reader;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class CharT,class Src,class Allocator=std::allocator<CharT>>
-using basic_json_pull_reader = basic_json_cursor<CharT,Src,Allocator>;
+using basic_json_pull_reader = basic_json_pull_reader<CharT,Src,Allocator>;
 
-JSONCONS_DEPRECATED("Instead, use json_cursor") typedef json_cursor json_pull_reader;
-JSONCONS_DEPRECATED("Instead, use wjson_cursor") typedef wjson_cursor wjson_pull_reader;
-
-template<class CharT,class Src,class Allocator=std::allocator<CharT>>
-using basic_json_stream_reader = basic_json_cursor<CharT,Src,Allocator>;
+JSONCONS_DEPRECATED("Instead, use json_pull_reader") typedef json_pull_reader json_pull_reader;
+JSONCONS_DEPRECATED("Instead, use wjson_pull_reader") typedef wjson_pull_reader wjson_pull_reader;
 
 template<class CharT,class Src,class Allocator=std::allocator<CharT>>
-using basic_json_staj_reader = basic_json_cursor<CharT,Src,Allocator>;
+using basic_json_stream_reader = basic_json_pull_reader<CharT,Src,Allocator>;
 
-JSONCONS_DEPRECATED("Instead, use json_cursor") typedef json_cursor json_stream_reader;
-JSONCONS_DEPRECATED("Instead, use wjson_cursor") typedef wjson_cursor wjson_stream_reader;
+template<class CharT,class Src,class Allocator=std::allocator<CharT>>
+using basic_json_staj_reader = basic_json_pull_reader<CharT,Src,Allocator>;
 
-JSONCONS_DEPRECATED("Instead, use json_cursor") typedef json_cursor json_staj_reader;
-JSONCONS_DEPRECATED("Instead, use wjson_cursor") typedef wjson_cursor wjson_staj_reader;
+JSONCONS_DEPRECATED("Instead, use json_pull_reader") typedef json_pull_reader json_stream_reader;
+JSONCONS_DEPRECATED("Instead, use wjson_pull_reader") typedef wjson_pull_reader wjson_stream_reader;
+
+JSONCONS_DEPRECATED("Instead, use json_pull_reader") typedef json_pull_reader json_staj_reader;
+JSONCONS_DEPRECATED("Instead, use wjson_pull_reader") typedef wjson_pull_reader wjson_staj_reader;
 #endif
 
 }

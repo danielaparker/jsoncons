@@ -26,7 +26,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 [json_filter](ref/json_filter.md)  
 [rename_object_member_filter](ref/rename_object_member_filter.md)  
 
-[json_cursor](ref/json_cursor.md)  
+[json_pull_reader](ref/json_pull_reader.md)  
 [staj_reader](ref/staj_reader.md)  
 [filtered_staj_reader](ref/filtered_staj_reader.md)  
 [staj_filter](ref/staj_filter.md)  

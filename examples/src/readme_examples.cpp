@@ -103,7 +103,7 @@ namespace readme
             }
         )";
 
-        json_cursor reader(data);
+        json_pull_reader reader(data);
         for (; !reader.done(); reader.next())
         {
             const auto& event = reader.current();

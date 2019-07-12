@@ -45,7 +45,7 @@ The example JSON text, `book_catalog.json`, is used in the example below.
 #### Filtering a JSON stream
 
 ```c++
-#include <jsoncons/json_cursor.hpp>
+#include <jsoncons/json_pull_reader.hpp>
 #include <string>
 #include <fstream>
 
@@ -79,7 +79,7 @@ public:
 int main()
 {
     std::ifstream is("book_catalog.json");
-    json_cursor cursor(is);
+    json_pull_reader cursor(is);
 
     author_filter filter;
     filtered_staj_reader reader(cursor, filter);
@@ -106,5 +106,5 @@ Graham Greene
 
 - [staj_filter](staj_filter.md) 
 - [staj_reader](staj_reader.md) 
-- [json_cursor](json_cursor.md)
+- [json_pull_reader](json_pull_reader.md)
 
