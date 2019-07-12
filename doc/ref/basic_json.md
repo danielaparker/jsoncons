@@ -49,7 +49,7 @@ Member type                         |Definition
 `const_object_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to const [key_value_type](json/key_value.md)
 `array_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `basic_json`
 `const_array_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `const basic_json`
-`proxy_type`|Proxies a keyed value. Type `proxy_type` supports conversion to `basic_json&`.
+`proxy_type`|proxy<basic_json>. The `proxy_type` class supports conversion to `basic_json&`.
 
 ### Static member functions
 
