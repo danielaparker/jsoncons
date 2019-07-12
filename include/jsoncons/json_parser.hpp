@@ -227,11 +227,6 @@ public:
         push_state(json_parse_state::root);
     }
 
-    void set_column_number(size_t column)
-    {
-        column_ = column;
-    }
-
     bool source_exhausted() const
     {
         return input_ptr_ == input_end_;
