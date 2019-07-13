@@ -43,12 +43,12 @@ string_view_type           |
 
     template <class Source>
     basic_json_reader(Source&& source,
-                      parse_error_handler& err_handler); // (3)
+                      std::function<bool(std::error_code,const ser_context&)> err_handler); // (3)
 
     template <class Source>
     basic_json_reader(Source&& source, 
                       const basic_json_decode_options<CharT>& options,
-                      parse_error_handler& err_handler); // (4)
+                      std::function<bool(std::error_code,const ser_context&)> err_handler); // (4)
 
     template <class Source>
     basic_json_reader(Source&& source, 
@@ -62,13 +62,13 @@ string_view_type           |
     template <class Source>
     basic_json_reader(Source&& source,
                       basic_json_content_handler<CharT>& handler,
-                      parse_error_handler& err_handler); // (7)
+                      std::function<bool(std::error_code,const ser_context&)> err_handler); // (7)
 
     template <class Source>
     basic_json_reader(Source&& source,
                       basic_json_content_handler<CharT>& handler, 
                       const basic_json_decode_options<CharT>& options,
-                      parse_error_handler& err_handler); // (8)
+                      std::function<bool(std::error_code,const ser_context&)> err_handler); // (8)
 
 Constructors (1)-(4) use a default [json_content_handler](json_content_handler.md) that discards the JSON parse events, and are for validation only.
 
