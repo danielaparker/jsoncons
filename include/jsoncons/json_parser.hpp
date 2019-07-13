@@ -162,7 +162,7 @@ class basic_json_parser : public ser_context
 
     const basic_json_decode_options<CharT>& options_;
 
-    std::function<bool(std::error_code,const ser_context&)> err_handler_;
+    std::function<bool(std::error_code,const ser_context&) noexcept> err_handler_;
     int initial_stack_capacity_;
     size_t nesting_depth_;
     uint32_t cp_;
@@ -192,7 +192,7 @@ public:
     {
     }
 
-    basic_json_parser(std::function<bool(std::error_code,const ser_context&)> err_handler)
+    basic_json_parser(std::function<bool(std::error_code,const ser_context&) noexcept> err_handler)
         : basic_json_parser(basic_json_options<CharT>::get_default_options(), err_handler)
     {
     }
@@ -203,7 +203,7 @@ public:
     }
 
     basic_json_parser(const basic_json_decode_options<CharT>& options,
-                      std::function<bool(std::error_code,const ser_context&)> err_handler)
+                      std::function<bool(std::error_code,const ser_context&) noexcept> err_handler)
        : options_(options),
          err_handler_(err_handler),
          initial_stack_capacity_(default_initial_stack_capacity_),

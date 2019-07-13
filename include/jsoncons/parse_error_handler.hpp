@@ -15,7 +15,7 @@ namespace jsoncons {
 
 struct default_parse_error_handler
 {
-    bool operator()(std::error_code code, const ser_context&) 
+    bool operator()(std::error_code code, const ser_context&) noexcept 
     {
         static const std::error_code illegal_comment = make_error_code(json_errc::illegal_comment);
 
@@ -32,7 +32,7 @@ struct default_parse_error_handler
 
 struct strict_parse_error_handler
 {
-    bool operator()(std::error_code, const ser_context&) 
+    bool operator()(std::error_code, const ser_context&) noexcept
     {
         return false;
     }
