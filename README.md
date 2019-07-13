@@ -353,6 +353,83 @@ end_array
 end_object
 ```
 
+You can apply a filter to the stream, for example,
+
+```c++
+int main()
+{
+    std::string name;
+    auto filter = [&](const staj_event& ev, const ser_context&) -> bool
+    {
+        if (ev.event_type() == staj_event_type::name)
+        {
+            name = ev.get<std::string>();
+            return false;
+        }
+        else if (name == "rated")
+        {
+            name.clear();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    };
+
+    json_pull_reader reader(data, filter);
+    for (; !reader.done(); reader.next())
+    {
+        const auto& event = reader.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::begin_array:
+                std::cout << "begin_array\n";
+                break;
+            case staj_event_type::end_array:
+                std::cout << "end_array\n";
+                break;
+            case staj_event_type::begin_object:
+                std::cout << "begin_object\n";
+                break;
+            case staj_event_type::end_object:
+                std::cout << "end_object\n";
+                break;
+            case staj_event_type::name:
+                // Or std::string_view, if supported
+                std::cout << "name: " << event.get<jsoncons::string_view>() << "\n";
+                break;
+            case staj_event_type::string_value:
+                // Or std::string_view, if supported
+                std::cout << "string_value: " << event.get<jsoncons::string_view>() << "\n";
+                break;
+            case staj_event_type::null_value:
+                std::cout << "null_value: " << "\n";
+                break;
+            case staj_event_type::bool_value:
+                std::cout << "bool_value: " << std::boolalpha << event.get<bool>() << "\n";
+                break;
+            case staj_event_type::int64_value:
+                std::cout << "int64_value: " << event.get<int64_t>() << "\n";
+                break;
+            case staj_event_type::uint64_value:
+                std::cout << "uint64_value: " << event.get<uint64_t>() << "\n";
+                break;
+            case staj_event_type::double_value:
+                std::cout << "double_value: " << event.get<double>() << "\n";
+                break;
+            default:
+                std::cout << "Unhandled event type\n";
+                break;
+        }
+    }
+}    
+```
+Output:
+```
+string_value: Marilyn C
+```
+
 ## About jsoncons::basic_json
 
 The jsoncons library provides a [basic_json](doc/ref/basic_json.md) class template, which is the generalization of a `json` value for different 

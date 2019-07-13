@@ -568,11 +568,11 @@ int main()
 
         polymorphic_examples();
 
-        json_pull_reader_examples();
-
         ubjson_examples();
 
         type_extensibility_examples();
+
+        json_pull_reader_examples();
 
         readme_examples();
     }
