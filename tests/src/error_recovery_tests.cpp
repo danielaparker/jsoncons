@@ -63,7 +63,7 @@ TEST_CASE("test_object_extra_comma")
 
 TEST_CASE("test_name_without_quotes")
 {
-    relaxed_error_handler err_handler;
+    //relaxed_error_handler err_handler;
 
     /*json val = json::parse(R"(
     {
