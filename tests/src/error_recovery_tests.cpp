@@ -13,12 +13,12 @@
 
 using namespace jsoncons;
 
-class relaxed_error_handler : public parse_error_handler
+class relaxed_error_handler
 {
-private:
+public:
 
-    bool do_error(std::error_code ec,
-                  const ser_context&) noexcept override
+    bool operator()(std::error_code ec,
+                    const ser_context&) noexcept 
     {
         if (ec == jsoncons::json_errc::extra_comma)
         {
