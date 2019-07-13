@@ -41,7 +41,7 @@ private:
     const function_dictionary functions_ =
     {
         {
-            keys_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec)
+            keys_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec) -> Json
                 {
                     Json j = typename Json::array();
                     if (args.size() != 1)
@@ -63,7 +63,7 @@ private:
                 }
         },
         {
-            max_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec)
+            max_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec) -> Json
                 {
                    if (args.size() != 1)
                    {
@@ -84,7 +84,7 @@ private:
                 }
         },
         {
-            min_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec) 
+            min_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec) -> Json
                 {
                     if (args.size() != 1)
                     {
@@ -105,7 +105,7 @@ private:
                 }
         },
         {
-            avg_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec)
+            avg_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec) -> Json
                 {
                     if (args.size() != 1)
                     {
@@ -122,7 +122,7 @@ private:
                 }
         },
         {
-            sum_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec)
+            sum_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec) -> Json
                 {
                     if (args.size() != 1)
                     {
@@ -139,7 +139,7 @@ private:
                 }
         },
         {
-            count_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec)
+            count_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec) -> Json
                 {
                     if (args.size() != 1)
                     {
@@ -156,7 +156,7 @@ private:
                 }
         },
         {
-            prod_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec)
+            prod_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec) -> Json
                 {
                     if (args.size() != 1)
                     {
@@ -179,7 +179,7 @@ private:
 #if !(defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ < 9))
 // GCC 4.8 has broken regex support: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631
         ,{
-            tokenize_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec)
+            tokenize_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec) -> Json
                 {
                     if (args.size() != 2)
                     {
