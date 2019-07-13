@@ -66,7 +66,7 @@ public:
        : basic_csv_reader(std::forward<Source>(source), 
                           handler, 
                           basic_csv_options<CharT>::get_default_options(), 
-                          default_parse_error_handler::get_instance())
+                          default_parse_error_handler())
     {
     }
 
@@ -78,14 +78,14 @@ public:
         : basic_csv_reader(std::forward<Source>(source), 
                            handler, 
                            options, 
-                           default_parse_error_handler::get_instance())
+                           default_parse_error_handler())
     {
     }
 
     template <class Source>
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler,
-                     parse_error_handler& err_handler)
+                     std::function<bool(std::error_code,const ser_context&)> err_handler)
         : basic_csv_reader(std::forward<Source>(source), 
                            handler, 
                            basic_csv_options<CharT>::get_default_options(), 
@@ -97,7 +97,7 @@ public:
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options,
-                     parse_error_handler& err_handler,
+                     std::function<bool(std::error_code,const ser_context&)> err_handler,
                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        :
          parser_(handler, options, err_handler),
@@ -113,7 +113,7 @@ public:
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options,
-                     parse_error_handler& err_handler,
+                     std::function<bool(std::error_code,const ser_context&)> err_handler,
                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        :
          parser_(handler, options, err_handler),
