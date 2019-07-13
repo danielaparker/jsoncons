@@ -98,7 +98,7 @@ class basic_csv_parser : public ser_context
 public:
     basic_csv_parser(basic_json_content_handler<CharT>& handler)
        : basic_csv_parser(handler, 
-                          basic_csv_options<CharT>::default_options(), 
+                          basic_csv_options<CharT>::get_default_options(), 
                           default_parse_error_handler::get_instance())
     {
     }
@@ -113,7 +113,7 @@ public:
 
     basic_csv_parser(basic_json_content_handler<CharT>& handler,
                      parse_error_handler& err_handler)
-        : basic_csv_parser(handler, basic_csv_options<CharT>::default_options(), err_handler)
+        : basic_csv_parser(handler, basic_csv_options<CharT>::get_default_options(), err_handler)
     {
     }
 

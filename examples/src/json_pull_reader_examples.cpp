@@ -85,11 +85,11 @@ void reading_a_json_stream()
     }
 }
 
-class author_filter : public staj_filter
+struct author_filter 
 {
     bool accept_next_ = false;
-public:
-    bool accept(const staj_event& event, const ser_context&) override
+
+    bool operator()(const staj_event& event, const ser_context&) 
     {
         if (event.event_type()  == staj_event_type::name &&
             event.get<jsoncons::string_view>() == "author")

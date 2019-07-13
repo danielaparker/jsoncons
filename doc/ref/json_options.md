@@ -112,7 +112,7 @@ For an array whose parent is an array, set whether that array is split on a new 
 
 #### Static member functions
 
-    static const basic_json_options<CharT>& default_options()
+    static const basic_json_options<CharT>& get_default_options()
 Default JSON encode and decode options.
 
 ### See also

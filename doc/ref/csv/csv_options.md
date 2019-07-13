@@ -98,7 +98,7 @@ Maximum number of lines to read. Default is unlimited.
 
 #### Static member functions
 
-    static const basic_csv_options<CharT>& default_options()
+    static const basic_csv_options<CharT>& get_default_options()
 Default CSV encode and decode options.
 
 ### See also

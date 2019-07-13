@@ -65,7 +65,7 @@ public:
 
        : basic_csv_reader(std::forward<Source>(source), 
                           handler, 
-                          basic_csv_options<CharT>::default_options(), 
+                          basic_csv_options<CharT>::get_default_options(), 
                           default_parse_error_handler::get_instance())
     {
     }
@@ -88,7 +88,7 @@ public:
                      parse_error_handler& err_handler)
         : basic_csv_reader(std::forward<Source>(source), 
                            handler, 
-                           basic_csv_options<CharT>::default_options(), 
+                           basic_csv_options<CharT>::get_default_options(), 
                            err_handler)
     {
     }
@@ -265,7 +265,7 @@ private:
 
 template <class T,class CharT>
 typename std::enable_if<is_basic_json_class<T>::value,T>::type 
-decode_csv(const std::basic_string<CharT>& s, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::default_options())
+decode_csv(const std::basic_string<CharT>& s, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options())
 {
     typedef CharT char_type;
 
@@ -278,7 +278,7 @@ decode_csv(const std::basic_string<CharT>& s, const basic_csv_options<CharT>& op
 
 template <class T,class CharT>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
-decode_csv(const std::basic_string<CharT>& s, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::default_options())
+decode_csv(const std::basic_string<CharT>& s, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options())
 {
     typedef CharT char_type;
 
@@ -291,7 +291,7 @@ decode_csv(const std::basic_string<CharT>& s, const basic_csv_options<CharT>& op
 
 template <class T,class CharT>
 typename std::enable_if<is_basic_json_class<T>::value,T>::type 
-decode_csv(std::basic_istream<CharT>& is, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::default_options())
+decode_csv(std::basic_istream<CharT>& is, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options())
 {
     typedef CharT char_type;
 
@@ -304,7 +304,7 @@ decode_csv(std::basic_istream<CharT>& is, const basic_csv_options<CharT>& option
 
 template <class T,class CharT>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
-decode_csv(std::basic_istream<CharT>& is, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::default_options())
+decode_csv(std::basic_istream<CharT>& is, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options())
 {
     typedef CharT char_type;
 

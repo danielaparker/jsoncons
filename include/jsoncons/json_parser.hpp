@@ -188,12 +188,12 @@ class basic_json_parser : public ser_context
 
 public:
     basic_json_parser()
-        : basic_json_parser(basic_json_options<CharT>::default_options(), default_parse_error_handler::get_instance())
+        : basic_json_parser(basic_json_options<CharT>::get_default_options(), default_parse_error_handler::get_instance())
     {
     }
 
     basic_json_parser(parse_error_handler& err_handler)
-        : basic_json_parser(basic_json_options<CharT>::default_options(), err_handler)
+        : basic_json_parser(basic_json_options<CharT>::get_default_options(), err_handler)
     {
     }
 

@@ -332,11 +332,11 @@ TEST_CASE("json_pull_reader object_value test")
     CHECK(reader.done());
 }
 
-class remove_mark_filter : public staj_filter
+class remove_mark_filter
 {
     bool reject_next_ = false;
 public:
-    bool accept(const staj_event& event, const ser_context&) override
+    bool operator()(const staj_event& event, const ser_context&) 
     {
         if (event.event_type()  == staj_event_type::name &&
             event.get<jsoncons::string_view>() == "mark")

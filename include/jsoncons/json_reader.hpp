@@ -170,7 +170,7 @@ public:
     explicit basic_json_reader(Source&& source)
         : basic_json_reader(std::forward<Source>(source),
                             default_content_handler_,
-                            basic_json_options<CharT>::default_options(),
+                            basic_json_options<CharT>::get_default_options(),
                             default_parse_error_handler::get_instance())
     {
     }
@@ -190,7 +190,7 @@ public:
                       parse_error_handler& err_handler)
         : basic_json_reader(std::forward<Source>(source),
                             default_content_handler_,
-                            basic_json_options<CharT>::default_options(),
+                            basic_json_options<CharT>::get_default_options(),
                             err_handler)
     {
     }
@@ -211,7 +211,7 @@ public:
                       basic_json_content_handler<CharT>& handler)
         : basic_json_reader(std::forward<Source>(source),
                             handler,
-                            basic_json_options<CharT>::default_options(),
+                            basic_json_options<CharT>::get_default_options(),
                             default_parse_error_handler::get_instance())
     {
     }
@@ -233,7 +233,7 @@ public:
                       parse_error_handler& err_handler)
         : basic_json_reader(std::forward<Source>(source),
                             handler,
-                            basic_json_options<CharT>::default_options(),
+                            basic_json_options<CharT>::get_default_options(),
                             err_handler)
     {
     }

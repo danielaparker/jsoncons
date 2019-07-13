@@ -83,7 +83,7 @@ private:
     basic_csv_encoder& operator=(const basic_csv_encoder&) = delete;
 public:
     basic_csv_encoder(result_type result)
-       : basic_csv_encoder(std::move(result), basic_csv_options<CharT>::default_options())
+       : basic_csv_encoder(std::move(result), basic_csv_options<CharT>::get_default_options())
     {
     }
 
@@ -569,7 +569,7 @@ private:
 
 template <class T,class CharT>
 typename std::enable_if<is_basic_json_class<T>::value,void>::type 
-encode_csv(const T& j, std::basic_string<CharT>& s, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::default_options())
+encode_csv(const T& j, std::basic_string<CharT>& s, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options())
 {
     typedef CharT char_type;
     basic_csv_encoder<char_type,jsoncons::string_result<std::basic_string<char_type>>> encoder(s,options);
@@ -578,7 +578,7 @@ encode_csv(const T& j, std::basic_string<CharT>& s, const basic_csv_options<Char
 
 template <class T,class CharT>
 typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
-encode_csv(const T& val, std::basic_string<CharT>& s, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::default_options())
+encode_csv(const T& val, std::basic_string<CharT>& s, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options())
 {
     typedef CharT char_type;
     basic_csv_encoder<char_type,jsoncons::string_result<std::basic_string<char_type>>> encoder(s,options);
@@ -587,7 +587,7 @@ encode_csv(const T& val, std::basic_string<CharT>& s, const basic_csv_options<Ch
 
 template <class T, class CharT>
 typename std::enable_if<is_basic_json_class<T>::value,void>::type 
-encode_csv(const T& j, std::basic_ostream<CharT>& os, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::default_options())
+encode_csv(const T& j, std::basic_ostream<CharT>& os, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options())
 {
     typedef CharT char_type;
     basic_csv_encoder<char_type,jsoncons::stream_result<char_type>> encoder(os,options);
@@ -596,7 +596,7 @@ encode_csv(const T& j, std::basic_ostream<CharT>& os, const basic_csv_options<Ch
 
 template <class T, class CharT>
 typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
-encode_csv(const T& val, std::basic_ostream<CharT>& os, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::default_options())
+encode_csv(const T& val, std::basic_ostream<CharT>& os, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options())
 {
     typedef CharT char_type;
     basic_csv_encoder<char_type,jsoncons::stream_result<char_type>> encoder(os,options);

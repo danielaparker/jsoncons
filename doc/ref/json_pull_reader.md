@@ -20,13 +20,13 @@ function to advance to the next event, until `done()` returns `true`.
 
     template <class Source>
     basic_json_pull_reader(Source&& source, 
-                           const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options(),
+                           const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::get_default_options(),
                            parse_error_handler& err_handler = default_parse_error_handler::get_instance()); // (1)
 
     template <class Source>
     basic_json_pull_reader(Source&& source, 
-                           basic_staj_filter<CharT>& filter,
-                           const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::default_options(),
+                           std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
+                           const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::get_default_options(),
                            parse_error_handler& err_handler = default_parse_error_handler::get_instance()); // (2)
 
 Constructors (1)-(2) read from a character sequence or stream and throw a 
@@ -49,18 +49,18 @@ Constructors (1)-(2) read from a character sequence or stream and throw a
 
     template <class Source>
     basic_json_pull_reader(Source&& source,
-                           basic_staj_filter<CharT>& filter,
+                           std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                            std::error_code& ec); // (6)
 
     template <class Source>
     basic_json_pull_reader(Source&& source, 
-                           basic_staj_filter<CharT>& filter,
+                           std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                            const basic_json_decode_options<CharT>& options,
                            std::error_code& ec) // (7)
 
     template <class Source>
     basic_json_pull_reader(Source&& source, 
-                           basic_staj_filter<CharT>& filter,
+                           std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                            const basic_json_decode_options<CharT>& options,
                            parse_error_handler& err_handler,
                            std::error_code& ec) // (8)
@@ -240,14 +240,14 @@ end_array
 
 using namespace jsoncons;
 
-class author_filter : public staj_filter
+struct author_filter 
 {
     bool accept_next_ = false;
-public:
-    bool accept(const staj_event& event, const ser_context&) override
+
+    bool operator()(const staj_event& event, const ser_context&) 
     {
         if (event.event_type()  == staj_event_type::name &&
-            event.as<jsoncons::string_view>() == "author")
+            event.get<jsoncons::string_view>() == "author")
         {
             accept_next_ = true;
             return false;
