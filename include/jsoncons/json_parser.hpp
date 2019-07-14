@@ -18,7 +18,6 @@
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 

@@ -19,7 +19,6 @@
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_parser.hpp>
-#include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/staj_reader.hpp>
 #include <jsoncons/source.hpp>
 

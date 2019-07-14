@@ -10,7 +10,6 @@
 #include <string>
 
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/parse_error_handler.hpp>
 
 namespace jsoncons {
 

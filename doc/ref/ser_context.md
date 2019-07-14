@@ -1,7 +1,7 @@
 ### jsoncons::ser_context
 
 ```c++
-#include <jsoncons/parse_error_handler.hpp>
+#include <jsoncons/ser_context.hpp>
 
 class ser_context;
 ```
