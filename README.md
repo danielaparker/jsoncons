@@ -16,7 +16,7 @@ Compared to other JSON libraries, jsoncons has been designed to handle very larg
 SAX style parsers and serializers. Its [json parser](doc/ref/json_parser.md) is an 
 incremental parser that can be fed its input in chunks, and does not require an entire file to be loaded in memory at one time. 
 Its tree model is more compact than most, and can be made more compact still with a user-supplied
-allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](doc/ref/json_cursor.md),
+allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](doc/ref/json_pull_reader.md),
 built on top of its incremental parser.  
 
 The [jsoncons data model](doc/ref/data-model.md) supports the familiar JSON types - nulls,
@@ -91,7 +91,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 - [Performance benchmarks with text and doubles](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance_fp.md)
 
-### Overview
+### Working with JSON data
 
 For the examples below you need to include some header files and construct a string of JSON data:
 
@@ -284,7 +284,7 @@ See [examples](doc/Examples.md#G1) for other ways of specializing `json_type_tra
 ```c++
 int main()
 {
-    json_cursor reader(data);
+    json_pull_reader reader(data);
     for (; !reader.done(); reader.next())
     {
         const auto& event = reader.current();
@@ -351,6 +351,83 @@ double_value: 0.9
 end_object
 end_array
 end_object
+```
+
+You can apply a filter to the stream, for example,
+
+```c++
+int main()
+{
+    std::string name;
+    auto filter = [&](const staj_event& ev, const ser_context&) -> bool
+    {
+        if (ev.event_type() == staj_event_type::name)
+        {
+            name = ev.get<std::string>();
+            return false;
+        }
+        else if (name == "rated")
+        {
+            name.clear();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    };
+
+    json_pull_reader reader(data, filter);
+    for (; !reader.done(); reader.next())
+    {
+        const auto& event = reader.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::begin_array:
+                std::cout << "begin_array\n";
+                break;
+            case staj_event_type::end_array:
+                std::cout << "end_array\n";
+                break;
+            case staj_event_type::begin_object:
+                std::cout << "begin_object\n";
+                break;
+            case staj_event_type::end_object:
+                std::cout << "end_object\n";
+                break;
+            case staj_event_type::name:
+                // Or std::string_view, if supported
+                std::cout << "name: " << event.get<jsoncons::string_view>() << "\n";
+                break;
+            case staj_event_type::string_value:
+                // Or std::string_view, if supported
+                std::cout << "string_value: " << event.get<jsoncons::string_view>() << "\n";
+                break;
+            case staj_event_type::null_value:
+                std::cout << "null_value: " << "\n";
+                break;
+            case staj_event_type::bool_value:
+                std::cout << "bool_value: " << std::boolalpha << event.get<bool>() << "\n";
+                break;
+            case staj_event_type::int64_value:
+                std::cout << "int64_value: " << event.get<int64_t>() << "\n";
+                break;
+            case staj_event_type::uint64_value:
+                std::cout << "uint64_value: " << event.get<uint64_t>() << "\n";
+                break;
+            case staj_event_type::double_value:
+                std::cout << "double_value: " << event.get<double>() << "\n";
+                break;
+            default:
+                std::cout << "Unhandled event type\n";
+                break;
+        }
+    }
+}    
+```
+Output:
+```
+string_value: Marilyn C
 ```
 
 ## About jsoncons::basic_json

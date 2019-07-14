@@ -34,7 +34,7 @@ void cbor_examples();
 void ubjson_examples();
 void json_parser_examples();
 void byte_string_examples();
-void json_cursor_examples();
+void json_pull_reader_examples();
 void data_model_examples();
 void staj_iterator_examples();
 void bson_examples();
@@ -58,8 +58,7 @@ void comment_example()
     // Strict
     try
     {
-        strict_parse_error_handler err_handler;
-        json j = json::parse(s, err_handler);
+        json j = json::parse(s, strict_parse_error_handler());
     }
     catch (const ser_error& e)
     {
@@ -568,11 +567,11 @@ int main()
 
         polymorphic_examples();
 
-        json_cursor_examples();
-
         ubjson_examples();
 
         type_extensibility_examples();
+
+        json_pull_reader_examples();
 
         readme_examples();
     }

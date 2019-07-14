@@ -16,17 +16,16 @@ struct jsonpath_filter_fixture
 {
 };
 
-class lenient_error_handler : public parse_error_handler
+class lenient_error_handler
 {
+    std::error_code value_;
 public:
     lenient_error_handler(std::error_code value)
         : value_(value)
     {
     }
-private:
-    std::error_code value_;
 
-    bool do_error(std::error_code ec, const ser_context&) noexcept
+    bool operator()(std::error_code ec, const ser_context&) noexcept
     {
         return ec == value_; // if returns true, use default processing
     }

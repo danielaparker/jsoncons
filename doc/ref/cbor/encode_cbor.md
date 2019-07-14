@@ -5,11 +5,11 @@
 
 template<class T>
 void encode_cbor(const T& val, std::vector<uint8_t>& buffer, 
-                 const cbor_encode_options& options = cbor_options::default_options()); // (1)
+                 const cbor_encode_options& options = cbor_options::get_default_options()); // (1)
 
 template<class T>
 void encode_cbor(const T& val, std::ostream& os, 
-                 const cbor_encode_options& options = cbor_options::default_options()); // (2)
+                 const cbor_encode_options& options = cbor_options::get_default_options()); // (2)
 ```
 
 Encodes a C++ data structure to the [Concise Binary Object Representation](http://cbor.io/) data format.

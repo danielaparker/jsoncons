@@ -309,7 +309,7 @@ private:
     basic_json_encoder& operator=(const basic_json_encoder&) = delete;
 public:
     basic_json_encoder(result_type result)
-        : basic_json_encoder(std::move(result), basic_json_options<CharT>::default_options())
+        : basic_json_encoder(std::move(result), basic_json_options<CharT>::get_default_options())
     {
     }
 
@@ -1053,7 +1053,7 @@ private:
     basic_json_compressed_encoder& operator=(const basic_json_compressed_encoder&) = delete;
 public:
     basic_json_compressed_encoder(result_type result)
-        : basic_json_compressed_encoder(std::move(result), basic_json_options<CharT>::default_options())
+        : basic_json_compressed_encoder(std::move(result), basic_json_options<CharT>::get_default_options())
     {
     }
 

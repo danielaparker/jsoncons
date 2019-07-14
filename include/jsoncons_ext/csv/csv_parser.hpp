@@ -69,12 +69,11 @@ class basic_csv_parser : public ser_context
 
     static const int default_depth = 3;
 
-    default_parse_error_handler default_err_handler_;
     csv_state_type state_;
     int top_;
     std::vector<csv_mode_type,csv_mode_allocator_type> stack_;
     basic_json_content_handler<CharT>& handler_;
-    parse_error_handler& err_handler_;
+    std::function<bool(std::error_code,const ser_context&)> err_handler_;
     unsigned long column_;
     unsigned long line_;
     CharT prev_char_;
@@ -98,25 +97,29 @@ class basic_csv_parser : public ser_context
 
 public:
     basic_csv_parser(basic_json_content_handler<CharT>& handler)
-       : basic_csv_parser(handler, basic_csv_options<CharT>::default_options(), default_err_handler_)
+       : basic_csv_parser(handler, 
+                          basic_csv_options<CharT>::get_default_options(), 
+                          default_parse_error_handler())
     {
     }
 
     basic_csv_parser(basic_json_content_handler<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options)
-        : basic_csv_parser(handler, options, default_err_handler_)
+        : basic_csv_parser(handler, 
+                           options, 
+                           default_parse_error_handler())
     {
     }
 
     basic_csv_parser(basic_json_content_handler<CharT>& handler,
-                     parse_error_handler& err_handler)
-        : basic_csv_parser(handler, basic_csv_options<CharT>::default_options(), err_handler)
+                     std::function<bool(std::error_code,const ser_context&)> err_handler)
+        : basic_csv_parser(handler, basic_csv_options<CharT>::get_default_options(), err_handler)
     {
     }
 
     basic_csv_parser(basic_json_content_handler<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options,
-                     parse_error_handler& err_handler)
+                     std::function<bool(std::error_code,const ser_context&)> err_handler)
        : top_(-1),
          stack_(default_depth),
          handler_(handler),
@@ -436,7 +439,7 @@ public:
             }
             if (!pop_mode(csv_mode_type::initial))
             {
-                err_handler_.fatal_error(csv_errc::unexpected_eof, *this);
+                err_handler_(csv_errc::unexpected_eof, *this);
                 ec = csv_errc::unexpected_eof;
                 continue_ = false;
                 return;
@@ -621,7 +624,7 @@ all_csv_states:
                     }
                     break;
                 default:
-                    err_handler_.fatal_error(csv_errc::invalid_state, *this);
+                    err_handler_(csv_errc::invalid_state, *this);
                     ec = csv_errc::invalid_state;
                     continue_ = false;
                     return;
@@ -854,7 +857,7 @@ private:
                 }
                 break;
             default:
-                err_handler_.fatal_error(csv_errc::invalid_csv_text, *this);
+                err_handler_(csv_errc::invalid_csv_text, *this);
                 ec = csv_errc::invalid_csv_text;
                 continue_ = false;
                 return;

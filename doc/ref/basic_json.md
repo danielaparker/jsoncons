@@ -10,7 +10,7 @@ template<
 ```
 
 The class `basic_json` resembles a union. A `basic_json` holds a data item of one of its alternative types:
-null, bool, int64_t, uint64_t, double, text string, byte string, array, and object. The data item may be tagged with a 
+null, `bool`, `int64_t`, `uint64_t`, `double`, text string, byte string, array, and object. The data item may be tagged with a 
 [semantic_tag](semantic_tag.md) that provides additional information about the data item.
 
 When assigned a new `basic_json` value, the old value is overwritten. The type of the new value may be different from the old value. 
@@ -49,6 +49,7 @@ Member type                         |Definition
 `const_object_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to const [key_value_type](json/key_value.md)
 `array_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `basic_json`
 `const_array_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `const basic_json`
+`proxy_type`|proxy<basic_json>. The `proxy_type` class supports conversion to `basic_json&`.
 
 ### Static member functions
 
@@ -151,27 +152,15 @@ Returns the allocator associated with the basic_json value.
     <td><a href="json/as.md">as</a></td>
     <td>Attempts to convert a basic_json value to a value of a type.</td> 
   </tr>
+  <tr>
+    <td><a href="json/operator_at.md">operator[]</a></td>
+    <td>Access or insert specified element.</td> 
+  </tr>
 </table>
 
     semantic_tag tag() const
 Returns the [semantic_tag](semantic_tag.md) associated with this value
-
-    basic_json& operator[](size_t i)
-    const basic_json& operator[](size_t i) const
-Returns a reference to the value at position i in a basic_json object or array.
-Throws `std::runtime_error` if not an object or array.
-
-    proxy<basic_json> operator[](const string_view_type& name)
-Returns a proxy to a keyed value. `proxy<basic_json>` supports conversion to `basic_json&`. If written to, 
-inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. 
-Throws `std::runtime_error` if not an object.
-If read, throws `std::out_of_range` if the object does not have a member with the specified name.  
-
-    const basic_json& operator[](const string_view_type& name) const
-If `name` matches the name of a member in the basic_json object, returns a reference to the basic_json object, otherwise throws.
-Throws `std::runtime_error` if not an object.
-Throws `std::out_of_range` if the object does not have a member with the specified name.  
-
+ 
     object_iterator find(const string_view_type& name)
     const_object_iterator find(const string_view_type& name) const
 Returns an object iterator to a member whose name compares equal to `name`. If there is no such member, returns `object_range.end()`.

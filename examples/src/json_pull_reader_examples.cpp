@@ -1,7 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/json_cursor.hpp>
+#include <jsoncons/json_pull_reader.hpp>
 #include <string>
 #include <sstream>
 
@@ -36,7 +36,7 @@ void reading_a_json_stream()
 {
     std::istringstream is(example);
 
-    json_cursor reader(is);
+    json_pull_reader reader(is);
 
     for (; !reader.done(); reader.next())
     {
@@ -85,11 +85,11 @@ void reading_a_json_stream()
     }
 }
 
-class author_filter : public staj_filter
+struct author_filter 
 {
     bool accept_next_ = false;
-public:
-    bool accept(const staj_event& event, const ser_context&) override
+
+    bool operator()(const staj_event& event, const ser_context&) 
     {
         if (event.event_type()  == staj_event_type::name &&
             event.get<jsoncons::string_view>() == "author")
@@ -113,10 +113,9 @@ public:
 // Filtering the stream
 void filtering_a_json_stream()
 {
-    json_cursor cursor(example);
 
     author_filter filter;
-    filtered_staj_reader reader(cursor, filter);
+    json_pull_reader reader(example, filter);
 
     for (; !reader.done(); reader.next())
     {
@@ -130,9 +129,9 @@ void filtering_a_json_stream()
     }
 }
 
-void json_cursor_examples()
+void json_pull_reader_examples()
 {
-    std::cout << "\njson_cursor examples\n\n";
+    std::cout << "\njson_pull_reader examples\n\n";
 
     std::cout << "\n";
     filtering_a_json_stream();

@@ -101,7 +101,7 @@ class basic_json
 {
 public:
 
-    typedef Allocator allocator_type;
+    typedef Allocator allocator_type; 
 
     typedef ImplementationPolicy implementation_policy;
 
@@ -1664,7 +1664,7 @@ public:
         }
     public:
 
-        typedef proxy<ParentT> proxy_type;
+        typedef proxy<typename ParentT::proxy_type> proxy_type;
 
         range<object_iterator> object_range()
         {
@@ -1990,9 +1990,9 @@ public:
             return evaluate().at(i);
         }
 
-        proxy<proxy_type> operator[](const string_view_type& key)
+        proxy_type operator[](const string_view_type& key)
         {
-            return proxy<proxy_type>(*this,key);
+            return proxy_type(*this,key);
         }
 
         const basic_json& operator[](const string_view_type& name) const
@@ -2616,13 +2616,15 @@ public:
 #endif
     };
 
+    typedef proxy<basic_json> proxy_type;
+
     static basic_json parse(std::basic_istream<char_type>& is)
     {
         parse_error_handler_type err_handler;
         return parse(is,err_handler);
     }
 
-    static basic_json parse(std::basic_istream<char_type>& is, parse_error_handler& err_handler)
+    static basic_json parse(std::basic_istream<char_type>& is, std::function<bool(std::error_code,const ser_context&)> err_handler)
     {
         json_decoder<basic_json> handler;
         basic_json_reader<char_type,stream_source<char_type>> reader(is, handler, err_handler);
@@ -2641,7 +2643,7 @@ public:
         return parse(s,err_handler);
     }
 
-    static basic_json parse(const string_view_type& s, parse_error_handler& err_handler)
+    static basic_json parse(const string_view_type& s, std::function<bool(std::error_code,const ser_context&)> err_handler)
     {
         json_decoder<basic_json> decoder;
         basic_json_parser<char_type> parser(err_handler);
@@ -2669,7 +2671,7 @@ public:
         return parse(is,options,err_handler);
     }
 
-    static basic_json parse(std::basic_istream<char_type>& is, const basic_json_options<char_type>& options, parse_error_handler& err_handler)
+    static basic_json parse(std::basic_istream<char_type>& is, const basic_json_options<char_type>& options, std::function<bool(std::error_code,const ser_context&)> err_handler)
     {
         json_decoder<basic_json> handler;
         basic_json_reader<char_type,stream_source<char_type>> reader(is, handler, options, err_handler);
@@ -2688,7 +2690,7 @@ public:
         return parse(s,options,err_handler);
     }
 
-    static basic_json parse(const string_view_type& s, const basic_json_options<char_type>& options, parse_error_handler& err_handler)
+    static basic_json parse(const string_view_type& s, const basic_json_options<char_type>& options, std::function<bool(std::error_code,const ser_context&)> err_handler)
     {
         json_decoder<basic_json> decoder;
         basic_json_parser<char_type> parser(options,err_handler);
@@ -3030,7 +3032,7 @@ public:
         return at(i);
     }
 
-    proxy<basic_json> operator[](const string_view_type& name)
+    proxy_type operator[](const string_view_type& name)
     {
         switch (var_.type())
         {
@@ -3038,7 +3040,7 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_type::object_val:
-            return proxy<basic_json>(*this, name);
+            return proxy_type(*this, name);
             break;
         default:
             JSONCONS_THROW(not_an_object(name.data(),name.length()));
@@ -4307,7 +4309,7 @@ public:
     }
 
     JSONCONS_DEPRECATED("Instead, use parse(const string_view_type&, parse_error_handler)")
-    static basic_json parse(const char_type* s, size_t length, parse_error_handler& err_handler)
+    static basic_json parse(const char_type* s, size_t length, std::function<bool(std::error_code,const ser_context&)> err_handler)
     {
         return parse(string_view_type(s,length),err_handler);
     }
@@ -4319,9 +4321,9 @@ public:
         return parse_file(filename,err_handler);
     }
 
-    JSONCONS_DEPRECATED("Instead, use parse(std::basic_istream<char_type>&, parse_error_handler&)")
+    JSONCONS_DEPRECATED("Instead, use parse(std::basic_istream<char_type>&, std::function<bool(std::error_code,const ser_context&)>)")
     static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename,
-                                 parse_error_handler& err_handler)
+                                 std::function<bool(std::error_code,const ser_context&)> err_handler)
     {
         std::basic_ifstream<char_type> is(filename);
         return parse(is,err_handler);
@@ -4332,8 +4334,8 @@ public:
     {
         return parse(is);
     }
-    JSONCONS_DEPRECATED("Instead, use parse(std::basic_istream<char_type>&, parse_error_handler&)")
-    static basic_json parse_stream(std::basic_istream<char_type>& is, parse_error_handler& err_handler)
+    JSONCONS_DEPRECATED("Instead, use parse(std::basic_istream<char_type>&, std::function<bool(std::error_code,const ser_context&)>)")
+    static basic_json parse_stream(std::basic_istream<char_type>& is, std::function<bool(std::error_code,const ser_context&)> err_handler)
     {
         return parse(is,err_handler);
     }
@@ -4344,8 +4346,8 @@ public:
         return parse(s);
     }
 
-    JSONCONS_DEPRECATED("Instead, use parse(parse(const string_view_type&, parse_error_handler&)")
-    static basic_json parse_string(const string_view_type& s, parse_error_handler& err_handler)
+    JSONCONS_DEPRECATED("Instead, use parse(parse(const string_view_type&, std::function<bool(std::error_code,const ser_context&)>)")
+    static basic_json parse_string(const string_view_type& s, std::function<bool(std::error_code,const ser_context&)> err_handler)
     {
         return parse(s,err_handler);
     }

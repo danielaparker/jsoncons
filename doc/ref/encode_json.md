@@ -9,7 +9,7 @@ have [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/do
 template <class T, class CharT>
 void encode_json(const T& val,
                  std::basic_ostream<CharT>& os, 
-                 const basic_json_encode_options<CharT>& options = basic_json_options<CharT>::default_options(), 
+                 const basic_json_encode_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
                  indenting line_indent = indenting::no_indent); // (1)
 
 template <class T, class CharT>
@@ -20,7 +20,7 @@ void encode_json(const T& val,
 template <class T, class CharT>
 void encode_json(const T& val,
                  std::basic_string<CharT>& s, 
-                 const basic_json_encode_options<CharT>& options = basic_json_options<CharT>::default_options(), 
+                 const basic_json_encode_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
                  indenting line_indent = indenting::no_indent); // (3)
 
 template <class T, class CharT>
@@ -36,7 +36,7 @@ template <class T, class CharT, class ImplementationPolicy, class Allocator>
 void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
                  const T& val,
                  std::basic_ostream<CharT>& os, 
-                 const basic_json_encode_options<CharT>& options = basic_json_options<CharT>::default_options(), 
+                 const basic_json_encode_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
                  indenting line_indent = indenting::no_indent); // (6)
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
@@ -49,7 +49,7 @@ template <class T, class CharT, class ImplementationPolicy, class Allocator>
 void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
                  const T& val,
                  std::basic_string<CharT>& s, 
-                 const basic_json_encode_options<CharT>& options = basic_json_options<CharT>::default_options(), 
+                 const basic_json_encode_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
                  indenting line_indent = indenting::no_indent); // (8)
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>

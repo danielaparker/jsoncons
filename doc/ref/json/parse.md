@@ -7,11 +7,11 @@ static basic_json parse(const string_view_type& s,
                         const basic_json_options<char_type>& options); // (2)
 
 static basic_json parse(const string_view_type& s, 
-                        parse_error_handler& err_handler); // (3)
+                        std::function<bool(std::error_code,const ser_context&)> err_handler); // (3)
 
 static basic_json parse(const string_view_type& s, 
                         const basic_json_options<char_type>& options,
-                        parse_error_handler& err_handler); // (4)
+                        std::function<bool(std::error_code,const ser_context&)> err_handler); // (4)
 
 static basic_json parse(std::istream& is); // (5)
 
@@ -20,11 +20,11 @@ static basic_json parse(std::istream& is,
               
 static basic_json parse(std::istream& is, 
                         const basic_json_options<char_type>& options,
-                        parse_error_handler& err_handler); // (7)
+                        std::function<bool(std::error_code,const ser_context&)> err_handler); // (7)
 
 static basic_json parse(std::istream& is, 
                         const basic_json_options<char_type>& options,
-                        parse_error_handler& err_handler); // (8)
+                        std::function<bool(std::error_code,const ser_context&)> err_handler); // (8)
 ```
 (1) - (4) Parses a string of JSON text and returns a json object or array value. 
 Throws [ser_error](ser_error.md) if parsing fails.

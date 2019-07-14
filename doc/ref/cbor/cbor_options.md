@@ -32,7 +32,7 @@ string references if present.
 
 #### Static member functions
 
-    static const cbor_options& default_options()
+    static const cbor_options& get_default_options()
 Default CBOR encode and decode options.
 
 ### See also
