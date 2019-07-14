@@ -21,13 +21,13 @@ function to advance to the next event, until `done()` returns `true`.
     template <class Source>
     basic_json_pull_reader(Source&& source, 
                            const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::get_default_options(),
-                           std::function<bool(std::error_code,const ser_context&)> err_handler = default_json_parsing()); // (1)
+                           std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); // (1)
 
     template <class Source>
     basic_json_pull_reader(Source&& source, 
                            std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                            const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::get_default_options(),
-                           std::function<bool(std::error_code,const ser_context&)> err_handler = default_json_parsing()); // (2)
+                           std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); // (2)
 
 Constructors (1)-(2) read from a character sequence or stream and throw a 
 [ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
@@ -44,7 +44,7 @@ Constructors (1)-(2) read from a character sequence or stream and throw a
     template <class Source>
     basic_json_pull_reader(Source&& source, 
                            const basic_json_decode_options<CharT>& options,
-                           std::function<bool(std::error_code,const ser_context&)> err_handler,
+                           std::function<bool(json_errc,const ser_context&)> err_handler,
                            std::error_code& ec) // (5)
 
     template <class Source>
@@ -62,7 +62,7 @@ Constructors (1)-(2) read from a character sequence or stream and throw a
     basic_json_pull_reader(Source&& source, 
                            std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                            const basic_json_decode_options<CharT>& options,
-                           std::function<bool(std::error_code,const ser_context&)> err_handler,
+                           std::function<bool(json_errc,const ser_context&)> err_handler,
                            std::error_code& ec) // (8)
 
 Constructors (3)-(8) read from a character sequence or stream and set `ec`
