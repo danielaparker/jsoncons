@@ -39,10 +39,10 @@ and by the pull parser [json_pull_reader](json_pull_reader.md).
 
     json_parser(const json_decode_options& options); // (2)
 
-    json_parser(std::function<bool(std::error_code,const ser_context&)> err_handler); // (3)
+    json_parser(std::function<bool(json_errc,const ser_context&)> err_handler); // (3)
 
     json_parser(const json_decode_options& options, 
-                std::function<bool(std::error_code,const ser_context&)> err_handler); // (4)
+                std::function<bool(json_errc,const ser_context&)> err_handler); // (4)
 
 (1) Constructs a `json_parser` that uses default [json_decode_options](json_decode_options.md)
 and a default [parse_error_handler](parse_error_handler.md).

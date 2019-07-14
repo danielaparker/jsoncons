@@ -198,7 +198,7 @@ std::cout << "(1) " << j << std::endl;
 // Strict
 try
 {
-    json j = json::parse(s, strict_parse_error_handler());
+    json j = json::parse(s, strict_json_parsing());
 }
 catch (const ser_error& e)
 {

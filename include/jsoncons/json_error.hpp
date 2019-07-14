@@ -141,7 +141,6 @@ JSONCONS_DEPRECATED("Instead, use json_errc") typedef json_errc json_parser_errc
 JSONCONS_DEPRECATED("Instead, use json_errc") typedef json_errc json_parse_errc;
 #endif
 
-
 }
 
 namespace std {

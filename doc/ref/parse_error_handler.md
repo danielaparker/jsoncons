@@ -1,7 +1,7 @@
 ### jsoncons::parse_error_handler
 
 ```c++
-#include <jsoncons/parse_error_handler.hpp>
+#include <jsoncons/json_parser.hpp>
 ```
 
 A `parse_error_handler` is a simple function, a functor or a lambda expression that receive arguments 
@@ -12,9 +12,9 @@ returns `false`, the parser will stop.
 
 The jsoncons library comes with two `parse_error_handler` handlers:
 
-- `default_parse_error_handler`, which returns `true` if the error code indicates a comment, otherwise `false`
+- `default_json_parsing`, which returns `true` if the error code indicates a comment, otherwise `false`
 
-- `strict_parse_error_handler`, which always returns `false`
+- `strict_json_parsing`, which always returns `false`
 
 
 

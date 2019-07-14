@@ -16,7 +16,6 @@
 #include <cctype>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json.hpp>
@@ -53,6 +52,14 @@ enum class csv_state_type
     done
 };
 
+struct default_csv_parsing
+{
+    bool operator()(csv_errc, const ser_context&) noexcept
+    {
+        return false;
+    }
+};
+
 template<class CharT,class Allocator=std::allocator<CharT>>
 class basic_csv_parser : public ser_context
 {
@@ -73,7 +80,7 @@ class basic_csv_parser : public ser_context
     int top_;
     std::vector<csv_mode_type,csv_mode_allocator_type> stack_;
     basic_json_content_handler<CharT>& handler_;
-    std::function<bool(std::error_code,const ser_context&)> err_handler_;
+    std::function<bool(csv_errc,const ser_context&)> err_handler_;
     unsigned long column_;
     unsigned long line_;
     CharT prev_char_;
@@ -99,7 +106,7 @@ public:
     basic_csv_parser(basic_json_content_handler<CharT>& handler)
        : basic_csv_parser(handler, 
                           basic_csv_options<CharT>::get_default_options(), 
-                          default_parse_error_handler())
+                          default_csv_parsing())
     {
     }
 
@@ -107,19 +114,19 @@ public:
                      const basic_csv_decode_options<CharT>& options)
         : basic_csv_parser(handler, 
                            options, 
-                           default_parse_error_handler())
+                           default_csv_parsing())
     {
     }
 
     basic_csv_parser(basic_json_content_handler<CharT>& handler,
-                     std::function<bool(std::error_code,const ser_context&)> err_handler)
+                     std::function<bool(csv_errc,const ser_context&)> err_handler)
         : basic_csv_parser(handler, basic_csv_options<CharT>::get_default_options(), err_handler)
     {
     }
 
     basic_csv_parser(basic_json_content_handler<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options,
-                     std::function<bool(std::error_code,const ser_context&)> err_handler)
+                     std::function<bool(csv_errc,const ser_context&)> err_handler)
        : top_(-1),
          stack_(default_depth),
          handler_(handler),
@@ -910,7 +917,7 @@ private:
                         {
                             if (column_index - offset_ < column_defaults_.size() && column_defaults_[column_index - offset_].length() > 0)
                             {
-                                basic_json_parser<CharT> parser(err_handler_);
+                                basic_json_parser<CharT> parser;
                                 parser.update(column_defaults_[column_index - offset_].data(),column_defaults_[column_index - offset_].length());
                                 parser.parse_some(filter_);
                                 parser.finish_parse(filter_);
@@ -941,7 +948,7 @@ private:
                             {
                                 if (column_index - offset_ < column_defaults_.size() && column_defaults_[column_index - offset_].length() > 0)
                                 {
-                                    basic_json_parser<CharT> parser(err_handler_);
+                                    basic_json_parser<CharT> parser;
                                     parser.update(column_defaults_[column_index - offset_].data(),column_defaults_[column_index - offset_].length());
                                     parser.parse_some(filter_);
                                     parser.finish_parse(filter_);
@@ -976,7 +983,7 @@ private:
                         {
                             if (column_index - offset_ < column_defaults_.size() && column_defaults_[column_index - offset_].length() > 0)
                             {
-                                basic_json_parser<CharT> parser(err_handler_);
+                                basic_json_parser<CharT> parser;
                                 parser.update(column_defaults_[column_index - offset_].data(),column_defaults_[column_index - offset_].length());
                                 parser.parse_some(filter_);
                                 parser.finish_parse(filter_);
@@ -997,7 +1004,7 @@ private:
                     {
                         if (column_index < column_defaults_.size() + offset_ && column_defaults_[column_index - offset_].length() > 0)
                         {
-                            basic_json_parser<CharT> parser(err_handler_);
+                            basic_json_parser<CharT> parser;
                             parser.update(column_defaults_[column_index - offset_].data(),column_defaults_[column_index - offset_].length());
                             parser.parse_some(filter_);
                             parser.finish_parse(filter_);

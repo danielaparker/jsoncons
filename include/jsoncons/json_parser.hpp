@@ -18,7 +18,6 @@
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 
@@ -148,6 +147,34 @@ enum class json_parse_state : uint8_t
     done
 };
 
+struct default_json_parsing
+{
+    bool operator()(json_errc ec, const ser_context&) noexcept 
+    {
+        if (ec == json_errc::illegal_comment)
+        {
+            return true; // Recover, allow comments
+        }
+        else
+        {
+            return false;
+        }
+    }
+};
+
+struct strict_json_parsing
+{
+    bool operator()(json_errc, const ser_context&) noexcept
+    {
+        return false;
+    }
+};
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+JSONCONS_DEPRECATED("instead, use default_json_parsing") typedef default_json_parsing strict_parse_error_handler;
+JSONCONS_DEPRECATED("instead, use strict_json_parsing") typedef strict_json_parsing default_parse_error_handler;
+#endif
+
 template <class CharT, class Allocator = std::allocator<char>>
 class basic_json_parser : public ser_context
 {
@@ -163,7 +190,7 @@ class basic_json_parser : public ser_context
 
     const basic_json_decode_options<CharT>& options_;
 
-    std::function<bool(std::error_code,const ser_context&)> err_handler_;
+    std::function<bool(json_errc,const ser_context&)> err_handler_;
     int initial_stack_capacity_;
     size_t nesting_depth_;
     uint32_t cp_;
@@ -189,22 +216,22 @@ class basic_json_parser : public ser_context
 
 public:
     basic_json_parser()
-        : basic_json_parser(basic_json_options<CharT>::get_default_options(), default_parse_error_handler())
+        : basic_json_parser(basic_json_options<CharT>::get_default_options(), default_json_parsing())
     {
     }
 
-    basic_json_parser(std::function<bool(std::error_code,const ser_context&)> err_handler)
+    basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler)
         : basic_json_parser(basic_json_options<CharT>::get_default_options(), err_handler)
     {
     }
 
     basic_json_parser(const basic_json_decode_options<CharT>& options)
-        : basic_json_parser(options, default_parse_error_handler())
+        : basic_json_parser(options, default_json_parsing())
     {
     }
 
     basic_json_parser(const basic_json_decode_options<CharT>& options,
-                      std::function<bool(std::error_code,const ser_context&)> err_handler)
+                      std::function<bool(json_errc,const ser_context&)> err_handler)
        : options_(options),
          err_handler_(err_handler),
          initial_stack_capacity_(default_initial_stack_capacity_),

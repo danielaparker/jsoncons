@@ -15,7 +15,6 @@
 #include <ios>
 #include <iterator> // std::input_iterator_tag
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/staj_reader.hpp>
 
 namespace jsoncons {
