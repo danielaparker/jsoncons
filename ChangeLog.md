@@ -14,6 +14,10 @@ Changes:
 - The classes `staj_filter` and `filtered_staj_reader` have been removed, instead, use a 
   lambda expression in the constructor of `json_pull_reader`.
 
+- The names `default_parse_error_handler` and `strict_parse_error_handler` have been deprecated 
+  and renamed to `default_json_parsing` and `strict_json_parsing`. Rationale: these apply only 
+  to JSON. 
+
 version 0.128.0
 ---------------
 
