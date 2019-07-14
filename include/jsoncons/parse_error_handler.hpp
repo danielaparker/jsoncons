@@ -4,8 +4,5 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_PARSE_ERROR_HANDLER_HPP
-#define JSONCONS_PARSE_ERROR_HANDLER_HPP
-
 #include <jsoncons/json_parser.hpp>
 
