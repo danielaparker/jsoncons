@@ -50,7 +50,7 @@ struct sorted_policy
     template <class CharT, class CharTraits, class Allocator>
     using string_storage = std::basic_string<CharT, CharTraits,Allocator>;
 
-    typedef default_parse_error_handler parse_error_handler_type;
+    typedef default_json_parsing parse_error_handler_type;
 };
 
 struct preserve_order_policy : public sorted_policy

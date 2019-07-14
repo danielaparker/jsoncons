@@ -58,7 +58,7 @@ void comment_example()
     // Strict
     try
     {
-        json j = json::parse(s, strict_parse_error_handler());
+        json j = json::parse(s, strict_json_parsing());
     }
     catch (const ser_error& e)
     {

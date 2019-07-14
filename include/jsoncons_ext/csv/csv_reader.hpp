@@ -66,7 +66,7 @@ public:
        : basic_csv_reader(std::forward<Source>(source), 
                           handler, 
                           basic_csv_options<CharT>::get_default_options(), 
-                          default_parse_error_handler())
+                          default_csv_parsing())
     {
     }
 
@@ -78,7 +78,7 @@ public:
         : basic_csv_reader(std::forward<Source>(source), 
                            handler, 
                            options, 
-                           default_parse_error_handler())
+                           default_csv_parsing())
     {
     }
 

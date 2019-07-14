@@ -148,6 +148,36 @@ enum class json_parse_state : uint8_t
     done
 };
 
+struct default_json_parsing
+{
+    bool operator()(std::error_code code, const ser_context&) noexcept 
+    {
+        static const std::error_code illegal_comment = make_error_code(json_errc::illegal_comment);
+
+        if (code == illegal_comment)
+        {
+            return true; // Recover, allow comments
+        }
+        else
+        {
+            return false;
+        }
+    }
+};
+
+struct strict_json_parsing
+{
+    bool operator()(std::error_code, const ser_context&) noexcept
+    {
+        return false;
+    }
+};
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED("instead, use default_json_parsing") typedef default_json_parsing strict_parse_error_handler;
+    JSONCONS_DEPRECATED("instead, use strict_json_parsing") typedef strict_json_parsing default_parse_error_handler;
+#endif
+
 template <class CharT, class Allocator = std::allocator<char>>
 class basic_json_parser : public ser_context
 {
@@ -189,7 +219,7 @@ class basic_json_parser : public ser_context
 
 public:
     basic_json_parser()
-        : basic_json_parser(basic_json_options<CharT>::get_default_options(), default_parse_error_handler())
+        : basic_json_parser(basic_json_options<CharT>::get_default_options(), default_json_parsing())
     {
     }
 
@@ -199,7 +229,7 @@ public:
     }
 
     basic_json_parser(const basic_json_decode_options<CharT>& options)
-        : basic_json_parser(options, default_parse_error_handler())
+        : basic_json_parser(options, default_json_parsing())
     {
     }
 

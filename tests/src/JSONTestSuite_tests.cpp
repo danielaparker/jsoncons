@@ -36,7 +36,7 @@ TEST_CASE("JSON Parsing Test Suite")
             if (fs::exists(p) && fs::is_regular_file(p) && p.path().extension() == ".json" && p.path().filename().c_str()[0] == 'y')
             {
                 std::ifstream is(p.path().c_str());
-                strict_parse_error_handler err_handler;
+                strict_json_parsing err_handler;
                 json_reader reader(is, err_handler);
                 std::error_code ec;
                 reader.read(ec);
@@ -56,7 +56,7 @@ TEST_CASE("JSON Parsing Test Suite")
             if (fs::exists(p) && fs::is_regular_file(p) && p.path().extension() == ".json" && p.path().filename().c_str()[0] == 'n')
             {
                 std::ifstream is(p.path().c_str());
-                strict_parse_error_handler err_handler;
+                strict_json_parsing err_handler;
                 json_reader reader(is, err_handler);
                 std::error_code ec;
                 reader.read(ec);

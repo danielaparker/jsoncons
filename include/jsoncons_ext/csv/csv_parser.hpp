@@ -53,6 +53,14 @@ enum class csv_state_type
     done
 };
 
+struct default_csv_parsing
+{
+    bool operator()(std::error_code, const ser_context&) noexcept
+    {
+        return false;
+    }
+};
+
 template<class CharT,class Allocator=std::allocator<CharT>>
 class basic_csv_parser : public ser_context
 {
@@ -99,7 +107,7 @@ public:
     basic_csv_parser(basic_json_content_handler<CharT>& handler)
        : basic_csv_parser(handler, 
                           basic_csv_options<CharT>::get_default_options(), 
-                          default_parse_error_handler())
+                          default_csv_parsing())
     {
     }
 
@@ -107,7 +115,7 @@ public:
                      const basic_csv_decode_options<CharT>& options)
         : basic_csv_parser(handler, 
                            options, 
-                           default_parse_error_handler())
+                           default_csv_parsing())
     {
     }
 

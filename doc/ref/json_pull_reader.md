@@ -21,13 +21,13 @@ function to advance to the next event, until `done()` returns `true`.
     template <class Source>
     basic_json_pull_reader(Source&& source, 
                            const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::get_default_options(),
-                           std::function<bool(std::error_code,const ser_context&)> err_handler = default_parse_error_handler()); // (1)
+                           std::function<bool(std::error_code,const ser_context&)> err_handler = default_json_parsing()); // (1)
 
     template <class Source>
     basic_json_pull_reader(Source&& source, 
                            std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                            const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::get_default_options(),
-                           std::function<bool(std::error_code,const ser_context&)> err_handler = default_parse_error_handler()); // (2)
+                           std::function<bool(std::error_code,const ser_context&)> err_handler = default_json_parsing()); // (2)
 
 Constructors (1)-(2) read from a character sequence or stream and throw a 
 [ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
