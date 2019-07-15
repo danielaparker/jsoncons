@@ -398,9 +398,32 @@ Output:
 string_value: Marilyn C
 ```
 
+## About jsoncons::basic_json
+
+The jsoncons library provides a [basic_json](doc/ref/basic_json.md) class template, which is the generalization of a `json` value for different 
+character types, different policies for ordering name-value pairs, etc. A `basic_json` provides a tree model
+of JSON-like data formats, and defines an interface for accessing and modifying that data.
+Despite its name, it is not only JSON.
+
+```c++
+template< 
+    class CharT,
+    class ImplementationPolicy = sorted_policy,
+    class Allocator = std::allocator<char>> class basic_json;
+```
+Several typedefs for common character types and policies for ordering an object's name/value pairs are provided:
+
+- [json](doc/ref/json.md) constructs a utf8 character json value that sorts name-value members alphabetically
+
+- [ojson](doc/ref/ojson.md) constructs a utf8 character json value that preserves the original name-value insertion order
+
+- [wjson](doc/ref/wjson.md) constructs a wide character json value that sorts name-value members alphabetically
+
+- [wojson](doc/ref/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
+
 ### Working with CBOR data
 
-For the examples below you need to include some header files and construct a vector of CBOR data:
+For the examples below you need to include some header files and construct a buffer of CBOR data:
 
 ```c++
 #include <iomanip>
@@ -434,7 +457,7 @@ std::vector<uint8_t> data = {
 };
 ```
 
-jsoncons allows you to work with the CBOR data in a number of ways:
+jsoncons allows you to work with the CBOR data similarly to JSON data:
 
 - As a variant-like structure, [basic_json](doc/ref/basic_json.md) 
 
@@ -563,29 +586,6 @@ byte_string_value: 50757373 (base64)
 string_value: 273.15 (bigdec)
 end_array (n/a)
 ```
-
-## About jsoncons::basic_json
-
-The jsoncons library provides a [basic_json](doc/ref/basic_json.md) class template, which is the generalization of a `json` value for different 
-character types, different policies for ordering name-value pairs, etc. A `basic_json` provides a tree model
-of JSON-like data formats, and defines an interface for accessing and modifying that data.
-Despite its name, it is not only JSON.
-
-```c++
-template< 
-    class CharT,
-    class ImplementationPolicy = sorted_policy,
-    class Allocator = std::allocator<char>> class basic_json;
-```
-Several typedefs for common character types and policies for ordering an object's name/value pairs are provided:
-
-- [json](doc/ref/json.md) constructs a utf8 character json value that sorts name-value members alphabetically
-
-- [ojson](doc/ref/ojson.md) constructs a utf8 character json value that preserves the original name-value insertion order
-
-- [wjson](doc/ref/wjson.md) constructs a wide character json value that sorts name-value members alphabetically
-
-- [wojson](doc/ref/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
 
 ## More examples
 
