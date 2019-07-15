@@ -18,6 +18,7 @@
 #include <jsoncons_ext/cbor/cbor_reader.hpp>
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
+#include <jsoncons/json_conversion_traits.hpp>
 
 namespace jsoncons { namespace cbor {
 
@@ -88,11 +89,9 @@ template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
 decode_cbor(const std::vector<uint8_t>& v)
 {
-    json_decoder<json> decoder;
-    basic_cbor_reader<jsoncons::bytes_source> reader(v, decoder);
-    reader.read();
-    json j = decoder.get_result();
-    return j.template as<T>();
+    cbor_bytes_cursor reader(v);
+    T val = read_from<T>(json(),reader);
+    return val;
 }
 
 template<class T>
@@ -110,12 +109,10 @@ template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
 decode_cbor(std::istream& is)
 {
-    jsoncons::json_decoder<json> decoder;
-    cbor_reader reader(is, decoder);
-    reader.read();
-    return decoder.get_result().template as<T>();
+    cbor_cursor reader(is);
+    T val = read_from<T>(json(), reader);
+    return val;
 }
-
   
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class Json>

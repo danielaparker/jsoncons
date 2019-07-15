@@ -571,9 +571,9 @@ int main()
 
         json_cursor_examples();
 
-        readme_examples();
-
         cbor_examples();
+
+        readme_examples();
     }
     catch (const std::exception& e)
     {

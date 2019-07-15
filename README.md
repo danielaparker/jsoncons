@@ -283,50 +283,66 @@ See [examples](doc/Examples.md#G1) for other ways of specializing `json_type_tra
 ```c++
 int main()
 {
-    json_cursor reader(data);
-    for (; !reader.done(); reader.next())
-    {
-        const auto& event = reader.current();
-        switch (event.event_type())
+        // Some JSON input data
+        std::string data = R"(
+            {
+               "application": "hiking",
+               "reputons": [
+               {
+                   "rater": "HikingAsylum",
+                   "assertion": "advanced",
+                   "rated": "Marilyn C",
+                   "rating": 0.90
+                 }
+               ]
+            }
+        )";
+
+        json_cursor cursor(data);
+        for (; !cursor.done(); cursor.next())
         {
-            case staj_event_type::begin_array:
-                std::cout << "begin_array\n";
-                break;
-            case staj_event_type::end_array:
-                std::cout << "end_array\n";
-                break;
-            case staj_event_type::begin_object:
-                std::cout << "begin_object\n";
-                break;
-            case staj_event_type::end_object:
-                std::cout << "end_object\n";
-                break;
-            case staj_event_type::name:
-                // Or std::string_view, if supported
-                std::cout << "name: " << event.get<jsoncons::string_view>() << "\n";
-                break;
-            case staj_event_type::string_value:
-                // Or std::string_view, if supported
-                std::cout << "string_value: " << event.get<jsoncons::string_view>() << "\n";
-                break;
-            case staj_event_type::null_value:
-                std::cout << "null_value: " << "\n";
-                break;
-            case staj_event_type::bool_value:
-                std::cout << "bool_value: " << std::boolalpha << event.get<bool>() << "\n";
-                break;
-            case staj_event_type::int64_value:
-                std::cout << "int64_value: " << event.get<int64_t>() << "\n";
-                break;
-            case staj_event_type::uint64_value:
-                std::cout << "uint64_value: " << event.get<uint64_t>() << "\n";
-                break;
-            case staj_event_type::double_value:
-                std::cout << "double_value: " << event.get<double>() << "\n";
-                break;
-            default:
-                std::cout << "Unhandled event type\n";
-                break;
+            const auto& event = cursor.current();
+            switch (event.event_type())
+            {
+                case staj_event_type::begin_array:
+                    std::cout << event.event_type() << " " << "\n";
+                    break;
+                case staj_event_type::end_array:
+                    std::cout << event.event_type() << " " << "\n";
+                    break;
+                case staj_event_type::begin_object:
+                    std::cout << event.event_type() << " " << "\n";
+                    break;
+                case staj_event_type::end_object:
+                    std::cout << event.event_type() << " " << "\n";
+                    break;
+                case staj_event_type::name:
+                    // Or std::string_view, if supported
+                    std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
+                    break;
+                case staj_event_type::string_value:
+                    // Or std::string_view, if supported
+                    std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
+                    break;
+                case staj_event_type::null_value:
+                    std::cout << event.event_type() << "\n";
+                    break;
+                case staj_event_type::bool_value:
+                    std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << "\n";
+                    break;
+                case staj_event_type::int64_value:
+                    std::cout << event.event_type() << ": " << event.get<int64_t>() << "\n";
+                    break;
+                case staj_event_type::uint64_value:
+                    std::cout << event.event_type() << ": " << event.get<uint64_t>() << "\n";
+                    break;
+                case staj_event_type::double_value:
+                    std::cout << event.event_type() << ": " << event.get<double>() << "\n";
+                    break;
+                default:
+                    std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";;
+                    break;
+            }
         }
     }
 }
@@ -350,6 +366,7 @@ double_value: 0.9
 end_object
 end_array
 end_object
+string_value: Marilyn C
 ```
 
 You can apply a filter to the stream, for example,
@@ -397,29 +414,6 @@ Output:
 ```
 string_value: Marilyn C
 ```
-
-## About jsoncons::basic_json
-
-The jsoncons library provides a [basic_json](doc/ref/basic_json.md) class template, which is the generalization of a `json` value for different 
-character types, different policies for ordering name-value pairs, etc. A `basic_json` provides a tree model
-of JSON-like data formats, and defines an interface for accessing and modifying that data.
-Despite its name, it is not only JSON.
-
-```c++
-template< 
-    class CharT,
-    class ImplementationPolicy = sorted_policy,
-    class Allocator = std::allocator<char>> class basic_json;
-```
-Several typedefs for common character types and policies for ordering an object's name/value pairs are provided:
-
-- [json](doc/ref/json.md) constructs a utf8 character json value that sorts name-value members alphabetically
-
-- [ojson](doc/ref/ojson.md) constructs a utf8 character json value that preserves the original name-value insertion order
-
-- [wjson](doc/ref/wjson.md) constructs a wide character json value that sorts name-value members alphabetically
-
-- [wojson](doc/ref/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
 
 ### Working with CBOR data
 
@@ -586,6 +580,29 @@ byte_string_value: 50757373 (base64)
 string_value: 273.15 (bigdec)
 end_array (n/a)
 ```
+
+## About jsoncons::basic_json
+
+The jsoncons library provides a [basic_json](doc/ref/basic_json.md) class template, which is the generalization of a `json` value for different 
+character types, different policies for ordering name-value pairs, etc. A `basic_json` provides a tree model
+of JSON-like data formats, and defines an interface for accessing and modifying that data.
+Despite its name, it is not only JSON.
+
+```c++
+template< 
+    class CharT,
+    class ImplementationPolicy = sorted_policy,
+    class Allocator = std::allocator<char>> class basic_json;
+```
+Several typedefs for common character types and policies for ordering an object's name/value pairs are provided:
+
+- [json](doc/ref/json.md) constructs a utf8 character json value that sorts name-value members alphabetically
+
+- [ojson](doc/ref/ojson.md) constructs a utf8 character json value that preserves the original name-value insertion order
+
+- [wjson](doc/ref/wjson.md) constructs a wide character json value that sorts name-value members alphabetically
+
+- [wojson](doc/ref/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
 
 ## More examples
 
