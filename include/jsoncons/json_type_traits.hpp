@@ -917,7 +917,7 @@ public:
     }
     
     static basic_byte_string<Allocator> as(const Json& j)
-    {
+    { 
         return j.template as_byte_string<Allocator>();
     }
     
@@ -947,7 +947,27 @@ public:
         return Json(val);
     }
 };
-
+/*
+template<class Json>
+struct json_type_traits<Json, byte_string>
+{
+public:
+    static bool is(const Json& j) noexcept
+    {
+        return j.is_byte_string();
+    }
+    
+    static byte_string as(const Json& j)
+    {
+        return j.as_byte_string();
+    }
+    
+    static Json to_json(const byte_string& val)
+    {
+        return Json(val);
+    }
+};
+*/
 // basic_bignum
 
 template<class Json, class Allocator>

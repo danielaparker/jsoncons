@@ -16,6 +16,7 @@
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons_ext/cbor/cbor_reader.hpp>
+#include <jsoncons_ext/cbor/cbor_cursor.hpp>
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
 
 namespace jsoncons { namespace cbor {
@@ -70,7 +71,7 @@ encode_cbor(const T& val, std::ostream& os, const cbor_encode_options& options)
     write_to(json(), val, encoder);
 }
 
-// decode_cbor
+// decode_cbor 
 
 template<class T>
 typename std::enable_if<is_basic_json_class<T>::value,T>::type 
@@ -87,10 +88,11 @@ template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
 decode_cbor(const std::vector<uint8_t>& v)
 {
-    jsoncons::json_decoder<json> decoder;
+    json_decoder<json> decoder;
     basic_cbor_reader<jsoncons::bytes_source> reader(v, decoder);
     reader.read();
-    return decoder.get_result().template as<T>();
+    json j = decoder.get_result();
+    return j.template as<T>();
 }
 
 template<class T>

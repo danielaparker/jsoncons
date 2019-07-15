@@ -8,6 +8,7 @@
 // book example
 
 namespace ns {
+
     struct book
     {
         std::string author;

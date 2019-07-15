@@ -127,7 +127,6 @@ jsoncons allows you to work with the data in a number of ways:
 #### As a variant-like structure
 
 ```c++
-
 int main()
 {
     // Parse the string of data into a json value
@@ -397,6 +396,172 @@ int main()
 Output:
 ```
 string_value: Marilyn C
+```
+
+### Working with CBOR data
+
+For the examples below you need to include some header files and construct a vector of CBOR data:
+
+```c++
+#include <iomanip>
+#include <iostream>
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+
+using namespace jsoncons; // for convenience
+
+std::vector<uint8_t> data = {
+    0x9f, // Start indefinte length array
+      0x83, // Array of length 3
+        0x63, // String value of length 3
+          0x66,0x6f,0x6f, // "foo" 
+        0x44, // Byte string value of length 4
+          0x50,0x75,0x73,0x73, // 'P''u''s''s'
+        0xc3, // Tag 3 (negative bignum)
+        0x49, // Byte string value of length 9
+          0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, // Bytes content
+      0x83, // Another array of length 3
+      0x63, // String value of length 3
+        0x62,0x61,0x72, // "bar"
+      0xd6, // Expected conversion to base64
+      0x44, // Byte string value of length 4
+        0x50,0x75,0x73,0x73, // 'P''u''s''s'
+      0xc4, // Tag 4 (decimal fraction)
+        0x82, // Array of length 2
+          0x21, // -2
+          0x19,0x6a,0xb3, // 27315
+    0xff // "break"
+};
+```
+
+jsoncons allows you to work with the CBOR data in a number of ways:
+
+- As a variant-like structure, [basic_json](doc/ref/basic_json.md) 
+
+- As a strongly typed C++ data structure
+
+- As a stream of parse events
+
+#### As a variant-like structure
+
+```c++
+int main()
+{
+    // Parse the string of data into a json value
+    json j = cbor::decode_cbor<json>(data);
+
+    // Pretty print
+    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+
+    std::cout << "(2)\n";
+    for (const auto& row : j.array_range())
+    {
+        std::cout << row[1].as<std::string>() << " (" << row[1].tag() << ")\n";
+    }
+}
+```
+Output:
+```
+(1)
+[
+    ["foo", "UHVzcw", "-18446744073709551617"],
+    ["bar", "UHVzcw==", "273.15"]
+]
+
+(2)
+UHVzcw (n/a)
+UHVzcw (base64)
+```
+
+#### As a strongly typed C++ data structure
+
+```c++
+int main()
+{
+    // Parse the string of data into a std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>> value
+    auto val = cbor::decode_cbor<std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>>>(data);
+
+    for (const auto& row : val)
+    {
+        std::cout << std::get<0>(row) << ", " << std::get<1>(row) << ", " << std::get<2>(row) << "\n";
+    }
+}
+```
+Output:
+```
+foo, 50757373, -18446744073709551617
+bar, 50757373, 273.15
+```
+
+#### As a stream of parse events
+
+```c++
+int main()
+{
+    cbor::cbor_bytes_cursor cursor(data);
+    for (; !cursor.done(); cursor.next())
+    {
+        const auto& event = cursor.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::begin_array:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::end_array:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::begin_object:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::end_object:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::name:
+                // Or std::string_view, if supported
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::string_value:
+                // Or std::string_view, if supported
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::byte_string_value:
+                std::cout << event.event_type() << ": " << event.get<jsoncons::byte_string_view>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::null_value:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::bool_value:
+                std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::int64_value:
+                std::cout << event.event_type() << ": " << event.get<int64_t>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::uint64_value:
+                std::cout << event.event_type() << ": " << event.get<uint64_t>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::double_value:
+                std::cout << event.event_type() << ": "  << event.get<double>() << " " << "(" << event.tag() << ")\n";
+                break;
+            default:
+                std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+        }
+    }
+}
+```
+Output:
+```
+begin_array (n/a)
+begin_array (n/a)
+string_value: foo (n/a)
+byte_string_value: 50757373 (n/a)
+string_value: -18446744073709551617 (bigint)
+end_array (n/a)
+begin_array (n/a)
+string_value: bar (n/a)
+byte_string_value: 50757373 (base64)
+string_value: 273.15 (bigdec)
+end_array (n/a)
 ```
 
 ## About jsoncons::basic_json

@@ -42,6 +42,70 @@ enum class semantic_tag : uint8_t
 #endif
 };
 
+inline
+std::ostream& operator<<(std::ostream& os, semantic_tag tag)
+{
+    switch (tag)
+    {
+        case semantic_tag::none:
+        {
+            os << "n/a";
+            break;
+        }
+        case semantic_tag::undefined:
+        {
+            os << "undefined";
+            break;
+        }
+        case semantic_tag::datetime:
+        {
+            os << "datetime";
+            break;
+        }
+        case semantic_tag::timestamp:
+        {
+            os << "timestamp";
+            break;
+        }
+        case semantic_tag::bigint:
+        {
+            os << "bigint";
+            break;
+        }
+        case semantic_tag::bigdec:
+        {
+            os << "bigdec";
+            break;
+        }
+        case semantic_tag::bigfloat:
+        {
+            os << "bigfloat";
+            break;
+        }
+        case semantic_tag::base16:
+        {
+            os << "base16";
+            break;
+        }
+        case semantic_tag::base64:
+        {
+            os << "base64";
+            break;
+        }
+        case semantic_tag::base64url:
+        {
+            os << "base64url";
+            break;
+        }
+        case semantic_tag::uri:
+        {
+            os << "uri";
+            break;
+        }
+    }
+    return os;
+}
+
 #if !defined(JSONCONS_NO_DEPRECATED)
     typedef semantic_tag semantic_tag_type;
 #endif

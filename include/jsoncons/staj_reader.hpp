@@ -41,6 +41,75 @@ enum class staj_event_type
     double_value
 };
 
+inline
+std::ostream& operator<<(std::ostream& os, staj_event_type tag)
+{
+    switch (tag)
+    {
+        case staj_event_type::begin_array:
+        {
+            os << "begin_array";
+            break;
+        }
+        case staj_event_type::end_array:
+        {
+            os << "end_array";
+            break;
+        }
+        case staj_event_type::begin_object:
+        {
+            os << "begin_object";
+            break;
+        }
+        case staj_event_type::end_object:
+        {
+            os << "end_object";
+            break;
+        }
+        case staj_event_type::name:
+        {
+            os << "name";
+            break;
+        }
+        case staj_event_type::string_value:
+        {
+            os << "string_value";
+            break;
+        }
+        case staj_event_type::byte_string_value:
+        {
+            os << "byte_string_value";
+            break;
+        }
+        case staj_event_type::null_value:
+        {
+            os << "null_value";
+            break;
+        }
+        case staj_event_type::bool_value:
+        {
+            os << "bool_value";
+            break;
+        }
+        case staj_event_type::int64_value:
+        {
+            os << "int64_value";
+            break;
+        }
+        case staj_event_type::uint64_value:
+        {
+            os << "uint64_value";
+            break;
+        }
+        case staj_event_type::double_value:
+        {
+            os << "double_value";
+            break;
+        }
+    }
+    return os;
+}
+
 JSONCONS_STRING_LITERAL(null,'n','u','l','l')
 JSONCONS_STRING_LITERAL(true,'t','r','u','e')
 JSONCONS_STRING_LITERAL(false,'f','a','l','s','e')

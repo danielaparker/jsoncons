@@ -5,6 +5,7 @@
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonpath/json_query.hpp>
+#include "example_types.hpp"
 #include <string>
 #include <iomanip>
 #include <cassert>
@@ -380,6 +381,153 @@ void decode_cbor_with_packed_strings()
     std::cout << pretty_print(j) << "\n";
 }
 
+void working_with_cbor1()
+{
+    std::vector<uint8_t> data = {
+        0x9f, // Start indefinte length array
+          0x83, // Array of length 3
+            0x63, // String value of length 3
+              0x66,0x6f,0x6f, // "foo" 
+            0x44, // Byte string value of length 4
+              0x50,0x75,0x73,0x73, // 'P''u''s''s'
+            0xc3, // Tag 3 (negative bignum)
+            0x49, // Byte string value of length 9
+              0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, // Bytes content
+          0x83, // Another array of length 3
+          0x63, // String value of length 3
+            0x62,0x61,0x72, // "bar"
+          0xd6, // Expected conversion to base64
+          0x44, // Byte string value of length 4
+            0x50,0x75,0x73,0x73, // 'P''u''s''s'
+          0xc4, // Tag 4 (decimal fraction)
+            0x82, // Array of length 2
+              0x21, // -2
+              0x19,0x6a,0xb3, // 27315
+        0xff // "break"
+    };
+
+    // Parse the string of data into a json value
+    json j = cbor::decode_cbor<json>(data);
+
+    // Pretty print
+    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+
+    std::cout << "(2)\n";
+    for (const auto& row : j.array_range())
+    {
+        std::cout << row[1].as<std::string>() << " (" << row[1].tag() << ")\n";
+    }
+}
+
+void working_with_cbor2()
+{
+    std::vector<uint8_t> data = {
+        0x9f, // Start indefinte length array
+          0x83, // Array of length 3
+            0x63, // String value of length 3
+              0x66,0x6f,0x6f, // "foo" 
+            0x44, // Byte string value of length 4
+              0x50,0x75,0x73,0x73, // 'P''u''s''s'
+            0xc3, // Tag 3 (negative bignum)
+            0x49, // Byte string value of length 9
+              0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, // Bytes content
+          0x83, // Another array of length 3
+          0x63, // String value of length 3
+            0x62,0x61,0x72, // "bar"
+          0xd6, // Expected conversion to base64
+          0x44, // Byte string value of length 4
+            0x50,0x75,0x73,0x73, // 'P''u''s''s'
+          0xc4, // Tag 4 (decimal fraction)
+            0x82, // Array of length 2
+              0x21, // -2
+              0x19,0x6a,0xb3, // 27315
+        0xff // "break"
+    };
+
+    // Parse the string of data into a std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>> value
+    auto val = cbor::decode_cbor<std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>>>(data);
+
+    for (const auto& row : val)
+    {
+        std::cout << std::get<0>(row) << ", " << std::get<1>(row) << ", " << std::get<2>(row) << "\n";
+    }
+}
+
+void working_with_cbor3()
+{
+    std::vector<uint8_t> data = {
+        0x82, // Array of length 2
+          0x83, // Array of length 3
+            0x63, // String value of length 3
+              0x66,0x6f,0x6f, // "foo" 
+            0x44, // Byte string value of length 4
+              0x50,0x75,0x73,0x73, // 'P''u''s''s'
+            0xc3, // Tag 3 (negative bignum)
+            0x49, // Byte string value of length 9
+              0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, // Bytes content
+          0x83, // Another array of length 3
+          0x63, // String value of length 3
+            0x62,0x61,0x72, // "bar"
+          0xd6, // Expected conversion to base64
+          0x44, // Byte string value of length 4
+            0x50,0x75,0x73,0x73, // 'P''u''s''s'
+          0xc4, // Tag 4 (decimal fraction)
+            0x82, // Array of length 2
+              0x21, // -2
+              0x19,0x6a,0xb3 // 27315
+    };
+
+    cbor::cbor_bytes_cursor cursor(data);
+    for (; !cursor.done(); cursor.next())
+    {
+        const auto& event = cursor.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::begin_array:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::end_array:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::begin_object:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::end_object:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::name:
+                // Or std::string_view, if supported
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::string_value:
+                // Or std::string_view, if supported
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::byte_string_value:
+                std::cout << event.event_type() << ": " << event.get<jsoncons::byte_string_view>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::null_value:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::bool_value:
+                std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::int64_value:
+                std::cout << event.event_type() << ": " << event.get<int64_t>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::uint64_value:
+                std::cout << event.event_type() << ": " << event.get<uint64_t>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::double_value:
+                std::cout << event.event_type() << ": "  << event.get<double>() << " " << "(" << event.tag() << ")\n";
+                break;
+            default:
+                std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+        }
+    }
+}
+
 void cbor_examples()
 {
     std::cout << "\ncbor examples\n\n";
@@ -394,6 +542,12 @@ void cbor_examples()
     encode_cbor_with_packed_strings();
 
     decode_cbor_with_packed_strings();
+
+    working_with_cbor1();
+    std::cout << "\n";
+    working_with_cbor2();
+    std::cout << "\n";
+    working_with_cbor3();
 
     std::cout << std::endl;
 }

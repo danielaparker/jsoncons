@@ -11,6 +11,7 @@
 #include <string>
 #include <cmath>
 #include <exception>
+#include <ostream>
 
 // Uncomment the following line to suppress deprecated names (recommended for new code)
 //#define JSONCONS_NO_DEPRECATED
@@ -95,7 +96,7 @@
 #else
 #define JSONCONS_NO_LOCALECONV
 #endif
-#endif
+#endif 
 
 #if defined(_MSC_VER)
 #define JSONCONS_HAS_MSC__STRTOD_L
@@ -127,5 +128,15 @@ using wstring_view = std::wstring_view;
         static const std::basic_string<CharT> sv(s, sizeof(s) / sizeof(CharT));\
         return sv;\
     }
+
+#define JSONCONS_EXPAND(X) X    
+#define JSONCONS_QUOTE(Prefix, A) JSONCONS_EXPAND(Prefix ## #A)
+
+#define JSONCONS_DEFINE_LITERAL( name ) \
+template<class CharT> CharT const* name##_literal(); \
+template<> inline char const * name##_literal<char>() { return JSONCONS_QUOTE(,name); } \
+template<> inline wchar_t const* name##_literal<wchar_t>() { return JSONCONS_QUOTE(L,name); } \
+template<> inline char16_t const* name##_literal<char16_t>() { return JSONCONS_QUOTE(u,name); } \
+template<> inline char32_t const* name##_literal<char32_t>() { return JSONCONS_QUOTE(U,name); }
 
 #endif

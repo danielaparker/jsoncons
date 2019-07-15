@@ -555,8 +555,6 @@ int main()
 
         jsonpointer_examples();
 
-        cbor_examples();
-
         byte_string_examples();
 
         cbor_examples();
@@ -574,6 +572,8 @@ int main()
         json_cursor_examples();
 
         readme_examples();
+
+        cbor_examples();
     }
     catch (const std::exception& e)
     {
