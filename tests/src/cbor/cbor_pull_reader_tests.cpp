@@ -6,7 +6,7 @@
 #endif
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <jsoncons_ext/cbor/cbor_cursor.hpp>
+#include <jsoncons_ext/cbor/cbor_pull_reader.hpp>
 #include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
@@ -15,7 +15,7 @@
 
 using namespace jsoncons;
 
-TEST_CASE("cbor_cursor test")
+TEST_CASE("cbor_pull_reader test")
 {
     ojson j1 = ojson::parse(R"(
     {
