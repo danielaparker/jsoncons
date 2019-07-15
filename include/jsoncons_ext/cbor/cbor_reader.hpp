@@ -98,6 +98,11 @@ public:
         state_stack_.emplace_back(parse_mode::root,0);
     }
 
+    void restart()
+    {
+        continue_ = true;
+    }
+
     void reset()
     {
         state_stack_.clear();

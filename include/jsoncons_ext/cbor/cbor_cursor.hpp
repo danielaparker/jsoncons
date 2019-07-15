@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_CURSOR_HPP
-#define JSONCONS_JSON_CURSOR_HPP
+#ifndef JSONCONS_CBOR_CBOR_CURSOR_HPP
+#define JSONCONS_CBOR_CBOR_CURSOR_HPP
 
 #include <memory> // std::allocator
 #include <string>
@@ -26,7 +26,7 @@ namespace jsoncons {
 namespace cbor {
 
 template<class Src=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
-class basic_cbor_pull_reader : public basic_staj_reader<char>, private virtual ser_context
+class basic_cbor_cursor : public basic_staj_reader<char>, private virtual ser_context
 {
 public:
     typedef Allocator allocator_type;
@@ -37,15 +37,15 @@ private:
     bool eof_;
 
     // Noncopyable and nonmoveable
-    basic_cbor_pull_reader(const basic_cbor_pull_reader&) = delete;
-    basic_cbor_pull_reader& operator=(const basic_cbor_pull_reader&) = delete;
+    basic_cbor_cursor(const basic_cbor_cursor&) = delete;
+    basic_cbor_cursor& operator=(const basic_cbor_cursor&) = delete;
 
 public:
     typedef string_view string_view_type;
 
 
     template <class Source>
-    basic_cbor_pull_reader(Source&& source)
+    basic_cbor_cursor(Source&& source)
        : parser_(std::forward<Source>(source)),
          eof_(false)
     {
@@ -58,7 +58,7 @@ public:
     // Constructors that set parse error codes
 
     template <class Source>
-    basic_cbor_pull_reader(Source&& source, 
+    basic_cbor_cursor(Source&& source, 
                       std::error_code& ec)
        : parser_(std::forward<Source>(source)),
          eof_(false)
@@ -151,7 +151,8 @@ public:
 private:
 };
 
-typedef basic_cbor_pull_reader<char> cbor_pull_reader;
+typedef basic_cbor_cursor<char> cbor_cursor;
+typedef basic_cbor_cursor<jsoncons::bytes_source> cbor_bytes_cursor;
 
 } // namespace cbor
 } // namespace jsoncons
