@@ -100,7 +100,7 @@ int main()
 {
     std::istringstream is(example);
 
-    json_pull_reader reader(is);
+    json_cursor reader(is);
 
     staj_array_iterator<json> it(reader);
 
@@ -170,7 +170,7 @@ int main()
 {
     std::istringstream is(example);
 
-    json_pull_reader reader(is);
+    json_cursor reader(is);
 
     staj_array_iterator<employee> it(reader);
 

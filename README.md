@@ -16,7 +16,7 @@ Compared to other JSON libraries, jsoncons has been designed to handle very larg
 SAX style parsers and serializers. Its [json parser](doc/ref/json_parser.md) is an 
 incremental parser that can be fed its input in chunks, and does not require an entire file to be loaded in memory at one time. 
 Its tree model is more compact than most, and can be made more compact still with a user-supplied
-allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](doc/ref/json_pull_reader.md),
+allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](doc/ref/json_cursor.md),
 built on top of its incremental parser.  
 
 The [jsoncons data model](doc/ref/data-model.md) supports the familiar JSON types - nulls,
@@ -284,7 +284,7 @@ See [examples](doc/Examples.md#G1) for other ways of specializing `json_type_tra
 ```c++
 int main()
 {
-    json_pull_reader reader(data);
+    json_cursor reader(data);
     for (; !reader.done(); reader.next())
     {
         const auto& event = reader.current();
@@ -377,7 +377,7 @@ int main()
         }
     };
 
-    json_pull_reader reader(data, filter);
+    json_cursor reader(data, filter);
     for (; !reader.done(); reader.next())
     {
         const auto& event = reader.current();

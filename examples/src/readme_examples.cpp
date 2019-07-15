@@ -103,7 +103,7 @@ namespace readme
             }
         )";
 
-        json_pull_reader reader(data);
+        json_cursor reader(data);
         for (; !reader.done(); reader.next())
         {
             const auto& event = reader.current();
@@ -187,7 +187,7 @@ namespace readme
             }
         };
 
-        json_pull_reader reader(data, filter);
+        json_cursor reader(data, filter);
         for (; !reader.done(); reader.next())
         {
             const auto& event = reader.current();

@@ -9,7 +9,7 @@
 [How to allow comments? How not to?](#A4)  
 [Set a maximum nesting depth](#A5)  
 [Prevent the alphabetic sort of the outputted JSON, retaining the original insertion order](#A6)  
-[Parse a very large JSON file with json_pull_reader](#A7)  
+[Parse a very large JSON file with json_cursor](#A7)  
 
 ### Encode
 
@@ -290,7 +290,7 @@ Output:
 
 <div id="A7"/> 
 
-### Parse a very large JSON file with json_pull_reader
+### Parse a very large JSON file with json_cursor
 
 
 A typical pull parsing application will repeatedly process the `current()` 
@@ -324,7 +324,7 @@ The example JSON text, `book_catalog.json`, is used by the examples below.
 ```c++
 std::ifstream is("book_catalog.json");
 
-json_pull_reader reader(is);
+json_cursor reader(is);
 
 for (; !reader.done(); reader.next())
 {
@@ -444,7 +444,7 @@ struct author_filter
 std::ifstream is("book_catalog.json");
 
 author_filter filter;
-json_pull_reader reader(is, filter);
+json_cursor reader(is, filter);
 
 for (; !reader.done(); reader.next())
 {
@@ -463,7 +463,7 @@ Haruki Murakami
 Graham Greene
 ```
 
-See [json_pull_reader](doc/ref/json_pull_reader.md) 
+See [json_cursor](doc/ref/json_cursor.md) 
 
 <div id="G0"/>
 
