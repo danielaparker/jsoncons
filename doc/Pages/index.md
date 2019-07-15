@@ -236,7 +236,7 @@ See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Example
 ```c++
 int main()
 {
-    json_pull_reader reader(data);
+    json_cursor reader(data);
     for (; !reader.done(); reader.next())
     {
         const auto& event = reader.current();

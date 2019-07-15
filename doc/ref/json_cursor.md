@@ -1,16 +1,16 @@
-### jsoncons::json_pull_reader
+### jsoncons::json_cursor
 
 ```c++
-#include <jsoncons/json_pull_reader.hpp>
+#include <jsoncons/json_cursor.hpp>
 
-typedef basic_json_pull_reader<char> json_pull_reader
+typedef basic_json_cursor<char> json_cursor
 ```
 
 A pull parser for parsing json events. A typical application will 
 repeatedly process the `current()` event and call the `next()`
 function to advance to the next event, until `done()` returns `true`.
 
-`json_pull_reader` is noncopyable and nonmoveable.
+`json_cursor` is noncopyable and nonmoveable.
 
 ### Implemented interfaces
 
@@ -19,12 +19,12 @@ function to advance to the next event, until `done()` returns `true`.
 #### Constructors
 
     template <class Source>
-    basic_json_pull_reader(Source&& source, 
+    basic_json_cursor(Source&& source, 
                            const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::get_default_options(),
                            std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); // (1)
 
     template <class Source>
-    basic_json_pull_reader(Source&& source, 
+    basic_json_cursor(Source&& source, 
                            std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                            const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::get_default_options(),
                            std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); // (2)
@@ -33,33 +33,33 @@ Constructors (1)-(2) read from a character sequence or stream and throw a
 [ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
 
     template <class Source>
-    basic_json_pull_reader(Source&& source,
+    basic_json_cursor(Source&& source,
                            std::error_code& ec); // (3)
 
     template <class Source>
-    basic_json_pull_reader(Source&& source, 
+    basic_json_cursor(Source&& source, 
                            const basic_json_decode_options<CharT>& options,
                            std::error_code& ec) // (4)
 
     template <class Source>
-    basic_json_pull_reader(Source&& source, 
+    basic_json_cursor(Source&& source, 
                            const basic_json_decode_options<CharT>& options,
                            std::function<bool(json_errc,const ser_context&)> err_handler,
                            std::error_code& ec) // (5)
 
     template <class Source>
-    basic_json_pull_reader(Source&& source,
+    basic_json_cursor(Source&& source,
                            std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                            std::error_code& ec); // (6)
 
     template <class Source>
-    basic_json_pull_reader(Source&& source, 
+    basic_json_cursor(Source&& source, 
                            std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                            const basic_json_decode_options<CharT>& options,
                            std::error_code& ec) // (7)
 
     template <class Source>
-    basic_json_pull_reader(Source&& source, 
+    basic_json_cursor(Source&& source, 
                            std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                            const basic_json_decode_options<CharT>& options,
                            std::function<bool(json_errc,const ser_context&)> err_handler,
@@ -68,14 +68,14 @@ Constructors (1)-(2) read from a character sequence or stream and throw a
 Constructors (3)-(8) read from a character sequence or stream and set `ec`
 if a parsing error is encountered while processing the initial event.
 
-Note: It is the programmer's responsibility to ensure that `basic_json_pull_reader` does not outlive any source, 
-content handler, and error handler passed in the constuctor, as `basic_json_pull_reader` holds pointers to but does not own these resources.
+Note: It is the programmer's responsibility to ensure that `basic_json_cursor` does not outlive any source, 
+content handler, and error handler passed in the constuctor, as `basic_json_cursor` holds pointers to but does not own these resources.
 
 #### Parameters
 
 `source` - a value from which a `jsoncons::basic_string_view<char_type>` is constructible, 
 or a value from which a `source_type` is constructible. In the case that a `jsoncons::basic_string_view<char_type>` is constructible
-from `source`, `source` is dispatched immediately to the parser. Otherwise, the `json_pull_reader` reads from a `source_type` in chunks. 
+from `source`, `source` is dispatched immediately to the parser. Otherwise, the `json_cursor` reads from a `source_type` in chunks. 
 
 #### Member functions
 
@@ -138,7 +138,7 @@ The example JSON text, `book_catalog.json`, is used in the example below.
 #### Reading a JSON stream
 
 ```c++
-#include <jsoncons/json_pull_reader.hpp>
+#include <jsoncons/json_cursor.hpp>
 #include <string>
 #include <fstream>
 
@@ -148,7 +148,7 @@ int main()
 {
     std::ifstream is("book_catalog.json");
 
-    json_pull_reader reader(is);
+    json_cursor reader(is);
 
     for (; !reader.done(); reader.next())
     {
@@ -234,7 +234,7 @@ end_array
 #### Filtering a JSON stream
 
 ```c++
-#include <jsoncons/json_pull_reader.hpp>
+#include <jsoncons/json_cursor.hpp>
 #include <string>
 #include <fstream>
 
@@ -270,7 +270,7 @@ int main()
     std::ifstream is("book_catalog.json");
 
     author_filter filter;
-    json_pull_reader reader(is, filter);
+    json_cursor reader(is, filter);
 
     for (; !reader.done(); reader.next())
     {

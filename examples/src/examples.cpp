@@ -34,7 +34,7 @@ void cbor_examples();
 void ubjson_examples();
 void json_parser_examples();
 void byte_string_examples();
-void json_pull_reader_examples();
+void json_cursor_examples();
 void data_model_examples();
 void staj_iterator_examples();
 void bson_examples();
@@ -571,7 +571,7 @@ int main()
 
         type_extensibility_examples();
 
-        json_pull_reader_examples();
+        json_cursor_examples();
 
         readme_examples();
     }

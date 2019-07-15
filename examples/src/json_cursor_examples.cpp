@@ -1,7 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/json_pull_reader.hpp>
+#include <jsoncons/json_cursor.hpp>
 #include <string>
 #include <sstream>
 
@@ -36,7 +36,7 @@ void reading_a_json_stream()
 {
     std::istringstream is(example);
 
-    json_pull_reader reader(is);
+    json_cursor reader(is);
 
     for (; !reader.done(); reader.next())
     {
@@ -115,7 +115,7 @@ void filtering_a_json_stream()
 {
 
     author_filter filter;
-    json_pull_reader reader(example, filter);
+    json_cursor reader(example, filter);
 
     for (; !reader.done(); reader.next())
     {
@@ -129,9 +129,9 @@ void filtering_a_json_stream()
     }
 }
 
-void json_pull_reader_examples()
+void json_cursor_examples()
 {
-    std::cout << "\njson_pull_reader examples\n\n";
+    std::cout << "\njson_cursor examples\n\n";
 
     std::cout << "\n";
     filtering_a_json_stream();
