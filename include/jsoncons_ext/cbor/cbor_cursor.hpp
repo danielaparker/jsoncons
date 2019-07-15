@@ -20,7 +20,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/staj_reader.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons_ext/cbor/cbor_reader.hpp>
+#include <jsoncons_ext/cbor/cbor_parser.hpp>
 
 namespace jsoncons { 
 namespace cbor {
