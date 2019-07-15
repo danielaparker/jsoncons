@@ -424,13 +424,15 @@ Several typedefs for common character types and policies for ordering an object'
 
 ## More examples
 
-[Constructing JSON values](#E1)  
+[Constructing json values](#E1)  
 
 [Playing around with CBOR, JSON, and CSV](#E2)  
 
 [Query CBOR with JSONPath](#E3)  
 
 <div id="E1"/> 
+
+### Constructing json values
 
 ```c++
 #include <iostream>
