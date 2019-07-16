@@ -1,98 +1,59 @@
-### jsoncons::basic_json_cursor
+### jsoncons::cbor::basic_cbor_cursor
 
 ```c++
-#include <jsoncons/json_cursor.hpp>
+#include <jsoncons/cbor_cursor.hpp>
 
 template<
-    class CharT,
-    class Src=jsoncons::stream_source<CharT>,
-    class Allocator=std::allocator<char>> basic_json_cursor;
+    class Src=jsoncons::binary_stream_source,
+    class Allocator=std::allocator<char>>
+class basic_cbor_cursor;
 ```
 
-A pull parser for reporting JSON parse events. A typical application will 
+A pull parser for reporting CBOR parse events. A typical application will 
 repeatedly process the `current()` event and call the `next()`
 function to advance to the next event, until `done()` returns `true`.
 
-`basic_json_cursor` is noncopyable and nonmoveable.
+`basic_cbor_cursor` is noncopyable and nonmoveable.
 
-Typedefs for common character types are provided:
+Typedefs for common sources are provided:
 
 Type                |Definition
 --------------------|------------------------------
-json_cursor     |basic_json_cursor<char>
-wjson_cursor   |basic_json_cursor<wchar_t>
+cbor_cursor     |basic_cbor_cursor<jsoncons::binary_stream_source>
+cbor_bytes_cursor   |basic_cbor_cursor<jsoncons::bytes_source>
 
 ### Implemented interfaces
 
-[basic_staj_reader](staj_reader.md)
+[staj_reader](staj_reader.md)
 
 #### Constructors
 
     template <class Source>
-    basic_json_cursor(Source&& source, 
-                      const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::get_default_options(),
-                      std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); // (1)
+    basic_cbor_cursor(Source&& source); // (1)
 
     template <class Source>
-    basic_json_cursor(Source&& source, 
-                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                      const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::get_default_options(),
-                      std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); // (2)
+    basic_cbor_cursor(Source&& source, std::error_code& ec); // (2)
 
-Constructors (1)-(2) read from a character sequence or stream and throw a 
+Constructor (1) reads from a buffer or stream source and throws a 
 [ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
 
-    template <class Source>
-    basic_json_cursor(Source&& source, std::error_code& ec); // (3)
-
-    template <class Source>
-    basic_json_cursor(Source&& source, 
-                      const basic_json_decode_options<CharT>& options,
-                      std::error_code& ec) // (4)
-
-    template <class Source>
-    basic_json_cursor(Source&& source, 
-                      const basic_json_decode_options<CharT>& options,
-                      std::function<bool(json_errc,const ser_context&)> err_handler,
-                      std::error_code& ec) // (5)
-
-    template <class Source>
-    basic_json_cursor(Source&& source,
-                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                      std::error_code& ec); // (6)
-
-    template <class Source>
-    basic_json_cursor(Source&& source, 
-                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                      const basic_json_decode_options<CharT>& options,
-                      std::error_code& ec) // (7)
-
-    template <class Source>
-    basic_json_cursor(Source&& source, 
-                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                      const basic_json_decode_options<CharT>& options,
-                      std::function<bool(json_errc,const ser_context&)> err_handler,
-                      std::error_code& ec) // (8)
-
-Constructors (3)-(8) read from a character sequence or stream and set `ec`
+Constructor (2) reads from a buffer or stream source and sets `ec`
 if a parsing error is encountered while processing the initial event.
 
-Note: It is the programmer's responsibility to ensure that `basic_json_cursor` does not outlive any source, 
-content handler, and error handler passed in the constuctor, as `basic_json_cursor` holds pointers to but does not own these resources.
+Note: It is the programmer's responsibility to ensure that `basic_cbor_cursor` does not outlive any source passed in the constuctor, 
+as `basic_cbor_cursor` holds pointers to but does not own these resources.
 
 #### Parameters
 
-`source` - a value from which a `jsoncons::basic_string_view<char_type>` is constructible, 
-or a value from which a `source_type` is constructible. In the case that a `jsoncons::basic_string_view<char_type>` is constructible
-from `source`, `source` is dispatched immediately to the parser. Otherwise, the `json_cursor` reads from a `source_type` in chunks. 
+`source` - a value from which a `source_type` is constructible. 
 
 #### Member functions
 
     bool done() const override;
 Checks if there are no more events.
 
-    const basic_staj_event& current() const override;
-Returns the current [basic_staj_event](staj_event.md).
+    const staj_event& current() const override;
+Returns the current [staj_event](staj_event.md).
 
     void read_to(json_content_handler& handler) override
 Sends the parse events from the current event to the
@@ -101,8 +62,7 @@ E.g., if the current event is `begin_object`, sends the `begin_object`
 event and all inbetween events until the matching `end_object` event.
 If a parsing error is encountered, throws a [ser_error](ser_error.md).
 
-    void read_to(basic_json_content_handler<char_type>& handler,
-                std::error_code& ec) override
+    void read_to(json_content_handler& handler, std::error_code& ec) override
 Sends the parse events from the current event to the
 matching completion event to the supplied [handler](json_content_handler.md)
 E.g., if the current event is `begin_object`, sends the `begin_object`
@@ -147,7 +107,7 @@ The example JSON text, `book_catalog.json`, is used in the example below.
 #### Reading a JSON stream
 
 ```c++
-#include <jsoncons/json_cursor.hpp>
+#include <jsoncons/cbor_cursor.hpp>
 #include <string>
 #include <fstream>
 
@@ -157,7 +117,7 @@ int main()
 {
     std::ifstream is("book_catalog.json");
 
-    json_cursor reader(is);
+    cbor_cursor reader(is);
 
     for (; !reader.done(); reader.next())
     {
@@ -243,7 +203,7 @@ end_array
 #### Filtering a JSON stream
 
 ```c++
-#include <jsoncons/json_cursor.hpp>
+#include <jsoncons/cbor_cursor.hpp>
 #include <string>
 #include <fstream>
 
@@ -279,7 +239,7 @@ int main()
     std::ifstream is("book_catalog.json");
 
     author_filter filter;
-    json_cursor reader(is, filter);
+    cbor_cursor reader(is, filter);
 
     for (; !reader.done(); reader.next())
     {
