@@ -11,7 +11,7 @@ template<
 `basic_msgpack_encoder` is noncopyable.
 
 
-![msgpack_encoder](./diagrams/msgpack_encoder.png)
+![msgpack_stream_encoder](./diagrams/msgpack_encoder.png)
 
 Four specializations for common character types and result types are defined:
 

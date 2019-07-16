@@ -18,10 +18,10 @@ Four specializations for common character types and result types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-csv_encoder            |basic_csv_encoder<char,jsoncons::stream_result<char>>
-json_string_encoder     |basic_csv_encoder<char,jsoncons::string_result<std::string>>
-wcsv_encoder           |basic_csv_encoder<wchar_t,jsoncons::stream_result<wchar_t>>
-wjson_string_encoder    |basic_csv_encoder<wchar_t,jsoncons::string_result<std::wstring>>
+csv_stream_encoder            |basic_csv_encoder<char,jsoncons::stream_result<char>>
+csv_string_encoder     |basic_csv_encoder<char,jsoncons::string_result<std::string>>
+wcsv_stream_encoder           |basic_csv_encoder<wchar_t,jsoncons::stream_result<wchar_t>>
+wcsv_string_encoder    |basic_csv_encoder<wchar_t,jsoncons::string_result<std::wstring>>
 
 #### Member types
 
@@ -120,7 +120,7 @@ Note
 
 - The third array element has a value that contains a comma, in the CSV file this value will be quoted.
 
-#### Serializing the comma delimited file with csv_encoder
+#### Serializing the comma delimited file with csv_stream_encoder
 ```c++
 std::string in_file = "input/countries.json";
 std::ifstream is(in_file);
@@ -130,7 +130,7 @@ json_reader reader(is,decoder);
 reader.read();
 json countries = decoder.get_result();
 
-csv_encoder encoder(std::cout);
+csv_stream_encoder encoder(std::cout);
 
 countries.dump(encoder);
 ```
@@ -195,7 +195,7 @@ json_reader reader(is,decoder);
 reader.read();
 json employees = decoder.get_result();
 
-csv_encoder encoder(std::cout,options);
+csv_stream_encoder encoder(std::cout,options);
 
 employees.dump(encoder);
 ```
@@ -241,7 +241,7 @@ int main()
     csv_options options;
     options.column_names("author,title,price");
 
-    csv_encoder encoder(std::cout, options);
+    csv_stream_encoder encoder(std::cout, options);
 
     books.dump(encoder);
 }

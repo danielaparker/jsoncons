@@ -80,7 +80,7 @@ int main()
     csv_options options;
     options.column_names("author,title,price");
 
-    csv_encoder encoder(std::cout, options);
+    csv_stream_encoder encoder(std::cout, options);
 
     books.dump(encoder);
 }

@@ -576,11 +576,12 @@ private:
     }
 };
 
-typedef basic_ubjson_reader<jsoncons::binary_stream_source> ubjson_reader;
+typedef basic_ubjson_reader<jsoncons::binary_stream_source> ubjson_stream_reader;
 
 typedef basic_ubjson_reader<jsoncons::bytes_source> ubjson_bytes_reader;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+JSONCONS_DEPRECATED("Instead, use ubjson_stream_reader") typedef ubjson_stream_reader ubjson_reader;
 JSONCONS_DEPRECATED("Instead, use ubjson_bytes_reader") typedef ubjson_bytes_reader ubjson_buffer_reader;
 #endif
 

@@ -105,7 +105,7 @@ void read_write_csv_tasks()
     std::cout << pretty_print(tasks) << "\n\n";
 
     std::cout << "(2)\n";
-    csv::csv_encoder encoder(std::cout);
+    csv::csv_stream_encoder encoder(std::cout);
     tasks.dump(encoder);
 }
 
@@ -117,7 +117,7 @@ void serialize_array_of_arrays_to_comma_delimited()
     json countries;
     is >> countries;
 
-    csv::csv_encoder encoder(std::cout);
+    csv::csv_stream_encoder encoder(std::cout);
     countries.dump(encoder);
 }
 
@@ -131,7 +131,7 @@ void serialize_to_tab_delimited_file()
 
     csv::csv_options options;
     options.field_delimiter('\t');
-    csv::csv_encoder encoder(std::cout,options);
+    csv::csv_stream_encoder encoder(std::cout,options);
 
     employees.dump(encoder);
 }
@@ -157,7 +157,7 @@ void serialize_books_to_csv_file()
     ]
     )");
 
-    csv::csv_encoder encoder(std::cout);
+    csv::csv_stream_encoder encoder(std::cout);
 
     books.dump(encoder);
 }
@@ -186,7 +186,7 @@ void serialize_books_to_csv_file_with_reorder()
     csv::csv_options options;
     options.column_names("author,title,price");
 
-    csv::csv_encoder encoder(std::cout, options);
+    csv::csv_stream_encoder encoder(std::cout, options);
 
     books.dump(encoder);
 }

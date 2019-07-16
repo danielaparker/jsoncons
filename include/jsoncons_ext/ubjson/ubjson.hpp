@@ -86,7 +86,7 @@ decode_ubjson(std::istream& is)
 {
     jsoncons::json_decoder<T> decoder;
     auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
-    ubjson_reader reader(is, adaptor);
+    ubjson_stream_reader reader(is, adaptor);
     reader.read();
     return decoder.get_result();
 }

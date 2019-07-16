@@ -781,7 +781,7 @@ TEST_CASE("serialize_comma_delimited_file")
     ojson countries1 = encoder1.get_result();
 
     std::stringstream ss;
-    csv::csv_encoder encoder(ss,options);
+    csv::csv_stream_encoder encoder(ss,options);
     countries1.dump(encoder);
 
     json_decoder<ojson> encoder2;
@@ -829,7 +829,7 @@ TEST_CASE("serialize_tab_delimited_file")
     ojson employees1 = decoder.get_result();
 
     std::stringstream ss;
-    csv::csv_encoder encoder(ss,options);
+    csv::csv_stream_encoder encoder(ss,options);
     //std::cout << pretty_print(employees1) << std::endl;
     employees1.dump(encoder);
     //std::cout << ss.str() << std::endl;

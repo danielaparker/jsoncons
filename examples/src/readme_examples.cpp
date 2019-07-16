@@ -187,8 +187,7 @@ namespace readme
             }
         };
 
-        author_filter filter;
-        json_cursor cursor(example, filter);
+        json_cursor cursor(data, filter);
 
         for (; !cursor.done(); cursor.next())
         {
