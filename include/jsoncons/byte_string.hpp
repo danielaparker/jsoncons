@@ -400,7 +400,7 @@ public:
     }
 
     template <class CharT>
-    friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const byte_string_view& o)
+    friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const byte_string_view& bstr)
     {
         std::basic_ostringstream<CharT> ss;
         ss.flags(std::ios::hex);
@@ -408,8 +408,17 @@ public:
         ss.width(2);
         ss.fill('0');
 
-        for (auto b : o)
+        bool first = true;
+        for (auto b : bstr)
         {
+            if (first)
+            {
+                first = false;
+            }
+            else 
+            {
+                ss << ' ';
+            }
             ss << (int)b;
         }
         os << ss.str();

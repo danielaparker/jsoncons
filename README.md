@@ -489,7 +489,7 @@ int main()
     std::cout << "(2)\n";
     for (const auto& row : j.array_range())
     {
-        std::cout << row[1].as<std::string>() << " (" << row[1].tag() << ")\n";
+        std::cout << row[1].as<jsoncons::byte_string>() << " (" << row[1].tag() << ")\n";
     }
 }
 ```
@@ -502,8 +502,8 @@ Output:
 ]
 
 (2)
-UHVzcw (n/a)
-UHVzcw (base64)
+50 75 73 73 (n/a)
+50 75 73 73 (base64)
 ```
 
 #### As a strongly typed C++ data structure
@@ -522,8 +522,8 @@ int main()
 ```
 Output:
 ```
-foo, 50757373, -18446744073709551617
-bar, 50757373, 273.15
+foo, 50 75 73 73, -18446744073709551617
+bar, 50 75 73 73, 273.15
 ```
 
 #### As a stream of parse events
@@ -587,12 +587,12 @@ Output:
 begin_array (n/a)
 begin_array (n/a)
 string_value: foo (n/a)
-byte_string_value: 50757373 (n/a)
+byte_string_value: 50 75 73 73 (n/a)
 string_value: -18446744073709551617 (bigint)
 end_array (n/a)
 begin_array (n/a)
 string_value: bar (n/a)
-byte_string_value: 50757373 (base64)
+byte_string_value: 50 75 73 73 (base64)
 string_value: 273.15 (bigdec)
 end_array (n/a)
 ```

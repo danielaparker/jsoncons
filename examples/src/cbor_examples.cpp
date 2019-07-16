@@ -415,7 +415,7 @@ void working_with_cbor1()
     std::cout << "(2)\n";
     for (const auto& row : j.array_range())
     {
-        std::cout << row[1].as<std::string>() << " (" << row[1].tag() << ")\n";
+        std::cout << row[1].as<jsoncons::byte_string>() << " (" << row[1].tag() << ")\n";
     }
 }
 
