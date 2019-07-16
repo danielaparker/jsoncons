@@ -297,68 +297,52 @@ See [examples](doc/Examples.md#G1) for other ways of specializing `json_type_tra
 ```c++
 int main()
 {
-        // Some JSON input data
-        std::string data = R"(
-            {
-               "application": "hiking",
-               "reputons": [
-               {
-                   "rater": "HikingAsylum",
-                   "assertion": "advanced",
-                   "rated": "Marilyn C",
-                   "rating": 0.90
-                 }
-               ]
-            }
-        )";
-
-        json_cursor cursor(data);
-        for (; !cursor.done(); cursor.next())
+    json_cursor cursor(data);
+    for (; !cursor.done(); cursor.next())
+    {
+        const auto& event = cursor.current();
+        switch (event.event_type())
         {
-            const auto& event = cursor.current();
-            switch (event.event_type())
-            {
-                case staj_event_type::begin_array:
-                    std::cout << event.event_type() << " " << "\n";
-                    break;
-                case staj_event_type::end_array:
-                    std::cout << event.event_type() << " " << "\n";
-                    break;
-                case staj_event_type::begin_object:
-                    std::cout << event.event_type() << " " << "\n";
-                    break;
-                case staj_event_type::end_object:
-                    std::cout << event.event_type() << " " << "\n";
-                    break;
-                case staj_event_type::name:
-                    // Or std::string_view, if supported
-                    std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
-                    break;
-                case staj_event_type::string_value:
-                    // Or std::string_view, if supported
-                    std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
-                    break;
-                case staj_event_type::null_value:
-                    std::cout << event.event_type() << "\n";
-                    break;
-                case staj_event_type::bool_value:
-                    std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << "\n";
-                    break;
-                case staj_event_type::int64_value:
-                    std::cout << event.event_type() << ": " << event.get<int64_t>() << "\n";
-                    break;
-                case staj_event_type::uint64_value:
-                    std::cout << event.event_type() << ": " << event.get<uint64_t>() << "\n";
-                    break;
-                case staj_event_type::double_value:
-                    std::cout << event.event_type() << ": " << event.get<double>() << "\n";
-                    break;
-                default:
-                    std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";;
-                    break;
-            }
+            case staj_event_type::begin_array:
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            case staj_event_type::end_array:
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            case staj_event_type::begin_object:
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            case staj_event_type::end_object:
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            case staj_event_type::name:
+                // Or std::string_view, if supported
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
+                break;
+            case staj_event_type::string_value:
+                // Or std::string_view, if supported
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
+                break;
+            case staj_event_type::null_value:
+                std::cout << event.event_type() << "\n";
+                break;
+            case staj_event_type::bool_value:
+                std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << "\n";
+                break;
+            case staj_event_type::int64_value:
+                std::cout << event.event_type() << ": " << event.get<int64_t>() << "\n";
+                break;
+            case staj_event_type::uint64_value:
+                std::cout << event.event_type() << ": " << event.get<uint64_t>() << "\n";
+                break;
+            case staj_event_type::double_value:
+                std::cout << event.event_type() << ": " << event.get<double>() << "\n";
+                break;
+            default:
+                std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";;
+                break;
         }
-    }
+    }    
 }
 ```
 Output:
