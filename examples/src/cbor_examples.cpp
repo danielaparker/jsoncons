@@ -477,7 +477,7 @@ void working_with_cbor3()
               0x19,0x6a,0xb3 // 27315
     };
 
-    cbor::cbor_byte_string_cursor cursor(data);
+    cbor::cbor_bytes_buf_cursor cursor(data);
     for (; !cursor.done(); cursor.next())
     {
         const auto& event = cursor.current();

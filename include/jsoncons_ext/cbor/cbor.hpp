@@ -89,7 +89,7 @@ template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
 decode_cbor(const std::vector<uint8_t>& v)
 {
-    cbor_byte_string_cursor reader(v);
+    cbor_bytes_buf_cursor reader(v);
     T val = read_from<T>(json(),reader);
     return val;
 }
@@ -109,7 +109,7 @@ template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
 decode_cbor(std::istream& is)
 {
-    cbor_stream_cursor reader(is);
+    cbor_cursor reader(is);
     T val = read_from<T>(json(), reader);
     return val;
 }
