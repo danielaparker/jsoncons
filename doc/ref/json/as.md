@@ -115,6 +115,6 @@ std::cout << bs << std::endl;
 ```
 Output:
 ```
-0x480x650x6c0x6c0x6f
+48 65 6c 6c 6f
 ```
 

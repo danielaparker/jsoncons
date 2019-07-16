@@ -147,7 +147,7 @@ int main()
 ```
 Output:
 ```
-(1) 0x480x650x6c0x6c0x6f
+(1) 48 65 6c 6c 6f
 
 (2) "SGVsbG8"
 ```
@@ -178,7 +178,7 @@ int main()
 ```
 Output:
 ```
-(1) 0x480x650x6c0x6c0x6f
+(1) 48 65 6c 6c 6f
 
 (2) "SGVsbG8="
 ```

@@ -1604,11 +1604,11 @@ Output:
     "EncodedByteString": "SGVsbG8="
 }
 
-(2) 48656c6c6f
+(2) 48 65 6c 6c 6f
 
-(3) 48656c6c6f
+(3) 48 65 6c 6c 6f
 
-(4) 48656c6c6f
+(4) 48 65 6c 6c 6f
 
 (5) Not a byte string
 ```

@@ -531,9 +531,7 @@ void working_with_cbor3()
 void cbor_examples()
 {
     std::cout << "\ncbor examples\n\n";
-    decode_byte_string_with_encoding_hint();
     encode_byte_string_with_encoding_hint();
-    decode_cbor_byte_string();
     encode_cbor_byte_string();
     serialize_to_cbor_buffer();
     serialize_to_cbor_stream();
@@ -549,6 +547,8 @@ void cbor_examples()
     std::cout << "\n";
     working_with_cbor3();
 
+    decode_cbor_byte_string();
+    decode_byte_string_with_encoding_hint();
     std::cout << std::endl;
 }
 

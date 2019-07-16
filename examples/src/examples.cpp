@@ -569,9 +569,9 @@ int main()
 
         json_cursor_examples();
 
-        cbor_examples();
-
         readme_examples();
+
+        cbor_examples();
 
         json_accessor_examples();
     }
