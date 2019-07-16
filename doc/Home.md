@@ -4,10 +4,8 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 [basic_json](ref/basic_json.md)  
 [json_parser](ref/json_parser.md)  
-[json_reader](ref/json_reader.md)  
+[basic_json_reader](ref/basic_json_reader.md)  
 [json_decoder](ref/json_decoder.md)  
-
-[wjson_reader](ref/wjson_reader.md)  
 
 #### C++/JSON Conversion
 

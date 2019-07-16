@@ -28,7 +28,7 @@ no more input, `finish_parse` may be called.
 `check_done` can be called to check if the input has any unconsumed 
 non-whitespace characters, which would normally be considered an error.  
 
-`json_parser` is used by the push parser [json_reader](json_reader.md),
+`json_parser` is used by the push parser [basic_json_reader](basic_json_reader.md),
 and by the pull parser [json_cursor](json_cursor.md).
 
 `json_parser` is noncopyable and nonmoveable.
