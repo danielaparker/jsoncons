@@ -91,6 +91,43 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 - [Performance benchmarks with text and doubles](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance_fp.md)
 
+## About jsoncons::basic_json
+
+The jsoncons library provides a [basic_json](doc/ref/basic_json.md) class template, which is the generalization of a `json` value for different 
+character types, different policies for ordering name-value pairs, etc. A `basic_json` provides a tree model
+of JSON-like data formats, and defines an interface for accessing and modifying that data.
+Despite its name, it is not only JSON.
+
+```c++
+template< 
+    class CharT,
+    class ImplementationPolicy = sorted_policy,
+    class Allocator = std::allocator<char>> class basic_json;
+```
+Several typedefs for common character types and policies for ordering an object's name/value pairs are provided:
+
+- [json](doc/ref/json.md) constructs a utf8 character json value that sorts name-value members alphabetically
+
+- [ojson](doc/ref/ojson.md) constructs a utf8 character json value that preserves the original name-value insertion order
+
+- [wjson](doc/ref/wjson.md) constructs a wide character json value that sorts name-value members alphabetically
+
+- [wojson](doc/ref/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
+
+## Examples
+
+[Working with JSON data](#E1)  
+
+[Working with CBOR data](#E2)  
+
+[Constructing json values](#E3)  
+
+[Playing around with CBOR, JSON, and CSV](#E4)  
+
+[Query CBOR with JSONPath](#E5)  
+
+<div id="E1"/> 
+
 ### Working with JSON data
 
 For the examples below you need to include some header files and construct a string of JSON data:
@@ -415,6 +452,8 @@ Output:
 string_value: Marilyn C
 ```
 
+<div id="E2"/> 
+
 ### Working with CBOR data
 
 For the examples below you need to include some header files and construct a buffer of CBOR data:
@@ -581,38 +620,7 @@ string_value: 273.15 (bigdec)
 end_array (n/a)
 ```
 
-## About jsoncons::basic_json
-
-The jsoncons library provides a [basic_json](doc/ref/basic_json.md) class template, which is the generalization of a `json` value for different 
-character types, different policies for ordering name-value pairs, etc. A `basic_json` provides a tree model
-of JSON-like data formats, and defines an interface for accessing and modifying that data.
-Despite its name, it is not only JSON.
-
-```c++
-template< 
-    class CharT,
-    class ImplementationPolicy = sorted_policy,
-    class Allocator = std::allocator<char>> class basic_json;
-```
-Several typedefs for common character types and policies for ordering an object's name/value pairs are provided:
-
-- [json](doc/ref/json.md) constructs a utf8 character json value that sorts name-value members alphabetically
-
-- [ojson](doc/ref/ojson.md) constructs a utf8 character json value that preserves the original name-value insertion order
-
-- [wjson](doc/ref/wjson.md) constructs a wide character json value that sorts name-value members alphabetically
-
-- [wojson](doc/ref/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
-
-## More examples
-
-[Constructing json values](#E1)  
-
-[Playing around with CBOR, JSON, and CSV](#E2)  
-
-[Query CBOR with JSONPath](#E3)  
-
-<div id="E1"/> 
+<div id="E3"/> 
 
 ### Constructing json values
 
@@ -670,7 +678,7 @@ Output:
 }
 ```
 
-<div id="E2"/> 
+<div id="E4"/> 
 
 ### Playing around with CBOR, JSON, and CSV
 
@@ -850,7 +858,7 @@ foo,UHVzcw,-18446744073709551617
 bar,UHVzcw==,273.15
 ```
 
-<div id="E3"/> 
+<div id="E5"/> 
 
 ### Query CBOR with JSONPath
 ```c++
