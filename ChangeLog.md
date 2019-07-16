@@ -3,8 +3,8 @@ version 0.129.0
 
 New features:
 
-- Pull parsers for reporting CBOR parse events, cbor_cursor for streams and cbor_bytes_buf_cursor for buffers,
-  have been added.
+- Pull parsers for reporting CBOR parse events, cbor_stream_cursor for streams and cbor_bytes_cursor 
+for buffers, have been added.
 
 - Added compile-time deprecation warnings 
 
