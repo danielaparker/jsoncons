@@ -152,6 +152,10 @@ Returns the allocator associated with the basic_json value.
     <td><a href="json/operator_at.md">operator[]</a></td>
     <td>Access or insert specified element.</td> 
   </tr>
+  <tr>
+    <td><a href="json/at.md">at</a></td>
+    <td>Access specified element.</td> 
+  </tr>
 </table>
 
     semantic_tag tag() const
@@ -160,19 +164,7 @@ Returns the [semantic_tag](semantic_tag.md) associated with this value
     object_iterator find(const string_view_type& name)
     const_object_iterator find(const string_view_type& name) const
 Returns an object iterator to a member whose name compares equal to `name`. If there is no such member, returns `object_range.end()`.
-Throws `std::runtime_error` if not an object.
-
-    basic_json& at(const string_view_type& name)
-    const basic_json& at(const string_view_type& name) const
-Returns a reference to the value with the specifed name in a basic_json object.
-Throws `std::runtime_error` if not an object.
-Throws `std::out_of_range` if the object does not have a member with the specified name.  
-
-    basic_json& at(size_t i)
-    const basic_json& at(size_t i) const
-Returns a reference to the element at index `i` in a basic_json array.  
-Throws `std::runtime_error` if not an array.
-Throws `std::out_of_range` if the index is outside the bounds of the array.  
+Throws `std::runtime_error` if not an object.  
 
     template <class T>
     T get_with_default(const string_view_type& name, 
