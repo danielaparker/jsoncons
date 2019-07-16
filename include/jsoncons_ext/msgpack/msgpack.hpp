@@ -44,7 +44,7 @@ typename std::enable_if<is_basic_json_class<T>::value,void>::type
 encode_msgpack(const T& j, std::ostream& os)
 {
     typedef typename T::char_type char_type;
-    msgpack_encoder encoder(os);
+    msgpack_stream_encoder encoder(os);
     auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
     j.dump(adaptor);
 }
@@ -53,7 +53,7 @@ template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
 encode_msgpack(const T& val, std::ostream& os)
 {
-    msgpack_encoder encoder(os);
+    msgpack_stream_encoder encoder(os);
     write_to(json(), val, encoder);
 }
 

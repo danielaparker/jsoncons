@@ -603,15 +603,21 @@ encode_csv(const T& val, std::basic_ostream<CharT>& os, const basic_csv_options<
     write_to(basic_json<CharT>(), val, encoder);
 }
 
-typedef basic_csv_encoder<char> csv_encoder;
+typedef basic_csv_encoder<char> csv_stream_encoder;
 typedef basic_csv_encoder<char,jsoncons::string_result<std::string>> csv_string_encoder;
+typedef basic_csv_encoder<wchar_t> csv_wstream_encoder;
+typedef basic_csv_encoder<wchar_t,jsoncons::string_result<std::wstring>> wcsv_string_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class CharT, class Result = jsoncons::stream_result<CharT>, class Allocator = std::allocator<CharT>>
 using basic_csv_serializer = basic_csv_encoder<CharT,Result,Allocator>;
 
-JSONCONS_DEPRECATED("Instead, use csv_encoder") typedef csv_encoder csv_serializer;
+JSONCONS_DEPRECATED("Instead, use csv_stream_encoder") typedef csv_stream_encoder csv_serializer;
 JSONCONS_DEPRECATED("Instead, use csv_string_encoder") typedef csv_string_encoder csv_string_serializer;
+JSONCONS_DEPRECATED("Instead, use csv_stream_encoder") typedef csv_stream_encoder csv_serializer;
+JSONCONS_DEPRECATED("Instead, use csv_string_encoder") typedef csv_string_encoder csv_string_serializer;
+JSONCONS_DEPRECATED("Instead, use csv_stream_encoder") typedef csv_stream_encoder csv_encoder;
+JSONCONS_DEPRECATED("Instead, use wcsv_stream_encoder") typedef csv_stream_encoder wcsv_encoder;
 #endif
 
 }}

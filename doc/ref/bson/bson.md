@@ -8,7 +8,7 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 [encode_bson](encode_bson.md)
 
-[bson_encoder](bson_encoder.md)
+[basic_bson_encoder](basic_bson_encoder.md)
 
 #### jsoncons-BSON mappings
 

@@ -9,7 +9,7 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 [encode_msgpack](encode_msgpack.md)
 
-[msgpack_encoder](msgpack_encoder.md)
+[basic_msgpack_encoder](basic_msgpack_encoder.md)
 
 #### jsoncons-MessagePack mappings
 

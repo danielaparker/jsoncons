@@ -418,14 +418,15 @@ private:
     }
 };
 
-typedef basic_ubjson_encoder<jsoncons::binary_stream_result> ubjson_encoder;
+typedef basic_ubjson_encoder<jsoncons::binary_stream_result> ubjson_stream_encoder;
 typedef basic_ubjson_encoder<jsoncons::bytes_result> ubjson_bytes_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class Result=jsoncons::binary_stream_result>
 using basic_ubjson_serializer = basic_ubjson_encoder<Result>; 
 
-JSONCONS_DEPRECATED("Instead, use ubjson_encoder") typedef ubjson_encoder ubjson_serializer;
+JSONCONS_DEPRECATED("Instead, use ubjson_stream_encoder") typedef ubjson_stream_encoder ubjson_encoder;
+JSONCONS_DEPRECATED("Instead, use ubjson_stream_encoder") typedef ubjson_stream_encoder ubjson_serializer;
 JSONCONS_DEPRECATED("Instead, use ubjson_bytes_encoder") typedef ubjson_bytes_encoder ubjson_buffer_serializer;
 #endif
 

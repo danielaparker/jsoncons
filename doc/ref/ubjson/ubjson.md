@@ -8,7 +8,7 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 [encode_ubjson](encode_ubjson.md)
 
-[ubjson_encoder](ubjson_encoder.md)
+[basic_ubjson_encoder](basic_ubjson_encoder.md)
 
 #### jsoncons-ubjson mappings
 

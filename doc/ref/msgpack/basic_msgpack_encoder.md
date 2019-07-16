@@ -1,23 +1,24 @@
-### jsoncons::bson::basic_bson_encoder
+### jsoncons::bson::basic_msgpack_encoder
 
 ```c++
-#include <jsoncons_ext/bson/bson_encoder.hpp>
+#include <jsoncons_ext/bson/msgpack_encoder.hpp>
 
 template<
     class Result>
-> class basic_bson_encoder : public jsoncons::json_content_handler
+> class basic_msgpack_encoder : public jsoncons::json_content_handler
 ```
 
-`basic_bson_encoder` is noncopyable.
+`basic_msgpack_encoder` is noncopyable.
 
-![bson_encoder](./diagrams/bson_encoder.png)
 
-Two specializations for common result types are defined:
+![msgpack_encoder](./diagrams/msgpack_encoder.png)
+
+Four specializations for common character types and result types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-bson_encoder            |basic_bson_encoder<jsoncons::binary_stream_result>
-bson_bytes_encoder     |basic_bson_encoder<jsoncons::binary_buffer_result>
+msgpack_stream_encoder            |basic_msgpack_encoder<jsoncons::binary_stream_result>
+bson_bytes_encoder     |basic_msgpack_encoder<jsoncons::binary_buffer_result>
 
 #### Member types
 
@@ -29,12 +30,12 @@ string_view_type           |
 
 #### Constructors
 
-    explicit basic_bson_encoder(result_type result)
+    explicit basic_msgpack_encoder(result_type result)
 Constructs a new encoder that writes to the specified result.
 
 #### Destructor
 
-    virtual ~basic_bson_encoder()
+    virtual ~basic_msgpack_encoder()
 
 ### Inherited from [basic_json_content_handler](../json_content_handler.md)
 
@@ -95,51 +96,4 @@ Constructs a new encoder that writes to the specified result.
 
 ### Examples
 
-#### Encode to BSON
 
-```c++
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/bson/bson.hpp>
-#include <iomanip>
-
-int main()
-{
-    std::vector<uint8_t> buffer;
-    bson::bson_bytes_encoder encoder(buffer);
-    encoder.begin_array(); // The total number of bytes comprising 
-                          // the bson document will be calculated
-    encoder.string_value("cat");
-    encoder.byte_string_value(byte_string({'p','u','r','r'}));
-    encoder.int64_value(1431027667, semantic_tag::timestamp);
-    encoder.end_array();
-    encoder.flush();
-
-    for (auto c : buffer)
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                  << std::noshowbase << std::setfill('0') << static_cast<int>(c);
-    }
-    std::cout << "\n\n";
-
-/* 
-    22000000 -- Total number of bytes comprising the document (34 bytes) 
-      02 -- UTF-8 string
-        3000 -- "0"
-        04000000 -- number bytes in the string (including trailing byte)
-          636174  -- "cat"
-            00 -- trailing byte
-      05 -- binary
-        3100 -- "1"
-        04000000 -- number of bytes
-        70757272 -- 'P''u''r''r'
-      09 -- datetime
-      3200 -- "2"
-        d3bf4b55 -- 1431027667
-      00 
-*/ 
-}
-```
-Output:
-```
-2200000002300004000000636174000531000400000070757272093200d3bf4b5500
-```

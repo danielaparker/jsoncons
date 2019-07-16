@@ -326,14 +326,15 @@ private:
     }
 };
 
-typedef basic_bson_encoder<jsoncons::binary_stream_result> bson_encoder;
+typedef basic_bson_encoder<jsoncons::binary_stream_result> bson_stream_encoder;
 typedef basic_bson_encoder<jsoncons::bytes_result> bson_bytes_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class Result=jsoncons::binary_stream_result>
 using basic_bson_serializer = basic_bson_encoder<Result>; 
 
-JSONCONS_DEPRECATED("Instead, use bson_encoder") typedef bson_encoder bson_serializer;
+JSONCONS_DEPRECATED("Instead, use bson_stream_encoder") typedef bson_stream_encoder bson_encoder;
+JSONCONS_DEPRECATED("Instead, use bson_stream_encoder") typedef bson_stream_encoder bson_serializer;
 JSONCONS_DEPRECATED("Instead, use bson_bytes_encoder")  typedef bson_bytes_encoder bson_buffer_serializer;
 
 #endif
