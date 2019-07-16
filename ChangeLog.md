@@ -1,6 +1,11 @@
 master
 ------
 
+Enhancements:
+
+- Pull parsers for reporting CBOR parse events, cbor_cursor for streams and cbor_bytes_cursor for buffers,
+  have been added.
+
 Changes:
 
 - The long since deprecated `basic_json` member type `null_type` has been removed.
