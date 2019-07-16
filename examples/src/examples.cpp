@@ -340,60 +340,6 @@ void object_range_based_for_loop()
     }
 }
 
-void more_examples()
-{
-    json file_settings = json::object{
-        {"Image Format", "JPEG"},
-        {"Color Space", "sRGB"},
-        { "Limit File Size", true},
-        {"Limit File Size To", 10000}
-    };
-
-    json image_sizing;
-    image_sizing.insert_or_assign("Resize To Fit",true);  // a boolean 
-    image_sizing.insert_or_assign("Resize Unit", "pixels");  // a string
-    image_sizing.insert_or_assign("Resize What", "long_edge");  // a string
-    image_sizing.insert_or_assign("Dimension 1",9.84);  // a double
-    std::cout << pretty_print(image_sizing) << std::endl;
-
-    json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
-
-    json color_spaces = json::array();
-    color_spaces.push_back("sRGB");
-    color_spaces.push_back("AdobeRGB");
-    color_spaces.push_back("ProPhoto RGB");
-
-    json export_settings;
-    export_settings["File Format Options"]["Color Spaces"] = std::move(color_spaces);
-    export_settings["File Format Options"]["Image Formats"] = std::move(image_formats);
-    export_settings["File Settings"] = std::move(file_settings);
-    export_settings["Image Sizing"] = std::move(image_sizing);
-
-    // Write to stream
-    std::ofstream os("./output/export_settings.json");
-    os << export_settings;
-
-    // Read from stream
-    std::ifstream is("./output/export_settings.json");
-    json j = json::parse(is);
-
-    // Pretty print
-    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
-
-    // Does object member exist?
-    std::cout << "(2) " << std::boolalpha << j.contains("Image Sizing") << "\n\n";
-
-    // Get reference to object member
-    const json& val = j["Image Sizing"];
-
-    // Access member as double
-    std::cout << "(3) " << "Dimension 1 = " << val["Dimension 1"].as<double>() << "\n\n";
-
-    // Try access member with default
-    std::cout << "(4) " << "Dimension 2 = " << val.get_with_default("Dimension 2",0.0) << "\n\n";
-
-}
-
 void parse_error_example()
 {
     std::string s = "[1,2,3,4,]";
@@ -531,8 +477,6 @@ int main()
 
         json_constructor_examples();
 
-        json_accessor_examples();
-
         jsonpatch_examples();
 
         max_nesting_path_example();
@@ -540,8 +484,6 @@ int main()
         get_example();
 
         json_parser_examples();
-
-        more_examples();
 
         data_model_examples();
 
@@ -572,6 +514,8 @@ int main()
         readme_examples();
 
         cbor_examples();
+
+        json_accessor_examples();
 
         json_accessor_examples();
     }

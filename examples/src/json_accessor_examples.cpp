@@ -108,6 +108,22 @@ void introspection_example()
     }
 }
 
+void operator_at_examples()
+{
+    json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
+
+    json color_spaces = json::array();
+    color_spaces.push_back("sRGB");
+    color_spaces.push_back("AdobeRGB");
+    color_spaces.push_back("ProPhoto RGB");
+
+    json export_settings;
+    export_settings["File Format Options"]["Color Spaces"] = std::move(color_spaces);
+    export_settings["File Format Options"]["Image Formats"] = std::move(image_formats);
+
+    std::cout << pretty_print(export_settings) << "\n\n";
+}
+
 void json_accessor_examples()
 {
     is_as_examples();
@@ -117,6 +133,8 @@ void json_accessor_examples()
     byte_string_from_char_array();
 
     byte_string_from_initializer_list();
+
+    operator_at_examples();
 }
 
 

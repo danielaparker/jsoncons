@@ -479,10 +479,9 @@ file_export["File Format Options"]["Image Formats"] =
 file_export["File Settings"] = std::move(file_settings);
 file_export["Image Sizing"] = std::move(image_sizing);
 ```
-Note that if `file_export["File Format Options"]` doesn't exist, 
-```c++
-file_export["File Format Options"]["Color Spaces"] = 
-    std::move(color_spaces)
+Note that if `file_export["File Format Options"]` doesn't exist, the statement
+```
+file_export["File Format Options"]["Color Spaces"] = std::move(color_spaces)
 ```
 creates `"File Format Options"` as an object and puts `"Color Spaces"` in it.
 

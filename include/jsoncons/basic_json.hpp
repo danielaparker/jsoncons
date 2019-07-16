@@ -5108,7 +5108,7 @@ private:
         return os;
     }
 
-    friend std::basic_istream<char_type>& operator<<(std::basic_istream<char_type>& is, basic_json& o)
+    friend std::basic_istream<char_type>& operator>>(std::basic_istream<char_type>& is, basic_json& o)
     {
         json_decoder<basic_json> handler;
         basic_json_reader<char_type,stream_source<char_type>> reader(is, handler);

@@ -30,4 +30,39 @@ Throws `std::runtime_error` if not an object or array.
 Unlike `std::map::operator[]`, a new element is never inserted into the container 
 when this operator is used for reading but the key does not exist.
 
+### Examples
+
+#### Assigning to a proxy when the key does not exist
+
+```c++
+int main()
+{
+    json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
+
+    json color_spaces = json::array();
+    color_spaces.push_back("sRGB");
+    color_spaces.push_back("AdobeRGB");
+    color_spaces.push_back("ProPhoto RGB");
+
+    json export_settings;
+    export_settings["File Format Options"]["Color Spaces"] = std::move(color_spaces);
+    export_settings["File Format Options"]["Image Formats"] = std::move(image_formats);
+
+    std::cout << pretty_print(export_settings) << "\n\n";
+}
+```
+Output:
+```
+{
+    "File Format Options": {
+        "Color Spaces": ["sRGB", "AdobeRGB", "ProPhoto RGB"],
+        "Image Formats": ["JPEG", "PSD", "TIFF", "DNG"]
+    }
+}
+```
+Note that if `file_export["File Format Options"]` doesn’t exist, the statement
+```
+file_export["File Format Options"]["Color Spaces"] = std::move(color_spaces)
+```
+creates "File Format Options" as an object and puts "Color Spaces" in it.
 
