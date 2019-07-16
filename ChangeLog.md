@@ -1,10 +1,12 @@
 master
 ------
 
-Enhancements:
+New features:
 
 - Pull parsers for reporting CBOR parse events, cbor_cursor for streams and cbor_bytes_buf_cursor for buffers,
   have been added.
+
+- Added compile-time deprecation warnings 
 
 Changes:
 
@@ -19,6 +21,14 @@ Changes:
 - The names `default_parse_error_handler` and `strict_parse_error_handler` have been deprecated 
   and renamed to `default_json_parsing` and `strict_json_parsing`. Rationale: these apply only 
   to JSON. 
+
+- The typedef'ed names `json_encoder`, `bson_encoder`, `cbor_encoder`,
+  `csv_encoder`, `cbor_encoder`, `msgpack_encoder`, and `ubjson_encoder`
+  have been deprecated and renamed to `json_stream_encoder`, 
+  `bson_stream_encoder`, `cbor_stream_encoder`, `csv_stream_encoder`, 
+  `cbor_stream_encoder`, `msgpack_stream_encoder`, and `ubjson_stream_encoder`.
+  Rationale: consistency for type names that are different for 
+  stream and string or bytes buffer specializations. 
 
 version 0.128.0
 ---------------
