@@ -531,7 +531,7 @@ bar, 50757373, 273.15
 ```c++
 int main()
 {
-    cbor::cbor_bytes_buf_cursor cursor(data);
+    cbor::cbor_bytes_cursor cursor(data);
     for (; !cursor.done(); cursor.next())
     {
         const auto& event = cursor.current();

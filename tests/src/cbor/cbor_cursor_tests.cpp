@@ -37,7 +37,7 @@ TEST_CASE("cbor_cursor reputon test")
 
     SECTION("test 1")
     {
-        cbor::cbor_bytes_buf_cursor cursor(data);
+        cbor::cbor_bytes_cursor cursor(data);
         for (; !cursor.done(); cursor.next())
         {
             const auto& event = cursor.current();
@@ -92,7 +92,7 @@ TEST_CASE("cbor_cursor playing around test")
 
     SECTION("test 1")
     {
-        cbor::cbor_bytes_buf_cursor cursor(data);
+        cbor::cbor_bytes_cursor cursor(data);
         for (; !cursor.done(); cursor.next())
         {
             const auto& event = cursor.current();
