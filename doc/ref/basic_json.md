@@ -265,18 +265,18 @@ Throws `std::runtime_error` if not an object.
   </tr>
 </table>
 
-    std::istream& operator>> (std::istream& os, basic_json& val)
+    std::basic_istream<char_type>& operator>>(std::basic_istream<char_type>& is, basic_json& o)
 Reads a `basic_json` value from a stream.
 
-    std::ostream& operator<< (std::ostream& os, const basic_json& val)
+    std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const basic_json& o)
 Inserts basic_json value into stream.
 
-    std::ostream& print(const basic_json& val)  
-    std::ostream& print(const basic_json& val, const json_options<CharT>& options)  
+    std::basic_ostream<char_type>& print(const basic_json& val)  
+    std::basic_ostream<char_type>& print(const basic_json& val, const json_options<CharT>& options)  
 Inserts basic_json value into stream using the specified [json_options](json_options.md) if supplied.
 
-    std::ostream& pretty_print(const basic_json& val)  
-    std::ostream& pretty_print(const basic_json& val, const json_options<CharT>& options)  
+    std::basic_ostream<char_type>& pretty_print(const basic_json& val)  
+    std::basic_ostream<char_type>& pretty_print(const basic_json& val, const json_options<CharT>& options)  
 Inserts basic_json value into stream using the specified [json_options](json_options.md) if supplied.
 
     void swap(basic_json& a, basic_json& b)

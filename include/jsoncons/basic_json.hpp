@@ -5129,23 +5129,6 @@ void swap(typename Json::key_value_type& a, typename Json::key_value_type& b)
     a.swap(b);
 }
 
-template <class Json>
-std::basic_istream<typename Json::char_type>& operator>>(std::basic_istream<typename Json::char_type>& is, Json& o)
-{
-    typedef typename Json::char_type char_type;
-
-    json_decoder<Json> handler;
-    basic_json_reader<char_type,stream_source<char_type>> reader(is, handler);
-    reader.read_next();
-    reader.check_done();
-    if (!handler.is_valid())
-    {
-        JSONCONS_THROW(json_runtime_error<std::runtime_error>("Failed to parse json stream"));
-    }
-    o = handler.get_result();
-    return is;
-}
-
 typedef basic_json<char,sorted_policy,std::allocator<char>> json;
 typedef basic_json<wchar_t,sorted_policy,std::allocator<char>> wjson;
 typedef basic_json<char, preserve_order_policy, std::allocator<char>> ojson;
