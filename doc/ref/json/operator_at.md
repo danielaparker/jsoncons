@@ -10,14 +10,21 @@ reference operator[](size_t i); // (3)
 const_reference operator[](size_t i) const; // (4)
 ```
 
-(1) Returns a temporary proxy with underlying type the keyed value. Type `proxy_type` supports conversion to `basic_json&`. If written to, 
-inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. 
+(1) Returns a "reference-like" proxy object that can be used to access 
+or assign to the underlying keyed value. Type `proxy_type` supports 
+the `basic_json` interface and conversion to `basic_json&`. If accessing 
+and the key exists, evaluates to a reference to the keyed value.If 
+accessing and the key does not exist, `noexcept` accessors return a 
+default value, e.g. the `is_xxx` functions return `false`, other 
+accessors throw.   
+If assigning, inserts or updates with the new value. 
 Throws `std::runtime_error` if not an object.
-If read, throws `std::out_of_range` if the object does not have a member with the specified name.  
+If read, throws `std::out_of_range` if the object does not have a 
+member with the specified key.  
 
 (2) If `key` matches the key of a member in the basic_json object, returns a reference to the basic_json object, otherwise throws.
 Throws `std::runtime_error` if not an object.
-Throws `std::out_of_range` if the object does not have a member with the specified name.  
+Throws `std::out_of_range` if the object does not have a member with the specified key.  
 
 (3) Returns a reference to the value at index i in a `basic_json` object or array.
 Throws `std::runtime_error` if not an object or array.
