@@ -479,10 +479,9 @@ file_export["File Format Options"]["Image Formats"] =
 file_export["File Settings"] = std::move(file_settings);
 file_export["Image Sizing"] = std::move(image_sizing);
 ```
-Note that if `file_export["File Format Options"]` doesn't exist, 
-```c++
-file_export["File Format Options"]["Color Spaces"] = 
-    std::move(color_spaces)
+Note that if `file_export["File Format Options"]` doesn't exist, the statement
+```
+file_export["File Format Options"]["Color Spaces"] = std::move(color_spaces)
 ```
 creates `"File Format Options"` as an object and puts `"Color Spaces"` in it.
 
@@ -684,7 +683,7 @@ int main()
 {
     std::string s = R"({"first":1,"second":2,"fourth":3,"fifth":4})";    
 
-    json_encoder encoder(std::cout);
+    json_stream_encoder encoder(std::cout);
 
     // Filters can be chained
     rename_object_member_filter filter2("fifth", "fourth", encoder);
