@@ -1715,9 +1715,13 @@ public:
             return evaluate().get_allocator();
         }
 
-        bool contains(const string_view_type& name) const
+        bool contains(const string_view_type& key) const noexcept
         {
-            return evaluate().contains(name);
+            if (!parent_.contains(key_))
+            {
+                return false;
+            }
+            return evaluate().contains(key);
         }
 
         bool is_null() const noexcept
@@ -3201,13 +3205,13 @@ public:
         }
     }
 
-    bool contains(const string_view_type& name) const
+    bool contains(const string_view_type& key) const noexcept
     {
         switch (var_.type())
         {
         case storage_type::object_val:
             {
-                const_object_iterator it = object_value().find(name);
+                const_object_iterator it = object_value().find(key);
                 return it != object_range().end();
             }
             break;

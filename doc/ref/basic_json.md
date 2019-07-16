@@ -137,12 +137,8 @@ Returns the allocator associated with the basic_json value.
 
 <table border="0">
   <tr>
-    <td><code>bool contains(const string_view_type& key) const</code></td>
+    <td><code>bool contains(const string_view_type& key) const noexcept</code></td>
     <td>Returns <code>true</code> if an object has a member with the given `key`, otherwise <code>false</code></td> 
-  </tr>
-  <tr>
-    <td><code>bool count(const string_view_type& key) const</code></td>
-    <td>Returns the number of object members that match `key`</td> 
   </tr>
   <tr>
     <td><a href="json/is.md">is</a></td>
