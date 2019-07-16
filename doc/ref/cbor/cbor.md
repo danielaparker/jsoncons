@@ -10,7 +10,7 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 [encode_cbor](encode_cbor.md)
 
-[cbor_encoder](cbor_encoder.md)
+[basic_cbor_encoder](cbor_encoder.md)
 
 [cbor_options](cbor_options.md)
 

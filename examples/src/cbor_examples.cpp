@@ -52,7 +52,7 @@ void serialize_to_cbor_buffer()
 void serialize_to_cbor_stream()
 {
     std::ostringstream os;
-    cbor::cbor_encoder encoder(os);
+    cbor::cbor_stream_encoder encoder(os);
 
     encoder.begin_array(3); // array of length 3
     encoder.string_value("-18446744073709551617", semantic_tag::bigint);

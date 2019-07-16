@@ -151,7 +151,7 @@ public:
 private:
 };
 
-typedef basic_cbor_cursor<jsoncons::binary_stream_source> cbor_cursor;
+typedef basic_cbor_cursor<jsoncons::binary_stream_source> cbor_stream_cursor;
 typedef basic_cbor_cursor<jsoncons::bytes_source> cbor_bytes_cursor;
 
 } // namespace cbor

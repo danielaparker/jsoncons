@@ -59,7 +59,7 @@ typename std::enable_if<is_basic_json_class<T>::value,void>::type
 encode_cbor(const T& j, std::ostream& os, const cbor_encode_options& options)
 {
     typedef typename T::char_type char_type;
-    cbor_encoder encoder(os, options);
+    cbor_stream_encoder encoder(os, options);
     auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
     j.dump(adaptor);
 }
@@ -68,7 +68,7 @@ template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
 encode_cbor(const T& val, std::ostream& os, const cbor_encode_options& options)
 {
-    cbor_encoder encoder(os, options);
+    cbor_stream_encoder encoder(os, options);
     write_to(json(), val, encoder);
 }
 
@@ -109,7 +109,7 @@ template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
 decode_cbor(std::istream& is)
 {
-    cbor_cursor reader(is);
+    cbor_stream_cursor reader(is);
     T val = read_from<T>(json(), reader);
     return val;
 }

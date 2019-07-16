@@ -19,7 +19,7 @@ Typedefs for common sources are provided:
 
 Type                |Definition
 --------------------|------------------------------
-cbor_cursor     |basic_cbor_cursor<jsoncons::binary_stream_source>
+cbor_stream_cursor  |basic_cbor_cursor<jsoncons::binary_stream_source>
 cbor_bytes_cursor   |basic_cbor_cursor<jsoncons::bytes_source>
 
 ### Implemented interfaces

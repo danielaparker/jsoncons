@@ -20,7 +20,7 @@ Typedefs for common character types are provided:
 Type                |Definition
 --------------------|------------------------------
 json_cursor     |basic_json_cursor<char>
-wjson_cursor   |basic_json_cursor<wchar_t>
+wjson_cursor    |basic_json_cursor<wchar_t>
 
 ### Implemented interfaces
 

@@ -10,13 +10,13 @@ template<
 
 `basic_cbor_encoder` is noncopyable
 
-![cbor_encoder](./diagrams/cbor_encoder.png)
+![basic_cbor_encoder](./diagrams/cbor_encoder.png)
 
 Four specializations for common result types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-cbor_encoder            |basic_cbor_encoder<jsoncons::binary_stream_result>
+cbor_stream_encoder            |basic_cbor_encoder<jsoncons::binary_stream_result>
 cbor_bytes_encoder     |basic_cbor_encoder<jsoncons::binary_buffer_result>
 
 #### Member types
@@ -155,7 +155,7 @@ Output:
 int main()
 {
     std::ostringstream os;
-    cbor::cbor_encoder encoder(os);
+    cbor::cbor_stream_encoder encoder(os);
 
     encoder.begin_array(3); // array of length 3
     encoder.string_value("-18446744073709551617", semantic_tag::bigint);
