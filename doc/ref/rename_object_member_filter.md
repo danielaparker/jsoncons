@@ -39,7 +39,7 @@ int main()
 {
     ojson j = ojson::parse(R"({"first":1,"second":2,"fourth":3})");
 
-    json_encoder encoder(std::cout);
+    json_stream_encoder encoder(std::cout);
 
     rename_object_member_filter filter("fourth","third",encoder);
     j.dump(filter);

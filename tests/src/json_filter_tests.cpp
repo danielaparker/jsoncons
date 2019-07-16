@@ -84,7 +84,7 @@ TEST_CASE("test_filter")
     std::ifstream is(in_file, std::ofstream::binary);
     std::ofstream os(out_file);
 
-    json_encoder encoder(os);
+    json_stream_encoder encoder(os);
     name_fix_up_filter filter(encoder);
     json_reader reader(is, filter);
     reader.read_next();
@@ -102,7 +102,7 @@ TEST_CASE("test_filter2")
     std::ifstream is(in_file, std::ofstream::binary);
     std::ofstream os(out_file);
 
-    json_encoder encoder(os);
+    json_stream_encoder encoder(os);
 
     name_fix_up_filter filter2(encoder);
 
@@ -142,7 +142,7 @@ TEST_CASE("test_rename_name")
     CHECK(j["store"]["book"][0]["price"].as<double>() == Approx(31.96).epsilon(0.001));
 
     std::stringstream ss;
-    json_encoder encoder(ss);
+    json_stream_encoder encoder(ss);
     rename_object_member_filter filter("price","price2",encoder);
     j.dump(filter);
 

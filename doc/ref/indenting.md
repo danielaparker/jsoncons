@@ -6,5 +6,5 @@
 enum class indenting {no_indent, indent}
 ```
 
-Specifies indentation options for the [json_encoder](json_encoder.md)
+Specifies indentation options for the [basic_json_encoder](basic_json_encoder.md)
 

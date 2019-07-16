@@ -297,7 +297,7 @@ void dump_json_fragments()
     ]
     )");
 
-    json_encoder encoder(std::cout); // pretty print
+    json_stream_encoder encoder(std::cout); // pretty print
     encoder.begin_array();
     for (const auto& book : some_books.array_range())
     {

@@ -16,20 +16,20 @@ template<
 
 `basic_json_encoder` and `basic_json_compressed_encoder` are noncopyable and nonmoveable.
 
-![json_encoder](./diagrams/json_encoder.png)
+![basic_json_encoder](./diagrams/json_encoder.png)
 
 Four specializations for common character types and result types are defined
 for both the pretty print and compressed serializers:
 
 Type                       |Definition
 ---------------------------|------------------------------
-json_encoder            |basic_json_encoder<char,jsoncons::stream_result<char>>
+json_stream_encoder            |basic_json_encoder<char,jsoncons::stream_result<char>>
 json_string_encoder     |basic_json_encoder<char,jsoncons::string_result<std::string>>
-wjson_encoder           |basic_json_encoder<wchar_t,jsoncons::stream_result<wchar_t>>
+wjson_stream_encoder           |basic_json_encoder<wchar_t,jsoncons::stream_result<wchar_t>>
 wjson_string_encoder    |basic_json_encoder<wchar_t,jsoncons::string_result<std::wstring>>
-json_compressed_encoder            |basic_json_compressed_encoder<char,jsoncons::stream_result<char>>
+json_compressed_stream_encoder            |basic_json_compressed_encoder<char,jsoncons::stream_result<char>>
 json_compressed_string_encoder     |basic_json_compressed_encoder<char,jsoncons::string_result<std::string>>
-wjson_compressed_encoder           |basic_json_compressed_encoder<wchar_t,jsoncons::stream_result<wchar_t>>
+wjson_compressed_stream_encoder           |basic_json_compressed_encoder<wchar_t,jsoncons::stream_result<wchar_t>>
 wjson_compressed_string_encoder    |basic_json_compressed_encoder<wchar_t,jsoncons::string_result<std::wstring>>
 
 #### Member types
@@ -113,7 +113,7 @@ and uses the specified [json options](json_options.md).
 
 ### Examples
 
-### Feeding json events directly to a `json_encoder`
+### Feeding json events directly to a `json_stream_encoder`
 ```c++
 #include <iostream>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -131,7 +131,7 @@ int main()
     A(1, 1) = 4;
 
     json_options options;
-    json_encoder os(std::cout, options); 
+    json_stream_encoder os(std::cout, options); 
     os.begin_array();
     for (size_t i = 0; i < A.size1(); ++i)
     {

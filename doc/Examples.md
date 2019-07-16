@@ -1631,7 +1631,7 @@ int main()
 {
     std::string s = R"({"first":1,"second":2,"fourth":3,"fifth":4})";    
 
-    json_encoder encoder(std::cout);
+    json_stream_encoder encoder(std::cout);
 
     // Filters can be chained
     rename_object_member_filter filter2("fifth", "fourth", encoder);

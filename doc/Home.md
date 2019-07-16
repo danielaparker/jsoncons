@@ -17,10 +17,9 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 #### Streaming
 
 [json_content_handler](ref/json_content_handler.md)  
-[json_encoder](ref/json_encoder.md)  
+[basic_json_encoder](ref/basic_json_encoder.md)  
 [json_options](ref/json_options.md)  
 
-[wjson_encoder](ref/wjson_encoder.md)  
 [wjson_options](ref/wjson_options.md)  
 
 [json_filter](ref/json_filter.md)  
