@@ -114,9 +114,9 @@ void json_accessor_examples()
 
     introspection_example();
 
-    byte_string_from_initializer_list();
-
     byte_string_from_char_array();
+
+    byte_string_from_initializer_list();
 }
 
 

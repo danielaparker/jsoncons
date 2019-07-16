@@ -119,9 +119,9 @@ std::cout << "(3) " << j << std::endl;
 
 Output:
 ```
-(1) 0x480x650x6c0x6c0x6f
+(1) 48 65 6c 6c 6f
 
 (2) Hello
 
-(3) "SGVsbG8_"
+(3) "SGVsbG8"
 ```

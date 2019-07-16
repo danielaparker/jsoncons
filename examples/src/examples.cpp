@@ -533,8 +533,6 @@ int main()
 
         json_accessor_examples();
 
-        json_accessor_examples();
-
         jsonpatch_examples();
 
         max_nesting_path_example();
@@ -574,6 +572,8 @@ int main()
         cbor_examples();
 
         readme_examples();
+
+        json_accessor_examples();
     }
     catch (const std::exception& e)
     {
