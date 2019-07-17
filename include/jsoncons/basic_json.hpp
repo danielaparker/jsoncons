@@ -1688,11 +1688,14 @@ public:
 
         size_t size() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().size();
+            }
+            catch (...)
             {
                 return 0;
             }
-            return evaluate().size();
         }
 
         storage_type type() const
@@ -1715,27 +1718,33 @@ public:
             return evaluate().get_allocator();
         }
 
-        bool contains(const string_view_type& key) const noexcept
+        bool contains(const string_view_type& key) const 
         {
-            if (!parent_.contains(key_))
-            {
-                return false;
-            }
             return evaluate().contains(key);
         }
 
         bool is_null() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_null();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_null();
         }
 
-        bool empty() const
+        bool empty() const noexcept
         {
-            return evaluate().empty();
+            try
+            {
+                return evaluate().empty();
+            }
+            catch (...)
+            {
+                return true;
+            }
         }
 
         size_t capacity() const
@@ -1762,118 +1771,157 @@ public:
         template<class T, class... Args>
         bool is(Args&&... args) const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().template is<T>(std::forward<Args>(args)...);
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().template is<T>(std::forward<Args>(args)...);
         }
 
         bool is_string() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_string();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_string();
         }
 
         bool is_string_view() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_string_view();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_string_view();
         }
 
         bool is_byte_string() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_byte_string();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_byte_string();
         }
 
         bool is_byte_string_view() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_byte_string_view();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_byte_string_view();
         }
 
         bool is_bignum() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_bignum();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_bignum();
         }
 
         bool is_number() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_number();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_number();
         }
         bool is_bool() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_bool();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_bool();
         }
 
         bool is_object() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_object();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_object();
         }
 
         bool is_array() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_array();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_array();
         }
 
         bool is_int64() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_int64();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_int64();
         }
 
         bool is_uint64() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_uint64();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_uint64();
         }
 
         bool is_double() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_double();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_double();
         }
 
         string_view_type as_string_view() const 
@@ -2271,21 +2319,27 @@ public:
         JSONCONS_DEPRECATED("Instead, use tag() == semantic_tag::datetime")
         bool is_datetime() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_datetime();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_datetime();
         }
 
         JSONCONS_DEPRECATED("Instead, use tag() == semantic_tag::timestamp")
         bool is_epoch_time() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_epoch_time();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_epoch_time();
         }
 
         template <class T>
@@ -2325,41 +2379,53 @@ public:
         JSONCONS_DEPRECATED("Instead, use is_int64()")
         bool is_integer() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_int64();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_int64();
         }
 
         JSONCONS_DEPRECATED("Instead, use is_uint64()")
         bool is_uinteger() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_uint64();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_uint64();
         }
 
         JSONCONS_DEPRECATED("Instead, use is<unsigned long long>()")
         bool is_ulonglong() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_ulonglong();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_ulonglong();
         }
 
         JSONCONS_DEPRECATED("Instead, use is<long long>()")
         bool is_longlong() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return evaluate().is_longlong();
+            }
+            catch (...)
             {
                 return false;
             }
-            return evaluate().is_longlong();
         }
 
         JSONCONS_DEPRECATED("Instead, use as<int>()")
@@ -2418,12 +2484,8 @@ public:
 
         template <class SAllocator=std::allocator<char_type>>
         JSONCONS_DEPRECATED("Instead, use dump(std::basic_string<char_type,char_traits_type,SAllocator>&)")
-        std::basic_string<char_type,char_traits_type,SAllocator> to_string(const SAllocator& allocator = SAllocator()) const noexcept
+        std::basic_string<char_type,char_traits_type,SAllocator> to_string(const SAllocator& allocator = SAllocator()) const 
         {
-            if (!parent_.contains(key_))
-            {
-                return false;
-            }
             return evaluate().to_string(allocator);
         }
         JSONCONS_DEPRECATED("Instead, use dump(basic_json_content_handler<char_type>&)")
@@ -2602,20 +2664,19 @@ public:
         JSONCONS_DEPRECATED("Instead, use empty()")
         bool is_empty() const noexcept
         {
-            if (!parent_.contains(key_))
-            {
-                return false;
-            }
             return empty();
         }
         JSONCONS_DEPRECATED("Instead, use is_number()")
         bool is_numeric() const noexcept
         {
-            if (!parent_.contains(key_))
+            try
+            {
+                return is_number();
+            }
+            catch (...)
             {
                 return false;
             }
-            return is_number();
         }
 #endif
     };
@@ -3205,7 +3266,7 @@ public:
         }
     }
 
-    bool contains(const string_view_type& key) const noexcept
+    bool contains(const string_view_type& key) const
     {
         switch (var_.type())
         {
