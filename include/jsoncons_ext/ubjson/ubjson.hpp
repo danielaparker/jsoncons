@@ -96,7 +96,7 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_ubjson(std::istream& is)
 {
     jsoncons::json_decoder<json> decoder;
-    ubjson_steam_reader reader(is, decoder);
+    ubjson_stream_reader reader(is, decoder);
     reader.read();
     return decoder.get_result();
 }
