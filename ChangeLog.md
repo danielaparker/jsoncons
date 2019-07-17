@@ -1,3 +1,8 @@
+version 0.129.1
+---------------
+
+- Fixed issue with deprecated function used in `decode_bson`
+
 version 0.129.0
 ---------------
 

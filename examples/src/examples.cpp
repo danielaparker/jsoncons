@@ -30,7 +30,7 @@ void json_accessor_examples();
 void msgpack_examples();
 void jsonpointer_examples();
 void jsonpatch_examples();
-void cbor_examples();
+void run_cbor_examples();
 void ubjson_examples();
 void json_parser_examples();
 void byte_string_examples();
@@ -497,8 +497,6 @@ int main()
 
         byte_string_examples();
 
-        cbor_examples();
-
         csv_examples();
 
         jsonpath_examples();
@@ -511,13 +509,13 @@ int main()
 
         json_cursor_examples();
 
+        json_accessor_examples();
+
+        json_accessor_examples();
+
+        run_cbor_examples();
+
         readme_examples();
-
-        cbor_examples();
-
-        json_accessor_examples();
-
-        json_accessor_examples();
     }
     catch (const std::exception& e)
     {

@@ -101,8 +101,6 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 [Playing around with CBOR, JSON, and CSV](#E4)  
 
-[Query CBOR with JSONPath](#E5)  
-
 <div id="E1"/> 
 
 ### Working with JSON data
@@ -111,6 +109,7 @@ For the examples below you need to include some header files and construct a str
 
 ```c++
 #include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/json_query.hpp>
 #include <iostream>
 
 using namespace jsoncons; // for convenience
@@ -162,6 +161,11 @@ int main()
         // Access rated as string and rating as double
         std::cout << item["rated"].as<std::string>() << ", " << item["rating"].as<double>() << "\n";
     }
+
+    // Extract all "rated" with JSONPath
+    std::cout << "(4)\n";
+    json result = jsonpath::json_query(j,"$..rated");
+    std::cout << pretty_print(result) << "\n\n";
 }
 ```
 Output:
@@ -183,6 +187,10 @@ Output:
 
 (3)
 Marilyn C, 0.9
+(4)
+[
+    "Marilyn C"
+]
 ```
 
 #### As a strongly typed C++ data structure
@@ -424,29 +432,34 @@ For the examples below you need to include some header files and construct a buf
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
+#include <jsoncons_ext/jsonpath/json_query.hpp>
 
 using namespace jsoncons; // for convenience
 
-std::vector<uint8_t> data = {
+const std::vector<uint8_t> data = {
     0x9f, // Start indefinte length array
       0x83, // Array of length 3
         0x63, // String value of length 3
           0x66,0x6f,0x6f, // "foo" 
         0x44, // Byte string value of length 4
           0x50,0x75,0x73,0x73, // 'P''u''s''s'
-        0xc3, // Tag 3 (negative bignum)
-        0x49, // Byte string value of length 9
-          0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, // Bytes content
+        0xc5, // Tag 5 (bigfloat)
+          0x82, // Array of length 2
+            0x20, // -1
+            0x03, // 3   
       0x83, // Another array of length 3
-      0x63, // String value of length 3
-        0x62,0x61,0x72, // "bar"
-      0xd6, // Expected conversion to base64
-      0x44, // Byte string value of length 4
-        0x50,0x75,0x73,0x73, // 'P''u''s''s'
-      0xc4, // Tag 4 (decimal fraction)
-        0x82, // Array of length 2
-          0x21, // -2
-          0x19,0x6a,0xb3, // 27315
+        0x63, // String value of length 3
+          0x62,0x61,0x72, // "bar"
+        0xd6, // Expected conversion to base64
+        0x44, // Byte string value of length 4
+          0x50,0x75,0x73,0x73, // 'P''u''s''s'
+        0xc4, // Tag 4 (decimal fraction)
+          0x82, // Array of length 2
+            0x38, // Negative integer of length 1
+              0x1c, // -29
+            0xc2, // Tag 2 (positive bignum)
+              0x4d, // Byte string value of length 13
+                0x01,0x8e,0xe9,0x0f,0xf6,0xc3,0x73,0xe0,0xee,0x4e,0x3f,0x0a,0xd2,
     0xff // "break"
 };
 ```
@@ -470,24 +483,36 @@ int main()
     // Pretty print
     std::cout << "(1)\n" << pretty_print(j) << "\n\n";
 
+    // Iterate over rows
     std::cout << "(2)\n";
     for (const auto& row : j.array_range())
     {
         std::cout << row[1].as<jsoncons::byte_string>() << " (" << row[1].tag() << ")\n";
     }
+    std::cout << "\n";
+
+    // Extract the third column with JSONPath
+    std::cout << "(3)\n";
+    json result = jsonpath::json_query(j,"$[*][2]");
+    std::cout << pretty_print(result) << "\n\n";
 }
 ```
 Output:
 ```
 (1)
 [
-    ["foo", "UHVzcw", "-18446744073709551617"],
-    ["bar", "UHVzcw==", "273.15"]
+    ["foo", "UHVzcw", "0x3p-1"],
+    ["bar", "UHVzcw==", "1.23456789012345678901234567890"]
 ]
 
 (2)
 50 75 73 73 (n/a)
 50 75 73 73 (base64)
+(3)
+[
+    "0x3p-1",
+    "1.23456789012345678901234567890"
+]
 ```
 
 #### As a strongly typed C++ data structure
@@ -506,8 +531,8 @@ int main()
 ```
 Output:
 ```
-foo, 50 75 73 73, -18446744073709551617
-bar, 50 75 73 73, 273.15
+foo, 50 75 73 73, 0x3p-1
+bar, 50 75 73 73, 1.23456789012345678901234567890
 ```
 
 #### As a stream of parse events
@@ -572,12 +597,12 @@ begin_array (n/a)
 begin_array (n/a)
 string_value: foo (n/a)
 byte_string_value: 50 75 73 73 (n/a)
-string_value: -18446744073709551617 (bigint)
+string_value: 0x3p-1 (bigfloat)
 end_array (n/a)
 begin_array (n/a)
 string_value: bar (n/a)
 byte_string_value: 50 75 73 73 (base64)
-string_value: 273.15 (bigdec)
+string_value: 1.23456789012345678901234567890 (bigdec)
 end_array (n/a)
 ```
 
@@ -821,116 +846,6 @@ bar,UHVzcw==,273.15
 
 <div id="E5"/> 
 
-### Query CBOR with JSONPath
-```c++
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/cbor/cbor.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
-#include <iostream>
-#include <iomanip>
-#include <cassert>
-
-using namespace jsoncons; // For convenience
-
-int main()
-{
-    // Construct a json array of numbers
-    json j = json::array();
-
-    j.emplace_back(5.0);
-
-    j.emplace_back(0.000071);
-
-    j.emplace_back("-18446744073709551617",semantic_tag::bigint);
-
-    j.emplace_back("1.23456789012345678901234567890", semantic_tag::bigdec);
-
-    j.emplace_back("0x3p-1", semantic_tag::bigfloat);
-
-    // Encode to JSON
-    std::cout << "(1)\n";
-    std::cout << pretty_print(j);
-    std::cout << "\n\n";
-
-    // as<std::string>() and as<double>()
-    std::cout << "(2)\n";
-    std::cout << std::dec << std::setprecision(15);
-    for (const auto& item : j.array_range())
-    {
-        std::cout << item.as<std::string>() << ", " << item.as<double>() << "\n";
-    }
-    std::cout << "\n";
-
-    // Encode to CBOR
-    std::vector<uint8_t> v;
-    cbor::encode_cbor(j,v);
-
-    std::cout << "(3)\n";
-    for (auto c : v)
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2)
-                  << std::setfill('0') << static_cast<int>(c);
-    }
-    std::cout << "\n\n";
-/*
-    85 -- Array of length 5     
-      fa -- float 
-        40a00000 -- 5.0
-      fb -- double 
-        3f129cbab649d389 -- 0.000071
-      c3 -- Tag 3 (negative bignum)
-        49 -- Byte string value of length 9
-          010000000000000000
-      c4 -- Tag 4 (decimal fraction)
-        82 -- Array of length 2
-          38 -- Negative integer of length 1
-            1c -- -29
-          c2 -- Tag 2 (positive bignum)
-            4d -- Byte string value of length 13
-              018ee90ff6c373e0ee4e3f0ad2
-      c5 -- Tag 5 (bigfloat)
-        82 -- Array of length 2
-          20 -- -1
-          03 -- 3   
-*/
-
-    // Decode back to json
-    json other = cbor::decode_cbor<json>(v);
-    assert(other == j);
-
-    // Query with JSONPath
-    std::cout << "(4)\n";
-    json result = jsonpath::json_query(other,"$[?(@ < 1.5)]");
-    std::cout << pretty_print(result) << "\n\n";
-```
-Output:
-```
-(1)
-[
-    5.0,
-    7.1e-05,
-    "-18446744073709551617",
-    "1.23456789012345678901234567890",
-    [-1, 3]
-]
-
-(2)
-5.0, 5
-7.1e-05, 7.1e-05
--18446744073709551617, -1.84467440737096e+19
-1.23456789012345678901234567890, 1.23456789012346
-1.5, 1.5
-
-(3)
-85fa40a00000fb3f129cbab649d389c349010000000000000000c482381cc24d018ee90ff6c373e0ee4e3f0ad2c5822003
-
-(4)
-[
-    7.1e-05,
-    "-18446744073709551617",
-    "1.23456789012345678901234567890"
-]
-```
 ## Building the test suite and examples with CMake
 
 [CMake](https://cmake.org/) is a cross-platform build tool that generates makefiles and solutions for the compiler environment of your choice. On Windows you can download a [Windows Installer package](https://cmake.org/download/). On Linux it is usually available as a package, e.g., on Ubuntu,

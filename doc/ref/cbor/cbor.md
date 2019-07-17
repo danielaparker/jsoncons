@@ -100,6 +100,8 @@ object        |                  | map |&#160;
 
 ### Examples
 
+#### CBOR and basic_json
+
 ```c++
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
@@ -173,5 +175,116 @@ Output:
 Marilyn C, 0.9
 
 (3) Marilyn C
+```
+
+#### Query CBOR with JSONPath
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <iostream>
+#include <iomanip>
+#include <cassert>
+
+using namespace jsoncons; // For convenience
+
+int main()
+{
+    // Construct a json array of numbers
+    json j = json::array();
+
+    j.emplace_back(5.0);
+
+    j.emplace_back(0.000071);
+
+    j.emplace_back("-18446744073709551617",semantic_tag::bigint);
+
+    j.emplace_back("1.23456789012345678901234567890", semantic_tag::bigdec);
+
+    j.emplace_back("0x3p-1", semantic_tag::bigfloat);
+
+    // Encode to JSON
+    std::cout << "(1)\n";
+    std::cout << pretty_print(j);
+    std::cout << "\n\n";
+
+    // as<std::string>() and as<double>()
+    std::cout << "(2)\n";
+    std::cout << std::dec << std::setprecision(15);
+    for (const auto& item : j.array_range())
+    {
+        std::cout << item.as<std::string>() << ", " << item.as<double>() << "\n";
+    }
+    std::cout << "\n";
+
+    // Encode to CBOR
+    std::vector<uint8_t> v;
+    cbor::encode_cbor(j,v);
+
+    std::cout << "(3)\n";
+    for (auto c : v)
+    {
+        std::cout << std::hex << std::setprecision(2) << std::setw(2)
+                  << std::setfill('0') << static_cast<int>(c);
+    }
+    std::cout << "\n\n";
+/*
+    85 -- Array of length 5     
+      fa -- float 
+        40a00000 -- 5.0
+      fb -- double 
+        3f129cbab649d389 -- 0.000071
+      c3 -- Tag 3 (negative bignum)
+        49 -- Byte string value of length 9
+          010000000000000000
+      c4 -- Tag 4 (decimal fraction)
+        82 -- Array of length 2
+          38 -- Negative integer of length 1
+            1c -- -29
+          c2 -- Tag 2 (positive bignum)
+            4d -- Byte string value of length 13
+              018ee90ff6c373e0ee4e3f0ad2
+      c5 -- Tag 5 (bigfloat)
+        82 -- Array of length 2
+          20 -- -1
+          03 -- 3   
+*/
+
+    // Decode back to json
+    json other = cbor::decode_cbor<json>(v);
+    assert(other == j);
+
+    // Query with JSONPath
+    std::cout << "(4)\n";
+    json result = jsonpath::json_query(other,"$[?(@ < 1.5)]");
+    std::cout << pretty_print(result) << "\n\n";
+```
+Output:
+```
+(1)
+[
+    5.0,
+    7.1e-05,
+    "-18446744073709551617",
+    "1.23456789012345678901234567890",
+    [-1, 3]
+]
+
+(2)
+5.0, 5
+7.1e-05, 7.1e-05
+-18446744073709551617, -1.84467440737096e+19
+1.23456789012345678901234567890, 1.23456789012346
+1.5, 1.5
+
+(3)
+85fa40a00000fb3f129cbab649d389c349010000000000000000c482381cc24d018ee90ff6c373e0ee4e3f0ad2c5822003
+
+(4)
+[
+    7.1e-05,
+    "-18446744073709551617",
+    "1.23456789012345678901234567890"
+]
 ```
 

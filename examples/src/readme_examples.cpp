@@ -5,6 +5,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/jsonpath/json_query.hpp>
 #include <jsoncons_ext/csv/csv_encoder.hpp>
 #include <string>
 #include <vector>
@@ -40,16 +41,21 @@ namespace readme
         // Does object member reputons exist?
         std::cout << "(2) " << std::boolalpha << j.contains("reputons") << "\n\n";
 
-        // Get a reference to reputons array value
+        // Get a reference to reputons array 
         const json& v = j["reputons"]; 
 
-        // Iterate over reputons array value
+        // Iterate over reputons array 
         std::cout << "(3)\n";
         for (const auto& item : v.array_range())
         {
             // Access rated as string and rating as double
             std::cout << item["rated"].as<std::string>() << ", " << item["rating"].as<double>() << "\n";
         }
+
+        // Extract all "rated" with JSONPath
+        std::cout << "(4)\n";
+        json result = jsonpath::json_query(j,"$..rated");
+        std::cout << pretty_print(result) << "\n\n";
     }
 
     void as_a_strongly_typed_cpp_structure()
@@ -338,11 +344,11 @@ void readme_examples()
 {
     std::cout << "\nReadme examples\n\n";
 
-    readme::as_a_variant_like_structure();
-    readme::as_a_strongly_typed_cpp_structure();
     readme::as_a_stream_of_json_events();
     readme::as_a_filtered_stream_of_json_events();
     readme::playing_around();
+    readme::as_a_strongly_typed_cpp_structure();
+    readme::as_a_variant_like_structure();
     std::cout << std::endl;
 }
 

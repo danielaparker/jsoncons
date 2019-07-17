@@ -12,6 +12,8 @@
 
 using namespace jsoncons;
 
+namespace cbor_examples {
+
 void serialize_to_cbor_buffer()
 {
     std::vector<uint8_t> buffer;
@@ -381,69 +383,57 @@ void decode_cbor_with_packed_strings()
     std::cout << pretty_print(j) << "\n";
 }
 
+const std::vector<uint8_t> data = {
+    0x9f, // Start indefinte length array
+      0x83, // Array of length 3
+        0x63, // String value of length 3
+          0x66,0x6f,0x6f, // "foo" 
+        0x44, // Byte string value of length 4
+          0x50,0x75,0x73,0x73, // 'P''u''s''s'
+        0xc5, // Tag 5 (bigfloat)
+          0x82, // Array of length 2
+            0x20, // -1
+            0x03, // 3   
+      0x83, // Another array of length 3
+        0x63, // String value of length 3
+          0x62,0x61,0x72, // "bar"
+        0xd6, // Expected conversion to base64
+        0x44, // Byte string value of length 4
+          0x50,0x75,0x73,0x73, // 'P''u''s''s'
+        0xc4, // Tag 4 (decimal fraction)
+          0x82, // Array of length 2
+            0x38, // Negative integer of length 1
+              0x1c, // -29
+            0xc2, // Tag 2 (positive bignum)
+              0x4d, // Byte string value of length 13
+                0x01,0x8e,0xe9,0x0f,0xf6,0xc3,0x73,0xe0,0xee,0x4e,0x3f,0x0a,0xd2,
+    0xff // "break"
+};
+
 void working_with_cbor1()
 {
-    std::vector<uint8_t> data = {
-        0x9f, // Start indefinte length array
-          0x83, // Array of length 3
-            0x63, // String value of length 3
-              0x66,0x6f,0x6f, // "foo" 
-            0x44, // Byte string value of length 4
-              0x50,0x75,0x73,0x73, // 'P''u''s''s'
-            0xc3, // Tag 3 (negative bignum)
-            0x49, // Byte string value of length 9
-              0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, // Bytes content
-          0x83, // Another array of length 3
-          0x63, // String value of length 3
-            0x62,0x61,0x72, // "bar"
-          0xd6, // Expected conversion to base64
-          0x44, // Byte string value of length 4
-            0x50,0x75,0x73,0x73, // 'P''u''s''s'
-          0xc4, // Tag 4 (decimal fraction)
-            0x82, // Array of length 2
-              0x21, // -2
-              0x19,0x6a,0xb3, // 27315
-        0xff // "break"
-    };
-
     // Parse the string of data into a json value
     json j = cbor::decode_cbor<json>(data);
 
     // Pretty print
     std::cout << "(1)\n" << pretty_print(j) << "\n\n";
 
+    // Iterate over rows
     std::cout << "(2)\n";
     for (const auto& row : j.array_range())
     {
         std::cout << row[1].as<jsoncons::byte_string>() << " (" << row[1].tag() << ")\n";
     }
+    std::cout << "\n";
+
+    // Extract the third column with JSONPath
+    std::cout << "(3)\n";
+    json result = jsonpath::json_query(j,"$[*][2]");
+    std::cout << pretty_print(result) << "\n\n";
 }
 
 void working_with_cbor2()
 {
-    std::vector<uint8_t> data = {
-        0x9f, // Start indefinte length array
-          0x83, // Array of length 3
-            0x63, // String value of length 3
-              0x66,0x6f,0x6f, // "foo" 
-            0x44, // Byte string value of length 4
-              0x50,0x75,0x73,0x73, // 'P''u''s''s'
-            0xc3, // Tag 3 (negative bignum)
-            0x49, // Byte string value of length 9
-              0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, // Bytes content
-          0x83, // Another array of length 3
-          0x63, // String value of length 3
-            0x62,0x61,0x72, // "bar"
-          0xd6, // Expected conversion to base64
-          0x44, // Byte string value of length 4
-            0x50,0x75,0x73,0x73, // 'P''u''s''s'
-          0xc4, // Tag 4 (decimal fraction)
-            0x82, // Array of length 2
-              0x21, // -2
-              0x19,0x6a,0xb3, // 27315
-        0xff // "break"
-    };
-
     // Parse the string of data into a std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>> value
     auto val = cbor::decode_cbor<std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>>>(data);
 
@@ -455,28 +445,6 @@ void working_with_cbor2()
 
 void working_with_cbor3()
 {
-    std::vector<uint8_t> data = {
-        0x82, // Array of length 2
-          0x83, // Array of length 3
-            0x63, // String value of length 3
-              0x66,0x6f,0x6f, // "foo" 
-            0x44, // Byte string value of length 4
-              0x50,0x75,0x73,0x73, // 'P''u''s''s'
-            0xc3, // Tag 3 (negative bignum)
-            0x49, // Byte string value of length 9
-              0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, // Bytes content
-          0x83, // Another array of length 3
-          0x63, // String value of length 3
-            0x62,0x61,0x72, // "bar"
-          0xd6, // Expected conversion to base64
-          0x44, // Byte string value of length 4
-            0x50,0x75,0x73,0x73, // 'P''u''s''s'
-          0xc4, // Tag 4 (decimal fraction)
-            0x82, // Array of length 2
-              0x21, // -2
-              0x19,0x6a,0xb3 // 27315
-    };
-
     cbor::cbor_bytes_cursor cursor(data);
     for (; !cursor.done(); cursor.next())
     {
@@ -528,27 +496,29 @@ void working_with_cbor3()
     }
 }
 
-void cbor_examples()
+}; // cbor_examples
+
+void run_cbor_examples()
 {
     std::cout << "\ncbor examples\n\n";
-    encode_byte_string_with_encoding_hint();
-    encode_cbor_byte_string();
-    serialize_to_cbor_buffer();
-    serialize_to_cbor_stream();
-    cbor_reputon_example();
-    query_cbor();
-    encode_cbor_with_packed_strings();
+    cbor_examples::encode_byte_string_with_encoding_hint();
+    cbor_examples::encode_cbor_byte_string();
+    cbor_examples::serialize_to_cbor_buffer();
+    cbor_examples::serialize_to_cbor_stream();
+    cbor_examples::cbor_reputon_example();
+    cbor_examples::query_cbor();
+    cbor_examples::encode_cbor_with_packed_strings();
 
-    decode_cbor_with_packed_strings();
+    cbor_examples::decode_cbor_with_packed_strings();
 
-    working_with_cbor1();
+    cbor_examples::decode_cbor_byte_string();
+    cbor_examples::decode_byte_string_with_encoding_hint();
+
+    cbor_examples::working_with_cbor2();
     std::cout << "\n";
-    working_with_cbor2();
+    cbor_examples::working_with_cbor3();
     std::cout << "\n";
-    working_with_cbor3();
-
-    decode_cbor_byte_string();
-    decode_byte_string_with_encoding_hint();
+    cbor_examples::working_with_cbor1();
     std::cout << std::endl;
 }
 
