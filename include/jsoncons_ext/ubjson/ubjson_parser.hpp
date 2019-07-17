@@ -24,13 +24,14 @@ class basic_ubjson_parser : public ser_context
 {
     Src source_;
     size_t nesting_depth_;
-    std::string buffer_;
     bool continue_;
+    std::string buffer_;
 public:
     template <class Source>
     basic_ubjson_parser(Source&& source)
        : source_(std::forward<Source>(source)), 
-         nesting_depth_(0)
+         nesting_depth_(0),
+         continue_(true)
     {
     }
 
