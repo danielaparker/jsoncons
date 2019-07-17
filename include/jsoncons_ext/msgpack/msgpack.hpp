@@ -91,7 +91,7 @@ decode_msgpack(std::istream& is)
 {
     jsoncons::json_decoder<T> decoder;
     auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
-    msgpack_reader reader(is, adaptor);
+    msgpack_stream_reader reader(is, adaptor);
     std::error_code ec;
     reader.read(ec);
     if (ec)
@@ -106,7 +106,7 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_msgpack(std::istream& is)
 {
     jsoncons::json_decoder<json> decoder;
-    msgpack_reader reader(is, decoder);
+    msgpack_stream_reader reader(is, decoder);
     reader.read();
     return decoder.get_result();
 }
