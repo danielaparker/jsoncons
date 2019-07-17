@@ -47,11 +47,6 @@ public:
 
     void read(std::error_code& ec)
     {
-        //if (source_.is_error())
-        //{
-        //    ec = cbor_errc::source_error;
-        //    return;
-        //}   
         try
         {
             parser_.reset();
