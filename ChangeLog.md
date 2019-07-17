@@ -1,7 +1,7 @@
 version 0.129.1
 ---------------
 
-- Fixed issue with deprecated function used in `decode_bson`
+- Fixed issue with deprecated class used in `decode_bson`, `decode_msgpack`, and `decode_ubjson`
 
 version 0.129.0
 ---------------
