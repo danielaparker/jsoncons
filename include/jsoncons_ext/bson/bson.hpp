@@ -96,7 +96,7 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_bson(std::istream& is)
 {
     jsoncons::json_decoder<json> decoder;
-    bson_reader reader(is, decoder);
+    bson_stream_reader reader(is, decoder);
     reader.read();
     return decoder.get_result();
 }
