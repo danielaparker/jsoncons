@@ -21,7 +21,7 @@
 
 namespace jsoncons { namespace cbor {
 
-enum class parse_mode {root,array,indefinite_array,map_key,map_value,indefinite_map_key,indefinite_map_value};
+enum class parse_mode {root,before_done,array,indefinite_array,map_key,map_value,indefinite_map_key,indefinite_map_value};
 
 struct mapped_string
 {
@@ -90,11 +90,12 @@ class basic_cbor_parser : public ser_context
     std::vector<uint64_t> tags_; 
     std::vector<parse_state> state_stack_;
     bool continue_;
+    bool done_;
 public:
     template <class Source>
     basic_cbor_parser(Source&& source)
        : source_(std::forward<Source>(source)),
-         continue_(true)
+         continue_(true), done_(false)
     {
         state_stack_.emplace_back(parse_mode::root,0);
     }
@@ -109,11 +110,12 @@ public:
         state_stack_.clear();
         state_stack_.emplace_back(parse_mode::root,0);
         continue_ = true;
+        done_ = false;
     }
 
     bool done() const
     {
-        return state_stack_.empty();
+        return done_;
     }
 
     bool stopped() const
@@ -133,7 +135,7 @@ public:
 
     void parse(json_content_handler& handler, std::error_code& ec)
     {
-        while (!state_stack_.empty() && continue_)
+        while (!done_ && continue_)
         {
             switch (state_stack_.back().mode)
             {
@@ -243,20 +245,23 @@ public:
                 }
                 case parse_mode::root:
                 {
+                    state_stack_.back().mode = parse_mode::before_done;
                     read_item(handler, ec);
                     if (ec)
                     {
                         return;
                     }
+                    break;
                 }
-                break;
-            }
-
-            JSONCONS_ASSERT(!state_stack_.empty());
-            if (state_stack_.back().mode == parse_mode::root)
-            {
-                state_stack_.pop_back();
-                handler.flush();
+                case parse_mode::before_done:
+                {
+                    JSONCONS_ASSERT(state_stack_.size() == 1);
+                    state_stack_.clear();
+                    continue_ = false;
+                    done_ = true;
+                    handler.flush();
+                    break;
+                }
             }
         }
     }
