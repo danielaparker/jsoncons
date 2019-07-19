@@ -98,7 +98,191 @@ byte_string   | base16           | byte string | 23 (Expected conversion to base
 array         |                  | array |&#160;
 object        |                  | map |&#160;
 
-### Examples
+### Working with CBOR data
+
+For the examples below you need to include some header files and construct a buffer of CBOR data:
+
+```c++
+#include <iomanip>
+#include <iostream>
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+#include <jsoncons_ext/jsonpath/json_query.hpp>
+
+using namespace jsoncons; // for convenience
+
+const std::vector<uint8_t> data = {
+    0x9f, // Start indefinte length array
+      0x83, // Array of length 3
+        0x63, // String value of length 3
+          0x66,0x6f,0x6f, // "foo" 
+        0x44, // Byte string value of length 4
+          0x50,0x75,0x73,0x73, // 'P''u''s''s'
+        0xc5, // Tag 5 (bigfloat)
+          0x82, // Array of length 2
+            0x20, // -1
+            0x03, // 3   
+      0x83, // Another array of length 3
+        0x63, // String value of length 3
+          0x62,0x61,0x72, // "bar"
+        0xd6, // Expected conversion to base64
+        0x44, // Byte string value of length 4
+          0x50,0x75,0x73,0x73, // 'P''u''s''s'
+        0xc4, // Tag 4 (decimal fraction)
+          0x82, // Array of length 2
+            0x38, // Negative integer of length 1
+              0x1c, // -29
+            0xc2, // Tag 2 (positive bignum)
+              0x4d, // Byte string value of length 13
+                0x01,0x8e,0xe9,0x0f,0xf6,0xc3,0x73,0xe0,0xee,0x4e,0x3f,0x0a,0xd2,
+    0xff // "break"
+};
+```
+
+jsoncons allows you to work with the CBOR data similarly to JSON data:
+
+- As a variant-like structure, [basic_json](doc/ref/basic_json.md) 
+
+- As a strongly typed C++ data structure
+
+- As a stream of parse events
+
+#### As a variant-like structure
+
+```c++
+int main()
+{
+    // Parse the string of data into a json value
+    json j = cbor::decode_cbor<json>(data);
+
+    // Pretty print
+    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+
+    // Iterate over rows
+    std::cout << "(2)\n";
+    for (const auto& row : j.array_range())
+    {
+        std::cout << row[1].as<jsoncons::byte_string>() << " (" << row[1].tag() << ")\n";
+    }
+    std::cout << "\n";
+
+    // Extract the third column with JSONPath
+    std::cout << "(3)\n";
+    json result = jsonpath::json_query(j,"$[*][2]");
+    std::cout << pretty_print(result) << "\n\n";
+}
+```
+Output:
+```
+(1)
+[
+    ["foo", "UHVzcw", "0x3p-1"],
+    ["bar", "UHVzcw==", "1.23456789012345678901234567890"]
+]
+
+(2)
+50 75 73 73 (n/a)
+50 75 73 73 (base64)
+(3)
+[
+    "0x3p-1",
+    "1.23456789012345678901234567890"
+]
+```
+
+#### As a strongly typed C++ data structure
+
+```c++
+int main()
+{
+    // Parse the string of data into a std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>> value
+    auto val = cbor::decode_cbor<std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>>>(data);
+
+    for (const auto& row : val)
+    {
+        std::cout << std::get<0>(row) << ", " << std::get<1>(row) << ", " << std::get<2>(row) << "\n";
+    }
+}
+```
+Output:
+```
+foo, 50 75 73 73, 0x3p-1
+bar, 50 75 73 73, 1.23456789012345678901234567890
+```
+
+#### As a stream of parse events
+
+```c++
+int main()
+{
+    cbor::cbor_bytes_cursor cursor(data);
+    for (; !cursor.done(); cursor.next())
+    {
+        const auto& event = cursor.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::begin_array:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::end_array:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::begin_object:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::end_object:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::name:
+                // Or std::string_view, if supported
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::string_value:
+                // Or std::string_view, if supported
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::byte_string_value:
+                std::cout << event.event_type() << ": " << event.get<jsoncons::byte_string_view>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::null_value:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::bool_value:
+                std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::int64_value:
+                std::cout << event.event_type() << ": " << event.get<int64_t>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::uint64_value:
+                std::cout << event.event_type() << ": " << event.get<uint64_t>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::double_value:
+                std::cout << event.event_type() << ": "  << event.get<double>() << " " << "(" << event.tag() << ")\n";
+                break;
+            default:
+                std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+        }
+    }
+}
+```
+Output:
+```
+begin_array (n/a)
+begin_array (n/a)
+string_value: foo (n/a)
+byte_string_value: 50 75 73 73 (n/a)
+string_value: 0x3p-1 (bigfloat)
+end_array (n/a)
+begin_array (n/a)
+string_value: bar (n/a)
+byte_string_value: 50 75 73 73 (base64)
+string_value: 1.23456789012345678901234567890 (bigdec)
+end_array (n/a)
+end_array (n/a)
+```
+
+### More Examples
 
 #### CBOR and basic_json
 
