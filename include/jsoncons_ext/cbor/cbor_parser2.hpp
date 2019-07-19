@@ -21,7 +21,7 @@
 
 namespace jsoncons { namespace cbor {
 
-enum class parse_mode {root,array,indefinite_array,map_key,map_value,indefinite_map_key,indefinite_map_value};
+enum class parse_mode {root,array,indefinite_array,map_name,map_value,indefinite_map_name,indefinite_map_value};
 
 struct mapped_string
 {
@@ -164,6 +164,7 @@ public:
                             continue_ = false;
                             return;
                         case 0xff:
+                            source_.ignore(1);
                             end_array(handler, ec);
                             if (ec)
                             {
@@ -180,7 +181,7 @@ public:
                     }
                     break;
                 }
-                case parse_mode::map_key:
+                case parse_mode::map_name:
                 {
                     if (state_stack_.back().index < state_stack_.back().length)
                     {
@@ -190,11 +191,7 @@ public:
                         {
                             return;
                         }
-                        read_item(handler, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
+                        state_stack_.back().mode = parse_mode::map_value;
                     }
                     else
                     {
@@ -202,7 +199,17 @@ public:
                     }
                     break;
                 }
-                case parse_mode::indefinite_map_key:
+                case parse_mode::map_value:
+                {
+                    read_item(handler, ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                    state_stack_.back().mode = parse_mode::map_name;
+                    break;
+                }
+                case parse_mode::indefinite_map_name:
                 {
                     int c = source_.peek();
                     switch (c)
@@ -212,6 +219,7 @@ public:
                             continue_ = false;
                             return;
                         case 0xff:
+                            source_.ignore(1);
                             end_map(handler, ec);
                             if (ec)
                             {
@@ -224,13 +232,19 @@ public:
                             {
                                 return;
                             }
-                            read_item(handler, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
+                            state_stack_.back().mode = parse_mode::indefinite_map_value;
                             break;
                     }
+                    break;
+                }
+                case parse_mode::indefinite_map_value:
+                {
+                    read_item(handler, ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                    state_stack_.back().mode = parse_mode::indefinite_map_name;
                     break;
                 }
                 case parse_mode::root:
@@ -463,6 +477,7 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::map:
             {
+                std::cout << "cbor_major_type::map\n";
                 begin_map(handler, info, ec);
                 break;
             }
@@ -516,22 +531,13 @@ private:
 
     void end_array(json_content_handler& handler, std::error_code&)
     {
-        switch (state_stack_.back().mode)
-        {
-            case parse_mode::indefinite_array: 
-            {
-                source_.ignore(1);
-                break;
-            }
-            default:
-                break;
-        }
         continue_ = handler.end_array(*this);
         state_stack_.pop_back();
     }
 
     void begin_map(json_content_handler& handler, uint8_t info, std::error_code& ec)
     {
+        std::cout << "begin_map(json_content_handler& handler, uint8_t info, std::error_code& ec)";
         auto stringref_map = state_stack_.back().stringref_map;
         for (auto t : tags_)
         {
@@ -549,20 +555,24 @@ private:
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length: 
             {
-                state_stack_.emplace_back(parse_mode::indefinite_map_key,0,stringref_map);
+                state_stack_.emplace_back(parse_mode::indefinite_map_name,0,stringref_map);
                 continue_ = handler.begin_object(semantic_tag::none, *this);
                 source_.ignore(1);
                 break;
             }
             default: // definite_length
             {
+                std::cout << "definite_length map\n";
                 size_t len = get_definite_length(ec);
                 if (ec)
                 {
+                    std::cout << "return?\n";
                     return;
                 }
-                state_stack_.emplace_back(parse_mode::map_key,len,stringref_map);
+                std::cout << "No return, call begin_object\n";
+                state_stack_.emplace_back(parse_mode::map_name,len,stringref_map);
                 continue_ = handler.begin_object(len, semantic_tag::none, *this);
+                std::cout << "begin_object called\n";
                 break;
             }
         }
@@ -570,22 +580,13 @@ private:
 
     void end_map(json_content_handler& handler, std::error_code&)
     {
-        switch (state_stack_.back().mode)
-        {
-            case parse_mode::indefinite_map_key: 
-            {
-                source_.ignore(1);
-                break;
-            }
-            default:
-                break;
-        }
         continue_ = handler.end_object(*this);
         state_stack_.pop_back();
     }
 
     void read_name(json_content_handler& handler, std::error_code& ec)
     {
+        std::cout << "cbor_cursor::read_name\n";
         read_tags(ec);
         if (ec)
         {
@@ -607,6 +608,7 @@ private:
         {
             case jsoncons::cbor::detail::cbor_major_type::text_string:
             {
+                std::cout << "key is text string\n";
                 text_buffer_ = get_text_string(ec);
                 if (ec)
                 {
@@ -683,6 +685,7 @@ private:
                 JSONCONS_FALLTHROUGH;
             default:
             {
+                std::cout << "key is not text string\n";
                 text_buffer_.clear();
                 json_string_encoder encoder(text_buffer_);
                 basic_cbor_parser<Src> reader(std::move(source_));
