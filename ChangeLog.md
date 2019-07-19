@@ -5,6 +5,12 @@ Bug fix:
 
 - Fixed issue with `cbor_cursor` not reporting name events and terminal event
 
+Enhancements
+
+- New `basic_cbor_cursor` constructor that takes a filter parameter
+- Rewrote `basic_ubjson_parser` template class to avoid recursive function calls
+- New `basic_ubjson_cursor` template class with `ubjson_stream_cursor` and `ubjson_bytes_cursor` typedefs
+
 version 0.129.1
 ---------------
 
