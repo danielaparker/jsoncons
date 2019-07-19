@@ -19,16 +19,17 @@
 
 namespace jsoncons { namespace ubjson {
 
-enum class parse_mode {root,array,indefinite_array,strongly_typed_array,map,indefinite_map};
+enum class parse_mode {root,array,indefinite_array,strongly_typed_array,map,strongly_typed_map,indefinite_map};
 
 struct parse_state 
 {
     parse_mode mode; 
     size_t length;
+    uint8_t type;
     size_t index;
 
-    parse_state(parse_mode mode, size_t length)
-        : mode(mode), length(length), index(0)
+    parse_state(parse_mode mode, size_t length, uint8_t type = 0)
+        : mode(mode), length(length), index(0), type(type)
     {
     }
 
@@ -51,6 +52,7 @@ public:
          nesting_depth_(0),
          continue_(true)
     {
+        state_stack_.emplace_back(parse_mode::root,0);
     }
 
     void restart()
@@ -60,12 +62,14 @@ public:
 
     void reset()
     {
+        state_stack_.clear();
+        state_stack_.emplace_back(parse_mode::root,0);
         continue_ = true;
     }
 
     bool done() const
     {
-        return false;
+        return state_stack_.empty();
     }
 
     bool stopped() const
@@ -85,6 +89,168 @@ public:
 
     void parse(json_content_handler& handler, std::error_code& ec)
     {
+        while (!state_stack_.empty() && continue_)
+        {
+            switch (state_stack_.back().mode)
+            {
+                case parse_mode::array:
+                {
+                    if (state_stack_.back().index < state_stack_.back().length)
+                    {
+                        ++state_stack_.back().index;
+                        read_type_and_value(handler, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        end_array(handler, ec);
+                    }
+                    break;
+                }
+                case parse_mode::strongly_typed_array:
+                {
+                    if (state_stack_.back().index < state_stack_.back().length)
+                    {
+                        ++state_stack_.back().index;
+                        read_value(handler, state_stack_.back().type, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        end_array(handler, ec);
+                    }
+                    break;
+                }
+                case parse_mode::indefinite_array:
+                {
+                    int c = source_.peek();
+                    switch (c)
+                    {
+                        case Src::traits_type::eof():
+                            ec = ubjson_errc::unexpected_eof;
+                            continue_ = false;
+                            return;
+                        case jsoncons::ubjson::detail::ubjson_format::end_array_marker:
+                            end_array(handler, ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            break;
+                        default:
+                            read_type_and_value(handler, ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            break;
+                    }
+                    break;
+                }
+                case parse_mode::map:
+                {
+                    if (state_stack_.back().index < state_stack_.back().length)
+                    {
+                        ++state_stack_.back().index;
+                        read_name(handler, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        read_type_and_value(handler, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        end_map(handler, ec);
+                    }
+                    break;
+                }
+                case parse_mode::strongly_typed_map:
+                {
+                    if (state_stack_.back().index < state_stack_.back().length)
+                    {
+                        ++state_stack_.back().index;
+                        read_name(handler, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        read_value(handler, state_stack_.back().type, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        end_map(handler, ec);
+                    }
+                    break;
+                }
+                case parse_mode::indefinite_map:
+                {
+                    int c = source_.peek();
+                    switch (c)
+                    {
+                        case Src::traits_type::eof():
+                            ec = ubjson_errc::unexpected_eof;
+                            continue_ = false;
+                            return;
+                        case jsoncons::ubjson::detail::ubjson_format::end_array_marker:
+                            end_map(handler, ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            break;
+                        default:
+                            read_name(handler, ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            read_type_and_value(handler, ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            break;
+                    }
+                    break;
+                }
+                case parse_mode::root:
+                {
+                    read_type_and_value(handler, ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                }
+                break;
+            }
+
+            JSONCONS_ASSERT(!state_stack_.empty());
+            if (state_stack_.back().mode == parse_mode::root)
+            {
+                state_stack_.pop_back();
+                handler.flush();
+            }
+        }
+    }
+private:
+/*
+    void parse(json_content_handler& handler, std::error_code& ec)
+    {
         if (source_.is_error())
         {
             ec = ubjson_errc::source_error;
@@ -99,7 +265,7 @@ public:
         }
         read_value(handler, type, ec);
     }
-
+*/
     void read_type_and_value(json_content_handler& handler, std::error_code& ec)
     {
         if (source_.is_error())
@@ -304,146 +470,12 @@ public:
             }
             case jsoncons::ubjson::detail::ubjson_format::start_array_marker: 
             {
-                if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::type_marker)
-                {
-                    source_.ignore(1);
-                    uint8_t item_type{};
-                    if (source_.get(item_type) == 0)
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::count_marker)
-                    {
-                        source_.ignore(1);
-                        size_t length = get_length(ec);
-                        continue_ = handler.begin_array(length, semantic_tag::none, *this);
-                        for (size_t i = 0; i < length; ++i)
-                        {
-                            read_value(handler, item_type, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                        }
-                        continue_ = handler.end_array(*this);
-                    }
-                    else
-                    {
-                        ec = ubjson_errc::count_required_after_type;
-                        return;
-                    }
-                }
-                else if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::count_marker)
-                {
-                    source_.ignore(1);
-                    size_t length = get_length(ec);
-                    continue_ = handler.begin_array(length, semantic_tag::none, *this);
-                    for (size_t i = 0; i < length; ++i)
-                    {
-                        read_type_and_value(handler, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                    }
-                    continue_ = handler.end_array(*this);
-                }
-                else
-                {
-                    continue_ = handler.begin_array(semantic_tag::none, *this);
-                    while (source_.peek() != jsoncons::ubjson::detail::ubjson_format::end_array_marker)
-                    {
-                        read_type_and_value(handler, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                    }
-                    continue_ = handler.end_array(*this);
-                    source_.ignore(1);
-                }
+                begin_array(handler,ec);
                 break;
             }
             case jsoncons::ubjson::detail::ubjson_format::start_object_marker: 
             {
-                if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::type_marker)
-                {
-                    source_.ignore(1);
-                    uint8_t item_type{};
-                    if (source_.get(item_type) == 0)
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::count_marker)
-                    {
-                        source_.ignore(1);
-                        size_t length = get_length(ec);
-                        continue_ = handler.begin_object(length, semantic_tag::none, *this);
-                        for (size_t i = 0; i < length; ++i)
-                        {
-                            read_name(handler, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            read_value(handler, item_type, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                        }
-                        continue_ = handler.end_object(*this);
-                    }
-                    else
-                    {
-                        ec = ubjson_errc::count_required_after_type;
-                        return;
-                    }
-                }
-                else
-                {
-                    if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::count_marker)
-                    {
-                        source_.ignore(1);
-                        size_t length = get_length(ec);
-                        continue_ = handler.begin_object(length, semantic_tag::none, *this);
-                        for (size_t i = 0; i < length; ++i)
-                        {
-                            read_name(handler, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            read_type_and_value(handler, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                        }
-                        continue_ = handler.end_object(*this);
-                    }
-                    else
-                    {
-                        continue_ = handler.begin_object(semantic_tag::none, *this);
-                        while (source_.peek() != jsoncons::ubjson::detail::ubjson_format::end_object_marker)
-                        {
-                            read_name(handler, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            read_type_and_value(handler, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                        }
-                        continue_ = handler.end_object(*this);
-                        source_.ignore(1);
-                    }
-                }
+                begin_map(handler, ec);
                 break;
             }
             default:
@@ -469,7 +501,7 @@ public:
             {
                 source_.ignore(1);
                 size_t length = get_length(ec);
-                state_stack_.push_back(parse_state(parse_mode::strongly_typed_array,length));
+                state_stack_.emplace_back(parse_mode::strongly_typed_array,length,item_type);
                 continue_ = handler.begin_array(length, semantic_tag::none, *this);
             }
             else
@@ -523,7 +555,7 @@ public:
             {
                 source_.ignore(1);
                 size_t length = get_length(ec);
-                state_stack_.push_back(parse_state(parse_mode::strongly_typed_map,length));
+                state_stack_.push_back(parse_state(parse_mode::strongly_typed_map,length,item_type));
                 continue_ = handler.begin_object(length, semantic_tag::none, *this);
             }
             else
