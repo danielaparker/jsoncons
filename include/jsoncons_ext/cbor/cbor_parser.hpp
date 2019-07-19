@@ -495,7 +495,7 @@ private:
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length:
             {
-                state_stack_.push_back(parse_state(parse_mode::indefinite_array,0,stringref_map));
+                state_stack_.emplace_back(parse_mode::indefinite_array,0,stringref_map);
                 continue_ = handler.begin_array(tag, *this);
                 source_.ignore(1);
                 break;
@@ -507,7 +507,7 @@ private:
                 {
                     return;
                 }
-                state_stack_.push_back(parse_state(parse_mode::array,len,stringref_map));
+                state_stack_.emplace_back(parse_mode::array,len,stringref_map);
                 continue_ = handler.begin_array(len, tag, *this);
                 break;
             }
@@ -549,7 +549,7 @@ private:
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length: 
             {
-                state_stack_.push_back(parse_state(parse_mode::indefinite_map,0,stringref_map));
+                state_stack_.emplace_back(parse_mode::indefinite_map,0,stringref_map);
                 continue_ = handler.begin_object(semantic_tag::none, *this);
                 source_.ignore(1);
                 break;
@@ -561,7 +561,7 @@ private:
                 {
                     return;
                 }
-                state_stack_.push_back(parse_state(parse_mode::map,len,stringref_map));
+                state_stack_.emplace_back(parse_mode::map,len,stringref_map);
                 continue_ = handler.begin_object(len, semantic_tag::none, *this);
                 break;
             }

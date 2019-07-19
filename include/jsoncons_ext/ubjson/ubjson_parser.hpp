@@ -514,12 +514,12 @@ private:
         {
             source_.ignore(1);
             size_t length = get_length(ec);
-            state_stack_.push_back(parse_state(parse_mode::array,length));
+            state_stack_.emplace_back(parse_mode::array,length);
             continue_ = handler.begin_array(length, semantic_tag::none, *this);
         }
         else
         {
-            state_stack_.push_back(parse_state(parse_mode::indefinite_array,0));
+            state_stack_.emplace_back(parse_mode::indefinite_array,0);
             continue_ = handler.begin_array(semantic_tag::none, *this);
         }
     }
@@ -555,7 +555,7 @@ private:
             {
                 source_.ignore(1);
                 size_t length = get_length(ec);
-                state_stack_.push_back(parse_state(parse_mode::strongly_typed_map,length,item_type));
+                state_stack_.emplace_back(parse_mode::strongly_typed_map,length,item_type);
                 continue_ = handler.begin_object(length, semantic_tag::none, *this);
             }
             else
@@ -570,12 +570,12 @@ private:
             {
                 source_.ignore(1);
                 size_t length = get_length(ec);
-                state_stack_.push_back(parse_state(parse_mode::map,length));
+                state_stack_.emplace_back(parse_mode::map,length);
                 continue_ = handler.begin_object(length, semantic_tag::none, *this);
             }
             else
             {
-                state_stack_.push_back(parse_state(parse_mode::indefinite_map,0));
+                state_stack_.emplace_back(parse_mode::indefinite_map,0);
                 continue_ = handler.begin_object(semantic_tag::none, *this);
             }
         }
