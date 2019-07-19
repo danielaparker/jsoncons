@@ -847,12 +847,12 @@ typedef basic_json_encode_options<char> json_encode_options;
 typedef basic_json_encode_options<wchar_t> wjson_encode_options;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_json_options<char> output_format;
-typedef basic_json_options<wchar_t> woutput_format;
-typedef basic_json_options<char> serialization_options;
-typedef basic_json_options<wchar_t> wserialization_options;
-typedef basic_json_options<char> json_serializing_options;
-typedef basic_json_options<wchar_t> wjson_serializing_options;
+JSONCONS_DEPRECATED("json_options") typedef json_options output_format;
+JSONCONS_DEPRECATED("wjson_options") typedef wjson_options woutput_format;
+JSONCONS_DEPRECATED("json_options") typedef json_options serialization_options;
+JSONCONS_DEPRECATED("wjson_options") typedef wjson_options wserialization_options;
+JSONCONS_DEPRECATED("json_options") typedef json_options json_serializing_options;
+JSONCONS_DEPRECATED("wjson_options") typedef wjson_options wjson_serializing_options;
 #endif
 
 }

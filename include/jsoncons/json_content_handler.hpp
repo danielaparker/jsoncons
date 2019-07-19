@@ -107,7 +107,7 @@ std::ostream& operator<<(std::ostream& os, semantic_tag tag)
 }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    typedef semantic_tag semantic_tag_type;
+    JSONCONS_DEPRECATED("Instead, use semantic_tag") typedef semantic_tag semantic_tag_type;
 #endif
 
 template <class CharT>
@@ -196,7 +196,44 @@ public:
     {
         return do_byte_string_value(byte_string(p, size), tag, context);
     }
+
+    bool int64_value(int64_t value, 
+                     semantic_tag tag = semantic_tag::none, 
+                     const ser_context& context=null_ser_context())
+    {
+        return do_int64_value(value, tag, context);
+    }
+
+    bool uint64_value(uint64_t value, 
+                      semantic_tag tag = semantic_tag::none, 
+                      const ser_context& context=null_ser_context())
+    {
+        return do_uint64_value(value, tag, context);
+    }
+
+    bool double_value(double value, 
+                      semantic_tag tag = semantic_tag::none, 
+                      const ser_context& context=null_ser_context())
+    {
+        return do_double_value(value, tag, context);
+    }
+
+    bool bool_value(bool value, 
+                    semantic_tag tag = semantic_tag::none,
+                    const ser_context& context=null_ser_context()) 
+    {
+        return do_bool_value(value, tag, context);
+    }
+
+    bool null_value(semantic_tag tag = semantic_tag::none,
+                    const ser_context& context=null_ser_context()) 
+    {
+        return do_null_value(tag, context);
+    }
+
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+    JSONCONS_DEPRECATED("Instead, use const byte_string_view&, semantic_tag=semantic_tag::none, const ser_context&=null_ser_context()") 
     bool byte_string_value(const byte_string_view& b, 
                            byte_string_chars_format encoding_hint, 
                            semantic_tag tag=semantic_tag::none, 
@@ -219,6 +256,7 @@ public:
         return do_byte_string_value(b, tag, context);
     }
 
+    JSONCONS_DEPRECATED("Instead, use const byte_string_view&, semantic_tag=semantic_tag::none, const ser_context&=null_ser_context()") 
     bool byte_string_value(const uint8_t* p, size_t size, 
                            byte_string_chars_format encoding_hint, 
                            semantic_tag tag=semantic_tag::none, 
@@ -259,59 +297,26 @@ public:
     {
         return do_int64_value(val, semantic_tag::timestamp, context);
     }
-#endif
 
-    bool int64_value(int64_t value, 
-                     semantic_tag tag = semantic_tag::none, 
-                     const ser_context& context=null_ser_context())
-    {
-        return do_int64_value(value, tag, context);
-    }
-
-    bool uint64_value(uint64_t value, 
-                      semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context())
-    {
-        return do_uint64_value(value, tag, context);
-    }
-
-    bool double_value(double value, 
-                      semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context())
-    {
-        return do_double_value(value, tag, context);
-    }
-
-    bool bool_value(bool value, 
-                    semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context()) 
-    {
-        return do_bool_value(value, tag, context);
-    }
-
-    bool null_value(semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context()) 
-    {
-        return do_null_value(tag, context);
-    }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-
+    JSONCONS_DEPRECATED("Not needed") 
     bool begin_document()
     {
         return true;
     }
 
+    JSONCONS_DEPRECATED("Instead, use flush() when serializing") 
     bool end_document()
     {
         flush();
         return true;
     }
 
+    JSONCONS_DEPRECATED("Not needed") 
     void begin_json()
     {
     }
 
+    JSONCONS_DEPRECATED("Instead, use flush() when serializing") 
     void end_json()
     {
         end_document();

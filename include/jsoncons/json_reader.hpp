@@ -507,9 +507,10 @@ private:
 
 typedef basic_json_reader<char> json_reader;
 typedef basic_json_reader<wchar_t> wjson_reader;
+
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_json_reader<char,jsoncons::string_source<char>> json_string_reader;
-typedef basic_json_reader<wchar_t, jsoncons::string_source<wchar_t>> wjson_string_reader;
+JSONCONS_DEPRECATED("Instead, use json_reader") typedef json_reader json_string_reader;
+JSONCONS_DEPRECATED("Instead, use wjson_reader") typedef wjson_reader wjson_string_reader;
 #endif
 
 }
