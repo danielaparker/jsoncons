@@ -1,10 +1,12 @@
-### ubjson extension
+## ubjson extension
 
 The ubjson extension implements encode to and decode from the [Universal Binary JSON Specification](http://ubjson.org/) data format.
 You can either parse into or serialize from a variant-like structure, [basic_json](../basic_json.md), or your own
 data structures, using [json_type_traits](../json_type_traits.md).
 
 [decode_ubjson](decode_ubjson.md)
+
+[basic_ubjson_cursor](ubjson_cursor.md)
 
 [encode_ubjson](encode_ubjson.md)
 
@@ -26,9 +28,219 @@ byte_string   |                  | array of uint8_t
 array         |                  | array 
 object        |                  | object
 
-### Examples
+## Examples
 
-#### encode/decode UBJSON from/to basic_json
+### Working with UBJSON data
+
+For the examples below you need to include some header files and construct a buffer of UBJSON data:
+
+```c++
+#include <iomanip>
+#include <iostream>
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/ubjson/ubjson.hpp>
+#include <jsoncons_ext/jsonpath/json_query.hpp>
+
+using namespace jsoncons; // for convenience
+
+const std::vector<uint8_t> data =
+{0x5b,0x23,0x55,0x05, // [ # i 5
+0x44, // float64
+    0x40,0x3d,0xf8,0x51,0xeb,0x85,0x1e,0xb8, // 29.97
+0x44, // float64
+    0x40,0x3f,0x21,0x47,0xae,0x14,0x7a,0xe1, // 31.13
+0x64, // float32
+    0x42,0x86,0x00,0x00, // 67.0
+0x44, // float64
+    0x40,0x00,0xe7,0x6c,0x8b,0x43,0x95,0x81, // 2.113
+0x44, // float64
+    0x40,0x37,0xe3,0x8e,0xf3,0x4d,0x6a,0x16 // 23.8889
+};
+```
+
+jsoncons allows you to work with the UBJSON data similarly to JSON data:
+
+- As a variant-like structure, [basic_json](doc/ref/basic_json.md) 
+
+- As a strongly typed C++ data structure
+
+- As a stream of parse events
+
+#### As a variant-like structure
+
+```c++
+int main()
+{
+    std::cout << std::dec;
+    std::cout << std::setprecision(15);
+
+    // Parse the UBJSON data into a json value
+    json j = ubjson::decode_ubjson<json>(data);
+
+    // Pretty print
+    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+
+    // Iterate over rows
+    std::cout << "(2)\n";
+    for (const auto& item : j.array_range())
+    {
+        std::cout << item.as<double>() << " (" << item.tag() << ")\n";
+    }
+    std::cout << "\n";
+
+    // Select all values less than 30 with JSONPath
+    std::cout << "(3)\n";
+    json result = jsonpath::json_query(j,"$[?(@ < 30)]");
+    std::cout << pretty_print(result) << "\n";
+}
+```
+Output:
+```
+(1)
+[
+    29.97,
+    31.13,
+    67.0,
+    2.113,
+    23.8889
+]
+
+(2)
+29.97 (n/a)
+31.13 (n/a)
+67 (n/a)
+2.113 (n/a)
+23.8889 (n/a)
+
+(3)
+[
+    29.97,
+    2.113,
+    23.8889
+]
+```
+
+#### As a strongly typed C++ data structure
+
+```c++
+int main()
+{
+    // Parse the UBJSON data into a std::vector<double> value
+    auto val = ubjson::decode_ubjson<std::vector<double>>(data);
+
+    for (auto item : val)
+    {
+        std::cout << item << "\n";
+    }
+}
+```
+Output:
+```
+29.97
+31.13
+67
+2.113
+23.8889
+```
+
+#### As a stream of parse events
+
+```c++
+int main()
+{
+    ubjson::ubjson_bytes_cursor cursor(data);
+    for (; !cursor.done(); cursor.next())
+    {
+        const auto& event = cursor.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::begin_array:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::end_array:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::begin_object:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::end_object:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::name:
+                // Or std::string_view, if supported
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::string_value:
+                // Or std::string_view, if supported
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::null_value:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::bool_value:
+                std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::int64_value:
+                std::cout << event.event_type() << ": " << event.get<int64_t>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::uint64_value:
+                std::cout << event.event_type() << ": " << event.get<uint64_t>() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::double_value:
+                std::cout << event.event_type() << ": "  << event.get<double>() << " " << "(" << event.tag() << ")\n";
+                break;
+            default:
+                std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+        }
+    }
+}
+```
+Output:
+```
+begin_array (n/a)
+double_value: 29.97 (n/a)
+double_value: 31.13 (n/a)
+double_value: 67 (n/a)
+double_value: 2.113 (n/a)
+double_value: 23.8889 (n/a)
+end_array (n/a)
+```
+
+You can apply a filter to the stream, for example,
+
+```c++
+int main()
+{
+    auto filter = [&](const staj_event& ev, const ser_context&) -> bool
+    {
+        return (ev.event_type() == staj_event_type::double_value) && (ev.get<double>() < 30.0);  
+    };
+
+    ubjson::ubjson_bytes_cursor cursor(data, filter);
+    for (; !cursor.done(); cursor.next())
+    {
+        const auto& event = cursor.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::double_value:
+                std::cout << event.event_type() << ": "  << event.get<double>() << " " << "(" << event.tag() << ")\n";
+                break;
+            default:
+                std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+        }
+    }
+}
+```
+Output:
+```
+double_value: 29.97 (n/a)
+double_value: 2.113 (n/a)
+double_value: 23.8889 (n/a)
+```
+
+### encode/decode UBJSON from/to basic_json
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -105,7 +317,7 @@ Marilyn C, 0.9
 (3) Marilyn C
 ```
 
-#### encode/decode UBJSON from/to your own data structures
+### encode/decode UBJSON from/to your own data structures
 
 ```c++
 #include <cassert>

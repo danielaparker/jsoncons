@@ -98,6 +98,8 @@ byte_string   | base16           | byte string | 23 (Expected conversion to base
 array         |                  | array |&#160;
 object        |                  | map |&#160;
 
+## Examples
+
 ### Working with CBOR data
 
 For the examples below you need to include some header files and construct a buffer of CBOR data:
@@ -282,9 +284,7 @@ end_array (n/a)
 end_array (n/a)
 ```
 
-### More Examples
-
-#### CBOR and basic_json
+### CBOR and basic_json
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -361,7 +361,7 @@ Marilyn C, 0.9
 (3) Marilyn C
 ```
 
-#### Query CBOR with JSONPath
+### Query CBOR with JSONPath
 ```c++
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>

@@ -32,12 +32,21 @@ cbor_bytes_cursor   |basic_cbor_cursor<jsoncons::bytes_source>
     basic_cbor_cursor(Source&& source); // (1)
 
     template <class Source>
-    basic_cbor_cursor(Source&& source, std::error_code& ec); // (2)
+    basic_cbor_cursor(Source&& source,
+                      std::function<bool(const staj_event&, const ser_context&)> filter); // (2)
 
-Constructor (1) reads from a buffer or stream source and throws a 
+    template <class Source>
+    basic_cbor_cursor(Source&& source, std::error_code& ec); // (3)
+
+    template <class Source>
+    basic_cbor_cursor(Source&& source,
+                      std::function<bool(const staj_event&, const ser_context&)> filter, 
+                      std::error_code& ec); // (4)
+
+Constructor3 (1)-(2) read from a buffer or stream source and throw a 
 [ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
 
-Constructor (2) reads from a buffer or stream source and sets `ec`
+Constructor3 (3)-(4) read from a buffer or stream source and set `ec`
 if a parsing error is encountered while processing the initial event.
 
 Note: It is the programmer's responsibility to ensure that `basic_cbor_cursor` does not outlive any source passed in the constuctor, 
@@ -117,11 +126,11 @@ int main()
 {
     std::ifstream is("book_catalog.json");
 
-    cbor_cursor reader(is);
+    cbor_cursor cursor(is);
 
-    for (; !reader.done(); reader.next())
+    for (; !cursor.done(); cursor.next())
     {
-        const auto& event = reader.current();
+        const auto& event = cursor.current();
         switch (event.event_type())
         {
             case staj_event_type::begin_array:
@@ -239,11 +248,11 @@ int main()
     std::ifstream is("book_catalog.json");
 
     author_filter filter;
-    cbor_cursor reader(is, filter);
+    cbor_cursor cursor(is, filter);
 
-    for (; !reader.done(); reader.next())
+    for (; !cursor.done(); cursor.next())
     {
-        const auto& event = reader.current();
+        const auto& event = cursor.current();
         switch (event.event_type())
         {
             case staj_event_type::string_value:

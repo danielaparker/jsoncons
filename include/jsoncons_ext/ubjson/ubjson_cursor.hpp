@@ -80,6 +80,19 @@ public:
         }
     }
 
+    template <class Source>
+    basic_ubjson_cursor(Source&& source,
+                      std::function<bool(const staj_event&, const ser_context&)> filter, 
+                      std::error_code& ec)
+       : parser_(std::forward<Source>(source)), event_handler_(filter),
+         eof_(false)
+    {
+        if (!done())
+        {
+            next(ec);
+        }
+    }
+
     bool done() const override
     {
         return parser_.done();
