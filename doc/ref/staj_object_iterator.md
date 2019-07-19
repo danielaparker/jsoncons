@@ -100,9 +100,9 @@ int main()
 {
     std::istringstream is(object_example);
 
-    json_cursor reader(is);
+    json_cursor cursor(is);
 
-    staj_object_iterator<json> it(reader);
+    staj_object_iterator<json> it(cursor);
 
     for (const auto& kv : it)
     {

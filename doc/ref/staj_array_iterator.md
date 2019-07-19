@@ -100,9 +100,9 @@ int main()
 {
     std::istringstream is(example);
 
-    json_cursor reader(is);
+    json_cursor cursor(is);
 
-    staj_array_iterator<json> it(reader);
+    staj_array_iterator<json> it(cursor);
 
     for (const auto& j : it)
     {
@@ -170,9 +170,9 @@ int main()
 {
     std::istringstream is(example);
 
-    json_cursor reader(is);
+    json_cursor cursor(is);
 
-    staj_array_iterator<employee> it(reader);
+    staj_array_iterator<employee> it(cursor);
 
     for (const auto& val : it)
     {

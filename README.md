@@ -399,10 +399,10 @@ int main()
         }
     };
 
-    json_cursor reader(data, filter);
-    for (; !reader.done(); reader.next())
+    json_cursor cursor(data, filter);
+    for (; !cursor.done(); cursor.next())
     {
-        const auto& event = reader.current();
+        const auto& event = cursor.current();
         switch (event.event_type())
         {
             case staj_event_type::string_value:

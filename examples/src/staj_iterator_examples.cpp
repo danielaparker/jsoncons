@@ -43,9 +43,9 @@ void staj_array_iterator_example()
 {
     std::istringstream is(array_example);
 
-    json_cursor reader(is);
+    json_cursor cursor(is);
 
-    staj_array_iterator<json> it(reader);
+    staj_array_iterator<json> it(cursor);
 
     for (const auto& j : it)
     {
@@ -93,9 +93,9 @@ void staj_array_iterator_example2()
 {
     std::istringstream is(array_example);
 
-    json_cursor reader(is);
+    json_cursor cursor(is);
 
-    staj_array_iterator<employee> it(reader);
+    staj_array_iterator<employee> it(cursor);
 
     for (const auto& val : it)
     {
@@ -109,9 +109,9 @@ void staj_object_iterator_example()
 
     std::istringstream is(object_example);
 
-    json_cursor reader(is);
+    json_cursor cursor(is);
 
-    staj_object_iterator<json> it(reader);
+    staj_object_iterator<json> it(cursor);
 
     for (const auto& kv : it)
     {

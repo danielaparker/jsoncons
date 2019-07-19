@@ -157,11 +157,11 @@ int main()
 {
     std::ifstream is("book_catalog.json");
 
-    json_cursor reader(is);
+    json_cursor cursor(is);
 
-    for (; !reader.done(); reader.next())
+    for (; !cursor.done(); cursor.next())
     {
-        const auto& event = reader.current();
+        const auto& event = cursor.current();
         switch (event.event_type())
         {
             case staj_event_type::begin_array:
@@ -279,11 +279,11 @@ int main()
     std::ifstream is("book_catalog.json");
 
     author_filter filter;
-    json_cursor reader(is, filter);
+    json_cursor cursor(is, filter);
 
-    for (; !reader.done(); reader.next())
+    for (; !cursor.done(); cursor.next())
     {
-        const auto& event = reader.current();
+        const auto& event = cursor.current();
         switch (event.event_type())
         {
             case staj_event_type::string_value:
