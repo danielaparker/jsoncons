@@ -154,7 +154,7 @@ jsoncons allows you to work with the CBOR data similarly to JSON data:
 ```c++
 int main()
 {
-    // Parse the string of data into a json value
+    // Parse the CBOR data into a json value
     json j = cbor::decode_cbor<json>(data);
 
     // Pretty print
@@ -197,7 +197,7 @@ Output:
 ```c++
 int main()
 {
-    // Parse the string of data into a std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>> value
+    // Parse the CBOR data into a std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>> value
     auto val = cbor::decode_cbor<std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>>>(data);
 
     for (const auto& row : val)
