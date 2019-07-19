@@ -191,15 +191,21 @@ public:
                         {
                             return;
                         }
-                        read_item(handler, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
+                        state_stack_.back().mode = parse_mode::map_value;
                     }
                     else
                     {
                         end_map(handler, ec);
+                    }
+                    break;
+                }
+                case parse_mode::map_value:
+                {
+                    state_stack_.back().mode = parse_mode::map_key;
+                    read_item(handler, ec);
+                    if (ec)
+                    {
+                        return;
                     }
                     break;
                 }
@@ -1226,7 +1232,6 @@ private:
                 jsoncons::detail::prettify_string(s.c_str(), s.size(), (int)exponent, -4, 17, result);
             }
         }
-        //std::cout << "s: " << s << ", exponent: " << std::dec << exponent << ", result: " << result << "\n";
         return result;
     }
 
