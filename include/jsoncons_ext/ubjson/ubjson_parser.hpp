@@ -43,7 +43,7 @@ class basic_ubjson_parser : public ser_context
     Src source_;
     size_t nesting_depth_;
     bool continue_;
-    std::string buffer_;
+    std::string text_buffer_;
     std::vector<parse_state> state_stack_;
 public:
     template <class Source>
@@ -428,20 +428,20 @@ private:
                 {
                     return;
                 }
-                std::string s;
-                source_.read(std::back_inserter(s), length);
+                text_buffer_.clear();
+                source_.read(std::back_inserter(text_buffer_), length);
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
                     return;
                 }
-                auto result = unicons::validate(s.begin(),s.end());
+                auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
                 if (result.ec != unicons::conv_errc())
                 {
                     ec = ubjson_errc::invalid_utf8_text_string;
                     return;
                 }
-                continue_ = handler.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this);
+                continue_ = handler.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this);
                 break;
             }
             case jsoncons::ubjson::detail::ubjson_format::high_precision_number_type: 
@@ -451,20 +451,20 @@ private:
                 {
                     return;
                 }
-                std::string s;
-                source_.read(std::back_inserter(s), length);
+                text_buffer_.clear();
+                source_.read(std::back_inserter(text_buffer_), length);
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
                     return;
                 }
-                if (jsoncons::detail::is_integer(s.data(),s.length()))
+                if (jsoncons::detail::is_integer(text_buffer_.data(),text_buffer_.length()))
                 {
-                    continue_ = handler.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::bigint, *this);
+                    continue_ = handler.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::bigint, *this);
                 }
                 else
                 {
-                    continue_ = handler.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::bigdec, *this);
+                    continue_ = handler.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::bigdec, *this);
                 }
                 break;
             }
@@ -733,20 +733,20 @@ private:
         {
             return;
         }
-        std::string s;
-        source_.read(std::back_inserter(s), length);
+        text_buffer_.clear();
+        source_.read(std::back_inserter(text_buffer_), length);
         if (source_.eof())
         {
             ec = ubjson_errc::unexpected_eof;
             return;
         }
-        auto result = unicons::validate(s.begin(),s.end());
+        auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
         if (result.ec != unicons::conv_errc())
         {
             ec = ubjson_errc::invalid_utf8_text_string;
             return;
         }
-        continue_ = handler.name(basic_string_view<char>(s.data(),s.length()), *this);
+        continue_ = handler.name(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
     }
 };
 
