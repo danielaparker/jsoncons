@@ -1,3 +1,10 @@
+master
+------
+
+Bug fix:
+
+- Fixed issue with `cbor_cursor` not reporting name events and terminal event
+
 version 0.129.1
 ---------------
 

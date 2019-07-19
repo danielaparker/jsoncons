@@ -511,11 +511,11 @@ int main()
 
         json_accessor_examples();
 
-        run_cbor_examples();
-
         readme_examples();
 
         ubjson_examples();
+
+        run_cbor_examples();
     }
     catch (const std::exception& e)
     {

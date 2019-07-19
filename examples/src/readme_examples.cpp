@@ -344,11 +344,11 @@ void readme_examples()
 {
     std::cout << "\nReadme examples\n\n";
 
-    readme::as_a_stream_of_json_events();
-    readme::as_a_filtered_stream_of_json_events();
     readme::playing_around();
     readme::as_a_strongly_typed_cpp_structure();
     readme::as_a_variant_like_structure();
+    readme::as_a_filtered_stream_of_json_events();
+    readme::as_a_stream_of_json_events();
     std::cout << std::endl;
 }
 

@@ -514,11 +514,11 @@ void run_cbor_examples()
     cbor_examples::decode_cbor_byte_string();
     cbor_examples::decode_byte_string_with_encoding_hint();
 
+    cbor_examples::working_with_cbor1();
+    std::cout << "\n";
     cbor_examples::working_with_cbor2();
     std::cout << "\n";
     cbor_examples::working_with_cbor3();
-    std::cout << "\n";
-    cbor_examples::working_with_cbor1();
     std::cout << std::endl;
 }
 
