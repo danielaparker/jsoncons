@@ -234,12 +234,18 @@ public:
                             {
                                 return;
                             }
-                            read_item(handler, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
+                            state_stack_.back().mode = parse_mode::map_value;
                             break;
+                    }
+                    break;
+                }
+                case parse_mode::indefinite_map_value:
+                {
+                    state_stack_.back().mode = parse_mode::indefinite_map_key;
+                    read_item(handler, ec);
+                    if (ec)
+                    {
+                        return;
                     }
                     break;
                 }
