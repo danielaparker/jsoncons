@@ -496,6 +496,30 @@ void working_with_cbor3()
     }
 }
 
+void working_with_cbor4()
+{
+    auto filter = [&](const staj_event& ev, const ser_context&) -> bool
+    {
+        return (ev.tag() == semantic_tag::bigdec) || (ev.tag() == semantic_tag::bigfloat);  
+    };
+
+    cbor::cbor_bytes_cursor cursor(data, filter);
+    for (; !cursor.done(); cursor.next())
+    {
+        const auto& event = cursor.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::string_value:
+                // Or std::string_view, if supported
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
+                break;
+            default:
+                std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+        }
+    }
+}
+
 }; // cbor_examples
 
 void run_cbor_examples()
@@ -519,6 +543,8 @@ void run_cbor_examples()
     cbor_examples::working_with_cbor2();
     std::cout << "\n";
     cbor_examples::working_with_cbor3();
+    std::cout << "\n";
+    cbor_examples::working_with_cbor4();
     std::cout << std::endl;
 }
 

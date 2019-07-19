@@ -284,6 +284,39 @@ end_array (n/a)
 end_array (n/a)
 ```
 
+You can apply a filter to the stream, for example,
+
+```c++
+int main()
+{
+    auto filter = [&](const staj_event& ev, const ser_context&) -> bool
+    {
+        return (ev.tag() == semantic_tag::bigdec) || (ev.tag() == semantic_tag::bigfloat);  
+    };
+
+    cbor::cbor_bytes_cursor cursor(data, filter);
+    for (; !cursor.done(); cursor.next())
+    {
+        const auto& event = cursor.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::string_value:
+                // Or std::string_view, if supported
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
+                break;
+            default:
+                std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+        }
+    }
+}
+```
+Output:
+```
+string_value: 0x3p-1 (bigfloat)
+string_value: 1.23456789012345678901234567890 (bigdec)
+```
+
 ### CBOR and basic_json
 
 ```c++
