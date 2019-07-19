@@ -29,7 +29,7 @@ struct parse_state
     size_t index;
 
     parse_state(parse_mode mode, size_t length, uint8_t type = 0)
-        : mode(mode), length(length), index(0), type(type)
+        : mode(mode), length(length), type(type), index(0)
     {
     }
 
