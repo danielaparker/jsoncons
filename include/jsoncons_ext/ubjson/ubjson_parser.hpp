@@ -19,7 +19,7 @@
 
 namespace jsoncons { namespace ubjson {
 
-enum class parse_mode {root,before_done,array,indefinite_array,strongly_typed_array,map,strongly_typed_map,indefinite_map};
+enum class parse_mode {root,before_done,array,indefinite_array,strongly_typed_array,map_key,map_value,strongly_typed_map_key,strongly_typed_map_value,indefinite_map_key,indefinite_map_value};
 
 struct parse_state 
 {
@@ -139,6 +139,7 @@ public:
                             continue_ = false;
                             return;
                         case jsoncons::ubjson::detail::ubjson_format::end_array_marker:
+                            source_.ignore(1);
                             end_array(handler, ec);
                             if (ec)
                             {
@@ -155,7 +156,7 @@ public:
                     }
                     break;
                 }
-                case parse_mode::map:
+                case parse_mode::map_key:
                 {
                     if (state_stack_.back().index < state_stack_.back().length)
                     {
@@ -165,11 +166,7 @@ public:
                         {
                             return;
                         }
-                        read_type_and_value(handler, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
+                        state_stack_.back().mode = parse_mode::map_value;
                     }
                     else
                     {
@@ -177,7 +174,17 @@ public:
                     }
                     break;
                 }
-                case parse_mode::strongly_typed_map:
+                case parse_mode::map_value:
+                {
+                    state_stack_.back().mode = parse_mode::map_key;
+                    read_type_and_value(handler, ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                    break;
+                }
+                case parse_mode::strongly_typed_map_key:
                 {
                     if (state_stack_.back().index < state_stack_.back().length)
                     {
@@ -187,11 +194,7 @@ public:
                         {
                             return;
                         }
-                        read_value(handler, state_stack_.back().type, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
+                        state_stack_.back().mode = parse_mode::strongly_typed_map_value;
                     }
                     else
                     {
@@ -199,7 +202,17 @@ public:
                     }
                     break;
                 }
-                case parse_mode::indefinite_map:
+                case parse_mode::strongly_typed_map_value:
+                {
+                    state_stack_.back().mode = parse_mode::strongly_typed_map_key;
+                    read_value(handler, state_stack_.back().type, ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                    break;
+                }
+                case parse_mode::indefinite_map_key:
                 {
                     int c = source_.peek();
                     switch (c)
@@ -209,6 +222,7 @@ public:
                             continue_ = false;
                             return;
                         case jsoncons::ubjson::detail::ubjson_format::end_array_marker:
+                            source_.ignore(1);
                             end_map(handler, ec);
                             if (ec)
                             {
@@ -221,12 +235,18 @@ public:
                             {
                                 return;
                             }
-                            read_type_and_value(handler, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
+                            state_stack_.back().mode = parse_mode::indefinite_map_value;
                             break;
+                    }
+                    break;
+                }
+                case parse_mode::indefinite_map_value:
+                {
+                    state_stack_.back().mode = parse_mode::indefinite_map_key;
+                    read_type_and_value(handler, ec);
+                    if (ec)
+                    {
+                        return;
                     }
                     break;
                 }
@@ -513,10 +533,6 @@ private:
 
     void end_array(json_content_handler& handler, std::error_code&)
     {
-        if (state_stack_.back().mode == parse_mode::indefinite_array)
-        {
-            source_.ignore(1);
-        }
         continue_ = handler.end_array(*this);
         state_stack_.pop_back();
     }
@@ -536,7 +552,7 @@ private:
             {
                 source_.ignore(1);
                 size_t length = get_length(ec);
-                state_stack_.emplace_back(parse_mode::strongly_typed_map,length,item_type);
+                state_stack_.emplace_back(parse_mode::strongly_typed_map_key,length,item_type);
                 continue_ = handler.begin_object(length, semantic_tag::none, *this);
             }
             else
@@ -551,12 +567,12 @@ private:
             {
                 source_.ignore(1);
                 size_t length = get_length(ec);
-                state_stack_.emplace_back(parse_mode::map,length);
+                state_stack_.emplace_back(parse_mode::map_key,length);
                 continue_ = handler.begin_object(length, semantic_tag::none, *this);
             }
             else
             {
-                state_stack_.emplace_back(parse_mode::indefinite_map,0);
+                state_stack_.emplace_back(parse_mode::indefinite_map_key,0);
                 continue_ = handler.begin_object(semantic_tag::none, *this);
             }
         }
@@ -564,16 +580,6 @@ private:
 
     void end_map(json_content_handler& handler, std::error_code&)
     {
-        switch (state_stack_.back().mode)
-        {
-            case parse_mode::indefinite_map: 
-            {
-                source_.ignore(1);
-                break;
-            }
-            default:
-                break;
-        }
         continue_ = handler.end_object(*this);
         state_stack_.pop_back();
     }
