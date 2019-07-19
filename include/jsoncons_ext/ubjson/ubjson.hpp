@@ -16,6 +16,7 @@
 #include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons_ext/ubjson/ubjson_encoder.hpp>
 #include <jsoncons_ext/ubjson/ubjson_reader.hpp>
+#include <jsoncons_ext/ubjson/ubjson_cursor.hpp>
 
 namespace jsoncons { namespace ubjson {
 

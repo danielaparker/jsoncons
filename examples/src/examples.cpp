@@ -503,8 +503,6 @@ int main()
 
         polymorphic_examples();
 
-        ubjson_examples();
-
         type_extensibility_examples();
 
         json_cursor_examples();
@@ -516,6 +514,8 @@ int main()
         run_cbor_examples();
 
         readme_examples();
+
+        ubjson_examples();
     }
     catch (const std::exception& e)
     {

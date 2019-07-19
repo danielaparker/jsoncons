@@ -19,7 +19,7 @@
 
 namespace jsoncons { namespace ubjson {
 
-enum class parse_mode {root,array,indefinite_array,strongly_typed_array,map,strongly_typed_map,indefinite_map};
+enum class parse_mode {root,before_done,array,indefinite_array,strongly_typed_array,map,strongly_typed_map,indefinite_map};
 
 struct parse_state 
 {
@@ -43,6 +43,7 @@ class basic_ubjson_parser : public ser_context
     Src source_;
     size_t nesting_depth_;
     bool continue_;
+    bool done_;
     std::string text_buffer_;
     std::vector<parse_state> state_stack_;
 public:
@@ -50,7 +51,7 @@ public:
     basic_ubjson_parser(Source&& source)
        : source_(std::forward<Source>(source)), 
          nesting_depth_(0),
-         continue_(true)
+         continue_(true), done_(false)
     {
         state_stack_.emplace_back(parse_mode::root,0);
     }
@@ -65,11 +66,12 @@ public:
         state_stack_.clear();
         state_stack_.emplace_back(parse_mode::root,0);
         continue_ = true;
+        done_ = false;
     }
 
     bool done() const
     {
-        return state_stack_.empty();
+        return done_;
     }
 
     bool stopped() const
@@ -89,7 +91,7 @@ public:
 
     void parse(json_content_handler& handler, std::error_code& ec)
     {
-        while (!state_stack_.empty() && continue_)
+        while (!done_ && continue_)
         {
             switch (state_stack_.back().mode)
             {
@@ -230,42 +232,27 @@ public:
                 }
                 case parse_mode::root:
                 {
+                    state_stack_.back().mode = parse_mode::before_done;
                     read_type_and_value(handler, ec);
                     if (ec)
                     {
                         return;
                     }
+                    break;
                 }
-                break;
-            }
-
-            JSONCONS_ASSERT(!state_stack_.empty());
-            if (state_stack_.back().mode == parse_mode::root)
-            {
-                state_stack_.pop_back();
-                handler.flush();
+                case parse_mode::before_done:
+                {
+                    JSONCONS_ASSERT(state_stack_.size() == 1);
+                    state_stack_.clear();
+                    continue_ = false;
+                    done_ = true;
+                    handler.flush();
+                    break;
+                }
             }
         }
     }
 private:
-/*
-    void parse(json_content_handler& handler, std::error_code& ec)
-    {
-        if (source_.is_error())
-        {
-            ec = ubjson_errc::source_error;
-            return;
-        }   
-
-        uint8_t type{};
-        if (source_.get(type) == 0)
-        {
-            ec = ubjson_errc::unexpected_eof;
-            return;
-        }
-        read_value(handler, type, ec);
-    }
-*/
     void read_type_and_value(json_content_handler& handler, std::error_code& ec)
     {
         if (source_.is_error())
@@ -526,15 +513,9 @@ private:
 
     void end_array(json_content_handler& handler, std::error_code&)
     {
-        switch (state_stack_.back().mode)
+        if (state_stack_.back().mode == parse_mode::indefinite_array)
         {
-            case parse_mode::indefinite_array: 
-            {
-                source_.ignore(1);
-                break;
-            }
-            default:
-                break;
+            source_.ignore(1);
         }
         continue_ = handler.end_array(*this);
         state_stack_.pop_back();
