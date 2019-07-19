@@ -12,6 +12,8 @@
 
 using namespace jsoncons;
 
+namespace ubjson_examples {
+
 void to_from_ubjson_using_basic_json()
 {
     ojson j1 = ojson::parse(R"(
@@ -73,29 +75,58 @@ void to_from_ubjson_using_example_type()
     assert(val2 == val);
 }
 
+const std::vector<uint8_t> data =
+{0x5b,0x23,0x55,0x05, // [ # i 5
+0x44, // float64
+    0x40,0x3d,0xf8,0x51,0xeb,0x85,0x1e,0xb8, // 29.97
+0x44, // float64
+    0x40,0x3f,0x21,0x47,0xae,0x14,0x7a,0xe1, // 31.13
+0x64, // float32
+    0x42,0x86,0x00,0x00, // 67.0
+0x44, // float64
+    0x40,0x00,0xe7,0x6c,0x8b,0x43,0x95,0x81, // 2.113
+0x44, // float64
+    0x40,0x37,0xe3,0x8e,0xf3,0x4d,0x6a,0x16 // 23.8889
+};
+
+void working_with_ubjson_1()
+{
+    std::cout << std::dec;
+    std::cout << std::setprecision(15);
+
+    // Parse the string of data into a json value
+    json j = ubjson::decode_ubjson<json>(data);
+
+    // Pretty print
+    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+
+    // Iterate over rows
+    std::cout << "(2)\n";
+    for (const auto& item : j.array_range())
+    {
+        std::cout << item.as<double>() << " (" << item.tag() << ")\n";
+    }
+    std::cout << "\n";
+
+    // Select all values less than 30 with JSONPath
+    std::cout << "(3)\n";
+    json result = jsonpath::json_query(j,"$[?(@ < 30)]");
+    std::cout << pretty_print(result) << "\n";
+}
+
 void working_with_ubjson_2()
 {
-    /*[[][$][d][#][i][5] // An array of 5 float32 elements.
-    [29.97] // Value type is known, so type markers are omitted.
-    [31.13]
-    [67.0]
-    [2.113]
-    [23.8889]*/
-// No end marker since a count was specified.
+    // Parse the string of data into a std::vector<double> value
+    auto val = ubjson::decode_ubjson<std::vector<double>>(data);
 
-    std::vector<uint8_t> data =
-    {0x5b,0x23,0x55,0x05,
-    0x44,
-        0x40,0x3d,0xf8,0x51,0xeb,0x85,0x1e,0xb8,
-    0x44,
-        0x40,0x3f,0x21,0x47,0xae,0x14,0x7a,0xe1,
-    0x64,
-        0x42,0x86,0x00,0x00,
-    0x44,
-        0x40,0x00,0xe7,0x6c,0x8b,0x43,0x95,0x81,
-    0x44,
-        0x40,0x37,0xe3,0x8e,0xf3,0x4d,0x6a,0x16};
+    for (auto item : val)
+    {
+        std::cout << item << "\n";
+    }
+}
 
+void working_with_ubjson_3()
+{
     ubjson::ubjson_bytes_cursor cursor(data);
     for (; !cursor.done(); cursor.next())
     {
@@ -103,65 +134,88 @@ void working_with_ubjson_2()
         switch (event.event_type())
         {
             case staj_event_type::begin_array:
-                std::cout << "begin_array\n";
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::end_array:
-                std::cout << "end_array\n";
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::begin_object:
-                std::cout << "begin_object\n";
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::end_object:
-                std::cout << "end_object\n";
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::name:
                 // Or std::string_view, if supported
-                std::cout << "name: " << event.get<jsoncons::string_view>() << "\n";
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::string_value:
                 // Or std::string_view, if supported
-                std::cout << "string_value: " << event.get<jsoncons::string_view>() << "\n";
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::null_value:
-                std::cout << "null_value: " << "\n";
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::bool_value:
-                std::cout << "bool_value: " << std::boolalpha << event.get<bool>() << "\n";
+                std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::int64_value:
-                std::cout << "int64_value: " << event.get<int64_t>() << "\n";
+                std::cout << event.event_type() << ": " << event.get<int64_t>() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::uint64_value:
-                std::cout << "uint64_value: " << event.get<uint64_t>() << "\n";
+                std::cout << event.event_type() << ": " << event.get<uint64_t>() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::double_value:
-                std::cout << "double_value: " << event.get<double>() << "\n";
+                std::cout << event.event_type() << ": "  << event.get<double>() << " " << "(" << event.tag() << ")\n";
                 break;
             default:
-                std::cout << "Unhandled event type\n";
+                std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";
                 break;
         }
     }
-
-    /* std::string s = "[29.97,31.13,67.0,2.113,23.8889]";
-    auto j = decode_json<json>(s);
-
-    std::vector<uint8_t> data;
-    ubjson::encode_ubjson(j,data);
-    for (auto c : data)
-    {
-        std::cout << "'0x" << std::hex << std::setprecision(2) << std::setw(2) 
-                  << std::noshowbase << std::setfill('0') << (int)unsigned char(c) << "',";
-    }
-    std::cout << "\n\n"; */
 }
 
-void ubjson_examples()
+void working_with_ubjson_4()
+{
+    auto filter = [&](const staj_event& ev, const ser_context&) -> bool
+    {
+        return (ev.event_type() == staj_event_type::double_value) && (ev.get<double>() < 30.0);  
+    };
+
+    ubjson::ubjson_bytes_cursor cursor(data, filter);
+    for (; !cursor.done(); cursor.next())
+    {
+        const auto& event = cursor.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::double_value:
+                std::cout << event.event_type() << ": "  << event.get<double>() << " " << "(" << event.tag() << ")\n";
+                break;
+            default:
+                std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+        }
+    }
+}
+
+} // ubjson_examples
+
+
+void run_ubjson_examples()
 {
     std::cout << "\nubjson examples\n\n";
-    to_from_ubjson_using_basic_json();
-    to_from_ubjson_using_example_type();
-    working_with_ubjson_2();
+
+    ubjson_examples::to_from_ubjson_using_basic_json();
+    std::cout << "\n";
+    ubjson_examples::to_from_ubjson_using_example_type();
+    std::cout << "\n";
+    ubjson_examples::working_with_ubjson_1();
+    std::cout << "\n";
+    ubjson_examples::working_with_ubjson_2();
+    std::cout << "\n";
+    ubjson_examples::working_with_ubjson_3();
+    std::cout << "\n";
+    ubjson_examples::working_with_ubjson_4();
 
     std::cout << std::endl;
 }
