@@ -234,7 +234,7 @@ public:
                             {
                                 return;
                             }
-                            state_stack_.back().mode = parse_mode::map_value;
+                            state_stack_.back().mode = parse_mode::indefinite_map_value;
                             break;
                     }
                     break;
