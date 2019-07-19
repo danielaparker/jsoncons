@@ -164,6 +164,7 @@ public:
                             continue_ = false;
                             return;
                         case 0xff:
+                            source_.ignore(1);
                             end_array(handler, ec);
                             if (ec)
                             {
@@ -212,6 +213,7 @@ public:
                             continue_ = false;
                             return;
                         case 0xff:
+                            source_.ignore(1);
                             end_map(handler, ec);
                             if (ec)
                             {
@@ -516,16 +518,6 @@ private:
 
     void end_array(json_content_handler& handler, std::error_code&)
     {
-        switch (state_stack_.back().mode)
-        {
-            case parse_mode::indefinite_array: 
-            {
-                source_.ignore(1);
-                break;
-            }
-            default:
-                break;
-        }
         continue_ = handler.end_array(*this);
         state_stack_.pop_back();
     }
@@ -570,16 +562,6 @@ private:
 
     void end_map(json_content_handler& handler, std::error_code&)
     {
-        switch (state_stack_.back().mode)
-        {
-            case parse_mode::indefinite_map_key: 
-            {
-                source_.ignore(1);
-                break;
-            }
-            default:
-                break;
-        }
         continue_ = handler.end_object(*this);
         state_stack_.pop_back();
     }
