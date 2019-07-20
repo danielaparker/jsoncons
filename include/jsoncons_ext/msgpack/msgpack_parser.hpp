@@ -26,9 +26,10 @@ struct parse_state
 {
     parse_mode mode; 
     size_t length;
+    size_t index;
 
     parse_state(parse_mode mode, size_t length)
-        : mode(mode), length(length)
+        : mode(mode), length(length), index(0)
     {
     }
 
@@ -87,6 +88,81 @@ public:
 
     void parse(json_content_handler& handler, std::error_code& ec)
     {
+        while (!done_ && continue_)
+        {
+            switch (state_stack_.back().mode)
+            {
+                case parse_mode::array:
+                {
+                    if (state_stack_.back().index < state_stack_.back().length)
+                    {
+                        ++state_stack_.back().index;
+                        parse_item(handler, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        end_array(handler, ec);
+                    }
+                    break;
+                }
+                case parse_mode::map_key:
+                {
+                    if (state_stack_.back().index < state_stack_.back().length)
+                    {
+                        ++state_stack_.back().index;
+                        parse_name(handler, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        state_stack_.back().mode = parse_mode::map_value;
+                    }
+                    else
+                    {
+                        end_map(handler, ec);
+                    }
+                    break;
+                }
+                case parse_mode::map_value:
+                {
+                    state_stack_.back().mode = parse_mode::map_key;
+                    parse_item(handler, ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                    break;
+                }
+                case parse_mode::root:
+                {
+                    state_stack_.back().mode = parse_mode::before_done;
+                    parse_item(handler, ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                    break;
+                }
+                case parse_mode::before_done:
+                {
+                    JSONCONS_ASSERT(state_stack_.size() == 1);
+                    state_stack_.clear();
+                    continue_ = false;
+                    done_ = true;
+                    handler.flush();
+                    break;
+                }
+            }
+        }
+    }
+private:
+
+    void parse_item(json_content_handler& handler, std::error_code& ec)
+    {
         if (source_.is_error())
         {
             ec = msgpack_errc::source_error;
@@ -105,38 +181,11 @@ public:
             }
             else if (type <= 0x8f) 
             {
-                // fixmap
-                const size_t len = type & 0x0f;
-                continue_ = handler.begin_object(len, semantic_tag::none, *this);
-                for (size_t i = 0; i < len; ++i)
-                {
-                    parse_name(handler, ec);
-                    if (ec)
-                    {
-                        return;
-                    }
-                    parse(handler, ec);
-                    if (ec)
-                    {
-                        return;
-                    }
-                }
-                continue_ = handler.end_object(*this);
+                begin_map(handler,type,ec); // fixmap
             }
             else if (type <= 0x9f) 
             {
-                // fixarray
-                const size_t len = type & 0x0f;
-                continue_ = handler.begin_array(len, semantic_tag::none, *this);
-                for (size_t i = 0; i < len; ++i)
-                {
-                    parse(handler, ec);
-                    if (ec)
-                    {
-                        return;
-                    }
-                }
-                continue_ = handler.end_array(*this);
+                begin_array(handler,type,ec); // fixarray
             }
             else 
             {
@@ -498,112 +547,16 @@ public:
                 }
 
                 case jsoncons::msgpack::detail::msgpack_format::array16_cd: 
-                {
-                    uint8_t buf[sizeof(int16_t)];
-                    source_.read(buf, sizeof(int16_t));
-                    if (source_.eof())
-                    {
-                        ec = msgpack_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
-
-                    continue_ = handler.begin_array(len, semantic_tag::none, *this);
-                    for (int16_t i = 0; i < len; ++i)
-                    {
-                        parse(handler, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                    }
-                    continue_ = handler.end_array(*this);
-                    break;
-                }
-
                 case jsoncons::msgpack::detail::msgpack_format::array32_cd: 
                 {
-                    uint8_t buf[sizeof(int32_t)];
-                    source_.read(buf, sizeof(int32_t));
-                    if (source_.eof())
-                    {
-                        ec = msgpack_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
-
-                    continue_ = handler.begin_array(len, semantic_tag::none, *this);
-                    for (int32_t i = 0; i < len; ++i)
-                    {
-                        parse(handler, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                    }
-                    continue_ = handler.end_array(*this);
+                    begin_array(handler,type,ec);
                     break;
                 }
 
                 case jsoncons::msgpack::detail::msgpack_format::map16_cd : 
-                {
-                    uint8_t buf[sizeof(int16_t)];
-                    source_.read(buf, sizeof(int16_t));
-                    if (source_.eof())
-                    {
-                        ec = msgpack_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
-
-                    continue_ = handler.begin_object(len, semantic_tag::none, *this);
-                    for (int16_t i = 0; i < len; ++i)
-                    {
-                        parse_name(handler, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                        parse(handler, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                    }
-                    continue_ = handler.end_object(*this);
-                    break;
-                }
-
                 case jsoncons::msgpack::detail::msgpack_format::map32_cd : 
                 {
-                    uint8_t buf[sizeof(int32_t)];
-                    source_.read(buf, sizeof(int32_t));
-                    if (source_.eof())
-                    {
-                        ec = msgpack_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
-
-                    continue_ = handler.begin_object(len, semantic_tag::none, *this);
-                    for (int32_t i = 0; i < len; ++i)
-                    {
-                        parse_name(handler, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                        parse(handler, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                    }
-                    continue_ = handler.end_object(*this);
+                    begin_map(handler, type, ec);
                     break;
                 }
 
