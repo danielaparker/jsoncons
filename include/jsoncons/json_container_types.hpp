@@ -131,6 +131,7 @@ public:
         value_.shrink_to_fit();
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED("Instead, use key()")
     const key_type& name() const
     {
         return key_;
@@ -345,6 +346,7 @@ public:
     void resize(size_t n, const Json& val) {elements_.resize(n,val);}
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED("Instead, use erase(const_iterator, const_iterator)")
     void remove_range(size_t from_index, size_t to_index) 
     {
         JSONCONS_ASSERT(from_index <= to_index);

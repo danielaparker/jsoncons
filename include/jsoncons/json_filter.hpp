@@ -375,8 +375,8 @@ typedef basic_rename_object_member_filter<char> rename_object_member_filter;
 typedef basic_rename_object_member_filter<wchar_t> wrename_object_member_filter;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_rename_object_member_filter<char> rename_name_filter;
-typedef basic_rename_object_member_filter<wchar_t> wrename_name_filter;
+JSONCONS_DEPRECATED("Instead, use rename_object_member_filter") typedef basic_rename_object_member_filter<char> rename_name_filter;
+JSONCONS_DEPRECATED("Instead, use wrename_object_member_filter") typedef basic_rename_object_member_filter<wchar_t> wrename_name_filter;
 #endif
 
 }

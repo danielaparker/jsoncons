@@ -298,7 +298,7 @@ public:
         return do_int64_value(val, semantic_tag::timestamp, context);
     }
 
-    JSONCONS_DEPRECATED("Not needed") 
+    JSONCONS_DEPRECATED("Remove calls to this method, it doesn't do anything") 
     bool begin_document()
     {
         return true;
@@ -311,7 +311,7 @@ public:
         return true;
     }
 
-    JSONCONS_DEPRECATED("Not needed") 
+    JSONCONS_DEPRECATED("Remove calls to this method, it doesn't do anything") 
     void begin_json()
     {
     }
@@ -322,41 +322,49 @@ public:
         end_document();
     }
 
+    JSONCONS_DEPRECATED("Instead, use name(const string_view_type&, const ser_context&=null_ser_context())") 
     void name(const CharT* p, size_t length, const ser_context& context) 
     {
         name(string_view_type(p, length), context);
     }
 
+    JSONCONS_DEPRECATED("Instead, use uint64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
     void integer_value(int64_t value)
     {
         int64_value(value);
     }
 
+    JSONCONS_DEPRECATED("Instead, use int64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
     void integer_value(int64_t value, const ser_context& context)
     {
         int64_value(value,context);
     }
 
+    JSONCONS_DEPRECATED("Instead, use uint64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
     void uinteger_value(uint64_t value)
     {
         uint64_value(value);
     }
 
+    JSONCONS_DEPRECATED("Instead, use uint64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
     void uinteger_value(uint64_t value, const ser_context& context)
     {
         uint64_value(value,context);
     }
 
+    JSONCONS_DEPRECATED("Instead, use string_value(const string_view_type&, semantic_tag, const ser_context& context=null_ser_context())") 
     bool bignum_value(const string_view_type& s, const ser_context& context=null_ser_context()) 
     {
         return do_string_value(s, semantic_tag::bigint, context);
     }
 
+    JSONCONS_DEPRECATED("Instead, use string_value(const string_view_type&, semantic_tag, const ser_context& context=null_ser_context())") 
     bool decimal_value(const string_view_type& s, const ser_context& context=null_ser_context()) 
     {
         return do_string_value(s, semantic_tag::bigdec, context);
     }
 
+    JSONCONS_DEPRECATED("Instead, use int64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
     bool epoch_time_value(int64_t val, const ser_context& context=null_ser_context()) 
     {
         return do_int64_value(val, semantic_tag::timestamp, context);
