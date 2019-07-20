@@ -7,6 +7,8 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 [decode_msgpack](decode_msgpack.md)
 
+[basic_msgpack_cursor](msgpack_cursor.md)
+
 [encode_msgpack](encode_msgpack.md)
 
 [basic_msgpack_encoder](basic_msgpack_encoder.md)
