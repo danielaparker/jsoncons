@@ -13,7 +13,7 @@
 #include <utility> // std::move
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/json_content_continue_ = handler.hpp>
+#include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons_ext/msgpack/msgpack_detail.hpp>
 #include <jsoncons_ext/msgpack/msgpack_error.hpp>
