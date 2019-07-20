@@ -20,19 +20,35 @@
 
 namespace jsoncons { namespace msgpack {
 
+enum class parse_mode {root,before_done,array,map_key,map_value};
+
+struct parse_state 
+{
+    parse_mode mode; 
+    size_t length;
+
+    parse_state(parse_mode mode, size_t length)
+        : mode(mode), length(length)
+    {
+    }
+
+    parse_state(const parse_state&) = default;
+    parse_state(parse_state&&) = default;
+};
+
 template <class Src>
 class basic_msgpack_parser : public ser_context
 {
     Src source_;
-    size_t nesting_depth_;
+    std::vector<parse_state> state_stack_;
     bool continue_;
+    bool done_;
     std::string buffer_;
 public:
     template <class Source>
     basic_msgpack_parser(Source&& source)
        : source_(std::forward<Source>(source)),
-         nesting_depth_(0),
-         continue_(true)
+         continue_(true), done_(false)
     {
     }
 
@@ -43,12 +59,15 @@ public:
 
     void reset()
     {
+        state_stack_.clear();
+        state_stack_.emplace_back(parse_mode::root,0);
         continue_ = true;
+        done_ = false;
     }
 
     bool done() const
     {
-        return false;
+        return done_;
     }
 
     bool stopped() const
@@ -89,7 +108,6 @@ public:
                 // fixmap
                 const size_t len = type & 0x0f;
                 handler.begin_object(len, semantic_tag::none, *this);
-                ++nesting_depth_;
                 for (size_t i = 0; i < len; ++i)
                 {
                     parse_name(handler, ec);
@@ -104,14 +122,12 @@ public:
                     }
                 }
                 handler.end_object(*this);
-                --nesting_depth_;
             }
             else if (type <= 0x9f) 
             {
                 // fixarray
                 const size_t len = type & 0x0f;
                 handler.begin_array(len, semantic_tag::none, *this);
-                ++nesting_depth_;
                 for (size_t i = 0; i < len; ++i)
                 {
                     parse(handler, ec);
@@ -121,7 +137,6 @@ public:
                     }
                 }
                 handler.end_array(*this);
-                --nesting_depth_;
             }
             else 
             {
@@ -154,22 +169,22 @@ public:
         {
             switch (type)
             {
-                case jsoncons::msgpack::detail::msgpack_format ::nil_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::nil_cd: 
                 {
                     handler.null_value(semantic_tag::none, *this);
                     break;
                 }
-                case jsoncons::msgpack::detail::msgpack_format ::true_cd:
+                case jsoncons::msgpack::detail::msgpack_format::true_cd:
                 {
                     handler.bool_value(true, semantic_tag::none, *this);
                     break;
                 }
-                case jsoncons::msgpack::detail::msgpack_format ::false_cd:
+                case jsoncons::msgpack::detail::msgpack_format::false_cd:
                 {
                     handler.bool_value(false, semantic_tag::none, *this);
                     break;
                 }
-                case jsoncons::msgpack::detail::msgpack_format ::float32_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::float32_cd: 
                 {
                     uint8_t buf[sizeof(float)];
                     source_.read(buf, sizeof(float));
@@ -184,7 +199,7 @@ public:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::float64_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::float64_cd: 
                 {
                     uint8_t buf[sizeof(double)];
                     source_.read(buf, sizeof(double));
@@ -199,7 +214,7 @@ public:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::uint8_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::uint8_cd: 
                 {
                     uint8_t val{};
                     source_.get(val);
@@ -207,7 +222,7 @@ public:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::uint16_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::uint16_cd: 
                 {
                     uint8_t buf[sizeof(uint16_t)];
                     source_.read(buf, sizeof(uint16_t));
@@ -222,7 +237,7 @@ public:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::uint32_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::uint32_cd: 
                 {
                     uint8_t buf[sizeof(uint32_t)];
                     source_.read(buf, sizeof(uint32_t));
@@ -237,7 +252,7 @@ public:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::uint64_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::uint64_cd: 
                 {
                     uint8_t buf[sizeof(uint64_t)];
                     source_.read(buf, sizeof(uint64_t));
@@ -252,7 +267,7 @@ public:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::int8_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::int8_cd: 
                 {
                     uint8_t buf[sizeof(int8_t)];
                     source_.read(buf, sizeof(int8_t));
@@ -267,7 +282,7 @@ public:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::int16_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::int16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(buf, sizeof(int16_t));
@@ -282,7 +297,7 @@ public:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::int32_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::int32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(buf, sizeof(int32_t));
@@ -297,7 +312,7 @@ public:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::int64_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::int64_cd: 
                 {
                     uint8_t buf[sizeof(int64_t)];
                     source_.read(buf, sizeof(int64_t));
@@ -312,7 +327,7 @@ public:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::str8_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::str8_cd: 
                 {
                     uint8_t buf[sizeof(int8_t)];
                     source_.read(buf, sizeof(int8_t));
@@ -341,7 +356,7 @@ public:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::str16_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::str16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(buf, sizeof(int16_t));
@@ -371,7 +386,7 @@ public:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::str32_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::str32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(buf, sizeof(int32_t));
@@ -401,7 +416,7 @@ public:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::bin8_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::bin8_cd: 
                 {
                     uint8_t buf[sizeof(int8_t)];
                     source_.read(buf, sizeof(int8_t));
@@ -428,7 +443,7 @@ public:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::bin16_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::bin16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(buf, sizeof(int16_t));
@@ -455,7 +470,7 @@ public:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::bin32_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::bin32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(buf, sizeof(int32_t));
@@ -482,7 +497,7 @@ public:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::array16_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::array16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(buf, sizeof(int16_t));
@@ -495,7 +510,6 @@ public:
                     int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
 
                     handler.begin_array(len, semantic_tag::none, *this);
-                    ++nesting_depth_;
                     for (int16_t i = 0; i < len; ++i)
                     {
                         parse(handler, ec);
@@ -505,11 +519,10 @@ public:
                         }
                     }
                     handler.end_array(*this);
-                    --nesting_depth_;
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::array32_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::array32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(buf, sizeof(int32_t));
@@ -522,7 +535,6 @@ public:
                     int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
 
                     handler.begin_array(len, semantic_tag::none, *this);
-                    ++nesting_depth_;
                     for (int32_t i = 0; i < len; ++i)
                     {
                         parse(handler, ec);
@@ -532,11 +544,10 @@ public:
                         }
                     }
                     handler.end_array(*this);
-                    --nesting_depth_;
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::map16_cd : 
+                case jsoncons::msgpack::detail::msgpack_format::map16_cd : 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(buf, sizeof(int16_t));
@@ -549,7 +560,6 @@ public:
                     int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
 
                     handler.begin_object(len, semantic_tag::none, *this);
-                    ++nesting_depth_;
                     for (int16_t i = 0; i < len; ++i)
                     {
                         parse_name(handler, ec);
@@ -564,11 +574,10 @@ public:
                         }
                     }
                     handler.end_object(*this);
-                    --nesting_depth_;
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::map32_cd : 
+                case jsoncons::msgpack::detail::msgpack_format::map32_cd : 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(buf, sizeof(int32_t));
@@ -581,7 +590,6 @@ public:
                     int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
 
                     handler.begin_object(len, semantic_tag::none, *this);
-                    ++nesting_depth_;
                     for (int32_t i = 0; i < len; ++i)
                     {
                         parse_name(handler, ec);
@@ -596,7 +604,6 @@ public:
                         }
                     }
                     handler.end_object(*this);
-                    --nesting_depth_;
                     break;
                 }
 
@@ -643,7 +650,7 @@ public:
         {
             switch (type)
             {
-                case jsoncons::msgpack::detail::msgpack_format ::str8_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::str8_cd: 
                 {
                     uint8_t buf[sizeof(int8_t)];
                     source_.read(buf, sizeof(int8_t));
@@ -673,7 +680,7 @@ public:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::str16_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::str16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(buf, sizeof(int16_t));
@@ -704,7 +711,7 @@ public:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format ::str32_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::str32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(buf, sizeof(int32_t));
@@ -730,6 +737,96 @@ public:
             }
 
         }
+    }
+
+    void begin_array(json_content_handler& handler, uint8_t type, std::error_code& ec)
+    {
+        size_t len = 0;
+        switch (type)
+        {
+            case jsoncons::msgpack::detail::msgpack_format::array16_cd: 
+            {
+                uint8_t buf[sizeof(int16_t)];
+                source_.read(buf, sizeof(int16_t));
+                if (source_.eof())
+                {
+                    ec = msgpack_errc::unexpected_eof;
+                    return;
+                }
+                const uint8_t* endp;
+                len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
+                break;
+            }
+            case jsoncons::msgpack::detail::msgpack_format::array32_cd: 
+            {
+                uint8_t buf[sizeof(int32_t)];
+                source_.read(buf, sizeof(int32_t));
+                if (source_.eof())
+                {
+                    ec = msgpack_errc::unexpected_eof;
+                    return;
+                }
+                const uint8_t* endp;
+                len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
+                break;
+            }
+            default:
+                JSONCONS_ASSERT(type > 0x8f && type <= 0x9f) // fixarray
+                len = type & 0x0f;
+                break;
+        }
+        handler.begin_array(len, semantic_tag::none, *this);
+    }
+
+    void end_array(json_content_handler& handler, std::error_code&)
+    {
+        continue_ = handler.end_array(*this);
+        state_stack_.pop_back();
+    }
+
+    void begin_map(json_content_handler& handler, uint8_t type, std::error_code& ec)
+    {
+        size_t len = 0;
+        switch (type)
+        {
+            case jsoncons::msgpack::detail::msgpack_format::map16_cd:
+            {
+                uint8_t buf[sizeof(int16_t)];
+                source_.read(buf, sizeof(int16_t));
+                if (source_.eof())
+                {
+                    ec = msgpack_errc::unexpected_eof;
+                    return;
+                }
+                const uint8_t* endp;
+                len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
+                break; 
+            }
+            case jsoncons::msgpack::detail::msgpack_format::map32_cd : 
+            {
+                uint8_t buf[sizeof(int32_t)];
+                source_.read(buf, sizeof(int32_t));
+                if (source_.eof())
+                {
+                    ec = msgpack_errc::unexpected_eof;
+                    return;
+                }
+                const uint8_t* endp;
+                len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
+                break;
+            }
+            default:
+                JSONCONS_ASSERT (type > 0x7f && type <= 0x8f) // fixmap
+                len = type & 0x0f;
+                break;
+        }
+        handler.begin_object(len, semantic_tag::none, *this);
+    }
+
+    void end_map(json_content_handler& handler, std::error_code&)
+    {
+        continue_ = handler.end_object(*this);
+        state_stack_.pop_back();
     }
 };
 
