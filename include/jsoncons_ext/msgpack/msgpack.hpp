@@ -16,6 +16,7 @@
 #include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons_ext/msgpack/msgpack_encoder.hpp>
 #include <jsoncons_ext/msgpack/msgpack_reader.hpp>
+#include <jsoncons_ext/msgpack/msgpack_cursor.hpp>
 
 namespace jsoncons { namespace msgpack {
 

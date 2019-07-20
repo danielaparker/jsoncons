@@ -51,6 +51,7 @@ public:
        : source_(std::forward<Source>(source)),
          continue_(true), done_(false)
     {
+        state_stack_.emplace_back(parse_mode::root,0);
     }
 
     void restart()
