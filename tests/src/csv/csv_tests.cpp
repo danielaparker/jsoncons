@@ -65,6 +65,7 @@ TEST_CASE("m_columns_test")
     csv::csv_reader reader(is, decoder, options);
     reader.read();
     ojson j = decoder.get_result();
+
     CHECK(6 == j.size());
     CHECK(3 == j["Date"].size());
     CHECK(3 == j["1Y"].size());
@@ -1257,4 +1258,3 @@ TEST_CASE("test_encode_decode csv string")
         CHECK(j1 == j2);
     }
 }
-

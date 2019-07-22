@@ -60,6 +60,175 @@ struct default_csv_parsing
     }
 };
 
+namespace detail {
+
+    template <class CharT, class Allocator>
+    class m_columns_filter : public basic_json_content_handler<CharT>
+    {
+    public:
+        typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
+        typedef CharT char_type;
+        typedef Allocator allocator_type;
+        typedef typename basic_json_options<CharT>::string_type string_type;
+        typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
+    private:
+        typedef basic_json<CharT, preserve_order_policy, Allocator> json_type;
+
+        basic_json_content_handler<CharT>& handler_;
+        const std::vector<string_type, string_allocator_type>& column_names_;
+        std::vector<json_decoder<json_type>> decoders_;
+        size_t column_index_;
+    public:
+        m_columns_filter() = delete;
+
+        m_columns_filter(const std::vector<string_type, string_allocator_type>& column_names, basic_json_content_handler<CharT>& handler)
+            : column_names_(column_names), handler_(handler), column_index_(0)
+        {
+        }
+
+        void initialize()
+        {
+            null_ser_context context;
+            for (size_t i = 0; i < column_names_.size(); ++i)
+            {
+                decoders_.push_back(json_decoder<json_type>());
+                decoders_.back().begin_array(semantic_tag::none, context);
+            }
+            column_index_ = 0;
+        }
+
+        void skip_column()
+        {
+            ++column_index_;
+        }
+
+        void do_flush() override
+        {
+            std::cout << "do_flush()\n";
+            null_ser_context context;
+            handler_.begin_object(semantic_tag::none, context);
+            for (size_t i = 0; i < column_names_.size(); ++i)
+            {
+                handler_.name(column_names_[i], context);
+                decoders_[i].end_array(context);
+                decoders_[i].flush();
+                auto j = decoders_[i].get_result();
+                std::cout << j << "\n";
+                //decoders_[i].get_result().dump(handler_);
+                j.dump(handler_);
+            }
+            handler_.end_object(context);
+            handler_.flush();
+            std::cout << "end do_flush()\n";
+        }
+
+        bool do_begin_object(semantic_tag, const ser_context&) override
+        {
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("unexpected begin_object"));
+        }
+
+        bool do_end_object(const ser_context&) override
+        {
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("unexpected end_object"));
+        }
+
+        bool do_begin_array(semantic_tag, const ser_context&) override
+        {
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("unexpected begin_array"));
+        }
+
+        bool do_end_array(const ser_context&) override
+        {
+            column_index_ = 0;
+            return true;
+        }
+
+        bool do_name(const string_view_type&, const ser_context&) override
+        {
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("unexpected name"));
+        }
+
+        bool do_null_value(semantic_tag tag, const ser_context& context) override
+        {
+            bool result(false);
+            if (column_index_ < column_names_.size())
+            {
+                result = decoders_[column_index_++].null_value(tag, context);
+            }
+            return result;
+        }
+
+        bool do_string_value(const string_view_type& value, semantic_tag tag, const ser_context& context) override
+        {
+            bool result(false);
+            if (column_index_ < column_names_.size())
+            {
+                result = decoders_[column_index_++].string_value(value, tag, context);
+            }
+            return result;
+        }
+
+        bool do_byte_string_value(const byte_string_view& value,
+                                  semantic_tag tag,
+                                  const ser_context& context) override
+        {
+            bool result(false);
+            if (column_index_ < column_names_.size())
+            {
+                result = decoders_[column_index_++].byte_string_value(value, tag, context);
+            }
+            return result;
+        }
+
+        bool do_double_value(double value,
+                             semantic_tag tag,
+                             const ser_context& context) override
+        {
+            bool result(false);
+            if (column_index_ < column_names_.size())
+            {
+                result = decoders_[column_index_++].double_value(value, tag, context);
+            }
+            return result;
+        }
+
+        bool do_int64_value(int64_t value,
+                            semantic_tag tag,
+                            const ser_context& context) override
+        {
+            bool result(false);
+            if (column_index_ < column_names_.size())
+            {
+                result = decoders_[column_index_++].int64_value(value, tag, context);
+            }
+            return result;
+        }
+
+        bool do_uint64_value(uint64_t value,
+                             semantic_tag tag,
+                             const ser_context& context) override
+        {
+            bool result(false);
+            if (column_index_ < column_names_.size())
+            {
+                result = decoders_[column_index_++].uint64_value(value, tag, context);
+            }
+            return result;
+        }
+
+        bool do_bool_value(bool value, semantic_tag tag, const ser_context& context) override
+        {
+            bool result(false);
+            if (column_index_ < column_names_.size())
+            {
+                result = decoders_[column_index_++].bool_value(value, tag, context);
+            }
+            return result;
+        }
+    };
+
+} // namespace detail
+
 template<class CharT,class Allocator=std::allocator<CharT>>
 class basic_csv_parser : public ser_context
 {
@@ -77,6 +246,7 @@ class basic_csv_parser : public ser_context
     static const int default_depth = 3;
 
     csv_state_type state_;
+    detail::m_columns_filter<CharT,Allocator> m_columns_filter_;
     int top_;
     std::vector<csv_mode_type,csv_mode_allocator_type> stack_;
     basic_json_content_handler<CharT>& handler_;
@@ -95,7 +265,6 @@ class basic_csv_parser : public ser_context
     size_t level_;
     size_t offset_;
     jsoncons::detail::string_to_double to_double_; 
-    std::vector<json_decoder<json_type>> decoders_;
     const CharT* begin_input_;
     const CharT* input_end_;
     const CharT* input_ptr_;
@@ -126,9 +295,10 @@ public:
     basic_csv_parser(basic_json_content_handler<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler)
-       : top_(-1),
+       : m_columns_filter_(column_names_,handler),
+         top_(-1),
          stack_(default_depth),
-         handler_(handler),
+         handler_(options.mapping() == mapping_type::m_columns ? m_columns_filter_ : handler),
          err_handler_(err_handler),
          options_(options),
          level_(0),
@@ -137,6 +307,7 @@ public:
          input_end_(nullptr),
          input_ptr_(nullptr),
          continue_(true)
+         
     {
         depth_ = default_depth;
         state_ = csv_state_type::start;
@@ -205,18 +376,7 @@ public:
     void before_multi_valued_field()
     {
         push_mode(csv_mode_type::subfields);
-        switch (options_.mapping())
-        {
-            case mapping_type::n_rows:
-            case mapping_type::n_objects:
-                continue_ = handler_.begin_array(semantic_tag::none, *this);
-                break;
-            case mapping_type::m_columns:
-                decoders_[column_index_].begin_array(semantic_tag::none, *this);
-                break;
-            default:
-                break;
-        }
+        continue_ = handler_.begin_array(semantic_tag::none, *this);
     }
 
     void after_field()
@@ -224,18 +384,7 @@ public:
         if (stack_[top_] == csv_mode_type::subfields)
         {
             pop_mode(csv_mode_type::subfields);
-            switch (options_.mapping())
-            {
-                case mapping_type::n_rows:
-                case mapping_type::n_objects:
-                    continue_ = handler_.end_array(*this);
-                    break;
-                case mapping_type::m_columns:
-                    decoders_[column_index_].end_array(*this);
-                    break;
-                default:
-                    break;
-            }
+            continue_ = handler_.end_array(*this);
         }
         ++column_index_;
     }
@@ -292,11 +441,7 @@ public:
                     }
                     break;
                 case mapping_type::m_columns:
-                    for (size_t i = 0; i < column_names_.size(); ++i)
-                    {
-                        decoders_.push_back(json_decoder<json_type>());
-                        decoders_.back().begin_array(semantic_tag::none, *this);
-                    }
+                    m_columns_filter_.initialize();
                     break;
                 default:
                     break;
@@ -313,6 +458,7 @@ public:
                     continue_ = handler_.end_object(*this);
                     break;
                 default:
+                    continue_ = handler_.end_array(*this);
                     break;
             }
         }
@@ -425,22 +571,7 @@ public:
                 default:
                     break;
             }
-            if (options_.mapping() == mapping_type::m_columns)
-            {
-                continue_ = handler_.begin_object(semantic_tag::none, *this);
-                for (size_t i = 0; i < column_names_.size(); ++i)
-                {
-                    continue_ = handler_.name(column_names_[i],*this);
-                    decoders_[i].end_array(*this);
-                    decoders_[i].flush();
-                    decoders_[i].get_result().dump(handler_);
-                }
-                continue_ = handler_.end_object(*this);
-            }
-            else
-            {
-                continue_ = handler_.end_array(*this);
-            }
+            continue_ = handler_.end_array(*this);
             if (!pop_mode(csv_mode_type::initial))
             {
                 err_handler_(csv_errc::unexpected_eof, *this);
@@ -760,7 +891,7 @@ private:
                     }
                     else
                     {
-                        end_value(value_buffer_,column_index_,options_.infer_types(),handler_);
+                        end_value(value_buffer_,column_index_,options_.infer_types());
                     }
                     break;
                 case mapping_type::n_objects:
@@ -774,7 +905,7 @@ private:
                             }
                             else
                             {
-                                end_value(value_buffer_,column_index_,options_.infer_types(),handler_);
+                                end_value(value_buffer_,column_index_,options_.infer_types());
                             }
                         }
                         else if (level_ > 0)
@@ -785,18 +916,19 @@ private:
                             }
                             else
                             {
-                                end_value(value_buffer_,column_index_,options_.infer_types(),handler_);
+                                end_value(value_buffer_,column_index_,options_.infer_types());
                             }
                         }
                     }
                     break;
                 case mapping_type::m_columns:
-                    if (column_index_ < decoders_.size())
+                    if (!(options_.ignore_empty_values() && value_buffer_.size() == 0))
                     {
-                        if (!(options_.ignore_empty_values() && value_buffer_.size() == 0))
-                        {
-                            end_value(value_buffer_,column_index_,options_.infer_types(),decoders_[column_index_]);
-                        }
+                        end_value(value_buffer_,column_index_,options_.infer_types());
+                    }
+                    else
+                    {
+                        m_columns_filter_.skip_column();
                     }
                     break;
                 }
@@ -823,7 +955,7 @@ private:
                 switch (options_.mapping())
                 {
                 case mapping_type::n_rows:
-                    end_value(value_buffer_,column_index_,false,handler_);
+                    end_value(value_buffer_,column_index_,false);
                     break;
                 case mapping_type::n_objects:
                     if (!(options_.ignore_empty_values() && value_buffer_.size() == 0))
@@ -834,9 +966,9 @@ private:
                             {
                                 continue_ = handler_.null_value(semantic_tag::none, *this);
                             }
-                            else
+                            else 
                             {
-                                end_value(value_buffer_,column_index_,false,handler_);
+                                end_value(value_buffer_,column_index_,false);
                             }
                         }
                         else if (level_ > 0)
@@ -847,15 +979,19 @@ private:
                             }
                             else
                             {
-                                end_value(value_buffer_,column_index_,false,handler_);
+                                end_value(value_buffer_,column_index_,false);
                             }
                         }
                     }
                     break;
                 case mapping_type::m_columns:
-                    if (column_index_ < decoders_.size())
+                    if (!(options_.ignore_empty_values() && value_buffer_.size() == 0))
                     {
-                        end_value(value_buffer_,column_index_,options_.infer_types(),decoders_[column_index_]);
+                        end_value(value_buffer_,column_index_,options_.infer_types());
+                    }
+                    else
+                    {
+                        m_columns_filter_.skip_column();
                     }
                     break;
                 }
@@ -872,8 +1008,7 @@ private:
 
     void end_value(const string_view_type& value, 
                    size_t column_index, 
-                   bool infer_types, 
-                   basic_json_content_handler<CharT>& handler)
+                   bool infer_types)
     {
         if (column_index < column_types_.size() + offset_)
         {
@@ -884,19 +1019,19 @@ private:
                 {
                     if (column_index == offset_ || level_ > column_types_[column_index-offset_].level)
                     {
-                        handler.end_array(*this);
+                        handler_.end_array(*this);
                     }
                     level_ = column_index == offset_ ? 0 : column_types_[column_index - offset_].level;
                 }
             }
             if (level_ < column_types_[column_index - offset_].level)
             {
-                handler.begin_array(semantic_tag::none, *this);
+                handler_.begin_array(semantic_tag::none, *this);
                 level_ = column_types_[column_index - offset_].level;
             }
             else if (level_ > column_types_[column_index - offset_].level)
             {
-                handler.end_array(*this);
+                handler_.end_array(*this);
                 level_ = column_types_[column_index - offset_].level;
             }
             switch (column_types_[column_index - offset_].col_type)
@@ -908,7 +1043,7 @@ private:
                         iss >> val;
                         if (!iss.fail())
                         {
-                            handler.int64_value(val, semantic_tag::none, *this);
+                            handler_.int64_value(val, semantic_tag::none, *this);
                         }
                         else
                         {
@@ -921,7 +1056,7 @@ private:
                             }
                             else
                             {
-                                handler.null_value(semantic_tag::none, *this);
+                                handler_.null_value(semantic_tag::none, *this);
                             }
                         }
                     }
@@ -930,7 +1065,7 @@ private:
                     {
                         if (options_.lossless_number())
                         {
-                            handler.string_value(value,semantic_tag::bigdec, *this);
+                            handler_.string_value(value,semantic_tag::bigdec, *this);
                         }
                         else
                         {
@@ -939,7 +1074,7 @@ private:
                             iss >> val;
                             if (!iss.fail())
                             {
-                                handler.double_value(val, semantic_tag::none, *this);
+                                handler_.double_value(val, semantic_tag::none, *this);
                             }
                             else
                             {
@@ -952,7 +1087,7 @@ private:
                                 }
                                 else
                                 {
-                                    handler.null_value(semantic_tag::none, *this);
+                                    handler_.null_value(semantic_tag::none, *this);
                                 }
                             }
                         }
@@ -962,19 +1097,19 @@ private:
                     {
                         if (value.length() == 1 && value[0] == '0')
                         {
-                            handler.bool_value(false, semantic_tag::none, *this);
+                            handler_.bool_value(false, semantic_tag::none, *this);
                         }
                         else if (value.length() == 1 && value[0] == '1')
                         {
-                            handler.bool_value(true, semantic_tag::none, *this);
+                            handler_.bool_value(true, semantic_tag::none, *this);
                         }
                         else if (value.length() == 5 && ((value[0] == 'f' || value[0] == 'F') && (value[1] == 'a' || value[1] == 'A') && (value[2] == 'l' || value[2] == 'L') && (value[3] == 's' || value[3] == 'S') && (value[4] == 'e' || value[4] == 'E')))
                         {
-                            handler.bool_value(false, semantic_tag::none, *this);
+                            handler_.bool_value(false, semantic_tag::none, *this);
                         }
                         else if (value.length() == 4 && ((value[0] == 't' || value[0] == 'T') && (value[1] == 'r' || value[1] == 'R') && (value[2] == 'u' || value[2] == 'U') && (value[3] == 'e' || value[3] == 'E')))
                         {
-                            handler.bool_value(true, semantic_tag::none, *this);
+                            handler_.bool_value(true, semantic_tag::none, *this);
                         }
                         else
                         {
@@ -987,7 +1122,7 @@ private:
                             }
                             else
                             {
-                                handler.null_value(semantic_tag::none, *this);
+                                handler_.null_value(semantic_tag::none, *this);
                             }
                         }
                     }
@@ -995,7 +1130,7 @@ private:
                 default:
                     if (value.length() > 0)
                     {
-                        handler.string_value(value, semantic_tag::none, *this);
+                        handler_.string_value(value, semantic_tag::none, *this);
                     }
                     else
                     {
@@ -1008,7 +1143,7 @@ private:
                         }
                         else
                         {
-                            handler.string_value(string_view_type(), semantic_tag::none, *this);
+                            handler_.string_value(string_view_type(), semantic_tag::none, *this);
                         }
                     }
                     break;  
@@ -1018,11 +1153,11 @@ private:
         {
             if (infer_types)
             {
-                end_value_with_numeric_check(value, handler);
+                end_value_with_numeric_check(value);
             }
             else
             {
-                handler.string_value(value, semantic_tag::none, *this);
+                handler_.string_value(value, semantic_tag::none, *this);
             }
         }
     }
@@ -1043,7 +1178,7 @@ private:
         done
     };
 
-    void end_value_with_numeric_check(const string_view_type& value, basic_json_content_handler<CharT>& handler)
+    void end_value_with_numeric_check(const string_view_type& value)
     {
         numeric_check_state state = numeric_check_state::initial;
         bool is_negative = false;
@@ -1253,13 +1388,13 @@ private:
         switch (state)
         {
             case numeric_check_state::null:
-                handler.null_value(semantic_tag::none, *this);
+                handler_.null_value(semantic_tag::none, *this);
                 break;
             case numeric_check_state::boolean_true:
-                handler.bool_value(true, semantic_tag::none, *this);
+                handler_.bool_value(true, semantic_tag::none, *this);
                 break;
             case numeric_check_state::boolean_false:
-                handler.bool_value(false, semantic_tag::none, *this);
+                handler_.bool_value(false, semantic_tag::none, *this);
                 break;
             case numeric_check_state::zero:
             case numeric_check_state::integer:
@@ -1269,11 +1404,11 @@ private:
                     auto result = jsoncons::detail::to_integer<int64_t>(value.data(), value.length());
                     if (result.ec == jsoncons::detail::to_integer_errc())
                     {
-                        handler.int64_value(result.value, semantic_tag::none, *this);
+                        handler_.int64_value(result.value, semantic_tag::none, *this);
                     }
                     else // Must be overflow
                     {
-                        handler.string_value(value, semantic_tag::bigint, *this);
+                        handler_.string_value(value, semantic_tag::bigint, *this);
                     }
                 }
                 else
@@ -1281,11 +1416,11 @@ private:
                     auto result = jsoncons::detail::to_integer<uint64_t>(value.data(), value.length());
                     if (result.ec == jsoncons::detail::to_integer_errc())
                     {
-                        handler.uint64_value(result.value, semantic_tag::none, *this);
+                        handler_.uint64_value(result.value, semantic_tag::none, *this);
                     }
                     else if (result.ec == jsoncons::detail::to_integer_errc::overflow)
                     {
-                        handler.string_value(value, semantic_tag::bigint, *this);
+                        handler_.string_value(value, semantic_tag::bigint, *this);
                     }
                     else
                     {
@@ -1299,17 +1434,17 @@ private:
             {
                 if (options_.lossless_number())
                 {
-                    handler.string_value(value,semantic_tag::bigdec, *this);
+                    handler_.string_value(value,semantic_tag::bigdec, *this);
                 }
                 else
                 {
                     double d = to_double_(buffer.c_str(), buffer.length());
-                    handler.double_value(d, semantic_tag::none, *this);
+                    handler_.double_value(d, semantic_tag::none, *this);
                 }
                 break;
             }
             default:
-                handler.string_value(value, semantic_tag::none, *this);
+                handler_.string_value(value, semantic_tag::none, *this);
         }
     }
 
