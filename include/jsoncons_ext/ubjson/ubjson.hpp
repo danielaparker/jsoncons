@@ -75,10 +75,9 @@ template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
 decode_ubjson(const std::vector<uint8_t>& v)
 {
-    jsoncons::json_decoder<json> decoder;
-    basic_ubjson_reader<jsoncons::bytes_source> reader(v, decoder);
-    reader.read();
-    return decoder.get_result().template as<T>();
+    ubjson_bytes_cursor reader(v);
+    T val = read_from<T>(json(),reader);
+    return val;
 }
 
 template<class T>
@@ -96,10 +95,9 @@ template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
 decode_ubjson(std::istream& is)
 {
-    jsoncons::json_decoder<json> decoder;
-    ubjson_stream_reader reader(is, decoder);
-    reader.read();
-    return decoder.get_result();
+    ubjson_stream_cursor reader(is);
+    T val = read_from<T>(json(), reader);
+    return val;
 }
 
 }}
