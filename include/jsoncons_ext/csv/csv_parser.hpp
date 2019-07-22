@@ -75,22 +75,23 @@ namespace detail {
         typedef basic_json<CharT, preserve_order_policy, Allocator> json_type;
 
         basic_json_content_handler<CharT>& handler_;
-        const std::vector<string_type, string_allocator_type>& column_names_;
+        std::vector<string_type, string_allocator_type> column_names_;
         std::vector<json_decoder<json_type>> decoders_;
         size_t column_index_;
     public:
         m_columns_filter() = delete;
 
-        m_columns_filter(const std::vector<string_type, string_allocator_type>& column_names, basic_json_content_handler<CharT>& handler)
-            : column_names_(column_names), handler_(handler), column_index_(0)
+        m_columns_filter(basic_json_content_handler<CharT>& handler)
+            : handler_(handler), column_index_(0)
         {
         }
 
-        void initialize()
+        void initialize(const std::vector<string_type, string_allocator_type>& column_names)
         {
             null_ser_context context;
-            for (size_t i = 0; i < column_names_.size(); ++i)
+            for (const auto& name : column_names)
             {
+                column_names_.push_back(name);
                 decoders_.push_back(json_decoder<json_type>());
                 decoders_.back().begin_array(semantic_tag::none, context);
             }
@@ -104,7 +105,6 @@ namespace detail {
 
         void do_flush() override
         {
-            std::cout << "do_flush()\n";
             null_ser_context context;
             handler_.begin_object(semantic_tag::none, context);
             for (size_t i = 0; i < column_names_.size(); ++i)
@@ -113,13 +113,10 @@ namespace detail {
                 decoders_[i].end_array(context);
                 decoders_[i].flush();
                 auto j = decoders_[i].get_result();
-                std::cout << j << "\n";
-                //decoders_[i].get_result().dump(handler_);
                 j.dump(handler_);
             }
             handler_.end_object(context);
             handler_.flush();
-            std::cout << "end do_flush()\n";
         }
 
         bool do_begin_object(semantic_tag, const ser_context&) override
@@ -295,7 +292,7 @@ public:
     basic_csv_parser(basic_json_content_handler<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler)
-       : m_columns_filter_(column_names_,handler),
+       : m_columns_filter_(handler),
          top_(-1),
          stack_(default_depth),
          handler_(options.mapping() == mapping_type::m_columns ? m_columns_filter_ : handler),
@@ -441,7 +438,7 @@ public:
                     }
                     break;
                 case mapping_type::m_columns:
-                    m_columns_filter_.initialize();
+                    m_columns_filter_.initialize(column_names_);
                     break;
                 default:
                     break;
