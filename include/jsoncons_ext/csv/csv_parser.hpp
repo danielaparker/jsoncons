@@ -92,7 +92,6 @@ class basic_csv_parser : public ser_context
     std::vector<csv_type_info,csv_type_info_allocator_type> column_types_;
     std::vector<string_type,string_allocator_type> column_defaults_;
     size_t column_index_;
-    basic_json_fragment_filter<CharT> filter_;
     size_t level_;
     size_t offset_;
     jsoncons::detail::string_to_double to_double_; 
@@ -132,7 +131,6 @@ public:
          handler_(handler),
          err_handler_(err_handler),
          options_(options),
-         filter_(handler),
          level_(0),
          offset_(0),
          begin_input_(nullptr),
@@ -429,14 +427,13 @@ public:
             }
             if (options_.mapping() == mapping_type::m_columns)
             {
-                basic_json_fragment_filter<CharT> fragment_filter(handler_);
                 continue_ = handler_.begin_object(semantic_tag::none, *this);
                 for (size_t i = 0; i < column_names_.size(); ++i)
                 {
                     continue_ = handler_.name(column_names_[i],*this);
                     decoders_[i].end_array(*this);
                     decoders_[i].flush();
-                    decoders_[i].get_result().dump(fragment_filter);
+                    decoders_[i].get_result().dump(handler_);
                 }
                 continue_ = handler_.end_object(*this);
             }
@@ -919,8 +916,8 @@ private:
                             {
                                 basic_json_parser<CharT> parser;
                                 parser.update(column_defaults_[column_index - offset_].data(),column_defaults_[column_index - offset_].length());
-                                parser.parse_some(filter_);
-                                parser.finish_parse(filter_);
+                                parser.parse_some(handler_);
+                                parser.finish_parse(handler_);
                             }
                             else
                             {
@@ -950,8 +947,8 @@ private:
                                 {
                                     basic_json_parser<CharT> parser;
                                     parser.update(column_defaults_[column_index - offset_].data(),column_defaults_[column_index - offset_].length());
-                                    parser.parse_some(filter_);
-                                    parser.finish_parse(filter_);
+                                    parser.parse_some(handler_);
+                                    parser.finish_parse(handler_);
                                 }
                                 else
                                 {
@@ -985,8 +982,8 @@ private:
                             {
                                 basic_json_parser<CharT> parser;
                                 parser.update(column_defaults_[column_index - offset_].data(),column_defaults_[column_index - offset_].length());
-                                parser.parse_some(filter_);
-                                parser.finish_parse(filter_);
+                                parser.parse_some(handler_);
+                                parser.finish_parse(handler_);
                             }
                             else
                             {
@@ -1006,8 +1003,8 @@ private:
                         {
                             basic_json_parser<CharT> parser;
                             parser.update(column_defaults_[column_index - offset_].data(),column_defaults_[column_index - offset_].length());
-                            parser.parse_some(filter_);
-                            parser.finish_parse(filter_);
+                            parser.parse_some(handler_);
+                            parser.finish_parse(handler_);
                         }
                         else
                         {
