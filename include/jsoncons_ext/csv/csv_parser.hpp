@@ -375,6 +375,7 @@ public:
         return column_names_;
     }
 
+    // name
     void before_field()
     {
         switch (stack_[top_])
@@ -407,6 +408,7 @@ public:
         }
     }
 
+    // begin_array
     void before_multi_valued_field()
     {
         push_mode(csv_mode_type::subfields);
@@ -423,6 +425,7 @@ public:
         ++column_index_;
     }
 
+    // begin_array or begin_record
     void before_record()
     {
         offset_ = 0;
@@ -444,6 +447,7 @@ public:
         }
     }
 
+    // end_array, begin_array, string_value (headers)
     void after_record()
     {
         if (column_types_.size() > 0)
@@ -491,7 +495,7 @@ public:
                 case mapping_type::n_objects:
                     continue_ = handler_.end_object(*this);
                     break;
-                default:
+                case mapping_type::m_columns:
                     continue_ = handler_.end_array(*this);
                     break;
             }
@@ -499,6 +503,7 @@ public:
         column_index_ = 0;
     }
 
+    // begin_array (m_columns)
     void reset()
     {
         push_mode(csv_mode_type::initial);
@@ -910,6 +915,9 @@ private:
         }
     }
 
+    /*
+        end_array, begin_array, xxx_value (end_value)
+    */
     void end_unquoted_string_value() 
     {
         switch (stack_[top_])
@@ -1210,6 +1218,9 @@ private:
         done
     };
 
+    /*
+        xxx_value 
+    */
     void end_value_with_numeric_check(const string_view_type& value)
     {
         numeric_check_state state = numeric_check_state::initial;

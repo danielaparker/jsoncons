@@ -86,7 +86,7 @@ class basic_cbor_parser : public ser_context
 {
     Src source_;
     std::string text_buffer_;
-    std::vector<uint8_t> bytesfer_;
+    std::vector<uint8_t> bytes_buffer_;
     std::vector<uint64_t> tags_; 
     std::vector<parse_state> state_stack_;
     bool continue_;
@@ -376,12 +376,12 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::byte_string:
             {
-                bytesfer_ = get_byte_string(ec);
+                bytes_buffer_ = get_byte_string(ec);
                 if (ec)
                 {
                     return;
                 }
-                handle_byte_string(handler, byte_string_view(bytesfer_.data(), bytesfer_.size()), ec);
+                handle_byte_string(handler, byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), ec);
                 if (ec)
                 {
                     return;
@@ -623,13 +623,13 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::byte_string:
             {
-                bytesfer_ = get_byte_string(ec);
+                bytes_buffer_ = get_byte_string(ec);
                 if (ec)
                 {
                     return;
                 }
                 text_buffer_.clear();
-                encode_base64url(bytesfer_.begin(),bytesfer_.end(),text_buffer_);
+                encode_base64url(bytes_buffer_.begin(),bytes_buffer_.end(),text_buffer_);
                 continue_ = handler.name(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
                 break;
             }
