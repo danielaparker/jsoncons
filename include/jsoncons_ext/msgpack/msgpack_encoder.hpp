@@ -446,14 +446,14 @@ typedef basic_msgpack_encoder<jsoncons::binary_stream_result> msgpack_stream_enc
 typedef basic_msgpack_encoder<jsoncons::bytes_result> msgpack_bytes_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use msgpack_bytes_encoder") typedef msgpack_bytes_encoder msgpack_bytes_serializer;
+JSONCONS_DEPRECATED("Instead, use msgpack_bytes_encoder") typedef msgpack_bytes_encoder msgpack_bytes_serializer;
 
 template<class Result=jsoncons::binary_stream_result>
 using basic_msgpack_serializer = basic_msgpack_encoder<Result>; 
 
-JSONCONS_DEPRECATED_MSG("Instead, use msgpack_stream_encoder") typedef msgpack_stream_encoder msgpack_encoder;
-JSONCONS_DEPRECATED_MSG("Instead, use msgpack_stream_encoder") typedef msgpack_stream_encoder msgpack_serializer;
-JSONCONS_DEPRECATED_MSG("Instead, use msgpack_bytes_encoder") typedef msgpack_bytes_encoder msgpack_buffer_serializer;
+JSONCONS_DEPRECATED("Instead, use msgpack_stream_encoder") typedef msgpack_stream_encoder msgpack_encoder;
+JSONCONS_DEPRECATED("Instead, use msgpack_stream_encoder") typedef msgpack_stream_encoder msgpack_serializer;
+JSONCONS_DEPRECATED("Instead, use msgpack_bytes_encoder") typedef msgpack_bytes_encoder msgpack_buffer_serializer;
 #endif
 
 }}

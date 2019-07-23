@@ -36,19 +36,19 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use to_handler") 
+    JSONCONS_DEPRECATED("Instead, use to_handler") 
     basic_json_content_handler<CharT>& input_handler()
     {
         return to_handler_;
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use to_handler") 
+    JSONCONS_DEPRECATED("Instead, use to_handler") 
     basic_json_content_handler<CharT>& downstream_handler()
     {
         return to_handler_;
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use to_handler") 
+    JSONCONS_DEPRECATED("Instead, use to_handler") 
     basic_json_content_handler<CharT>& destination_handler()
     {
         return to_handler_;
@@ -147,7 +147,7 @@ private:
 #if !defined(JSONCONS_NO_DEPRECATED)
 // Filters out begin_document and end_document events
 template <class CharT>
-class JSONCONS_DEPRECATED_MSG("Remove this wrapper around a json_content_handler, it doesn't do anything")  basic_json_fragment_filter : public basic_json_filter<CharT>
+class JSONCONS_DEPRECATED("Remove this wrapper around a json_content_handler, it doesn't do anything")  basic_json_fragment_filter : public basic_json_filter<CharT>
 {
 public:
     using typename basic_json_filter<CharT>::string_view_type;
@@ -377,8 +377,8 @@ typedef basic_rename_object_member_filter<char> rename_object_member_filter;
 typedef basic_rename_object_member_filter<wchar_t> wrename_object_member_filter;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use rename_object_member_filter") typedef basic_rename_object_member_filter<char> rename_name_filter;
-JSONCONS_DEPRECATED_MSG("Instead, use wrename_object_member_filter") typedef basic_rename_object_member_filter<wchar_t> wrename_name_filter;
+JSONCONS_DEPRECATED("Instead, use rename_object_member_filter") typedef basic_rename_object_member_filter<char> rename_name_filter;
+JSONCONS_DEPRECATED("Instead, use wrename_object_member_filter") typedef basic_rename_object_member_filter<wchar_t> wrename_name_filter;
 #endif
 
 }

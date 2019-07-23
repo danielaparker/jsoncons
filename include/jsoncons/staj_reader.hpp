@@ -307,7 +307,7 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     template<class T>
-    JSONCONS_DEPRECATED_MSG("Instead, use get<T>()")
+    JSONCONS_DEPRECATED("Instead, use get<T>()")
     T as() const
     {
         return get<T>();
@@ -643,7 +643,7 @@ typedef basic_staj_reader<wchar_t> wstaj_reader;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-JSONCONS_DEPRECATED_MSG("Instead, use staj_event_type") typedef staj_event_type stream_event_type;
+JSONCONS_DEPRECATED("Instead, use staj_event_type") typedef staj_event_type stream_event_type;
 
 template<class CharT>
 using basic_stream_event = basic_staj_event<CharT>;
@@ -651,11 +651,11 @@ using basic_stream_event = basic_staj_event<CharT>;
 template<class CharT>
 using basic_stream_reader = basic_staj_reader<CharT>;
 
-JSONCONS_DEPRECATED_MSG("Instead, use staj_event") typedef basic_staj_event<char> stream_event;
-JSONCONS_DEPRECATED_MSG("Instead, use wstaj_event") typedef basic_staj_event<wchar_t> wstream_event;
+JSONCONS_DEPRECATED("Instead, use staj_event") typedef basic_staj_event<char> stream_event;
+JSONCONS_DEPRECATED("Instead, use wstaj_event") typedef basic_staj_event<wchar_t> wstream_event;
 
-JSONCONS_DEPRECATED_MSG("Instead, use staj_reader") typedef basic_staj_reader<char> stream_reader;
-JSONCONS_DEPRECATED_MSG("Instead, use wstaj_reader") typedef basic_staj_reader<wchar_t> wstream_reader;
+JSONCONS_DEPRECATED("Instead, use staj_reader") typedef basic_staj_reader<char> stream_reader;
+JSONCONS_DEPRECATED("Instead, use wstaj_reader") typedef basic_staj_reader<wchar_t> wstream_reader;
 
 #endif
 

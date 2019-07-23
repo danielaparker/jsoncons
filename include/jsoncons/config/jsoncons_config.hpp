@@ -74,20 +74,20 @@
 #define JSONCONS_NO_TO_CHARS
 
 // Deprecated symbols markup
-#if !defined(JSONCONS_DEPRECATED_MSG) && defined(__has_extension)
+#if !defined(JSONCONS_DEPRECATED) && defined(__has_extension)
 #if __has_extension(attribute_deprecated_with_message)
-#define JSONCONS_DEPRECATED_MSG(msg) __attribute__((deprecated(msg)))
+#define JSONCONS_DEPRECATED(msg) __attribute__((deprecated(msg)))
 #endif
 #endif
 
-#if !defined(JSONCONS_DEPRECATED_MSG) && defined(_MSC_VER)
+#if !defined(JSONCONS_DEPRECATED) && defined(_MSC_VER)
 #if (_MSC_VER) >= 1400
-#define JSONCONS_DEPRECATED_MSG(msg) __declspec(deprecated(msg))
+#define JSONCONS_DEPRECATED(msg) __declspec(deprecated(msg))
 #endif
 #endif
 
-#if !defined(JSONCONS_DEPRECATED_MSG)
-#define JSONCONS_DEPRECATED_MSG(msg)
+#if !defined(JSONCONS_DEPRECATED)
+#define JSONCONS_DEPRECATED(msg)
 #endif
 
 #if defined(ANDROID) || defined(__ANDROID__)
