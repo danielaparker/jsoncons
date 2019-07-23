@@ -28,9 +28,7 @@ TEST_CASE("n_objects_test")
 
     json_decoder<ojson> decoder;
     csv::csv_options options;
-    options.assume_header(true)
-          .subfield_delimiter(0);
-          //.column_types("string,float,float,float,float");
+    options.assume_header(true);
 
     options.mapping(csv::mapping_type::n_rows);
     csv::csv_reader reader1(bond_yields,decoder,options);
@@ -1256,3 +1254,4 @@ TEST_CASE("test_encode_decode csv string")
         CHECK(j1 == j2);
     }
 }
+

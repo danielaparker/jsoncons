@@ -460,7 +460,7 @@ public:
         }
     }
 
-    // end_array, begin_array, string_value (headers)
+    // end_array, begin_array (headers)
     void after_record()
     {
         if (column_types_.size() > 0)
@@ -483,12 +483,9 @@ public:
                 case mapping_type::n_rows:
                     if (column_names_.size() > 0)
                     {
+                        std::cout << "begin_array " << column_names_.size() << "\n"; 
                         continue_ = handler_.begin_array(semantic_tag::none, *this);
-                        for (const auto& name : column_names_)
-                        {
-                            continue_ = handler_.string_value(name, semantic_tag::none, *this);
-                        }
-                        continue_ = handler_.end_array(*this);
+                        state_ = csv_state_type::column_labels;
                     }
                     break;
                 case mapping_type::m_columns:
@@ -646,6 +643,10 @@ public:
         {
             CharT curr_char = *input_ptr_;
 all_csv_states:
+if (!continue_)
+{
+    break;
+}
             switch (state_)
             {
                 case csv_state_type::start:
@@ -654,6 +655,21 @@ all_csv_states:
                         continue_ = handler_.begin_array(semantic_tag::none, *this);
                     }
                     state_ = csv_state_type::expect_value;
+                    goto all_csv_states;
+                case csv_state_type::column_labels:
+                    std::cout << "csv_state_type::column_labels\n";
+                    if (stack_.back().index < column_names_.size())
+                    {
+                        std::cout << column_names_[stack_.back().index] << "\n";
+                        continue_ = handler_.string_value(column_names_[stack_.back().index], semantic_tag::none, *this);
+                        ++stack_.back().index;
+                    }
+                    else
+                    {
+                        continue_ = handler_.end_array(*this);
+                        state_ = csv_state_type::expect_value;
+                        stack_.back().mode = csv_mode_type::data;
+                    }
                     goto all_csv_states;
                 case csv_state_type::comment:
                     if (curr_char == '\n')
@@ -730,6 +746,7 @@ all_csv_states:
                             end_quoted_string_value(ec);
                             if (ec) return;
                             after_field();
+                            std::cout << "between_fields\n";
                             after_record();
                         }
                         state_ = csv_state_type::expect_value;
@@ -784,9 +801,13 @@ all_csv_states:
                                 }
                                 end_unquoted_string_value();
                                 after_field();
+                                std::cout << "unquoted_string linefeed\n";
                                 after_record();
                             }
-                            state_ = csv_state_type::expect_value;
+                            if (state_ != csv_state_type::column_labels)
+                            {
+                                state_ = csv_state_type::expect_value;
+                            }
                         }
                         else if (curr_char == options_.field_delimiter() || (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
                         {
