@@ -513,21 +513,21 @@ public:
         return *this;
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED("Instead, use column_names(const string_type&)")
+    JSONCONS_DEPRECATED_MSG("Instead, use column_names(const string_type&)")
     basic_csv_options& column_names(const std::vector<string_type>& value)
     {
         column_names_ = value;
         return *this;
     }
 
-    JSONCONS_DEPRECATED("Instead, use column_defaults(const string_type&)")
+    JSONCONS_DEPRECATED_MSG("Instead, use column_defaults(const string_type&)")
     basic_csv_options& column_defaults(const std::vector<string_type>& value)
     {
         column_defaults_ = value;
         return *this;
     }
 
-    JSONCONS_DEPRECATED("Instead, use column_types(const string_type&)")
+    JSONCONS_DEPRECATED_MSG("Instead, use column_types(const string_type&)")
     basic_csv_options& column_types(const std::vector<string_type>& value)
     {
         if (value.size() > 0)
@@ -763,10 +763,10 @@ typedef basic_csv_options<char> csv_options;
 typedef basic_csv_options<wchar_t> wcsv_options;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED("Instead, use csv_options") typedef csv_options csv_parameters;
-JSONCONS_DEPRECATED("Instead, use wcsv_options") typedef wcsv_options wcsv_parameters;
-JSONCONS_DEPRECATED("Instead, use csv_options") typedef csv_options csv_serializing_options;
-JSONCONS_DEPRECATED("Instead, use wcsv_options") typedef wcsv_options wcsv_serializing_options;
+JSONCONS_DEPRECATED_MSG("Instead, use csv_options") typedef csv_options csv_parameters;
+JSONCONS_DEPRECATED_MSG("Instead, use wcsv_options") typedef wcsv_options wcsv_parameters;
+JSONCONS_DEPRECATED_MSG("Instead, use csv_options") typedef csv_options csv_serializing_options;
+JSONCONS_DEPRECATED_MSG("Instead, use wcsv_options") typedef wcsv_options wcsv_serializing_options;
 #endif
 
 

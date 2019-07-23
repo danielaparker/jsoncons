@@ -171,8 +171,8 @@ struct strict_json_parsing
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED("instead, use default_json_parsing") typedef default_json_parsing strict_parse_error_handler;
-JSONCONS_DEPRECATED("instead, use strict_json_parsing") typedef strict_json_parsing default_parse_error_handler;
+JSONCONS_DEPRECATED_MSG("instead, use default_json_parsing") typedef default_json_parsing strict_parse_error_handler;
+JSONCONS_DEPRECATED_MSG("instead, use strict_json_parsing") typedef strict_json_parsing default_parse_error_handler;
 #endif
 
 template <class CharT, class Allocator = std::allocator<char>>
@@ -263,13 +263,13 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED("Instead, use basic_json_options<CharT>::max_nesting_depth()")
+    JSONCONS_DEPRECATED_MSG("Instead, use basic_json_options<CharT>::max_nesting_depth()")
     size_t max_nesting_depth() const
     {
         return options_.max_nesting_depth();
     }
 
-    JSONCONS_DEPRECATED("Instead, use basic_json_options<CharT>::max_nesting_depth(size_t)")
+    JSONCONS_DEPRECATED_MSG("Instead, use basic_json_options<CharT>::max_nesting_depth(size_t)")
     void max_nesting_depth(size_t value)
     {
         options_.max_nesting_depth() = value;
@@ -2585,7 +2585,7 @@ escape_u9:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-    JSONCONS_DEPRECATED("Instead, use finish_parse(basic_json_content_handler<CharT>&)")
+    JSONCONS_DEPRECATED_MSG("Instead, use finish_parse(basic_json_content_handler<CharT>&)")
     void end_parse(basic_json_content_handler<CharT>& handler)
     {
         std::error_code ec;
@@ -2596,7 +2596,7 @@ escape_u9:
         }
     }
 
-    JSONCONS_DEPRECATED("Instead, use finish_parse(basic_json_content_handler<CharT>&, std::error_code&)")
+    JSONCONS_DEPRECATED_MSG("Instead, use finish_parse(basic_json_content_handler<CharT>&, std::error_code&)")
     void end_parse(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
         while (!finished())
@@ -2605,7 +2605,7 @@ escape_u9:
         }
     }
 
-    JSONCONS_DEPRECATED("Instead, use update(const CharT*, size_t)")
+    JSONCONS_DEPRECATED_MSG("Instead, use update(const CharT*, size_t)")
     void set_source(const CharT* data, size_t length)
     {
         begin_input_ = data;

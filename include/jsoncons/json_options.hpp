@@ -76,8 +76,8 @@ enum class bigint_chars_format : uint8_t {number, base10, base64, base64url
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED("Instead, use bigint_chars_format") typedef bigint_chars_format bignum_chars_format;
-JSONCONS_DEPRECATED("Instead, use bigint_chars_format") typedef bigint_chars_format big_integer_chars_format;
+JSONCONS_DEPRECATED_MSG("Instead, use bigint_chars_format") typedef bigint_chars_format bignum_chars_format;
+JSONCONS_DEPRECATED_MSG("Instead, use bigint_chars_format") typedef bigint_chars_format big_integer_chars_format;
 #endif
 
 enum class byte_string_chars_format : uint8_t {none=0,base16,base64,base64url};
@@ -665,38 +665,38 @@ public:
     bigint_chars_format bignum_format() const {return bigint_format_;}
     basic_json_options<CharT>&  bignum_format(bigint_chars_format value) {bigint_format_ = value; return *this;}
 
-    JSONCONS_DEPRECATED("Instead, use lossless_number()")
+    JSONCONS_DEPRECATED_MSG("Instead, use lossless_number()")
     bool dec_to_str() const 
     {
         return lossless_number_;
     }
 
-    JSONCONS_DEPRECATED("Instead, use lossless_number(bool)")
+    JSONCONS_DEPRECATED_MSG("Instead, use lossless_number(bool)")
     basic_json_options<CharT>& dec_to_str(bool value) 
     {
         lossless_number_ = value;
         return *this;
     }
 
-    JSONCONS_DEPRECATED("Instead, use indent_size()")
+    JSONCONS_DEPRECATED_MSG("Instead, use indent_size()")
     size_t indent() const 
     {
         return indent_size();
     }
 
-    JSONCONS_DEPRECATED("Instead, use indent_size(size_t)")
+    JSONCONS_DEPRECATED_MSG("Instead, use indent_size(size_t)")
     basic_json_options<CharT>& indent(size_t value)
     {
         return indent_size(value);
     }
 
-    JSONCONS_DEPRECATED("Instead, use is_nan_to_num() or is_nan_to_str()")
+    JSONCONS_DEPRECATED_MSG("Instead, use is_nan_to_num() or is_nan_to_str()")
     bool can_read_nan_replacement() const {return can_read_nan_replacement_;}
 
-    JSONCONS_DEPRECATED("Instead, use is_inf_to_num() or is_inf_to_str()")
+    JSONCONS_DEPRECATED_MSG("Instead, use is_inf_to_num() or is_inf_to_str()")
     bool can_read_pos_inf_replacement() const {return can_read_pos_inf_replacement_;}
 
-    JSONCONS_DEPRECATED("Instead, use is_neginf_to_num() or is_neginf_to_str()")
+    JSONCONS_DEPRECATED_MSG("Instead, use is_neginf_to_num() or is_neginf_to_str()")
     bool can_read_neg_inf_replacement() const {return can_read_neg_inf_replacement_;}
 
     bool can_write_nan_replacement() const {return !nan_replacement_.empty();}
@@ -705,7 +705,7 @@ public:
 
     bool can_write_neg_inf_replacement() const {return !neg_inf_replacement_.empty();}
 
-    JSONCONS_DEPRECATED("Instead, use inf_to_num(const std::basic_string<CharT>&) or inf_to_str(const std::basic_string<CharT>&)")
+    JSONCONS_DEPRECATED_MSG("Instead, use inf_to_num(const std::basic_string<CharT>&) or inf_to_str(const std::basic_string<CharT>&)")
     basic_json_options<CharT>& replace_inf(bool replace)
     {
         can_read_pos_inf_replacement_ = replace;
@@ -713,27 +713,27 @@ public:
         return *this;
     }
 
-    JSONCONS_DEPRECATED("Instead, use inf_to_num(const std::basic_string<CharT>&) or inf_to_str(const std::basic_string<CharT>&)")
+    JSONCONS_DEPRECATED_MSG("Instead, use inf_to_num(const std::basic_string<CharT>&) or inf_to_str(const std::basic_string<CharT>&)")
     basic_json_options<CharT>& replace_pos_inf(bool replace)
     {
         can_read_pos_inf_replacement_ = replace;
         return *this;
     }
 
-    JSONCONS_DEPRECATED("Instead, use neginf_to_num(const std::basic_string<CharT>&) or neginf_to_str(const std::basic_string<CharT>&)")
+    JSONCONS_DEPRECATED_MSG("Instead, use neginf_to_num(const std::basic_string<CharT>&) or neginf_to_str(const std::basic_string<CharT>&)")
     basic_json_options<CharT>& replace_neg_inf(bool replace)
     {
         can_read_neg_inf_replacement_ = replace;
         return *this;
     }
 
-    JSONCONS_DEPRECATED("Instead, use nan_to_num() or nan_to_str()")
+    JSONCONS_DEPRECATED_MSG("Instead, use nan_to_num() or nan_to_str()")
     const string_type& nan_replacement() const
     {
         return nan_replacement_;
     }
 
-    JSONCONS_DEPRECATED("Instead, use nan_to_num(const std::basic_string<CharT>&) or nan_to_str(const std::basic_string<CharT>&)")
+    JSONCONS_DEPRECATED_MSG("Instead, use nan_to_num(const std::basic_string<CharT>&) or nan_to_str(const std::basic_string<CharT>&)")
     basic_json_options<CharT>& nan_replacement(const string_type& value)
     {
         nan_replacement_ = value;
@@ -743,13 +743,13 @@ public:
         return *this;
     }
 
-    JSONCONS_DEPRECATED("Instead, use inf_to_num() or inf_to_str()")
+    JSONCONS_DEPRECATED_MSG("Instead, use inf_to_num() or inf_to_str()")
     const string_type& pos_inf_replacement() const 
     {
         return pos_inf_replacement_;
     }
 
-    JSONCONS_DEPRECATED("Instead, use inf_to_num(const std::basic_string<CharT>&) or inf_to_str(const std::basic_string<CharT>&)")
+    JSONCONS_DEPRECATED_MSG("Instead, use inf_to_num(const std::basic_string<CharT>&) or inf_to_str(const std::basic_string<CharT>&)")
     basic_json_options<CharT>& pos_inf_replacement(const string_type& value)
     {
         pos_inf_replacement_ = value;
@@ -757,13 +757,13 @@ public:
         return *this;
     }
 
-    JSONCONS_DEPRECATED("Instead, use neginf_to_num() or neginf_to_str()")
+    JSONCONS_DEPRECATED_MSG("Instead, use neginf_to_num() or neginf_to_str()")
     const string_type& neg_inf_replacement() const 
     {
         return neg_inf_replacement_;
     }
 
-    JSONCONS_DEPRECATED("Instead, use neginf_to_num(const std::basic_string<CharT>&) or neginf_to_str(const std::basic_string<CharT>&)")
+    JSONCONS_DEPRECATED_MSG("Instead, use neginf_to_num(const std::basic_string<CharT>&) or neginf_to_str(const std::basic_string<CharT>&)")
     basic_json_options<CharT>& neg_inf_replacement(const string_type& value)
     {
         neg_inf_replacement_ = value;
@@ -771,24 +771,24 @@ public:
         return *this;
     }
 
-    JSONCONS_DEPRECATED("Instead, use object_object_line_splits()")
+    JSONCONS_DEPRECATED_MSG("Instead, use object_object_line_splits()")
     line_split_kind object_object_split_lines() const {return object_object_line_splits_;}
-    JSONCONS_DEPRECATED("Instead, use object_object_line_splits(line_split_kind)")
+    JSONCONS_DEPRECATED_MSG("Instead, use object_object_line_splits(line_split_kind)")
     basic_json_options<CharT>& object_object_split_lines(line_split_kind value) {object_object_line_splits_ = value; return *this;}
 
-    JSONCONS_DEPRECATED("Instead, use array_object_line_splits()")
+    JSONCONS_DEPRECATED_MSG("Instead, use array_object_line_splits()")
     line_split_kind array_object_split_lines() const {return array_object_line_splits_;}
-    JSONCONS_DEPRECATED("Instead, use array_object_line_splits(line_split_kind)")
+    JSONCONS_DEPRECATED_MSG("Instead, use array_object_line_splits(line_split_kind)")
     basic_json_options<CharT>& array_object_split_lines(line_split_kind value) {array_object_line_splits_ = value; return *this;}
 
-    JSONCONS_DEPRECATED("Instead, use object_array_line_splits()")
+    JSONCONS_DEPRECATED_MSG("Instead, use object_array_line_splits()")
     line_split_kind object_array_split_lines() const {return object_array_line_splits_;}
-    JSONCONS_DEPRECATED("Instead, use object_array_line_splits(line_split_kind)")
+    JSONCONS_DEPRECATED_MSG("Instead, use object_array_line_splits(line_split_kind)")
     basic_json_options<CharT>& object_array_split_lines(line_split_kind value) {object_array_line_splits_ = value; return *this;}
 
-    JSONCONS_DEPRECATED("Instead, use array_array_line_splits()")
+    JSONCONS_DEPRECATED_MSG("Instead, use array_array_line_splits()")
     line_split_kind array_array_split_lines() const {return array_array_line_splits_;}
-    JSONCONS_DEPRECATED("Instead, use array_array_line_splits(line_split_kind)")
+    JSONCONS_DEPRECATED_MSG("Instead, use array_array_line_splits(line_split_kind)")
     basic_json_options<CharT>& array_array_split_lines(line_split_kind value) {array_array_line_splits_ = value; return *this;}
 #endif
 private:
@@ -847,12 +847,12 @@ typedef basic_json_encode_options<char> json_encode_options;
 typedef basic_json_encode_options<wchar_t> wjson_encode_options;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED("json_options") typedef json_options output_format;
-JSONCONS_DEPRECATED("wjson_options") typedef wjson_options woutput_format;
-JSONCONS_DEPRECATED("json_options") typedef json_options serialization_options;
-JSONCONS_DEPRECATED("wjson_options") typedef wjson_options wserialization_options;
-JSONCONS_DEPRECATED("json_options") typedef json_options json_serializing_options;
-JSONCONS_DEPRECATED("wjson_options") typedef wjson_options wjson_serializing_options;
+JSONCONS_DEPRECATED_MSG("json_options") typedef json_options output_format;
+JSONCONS_DEPRECATED_MSG("wjson_options") typedef wjson_options woutput_format;
+JSONCONS_DEPRECATED_MSG("json_options") typedef json_options serialization_options;
+JSONCONS_DEPRECATED_MSG("wjson_options") typedef wjson_options wserialization_options;
+JSONCONS_DEPRECATED_MSG("json_options") typedef json_options json_serializing_options;
+JSONCONS_DEPRECATED_MSG("wjson_options") typedef wjson_options wjson_serializing_options;
 #endif
 
 }

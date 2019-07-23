@@ -286,13 +286,13 @@ public:
         buffer_.reserve(buffer_length_);
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED("Instead, use max_nesting_depth() on options")
+    JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth() on options")
     size_t max_nesting_depth() const
     {
         return parser_.max_nesting_depth();
     }
 
-    JSONCONS_DEPRECATED("Instead, use max_nesting_depth(size_t) on options")
+    JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth(size_t) on options")
     void max_nesting_depth(size_t depth)
     {
         parser_.max_nesting_depth(depth);
@@ -449,25 +449,25 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-    JSONCONS_DEPRECATED("Instead, use buffer_length()")
+    JSONCONS_DEPRECATED_MSG("Instead, use buffer_length()")
     size_t buffer_capacity() const
     {
         return buffer_length_;
     }
 
-    JSONCONS_DEPRECATED("Instead, use buffer_length(size_t)")
+    JSONCONS_DEPRECATED_MSG("Instead, use buffer_length(size_t)")
     void buffer_capacity(size_t length)
     {
         buffer_length_ = length;
         buffer_.reserve(buffer_length_);
     }
-    JSONCONS_DEPRECATED("Instead, use max_nesting_depth()")
+    JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth()")
     size_t max_depth() const
     {
         return parser_.max_nesting_depth();
     }
 
-    JSONCONS_DEPRECATED("Instead, use max_nesting_depth(size_t)")
+    JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth(size_t)")
     void max_depth(size_t depth)
     {
         parser_.max_nesting_depth(depth);
@@ -509,8 +509,8 @@ typedef basic_json_reader<char> json_reader;
 typedef basic_json_reader<wchar_t> wjson_reader;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED("Instead, use json_reader") typedef json_reader json_string_reader;
-JSONCONS_DEPRECATED("Instead, use wjson_reader") typedef wjson_reader wjson_string_reader;
+JSONCONS_DEPRECATED_MSG("Instead, use json_reader") typedef json_reader json_string_reader;
+JSONCONS_DEPRECATED_MSG("Instead, use wjson_reader") typedef wjson_reader wjson_string_reader;
 #endif
 
 }
