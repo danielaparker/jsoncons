@@ -46,8 +46,10 @@ public:
                 return "Expected quote character";
             case csv_errc::invalid_csv_text:
                 return "Invalid CSV text";
+            case csv_errc::invalid_state:
+                return "Invalid CSV parser state";
             default:
-                return "Unknown JSON parser error";
+                return "Unknown CSV parser error";
         }
     }
 };

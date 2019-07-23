@@ -1,0 +1,89 @@
+// Copyright 2018 Daniel Parker
+// Distributed under Boost license
+
+#if defined(_MSC_VER)
+#include "windows.h" // test no inadvertant macro expansions
+#endif
+#include <jsoncons/json.hpp>
+#include <jsoncons/json_encoder.hpp>
+#include <jsoncons_ext/csv/csv_cursor.hpp>
+#include <jsoncons_ext/csv/csv.hpp>
+#include <catch/catch.hpp>
+#include <sstream>
+#include <vector>
+#include <utility>
+#include <ctime>
+
+using namespace jsoncons;
+
+TEST_CASE("csv_cursor test")
+{
+    const std::string data = R"(index_id,observation_date,rate
+EUR_LIBOR_06M,2015-10-23,0.0000214
+EUR_LIBOR_06M,2015-10-26,0.0000143
+EUR_LIBOR_06M,2015-10-27,0.0000001
+)";
+
+    SECTION("test 1")
+    {
+        csv::csv_options options;
+        options.assume_header(true)
+               .mapping(csv::mapping_type::n_rows);
+
+        auto j = csv::decode_csv<ojson>(data, options);
+        std::cout << pretty_print(j) << "\n";
+    }
+
+    /* SECTION("test 2")
+    {
+        csv::csv_options options;
+        options.assume_header(true)
+               .mapping(csv::mapping_type::n_rows);
+        csv::csv_cursor cursor(data, options);
+
+        for (; !cursor.done(); cursor.next())
+        {
+            const auto& event = cursor.current();
+            switch (event.event_type())
+            {
+                case staj_event_type::begin_array:
+                    std::cout << event.event_type() << " " << "\n";
+                    break;
+                case staj_event_type::end_array:
+                    std::cout << event.event_type() << " " << "\n";
+                    break;
+                case staj_event_type::begin_object:
+                    std::cout << event.event_type() << " " << "\n";
+                    break;
+                case staj_event_type::end_object:
+                    std::cout << event.event_type() << " " << "\n";
+                    break;
+                case staj_event_type::name:
+                    std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
+                    break;
+                case staj_event_type::string_value:
+                    std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
+                    break;
+                case staj_event_type::null_value:
+                    std::cout << event.event_type() << "\n";
+                    break;
+                case staj_event_type::bool_value:
+                    std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << "\n";
+                    break;
+                case staj_event_type::int64_value:
+                    std::cout << event.event_type() << ": " << event.get<int64_t>() << "\n";
+                    break;
+                case staj_event_type::uint64_value:
+                    std::cout << event.event_type() << ": " << event.get<uint64_t>() << "\n";
+                    break;
+                case staj_event_type::double_value:
+                    std::cout << event.event_type() << ": " << event.get<double>() << "\n";
+                    break;
+                default:
+                    std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";;
+                    break;
+            }
+        }
+    }*/
+}
+
