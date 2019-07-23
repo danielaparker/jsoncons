@@ -24,7 +24,7 @@ EUR_LIBOR_06M,2015-10-26,0.0000143
 EUR_LIBOR_06M,2015-10-27,0.0000001
 )";
 
-    SECTION("test 1")
+    /*SECTION("test 1")
     {
         csv::csv_options options;
         options.assume_header(true)
@@ -32,9 +32,9 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
 
         auto j = csv::decode_csv<ojson>(data, options);
         std::cout << pretty_print(j) << "\n";
-    }
+    }*/
 
-    /* SECTION("test 2")
+    SECTION("test 2")
     {
         csv::csv_options options;
         options.assume_header(true)
@@ -84,6 +84,6 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
                     break;
             }
         }
-    }*/
+    }
 }
 
