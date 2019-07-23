@@ -136,15 +136,7 @@ NY,LON,TOR;LON
 }
     )"_json;
 
-    try
-    {
-        json j = csv::decode_csv<json>(s,options);
-        CHECK(j == expected);
-        //std::cout << pretty_print(j) << std::endl;
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
+    json j = csv::decode_csv<json>(s,options);
+    CHECK(j == expected);
 }
 
