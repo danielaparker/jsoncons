@@ -36,6 +36,7 @@ enum class csv_mode_type
 enum class csv_state_type 
 {
     start, 
+    column_labels,
     comment,
     expect_value,
     between_fields,
@@ -263,6 +264,20 @@ namespace detail {
 
 } // namespace detail
 
+struct parse_state 
+{
+    csv_mode_type mode; 
+    size_t index;
+
+    parse_state(csv_mode_type mode)
+        : mode(mode), index(0)
+    {
+    }
+
+    parse_state(const parse_state&) = default;
+    parse_state(parse_state&&) = default;
+};
+
 template<class CharT,class Allocator=std::allocator<CharT>>
 class basic_csv_parser : public ser_context
 {
@@ -272,7 +287,7 @@ class basic_csv_parser : public ser_context
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
     typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<csv_mode_type> csv_mode_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<csv_type_info> csv_type_info_allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::vector<string_type,string_allocator_type>> string_vector_allocator_type;
     typedef basic_json<CharT,preserve_order_policy,Allocator> json_type;
@@ -281,7 +296,7 @@ class basic_csv_parser : public ser_context
 
     csv_state_type state_;
     detail::m_columns_filter<CharT,Allocator> m_columns_filter_;
-    std::vector<csv_mode_type,csv_mode_allocator_type> stack_;
+    std::vector<parse_state,parse_state_allocator_type> stack_;
     basic_json_content_handler<CharT>& handler_;
     std::function<bool(csv_errc,const ser_context&)> err_handler_;
     unsigned long column_;
@@ -376,7 +391,7 @@ public:
     // name
     void before_field()
     {
-        switch (stack_.back())
+        switch (stack_.back().mode)
         {
             case csv_mode_type::header:
                 if (options_.assume_header() && line_ == 1)
@@ -409,13 +424,13 @@ public:
     // begin_array
     void before_multi_valued_field()
     {
-        stack_.push_back(csv_mode_type::subfields);
+        stack_.emplace_back(csv_mode_type::subfields);
         continue_ = handler_.begin_array(semantic_tag::none, *this);
     }
 
     void after_field()
     {
-        if (stack_.back() == csv_mode_type::subfields)
+        if (stack_.back().mode == csv_mode_type::subfields)
         {
             stack_.pop_back();
             continue_ = handler_.end_array(*this);
@@ -427,7 +442,7 @@ public:
     void before_record()
     {
         offset_ = 0;
-        if (stack_.back() == csv_mode_type::data)
+        if (stack_.back().mode == csv_mode_type::data)
         {
             switch (options_.mapping())
             {
@@ -456,11 +471,11 @@ public:
                 level_ = 0;
             }
         }
-        if (stack_.back() == csv_mode_type::header)
+        if (stack_.back().mode == csv_mode_type::header)
         {
             if (line_ >= options_.header_lines())
             {
-                stack_.back() = csv_mode_type::data;
+                stack_.back().mode = csv_mode_type::data;
             }
             column_values_.resize(column_names_.size());
             switch (options_.mapping())
@@ -483,7 +498,7 @@ public:
                     break;
             }
         }
-        else if (stack_.back() == csv_mode_type::data || stack_.back() == csv_mode_type::subfields)
+        else if (stack_.back().mode == csv_mode_type::data || stack_.back().mode == csv_mode_type::subfields)
         {
             switch (options_.mapping())
             {
@@ -508,7 +523,7 @@ public:
         column_types_.clear();
         column_defaults_.clear();
 
-        stack_.push_back(csv_mode_type::initial);
+        stack_.emplace_back(csv_mode_type::initial);
 
         for (auto name : options_.column_names())
         {
@@ -524,11 +539,11 @@ public:
         }
         if (options_.header_lines() > 0)
         {
-            stack_.push_back(csv_mode_type::header);
+            stack_.emplace_back(csv_mode_type::header);
         }
         else
         {
-            stack_.push_back(csv_mode_type::data);
+            stack_.emplace_back(csv_mode_type::data);
         }
         state_ = csv_state_type::start;
         column_index_ = 0;
@@ -571,7 +586,7 @@ public:
                         {
                             before_record();
                         }
-                        if (stack_.back() != csv_mode_type::subfields)
+                        if (stack_.back().mode != csv_mode_type::subfields)
                         {
                             before_field();
                         }
@@ -586,7 +601,7 @@ public:
                         {
                             before_record();
                         }
-                        if (stack_.back() != csv_mode_type::subfields)
+                        if (stack_.back().mode != csv_mode_type::subfields)
                         {
                             before_field();
                         }
@@ -602,7 +617,7 @@ public:
             {
                 after_record();
             }
-            switch (stack_.back())
+            switch (stack_.back().mode)
             {
                 case csv_mode_type::header:
                     stack_.pop_back();
@@ -614,7 +629,7 @@ public:
                     break;
             }
             continue_ = handler_.end_array(*this);
-            if (!(stack_.size() == 1 && stack_.back() == csv_mode_type::initial))
+            if (!(stack_.size() == 1 && stack_.back().mode == csv_mode_type::initial))
             {
                 err_handler_(csv_errc::unexpected_eof, *this);
                 ec = csv_errc::unexpected_eof;
@@ -708,7 +723,7 @@ all_csv_states:
                             {
                                 before_record();
                             }
-                            if (stack_.back() != csv_mode_type::subfields)
+                            if (stack_.back().mode != csv_mode_type::subfields)
                             {
                                 before_field();
                             }
@@ -721,7 +736,7 @@ all_csv_states:
                     }
                     else if (curr_char == options_.field_delimiter() || (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
                     {
-                        if (column_index_ == 0 && stack_.back() != csv_mode_type::subfields)
+                        if (column_index_ == 0 && stack_.back().mode != csv_mode_type::subfields)
                         {
                             before_record();
                         }
@@ -729,7 +744,7 @@ all_csv_states:
                         {
                             trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                         }
-                        if (stack_.back() != csv_mode_type::subfields)
+                        if (stack_.back().mode != csv_mode_type::subfields)
                         {
                             before_field();
                             if (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first)
@@ -763,7 +778,7 @@ all_csv_states:
                                 {
                                     before_record();
                                 }
-                                if (stack_.back() != csv_mode_type::subfields)
+                                if (stack_.back().mode != csv_mode_type::subfields)
                                 {
                                     before_field();
                                 }
@@ -775,7 +790,7 @@ all_csv_states:
                         }
                         else if (curr_char == options_.field_delimiter() || (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
                         {
-                            if (column_index_ == 0 && stack_.back() != csv_mode_type::subfields)
+                            if (column_index_ == 0 && stack_.back().mode != csv_mode_type::subfields)
                             {
                                 before_record();
                             }
@@ -783,7 +798,7 @@ all_csv_states:
                             {
                                 trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                             }
-                            if (stack_.back() != csv_mode_type::subfields)
+                            if (stack_.back().mode != csv_mode_type::subfields)
                             {
                                 before_field();
                                 if (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first)
@@ -932,7 +947,7 @@ private:
     */
     void end_unquoted_string_value() 
     {
-        switch (stack_.back())
+        switch (stack_.back().mode)
         {
             case csv_mode_type::data:
             case csv_mode_type::subfields:
@@ -1000,7 +1015,7 @@ private:
         {
             trim_string_buffer(options_.trim_leading_inside_quotes(),options_.trim_trailing_inside_quotes());
         }
-        switch (stack_.back())
+        switch (stack_.back().mode)
         {
             case csv_mode_type::header:
                 break;
