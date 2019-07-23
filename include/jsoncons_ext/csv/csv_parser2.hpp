@@ -35,7 +35,7 @@ enum class csv_mode_type
 
 enum class csv_state_type 
 {
-    start, 
+    start,
     comment,
     expect_value,
     between_fields,
@@ -279,7 +279,6 @@ class basic_csv_parser : public ser_context
 
     static const int default_depth = 3;
 
-    csv_state_type state_;
     detail::m_columns_filter<CharT,Allocator> m_columns_filter_;
     std::vector<csv_mode_type,csv_mode_allocator_type> stack_;
     basic_json_content_handler<CharT>& handler_;
@@ -302,6 +301,7 @@ class basic_csv_parser : public ser_context
     const CharT* input_end_;
     const CharT* input_ptr_;
     bool continue_;
+    csv_state_type state_;
 
 public:
     basic_csv_parser(basic_json_content_handler<CharT>& handler)
@@ -338,14 +338,13 @@ public:
          input_end_(nullptr),
          input_ptr_(nullptr),
          continue_(true)
-         
     {
         depth_ = default_depth;
-        state_ = csv_state_type::start;
         line_ = 1;
         column_ = 1;
         column_index_ = 0;
-        stack_.reserve(default_depth);
+        prev_char_ = 0;
+        state_= csv_state_type::start;
         reset();
     }
 
@@ -409,7 +408,7 @@ public:
     // begin_array
     void before_multi_valued_field()
     {
-        stack_.push_back(csv_mode_type::subfields);
+        push_mode(csv_mode_type::subfields);
         continue_ = handler_.begin_array(semantic_tag::none, *this);
     }
 
@@ -460,7 +459,7 @@ public:
         {
             if (line_ >= options_.header_lines())
             {
-                stack_.back() = csv_mode_type::data;
+                stack_.back() = csv_mode_type::header;
             }
             column_values_.resize(column_names_.size());
             switch (options_.mapping())
@@ -501,6 +500,7 @@ public:
         column_index_ = 0;
     }
 
+    // begin_array (m_columns)
     void reset()
     {
         stack_.clear();
@@ -508,33 +508,38 @@ public:
         column_types_.clear();
         column_defaults_.clear();
 
-        stack_.push_back(csv_mode_type::initial);
+        push_mode(csv_mode_type::initial);
 
-        for (auto name : options_.column_names())
+        for (const auto& name : options_.column_names())
         {
             column_names_.emplace_back(name.data(),name.size());
         }
-        for (auto name : options_.column_types())
+        for (const auto& name : options_.column_types())
         {
             column_types_.push_back(name);
         }
-        for (auto name : options_.column_defaults())
+        for (const auto& name : options_.column_defaults())
         {
             column_defaults_.emplace_back(name.data(), name.size());
         }
         if (options_.header_lines() > 0)
         {
-            stack_.push_back(csv_mode_type::header);
+            push_mode(csv_mode_type::header);
         }
         else
         {
-            stack_.push_back(csv_mode_type::data);
+            push_mode(csv_mode_type::data);
         }
         state_ = csv_state_type::start;
         column_index_ = 0;
         prev_char_ = 0;
         column_ = 1;
         level_ = 0;
+    }
+
+    void restart()
+    {
+        continue_ = true;
     }
 
     void parse_some()
@@ -555,6 +560,13 @@ public:
         {
             switch (state_)
             {
+                case csv_state_type::start:
+                    if (options_.mapping() != mapping_type::m_columns)
+                    {
+                        continue_ = handler_.begin_array(semantic_tag::none, *this);
+                    }
+                    state_ = csv_state_type::expect_value;
+                    break;
                 case csv_state_type::unquoted_string: 
                     if (options_.trim_leading() || options_.trim_trailing())
                     {
@@ -609,15 +621,8 @@ public:
                     break;
             }
             continue_ = handler_.end_array(*this);
-            if (!(stack_.size() == 1 && stack_.back() == csv_mode_type::initial))
-            {
-                err_handler_(csv_errc::unexpected_eof, *this);
-                ec = csv_errc::unexpected_eof;
-                continue_ = false;
-                return;
-            }
+            JSONCONS_ASSERT(!stack_.empty());
             stack_.pop_back();
-
             handler_.flush();
             continue_ = false;
         }
@@ -1496,6 +1501,21 @@ private:
             default:
                 handler_.string_value(value, semantic_tag::none, *this);
         }
+    }
+
+    void push_mode(csv_mode_type mode)
+    {
+        stack_.push_back(mode);
+    }
+
+    int peek()
+    {
+        return stack_.back();
+    }
+
+    bool peek(csv_mode_type mode)
+    {
+        return stack_.back() == mode;
     }
 };
 
