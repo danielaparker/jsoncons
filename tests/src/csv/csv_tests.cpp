@@ -862,27 +862,25 @@ TEST_CASE("csv_test1_array_3cols_grouped1")
 
     csv::csv_options options;
     options.assume_header(false)
-           .column_types("integer,[integer]*");
+           .column_types("integer,integer*");
 
     csv::csv_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
-    //std::cout << val << std::endl;
-
-    /*CHECK(val.size()==3);
+    CHECK(val.size()==3);
     CHECK(val[0].size()==3);
     CHECK(val[1].size()==3);
     CHECK(val[2].size()==3);
-    CHECK(val[0][0]==json(1));
-    CHECK(val[0][1]==json(2));
-    CHECK(val[0][2]==json(3));
-    CHECK(val[1][0]==json(4));
-    CHECK(val[1][1]==json(5));
-    CHECK(val[1][2]==json(6));
-    CHECK(val[2][0]==json(7));
-    CHECK(val[2][1]==json(8));
-    CHECK(val[2][2]==json(9));*/
+    CHECK(val[0][0].as<int>() == 1);
+    CHECK(val[0][1].as<int>() == 2);
+    CHECK(val[0][2].as<int>() == 3);
+    CHECK(val[1][0].as<int>() == 4);
+    CHECK(val[1][1].as<int>() == 5);
+    CHECK(val[1][2].as<int>() == 6);
+    CHECK(val[2][0].as<int>() == 7);
+    CHECK(val[2][1].as<int>() == 8);
+    CHECK(val[2][2].as<int>() == 9); 
 }
 
 TEST_CASE("csv_test1_array_3cols_grouped2")

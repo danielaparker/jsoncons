@@ -78,11 +78,12 @@ namespace detail {
         std::vector<string_type, string_allocator_type> column_names_;
         std::vector<json_decoder<json_type>> decoders_;
         size_t column_index_;
+        int level_;
     public:
         m_columns_filter() = delete;
 
         m_columns_filter(basic_json_content_handler<CharT>& handler)
-            : handler_(handler), column_index_(0)
+            : handler_(handler), column_index_(0), level_(0)
         {
         }
 
@@ -96,6 +97,7 @@ namespace detail {
                 decoders_.back().begin_array(semantic_tag::none, context);
             }
             column_index_ = 0;
+            level_ = 0;
         }
 
         void skip_column()
@@ -129,14 +131,28 @@ namespace detail {
             JSONCONS_THROW(json_runtime_error<std::invalid_argument>("unexpected end_object"));
         }
 
-        bool do_begin_array(semantic_tag, const ser_context&) override
+        bool do_begin_array(semantic_tag tag, const ser_context& context) override
         {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("unexpected begin_array"));
+            if (column_index_ < column_names_.size())
+            {
+                decoders_[column_index_].begin_array(tag, context);
+                ++level_;
+            }
+            return true;
         }
 
-        bool do_end_array(const ser_context&) override
+        bool do_end_array(const ser_context& context) override
         {
-            column_index_ = 0;
+            if (level_ > 0)
+            {
+                decoders_[column_index_].end_array(context);
+                ++column_index_;
+                --level_;
+            }
+            else
+            {
+                column_index_ = 0;
+            }
             return true;
         }
 
@@ -147,80 +163,101 @@ namespace detail {
 
         bool do_null_value(semantic_tag tag, const ser_context& context) override
         {
-            bool result(false);
             if (column_index_ < column_names_.size())
             {
-                result = decoders_[column_index_++].null_value(tag, context);
+                decoders_[column_index_].null_value(tag, context);
+                if (level_ == 0)
+                {
+                    ++column_index_;
+                }
             }
-            return result;
+            return true;
         }
 
         bool do_string_value(const string_view_type& value, semantic_tag tag, const ser_context& context) override
         {
-            bool result(false);
             if (column_index_ < column_names_.size())
             {
-                result = decoders_[column_index_++].string_value(value, tag, context);
+                decoders_[column_index_].string_value(value, tag, context);
+                if (level_ == 0)
+                {
+                    ++column_index_;
+                }
             }
-            return result;
+            return true;
         }
 
         bool do_byte_string_value(const byte_string_view& value,
                                   semantic_tag tag,
                                   const ser_context& context) override
         {
-            bool result(false);
             if (column_index_ < column_names_.size())
             {
-                result = decoders_[column_index_++].byte_string_value(value, tag, context);
+                decoders_[column_index_].byte_string_value(value, tag, context);
+                if (level_ == 0)
+                {
+                    ++column_index_;
+                }
             }
-            return result;
+            return true;
         }
 
         bool do_double_value(double value,
                              semantic_tag tag,
                              const ser_context& context) override
         {
-            bool result(false);
             if (column_index_ < column_names_.size())
             {
-                result = decoders_[column_index_++].double_value(value, tag, context);
+                decoders_[column_index_].double_value(value, tag, context);
+                if (level_ == 0)
+                {
+                    ++column_index_;
+                }
             }
-            return result;
+            return true;
         }
 
         bool do_int64_value(int64_t value,
                             semantic_tag tag,
                             const ser_context& context) override
         {
-            bool result(false);
             if (column_index_ < column_names_.size())
             {
-                result = decoders_[column_index_++].int64_value(value, tag, context);
+                decoders_[column_index_].int64_value(value, tag, context);
+                if (level_ == 0)
+                {
+                    ++column_index_;
+                }
             }
-            return result;
+            return true;
         }
 
         bool do_uint64_value(uint64_t value,
                              semantic_tag tag,
                              const ser_context& context) override
         {
-            bool result(false);
             if (column_index_ < column_names_.size())
             {
-                result = decoders_[column_index_++].uint64_value(value, tag, context);
+                decoders_[column_index_].uint64_value(value, tag, context);
+                if (level_ == 0)
+                {
+                    ++column_index_;
+                }
             }
-            return result;
+            return true;
         }
 
         bool do_bool_value(bool value, semantic_tag tag, const ser_context& context) override
         {
-            bool result(false);
             if (column_index_ < column_names_.size())
             {
-                result = decoders_[column_index_++].bool_value(value, tag, context);
+                decoders_[column_index_].bool_value(value, tag, context);
+                if (level_ == 0)
+                {
+                    ++column_index_;
+                }
             }
-            return result;
+            return true;
         }
     };
 
