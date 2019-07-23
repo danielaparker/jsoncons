@@ -537,6 +537,11 @@ public:
         level_ = 0;
     }
 
+    void restart()
+    {
+        continue_ = true;
+    }
+
     void parse_some()
     {
         std::error_code ec;
