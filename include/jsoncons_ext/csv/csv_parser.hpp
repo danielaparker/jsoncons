@@ -288,7 +288,6 @@ class basic_csv_parser : public ser_context
     std::function<bool(csv_errc,const ser_context&)> err_handler_;
     unsigned long column_;
     unsigned long line_;
-    CharT prev_char_;
     string_type value_buffer_;
     int depth_;
     const basic_csv_decode_options<CharT>& options_;
@@ -535,7 +534,6 @@ public:
         }
         state_ = csv_parse_state::start;
         column_index_ = 0;
-        prev_char_ = 0;
         column_ = 1;
         level_ = 0;
     }
@@ -665,7 +663,7 @@ public:
                     switch (curr_char)
                     {
                         case '\n':
-                            if (prev_char_ != '\r')
+                            //if (prev_char_ != '\r')
                             {
                                 ++line_;
                                 column_ = 1;
@@ -676,20 +674,20 @@ public:
                             ++line_;
                             column_ = 1;
                             state_ = csv_parse_state::expect_value;
+                            push_state(state_);
+                            state_ = csv_parse_state::cr;
                             break;
                         default:
                             ++column_;
                             break;
                     }
                     ++input_ptr_;
-                    prev_char_ = curr_char;
                     break;
                 case csv_parse_state::expect_value:
                     if (column_ == 1 && curr_char == options_.comment_starter())
                     {
                         state_ = csv_parse_state::comment;
                         ++column_;
-                        prev_char_ = curr_char;
                         ++input_ptr_;
                     }
                     else
@@ -712,7 +710,6 @@ public:
                         }
                         else
                         {
-                            prev_char_ = curr_char;
                         }
                     }
                     break;
@@ -733,13 +730,12 @@ public:
                     }
                     ++column_;
                     ++input_ptr_;
-                    prev_char_ = curr_char;
                     break;
                 case csv_parse_state::between_fields:
                     switch (curr_char)
                     {
                         case '\n':
-                            if (prev_char_ != '\r')
+                            //if (prev_char_ != '\r')
                             {
                                 after_newline_between_fields(ec);
                                 if (ec)
@@ -760,6 +756,10 @@ public:
                             ++line_;
                             column_ = 1;
                             state_ = csv_parse_state::expect_value;
+                            push_state(state_);
+                            ++input_ptr_;
+                            ++column_;
+                            state_ = csv_parse_state::cr;
                             break;
                         default:
                             if (curr_char == options_.field_delimiter() || (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
@@ -792,14 +792,13 @@ public:
                             break;
                     }
                     ++input_ptr_;
-                    prev_char_ = curr_char;
                     break;
                 case csv_parse_state::unquoted_string: 
                     {
                         switch (curr_char)
                         {
                             case '\n':
-                                if (prev_char_ != '\r')
+                                //if (prev_char_ != '\r')
                                 {
                                     after_newline();
                                     ++line_;
@@ -812,6 +811,8 @@ public:
                                 state_ = csv_parse_state::expect_value;
                                 ++line_;
                                 column_ = 1;
+                                push_state(state_);
+                                state_ = csv_parse_state::cr;
                                 break;
                             default:
                                 if (curr_char == options_.field_delimiter() || (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
@@ -852,7 +853,6 @@ public:
                             }
                         }
                     ++input_ptr_;
-                    prev_char_ = curr_char;
                     break;
                 default:
                     err_handler_(csv_errc::invalid_state, *this);
