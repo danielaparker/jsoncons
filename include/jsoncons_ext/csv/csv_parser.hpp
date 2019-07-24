@@ -661,15 +661,25 @@ all_csv_states:
                     }
                     state_ = csv_parse_state::expect_value;
                     goto all_csv_states;
-                case csv_parse_state::comment:
-                    if (curr_char == '\n')
+                case csv_parse_state::comment: 
+                    switch (curr_char)
                     {
-                        state_ = csv_parse_state::expect_value;
-                    }
-                    else if (prev_char_ == '\r')
-                    {
-                        state_ = csv_parse_state::expect_value;
-                        goto all_csv_states;
+                        case '\n':
+                            if (prev_char_ != '\r')
+                            {
+                                ++line_;
+                                column_ = 1;
+                                state_ = csv_parse_state::expect_value;
+                            }
+                            break;
+                        case '\r':
+                            ++line_;
+                            column_ = 1;
+                            state_ = csv_parse_state::expect_value;
+                            break;
+                        default:
+                            ++column_;
+                            break;
                     }
                     prev_char_ = curr_char;
                     break;
@@ -677,6 +687,7 @@ all_csv_states:
                     if (column_ == 1 && curr_char == options_.comment_starter())
                     {
                         state_ = csv_parse_state::comment;
+                        ++column_;
                     }
                     else
                     {
@@ -691,6 +702,7 @@ all_csv_states:
                         {
                             value_buffer_.push_back(static_cast<CharT>(curr_char));
                             state_ = csv_parse_state::quoted_string;
+                            ++column_;
                         }
                         else if (options_.quote_escape_char() == options_.quote_char())
                         {
@@ -715,6 +727,7 @@ all_csv_states:
                             value_buffer_.push_back(static_cast<CharT>(curr_char));
                         }
                     }
+                    ++column_;
                     prev_char_ = curr_char;
                     break;
                 case csv_parse_state::between_fields:
@@ -770,6 +783,7 @@ all_csv_states:
                                 }
                                 state_ = csv_parse_state::unquoted_string;
                             }
+                            ++column_;
                             break;
                     }
                     prev_char_ = curr_char;
@@ -828,6 +842,7 @@ all_csv_states:
                                 {
                                     value_buffer_.push_back(static_cast<CharT>(curr_char));
                                 }
+                                ++column_;
                             }
                         }
                     prev_char_ = curr_char;
@@ -842,15 +857,6 @@ all_csv_states:
             {
                 state_ = csv_parse_state::done;
                 continue_ = false;
-            }
-            switch (curr_char)
-            {
-                case '\r':
-                case '\n':
-                    break;
-                default:
-                    ++column_;
-                    break;
             }
         }
     }
