@@ -671,6 +671,7 @@ all_csv_states:
                         state_ = csv_parse_state::expect_value;
                         goto all_csv_states;
                     }
+                    prev_char_ = curr_char;
                     break;
                 case csv_parse_state::expect_value:
                     if (column_ == 1 && curr_char == options_.comment_starter())
@@ -682,6 +683,7 @@ all_csv_states:
                         state_ = csv_parse_state::unquoted_string;
                         goto all_csv_states;
                     }
+                    prev_char_ = curr_char;
                     break;
                 case csv_parse_state::escaped_value: 
                     {
@@ -696,6 +698,7 @@ all_csv_states:
                             goto all_csv_states;
                         }
                     }
+                    prev_char_ = curr_char;
                     break;
                 case csv_parse_state::quoted_string: 
                     {
@@ -712,6 +715,7 @@ all_csv_states:
                             value_buffer_.push_back(static_cast<CharT>(curr_char));
                         }
                     }
+                    prev_char_ = curr_char;
                     break;
                 case csv_parse_state::between_fields:
                     switch (curr_char)
@@ -842,21 +846,12 @@ all_csv_states:
             switch (curr_char)
             {
                 case '\r':
-                    //++line_;
-                    //column_ = 1;
-                    break;
                 case '\n':
-                    //if (prev_char_ != '\r')
-                    //{
-                    //    ++line_;
-                    //}
-                    //column_ = 1;
                     break;
                 default:
                     ++column_;
                     break;
             }
-            prev_char_ = curr_char;
         }
     }
 
