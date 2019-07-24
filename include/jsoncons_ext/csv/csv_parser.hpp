@@ -663,13 +663,12 @@ public:
                     switch (curr_char)
                     {
                         case '\n':
-                            //if (prev_char_ != '\r')
-                            {
-                                ++line_;
-                                column_ = 1;
-                                state_ = csv_parse_state::expect_value;
-                            }
+                        {
+                            ++line_;
+                            column_ = 1;
+                            state_ = csv_parse_state::expect_value;
                             break;
+                        }
                         case '\r':
                             ++line_;
                             column_ = 1;
@@ -710,6 +709,8 @@ public:
                         }
                         else
                         {
+                            ++column_;
+                            ++input_ptr_;
                         }
                     }
                     break;
@@ -735,18 +736,17 @@ public:
                     switch (curr_char)
                     {
                         case '\n':
-                            //if (prev_char_ != '\r')
+                        {
+                            after_newline_between_fields(ec);
+                            if (ec)
                             {
-                                after_newline_between_fields(ec);
-                                if (ec)
-                                {
-                                    return;
-                                }
-                                ++line_;
-                                column_ = 1;
-                                state_ = csv_parse_state::expect_value;
+                                return;
                             }
+                            ++line_;
+                            column_ = 1;
+                            state_ = csv_parse_state::expect_value;
                             break;
+                        }
                         case '\r':
                             after_newline_between_fields(ec);
                             if (ec)
@@ -798,14 +798,13 @@ public:
                         switch (curr_char)
                         {
                             case '\n':
-                                //if (prev_char_ != '\r')
-                                {
-                                    after_newline();
-                                    ++line_;
-                                    column_ = 1;
-                                    state_ = csv_parse_state::expect_value;
-                                }
+                            {
+                                after_newline();
+                                ++line_;
+                                column_ = 1;
+                                state_ = csv_parse_state::expect_value;
                                 break;
+                            }
                             case '\r':
                                 after_newline();
                                 state_ = csv_parse_state::expect_value;
