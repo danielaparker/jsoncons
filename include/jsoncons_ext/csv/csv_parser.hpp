@@ -630,10 +630,10 @@ public:
             continue_ = false;
         }
 
-        for (; (input_ptr_ < local_input_end) && continue_; ++input_ptr_)
+        for (; (input_ptr_ < local_input_end) && continue_;)
         {
             CharT curr_char = *input_ptr_;
-all_csv_states:
+
             if (!(input_ptr_ < local_input_end))
             {
                 return;
@@ -660,7 +660,7 @@ all_csv_states:
                         continue_ = handler_.begin_array(semantic_tag::none, *this);
                     }
                     state_ = csv_parse_state::expect_value;
-                    goto all_csv_states;
+                    break;
                 case csv_parse_state::comment: 
                     switch (curr_char)
                     {
@@ -681,6 +681,7 @@ all_csv_states:
                             ++column_;
                             break;
                     }
+                    ++input_ptr_;
                     prev_char_ = curr_char;
                     break;
                 case csv_parse_state::expect_value:
@@ -689,11 +690,11 @@ all_csv_states:
                         state_ = csv_parse_state::comment;
                         ++column_;
                         prev_char_ = curr_char;
+                        ++input_ptr_;
                     }
                     else
                     {
                         state_ = csv_parse_state::unquoted_string;
-                        goto all_csv_states;
                     }
                     break;
                 case csv_parse_state::escaped_value: 
@@ -703,12 +704,11 @@ all_csv_states:
                             value_buffer_.push_back(static_cast<CharT>(curr_char));
                             state_ = csv_parse_state::quoted_string;
                             ++column_;
-                            prev_char_ = curr_char;
+                            ++input_ptr_;
                         }
                         else if (options_.quote_escape_char() == options_.quote_char())
                         {
                             state_ = csv_parse_state::between_fields;
-                            goto all_csv_states;
                         }
                         else
                         {
@@ -732,6 +732,7 @@ all_csv_states:
                         }
                     }
                     ++column_;
+                    ++input_ptr_;
                     prev_char_ = curr_char;
                     break;
                 case csv_parse_state::between_fields:
@@ -790,6 +791,7 @@ all_csv_states:
                             ++column_;
                             break;
                     }
+                    ++input_ptr_;
                     prev_char_ = curr_char;
                     break;
                 case csv_parse_state::unquoted_string: 
@@ -849,6 +851,7 @@ all_csv_states:
                                 ++column_;
                             }
                         }
+                    ++input_ptr_;
                     prev_char_ = curr_char;
                     break;
                 default:
