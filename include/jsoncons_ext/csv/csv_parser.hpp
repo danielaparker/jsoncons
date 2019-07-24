@@ -569,10 +569,6 @@ public:
                     }
                     if (!options_.ignore_empty_lines() || (column_index_ > 0 || value_buffer_.length() > 0))
                     {
-                        //if (column_index_ == 0)
-                        //{
-                        //    before_record();
-                        //}
                         if (stack_.back() != csv_mode::subfields)
                         {
                             before_field();
@@ -584,10 +580,6 @@ public:
                 case csv_parse_state::escaped_value:
                     if (options_.quote_escape_char() == options_.quote_char())
                     {
-                        //if (column_index_ == 0)
-                        //{
-                        //    before_record();
-                        //}
                         if (stack_.back() != csv_mode::subfields)
                         {
                             before_field();
@@ -765,10 +757,6 @@ public:
                         default:
                             if (curr_char == options_.field_delimiter() || (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
                             {
-                                //if (column_index_ == 0 && stack_.back() != csv_mode::subfields)
-                                //{
-                                //    before_record();
-                                //}
                                 if (options_.trim_leading() || options_.trim_trailing())
                                 {
                                     trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
@@ -817,10 +805,6 @@ public:
                             default:
                                 if (curr_char == options_.field_delimiter() || (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
                                 {
-                                    //if (column_index_ == 0 && stack_.back() != csv_mode::subfields)
-                                    //{
-                                    //    before_record();
-                                    //}
                                     if (options_.trim_leading() || options_.trim_trailing())
                                     {
                                         trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
@@ -1610,10 +1594,6 @@ private:
         }
         if (!options_.ignore_empty_lines() || (column_index_ > 0 || value_buffer_.length() > 0))
         {
-            //if (column_index_ == 0)
-            //{
-            //    before_record();
-            //}
             if (stack_.back() != csv_mode::subfields)
             {
                 before_field();
@@ -1632,10 +1612,6 @@ private:
         }
         if (!options_.ignore_empty_lines() || (column_index_ > 0 || value_buffer_.length() > 0))
         {
-            //if (column_index_ == 0)
-            //{
-            //    before_record();
-            //}
             if (stack_.back() != csv_mode::subfields)
             {
                 before_field();
