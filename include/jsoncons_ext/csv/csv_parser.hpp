@@ -39,6 +39,7 @@ enum class csv_parse_state
     cr, 
     expect_comment_or_record,
     expect_record,
+    end_record,
     comment,
     between_fields,
     quoted_string,
@@ -844,29 +845,35 @@ public:
                         {
                             case '\n':
                             {
-                                ++line_;
-                                column_ = 1;
-                                state_ = csv_parse_state::expect_comment_or_record;
                                 if (!options_.ignore_empty_lines())
                                 {
                                     before_record();
-                                    after_record();
+                                    state_ = csv_parse_state::end_record;
                                 }
-                                ++input_ptr_;
+                                else
+                                {
+                                    ++line_;
+                                    column_ = 1;
+                                    state_ = csv_parse_state::expect_comment_or_record;
+                                    ++input_ptr_;
+                                }
                                 break;
                             }
                             case '\r':
-                                ++line_;
-                                column_ = 1;
                                 if (!options_.ignore_empty_lines())
                                 {
                                     before_record();
-                                    after_record();
+                                    state_ = csv_parse_state::end_record;
                                 }
-                                state_ = csv_parse_state::expect_comment_or_record;
-                                push_state(state_);
-                                state_ = csv_parse_state::cr;
-                                ++input_ptr_;
+                                else
+                                {
+                                    ++line_;
+                                    column_ = 1;
+                                    state_ = csv_parse_state::expect_comment_or_record;
+                                    ++input_ptr_;
+                                    push_state(state_);
+                                    state_ = csv_parse_state::cr;
+                                }
                                 break;
                             case ' ':
                             case '\t':
@@ -894,6 +901,41 @@ public:
                                 ++column_;
                                 ++input_ptr_;
                                 break;
+                            }
+                        }
+                    break;
+                case csv_parse_state::end_record: 
+                    {
+                        switch (curr_char)
+                        {
+                            case '\n':
+                            {
+                                ++line_;
+                                column_ = 1;
+                                state_ = csv_parse_state::expect_comment_or_record;
+                                after_record();
+                                ++input_ptr_;
+                                break;
+                            }
+                            case '\r':
+                                ++line_;
+                                column_ = 1;
+                                state_ = csv_parse_state::expect_comment_or_record;
+                                after_record();
+                                push_state(state_);
+                                state_ = csv_parse_state::cr;
+                                ++input_ptr_;
+                                break;
+                            case ' ':
+                            case '\t':
+                                ++column_;
+                                ++input_ptr_;
+                                break;
+                            default:
+                                err_handler_(csv_errc::invalid_csv_text, *this);
+                                ec = csv_errc::invalid_csv_text;
+                                continue_ = false;
+                                return;
                             }
                         }
                     break;
