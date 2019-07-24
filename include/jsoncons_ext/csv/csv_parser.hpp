@@ -688,13 +688,13 @@ all_csv_states:
                     {
                         state_ = csv_parse_state::comment;
                         ++column_;
+                        prev_char_ = curr_char;
                     }
                     else
                     {
                         state_ = csv_parse_state::unquoted_string;
                         goto all_csv_states;
                     }
-                    prev_char_ = curr_char;
                     break;
                 case csv_parse_state::escaped_value: 
                     {
@@ -703,14 +703,18 @@ all_csv_states:
                             value_buffer_.push_back(static_cast<CharT>(curr_char));
                             state_ = csv_parse_state::quoted_string;
                             ++column_;
+                            prev_char_ = curr_char;
                         }
                         else if (options_.quote_escape_char() == options_.quote_char())
                         {
                             state_ = csv_parse_state::between_fields;
                             goto all_csv_states;
                         }
+                        else
+                        {
+                            prev_char_ = curr_char;
+                        }
                     }
-                    prev_char_ = curr_char;
                     break;
                 case csv_parse_state::quoted_string: 
                     {
