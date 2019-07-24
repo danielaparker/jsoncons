@@ -37,8 +37,8 @@ enum class csv_parse_state
 {
     start,
     cr, 
+    expect_comment_or_record,
     comment,
-    expect_value,
     between_fields,
     quoted_string,
     unquoted_string,
@@ -657,7 +657,7 @@ public:
                     {
                         continue_ = handler_.begin_array(semantic_tag::none, *this);
                     }
-                    state_ = csv_parse_state::expect_value;
+                    state_ = csv_parse_state::expect_comment_or_record;
                     break;
                 case csv_parse_state::comment: 
                     switch (curr_char)
@@ -666,13 +666,13 @@ public:
                         {
                             ++line_;
                             column_ = 1;
-                            state_ = csv_parse_state::expect_value;
+                            state_ = csv_parse_state::expect_comment_or_record;
                             break;
                         }
                         case '\r':
                             ++line_;
                             column_ = 1;
-                            state_ = csv_parse_state::expect_value;
+                            state_ = csv_parse_state::expect_comment_or_record;
                             push_state(state_);
                             state_ = csv_parse_state::cr;
                             break;
@@ -682,8 +682,8 @@ public:
                     }
                     ++input_ptr_;
                     break;
-                case csv_parse_state::expect_value:
-                    if (column_ == 1 && curr_char == options_.comment_starter())
+                case csv_parse_state::expect_comment_or_record:
+                    if (curr_char == options_.comment_starter())
                     {
                         state_ = csv_parse_state::comment;
                         ++column_;
@@ -744,7 +744,7 @@ public:
                             }
                             ++line_;
                             column_ = 1;
-                            state_ = csv_parse_state::expect_value;
+                            state_ = csv_parse_state::expect_comment_or_record;
                             break;
                         }
                         case '\r':
@@ -755,7 +755,7 @@ public:
                             }
                             ++line_;
                             column_ = 1;
-                            state_ = csv_parse_state::expect_value;
+                            state_ = csv_parse_state::expect_comment_or_record;
                             push_state(state_);
                             ++input_ptr_;
                             ++column_;
@@ -802,14 +802,14 @@ public:
                                 after_newline();
                                 ++line_;
                                 column_ = 1;
-                                state_ = csv_parse_state::expect_value;
+                                state_ = csv_parse_state::expect_comment_or_record;
                                 break;
                             }
                             case '\r':
                                 after_newline();
-                                state_ = csv_parse_state::expect_value;
                                 ++line_;
                                 column_ = 1;
+                                state_ = csv_parse_state::expect_comment_or_record;
                                 push_state(state_);
                                 state_ = csv_parse_state::cr;
                                 break;
@@ -1016,7 +1016,7 @@ private:
             default:
                 break;
         }
-        state_ = csv_parse_state::expect_value;
+        state_ = csv_parse_state::expect_comment_or_record;
         value_buffer_.clear();
     }
 
@@ -1082,7 +1082,7 @@ private:
                 continue_ = false;
                 return;
         }
-        state_ = csv_parse_state::expect_value;
+        state_ = csv_parse_state::expect_comment_or_record;
         value_buffer_.clear();
     }
 
