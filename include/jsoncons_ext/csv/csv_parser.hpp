@@ -729,6 +729,7 @@ public:
                 case csv_parse_state::between_fields:
                     switch (curr_char)
                     {
+                        case '\r':
                         case '\n':
                         {
                             after_newline_between_fields(ec);
@@ -736,25 +737,9 @@ public:
                             {
                                 return;
                             }
-                            ++line_;
-                            column_ = 1;
-                            state_ = csv_parse_state::expect_comment_or_record;
+                            state_ = csv_parse_state::end_record;
                             break;
                         }
-                        case '\r':
-                            after_newline_between_fields(ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            ++line_;
-                            column_ = 1;
-                            state_ = csv_parse_state::expect_comment_or_record;
-                            push_state(state_);
-                            ++input_ptr_;
-                            ++column_;
-                            state_ = csv_parse_state::cr;
-                            break;
                         default:
                             if (curr_char == options_.field_delimiter() || (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
                             {
@@ -779,30 +764,21 @@ public:
                                 state_ = csv_parse_state::unquoted_string;
                             }
                             ++column_;
+                            ++input_ptr_;
                             break;
                     }
-                    ++input_ptr_;
                     break;
                 case csv_parse_state::unquoted_string: 
                     {
                         switch (curr_char)
                         {
                             case '\n':
+                            case '\r':
                             {
                                 after_newline();
-                                ++line_;
-                                column_ = 1;
-                                state_ = csv_parse_state::expect_comment_or_record;
+                                state_ = csv_parse_state::end_record;
                                 break;
                             }
-                            case '\r':
-                                after_newline();
-                                ++line_;
-                                column_ = 1;
-                                state_ = csv_parse_state::expect_comment_or_record;
-                                push_state(state_);
-                                state_ = csv_parse_state::cr;
-                                break;
                             default:
                                 if (curr_char == options_.field_delimiter() || (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
                                 {
@@ -835,9 +811,9 @@ public:
                                     value_buffer_.push_back(static_cast<CharT>(curr_char));
                                 }
                                 ++column_;
-                            }
+                                ++input_ptr_;
                         }
-                    ++input_ptr_;
+                    }
                     break;
                 case csv_parse_state::expect_record: 
                     {
@@ -1642,7 +1618,6 @@ private:
             }
             end_unquoted_string_value();
             after_field();
-            after_record();
         }
     }
 
@@ -1661,7 +1636,6 @@ private:
             end_quoted_string_value(ec);
             if (ec) return;
             after_field();
-            after_record();
         }
     }
 };
