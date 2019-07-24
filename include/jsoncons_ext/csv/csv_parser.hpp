@@ -634,6 +634,10 @@ public:
         {
             CharT curr_char = *input_ptr_;
 all_csv_states:
+            if (!(input_ptr_ < local_input_end))
+            {
+                return;
+            }
             switch (state_)
             {
                 case csv_parse_state::cr:
