@@ -710,121 +710,112 @@ all_csv_states:
                     }
                     break;
                 case csv_parse_state::between_fields:
-                    if (prev_char_ == '\r' && curr_char == '\n')
+                    switch (curr_char)
                     {
-                    }
-                    else if (curr_char == '\r' || curr_char == '\n')
-                    {
-                        if (options_.trim_leading() || options_.trim_trailing())
-                        {
-                            trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
-                        }
-                        if (!options_.ignore_empty_lines() || (column_index_ > 0 || value_buffer_.length() > 0))
-                        {
-                            if (column_index_ == 0)
+                        case '\n':
+                            if (prev_char_ != '\r')
                             {
-                                before_record();
+                                after_newline_between_fields(ec);
+                                if (ec)
+                                {
+                                    return;
+                                }
+                                state_ = csv_parse_state::expect_value;
                             }
-                            if (stack_.back() != csv_mode::subfields)
+                            break;
+                        case '\r':
+                            after_newline_between_fields(ec);
+                            if (ec)
                             {
-                                before_field();
+                                return;
                             }
-                            end_quoted_string_value(ec);
-                            if (ec) return;
-                            after_field();
-                            after_record();
-                        }
-                        state_ = csv_parse_state::expect_value;
-                    }
-                    else if (curr_char == options_.field_delimiter() || (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
-                    {
-                        if (column_index_ == 0 && stack_.back() != csv_mode::subfields)
-                        {
-                            before_record();
-                        }
-                        if (options_.trim_leading() || options_.trim_trailing())
-                        {
-                            trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
-                        }
-                        if (stack_.back() != csv_mode::subfields)
-                        {
-                            before_field();
-                            if (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first)
+                            state_ = csv_parse_state::expect_value;
+                            prev_char_ = '\r';
+                            break;
+                        default:
+                            if (curr_char == options_.field_delimiter() || (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
                             {
-                                before_multi_valued_field();
-                            }
-                        }
-                        end_quoted_string_value(ec);
-                        if (ec) return;
-                        if (curr_char == options_.field_delimiter())
-                        {
-                            after_field();
-                        }
-                        state_ = csv_parse_state::unquoted_string;
-                    }
-                    break;
-                case csv_parse_state::unquoted_string: 
-                    {
-                        if (prev_char_ == '\r' && curr_char == '\n')
-                        {
-                        }
-                        else if (curr_char == '\r' || curr_char == '\n')
-                        {
-                            if (options_.trim_leading() || options_.trim_trailing())
-                            {
-                                trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
-                            }
-                            if (!options_.ignore_empty_lines() || (column_index_ > 0 || value_buffer_.length() > 0))
-                            {
-                                if (column_index_ == 0)
+                                if (column_index_ == 0 && stack_.back() != csv_mode::subfields)
                                 {
                                     before_record();
+                                }
+                                if (options_.trim_leading() || options_.trim_trailing())
+                                {
+                                    trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                                 }
                                 if (stack_.back() != csv_mode::subfields)
                                 {
                                     before_field();
+                                    if (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first)
+                                    {
+                                        before_multi_valued_field();
+                                    }
                                 }
-                                end_unquoted_string_value();
-                                after_field();
-                                after_record();
-                            }
-                            state_ = csv_parse_state::expect_value;
-                        }
-                        else if (curr_char == options_.field_delimiter() || (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
-                        {
-                            if (column_index_ == 0 && stack_.back() != csv_mode::subfields)
-                            {
-                                before_record();
-                            }
-                            if (options_.trim_leading() || options_.trim_trailing())
-                            {
-                                trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
-                            }
-                            if (stack_.back() != csv_mode::subfields)
-                            {
-                                before_field();
-                                if (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first)
+                                end_quoted_string_value(ec);
+                                if (ec) return;
+                                if (curr_char == options_.field_delimiter())
                                 {
-                                    before_multi_valued_field();
+                                    after_field();
+                                }
+                                state_ = csv_parse_state::unquoted_string;
+                            }
+                            break;
+                    }
+                    break;
+                case csv_parse_state::unquoted_string: 
+                    {
+                        switch (curr_char)
+                        {
+                            case '\n':
+                                if (prev_char_ != '\r')
+                                {
+                                    after_newline();
+                                    state_ = csv_parse_state::expect_value;
+                                }
+                                break;
+                            case '\r':
+                                after_newline();
+                                state_ = csv_parse_state::expect_value;
+                                prev_char_ = '\r';
+                                break;
+                            default:
+                                if (curr_char == options_.field_delimiter() || (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
+                                {
+                                    if (column_index_ == 0 && stack_.back() != csv_mode::subfields)
+                                    {
+                                        before_record();
+                                    }
+                                    if (options_.trim_leading() || options_.trim_trailing())
+                                    {
+                                        trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
+                                    }
+                                    if (stack_.back() != csv_mode::subfields)
+                                    {
+                                        before_field();
+                                        if (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first)
+                                        {
+                                            before_multi_valued_field();
+                                        }
+                                    }
+                                    end_unquoted_string_value();
+                                    if (curr_char == options_.field_delimiter())
+                                    {
+                                        after_field();
+                                    }
+                                    state_ = csv_parse_state::unquoted_string;
+                                }
+                                else if (curr_char == options_.quote_char())
+                                {
+                                    value_buffer_.clear();
+                                    state_ = csv_parse_state::quoted_string;
+                                }
+                                else
+                                {
+                                    value_buffer_.push_back(static_cast<CharT>(curr_char));
                                 }
                             }
-                            end_unquoted_string_value();
-                            if (curr_char == options_.field_delimiter())
-                            {
-                                after_field();
-                            }
-                            state_ = csv_parse_state::unquoted_string;
+                            break;
                         }
-                        else if (curr_char == options_.quote_char())
-                        {
-                            value_buffer_.clear();
-                            state_ = csv_parse_state::quoted_string;
-                        }
-                        else
-                        {
-                            value_buffer_.push_back(static_cast<CharT>(curr_char));
-                        }
-                    }
                     break;
                 default:
                     err_handler_(csv_errc::invalid_state, *this);
@@ -1518,7 +1509,7 @@ private:
             default:
                 handler_.string_value(value, semantic_tag::none, *this);
         }
-    }
+    } 
 
     void push_state(csv_parse_state state)
     {
@@ -1531,6 +1522,51 @@ private:
         csv_parse_state state = state_stack_.back();
         state_stack_.pop_back();
         return state;
+    }
+
+    void after_newline()
+    {
+        if (options_.trim_leading() || options_.trim_trailing())
+        {
+            trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
+        }
+        if (!options_.ignore_empty_lines() || (column_index_ > 0 || value_buffer_.length() > 0))
+        {
+            if (column_index_ == 0)
+            {
+                before_record();
+            }
+            if (stack_.back() != csv_mode::subfields)
+            {
+                before_field();
+            }
+            end_unquoted_string_value();
+            after_field();
+            after_record();
+        }
+    }
+
+    void after_newline_between_fields(std::error_code& ec)
+    {
+        if (options_.trim_leading() || options_.trim_trailing())
+        {
+            trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
+        }
+        if (!options_.ignore_empty_lines() || (column_index_ > 0 || value_buffer_.length() > 0))
+        {
+            if (column_index_ == 0)
+            {
+                before_record();
+            }
+            if (stack_.back() != csv_mode::subfields)
+            {
+                before_field();
+            }
+            end_quoted_string_value(ec);
+            if (ec) return;
+            after_field();
+            after_record();
+        }
     }
 };
 
