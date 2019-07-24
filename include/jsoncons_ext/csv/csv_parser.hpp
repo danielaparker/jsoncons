@@ -724,6 +724,8 @@ all_csv_states:
                                 {
                                     return;
                                 }
+                                ++line_;
+                                column_ = 1;
                                 state_ = csv_parse_state::expect_value;
                             }
                             break;
@@ -733,8 +735,9 @@ all_csv_states:
                             {
                                 return;
                             }
+                            ++line_;
+                            column_ = 1;
                             state_ = csv_parse_state::expect_value;
-                            prev_char_ = '\r';
                             break;
                         default:
                             if (curr_char == options_.field_delimiter() || (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
@@ -765,6 +768,7 @@ all_csv_states:
                             }
                             break;
                     }
+                    prev_char_ = curr_char;
                     break;
                 case csv_parse_state::unquoted_string: 
                     {
@@ -774,13 +778,16 @@ all_csv_states:
                                 if (prev_char_ != '\r')
                                 {
                                     after_newline();
+                                    ++line_;
+                                    column_ = 1;
                                     state_ = csv_parse_state::expect_value;
                                 }
                                 break;
                             case '\r':
                                 after_newline();
                                 state_ = csv_parse_state::expect_value;
-                                prev_char_ = '\r';
+                                ++line_;
+                                column_ = 1;
                                 break;
                             default:
                                 if (curr_char == options_.field_delimiter() || (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
@@ -818,8 +825,8 @@ all_csv_states:
                                     value_buffer_.push_back(static_cast<CharT>(curr_char));
                                 }
                             }
-                            break;
                         }
+                    prev_char_ = curr_char;
                     break;
                 default:
                     err_handler_(csv_errc::invalid_state, *this);
@@ -835,15 +842,15 @@ all_csv_states:
             switch (curr_char)
             {
                 case '\r':
-                    ++line_;
-                    column_ = 1;
+                    //++line_;
+                    //column_ = 1;
                     break;
                 case '\n':
-                    if (prev_char_ != '\r')
-                    {
-                        ++line_;
-                    }
-                    column_ = 1;
+                    //if (prev_char_ != '\r')
+                    //{
+                    //    ++line_;
+                    //}
+                    //column_ = 1;
                     break;
                 default:
                     ++column_;
