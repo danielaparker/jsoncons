@@ -466,47 +466,53 @@ public:
                 level_ = 0;
             }
         }
-        if (stack_.back() == csv_mode::header)
+        switch (stack_.back())
         {
-            if (line_ >= options_.header_lines())
-            {
-                stack_.back() = csv_mode::data;
-            }
-            column_values_.resize(column_names_.size());
-            switch (options_.mapping())
-            {
-                case mapping_type::n_rows:
-                    if (options_.assume_header() && column_names_.size() > 0)
-                    {
-                        continue_ = handler_.begin_array(semantic_tag::none, *this);
-                        for (const auto& name : column_names_)
+            case csv_mode::header:
+                if (line_ >= options_.header_lines())
+                {
+                    stack_.back() = csv_mode::data;
+                }
+                column_values_.resize(column_names_.size());
+                switch (options_.mapping())
+                {
+                    case mapping_type::n_rows:
+                        if (options_.assume_header() && column_names_.size() > 0)
                         {
-                            continue_ = handler_.string_value(name, semantic_tag::none, *this);
+                            continue_ = handler_.begin_array(semantic_tag::none, *this);
+                            for (const auto& name : column_names_)
+                            {
+                                continue_ = handler_.string_value(name, semantic_tag::none, *this);
+                            }
+                            continue_ = handler_.end_array(*this);
                         }
-                        continue_ = handler_.end_array(*this);
-                    }
-                    break;
-                case mapping_type::m_columns:
-                    m_columns_filter_.initialize(column_names_);
-                    break;
-                default:
-                    break;
-            }
-        }
-        else if (stack_.back() == csv_mode::data || stack_.back() == csv_mode::subfields)
-        {
-            switch (options_.mapping())
+                        break;
+                    case mapping_type::m_columns:
+                        m_columns_filter_.initialize(column_names_);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case csv_mode::data:
+            case csv_mode::subfields:
             {
-                case mapping_type::n_rows:
-                    continue_ = handler_.end_array(*this);
-                    break;
-                case mapping_type::n_objects:
-                    continue_ = handler_.end_object(*this);
-                    break;
-                case mapping_type::m_columns:
-                    continue_ = handler_.end_array(*this);
-                    break;
+                switch (options_.mapping())
+                {
+                    case mapping_type::n_rows:
+                        continue_ = handler_.end_array(*this);
+                        break;
+                    case mapping_type::n_objects:
+                        continue_ = handler_.end_object(*this);
+                        break;
+                    case mapping_type::m_columns:
+                        continue_ = handler_.end_array(*this);
+                        break;
+                }
+                break;
             }
+            default:
+                break;
         }
         column_index_ = 0;
     }
