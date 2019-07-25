@@ -439,7 +439,7 @@ public:
             {
                 case csv_parse_state::before_unquoted_string: 
                     value_buffer_.clear();
-                    JSONCONS_FALLTHROUGH
+                    JSONCONS_FALLTHROUGH;
                 case csv_parse_state::unquoted_string: 
                     if (options_.trim_leading() || options_.trim_trailing())
                     {
@@ -1215,19 +1215,19 @@ private:
                 {
                     if (column_index_ == offset_ || level_ > column_types_[column_index_-offset_].level)
                     {
-                        handler_.end_array(*this);
+                        continue_ = handler_.end_array(*this);
                     }
                     level_ = column_index_ == offset_ ? 0 : column_types_[column_index_ - offset_].level;
                 }
             }
             if (level_ < column_types_[column_index_ - offset_].level)
             {
-                handler_.begin_array(semantic_tag::none, *this);
+                continue_ = handler_.begin_array(semantic_tag::none, *this);
                 level_ = column_types_[column_index_ - offset_].level;
             }
             else if (level_ > column_types_[column_index_ - offset_].level)
             {
-                handler_.end_array(*this);
+                continue_ = handler_.end_array(*this);
                 level_ = column_types_[column_index_ - offset_].level;
             }
             switch (column_types_[column_index_ - offset_].col_type)
@@ -1239,7 +1239,7 @@ private:
                         iss >> val;
                         if (!iss.fail())
                         {
-                            handler_.int64_value(val, semantic_tag::none, *this);
+                            continue_ = handler_.int64_value(val, semantic_tag::none, *this);
                         }
                         else
                         {
@@ -1252,7 +1252,7 @@ private:
                             }
                             else
                             {
-                                handler_.null_value(semantic_tag::none, *this);
+                                continue_ = handler_.null_value(semantic_tag::none, *this);
                             }
                         }
                     }
@@ -1261,7 +1261,7 @@ private:
                     {
                         if (options_.lossless_number())
                         {
-                            handler_.string_value(value,semantic_tag::bigdec, *this);
+                            continue_ = handler_.string_value(value,semantic_tag::bigdec, *this);
                         }
                         else
                         {
@@ -1270,7 +1270,7 @@ private:
                             iss >> val;
                             if (!iss.fail())
                             {
-                                handler_.double_value(val, semantic_tag::none, *this);
+                                continue_ = handler_.double_value(val, semantic_tag::none, *this);
                             }
                             else
                             {
@@ -1283,7 +1283,7 @@ private:
                                 }
                                 else
                                 {
-                                    handler_.null_value(semantic_tag::none, *this);
+                                    continue_ = handler_.null_value(semantic_tag::none, *this);
                                 }
                             }
                         }
@@ -1293,19 +1293,19 @@ private:
                     {
                         if (value.length() == 1 && value[0] == '0')
                         {
-                            handler_.bool_value(false, semantic_tag::none, *this);
+                            continue_ = handler_.bool_value(false, semantic_tag::none, *this);
                         }
                         else if (value.length() == 1 && value[0] == '1')
                         {
-                            handler_.bool_value(true, semantic_tag::none, *this);
+                            continue_ = handler_.bool_value(true, semantic_tag::none, *this);
                         }
                         else if (value.length() == 5 && ((value[0] == 'f' || value[0] == 'F') && (value[1] == 'a' || value[1] == 'A') && (value[2] == 'l' || value[2] == 'L') && (value[3] == 's' || value[3] == 'S') && (value[4] == 'e' || value[4] == 'E')))
                         {
-                            handler_.bool_value(false, semantic_tag::none, *this);
+                            continue_ = handler_.bool_value(false, semantic_tag::none, *this);
                         }
                         else if (value.length() == 4 && ((value[0] == 't' || value[0] == 'T') && (value[1] == 'r' || value[1] == 'R') && (value[2] == 'u' || value[2] == 'U') && (value[3] == 'e' || value[3] == 'E')))
                         {
-                            handler_.bool_value(true, semantic_tag::none, *this);
+                            continue_ = handler_.bool_value(true, semantic_tag::none, *this);
                         }
                         else
                         {
@@ -1318,7 +1318,7 @@ private:
                             }
                             else
                             {
-                                handler_.null_value(semantic_tag::none, *this);
+                                continue_ = handler_.null_value(semantic_tag::none, *this);
                             }
                         }
                     }
@@ -1326,7 +1326,7 @@ private:
                 default:
                     if (value.length() > 0)
                     {
-                        handler_.string_value(value, semantic_tag::none, *this);
+                        continue_ = handler_.string_value(value, semantic_tag::none, *this);
                     }
                     else
                     {
@@ -1339,7 +1339,7 @@ private:
                         }
                         else
                         {
-                            handler_.string_value(string_view_type(), semantic_tag::none, *this);
+                            continue_ = handler_.string_value(string_view_type(), semantic_tag::none, *this);
                         }
                     }
                     break;  
@@ -1353,7 +1353,7 @@ private:
             }
             else
             {
-                handler_.string_value(value, semantic_tag::none, *this);
+                continue_ = handler_.string_value(value, semantic_tag::none, *this);
             }
         }
     }
@@ -1587,13 +1587,13 @@ private:
         switch (state)
         {
             case numeric_check_state::null:
-                handler_.null_value(semantic_tag::none, *this);
+                continue_ = handler_.null_value(semantic_tag::none, *this);
                 break;
             case numeric_check_state::boolean_true:
-                handler_.bool_value(true, semantic_tag::none, *this);
+                continue_ = handler_.bool_value(true, semantic_tag::none, *this);
                 break;
             case numeric_check_state::boolean_false:
-                handler_.bool_value(false, semantic_tag::none, *this);
+                continue_ = handler_.bool_value(false, semantic_tag::none, *this);
                 break;
             case numeric_check_state::zero:
             case numeric_check_state::integer:
@@ -1603,11 +1603,11 @@ private:
                     auto result = jsoncons::detail::to_integer<int64_t>(value.data(), value.length());
                     if (result.ec == jsoncons::detail::to_integer_errc())
                     {
-                        handler_.int64_value(result.value, semantic_tag::none, *this);
+                        continue_ = handler_.int64_value(result.value, semantic_tag::none, *this);
                     }
                     else // Must be overflow
                     {
-                        handler_.string_value(value, semantic_tag::bigint, *this);
+                        continue_ = handler_.string_value(value, semantic_tag::bigint, *this);
                     }
                 }
                 else
@@ -1615,11 +1615,11 @@ private:
                     auto result = jsoncons::detail::to_integer<uint64_t>(value.data(), value.length());
                     if (result.ec == jsoncons::detail::to_integer_errc())
                     {
-                        handler_.uint64_value(result.value, semantic_tag::none, *this);
+                        continue_ = handler_.uint64_value(result.value, semantic_tag::none, *this);
                     }
                     else if (result.ec == jsoncons::detail::to_integer_errc::overflow)
                     {
-                        handler_.string_value(value, semantic_tag::bigint, *this);
+                        continue_ = handler_.string_value(value, semantic_tag::bigint, *this);
                     }
                     else
                     {
@@ -1633,18 +1633,18 @@ private:
             {
                 if (options_.lossless_number())
                 {
-                    handler_.string_value(value,semantic_tag::bigdec, *this);
+                    continue_ = handler_.string_value(value,semantic_tag::bigdec, *this);
                 }
                 else
                 {
                     double d = to_double_(buffer.c_str(), buffer.length());
-                    handler_.double_value(d, semantic_tag::none, *this);
+                    continue_ = handler_.double_value(d, semantic_tag::none, *this);
                 }
                 break;
             }
             default:
             {
-                handler_.string_value(value, semantic_tag::none, *this);
+                continue_ = handler_.string_value(value, semantic_tag::none, *this);
                 break;
             }
         }
