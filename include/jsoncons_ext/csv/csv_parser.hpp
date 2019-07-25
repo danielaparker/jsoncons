@@ -985,11 +985,6 @@ private:
                     case mapping_type::n_rows:
                         if (options_.assume_header())
                         {
-                            //continue_ = handler_.begin_array(semantic_tag::none, *this);
-                            //for (const auto& name : column_names_)
-                            //{
-                            //    continue_ = handler_.string_value(name, semantic_tag::none, *this);
-                            //}
                             continue_ = handler_.end_array(*this);
                         }
                         break;
