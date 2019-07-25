@@ -45,6 +45,7 @@ enum class csv_parse_state
     between_fields,
     quoted_string,
     unquoted_string,
+    before_unquoted_string,
     escaped_value,
     minus, 
     zero,  
@@ -501,10 +502,6 @@ public:
         {
             CharT curr_char = *input_ptr_;
 
-            if (!(input_ptr_ < local_input_end))
-            {
-                return;
-            }
             switch (state_) 
             {
                 case csv_parse_state::cr:
@@ -608,6 +605,12 @@ public:
                         }
                     }
                     break;
+                case csv_parse_state::before_unquoted_string: 
+                {
+                    value_buffer_.clear();
+                    state_ = csv_parse_state::unquoted_string;
+                    break;
+                }
                 case csv_parse_state::quoted_string: 
                     {
                         if (curr_char == options_.quote_escape_char())
@@ -699,7 +702,8 @@ public:
                                     {
                                         after_field();
                                     }
-                                    state_ = csv_parse_state::unquoted_string;
+                                    value_buffer_.clear();
+                                    state_ = csv_parse_state::before_unquoted_string;
                                 }
                                 else if (curr_char == options_.quote_char())
                                 {
@@ -712,6 +716,7 @@ public:
                                 }
                                 ++column_;
                                 ++input_ptr_;
+                                break;
                         }
                     }
                     break;
