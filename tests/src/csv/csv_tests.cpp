@@ -18,6 +18,27 @@
 
 using namespace jsoncons;
 
+TEST_CASE("csv_test_empty_values_with_defaults x")
+{
+    std::string input = "bool-f,string-f"
+"\n,";
+
+    std::istringstream is(input);
+
+    json_decoder<json> decoder;
+
+    csv::csv_options options;
+    options.assume_header(true); 
+
+    csv::csv_reader reader(is,decoder,options);
+    reader.read();
+    json val = decoder.get_result();
+
+    std::cout << pretty_print(val) << std::endl;
+
+    CHECK(val[0]["string-f"].as<std::string>() == "");
+}
+
 TEST_CASE("n_objects_test")
 {
     const std::string bond_yields = R"(Date,1Y,2Y,3Y,5Y
