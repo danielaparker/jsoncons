@@ -576,6 +576,7 @@ public:
                     break;
                 
                 case csv_parse_state::expect_comment_or_record:
+                    value_buffer_.clear();
                     if (curr_char == options_.comment_starter())
                     {
                         state_ = csv_parse_state::comment;
