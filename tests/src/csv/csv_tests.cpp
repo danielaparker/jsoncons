@@ -17,7 +17,7 @@
 #include <catch/catch.hpp>
 
 using namespace jsoncons;
-#if 0
+
 TEST_CASE("n_objects_test")
 {
     const std::string bond_yields = R"(Date,1Y,2Y,3Y,5Y
@@ -146,7 +146,7 @@ TEST_CASE("csv_test_empty_values")
     CHECK(val[0]["string-f"] .as<std::string>() == "");
     CHECK(val[0]["string-f"].is<std::string>());
 }
-#endif
+
 TEST_CASE("csv_test_empty_values_with_defaults")
 {
     std::string input = "bool-f,int-f,float-f,string-f"
@@ -196,7 +196,7 @@ TEST_CASE("csv_test_empty_values_with_defaults")
     CHECK(val[2]["string-f"].as<std::string>() == "");
     CHECK(val[2]["string-f"].is<std::string>());
 }
-#if 0
+
 TEST_CASE("csv_test_empty_values_with_empty_defaults")
 {
     std::string input = "bool-f,int-f,float-f,string-f"
@@ -1256,4 +1256,4 @@ TEST_CASE("test_encode_decode csv string")
         CHECK(j1 == j2);
     }
 }
-#endif
+

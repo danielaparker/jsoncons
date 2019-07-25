@@ -664,7 +664,7 @@ public:
                                 {
                                     after_field();
                                 }
-                                state_ = csv_parse_state::unquoted_string;
+                                state_ = csv_parse_state::before_unquoted_string;
                             }
                             ++column_;
                             ++input_ptr_;
@@ -703,7 +703,7 @@ public:
                                         after_field();
                                     }
                                     value_buffer_.clear();
-                                    state_ = csv_parse_state::before_unquoted_string;
+                                    state_ = csv_parse_state::unquoted_string;
                                 }
                                 else if (curr_char == options_.quote_char())
                                 {
@@ -885,14 +885,6 @@ private:
         switch (stack_.back())
         {
             case csv_mode::header:
-                if (options_.assume_header() && line_ == 1)
-                {
-                    column_names_.push_back(value_buffer_);
-                    if (options_.mapping() == mapping_type::n_rows)
-                    {
-                        continue_ = handler_.string_value(value_buffer_, semantic_tag::none, *this);
-                    }
-                }
                 break;
             case csv_mode::data:
             case csv_mode::subfields:
@@ -1073,6 +1065,16 @@ private:
     {
         switch (stack_.back())
         {
+            case csv_mode::header:
+                if (options_.assume_header() && line_ == 1)
+                {
+                    column_names_.push_back(value_buffer_);
+                    if (options_.mapping() == mapping_type::n_rows)
+                    {
+                        continue_ = handler_.string_value(value_buffer_, semantic_tag::none, *this);
+                    }
+                }
+                break;
             case csv_mode::data:
             case csv_mode::subfields:
                 switch (options_.mapping())
@@ -1129,7 +1131,6 @@ private:
             default:
                 break;
         }
-        value_buffer_.clear();
     }
 
     void end_quoted_string_value(std::error_code& ec) 
@@ -1141,6 +1142,14 @@ private:
         switch (stack_.back())
         {
             case csv_mode::header:
+                if (options_.assume_header() && line_ == 1)
+                {
+                    column_names_.push_back(value_buffer_);
+                    if (options_.mapping() == mapping_type::n_rows)
+                    {
+                        continue_ = handler_.string_value(value_buffer_, semantic_tag::none, *this);
+                    }
+                }
                 break;
             case csv_mode::data:
             case csv_mode::subfields:
@@ -1194,7 +1203,6 @@ private:
                 continue_ = false;
                 return;
         }
-        value_buffer_.clear();
     }
 
     void end_value(const string_view_type& value, bool infer_types)
