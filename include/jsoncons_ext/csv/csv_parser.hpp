@@ -449,6 +449,7 @@ public:
                         }
                         end_unquoted_string_value();
                         after_field();
+                        state_ = csv_parse_state::expect_comment_or_record;
                     }
                     break;
                 case csv_parse_state::escaped_value:
@@ -461,6 +462,7 @@ public:
                         end_quoted_string_value(ec);
                         if (ec) return;
                         after_field();
+                        state_ = csv_parse_state::expect_comment_or_record;
                     }
                     break;
                 default:
@@ -1121,7 +1123,6 @@ private:
             default:
                 break;
         }
-        state_ = csv_parse_state::expect_comment_or_record;
         value_buffer_.clear();
     }
 
@@ -1187,7 +1188,6 @@ private:
                 continue_ = false;
                 return;
         }
-        state_ = csv_parse_state::expect_comment_or_record;
         value_buffer_.clear();
     }
 
