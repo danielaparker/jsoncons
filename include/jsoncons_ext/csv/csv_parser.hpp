@@ -432,21 +432,26 @@ public:
     void before_record()
     {
         offset_ = 0;
-        if (stack_.back() == csv_mode::data)
+
+        switch (stack_.back())
         {
-            switch (options_.mapping())
-            {
-                case mapping_type::n_rows:
-                    continue_ = handler_.begin_array(semantic_tag::none, *this);
-                    break;
-                case mapping_type::n_objects:
-                    continue_ = handler_.begin_object(semantic_tag::none, *this);
-                    break;
-                case mapping_type::m_columns:
-                    break;
-                default:
-                    break;
-            }
+            case csv_mode::data:
+                switch (options_.mapping())
+                {
+                    case mapping_type::n_rows:
+                        continue_ = handler_.begin_array(semantic_tag::none, *this);
+                        break;
+                    case mapping_type::n_objects:
+                        continue_ = handler_.begin_object(semantic_tag::none, *this);
+                        break;
+                    case mapping_type::m_columns:
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -631,7 +636,7 @@ public:
             {
                 return;
             }
-            switch (state_)
+            switch (state_) 
             {
                 case csv_parse_state::cr:
                     ++line_;
