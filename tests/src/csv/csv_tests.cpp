@@ -1019,11 +1019,13 @@ WLF,WALLIS & FUTUNA ISLANDS
     csv::csv_reader reader(is,decoder,options);
     reader.read();
     json j = decoder.get_result();
-    CHECK(j.size() == 5);
+
+    //std::cout << pretty_print(j) << "\n";
+    REQUIRE(j.size() == 5);
 
     CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW"));
     CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA"));
-    CHECK(j[1]["country_code"].as<std::string>() == std::string("")); // ok, no delimiter
+    CHECK(!j[1].contains("country_code")); // ok, no delimiter
     CHECK(j[2]["country_code"].as<std::string>() == std::string("ATF"));
     CHECK(j[2]["name"].as<std::string>() == std::string("FRENCH SOUTHERN TERRITORIES, D.R. OF"));
     CHECK(j[3]["country_code"].as<std::string>() == std::string("VUT"));
@@ -1052,7 +1054,7 @@ WLF,WALLIS & FUTUNA ISLANDS
     csv::csv_reader reader(is,decoder,options);
     reader.read();
     json j = decoder.get_result();
-    CHECK(j.size() == 5);
+    REQUIRE(j.size() == 5);
     CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW"));
     CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA"));
     CHECK(j[1]["country_code"].as<std::string>() == std::string(" ")); // ok, one space, no delimiter
@@ -1087,7 +1089,7 @@ WLF,WALLIS & FUTUNA ISLANDS
     csv::csv_reader reader(is,decoder,options);
     reader.read();
     json j = decoder.get_result();
-    CHECK(j.size() == 4);
+    REQUIRE(j.size() == 4);
     CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW"));
     CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA"));
     CHECK(j[1]["country_code"].as<std::string>() == std::string("ATF"));
