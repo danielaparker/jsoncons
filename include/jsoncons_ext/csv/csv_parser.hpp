@@ -880,6 +880,10 @@ private:
                 if (options_.assume_header() && line_ == 1)
                 {
                     column_names_.push_back(value_buffer_);
+                    if (options_.mapping() == mapping_type::n_rows)
+                    {
+                        continue_ = handler_.string_value(value_buffer_, semantic_tag::none, *this);
+                    }
                 }
                 break;
             case csv_mode::data:
@@ -928,6 +932,15 @@ private:
 
         switch (stack_.back())
         {
+            case csv_mode::header:
+                if (options_.assume_header() && line_ == 1)
+                {
+                    if (options_.mapping() == mapping_type::n_rows)
+                    {
+                        continue_ = handler_.begin_array(semantic_tag::none, *this);
+                    }
+                }
+                break;
             case csv_mode::data:
                 switch (options_.mapping())
                 {
@@ -970,13 +983,13 @@ private:
                 switch (options_.mapping())
                 {
                     case mapping_type::n_rows:
-                        if (options_.assume_header() && column_names_.size() > 0)
+                        if (options_.assume_header())
                         {
-                            continue_ = handler_.begin_array(semantic_tag::none, *this);
-                            for (const auto& name : column_names_)
-                            {
-                                continue_ = handler_.string_value(name, semantic_tag::none, *this);
-                            }
+                            //continue_ = handler_.begin_array(semantic_tag::none, *this);
+                            //for (const auto& name : column_names_)
+                            //{
+                            //    continue_ = handler_.string_value(name, semantic_tag::none, *this);
+                            //}
                             continue_ = handler_.end_array(*this);
                         }
                         break;
