@@ -34,7 +34,7 @@ TEST_CASE("csv_test_empty_values_with_defaults x")
     reader.read();
     json val = decoder.get_result();
 
-    std::cout << pretty_print(val) << std::endl;
+    //std::cout << pretty_print(val) << std::endl;
 
     CHECK(val[0]["string-f"].as<std::string>() == "");
 }

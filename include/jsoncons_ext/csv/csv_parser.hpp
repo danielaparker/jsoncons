@@ -438,8 +438,8 @@ public:
             switch (state_)
             {
                 case csv_parse_state::before_unquoted_string: 
-                    state_ = csv_parse_state::done;
-                    break;
+                    value_buffer_.clear();
+                    JSONCONS_FALLTHROUGH
                 case csv_parse_state::unquoted_string: 
                     if (options_.trim_leading() || options_.trim_trailing())
                     {
@@ -703,8 +703,7 @@ public:
                                 {
                                     after_field();
                                 }
-                                value_buffer_.clear();
-                                state_ = csv_parse_state::unquoted_string;
+                                state_ = csv_parse_state::before_unquoted_string;
                             }
                             else if (curr_char == options_.quote_char())
                             {
@@ -780,7 +779,6 @@ public:
                             else
                             {
                                 state_ = csv_parse_state::unquoted_string;
-                                //value_buffer_.push_back(static_cast<CharT>(curr_char));
                             }
                             break;
                         }
@@ -1645,7 +1643,10 @@ private:
                 break;
             }
             default:
+            {
                 handler_.string_value(value, semantic_tag::none, *this);
+                break;
+            }
         }
     } 
 
