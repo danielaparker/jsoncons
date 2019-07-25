@@ -54,6 +54,7 @@ enum class csv_parse_state
     exp1,
     exp2,
     exp3,
+    before_done,
     done
 };
 
@@ -369,6 +370,11 @@ public:
         return !continue_;
     }
 
+    bool finished() const
+    {
+        return !continue_ && state_ != csv_parse_state::before_done;
+    }
+
     bool source_exhausted() const
     {
         return input_ptr_ == input_end_;
@@ -388,15 +394,15 @@ public:
 
         stack_.push_back(csv_mode::initial);
 
-        for (auto name : options_.column_names())
+        for (const auto& name : options_.column_names())
         {
             column_names_.emplace_back(name.data(),name.size());
         }
-        for (auto name : options_.column_types())
+        for (const auto& name : options_.column_types())
         {
             column_types_.push_back(name);
         }
-        for (auto name : options_.column_defaults())
+        for (const auto& name : options_.column_defaults())
         {
             column_defaults_.emplace_back(name.data(), name.size());
         }
@@ -431,6 +437,14 @@ public:
 
     void parse_some(std::error_code& ec)
     {
+        if (state_ == csv_parse_state::before_done)
+        {
+            handler_.flush();
+            state_ = csv_parse_state::done;
+            continue_ = false;
+            return;
+        }
+
         const CharT* local_input_end = input_end_;
 
         if (input_ptr_ == local_input_end && continue_)
@@ -495,8 +509,8 @@ public:
             }
             stack_.pop_back();
 
-            handler_.flush();
             continue_ = false;
+            state_ = csv_parse_state::before_done;
         }
 
         for (; (input_ptr_ < local_input_end) && continue_;)
