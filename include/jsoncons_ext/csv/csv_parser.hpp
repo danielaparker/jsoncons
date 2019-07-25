@@ -37,6 +37,7 @@ enum class csv_parse_state
 {
     start,
     cr, 
+    column_labels,
     expect_comment_or_record,
     expect_record,
     end_record,
@@ -470,7 +471,7 @@ public:
             switch (options_.mapping())
             {
                 case mapping_type::n_rows:
-                    if (column_names_.size() > 0)
+                    if (options_.assume_header() && column_names_.size() > 0)
                     {
                         continue_ = handler_.begin_array(semantic_tag::none, *this);
                         for (const auto& name : column_names_)
@@ -651,7 +652,30 @@ public:
                     {
                         continue_ = handler_.begin_array(semantic_tag::none, *this);
                     }
-                    state_ = csv_parse_state::expect_comment_or_record;
+                    if (!options_.assume_header() && options_.mapping() == mapping_type::n_rows && options_.column_names().size() > 0)
+                    {
+                        column_index_ = 0;
+                        state_ = csv_parse_state::column_labels;
+                        continue_ = handler_.begin_array(semantic_tag::none, *this);
+                    }
+                    else
+                    {
+                        state_ = csv_parse_state::expect_comment_or_record;
+                    }
+                    break;
+                case csv_parse_state::column_labels:
+                    if (column_index_ < column_names_.size())
+                    {
+                        continue_ = handler_.string_value(column_names_[column_index_], semantic_tag::none, *this);
+                        ++column_index_;
+                    }
+                    else
+                    {
+                        continue_ = handler_.end_array(*this);
+                        state_ = csv_parse_state::expect_comment_or_record; 
+                        //stack_.back() = csv_mode::data;
+                        column_index_ = 0;
+                    }
                     break;
                 case csv_parse_state::comment: 
                     switch (curr_char)
@@ -676,6 +700,7 @@ public:
                     }
                     ++input_ptr_;
                     break;
+                
                 case csv_parse_state::expect_comment_or_record:
                     if (curr_char == options_.comment_starter())
                     {
