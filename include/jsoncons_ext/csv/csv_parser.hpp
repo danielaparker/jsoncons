@@ -461,10 +461,7 @@ public:
                     }
                     if (!options_.ignore_empty_lines() || (column_index_ > 0 || buffer_.length() > 0))
                     {
-                        if (stack_.back() == csv_mode::data)
-                        {
-                            before_field();
-                        }
+                        before_field();
                         end_unquoted_string_value();
                         after_field();
                     }
@@ -472,10 +469,7 @@ public:
                 case csv_parse_state::escaped_value:
                     if (options_.quote_escape_char() == options_.quote_char())
                     {
-                        if (stack_.back() == csv_mode::data)
-                        {
-                            before_field();
-                        }
+                        before_field();
                         end_quoted_string_value(ec);
                         if (ec) return;
                         after_field();
@@ -657,9 +651,9 @@ public:
                                 {
                                     trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                                 }
+                                before_field();
                                 if (stack_.back() == csv_mode::data)
                                 {
-                                    before_field();
                                     if (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first)
                                     {
                                         before_multi_valued_field();
@@ -702,9 +696,9 @@ public:
                                 {
                                     trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                                 }
+                                before_field();
                                 if (stack_.back() == csv_mode::data)
                                 {
-                                    before_field();
                                     if (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first)
                                     {
                                         before_multi_valued_field();
@@ -896,19 +890,15 @@ private:
         switch (stack_.back())
         {
             case csv_mode::data:
-                switch (options_.mapping())
+                if (options_.mapping() == mapping_type::n_objects)
                 {
-                    case mapping_type::n_objects:
-                        if (!(options_.ignore_empty_values() && buffer_.size() == 0))
+                    if (!(options_.ignore_empty_values() && buffer_.size() == 0))
+                    {
+                        if (column_index_ < column_names_.size() + offset_)
                         {
-                            if (column_index_ < column_names_.size() + offset_)
-                            {
-                                continue_ = handler_.name(column_names_[column_index_ - offset_], *this);
-                            }
+                            continue_ = handler_.name(column_names_[column_index_ - offset_], *this);
                         }
-                        break;
-                    default:
-                        break;
+                    }
                 }
                 break;
             default:
