@@ -508,8 +508,6 @@ public:
                 return;
             }
             stack_.pop_back();
-
-            continue_ = false;
             state_ = csv_parse_state::before_done;
         }
 
