@@ -674,6 +674,8 @@ public:
                                 if (ec) return;
                                 after_field();
                                 state_ = csv_parse_state::before_unquoted_string;
+                                ++column_;
+                                ++input_ptr_;
                             }
                             else if ((options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
                             {
@@ -689,9 +691,9 @@ public:
                                 end_quoted_string_value(ec);
                                 if (ec) return;
                                 state_ = csv_parse_state::before_unquoted_string;
+                                ++column_;
+                                ++input_ptr_;
                             }
-                            ++column_;
-                            ++input_ptr_;
                             break;
                     }
                     break;
