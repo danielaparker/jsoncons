@@ -58,6 +58,7 @@ enum class csv_parse_state
     before_unquoted_value,
     before_unquoted_value1,
     before_quoted_value,
+    before_quoted_value1,
     done
 };
 
@@ -661,10 +662,14 @@ public:
                             if (!options_.ignore_empty_lines() || (column_index_ > 0 || buffer_.length() > 0))
                             {
                                 before_value();
-                                end_quoted_string_value();
-                                after_field();
+                                state_ = csv_parse_state::before_quoted_value1;
+                                //end_quoted_string_value();
+                                //after_field();
                             }
-                            state_ = csv_parse_state::end_record;
+                            else
+                            {
+                                state_ = csv_parse_state::end_record;
+                            }
                             break;
                         }
                         default:
@@ -725,6 +730,13 @@ public:
                     state_ = csv_parse_state::before_unquoted_string;
                     ++column_;
                     ++input_ptr_;
+                    break;
+                case csv_parse_state::before_quoted_value1:
+                    end_quoted_string_value();
+                    after_field();
+                    state_ = csv_parse_state::end_record;
+                    //++column_;
+                    //++input_ptr_;
                     break;
                 case csv_parse_state::before_unquoted_value1:
                     end_unquoted_string_value();

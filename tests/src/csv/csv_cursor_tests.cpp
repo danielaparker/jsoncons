@@ -89,7 +89,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
 #endif
 TEST_CASE("csv_cursor n_rows with quotes test")
 {
-    const std::string data = R"("index_id","observation_date","rate""
+    const std::string data = R"("index_id","observation_date","rate"
 EUR_LIBOR_06M,2015-10-23,0.0000214
 EUR_LIBOR_06M,2015-10-26,0.0000143
 EUR_LIBOR_06M,2015-10-27,0.0000001
@@ -101,7 +101,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         options.assume_header(true)
                .mapping(csv::mapping_type::n_rows);
         csv::csv_cursor cursor(data, options);
-        for (; !cursor.done(); cursor.next())
+        /* for (; !cursor.done(); cursor.next())
         {
             const auto& event = cursor.current();
             switch (event.event_type())
@@ -145,8 +145,8 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
                     std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";;
                     break;
             }
-        }
-/*
+        }*/
+
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
         cursor.next();
 
@@ -200,7 +200,6 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         CHECK(cursor.current().event_type() == staj_event_type::end_array);
         cursor.next();
         CHECK(cursor.done());
- */
     }
 }
 #if 0
