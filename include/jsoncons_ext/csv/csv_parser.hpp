@@ -42,7 +42,7 @@ enum class csv_parse_state
     expect_record,
     end_record,
     comment,
-    between_fields,
+    between_values,
     quoted_string,
     unquoted_string,
     before_unquoted_string,
@@ -463,8 +463,11 @@ public:
                     if (!options_.ignore_empty_lines() || (column_index_ > 0 || buffer_.length() > 0))
                     {
                         before_value();
-                        end_unquoted_string_value();
-                        after_field();
+                        state_ = csv_parse_state::before_unquoted_value;
+                    }
+                    else
+                    {
+                        state_ = csv_parse_state::end_record;
                     }
                     break;
                 case csv_parse_state::escaped_value:
@@ -475,35 +478,45 @@ public:
                         if (ec) return;
                         after_field();
                     }
+                    state_ = csv_parse_state::end_record;
+                    break;
+                case csv_parse_state::before_unquoted_value:
+                    end_unquoted_string_value();
+                    after_field();
+                    state_ = csv_parse_state::end_record;
                     break;
                 default:
+                    state_ = csv_parse_state::end_record;
                     break;
             }
-            if (column_index_ > 0)
+            if (state_ == csv_parse_state::end_record)
             {
-                after_record();
+                if (column_index_ > 0)
+                {
+                    after_record();
+                }
+                switch (stack_.back()) 
+                {
+                    case csv_mode::header:
+                        stack_.pop_back();
+                        break;
+                    case csv_mode::data:
+                        stack_.pop_back();
+                        break;
+                    default:
+                        break;
+                }
+                continue_ = handler_.end_array(*this);
+                if (!(stack_.size() == 1 && stack_.back() == csv_mode::initial))
+                {
+                    err_handler_(csv_errc::unexpected_eof, *this);
+                    ec = csv_errc::unexpected_eof;
+                    continue_ = false;
+                    return;
+                }
+                stack_.pop_back();
+                state_ = csv_parse_state::before_done;
             }
-            switch (stack_.back()) 
-            {
-                case csv_mode::header:
-                    stack_.pop_back();
-                    break;
-                case csv_mode::data:
-                    stack_.pop_back();
-                    break;
-                default:
-                    break;
-            }
-            continue_ = handler_.end_array(*this);
-            if (!(stack_.size() == 1 && stack_.back() == csv_mode::initial))
-            {
-                err_handler_(csv_errc::unexpected_eof, *this);
-                ec = csv_errc::unexpected_eof;
-                continue_ = false;
-                return;
-            }
-            stack_.pop_back();
-            state_ = csv_parse_state::before_done;
         }
 
         for (; (input_ptr_ < local_input_end) && continue_;)
@@ -604,12 +617,13 @@ public:
                         }
                         else if (options_.quote_escape_char() == options_.quote_char())
                         {
-                            state_ = csv_parse_state::between_fields;
+                            state_ = csv_parse_state::between_values;
                         }
                         else
                         {
-                            ++column_;
-                            ++input_ptr_;
+                            ec = csv_errc::invalid_escaped_char;
+                            continue_ = false;
+                            return;
                         }
                     }
                     break;
@@ -621,7 +635,7 @@ public:
                         }
                         else if (curr_char == options_.quote_char())
                         {
-                            state_ = csv_parse_state::between_fields;
+                            state_ = csv_parse_state::between_values;
                         }
                         else
                         {
@@ -631,7 +645,7 @@ public:
                     ++column_;
                     ++input_ptr_;
                     break;
-                case csv_parse_state::between_fields:
+                case csv_parse_state::between_values:
                     switch (curr_char)
                     {
                         case '\r':
@@ -646,7 +660,8 @@ public:
                             break;
                         }
                         default:
-                            if (curr_char == options_.field_delimiter() || (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
+                            /* if (curr_char == options_.field_delimiter() || 
+                                (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
                             {
                                 if (options_.trim_leading() || options_.trim_trailing())
                                 {
@@ -666,6 +681,35 @@ public:
                                 {
                                     after_field();
                                 }
+                                state_ = csv_parse_state::before_unquoted_string;
+                            }
+                            ++column_;
+                            ++input_ptr_;*/
+                            if (curr_char == options_.field_delimiter())
+                            {
+                                if (options_.trim_leading() || options_.trim_trailing())
+                                {
+                                    trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
+                                }
+                                before_value();
+                                end_quoted_string_value(ec);
+                                if (ec) return;
+                                after_field();
+                                state_ = csv_parse_state::before_unquoted_string;
+                            }
+                            else if ((options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
+                            {
+                                if (options_.trim_leading() || options_.trim_trailing())
+                                {
+                                    trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
+                                }
+                                before_value();
+                                if (stack_.back() == csv_mode::data)
+                                {
+                                    before_multi_valued_field();
+                                }
+                                end_quoted_string_value(ec);
+                                if (ec) return;
                                 state_ = csv_parse_state::before_unquoted_string;
                             }
                             ++column_;

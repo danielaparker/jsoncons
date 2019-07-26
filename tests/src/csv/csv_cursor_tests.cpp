@@ -102,7 +102,6 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
                .mapping(csv::mapping_type::n_objects);
         csv::csv_cursor cursor(data, options);
 
-
         for (; !cursor.done(); cursor.next())
         {
             const auto& event = cursor.current();
@@ -148,7 +147,6 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
                     break;
             }
         }
-
 /*
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
         cursor.next();
