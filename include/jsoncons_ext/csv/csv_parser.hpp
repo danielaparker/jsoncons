@@ -1094,7 +1094,7 @@ private:
                     }
                     else
                     {
-                        end_value(value_buffer_,options_.infer_types());
+                        end_value(options_.infer_types());
                     }
                     break;
                 case mapping_type::n_objects:
@@ -1108,7 +1108,7 @@ private:
                             }
                             else
                             {
-                                end_value(value_buffer_,options_.infer_types());
+                                end_value(options_.infer_types());
                             }
                         }
                         else if (level_ > 0)
@@ -1119,7 +1119,7 @@ private:
                             }
                             else
                             {
-                                end_value(value_buffer_,options_.infer_types());
+                                end_value(options_.infer_types());
                             }
                         }
                     }
@@ -1127,7 +1127,7 @@ private:
                 case mapping_type::m_columns:
                     if (!(options_.ignore_empty_values() && value_buffer_.size() == 0))
                     {
-                        end_value(value_buffer_,options_.infer_types());
+                        end_value(options_.infer_types());
                     }
                     else
                     {
@@ -1164,7 +1164,7 @@ private:
                 switch (options_.mapping())
                 {
                 case mapping_type::n_rows:
-                    end_value(value_buffer_,false);
+                    end_value(false);
                     break;
                 case mapping_type::n_objects:
                     if (!(options_.ignore_empty_values() && value_buffer_.size() == 0))
@@ -1177,7 +1177,7 @@ private:
                             }
                             else 
                             {
-                                end_value(value_buffer_,false);
+                                end_value(false);
                             }
                         }
                         else if (level_ > 0)
@@ -1188,7 +1188,7 @@ private:
                             }
                             else
                             {
-                                end_value(value_buffer_,false);
+                                end_value(false);
                             }
                         }
                     }
@@ -1196,7 +1196,7 @@ private:
                 case mapping_type::m_columns:
                     if (!(options_.ignore_empty_values() && value_buffer_.size() == 0))
                     {
-                        end_value(value_buffer_,options_.infer_types());
+                        end_value(options_.infer_types());
                     }
                     else
                     {
@@ -1213,7 +1213,7 @@ private:
         }
     }
 
-    void end_value(const string_view_type& value, bool infer_types)
+    void end_value(bool infer_types)
     {
         if (column_index_ < column_types_.size() + offset_)
         {
@@ -1243,7 +1243,7 @@ private:
             {
                 case csv_column_type::integer_t:
                     {
-                        std::istringstream iss{ std::string(value) };
+                        std::istringstream iss{ std::string(value_buffer_) };
                         int64_t val;
                         iss >> val;
                         if (!iss.fail())
@@ -1270,11 +1270,11 @@ private:
                     {
                         if (options_.lossless_number())
                         {
-                            continue_ = handler_.string_value(value,semantic_tag::bigdec, *this);
+                            continue_ = handler_.string_value(value_buffer_,semantic_tag::bigdec, *this);
                         }
                         else
                         {
-                            std::istringstream iss{ std::string(value) };
+                            std::istringstream iss{ std::string(value_buffer_) };
                             double val;
                             iss >> val;
                             if (!iss.fail())
@@ -1300,19 +1300,19 @@ private:
                     break;
                 case csv_column_type::boolean_t:
                     {
-                        if (value.length() == 1 && value[0] == '0')
+                        if (value_buffer_.length() == 1 && value_buffer_[0] == '0')
                         {
                             continue_ = handler_.bool_value(false, semantic_tag::none, *this);
                         }
-                        else if (value.length() == 1 && value[0] == '1')
+                        else if (value_buffer_.length() == 1 && value_buffer_[0] == '1')
                         {
                             continue_ = handler_.bool_value(true, semantic_tag::none, *this);
                         }
-                        else if (value.length() == 5 && ((value[0] == 'f' || value[0] == 'F') && (value[1] == 'a' || value[1] == 'A') && (value[2] == 'l' || value[2] == 'L') && (value[3] == 's' || value[3] == 'S') && (value[4] == 'e' || value[4] == 'E')))
+                        else if (value_buffer_.length() == 5 && ((value_buffer_[0] == 'f' || value_buffer_[0] == 'F') && (value_buffer_[1] == 'a' || value_buffer_[1] == 'A') && (value_buffer_[2] == 'l' || value_buffer_[2] == 'L') && (value_buffer_[3] == 's' || value_buffer_[3] == 'S') && (value_buffer_[4] == 'e' || value_buffer_[4] == 'E')))
                         {
                             continue_ = handler_.bool_value(false, semantic_tag::none, *this);
                         }
-                        else if (value.length() == 4 && ((value[0] == 't' || value[0] == 'T') && (value[1] == 'r' || value[1] == 'R') && (value[2] == 'u' || value[2] == 'U') && (value[3] == 'e' || value[3] == 'E')))
+                        else if (value_buffer_.length() == 4 && ((value_buffer_[0] == 't' || value_buffer_[0] == 'T') && (value_buffer_[1] == 'r' || value_buffer_[1] == 'R') && (value_buffer_[2] == 'u' || value_buffer_[2] == 'U') && (value_buffer_[3] == 'e' || value_buffer_[3] == 'E')))
                         {
                             continue_ = handler_.bool_value(true, semantic_tag::none, *this);
                         }
@@ -1333,9 +1333,9 @@ private:
                     }
                     break;
                 default:
-                    if (value.length() > 0)
+                    if (value_buffer_.length() > 0)
                     {
-                        continue_ = handler_.string_value(value, semantic_tag::none, *this);
+                        continue_ = handler_.string_value(value_buffer_, semantic_tag::none, *this);
                     }
                     else
                     {
@@ -1358,11 +1358,11 @@ private:
         {
             if (infer_types)
             {
-                end_value_with_numeric_check(value);
+                end_value_with_numeric_check();
             }
             else
             {
-                continue_ = handler_.string_value(value, semantic_tag::none, *this);
+                continue_ = handler_.string_value(value_buffer_, semantic_tag::none, *this);
             }
         }
     }
@@ -1386,17 +1386,17 @@ private:
     /*
         xxx_value 
     */
-    void end_value_with_numeric_check(const string_view_type& value)
+    void end_value_with_numeric_check()
     {
         numeric_check_state state = numeric_check_state::initial;
         bool is_negative = false;
         int precision = 0;
         uint8_t decimal_places = 0;
 
-        auto last = value.end();
+        auto last = value_buffer_.end();
 
         std::string buffer;
-        for (auto p = value.begin(); state != numeric_check_state::done && p != last; ++p)
+        for (auto p = value_buffer_.begin(); state != numeric_check_state::done && p != last; ++p)
         {
             switch (state)
             {
@@ -1609,26 +1609,26 @@ private:
             {
                 if (is_negative)
                 {
-                    auto result = jsoncons::detail::to_integer<int64_t>(value.data(), value.length());
+                    auto result = jsoncons::detail::to_integer<int64_t>(value_buffer_.data(), value_buffer_.length());
                     if (result.ec == jsoncons::detail::to_integer_errc())
                     {
                         continue_ = handler_.int64_value(result.value, semantic_tag::none, *this);
                     }
                     else // Must be overflow
                     {
-                        continue_ = handler_.string_value(value, semantic_tag::bigint, *this);
+                        continue_ = handler_.string_value(value_buffer_, semantic_tag::bigint, *this);
                     }
                 }
                 else
                 {
-                    auto result = jsoncons::detail::to_integer<uint64_t>(value.data(), value.length());
+                    auto result = jsoncons::detail::to_integer<uint64_t>(value_buffer_.data(), value_buffer_.length());
                     if (result.ec == jsoncons::detail::to_integer_errc())
                     {
                         continue_ = handler_.uint64_value(result.value, semantic_tag::none, *this);
                     }
                     else if (result.ec == jsoncons::detail::to_integer_errc::overflow)
                     {
-                        continue_ = handler_.string_value(value, semantic_tag::bigint, *this);
+                        continue_ = handler_.string_value(value_buffer_, semantic_tag::bigint, *this);
                     }
                     else
                     {
@@ -1642,7 +1642,7 @@ private:
             {
                 if (options_.lossless_number())
                 {
-                    continue_ = handler_.string_value(value,semantic_tag::bigdec, *this);
+                    continue_ = handler_.string_value(value_buffer_,semantic_tag::bigdec, *this);
                 }
                 else
                 {
@@ -1653,7 +1653,7 @@ private:
             }
             default:
             {
-                continue_ = handler_.string_value(value, semantic_tag::none, *this);
+                continue_ = handler_.string_value(value_buffer_, semantic_tag::none, *this);
                 break;
             }
         }
