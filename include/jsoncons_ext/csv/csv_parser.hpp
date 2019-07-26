@@ -57,6 +57,7 @@ enum class csv_parse_state
     before_done,
     before_unquoted_value,
     before_unquoted_value1,
+    before_unquoted_subvalue,
     before_quoted_value,
     before_quoted_value1,
     done
@@ -738,6 +739,29 @@ public:
                     ++column_;
                     ++input_ptr_;
                     break;
+                case csv_parse_state::before_unquoted_subvalue:
+                    if (stack_.back() == csv_mode::data)
+                    {
+                        if (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first)
+                        {
+                            stack_.push_back(csv_mode::subfields);
+                            continue_ = handler_.begin_array(semantic_tag::none, *this);
+                        }
+                    }
+                    end_unquoted_string_value();
+                    if (curr_char == options_.field_delimiter())
+                    {
+                        if (stack_.back() == csv_mode::subfields)
+                        {
+                            stack_.pop_back();
+                            continue_ = handler_.end_array(*this);
+                        }
+                        ++column_index_;
+                    }
+                    state_ = csv_parse_state::before_unquoted_string;
+                    ++column_;
+                    ++input_ptr_;
+                    break;
                 case csv_parse_state::before_quoted_value:
                     end_quoted_string_value();
                     if (stack_.back() == csv_mode::subfields)
@@ -793,7 +817,16 @@ public:
                             break;
                         }
                         default:
-                            if (curr_char == options_.field_delimiter() || (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
+                            if (curr_char == options_.field_delimiter())
+                            {
+                                if (options_.trim_leading() || options_.trim_trailing())
+                                {
+                                    trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
+                                }
+                                before_value();
+                                state_ = csv_parse_state::before_unquoted_value;
+                            }
+                            else if (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first)
                             {
                                 if (options_.trim_leading() || options_.trim_trailing())
                                 {
