@@ -472,7 +472,6 @@ public:
                     if (!options_.ignore_empty_lines() || (column_index_ > 0 || buffer_.length() > 0))
                     {
                         before_value();
-                        push_state(csv_parse_state::before_unquoted_string);
                         state_ = csv_parse_state::before_unquoted_value;
                     }
                     else
@@ -663,8 +662,6 @@ public:
                             {
                                 before_value();
                                 state_ = csv_parse_state::before_quoted_value1;
-                                //end_quoted_string_value();
-                                //after_field();
                             }
                             else
                             {
@@ -720,7 +717,7 @@ public:
                     {
                         after_field();
                     }
-                    state_ = pop_state();
+                    state_ = csv_parse_state::before_unquoted_string;
                     ++column_;
                     ++input_ptr_;
                     break;
@@ -735,15 +732,11 @@ public:
                     end_quoted_string_value();
                     after_field();
                     state_ = csv_parse_state::end_record;
-                    //++column_;
-                    //++input_ptr_;
                     break;
                 case csv_parse_state::before_unquoted_value1:
                     end_unquoted_string_value();
                     after_field();
-                    state_ = pop_state();
-                    //++column_;
-                    //++input_ptr_;
+                    state_ = csv_parse_state::end_record;
                     break;
                 case csv_parse_state::unquoted_string: 
                 {
@@ -759,7 +752,6 @@ public:
                             if (!options_.ignore_empty_lines() || (column_index_ > 0 || buffer_.length() > 0))
                             {
                                 before_value();
-                                push_state(csv_parse_state::end_record);
                                 state_ = csv_parse_state::before_unquoted_value1;
                             }
                             else
@@ -776,7 +768,6 @@ public:
                                     trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                                 }
                                 before_value();
-                                push_state(csv_parse_state::before_unquoted_string);
                                 state_ = csv_parse_state::before_unquoted_value;
                             }
                             else if (curr_char == options_.quote_char())
