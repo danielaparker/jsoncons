@@ -15,7 +15,7 @@
 #include <ctime>
 
 using namespace jsoncons;
-#if 0
+
 TEST_CASE("csv_cursor n_rows test")
 {
     const std::string data = R"(index_id,observation_date,rate
@@ -86,7 +86,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         CHECK(cursor.done());
     }
 }
-#endif
+
 TEST_CASE("csv_cursor n_objects test")
 {
     const std::string data = R"(index_id,observation_date,rate
@@ -101,7 +101,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         options.assume_header(true)
                .mapping(csv::mapping_type::n_objects);
         csv::csv_cursor cursor(data, options);
-
+/*
         for (; !cursor.done(); cursor.next())
         {
             const auto& event = cursor.current();
@@ -147,7 +147,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
                     break;
             }
         }
-/*
+*/
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
         cursor.next();
 
@@ -214,7 +214,6 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         CHECK(cursor.current().event_type() == staj_event_type::end_array);
         cursor.next();
         CHECK(cursor.done());
-*/
     }
 }
 

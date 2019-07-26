@@ -739,9 +739,6 @@ public:
                             if (!options_.ignore_empty_lines() || (column_index_ > 0 || buffer_.length() > 0))
                             {
                                 before_value();
-                                //end_unquoted_string_value();
-                                //after_field();
-                                //state_ = csv_parse_state::end_record;
                                 push_state(csv_parse_state::end_record);
                                 state_ = csv_parse_state::before_unquoted_value1;
                             }
@@ -749,8 +746,6 @@ public:
                             {
                                 state_ = csv_parse_state::end_record;
                             }
-                            //after_newline();
-                            //state_ = csv_parse_state::end_record;
                             break;
                         }
                         default:
