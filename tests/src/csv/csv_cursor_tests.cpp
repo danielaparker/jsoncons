@@ -15,7 +15,7 @@
 #include <ctime>
 
 using namespace jsoncons;
-
+#if 0
 TEST_CASE("csv_cursor n_rows test")
 {
     const std::string data = R"(index_id,observation_date,rate
@@ -86,7 +86,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         CHECK(cursor.done());
     }
 }
-
+#endif
 TEST_CASE("csv_cursor n_objects test")
 {
     const std::string data = R"(index_id,observation_date,rate

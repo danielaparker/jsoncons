@@ -452,6 +452,11 @@ public:
         {
             switch (state_)
             {
+                case csv_parse_state::before_unquoted_value:
+                    end_unquoted_string_value();
+                    after_field();
+                    state_ = csv_parse_state::end_record;
+                    break;
                 case csv_parse_state::before_unquoted_string: 
                     buffer_.clear();
                     JSONCONS_FALLTHROUGH;
@@ -463,6 +468,7 @@ public:
                     if (!options_.ignore_empty_lines() || (column_index_ > 0 || buffer_.length() > 0))
                     {
                         before_value();
+                        push_state(csv_parse_state::before_unquoted_string);
                         state_ = csv_parse_state::before_unquoted_value;
                     }
                     else
@@ -478,11 +484,6 @@ public:
                         if (ec) return;
                         after_field();
                     }
-                    state_ = csv_parse_state::end_record;
-                    break;
-                case csv_parse_state::before_unquoted_value:
-                    end_unquoted_string_value();
-                    after_field();
                     state_ = csv_parse_state::end_record;
                     break;
                 default:
@@ -711,7 +712,7 @@ public:
                     {
                         after_field();
                     }
-                    state_ = csv_parse_state::before_unquoted_string;
+                    state_ = pop_state();
                     ++column_;
                     ++input_ptr_;
                     break;
@@ -734,6 +735,7 @@ public:
                                     trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                                 }
                                 before_value();
+                                push_state(csv_parse_state::before_unquoted_string);
                                 state_ = csv_parse_state::before_unquoted_value;
                             }
                             else if (curr_char == options_.quote_char())
