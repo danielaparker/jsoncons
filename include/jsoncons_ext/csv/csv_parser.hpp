@@ -474,7 +474,7 @@ public:
                     {
                         trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                     }
-                    if (!options_.ignore_empty_lines() || (column_index_ > 0 || buffer_.length() > 0))
+                    if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
                         before_value();
                         state_ = csv_parse_state::before_unquoted_value;
@@ -668,7 +668,7 @@ public:
                             {
                                 trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                             }
-                            if (!options_.ignore_empty_lines() || (column_index_ > 0 || buffer_.length() > 0))
+                            if (!(options_.ignore_empty_values() && buffer_.empty()))
                             {
                                 before_value();
                                 state_ = csv_parse_state::before_quoted_value1;
@@ -781,7 +781,7 @@ public:
                             {
                                 trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                             }
-                            if (!options_.ignore_empty_lines() || (column_index_ > 0 || buffer_.length() > 0))
+                            if (!(options_.ignore_empty_values() && buffer_.empty()))
                             {
                                 before_value();
                                 state_ = csv_parse_state::before_unquoted_value1;
@@ -999,7 +999,7 @@ private:
             case csv_mode::data:
                 if (options_.mapping() == mapping_type::n_objects)
                 {
-                    if (!(options_.ignore_empty_values() && buffer_.size() == 0))
+                    if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
                         if (column_index_ < column_names_.size() + offset_)
                         {
@@ -1168,7 +1168,7 @@ private:
                     }
                     break;
                 case mapping_type::n_objects:
-                    if (!(options_.ignore_empty_values() && buffer_.size() == 0))
+                    if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
                         if (column_index_ < column_names_.size() + offset_)
                         {
@@ -1195,7 +1195,7 @@ private:
                     }
                     break;
                 case mapping_type::m_columns:
-                    if (!(options_.ignore_empty_values() && buffer_.size() == 0))
+                    if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
                         end_value(options_.infer_types());
                     }
@@ -1227,7 +1227,7 @@ private:
                     end_value(false);
                     break;
                 case mapping_type::n_objects:
-                    if (!(options_.ignore_empty_values() && buffer_.size() == 0))
+                    if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
                         if (column_index_ < column_names_.size() + offset_)
                         {
@@ -1254,7 +1254,7 @@ private:
                     }
                     break;
                 case mapping_type::m_columns:
-                    if (!(options_.ignore_empty_values() && buffer_.size() == 0))
+                    if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
                         end_value(options_.infer_types());
                     }
