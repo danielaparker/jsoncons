@@ -461,7 +461,7 @@ public:
                     }
                     if (!options_.ignore_empty_lines() || (column_index_ > 0 || value_buffer_.length() > 0))
                     {
-                        if (stack_.back() != csv_mode::subfields)
+                        if (stack_.back() == csv_mode::data)
                         {
                             before_field();
                         }
@@ -472,7 +472,7 @@ public:
                 case csv_parse_state::escaped_value:
                     if (options_.quote_escape_char() == options_.quote_char())
                     {
-                        if (stack_.back() != csv_mode::subfields)
+                        if (stack_.back() == csv_mode::data)
                         {
                             before_field();
                         }
@@ -657,7 +657,7 @@ public:
                                 {
                                     trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                                 }
-                                if (stack_.back() != csv_mode::subfields)
+                                if (stack_.back() == csv_mode::data)
                                 {
                                     before_field();
                                     if (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first)
@@ -702,7 +702,7 @@ public:
                                 {
                                     trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                                 }
-                                if (stack_.back() != csv_mode::subfields)
+                                if (stack_.back() == csv_mode::data)
                                 {
                                     before_field();
                                     if (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first)
@@ -895,10 +895,7 @@ private:
     {
         switch (stack_.back())
         {
-            case csv_mode::header:
-                break;
             case csv_mode::data:
-            case csv_mode::subfields:
                 switch (options_.mapping())
                 {
                     case mapping_type::n_objects:
@@ -1683,7 +1680,7 @@ private:
         }
         if (!options_.ignore_empty_lines() || (column_index_ > 0 || value_buffer_.length() > 0))
         {
-            if (stack_.back() != csv_mode::subfields)
+            if (stack_.back() == csv_mode::data)
             {
                 before_field();
             }
@@ -1700,7 +1697,7 @@ private:
         }
         if (!options_.ignore_empty_lines() || (column_index_ > 0 || value_buffer_.length() > 0))
         {
-            if (stack_.back() != csv_mode::subfields)
+            if (stack_.back() == csv_mode::data)
             {
                 before_field();
             }
