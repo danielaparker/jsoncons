@@ -609,6 +609,24 @@ public:
                         state_ = csv_parse_state::expect_record;
                     }
                     break;
+                case csv_parse_state::quoted_string: 
+                    {
+                        if (curr_char == options_.quote_escape_char())
+                        {
+                            state_ = csv_parse_state::escaped_value;
+                        }
+                        else if (curr_char == options_.quote_char())
+                        {
+                            state_ = csv_parse_state::between_values;
+                        }
+                        else
+                        {
+                            buffer_.push_back(static_cast<CharT>(curr_char));
+                        }
+                    }
+                    ++column_;
+                    ++input_ptr_;
+                    break;
                 case csv_parse_state::escaped_value: 
                     {
                         if (curr_char == options_.quote_char())
@@ -630,31 +648,22 @@ public:
                         }
                     }
                     break;
-                case csv_parse_state::quoted_string: 
-                    {
-                        if (curr_char == options_.quote_escape_char())
-                        {
-                            state_ = csv_parse_state::escaped_value;
-                        }
-                        else if (curr_char == options_.quote_char())
-                        {
-                            state_ = csv_parse_state::between_values;
-                        }
-                        else
-                        {
-                            buffer_.push_back(static_cast<CharT>(curr_char));
-                        }
-                    }
-                    ++column_;
-                    ++input_ptr_;
-                    break;
                 case csv_parse_state::between_values:
                     switch (curr_char)
                     {
                         case '\r':
                         case '\n':
                         {
-                            after_newline_between_fields();
+                            if (options_.trim_leading() || options_.trim_trailing())
+                            {
+                                trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
+                            }
+                            if (!options_.ignore_empty_lines() || (column_index_ > 0 || buffer_.length() > 0))
+                            {
+                                before_value();
+                                end_quoted_string_value();
+                                after_field();
+                            }
                             state_ = csv_parse_state::end_record;
                             break;
                         }
@@ -1700,34 +1709,6 @@ private:
         csv_parse_state state = state_stack_.back();
         state_stack_.pop_back();
         return state;
-    }
-
-    void after_newline()
-    {
-        if (options_.trim_leading() || options_.trim_trailing())
-        {
-            trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
-        }
-        if (!options_.ignore_empty_lines() || (column_index_ > 0 || buffer_.length() > 0))
-        {
-            before_value();
-            end_unquoted_string_value();
-            after_field();
-        }
-    }
-
-    void after_newline_between_fields()
-    {
-        if (options_.trim_leading() || options_.trim_trailing())
-        {
-            trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
-        }
-        if (!options_.ignore_empty_lines() || (column_index_ > 0 || buffer_.length() > 0))
-        {
-            before_value();
-            end_quoted_string_value();
-            after_field();
-        }
     }
 };
 
