@@ -56,6 +56,7 @@ enum class csv_parse_state
     exp3,
     before_done,
     before_unquoted_field,
+    before_unquoted_field_foo,
     before_last_unquoted_field,
     before_unquoted_subfield,
     before_quoted_field,
@@ -716,8 +717,8 @@ public:
                     state_ = csv_parse_state::unquoted_string;
                     break;
                 }
-                case csv_parse_state::before_unquoted_field:
-                    end_unquoted_string_value();
+                case csv_parse_state::before_unquoted_field_foo:
+                {
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
@@ -727,6 +728,12 @@ public:
                     state_ = csv_parse_state::before_unquoted_string;
                     ++column_;
                     ++input_ptr_;
+                    break;
+                }
+
+                case csv_parse_state::before_unquoted_field:
+                    end_unquoted_string_value();
+                    state_ = csv_parse_state::before_unquoted_field_foo;
                     break;
                 case csv_parse_state::before_unquoted_subfield:
                     if (stack_.back() == csv_mode::data)
@@ -738,7 +745,7 @@ public:
                     state_ = csv_parse_state::before_unquoted_string;
                     ++column_;
                     ++input_ptr_;
-                    break;
+                    break; 
                 case csv_parse_state::before_quoted_field:
                     end_quoted_string_value();
                     if (stack_.back() == csv_mode::subfields)
