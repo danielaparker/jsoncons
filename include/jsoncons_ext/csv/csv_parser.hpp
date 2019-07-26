@@ -483,8 +483,7 @@ public:
                     if (options_.quote_escape_char() == options_.quote_char())
                     {
                         before_value();
-                        end_quoted_string_value(ec);
-                        if (ec) return;
+                        end_quoted_string_value();
                         after_field();
                     }
                     state_ = csv_parse_state::end_record;
@@ -655,11 +654,7 @@ public:
                         case '\r':
                         case '\n':
                         {
-                            after_newline_between_fields(ec);
-                            if (ec)
-                            {
-                                return;
-                            }
+                            after_newline_between_fields();
                             state_ = csv_parse_state::end_record;
                             break;
                         }
@@ -684,8 +679,7 @@ public:
                                 {
                                     before_multi_valued_field();
                                 }
-                                end_quoted_string_value(ec);
-                                if (ec) return;
+                                end_quoted_string_value();
                                 state_ = csv_parse_state::before_unquoted_string;
                                 ++column_;
                                 ++input_ptr_;
@@ -717,8 +711,7 @@ public:
                     ++input_ptr_;
                     break;
                 case csv_parse_state::before_quoted_value:
-                    end_quoted_string_value(ec);
-                    if (ec) return;
+                    end_quoted_string_value();
                     after_field();
                     state_ = csv_parse_state::before_unquoted_string;
                     ++column_;
@@ -1191,7 +1184,7 @@ private:
         }
     }
 
-    void end_quoted_string_value(std::error_code& ec) 
+    void end_quoted_string_value() 
     {
         switch (stack_.back())
         {
@@ -1246,10 +1239,7 @@ private:
                 }
                 break;
             default:
-                err_handler_(csv_errc::invalid_csv_text, *this);
-                ec = csv_errc::invalid_csv_text;
-                continue_ = false;
-                return;
+                break;
         }
     }
 
@@ -1726,7 +1716,7 @@ private:
         }
     }
 
-    void after_newline_between_fields(std::error_code& ec)
+    void after_newline_between_fields()
     {
         if (options_.trim_leading() || options_.trim_trailing())
         {
@@ -1735,8 +1725,7 @@ private:
         if (!options_.ignore_empty_lines() || (column_index_ > 0 || buffer_.length() > 0))
         {
             before_value();
-            end_quoted_string_value(ec);
-            if (ec) return;
+            end_quoted_string_value();
             after_field();
         }
     }
