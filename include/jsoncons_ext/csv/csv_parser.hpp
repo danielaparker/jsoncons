@@ -742,22 +742,10 @@ public:
                 case csv_parse_state::before_unquoted_subvalue:
                     if (stack_.back() == csv_mode::data)
                     {
-                        if (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first)
-                        {
-                            stack_.push_back(csv_mode::subfields);
-                            continue_ = handler_.begin_array(semantic_tag::none, *this);
-                        }
+                        stack_.push_back(csv_mode::subfields);
+                        continue_ = handler_.begin_array(semantic_tag::none, *this);
                     }
                     end_unquoted_string_value();
-                    if (curr_char == options_.field_delimiter())
-                    {
-                        if (stack_.back() == csv_mode::subfields)
-                        {
-                            stack_.pop_back();
-                            continue_ = handler_.end_array(*this);
-                        }
-                        ++column_index_;
-                    }
                     state_ = csv_parse_state::before_unquoted_string;
                     ++column_;
                     ++input_ptr_;
@@ -833,7 +821,7 @@ public:
                                     trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                                 }
                                 before_value();
-                                state_ = csv_parse_state::before_unquoted_value;
+                                state_ = csv_parse_state::before_unquoted_subvalue;
                             }
                             else if (curr_char == options_.quote_char())
                             {
