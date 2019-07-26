@@ -62,8 +62,12 @@ enum class csv_parse_state
     before_last_unquoted_field_foo,
     before_unquoted_subfield,
     before_unquoted_subfield_foo,
+    before_quoted_subfield,
+    before_quoted_subfield_foo,
     before_quoted_field,
+    before_quoted_field_foo,
     before_last_quoted_field,
+    before_last_quoted_field_foo,
     done
 };
 
@@ -702,7 +706,8 @@ public:
                                     trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                                 }
                                 before_value();
-                                if (stack_.back() == csv_mode::data)
+                                state_ = csv_parse_state::before_quoted_subfield;
+                                /*if (stack_.back() == csv_mode::data)
                                 {
                                     stack_.push_back(csv_mode::subfields);
                                     continue_ = handler_.begin_array(semantic_tag::none, *this);
@@ -710,7 +715,7 @@ public:
                                 end_quoted_string_value();
                                 state_ = csv_parse_state::before_unquoted_string;
                                 ++column_;
-                                ++input_ptr_;
+                                ++input_ptr_;*/
                             }
                             break;
                     }
@@ -792,8 +797,25 @@ public:
                     ++column_;
                     ++input_ptr_;
                     break;
+                case csv_parse_state::before_quoted_subfield:
+                    if (stack_.back() == csv_mode::data)
+                    {
+                        stack_.push_back(csv_mode::subfields);
+                        continue_ = handler_.begin_array(semantic_tag::none, *this);
+                    }
+                    state_ = csv_parse_state::before_quoted_subfield_foo;
+                    break; 
+                case csv_parse_state::before_quoted_subfield_foo:
+                    end_quoted_string_value();
+                    state_ = csv_parse_state::before_unquoted_string;
+                    ++column_;
+                    ++input_ptr_;
+                    break;
                 case csv_parse_state::before_last_quoted_field:
                     end_quoted_string_value();
+                    state_ = csv_parse_state::before_last_quoted_field_foo;
+                    break;
+                case csv_parse_state::before_last_quoted_field_foo:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
