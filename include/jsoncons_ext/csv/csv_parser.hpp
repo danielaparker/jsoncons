@@ -57,6 +57,7 @@ enum class csv_parse_state
     before_done,
     before_unquoted_value,
     before_unquoted_value1,
+    before_quoted_value,
     done
 };
 
@@ -670,12 +671,7 @@ public:
                                     trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                                 }
                                 before_value();
-                                end_quoted_string_value(ec);
-                                if (ec) return;
-                                after_field();
-                                state_ = csv_parse_state::before_unquoted_string;
-                                ++column_;
-                                ++input_ptr_;
+                                state_ = csv_parse_state::before_quoted_value;
                             }
                             else if ((options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
                             {
@@ -717,6 +713,14 @@ public:
                         after_field();
                     }
                     state_ = pop_state();
+                    ++column_;
+                    ++input_ptr_;
+                    break;
+                case csv_parse_state::before_quoted_value:
+                    end_quoted_string_value(ec);
+                    if (ec) return;
+                    after_field();
+                    state_ = csv_parse_state::before_unquoted_string;
                     ++column_;
                     ++input_ptr_;
                     break;
