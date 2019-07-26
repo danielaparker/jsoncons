@@ -395,6 +395,90 @@ NY,LON,TOR;LON
                     break;
             }
         }
+
+        /* CHECK(cursor.current().event_type() == staj_event_type::begin_array);
+        cursor.next();
+
+        CHECK(cursor.current().event_type() == staj_event_type::begin_object);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::name);
+        CHECK(cursor.current().get<std::string>() == std::string("calculationPeriodCenters"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::begin_array);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(cursor.current().get<std::string>() == std::string("NY"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(cursor.current().get<std::string>() == std::string("LON"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::end_array);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::name);
+        CHECK(cursor.current().get<std::string>() == std::string("paymentCenters"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::name);
+        CHECK(cursor.current().get<std::string>() == std::string("resetCenters"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::end_object);
+        cursor.next();
+
+        CHECK(cursor.current().event_type() == staj_event_type::begin_object);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::name);
+        CHECK(cursor.current().get<std::string>() == std::string("calculationPeriodCenters"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::name);
+        CHECK(cursor.current().get<std::string>() == std::string("paymentCenters"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::name);
+        CHECK(cursor.current().get<std::string>() == std::string("resetCenters"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::begin_array);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(cursor.current().get<std::string>() == std::string("TOR"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(cursor.current().get<std::string>() == std::string("LON"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::end_array);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::end_object);
+        cursor.next();
+
+        CHECK(cursor.current().event_type() == staj_event_type::begin_object);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::name);
+        CHECK(cursor.current().get<std::string>() == std::string("calculationPeriodCenters"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::name);
+        CHECK(cursor.current().get<std::string>() == std::string("paymentCenters"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::name);
+        CHECK(cursor.current().get<std::string>() == std::string("resetCenters"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::end_object);
+        cursor.next();
+
+        CHECK(cursor.current().event_type() == staj_event_type::begin_object);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::name);
+        CHECK(cursor.current().get<std::string>() == std::string("calculationPeriodCenters"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::name);
+        CHECK(cursor.current().get<std::string>() == std::string("paymentCenters"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::name);
+        CHECK(cursor.current().get<std::string>() == std::string("resetCenters"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::end_object);
+        cursor.next();
+
+        CHECK(cursor.current().event_type() == staj_event_type::end_array);
+        cursor.next();
+        CHECK(cursor.done()); */
+
     }
 }
 
