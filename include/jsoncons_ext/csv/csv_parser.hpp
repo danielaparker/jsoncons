@@ -56,6 +56,7 @@ enum class csv_parse_state
     exp3,
     before_done,
     before_unquoted_value,
+    before_unquoted_value1,
     done
 };
 
@@ -453,6 +454,7 @@ public:
             switch (state_)
             {
                 case csv_parse_state::before_unquoted_value:
+                case csv_parse_state::before_unquoted_value1:
                     end_unquoted_string_value();
                     after_field();
                     state_ = csv_parse_state::end_record;
@@ -716,6 +718,13 @@ public:
                     ++column_;
                     ++input_ptr_;
                     break;
+                case csv_parse_state::before_unquoted_value1:
+                    end_unquoted_string_value();
+                    after_field();
+                    state_ = pop_state();
+                    //++column_;
+                    //++input_ptr_;
+                    break;
                 case csv_parse_state::unquoted_string: 
                 {
                     switch (curr_char)
@@ -723,8 +732,25 @@ public:
                         case '\n':
                         case '\r':
                         {
-                            after_newline();
-                            state_ = csv_parse_state::end_record;
+                            if (options_.trim_leading() || options_.trim_trailing())
+                            {
+                                trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
+                            }
+                            if (!options_.ignore_empty_lines() || (column_index_ > 0 || buffer_.length() > 0))
+                            {
+                                before_value();
+                                //end_unquoted_string_value();
+                                //after_field();
+                                //state_ = csv_parse_state::end_record;
+                                push_state(csv_parse_state::end_record);
+                                state_ = csv_parse_state::before_unquoted_value1;
+                            }
+                            else
+                            {
+                                state_ = csv_parse_state::end_record;
+                            }
+                            //after_newline();
+                            //state_ = csv_parse_state::end_record;
                             break;
                         }
                         default:
