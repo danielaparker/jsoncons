@@ -450,14 +450,6 @@ public:
 
     void parse_some(std::error_code& ec)
     {
-        if (state_ == csv_parse_state::before_done)
-        {
-            handler_.flush();
-            state_ = csv_parse_state::done;
-            continue_ = false;
-            return;
-        }
-
         const CharT* local_input_end = input_end_;
 
         if (input_ptr_ == local_input_end && continue_)
@@ -508,37 +500,42 @@ public:
                     }
                     state_ = csv_parse_state::end_record;
                     break;
+                case csv_parse_state::end_record:
+                    if (column_index_ > 0)
+                    {
+                        after_record();
+                    }
+                    switch (stack_.back()) 
+                    {
+                        case csv_mode::header:
+                            stack_.pop_back();
+                            break;
+                        case csv_mode::data:
+                            stack_.pop_back();
+                            break;
+                        default:
+                            break;
+                    }
+                    continue_ = handler_.end_array(*this);
+                    if (!(stack_.size() == 1 && stack_.back() == csv_mode::initial))
+                    {
+                        err_handler_(csv_errc::unexpected_eof, *this);
+                        ec = csv_errc::unexpected_eof;
+                        continue_ = false;
+                        return;
+                    }
+                    stack_.pop_back();
+                    state_ = csv_parse_state::before_done;
+                    break;
+                case csv_parse_state::before_done:
+                    handler_.flush();
+                    state_ = csv_parse_state::done;
+                    continue_ = false;
+                    return;
+                    break;
                 default:
                     state_ = csv_parse_state::end_record;
                     break;
-            }
-            if (state_ == csv_parse_state::end_record)
-            {
-                if (column_index_ > 0)
-                {
-                    after_record();
-                }
-                switch (stack_.back()) 
-                {
-                    case csv_mode::header:
-                        stack_.pop_back();
-                        break;
-                    case csv_mode::data:
-                        stack_.pop_back();
-                        break;
-                    default:
-                        break;
-                }
-                continue_ = handler_.end_array(*this);
-                if (!(stack_.size() == 1 && stack_.back() == csv_mode::initial))
-                {
-                    err_handler_(csv_errc::unexpected_eof, *this);
-                    ec = csv_errc::unexpected_eof;
-                    continue_ = false;
-                    return;
-                }
-                stack_.pop_back();
-                state_ = csv_parse_state::before_done;
             }
         }
 
