@@ -6,7 +6,7 @@
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonpath/json_query.hpp>
-#include <jsoncons_ext/csv/csv_encoder.hpp>
+#include <jsoncons_ext/csv/csv.hpp>
 #include <string>
 #include <vector>
 #include <iomanip>

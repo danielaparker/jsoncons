@@ -1,7 +1,7 @@
 ### jsoncons::csv::basic_csv_encoder
 
 ```c++
-#include <jsoncons_ext/csv/csv_encoder.hpp>
+#include <jsoncons_ext/csv/csv.hpp>
 
 template<
     class CharT,

@@ -3,7 +3,7 @@
 Decodes a [comma-separated variables (CSV)](https://en.wikipedia.org/wiki/Comma-separated_values) data format into a C++ data structure.
 
 ```c++
-#include <jsoncons_ext/csv/csv_reader.hpp>
+#include <jsoncons_ext/csv/csv.hpp>
 
 template <class T,class CharT>
 T decode_csv(const std::basic_string<CharT>& s, 

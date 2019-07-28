@@ -13,6 +13,7 @@
 #include <unordered_map> // std::unordered_map
 #include <limits> // std::numeric_limits
 #include <cwchar>
+#include <jsoncons/json_options.hpp>
 
 namespace jsoncons { namespace csv {
 
