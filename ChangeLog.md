@@ -3,6 +3,7 @@ master
 
 - `basic_msgpack_parser` template class rewritten to avoid recursive function calls
 - New `basic_msgpack_cursor` template class with `msgpack_stream_cursor` and `msgpack_bytes_cursor` typedefs
+- New `basic_csv_cursor` template class with `csv_cursor` and `wcsv_cursor` typedefs
 
 version 0.130.0
 ---------------
