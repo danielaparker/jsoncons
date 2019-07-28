@@ -24,7 +24,7 @@ void type_extensibility_examples();
 void type_extensibility_examples2();
 void ojson_examples();
 void unicode_examples();
-void csv_examples();
+void run_csv_examples();
 void jsonpath_examples();
 void json_accessor_examples();
 void msgpack_examples();
@@ -455,8 +455,6 @@ int main()
         array_examples();
         container_examples();
 
-        csv_examples();
-
         mulitple_json_objects();
 
         wjson_examples();
@@ -497,8 +495,6 @@ int main()
 
         byte_string_examples();
 
-        csv_examples();
-
         jsonpath_examples();
 
         polymorphic_examples();
@@ -516,6 +512,8 @@ int main()
         run_ubjson_examples();
 
         run_cbor_examples();
+
+        run_csv_examples();
     }
     catch (const std::exception& e)
     {

@@ -10,5 +10,6 @@
 #include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>
 #include <jsoncons_ext/csv/csv_encoder.hpp>
+#include <jsoncons_ext/csv/csv_cursor.hpp>
 
 #endif
