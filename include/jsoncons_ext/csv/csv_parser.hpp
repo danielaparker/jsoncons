@@ -91,6 +91,8 @@ namespace detail {
         typedef Allocator allocator_type;
         typedef typename basic_json_options<CharT>::string_type string_type;
         typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
+    public:
+        basic_json_content_handler<CharT>* handler_;
     private:
         typedef basic_json<CharT, preserve_order_policy, Allocator> json_type;
 
@@ -99,7 +101,6 @@ namespace detail {
         size_t column_index_;
         int level_;
     public:
-        basic_json_content_handler<CharT>* handler_;
 
         m_columns_filter() = delete;
 
