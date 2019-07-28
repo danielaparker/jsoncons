@@ -44,6 +44,10 @@ class basic_csv_reader
     basic_csv_reader(const basic_csv_reader&) = delete; 
     basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
 
+    basic_null_json_content_handler<CharT> default_content_handler_;
+
+    basic_json_content_handler<CharT>& handler_;
+
     basic_csv_parser<CharT,Allocator> parser_;
     Src source_;
     std::vector<CharT,char_allocator_type> buffer_;
@@ -98,7 +102,7 @@ public:
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
-       :
+       : handler_(handler),
          parser_(handler, options, err_handler),
          source_(std::forward<Source>(source)),
          buffer_length_(default_max_buffer_length),
@@ -114,7 +118,7 @@ public:
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
-       :
+       : handler_(handler),
          parser_(handler, options, err_handler),
          buffer_length_(0),
          eof_(false),
@@ -197,11 +201,7 @@ private:
             return;
         }   
         parser_.reset();
-        if (ec)
-        {
-            return;
-        }
-        while (!parser_.stopped())
+        while (!parser_.finished())
         {
             if (parser_.source_exhausted())
             {
@@ -212,15 +212,6 @@ private:
                     {
                         return;
                     }
-                    /* buffer_.clear();
-                    buffer_.resize(buffer_length_);
-                    size_t count = source_.read(buffer_.data(), buffer_length_);
-                    buffer_.resize(count);
-                    if (buffer_.size() == 0)
-                    {
-                        eof_ = true;
-                    }
-                    parser_.update(buffer_.data(),buffer_.size());*/
                 }
                 else
                 {
@@ -228,7 +219,7 @@ private:
                     eof_ = true;
                 }
             }
-            parser_.parse_some(ec);
+            parser_.parse_some(handler_, ec);
             if (ec) return;
         }
     }

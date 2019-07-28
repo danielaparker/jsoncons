@@ -41,6 +41,7 @@ enum class csv_parse_state
     expect_comment_or_record,
     expect_record,
     end_record,
+    no_more_records,
     comment,
     between_values,
     quoted_string,
@@ -93,16 +94,17 @@ namespace detail {
     private:
         typedef basic_json<CharT, preserve_order_policy, Allocator> json_type;
 
-        basic_json_content_handler<CharT>& handler_;
         std::vector<string_type, string_allocator_type> column_names_;
         std::vector<json_decoder<json_type>> decoders_;
         size_t column_index_;
         int level_;
     public:
+        basic_json_content_handler<CharT>* handler_;
+
         m_columns_filter() = delete;
 
         m_columns_filter(basic_json_content_handler<CharT>& handler)
-            : handler_(handler), column_index_(0), level_(0)
+            : handler_(std::addressof(handler)), column_index_(0), level_(0)
         {
         }
 
@@ -127,17 +129,17 @@ namespace detail {
         void do_flush() override
         {
             null_ser_context context;
-            handler_.begin_object(semantic_tag::none, context);
+            handler_->begin_object(semantic_tag::none, context);
             for (size_t i = 0; i < column_names_.size(); ++i)
             {
-                handler_.name(column_names_[i], context);
+                handler_->name(column_names_[i], context);
                 decoders_[i].end_array(context);
                 decoders_[i].flush();
                 auto j = decoders_[i].get_result();
-                j.dump(handler_);
+                j.dump(*handler_);
             }
-            handler_.end_object(context);
-            handler_.flush();
+            handler_->end_object(context);
+            handler_->flush();
         }
 
         bool do_begin_object(semantic_tag, const ser_context&) override
@@ -302,7 +304,7 @@ class basic_csv_parser : public ser_context
     csv_parse_state state_;
     detail::m_columns_filter<CharT,Allocator> m_columns_filter_;
     std::vector<csv_mode,csv_mode_allocator_type> stack_;
-    basic_json_content_handler<CharT>& handler_;
+    basic_json_content_handler<CharT>* handler_;
     std::function<bool(csv_errc,const ser_context&)> err_handler_;
     unsigned long column_;
     unsigned long line_;
@@ -349,7 +351,7 @@ public:
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler)
        : m_columns_filter_(handler),
-         handler_(options.mapping() == mapping_type::m_columns ? m_columns_filter_ : handler),
+         handler_(options.mapping() == mapping_type::m_columns ? &m_columns_filter_ : std::addressof(handler)),
          err_handler_(err_handler),
          options_(options),
          level_(0),
@@ -385,7 +387,8 @@ public:
 
     bool finished() const
     {
-        return !continue_ && state_ != csv_parse_state::before_done;
+        return !continue_;
+        //return !continue_ && (state_ != csv_parse_state::no_more_records || state_ != csv_parse_state::before_done);
     }
 
     bool source_exhausted() const
@@ -438,18 +441,27 @@ public:
         continue_ = true;
     }
 
-    void parse_some()
+    void parse_some(basic_json_content_handler<CharT>& handler)
     {
         std::error_code ec;
-        parse_some(ec);
+        parse_some(handler,ec);
         if (ec)
         {
             throw ser_error(ec,line_,column_);
         }
     }
 
-    void parse_some(std::error_code& ec)
+    void parse_some(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
+        if (options_.mapping() == mapping_type::m_columns)
+        {
+            m_columns_filter_.handler_ = std::addressof(handler);
+        }
+        else
+        {
+            handler_ = std::addressof(handler);
+        }
+
         const CharT* local_input_end = input_end_;
 
         if (input_ptr_ == local_input_end && continue_)
@@ -463,7 +475,7 @@ public:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        continue_ = handler_.end_array(*this);
+                        continue_ = handler_->end_array(*this);
                     }
                     ++column_index_;
                     state_ = csv_parse_state::end_record;
@@ -483,28 +495,56 @@ public:
                     }
                     else
                     {
+                        if (options_.trim_leading() || options_.trim_trailing())
+                        {
+                            trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
+                        }
+                        if (!(options_.ignore_empty_values() && buffer_.empty()))
+                        {
+                            before_value();
+                            state_ = csv_parse_state::before_last_quoted_field;
+                        }
+                        else
+                        {
+                            state_ = csv_parse_state::end_record;
+                        }
                         state_ = csv_parse_state::end_record;
                     }
+                    break;
+                case csv_parse_state::before_last_quoted_field:
+                    end_quoted_string_value();
+                    ++column_index_;
+                    state_ = csv_parse_state::end_record;
                     break;
                 case csv_parse_state::escaped_value:
                     if (options_.quote_escape_char() == options_.quote_char())
                     {
-                        before_value();
-                        end_quoted_string_value();
-                        if (stack_.back() == csv_mode::subfields)
+                        if (!(options_.ignore_empty_values() && buffer_.empty()))
                         {
-                            stack_.pop_back();
-                            continue_ = handler_.end_array(*this);
+                            before_value();
+                            ++column_;
+                            state_ = csv_parse_state::before_last_quoted_field;
                         }
-                        ++column_index_;
+                        else
+                        {
+                            state_ = csv_parse_state::end_record;
+                        }
                     }
-                    state_ = csv_parse_state::end_record;
+                    else
+                    {
+                        ec = csv_errc::invalid_escaped_char;
+                        continue_ = false;
+                        return;
+                    }
                     break;
                 case csv_parse_state::end_record:
                     if (column_index_ > 0)
                     {
                         after_record();
                     }
+                    state_ = csv_parse_state::no_more_records;
+                    break;
+                case csv_parse_state::no_more_records: 
                     switch (stack_.back()) 
                     {
                         case csv_mode::header:
@@ -516,7 +556,10 @@ public:
                         default:
                             break;
                     }
-                    continue_ = handler_.end_array(*this);
+                    continue_ = handler_->end_array(*this);
+                    state_ = csv_parse_state::before_done;
+                    break;
+                case csv_parse_state::before_done:
                     if (!(stack_.size() == 1 && stack_.back() == csv_mode::initial))
                     {
                         err_handler_(csv_errc::unexpected_eof, *this);
@@ -525,10 +568,7 @@ public:
                         return;
                     }
                     stack_.pop_back();
-                    state_ = csv_parse_state::before_done;
-                    break;
-                case csv_parse_state::before_done:
-                    handler_.flush();
+                    handler_->flush();
                     state_ = csv_parse_state::done;
                     continue_ = false;
                     return;
@@ -562,13 +602,13 @@ public:
                 case csv_parse_state::start:
                     if (options_.mapping() != mapping_type::m_columns)
                     {
-                        continue_ = handler_.begin_array(semantic_tag::none, *this);
+                        continue_ = handler_->begin_array(semantic_tag::none, *this);
                     }
                     if (!options_.assume_header() && options_.mapping() == mapping_type::n_rows && options_.column_names().size() > 0)
                     {
                         column_index_ = 0;
                         state_ = csv_parse_state::column_labels;
-                        continue_ = handler_.begin_array(semantic_tag::none, *this);
+                        continue_ = handler_->begin_array(semantic_tag::none, *this);
                     }
                     else
                     {
@@ -578,12 +618,12 @@ public:
                 case csv_parse_state::column_labels:
                     if (column_index_ < column_names_.size())
                     {
-                        continue_ = handler_.string_value(column_names_[column_index_], semantic_tag::none, *this);
+                        continue_ = handler_->string_value(column_names_[column_index_], semantic_tag::none, *this);
                         ++column_index_;
                     }
                     else
                     {
-                        continue_ = handler_.end_array(*this);
+                        continue_ = handler_->end_array(*this);
                         state_ = csv_parse_state::expect_comment_or_record; 
                         //stack_.back() = csv_mode::data;
                         column_index_ = 0;
@@ -723,7 +763,7 @@ public:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        continue_ = handler_.end_array(*this);
+                        continue_ = handler_->end_array(*this);
                     }
                     ++column_index_;
                     state_ = csv_parse_state::before_unquoted_string;
@@ -736,7 +776,7 @@ public:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        continue_ = handler_.end_array(*this);
+                        continue_ = handler_->end_array(*this);
                     }
                     state_ = csv_parse_state::end_record;
                     ++column_;
@@ -753,7 +793,7 @@ public:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        continue_ = handler_.end_array(*this);
+                        continue_ = handler_->end_array(*this);
                     }
                     ++column_index_;
                     state_ = csv_parse_state::end_record;
@@ -763,7 +803,7 @@ public:
                     if (stack_.back() == csv_mode::data)
                     {
                         stack_.push_back(csv_mode::subfields);
-                        continue_ = handler_.begin_array(semantic_tag::none, *this);
+                        continue_ = handler_->begin_array(semantic_tag::none, *this);
                     }
                     state_ = csv_parse_state::before_unquoted_subfield_tail;
                     break; 
@@ -781,7 +821,7 @@ public:
                     if (stack_.back() == csv_mode::data)
                     {
                         stack_.push_back(csv_mode::subfields);
-                        continue_ = handler_.begin_array(semantic_tag::none, *this);
+                        continue_ = handler_->begin_array(semantic_tag::none, *this);
                     }
                     state_ = csv_parse_state::before_quoted_subfield_tail;
                     break; 
@@ -799,7 +839,7 @@ public:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        continue_ = handler_.end_array(*this);
+                        continue_ = handler_->end_array(*this);
                     }
                     ++column_index_;
                     state_ = csv_parse_state::end_record;
@@ -1035,7 +1075,7 @@ private:
                     column_names_.push_back(buffer_);
                     if (options_.mapping() == mapping_type::n_rows)
                     {
-                        continue_ = handler_.string_value(buffer_, semantic_tag::none, *this);
+                        continue_ = handler_->string_value(buffer_, semantic_tag::none, *this);
                     }
                 }
                 break;
@@ -1046,7 +1086,7 @@ private:
                     {
                         if (column_index_ < column_names_.size() + offset_)
                         {
-                            continue_ = handler_.name(column_names_[column_index_ - offset_], *this);
+                            continue_ = handler_->name(column_names_[column_index_ - offset_], *this);
                         }
                     }
                 }
@@ -1068,7 +1108,7 @@ private:
                 {
                     if (options_.mapping() == mapping_type::n_rows)
                     {
-                        continue_ = handler_.begin_array(semantic_tag::none, *this);
+                        continue_ = handler_->begin_array(semantic_tag::none, *this);
                     }
                 }
                 break;
@@ -1076,10 +1116,10 @@ private:
                 switch (options_.mapping())
                 {
                     case mapping_type::n_rows:
-                        continue_ = handler_.begin_array(semantic_tag::none, *this);
+                        continue_ = handler_->begin_array(semantic_tag::none, *this);
                         break;
                     case mapping_type::n_objects:
-                        continue_ = handler_.begin_object(semantic_tag::none, *this);
+                        continue_ = handler_->begin_object(semantic_tag::none, *this);
                         break;
                     case mapping_type::m_columns:
                         break;
@@ -1099,7 +1139,7 @@ private:
         {
             if (level_ > 0)
             {
-                continue_ = handler_.end_array(*this);
+                continue_ = handler_->end_array(*this);
                 level_ = 0;
             }
         }
@@ -1116,7 +1156,7 @@ private:
                     case mapping_type::n_rows:
                         if (options_.assume_header())
                         {
-                            continue_ = handler_.end_array(*this);
+                            continue_ = handler_->end_array(*this);
                         }
                         break;
                     case mapping_type::m_columns:
@@ -1132,13 +1172,13 @@ private:
                 switch (options_.mapping())
                 {
                     case mapping_type::n_rows:
-                        continue_ = handler_.end_array(*this);
+                        continue_ = handler_->end_array(*this);
                         break;
                     case mapping_type::n_objects:
-                        continue_ = handler_.end_object(*this);
+                        continue_ = handler_->end_object(*this);
                         break;
                     case mapping_type::m_columns:
-                        continue_ = handler_.end_array(*this);
+                        continue_ = handler_->end_array(*this);
                         break;
                 }
                 break;
@@ -1203,7 +1243,7 @@ private:
                 case mapping_type::n_rows:
                     if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                     {
-                        continue_ = handler_.null_value(semantic_tag::none, *this);
+                        continue_ = handler_->null_value(semantic_tag::none, *this);
                     }
                     else
                     {
@@ -1217,7 +1257,7 @@ private:
                         {
                             if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                             {
-                                continue_ = handler_.null_value(semantic_tag::none, *this);
+                                continue_ = handler_->null_value(semantic_tag::none, *this);
                             }
                             else
                             {
@@ -1228,7 +1268,7 @@ private:
                         {
                             if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                             {
-                                continue_ = handler_.null_value(semantic_tag::none, *this);
+                                continue_ = handler_->null_value(semantic_tag::none, *this);
                             }
                             else
                             {
@@ -1276,7 +1316,7 @@ private:
                         {
                             if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                             {
-                                continue_ = handler_.null_value(semantic_tag::none, *this);
+                                continue_ = handler_->null_value(semantic_tag::none, *this);
                             }
                             else 
                             {
@@ -1287,7 +1327,7 @@ private:
                         {
                             if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                             {
-                                continue_ = handler_.null_value(semantic_tag::none, *this);
+                                continue_ = handler_->null_value(semantic_tag::none, *this);
                             }
                             else
                             {
@@ -1324,19 +1364,19 @@ private:
                 {
                     if (column_index_ == offset_ || level_ > column_types_[column_index_-offset_].level)
                     {
-                        continue_ = handler_.end_array(*this);
+                        continue_ = handler_->end_array(*this);
                     }
                     level_ = column_index_ == offset_ ? 0 : column_types_[column_index_ - offset_].level;
                 }
             }
             if (level_ < column_types_[column_index_ - offset_].level)
             {
-                continue_ = handler_.begin_array(semantic_tag::none, *this);
+                continue_ = handler_->begin_array(semantic_tag::none, *this);
                 level_ = column_types_[column_index_ - offset_].level;
             }
             else if (level_ > column_types_[column_index_ - offset_].level)
             {
-                continue_ = handler_.end_array(*this);
+                continue_ = handler_->end_array(*this);
                 level_ = column_types_[column_index_ - offset_].level;
             }
             switch (column_types_[column_index_ - offset_].col_type)
@@ -1348,7 +1388,7 @@ private:
                         iss >> val;
                         if (!iss.fail())
                         {
-                            continue_ = handler_.int64_value(val, semantic_tag::none, *this);
+                            continue_ = handler_->int64_value(val, semantic_tag::none, *this);
                         }
                         else
                         {
@@ -1356,12 +1396,12 @@ private:
                             {
                                 basic_json_parser<CharT> parser;
                                 parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
-                                parser.parse_some(handler_);
-                                parser.finish_parse(handler_);
+                                parser.parse_some(*handler_);
+                                parser.finish_parse(*handler_);
                             }
                             else
                             {
-                                continue_ = handler_.null_value(semantic_tag::none, *this);
+                                continue_ = handler_->null_value(semantic_tag::none, *this);
                             }
                         }
                     }
@@ -1370,7 +1410,7 @@ private:
                     {
                         if (options_.lossless_number())
                         {
-                            continue_ = handler_.string_value(buffer_,semantic_tag::bigdec, *this);
+                            continue_ = handler_->string_value(buffer_,semantic_tag::bigdec, *this);
                         }
                         else
                         {
@@ -1379,7 +1419,7 @@ private:
                             iss >> val;
                             if (!iss.fail())
                             {
-                                continue_ = handler_.double_value(val, semantic_tag::none, *this);
+                                continue_ = handler_->double_value(val, semantic_tag::none, *this);
                             }
                             else
                             {
@@ -1387,12 +1427,12 @@ private:
                                 {
                                     basic_json_parser<CharT> parser;
                                     parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
-                                    parser.parse_some(handler_);
-                                    parser.finish_parse(handler_);
+                                    parser.parse_some(*handler_);
+                                    parser.finish_parse(*handler_);
                                 }
                                 else
                                 {
-                                    continue_ = handler_.null_value(semantic_tag::none, *this);
+                                    continue_ = handler_->null_value(semantic_tag::none, *this);
                                 }
                             }
                         }
@@ -1402,19 +1442,19 @@ private:
                     {
                         if (buffer_.length() == 1 && buffer_[0] == '0')
                         {
-                            continue_ = handler_.bool_value(false, semantic_tag::none, *this);
+                            continue_ = handler_->bool_value(false, semantic_tag::none, *this);
                         }
                         else if (buffer_.length() == 1 && buffer_[0] == '1')
                         {
-                            continue_ = handler_.bool_value(true, semantic_tag::none, *this);
+                            continue_ = handler_->bool_value(true, semantic_tag::none, *this);
                         }
                         else if (buffer_.length() == 5 && ((buffer_[0] == 'f' || buffer_[0] == 'F') && (buffer_[1] == 'a' || buffer_[1] == 'A') && (buffer_[2] == 'l' || buffer_[2] == 'L') && (buffer_[3] == 's' || buffer_[3] == 'S') && (buffer_[4] == 'e' || buffer_[4] == 'E')))
                         {
-                            continue_ = handler_.bool_value(false, semantic_tag::none, *this);
+                            continue_ = handler_->bool_value(false, semantic_tag::none, *this);
                         }
                         else if (buffer_.length() == 4 && ((buffer_[0] == 't' || buffer_[0] == 'T') && (buffer_[1] == 'r' || buffer_[1] == 'R') && (buffer_[2] == 'u' || buffer_[2] == 'U') && (buffer_[3] == 'e' || buffer_[3] == 'E')))
                         {
-                            continue_ = handler_.bool_value(true, semantic_tag::none, *this);
+                            continue_ = handler_->bool_value(true, semantic_tag::none, *this);
                         }
                         else
                         {
@@ -1422,12 +1462,12 @@ private:
                             {
                                 basic_json_parser<CharT> parser;
                                 parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
-                                parser.parse_some(handler_);
-                                parser.finish_parse(handler_);
+                                parser.parse_some(*handler_);
+                                parser.finish_parse(*handler_);
                             }
                             else
                             {
-                                continue_ = handler_.null_value(semantic_tag::none, *this);
+                                continue_ = handler_->null_value(semantic_tag::none, *this);
                             }
                         }
                     }
@@ -1435,7 +1475,7 @@ private:
                 default:
                     if (buffer_.length() > 0)
                     {
-                        continue_ = handler_.string_value(buffer_, semantic_tag::none, *this);
+                        continue_ = handler_->string_value(buffer_, semantic_tag::none, *this);
                     }
                     else
                     {
@@ -1443,12 +1483,12 @@ private:
                         {
                             basic_json_parser<CharT> parser;
                             parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
-                            parser.parse_some(handler_);
-                            parser.finish_parse(handler_);
+                            parser.parse_some(*handler_);
+                            parser.finish_parse(*handler_);
                         }
                         else
                         {
-                            continue_ = handler_.string_value(string_view_type(), semantic_tag::none, *this);
+                            continue_ = handler_->string_value(string_view_type(), semantic_tag::none, *this);
                         }
                     }
                     break;  
@@ -1462,7 +1502,7 @@ private:
             }
             else
             {
-                continue_ = handler_.string_value(buffer_, semantic_tag::none, *this);
+                continue_ = handler_->string_value(buffer_, semantic_tag::none, *this);
             }
         }
     }
@@ -1696,13 +1736,13 @@ private:
         switch (state)
         {
             case numeric_check_state::null:
-                continue_ = handler_.null_value(semantic_tag::none, *this);
+                continue_ = handler_->null_value(semantic_tag::none, *this);
                 break;
             case numeric_check_state::boolean_true:
-                continue_ = handler_.bool_value(true, semantic_tag::none, *this);
+                continue_ = handler_->bool_value(true, semantic_tag::none, *this);
                 break;
             case numeric_check_state::boolean_false:
-                continue_ = handler_.bool_value(false, semantic_tag::none, *this);
+                continue_ = handler_->bool_value(false, semantic_tag::none, *this);
                 break;
             case numeric_check_state::zero:
             case numeric_check_state::integer:
@@ -1712,11 +1752,11 @@ private:
                     auto result = jsoncons::detail::to_integer<int64_t>(buffer_.data(), buffer_.length());
                     if (result.ec == jsoncons::detail::to_integer_errc())
                     {
-                        continue_ = handler_.int64_value(result.value, semantic_tag::none, *this);
+                        continue_ = handler_->int64_value(result.value, semantic_tag::none, *this);
                     }
                     else // Must be overflow
                     {
-                        continue_ = handler_.string_value(buffer_, semantic_tag::bigint, *this);
+                        continue_ = handler_->string_value(buffer_, semantic_tag::bigint, *this);
                     }
                 }
                 else
@@ -1724,11 +1764,11 @@ private:
                     auto result = jsoncons::detail::to_integer<uint64_t>(buffer_.data(), buffer_.length());
                     if (result.ec == jsoncons::detail::to_integer_errc())
                     {
-                        continue_ = handler_.uint64_value(result.value, semantic_tag::none, *this);
+                        continue_ = handler_->uint64_value(result.value, semantic_tag::none, *this);
                     }
                     else if (result.ec == jsoncons::detail::to_integer_errc::overflow)
                     {
-                        continue_ = handler_.string_value(buffer_, semantic_tag::bigint, *this);
+                        continue_ = handler_->string_value(buffer_, semantic_tag::bigint, *this);
                     }
                     else
                     {
@@ -1742,18 +1782,18 @@ private:
             {
                 if (options_.lossless_number())
                 {
-                    continue_ = handler_.string_value(buffer_,semantic_tag::bigdec, *this);
+                    continue_ = handler_->string_value(buffer_,semantic_tag::bigdec, *this);
                 }
                 else
                 {
                     double d = to_double_(buffer.c_str(), buffer.length());
-                    continue_ = handler_.double_value(d, semantic_tag::none, *this);
+                    continue_ = handler_->double_value(d, semantic_tag::none, *this);
                 }
                 break;
             }
             default:
             {
-                continue_ = handler_.string_value(buffer_, semantic_tag::none, *this);
+                continue_ = handler_->string_value(buffer_, semantic_tag::none, *this);
                 break;
             }
         }

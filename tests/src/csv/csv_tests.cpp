@@ -608,7 +608,7 @@ TEST_CASE("csv_test1_object_1col_quoted")
     reader.read();
     json val = decoder.get_result();
 
-    CHECK(val.size()==2);
+    REQUIRE(val.size()==2);
     CHECK(val[0].size()==1);
     CHECK(val[1].size()==1);
     CHECK(val[0]["a"]==json("1"));

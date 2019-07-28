@@ -305,10 +305,10 @@ public:
         read_next(event_handler_, ec);
     }
 
-    void read_next(basic_json_content_handler<CharT>& /*handler*/, std::error_code& ec)
+    void read_next(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
         parser_.restart();
-        while (!parser_.stopped())
+        while (!parser_.finished())
         {
             if (parser_.source_exhausted())
             {
@@ -322,7 +322,7 @@ public:
                     eof_ = true;
                 }
             }
-            parser_.parse_some(/*handler,*/ ec);
+            parser_.parse_some(handler, ec);
             if (ec) return;
         }
     }
