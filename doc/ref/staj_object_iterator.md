@@ -3,8 +3,9 @@
 ```c++
 #include <jsoncons/staj_iterator.hpp>
 
-template <class T>
-using staj_object_iterator = basic_staj_object_iterator<T,char,basic_json<char>>;
+template<
+    class Json, 
+    class T=Json> class staj_object_iterator
 ```
 
 A `staj_object_iterator` is an [InputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) that
@@ -17,7 +18,7 @@ does not have type `begin_object`, it becomes equal to the default-constructed i
 
 Member type                         |Definition
 ------------------------------------|------------------------------
-`char_type`|`char`
+`char_type`|`Json::char_type`
 `key_type`|`std::basic_string<char_type>`
 `value_type`|`std::pair<string_type,T>`
 `difference_type`|`std::ptrdiff_t`

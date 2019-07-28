@@ -12,7 +12,7 @@
 #include <tuple>
 #include <memory>
 #include <istream> // std::basic_istream
-#include <jsoncons/json_conversion_traits.hpp>
+#include <jsoncons/ser_traits.hpp>
 #include <jsoncons/json_cursor.hpp>
 
 namespace jsoncons {

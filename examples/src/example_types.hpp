@@ -9,6 +9,13 @@
 
 namespace ns {
 
+    struct employee
+    {
+        std::string employeeNo;
+        std::string name;
+        std::string title;
+    };
+
     class fixing
     {
         std::string index_id_;
@@ -176,6 +183,7 @@ JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, ra
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputation, application, reputons)
 
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::fixing, index_id, observation_date, rate)
+JSONCONS_MEMBER_TRAITS_DECL(ns::employee, employeeNo, name, title)
 
 // Declare the traits. Specify which data members need to be serialized.
 JSONCONS_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)

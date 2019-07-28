@@ -18,7 +18,7 @@
 #include <jsoncons_ext/cbor/cbor_reader.hpp>
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
-#include <jsoncons/json_conversion_traits.hpp>
+#include <jsoncons/ser_traits.hpp>
 
 namespace jsoncons { namespace cbor {
 

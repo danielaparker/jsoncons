@@ -3,8 +3,10 @@
 ```c++
 #include <jsoncons/staj_iterator.hpp>
 
-template <class T>
-using staj_array_iterator = basic_staj_array_iterator<T,char,basic_json<char>>;
+template<
+    class Json, 
+    class T=Json>
+class staj_array_iterator
 ```
 
 A `staj_array_iterator` is an [InputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) that
@@ -17,7 +19,7 @@ it becomes equal to the default-constructed iterator.
 
 Member type                         |Definition
 ------------------------------------|------------------------------
-`char_type`|char
+`char_type`|Json::char_type
 `value_type`|`T`
 `difference_type`|`std::ptrdiff_t`
 `pointer`|`value_type*`
@@ -128,43 +130,18 @@ Output:
 #### Iterate over the JSON array, returning employee values 
 
 ```c++
-struct employee
-{
-    std::string employeeNo;
-    std::string name;
-    std::string title;
-};
+namespace ns {
 
-namespace jsoncons
-{
-    template<class Json>
-    struct json_type_traits<Json, employee>
+    struct employee
     {
-    template<class Json>
-    struct json_type_traits<Json, employee>
-    {
-        static bool is(const Json& j) noexcept
-        {
-            return j.is_object() && j.contains("employeeNo") && j.contains("name") && j.contains("title");
-        }
-        static employee as(const Json& j)
-        {
-            employee val;
-            val.employeeNo = j["employeeNo"].template as<std::string>();
-            val.name = j["name"].template as<std::string>();
-            val.title = j["title"].template as<std::string>();
-            return val;
-        }
-        static Json to_json(const employee& val)
-        {
-            Json j;
-            j["employeeNo"] = val.employeeNo;
-            j["name"] = val.name;
-            j["title"] = val.title;
-            return j;
-        }
+        std::string employeeNo;
+        std::string name;
+        std::string title;
     };
-}
+
+} // namespace ns
+
+JSONCONS_MEMBER_TRAITS_DECL(ns::employee, employeeNo, name, title)
       
 int main()
 {
@@ -172,7 +149,7 @@ int main()
 
     json_cursor cursor(is);
 
-    staj_array_iterator<employee> it(cursor);
+    staj_array_iterator<json,employee> it(cursor);
 
     for (const auto& val : it)
     {
