@@ -115,8 +115,7 @@ public:
 
     // Constructors that set parse error codes
     template <class Source>
-    basic_csv_cursor(Source&& source,
-                     std::error_code& ec)
+    basic_csv_cursor(Source&& source, std::error_code& ec)
         : basic_csv_cursor(std::forward<Source>(source),
                            accept,
                            basic_csv_options<CharT>::get_default_options(),
