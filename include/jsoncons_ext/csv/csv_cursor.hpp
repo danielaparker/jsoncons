@@ -73,7 +73,7 @@ public:
                      std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : event_handler_(filter),
-         parser_(event_handler_,options,err_handler),
+         parser_(options,err_handler),
          source_(source),
          buffer_length_(default_max_buffer_length),
          eof_(false),
@@ -93,7 +93,7 @@ public:
                      std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : event_handler_(filter),
-         parser_(event_handler_,options,err_handler),
+         parser_(options,err_handler),
          buffer_length_(0),
          eof_(false),
          begin_(false)
@@ -170,7 +170,7 @@ public:
                      std::error_code& ec,
                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : event_handler_(filter),
-         parser_(event_handler_,options,err_handler),
+         parser_(options,err_handler),
          source_(source),
          eof_(false),
          buffer_length_(default_max_buffer_length),
@@ -191,7 +191,7 @@ public:
                      std::error_code& ec,
                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : event_handler_(filter),
-         parser_(event_handler_,err_handler),
+         parser_(err_handler),
          eof_(false),
          buffer_length_(0),
          begin_(false)

@@ -92,20 +92,18 @@ namespace detail {
         typedef typename basic_json_options<CharT>::string_type string_type;
         typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
     public:
-        basic_json_content_handler<CharT>* handler_;
     private:
         typedef basic_json<CharT, preserve_order_policy, Allocator> json_type;
 
+        basic_json_content_handler<CharT>* handler_;
         std::vector<string_type, string_allocator_type> column_names_;
         std::vector<json_decoder<json_type>> decoders_;
         size_t column_index_;
         int level_;
     public:
 
-        m_columns_filter() = delete;
-
-        m_columns_filter(basic_json_content_handler<CharT>& handler)
-            : handler_(std::addressof(handler)), column_index_(0), level_(0)
+        m_columns_filter()
+            : handler_(nullptr), column_index_(0), level_(0)
         {
         }
 
@@ -120,6 +118,11 @@ namespace detail {
             }
             column_index_ = 0;
             level_ = 0;
+        }
+
+        void handler(basic_json_content_handler<CharT>& handler)
+        {
+            handler_ = std::addressof(handler);
         }
 
         void skip_column()
@@ -327,32 +330,26 @@ class basic_csv_parser : public ser_context
     std::vector<csv_parse_state,csv_parse_state_allocator_type> state_stack_;
 
 public:
-    basic_csv_parser(basic_json_content_handler<CharT>& handler)
-       : basic_csv_parser(handler, 
-                          basic_csv_options<CharT>::get_default_options(), 
+    basic_csv_parser()
+       : basic_csv_parser(basic_csv_options<CharT>::get_default_options(), 
                           default_csv_parsing())
     {
     }
 
-    basic_csv_parser(basic_json_content_handler<CharT>& handler,
-                     const basic_csv_decode_options<CharT>& options)
-        : basic_csv_parser(handler, 
-                           options, 
+    basic_csv_parser(const basic_csv_decode_options<CharT>& options)
+        : basic_csv_parser(options, 
                            default_csv_parsing())
     {
     }
 
-    basic_csv_parser(basic_json_content_handler<CharT>& handler,
-                     std::function<bool(csv_errc,const ser_context&)> err_handler)
-        : basic_csv_parser(handler, basic_csv_options<CharT>::get_default_options(), err_handler)
+    basic_csv_parser(std::function<bool(csv_errc,const ser_context&)> err_handler)
+        : basic_csv_parser(basic_csv_options<CharT>::get_default_options(), err_handler)
     {
     }
 
-    basic_csv_parser(basic_json_content_handler<CharT>& handler,
-                     const basic_csv_decode_options<CharT>& options,
+    basic_csv_parser(const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler)
-       : m_columns_filter_(handler),
-         handler_(options.mapping() == mapping_type::m_columns ? &m_columns_filter_ : std::addressof(handler)),
+       : handler_(nullptr),
          err_handler_(err_handler),
          options_(options),
          level_(0),
@@ -454,13 +451,15 @@ public:
 
     void parse_some(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
-        if (options_.mapping() == mapping_type::m_columns)
+        switch (options_.mapping())
         {
-            m_columns_filter_.handler_ = std::addressof(handler);
-        }
-        else
-        {
-            handler_ = std::addressof(handler);
+            case mapping_type::m_columns:
+                m_columns_filter_.handler(handler);
+                handler_ = &m_columns_filter_;
+                break;
+            default:
+                handler_ = std::addressof(handler);
+                break;
         }
 
         const CharT* local_input_end = input_end_;

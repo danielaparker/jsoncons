@@ -103,7 +103,7 @@ public:
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : handler_(handler),
-         parser_(handler, options, err_handler),
+         parser_(options, err_handler),
          source_(std::forward<Source>(source)),
          buffer_length_(default_max_buffer_length),
          eof_(false),
@@ -119,7 +119,7 @@ public:
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : handler_(handler),
-         parser_(handler, options, err_handler),
+         parser_(options, err_handler),
          buffer_length_(0),
          eof_(false),
          begin_(false)
