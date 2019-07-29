@@ -191,19 +191,18 @@ namespace detail {
     private:
         typedef std::vector<parse_event<CharT>> parse_event_vector;
 
-        std::vector<string_type, string_allocator_type> column_names_;
         size_t name_index_;
         int level_;
-        staj_event_type next_;
         cached_state state_;
         size_t column_index_;
         size_t row_index_;
 
+        std::vector<string_type, string_allocator_type> column_names_;
         std::vector<parse_event_vector> cached_events_;
     public:
 
         m_columns_filter()
-            : name_index_(0), level_(0), next_(staj_event_type::begin_object), column_index_(0), row_index_(0), state_(cached_state::begin_object)
+            : name_index_(0), level_(0), state_(cached_state::begin_object), column_index_(0), row_index_(0)
         {
         }
 
