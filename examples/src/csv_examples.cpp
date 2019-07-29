@@ -497,11 +497,13 @@ void grouped_into_basic_json_records()
     options.assume_header(true);
     csv::csv_cursor cursor(data, options);
 
-    staj_array_iterator<ojson> iter(cursor);
+    staj_array_iterator<ojson> it(cursor);
+    staj_array_iterator<ojson> end;
 
-    for (const auto& record : iter)
+    while (it != end)
     {
-        std::cout << pretty_print(record) << "\n";
+        std::cout << pretty_print(*it) << "\n";
+        ++it;
     }
 }
 
@@ -513,10 +515,10 @@ void grouped_into_strongly_typed_records()
     options.assume_header(true);
     csv::csv_cursor cursor(data, options);
 
-    staj_array_iterator<ojson,record_type> iter(cursor);
+    staj_array_iterator<ojson,record_type> it(cursor);
 
     std::cout << std::fixed << std::setprecision(7);
-    for (const auto& record : iter)
+    for (const auto& record : it)
     {
         std::cout << std::get<0>(record) << ", " << std::get<1>(record) << ", " << std::get<2>(record) << "\n";
     }
