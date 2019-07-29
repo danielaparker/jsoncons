@@ -470,8 +470,10 @@ public:
             {
                 case csv_parse_state::before_unquoted_field:
                 case csv_parse_state::before_last_unquoted_field:
-                case csv_parse_state::before_last_unquoted_field_tail:
                     end_unquoted_string_value();
+                    state_ = csv_parse_state::before_last_unquoted_field_tail;
+                    break;
+                case csv_parse_state::before_last_unquoted_field_tail:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
