@@ -72,6 +72,17 @@ enum class csv_parse_state
     done
 };
 
+enum class cached_state
+{
+    begin_object,
+    end_object,
+    begin_array,
+    end_array,
+    name,
+    item,
+    done
+};
+
 struct default_csv_parsing
 {
     bool operator()(csv_errc, const ser_context&) noexcept
@@ -83,7 +94,7 @@ struct default_csv_parsing
 namespace detail {
 
     template <class CharT>
-    struct parse_event
+    class parse_event
     {
         typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
 
@@ -98,7 +109,7 @@ namespace detail {
             double double_value;
         };
         semantic_tag tag;
-
+    public:
         parse_event(staj_event_type event_type, semantic_tag tag=semantic_tag::none)
             : event_type(event_type), tag(tag)
         {
@@ -181,15 +192,24 @@ namespace detail {
         typedef std::vector<parse_event<CharT>> parse_event_vector;
 
         std::vector<string_type, string_allocator_type> column_names_;
-        size_t column_index_;
+        size_t name_index_;
         int level_;
+        staj_event_type next_;
+        cached_state state_;
+        size_t column_index_;
+        size_t row_index_;
 
         std::vector<parse_event_vector> cached_events_;
     public:
 
         m_columns_filter()
-            : column_index_(0), level_(0)
+            : name_index_(0), level_(0), next_(staj_event_type::begin_object), column_index_(0), row_index_(0), state_(cached_state::begin_object)
         {
+        }
+
+        bool done() const
+        {
+            return state_ == cached_state::done;
         }
 
         void initialize(const std::vector<string_type, string_allocator_type>& column_names)
@@ -200,30 +220,74 @@ namespace detail {
                 column_names_.push_back(name);
                 cached_events_.push_back(parse_event_vector());
             }
-            column_index_ = 0;
+            name_index_ = 0;
             level_ = 0;
+            column_index_ = 0;
+            row_index_ = 0;
+            state_ = cached_state::begin_object;
         }
 
         void skip_column()
         {
-            ++column_index_;
+            ++name_index_;
         }
 
-        void replay_parse_events(basic_json_content_handler<CharT>& handler)
+        bool replay_parse_events(basic_json_content_handler<CharT>& handler)
         {
             null_ser_context context;
-            handler.begin_object(semantic_tag::none, context);
-            for (size_t i = 0; i < column_names_.size(); ++i)
+
+            bool more = true;
+            while (more)
             {
-                handler.name(column_names_[i], context);
-                handler.begin_array(semantic_tag::none, context);
-                for (const auto& item : cached_events_[i])
+                switch (state_)
                 {
-                    item.replay(handler);
+                    case cached_state::begin_object:
+                        more = handler.begin_object(semantic_tag::none, context);
+                        column_index_ = 0;
+                        state_ = cached_state::name;
+                        break;
+                    case cached_state::end_object:
+                        more = handler.end_object(context);
+                        state_ = cached_state::done;
+                        break;
+                    case cached_state::name:
+                        if (column_index_ < column_names_.size())
+                        {
+                            more = handler.name(column_names_[column_index_], context);
+                            state_ = cached_state::begin_array;
+                        }
+                        else
+                        {
+                            state_ = cached_state::end_object;
+                        }
+                        break;
+                    case cached_state::begin_array:
+                        more = handler.begin_array(semantic_tag::none, context);
+                        row_index_ = 0;
+                        state_ = cached_state::item;
+                        break;
+                    case cached_state::end_array:
+                        more = handler.end_array(context);
+                        ++column_index_;
+                        state_ = cached_state::name;
+                        break;
+                    case cached_state::item:
+                        if (row_index_ < cached_events_[column_index_].size())
+                        {
+                            more = cached_events_[column_index_][row_index_].replay(handler);
+                            ++row_index_;
+                        }
+                        else
+                        {
+                            state_ = cached_state::end_array;
+                        }
+                        break;
+                    default:
+                        more = false;
+                        break;
                 }
-                handler.end_array(context);
             }
-            handler.end_object(context);
+            return more;
         }
 
         void do_flush() override
@@ -242,9 +306,9 @@ namespace detail {
 
         bool do_begin_array(semantic_tag tag, const ser_context&) override
         {
-            if (column_index_ < column_names_.size())
+            if (name_index_ < column_names_.size())
             {
-                cached_events_[column_index_].emplace_back(staj_event_type::begin_array, tag);
+                cached_events_[name_index_].emplace_back(staj_event_type::begin_array, tag);
                 
                 ++level_;
             }
@@ -255,13 +319,13 @@ namespace detail {
         {
             if (level_ > 0)
             {
-                cached_events_[column_index_].emplace_back(staj_event_type::end_array);
-                ++column_index_;
+                cached_events_[name_index_].emplace_back(staj_event_type::end_array);
+                ++name_index_;
                 --level_;
             }
             else
             {
-                column_index_ = 0;
+                name_index_ = 0;
             }
             return true;
         }
@@ -273,12 +337,12 @@ namespace detail {
 
         bool do_null_value(semantic_tag tag, const ser_context&) override
         {
-            if (column_index_ < column_names_.size())
+            if (name_index_ < column_names_.size())
             {
-                cached_events_[column_index_].emplace_back(staj_event_type::null_value, tag);
+                cached_events_[name_index_].emplace_back(staj_event_type::null_value, tag);
                 if (level_ == 0)
                 {
-                    ++column_index_;
+                    ++name_index_;
                 }
             }
             return true;
@@ -286,13 +350,13 @@ namespace detail {
 
         bool do_string_value(const string_view_type& value, semantic_tag tag, const ser_context&) override
         {
-            if (column_index_ < column_names_.size())
+            if (name_index_ < column_names_.size())
             {
-                cached_events_[column_index_].emplace_back(value, tag);
+                cached_events_[name_index_].emplace_back(value, tag);
 
                 if (level_ == 0)
                 {
-                    ++column_index_;
+                    ++name_index_;
                 }
             }
             return true;
@@ -302,12 +366,12 @@ namespace detail {
                                   semantic_tag tag,
                                   const ser_context&) override
         {
-            if (column_index_ < column_names_.size())
+            if (name_index_ < column_names_.size())
             {
-                cached_events_[column_index_].emplace_back(value, tag);
+                cached_events_[name_index_].emplace_back(value, tag);
                 if (level_ == 0)
                 {
-                    ++column_index_;
+                    ++name_index_;
                 }
             }
             return true;
@@ -317,12 +381,12 @@ namespace detail {
                              semantic_tag tag, 
                              const ser_context&) override
         {
-            if (column_index_ < column_names_.size())
+            if (name_index_ < column_names_.size())
             {
-                cached_events_[column_index_].emplace_back(value, tag);
+                cached_events_[name_index_].emplace_back(value, tag);
                 if (level_ == 0)
                 {
-                    ++column_index_;
+                    ++name_index_;
                 }
             }
             return true;
@@ -332,12 +396,12 @@ namespace detail {
                             semantic_tag tag,
                             const ser_context&) override
         {
-            if (column_index_ < column_names_.size())
+            if (name_index_ < column_names_.size())
             {
-                cached_events_[column_index_].emplace_back(value, tag);
+                cached_events_[name_index_].emplace_back(value, tag);
                 if (level_ == 0)
                 {
-                    ++column_index_;
+                    ++name_index_;
                 }
             }
             return true;
@@ -347,12 +411,12 @@ namespace detail {
                              semantic_tag tag,
                              const ser_context&) override
         {
-            if (column_index_ < column_names_.size())
+            if (name_index_ < column_names_.size())
             {
-                cached_events_[column_index_].emplace_back(value, tag);
+                cached_events_[name_index_].emplace_back(value, tag);
                 if (level_ == 0)
                 {
-                    ++column_index_;
+                    ++name_index_;
                 }
             }
             return true;
@@ -360,12 +424,12 @@ namespace detail {
 
         bool do_bool_value(bool value, semantic_tag tag, const ser_context&) override
         {
-            if (column_index_ < column_names_.size())
+            if (name_index_ < column_names_.size())
             {
-                cached_events_[column_index_].emplace_back(value, tag);
+                cached_events_[name_index_].emplace_back(value, tag);
                 if (level_ == 0)
                 {
-                    ++column_index_;
+                    ++name_index_;
                 }
             }
             return true;
@@ -643,10 +707,20 @@ public:
                             break;
                     }
                     continue_ = handler_->end_array(*this);
-                    state_ = csv_parse_state::before_done;
                     if (options_.mapping() == mapping_type::m_columns)
                     {
-                        m_columns_filter_.replay_parse_events(handler);
+                        if (!m_columns_filter_.done())
+                        {
+                            continue_ = m_columns_filter_.replay_parse_events(handler);
+                        }
+                        else
+                        {
+                            state_ = csv_parse_state::before_done;
+                        }
+                    }
+                    else
+                    {
+                        state_ = csv_parse_state::before_done;
                     }
                     break;
                 case csv_parse_state::before_done:
