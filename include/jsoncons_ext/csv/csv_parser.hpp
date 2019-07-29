@@ -574,7 +574,6 @@ public:
                     state_ = csv_parse_state::done;
                     continue_ = false;
                     return;
-                    break;
                 default:
                     state_ = csv_parse_state::end_record;
                     break;

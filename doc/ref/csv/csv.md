@@ -12,6 +12,8 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 [csv_reader](csv_reader.md)
 
+[csv_cursor](csv_cursor.md)
+
 [basic_csv_encoder](basic_csv_encoder.md)
 
 ### Working with CSV data
