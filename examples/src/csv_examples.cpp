@@ -4,6 +4,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
 #include <fstream>
+#include <iomanip>
 #include "example_types.hpp"
 
 using namespace jsoncons;
@@ -423,6 +424,7 @@ void as_a_strongly_typed_cpp_structure()
     std::vector<ns::fixing> v = csv::decode_csv<std::vector<ns::fixing>>(data, options);
 
     // Iterate over values
+    std::cout << std::fixed << std::setprecision(7);
     std::cout << "(1)\n";
     for (const auto& item : v)
     {
@@ -489,6 +491,37 @@ void as_a_stream_of_json_events()
     }
 }
 
+void grouped_into_basic_json_records()
+{
+    csv::csv_options options;
+    options.assume_header(true);
+    csv::csv_cursor cursor(data, options);
+
+    staj_array_iterator<ojson> iter(cursor);
+
+    for (const auto& record : iter)
+    {
+        std::cout << pretty_print(record) << "\n";
+    }
+}
+
+void grouped_into_strongly_typed_records()
+{
+    typedef std::tuple<std::string,std::string,double> record_type;
+
+    csv::csv_options options;
+    options.assume_header(true);
+    csv::csv_cursor cursor(data, options);
+
+    staj_array_iterator<ojson,record_type> iter(cursor);
+
+    std::cout << std::fixed << std::setprecision(7);
+    for (const auto& record : iter)
+    {
+        std::cout << std::get<0>(record) << ", " << std::get<1>(record) << ", " << std::get<2>(record) << "\n";
+    }
+}
+
 
 } // csv_examples
 
@@ -520,6 +553,10 @@ void run_csv_examples()
     csv_examples::as_a_strongly_typed_cpp_structure();
     std::cout << "\n";
     csv_examples::as_a_stream_of_json_events();
+    std::cout << "\n";
+    csv_examples::grouped_into_basic_json_records();
+    std::cout << "\n";
+    csv_examples::grouped_into_strongly_typed_records();
     std::cout << "\n";
 
     std::cout << std::endl;

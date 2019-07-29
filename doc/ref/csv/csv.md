@@ -104,6 +104,7 @@ int main()
     std::vector<ns::fixing> v = csv::decode_csv<std::vector<ns::fixing>>(data, options);
 
     // Iterate over values
+    std::cout << std::fixed << std::setprecision(7);
     std::cout << "(1)\n";
     for (const auto& item : v)
     {
@@ -120,9 +121,9 @@ int main()
 Output:
 ```
 (1)
-EUR_LIBOR_06M, 2015-10-23, 2.1e-05
-EUR_LIBOR_06M, 2015-10-26, 1.4e-05
-EUR_LIBOR_06M, 2015-10-27, 1e-07
+EUR_LIBOR_06M, 2015-10-23, 0.0000214
+EUR_LIBOR_06M, 2015-10-26, 0.0000143
+EUR_LIBOR_06M, 2015-10-27, 0.0000001
 (2)
 index_id,observation_date,rate
 EUR_LIBOR_06M,2015-10-23,2.14e-05
@@ -216,3 +217,62 @@ end_object
 end_array
 ```
 
+You can use a [staj_array_iterator](../staj_array_iterator.md) to group the CSV parse events into [basic_json](../basic_json.md) records:
+```c++
+int main()
+{
+    csv::csv_options options;
+    options.assume_header(true);
+    csv::csv_cursor cursor(data, options);
+
+    staj_array_iterator<ojson> iter(cursor);
+
+    for (const auto& record : iter)
+    {
+        std::cout << pretty_print(record) << "\n";
+    }
+```
+Output:
+```
+{
+    "index_id": "EUR_LIBOR_06M",
+    "observation_date": "2015-10-23",
+    "rate": 2.14e-05
+}
+{
+    "index_id": "EUR_LIBOR_06M",
+    "observation_date": "2015-10-26",
+    "rate": 1.43e-05
+}
+{
+    "index_id": "EUR_LIBOR_06M",
+    "observation_date": "2015-10-27",
+    "rate": 1e-07
+}
+```
+
+Or into strongly typed records:
+```c++
+int main()
+{
+    typedef std::tuple<std::string,std::string,double> record_type;
+
+    csv::csv_options options;
+    options.assume_header(true);
+    csv::csv_cursor cursor(data, options);
+
+    staj_array_iterator<ojson,record_type> iter(cursor);
+
+    std::cout << std::fixed << std::setprecision(7);
+    for (const auto& record : iter)
+    {
+        std::cout << std::get<0>(record) << ", " << std::get<1>(record) << ", " << std::get<2>(record) << "\n";
+    }
+}
+```
+Output
+```
+EUR_LIBOR_06M, 2015-10-23, 0.0000214
+EUR_LIBOR_06M, 2015-10-26, 0.0000143
+EUR_LIBOR_06M, 2015-10-27, 0.0000001
+```
