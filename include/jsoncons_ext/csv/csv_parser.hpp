@@ -82,6 +82,64 @@ struct default_csv_parsing
 
 namespace detail {
 
+    template <class CharT>
+    struct parse_event
+    {
+        typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
+
+        staj_event_type event_type;
+        std::basic_string<CharT> string_value;
+        byte_string byte_string_value;
+        union
+        {
+            bool bool_value;
+            int64_t int64_value;
+            uint64_t uint64_value;
+            double double_value;
+        };
+        semantic_tag tag;
+
+        parse_event(staj_event_type event_type, semantic_tag tag=semantic_tag::none)
+            : event_type(event_type), tag(tag)
+        {
+        }
+
+        parse_event(const string_view_type& value, semantic_tag tag)
+            : event_type(staj_event_type::string_value), string_value(value.data(),value.length()), tag(tag)
+        {
+        }
+
+        parse_event(const byte_string_view& value, semantic_tag tag)
+            : event_type(staj_event_type::byte_string_value), byte_string_value(value.data(),value.length()), tag(tag)
+        {
+        }
+
+        parse_event(bool value, semantic_tag tag)
+            : event_type(staj_event_type::bool_value), bool_value(value), tag(tag)
+        {
+        }
+
+        parse_event(int64_t value, semantic_tag tag)
+            : event_type(staj_event_type::int64_value), int64_value(value), tag(tag)
+        {
+        }
+
+        parse_event(uint64_t value, semantic_tag tag)
+            : event_type(staj_event_type::uint64_value), uint64_value(value), tag(tag)
+        {
+        }
+
+        parse_event(double value, semantic_tag tag)
+            : event_type(staj_event_type::double_value), double_value(value), tag(tag)
+        {
+        }
+
+        parse_event(const parse_event&) = default;
+        parse_event(parse_event&&) = default;
+        parse_event& operator=(const parse_event&) = default;
+        parse_event& operator=(parse_event&&) = default;
+    };
+
     template <class CharT, class Allocator>
     class m_columns_filter : public basic_json_content_handler<CharT>
     {
@@ -94,11 +152,13 @@ namespace detail {
     public:
     private:
         typedef basic_json<CharT, preserve_order_policy, Allocator> json_type;
+        typedef std::vector<parse_event<CharT>> parse_event_vector;
 
         std::vector<string_type, string_allocator_type> column_names_;
-        std::vector<json_decoder<json_type>> decoders_;
         size_t column_index_;
         int level_;
+
+        std::vector<parse_event_vector> cached_events_;
     public:
 
         m_columns_filter()
@@ -112,8 +172,7 @@ namespace detail {
             for (const auto& name : column_names)
             {
                 column_names_.push_back(name);
-                decoders_.push_back(json_decoder<json_type>());
-                decoders_.back().begin_array(semantic_tag::none, context);
+                cached_events_.push_back(parse_event_vector());
             }
             column_index_ = 0;
             level_ = 0;
@@ -124,17 +183,49 @@ namespace detail {
             ++column_index_;
         }
 
-        void read_to(basic_json_content_handler<CharT>& handler)
+        void replay_parse_events(basic_json_content_handler<CharT>& handler)
         {
             null_ser_context context;
             handler.begin_object(semantic_tag::none, context);
             for (size_t i = 0; i < column_names_.size(); ++i)
             {
                 handler.name(column_names_[i], context);
-                decoders_[i].end_array(context);
-                decoders_[i].flush();
-                auto j = decoders_[i].get_result();
-                j.dump(handler);
+                handler.begin_array(semantic_tag::none, context);
+                for (const auto& item : cached_events_[i])
+                {
+                    switch (item.event_type)
+                    {
+                        case staj_event_type::begin_array:
+                            handler.begin_array(item.tag, context);
+                            break;
+                        case staj_event_type::end_array:
+                            handler.end_array(context);
+                            break;
+                        case staj_event_type::string_value:
+                            handler.string_value(item.string_value, item.tag, context);
+                            break;
+                        case staj_event_type::byte_string_value:
+                            break;
+                        case staj_event_type::null_value:
+                            handler.null_value(item.tag, context);
+                            break;
+                        case staj_event_type::bool_value:
+                            handler.bool_value(item.bool_value, item.tag, context);
+                            break;
+                        case staj_event_type::int64_value:
+                            handler.int64_value(item.int64_value, item.tag, context);
+                            break;
+                        case staj_event_type::uint64_value:
+                            handler.uint64_value(item.uint64_value, item.tag, context);
+                            break;
+                        case staj_event_type::double_value:
+                            handler.double_value(item.double_value, item.tag, context);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                handler.end_array(context);
             }
             handler.end_object(context);
             handler.flush();
@@ -154,21 +245,22 @@ namespace detail {
             JSONCONS_THROW(json_runtime_error<std::invalid_argument>("unexpected end_object"));
         }
 
-        bool do_begin_array(semantic_tag tag, const ser_context& context) override
+        bool do_begin_array(semantic_tag tag, const ser_context&) override
         {
             if (column_index_ < column_names_.size())
             {
-                decoders_[column_index_].begin_array(tag, context);
+                cached_events_[column_index_].emplace_back(staj_event_type::begin_array, tag);
+                
                 ++level_;
             }
             return true;
         }
 
-        bool do_end_array(const ser_context& context) override
+        bool do_end_array(const ser_context&) override
         {
             if (level_ > 0)
             {
-                decoders_[column_index_].end_array(context);
+                cached_events_[column_index_].emplace_back(staj_event_type::end_array);
                 ++column_index_;
                 --level_;
             }
@@ -184,11 +276,11 @@ namespace detail {
             JSONCONS_THROW(json_runtime_error<std::invalid_argument>("unexpected name"));
         }
 
-        bool do_null_value(semantic_tag tag, const ser_context& context) override
+        bool do_null_value(semantic_tag tag, const ser_context&) override
         {
             if (column_index_ < column_names_.size())
             {
-                decoders_[column_index_].null_value(tag, context);
+                cached_events_[column_index_].emplace_back(staj_event_type::null_value, tag);
                 if (level_ == 0)
                 {
                     ++column_index_;
@@ -197,11 +289,12 @@ namespace detail {
             return true;
         }
 
-        bool do_string_value(const string_view_type& value, semantic_tag tag, const ser_context& context) override
+        bool do_string_value(const string_view_type& value, semantic_tag tag, const ser_context&) override
         {
             if (column_index_ < column_names_.size())
             {
-                decoders_[column_index_].string_value(value, tag, context);
+                cached_events_[column_index_].emplace_back(value, tag);
+
                 if (level_ == 0)
                 {
                     ++column_index_;
@@ -212,11 +305,11 @@ namespace detail {
 
         bool do_byte_string_value(const byte_string_view& value,
                                   semantic_tag tag,
-                                  const ser_context& context) override
+                                  const ser_context&) override
         {
             if (column_index_ < column_names_.size())
             {
-                decoders_[column_index_].byte_string_value(value, tag, context);
+                cached_events_[column_index_].emplace_back(value, tag);
                 if (level_ == 0)
                 {
                     ++column_index_;
@@ -226,12 +319,12 @@ namespace detail {
         }
 
         bool do_double_value(double value,
-                             semantic_tag tag,
-                             const ser_context& context) override
+                             semantic_tag tag, 
+                             const ser_context&) override
         {
             if (column_index_ < column_names_.size())
             {
-                decoders_[column_index_].double_value(value, tag, context);
+                cached_events_[column_index_].emplace_back(value, tag);
                 if (level_ == 0)
                 {
                     ++column_index_;
@@ -242,11 +335,11 @@ namespace detail {
 
         bool do_int64_value(int64_t value,
                             semantic_tag tag,
-                            const ser_context& context) override
+                            const ser_context&) override
         {
             if (column_index_ < column_names_.size())
             {
-                decoders_[column_index_].int64_value(value, tag, context);
+                cached_events_[column_index_].emplace_back(value, tag);
                 if (level_ == 0)
                 {
                     ++column_index_;
@@ -257,11 +350,11 @@ namespace detail {
 
         bool do_uint64_value(uint64_t value,
                              semantic_tag tag,
-                             const ser_context& context) override
+                             const ser_context&) override
         {
             if (column_index_ < column_names_.size())
             {
-                decoders_[column_index_].uint64_value(value, tag, context);
+                cached_events_[column_index_].emplace_back(value, tag);
                 if (level_ == 0)
                 {
                     ++column_index_;
@@ -270,11 +363,11 @@ namespace detail {
             return true;
         }
 
-        bool do_bool_value(bool value, semantic_tag tag, const ser_context& context) override
+        bool do_bool_value(bool value, semantic_tag tag, const ser_context&) override
         {
             if (column_index_ < column_names_.size())
             {
-                decoders_[column_index_].bool_value(value, tag, context);
+                cached_events_[column_index_].emplace_back(value, tag);
                 if (level_ == 0)
                 {
                     ++column_index_;
@@ -559,7 +652,7 @@ public:
                     state_ = csv_parse_state::before_done;
                     if (options_.mapping() == mapping_type::m_columns)
                     {
-                        m_columns_filter_.read_to(handler);
+                        m_columns_filter_.replay_parse_events(handler);
                     }
                     break;
                 case csv_parse_state::before_done:
