@@ -51,6 +51,20 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
         cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(cursor.current().get<std::string>() == std::string("EUR_LIBOR_06M"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(cursor.current().get<std::string>() == std::string("2015-10-23"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::double_value);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::end_array);
+        cursor.next();
+
+        CHECK(cursor.current().event_type() == staj_event_type::begin_array);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(cursor.current().get<std::string>() == std::string("EUR_LIBOR_06M"));
         cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::string_value);
         cursor.next();
@@ -62,17 +76,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
         cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::string_value);
-        cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::string_value);
-        cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::double_value);
-        cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::end_array);
-        cursor.next();
-
-        CHECK(cursor.current().event_type() == staj_event_type::begin_array);
-        cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(cursor.current().get<std::string>() == std::string("EUR_LIBOR_06M"));
         cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::string_value);
         cursor.next();
