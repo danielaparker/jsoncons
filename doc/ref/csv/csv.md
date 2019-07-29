@@ -33,7 +33,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
 
 jsoncons allows you to work with the CSV data similarly to JSON data:
 
-- As a variant-like structure, [basic_json](doc/ref/basic_json.md) 
+- As a variant-like structure, [basic_json](../basic_json.md) 
 
 - As a strongly typed C++ data structure
 
