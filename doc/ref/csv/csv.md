@@ -94,6 +94,7 @@ EUR_LIBOR_06M, 2015-10-27, 1e-07
 
 #### As a strongly typed C++ data structure
 
+jsoncons supports mapping CSV data into C++ data structures. The functions decode_csv and encode_csv convert strings or streams of JSON data to C++ data structures and back. Decode and encode work for all C++ classes that have json_type_traits defined. The standard library containers are already supported, and your own types will be supported too if you specialize json_type_traits in the jsoncons namespace.
 ```c++
 
 namespace ns {
