@@ -95,7 +95,6 @@ namespace detail {
     private:
         typedef basic_json<CharT, preserve_order_policy, Allocator> json_type;
 
-        basic_json_content_handler<CharT>* handler_;
         std::vector<string_type, string_allocator_type> column_names_;
         std::vector<json_decoder<json_type>> decoders_;
         size_t column_index_;
@@ -103,7 +102,7 @@ namespace detail {
     public:
 
         m_columns_filter()
-            : handler_(nullptr), column_index_(0), level_(0)
+            : column_index_(0), level_(0)
         {
         }
 
@@ -120,30 +119,29 @@ namespace detail {
             level_ = 0;
         }
 
-        void handler(basic_json_content_handler<CharT>& handler)
-        {
-            handler_ = std::addressof(handler);
-        }
-
         void skip_column()
         {
             ++column_index_;
         }
 
-        void do_flush() override
+        void read_to(basic_json_content_handler<CharT>& handler)
         {
             null_ser_context context;
-            handler_->begin_object(semantic_tag::none, context);
+            handler.begin_object(semantic_tag::none, context);
             for (size_t i = 0; i < column_names_.size(); ++i)
             {
-                handler_->name(column_names_[i], context);
+                handler.name(column_names_[i], context);
                 decoders_[i].end_array(context);
                 decoders_[i].flush();
                 auto j = decoders_[i].get_result();
-                j.dump(*handler_);
+                j.dump(handler);
             }
-            handler_->end_object(context);
-            handler_->flush();
+            handler.end_object(context);
+            handler.flush();
+        }
+
+        void do_flush() override
+        {
         }
 
         bool do_begin_object(semantic_tag, const ser_context&) override
@@ -454,7 +452,6 @@ public:
         switch (options_.mapping())
         {
             case mapping_type::m_columns:
-                m_columns_filter_.handler(handler);
                 handler_ = &m_columns_filter_;
                 break;
             default:
@@ -560,6 +557,10 @@ public:
                     }
                     continue_ = handler_->end_array(*this);
                     state_ = csv_parse_state::before_done;
+                    if (options_.mapping() == mapping_type::m_columns)
+                    {
+                        m_columns_filter_.read_to(handler);
+                    }
                     break;
                 case csv_parse_state::before_done:
                     if (!(stack_.size() == 1 && stack_.back() == csv_mode::initial))
