@@ -350,7 +350,8 @@ NY,LON,TOR;LON
 
         csv::csv_cursor cursor(data, options);
 
-        /* for (; !cursor.done(); cursor.next())
+        /* 
+        for (; !cursor.done(); cursor.next())
         {
             const auto& event = cursor.current();
             switch (event.event_type())
@@ -394,7 +395,8 @@ NY,LON,TOR;LON
                     std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";;
                     break;
             }
-        }*/
+        } 
+        */ 
 
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
         cursor.next();
@@ -586,9 +588,45 @@ TEST_CASE("csv_cursor n_objects, header test")
     }
 }
 
-TEST_CASE("csv_cursor n_objects, header, subfield test")
+TEST_CASE("csv_cursor header, subfield no terminating new line test")
 {
     std::string data = "a\n4;-5";
+
+    SECTION("test 1")
+    {
+        csv::csv_options options;
+        options.assume_header(true)
+               .subfield_delimiter(';')
+               .mapping(csv::mapping_type::n_rows);
+        csv::csv_cursor cursor(data, options);
+
+        CHECK(cursor.current().event_type() == staj_event_type::begin_array);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::begin_array);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(cursor.current().get<std::string>() == std::string("a"));
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::end_array);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::begin_array);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::begin_array);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::uint64_value);
+        CHECK(cursor.current().get<int>() == 4);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::int64_value);
+        CHECK(cursor.current().get<int>() == -5);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::end_array);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::end_array);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::end_array);
+        cursor.next();
+        CHECK(cursor.done());
+    }
 
     SECTION("test 2")
     {
@@ -621,6 +659,6 @@ TEST_CASE("csv_cursor n_objects, header, subfield test")
         CHECK(cursor.current().event_type() == staj_event_type::end_array);
         cursor.next();
         CHECK(cursor.done());
-        
     }
 }
+
