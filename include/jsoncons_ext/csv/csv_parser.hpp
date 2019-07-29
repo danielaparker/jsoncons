@@ -138,6 +138,33 @@ namespace detail {
         parse_event(parse_event&&) = default;
         parse_event& operator=(const parse_event&) = default;
         parse_event& operator=(parse_event&&) = default;
+
+        bool replay(basic_json_content_handler<CharT>& handler) const
+        {
+            null_ser_context context;
+            switch (event_type)
+            {
+                case staj_event_type::begin_array:
+                    return handler.begin_array(tag, context);
+                case staj_event_type::end_array:
+                    return handler.end_array(context);
+                case staj_event_type::string_value:
+                    return handler.string_value(string_value, tag, context);
+                case staj_event_type::byte_string_value:
+                case staj_event_type::null_value:
+                    return handler.null_value(tag, context);
+                case staj_event_type::bool_value:
+                    return handler.bool_value(bool_value, tag, context);
+                case staj_event_type::int64_value:
+                    return handler.int64_value(int64_value, tag, context);
+                case staj_event_type::uint64_value:
+                    return handler.uint64_value(uint64_value, tag, context);
+                case staj_event_type::double_value:
+                    return handler.double_value(double_value, tag, context);
+                default:
+                    return false;
+            }
+        }
     };
 
     template <class CharT, class Allocator>
@@ -151,7 +178,6 @@ namespace detail {
         typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
     public:
     private:
-        typedef basic_json<CharT, preserve_order_policy, Allocator> json_type;
         typedef std::vector<parse_event<CharT>> parse_event_vector;
 
         std::vector<string_type, string_allocator_type> column_names_;
@@ -193,42 +219,11 @@ namespace detail {
                 handler.begin_array(semantic_tag::none, context);
                 for (const auto& item : cached_events_[i])
                 {
-                    switch (item.event_type)
-                    {
-                        case staj_event_type::begin_array:
-                            handler.begin_array(item.tag, context);
-                            break;
-                        case staj_event_type::end_array:
-                            handler.end_array(context);
-                            break;
-                        case staj_event_type::string_value:
-                            handler.string_value(item.string_value, item.tag, context);
-                            break;
-                        case staj_event_type::byte_string_value:
-                            break;
-                        case staj_event_type::null_value:
-                            handler.null_value(item.tag, context);
-                            break;
-                        case staj_event_type::bool_value:
-                            handler.bool_value(item.bool_value, item.tag, context);
-                            break;
-                        case staj_event_type::int64_value:
-                            handler.int64_value(item.int64_value, item.tag, context);
-                            break;
-                        case staj_event_type::uint64_value:
-                            handler.uint64_value(item.uint64_value, item.tag, context);
-                            break;
-                        case staj_event_type::double_value:
-                            handler.double_value(item.double_value, item.tag, context);
-                            break;
-                        default:
-                            break;
-                    }
+                    item.replay(handler);
                 }
                 handler.end_array(context);
             }
             handler.end_object(context);
-            handler.flush();
         }
 
         void do_flush() override
@@ -392,7 +387,6 @@ class basic_csv_parser : public ser_context
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<csv_type_info> csv_type_info_allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::vector<string_type,string_allocator_type>> string_vector_allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<csv_parse_state> csv_parse_state_allocator_type;
-    typedef basic_json<CharT,preserve_order_policy,Allocator> json_type;
 
     static const int default_depth = 3;
 
