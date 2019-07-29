@@ -95,6 +95,31 @@ EUR_LIBOR_06M, 2015-10-27, 1e-07
 #### As a strongly typed C++ data structure
 
 ```c++
+
+namespace ns {
+
+    class fixing
+    {
+        std::string index_id_;
+        std::string observation_date_;
+        double rate_;
+    public:
+        fixing(const std::string& index_id, const std::string& observation_date, double rate)
+            : index_id_(index_id), observation_date_(observation_date), rate_(rate)
+        {
+        }
+
+        const std::string& index_id() const {return  index_id_;}
+
+        const std::string& observation_date() const {return  observation_date_;}
+
+        double rate() const {return rate_;}
+    };
+
+} // namespace ns
+
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::fixing, index_id, observation_date, rate)
+
 int main()
 {
     csv::csv_options options;
@@ -256,6 +281,7 @@ Output:
 
 Or into strongly typed records:
 ```c++
+
 int main()
 {
     typedef std::tuple<std::string,std::string,double> record_type;
