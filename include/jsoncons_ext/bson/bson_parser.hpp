@@ -156,23 +156,23 @@ private:
         state_stack_.pop_back();
     }
 
-    void read_name(json_content_handler& handler, jsoncons::bson::detail::bson_container_type type, std::error_code& ec)
+    void read_e_name(json_content_handler& handler, jsoncons::bson::detail::bson_container_type type, std::error_code& ec)
     {
-        std::basic_string<char> s;
+        text_buffer_.clear();
         uint8_t c{};
         while (source_.get(c) > 0 && c != 0)
         {
-            s.push_back(c);
+            text_buffer_.push_back(c);
         }
         if (type == jsoncons::bson::detail::bson_container_type::document)
         {
-            auto result = unicons::validate(s.begin(),s.end());
+            auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
             if (result.ec != unicons::conv_errc())
             {
                 ec = bson_errc::invalid_utf8_text_string;
                 return;
             }
-            handler.name(basic_string_view<char>(s.data(),s.length()), *this);
+            handler.name(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
         }
     }
 
@@ -181,12 +181,12 @@ private:
         uint8_t t{};
         while (source_.get(t) > 0 && t != 0x00)
         {
-            read_name(handler, type, ec);
-            read_internal(handler, t, ec);
+            read_e_name(handler, type, ec);
+            read_value(handler, t, ec);
         }
     }
 
-    void read_internal(json_content_handler& handler, uint8_t type, std::error_code& ec)
+    void read_value(json_content_handler& handler, uint8_t type, std::error_code& ec)
     {
         switch (type)
         {
