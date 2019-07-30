@@ -20,7 +20,7 @@
 
 namespace jsoncons { namespace bson {
 
-enum class parse_mode {root,before_done,document};
+enum class parse_mode {root,before_done,document,array};
 
 struct parse_state 
 {
@@ -122,8 +122,8 @@ private:
         /* auto len = */jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
 
         handler.begin_object(semantic_tag::none, *this);
-        state_stack_.emplace_back(parse_mode::document,0);
         ++nesting_depth_;
+        state_stack_.emplace_back(parse_mode::document,0);
     }
 
     void end_document(json_content_handler& handler, std::error_code&)
@@ -133,28 +133,55 @@ private:
         --nesting_depth_;
     }
 
+    void begin_array(json_content_handler& handler, std::error_code& ec)
+    {
+        uint8_t buf[sizeof(int32_t)]; 
+        if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
+        {
+            ec = bson_errc::unexpected_eof;
+            return;
+        }
+        const uint8_t* endp;
+        /* auto len = */ jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
+
+        handler.begin_array(semantic_tag::none, *this);
+        ++nesting_depth_;
+        state_stack_.emplace_back(parse_mode::array,0);
+    }
+
+    void end_array(json_content_handler& handler, std::error_code&)
+    {
+        handler.end_array(*this);
+        --nesting_depth_;
+        state_stack_.pop_back();
+    }
+
+    void read_name(json_content_handler& handler, jsoncons::bson::detail::bson_container_type type, std::error_code& ec)
+    {
+        std::basic_string<char> s;
+        uint8_t c{};
+        while (source_.get(c) > 0 && c != 0)
+        {
+            s.push_back(c);
+        }
+        if (type == jsoncons::bson::detail::bson_container_type::document)
+        {
+            auto result = unicons::validate(s.begin(),s.end());
+            if (result.ec != unicons::conv_errc())
+            {
+                ec = bson_errc::invalid_utf8_text_string;
+                return;
+            }
+            handler.name(basic_string_view<char>(s.data(),s.length()), *this);
+        }
+    }
+
     void read_e_list(json_content_handler& handler, jsoncons::bson::detail::bson_container_type type, std::error_code& ec)
     {
         uint8_t t{};
         while (source_.get(t) > 0 && t != 0x00)
         {
-            std::basic_string<char> s;
-            uint8_t c{};
-            while (source_.get(c) > 0 && c != 0)
-            {
-                s.push_back(c);
-            }
-
-            if (type == jsoncons::bson::detail::bson_container_type::document)
-            {
-                auto result = unicons::validate(s.begin(),s.end());
-                if (result.ec != unicons::conv_errc())
-                {
-                    ec = bson_errc::invalid_utf8_text_string;
-                    return;
-                }
-                handler.name(basic_string_view<char>(s.data(),s.length()), *this);
-            }
+            read_name(handler, type, ec);
             read_internal(handler, t, ec);
         }
     }
@@ -217,20 +244,9 @@ private:
 
             case jsoncons::bson::detail::bson_format::array_cd: 
             {
-                uint8_t buf[sizeof(int32_t)]; 
-                if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
-                {
-                    ec = bson_errc::unexpected_eof;
-                    return;
-                }
-                const uint8_t* endp;
-                /* auto len = */ jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
-
-                handler.begin_array(semantic_tag::none, *this);
-                ++nesting_depth_;
-                read_e_list(handler, jsoncons::bson::detail::bson_container_type::document, ec);
-                handler.end_array(*this);
-                --nesting_depth_;
+                begin_array(handler,ec);
+                read_e_list(handler, jsoncons::bson::detail::bson_container_type::array, ec);
+                end_array(handler,ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::null_cd: 
