@@ -20,7 +20,7 @@
 
 namespace jsoncons { namespace bson {
 
-enum class parse_mode {root,before_done,document,array};
+enum class parse_mode {root,before_done,document,array,value};
 
 struct parse_state 
 {
@@ -91,20 +91,64 @@ public:
 
     void parse(json_content_handler& handler, std::error_code& ec)
     {
-        try
+        if (source_.is_error())
         {
-            if (source_.is_error())
-            {
-                ec = bson_errc::source_error;
-                return;
-            }   
-            begin_document(handler, ec);
-            read_e_list(handler, jsoncons::bson::detail::bson_container_type::document, ec);
-            end_document(handler, ec);
+            ec = bson_errc::source_error;
+            return;
         }
-        catch (const ser_error& e)
+        
+        while (!done_ && continue_)
         {
-            ec = e.code();
+            switch (state_stack_.back().mode)
+            {
+                case parse_mode::root:
+                    state_stack_.back().mode = parse_mode::before_done;
+                    begin_document(handler, ec);
+                    break;
+                case parse_mode::document:
+                {
+                    uint8_t t{};
+                    if (source_.get(t) == 0)
+                    {
+                        ec = bson_errc::unexpected_eof;
+                        return;
+                    }
+                    if (t != 0x00)
+                    {
+                        read_e_name(handler,jsoncons::bson::detail::bson_container_type::document,ec);
+                        state_stack_.back().mode = parse_mode::value;
+                        state_stack_.back().type = t;
+                    }
+                    else
+                    {
+                        end_document(handler,ec);
+                    }
+                    break;
+                }
+                case parse_mode::array:
+                {
+                    uint8_t t{};
+                    if (source_.get(t) == 0)
+                    {
+                        ec = bson_errc::unexpected_eof;
+                        return;
+                    }
+                    if (t != 0x00)
+                    {
+                        read_e_name(handler,jsoncons::bson::detail::bson_container_type::array,ec);
+                        read_value(handler,t,ec);
+                    }
+                    else
+                    {
+                        end_array(handler,ec);
+                    }
+                    break;
+                }
+                case parse_mode::value:
+                    read_value(handler,state_stack_.back().type,ec);
+                    state_stack_.back().mode = parse_mode::document;
+                    break;
+            }
         }
     }
 
@@ -119,11 +163,11 @@ private:
             return;
         }
         const uint8_t* endp;
-        /* auto len = */jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
+        auto length = jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
 
         handler.begin_object(semantic_tag::none, *this);
         ++nesting_depth_;
-        state_stack_.emplace_back(parse_mode::document,0);
+        state_stack_.emplace_back(parse_mode::document,length);
     }
 
     void end_document(json_content_handler& handler, std::error_code&)
@@ -176,16 +220,6 @@ private:
         }
     }
 
-    void read_e_list(json_content_handler& handler, jsoncons::bson::detail::bson_container_type type, std::error_code& ec)
-    {
-        uint8_t t{};
-        while (source_.get(t) > 0 && t != 0x00)
-        {
-            read_e_name(handler, type, ec);
-            read_value(handler, t, ec);
-        }
-    }
-
     void read_value(json_content_handler& handler, uint8_t type, std::error_code& ec)
     {
         switch (type)
@@ -234,19 +268,13 @@ private:
             }
             case jsoncons::bson::detail::bson_format::document_cd: 
             {
-                parse(handler, ec);
-                if (ec)
-                {
-                    return;
-                }
+                begin_document(handler,ec);
                 break;
             }
 
             case jsoncons::bson::detail::bson_format::array_cd: 
             {
                 begin_array(handler,ec);
-                read_e_list(handler, jsoncons::bson::detail::bson_container_type::array, ec);
-                end_array(handler,ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::null_cd: 
