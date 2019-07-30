@@ -1122,21 +1122,86 @@ WLF,WALLIS & FUTUNA ISLANDS
     //std::cout << pretty_print(j) << std::endl;
 }
 
-TEST_CASE("test_decode_csv_from_string")
+TEST_CASE("Test decode_csv, terminating newline")
 {
-    std::string s = "some label\nsome value";
-    csv::csv_options options;
-    options.assume_header(true);
-    std::cout << csv::decode_csv<json>(s,options) << std::endl;
+    std::string data = "some label\nsome value\nanother value\n";
+
+    SECTION("From string")
+    {
+        csv::csv_options options;
+        options.assume_header(true);
+        auto j = csv::decode_csv<json>(data,options);
+        REQUIRE(j.is_array());
+        REQUIRE(j.size() == 2);
+        CHECK(j[0]["some label"].as<std::string>() == std::string("some value"));
+        CHECK(j[1]["some label"].as<std::string>() == std::string("another value"));
+    }
+
+    SECTION("From stream")
+    {
+        std::stringstream is(data);
+
+        csv::csv_options options;
+        options.assume_header(true);
+        auto j = csv::decode_csv<json>(is,options);
+        REQUIRE(j.is_array());
+        REQUIRE(j.size() == 2);
+        CHECK(j[0]["some label"].as<std::string>() == std::string("some value"));
+        CHECK(j[1]["some label"].as<std::string>() == std::string("another value"));
+    }
+
+    SECTION("m_columns")
+    {
+        csv::csv_options options;
+        options.assume_header(true)
+               .mapping(csv::mapping_type::m_columns);
+        auto j = csv::decode_csv<json>(data,options);
+        REQUIRE(j.is_object());
+        REQUIRE(j.size() == 1);
+        CHECK(j["some label"][0].as<std::string>() == std::string("some value"));
+        CHECK(j["some label"][1].as<std::string>() == std::string("another value"));
+    }
 }
 
-TEST_CASE("test_decode_csv_from_stream")
+TEST_CASE("Test decode_csv, no terminating newline")
 {
-    std::string s = "some label\nsome value";
-    std::stringstream is(s);
-    csv::csv_options options;
-    options.assume_header(true);
-    std::cout << csv::decode_csv<json>(is,options) << std::endl;
+    std::string data = "some label\nsome value\nanother value";
+
+    SECTION("From string")
+    {
+        csv::csv_options options;
+        options.assume_header(true);
+        auto j = csv::decode_csv<json>(data,options);
+        REQUIRE(j.is_array());
+        REQUIRE(j.size() == 2);
+        CHECK(j[0]["some label"].as<std::string>() == std::string("some value"));
+        CHECK(j[1]["some label"].as<std::string>() == std::string("another value"));
+    }
+
+    SECTION("From stream")
+    {
+        std::stringstream is(data);
+
+        csv::csv_options options;
+        options.assume_header(true);
+        auto j = csv::decode_csv<json>(is,options);
+        REQUIRE(j.is_array());
+        REQUIRE(j.size() == 2);
+        CHECK(j[0]["some label"].as<std::string>() == std::string("some value"));
+        CHECK(j[1]["some label"].as<std::string>() == std::string("another value"));
+    }
+
+    SECTION("m_columns")
+    {
+        csv::csv_options options;
+        options.assume_header(true)
+               .mapping(csv::mapping_type::m_columns);
+        auto j = csv::decode_csv<json>(data,options);
+        REQUIRE(j.is_object());
+        REQUIRE(j.size() == 1);
+        CHECK(j["some label"][0].as<std::string>() == std::string("some value"));
+        CHECK(j["some label"][1].as<std::string>() == std::string("another value"));
+    }
 }
 
 TEST_CASE("test_encode_csv_to_stream")
