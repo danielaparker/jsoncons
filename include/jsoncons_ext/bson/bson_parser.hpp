@@ -42,7 +42,6 @@ template <class Src>
 class basic_bson_parser : public ser_context
 {
     Src source_;
-    size_t nesting_depth_;
     bool continue_;
     bool done_;
     std::string text_buffer_;
@@ -51,9 +50,9 @@ public:
     template <class Source>
     basic_bson_parser(Source&& source)
        : source_(std::forward<Source>(source)), 
-         nesting_depth_(0),
          continue_(true), done_(false)
     {
+        state_stack_.emplace_back(parse_mode::root,0);
     }
 
     void restart()
@@ -145,9 +144,18 @@ public:
                     break;
                 }
                 case parse_mode::value:
-                    read_value(handler,state_stack_.back().type,ec);
                     state_stack_.back().mode = parse_mode::document;
+                    read_value(handler,state_stack_.back().type,ec);
                     break;
+                case parse_mode::before_done:
+                {
+                    JSONCONS_ASSERT(state_stack_.size() == 1);
+                    state_stack_.clear();
+                    continue_ = false;
+                    done_ = true;
+                    handler.flush();
+                    break;
+                }
             }
         }
     }
@@ -165,8 +173,7 @@ private:
         const uint8_t* endp;
         auto length = jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
 
-        handler.begin_object(semantic_tag::none, *this);
-        ++nesting_depth_;
+        continue_ = handler.begin_object(semantic_tag::none, *this);
         state_stack_.emplace_back(parse_mode::document,length);
     }
 
@@ -174,7 +181,6 @@ private:
     {
         continue_ = handler.end_object(*this);
         state_stack_.pop_back();
-        --nesting_depth_;
     }
 
     void begin_array(json_content_handler& handler, std::error_code& ec)
@@ -188,15 +194,13 @@ private:
         const uint8_t* endp;
         /* auto len = */ jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
 
-        handler.begin_array(semantic_tag::none, *this);
-        ++nesting_depth_;
+        continue_ = handler.begin_array(semantic_tag::none, *this);
         state_stack_.emplace_back(parse_mode::array,0);
     }
 
     void end_array(json_content_handler& handler, std::error_code&)
     {
-        handler.end_array(*this);
-        --nesting_depth_;
+        continue_ = handler.end_array(*this);
         state_stack_.pop_back();
     }
 
@@ -216,7 +220,7 @@ private:
                 ec = bson_errc::invalid_utf8_text_string;
                 return;
             }
-            handler.name(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
+            continue_ = handler.name(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
         }
     }
 
@@ -234,7 +238,7 @@ private:
                 }
                 const uint8_t* endp;
                 double res = jsoncons::detail::from_little_endian<double>(buf,buf+sizeof(buf),&endp);
-                handler.double_value(res, semantic_tag::none, *this);
+                continue_ = handler.double_value(res, semantic_tag::none, *this);
                 break;
             }
             case jsoncons::bson::detail::bson_format::string_cd:
@@ -263,7 +267,7 @@ private:
                     ec = bson_errc::invalid_utf8_text_string;
                     return;
                 }
-                handler.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this);
+                continue_ = handler.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this);
                 break;
             }
             case jsoncons::bson::detail::bson_format::document_cd: 
@@ -279,7 +283,7 @@ private:
             }
             case jsoncons::bson::detail::bson_format::null_cd: 
             {
-                handler.null_value(semantic_tag::none, *this);
+                continue_ = handler.null_value(semantic_tag::none, *this);
                 break;
             }
             case jsoncons::bson::detail::bson_format::bool_cd:
@@ -290,7 +294,7 @@ private:
                     ec = bson_errc::unexpected_eof;
                     return;
                 }
-                handler.bool_value(val != 0, semantic_tag::none, *this);
+                continue_ = handler.bool_value(val != 0, semantic_tag::none, *this);
                 break;
             }
             case jsoncons::bson::detail::bson_format::int32_cd: 
@@ -303,7 +307,7 @@ private:
                 }
                 const uint8_t* endp;
                 auto val = jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
-                handler.int64_value(val, semantic_tag::none, *this);
+                continue_ = handler.int64_value(val, semantic_tag::none, *this);
                 break;
             }
 
@@ -317,7 +321,7 @@ private:
                 }
                 const uint8_t* endp;
                 auto val = jsoncons::detail::from_little_endian<uint64_t>(buf, buf+sizeof(uint64_t),&endp);
-                handler.uint64_value(val, semantic_tag::timestamp, *this);
+                continue_ = handler.uint64_value(val, semantic_tag::timestamp, *this);
                 break;
             }
 
@@ -331,7 +335,7 @@ private:
                 }
                 const uint8_t* endp;
                 auto val = jsoncons::detail::from_little_endian<int64_t>(buf, buf+sizeof(int64_t),&endp);
-                handler.int64_value(val, semantic_tag::none, *this);
+                continue_ = handler.int64_value(val, semantic_tag::none, *this);
                 break;
             }
 
@@ -345,7 +349,7 @@ private:
                 }
                 const uint8_t* endp;
                 auto val = jsoncons::detail::from_little_endian<int64_t>(buf, buf+sizeof(int64_t),&endp);
-                handler.int64_value(val, semantic_tag::timestamp, *this);
+                continue_ = handler.int64_value(val, semantic_tag::timestamp, *this);
                 break;
             }
             case jsoncons::bson::detail::bson_format::binary_cd: 
@@ -366,7 +370,7 @@ private:
                     return;
                 }
 
-                handler.byte_string_value(byte_string_view(v.data(),v.size()), 
+                continue_ = handler.byte_string_value(byte_string_view(v.data(),v.size()), 
                                            semantic_tag::none, 
                                            *this);
                 break;
