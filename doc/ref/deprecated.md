@@ -6,6 +6,14 @@ In the table, <em>&#x2713;</em> indicates that the old name is still supported.
 
 Component or location|Old name, now deprecated|<em>&#x2713;</em>|New name
 --------|-----------|--------------|------------------------
+class basic_json|value_type|<em>&#x2713;</em>|No replacement
+class basic_json|json_type|<em>&#x2713;</em>|No replacement
+class basic_json|string_type|<em>&#x2713;</em>|No replacement
+class basic_json|kvp_type|<em>&#x2713;</em>|key_value_type
+class basic_json|member_type|<em>&#x2713;</em>|key_value_type
+
+class basic_json|as_integer() with default template argument|<em>&#x2713;</em>|as<int64_t>()
+
 class parse_error|`parse_error`|<em>&#x2713;</em>|`serialization_error`
 class basic_json|`object_iterator`|<em>&#x2713;</em>|`object_iterator_type`
 class basic_json|`const_object_iterator`|<em>&#x2713;</em>|`const_object_iterator_type`

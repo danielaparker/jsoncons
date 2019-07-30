@@ -124,9 +124,9 @@ public:
     typedef key_value<key_type,basic_json> key_value_type;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED("instead, use basic_json<char_type,implementation_policy,allocator_type>") typedef basic_json value_type;
-    JSONCONS_DEPRECATED("instead, use basic_json<char_type,implementation_policy,allocator_type>") typedef basic_json json_type;
-    JSONCONS_DEPRECATED("instead, use basic_string<char_type>") typedef std::basic_string<char_type> string_type;
+    JSONCONS_DEPRECATED("no replacement") typedef basic_json value_type;
+    JSONCONS_DEPRECATED("no replacemment") typedef basic_json json_type;
+    JSONCONS_DEPRECATED("no replacement") typedef std::basic_string<char_type> string_type;
     JSONCONS_DEPRECATED("instead, use key_value_type") typedef key_value_type kvp_type;
     JSONCONS_DEPRECATED("instead, use key_value_type") typedef key_value_type member_type;
 #endif
