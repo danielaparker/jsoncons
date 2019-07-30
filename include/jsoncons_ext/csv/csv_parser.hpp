@@ -475,6 +475,7 @@ class basic_csv_parser : public ser_context
     const CharT* input_end_;
     const CharT* input_ptr_;
     bool continue_;
+    size_t header_line_;
     std::vector<csv_parse_state,csv_parse_state_allocator_type> state_stack_;
 
 public:
@@ -505,7 +506,8 @@ public:
          begin_input_(nullptr),
          input_end_(nullptr),
          input_ptr_(nullptr),
-         continue_(true)
+         continue_(true),
+         header_line_(1)
          
     {
         depth_ = default_depth;
@@ -797,12 +799,20 @@ public:
                         case '\n':
                         {
                             ++line_;
+                            if (stack_.back() == csv_mode::header)
+                            {
+                                ++header_line_;
+                            }
                             column_ = 1;
                             state_ = csv_parse_state::expect_comment_or_record;
                             break;
                         }
                         case '\r':
                             ++line_;
+                            if (stack_.back() == csv_mode::header)
+                            {
+                                ++header_line_;
+                            }
                             column_ = 1;
                             state_ = csv_parse_state::expect_comment_or_record;
                             push_state(state_);
@@ -1232,7 +1242,7 @@ private:
                 {
                     trim_string_buffer(options_.trim_leading_inside_quotes(),options_.trim_trailing_inside_quotes());
                 }
-                if (options_.assume_header() && line_ == 1)
+                if (options_.assume_header() && line_ == header_line_)
                 {
                     column_names_.push_back(buffer_);
                     if (options_.mapping() == mapping_type::n_rows)
@@ -1266,7 +1276,7 @@ private:
         switch (stack_.back())
         {
             case csv_mode::header:
-                if (options_.assume_header() && line_ == 1)
+                if (options_.assume_header() && line_ == header_line_)
                 {
                     if (options_.mapping() == mapping_type::n_rows)
                     {
