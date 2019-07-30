@@ -20,7 +20,7 @@
 
 namespace jsoncons { namespace bson {
 
-enum class parse_mode {root,before_done};
+enum class parse_mode {root,before_done,document};
 
 struct parse_state 
 {
@@ -98,20 +98,9 @@ public:
                 ec = bson_errc::source_error;
                 return;
             }   
-            uint8_t buf[sizeof(int32_t)]; 
-            if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
-            {
-                ec = bson_errc::unexpected_eof;
-                return;
-            }
-            const uint8_t* endp;
-            /* auto len = */jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
-
-            handler.begin_object(semantic_tag::none, *this);
-            ++nesting_depth_;
+            begin_document(handler, ec);
             read_e_list(handler, jsoncons::bson::detail::bson_container_type::document, ec);
-            handler.end_object(*this);
-            --nesting_depth_;
+            end_document(handler, ec);
         }
         catch (const ser_error& e)
         {
@@ -120,6 +109,29 @@ public:
     }
 
 private:
+
+    void begin_document(json_content_handler& handler, std::error_code& ec)
+    {
+        uint8_t buf[sizeof(int32_t)]; 
+        if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
+        {
+            ec = bson_errc::unexpected_eof;
+            return;
+        }
+        const uint8_t* endp;
+        /* auto len = */jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
+
+        handler.begin_object(semantic_tag::none, *this);
+        state_stack_.emplace_back(parse_mode::document,0);
+        ++nesting_depth_;
+    }
+
+    void end_document(json_content_handler& handler, std::error_code&)
+    {
+        continue_ = handler.end_object(*this);
+        state_stack_.pop_back();
+        --nesting_depth_;
+    }
 
     void read_e_list(json_content_handler& handler, jsoncons::bson::detail::bson_container_type type, std::error_code& ec)
     {
