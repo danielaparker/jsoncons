@@ -1204,16 +1204,25 @@ TEST_CASE("Test decode_csv, no terminating newline")
     }
 }
 
-TEST_CASE("test_encode_csv_to_stream")
+TEST_CASE("test encode_csv")
 {
     json j = json::array();
     j.push_back(json::object({ {"a",1},{"b",2} }));
-    std::cout << j << std::endl;
-    csv::csv_options options;
-    options.assume_header(true);
-    std::ostringstream os;
-    csv::encode_csv(j, os, options);
-    std::cout << os.str() << std::endl;
+
+    SECTION("To stream")
+    {
+        csv::csv_options options;
+        options.assume_header(true);
+        std::stringstream ss;
+        csv::encode_csv(j, ss, options);
+
+        auto j2 = csv::decode_csv<json>(ss, options);
+
+        REQUIRE(j2.is_array());
+        REQUIRE(j2.size() == 1);
+        CHECK(j2[0]["a"].as<int>() == 1);
+        CHECK(j2[0]["b"].as<int>() == 2);
+    }
 }
 
 TEST_CASE("test_type_inference")
@@ -1227,25 +1236,41 @@ TEST_CASE("test_type_inference")
 
     std::cout << input << std::endl;
 
-    json_decoder<ojson> decoder;
+    SECTION("n_rows")
+    {
+        csv::csv_options options;
+        options.assume_header(true)
+               .mapping(csv::mapping_type::n_rows);
 
-    csv::csv_options options;
-    options.assume_header(true)
-           .mapping(csv::mapping_type::n_rows);
+        ojson j = csv::decode_csv<ojson>(input,options);
+        std::cout << "\n(1)\n"<< pretty_print(j) << "\n";
+        REQUIRE(j.is_array());
+        REQUIRE(j.size() == 5);
+    }
 
-    ojson j1 = csv::decode_csv<ojson>(input,options);
-    std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
-    //CHECK(j1.size() == 4);
+    SECTION("n_objects")
+    {
+        csv::csv_options options;
+        options.assume_header(true)
+               .mapping(csv::mapping_type::n_objects);
+        ojson j = csv::decode_csv<ojson>(input,options);
+        std::cout << "\n(2)\n"<< pretty_print(j) << "\n";
 
-    options.mapping(csv::mapping_type::n_objects);
-    ojson j2 = csv::decode_csv<ojson>(input,options);
-    std::cout << "\n(2)\n"<< pretty_print(j2) << "\n";
+        REQUIRE(j.is_array());
+        REQUIRE(j.size() == 4);
+    }
+    
+    SECTION("m_columns")
+    {
+        csv::csv_options options;
+        options.assume_header(true)
+               .mapping(csv::mapping_type::m_columns);
+        ojson j = csv::decode_csv<ojson>(input,options);
+        std::cout << "\n(3)\n"<< pretty_print(j) << "\n";
 
-    options.mapping(csv::mapping_type::m_columns);
-    ojson j3 = csv::decode_csv<ojson>(input,options);
-    std::cout << "\n(3)\n"<< pretty_print(j3) << "\n";
-    //REQUIRE(j2.size() == 3);
-    //CHECK("2017-01-09" == j2[0]["Date"].as<std::string>());
+        REQUIRE(j.is_object());
+        REQUIRE(j.size() == 6);
+    }
 }
 
 TEST_CASE("csv_options lossless_number")
