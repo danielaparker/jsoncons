@@ -20,18 +20,39 @@
 
 namespace jsoncons { namespace bson {
 
+enum class parse_mode {root,before_done};
+
+struct parse_state 
+{
+    parse_mode mode; 
+    size_t length;
+    uint8_t type;
+    size_t index;
+
+    parse_state(parse_mode mode, size_t length, uint8_t type = 0)
+        : mode(mode), length(length), type(type), index(0)
+    {
+    }
+
+    parse_state(const parse_state&) = default;
+    parse_state(parse_state&&) = default;
+};
+
 template <class Src>
 class basic_bson_parser : public ser_context
 {
     Src source_;
     size_t nesting_depth_;
     bool continue_;
+    bool done_;
+    std::string text_buffer_;
+    std::vector<parse_state> state_stack_;
 public:
     template <class Source>
     basic_bson_parser(Source&& source)
        : source_(std::forward<Source>(source)), 
          nesting_depth_(0),
-         continue_(true)
+         continue_(true), done_(false)
     {
     }
 
@@ -42,12 +63,15 @@ public:
 
     void reset()
     {
+        state_stack_.clear();
+        state_stack_.emplace_back(parse_mode::root,0);
         continue_ = true;
+        done_ = false;
     }
 
     bool done() const
     {
-        return false;
+        return done_;
     }
 
     bool stopped() const
