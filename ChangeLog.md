@@ -1,5 +1,5 @@
-master
-------
+v0.131.0
+---------------
 
 Changes
 
@@ -19,7 +19,7 @@ Bug fix:
 - Fixed issue with commented out first line of CSV file and column labels on next line
 - Fixed issue with parsing BSON arrays
 
-version 0.130.0
+v0.130.0
 ---------------
 
 Bug fix:
@@ -32,12 +32,12 @@ Enhancements
 - Rewrote `basic_ubjson_parser` template class to avoid recursive function calls
 - New `basic_ubjson_cursor` template class with `ubjson_stream_cursor` and `ubjson_bytes_cursor` typedefs
 
-version 0.129.1
+v0.129.1
 ---------------
 
 - Fixed issue with deprecated class used in `decode_bson`, `decode_msgpack`, and `decode_ubjson`
 
-version 0.129.0
+v0.129.0
 ---------------
 
 New features:
@@ -69,7 +69,7 @@ Changes:
   Rationale: consistency for type names that are different for 
   stream and string or bytes buffer specializations. 
 
-version 0.128.0
+v0.128.0
 ---------------
 
 Changes
@@ -101,7 +101,7 @@ are for specializing `json_type_traits` for template types. The parameter `num_t
 
 `JSONCONS_ENUM_TRAITS_DECL` allows you to encode and decode an enum type as a string.
 
-version 0.127.0
+v0.127.0
 ---------------
 
 Changes to staj streaming classes
@@ -125,7 +125,7 @@ Enhancements
   and types that are specialized with `JSONCONS_GETTER_CTOR_TRAITS_DECL` are not required to have a default
   constructor at all.
 
-version 0.126.0
+v0.126.0
 ---------------
 
 Enhancements
@@ -520,7 +520,7 @@ New features:
 - The cbor, msgpack and ubjson streaming serializers now validate that the expected number of
   items have been supplied in an object or array of pre-determined length.
 
-version 0.113.0
+v0.113.0
 ---------------
 
 Bug fix
