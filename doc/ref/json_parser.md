@@ -29,7 +29,7 @@ no more input, `finish_parse` may be called.
 non-whitespace characters, which would normally be considered an error.  
 
 `json_parser` is used by the push parser [basic_json_reader](basic_json_reader.md),
-and by the pull parser [json_cursor](json_cursor.md).
+and by the pull parser [basic_json_cursor](basic_json_cursor.md).
 
 `json_parser` is noncopyable and nonmoveable.
 

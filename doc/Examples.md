@@ -462,7 +462,7 @@ Haruki Murakami
 Graham Greene
 ```
 
-See [json_cursor](doc/ref/json_cursor.md) 
+See [basic_json_cursor](doc/ref/basic_json_cursor.md) 
 
 <div id="G0"/>
 

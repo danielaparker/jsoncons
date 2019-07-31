@@ -1,22 +1,21 @@
 # JSONCONS
 
 jsoncons is a C++, header-only library for constructing [JSON](http://www.json.org) and JSON-like
-data formats such as [CBOR](http://cbor.io/). It supports 
+data formats such as [CBOR](http://cbor.io/). For each supported data format, it enables you
+to work with data in a number of ways:
 
-- Parsing JSON-like text or binary formats into a tree model
-  that defines an interface for accessing and modifying that data.
+- As a variant-like data structure, [basic_json](doc/ref/basic_json.md) 
 
-- Serializing the tree model into different JSON-like text or binary formats.
+- As a strongly typed C++ data structure
 
-- Converting from JSON-like text or binary formats to C++ data structures and back via [json_type_traits](doc/ref/json_type_traits.md).
-
-- Streaming JSON read and write events, somewhat analogously to SAX (push parsing) and StAX (pull parsing) in the XML world. 
+- As a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
+  in the XML world.
 
 Compared to other JSON libraries, jsoncons has been designed to handle very large JSON texts. At its heart are
 SAX style parsers and serializers. Its [json parser](doc/ref/json_parser.md) is an 
 incremental parser that can be fed its input in chunks, and does not require an entire file to be loaded in memory at one time. 
-Its tree model is more compact than most, and can be made more compact still with a user-supplied
-allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](doc/ref/json_cursor.md),
+Its variant-like data structure is more compact than most, and can be made more compact still with a user-supplied
+allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](doc/ref/basic_json_cursor.md),
 built on top of its incremental parser.  
 
 The [jsoncons data model](doc/ref/data-model.md) supports the familiar JSON types - nulls,
