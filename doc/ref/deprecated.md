@@ -17,5 +17,20 @@ class basic_json|is_datetime()|<em>&#x2713;</em>|tag() == semantic_tag::datetime
 class basic_json|is_epoch_time()|<em>&#x2713;</em>|tag() == semantic_tag::timestamp
 class basic_json|add(T&&)|<em>&#x2713;</em>|push_back(T&&)
 class basic_json|add(const_array_iterator, T&&)|<em>&#x2713;</em>|insert(const_array_iterator, T&&)
-
+class basic_json|set(const string_view_type&, T&&)|<em>&#x2713;</em>|insert_or_assign(const string_view_type&, T&&)
+class basic_json|set(object_iterator, const string_view_type&, T&&)|<em>&#x2713;</em>|insert_or_assign(object_iterator, const string_view_type&, T&&)
+class basic_json|has_key(const string_view_type&)|<em>&#x2713;</em>|contains(const string_view_type&)
+class basic_json|is_integer()|<em>&#x2713;</em>|is<int64_t>()
+class basic_json|is_uinteger()|<em>&#x2713;</em>|is<uint64_t>()
+class basic_json|is_ulonglong()|<em>&#x2713;</em>|is<unsigned long long>()
+class basic_json|is_longlong()|<em>&#x2713;</em>|is<long long>()
+class basic_json|as_int()|<em>&#x2713;</em>|as<int>()
+class basic_json|as_uint()|<em>&#x2713;</em>|as<unsigned int>()
+class basic_json|as_long()|<em>&#x2713;</em>|as<long>()
+class basic_json|as_ulong()|<em>&#x2713;</em>|as<unsigned long>()
+class basic_json|as_longlong()|<em>&#x2713;</em>|as<long long>()
+class basic_json|as_ulonglong()|<em>&#x2713;</em>|as<unsigned long long>()
+class basic_json|as_uinteger()|<em>&#x2713;</em>|as<uint64_t>()
+class basic_json|dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, bool)|<em>&#x2713;</em>|dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, indenting)
+class basic_json|dump(std::basic_ostream<char_type>&, bool)|<em>&#x2713;</em>|dump(std::basic_ostream<char_type>&, indenting)
 

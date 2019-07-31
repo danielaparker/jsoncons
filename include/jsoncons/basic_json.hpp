@@ -2376,7 +2376,7 @@ public:
             return evaluate().contains(name);
         }
 
-        JSONCONS_DEPRECATED("Instead, use is_int64()")
+        JSONCONS_DEPRECATED("Instead, use is<int64_t>()")
         bool is_integer() const noexcept
         {
             try
@@ -2389,7 +2389,7 @@ public:
             }
         }
 
-        JSONCONS_DEPRECATED("Instead, use is_uint64()")
+        JSONCONS_DEPRECATED("Instead, use is<uint64_t>()")
         bool is_uinteger() const noexcept
         {
             try
@@ -2458,7 +2458,7 @@ public:
             return evaluate().as_longlong();
         }
 
-        JSONCONS_DEPRECATED("Instead, use is<unsigned long long>()")
+        JSONCONS_DEPRECATED("Instead, use as<unsigned long long>()")
         unsigned long long as_ulonglong() const
         {
             return evaluate().as_ulonglong();
