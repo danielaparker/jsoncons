@@ -6,6 +6,8 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 [decode_bson](decode_bson.md)
 
+[basic_bson_cursor](basic_bson_cursor.md)
+
 [encode_bson](encode_bson.md)
 
 [basic_bson_encoder](basic_bson_encoder.md)

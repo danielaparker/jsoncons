@@ -1,26 +1,26 @@
-### jsoncons::msgpack::basic_msgpack_cursor
+### jsoncons::bson::basic_bson_cursor
 
 ```c++
-#include <jsoncons/msgpack_cursor.hpp>
+#include <jsoncons/bson_cursor.hpp>
 
 template<
     class Src=jsoncons::binary_stream_source,
     class Allocator=std::allocator<char>>
-class basic_msgpack_cursor;
+class basic_bson_cursor;
 ```
 
-A pull parser for reporting MSGPACK parse events. A typical application will 
+A pull parser for reporting BSON parse events. A typical application will 
 repeatedly process the `current()` event and call the `next()`
 function to advance to the next event, until `done()` returns `true`.
 
-`basic_msgpack_cursor` is noncopyable and nonmoveable.
+`basic_bson_cursor` is noncopyable and nonmoveable.
 
 Typedefs for common sources are provided:
 
 Type                |Definition
 --------------------|------------------------------
-msgpack_stream_cursor  |basic_msgpack_cursor<jsoncons::binary_stream_source>
-msgpack_bytes_cursor   |basic_msgpack_cursor<jsoncons::bytes_source>
+bson_stream_cursor  |basic_bson_cursor<jsoncons::binary_stream_source>
+bson_bytes_cursor   |basic_bson_cursor<jsoncons::bytes_source>
 
 ### Implemented interfaces
 
@@ -29,17 +29,17 @@ msgpack_bytes_cursor   |basic_msgpack_cursor<jsoncons::bytes_source>
 #### Constructors
 
     template <class Source>
-    basic_msgpack_cursor(Source&& source); // (1)
+    basic_bson_cursor(Source&& source); // (1)
 
     template <class Source>
-    basic_msgpack_cursor(Source&& source,
+    basic_bson_cursor(Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter); // (2)
 
     template <class Source>
-    basic_msgpack_cursor(Source&& source, std::error_code& ec); // (3)
+    basic_bson_cursor(Source&& source, std::error_code& ec); // (3)
 
     template <class Source>
-    basic_msgpack_cursor(Source&& source,
+    basic_bson_cursor(Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter, 
                       std::error_code& ec); // (4)
 
@@ -49,8 +49,8 @@ Constructor3 (1)-(2) read from a buffer or stream source and throw a
 Constructor3 (3)-(4) read from a buffer or stream source and set `ec`
 if a parsing error is encountered while processing the initial event.
 
-Note: It is the programmer's responsibility to ensure that `basic_msgpack_cursor` does not outlive any source passed in the constuctor, 
-as `basic_msgpack_cursor` holds pointers to but does not own these resources.
+Note: It is the programmer's responsibility to ensure that `basic_bson_cursor` does not outlive any source passed in the constuctor, 
+as `basic_bson_cursor` holds pointers to but does not own these resources.
 
 #### Parameters
 
@@ -116,7 +116,7 @@ The example JSON text, `book_catalog.json`, is used in the example below.
 #### Reading a JSON stream
 
 ```c++
-#include <jsoncons/msgpack_cursor.hpp>
+#include <jsoncons/bson_cursor.hpp>
 #include <string>
 #include <fstream>
 
@@ -126,7 +126,7 @@ int main()
 {
     std::ifstream is("book_catalog.json");
 
-    msgpack_cursor cursor(is);
+    bson_cursor cursor(is);
 
     for (; !cursor.done(); cursor.next())
     {
@@ -212,7 +212,7 @@ end_array
 #### Filtering a JSON stream
 
 ```c++
-#include <jsoncons/msgpack_cursor.hpp>
+#include <jsoncons/bson_cursor.hpp>
 #include <string>
 #include <fstream>
 
@@ -248,7 +248,7 @@ int main()
     std::ifstream is("book_catalog.json");
 
     author_filter filter;
-    msgpack_cursor cursor(is, filter);
+    bson_cursor cursor(is, filter);
 
     for (; !cursor.done(); cursor.next())
     {

@@ -6,7 +6,7 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 [decode_cbor](decode_cbor.md)
 
-[basic_cbor_cursor](cbor_cursor.md)
+[basic_cbor_cursor](basic_cbor_cursor.md)
 
 [encode_cbor](encode_cbor.md)
 

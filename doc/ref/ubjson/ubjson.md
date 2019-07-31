@@ -6,7 +6,7 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 [decode_ubjson](decode_ubjson.md)
 
-[basic_ubjson_cursor](ubjson_cursor.md)
+[basic_ubjson_cursor](basic_ubjson_cursor.md)
 
 [encode_ubjson](encode_ubjson.md)
 
