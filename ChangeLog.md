@@ -9,12 +9,15 @@ Changes
 Enhancements
 
 - `basic_msgpack_parser` template class rewritten to avoid recursive function calls
+- `basic_bson_parser` template class rewritten to avoid recursive function calls
 - New `basic_msgpack_cursor` template class with `msgpack_stream_cursor` and `msgpack_bytes_cursor` typedefs
+- New `basic_bson_cursor` template class with `bson_stream_cursor` and `bson_bytes_cursor` typedefs
 - New `basic_csv_cursor` template class with `csv_cursor` and `wcsv_cursor` typedefs
 
 Bug fix:
 
 - Fixed issue with commented out first line of CSV file and column labels on next line
+- Fixed issue with parsing BSON arrays
 
 version 0.130.0
 ---------------
