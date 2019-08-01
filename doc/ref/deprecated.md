@@ -6,51 +6,51 @@ In the table, <em>&#x2713;</em> indicates that the old name is still supported.
 
 Component or location|Old name, now deprecated|<em>&#x2713;</em>|Replacement
 --------|-----------|--------------|------------------------
-class basic_json|value_type|<em>&#x2713;</em>|No replacement
-class basic_json|json_type|<em>&#x2713;</em>|No replacement
-class basic_json|string_type|<em>&#x2713;</em>|No replacement
-class basic_json|kvp_type|<em>&#x2713;</em>|key_value_type
-class basic_json|member_type|<em>&#x2713;</em>|key_value_type
-class basic_json|as_integer() with default template argument|<em>&#x2713;</em>|as<int64_t>()
-class basic_json|get_semantic_tag()|<em>&#x2713;</em>|tag()
-class basic_json|is_datetime()|<em>&#x2713;</em>|tag() == semantic_tag::datetime
-class basic_json|is_epoch_time()|<em>&#x2713;</em>|tag() == semantic_tag::timestamp
-class basic_json|add(T&&)|<em>&#x2713;</em>|push_back(T&&)
-class basic_json|add(const_array_iterator, T&&)|<em>&#x2713;</em>|insert(const_array_iterator, T&&)
-class basic_json|set(const string_view_type&, T&&)|<em>&#x2713;</em>|insert_or_assign(const string_view_type&, T&&)
-class basic_json|set(object_iterator, const string_view_type&, T&&)|<em>&#x2713;</em>|insert_or_assign(object_iterator, const string_view_type&, T&&)
-class basic_json|is_integer()|<em>&#x2713;</em>|is<int64_t>()
-class basic_json|is_uinteger()|<em>&#x2713;</em>|is<uint64_t>()
-class basic_json|is_ulonglong()|<em>&#x2713;</em>|is<unsigned long long>()
-class basic_json|is_longlong()|<em>&#x2713;</em>|is<long long>()
-class basic_json|as_int()|<em>&#x2713;</em>|as<int>()
-class basic_json|as_uint()|<em>&#x2713;</em>|as<unsigned int>()
-class basic_json|as_long()|<em>&#x2713;</em>|as<long>()
-class basic_json|as_ulong()|<em>&#x2713;</em>|as<unsigned long>()
-class basic_json|as_longlong()|<em>&#x2713;</em>|as<long long>()
-class basic_json|as_ulonglong()|<em>&#x2713;</em>|as<unsigned long long>()
-class basic_json|as_uinteger()|<em>&#x2713;</em>|as<uint64_t>()
-class basic_json|dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, bool)|<em>&#x2713;</em>|dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, indenting)
-class basic_json|dump(std::basic_ostream<char_type>&, bool)|<em>&#x2713;</em>|dump(std::basic_ostream<char_type>&, indenting)
-class basic_json|to_string(const SAllocator& = SAllocator()))|<em>&#x2713;</em>|dump(std::basic_string<char_type,char_traits_type,SAllocator>&)
-class basic_json|write(basic_json_content_handler<char_type>&)|<em>&#x2713;</em>|dump(basic_json_content_handler<char_type>&)
-class basic_json|write(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)|<em>&#x2713;</em>|dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)
-class basic_json|write(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, bool)|<em>&#x2713;</em>|dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, indenting)
-class basic_json|to_string(const basic_json_options<char_type>&, char_allocator_type& = char_allocator_type())|<em>&#x2713;</em>|dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)
-class basic_json|to_stream(basic_json_content_handler<char_type>&)|<em>&#x2713;</em>|dump(basic_json_content_handler<char_type>&)
-class basic_json|to_stream(std::basic_ostream<char_type>&)|<em>&#x2713;</em>|dump(std::basic_ostream<char_type>&)
-class basic_json|to_stream(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)|<em>&#x2713;</em>|dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)
-class basic_json|to_stream(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, bool)|<em>&#x2713;</em>|dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, indenting)
-class basic_json|members()|<em>&#x2713;</em>|object_range()
-class basic_json|elements()|<em>&#x2713;</em>|array_range()
-class basic_json|resize_array(size_t)|<em>&#x2713;</em>|resize(size_t)
-class basic_json|resize_array(size_t, T)|<em>&#x2713;</em>|resize(size_t, T)
-class basic_json|begin_members()|<em>&#x2713;</em>|object_range().begin()
-class basic_json|end_members()|<em>&#x2713;</em>|object_range().end()
-class basic_json|begin_elements()|<em>&#x2713;</em>|array_range().begin()
-class basic_json|end_elements()|<em>&#x2713;</em>|array_range().end()
-class basic_json|get(const string_view_type&, T&&)|<em>&#x2713;</em>|get_with_default(const string_view_type&, T&&)
-class basic_json|get(const string_view_type&)|<em>&#x2713;</em>|at(const string_view_type&)
-class basic_json|has_key(const string_view_type&)|<em>&#x2713;</em>|contains(const string_view_type&)
-class basic_json|has_member(const string_view_type&)|<em>&#x2713;</em>|contains(const string_view_type&)
+class basic_json|`value_type'|<em>&#x2713;</em>|No replacement
+class basic_json|`json_type'|<em>&#x2713;</em>|No replacement
+class basic_json|`string_type'|<em>&#x2713;</em>|No replacement
+class basic_json|`kvp_type'|<em>&#x2713;</em>|`key_value_type`
+class basic_json|`member_type'|<em>&#x2713;</em>|`key_value_type`
+class basic_json|`as_integer() with default template argument|<em>&#x2713;</em>|`as<int64_t>()`
+class basic_json|`get_semantic_tag()'|<em>&#x2713;</em>|`tag()`
+class basic_json|`is_datetime()'|<em>&#x2713;</em>|`tag() == semantic_tag::datetime`
+class basic_json|`is_epoch_time()'|<em>&#x2713;</em>|`tag() == semantic_tag::timestamp`
+class basic_json|`add(T&&)'|<em>&#x2713;</em>|`push_back(T&&)`
+class basic_json|`add(const_array_iterator, T&&)'|<em>&#x2713;</em>|`insert(const_array_iterator, T&&)`
+class basic_json|`set(const string_view_type&, T&&)'|<em>&#x2713;</em>|`insert_or_assign(const string_view_type&, T&&)`
+class basic_json|`set(object_iterator, const string_view_type&, T&&)'|<em>&#x2713;</em>|`insert_or_assign(object_iterator, const string_view_type&, T&&)`
+class basic_json|`is_integer()'|<em>&#x2713;</em>|`is<int64_t>()`
+class basic_json|`is_uinteger()'|<em>&#x2713;</em>|`is<uint64_t>()`
+class basic_json|`is_ulonglong()'|<em>&#x2713;</em>|`is<unsigned long long>()`
+class basic_json|`is_longlong()'|<em>&#x2713;</em>|`is<long long>()`
+class basic_json|`as_int()'|<em>&#x2713;</em>|`as<int>()`
+class basic_json|`as_uint()'|<em>&#x2713;</em>|`as<unsigned int>()`
+class basic_json|`as_long()'|<em>&#x2713;</em>|`as<long>()`
+class basic_json|`as_ulong()'|<em>&#x2713;</em>|`as<unsigned long>()`
+class basic_json|`as_longlong()'|<em>&#x2713;</em>|`as<long long>()`
+class basic_json|`as_ulonglong()'|<em>&#x2713;</em>|`as<unsigned long long>()`
+class basic_json|`as_uinteger()'|<em>&#x2713;</em>|`as<uint64_t>()`
+class basic_json|`dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, bool)'|<em>&#x2713;</em>|`dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, indenting)`
+class basic_json|`dump(std::basic_ostream<char_type>&, bool)'|<em>&#x2713;</em>|`dump(std::basic_ostream<char_type>&, indenting)`
+class basic_json|`to_string(const SAllocator& = SAllocator()))'|<em>&#x2713;</em>|`dump(std::basic_string<char_type,char_traits_type,SAllocator>&)`
+class basic_json|`write(basic_json_content_handler<char_type>&)'|<em>&#x2713;</em>|`dump(basic_json_content_handler<char_type>&)`
+class basic_json|`write(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)'|<em>&#x2713;</em>|`dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)`
+class basic_json|`write(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, bool)'|<em>&#x2713;</em>|`dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, indenting)`
+class basic_json|`to_string(const basic_json_options<char_type>&, char_allocator_type& = char_allocator_type())'|<em>&#x2713;</em>|`dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)`
+class basic_json|`to_stream(basic_json_content_handler<char_type>&)'|<em>&#x2713;</em>|`dump(basic_json_content_handler<char_type>&)`
+class basic_json|`to_stream(std::basic_ostream<char_type>&)'|<em>&#x2713;</em>|`dump(std::basic_ostream<char_type>&)`
+class basic_json|`to_stream(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)'|<em>&#x2713;</em>|`dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)`
+class basic_json|`to_stream(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, bool)'|<em>&#x2713;</em>|`dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, indenting)`
+class basic_json|`members()'|<em>&#x2713;</em>|`object_range()`
+class basic_json|`elements()'|<em>&#x2713;</em>|`array_range()`
+class basic_json|`begin_members()'|<em>&#x2713;</em>|`object_range().begin()`
+class basic_json|`end_members()'|<em>&#x2713;</em>|`object_range().end()`
+class basic_json|`begin_elements()'|<em>&#x2713;</em>|`array_range().begin()`
+class basic_json|`end_elements()'|<em>&#x2713;</em>|`array_range().end()`
+class basic_json|`resize_array(size_t)'|<em>&#x2713;</em>|`resize(size_t)`
+class basic_json|`resize_array(size_t, T)'|<em>&#x2713;</em>|`resize(size_t, T)`
+class basic_json|`get(const string_view_type&, T&&)'|<em>&#x2713;</em>|`get_with_default(const string_view_type&, T&&)`
+class basic_json|`get(const string_view_type&)'|<em>&#x2713;</em>|`at(const string_view_type&)`
+class basic_json|`has_key(const string_view_type&)'|<em>&#x2713;</em>|`contains(const string_view_type&)`
+class basic_json|`has_member(const string_view_type&)'|<em>&#x2713;</em>|`contains(const string_view_type&)`
 
