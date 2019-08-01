@@ -723,7 +723,7 @@ Output:
 
 namespace jsoncons {
 
-    template <class Json,class T>
+    template <class Json, class T>
     struct json_type_traits<Json,boost::numeric::ublas::matrix<T>>
     {
         static bool is(const Json& val) noexcept

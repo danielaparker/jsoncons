@@ -62,10 +62,10 @@ Advances the iterator to the next array element.
 
 Range-based for loop support
 
-    template <class T>
+    template <class Json, class T>
     staj_array_iterator<T> begin(staj_array_iterator<T> iter) noexcept; // (1)
 
-    template <class T>
+    template <class Json, class T>
     staj_array_iterator<T> end(const staj_array_iterator<T>&) noexcept; // (2)
 
 (1) Returns iter unchanged (range-based for loop support.)
@@ -82,10 +82,10 @@ Range-based for loop support
 
 (2) Makes a `staj_array_iterator` that iterates over the items retrieved from a pull reader.
 
-    template <class T>
+    template <class Json, class T>
     bool operator==(const staj_array_iterator<T>& a, const staj_array_iterator<T>& b)
 
-    template <class T>
+    template <class Json, class T>
     bool operator!=(const staj_array_iterator<T>& a, const staj_array_iterator<T>& b)
 
 ### Examples

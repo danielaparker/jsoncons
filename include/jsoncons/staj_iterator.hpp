@@ -187,7 +187,7 @@ staj_array_iterator<Json,T> begin(staj_array_iterator<Json,T> iter) noexcept
     return iter;
 }
 
-template <class Json,class T>
+template <class Json, class T>
 staj_array_iterator<Json,T> end(const staj_array_iterator<Json,T>&) noexcept
 {
     return staj_array_iterator<Json,T>();
@@ -436,7 +436,7 @@ void staj_object_iterator<Json,T>::next()
     }
 }
 
-template<class Json,class T>
+template<class Json, class T>
 void staj_object_iterator<Json,T>::next(std::error_code& ec)
 {
     reader_->next(ec);

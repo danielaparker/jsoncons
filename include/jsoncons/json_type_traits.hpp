@@ -402,7 +402,7 @@ struct json_type_traits<Json, T,
     }
 };
 
-template<class Json,class T>
+template<class Json, class T>
 struct json_type_traits<Json, T,
                         typename std::enable_if<std::is_floating_point<T>::value
 >::type>
@@ -513,7 +513,7 @@ struct json_type_traits<Json, bool>
     }
 };
 
-template<class Json,class T>
+template<class Json, class T>
 struct json_type_traits<Json, T, typename std::enable_if<std::is_same<T, 
     std::conditional<!std::is_same<bool,std::vector<bool>::const_reference>::value,
                      std::vector<bool>::const_reference,

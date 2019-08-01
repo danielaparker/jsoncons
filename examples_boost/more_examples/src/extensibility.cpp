@@ -75,7 +75,7 @@ namespace jsoncons
         }
     };
 
-    template <class Json,class T>
+    template <class Json, class T>
     struct json_type_traits<Json,boost::numeric::ublas::matrix<T>>
     {
         typedef typename Json::allocator_type allocator_type;
