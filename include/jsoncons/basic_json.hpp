@@ -2518,30 +2518,6 @@ public:
         {
             return evaluate().to_string(options,allocator);
         }
-
-        JSONCONS_DEPRECATED("Instead, use object_range()")
-        range<object_iterator> members()
-        {
-            return evaluate().members();
-        }
-
-        JSONCONS_DEPRECATED("Instead, use object_range()")
-        range<const_object_iterator> members() const
-        {
-            return evaluate().members();
-        }
-
-        JSONCONS_DEPRECATED("Instead, use array_range()")
-        range<array_iterator> elements()
-        {
-            return evaluate().elements();
-        }
-
-        JSONCONS_DEPRECATED("Instead, use array_range()")
-        range<const_array_iterator> elements() const
-        {
-            return evaluate().elements();
-        }
         JSONCONS_DEPRECATED("Instead, use dump(basic_json_content_handler<char_type>&)")
         void to_stream(basic_json_content_handler<char_type>& handler) const
         {
@@ -2577,6 +2553,30 @@ public:
         void resize_array(size_t n, T val)
         {
             evaluate().resize_array(n,val);
+        }
+
+        JSONCONS_DEPRECATED("Instead, use object_range()")
+        range<object_iterator> members()
+        {
+            return evaluate().members();
+        }
+
+        JSONCONS_DEPRECATED("Instead, use object_range()")
+        range<const_object_iterator> members() const
+        {
+            return evaluate().members();
+        }
+
+        JSONCONS_DEPRECATED("Instead, use array_range()")
+        range<array_iterator> elements()
+        {
+            return evaluate().elements();
+        }
+
+        JSONCONS_DEPRECATED("Instead, use array_range()")
+        range<const_array_iterator> elements() const
+        {
+            return evaluate().elements();
         }
 
         JSONCONS_DEPRECATED("Instead, use object_range().begin()")
