@@ -41,10 +41,10 @@ TEST_CASE("array_iterator test")
     ]
     )";
 
-    json_cursor reader(s);
+    json_cursor cursor(s);
 
-    staj_array_iterator<json> it(reader);
-    staj_array_iterator<json> end;
+    auto it = make_array_iterator<json>(cursor);
+    auto end = jsoncons::end(it);
 
     const auto& j1 = *it;
     CHECK(j1["firstName"].as<std::string>() == std::string("Tom"));
@@ -70,9 +70,9 @@ TEST_CASE("object_iterator test")
     )";
 
     std::istringstream is(s);
-    json_cursor reader(is);
-    staj_object_iterator<json> it(reader);
-    staj_object_iterator<json> end;
+    json_cursor cursor(is);
+    auto it = make_object_iterator<json>(cursor);
+    auto end = jsoncons::end(it);
 
     const auto& p1 = *it;
     CHECK(p1.second.as<int>() == 100);
