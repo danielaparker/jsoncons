@@ -1,5 +1,13 @@
+master
+------
+
+Enhancements
+
+- New non-member functions `make_array_iterator` and `make_object_iterator`
+for creating a `staj_array_iterator` and a `staj_object_iterator`
+
 v0.131.0
----------------
+--------
 
 Changes
 
