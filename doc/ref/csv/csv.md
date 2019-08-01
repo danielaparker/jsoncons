@@ -256,8 +256,8 @@ int main()
     options.assume_header(true);
     csv::csv_cursor cursor(data, options);
 
-    staj_array_iterator<ojson> it(cursor);
-    staj_array_iterator<ojson> end; // default-constructed iterator is end iterator
+    auto it = make_array_iterator<ojson>(cursor);
+    auto end = jsoncons::end(it);
 
     while (it != end)
     {
@@ -296,10 +296,10 @@ int main()
     options.assume_header(true);
     csv::csv_cursor cursor(data, options);
 
-    staj_array_iterator<ojson,record_type> it(cursor);
+    auto it = make_array_iterator<record_type>(cursor);
 
     std::cout << std::fixed << std::setprecision(7);
-    for (const auto& record : it) // range-based for loop 
+    for (const auto& record : it)
     {
         std::cout << std::get<0>(record) << ", " << std::get<1>(record) << ", " << std::get<2>(record) << "\n";
     }

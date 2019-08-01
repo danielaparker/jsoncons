@@ -60,11 +60,7 @@ Advances the iterator to the next array element.
 
 #### Non-member functions
 
-    template <class T>
-    bool operator==(const staj_array_iterator<T>& a, const staj_array_iterator<T>& b)
-
-    template <class T>
-    bool operator!=(const staj_array_iterator<T>& a, const staj_array_iterator<T>& b)
+Range-based for loop support
 
     template <class T>
     staj_array_iterator<T> begin(staj_array_iterator<T> iter) noexcept; // (1)
@@ -72,11 +68,25 @@ Advances the iterator to the next array element.
     template <class T>
     staj_array_iterator<T> end(const staj_array_iterator<T>&) noexcept; // (2)
 
-(1) Returns iter unchanged
+(1) Returns iter unchanged (range-based for loop support.)
 
 (2) Returns a default-constructed `stax_array_iterator`, which serves as an end iterator. The argument is ignored.
 
-The `begin` and `end` non-member functions enable the use of `stax_array_iterators` with range-based for loops.
+    template <class T, class CharT>
+    staj_array_iterator<T> make_array_iterator(basic_staj_reader<CharT>& reader); // (1)
+
+    template <class T, class CharT>
+    staj_array_iterator<T> make_array_iterator(basic_staj_reader<CharT>& reader, std::error_code& ec); // (1)
+
+(1) Makes a `staj_array_iterator` that iterates over the items retrieved from a pull reader.
+
+(2) Makes a `staj_array_iterator` that iterates over the items retrieved from a pull reader.
+
+    template <class T>
+    bool operator==(const staj_array_iterator<T>& a, const staj_array_iterator<T>& b)
+
+    template <class T>
+    bool operator!=(const staj_array_iterator<T>& a, const staj_array_iterator<T>& b)
 
 ### Examples
 
@@ -104,7 +114,7 @@ int main()
 
     json_cursor cursor(is);
 
-    staj_array_iterator<json> it(cursor);
+    auto it = make_array_iterator<json>(cursor);
 
     for (const auto& j : it)
     {
@@ -149,7 +159,7 @@ int main()
 
     json_cursor cursor(is);
 
-    staj_array_iterator<json,employee> it(cursor);
+    auto it = make_array_iterator<ns::employee>(cursor);
 
     for (const auto& val : it)
     {

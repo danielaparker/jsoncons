@@ -99,11 +99,9 @@ const std::string example = R"(
 
 int main()
 {
-    std::istringstream is(object_example);
+    json_cursor cursor(example);
 
-    json_cursor cursor(is);
-
-    staj_object_iterator<json> it(cursor);
+    auto it = make_object_iterator<json>(cursor);
 
     for (const auto& kv : it)
     {

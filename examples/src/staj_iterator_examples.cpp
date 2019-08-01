@@ -46,7 +46,7 @@ void staj_array_iterator_example()
 
     json_cursor cursor(is);
 
-    staj_array_iterator<json> it(cursor);
+    auto it = make_array_iterator<json>(cursor);
 
     for (const auto& j : it)
     {
@@ -61,7 +61,7 @@ void staj_array_iterator_example2()
 
     json_cursor cursor(is);
 
-    staj_array_iterator<json,ns::employee> it(cursor);
+    auto it = make_array_iterator<ns::employee>(cursor);
 
     for (const auto& val : it)
     {
@@ -72,12 +72,9 @@ void staj_array_iterator_example2()
 
 void staj_object_iterator_example()
 {
+    json_cursor cursor(object_example);
 
-    std::istringstream is(object_example);
-
-    json_cursor cursor(is);
-
-    staj_object_iterator<json> it(cursor);
+    auto it = make_object_iterator<json>(cursor);
 
     for (const auto& kv : it)
     {

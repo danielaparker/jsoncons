@@ -464,6 +464,62 @@ void staj_object_iterator<Json,T>::next(std::error_code& ec)
     }
 }
 
+template <class T, class CharT>
+typename std::enable_if<is_basic_json_class<T>::value,staj_array_iterator<T,T>>::type
+make_array_iterator(basic_staj_reader<CharT>& reader)
+{
+    return staj_array_iterator<T,T>(reader);
+}
+
+template <class T, class CharT>
+typename std::enable_if<!is_basic_json_class<T>::value,staj_array_iterator<basic_json<CharT>,T>>::type
+make_array_iterator(basic_staj_reader<CharT>& reader)
+{
+    return staj_array_iterator<basic_json<CharT>,T>(reader);
+}
+
+template <class T, class CharT>
+typename std::enable_if<is_basic_json_class<T>::value,staj_array_iterator<T,T>>::type
+make_array_iterator(basic_staj_reader<CharT>& reader, std::error_code& ec)
+{
+    return staj_array_iterator<T,T>(reader, ec);
+}
+
+template <class T, class CharT>
+typename std::enable_if<!is_basic_json_class<T>::value,staj_array_iterator<basic_json<CharT>,T>>::type
+make_array_iterator(basic_staj_reader<CharT>& reader, std::error_code& ec)
+{
+    return staj_array_iterator<basic_json<CharT>,T>(reader, ec);
+}
+
+template <class T, class CharT>
+typename std::enable_if<is_basic_json_class<T>::value,staj_object_iterator<T,T>>::type
+make_object_iterator(basic_staj_reader<CharT>& reader)
+{
+    return staj_object_iterator<T,T>(reader);
+}
+
+template <class T, class CharT>
+typename std::enable_if<!is_basic_json_class<T>::value,staj_object_iterator<basic_json<CharT>,T>>::type
+make_object_iterator(basic_staj_reader<CharT>& reader)
+{
+    return staj_object_iterator<basic_json<CharT>,T>(reader);
+}
+
+template <class T, class CharT>
+typename std::enable_if<is_basic_json_class<T>::value,staj_object_iterator<T,T>>::type
+make_object_iterator(basic_staj_reader<CharT>& reader, std::error_code& ec)
+{
+    return staj_object_iterator<T,T>(reader, ec);
+}
+
+template <class T, class CharT>
+typename std::enable_if<!is_basic_json_class<T>::value,staj_object_iterator<basic_json<CharT>,T>>::type
+make_object_iterator(basic_staj_reader<CharT>& reader, std::error_code& ec)
+{
+    return staj_object_iterator<basic_json<CharT>,T>(reader, ec);
+}
+
 }
 
 #endif
