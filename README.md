@@ -566,6 +566,9 @@ bar, 50 75 73 73, 1.23456789012345678901234567890
 82 83 63 66 6f 6f 44 50 75 73 73 66 30 78 33 70 2d 31 83 63 62 61 72 44 50 75 73 73 78 1f 31 2e 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36 37 38 39 30
 ```
 
+Note that when decoding the bigfloat and decimal fraction into a `std::string`, we lose the semantic information
+that the variant like data structure preserved with a tag, so serializing back to CBOR results in a text string.
+
 #### As a stream of parse events
 
 ```c++

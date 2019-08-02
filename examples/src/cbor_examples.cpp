@@ -465,6 +465,9 @@ void working_with_cbor2()
                   << std::noshowbase << std::setfill('0') << static_cast<int>(c) << ' ';
     }
     std::cout << "\n\n";
+
+    json j = cbor::decode_cbor<json>(buffer);
+    std::cout << pretty_print(j) << "\n\n";
 }
 
 void working_with_cbor3()
