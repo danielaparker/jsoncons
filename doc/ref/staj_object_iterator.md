@@ -61,16 +61,16 @@ Advances the iterator to the next object member.
 #### Non-member functions
 
     template <class Json, class T>
-    bool operator==(const staj_object_iterator<T>& a, const staj_object_iterator<T>& b)
+    bool operator==(const staj_object_iterator<Json, T>& a, const staj_object_iterator<Json, T>& b)
 
     template <class Json, class T>
-    bool operator!=(const staj_object_iterator<T>& a, const staj_object_iterator<T>& b)
+    bool operator!=(const staj_object_iterator<Json, T>& a, const staj_object_iterator<Json, T>& b)
 
     template <class Json, class T>
-    staj_object_iterator<T> begin(staj_object_iterator<T> iter) noexcept; // (1)
+    staj_object_iterator<Json, T> begin(staj_object_iterator<Json, T> iter) noexcept; // (1)
 
     template <class Json, class T>
-    staj_object_iterator<T> end(const staj_object_iterator<T>&) noexcept; // (2)
+    staj_object_iterator<Json, T> end(const staj_object_iterator<Json, T>&) noexcept; // (2)
 
 (1) Returns iter unchanged
 

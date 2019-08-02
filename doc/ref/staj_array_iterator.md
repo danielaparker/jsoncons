@@ -63,30 +63,30 @@ Advances the iterator to the next array element.
 Range-based for loop support
 
     template <class Json, class T>
-    staj_array_iterator<T> begin(staj_array_iterator<T> iter) noexcept; // (1)
+    staj_array_iterator<Json, T> begin(staj_array_iterator<Json, T> iter) noexcept; // (1)
 
     template <class Json, class T>
-    staj_array_iterator<T> end(const staj_array_iterator<T>&) noexcept; // (2)
+    staj_array_iterator<Json, T> end(const staj_array_iterator<Json, T>&) noexcept; // (2)
 
 (1) Returns iter unchanged (range-based for loop support.)
 
 (2) Returns a default-constructed `stax_array_iterator`, which serves as an end iterator. The argument is ignored.
 
     template <class T, class CharT>
-    staj_array_iterator<T> make_array_iterator(basic_staj_reader<CharT>& reader); // (1)
+    staj_array_iterator<Json, T> make_array_iterator(basic_staj_reader<CharT>& reader); // (1)
 
     template <class T, class CharT>
-    staj_array_iterator<T> make_array_iterator(basic_staj_reader<CharT>& reader, std::error_code& ec); // (1)
+    staj_array_iterator<Json, T> make_array_iterator(basic_staj_reader<CharT>& reader, std::error_code& ec); // (1)
 
 (1) Makes a `staj_array_iterator` that iterates over the items retrieved from a pull reader.
 
 (2) Makes a `staj_array_iterator` that iterates over the items retrieved from a pull reader.
 
     template <class Json, class T>
-    bool operator==(const staj_array_iterator<T>& a, const staj_array_iterator<T>& b)
+    bool operator==(const staj_array_iterator<Json, T>& a, const staj_array_iterator<Json, T>& b)
 
     template <class Json, class T>
-    bool operator!=(const staj_array_iterator<T>& a, const staj_array_iterator<T>& b)
+    bool operator!=(const staj_array_iterator<Json, T>& a, const staj_array_iterator<Json, T>& b)
 
 ### Examples
 
