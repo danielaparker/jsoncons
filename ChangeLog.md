@@ -1,3 +1,11 @@
+v0.131.2
+--------
+
+Bug fix
+
+- Fixed issue with serializing a C++ standard library container class to a binary format, 
+and getting an indefinite length array or map. 
+
 v0.131.1
 --------
 

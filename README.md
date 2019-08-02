@@ -494,6 +494,17 @@ int main()
     std::cout << "(3)\n";
     json result = jsonpath::json_query(j,"$[*][2]");
     std::cout << pretty_print(result) << "\n\n";
+
+    // Serialize back to CBOR
+    std::cout << "(4)\n";
+    std::vector<uint8_t> buffer;
+    cbor::encode_cbor(j, buffer);
+    for (auto c : buffer) 
+    {
+        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
+                  << std::noshowbase << std::setfill('0') << static_cast<int>(c) << ' ';
+    }
+    std::cout << "\n\n";
 }
 ```
 Output:
@@ -507,11 +518,15 @@ Output:
 (2)
 50 75 73 73 (n/a)
 50 75 73 73 (base64)
+
 (3)
 [
     "0x3p-1",
     "1.23456789012345678901234567890"
 ]
+
+(4)
+82 83 63 66 6f 6f 44 50 75 73 73 c5 82 20 03 83 63 62 61 72 d6 44 50 75 73 73 c4 82 38 1c c2 4d 01 8e e9 0f f6 c3 73 e0 ee 4e 3f 0a d2
 ```
 
 #### As a strongly typed C++ data structure
@@ -519,19 +534,36 @@ Output:
 ```c++
 int main()
 {
-    // Parse the CBOR data into a std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>> value
+    // Parse the string of data into a std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>> value
     auto val = cbor::decode_cbor<std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>>>(data);
 
+    std::cout << "(1)\n";
     for (const auto& row : val)
     {
         std::cout << std::get<0>(row) << ", " << std::get<1>(row) << ", " << std::get<2>(row) << "\n";
     }
+    std::cout << "\n";
+
+    // Serialize back to CBOR
+    std::cout << "(2)\n";
+    std::vector<uint8_t> buffer;
+    cbor::encode_cbor(val, buffer);
+    for (auto c : buffer) 
+    {
+        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
+                  << std::noshowbase << std::setfill('0') << static_cast<int>(c) << ' ';
+    }
+    std::cout << "\n\n";
 }
 ```
 Output:
 ```
+(1)
 foo, 50 75 73 73, 0x3p-1
 bar, 50 75 73 73, 1.23456789012345678901234567890
+
+(2)
+82 83 63 66 6f 6f 44 50 75 73 73 66 30 78 33 70 2d 31 83 63 62 61 72 44 50 75 73 73 78 1f 31 2e 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36 37 38 39 30
 ```
 
 #### As a stream of parse events

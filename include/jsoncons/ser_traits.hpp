@@ -94,7 +94,7 @@ struct ser_traits<T,
     template <class CharT, class Json>
     static void encode(const T& val, basic_json_content_handler<CharT>& receiver)
     {
-        receiver.begin_array();
+        receiver.begin_array(val.size());
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
             ser_traits<value_type>::template encode<CharT,Json>(*it,receiver);
@@ -130,7 +130,7 @@ struct ser_traits<std::array<T,N>>
     template <class CharT, class Json>
     static void encode(const std::array<T, N>& val, basic_json_content_handler<CharT>& receiver)
     {
-        receiver.begin_array();
+        receiver.begin_array(val.size());
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
             ser_traits<value_type>::template encode<CharT,Json>(*it,receiver);
@@ -169,7 +169,7 @@ struct ser_traits<T,
     template <class CharT, class Json>
     static void encode(const T& val, basic_json_content_handler<CharT>& receiver)
     {
-        receiver.begin_object();
+        receiver.begin_object(val.size());
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
             receiver.name(it->first);

@@ -511,9 +511,9 @@ int main()
 
         run_ubjson_examples();
 
-        run_cbor_examples();
-
         run_csv_examples();
+
+        run_cbor_examples();
     }
     catch (const std::exception& e)
     {

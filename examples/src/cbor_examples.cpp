@@ -412,7 +412,7 @@ const std::vector<uint8_t> data = {
 
 void working_with_cbor1()
 {
-    // Parse the string of data into a json value
+    // Parse the CBOR data into a json value
     json j = cbor::decode_cbor<json>(data);
 
     // Pretty print
@@ -430,6 +430,17 @@ void working_with_cbor1()
     std::cout << "(3)\n";
     json result = jsonpath::json_query(j,"$[*][2]");
     std::cout << pretty_print(result) << "\n\n";
+
+    // Serialize back to CBOR
+    std::cout << "(4)\n";
+    std::vector<uint8_t> buffer;
+    cbor::encode_cbor(j, buffer);
+    for (auto c : buffer) 
+    {
+        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
+                  << std::noshowbase << std::setfill('0') << static_cast<int>(c) << ' ';
+    }
+    std::cout << "\n\n";
 }
 
 void working_with_cbor2()
@@ -437,10 +448,23 @@ void working_with_cbor2()
     // Parse the string of data into a std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>> value
     auto val = cbor::decode_cbor<std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>>>(data);
 
+    std::cout << "(1)\n";
     for (const auto& row : val)
     {
         std::cout << std::get<0>(row) << ", " << std::get<1>(row) << ", " << std::get<2>(row) << "\n";
     }
+    std::cout << "\n";
+
+    // Serialize back to CBOR
+    std::cout << "(2)\n";
+    std::vector<uint8_t> buffer;
+    cbor::encode_cbor(val, buffer);
+    for (auto c : buffer) 
+    {
+        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
+                  << std::noshowbase << std::setfill('0') << static_cast<int>(c) << ' ';
+    }
+    std::cout << "\n\n";
 }
 
 void working_with_cbor3()
@@ -538,13 +562,13 @@ void run_cbor_examples()
     cbor_examples::decode_cbor_byte_string();
     cbor_examples::decode_byte_string_with_encoding_hint();
 
-    cbor_examples::working_with_cbor1();
-    std::cout << "\n";
-    cbor_examples::working_with_cbor2();
-    std::cout << "\n";
     cbor_examples::working_with_cbor3();
     std::cout << "\n";
     cbor_examples::working_with_cbor4();
+    std::cout << "\n";
+    cbor_examples::working_with_cbor1();
     std::cout << std::endl;
+    cbor_examples::working_with_cbor2();
+    std::cout << "\n";
 }
 
