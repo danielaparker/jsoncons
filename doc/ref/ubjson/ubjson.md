@@ -32,7 +32,7 @@ object        |                  | object
 
 ### Working with UBJSON data
 
-For the examples below you need to include some header files and construct a buffer of UBJSON data:
+For the examples below you need to include some header files and initialize a buffer of UBJSON data:
 
 ```c++
 #include <iomanip>

@@ -35,17 +35,14 @@ namespace readme
         // Parse the string of data into a json value
         json j = json::parse(data);
 
-        // Pretty print
-        std::cout << "(1)\n" << pretty_print(j) << "\n\n";
-
         // Does object member reputons exist?
-        std::cout << "(2) " << std::boolalpha << j.contains("reputons") << "\n\n";
+        std::cout << "(1) " << std::boolalpha << j.contains("reputons") << "\n\n";
 
         // Get a reference to reputons array 
         const json& v = j["reputons"]; 
 
         // Iterate over reputons array 
-        std::cout << "(3)\n";
+        std::cout << "(2)\n";
         for (const auto& item : v.array_range())
         {
             // Access rated as string and rating as double
@@ -54,9 +51,12 @@ namespace readme
         std::cout << "\n";
 
         // Select all "rated" with JSONPath
-        std::cout << "(4)\n";
+        std::cout << "(3)\n";
         json result = jsonpath::json_query(j,"$..rated");
         std::cout << pretty_print(result) << "\n\n";
+
+        // Serialize back to JSON
+        std::cout << "(4)\n" << pretty_print(j) << "\n\n";
     }
 
     void as_a_strongly_typed_cpp_structure()

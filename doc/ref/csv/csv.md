@@ -18,7 +18,7 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 ### Working with CSV data
 
-For the examples below you need to include some header files and construct a string of CSV data:
+For the examples below you need to include some header files and initialize a string of CSV data:
 
 ```c++
 #include <iomanip>

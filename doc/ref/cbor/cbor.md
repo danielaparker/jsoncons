@@ -102,7 +102,7 @@ object        |                  | map |&#160;
 
 ### Working with CBOR data
 
-For the examples below you need to include some header files and construct a buffer of CBOR data:
+For the examples below you need to include some header files and initialize a buffer of CBOR data:
 
 ```c++
 #include <iomanip>

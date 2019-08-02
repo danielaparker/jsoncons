@@ -42,7 +42,7 @@ supports semantic tagging of date-time values, timestamp values, big integers,
 big decimals, bigfloats and binary encodings. This allows it to preserve these type semantics when parsing 
 JSON-like data formats such as CBOR that have them.
 
-For the examples below you need to include some header files and construct a string of JSON data:
+For the examples below you need to include some header files and initialize a string of JSON data:
 
 ```c++
 #include <jsoncons/json.hpp>

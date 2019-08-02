@@ -104,7 +104,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 ### Working with JSON data
 
-For the examples below you need to include some header files and construct a string of JSON data:
+For the examples below you need to include some header files and initialize a string of JSON data:
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -144,17 +144,14 @@ int main()
         // Parse the string of data into a json value
         json j = json::parse(data);
 
-        // Pretty print
-        std::cout << "(1)\n" << pretty_print(j) << "\n\n";
-
         // Does object member reputons exist?
-        std::cout << "(2) " << std::boolalpha << j.contains("reputons") << "\n\n";
+        std::cout << "(1) " << std::boolalpha << j.contains("reputons") << "\n\n";
 
         // Get a reference to reputons array 
         const json& v = j["reputons"]; 
 
         // Iterate over reputons array 
-        std::cout << "(3)\n";
+        std::cout << "(2)\n";
         for (const auto& item : v.array_range())
         {
             // Access rated as string and rating as double
@@ -163,14 +160,27 @@ int main()
         std::cout << "\n";
 
         // Select all "rated" with JSONPath
-        std::cout << "(4)\n";
+        std::cout << "(3)\n";
         json result = jsonpath::json_query(j,"$..rated");
         std::cout << pretty_print(result) << "\n\n";
+
+        // Serialize back to JSON
+        std::cout << "(4)\n" << pretty_print(j) << "\n\n";
 }
 ```
 Output:
 ```
-(1)
+(1) true
+
+(2)
+Marilyn C, 0.90
+
+(3)
+[
+    "Marilyn C"
+]
+
+(4)
 {
     "application": "hiking",
     "reputons": [
@@ -182,16 +192,6 @@ Output:
         }
     ]
 }
-
-(2) true
-
-(3)
-Marilyn C, 0.90
-
-(4)
-[
-    "Marilyn C"
-]
 ```
 
 #### As a strongly typed C++ data structure
@@ -426,7 +426,7 @@ string_value: Marilyn C
 
 ### Working with CBOR data
 
-For the examples below you need to include some header files and construct a buffer of CBOR data:
+For the examples below you need to include some header files and initialize a buffer of CBOR data:
 
 ```c++
 #include <iomanip>
