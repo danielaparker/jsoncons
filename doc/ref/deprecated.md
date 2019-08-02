@@ -59,4 +59,8 @@ class basic_json|`remove_member(const string_view_type&)`|<em>&#x2713;</em>|`era
 class basic_json|`is_empty()`|<em>&#x2713;</em>|`empty()`
 class basic_json|`is_numeric()`|<em>&#x2713;</em>|`is_number()`
 class basic_json|`parse(const char_type*, size_t)`|<em>&#x2713;</em>|`parse(const string_view_type&)`
+class basic_json|`parse_file(const std::basic_string<char_type,char_traits_type>&)`|<em>&#x2713;</em>|`parse(std::basic_istream<char_type>&)`
+class basic_json|`parse_stream(std::basic_istream<char_type>&)`|<em>&#x2713;</em>|`parse(std::basic_istream<char_type>&)`
+class basic_json|`parse_string(const string_view_type& s)`|<em>&#x2713;</em>|`parse(std::basic_istream<char_type>&)`
+
 
