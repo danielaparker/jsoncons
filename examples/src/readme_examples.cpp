@@ -51,6 +51,7 @@ namespace readme
             // Access rated as string and rating as double
             std::cout << item["rated"].as<std::string>() << ", " << item["rating"].as<double>() << "\n";
         }
+        std::cout << "\n";
 
         // Select all "rated" with JSONPath
         std::cout << "(4)\n";
@@ -346,9 +347,9 @@ void readme_examples()
 
     readme::playing_around();
     readme::as_a_strongly_typed_cpp_structure();
-    readme::as_a_variant_like_structure();
     readme::as_a_filtered_stream_of_json_events();
     readme::as_a_stream_of_json_events();
+    readme::as_a_variant_like_structure();
     std::cout << std::endl;
 }
 

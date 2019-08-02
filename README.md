@@ -141,30 +141,31 @@ jsoncons allows you to work with the data in a number of ways:
 ```c++
 int main()
 {
-    // Parse the string of data into a json value
-    json j = json::parse(data);
+        // Parse the string of data into a json value
+        json j = json::parse(data);
 
-    // Pretty print
-    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+        // Pretty print
+        std::cout << "(1)\n" << pretty_print(j) << "\n\n";
 
-    // Does object member reputons exist?
-    std::cout << "(2) " << std::boolalpha << j.contains("reputons") << "\n\n";
+        // Does object member reputons exist?
+        std::cout << "(2) " << std::boolalpha << j.contains("reputons") << "\n\n";
 
-    // Get a reference to reputons array value
-    const json& v = j["reputons"]; 
+        // Get a reference to reputons array 
+        const json& v = j["reputons"]; 
 
-    // Iterate over reputons array value
-    std::cout << "(3)\n";
-    for (const auto& item : v.array_range())
-    {
-        // Access rated as string and rating as double
-        std::cout << item["rated"].as<std::string>() << ", " << item["rating"].as<double>() << "\n";
-    }
+        // Iterate over reputons array 
+        std::cout << "(3)\n";
+        for (const auto& item : v.array_range())
+        {
+            // Access rated as string and rating as double
+            std::cout << item["rated"].as<std::string>() << ", " << item["rating"].as<double>() << "\n";
+        }
+        std::cout << "\n";
 
-    // Select all "rated" with JSONPath
-    std::cout << "(4)\n";
-    json result = jsonpath::json_query(j,"$..rated");
-    std::cout << pretty_print(result) << "\n\n";
+        // Select all "rated" with JSONPath
+        std::cout << "(4)\n";
+        json result = jsonpath::json_query(j,"$..rated");
+        std::cout << pretty_print(result) << "\n\n";
 }
 ```
 Output:
@@ -185,7 +186,8 @@ Output:
 (2) true
 
 (3)
-Marilyn C, 0.9
+Marilyn C, 0.90
+
 (4)
 [
     "Marilyn C"
