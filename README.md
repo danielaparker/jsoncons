@@ -130,13 +130,13 @@ std::string data = R"(
 
 jsoncons allows you to work with the data in a number of ways:
 
-- As a variant-like structure, [basic_json](doc/ref/basic_json.md) 
+- As a variant-like data structure, [basic_json](doc/ref/basic_json.md) 
 
 - As a strongly typed C++ data structure
 
 - As a stream of parse events
 
-#### As a variant-like structure
+#### As a variant-like data structure
 
 ```c++
 int main()
@@ -465,13 +465,13 @@ const std::vector<uint8_t> data = {
 
 jsoncons allows you to work with the CBOR data similarly to JSON data:
 
-- As a variant-like structure, [basic_json](doc/ref/basic_json.md) 
+- As a variant-like data structure, [basic_json](doc/ref/basic_json.md) 
 
 - As a strongly typed C++ data structure
 
 - As a stream of parse events
 
-#### As a variant-like structure
+#### As a variant-like data structure
 
 ```c++
 int main()
@@ -567,7 +567,7 @@ bar, 50 75 73 73, 1.23456789012345678901234567890
 ```
 
 Note that when decoding the bigfloat and decimal fraction into a `std::string`, we lose the semantic information
-that the variant like data structure preserved with a tag, so serializing back to CBOR results in a text string.
+that the variant like data structure preserved with a tag, so serializing back to CBOR produces a text string.
 
 #### As a stream of parse events
 

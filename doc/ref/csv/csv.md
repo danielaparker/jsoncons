@@ -1,7 +1,7 @@
 ### csv extension
 
 The csv extension implements decode from and encode to the [CSV format](https://www.rfc-editor.org/rfc/rfc4180.txt)
-You can either parse into or serialize from a variant-like structure, [basic_json](../basic_json.md), or your own
+You can either parse into or serialize from a variant-like data structure, [basic_json](../basic_json.md), or your own
 data structures, using [json_type_traits](../json_type_traits.md).
 
 [decode_csv](decode_csv.md)
@@ -35,14 +35,14 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
 
 jsoncons allows you to work with the CSV data similarly to JSON data:
 
-- As a variant-like structure, [basic_json](../basic_json.md) 
+- As a variant-like data structure, [basic_json](../basic_json.md) 
 
 - As a strongly typed C++ data structure
 
 - As a stream of parse events
 
 
-#### As a variant-like structure
+#### As a variant-like data structure
 
 ```c++
 int main()

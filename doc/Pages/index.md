@@ -68,13 +68,13 @@ std::string data = R"(
 
 jsoncons allows you to work with the data in a number of ways:
 
-- As a variant-like structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json.md) 
+- As a variant-like data structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json.md) 
 
 - As a strongly typed C++ data structure
 
 - As a stream of parse events
 
-#### As a variant-like structure
+#### As a variant-like data structure
 
 ```c++
 
