@@ -53,4 +53,10 @@ class basic_json|`get(const string_view_type&, T&&)`|<em>&#x2713;</em>|`get_with
 class basic_json|`get(const string_view_type&)`|<em>&#x2713;</em>|`at(const string_view_type&)`
 class basic_json|`has_key(const string_view_type&)`|<em>&#x2713;</em>|`contains(const string_view_type&)`
 class basic_json|`has_member(const string_view_type&)`|<em>&#x2713;</em>|`contains(const string_view_type&)`
+class basic_json|`remove_range(size_t, size_t)`|<em>&#x2713;</em>|`erase(const_object_iterator, const_object_iterator)`
+class basic_json|`remove(const string_view_type&)`|<em>&#x2713;</em>|`erase(const string_view_type& name)`
+class basic_json|`remove_member(const string_view_type&)`|<em>&#x2713;</em>|`erase(const string_view_type& name)`
+class basic_json|`is_empty()`|<em>&#x2713;</em>|`empty()`
+class basic_json|`is_numeric()`|<em>&#x2713;</em>|`is_number()`
+class basic_json|`parse(const char_type*, size_t)`|<em>&#x2713;</em>|`parse(const string_view_type&)`
 
