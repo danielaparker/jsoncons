@@ -52,7 +52,7 @@ namespace readme
             std::cout << item["rated"].as<std::string>() << ", " << item["rating"].as<double>() << "\n";
         }
 
-        // Extract all "rated" with JSONPath
+        // Select all "rated" with JSONPath
         std::cout << "(4)\n";
         json result = jsonpath::json_query(j,"$..rated");
         std::cout << pretty_print(result) << "\n\n";

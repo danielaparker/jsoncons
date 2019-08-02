@@ -426,7 +426,7 @@ void working_with_cbor1()
     }
     std::cout << "\n";
 
-    // Extract the third column with JSONPath
+    // Select the third column with JSONPath
     std::cout << "(3)\n";
     json result = jsonpath::json_query(j,"$[*][2]");
     std::cout << pretty_print(result) << "\n\n";
