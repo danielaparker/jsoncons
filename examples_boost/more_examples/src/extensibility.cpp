@@ -8,7 +8,7 @@
 #include <utility>
 #include <ctime>
 #include <cassert>
-#include <boost/datetime/gregorian/gregorian.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
