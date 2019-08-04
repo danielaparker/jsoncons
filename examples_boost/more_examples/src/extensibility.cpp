@@ -2,7 +2,7 @@
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_encoder.hpp>
+#include <jsoncons_ext/csv/csv.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -12,20 +12,18 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
-namespace jsoncons 
-{
+namespace jsoncons {
+
     template <class Json>
     struct json_type_traits<Json,boost::gregorian::date>
     {
         static bool is(const Json& val) noexcept
         {
             if (!val.is_string())
-            {
                 return false;
-            }
-            std::string s = val.template as<std::string>();
             try
             {
+                std::string s = val.template as<std::string>();
                 boost::gregorian::from_simple_string(s);
                 return true;
             }
@@ -41,9 +39,10 @@ namespace jsoncons
             return boost::gregorian::from_simple_string(s);
         }
 
-        static Json to_json(boost::gregorian::date val)
+        static Json to_json(boost::gregorian::date val, 
+                            typename Json::allocator_type allocator = Json::allocator_type())
         {
-            return Json(to_iso_extended_string(val));
+            return Json(to_iso_extended_string(val), allocator);
         }
     };
 
@@ -153,7 +152,29 @@ namespace jsoncons
             return a;
         }
     };
-}
+} // namespace jsoncons
+
+namespace ns {
+    class fixing
+    {
+        std::string index_id_;
+        boost::gregorian::date observation_date_;
+        double rate_;
+    public:
+        fixing(const std::string& index_id, boost::gregorian::date observation_date, double rate)
+            : index_id_(index_id), observation_date_(observation_date), rate_(rate)
+        {
+        }
+
+        const std::string& index_id() const {return  index_id_;}
+
+        boost::gregorian::date observation_date() const {return  observation_date_;}
+
+        double rate() const {return rate_;}
+    };
+} namespace ns
+
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::fixing, index_id, observation_date, rate)
 
 using namespace jsoncons;
 using boost::numeric::ublas::matrix;
@@ -230,6 +251,38 @@ void boost_multiprecison_conversions()
     std::cout << "(2) " << j2[0].as<std::string>() << "\n";
 }
 
+void csv_strongly_typed_example()
+{
+    const std::string data = R"(index_id,observation_date,rate
+EUR_LIBOR_06M,2015-10-23,0.0000214
+EUR_LIBOR_06M,2015-10-26,0.0000143
+EUR_LIBOR_06M,2015-10-27,0.0000001
+)";
+
+    csv::csv_options options;
+    options.assume_header(true);
+
+    // Decode the CSV data into a c++ structure
+    std::vector<ns::fixing> v = csv::decode_csv<std::vector<ns::fixing>>(data, options);
+
+    // Iterate over values
+    std::cout << std::fixed << std::setprecision(7);
+    std::cout << "(1)\n";
+    for (const auto& item : v)
+    {
+        std::cout << item.index_id() << ", " << item.observation_date() << ", " << item.rate() << "\n";
+    }
+
+    // Encode the c++ structure into CSV data
+    std::string s;
+    csv::encode_csv(v, s);
+    std::cout << "(2)\n";
+    std::cout << s << "\n";
+
+    //std::vector<json> v = csv::decode_csv<std::vector<json>>(data, options);
+    //std::cout << v[0]["observation_date"].as<boost::gregorian::date>() << "\n";
+}
+
 void extensibility_examples()
 {
     std::cout << "extensibility examples\n\n";
@@ -237,4 +290,5 @@ void extensibility_examples()
     boost_date_conversions();
     boost_matrix_conversions();
     boost_multiprecison_conversions();
+    csv_strongly_typed_example();
 }

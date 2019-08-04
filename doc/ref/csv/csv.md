@@ -25,6 +25,7 @@ For the examples below you need to include some header files and initialize a st
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
 
     const std::string data = R"(index_id,observation_date,rate
 EUR_LIBOR_06M,2015-10-23,0.0000214
@@ -107,22 +108,52 @@ namespace ns {
     class fixing
     {
         std::string index_id_;
-        std::string observation_date_;
+        boost::gregorian::date observation_date_;
         double rate_;
     public:
-        fixing(const std::string& index_id, const std::string& observation_date, double rate)
+        fixing(const std::string& index_id, boost::gregorian::date observation_date, double rate)
             : index_id_(index_id), observation_date_(observation_date), rate_(rate)
         {
         }
 
         const std::string& index_id() const {return  index_id_;}
 
-        const std::string& observation_date() const {return  observation_date_;}
+        boost::gregorian::date observation_date() const {return  observation_date_;}
 
         double rate() const {return rate_;}
     };
 
 } // namespace ns
+
+template <class Json>
+struct json_type_traits<Json,boost::gregorian::date>
+{
+    static bool is(const Json& val) noexcept
+    {
+        if (!val.is_string())
+            return false;
+        try
+        {
+            std::string s = val.template as<std::string>();
+            boost::gregorian::from_simple_string(s);
+            return true;
+        }
+        catch (...)
+        {
+            return false;
+        }
+    }
+    static boost::gregorian::date as(const Json& val)
+    {
+        std::string s = val.template as<std::string>();
+        return boost::gregorian::from_simple_string(s);
+    }
+    static Json to_json(boost::gregorian::date val, 
+                        typename Json::allocator_type allocator = Json::allocator_type())
+    {
+        return Json(to_iso_extended_string(val), allocator);
+    }
+};
 
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::fixing, index_id, observation_date, rate)
 

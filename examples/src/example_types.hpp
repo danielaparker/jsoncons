@@ -19,17 +19,17 @@ namespace ns {
     class fixing
     {
         std::string index_id_;
-        std::string observation_date_;
+        boost::gregorian::date observation_date_;
         double rate_;
     public:
-        fixing(const std::string& index_id, const std::string& observation_date, double rate)
+        fixing(const std::string& index_id, const boost::gregorian::date& observation_date, double rate)
             : index_id_(index_id), observation_date_(observation_date), rate_(rate)
         {
         }
 
         const std::string& index_id() const {return  index_id_;}
 
-        const std::string& observation_date() const {return  observation_date_;}
+        boost::gregorian::date observation_date() const {return  observation_date_;}
 
         double rate() const {return rate_;}
     };
