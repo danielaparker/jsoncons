@@ -25,7 +25,6 @@ For the examples below you need to include some header files and initialize a st
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
 
     const std::string data = R"(index_id,observation_date,rate
 EUR_LIBOR_06M,2015-10-23,0.0000214
@@ -102,6 +101,7 @@ CSV data to C++ data structures and back. Decode and encode work for all C++ cla
 The standard library containers are already supported, and your own types will be supported too if you specialize [json_type_traits](../json_type_traits.md) 
 in the jsoncons namespace.
 ```c++
+#include <boost/date_time/gregorian/gregorian.hpp>
 
 namespace ns {
 
