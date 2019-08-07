@@ -3,7 +3,11 @@ master
 
 Changes
 
-- The name JSONCONS_GETTER_CTOR_TRAITS_DECL has been deprecated and renamed to JSONCONS_CTOR_GETTER_TRAITS_DECL
+- The macro name `JSONCONS_GETTER_CTOR_TRAITS_DECL` has been deprecated and renamed to `JSONCONS_CTOR_GETTER_TRAITS_DECL`
+- The enum name `jsoncons::chars_format` used in `json_options` and `csv_options` has been deprecated and renamed to
+  `float_chars_format`.
+- The function name `floating_point_format()` used in `json_options` and `csv_options` has been deprecated and renamed to
+  `float_format`.
 
 v0.131.2
 --------

@@ -272,7 +272,7 @@ public:
     {
         size_t count = 0;
 
-        chars_format format = override_.format() != chars_format() ? override_.format() : chars_format::general;
+        float_chars_format format = override_.format() != float_chars_format() ? override_.format() : float_chars_format::general;
 
         int decimal_places;
         if (override_.decimal_places() != 0)
@@ -281,7 +281,7 @@ public:
         }
         else
         {
-            format = chars_format::general;
+            format = float_chars_format::general;
             decimal_places = 0;
         }             
 
@@ -290,7 +290,7 @@ public:
 
         switch (format)
         {
-        case chars_format::fixed:
+        case float_chars_format::fixed:
             {
                 length = snprintf(number_buffer, sizeof(number_buffer), "%1.*f", decimal_places, val);
                 if (length < 0)
@@ -300,7 +300,7 @@ public:
                 dump_buffer(number_buffer, length, decimal_point_, result);
             }
             break;
-        case chars_format::scientific:
+        case float_chars_format::scientific:
             {
                 length = snprintf(number_buffer, sizeof(number_buffer), "%1.*e", decimal_places, val);
                 if (length < 0)
@@ -310,7 +310,7 @@ public:
                 dump_buffer(number_buffer, length, decimal_point_, result);
             }
             break;
-        case chars_format::general:
+        case float_chars_format::general:
             {
                 if (override_.precision() != 0)
                 {

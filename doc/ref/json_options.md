@@ -10,7 +10,7 @@ Specifies options for encoding and decoding JSON text. The `json_options` class 
 
 The default floating point formatting for a floating point value that was previously decoded from json text is to preserve the original format and precision. This ensures round-trip for both format and precision, e.g. 1.1 read will remain `1.1` when written, and not become `1.1000000000000001` (an equivalent but longer representation.)
 
-The default floating point formatting for a floating point value that was directly inserted into a json value is [chars_format::general](chars_format.md) with shortest representation. Trailing zeros are removed, except one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.
+The default floating point formatting for a floating point value that was directly inserted into a json value is [float_chars_format::general](float_chars_format.md) with shortest representation. Trailing zeros are removed, except one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.
 
 ![json_options](./diagrams/json_options.png)
 

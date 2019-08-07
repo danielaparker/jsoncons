@@ -35,10 +35,10 @@ Default is `false`
     virtual bool pad_inside_array_brackets() const = 0;
 Default is `false`
 
-    virtual chars_format floating_point_format() const = 0 
-Overrides [floating point format](chars_format.md) when serializing json.
+    virtual float_chars_format float_format() const = 0 
+Overrides [floating point format](float_chars_format.md) when serializing json.
 The default, for a floating point value that was previously decoded from json text, is to preserve the original format when serializing.
-The default, for a floating point value that was directly inserted into a json value, to serialize with [chars_format::general](chars_format.md). 
+The default, for a floating point value that was directly inserted into a json value, to serialize with [float_chars_format::general](float_chars_format.md). 
 
     virtual bigint_chars_format bigint_format() const = 0 
 Overrides [bignum format](bigint_chars_format.md) when serializing json.

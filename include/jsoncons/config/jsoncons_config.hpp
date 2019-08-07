@@ -71,8 +71,6 @@
 #  endif // defined(_MSC_VER)
 #endif // !defined(JSONCONS_HAS_STRING_VIEW)
 
-#define JSONCONS_NO_TO_CHARS
-
 // Deprecated symbols markup
 #if !defined(JSONCONS_DEPRECATED) && defined(__has_extension)
 #if __has_extension(attribute_deprecated_with_message)

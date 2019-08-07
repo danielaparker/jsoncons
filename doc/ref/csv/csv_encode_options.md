@@ -12,7 +12,7 @@ An abstract class that defines accessors for CSV encode options.
 
 #### Accessors
 
-    virtual chars_format floating_point_format() const = 0;
+    virtual float_chars_format float_format() const = 0;
 
     virtual int precision() const = 0;
 

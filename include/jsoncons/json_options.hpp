@@ -15,31 +15,31 @@
 
 namespace jsoncons {
 
-#if !defined(JSONCONS_NO_TO_CHARS)
-using chars_format = std::chars_format;
-#else
-enum class chars_format : uint8_t {fixed=1,scientific=2,hex=4,general=fixed|scientific};
+enum class float_chars_format : uint8_t {fixed=1,scientific=2,hex=4,general=fixed|scientific};
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+JSONCONS_DEPRECATED("instead, use float_chars_format") typedef float_chars_format chars_format;
 #endif
 
 // floating_point_options
 
 class floating_point_options
 {
-    chars_format format_;
+    float_chars_format format_;
     int precision_;
     uint8_t decimal_places_;
 public:
     floating_point_options()
-        : format_(chars_format::general), precision_(0), decimal_places_(0)
+        : format_(float_chars_format::general), precision_(0), decimal_places_(0)
     {
     }
 
-    floating_point_options(chars_format format, int precision, uint8_t decimal_places = 0)
+    floating_point_options(float_chars_format format, int precision, uint8_t decimal_places = 0)
         : format_(format), precision_(precision), decimal_places_(decimal_places)
     {
     }
 
-    explicit floating_point_options(chars_format format)
+    explicit floating_point_options(float_chars_format format)
         : format_(format), precision_(0), decimal_places_(0)
     {
     }
@@ -59,7 +59,7 @@ public:
         return decimal_places_;
     }
 
-    chars_format format() const
+    float_chars_format format() const
     {
         return format_;
     }
@@ -135,7 +135,7 @@ public:
 
     virtual size_t line_length_limit() const = 0;  
 
-    virtual chars_format floating_point_format() const = 0; 
+    virtual float_chars_format float_format() const = 0; 
 
     virtual int precision() const = 0; 
 
@@ -187,7 +187,7 @@ public:
     typedef std::basic_string<CharT> string_type;
 private:
     size_t indent_size_;
-    chars_format floating_point_format_;
+    float_chars_format float_format_;
     int precision_;
 #if !defined(JSONCONS_NO_DEPRECATED)
     bool can_read_nan_replacement_;
@@ -246,7 +246,7 @@ public:
 
     basic_json_options()
         : indent_size_(indent_size_default),
-          floating_point_format_(chars_format()),
+          float_format_(float_chars_format()),
           precision_(0),
 #if !defined(JSONCONS_NO_DEPRECATED)
           can_read_nan_replacement_(false),
@@ -606,14 +606,14 @@ public:
         return *this;
     }
 
-    chars_format floating_point_format() const override
+    float_chars_format float_format() const override
     {
-        return floating_point_format_;
+        return float_format_;
     }
 
-    basic_json_options<CharT>& floating_point_format(chars_format value)
+    basic_json_options<CharT>& float_format(float_chars_format value)
     {
-        floating_point_format_ = value;
+        float_format_ = value;
         return *this;
     }
 
@@ -661,9 +661,21 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED("Instead, use bigint_format(bigint_chars_format)")
     basic_json_options<CharT>&  big_integer_format(bigint_chars_format value) {bigint_format_ = value; return *this;}
+
+    JSONCONS_DEPRECATED("Instead, use bigint_format()")
     bigint_chars_format bignum_format() const {return bigint_format_;}
+
+    JSONCONS_DEPRECATED("Instead, use bigint_format(bigint_chars_format)")
     basic_json_options<CharT>&  bignum_format(bigint_chars_format value) {bigint_format_ = value; return *this;}
+
+    JSONCONS_DEPRECATED("Instead, use float_format(float_chars_format)")
+    basic_csv_options<CharT>& floating_point_format(float_chars_format value)
+    {
+        float_format_ = value;
+        return *this;
+    }
 
     JSONCONS_DEPRECATED("Instead, use lossless_number()")
     bool dec_to_str() const 

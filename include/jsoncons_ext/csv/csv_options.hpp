@@ -124,7 +124,7 @@ class basic_csv_encode_options
 public:
     typedef std::basic_string<CharT> string_type;
 
-    virtual chars_format floating_point_format() const = 0;
+    virtual float_chars_format float_format() const = 0;
 
     virtual int precision() const = 0;
 
@@ -150,7 +150,7 @@ class basic_csv_options : public virtual basic_csv_decode_options<CharT>,
     typedef CharT char_type;
     typedef std::basic_string<CharT> string_type;
 
-    chars_format floating_point_format_;
+    float_chars_format float_format_;
     int precision_;
     bool assume_header_;
     bool ignore_empty_values_;
@@ -188,7 +188,7 @@ public:
 //  Constructors
 
     basic_csv_options() :
-        floating_point_format_(chars_format()),
+        float_format_(float_chars_format()),
         precision_(0),
         assume_header_(false),
         ignore_empty_values_(false),
@@ -215,14 +215,14 @@ public:
 
 //  Properties
 
-    chars_format floating_point_format() const override
+    float_chars_format float_format() const override
     {
-        return floating_point_format_;
+        return float_format_;
     }
 
-    basic_csv_options<CharT>& floating_point_format(chars_format value)
+    basic_csv_options<CharT>& float_format(float_chars_format value)
     {
-        floating_point_format_ = value;
+        float_format_ = value;
         return *this;
     }
 
@@ -514,6 +514,14 @@ public:
         return *this;
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+    JSONCONS_DEPRECATED("Instead, use float_format(float_chars_format)")
+    basic_csv_options<CharT>& floating_point_format(float_chars_format value)
+    {
+        float_format_ = value;
+        return *this;
+    }
+
     JSONCONS_DEPRECATED("Instead, use column_names(const string_type&)")
     basic_csv_options& column_names(const std::vector<string_type>& value)
     {
