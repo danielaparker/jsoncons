@@ -22,7 +22,7 @@
 
 [Convert JSON to/from C++ data structures by specializing json_type_traits](#G1)  
 [Mapping to C++ data structures with and without defaults allowed](#G2)  
-[An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL](#G3)  
+[An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_CTOR_GETTER_TRAITS_DECL](#G3)  
 [Serializing a templated class with the `JSONCONS_TEMPLATE_xxx` macros](#G4)  
 [A polymorphic example](#G5)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G6)
@@ -673,15 +673,15 @@ Key 'ssn' not found
 
 <div id="G3"/>
 
-#### An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL
+#### An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_CTOR_GETTER_TRAITS_DECL
 
 This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS_DECL`
-and `JSONCONS_GETTER_CTOR_TRAITS_DECL` to specialize the 
+and `JSONCONS_CTOR_GETTER_TRAITS_DECL` to specialize the 
 [json_type_traits](doc/ref/json_type_traits.md) for the enum type
 `ns::hiking_experience` and the classes `ns::hiking_reputon` and 
 `ns::hiking_reputation`.
 The macro `JSONCONS_ENUM_TRAITS_DECL` generates the code from
-the enum values, and the macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` 
+the enum values, and the macro `JSONCONS_CTOR_GETTER_TRAITS_DECL` 
 generates the code from the getter functions and a constructor. 
 These macro declarations must be placed outside any namespace blocks.
 
@@ -754,8 +754,8 @@ namespace ns {
 
 // Declare the traits. Specify which data members need to be serialized.
 JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputation, application, reputons)
+JSONCONS_CTOR_GETTER_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
+JSONCONS_CTOR_GETTER_TRAITS_DECL(ns::hiking_reputation, application, reputons)
 
 using namespace jsoncons; // for convenience
 
@@ -838,7 +838,7 @@ int main()
 
 #### A polymorphic example
 
-`JSONCONS_GETTER_CTOR_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
+`JSONCONS_CTOR_GETTER_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
 from the getter functions and a constructor.
 
 ```c++
@@ -933,8 +933,8 @@ public:
 };
 } // ns
 
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, hours)
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
+JSONCONS_CTOR_GETTER_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, hours)
+JSONCONS_CTOR_GETTER_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
 
 namespace jsoncons {
 

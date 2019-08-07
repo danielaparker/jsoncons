@@ -259,7 +259,7 @@ namespace jsoncons \
     JSONCONS_STRICT_MEMBER_TRAITS_DECL_BASE(wchar_t,L,NumTemplateParams,ValueType,__VA_ARGS__) \
   /**/
  
-#define JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(CharT,Prefix,NumTemplateParams, ValueType, ...)  \
+#define JSONCONS_CTOR_GETTER_TRAITS_DECL_BASE(CharT,Prefix,NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
 { \
     template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, NumTemplateParams)> \
@@ -287,14 +287,14 @@ namespace jsoncons \
 } \
   /**/
  
-#define JSONCONS_GETTER_CTOR_TRAITS_DECL(ValueType, ...)  \
-JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(char,,0, ValueType, __VA_ARGS__) \
-JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(wchar_t,L,0, ValueType, __VA_ARGS__) \
+#define JSONCONS_CTOR_GETTER_TRAITS_DECL(ValueType, ...)  \
+JSONCONS_CTOR_GETTER_TRAITS_DECL_BASE(char,,0, ValueType, __VA_ARGS__) \
+JSONCONS_CTOR_GETTER_TRAITS_DECL_BASE(wchar_t,L,0, ValueType, __VA_ARGS__) \
   /**/
  
-#define JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
-JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(char,,NumTemplateParams, ValueType, __VA_ARGS__) \
-JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(wchar_t,L,NumTemplateParams, ValueType, __VA_ARGS__) \
+#define JSONCONS_TEMPLATE_CTOR_GETTER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
+JSONCONS_CTOR_GETTER_TRAITS_DECL_BASE(char,,NumTemplateParams, ValueType, __VA_ARGS__) \
+JSONCONS_CTOR_GETTER_TRAITS_DECL_BASE(wchar_t,L,NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
 
 #define JSONCONS_ENUM_PAIR(TC, JVal, TVal, Prefix, Member) {value_type::Member, JSONCONS_QUOTE(Prefix,Member)},
@@ -400,6 +400,8 @@ namespace jsoncons \
     /**/
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+#define JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL JSONCONS_TEMPLATE_CTOR_GETTER_TRAITS_DECL 
+#define JSONCONS_GETTER_CTOR_TRAITS_DECL JSONCONS_CTOR_GETTER_TRAITS_DECL 
 #define JSONCONS_TYPE_TRAITS_DECL JSONCONS_MEMBER_TRAITS_DECL
 #define JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL JSONCONS_STRICT_MEMBER_TRAITS_DECL
 #endif

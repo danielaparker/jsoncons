@@ -51,7 +51,7 @@ TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_CTOR_GETTER_TRAITS_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
@@ -152,7 +152,7 @@ TEST_CASE("JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_TEMPLATE_CTOR_GETTER_TRAITS_DECL tests")
 {
     SECTION("MyStruct<std::pair<int,int>>")
     {

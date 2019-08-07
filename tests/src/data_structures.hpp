@@ -150,12 +150,12 @@ namespace ns {
 // Declare the traits. Specify which data members need to be serialized.
 
 JSONCONS_ENUM_TRAITS_DECL(ns::float_format, scientific, fixed, hex, general)
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::book3, author, title, price)
+JSONCONS_CTOR_GETTER_TRAITS_DECL(ns::book3, author, title, price)
 JSONCONS_MEMBER_TRAITS_DECL(ns::book,author,title,price)
 JSONCONS_MEMBER_TRAITS_DECL(ns::book2,author,title,price,isbn)
 JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(1,ns::MyStruct,typeContent,someString)
 JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL(1,ns::MyStruct2,typeContent,someString)
-JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL(1,ns::MyStruct3,typeContent,someString)
+JSONCONS_TEMPLATE_CTOR_GETTER_TRAITS_DECL(1,ns::MyStruct3,typeContent,someString)
 JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
 
 JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
