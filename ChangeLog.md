@@ -1,3 +1,10 @@
+master
+------
+
+Changes
+
+- The name JSONCONS_GETTER_CTOR_TRAITS_DECL has been deprecated and renamed to JSONCONS_CTOR_GETTER_TRAITS_DECL
+
 v0.131.2
 --------
 
