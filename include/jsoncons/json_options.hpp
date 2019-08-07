@@ -671,7 +671,7 @@ public:
     basic_json_options<CharT>&  bignum_format(bigint_chars_format value) {bigint_format_ = value; return *this;}
 
     JSONCONS_DEPRECATED("Instead, use float_format(float_chars_format)")
-    basic_csv_options<CharT>& floating_point_format(float_chars_format value)
+    basic_json_options<CharT>& floating_point_format(float_chars_format value)
     {
         float_format_ = value;
         return *this;
