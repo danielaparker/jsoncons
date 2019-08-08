@@ -50,11 +50,9 @@ for a user-defined class.
 - `JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL`(num_template_params,class_name,member_name1,member_name2,...)
 - `JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL`(num_template_params,class_name,member_name1,member_name2,...)
 
-- `JSONCONS_GETTER_CTOR_TRAITS_DECL`(class_name,getter_name1,getter_name2,...) (until 0.132.0)
-- `JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL`(num_template_params,class_name,getter_name1,getter_name2,...) (until 0.132.0)
+- `JSONCONS_GETTER_CTOR_TRAITS_DECL`(class_name,getter_name1,getter_name2,...) 
 
-- `JSONCONS_CTOR_GETTER_TRAITS_DECL`(class_name,getter_name1,getter_name2,...) (after 0.132.0)
-- `JSONCONS_TEMPLATE_CTOR_GETTER_TRAITS_DECL`(num_template_params,class_name,getter_name1,getter_name2,...) (after 0.132.0)
+- `JSONCONS_GETTER_CTOR_TRAITS_DECL`(class_name,getter_name1,getter_name2,...) 
 
 - `JSONCONS_ENUM_TRAITS_DECL(enum_type_name,value1,value2,...)`
 
@@ -65,7 +63,7 @@ These macro declarations must be placed at global scope, outside any namespace b
 not present in the JSON to have default values, while `JSONCONS_STRICT_MEMBER_TRAITS_DECL` requires all member names
 to be present in the JSON.
 
-`JSONCONS_CTOR_GETTER_TRAITS_DECL` generates the code to specialize `json_type_traits` from the getter functions 
+`JSONCONS_GETTER_CTOR_TRAITS_DECL` generates the code to specialize `json_type_traits` from the getter functions 
 and a constructor. When decoding to a C++ data strucure, all data members in the C++ object must be present in the JSON.
 
 `JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL`, `JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL` and `JSONCONS_TEMPLATE_CTOR_GETTER_TRAITS_DECL`
@@ -100,7 +98,7 @@ STL associative container e.g. std::map|`true` if object and each `mapped_type` 
 [Extend json_type_traits to support `boost::gregorian` dates.](#A4)  
 [Specialize json_type_traits to support a book class.](#A5)  
 [Using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits](#A6)  
-[A polymorphic example using JSONCONS_CTOR_GETTER_TRAITS_DECL to generate the json_type_traits](#A7)  
+[A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits](#A7)  
 [Specialize json_type_traits for a container type that the jsoncons library also supports](#A8)  
 [Convert JSON to/from boost matrix](#A9)
 
@@ -428,8 +426,8 @@ using namespace jsoncons; // for convenience
 
 // Declare the traits. Specify which data members need to be serialized.
 JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
-JSONCONS_CTOR_GETTER_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
-JSONCONS_CTOR_GETTER_TRAITS_DECL(ns::hiking_reputation, application, reputons)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputation, application, reputons)
 
 int main()
 {
@@ -461,9 +459,9 @@ Output:
 
 <div id="A7"/> 
 
-#### A polymorphic example using JSONCONS_CTOR_GETTER_TRAITS_DECL to generate the json_type_traits
+#### A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits
 
-`JSONCONS_CTOR_GETTER_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
+`JSONCONS_GETTER_CTOR_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
 from the getter functions and a constructor.
 
 ```c++
@@ -558,8 +556,8 @@ public:
 };
 } // ns
 
-JSONCONS_CTOR_GETTER_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, hours)
-JSONCONS_CTOR_GETTER_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, hours)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
 
 namespace jsoncons {
 

@@ -174,7 +174,7 @@ namespace ns {
     };
 } namespace ns
 
-JSONCONS_CTOR_GETTER_TRAITS_DECL(ns::fixing, index_id, observation_date, rate)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::fixing, index_id, observation_date, rate)
 
 using namespace jsoncons;
 using boost::numeric::ublas::matrix;
