@@ -53,7 +53,6 @@ TEST_CASE("JSONCONS_RENAME_MEMBER_TRAITS_DECL tests")
         json j = decode_json<json>(s);
 
         REQUIRE(j.is<ns::book>() == true);
-        REQUIRE(j.is<ns::book2>() == false);
 
         CHECK(j["author"].as<std::string>() == an_author);
         CHECK(j["title"].as<std::string>() == a_title);

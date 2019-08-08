@@ -404,6 +404,17 @@ namespace jsoncons \
 #define JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL JSONCONS_STRICT_MEMBER_TRAITS_DECL
 #endif
 
+#define JSONCONS_RENAME_IS(TC, JVal, TVal, Prefix, Member) JSONCONS_RENAME_IS_(Member, Prefix)
+#define JSONCONS_RENAME_IS_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_RENAME_IS_(Member, Prefix)
+#define JSONCONS_RENAME_IS_(Member, Prefix) if (!j.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+
+#define JSONCONS_RENAME_TO_JSON(TC, JVal, TVal, Prefix, Member) JSONCONS_RENAME_TO_(Member, Prefix)
+#define JSONCONS_RENAME_TO_JSON_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_RENAME_TO_(Member, Prefix)
+#define JSONCONS_RENAME_TO_(Member, Prefix) j.try_emplace(JSONCONS_QUOTE(Prefix, Member), val.Member);
+
+#define JSONCONS_RENAME_AS(TC, JVal, TVal, Prefix, Member) JSONCONS_RENAME_AS_(Member, Prefix)
+#define JSONCONS_RENAME_AS_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_RENAME_AS_(Member, Prefix)
+#define JSONCONS_RENAME_AS_(Member, Prefix) if (j.contains(JSONCONS_QUOTE(Prefix, Member))) {val.Member = j.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(val.Member)>();}
 
 #define JSONCONS_RENAME_MEMBER_TRAITS_DECL_BASE(CharT,Prefix,NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
@@ -416,19 +427,19 @@ namespace jsoncons \
         static bool is(const Json& j) noexcept \
         { \
             if (!j.is_object()) return false; \
-            JSONCONS_REP_N(JSONCONS_IS, 0, j, void(), Prefix, __VA_ARGS__)\
+            JSONCONS_REP_N(JSONCONS_RENAME_IS, 0, j, void(), Prefix, __VA_ARGS__)\
             return true; \
         } \
         static value_type as(const Json& j) \
         { \
             value_type val{}; \
-            JSONCONS_REP_N(JSONCONS_AS, 0, j, val, Prefix, __VA_ARGS__) \
+            JSONCONS_REP_N(JSONCONS_RENAME_AS, 0, j, val, Prefix, __VA_ARGS__) \
             return val; \
         } \
         static Json to_json(const value_type& val, allocator_type allocator=allocator_type()) \
         { \
             Json j(allocator); \
-            JSONCONS_REP_N(JSONCONS_TO_JSON, 0, j, val, Prefix, __VA_ARGS__) \
+            JSONCONS_REP_N(JSONCONS_RENAME_TO_JSON, 0, j, val, Prefix, __VA_ARGS__) \
             return j; \
         } \
     }; \
