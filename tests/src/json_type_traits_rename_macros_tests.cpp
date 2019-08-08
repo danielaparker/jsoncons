@@ -34,7 +34,7 @@ namespace json_type_traits_rename_macro_tests
 
 namespace ns = json_type_traits_rename_macro_tests;
 
-JSONCONS_RENAME_MEMBER_TRAITS_DECL(ns::book,author,title,price)
+JSONCONS_RENAME_MEMBER_TRAITS_DECL(ns::book,(author,"Author"),(title,"Title"),(price,"Price"))
 
 TEST_CASE("JSONCONS_RENAME_MEMBER_TRAITS_DECL tests")
 {
@@ -54,9 +54,9 @@ TEST_CASE("JSONCONS_RENAME_MEMBER_TRAITS_DECL tests")
 
         REQUIRE(j.is<ns::book>() == true);
 
-        CHECK(j["author"].as<std::string>() == an_author);
-        CHECK(j["title"].as<std::string>() == a_title);
-        CHECK(j["price"].as<double>() == Approx(a_price).epsilon(0.001));
+        CHECK(j["Author"].as<std::string>() == an_author);
+        CHECK(j["Title"].as<std::string>() == a_title);
+        CHECK(j["Price"].as<double>() == Approx(a_price).epsilon(0.001));
 
         json j2(book);
 

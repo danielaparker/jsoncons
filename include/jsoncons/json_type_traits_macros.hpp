@@ -404,17 +404,17 @@ namespace jsoncons \
 #define JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL JSONCONS_STRICT_MEMBER_TRAITS_DECL
 #endif
 
-#define JSONCONS_RENAME_IS(TC, JVal, TVal, Prefix, Member) JSONCONS_RENAME_IS_(Member, Prefix)
-#define JSONCONS_RENAME_IS_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_RENAME_IS_(Member, Prefix)
-#define JSONCONS_RENAME_IS_(Member, Prefix) if (!j.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+#define JSONCONS_RENAME_IS(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_IS_ Member)
+#define JSONCONS_RENAME_IS_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_IS_ Member)
+#define JSONCONS_RENAME_IS_(Member, Name) if (!j.contains(Name)) return false;
 
-#define JSONCONS_RENAME_TO_JSON(TC, JVal, TVal, Prefix, Member) JSONCONS_RENAME_TO_(Member, Prefix)
-#define JSONCONS_RENAME_TO_JSON_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_RENAME_TO_(Member, Prefix)
-#define JSONCONS_RENAME_TO_(Member, Prefix) j.try_emplace(JSONCONS_QUOTE(Prefix, Member), val.Member);
+#define JSONCONS_RENAME_TO_JSON(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_TO_ Member)
+#define JSONCONS_RENAME_TO_JSON_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_TO_ Member)
+#define JSONCONS_RENAME_TO_(Member, Name) j.try_emplace(Name, val.Member);
 
-#define JSONCONS_RENAME_AS(TC, JVal, TVal, Prefix, Member) JSONCONS_RENAME_AS_(Member, Prefix)
-#define JSONCONS_RENAME_AS_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_RENAME_AS_(Member, Prefix)
-#define JSONCONS_RENAME_AS_(Member, Prefix) if (j.contains(JSONCONS_QUOTE(Prefix, Member))) {val.Member = j.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(val.Member)>();}
+#define JSONCONS_RENAME_AS(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_AS_ Member)
+#define JSONCONS_RENAME_AS_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_AS_ Member)
+#define JSONCONS_RENAME_AS_(Member, Name) if (j.contains(Name)) {val.Member = j.at(Name).template as<decltype(val.Member)>();}
 
 #define JSONCONS_RENAME_MEMBER_TRAITS_DECL_BASE(CharT,Prefix,NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
