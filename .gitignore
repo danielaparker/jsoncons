@@ -1,3 +1,5 @@
+**/.vs
+*.sln
 *.suo
 *.sdf
 *.VC.opendb
