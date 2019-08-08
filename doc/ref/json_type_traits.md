@@ -48,7 +48,7 @@ for a user-defined class.
 - `JSONCONS_MEMBER_TRAITS_DECL`(class_name,member_name1,member_name2,...)
 - `JSONCONS_STRICT_MEMBER_TRAITS_DECL`(class_name,member_name1,member_name2,...)
 - `JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL`(num_template_params,class_name,member_name1,member_name2,...)
-- `JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL`(num_template_params,class_name,member_name1,member_name2,...)
+- `JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_DECL`(num_template_params,class_name,member_name1,member_name2,...)
 
 - `JSONCONS_GETTER_CTOR_TRAITS_DECL`(class_name,getter_name1,getter_name2,...) 
 
@@ -66,7 +66,7 @@ to be present in the JSON.
 `JSONCONS_GETTER_CTOR_TRAITS_DECL` generates the code to specialize `json_type_traits` from the getter functions 
 and a constructor. When decoding to a C++ data strucure, all data members in the C++ object must be present in the JSON.
 
-`JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL`, `JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL` and `JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL`
+`JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL`, `JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_DECL` and `JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL`
 are for specializing `json_type_traits` for template types. The parameter `num_template_params` gives the number of template parameters. 
 
 `JSONCONS_ENUM_TRAITS_DECL` allows you to encode and decode an enum type as a string.

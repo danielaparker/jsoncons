@@ -154,7 +154,7 @@ JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::book3, author, title, price)
 JSONCONS_MEMBER_TRAITS_DECL(ns::book,author,title,price)
 JSONCONS_MEMBER_TRAITS_DECL(ns::book2,author,title,price,isbn)
 JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(1,ns::MyStruct,typeContent,someString)
-JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL(1,ns::MyStruct2,typeContent,someString)
+JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_DECL(1,ns::MyStruct2,typeContent,someString)
 JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL(1,ns::MyStruct3,typeContent,someString)
 JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
 

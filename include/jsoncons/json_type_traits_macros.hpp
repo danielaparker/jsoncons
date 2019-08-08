@@ -225,7 +225,7 @@ namespace jsoncons \
     JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_MAND_AS,wchar_t,L,0,ValueType,__VA_ARGS__) \
   /**/
 
-#define JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
+#define JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
     JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_MAND_AS,char,,NumTemplateParams,ValueType,__VA_ARGS__) \
     JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_MAND_AS,wchar_t,L,NumTemplateParams,ValueType,__VA_ARGS__) \
   /**/
@@ -373,6 +373,7 @@ namespace jsoncons \
 #if !defined(JSONCONS_NO_DEPRECATED)
 #define JSONCONS_TYPE_TRAITS_DECL JSONCONS_MEMBER_TRAITS_DECL
 #define JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL JSONCONS_STRICT_MEMBER_TRAITS_DECL
+#define JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_DECL
 #endif
 
 #define JSONCONS_RENAME_IS(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_IS_ Member)
@@ -387,7 +388,11 @@ namespace jsoncons \
 #define JSONCONS_RENAME_AS_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_AS_ Member)
 #define JSONCONS_RENAME_AS_(Member, Name) if (j.contains(Name)) {val.Member = j.at(Name).template as<decltype(val.Member)>();}
 
-#define JSONCONS_RENAME_MEMBER_TRAITS_DECL_BASE(NumTemplateParams, ValueType, ...)  \
+#define JSONCONS_MAND_RENAME_AS(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_MAND_RENAME_AS_ Member)
+#define JSONCONS_MAND_RENAME_AS_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_MAND_RENAME_AS_ Member)
+#define JSONCONS_MAND_RENAME_AS_(Member, Name) {val.Member = j.at(Name).template as<decltype(val.Member)>();}
+
+#define JSONCONS_RENAME_MEMBER_TRAITS_DECL_BASE(As, NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
 { \
     template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, NumTemplateParams)> \
@@ -404,7 +409,7 @@ namespace jsoncons \
         static value_type as(const Json& j) \
         { \
             value_type val{}; \
-            JSONCONS_REP_N(JSONCONS_RENAME_AS, 0, j, val,, __VA_ARGS__) \
+            JSONCONS_REP_N(As, 0, j, val,, __VA_ARGS__) \
             return val; \
         } \
         static Json to_json(const value_type& val, allocator_type allocator=allocator_type()) \
@@ -419,11 +424,19 @@ namespace jsoncons \
 
 
 #define JSONCONS_RENAME_MEMBER_TRAITS_DECL(ValueType, ...)  \
-    JSONCONS_RENAME_MEMBER_TRAITS_DECL_BASE(0, ValueType, __VA_ARGS__) \
+    JSONCONS_RENAME_MEMBER_TRAITS_DECL_BASE(JSONCONS_RENAME_AS, 0, ValueType, __VA_ARGS__) \
   /**/
 
 #define JSONCONS_TEMPLATE_RENAME_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
-    JSONCONS_RENAME_MEMBER_TRAITS_DECL_BASE(NumTemplateParams, ValueType, __VA_ARGS__) \
+    JSONCONS_RENAME_MEMBER_TRAITS_DECL_BASE(JSONCONS_RENAME_AS, NumTemplateParams, ValueType, __VA_ARGS__) \
+  /**/
+
+#define JSONCONS_STRICT_RENAME_MEMBER_TRAITS_DECL(ValueType, ...)  \
+    JSONCONS_RENAME_MEMBER_TRAITS_DECL_BASE(JSONCONS_MAND_RENAME_AS, 0, ValueType, __VA_ARGS__) \
+  /**/
+
+#define JSONCONS_STRICT_TEMPLATE_RENAME_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
+    JSONCONS_RENAME_MEMBER_TRAITS_DECL_BASE(JSONCONS_MAND_RENAME_AS, NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
 
 

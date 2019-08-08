@@ -17,14 +17,36 @@ using namespace jsoncons;
 
 namespace json_type_traits_rename_macro_tests
 {
-
     struct book
     {
         std::string author;
         std::string title;
         double price;
 
+        book()
+            : author(""), title(""), price(0)
+        {
+        }
+
+        book(const std::string& author, const std::string& title, double price)
+            : author(author), title(title), price(price)
+        {
+        }
+
         friend std::ostream& operator<<(std::ostream& os, const book& b)
+        {
+            std::cout << "author: " << b.author << ", title: " << b.title << ", price: " << b.price << "\n";
+            return os;
+        }
+    };
+
+    struct book_without_defaults
+    {
+        std::string author;
+        std::string title;
+        double price;
+
+        friend std::ostream& operator<<(std::ostream& os, const book_without_defaults& b)
         {
             std::cout << "author: " << b.author << ", title: " << b.title << ", price: " << b.price << "\n";
             return os;
@@ -49,6 +71,7 @@ namespace json_type_traits_rename_macro_tests
 namespace ns = json_type_traits_rename_macro_tests;
 
 JSONCONS_RENAME_MEMBER_TRAITS_DECL(ns::book,(author,"Author"),(title,"Title"),(price,"Price"))
+JSONCONS_STRICT_RENAME_MEMBER_TRAITS_DECL(ns::book_without_defaults,(author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_TEMPLATE_RENAME_MEMBER_TRAITS_DECL(1,ns::TemplatedStruct1,(typeContent,"type-content"),(someString,"some-string"))
 JSONCONS_TEMPLATE_RENAME_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct2,(aT1,"a-t1"),(aT2,"a-t2"))
 
@@ -79,6 +102,40 @@ TEST_CASE("JSONCONS_RENAME_MEMBER_TRAITS_DECL tests")
         CHECK(j == j2);
 
         ns::book val = j.as<ns::book>();
+
+        CHECK(val.author == book.author);
+        CHECK(val.title == book.title);
+        CHECK(val.price == Approx(book.price).epsilon(0.001));
+    }
+} 
+
+TEST_CASE("JSONCONS_STRICT_RENAME_MEMBER_TRAITS_DECL tests")
+{
+    std::string an_author = "Haruki Murakami"; 
+    std::string a_title = "Kafka on the Shore";
+    double a_price = 25.17;
+
+    ns::book_without_defaults book{an_author, a_title, a_price};
+
+    SECTION("book")
+    {
+        std::string s;
+
+        encode_json(book, s);
+
+        json j = decode_json<json>(s);
+
+        REQUIRE(j.is<ns::book_without_defaults>() == true);
+
+        CHECK(j["Author"].as<std::string>() == an_author);
+        CHECK(j["Title"].as<std::string>() == a_title);
+        CHECK(j["Price"].as<double>() == Approx(a_price).epsilon(0.001));
+
+        json j2(book);
+
+        CHECK(j == j2);
+
+        ns::book_without_defaults val = j.as<ns::book_without_defaults>();
 
         CHECK(val.author == book.author);
         CHECK(val.title == book.title);
@@ -136,5 +193,6 @@ TEST_CASE("JSONCONS_TEMPLATE_RENAME_MEMBER_TRAITS_DECL tests")
 
         //std::cout << val.typeContent.first << ", " << val.typeContent.second << ", " << val.someString << "\n";
     }
+   
 }
 
