@@ -91,26 +91,26 @@
 #define JSONCONS_REP_OF_2(Call, TC, JVal, TVal, Prefix, P2, ...)     JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_1(Call, TC, JVal, TVal, Prefix, __VA_ARGS__)) 
 #define JSONCONS_REP_OF_1(Call, TC, JVal, TVal, Prefix, P2)          JSONCONS_EXPAND(Call ## _LAST(TC, JVal, TVal, Prefix, P2))
 
-#define JSONCONS_IS(TC, JVal, TVal, Prefix, Member) if (!j.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
-#define JSONCONS_IS_LAST(TC, JVal, TVal, Prefix, Member) if (!j.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+#define JSONCONS_IS(TC, JVal, TVal, Prefix, Member) if (!ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+#define JSONCONS_IS_LAST(TC, JVal, TVal, Prefix, Member) if (!ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
 
-#define JSONCONS_TO_JSON(TC, JVal, TVal, Prefix, Member) j.try_emplace(JSONCONS_QUOTE(Prefix, Member), val.Member);
-#define JSONCONS_TO_JSON_LAST(TC, JVal, TVal, Prefix, Member) j.try_emplace(JSONCONS_QUOTE(Prefix, Member), val.Member);
+#define JSONCONS_TO_JSON(TC, JVal, TVal, Prefix, Member) ajson.try_emplace(JSONCONS_QUOTE(Prefix, Member), aval.Member);
+#define JSONCONS_TO_JSON_LAST(TC, JVal, TVal, Prefix, Member) ajson.try_emplace(JSONCONS_QUOTE(Prefix, Member), aval.Member);
 
-#define JSONCONS_AS(TC, JVal, TVal, Prefix, Member) if (j.contains(JSONCONS_QUOTE(Prefix, Member))) {val.Member = j.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(val.Member)>();}
-#define JSONCONS_AS_LAST(TC, JVal, TVal, Prefix, Member) if (j.contains(JSONCONS_QUOTE(Prefix, Member))) {val.Member = j.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(val.Member)>();}
+#define JSONCONS_AS(TC, JVal, TVal, Prefix, Member) if (ajson.contains(JSONCONS_QUOTE(Prefix, Member))) {aval.Member = ajson.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(aval.Member)>();}
+#define JSONCONS_AS_LAST(TC, JVal, TVal, Prefix, Member) if (ajson.contains(JSONCONS_QUOTE(Prefix, Member))) {aval.Member = ajson.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(aval.Member)>();}
 
-#define JSONCONS_MAND_AS(TC, JVal, TVal, Prefix, Member) {val.Member = j.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(val.Member)>();}
-#define JSONCONS_MAND_AS_LAST(TC, JVal, TVal, Prefix, Member) {val.Member = j.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(val.Member)>();}
+#define JSONCONS_MAND_AS(TC, JVal, TVal, Prefix, Member) {aval.Member = ajson.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(aval.Member)>();}
+#define JSONCONS_MAND_AS_LAST(TC, JVal, TVal, Prefix, Member) {aval.Member = ajson.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(aval.Member)>();}
  
-#define JSONCONS_IS2(TC, JVal, TVal, Prefix, Member) if (!j.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
-#define JSONCONS_IS2_LAST(TC, JVal, TVal, Prefix, Member) if (!j.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+#define JSONCONS_IS2(TC, JVal, TVal, Prefix, Member) if (!ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+#define JSONCONS_IS2_LAST(TC, JVal, TVal, Prefix, Member) if (!ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
 
-#define JSONCONS_TO_JSON2(TC, JVal, TVal, Prefix, Member) j.try_emplace(JSONCONS_QUOTE(Prefix, Member), val.Member() );
-#define JSONCONS_TO_JSON2_LAST(TC, JVal, TVal, Prefix, Member) j.try_emplace(JSONCONS_QUOTE(Prefix, Member), val.Member() );
+#define JSONCONS_TO_JSON2(TC, JVal, TVal, Prefix, Member) ajson.try_emplace(JSONCONS_QUOTE(Prefix, Member), aval.Member() );
+#define JSONCONS_TO_JSON2_LAST(TC, JVal, TVal, Prefix, Member) ajson.try_emplace(JSONCONS_QUOTE(Prefix, Member), aval.Member() );
 
-#define JSONCONS_AS2(TC, JVal, TVal, Prefix, Member) (j.at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>(),
-#define JSONCONS_AS2_LAST(TC, JVal, TVal, Prefix, Member) (j.at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()
+#define JSONCONS_AS2(TC, JVal, TVal, Prefix, Member) (ajson.at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>(),
+#define JSONCONS_AS2_LAST(TC, JVal, TVal, Prefix, Member) (ajson.at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()
 
 #define JSONCONS_TYPE_TRAITS_FRIEND \
     template <class JSON,class T,class Enable> \
@@ -187,23 +187,23 @@ namespace jsoncons \
     { \
         typedef ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams) value_type; \
         typedef typename Json::allocator_type allocator_type; \
-        static bool is(const Json& j) noexcept \
+        static bool is(const Json& ajson) noexcept \
         { \
-            if (!j.is_object()) return false; \
-            JSONCONS_REP_N(JSONCONS_IS, 0, j, void(), Prefix, __VA_ARGS__)\
+            if (!ajson.is_object()) return false; \
+            JSONCONS_REP_N(JSONCONS_IS, 0, ajson, void(), Prefix, __VA_ARGS__)\
             return true; \
         } \
-        static value_type as(const Json& j) \
+        static value_type as(const Json& ajson) \
         { \
-            value_type val{}; \
-            JSONCONS_REP_N(As, 0, j, val, Prefix, __VA_ARGS__) \
-            return val; \
+            value_type aval{}; \
+            JSONCONS_REP_N(As, 0, ajson, aval, Prefix, __VA_ARGS__) \
+            return aval; \
         } \
-        static Json to_json(const value_type& val, allocator_type allocator=allocator_type()) \
+        static Json to_json(const value_type& aval, allocator_type allocator=allocator_type()) \
         { \
-            Json j(allocator); \
-            JSONCONS_REP_N(JSONCONS_TO_JSON, 0, j, val, Prefix, __VA_ARGS__) \
-            return j; \
+            Json ajson(allocator); \
+            JSONCONS_REP_N(JSONCONS_TO_JSON, 0, ajson, aval, Prefix, __VA_ARGS__) \
+            return ajson; \
         } \
     }; \
 } \
@@ -238,21 +238,21 @@ namespace jsoncons \
     { \
         typedef ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams) value_type; \
         typedef typename Json::allocator_type allocator_type; \
-        static bool is(const Json& j) noexcept \
+        static bool is(const Json& ajson) noexcept \
         { \
-            if (!j.is_object()) return false; \
-            JSONCONS_REP_N(JSONCONS_IS2, 0, j, void(), Prefix, __VA_ARGS__)\
+            if (!ajson.is_object()) return false; \
+            JSONCONS_REP_N(JSONCONS_IS2, 0, ajson, void(), Prefix, __VA_ARGS__)\
             return true; \
         } \
-        static value_type as(const Json& j) \
+        static value_type as(const Json& ajson) \
         { \
-            return value_type ( JSONCONS_REP_N(JSONCONS_AS2, 0, j, void(), Prefix, __VA_ARGS__) ); \
+            return value_type ( JSONCONS_REP_N(JSONCONS_AS2, 0, ajson, void(), Prefix, __VA_ARGS__) ); \
         } \
-        static Json to_json(const value_type& val, allocator_type allocator=allocator_type()) \
+        static Json to_json(const value_type& aval, allocator_type allocator=allocator_type()) \
         { \
-            Json j(allocator); \
-            JSONCONS_REP_N(JSONCONS_TO_JSON2, 0, j, val, Prefix, __VA_ARGS__) \
-            return j; \
+            Json ajson(allocator); \
+            JSONCONS_REP_N(JSONCONS_TO_JSON2, 0, ajson, aval, Prefix, __VA_ARGS__) \
+            return ajson; \
         } \
     }; \
 } \
@@ -292,12 +292,12 @@ namespace jsoncons \
             return std::make_pair(v,v+JSONCONS_NARGS(__VA_ARGS__)); \
         } \
         \
-        static bool is(const Json& j) noexcept \
+        static bool is(const Json& ajson) noexcept \
         { \
-            if (!j.is_string()) return false; \
+            if (!ajson.is_string()) return false; \
             auto first = get_values().first; \
             auto last = get_values().second; \
-            const string_view_type s = j.template as<string_view_type>(); \
+            const string_view_type s = ajson.template as<string_view_type>(); \
             if (s.empty() && std::find_if(first, last, \
                                           [](const mapped_type& item) -> bool \
                                           { return item.first == value_type(); }) == last) \
@@ -309,13 +309,13 @@ namespace jsoncons \
                                    { return item.second == s; }); \
             return it != last; \
         } \
-        static value_type as(const Json& j) \
+        static value_type as(const Json& ajson) \
         { \
-            if (!j.is_string()) \
+            if (!ajson.is_string()) \
             { \
                 JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
             } \
-            const string_view_type s = j.template as<string_view_type>(); \
+            const string_view_type s = ajson.template as<string_view_type>(); \
             auto first = get_values().first; \
             auto last = get_values().second; \
             if (s.empty() && std::find_if(first, last, \
@@ -340,17 +340,17 @@ namespace jsoncons \
             } \
             return it->first; \
         } \
-        static Json to_json(value_type val, allocator_type allocator=allocator_type()) \
+        static Json to_json(value_type aval, allocator_type allocator=allocator_type()) \
         { \
             static constexpr CharT empty_string[] = {0}; \
             auto first = get_values().first; \
             auto last = get_values().second; \
             auto it = std::find_if(first, last, \
-                                   [val](const mapped_type& item) -> bool \
-                                   { return item.first == val; }); \
+                                   [aval](const mapped_type& item) -> bool \
+                                   { return item.first == aval; }); \
             if (it == last) \
             { \
-                if (val == value_type()) \
+                if (aval == value_type()) \
                 { \
                     return Json(empty_string); \
                 } \
@@ -378,19 +378,19 @@ namespace jsoncons \
 
 #define JSONCONS_RENAME_IS(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_IS_ Member)
 #define JSONCONS_RENAME_IS_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_IS_ Member)
-#define JSONCONS_RENAME_IS_(Member, Name) if (!j.contains(Name)) return false;
+#define JSONCONS_RENAME_IS_(Member, Name) if (!ajson.contains(Name)) return false;
 
 #define JSONCONS_RENAME_TO_JSON(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_TO_ Member)
 #define JSONCONS_RENAME_TO_JSON_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_TO_ Member)
-#define JSONCONS_RENAME_TO_(Member, Name) j.try_emplace(Name, val.Member);
+#define JSONCONS_RENAME_TO_(Member, Name) ajson.try_emplace(Name, aval.Member);
 
 #define JSONCONS_RENAME_AS(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_AS_ Member)
 #define JSONCONS_RENAME_AS_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_AS_ Member)
-#define JSONCONS_RENAME_AS_(Member, Name) if (j.contains(Name)) {val.Member = j.at(Name).template as<decltype(val.Member)>();}
+#define JSONCONS_RENAME_AS_(Member, Name) if (ajson.contains(Name)) {aval.Member = ajson.at(Name).template as<decltype(aval.Member)>();}
 
 #define JSONCONS_MAND_RENAME_AS(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_MAND_RENAME_AS_ Member)
 #define JSONCONS_MAND_RENAME_AS_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_MAND_RENAME_AS_ Member)
-#define JSONCONS_MAND_RENAME_AS_(Member, Name) {val.Member = j.at(Name).template as<decltype(val.Member)>();}
+#define JSONCONS_MAND_RENAME_AS_(Member, Name) {aval.Member = ajson.at(Name).template as<decltype(aval.Member)>();}
 
 #define JSONCONS_RENAME_MEMBER_TRAITS_DECL_BASE(As, NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
@@ -400,23 +400,23 @@ namespace jsoncons \
     { \
         typedef ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams) value_type; \
         typedef typename Json::allocator_type allocator_type; \
-        static bool is(const Json& j) noexcept \
+        static bool is(const Json& ajson) noexcept \
         { \
-            if (!j.is_object()) return false; \
-            JSONCONS_REP_N(JSONCONS_RENAME_IS, 0, j, void(),, __VA_ARGS__)\
+            if (!ajson.is_object()) return false; \
+            JSONCONS_REP_N(JSONCONS_RENAME_IS, 0, ajson, void(),, __VA_ARGS__)\
             return true; \
         } \
-        static value_type as(const Json& j) \
+        static value_type as(const Json& ajson) \
         { \
-            value_type val{}; \
-            JSONCONS_REP_N(As, 0, j, val,, __VA_ARGS__) \
-            return val; \
+            value_type aval{}; \
+            JSONCONS_REP_N(As, 0, ajson, aval,, __VA_ARGS__) \
+            return aval; \
         } \
-        static Json to_json(const value_type& val, allocator_type allocator=allocator_type()) \
+        static Json to_json(const value_type& aval, allocator_type allocator=allocator_type()) \
         { \
-            Json j(allocator); \
-            JSONCONS_REP_N(JSONCONS_RENAME_TO_JSON, 0, j, val,, __VA_ARGS__) \
-            return j; \
+            Json ajson(allocator); \
+            JSONCONS_REP_N(JSONCONS_RENAME_TO_JSON, 0, ajson, aval,, __VA_ARGS__) \
+            return ajson; \
         } \
     }; \
 } \
@@ -466,12 +466,12 @@ namespace jsoncons \
             return std::make_pair(v,v+JSONCONS_NARGS(__VA_ARGS__)); \
         } \
         \
-        static bool is(const Json& j) noexcept \
+        static bool is(const Json& ajson) noexcept \
         { \
-            if (!j.is_string()) return false; \
+            if (!ajson.is_string()) return false; \
             auto first = get_values().first; \
             auto last = get_values().second; \
-            const string_view_type s = j.template as<string_view_type>(); \
+            const string_view_type s = ajson.template as<string_view_type>(); \
             if (s.empty() && std::find_if(first, last, \
                                           [](const mapped_type& item) -> bool \
                                           { return item.first == value_type(); }) == last) \
@@ -483,13 +483,13 @@ namespace jsoncons \
                                    { return item.second == s; }); \
             return it != last; \
         } \
-        static value_type as(const Json& j) \
+        static value_type as(const Json& ajson) \
         { \
-            if (!j.is_string()) \
+            if (!ajson.is_string()) \
             { \
                 JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
             } \
-            const string_view_type s = j.template as<string_view_type>(); \
+            const string_view_type s = ajson.template as<string_view_type>(); \
             auto first = get_values().first; \
             auto last = get_values().second; \
             if (s.empty() && std::find_if(first, last, \
@@ -514,17 +514,17 @@ namespace jsoncons \
             } \
             return it->first; \
         } \
-        static Json to_json(value_type val, allocator_type allocator=allocator_type()) \
+        static Json to_json(value_type aval, allocator_type allocator=allocator_type()) \
         { \
             static constexpr char_type empty_string[] = {0}; \
             auto first = get_values().first; \
             auto last = get_values().second; \
             auto it = std::find_if(first, last, \
-                                   [val](const mapped_type& item) -> bool \
-                                   { return item.first == val; }); \
+                                   [aval](const mapped_type& item) -> bool \
+                                   { return item.first == aval; }); \
             if (it == last) \
             { \
-                if (val == value_type()) \
+                if (aval == value_type()) \
                 { \
                     return Json(empty_string); \
                 } \
@@ -542,15 +542,15 @@ namespace jsoncons \
  
 #define JSONCONS_RENAME_IS2(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_IS2_ Member)
 #define JSONCONS_RENAME_IS2_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_IS2_ Member)
-#define JSONCONS_RENAME_IS2_(Member, Name) if (!j.contains(Name)) return false;
+#define JSONCONS_RENAME_IS2_(Member, Name) if (!ajson.contains(Name)) return false;
 
 #define JSONCONS_RENAME_TO_JSON2(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_TO_JSON2_ Member)
 #define JSONCONS_RENAME_TO_JSON2_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_TO_JSON2_ Member)
-#define JSONCONS_RENAME_TO_JSON2_(Member, Name) j.try_emplace(Name, val.Member() );
+#define JSONCONS_RENAME_TO_JSON2_(Member, Name) ajson.try_emplace(Name, aval.Member() );
 
 #define JSONCONS_RENAME_AS2(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_AS2_ Member),
 #define JSONCONS_RENAME_AS2_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_AS2_ Member)
-#define JSONCONS_RENAME_AS2_(Member, Name) (j.at(Name)).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()
+#define JSONCONS_RENAME_AS2_(Member, Name) (ajson.at(Name)).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()
  
 #define JSONCONS_RENAME_GETTER_CTOR_TRAITS_DECL_BASE(NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
@@ -560,21 +560,21 @@ namespace jsoncons \
     { \
         typedef ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams) value_type; \
         typedef typename Json::allocator_type allocator_type; \
-        static bool is(const Json& j) noexcept \
+        static bool is(const Json& ajson) noexcept \
         { \
-            if (!j.is_object()) return false; \
-            JSONCONS_REP_N(JSONCONS_RENAME_IS2, 0, j, void(),, __VA_ARGS__)\
+            if (!ajson.is_object()) return false; \
+            JSONCONS_REP_N(JSONCONS_RENAME_IS2, 0, ajson, void(),, __VA_ARGS__)\
             return true; \
         } \
-        static value_type as(const Json& j) \
+        static value_type as(const Json& ajson) \
         { \
-            return value_type ( JSONCONS_REP_N(JSONCONS_RENAME_AS2, 0, j, void(),, __VA_ARGS__) ); \
+            return value_type ( JSONCONS_REP_N(JSONCONS_RENAME_AS2, 0, ajson, void(),, __VA_ARGS__) ); \
         } \
-        static Json to_json(const value_type& val, allocator_type allocator=allocator_type()) \
+        static Json to_json(const value_type& aval, allocator_type allocator=allocator_type()) \
         { \
-            Json j(allocator); \
-            JSONCONS_REP_N(JSONCONS_RENAME_TO_JSON2, 0, j, val,, __VA_ARGS__) \
-            return j; \
+            Json ajson(allocator); \
+            JSONCONS_REP_N(JSONCONS_RENAME_TO_JSON2, 0, ajson, aval,, __VA_ARGS__) \
+            return ajson; \
         } \
     }; \
 } \
