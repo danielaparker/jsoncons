@@ -53,6 +53,40 @@ namespace json_type_traits_rename_macro_tests
         }
     };
 
+    class book_with_getters
+    {
+        std::string author_;
+        std::string title_;
+        double price_;
+    public:
+        book_with_getters(const std::string& author,
+              const std::string& title,
+              double price)
+            : author_(author), title_(title), price_(price)
+        {
+        }
+
+        book_with_getters(const book_with_getters&) = default;
+        book_with_getters(book_with_getters&&) = default;
+        book_with_getters& operator=(const book_with_getters&) = default;
+        book_with_getters& operator=(book_with_getters&&) = default;
+
+        const std::string& author() const
+        {
+            return author_;
+        }
+
+        const std::string& title() const
+        {
+            return title_;
+        }
+
+        double price() const
+        {
+            return price_;
+        }
+    };
+
     template <typename T1>
     struct TemplatedStruct1
     {
@@ -74,6 +108,7 @@ namespace ns = json_type_traits_rename_macro_tests;
 
 JSONCONS_RENAME_MEMBER_TRAITS_DECL(ns::book,(author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_STRICT_RENAME_MEMBER_TRAITS_DECL(ns::book_without_defaults,(author,"Author"),(title,"Title"),(price,"Price"))
+JSONCONS_RENAME_GETTER_CTOR_TRAITS_DECL(ns::book_with_getters, (author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_TEMPLATE_RENAME_MEMBER_TRAITS_DECL(1,ns::TemplatedStruct1,(typeContent,"type-content"),(someString,"some-string"))
 JSONCONS_TEMPLATE_RENAME_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct2,(aT1,"a-t1"),(aT2,"a-t2"))
 JSONCONS_RENAME_ENUM_TRAITS_DECL(ns::float_format, (scientific,"Exponential"), (fixed,"Fixed"), (hex,"Hex"), (general,"General"))
@@ -225,6 +260,48 @@ TEST_CASE("JSONCONS_RENAME_ENUM_TRAITS_DECL tests")
 
         auto val2 = decode_json<ns::float_format>(s);
         CHECK(val2 == val);
+    }
+}
+
+TEST_CASE("JSONCONS_RENAME_GETTER_CTOR_TRAITS_DECL tests")
+{
+    std::string an_author = "Haruki Murakami"; 
+    std::string a_title = "Kafka on the Shore";
+    double a_price = 25.17;
+
+    SECTION("is")
+    {
+        json j;
+        j["Author"] = an_author;
+        j["Title"] = a_title;
+        j["Price"] = a_price;
+
+        bool val = j.is<ns::book_with_getters>();
+        CHECK(val);
+    }
+    SECTION("to_json")
+    {
+        ns::book_with_getters book(an_author,a_title,a_price);
+
+        json j(book);
+
+        CHECK(j["Author"].as<std::string>() == an_author);
+        CHECK(j["Title"].as<std::string>() == a_title);
+        CHECK(j["Price"].as<double>() == Approx(a_price).epsilon(0.001));
+    }
+
+    SECTION("as")
+    {
+        json j;
+        j["Author"] = an_author;
+        j["Title"] = a_title;
+        j["Price"] = a_price;
+
+        ns::book_with_getters book = j.as<ns::book_with_getters>();
+
+        CHECK(book.author() == an_author);
+        CHECK(book.title() == a_title);
+        CHECK(book.price() == Approx(a_price).epsilon(0.001));
     }
 }
 

@@ -540,41 +540,52 @@ namespace jsoncons \
     /**/
  
  
-#define JSONCONS_RENAME_IS2(TC, JVal, TVal, Prefix, Member) if (!(JVal).contains(JSONCONS_QUOTE(Prefix, Member))) return false;
-#define JSONCONS_RENAME_IS2_LAST(TC, JVal, TVal, Prefix, Member) if (!(JVal).contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+#define JSONCONS_RENAME_IS2(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_IS2_ Member)
+#define JSONCONS_RENAME_IS2_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_IS2_ Member)
+#define JSONCONS_RENAME_IS2_(Member, Name) if (!j.contains(Name)) return false;
 
-#define JSONCONS_RENAME_TO_JSON2(TC, JVal, TVal, Prefix, Member) (JVal).try_emplace(JSONCONS_QUOTE(Prefix, Member), TVal.Member() );
-#define JSONCONS_RENAME_TO_JSON2_LAST(TC, JVal, TVal, Prefix, Member) (JVal).try_emplace(JSONCONS_QUOTE(Prefix, Member), TVal.Member() );
+#define JSONCONS_RENAME_TO_JSON2(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_TO_JSON2_ Member)
+#define JSONCONS_RENAME_TO_JSON2_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_TO_JSON2_ Member)
+#define JSONCONS_RENAME_TO_JSON2_(Member, Name) j.try_emplace(Name, val.Member() );
 
-#define JSONCONS_RENAME_AS2(TC, JVal, TVal, Prefix, Member) ((JVal).at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>(),
-#define JSONCONS_RENAME_AS2_LAST(TC, JVal, TVal, Prefix, Member) ((JVal).at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()
+#define JSONCONS_RENAME_AS2(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_AS2_ Member),
+#define JSONCONS_RENAME_AS2_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_AS2_ Member)
+#define JSONCONS_RENAME_AS2_(Member, Name) (j.at(Name)).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()
  
- #define JSONCONS_RENAME_GETTER_CTOR_TRAITS_DECL_BASE(CharT,Prefix,NumTemplateParams, ValueType, ...)  \
+#define JSONCONS_RENAME_GETTER_CTOR_TRAITS_DECL_BASE(NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
 { \
     template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, NumTemplateParams)> \
-    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams), typename std::enable_if<std::is_same<typename Json::char_type,CharT>::value>::type> \
+    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams)> \
     { \
         typedef ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams) value_type; \
         typedef typename Json::allocator_type allocator_type; \
         static bool is(const Json& j) noexcept \
         { \
             if (!j.is_object()) return false; \
-            JSONCONS_REP_N(JSONCONS_RENAME_IS2, 0, j, void(), Prefix, __VA_ARGS__)\
+            JSONCONS_REP_N(JSONCONS_RENAME_IS2, 0, j, void(),, __VA_ARGS__)\
             return true; \
         } \
         static value_type as(const Json& j) \
         { \
-            return value_type ( JSONCONS_REP_N(JSONCONS_RENAME_AS2, 0, j, void(), Prefix, __VA_ARGS__) ); \
+            return value_type ( JSONCONS_REP_N(JSONCONS_RENAME_AS2, 0, j, void(),, __VA_ARGS__) ); \
         } \
         static Json to_json(const value_type& val, allocator_type allocator=allocator_type()) \
         { \
             Json j(allocator); \
-            JSONCONS_REP_N(JSONCONS_RENAME_TO_JSON2, 0, j, val, Prefix, __VA_ARGS__) \
+            JSONCONS_REP_N(JSONCONS_RENAME_TO_JSON2, 0, j, val,, __VA_ARGS__) \
             return j; \
         } \
     }; \
 } \
+  /**/
+ 
+#define JSONCONS_RENAME_GETTER_CTOR_TRAITS_DECL(ValueType, ...)  \
+JSONCONS_RENAME_GETTER_CTOR_TRAITS_DECL_BASE(0, ValueType, __VA_ARGS__) \
+  /**/
+ 
+#define JSONCONS_TEMPLATE_RENAME_GETTER_CTOR_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
+JSONCONS_RENAME_GETTER_CTOR_TRAITS_DECL_BASE(NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
 
 #endif
