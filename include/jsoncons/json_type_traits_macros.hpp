@@ -91,26 +91,26 @@
 #define JSONCONS_REP_OF_2(Call, TC, JVal, TVal, Prefix, P2, ...)     JSONCONS_EXPAND_CALL4(Call, TC, JVal, TVal, Prefix, P2) JSONCONS_EXPAND(JSONCONS_REP_OF_1(Call, TC, JVal, TVal, Prefix, __VA_ARGS__)) 
 #define JSONCONS_REP_OF_1(Call, TC, JVal, TVal, Prefix, P2)          JSONCONS_EXPAND(Call ## _LAST(TC, JVal, TVal, Prefix, P2))
 
-#define JSONCONS_IS(TC, JVal, TVal, Prefix, Member) if (!(JVal).contains(JSONCONS_QUOTE(Prefix, Member))) return false;
-#define JSONCONS_IS_LAST(TC, JVal, TVal, Prefix, Member) if (!(JVal).contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+#define JSONCONS_IS(TC, JVal, TVal, Prefix, Member) if (!j.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+#define JSONCONS_IS_LAST(TC, JVal, TVal, Prefix, Member) if (!j.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
 
-#define JSONCONS_TO_JSON(TC, JVal, TVal, Prefix, Member) (JVal).try_emplace(JSONCONS_QUOTE(Prefix, Member), TVal.Member);
-#define JSONCONS_TO_JSON_LAST(TC, JVal, TVal, Prefix, Member) (JVal).try_emplace(JSONCONS_QUOTE(Prefix, Member), TVal.Member);
+#define JSONCONS_TO_JSON(TC, JVal, TVal, Prefix, Member) j.try_emplace(JSONCONS_QUOTE(Prefix, Member), val.Member);
+#define JSONCONS_TO_JSON_LAST(TC, JVal, TVal, Prefix, Member) j.try_emplace(JSONCONS_QUOTE(Prefix, Member), val.Member);
 
-#define JSONCONS_AS(TC, JVal, TVal, Prefix, Member) if ((JVal).contains(JSONCONS_QUOTE(Prefix, Member))) {val.Member = (JVal).at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(TVal.Member)>();}
-#define JSONCONS_AS_LAST(TC, JVal, TVal, Prefix, Member) if ((JVal).contains(JSONCONS_QUOTE(Prefix, Member))) {val.Member = (JVal).at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(TVal.Member)>();}
+#define JSONCONS_AS(TC, JVal, TVal, Prefix, Member) if (j.contains(JSONCONS_QUOTE(Prefix, Member))) {val.Member = j.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(val.Member)>();}
+#define JSONCONS_AS_LAST(TC, JVal, TVal, Prefix, Member) if (j.contains(JSONCONS_QUOTE(Prefix, Member))) {val.Member = j.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(val.Member)>();}
 
-#define JSONCONS_MAND_AS(TC, JVal, TVal, Prefix, Member) {val.Member = (JVal).at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(TVal.Member)>();}
-#define JSONCONS_MAND_AS_LAST(TC, JVal, TVal, Prefix, Member) {val.Member = (JVal).at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(TVal.Member)>();}
+#define JSONCONS_MAND_AS(TC, JVal, TVal, Prefix, Member) {val.Member = j.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(val.Member)>();}
+#define JSONCONS_MAND_AS_LAST(TC, JVal, TVal, Prefix, Member) {val.Member = j.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(val.Member)>();}
  
-#define JSONCONS_IS2(TC, JVal, TVal, Prefix, Member) if (!(JVal).contains(JSONCONS_QUOTE(Prefix, Member))) return false;
-#define JSONCONS_IS2_LAST(TC, JVal, TVal, Prefix, Member) if (!(JVal).contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+#define JSONCONS_IS2(TC, JVal, TVal, Prefix, Member) if (!j.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+#define JSONCONS_IS2_LAST(TC, JVal, TVal, Prefix, Member) if (!j.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
 
-#define JSONCONS_TO_JSON2(TC, JVal, TVal, Prefix, Member) (JVal).try_emplace(JSONCONS_QUOTE(Prefix, Member), TVal.Member() );
-#define JSONCONS_TO_JSON2_LAST(TC, JVal, TVal, Prefix, Member) (JVal).try_emplace(JSONCONS_QUOTE(Prefix, Member), TVal.Member() );
+#define JSONCONS_TO_JSON2(TC, JVal, TVal, Prefix, Member) j.try_emplace(JSONCONS_QUOTE(Prefix, Member), val.Member() );
+#define JSONCONS_TO_JSON2_LAST(TC, JVal, TVal, Prefix, Member) j.try_emplace(JSONCONS_QUOTE(Prefix, Member), val.Member() );
 
-#define JSONCONS_AS2(TC, JVal, TVal, Prefix, Member) ((JVal).at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>(),
-#define JSONCONS_AS2_LAST(TC, JVal, TVal, Prefix, Member) ((JVal).at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()
+#define JSONCONS_AS2(TC, JVal, TVal, Prefix, Member) (j.at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>(),
+#define JSONCONS_AS2_LAST(TC, JVal, TVal, Prefix, Member) (j.at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()
 
 #define JSONCONS_TYPE_TRAITS_FRIEND \
     template <class JSON,class T,class Enable> \
