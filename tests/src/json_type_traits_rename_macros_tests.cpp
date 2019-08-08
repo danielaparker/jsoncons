@@ -66,6 +66,8 @@ namespace json_type_traits_rename_macro_tests
           T1 aT1;
           T2 aT2;
     };
+
+    enum class float_format {scientific = 1,fixed = 2,hex = 4,general = fixed | scientific};
 };
 
 namespace ns = json_type_traits_rename_macro_tests;
@@ -74,6 +76,7 @@ JSONCONS_RENAME_MEMBER_TRAITS_DECL(ns::book,(author,"Author"),(title,"Title"),(p
 JSONCONS_STRICT_RENAME_MEMBER_TRAITS_DECL(ns::book_without_defaults,(author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_TEMPLATE_RENAME_MEMBER_TRAITS_DECL(1,ns::TemplatedStruct1,(typeContent,"type-content"),(someString,"some-string"))
 JSONCONS_TEMPLATE_RENAME_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct2,(aT1,"a-t1"),(aT2,"a-t2"))
+JSONCONS_RENAME_ENUM_TRAITS_DECL(ns::float_format, (scientific,"Exponential"), (fixed,"Fixed"), (hex,"Hex"), (general,"General"))
 
 TEST_CASE("JSONCONS_RENAME_MEMBER_TRAITS_DECL tests")
 {
@@ -193,6 +196,35 @@ TEST_CASE("JSONCONS_TEMPLATE_RENAME_MEMBER_TRAITS_DECL tests")
 
         //std::cout << val.typeContent.first << ", " << val.typeContent.second << ", " << val.someString << "\n";
     }
-   
+}
+
+TEST_CASE("JSONCONS_RENAME_ENUM_TRAITS_DECL tests")
+{
+    SECTION("float_format default")
+    {
+        ns::float_format val{ns::float_format::hex};
+
+        std::string s;
+        encode_json(val,s);
+
+        json j = decode_json<json>(s);
+        CHECK(j.as<std::string>() == std::string("Hex"));
+
+        auto val2 = decode_json<ns::float_format>(s);
+        CHECK(val2 == val);
+    }
+    SECTION("float_format hex")
+    {
+        ns::float_format val{ns::float_format()};
+
+        std::string s;
+        encode_json(val,s);
+
+        json j = decode_json<json>(s);
+        CHECK(j.as<std::string>().empty());
+
+        auto val2 = decode_json<ns::float_format>(s);
+        CHECK(val2 == val);
+    }
 }
 

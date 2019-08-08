@@ -440,4 +440,104 @@ namespace jsoncons \
   /**/
 
 
+#define JSONCONS_RENAME_ENUM_PAIR(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_ENUM_PAIR_ Member)
+#define JSONCONS_RENAME_ENUM_PAIR_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_ENUM_PAIR_LAST_ Member)
+#define JSONCONS_RENAME_ENUM_PAIR_(Member, Name) {value_type::Member, Name},
+#define JSONCONS_RENAME_ENUM_PAIR_LAST_(Member, Name) {value_type::Member, Name}
+
+#define JSONCONS_RENAME_ENUM_TRAITS_DECL(EnumType, ...)  \
+namespace jsoncons \
+{ \
+    template<typename Json> \
+    struct json_type_traits<Json, EnumType> \
+    { \
+        typedef typename Json::char_type char_type; \
+        static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
+        typedef EnumType value_type; \
+        typedef std::basic_string<char_type> string_type; \
+        typedef basic_string_view<char_type> string_view_type; \
+        typedef typename Json::allocator_type allocator_type; \
+        typedef std::pair<EnumType,string_type> mapped_type; \
+        \
+        static std::pair<const mapped_type*,const mapped_type*> get_values() \
+        { \
+            static const mapped_type v[] = { \
+                JSONCONS_REP_N(JSONCONS_RENAME_ENUM_PAIR, 0, void(), void(),, __VA_ARGS__)\
+            };\
+            return std::make_pair(v,v+JSONCONS_NARGS(__VA_ARGS__)); \
+        } \
+        \
+        static bool is(const Json& j) noexcept \
+        { \
+            if (!j.is_string()) return false; \
+            auto first = get_values().first; \
+            auto last = get_values().second; \
+            const string_view_type s = j.template as<string_view_type>(); \
+            if (s.empty() && std::find_if(first, last, \
+                                          [](const mapped_type& item) -> bool \
+                                          { return item.first == value_type(); }) == last) \
+            { \
+                return true; \
+            } \
+            auto it = std::find_if(first, last, \
+                                   [&](const mapped_type& item) -> bool \
+                                   { return item.second == s; }); \
+            return it != last; \
+        } \
+        static value_type as(const Json& j) \
+        { \
+            if (!j.is_string()) \
+            { \
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
+            } \
+            const string_view_type s = j.template as<string_view_type>(); \
+            auto first = get_values().first; \
+            auto last = get_values().second; \
+            if (s.empty() && std::find_if(first, last, \
+                                          [](const mapped_type& item) -> bool \
+                                          { return item.first == value_type(); }) == last) \
+            { \
+                return value_type(); \
+            } \
+            auto it = std::find_if(first, last, \
+                                   [&](const mapped_type& item) -> bool \
+                                   { return item.second == s; }); \
+            if (it == last) \
+            { \
+                if (s.empty()) \
+                { \
+                    return value_type(); \
+                } \
+                else \
+                { \
+                    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
+                } \
+            } \
+            return it->first; \
+        } \
+        static Json to_json(value_type val, allocator_type allocator=allocator_type()) \
+        { \
+            static constexpr char_type empty_string[] = {0}; \
+            auto first = get_values().first; \
+            auto last = get_values().second; \
+            auto it = std::find_if(first, last, \
+                                   [val](const mapped_type& item) -> bool \
+                                   { return item.first == val; }); \
+            if (it == last) \
+            { \
+                if (val == value_type()) \
+                { \
+                    return Json(empty_string); \
+                } \
+                else \
+                { \
+                    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
+                } \
+            } \
+            return Json(it->second,allocator); \
+        } \
+    }; \
+} \
+    /**/
+
 #endif
