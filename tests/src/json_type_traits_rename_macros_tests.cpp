@@ -106,14 +106,14 @@ namespace json_type_traits_rename_macro_tests
 
 namespace ns = json_type_traits_rename_macro_tests;
 
-JSONCONS_RENAME_MEMBER_TRAITS_DECL(ns::book,(author,"Author"),(title,"Title"),(price,"Price"))
-JSONCONS_STRICT_RENAME_MEMBER_TRAITS_DECL(ns::book_without_defaults,(author,"Author"),(title,"Title"),(price,"Price"))
-JSONCONS_RENAME_GETTER_CTOR_TRAITS_DECL(ns::book_with_getters, (author,"Author"),(title,"Title"),(price,"Price"))
-JSONCONS_TEMPLATE_RENAME_MEMBER_TRAITS_DECL(1,ns::TemplatedStruct1,(typeContent,"type-content"),(someString,"some-string"))
-JSONCONS_TEMPLATE_RENAME_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct2,(aT1,"a-t1"),(aT2,"a-t2"))
-JSONCONS_RENAME_ENUM_TRAITS_DECL(ns::float_format, (scientific,"Exponential"), (fixed,"Fixed"), (hex,"Hex"), (general,"General"))
+JSONCONS_MEMBER_TRAITS_NAMED_DECL(ns::book,(author,"Author"),(title,"Title"),(price,"Price"))
+JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ns::book_without_defaults,(author,"Author"),(title,"Title"),(price,"Price"))
+JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL(ns::book_with_getters, (author,"Author"),(title,"Title"),(price,"Price"))
+JSONCONS_TEMPLATE_MEMBER_TRAITS_NAMED_DECL(1,ns::TemplatedStruct1,(typeContent,"type-content"),(someString,"some-string"))
+JSONCONS_TEMPLATE_MEMBER_TRAITS_NAMED_DECL(2,ns::TemplatedStruct2,(aT1,"a-t1"),(aT2,"a-t2"))
+JSONCONS_ENUM_TRAITS_NAMED_DECL(ns::float_format, (scientific,"Exponential"), (fixed,"Fixed"), (hex,"Hex"), (general,"General"))
 
-TEST_CASE("JSONCONS_RENAME_MEMBER_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_MEMBER_TRAITS_NAMED_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
@@ -147,7 +147,7 @@ TEST_CASE("JSONCONS_RENAME_MEMBER_TRAITS_DECL tests")
     }
 } 
 
-TEST_CASE("JSONCONS_STRICT_RENAME_MEMBER_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
@@ -181,7 +181,7 @@ TEST_CASE("JSONCONS_STRICT_RENAME_MEMBER_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_TEMPLATE_RENAME_MEMBER_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_TEMPLATE_MEMBER_TRAITS_NAMED_DECL tests")
 {
     SECTION("TemplatedStruct1<std::pair<int,int>>")
     {
@@ -233,7 +233,7 @@ TEST_CASE("JSONCONS_TEMPLATE_RENAME_MEMBER_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_RENAME_ENUM_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_ENUM_TRAITS_NAMED_DECL tests")
 {
     SECTION("float_format default")
     {
@@ -263,7 +263,7 @@ TEST_CASE("JSONCONS_RENAME_ENUM_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_RENAME_GETTER_CTOR_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";

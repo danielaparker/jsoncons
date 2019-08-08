@@ -47,14 +47,19 @@ for a user-defined class.
 
 - `JSONCONS_MEMBER_TRAITS_DECL`(class_name,member_name1,member_name2,...)
 - `JSONCONS_STRICT_MEMBER_TRAITS_DECL`(class_name,member_name1,member_name2,...)
+- `JSONCONS_MEMBER_TRAITS_NAMED_DECL`(class_name,member_name1,member_name2,...)
+- `JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL`(class_name,member_name1,member_name2,...)
+
 - `JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL`(num_template_params,class_name,member_name1,member_name2,...)
 - `JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_DECL`(num_template_params,class_name,member_name1,member_name2,...)
+- `JSONCONS_TEMPLATE_MEMBER_TRAITS_NAMED_DECL`(num_template_params,class_name,member_name1,member_name2,...)
+- `JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_NAMED_DECL`(num_template_params,class_name,member_name1,member_name2,...)
 
 - `JSONCONS_GETTER_CTOR_TRAITS_DECL`(class_name,getter_name1,getter_name2,...) 
-
-- `JSONCONS_GETTER_CTOR_TRAITS_DECL`(class_name,getter_name1,getter_name2,...) 
+- `JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL`(class_name,getter_name1,getter_name2,...) 
 
 - `JSONCONS_ENUM_TRAITS_DECL(enum_type_name,value1,value2,...)`
+- `JSONCONS_ENUM_TRAITS_NAMED_DECL(enum_type_name,value1,value2,...)`
 
 These macro declarations must be placed at global scope, outside any namespace blocks, and `class_name` must be a fully namespace qualified name.
 

@@ -392,7 +392,7 @@ namespace jsoncons \
 #define JSONCONS_MAND_RENAME_AS_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_MAND_RENAME_AS_ Member)
 #define JSONCONS_MAND_RENAME_AS_(Member, Name) {aval.Member = ajson.at(Name).template as<decltype(aval.Member)>();}
 
-#define JSONCONS_RENAME_MEMBER_TRAITS_DECL_BASE(As, NumTemplateParams, ValueType, ...)  \
+#define JSONCONS_MEMBER_TRAITS_NAMED_DECL_BASE(As, NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
 { \
     template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, NumTemplateParams)> \
@@ -423,20 +423,20 @@ namespace jsoncons \
   /**/
 
 
-#define JSONCONS_RENAME_MEMBER_TRAITS_DECL(ValueType, ...)  \
-    JSONCONS_RENAME_MEMBER_TRAITS_DECL_BASE(JSONCONS_RENAME_AS, 0, ValueType, __VA_ARGS__) \
+#define JSONCONS_MEMBER_TRAITS_NAMED_DECL(ValueType, ...)  \
+    JSONCONS_MEMBER_TRAITS_NAMED_DECL_BASE(JSONCONS_RENAME_AS, 0, ValueType, __VA_ARGS__) \
   /**/
 
-#define JSONCONS_TEMPLATE_RENAME_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
-    JSONCONS_RENAME_MEMBER_TRAITS_DECL_BASE(JSONCONS_RENAME_AS, NumTemplateParams, ValueType, __VA_ARGS__) \
+#define JSONCONS_TEMPLATE_MEMBER_TRAITS_NAMED_DECL(NumTemplateParams, ValueType, ...)  \
+    JSONCONS_MEMBER_TRAITS_NAMED_DECL_BASE(JSONCONS_RENAME_AS, NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
 
-#define JSONCONS_STRICT_RENAME_MEMBER_TRAITS_DECL(ValueType, ...)  \
-    JSONCONS_RENAME_MEMBER_TRAITS_DECL_BASE(JSONCONS_MAND_RENAME_AS, 0, ValueType, __VA_ARGS__) \
+#define JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ValueType, ...)  \
+    JSONCONS_MEMBER_TRAITS_NAMED_DECL_BASE(JSONCONS_MAND_RENAME_AS, 0, ValueType, __VA_ARGS__) \
   /**/
 
-#define JSONCONS_STRICT_TEMPLATE_RENAME_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
-    JSONCONS_RENAME_MEMBER_TRAITS_DECL_BASE(JSONCONS_MAND_RENAME_AS, NumTemplateParams, ValueType, __VA_ARGS__) \
+#define JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_NAMED_DECL(NumTemplateParams, ValueType, ...)  \
+    JSONCONS_MEMBER_TRAITS_NAMED_DECL_BASE(JSONCONS_MAND_RENAME_AS, NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
 
 
@@ -444,7 +444,7 @@ namespace jsoncons \
 #define JSONCONS_RENAME_ENUM_PAIR_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_ENUM_PAIR_ Member)
 #define JSONCONS_RENAME_ENUM_PAIR_(Member, Name) {value_type::Member, Name}
 
-#define JSONCONS_RENAME_ENUM_TRAITS_DECL(EnumType, ...)  \
+#define JSONCONS_ENUM_TRAITS_NAMED_DECL(EnumType, ...)  \
 namespace jsoncons \
 { \
     template<typename Json> \
@@ -552,7 +552,7 @@ namespace jsoncons \
 #define JSONCONS_RENAME_AS2_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_AS2_ Member)
 #define JSONCONS_RENAME_AS2_(Member, Name) (ajson.at(Name)).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()
  
-#define JSONCONS_RENAME_GETTER_CTOR_TRAITS_DECL_BASE(NumTemplateParams, ValueType, ...)  \
+#define JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL_BASE(NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
 { \
     template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, NumTemplateParams)> \
@@ -580,12 +580,12 @@ namespace jsoncons \
 } \
   /**/
  
-#define JSONCONS_RENAME_GETTER_CTOR_TRAITS_DECL(ValueType, ...)  \
-JSONCONS_RENAME_GETTER_CTOR_TRAITS_DECL_BASE(0, ValueType, __VA_ARGS__) \
+#define JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL(ValueType, ...)  \
+JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL_BASE(0, ValueType, __VA_ARGS__) \
   /**/
  
 #define JSONCONS_TEMPLATE_RENAME_GETTER_CTOR_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
-JSONCONS_RENAME_GETTER_CTOR_TRAITS_DECL_BASE(NumTemplateParams, ValueType, __VA_ARGS__) \
+JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL_BASE(NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
 
 #endif
