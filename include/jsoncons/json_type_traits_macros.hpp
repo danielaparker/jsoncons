@@ -440,10 +440,9 @@ namespace jsoncons \
   /**/
 
 
-#define JSONCONS_RENAME_ENUM_PAIR(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_ENUM_PAIR_ Member)
-#define JSONCONS_RENAME_ENUM_PAIR_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_ENUM_PAIR_LAST_ Member)
-#define JSONCONS_RENAME_ENUM_PAIR_(Member, Name) {value_type::Member, Name},
-#define JSONCONS_RENAME_ENUM_PAIR_LAST_(Member, Name) {value_type::Member, Name}
+#define JSONCONS_RENAME_ENUM_PAIR(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_ENUM_PAIR_ Member),
+#define JSONCONS_RENAME_ENUM_PAIR_LAST(TC, JVal, TVal, Prefix, Member) JSONCONS_EXPAND(JSONCONS_RENAME_ENUM_PAIR_ Member)
+#define JSONCONS_RENAME_ENUM_PAIR_(Member, Name) {value_type::Member, Name}
 
 #define JSONCONS_RENAME_ENUM_TRAITS_DECL(EnumType, ...)  \
 namespace jsoncons \
@@ -539,5 +538,43 @@ namespace jsoncons \
     }; \
 } \
     /**/
+ 
+ 
+#define JSONCONS_RENAME_IS2(TC, JVal, TVal, Prefix, Member) if (!(JVal).contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+#define JSONCONS_RENAME_IS2_LAST(TC, JVal, TVal, Prefix, Member) if (!(JVal).contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+
+#define JSONCONS_RENAME_TO_JSON2(TC, JVal, TVal, Prefix, Member) (JVal).try_emplace(JSONCONS_QUOTE(Prefix, Member), TVal.Member() );
+#define JSONCONS_RENAME_TO_JSON2_LAST(TC, JVal, TVal, Prefix, Member) (JVal).try_emplace(JSONCONS_QUOTE(Prefix, Member), TVal.Member() );
+
+#define JSONCONS_RENAME_AS2(TC, JVal, TVal, Prefix, Member) ((JVal).at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>(),
+#define JSONCONS_RENAME_AS2_LAST(TC, JVal, TVal, Prefix, Member) ((JVal).at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()
+ 
+ #define JSONCONS_RENAME_GETTER_CTOR_TRAITS_DECL_BASE(CharT,Prefix,NumTemplateParams, ValueType, ...)  \
+namespace jsoncons \
+{ \
+    template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, NumTemplateParams)> \
+    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams), typename std::enable_if<std::is_same<typename Json::char_type,CharT>::value>::type> \
+    { \
+        typedef ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams) value_type; \
+        typedef typename Json::allocator_type allocator_type; \
+        static bool is(const Json& j) noexcept \
+        { \
+            if (!j.is_object()) return false; \
+            JSONCONS_REP_N(JSONCONS_RENAME_IS2, 0, j, void(), Prefix, __VA_ARGS__)\
+            return true; \
+        } \
+        static value_type as(const Json& j) \
+        { \
+            return value_type ( JSONCONS_REP_N(JSONCONS_RENAME_AS2, 0, j, void(), Prefix, __VA_ARGS__) ); \
+        } \
+        static Json to_json(const value_type& val, allocator_type allocator=allocator_type()) \
+        { \
+            Json j(allocator); \
+            JSONCONS_REP_N(JSONCONS_RENAME_TO_JSON2, 0, j, val, Prefix, __VA_ARGS__) \
+            return j; \
+        } \
+    }; \
+} \
+  /**/
 
 #endif
