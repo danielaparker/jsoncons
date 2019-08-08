@@ -179,7 +179,7 @@
 #define JSONCONS_GENERATE_TEMPLATE_ARG(Expr, Id) T ## Id,
 #define JSONCONS_GENERATE_TEMPLATE_ARG_LAST(Ex, Id) T ## Id 
 
-#define JSONCONS_MEMBER_TRAITS_DECL_BASE(CharT,Prefix,NumTemplateParams, ValueType, ...)  \
+#define JSONCONS_MEMBER_TRAITS_DECL_BASE(As,CharT,Prefix,NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
 { \
     template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, NumTemplateParams)> \
@@ -196,7 +196,7 @@ namespace jsoncons \
         static value_type as(const Json& j) \
         { \
             value_type val{}; \
-            JSONCONS_REP_N(JSONCONS_AS, 0, j, val, Prefix, __VA_ARGS__) \
+            JSONCONS_REP_N(As, 0, j, val, Prefix, __VA_ARGS__) \
             return val; \
         } \
         static Json to_json(const value_type& val, allocator_type allocator=allocator_type()) \
@@ -210,53 +210,24 @@ namespace jsoncons \
   /**/
 
 #define JSONCONS_MEMBER_TRAITS_DECL(ValueType, ...)  \
-    JSONCONS_MEMBER_TRAITS_DECL_BASE(char,,0, ValueType, __VA_ARGS__) \
-    JSONCONS_MEMBER_TRAITS_DECL_BASE(wchar_t,L,0, ValueType, __VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_AS, char,,0, ValueType, __VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_AS, wchar_t,L,0, ValueType, __VA_ARGS__) \
   /**/
 
 #define JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
-    JSONCONS_MEMBER_TRAITS_DECL_BASE(char,,NumTemplateParams, ValueType, __VA_ARGS__) \
-    JSONCONS_MEMBER_TRAITS_DECL_BASE(wchar_t,L,NumTemplateParams, ValueType, __VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_AS, char,,NumTemplateParams, ValueType, __VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_AS, wchar_t,L,NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
 
-#define JSONCONS_STRICT_MEMBER_TRAITS_DECL_BASE(CharT,Prefix,NumTemplateParams, ValueType, ...)  \
-namespace jsoncons \
-{ \
-    template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, NumTemplateParams)> \
-    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams), typename std::enable_if<std::is_same<typename Json::char_type,CharT>::value>::type> \
-    { \
-        typedef ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams) value_type; \
-        typedef typename Json::allocator_type allocator_type; \
-        static bool is(const Json& j) noexcept \
-        { \
-            if (!j.is_object()) return false; \
-            JSONCONS_REP_N(JSONCONS_IS, 0, j, void(), Prefix, __VA_ARGS__)\
-            return true; \
-        } \
-        static value_type as(const Json& j) \
-        { \
-            value_type val{}; \
-            JSONCONS_REP_N(JSONCONS_MAND_AS, 0, j, val, Prefix, __VA_ARGS__) \
-            return val; \
-        } \
-        static Json to_json(const value_type& val, allocator_type allocator=allocator_type()) \
-        { \
-            Json j(allocator); \
-            JSONCONS_REP_N(JSONCONS_TO_JSON, 0, j, val, Prefix, __VA_ARGS__) \
-            return j; \
-        } \
-    }; \
-} \
-  /**/
 
 #define JSONCONS_STRICT_MEMBER_TRAITS_DECL(ValueType, ...)  \
-    JSONCONS_STRICT_MEMBER_TRAITS_DECL_BASE(char,,0,ValueType,__VA_ARGS__) \
-    JSONCONS_STRICT_MEMBER_TRAITS_DECL_BASE(wchar_t,L,0,ValueType,__VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_MAND_AS,char,,0,ValueType,__VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_MAND_AS,wchar_t,L,0,ValueType,__VA_ARGS__) \
   /**/
 
 #define JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
-    JSONCONS_STRICT_MEMBER_TRAITS_DECL_BASE(char,,NumTemplateParams,ValueType,__VA_ARGS__) \
-    JSONCONS_STRICT_MEMBER_TRAITS_DECL_BASE(wchar_t,L,NumTemplateParams,ValueType,__VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_MAND_AS,char,,NumTemplateParams,ValueType,__VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_MAND_AS,wchar_t,L,NumTemplateParams,ValueType,__VA_ARGS__) \
   /**/
  
 #define JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(CharT,Prefix,NumTemplateParams, ValueType, ...)  \
