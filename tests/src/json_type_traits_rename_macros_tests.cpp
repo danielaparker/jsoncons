@@ -68,7 +68,7 @@ namespace json_type_traits_rename_macro_tests
     };
 
     enum class float_format {scientific = 1,fixed = 2,hex = 4,general = fixed | scientific};
-};
+} // namespace json_type_traits_rename_macro_tests
 
 namespace ns = json_type_traits_rename_macro_tests;
 
