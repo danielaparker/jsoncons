@@ -20,7 +20,7 @@ New macros that serialize to given names (instead of the c++ names)
 - JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL(class_name,(getter_name0,"name0"),(getter_name1,"name1")...) 
 - JSONCONS_ENUM_TRAITS_NAMED_DECL(enum_type_name,(identifier0,"name0"),(identifier1,"name1")...)
 
-Removed deprecated features
+Deprecated features removed
 
 - Constructor `basic_json(double, const floating_point_options&, semantic_tag)` 
 
