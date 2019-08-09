@@ -927,5 +927,5 @@ Output:
 }
 ```
 
-For more information, consult the latest [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md), [documentation](https://github.com/danielaparker/jsoncons/blob/master/doc/Home.md) and [roadmap](https://github.com/danielaparker/jsoncons/blob/master/Roadmap.md). 
+For more information, consult the latest [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md), [documentation](https://github.com/danielaparker/jsoncons/blob/master/doc/Reference.md) and [roadmap](https://github.com/danielaparker/jsoncons/blob/master/Roadmap.md). 
 
