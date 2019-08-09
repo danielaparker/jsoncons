@@ -111,6 +111,16 @@ void person_extensibility_example()
     }
 }
 
+void named_example()
+{
+    ns::bond bond{1000000,"2024-03-30",0.02,"6M"};
+
+    std::string s;
+    jsoncons::encode_json(bond, s, indenting::indent);
+
+    std::cout << s << "\n";
+}
+
 //own vector will always be of an even length 
 struct own_vector : std::vector<int64_t> { using  std::vector<int64_t>::vector; };
 
@@ -188,6 +198,8 @@ void type_extensibility_examples()
     person_extensibility_example();
 
     templated_struct_example();
+
+    named_example();
 
     std::cout << std::endl;
 }

@@ -23,9 +23,10 @@
 [Convert JSON to/from C++ data structures by specializing json_type_traits](#G1)  
 [Mapping to C++ data structures with and without defaults allowed](#G2)  
 [An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL](#G3)  
-[Serializing a templated class with the `JSONCONS_TEMPLATE_xxx` macros](#G4)  
-[A polymorphic example](#G5)  
-[Convert JSON numbers to/from boost multiprecision numbers](#G6)
+[Serializing a templated class with the `_TEMPLATE_` macros](#G4)  
+[Serializing to given names with the `_NAMED_` macros](#G5)  
+[A polymorphic example](#G6)  
+[Convert JSON numbers to/from boost multiprecision numbers](#G7)
 
 ### Construct
 
@@ -789,7 +790,7 @@ Output:
 
 <div id="G4"/>
 
-#### Serializing a templated class with the `JSONCONS_TEMPLATE_xxx` macros
+#### Serializing a templated class with the `_TEMPLATE_` macros
 
 ```c++
 #include <cassert>
@@ -835,6 +836,50 @@ int main()
 ```
 
 <div id="G5"/>
+
+#### Serializing to given names with the `_NAMED_` macros
+
+```c++
+#include <jsoncons/json.hpp>
+
+namespace ns {
+
+    struct bond
+    {
+        double principal;
+        std::string maturity;
+        double coupon;
+        std::string period;
+    };
+
+} // namespace ns
+
+// Declare the traits. 
+JSONCONS_MEMBER_TRAITS_NAMED_DECL(ns::bond, (principal,"notional"), (maturity,"maturityDate"), (coupon,"couponRate"), (period,"frequency"))
+
+using namespace jsoncons; // for convenience
+
+int main()
+{
+    ns::bond bond{1000000,"2024-03-30",0.02,"6M"};
+
+    std::string s;
+    jsoncons::encode_json(bond, s, indenting::indent);
+
+    std::cout << s << "\n";
+}
+```
+Output:
+```
+{
+    "couponRate": 0.02,
+    "frequency": "6M",
+    "maturityDate": "2024-03-30",
+    "notional": 1000000.0
+}
+```
+
+<div id="G6"/>
 
 #### A polymorphic example
 
@@ -1029,7 +1074,7 @@ Output:
 ]
 ```
 
-<div id="G6"/>
+<div id="G7"/>
 
 #### Convert JSON numbers to/from boost multiprecision numbers
 

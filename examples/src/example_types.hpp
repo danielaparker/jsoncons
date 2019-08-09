@@ -9,6 +9,14 @@
 
 namespace ns {
 
+    struct bond
+    {
+        double principal;
+        std::string maturity;
+        double coupon;
+        std::string period;
+    };
+
     struct employee
     {
         std::string employeeNo;
@@ -19,17 +27,17 @@ namespace ns {
     class fixing
     {
         std::string index_id_;
-        boost::gregorian::date observation_date_;
+        std::string observation_date_;
         double rate_;
     public:
-        fixing(const std::string& index_id, const boost::gregorian::date& observation_date, double rate)
+        fixing(const std::string& index_id, const std::string& observation_date, double rate)
             : index_id_(index_id), observation_date_(observation_date), rate_(rate)
         {
         }
 
         const std::string& index_id() const {return  index_id_;}
 
-        boost::gregorian::date observation_date() const {return  observation_date_;}
+        const std::string& observation_date() const {return  observation_date_;}
 
         double rate() const {return rate_;}
     };
@@ -178,6 +186,8 @@ namespace jsoncons {
 } // namespace jsoncons
 
 // Declare the traits. Specify which data members need to be serialized.
+JSONCONS_MEMBER_TRAITS_NAMED_DECL(ns::bond, (principal,"notional"), (maturity,"maturityDate"), (coupon,"couponRate"), (period,"frequency"))
+
 JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputation, application, reputons)

@@ -499,8 +499,6 @@ int main()
 
         polymorphic_examples();
 
-        type_extensibility_examples();
-
         json_cursor_examples();
 
         json_accessor_examples();
@@ -514,6 +512,8 @@ int main()
         run_cbor_examples();
 
         readme_examples();
+
+        type_extensibility_examples();
     }
     catch (const std::exception& e)
     {
