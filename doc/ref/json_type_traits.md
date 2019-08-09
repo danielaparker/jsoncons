@@ -79,27 +79,27 @@ class MyClass
 ...
 };
 ```
-(1) and (2) will serialize to the C++ names, (3) and (4) will serialize to the given names. 
+(1) and (2) will serialize to the stringified member names, (3) and (4) will serialize to the given names. 
 
 (5) - (8) generate the code to specialize `json_type_traits` from the member data of a class template. When decoding to a C++ data structure, 
 (5) and (7) allow member names not present in the JSON to have default values, while the strict (6) and (8) 
 require that all member names be present in the JSON. The class template must have a default constructor.
 If the member data or default constructor are private, the macro `JSONCONS_TYPE_TRAITS_FRIEND`
 will make them accessible to `json_type_traits`.
-(5) and (6) will serialize to the C++ names, (7) and (8) will serialize to the given names. 
+(5) and (6) will serialize to the stringified member names, (7) and (8) will serialize to the given names. 
 
 (9) - (10) generate the code to specialize `json_type_traits` from the getter functions and a constructor of a class. 
 When decoding to a C++ data strucure, all data members in the C++ object must be present in the JSON.
 The class must have a constructor such that the return types of the getter functions are convertible to
-its parameters. (9) will serialize to the C++ names, (10) will serialize to the given names. 
+its parameters, taken in order. (9) will serialize to the stringified getter names, (10) will serialize to the given names. 
 
 (11) - (12) generate the code to specialize `json_type_traits` from the getter functions and a constructor of a
 class template. When decoding to a C++ data strucure, all data members in the C++ object must be present in the JSON.
 The class must have a constructor such that the return types of the getter functions are convertible to
-its parameters. (11) will serialize to the C++ names, (12) will serialize to the given names. 
+its parameters, taken in order. (11) will serialize to the stringified getter names, (12) will serialize to the given names. 
 
 (13) - (14) generate the code to specialize `json_type_traits` from the identifiers of an enumeration.
-(13) will serialize to the C++ names, (14) will serialize to the given names. 
+(13) will serialize to the stringified identifier names, (14) will serialize to the given names. 
 
 These macro declarations must be placed at global scope, outside any namespace blocks, and `class_name` must be a fully namespace qualified name.
 
