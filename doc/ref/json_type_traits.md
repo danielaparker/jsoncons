@@ -57,13 +57,13 @@ JSONCONS_TEMPLATE_MEMBER_TRAITS_NAMED_DECL(num_template_params,class_name,(membe
 JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_NAMED_DECL(num_template_params,class_name,(member_name0,"name0"),(member_name1,"name1")...) // (8)
 
 JSONCONS_GETTER_CTOR_TRAITS_DECL(class_name,getter_name0,getter_name1,...)                      // (9)
-JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL(class_name,(getter_name0,name0),(getter_name1,name1)...) // (10)
+JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL(class_name,(getter_name0,"name0"),(getter_name1,"name1")...) // (10)
 
 JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL(class_name,getter_name0,getter_name1,...)                      // (11)
-JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_NAMED_DECL(class_name,(getter_name0,name0),(getter_name1,name1)...) // (12)
+JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_NAMED_DECL(class_name,(getter_name0,"name0"),(getter_name1,"name1")...) // (12)
 
 JSONCONS_ENUM_TRAITS_DECL(enum_type_name,identifier0,identifier1,...)                      // (13)
-JSONCONS_ENUM_TRAITS_NAMED_DECL(enum_type_name,(identifier0,name0),(identifier1,name1)...) // (14)
+JSONCONS_ENUM_TRAITS_NAMED_DECL(enum_type_name,(identifier0,"name0"),(identifier1,"name1")...) // (14)
 ```
 
 (1) - (4) generate the code to specialize `json_type_traits` from the member data of a class. When decoding to a C++ data structure, 
