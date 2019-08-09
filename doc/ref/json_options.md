@@ -166,7 +166,7 @@ By default, jsoncons parses a number with an exponent or fractional part
 into a double precision floating point number. If you wish, you can
 keep the number as a string with semantic tagging `bigdec`, 
 using the `lossless_number` option. You can then put it into a `float`, 
-`double`, a boost multiprecision number, or whatever other type you want. 
+`double`, a boost multiprecision number, or whatever type you want. 
 
 ```c++
 int main()
