@@ -67,7 +67,7 @@ JSONCONS_ENUM_TRAITS_NAMED_DECL(enum_type_name,(identifier0,name0),(identifier1,
 ```
 
 (1) - (4) generate the code to specialize `json_type_traits` from the member data of a class. When decoding to a C++ data structure, 
-(1) and (3) allow member names not present in the JSON to have default values, while the strict (3) and (4) 
+(1) and (3) allow member names not present in the JSON to have default values, while the strict (2) and (4) 
 require that all member names be present in the JSON. The class must have a default constructor.
 If the member data or default constructor are private, the macro `JSONCONS_TYPE_TRAITS_FRIEND`
 will make them accessible to `json_type_traits`, used so
