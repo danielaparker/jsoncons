@@ -183,6 +183,39 @@ void dump_buffer(const char *buffer, size_t length, char decimal_point, Result& 
 }
 
 template<class Result>
+bool dtoa_scientific(double val, char decimal_point, Result& result)
+{
+    if (val == 0)
+    {
+        result.push_back('0');
+        result.push_back('.');
+        result.push_back('0');
+        return true;
+    }
+
+    jsoncons::detail::string_to_double to_double_;
+
+    char buffer[100];
+    int precision = std::numeric_limits<double>::digits10;
+    int length = snprintf(buffer, sizeof(buffer), "%1.*e", precision, val);
+    if (length < 0)
+    {
+        return false;
+    }
+    if (to_double_(buffer, sizeof(buffer)) != val)
+    {
+        const int precision2 = std::numeric_limits<double>::max_digits10;
+        length = snprintf(buffer, sizeof(buffer), "%1.*e", precision2, val);
+        if (length < 0)
+        {
+            return false;
+        }
+    }
+    dump_buffer(buffer, length, decimal_point, result);
+    return true;
+}
+
+template<class Result>
 bool dtoa_general(double val, char decimal_point, Result& result, std::false_type)
 {
     if (val == 0)
@@ -389,7 +422,10 @@ public:
                 }
                 else
                 {
-                    JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
+                    if (!dtoa_scientific(val, decimal_point_, result))
+                    {
+                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
+                    }
                 }
             }
             break;
