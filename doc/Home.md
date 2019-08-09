@@ -1,24 +1,26 @@
 All core jsoncons classes and functions are in namespace `jsoncons`.  
 
+#### Serialize and Deserialize Support
+
+[json_type_traits](ref/json_type_traits.md)
+[encode_json](ref/encode_json.md)  
+[decode_json](ref/decode_json.md)
+[json_options](ref/json_options.md)  
+
 #### Variant-like Data Structure
 
 [basic_json](ref/basic_json.md)  
-[json_parser](ref/json_parser.md)  
-[basic_json_reader](ref/basic_json_reader.md)  
 [json_decoder](ref/json_decoder.md)  
 
-#### C++/JSON Conversion
+#### Parsing
 
-[encode_json](ref/encode_json.md)  
-[decode_json](ref/decode_json.md)
+[json_parser](ref/json_parser.md)  
+[basic_json_reader](ref/basic_json_reader.md)  
 
 #### Streaming
 
 [json_content_handler](ref/json_content_handler.md)  
 [basic_json_encoder](ref/basic_json_encoder.md)  
-[json_options](ref/json_options.md)  
-
-[wjson_options](ref/wjson_options.md)  
 
 [json_filter](ref/json_filter.md)  
 [rename_object_member_filter](ref/rename_object_member_filter.md)  
