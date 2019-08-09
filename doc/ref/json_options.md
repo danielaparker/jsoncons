@@ -56,8 +56,7 @@ The default is [byte_string_chars_format::base64url](byte_string_chars_format.md
 
     json_options& precision(int value)
 Overrides floating point precision when serializing json. 
-The default, for a floating point value that was previously decoded from json text, is to preserve the original precision. 
-The default, for a floating point value that was directly inserted into a json value, to serialize with shortest representation. 
+The default is shortest representation.
 
     json_options& escape_all_non_ascii(bool value)
 Escape all non-ascii characters. The default is `false`.

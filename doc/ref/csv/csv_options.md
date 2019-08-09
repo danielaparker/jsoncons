@@ -19,7 +19,7 @@ Constructs an `csv_options` with default values.
 Overrides [floating point format](../float_chars_format.md) when serializing csv from json. For a floating point value that was previously decoded from json text, preserves the original format when serializing.For a floating point value that was directly inserted into a json value, serializes with [float_chars_format::general](float_chars_format.md).
 
     basic_csv_options<CharT>& precision(int value);
-Overrides floating point precision when serializing csv from json. The default, For a floating point value that was previously decoded from json text, preserves the original precision. The fefault, For a floating point value that was directly inserted into a json value, serializes with shortest representation.
+Overrides floating point precision when serializing csv from json. The default is shortest representation.
 
     basic_csv_options& header_lines(size_t value);
 Number of header lines in the CSV text. Defaults to 1 if assume_header is true, otherwise 0
