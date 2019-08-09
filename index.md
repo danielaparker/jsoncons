@@ -42,7 +42,7 @@ supports semantic tagging of date-time values, timestamp values, big integers,
 big decimals, bigfloats and binary encodings. This allows it to preserve these type semantics when parsing 
 JSON-like data formats such as CBOR that have them.
 
-For the examples below you need to include some header files and construct a string of JSON data:
+For the examples below you need to include some header files and initialize a string of JSON data:
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -68,13 +68,13 @@ std::string data = R"(
 
 jsoncons allows you to work with the data in a number of ways:
 
-- As a variant-like structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json.md) 
+- As a variant-like data structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json.md) 
 
 - As a strongly typed C++ data structure
 
 - As a stream of parse events
 
-#### As a variant-like structure
+#### As a variant-like data structure
 
 ```c++
 
@@ -927,5 +927,5 @@ Output:
 }
 ```
 
-For more information, consult the latest [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md), [documentation](https://github.com/danielaparker/jsoncons/blob/master/doc/Home.md) and [roadmap](https://github.com/danielaparker/jsoncons/blob/master/Roadmap.md). 
+For more information, consult the latest [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md), [documentation](https://github.com/danielaparker/jsoncons/blob/master/doc/Reference.md) and [roadmap](https://github.com/danielaparker/jsoncons/blob/master/Roadmap.md). 
 
