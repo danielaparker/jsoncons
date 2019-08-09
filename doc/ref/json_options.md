@@ -54,6 +54,9 @@ The default is [bigint_chars_format::base10](bigint_chars_format.md).
 Overrides [byte string format](byte_string_chars_format.md) when serializing json.
 The default is [byte_string_chars_format::base64url](byte_string_chars_format.md). 
 
+    json_options& float_format(float_chars_format value);
+Overrides [floating point format](../float_chars_format.md) when serializing to JSON. The default is [float_chars_format::general](float_chars_format.md).
+
     json_options& precision(int value)
 Overrides floating point precision when serializing json. 
 The default is shortest representation.
