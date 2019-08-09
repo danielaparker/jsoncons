@@ -2,10 +2,10 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 #### Serialize and Deserialize Support
 
-[json_type_traits](ref/json_type_traits.md)
+[json_type_traits](ref/json_type_traits.md)  
 [encode_json](ref/encode_json.md)  
-[decode_json](ref/decode_json.md)
-[json_options](ref/json_options.md)  
+[decode_json](ref/decode_json.md)  
+[json_options](ref/json_options.md)    
 
 #### Variant-like Data Structure
 
