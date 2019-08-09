@@ -54,7 +54,9 @@ int main()
     ojson j = csv::decode_csv<ojson>(data, options);
 
     // Pretty print
-    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+    json_options print_options;
+    print_options.float_format(float_chars_format::fixed);
+    std::cout << "(1)\n" << pretty_print(j, print_options) << "\n\n";
 
     // Iterate over the rows
     std::cout << "(2)\n";
@@ -74,24 +76,24 @@ Output:
     {
         "index_id": "EUR_LIBOR_06M",
         "observation_date": "2015-10-23",
-        "rate": 2.14e-05
+        "rate": 0.0000214
     },
     {
         "index_id": "EUR_LIBOR_06M",
         "observation_date": "2015-10-26",
-        "rate": 1.43e-05
+        "rate": 0.0000143
     },
     {
         "index_id": "EUR_LIBOR_06M",
         "observation_date": "2015-10-27",
-        "rate": 1e-07
+        "rate": 0.0000001
     }
 ]
 
 (2)
-EUR_LIBOR_06M, 2015-10-23, 2.1e-05
-EUR_LIBOR_06M, 2015-10-26, 1.4e-05
-EUR_LIBOR_06M, 2015-10-27, 1e-07
+EUR_LIBOR_06M, 2015-10-23, 0.0000214
+EUR_LIBOR_06M, 2015-10-26, 0.0000143
+EUR_LIBOR_06M, 2015-10-27, 0.0000001
 ```
 
 #### As a strongly typed C++ data structure
@@ -160,7 +162,8 @@ JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::fixing, index_id, observation_date, rate)
 int main()
 {
     csv::csv_options options;
-    options.assume_header(true);
+    options.assume_header(true)
+           .float_format(float_chars_format::fixed);
 
     // Decode the CSV data into a c++ structure
     std::vector<ns::fixing> v = csv::decode_csv<std::vector<ns::fixing>>(data, options);
@@ -175,7 +178,7 @@ int main()
 
     // Encode the c++ structure into CSV data
     std::string s;
-    csv::encode_csv(v, s);
+    csv::encode_csv(v, s, options);
     std::cout << "(2)\n";
     std::cout << s << "\n";
 }
@@ -188,9 +191,9 @@ EUR_LIBOR_06M, 2015-10-26, 0.0000143
 EUR_LIBOR_06M, 2015-10-27, 0.0000001
 (2)
 index_id,observation_date,rate
-EUR_LIBOR_06M,2015-10-23,2.14e-05
-EUR_LIBOR_06M,2015-10-26,1.43e-05
-EUR_LIBOR_06M,2015-10-27,1e-07
+EUR_LIBOR_06M,2015-10-23,0.0000214
+EUR_LIBOR_06M,2015-10-26,0.0000143
+EUR_LIBOR_06M,2015-10-27,0.0000001
 ```
 
 #### As a stream of parse events
@@ -258,7 +261,7 @@ string_value: EUR_LIBOR_06M
 name: observation_date
 string_value: 2015-10-23
 name: rate
-double_value: 2.1e-05
+double_value: 0.0000214
 end_object
 begin_object
 name: index_id
@@ -266,7 +269,7 @@ string_value: EUR_LIBOR_06M
 name: observation_date
 string_value: 2015-10-26
 name: rate
-double_value: 1.4e-05
+double_value: 0.0000143
 end_object
 begin_object
 name: index_id
@@ -274,7 +277,7 @@ string_value: EUR_LIBOR_06M
 name: observation_date
 string_value: 2015-10-27
 name: rate
-double_value: 1e-07
+double_value: 0.0000001
 end_object
 end_array
 ```
@@ -285,14 +288,17 @@ int main()
 {
     csv::csv_options options;
     options.assume_header(true);
+
     csv::csv_cursor cursor(data, options);
 
     auto it = make_array_iterator<ojson>(cursor);
     auto end = jsoncons::end(it);
 
+    json_options print_options;
+    print_options.float_format(float_chars_format::fixed);
     while (it != end)
     {
-        std::cout << pretty_print(*it) << "\n";
+        std::cout << pretty_print(*it, print_options) << "\n";
         ++it;
     }
 }
@@ -302,17 +308,17 @@ Output:
 {
     "index_id": "EUR_LIBOR_06M",
     "observation_date": "2015-10-23",
-    "rate": 2.14e-05
+    "rate": 0.0000214
 }
 {
     "index_id": "EUR_LIBOR_06M",
     "observation_date": "2015-10-26",
-    "rate": 1.43e-05
+    "rate": 0.0000143
 }
 {
     "index_id": "EUR_LIBOR_06M",
     "observation_date": "2015-10-27",
-    "rate": 1e-07
+    "rate": 0.0000001
 }
 ```
 

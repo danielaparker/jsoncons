@@ -507,13 +507,13 @@ int main()
 
         run_ubjson_examples();
 
-        run_csv_examples();
-
         run_cbor_examples();
 
         readme_examples();
 
         type_extensibility_examples();
+
+        run_csv_examples();
     }
     catch (const std::exception& e)
     {

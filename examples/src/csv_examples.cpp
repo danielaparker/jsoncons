@@ -361,14 +361,16 @@ NY,LON,TOR;LON
 "NY";"LON","TOR","LON"
 "NY","LON","TOR";"LON"
 )";
-    json_options print_options;
-    print_options.array_array_line_splits(line_split_kind::same_line);
-
     csv::csv_options options1;
     options1.assume_header(true)
-           .subfield_delimiter(';');
+            .subfield_delimiter(';');
 
     json j1 = csv::decode_csv<json>(s,options1);
+
+    json_options print_options;
+    print_options.array_array_line_splits(line_split_kind::same_line)
+                 .float_format(float_chars_format::fixed);
+
     std::cout << "(1)\n" << pretty_print(j1,print_options) << "\n\n";
 
     csv::csv_options options2;
@@ -402,9 +404,12 @@ void as_a_variant_like_structure()
     ojson j = csv::decode_csv<ojson>(data, options);
 
     // Pretty print
-    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+    json_options print_options;
+    print_options.float_format(float_chars_format::fixed);
+    std::cout << "(1)\n" << pretty_print(j, print_options) << "\n\n";
 
     // Iterate over the rows
+    std::cout << std::fixed << std::setprecision(7);
     std::cout << "(2)\n";
     for (const auto& row : j.array_range())
     {
@@ -418,7 +423,8 @@ void as_a_variant_like_structure()
 void as_a_strongly_typed_cpp_structure()
 {
     csv::csv_options options;
-    options.assume_header(true);
+    options.assume_header(true)
+           .float_format(float_chars_format::fixed);
 
     // Decode the CSV data into a c++ structure
     std::vector<ns::fixing> v = csv::decode_csv<std::vector<ns::fixing>>(data, options);
@@ -433,7 +439,7 @@ void as_a_strongly_typed_cpp_structure()
 
     // Encode the c++ structure into CSV data
     std::string s;
-    csv::encode_csv(v, s);
+    csv::encode_csv(v, s, options);
     std::cout << "(2)\n";
     std::cout << s << "\n";
 }
@@ -442,6 +448,7 @@ void as_a_stream_of_json_events()
 {
     csv::csv_options options;
     options.assume_header(true);
+
     csv::csv_cursor cursor(data, options);
 
     for (; !cursor.done(); cursor.next())
@@ -495,14 +502,17 @@ void grouped_into_basic_json_records()
 {
     csv::csv_options options;
     options.assume_header(true);
+
     csv::csv_cursor cursor(data, options);
 
     auto it = make_array_iterator<ojson>(cursor);
     auto end = jsoncons::end(it);
 
+    json_options print_options;
+    print_options.float_format(float_chars_format::fixed);
     while (it != end)
     {
-        std::cout << pretty_print(*it) << "\n";
+        std::cout << pretty_print(*it, print_options) << "\n";
         ++it;
     }
 }
