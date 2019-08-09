@@ -55,6 +55,7 @@ jsoncons uses some features that are new to C++ 11, including [move semantics](h
 |-------------------------|---------------------------|-------------|-------------------|-------|
 | Microsoft Visual Studio | vs2015 (MSVC 19.0.24241.7)| x86,x64     | Windows 10        |       |
 |                         | vs2017                    | x86,x64     | Windows 10        |       |
+|                         | vs2019                    | x86,x64     | Windows 10        |       |
 | g++                     | 4.8 and above             | x64         | Ubuntu            |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
 |                         | 4.8.5                     | x64         | CentOS 7.6        |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
 |                         | 6.3.1 (Red Hat 6.3.1-1)   | x64         | Fedora release 24 |       |

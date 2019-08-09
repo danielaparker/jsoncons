@@ -8,6 +8,8 @@
 *.vcxproj.filters
 **/x64/Debug/
 **/x64/Release/
+**/Debug/
+**/Release/
 **/*.vcxproj
 **/vs2017
 **/vs2015
