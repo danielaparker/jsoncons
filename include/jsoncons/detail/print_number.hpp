@@ -305,7 +305,7 @@ bool dtoa_fixed(double v, char decimal_point, Result& result, std::true_type)
         {
             result.push_back('-');
         }
-        jsoncons::detail::prettify_string(buffer, length, k, std::numeric_limits<int>::lowest(), std::numeric_limits<int>::max(), result);
+        jsoncons::detail::prettify_string(buffer, length, k, std::numeric_limits<int>::lowest(), (std::numeric_limits<int>::max)(), result);
         return true;
     }
     else

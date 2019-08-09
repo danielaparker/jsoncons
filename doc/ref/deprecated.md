@@ -66,5 +66,6 @@ class basic_json|`parse_string(const string_view_type&, std::function<bool(json_
 class basic_json|`basic_json(double, uint8_t)`|<em>&#x2713;</em>|`basic_json(double)`
 class basic_json|`basic_json(double, const floating_point_options&, semantic_tag)`| |`basic_json(double,semantic_tag)`
 class floating_point_options|`floating_point_options`| |No replacement
+class basic_json_fragment_filter|`basic_json_fragment_filter`| |No replacement
 
 

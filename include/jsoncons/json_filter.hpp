@@ -144,25 +144,6 @@ private:
 
 };
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-// Filters out begin_document and end_document events
-template <class CharT>
-class JSONCONS_DEPRECATED("Remove this wrapper around a json_content_handler, it doesn't do anything")  basic_json_fragment_filter : public basic_json_filter<CharT>
-{
-public:
-    using typename basic_json_filter<CharT>::string_view_type;
-
-    basic_json_fragment_filter(basic_json_content_handler<CharT>& handler)
-        : basic_json_filter<CharT>(handler)
-    {
-    }
-private:
-    void do_flush() override
-    {
-    }
-};
-#endif
-
 template <class CharT>
 class basic_rename_object_member_filter : public basic_json_filter<CharT>
 {
