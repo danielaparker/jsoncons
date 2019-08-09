@@ -315,6 +315,12 @@ bool dtoa_fixed(double v, char decimal_point, Result& result, std::true_type)
 }
 
 template<class Result>
+bool dtoa_fixed(double v, char decimal_point, Result& result)
+{
+    return dtoa_fixed(v, decimal_point, result, std::integral_constant<bool, std::numeric_limits<double>::is_iec559>());
+}
+
+template<class Result>
 bool dtoa_general(double v, char decimal_point, Result& result)
 {
     return dtoa_general(v, decimal_point, result, std::integral_constant<bool, std::numeric_limits<double>::is_iec559>());
@@ -324,12 +330,12 @@ class print_double
 {
 private:
     string_to_double to_double_;
-    float_chars_format format_code_;
+    float_chars_format float_format_;
     int precision_;
     char decimal_point_;
 public:
-    print_double(float_chars_format format_code, int precision)
-       : format_code_(format_code == float_chars_format() ? float_chars_format::general : format_code), precision_(precision), decimal_point_('.')
+    print_double(float_chars_format float_format, int precision)
+       : float_format_(float_format), precision_(precision), decimal_point_('.')
     {
 #if !defined(JSONCONS_NO_LOCALECONV)
         struct lconv *lc = localeconv();
@@ -345,12 +351,10 @@ public:
     {
         size_t count = 0;
 
-        float_chars_format format = format_code_ != float_chars_format() ? format_code_ : float_chars_format::general;
-
         char number_buffer[200];
         int length = 0;
 
-        switch (format)
+        switch (float_format_)
         {
         case float_chars_format::fixed:
             {
@@ -363,16 +367,30 @@ public:
                     }
                     dump_buffer(number_buffer, length, decimal_point_, result);
                 }
+                else
+                {
+                    if (!dtoa_fixed(val, decimal_point_, result))
+                    {
+                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
+                    }
+                }
             }
             break;
         case float_chars_format::scientific:
             {
-                length = snprintf(number_buffer, sizeof(number_buffer), "%1.*e", precision_, val);
-                if (length < 0)
+                if (precision_ > 0)
+                {
+                    length = snprintf(number_buffer, sizeof(number_buffer), "%1.*e", precision_, val);
+                    if (length < 0)
+                    {
+                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
+                    }
+                    dump_buffer(number_buffer, length, decimal_point_, result);
+                }
+                else
                 {
                     JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
                 }
-                dump_buffer(number_buffer, length, decimal_point_, result);
             }
             break;
         case float_chars_format::general:

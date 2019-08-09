@@ -188,7 +188,7 @@ public:
 //  Constructors
 
     basic_csv_options() :
-        float_format_(float_chars_format()),
+        float_format_(float_chars_format::general),
         precision_(0),
         assume_header_(false),
         ignore_empty_values_(false),

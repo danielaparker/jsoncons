@@ -3,8 +3,8 @@
 ```c++
 #include <jsoncons/json_options.hpp>
 
-enum class float_chars_format : uint8_t {fixed=1,scientific=2,hex=4,general=fixed|scientific};
+enum class float_chars_format : uint8_t {general,fixed,scientific,hex};
 ```
 
-A bitmask type used to specify floating-point formatting. 
+A type used to specify floating-point formatting. 
 

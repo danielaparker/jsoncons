@@ -15,7 +15,7 @@
 
 namespace jsoncons {
 
-enum class float_chars_format : uint8_t {fixed=1,scientific=2,hex=4,general=fixed|scientific};
+enum class float_chars_format : uint8_t {general,fixed,scientific,hex};
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED("instead, use float_chars_format") typedef float_chars_format chars_format;
@@ -202,7 +202,7 @@ public:
 
     basic_json_options()
         : indent_size_(indent_size_default),
-          float_format_(float_chars_format()),
+          float_format_(float_chars_format::general),
           precision_(0),
 #if !defined(JSONCONS_NO_DEPRECATED)
           can_read_nan_replacement_(false),

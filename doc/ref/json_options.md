@@ -8,9 +8,9 @@ typedef basic_json_options<char> json_options
 
 Specifies options for encoding and decoding JSON text. The `json_options` class is an instantiation of the `basic_json_options` class template that uses `char` as the character type.
 
-The default floating point formatting for a floating point value that was previously decoded from json text is to preserve the original format and precision. This ensures round-trip for both format and precision, e.g. 1.1 read will remain `1.1` when written, and not become `1.1000000000000001` (an equivalent but longer representation.)
-
-The default floating point formatting for a floating point value that was directly inserted into a json value is [float_chars_format::general](float_chars_format.md) with shortest representation. Trailing zeros are removed, except one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.
+The default floating point format is [float_chars_format::general](float_chars_format.md).
+The default precision is shortest representation, e.g. 1.1 read will remain `1.1` when written, and not become `1.1000000000000001` (an equivalent but longer representation.)
+Trailing zeros are removed, except one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.
 
 ![json_options](./diagrams/json_options.png)
 
@@ -93,7 +93,7 @@ Defaults to `false`.
     json_options& new_line_chars(const std::string& value)
 Defaults to "\n"
 
-    json_options & line_length_limit(size_t value)
+    json_options& line_length_limit(size_t value)
 
     void max_nesting_depth(size_t depth)
 The maximum nesting depth allowed when parsing JSON. By default `jsoncons` can read a `JSON` text of arbitrarily large depth.
