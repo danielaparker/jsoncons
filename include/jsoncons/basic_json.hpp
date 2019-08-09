@@ -4423,14 +4423,6 @@ public:
     {
     }
 
-    JSONCONS_DEPRECATED("Instead, use basic_json(double,semantic_tag)")
-    basic_json(double val, 
-               const floating_point_options&,
-               semantic_tag tag = semantic_tag::none)
-        : var_(val, tag)
-    {
-    }
-
     JSONCONS_DEPRECATED("Instead, use basic_json(const byte_string_view& ,semantic_tag)")
     basic_json(const byte_string_view& bs, 
                byte_string_chars_format encoding_hint,

@@ -21,50 +21,6 @@ enum class float_chars_format : uint8_t {fixed=1,scientific=2,hex=4,general=fixe
 JSONCONS_DEPRECATED("instead, use float_chars_format") typedef float_chars_format chars_format;
 #endif
 
-// floating_point_options
-
-class floating_point_options
-{
-    float_chars_format format_;
-    int precision_;
-    uint8_t decimal_places_;
-public:
-    floating_point_options()
-        : format_(float_chars_format::general), precision_(0), decimal_places_(0)
-    {
-    }
-
-    floating_point_options(float_chars_format format, int precision, uint8_t decimal_places = 0)
-        : format_(format), precision_(precision), decimal_places_(decimal_places)
-    {
-    }
-
-    explicit floating_point_options(float_chars_format format)
-        : format_(format), precision_(0), decimal_places_(0)
-    {
-    }
-
-    floating_point_options(const floating_point_options&) = default;
-    floating_point_options(floating_point_options&&) = default;
-    floating_point_options& operator=(const floating_point_options& e) = default;
-    floating_point_options& operator=(floating_point_options&& e) = default;
-
-    int precision() const
-    {
-        return precision_;
-    }
-
-    uint8_t decimal_places() const
-    {
-        return decimal_places_;
-    }
-
-    float_chars_format format() const
-    {
-        return format_;
-    }
-};
-
 enum class indenting : uint8_t {no_indent = 0, indent = 1};
 
 enum class line_split_kind  : uint8_t {same_line,new_line,multi_line};

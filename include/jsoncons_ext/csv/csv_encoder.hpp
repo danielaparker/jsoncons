@@ -93,9 +93,7 @@ public:
        result_(std::move(result)),
        options_(options),
        stack_(),
-       fp_(floating_point_options(options.float_format(), 
-                                  options.precision(),
-                                  0)),
+       fp_(options.float_format(), options.precision()),
        column_names_(options_.column_names())
     {
     }

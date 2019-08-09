@@ -208,7 +208,7 @@ public:
         case staj_event_type::double_value:
         {
             jsoncons::string_result<T> result(s);
-            jsoncons::detail::print_double f{ floating_point_options() };
+            jsoncons::detail::print_double f{float_chars_format::general,0};
             f(value_.double_value_, result);
             break;
         }

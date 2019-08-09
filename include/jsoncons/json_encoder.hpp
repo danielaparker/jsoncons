@@ -316,9 +316,7 @@ public:
     basic_json_encoder(result_type result, 
                        const basic_json_encode_options<CharT>& options)
        : options_(options),
-         fp_(floating_point_options(options.float_format(), 
-                                    options.precision(),
-                                    0)),
+         fp_(options.float_format(), options.precision()),
          result_(std::move(result)), 
          indent_amount_(0), 
          column_(0)
@@ -1060,9 +1058,7 @@ public:
     basic_json_compressed_encoder(result_type result, 
                                      const basic_json_encode_options<CharT>& options)
        : options_(options),
-         fp_(floating_point_options(options.float_format(), 
-                                    options.precision(),
-                                    0)),
+         fp_(options.float_format(), options.precision()),
          result_(std::move(result))
     {
     }
