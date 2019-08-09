@@ -48,13 +48,13 @@ for a user-defined class.
 ```c++
 JSONCONS_MEMBER_TRAITS_DECL(class_name,member_name0,member_name1,...)                             // (1)
 JSONCONS_STRICT_MEMBER_TRAITS_DECL(class_name,member_name0,member_name1,...)                      // (2)
-JSONCONS_MEMBER_TRAITS_NAMED_DECL(class_name,(member_name0,name0),(member_name1,name1)...)        // (3)
-JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(class_name,(member_name0,name0),(member_name1,name1)...) // (4)
+JSONCONS_MEMBER_TRAITS_NAMED_DECL(class_name,(member_name0,"name0"),(member_name1,"name1")...)        // (3)
+JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(class_name,(member_name0,"name0"),(member_name1,"name1")...) // (4)
 
 JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(num_template_params,class_name,member_name0,member_name1,...)                             // (5)  
 JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_DECL(num_template_params,class_name,member_name0,member_name1,...)                      // (6)
-JSONCONS_TEMPLATE_MEMBER_TRAITS_NAMED_DECL(num_template_params,class_name,(member_name0,name0),(member_name1,name1)...)        // (7)
-JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_NAMED_DECL(num_template_params,class_name,(member_name0,name0),(member_name1,name1)...) // (8)
+JSONCONS_TEMPLATE_MEMBER_TRAITS_NAMED_DECL(num_template_params,class_name,(member_name0,"name0"),(member_name1,"name1")...)        // (7)
+JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_NAMED_DECL(num_template_params,class_name,(member_name0,"name0"),(member_name1,"name1")...) // (8)
 
 JSONCONS_GETTER_CTOR_TRAITS_DECL(class_name,getter_name0,getter_name1,...)                      // (9)
 JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL(class_name,(getter_name0,name0),(getter_name1,name1)...) // (10)
