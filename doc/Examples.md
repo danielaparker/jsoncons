@@ -23,8 +23,8 @@
 [Convert JSON to/from C++ data structures by specializing json_type_traits](#G1)  
 [Mapping to C++ data structures with and without defaults allowed](#G2)  
 [An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL](#G3)  
-[Serializing a templated class with the `_TEMPLATE_` macros](#G4)  
-[Serializing to given names with the `_NAMED_` macros](#G5)  
+[Serializing a templated class with the _TEMPLATE_ macros](#G4)  
+[Serializing to given names with the _NAMED_ macros](#G5)  
 [A polymorphic example](#G6)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G7)
 
@@ -790,7 +790,7 @@ Output:
 
 <div id="G4"/>
 
-#### Serializing a templated class with the `_TEMPLATE_` macros
+#### Serializing a templated class with the _TEMPLATE_ macros
 
 ```c++
 #include <cassert>
@@ -837,7 +837,7 @@ int main()
 
 <div id="G5"/>
 
-#### Serializing to given names with the `_NAMED_` macros
+#### Serializing to given names with the _NAMED_ macros
 
 ```c++
 #include <jsoncons/json.hpp>
