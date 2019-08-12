@@ -94,7 +94,9 @@
 #endif
 
 #if !defined(JSONCONS_DEPRECATED_MSG) && defined(_MSC_VER)
-#if (_MSC_VER) >= 1400
+#if (_MSC_VER) >= 1420
+#define JSONCONS_DEPRECATED_MSG(msg) [[deprecated(msg)]]
+#elif (_MSC_VER) >= 1400
 #define JSONCONS_DEPRECATED_MSG(msg) __declspec(deprecated(msg))
 #endif
 #endif
