@@ -351,7 +351,7 @@ public:
                 ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),val.get_allocator());
             }
 
-            long_string_data(long_string_data&& val)
+            long_string_data(long_string_data&& val) noexcept
                 : data_base(val.ext_type()), ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
@@ -436,7 +436,7 @@ public:
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
-            byte_string_data(byte_string_data&& val)
+            byte_string_data(byte_string_data&& val) noexcept
                 : data_base(val.ext_type()), ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
@@ -529,7 +529,7 @@ public:
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
-            array_data(array_data&& val)
+            array_data(array_data&& val) noexcept
                 : data_base(val.ext_type()), ptr_(nullptr)
             {
                 std::swap(val.ptr_, ptr_);
@@ -611,7 +611,7 @@ public:
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
-            explicit object_data(object_data&& val)
+            explicit object_data(object_data&& val) noexcept
                 : data_base(val.ext_type()), ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);

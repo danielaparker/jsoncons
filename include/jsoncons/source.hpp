@@ -438,7 +438,7 @@ public:
     {
     }
 
-    binary_stream_source(binary_stream_source&& other) 
+    binary_stream_source(binary_stream_source&& other) noexcept
     {
         std::swap(is_,other.is_);
         std::swap(sbuf_,other.sbuf_);
@@ -449,7 +449,7 @@ public:
     {
     }
 
-    binary_stream_source& operator=(binary_stream_source&& other) 
+    binary_stream_source& operator=(binary_stream_source&& other) noexcept
     {
         std::swap(is_,other.is_);
         std::swap(sbuf_,other.sbuf_);

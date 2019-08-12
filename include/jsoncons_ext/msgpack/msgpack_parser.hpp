@@ -193,21 +193,21 @@ private:
                 // fixstr
                 const size_t len = type & 0x1f;
 
-                std::basic_string<char> s;
-                source_.read(std::back_inserter(s), len);
+                buffer_.clear();
+                source_.read(std::back_inserter(buffer_), len);
                 if (source_.eof())
                 {
                     ec = msgpack_errc::unexpected_eof;
                     return;
                 }
 
-                auto result = unicons::validate(s.begin(),s.end());
+                auto result = unicons::validate(buffer_.begin(),buffer_.end());
                 if (result.ec != unicons::conv_errc())
                 {
                     ec = msgpack_errc::invalid_utf8_text_string;
                     return;
                 }
-                continue_ = handler.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this);
+                continue_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this);
             }
         }
         else if (type >= 0xe0) 
@@ -389,20 +389,20 @@ private:
                     const uint8_t* endp;
                     int8_t len = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
 
-                    std::basic_string<char> s;
-                    source_.read(std::back_inserter(s), len);
+                    buffer_.clear();
+                    source_.read(std::back_inserter(buffer_), len);
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
                     }
-                    auto result = unicons::validate(s.begin(),s.end());
+                    auto result = unicons::validate(buffer_.begin(),buffer_.end());
                     if (result.ec != unicons::conv_errc())
                     {
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    continue_ = handler.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this);
+                    continue_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this);
                     break;
                 }
 
@@ -418,21 +418,21 @@ private:
                     const uint8_t* endp;
                     int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
 
-                    std::basic_string<char> s;
-                    source_.read(std::back_inserter(s), len);
+                    buffer_.clear();
+                    source_.read(std::back_inserter(buffer_), len);
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
                     }
 
-                    auto result = unicons::validate(s.begin(),s.end());
+                    auto result = unicons::validate(buffer_.begin(),buffer_.end());
                     if (result.ec != unicons::conv_errc())
                     {
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    continue_ = handler.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this);
+                    continue_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this);
                     break;
                 }
 
@@ -448,21 +448,21 @@ private:
                     const uint8_t* endp;
                     int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
 
-                    std::basic_string<char> s;
-                    source_.read(std::back_inserter(s), len);
+                    buffer_.clear();
+                    source_.read(std::back_inserter(buffer_), len);
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
                     }
 
-                    auto result = unicons::validate(s.begin(),s.end());
+                    auto result = unicons::validate(buffer_.begin(),buffer_.end());
                     if (result.ec != unicons::conv_errc())
                     {
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    continue_ = handler.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this);
+                    continue_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this);
                     break;
                 }
 
@@ -585,20 +585,20 @@ private:
                 // fixstr
             const size_t len = type & 0x1f;
 
-            std::basic_string<char> s;
-            source_.read(std::back_inserter(s), len);
+            buffer_.clear();
+            source_.read(std::back_inserter(buffer_), len);
             if (source_.eof())
             {
                 ec = msgpack_errc::unexpected_eof;
                 return;
             }
-            auto result = unicons::validate(s.begin(),s.end());
+            auto result = unicons::validate(buffer_.begin(),buffer_.end());
             if (result.ec != unicons::conv_errc())
             {
                 ec = msgpack_errc::invalid_utf8_text_string;
                 return;
             }
-            continue_ = handler.name(basic_string_view<char>(s.data(),s.length()), *this);
+            continue_ = handler.name(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
         }
         else
         {
@@ -616,21 +616,21 @@ private:
                     const uint8_t* endp;
                     int8_t len = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
 
-                    std::basic_string<char> s;
-                    source_.read(std::back_inserter(s), len);
+                    buffer_.clear();
+                    source_.read(std::back_inserter(buffer_), len);
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
                     }
 
-                    auto result = unicons::validate(s.begin(),s.end());
+                    auto result = unicons::validate(buffer_.begin(),buffer_.end());
                     if (result.ec != unicons::conv_errc())
                     {
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    continue_ = handler.name(basic_string_view<char>(s.data(),s.length()), *this);
+                    continue_ = handler.name(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
                     break;
                 }
 
@@ -646,22 +646,15 @@ private:
                     const uint8_t* endp;
                     int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
 
-                    std::basic_string<char> s;
-                    source_.read(std::back_inserter(s), len);
+                    buffer_.clear();
+                    source_.read(std::back_inserter(buffer_), len);
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
                     }
 
-                    //std::basic_string<char> s;
-                    //auto result = unicons::convert(
-                    //    first, last,std::back_inserter(s),unicons::conv_flags::strict);
-                    //if (result.ec != unicons::conv_errc())
-                    //{
-                    //    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Illegal unicode"));
-                    //}
-                    continue_ = handler.name(basic_string_view<char>(s.data(),s.length()), *this);
+                    continue_ = handler.name(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
                     break;
                 }
 
@@ -677,19 +670,18 @@ private:
                     const uint8_t* endp;
                     int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
 
-                    std::basic_string<char> s;
-                    source_.read(std::back_inserter(s), len);
+                    buffer_.clear();
+                    source_.read(std::back_inserter(buffer_), len);
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
                     }
 
-                    continue_ = handler.name(basic_string_view<char>(s.data(),s.length()), *this);
+                    continue_ = handler.name(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
                     break;
                 }
             }
-
         }
     }
 
