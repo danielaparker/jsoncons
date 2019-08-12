@@ -193,7 +193,8 @@ void normalized_boundaries(double d, diy_fp_t *out_m_minus, diy_fp_t *out_m_plus
         mi.f = (v.f << 1) - 1;
         mi.e = v.e - 1;
     }
-    mi.f <<= mi.e - pl.e;
+	int x = mi.e - pl.e;
+    mi.f <<= x;
     mi.e = pl.e;
     *out_m_plus = pl;
     *out_m_minus = mi;
