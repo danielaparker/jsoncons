@@ -51,6 +51,9 @@ class heap_only_string : public heap_only_string_base<Allocator>
     typedef typename allocator_traits_type::pointer pointer;
 
     friend class heap_only_string_factory<CharT, Allocator>;
+
+	pointer p_;
+	size_t length_;
 public:
     typedef CharT char_type;
     typedef heap_only_string<CharT,Allocator> value_type;
@@ -71,18 +74,15 @@ public:
     }
 private:
     heap_only_string()
-        : heap_only_string_base<Allocator>(Allocator())
+        : heap_only_string_base<Allocator>(Allocator()), length_(0)
     {
 
     }
     heap_only_string(const Allocator& allocator)
-        : heap_only_string_base<Allocator>(allocator)
+        : heap_only_string_base<Allocator>(allocator), length_(0)
     {
 
     }
-
-    pointer p_;
-    size_t length_;
 
     heap_only_string(const heap_only_string&) = delete;
     heap_only_string& operator=(const heap_only_string&) = delete;

@@ -662,30 +662,30 @@ public:
 
         data_t data_;
     public:
-        variant(semantic_tag tag)
+		variant(semantic_tag tag) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))empty_object_data(tag);
         }
 
-        explicit variant(null_type, semantic_tag tag)
+        explicit variant(null_type, semantic_tag tag) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))null_data(tag);
         }
 
-        explicit variant(bool val, semantic_tag tag)
+		explicit variant(bool val, semantic_tag tag) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))bool_data(val,tag);
         }
-        explicit variant(int64_t val, semantic_tag tag)
+		explicit variant(int64_t val, semantic_tag tag) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))int64_data(val, tag);
         }
-        explicit variant(uint64_t val, semantic_tag tag)
+		explicit variant(uint64_t val, semantic_tag tag) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))uint64_data(val, tag);
         }
 
-        variant(double val, semantic_tag tag)
+		variant(double val, semantic_tag tag) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))double_data(val, tag);
         }
@@ -702,7 +702,7 @@ public:
             }
         }
 
-        variant(const char_type* s, size_t length, semantic_tag tag, const Allocator& alloc)
+		variant(const char_type* s, size_t length, semantic_tag tag, const Allocator& alloc) : data_{}
         {
             if (length <= short_string_data::max_length)
             {
@@ -714,17 +714,17 @@ public:
             }
         }
 
-        variant(const byte_string_view& bs, semantic_tag tag)
+        variant(const byte_string_view& bs, semantic_tag tag) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.length(), byte_allocator_type());
         }
 
-        variant(const byte_string_view& bs, semantic_tag tag, const Allocator& allocator)
+        variant(const byte_string_view& bs, semantic_tag tag, const Allocator& allocator) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.length(), allocator);
         }
 
-        variant(const basic_bignum<byte_allocator_type>& n)
+        variant(const basic_bignum<byte_allocator_type>& n) : data_{}
         {
             std::basic_string<char_type> s;
             n.dump(s);
@@ -739,7 +739,7 @@ public:
             }
         }
 
-        variant(const basic_bignum<byte_allocator_type>& n, const Allocator& allocator)
+        variant(const basic_bignum<byte_allocator_type>& n, const Allocator& allocator) : data_{}
         {
             std::basic_string<char_type> s;
             n.dump(s);
@@ -753,19 +753,19 @@ public:
                 new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag::bigint, s.data(), s.length(), char_allocator_type(allocator));
             }
         }
-        variant(const object& val, semantic_tag tag)
+		variant(const object& val, semantic_tag tag) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))object_data(val, tag);
         }
-        variant(const object& val, semantic_tag tag, const Allocator& alloc)
+        variant(const object& val, semantic_tag tag, const Allocator& alloc) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))object_data(val, tag, alloc);
         }
-        variant(const array& val, semantic_tag tag)
+        variant(const array& val, semantic_tag tag) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))array_data(val, tag);
         }
-        variant(const array& val, semantic_tag tag, const Allocator& alloc)
+        variant(const array& val, semantic_tag tag, const Allocator& alloc) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))array_data(val, tag, alloc);
         }

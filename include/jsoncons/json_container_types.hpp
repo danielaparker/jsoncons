@@ -73,7 +73,7 @@ public:
     {
     }
 
-    key_value(key_value&& member)
+    key_value(key_value&& member) noexcept
         : key_(std::move(member.key_)), value_(std::move(member.value_))
     {
     }
@@ -115,7 +115,7 @@ public:
         return *this;
     }
 
-    key_value& operator=(key_value&& member)
+    key_value& operator=(key_value&& member) noexcept
     {
         if (this != &member)
         {

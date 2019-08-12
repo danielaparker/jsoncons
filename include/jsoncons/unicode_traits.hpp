@@ -880,7 +880,7 @@ validate(InputIt first, InputIt last) UNICONS_NOEXCEPT
     conv_errc  result = conv_errc();
     while (first != last) 
     {
-        size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(*first)] + 1;
+        size_t length = static_cast<size_t>(trailing_bytes_for_utf8[static_cast<uint8_t>(*first)]) + 1;
         if (length > (size_t)(last - first))
         {
             return convert_result<InputIt>{first, conv_errc::source_exhausted};

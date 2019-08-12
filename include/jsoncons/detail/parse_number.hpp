@@ -133,7 +133,7 @@ to_integer(const CharT* s, size_t length)
         ++s;
         for (; s < end; ++s)
         {
-            T x = *s - '0';
+            T x = (T)*s - (T)('0');
             if (n < min_value_div_10)
             {
                 ec = to_integer_errc::overflow;
@@ -155,7 +155,7 @@ to_integer(const CharT* s, size_t length)
         static const T max_value_div_10 = max_value / 10;
         for (; s < end; ++s)
         {
-            T x = *s - '0';
+            T x = (T)(*s - '0');
             if (n > max_value_div_10)
             {
                 ec = to_integer_errc::overflow;
@@ -198,7 +198,7 @@ to_integer(const CharT* s, size_t length)
     static const T max_value_div_10 = max_value / 10;
     for (; s < end; ++s)
     {
-        T x = *s - '0';
+        T x = (T)(*s - '0');
         if (n > max_value_div_10)
         {
             ec = to_integer_errc::overflow;

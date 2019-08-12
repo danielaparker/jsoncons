@@ -395,15 +395,8 @@ private:
             case staj_event_type::name:
             case staj_event_type::string_value:
             {
-                std::string target;
-                auto result = unicons::convert(
-                    value_.string_data_, value_.string_data_ + length_, std::back_inserter(target), unicons::conv_flags::strict);
-                if (result.ec != unicons::conv_errc())
-                {
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a double"));
-                }
                 jsoncons::detail::string_to_double f;
-                return f(target.data(), target.length());
+                return f(value_.string_data_, length_);
             }
             case staj_event_type::double_value:
                 return value_.double_value_;
