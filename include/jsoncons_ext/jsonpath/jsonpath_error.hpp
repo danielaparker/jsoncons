@@ -67,13 +67,13 @@ public:
         return column_number_;
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED("Instead, use line()")
+    JSONCONS_DEPRECATED_MSG("Instead, use line()")
     size_t line_number() const noexcept
     {
         return line();
     }
 
-    JSONCONS_DEPRECATED("Instead, use column()")
+    JSONCONS_DEPRECATED_MSG("Instead, use column()")
     size_t column_number() const noexcept
     {
         return column();

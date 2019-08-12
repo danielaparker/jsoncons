@@ -72,20 +72,38 @@
 #endif // !defined(JSONCONS_HAS_STRING_VIEW)
 
 // Deprecated symbols markup
-#if !defined(JSONCONS_DEPRECATED) && defined(__has_extension)
+#if (defined(__cplusplus) && __cplusplus >= 201402L)
+#define JSONCONS_DEPRECATED [[deprecated]]
+#define JSONCONS_DEPRECATED_MSG(msg) [[deprecated(msg)]]
+#endif
+
+#if !defined(JSONCONS_DEPRECATED) && defined(__GNUC__) && defined(__has_extension)
+#if __has_extension(attribute_deprecated)
+#define JSONCONS_DEPRECATED __attribute__((deprecated))
+#endif
+#endif
+
+#if !defined(JSONCONS_DEPRECATED_MSG) && defined(__GNUC__) && defined(__has_extension)
 #if __has_extension(attribute_deprecated_with_message)
-#define JSONCONS_DEPRECATED(msg) __attribute__((deprecated(msg)))
+#define JSONCONS_DEPRECATED_MSG(msg) __attribute__((deprecated(msg)))
 #endif
 #endif
 
 #if !defined(JSONCONS_DEPRECATED) && defined(_MSC_VER)
+#define JSONCONS_DEPRECATED __declspec(deprecated)
+#endif
+
+#if !defined(JSONCONS_DEPRECATED_MSG) && defined(_MSC_VER)
 #if (_MSC_VER) >= 1400
-#define JSONCONS_DEPRECATED(msg) __declspec(deprecated(msg))
+#define JSONCONS_DEPRECATED_MSG(msg) __declspec(deprecated(msg))
 #endif
 #endif
 
 #if !defined(JSONCONS_DEPRECATED)
-#define JSONCONS_DEPRECATED(msg)
+#define JSONCONS_DEPRECATED
+#endif
+#if !defined(JSONCONS_DEPRECATED_MSG)
+#define JSONCONS_DEPRECATED_MSG(msg)
 #endif
 
 #if defined(ANDROID) || defined(__ANDROID__)

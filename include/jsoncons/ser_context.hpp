@@ -19,13 +19,13 @@ public:
     virtual size_t column() const = 0; 
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED("Instead, use line()")
+    JSONCONS_DEPRECATED_MSG("Instead, use line()")
     size_t line_number() const
     {
         return line();
     }
 
-    JSONCONS_DEPRECATED("Instead, use column()")
+    JSONCONS_DEPRECATED_MSG("Instead, use column()")
     size_t column_number() const 
     {
         return column();
@@ -42,10 +42,10 @@ private:
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED("Instead, use ser_context") typedef ser_context parsing_context;
-JSONCONS_DEPRECATED("Instead, use ser_context") typedef ser_context serializing_context;
-JSONCONS_DEPRECATED("Instead, use null_ser_context") typedef null_ser_context null_parsing_context;
-JSONCONS_DEPRECATED("Instead, use null_ser_context") typedef null_ser_context null_serializing_context;
+JSONCONS_DEPRECATED_MSG("Instead, use ser_context") typedef ser_context parsing_context;
+JSONCONS_DEPRECATED_MSG("Instead, use ser_context") typedef ser_context serializing_context;
+JSONCONS_DEPRECATED_MSG("Instead, use null_ser_context") typedef null_ser_context null_parsing_context;
+JSONCONS_DEPRECATED_MSG("Instead, use null_ser_context") typedef null_ser_context null_serializing_context;
 #endif
 
 }
