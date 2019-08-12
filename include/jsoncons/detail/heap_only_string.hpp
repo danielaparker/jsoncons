@@ -74,12 +74,12 @@ public:
     }
 private:
     heap_only_string()
-        : heap_only_string_base<Allocator>(Allocator()), length_(0), p_(nullptr)
+        : heap_only_string_base<Allocator>(Allocator()), p_(nullptr), length_(0)
     {
 
     }
     heap_only_string(const Allocator& allocator)
-        : heap_only_string_base<Allocator>(allocator), length_(0), p_(nullptr)
+        : heap_only_string_base<Allocator>(allocator), p_(nullptr), length_(0)
     {
 
     }
