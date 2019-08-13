@@ -10,7 +10,6 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 #### Variant-like Data Structure
 
 [basic_json](ref/basic_json.md)  
-[json_decoder](ref/json_decoder.md)  
 
 #### Streaming API for JSON (StAJ)
 
@@ -28,6 +27,8 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 [json_parser](ref/json_parser.md)  
 [basic_json_reader](ref/basic_json_reader.md)  
+
+[json_decoder](ref/json_decoder.md)  
 
 [json_filter](ref/json_filter.md)  
 [rename_object_member_filter](ref/rename_object_member_filter.md)  
