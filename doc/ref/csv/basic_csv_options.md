@@ -7,7 +7,7 @@ template<
     class CharT
 > class basic_csv_options;
 ```
-Specifies options for encoding and decoding CSV data. 
+Specifies options for parsing and serializing CSV data. 
 
 ![basic_csv_options](./diagrams/csv_options.png)
 
@@ -118,6 +118,6 @@ Default CSV encode and decode options.
 
 ### See also
 
-[csv_decode_options](csv_decode_options.md)
-[csv_encode_options](csv_encode_options.md)
+[basic_csv_decode_options](basic_csv_decode_options.md)
+[basic_csv_encode_options](basic_csv_encode_options.md)
 

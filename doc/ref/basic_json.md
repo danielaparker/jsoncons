@@ -6,7 +6,8 @@
 template< 
     class CharT,
     class ImplementationPolicy = sorted_policy,
-    class Allocator = std::allocator<char>> class basic_json;
+    class Allocator = std::allocator<char>
+> class basic_json;
 ```
 
 The class `basic_json` resembles a union. A `basic_json` holds a data item of one of its alternative types:

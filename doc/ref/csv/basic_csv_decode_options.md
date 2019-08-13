@@ -1,16 +1,29 @@
-### jsoncons::csv::csv_decode_options
+### jsoncons::csv::basic_csv_decode_options
 
 ```c++
 #include <jsoncons/csv/csv_options.hpp>
 
-typedef basic_csv_decode_options<char> csv_decode_options
+template< 
+    class CharT
+> class basic_csv_decode_options;
 ```
 
-An abstract class that defines accessors for CSV decode options.
+An abstract class that defines accessors for CSV parsing options.
 
 #### Implementing classes
 
 [basic_csv_options](basic_csv_options.md)
+
+Typedefs for common character types are provided:
+
+Type                |Definition
+--------------------|------------------------------
+csv_decode_options        |basic_csv_decode_options<char>
+wcsv_decode_options       |basic_csv_decode_options<wchar_t>
+
+Member type                         |Definition
+------------------------------------|------------------------------
+`string_type`|std::basic_string<CharT>
 
 #### Accessors
 

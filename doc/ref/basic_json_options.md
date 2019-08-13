@@ -8,7 +8,7 @@ template<
 > class basic_json_options;
 ```
 
-Specifies options for encoding and decoding JSON text. 
+Specifies options for parsing and serializing JSON text. 
 
 The default floating point format is [float_chars_format::general](float_chars_format.md).
 The default precision is shortest representation, e.g. 1.1 read will remain `1.1` when written, and not become `1.1000000000000001` (an equivalent but longer representation.)
@@ -133,8 +133,8 @@ Default JSON encode and decode options.
 
 ### See also
 
-[json_decode_options](json_decode_options.md)
-[json_encode_options](json_encode_options.md)
+[basic_json_decode_options](basic_json_decode_options.md)
+[basic_json_encode_options](basic_json_encode_options.md)
 
 ### Examples
 
