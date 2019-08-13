@@ -32,17 +32,17 @@ void dump(basic_json_content_handler<char_type>& content_handler) const; // (9)
 
 (2) Dumps json value to string using default serialization options and the specified [indenting](../indenting.md). 
 
-(3) Dumps json value to string using specified [json_options](../json_options.md). 
+(3) Dumps json value to string using specified [basic_json_options](../basic_json_options.md). 
 
-(4) Dumps json value to string using the specified [json_options](../json_options.md) and [indenting](../indenting.md). 
+(4) Dumps json value to string using the specified [basic_json_options](../basic_json_options.md) and [indenting](../indenting.md). 
 
 (5) Dumps json value to stream with default serialization options. 
 
 (6) Dumps json value to stream using default serialization options and the specified [indenting](../indenting.md). 
 
-(7) Dumps json value to stream using specified [json_options](../json_options.md). 
+(7) Dumps json value to stream using specified [basic_json_options](../basic_json_options.md). 
 
-(8) Dumps json value to stream using the specified [json_options](../json_options.md) and [indenting](../indenting.md). 
+(8) Dumps json value to stream using the specified [basic_json_options](../basic_json_options.md) and [indenting](../indenting.md). 
 
 (9) Emits json value to the [json_content_handler](../json_content_handler.md).
 

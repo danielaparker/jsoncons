@@ -10,7 +10,7 @@ An abstract class that defines accessors for JSON decode options. The `json_deco
 
 #### Implementing classes
 
-[json_options](json_options.md)
+[basic_json_options](basic_json_options.md)
 
 #### Destructor
 

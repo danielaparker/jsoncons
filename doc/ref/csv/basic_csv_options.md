@@ -7,7 +7,7 @@ typedef basic_csv_options<char> csv_options
 ```
 Specifies options for encoding and decoding csv data. The `csv_options` class is an instantiation of the `basic_csv_options` class template that uses `char` as the character type.
 
-![csv_options](./diagrams/csv_options.png)
+![basic_csv_options](./diagrams/csv_options.png)
 
 #### Constructors
 

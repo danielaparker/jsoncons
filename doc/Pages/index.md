@@ -618,7 +618,7 @@ produces
 ```
 By default, within objects, arrays of scalar values are displayed on the same line.
 
-The `pretty_print` function takes an optional second parameter, [json_options](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_options.md), that allows custom formatting of output.
+The `pretty_print` function takes an optional second parameter, [basic_json_options](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json_options.md), that allows custom formatting of output.
 To display the array scalar values on a new line, set the `object_array_line_splits` property to `line_split_kind::new_line`. The code
 ```c++
 json_options options;

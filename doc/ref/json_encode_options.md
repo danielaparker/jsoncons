@@ -10,7 +10,7 @@ An abstract class that defines accessors for JSON encoding options. The `json_en
 
 #### Implementing classes
 
-[json_options](json_options.md)
+[basic_json_options](basic_json_options.md)
 
 #### Destructor
 

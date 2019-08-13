@@ -10,7 +10,7 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 [encode_csv](encode_csv.md)
 
-[csv_options](csv_options.md)
+[basic_csv_options](basic_csv_options.md)
 
 [csv_reader](csv_reader.md)
 

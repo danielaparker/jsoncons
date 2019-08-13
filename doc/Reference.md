@@ -9,7 +9,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 [json_type_traits](ref/json_type_traits.md)  
 [encode_json](ref/encode_json.md)  
 [decode_json](ref/decode_json.md)  
-[json_options](ref/json_options.md)    
+[basic_json_options](ref/basic_json_options.md)    
 
 #### Streaming API for JSON (StAJ)
 

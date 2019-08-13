@@ -272,12 +272,12 @@ Reads a `basic_json` value from a stream.
 Inserts basic_json value into stream.
 
     std::basic_ostream<char_type>& print(const basic_json& val)  
-    std::basic_ostream<char_type>& print(const basic_json& val, const json_options<CharT>& options)  
-Inserts basic_json value into stream using the specified [json_options](json_options.md) if supplied.
+    std::basic_ostream<char_type>& print(const basic_json& val, const basic_json_options<CharT>& options)  
+Inserts basic_json value into stream using the specified [basic_json_options](basic_json_options.md) if supplied.
 
     std::basic_ostream<char_type>& pretty_print(const basic_json& val)  
-    std::basic_ostream<char_type>& pretty_print(const basic_json& val, const json_options<CharT>& options)  
-Inserts basic_json value into stream using the specified [json_options](json_options.md) if supplied.
+    std::basic_ostream<char_type>& pretty_print(const basic_json& val, const basic_json_options<CharT>& options)  
+Inserts basic_json value into stream using the specified [basic_json_options](basic_json_options.md) if supplied.
 
     void swap(basic_json& a, basic_json& b)
 Exchanges the values of `a` and `b`

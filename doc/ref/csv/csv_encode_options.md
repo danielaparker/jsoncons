@@ -8,7 +8,7 @@ An abstract class that defines accessors for CSV encode options.
 
 #### Implementing classes
 
-[csv_options](csv_options.md)
+[basic_csv_options](basic_csv_options.md)
 
 #### Accessors
 

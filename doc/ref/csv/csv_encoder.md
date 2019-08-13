@@ -39,7 +39,7 @@ Constructs a new csv encoder that is associated with the output adaptor `result`
     basic_csv_encoder(result_type result, 
                          const basic_csv_options<CharT>& options)
 Constructs a new csv encoder that is associated with the output adaptor `result` 
-and uses the specified [csv options](csv_options.md). 
+and uses the specified [csv options](basic_csv_options.md). 
 
 #### Destructor
 
