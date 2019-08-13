@@ -12,23 +12,25 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 [basic_json](ref/basic_json.md)  
 [json_decoder](ref/json_decoder.md)  
 
-#### Parsing
+#### Streaming API for JSON (StAJ)
+
+[staj_reader](ref/staj_reader.md)  
+[staj_event](ref/staj_event.md)  
+[staj_object_iterator](ref/staj_object_iterator.md)  
+[staj_array_iterator](ref/staj_array_iterator.md)  
+
+[basic_json_cursor](ref/basic_json_cursor.md)  
+[basic_json_encoder](ref/basic_json_encoder.md)  
+
+#### Push Parsing API
+
+[json_content_handler](ref/json_content_handler.md)  
 
 [json_parser](ref/json_parser.md)  
 [basic_json_reader](ref/basic_json_reader.md)  
 
-#### Streaming
-
-[json_content_handler](ref/json_content_handler.md)  
-[basic_json_encoder](ref/basic_json_encoder.md)  
-
 [json_filter](ref/json_filter.md)  
 [rename_object_member_filter](ref/rename_object_member_filter.md)  
-
-[basic_json_cursor](ref/basic_json_cursor.md)  
-[staj_reader](ref/staj_reader.md)  
-[staj_object_iterator](ref/staj_object_iterator.md)  
-[staj_array_iterator](ref/staj_array_iterator.md)  
 
 ### Extensions
 
