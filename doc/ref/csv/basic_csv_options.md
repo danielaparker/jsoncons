@@ -15,13 +15,13 @@ Typedefs for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------
-csv_options        |basic_csv_options<char>
-wcsv_options       |basic_csv_options<wchar_t>
+`csv_options`        |`basic_csv_options<char>`
+`wcsv_options`       |`basic_csv_options<wchar_t>`
 
 Member type                         |Definition
 ------------------------------------|------------------------------
 `char_type`|`CharT`
-`string_type`|std::basic_string<CharT>
+`string_type`|`std::basic_string<CharT>`
 
 #### Constructors
 

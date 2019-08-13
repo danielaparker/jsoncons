@@ -18,12 +18,12 @@ Typedefs for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------
-csv_encode_options        |basic_csv_encode_options<char>
-wcsv_encode_options       |basic_csv_encode_options<wchar_t>
+`csv_encode_options`        |`basic_csv_encode_options<char>`
+`wcsv_encode_options`       |`basic_csv_encode_options<wchar_t>`
 
 Member type                         |Definition
 ------------------------------------|------------------------------
-`string_type`|std::basic_string<CharT>
+`string_type`|`std::basic_string<CharT>`
 
 #### Accessors
 

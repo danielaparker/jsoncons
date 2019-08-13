@@ -18,12 +18,12 @@ Typedefs for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------
-json_encode_options        |basic_json_encode_options<char>
-wjson_encode_options       |basic_json_encode_options<wchar_t>
+`json_encode_options`        |`basic_json_encode_options<char>`
+`wjson_encode_options`       |`basic_json_encode_options<wchar_t>`
 
 Member type                         |Definition
 ------------------------------------|------------------------------
-`string_type`|std::basic_string<CharT>
+`string_type`|`std::basic_string<CharT>`
 
 #### Destructor
 
