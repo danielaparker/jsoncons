@@ -1,24 +1,39 @@
-### jsoncons::csv::csv_options
+### jsoncons::csv::basic_csv_options
 
 ```c++
 #include <jsoncons_ext/csv/csv_options.hpp>
 
-typedef basic_csv_options<char> csv_options
+template< 
+    class CharT
+> class basic_csv_options;
 ```
-Specifies options for encoding and decoding csv data. The `csv_options` class is an instantiation of the `basic_csv_options` class template that uses `char` as the character type.
+Specifies options for encoding and decoding CSV data. 
 
 ![basic_csv_options](./diagrams/csv_options.png)
 
+Typedefs for common character types are provided:
+
+Type                |Definition
+--------------------|------------------------------
+csv_options        |basic_csv_options<char>
+wcsv_options       |basic_csv_options<wchar_t>
+
+Member type                         |Definition
+------------------------------------|------------------------------
+`char_type`|`CharT`
+`string_type`|std::basic_string<CharT>
+
 #### Constructors
 
-    csv_options()
-Constructs an `csv_options` with default values. 
+    basic_csv_options()
+Constructs a `basic_csv_options` with default values. 
 
 #### Modifiers
-    basic_csv_options<CharT>& float_format(float_chars_format value);
+
+    basic_csv_options& float_format(float_chars_format value);
 Overrides [floating point format](../float_chars_format.md) when serializing to CSV. The default is [float_chars_format::general](float_chars_format.md).
 
-    basic_csv_options<CharT>& precision(int value);
+    basic_csv_options& precision(int value);
 Overrides floating point precision when serializing csv from json. The default is shortest representation.
 
     basic_csv_options& header_lines(size_t value);
@@ -63,16 +78,16 @@ A comma separated list of data types corresponding to the columns in the file. T
     basic_csv_options& column_defaults(const string_type& defaults);
 A comma separated list of strings containing default json values corresponding to the columns in the file. Example: "false,0.0,"\"\""
 
-    basic_csv_options& field_delimiter(CharT value);
+    basic_csv_options& field_delimiter(char_type value);
 A delimiter character that indicates the end of a field. Default is `,`             
 
-    basic_csv_options& subfield_delimiter(CharT value);
+    basic_csv_options& subfield_delimiter(char_type value);
 A delimiter character that indicates the end of a single value in a multi-valued field. Default is no multi-valued fields.
 
     basic_csv_options& line_delimiter(string_type value);
 String to write between records. Default is \n.  
 
-    basic_csv_options& quote_char(CharT value);
+    basic_csv_options& quote_char(char_type value);
 Quote character. Default is quote character "             
 
     basic_csv_options& infer_types(bool value);
@@ -81,10 +96,10 @@ Infer null, true, false, integers and floating point values in the CSV source. D
     basic_csv_options& lossless_number(bool value); 
 If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`. Default is `false`.
 
-    basic_csv_options& quote_escape_char(CharT value);
+    basic_csv_options& quote_escape_char(char_type value);
 Character to escape quote character (by default the quote character is doubled). Default is quote character `"`.
 
-    basic_csv_options& comment_starter(CharT value);
+    basic_csv_options& comment_starter(char_type value);
 Character to comment out a line, must be at column 1. Default is no comments.
 
     basic_csv_options& quote_style(quote_style_type value);
@@ -98,7 +113,7 @@ Maximum number of lines to read. Default is unlimited.
 
 #### Static member functions
 
-    static const basic_csv_options<CharT>& get_default_options()
+    static const basic_csv_options& get_default_options()
 Default CSV encode and decode options.
 
 ### See also

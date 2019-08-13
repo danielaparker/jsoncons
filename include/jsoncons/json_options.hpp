@@ -52,15 +52,15 @@ public:
 
     virtual bool is_str_to_nan() const = 0;
 
-    virtual std::basic_string<CharT> nan_to_str() const = 0;
+    virtual string_type nan_to_str() const = 0;
 
     virtual bool is_str_to_inf() const = 0;
 
-    virtual std::basic_string<CharT> inf_to_str() const = 0;
+    virtual string_type inf_to_str() const = 0;
 
     virtual bool is_str_to_neginf() const = 0;
 
-    virtual std::basic_string<CharT> neginf_to_str() const = 0;
+    virtual string_type neginf_to_str() const = 0;
 
     virtual bool lossless_number() const = 0;
 };
@@ -107,31 +107,31 @@ public:
 
     virtual bool pad_inside_array_brackets() const = 0;
 
-    virtual std::basic_string<CharT> new_line_chars() const = 0;
+    virtual string_type new_line_chars() const = 0;
 
     virtual bool is_nan_to_num() const = 0;
 
-    virtual std::basic_string<CharT> nan_to_num() const = 0;
+    virtual string_type nan_to_num() const = 0;
 
     virtual bool is_inf_to_num() const = 0;
 
-    virtual std::basic_string<CharT> inf_to_num() const = 0;
+    virtual string_type inf_to_num() const = 0;
 
     virtual bool is_neginf_to_num() const = 0;
 
-    virtual std::basic_string<CharT> neginf_to_num() const = 0;
+    virtual string_type neginf_to_num() const = 0;
 
     virtual bool is_nan_to_str() const = 0;
 
-    virtual std::basic_string<CharT> nan_to_str() const = 0;
+    virtual string_type nan_to_str() const = 0;
 
     virtual bool is_inf_to_str() const = 0;
 
-    virtual std::basic_string<CharT> inf_to_str() const = 0;
+    virtual string_type inf_to_str() const = 0;
 
     virtual bool is_neginf_to_str() const = 0;
 
-    virtual std::basic_string<CharT> neginf_to_str() const = 0;
+    virtual string_type neginf_to_str() const = 0;
 };
 
 template <class CharT>
@@ -192,7 +192,7 @@ public:
     static const size_t indent_size_default = 4;
     static const size_t line_length_limit_default = 120;
 
-    static const basic_json_options<char_type>& get_default_options()
+    static const basic_json_options& get_default_options()
     {
         static basic_json_options<char_type> options{};
         return options;
