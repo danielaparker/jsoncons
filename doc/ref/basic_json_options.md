@@ -1,18 +1,27 @@
-### jsoncons::json_options
+### jsoncons::basic_json_options
 
 ```c++
 #include <jsoncons/json_options.hpp>
 
-typedef basic_json_options<char> json_options
+template< 
+    class CharT
+> class basic_json_options;
 ```
 
-Specifies options for encoding and decoding JSON text. The `json_options` class is an instantiation of the `basic_json_options` class template that uses `char` as the character type.
+Specifies options for encoding and decoding JSON text. 
 
 The default floating point format is [float_chars_format::general](float_chars_format.md).
 The default precision is shortest representation, e.g. 1.1 read will remain `1.1` when written, and not become `1.1000000000000001` (an equivalent but longer representation.)
 Trailing zeros are removed, except one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.
 
 ![basic_json_options](./diagrams/json_options.png)
+
+Typedefs for common character types are provided:
+
+Type                |Definition
+--------------------|------------------------------
+json_options        |basic_json_decode_options<char>
+wjson_options       |basic_json_decode_options<wchar_t>
 
 #### Member constants
 
@@ -22,99 +31,104 @@ The default size indent is 4
     static const size_t line_length_limit_default = 120;
 The default line length limit is 120
 
+Member type                         |Definition
+------------------------------------|------------------------------
+`char_type`|`CharT`
+`string_type`|std::basic_string<CharT>
+
 #### Constructors
 
-    json_options()
-Constructs an `json_options` with default values. 
+    basic_json_options()
+Constructs a `basic_json_options` with default values. 
 
 #### Modifiers
 
-    json_options& indent(size_t value)
+    basic_json_options& indent_size(size_t value)
 The indent size, the default is 4.
 
-    json_options & spaces_around_colon(spaces_option value)
+    basic_json_options& spaces_around_colon(spaces_option value)
 Indicates [space option](spaces_option.md) for name separator (`:`). Default
 is space after.
 
-    json_options & spaces_around_comma(spaces_option value)
+    basic_json_options& spaces_around_comma(spaces_option value)
 Indicates [space option](spaces_option.md) for array value and object name/value pair separators (`,`). Default
 is space after.
 
-    json_options & pad_inside_object_braces(bool value)
+    basic_json_options& pad_inside_object_braces(bool value)
 Default is `false`
 
-    json_options & pad_inside_array_brackets(bool value)
+    basic_json_options& pad_inside_array_brackets(bool value)
 Default is `false`
 
-    json_options& bigint_format(bigint_chars_format value)
+    basic_json_options& bigint_format(bigint_chars_format value)
 Overrides [bignum format](bigint_chars_format.md) when serializing json.
 The default is [bigint_chars_format::base10](bigint_chars_format.md). 
 
-    json_options& byte_string_format(byte_string_chars_format value)
+    basic_json_options& byte_string_format(byte_string_chars_format value)
 Overrides [byte string format](byte_string_chars_format.md) when serializing json.
 The default is [byte_string_chars_format::base64url](byte_string_chars_format.md). 
 
-    json_options& float_format(float_chars_format value);
+    basic_json_options& float_format(float_chars_format value);
 Overrides [floating point format](../float_chars_format.md) when serializing to JSON. The default is [float_chars_format::general](float_chars_format.md).
 
-    json_options& precision(int value)
+    basic_json_options& precision(int value)
 Overrides floating point precision when serializing json. 
 The default is shortest representation.
 
-    json_options& escape_all_non_ascii(bool value)
+    basic_json_options& escape_all_non_ascii(bool value)
 Escape all non-ascii characters. The default is `false`.
 
-    json_options& escape_solidus(bool value)
+    basic_json_options& escape_solidus(bool value)
 Escape the solidus ('/') character. The default is `false`.
 
-    json_options& nan_to_num(const std::string& value); 
+    basic_json_options& nan_to_num(const string_type& value); 
 Sets a number replacement for `NaN` when writing JSON
 
-    json_options& inf_to_num(const std::string& value); 
+    basic_json_options& inf_to_num(const string_type& value); 
 Sets a number replacement for `Infinity` when writing JSON
 
-    json_options& neginf_to_num(const std::string& value); 
+    basic_json_options& neginf_to_num(const string_type& value); 
 Sets a number replacement for `Negative Infinity` when writing JSON
 
-    json_options& nan_to_str(const std::string& value, bool is_str_to_nan = true); 
+    basic_json_options& nan_to_str(const string_type& value, bool is_str_to_nan = true); 
 Sets a string replacement for `NaN` when writing JSON, and indicate whether it is also
 to be used when reading JSON.
 
-    json_options& inf_to_str(const std::string& value, bool is_str_to_inf = true); 
+    basic_json_options& inf_to_str(const string_type& value, bool is_str_to_inf = true); 
 Sets a string replacement for infinity when writing JSON, and indicate whether it is also
 to be used when reading JSON.
 
-    json_options& neginf_to_str(const std::string& value, bool is_str_to_neginf = true); // (4)
+    basic_json_options& neginf_to_str(const string_type& value, bool is_str_to_neginf = true); // (4)
 Sets a string replacement for negative infinity when writing JSON, and indicate whether it is also
 to be used when reading JSON.
 
-    json_options& lossless_number(bool value); 
+    basic_json_options& lossless_number(bool value); 
 If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`.
 Defaults to `false`.
 
-    json_options& new_line_chars(const std::string& value)
+    basic_json_options& new_line_chars(const string_type& value)
 Defaults to "\n"
 
-    json_options& line_length_limit(size_t value)
+    basic_json_options& line_length_limit(size_t value)
 
     void max_nesting_depth(size_t depth)
 The maximum nesting depth allowed when parsing JSON. By default `jsoncons` can read a `JSON` text of arbitrarily large depth.
 
-    json_options& object_object_line_splits(line_split_kind value)
+    basic_json_options& object_object_line_splits(line_split_kind value)
 For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
 
-    json_options& array_object_line_splits(line_split_kind value)
+    basic_json_options& array_object_line_splits(line_split_kind value)
 For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
 
-    json_options& object_array_line_splits(line_split_kind value)
+    basic_json_options& object_array_line_splits(line_split_kind value)
 For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::same_line](line_split_kind.md).
 
-    json_options& array_array_line_splits(line_split_kind value)
+    basic_json_options& array_array_line_splits(line_split_kind value)
 For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind.md).
 
 #### Static member functions
 
-    static const basic_json_options<CharT>& get_default_options()
+    static const basic_json_options& get_default_options()
 Default JSON encode and decode options.
 
 ### See also
