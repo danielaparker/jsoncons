@@ -752,7 +752,7 @@ using namespace jsoncons;
 
 int main()
 {
-    // Construct some CBOR using the streaming API
+    // Construct some CBOR using the push serializer
     std::vector<uint8_t> b;
     cbor::cbor_bytes_encoder encoder(b);
     encoder.begin_array(); // indefinite length outer array
