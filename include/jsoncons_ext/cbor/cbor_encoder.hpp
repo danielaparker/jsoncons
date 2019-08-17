@@ -196,7 +196,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(size_t length, semantic_tag tag, const ser_context&) override
+    bool do_begin_array(size_t length, semantic_tag, const ser_context&) override
     {
         stack_.push_back(stack_item(cbor_container_type::array, length));
         if (length <= 0x17)
