@@ -113,9 +113,6 @@ std::ostream& operator<<(std::ostream& os, semantic_tag tag)
 template <class CharT>
 class basic_json_content_handler
 {
-#if !defined(JSONCONS_NO_DEPRECATED)
-    std::basic_string<CharT> buffer_;
-#endif
 public:
     typedef CharT char_type;
     typedef std::char_traits<char_type> char_traits_type;

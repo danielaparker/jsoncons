@@ -178,7 +178,6 @@ JSONCONS_DEPRECATED_MSG("instead, use strict_json_parsing") typedef strict_json_
 template <class CharT, class Allocator = std::allocator<char>>
 class basic_json_parser : public ser_context
 {
-    typedef std::basic_string<CharT> string_type;
     typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
     typedef Allocator allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
