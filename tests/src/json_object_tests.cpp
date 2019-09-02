@@ -266,22 +266,36 @@ TEST_CASE("test_empty_object_assignment")
     CHECK(c.is<json::object>());
 }
 
-TEST_CASE("test_get")
+TEST_CASE("get_with_default test")
 {
     json a;
 
     a["field1"] = "value1";
 
-    std::string s1 = a.at("field1").as<std::string>();
-    std::string s1a = a.at("field1").as<std::string>();
-    std::string s2 = a.get_with_default("field2","null");
-    REQUIRE_THROWS_AS(a.at("field2"), std::out_of_range);
+    SECTION("1 arg")
+    {
+        const json& j = a.get_with_default("field1");
+        CHECK(j.as<std::string>() == std::string("value1"));
+    }
 
-    CHECK(s1 == std::string("value1"));
-    CHECK(s1a == std::string("value1"));
+    SECTION("1 arg default")
+    {
+        const json& j = a.get_with_default("field2");
+        CHECK(j.is_null());
+    }
 
-    //std::cout << "s2=" << s2 << std::endl;
-    CHECK(std::string("null") == s2);
+    SECTION("2 arg")
+    {
+        std::string s1 = a.at("field1").as<std::string>();
+        std::string s1a = a.at("field1").as<std::string>();
+        std::string s2 = a.get_with_default("field2","null");
+        REQUIRE_THROWS_AS(a.at("field2"), std::out_of_range);
+
+        CHECK(s1 == std::string("value1"));
+        CHECK(s1a == std::string("value1"));
+
+        CHECK(s2 == std::string("null"));
+    }
 }
 
 TEST_CASE("test_proxy_get")

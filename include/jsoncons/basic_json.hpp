@@ -2082,6 +2082,11 @@ public:
             return evaluate().find(name);
         }
 
+        const basic_json& get_with_default(const string_view_type& name) const
+        {
+            return evaluate().template get_with_default(name);
+        }
+
         template <class T>
         T get_with_default(const string_view_type& name, const T& default_val) const
         {
@@ -2634,7 +2639,7 @@ public:
             return evaluate().get(name,std::forward<T>(default_val));
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use at(const string_view_type&)")
+        JSONCONS_DEPRECATED_MSG("Instead, use get_with_default(const string_view_type&)")
         const basic_json& get(const string_view_type& name) const
         {
             return evaluate().get(name);
@@ -3870,6 +3875,33 @@ public:
             return object_range().end();
         case storage_type::object_val:
             return object_value().find(name);
+        default:
+            {
+                JSONCONS_THROW(not_an_object(name.data(),name.length()));
+            }
+        }
+    }
+
+    const basic_json& get_with_default(const string_view_type& name) const
+    {
+        switch (var_.type())
+        {
+        case storage_type::empty_object_val:
+            {
+                return null();
+            }
+        case storage_type::object_val:
+            {
+                const_object_iterator it = object_value().find(name);
+                if (it != object_range().end())
+                {
+                    return it->value();
+                }
+                else
+                {
+                    return null();
+                }
+            }
         default:
             {
                 JSONCONS_THROW(not_an_object(name.data(),name.length()));
