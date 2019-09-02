@@ -167,6 +167,10 @@ Returns the [semantic_tag](semantic_tag.md) associated with this value
 Returns an object iterator to a member whose name compares equal to `name`. If there is no such member, returns `object_range.end()`.
 Throws `std::runtime_error` if not an object.  
 
+    const basic_json& get_with_default(const string_view_type& name) const
+If `name` matches the name of a member in the basic_json object, returns the member value converted to the default's data type, otherwise returns `null`.
+Throws `std::runtime_error` if not an object.
+
     template <class T>
     T get_with_default(const string_view_type& name, 
                        const T& default_val) const
