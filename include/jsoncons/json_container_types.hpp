@@ -554,7 +554,7 @@ public:
         members_.erase(it, members_.end());
     }
 
-    template<class InputIt, class Key, class Value>
+    template<class InputIt>
     json_object(InputIt first, InputIt last, 
                 const allocator_type& allocator)
         : container_base<allocator_type>(allocator), 
