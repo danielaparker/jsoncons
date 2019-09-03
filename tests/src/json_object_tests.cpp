@@ -279,8 +279,6 @@ TEST_CASE("get_with_default test")
     {
         const json& j = a.get_with_default("key1");
         CHECK(j.as<std::string>() == std::string("value1"));
-
-        const json& j2 = a.get("key1");
     }
 
     SECTION("1 arg proxy")
