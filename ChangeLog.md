@@ -1,7 +1,7 @@
 v0.133.0
 --------
 
-- Deprecation warnings should now show for all suported versions of GCC and clang
+- Deprecation warnings should now show for all supported versions of GCC and clang
 
 - New single argument `basic_json::get_value_with_default`, which has default value `basic_json::null()`,
   to replace deprecated `basic_json::get`. 
