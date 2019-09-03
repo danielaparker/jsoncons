@@ -112,7 +112,7 @@ decode_msgpack(std::istream& is)
   
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class Json>
-JSONCONS_DEPRECATED_MSG("Instead, use encode_msgpack(const T&, std::vector<uint8_t>&")
+JSONCONS_DEPRECATED("Instead, use encode_msgpack(const T&, std::vector<uint8_t>&")
 std::vector<uint8_t> encode_msgpack(const Json& j)
 {
     std::vector<uint8_t> v;

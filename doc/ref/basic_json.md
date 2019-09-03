@@ -169,19 +169,19 @@ Throws `std::runtime_error` if not an object.
 
     const basic_json& get_with_default(const string_view_type& name) const
 If `name` matches the name of a member in the basic_json object, returns the member value converted to the default's data type, otherwise returns `null`.
-Throws `std::runtime_error` if not an object.
+Throws `std::runtime_error` if not an object or null value.
 
     template <class T>
     T get_with_default(const string_view_type& name, 
                        const T& default_val) const
 If `name` matches the name of a member in the basic_json object, returns the member value converted to the default's data type, otherwise returns `default_val`.
-Throws `std::runtime_error` if not an object.
+Throws `std::runtime_error` if not an object or null value.
 
     template <class T = std::string>
     T get_with_default(const string_view_type& name, 
                        const char_type* default_val) const
 Make `get_with_default` do the right thing for string literals. 
-Throws `std::runtime_error` if not an object. 
+Throws `std::runtime_error` if not an object or null value. 
 
 #### Modifiers
 

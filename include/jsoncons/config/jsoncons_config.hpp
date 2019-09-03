@@ -73,39 +73,40 @@
 
 // Deprecated symbols markup
 #if (defined(__cplusplus) && __cplusplus >= 201402L)
-#define JSONCONS_DEPRECATED [[deprecated]]
-#define JSONCONS_DEPRECATED_MSG(msg) [[deprecated(msg)]]
+#define JSONCONS_DEPRECATED(msg) [[deprecated(msg)]]
 #endif
 
 #if !defined(JSONCONS_DEPRECATED) && defined(__GNUC__) && defined(__has_extension)
-#if __has_extension(attribute_deprecated)
-#define JSONCONS_DEPRECATED __attribute__((deprecated))
-#endif
-#endif
-
-#if !defined(JSONCONS_DEPRECATED_MSG) && defined(__GNUC__) && defined(__has_extension)
 #if __has_extension(attribute_deprecated_with_message)
-#define JSONCONS_DEPRECATED_MSG(msg) __attribute__((deprecated(msg)))
+#define JSONCONS_DEPRECATED(msg) __attribute__((deprecated(msg)))
 #endif
 #endif
 
 #if !defined(JSONCONS_DEPRECATED) && defined(_MSC_VER)
-#define JSONCONS_DEPRECATED __declspec(deprecated)
+#if (_MSC_VER) >= 1920
+#define JSONCONS_DEPRECATED(msg) [[deprecated(msg)]]
+#else
+#define JSONCONS_DEPRECATED(msg) __declspec(deprecated(msg))
+#endif
 #endif
 
-#if !defined(JSONCONS_DEPRECATED_MSG) && defined(_MSC_VER)
-#if (_MSC_VER) >= 1920
-#define JSONCONS_DEPRECATED_MSG(msg) [[deprecated(msg)]]
-#else
-#define JSONCONS_DEPRECATED_MSG(msg) __declspec(deprecated(msg))
+// Following boost/atomic/detail/config.hpp
+#if !defined(JSONCONS_DEPRECATED) && (\
+    (defined(__GNUC__) && ((__GNUC__ + 0) * 100 + (__GNUC_MINOR__ + 0)) >= 405) ||\
+    (defined(__SUNPRO_CC) && (__SUNPRO_CC + 0) >= 0x5130))
+    #define JSONCONS_DEPRECATED(msg) __attribute__((deprecated(msg)))
 #endif
+
+#if !defined(JSONCONS_DEPRECATED) && defined(__clang__) && defined(__has_extension)
+    #if __has_extension(attribute_deprecated_with_message)
+        #define JSONCONS_DEPRECATED(msg) __attribute__((deprecated(msg)))
+    #else
+        #define JSONCONS_DEPRECATED(msg) __attribute__((deprecated))
+    #endif
 #endif
 
 #if !defined(JSONCONS_DEPRECATED)
-#define JSONCONS_DEPRECATED
-#endif
-#if !defined(JSONCONS_DEPRECATED_MSG)
-#define JSONCONS_DEPRECATED_MSG(msg)
+#define JSONCONS_DEPRECATED(msg)
 #endif
 
 #if defined(ANDROID) || defined(__ANDROID__)

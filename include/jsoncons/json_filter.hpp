@@ -36,19 +36,19 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use to_handler") 
+    JSONCONS_DEPRECATED("Instead, use to_handler") 
     basic_json_content_handler<CharT>& input_handler()
     {
         return to_handler_;
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use to_handler") 
+    JSONCONS_DEPRECATED("Instead, use to_handler") 
     basic_json_content_handler<CharT>& downstream_handler()
     {
         return to_handler_;
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use to_handler") 
+    JSONCONS_DEPRECATED("Instead, use to_handler") 
     basic_json_content_handler<CharT>& destination_handler()
     {
         return to_handler_;
@@ -358,8 +358,8 @@ typedef basic_rename_object_member_filter<char> rename_object_member_filter;
 typedef basic_rename_object_member_filter<wchar_t> wrename_object_member_filter;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use rename_object_member_filter") typedef basic_rename_object_member_filter<char> rename_name_filter;
-JSONCONS_DEPRECATED_MSG("Instead, use wrename_object_member_filter") typedef basic_rename_object_member_filter<wchar_t> wrename_name_filter;
+JSONCONS_DEPRECATED("Instead, use rename_object_member_filter") typedef basic_rename_object_member_filter<char> rename_name_filter;
+JSONCONS_DEPRECATED("Instead, use wrename_object_member_filter") typedef basic_rename_object_member_filter<wchar_t> wrename_name_filter;
 #endif
 
 }

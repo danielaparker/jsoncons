@@ -24,7 +24,7 @@ namespace jsoncons { namespace csv {
     };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use csv_errc") typedef csv_errc csv_parser_errc;
+JSONCONS_DEPRECATED("Instead, use csv_errc") typedef csv_errc csv_parser_errc;
 #endif
 
 class csv_error_category_impl

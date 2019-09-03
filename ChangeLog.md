@@ -1,7 +1,18 @@
+master
+------
+
+- Deprecation warnings should now show for older versions of GCC 
+
+- New single argument `basic_json::get_value_with_default`, which has default value `basic_json::null()`,
+  to replace deprecated `basic_json::get`. 
+
+- `basic_json::get_value_with_default` now returns the default value if a `basic_json` has a null value,
+  previously threw.
+
 v0.132.1
 --------
 
-Fixed vs2019 warnings
+- Fixed vs2019 warnings
 
 v0.132.0
 --------

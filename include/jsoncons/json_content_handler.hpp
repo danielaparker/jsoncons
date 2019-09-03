@@ -107,7 +107,7 @@ std::ostream& operator<<(std::ostream& os, semantic_tag tag)
 }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use semantic_tag") typedef semantic_tag semantic_tag_type;
+    JSONCONS_DEPRECATED("Instead, use semantic_tag") typedef semantic_tag semantic_tag_type;
 #endif
 
 template <class CharT>
@@ -230,7 +230,7 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-    JSONCONS_DEPRECATED_MSG("Instead, use const byte_string_view&, semantic_tag=semantic_tag::none, const ser_context&=null_ser_context()") 
+    JSONCONS_DEPRECATED("Instead, use const byte_string_view&, semantic_tag=semantic_tag::none, const ser_context&=null_ser_context()") 
     bool byte_string_value(const byte_string_view& b, 
                            byte_string_chars_format encoding_hint, 
                            semantic_tag tag=semantic_tag::none, 
@@ -253,7 +253,7 @@ public:
         return do_byte_string_value(b, tag, context);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use const byte_string_view&, semantic_tag=semantic_tag::none, const ser_context&=null_ser_context()") 
+    JSONCONS_DEPRECATED("Instead, use const byte_string_view&, semantic_tag=semantic_tag::none, const ser_context&=null_ser_context()") 
     bool byte_string_value(const uint8_t* p, size_t size, 
                            byte_string_chars_format encoding_hint, 
                            semantic_tag tag=semantic_tag::none, 
@@ -295,73 +295,73 @@ public:
         return do_int64_value(val, semantic_tag::timestamp, context);
     }
 
-    JSONCONS_DEPRECATED_MSG("Remove calls to this method, it doesn't do anything") 
+    JSONCONS_DEPRECATED("Remove calls to this method, it doesn't do anything") 
     bool begin_document()
     {
         return true;
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use flush() when serializing") 
+    JSONCONS_DEPRECATED("Instead, use flush() when serializing") 
     bool end_document()
     {
         flush();
         return true;
     }
 
-    JSONCONS_DEPRECATED_MSG("Remove calls to this method, it doesn't do anything") 
+    JSONCONS_DEPRECATED("Remove calls to this method, it doesn't do anything") 
     void begin_json()
     {
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use flush() when serializing") 
+    JSONCONS_DEPRECATED("Instead, use flush() when serializing") 
     void end_json()
     {
         end_document();
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use name(const string_view_type&, const ser_context&=null_ser_context())") 
+    JSONCONS_DEPRECATED("Instead, use name(const string_view_type&, const ser_context&=null_ser_context())") 
     void name(const CharT* p, size_t length, const ser_context& context) 
     {
         name(string_view_type(p, length), context);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use uint64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
+    JSONCONS_DEPRECATED("Instead, use uint64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
     void integer_value(int64_t value)
     {
         int64_value(value);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use int64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
+    JSONCONS_DEPRECATED("Instead, use int64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
     void integer_value(int64_t value, const ser_context& context)
     {
         int64_value(value,context);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use uint64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
+    JSONCONS_DEPRECATED("Instead, use uint64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
     void uinteger_value(uint64_t value)
     {
         uint64_value(value);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use uint64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
+    JSONCONS_DEPRECATED("Instead, use uint64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
     void uinteger_value(uint64_t value, const ser_context& context)
     {
         uint64_value(value,context);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use string_value(const string_view_type&, semantic_tag, const ser_context& context=null_ser_context())") 
+    JSONCONS_DEPRECATED("Instead, use string_value(const string_view_type&, semantic_tag, const ser_context& context=null_ser_context())") 
     bool bignum_value(const string_view_type& s, const ser_context& context=null_ser_context()) 
     {
         return do_string_value(s, semantic_tag::bigint, context);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use string_value(const string_view_type&, semantic_tag, const ser_context& context=null_ser_context())") 
+    JSONCONS_DEPRECATED("Instead, use string_value(const string_view_type&, semantic_tag, const ser_context& context=null_ser_context())") 
     bool decimal_value(const string_view_type& s, const ser_context& context=null_ser_context()) 
     {
         return do_string_value(s, semantic_tag::bigdec, context);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use int64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
+    JSONCONS_DEPRECATED("Instead, use int64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
     bool epoch_time_value(int64_t val, const ser_context& context=null_ser_context()) 
     {
         return do_int64_value(val, semantic_tag::timestamp, context);
