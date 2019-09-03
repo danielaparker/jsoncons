@@ -141,13 +141,13 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED("Instead, use line()")
+    JSONCONS_DEPRECATED_MSG("Instead, use line()")
     size_t line_number() const noexcept
     {
         return line();
     }
 
-    JSONCONS_DEPRECATED("Instead, use column()")
+    JSONCONS_DEPRECATED_MSG("Instead, use column()")
     size_t column_number() const noexcept
     {
         return column();
@@ -160,10 +160,10 @@ private:
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED("Instead, use ser_error") typedef ser_error serialization_error;
-JSONCONS_DEPRECATED("Instead, use ser_error") typedef ser_error json_parse_exception;
-JSONCONS_DEPRECATED("Instead, use ser_error") typedef ser_error parse_exception;
-JSONCONS_DEPRECATED("Instead, use ser_error") typedef ser_error parse_error;
+JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error serialization_error;
+JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error json_parse_exception;
+JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error parse_exception;
+JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error parse_error;
 #endif
 
 #define JSONCONS_STR2(x)  #x
