@@ -477,7 +477,7 @@ jsoncons supports conversion between JSON text and C++ data structures. The func
 and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
 [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
-defined. defined. The standard library containers are already supported, 
+defined. The standard library containers are already supported, 
 and your own types will be supported too if you specialize `json_type_traits`
 in the `jsoncons` namespace. 
 
