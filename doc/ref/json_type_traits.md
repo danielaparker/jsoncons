@@ -316,7 +316,7 @@ namespace jsoncons {
 ```
 
 To save typing and enhance readability, the jsoncons library defines macros, 
-so we could have written
+so you could also write
 
 ```c++
 JSONCONS_MEMBER_TRAITS_DECL(ns::book, author, title, price)
