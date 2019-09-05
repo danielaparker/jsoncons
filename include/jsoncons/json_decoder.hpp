@@ -143,7 +143,6 @@ private:
 
     bool do_end_object(const ser_context&) override
     {
-#if 0
         JSONCONS_ASSERT(structure_stack_.size() > 0);
         JSONCONS_ASSERT(structure_stack_.back().type_ == structure_type::object_t);
         const size_t structure_index = structure_stack_.back().offset_;
@@ -165,7 +164,6 @@ private:
             is_valid_ = true;
             return false;
         }
-#endif
         return true;
     }
 
@@ -183,7 +181,6 @@ private:
 
     bool do_end_array(const ser_context&) override
     {
-#if 0
         JSONCONS_ASSERT(structure_stack_.size() > 0);
         JSONCONS_ASSERT(structure_stack_.back().type_ == structure_type::array_t);
         const size_t structure_index = structure_stack_.back().offset_;
@@ -207,7 +204,6 @@ private:
             is_valid_ = true;
             return false;
         }
-#endif
         return true;
     }
 
