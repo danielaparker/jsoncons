@@ -498,11 +498,11 @@ public:
             template <typename... Args>
             void create(array_allocator allocator, Args&& ... args)
             {
-                typename std::allocator_traits<Allocator>:: template rebind_alloc<array> alloc(allocator);
+                array_allocator alloc(allocator);
                 ptr_ = alloc.allocate(1);
                 try
                 {
-                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                    std::allocator_traits<array_allocator>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 catch (...)
                 {
@@ -578,13 +578,13 @@ public:
             pointer ptr_;
 
             template <typename... Args>
-            void create(Allocator allocator, Args&& ... args)
+            void create(const Allocator& allocator, Args&& ... args)
             {
-                typename std::allocator_traits<object_allocator>:: template rebind_alloc<object> alloc(allocator);
+                object_allocator alloc(allocator);
                 ptr_ = alloc.allocate(1);
                 try
                 {
-                    std::allocator_traits<object_allocator>:: template rebind_traits<object>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                    std::allocator_traits<object_allocator>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 catch (...)
                 {

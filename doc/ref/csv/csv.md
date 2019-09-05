@@ -1,8 +1,6 @@
 ### csv extension
 
 The csv extension implements decode from and encode to the [CSV format](https://www.rfc-editor.org/rfc/rfc4180.txt)
-You can either parse into or serialize from a variant-like data structure, [basic_json](../basic_json.md), or your own
-data structures, using [json_type_traits](../json_type_traits.md).
 
 [decode_csv](decode_csv.md)
 
