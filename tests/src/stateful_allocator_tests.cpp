@@ -165,7 +165,7 @@ bool operator!=(const pool_allocator<T> &s0, const pool_allocator<T> &s1)
     return s0.pool_ptr_ != s1.pool_ptr_;
 }
 #if !defined(__GNUC__) 
-// basic_string doesn't satisfy C++11 allocator requirements
+// gcc 4.8 basic_string doesn't satisfy C++11 allocator requirements
 TEST_CASE("test_string_allocation")
 {
 
@@ -174,15 +174,35 @@ TEST_CASE("test_string_allocation")
 
     typedef basic_json<char,sorted_policy,pool_allocator<json>> myjson;
 
+    SECTION("construct")
     {
-        myjson j("String too long for short string", allocator);
+        {
+            myjson j("String too long for short string", allocator);
+        }
+        //std::cout << "Allocate count = " << a_pool.allocate_count_ 
+        //          << ", construct count = " << a_pool.construct_count_ 
+        //          << ", destroy count = " << a_pool.destroy_count_ 
+        //          << ", deallocate count = " << a_pool.deallocate_count_ << std::endl;
+        CHECK(a_pool.allocate_count_ == a_pool.deallocate_count_);
+        CHECK(a_pool.construct_count_ == a_pool.destroy_count_);
     }
-    std::cout << "Allocate count = " << a_pool.allocate_count_ 
-              << ", construct count = " << a_pool.construct_count_ 
-              << ", destroy count = " << a_pool.destroy_count_ 
-              << ", deallocate count = " << a_pool.deallocate_count_ << std::endl;
-    CHECK(a_pool.allocate_count_ == a_pool.deallocate_count_);
-    CHECK(a_pool.construct_count_ == a_pool.destroy_count_);
+#if 0
+    SECTION("parse")
+    {
+        std::string input = "\"String too long for short string\"";
+
+        json_decoder<myjson> decoder(allocator);
+        try
+        {
+            //json_reader reader(input,decoder);
+            //reader.read_next();
+        }
+        catch (const std::exception&)
+        {
+        }
+        CHECK(decoder.is_valid());
+    }
+#endif
 
 }
 #endif

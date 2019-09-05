@@ -18,7 +18,7 @@
 
 namespace jsoncons {
 
-template <class Json,class Allocator=std::allocator<typename Json::char_type>>
+template <class Json,class WorkAllocator=std::allocator<char>>
 class json_decoder final : public basic_json_content_handler<typename Json::char_type>
 {
 public:
@@ -35,13 +35,6 @@ public:
     typedef typename object::allocator_type json_object_allocator;
     typedef typename std::allocator_traits<json_allocator_type>:: template rebind_alloc<uint8_t> json_byte_allocator_type;
 private:
-    json_string_allocator string_allocator_;
-    json_object_allocator object_allocator_;
-    json_array_allocator array_allocator_;
-    json_byte_allocator_type byte_allocator_;
-
-    Json result_;
-
     struct stack_item
     {
         key_type name_;
@@ -74,9 +67,18 @@ private:
 
     };
 
-    typedef Allocator allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<stack_item> stack_item_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<structure_info> size_t_allocator_type;
+    typedef WorkAllocator work_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<stack_item> stack_item_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<structure_info> size_t_allocator_type;
+
+    json_string_allocator string_allocator_;
+    json_byte_allocator_type byte_allocator_;
+    json_object_allocator object_allocator_;
+    json_array_allocator array_allocator_;
+    stack_item_allocator_type stack_item_allocator_;
+    size_t_allocator_type size_t_allocator_;
+
+    Json result_;
 
     key_type name_;
     std::vector<stack_item,stack_item_allocator_type> item_stack_;
@@ -84,10 +86,16 @@ private:
     bool is_valid_;
 
 public:
-    json_decoder(const json_allocator_type& jallocator = json_allocator_type())
+    json_decoder(const json_allocator_type& jallocator = json_allocator_type(), 
+                 const work_allocator_type& wallocator = work_allocator_type())
         : string_allocator_(jallocator),
+          byte_allocator_(jallocator),
           object_allocator_(jallocator),
           array_allocator_(jallocator),
+          stack_item_allocator_(wallocator),
+          size_t_allocator_(wallocator),
+          result_(jallocator),
+          name_(string_allocator_),
           is_valid_(false) 
 
     {
@@ -135,6 +143,7 @@ private:
 
     bool do_end_object(const ser_context&) override
     {
+#if 0
         JSONCONS_ASSERT(structure_stack_.size() > 0);
         JSONCONS_ASSERT(structure_stack_.back().type_ == structure_type::object_t);
         const size_t structure_index = structure_stack_.back().offset_;
@@ -156,6 +165,7 @@ private:
             is_valid_ = true;
             return false;
         }
+#endif
         return true;
     }
 
@@ -173,6 +183,7 @@ private:
 
     bool do_end_array(const ser_context&) override
     {
+#if 0
         JSONCONS_ASSERT(structure_stack_.size() > 0);
         JSONCONS_ASSERT(structure_stack_.back().type_ == structure_type::array_t);
         const size_t structure_index = structure_stack_.back().offset_;
@@ -196,12 +207,13 @@ private:
             is_valid_ = true;
             return false;
         }
+#endif
         return true;
     }
 
     bool do_name(const string_view_type& name, const ser_context&) override
     {
-        name_ = key_type(name.data(),name.length());
+        name_ = key_type(name.data(),name.length(),string_allocator_);
         return true;
     }
 
