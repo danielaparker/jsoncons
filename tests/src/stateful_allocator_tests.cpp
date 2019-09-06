@@ -117,7 +117,7 @@ public:
         : pool_ptr_(s.pool_ptr_) 
     {
     } 
-    ~pool_allocator() throw() 
+    ~pool_allocator() noexcept
     {
     } 
     pointer address(reference x) const 
@@ -179,7 +179,7 @@ TEST_CASE("test_string_allocation")
     SECTION("construct")
     {
         {
-            //myjson j("String too long for short string", allocator);
+            myjson j("String too long for short string", allocator);
         }
         //std::cout << "Allocate count = " << a_pool.allocate_count_ 
         //          << ", construct count = " << a_pool.construct_count_ 
@@ -193,17 +193,16 @@ TEST_CASE("test_string_allocation")
     {
         std::string input = "\"String too long for short string\"";
 
-        //myjson j2(allocator);
-        //json_decoder<myjson> decoder(allocator);
+        json_decoder<myjson> decoder(allocator);
         try
         {
-            //json_reader reader(input,decoder);
-            //reader.read_next();
+            json_reader reader(input,decoder);
+            reader.read_next();
         }
         catch (const std::exception&)
         {
         }
-        //CHECK(decoder.is_valid());
+        CHECK(decoder.is_valid());
     }
 
 }

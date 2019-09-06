@@ -3442,7 +3442,16 @@ public:
     template<class U=Allocator>
     void create_object_implicitly()
     {
-        static_assert(is_stateless<U>::value, "Cannot create object implicitly - allocator is stateful.");
+        create_object_implicitly(std::integral_constant<bool, is_stateless<U>::value>());
+    }
+
+    void create_object_implicitly(std::false_type)
+    {
+        static_assert(std::true_type::value, "Cannot create object implicitly - allocator is stateful.");
+    }
+
+    void create_object_implicitly(std::true_type)
+    {
         var_ = variant(object(Allocator()), semantic_tag::none);
     }
 
