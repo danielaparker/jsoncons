@@ -25,7 +25,7 @@
 
 namespace jsoncons { namespace csv {
 
-template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
+template<class CharT,class Src=jsoncons::stream_source<CharT>,class WorkAllocator=std::allocator<char>>
 class basic_csv_reader 
 {
     struct stack_item
@@ -38,8 +38,8 @@ class basic_csv_reader
         bool array_begun_;
     };
     typedef CharT char_type;
-    typedef Allocator allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+    typedef WorkAllocator work_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
 
     basic_csv_reader(const basic_csv_reader&) = delete; 
     basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
@@ -48,7 +48,7 @@ class basic_csv_reader
 
     basic_json_content_handler<CharT>& handler_;
 
-    basic_csv_parser<CharT,Allocator> parser_;
+    basic_csv_parser<CharT,WorkAllocator> parser_;
     Src source_;
     std::vector<CharT,char_allocator_type> buffer_;
     size_t buffer_length_;

@@ -135,16 +135,16 @@ private:
     }
 };
 
-template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
+template<class CharT,class Src=jsoncons::stream_source<CharT>,class WorkAllocator=std::allocator<char>>
 class basic_json_reader 
 {
 public:
     typedef CharT char_type;
     typedef Src source_type;
     typedef basic_string_view<CharT> string_view_type;
-    typedef Allocator allocator_type;
+    typedef WorkAllocator work_allocator_type;
 private:
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
 
     static const size_t default_max_buffer_length = 16384;
 
@@ -152,7 +152,7 @@ private:
 
     basic_json_content_handler<CharT>& handler_;
 
-    basic_json_parser<CharT,Allocator> parser_;
+    basic_json_parser<CharT,WorkAllocator> parser_;
 
     source_type source_;
     std::vector<CharT,char_allocator_type> buffer_;

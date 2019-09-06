@@ -29,11 +29,11 @@ public:
     typedef typename Json::key_type key_type;
     typedef typename Json::array array;
     typedef typename Json::object object;
-    typedef typename Json::allocator_type json_allocator_type;
+    typedef typename Json::allocator_type result_allocator_type;
     typedef typename key_type::allocator_type json_string_allocator;
     typedef typename array::allocator_type json_array_allocator;
     typedef typename object::allocator_type json_object_allocator;
-    typedef typename std::allocator_traits<json_allocator_type>:: template rebind_alloc<uint8_t> json_byte_allocator_type;
+    typedef typename std::allocator_traits<result_allocator_type>:: template rebind_alloc<uint8_t> json_byte_allocator_type;
 private:
     struct stack_item
     {
@@ -86,15 +86,15 @@ private:
     bool is_valid_;
 
 public:
-    json_decoder(const json_allocator_type& jallocator = json_allocator_type(), 
+    json_decoder(const result_allocator_type& rallocator = result_allocator_type(), 
                  const work_allocator_type& wallocator = work_allocator_type())
-        : string_allocator_(jallocator),
-          byte_allocator_(jallocator),
-          object_allocator_(jallocator),
-          array_allocator_(jallocator),
+        : string_allocator_(rallocator),
+          byte_allocator_(rallocator),
+          object_allocator_(rallocator),
+          array_allocator_(rallocator),
           stack_item_allocator_(wallocator),
           size_t_allocator_(wallocator),
-          result_(jallocator),
+          result_(rallocator),
           name_(string_allocator_),
           item_stack_(stack_item_allocator_),
           structure_stack_(size_t_allocator_),
