@@ -96,6 +96,10 @@ public:
     {
         typedef FreelistAllocator<U> other;
     };
+    typedef T * pointer;
+    typedef const T * const_pointer;
+    typedef T & reference;
+    typedef const T & const_reference;
 };
 
 template <typename T, typename U>
