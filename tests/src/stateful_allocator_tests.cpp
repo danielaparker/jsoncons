@@ -96,10 +96,11 @@ public:
     {
         typedef FreelistAllocator<U> other;
     };
-    typedef T * pointer;
-    typedef const T * const_pointer;
-    typedef T & reference;
-    typedef const T & const_reference;
+    typedef T* pointer;
+    typedef const T* const_pointer;
+    typedef T& reference;
+    typedef const T& const_reference;
+    typedef std::ptrdiff_t difference_type;
 };
 
 template <typename T, typename U>
