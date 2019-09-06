@@ -69,20 +69,20 @@ private:
 
     typedef WorkAllocator work_allocator_type;
     typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<stack_item> stack_item_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<structure_info> size_t_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<structure_info> structure_info_allocator_type;
  
     json_string_allocator string_allocator_;
     json_byte_allocator_type byte_allocator_;
     json_object_allocator object_allocator_;
     json_array_allocator array_allocator_;
     stack_item_allocator_type stack_item_allocator_;
-    size_t_allocator_type size_t_allocator_;
+    structure_info_allocator_type size_t_allocator_;
 
     Json result_;
 
     key_type name_;
     std::vector<stack_item,stack_item_allocator_type> item_stack_;
-    std::vector<structure_info,size_t_allocator_type> structure_stack_;
+    std::vector<structure_info,structure_info_allocator_type> structure_stack_;
     bool is_valid_;
 
 public:
