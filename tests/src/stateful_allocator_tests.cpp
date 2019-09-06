@@ -189,9 +189,19 @@ TEST_CASE("test_string_allocation")
         CHECK(a_pool.construct_count_ == a_pool.destroy_count_);
     }
 
+    SECTION("construct")
+    {
+        {
+            myjson j("String too long for short string", allocator);
+        }
+        //CHECK(a_pool.allocate_count_ == a_pool.deallocate_count_);
+       // CHECK(a_pool.construct_count_ == a_pool.destroy_count_);
+    }
+
     SECTION("parse")
     {
-        std::string input = "\"String too long for short string\"";
+        std::string s = "String too long for short string";
+        std::string input = "\"" + s + "\"";
 
         json_decoder<myjson> decoder(allocator);
         try
@@ -203,6 +213,8 @@ TEST_CASE("test_string_allocation")
         {
         }
         CHECK(decoder.is_valid());
+        auto j = decoder.get_result();
+        CHECK(j.as<std::string>() == s);
     }
 
 }

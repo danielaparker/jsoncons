@@ -70,7 +70,7 @@ private:
     typedef WorkAllocator work_allocator_type;
     typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<stack_item> stack_item_allocator_type;
     typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<structure_info> size_t_allocator_type;
-
+ 
     json_string_allocator string_allocator_;
     json_byte_allocator_type byte_allocator_;
     json_object_allocator object_allocator_;
@@ -96,6 +96,8 @@ public:
           size_t_allocator_(wallocator),
           result_(jallocator),
           name_(string_allocator_),
+          item_stack_(stack_item_allocator_),
+          structure_stack_(size_t_allocator_),
           is_valid_(false) 
 
     {
