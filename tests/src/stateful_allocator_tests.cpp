@@ -90,6 +90,12 @@ public:
             ::operator delete(ptr);
         }
     }
+
+    template<typename U>
+    struct rebind
+    {
+        typedef FreelistAllocator<U> other;
+    };
 };
 
 template <typename T, typename U>
