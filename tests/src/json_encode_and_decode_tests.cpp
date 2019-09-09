@@ -9,7 +9,7 @@
 #include <utility>
 #include <ctime>
 #include <cstdint>
-#include "data_structures.hpp"
+#include "sample_types.hpp"
 
 using namespace jsoncons;
 

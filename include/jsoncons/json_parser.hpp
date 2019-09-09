@@ -175,14 +175,13 @@ JSONCONS_DEPRECATED_MSG("instead, use default_json_parsing") typedef default_jso
 JSONCONS_DEPRECATED_MSG("instead, use strict_json_parsing") typedef strict_json_parsing default_parse_error_handler;
 #endif
 
-template <class CharT, class Allocator = std::allocator<char>>
+template <class CharT, class WorkAllocator = std::allocator<char>>
 class basic_json_parser : public ser_context
 {
     typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
-    typedef Allocator allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char> numeral_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
+    typedef WorkAllocator work_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<json_parse_state> parse_state_allocator_type;
 
     static const size_t initial_string_buffer_capacity_ = 1024;
     static const int default_initial_stack_capacity_ = 100;
@@ -206,7 +205,6 @@ class basic_json_parser : public ser_context
     std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_buffer_;
     jsoncons::detail::string_to_double to_double_;
 
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_parse_state> parse_state_allocator_type;
     std::vector<json_parse_state,parse_state_allocator_type> state_stack_;
 
     // Noncopyable and nonmoveable
@@ -214,23 +212,24 @@ class basic_json_parser : public ser_context
     basic_json_parser& operator=(const basic_json_parser&) = delete;
 
 public:
-    basic_json_parser()
-        : basic_json_parser(basic_json_options<CharT>::get_default_options(), default_json_parsing())
+    basic_json_parser(const WorkAllocator& allocator = WorkAllocator())
+        : basic_json_parser(basic_json_options<CharT>::get_default_options(), default_json_parsing(), allocator)
     {
     }
 
-    basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler)
-        : basic_json_parser(basic_json_options<CharT>::get_default_options(), err_handler)
+    basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler, const WorkAllocator& allocator = WorkAllocator())
+        : basic_json_parser(basic_json_options<CharT>::get_default_options(), err_handler, allocator)
     {
     }
 
-    basic_json_parser(const basic_json_decode_options<CharT>& options)
-        : basic_json_parser(options, default_json_parsing())
+    basic_json_parser(const basic_json_decode_options<CharT>& options, const WorkAllocator& allocator = WorkAllocator())
+        : basic_json_parser(options, default_json_parsing(), allocator)
     {
     }
 
     basic_json_parser(const basic_json_decode_options<CharT>& options,
-                      std::function<bool(json_errc,const ser_context&)> err_handler)
+                      std::function<bool(json_errc,const ser_context&)> err_handler, 
+                      const WorkAllocator& allocator = WorkAllocator())
        : options_(options),
          err_handler_(err_handler),
          initial_stack_capacity_(default_initial_stack_capacity_),
@@ -244,7 +243,9 @@ public:
          input_ptr_(nullptr),
          state_(json_parse_state::start),
          continue_(true),
-         done_(false)
+         done_(false),
+         string_buffer_(allocator),
+         state_stack_(allocator)
     {
         string_buffer_.reserve(initial_string_buffer_capacity_);
 

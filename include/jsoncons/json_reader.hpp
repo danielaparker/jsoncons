@@ -166,74 +166,87 @@ private:
 
 public:
     template <class Source>
-    explicit basic_json_reader(Source&& source)
+    explicit basic_json_reader(Source&& source, const WorkAllocator& allocator = WorkAllocator())
         : basic_json_reader(std::forward<Source>(source),
                             default_content_handler_,
                             basic_json_options<CharT>::get_default_options(),
-                            default_json_parsing())
+                            default_json_parsing(),
+                            allocator)
     {
     }
 
     template <class Source>
     basic_json_reader(Source&& source, 
-                      const basic_json_decode_options<CharT>& options)
+                      const basic_json_decode_options<CharT>& options, 
+                      const WorkAllocator& allocator = WorkAllocator())
         : basic_json_reader(std::forward<Source>(source),
                             default_content_handler_,
                             options,
-                            default_json_parsing())
+                            default_json_parsing(),
+                            allocator)
     {
     }
 
     template <class Source>
     basic_json_reader(Source&& source,
-                      std::function<bool(json_errc,const ser_context&)> err_handler)
+                      std::function<bool(json_errc,const ser_context&)> err_handler, 
+                      const WorkAllocator& allocator = WorkAllocator())
         : basic_json_reader(std::forward<Source>(source),
                             default_content_handler_,
                             basic_json_options<CharT>::get_default_options(),
-                            err_handler)
+                            err_handler,
+                            allocator)
     {
     }
 
     template <class Source>
     basic_json_reader(Source&& source, 
                       const basic_json_decode_options<CharT>& options,
-                      std::function<bool(json_errc,const ser_context&)> err_handler)
+                      std::function<bool(json_errc,const ser_context&)> err_handler, 
+                      const WorkAllocator& allocator = WorkAllocator())
         : basic_json_reader(std::forward<Source>(source),
                             default_content_handler_,
                             options,
-                            err_handler)
+                            err_handler,
+                            allocator)
     {
     }
 
     template <class Source>
     basic_json_reader(Source&& source, 
-                      basic_json_content_handler<CharT>& handler)
+                      basic_json_content_handler<CharT>& handler, 
+                      const WorkAllocator& allocator = WorkAllocator())
         : basic_json_reader(std::forward<Source>(source),
                             handler,
                             basic_json_options<CharT>::get_default_options(),
-                            default_json_parsing())
+                            default_json_parsing(),
+                            allocator)
     {
     }
 
     template <class Source>
     basic_json_reader(Source&& source, 
                       basic_json_content_handler<CharT>& handler,
-                      const basic_json_decode_options<CharT>& options)
+                      const basic_json_decode_options<CharT>& options, 
+                      const WorkAllocator& allocator = WorkAllocator())
         : basic_json_reader(std::forward<Source>(source),
                             handler,
                             options,
-                            default_json_parsing())
+                            default_json_parsing(),
+                            allocator)
     {
     }
 
     template <class Source>
     basic_json_reader(Source&& source,
                       basic_json_content_handler<CharT>& handler,
-                      std::function<bool(json_errc,const ser_context&)> err_handler)
+                      std::function<bool(json_errc,const ser_context&)> err_handler, 
+                      const WorkAllocator& allocator = WorkAllocator())
         : basic_json_reader(std::forward<Source>(source),
                             handler,
                             basic_json_options<CharT>::get_default_options(),
-                            err_handler)
+                            err_handler,
+                            allocator)
     {
     }
 
@@ -241,10 +254,11 @@ public:
     basic_json_reader(Source&& source,
                       basic_json_content_handler<CharT>& handler, 
                       const basic_json_decode_options<CharT>& options,
-                      std::function<bool(json_errc,const ser_context&)> err_handler,
+                      std::function<bool(json_errc,const ser_context&)> err_handler, 
+                      const WorkAllocator& allocator = WorkAllocator(),
                       typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : handler_(handler),
-         parser_(options,err_handler),
+         parser_(options,err_handler,allocator),
          source_(std::forward<Source>(source)),
          buffer_length_(default_max_buffer_length),
          eof_(false),
@@ -257,10 +271,11 @@ public:
     basic_json_reader(Source&& source,
                       basic_json_content_handler<CharT>& handler, 
                       const basic_json_decode_options<CharT>& options,
-                      std::function<bool(json_errc,const ser_context&)> err_handler,
+                      std::function<bool(json_errc,const ser_context&)> err_handler, 
+                      const WorkAllocator& allocator = WorkAllocator(),
                       typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : handler_(handler),
-         parser_(options,err_handler),
+         parser_(options,err_handler,allocator),
          buffer_length_(0),
          eof_(false),
          begin_(false)
