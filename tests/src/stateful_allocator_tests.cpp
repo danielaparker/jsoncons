@@ -13,8 +13,9 @@
 
 using namespace jsoncons;
 
-#if !(defined(__GNUC__) && __GNUC__ == 4)
+#if !(defined(__GNUC__))
 // gcc 4.8 basic_string doesn't satisfy C++11 allocator requirements
+// and gcc doesn't support allocators with no default constructor
 TEST_CASE("test_string_allocation")
 {
 
