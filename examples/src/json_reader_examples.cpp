@@ -57,10 +57,8 @@ void read_with_stateful_allocator()
 ]
 )";
 
-    FreelistAllocator<char> my_allocator{1}; 
-
-    json_decoder<my_json,FreelistAllocator<char>> decoder(my_allocator,my_allocator);
-    basic_json_reader<char,stream_source<char>,FreelistAllocator<char>> reader(input, decoder, my_allocator);
+    json_decoder<my_json,FreelistAllocator<char>> decoder(FreelistAllocator<char>(1),FreelistAllocator<char>(2));
+    basic_json_reader<char,stream_source<char>,FreelistAllocator<char>> reader(input, decoder, FreelistAllocator<char>(3));
     reader.read();
 
     my_json j = decoder.get_result();
