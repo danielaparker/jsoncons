@@ -12,6 +12,7 @@
 
 using namespace jsoncons;
 
+void json_reader_examples();
 void readme_examples();
 void basics_examples();
 void basics_wexamples();
@@ -299,28 +300,6 @@ void json_constructor_examples()
     std::cout << pretty_print(arr) << std::endl;
 }
 
-void mulitple_json_objects()
-{
-    std::ifstream is("./input/multiple-json-objects.json");
-    if (!is.is_open())
-    {
-        throw std::runtime_error("Cannot open file");
-    }
-
-    json_decoder<json> decoder;
-    json_reader reader(is, decoder);
-
-    while (!reader.eof())
-    {
-        reader.read_next();
-        if (!reader.eof())
-        {
-            json val = decoder.get_result();
-            std::cout << val << std::endl;
-        }
-    }
-}
-
 void object_range_based_for_loop()
 {
     json j = json::parse(R"(
@@ -455,8 +434,6 @@ int main()
         array_examples();
         container_examples();
 
-        mulitple_json_objects();
-
         wjson_examples();
 
         unicode_examples();
@@ -514,6 +491,8 @@ int main()
         type_extensibility_examples();
 
         run_csv_examples();
+
+        json_reader_examples();
     }
     catch (const std::exception& e)
     {

@@ -10,6 +10,7 @@
 [Set a maximum nesting depth](#A5)  
 [Prevent the alphabetic sort of the outputted JSON, retaining the original insertion order](#A6)  
 [Parse a very large JSON file with json_cursor](#A7)  
+[Read a JSON text using stateful result and work allocators](#A9)  
 
 ### Encode
 
@@ -293,12 +294,11 @@ Output:
 
 ### Parse a very large JSON file with json_cursor
 
-
 A typical pull parsing application will repeatedly process the `current()` 
 event and call `next()` to advance to the next event, until `done()` 
 returns `true`.
 
-The example JSON text, `book_catalog.json`, is used by the examples below.
+The example JSON text, `book_catalog.json`:
 
 ```json
 [ 
@@ -405,6 +405,28 @@ name: price
 double_value: 16
 end_object
 end_array
+```
+
+<div id="A9"/> 
+
+### Read a JSON text using stateful result and work allocators
+
+```c++
+// Given allocator my_alloc with a single-argument constructor my_alloc(int),
+// use my_alloc(1) to allocate basic_json memory, my_alloc(2) to allocate
+// working memory used by json_decoder, and my_alloc(3) to allocate
+// working memory used by basic_json_reader. 
+
+typedef basic_json<char,sorted_policy,my_alloc> my_json;
+
+std::ifstream is("book_catalog.json");
+json_decoder<my_json,my_alloc> decoder(my_alloc(1),my_alloc(2));
+
+basic_json_reader<char,stream_source<char>,my_alloc> reader(is, decoder, my_alloc(3));
+reader.read();
+
+my_json j = decoder.get_result();
+std::cout << pretty_print(j) << "\n";
 ```
 
 #### Filtering the JSON stream

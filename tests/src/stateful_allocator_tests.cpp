@@ -18,14 +18,14 @@ using namespace jsoncons;
 TEST_CASE("test_string_allocation")
 {
 
-    FreelistAllocator<char> allocator; 
+    FreelistAllocator<char> allocator(true); 
 
-    typedef basic_json<char,sorted_policy,FreelistAllocator<char>> myjson;
+    typedef basic_json<char,sorted_policy,FreelistAllocator<char>> my_json;
 
     SECTION("construct")
     {
         {
-            myjson j("String too long for short string", allocator);
+            my_json j("String too long for short string", allocator);
         }
         //std::cout << "Allocate count = " << a_pool.allocate_count_ 
         //          << ", construct count = " << a_pool.construct_count_ 
@@ -36,7 +36,7 @@ TEST_CASE("test_string_allocation")
     SECTION("construct")
     {
         {
-            myjson j("String too long for short string", allocator);
+            my_json j("String too long for short string", allocator);
         }
         //CHECK(a_pool.allocate_count_ == a_pool.deallocate_count_);
        // CHECK(a_pool.construct_count_ == a_pool.destroy_count_);
@@ -44,12 +44,12 @@ TEST_CASE("test_string_allocation")
 
     SECTION("parse")
     {
-        FreelistAllocator<char> allocator2; 
+        FreelistAllocator<char> allocator2(true); 
 
         std::string s = "String too long for short string";
         std::string input = "\"" + s + "\"";
 
-        json_decoder<myjson,FreelistAllocator<char>> decoder(allocator, allocator2);
+        json_decoder<my_json,FreelistAllocator<char>> decoder(allocator, allocator2);
         try
         {
             json_reader reader(input,decoder);

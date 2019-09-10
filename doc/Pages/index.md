@@ -838,9 +838,9 @@ Note that the allocator type allows you to supply a custom allocator. For exampl
 #include <boost/pool/pool_alloc.hpp>
 #include <jsoncons/json.hpp>
 
-typedef jsoncons::basic_json<char, boost::fast_pool_allocator<char>> myjson;
+typedef jsoncons::basic_json<char, boost::fast_pool_allocator<char>> my_json;
 
-myjson o;
+my_json o;
 
 o.insert_or_assign("FirstName","Joe");
 o.insert_or_assign("LastName","Smith");

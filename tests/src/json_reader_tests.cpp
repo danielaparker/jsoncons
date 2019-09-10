@@ -4,6 +4,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_reader.hpp>
+#include "sample_allocators.hpp"
 #include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
@@ -47,6 +48,47 @@ void test_json_reader_ec(const std::string& text, std::error_code expected)
     CHECK(ec);
     CHECK(ec == expected);
 }
+
+#if !(defined(__GNUC__) && __GNUC__ == 4)
+// gcc 4.8 basic_string doesn't satisfy C++11 allocator requirements
+TEST_CASE("json_reader constructors")
+{
+    std::string input = R"(
+{
+  "store": {
+    "book": [
+      {
+        "category": "reference",
+        "author": "Margaret Weis",
+        "title": "Dragonlance Series",
+        "price": 31.96
+      },
+      {
+        "category": "reference",
+        "author": "Brent Weeks",
+        "title": "Night Angel Trilogy",
+        "price": 14.70
+      }
+    ]
+  }
+}
+)";
+
+    SECTION("stateful allocator")
+    {
+        typedef basic_json<char,sorted_policy,FreelistAllocator<char>> my_json;
+
+        FreelistAllocator<char> my_allocator{1}; 
+
+        json_decoder<my_json,FreelistAllocator<char>> decoder(my_allocator,my_allocator);
+        basic_json_reader<char,stream_source<char>,FreelistAllocator<char>> reader(input, decoder, my_allocator);
+        reader.read();
+
+        my_json j = decoder.get_result();
+        //std::cout << pretty_print(j) << "\n";
+    }
+}
+#endif
 
 TEST_CASE("test_missing_separator")
 {

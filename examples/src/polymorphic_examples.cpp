@@ -1,7 +1,7 @@
 // Copyright 2016 Daniel Parker
 // Distributed under Boost license
 
-#include "example_types.hpp"
+#include "sample_types.hpp"
 #include <cassert>
 #include <string>
 #include <vector>

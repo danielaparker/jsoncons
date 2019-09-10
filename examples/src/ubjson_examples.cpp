@@ -1,7 +1,7 @@
 // Copyright 2017 Daniel Parker
 // Distributed under Boost license
 
-#include "example_types.hpp"
+#include "sample_types.hpp"
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/ubjson/ubjson.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>

@@ -155,10 +155,10 @@ private:
     basic_json_parser<CharT,WorkAllocator> parser_;
 
     source_type source_;
-    std::vector<CharT,char_allocator_type> buffer_;
-    size_t buffer_length_;
     bool eof_;
     bool begin_;
+    size_t buffer_length_;
+    std::vector<CharT,char_allocator_type> buffer_;
 
     // Noncopyable and nonmoveable
     basic_json_reader(const basic_json_reader&) = delete;
@@ -260,9 +260,10 @@ public:
        : handler_(handler),
          parser_(options,err_handler,allocator),
          source_(std::forward<Source>(source)),
-         buffer_length_(default_max_buffer_length),
          eof_(false),
-         begin_(true)
+         begin_(true),
+         buffer_length_(default_max_buffer_length),
+         buffer_(allocator)
     {
         buffer_.reserve(buffer_length_);
     }
@@ -276,9 +277,10 @@ public:
                       typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : handler_(handler),
          parser_(options,err_handler,allocator),
-         buffer_length_(0),
          eof_(false),
-         begin_(false)
+         begin_(false),
+         buffer_length_(0),
+         buffer_(allocator)
     {
         basic_string_view<CharT> sv(std::forward<Source>(source));
         auto result = unicons::skip_bom(sv.begin(), sv.end());

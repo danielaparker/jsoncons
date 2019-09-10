@@ -5,7 +5,7 @@
 #include <jsoncons_ext/csv/csv.hpp>
 #include <fstream>
 #include <iomanip>
-#include "example_types.hpp"
+#include "sample_types.hpp"
 
 using namespace jsoncons;
 
