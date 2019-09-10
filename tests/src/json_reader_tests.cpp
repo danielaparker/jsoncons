@@ -49,7 +49,7 @@ void test_json_reader_ec(const std::string& text, std::error_code expected)
     CHECK(ec == expected);
 }
 
-#if !(defined(__GNUC__) && __GNUC__ == 4)
+#if !(defined(__GNUC__))
 // gcc 4.8 basic_string doesn't satisfy C++11 allocator requirements
 TEST_CASE("json_reader constructors")
 {
