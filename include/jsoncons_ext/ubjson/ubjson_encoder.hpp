@@ -80,11 +80,11 @@ public:
 
     ~basic_ubjson_encoder()
     {
-        try
+        JSONCONS_TRY
         {
             result_.flush();
         }
-        catch (...)
+        JSONCONS_CATCH(...)
         {
         }
     }
@@ -126,11 +126,11 @@ private:
         {
             if (stack_.back().count() < stack_.back().length())
             {
-                throw ser_error(ubjson_errc::too_few_items);
+                JSONCONS_THROW(ser_error(ubjson_errc::too_few_items));
             }
             if (stack_.back().count() > stack_.back().length())
             {
-                throw ser_error(ubjson_errc::too_many_items);
+                JSONCONS_THROW(ser_error(ubjson_errc::too_many_items));
             }
         }
         stack_.pop_back();
@@ -167,11 +167,11 @@ private:
         {
             if (stack_.back().count() < stack_.back().length())
             {
-                throw ser_error(ubjson_errc::too_few_items);
+                JSONCONS_THROW(ser_error(ubjson_errc::too_few_items));
             }
             if (stack_.back().count() > stack_.back().length())
             {
-                throw ser_error(ubjson_errc::too_many_items);
+                JSONCONS_THROW(ser_error(ubjson_errc::too_many_items));
             }
         }
         stack_.pop_back();
@@ -184,7 +184,7 @@ private:
         auto result = unicons::validate(name.begin(), name.end());
         if (result.ec != unicons::conv_errc())
         {
-            throw ser_error(ubjson_errc::invalid_utf8_text_string);
+            JSONCONS_THROW(ser_error(ubjson_errc::invalid_utf8_text_string));
         }
 
         put_length(name.length());

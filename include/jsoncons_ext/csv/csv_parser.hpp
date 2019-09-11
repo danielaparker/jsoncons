@@ -595,7 +595,7 @@ public:
         parse_some(handler,ec);
         if (ec)
         {
-            throw ser_error(ec,line_,column_);
+            JSONCONS_THROW(ser_error(ec,line_,column_));
         }
     }
 
@@ -1193,7 +1193,7 @@ public:
         finish_parse(ec);
         if (ec)
         {
-            throw ser_error(ec,line_,column_);
+            JSONCONS_THROW(ser_error(ec,line_,column_));
         }
     }
 

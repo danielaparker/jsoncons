@@ -20,6 +20,7 @@
 #include <memory> // std::allocator
 #include <initializer_list> // std::initializer_list
 #include <type_traits> // std::enable_if
+#include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons {
 
@@ -1279,7 +1280,7 @@ private:
     {
         if ( denom.length() == 0 )
         {
-            throw std::runtime_error( "Zero divide." );
+            JSONCONS_THROW(std::runtime_error( "Zero divide." ));
         }
         bool quot_neg = neg_ ^ denom.neg_;
         bool rem_neg = neg_;
@@ -1532,7 +1533,7 @@ private:
                     v = (v * 10) + (uint64_t)(c - '0');
                     break;
                 default:
-                    throw std::runtime_error(std::string("Invalid digit ") + "\'" + (char)c + "\'");
+                    JSONCONS_THROW(std::runtime_error(std::string("Invalid digit ") + "\'" + (char)c + "\'"));
             }
         }
 
@@ -1548,7 +1549,7 @@ private:
     {
         if (!(base >= 2 && base <= 16))
         {
-            throw std::runtime_error("Unsupported base");
+            JSONCONS_THROW(std::runtime_error("Unsupported base"));
         }
 
         bool neg;
@@ -1580,11 +1581,11 @@ private:
                     d = (uint64_t)(c - ('A' - 10));
                     break;
                 default:
-                    throw std::runtime_error(std::string("Invalid digit in base ") + std::to_string(base) + ": \'" + (char)c + "\'");
+                    JSONCONS_THROW(std::runtime_error(std::string("Invalid digit in base ") + std::to_string(base) + ": \'" + (char)c + "\'"));
             }
             if (d >= base)
             {
-                throw std::runtime_error(std::string("Invalid digit in base ") + std::to_string(base) + ": \'" + (char)c + "\'");
+                JSONCONS_THROW(std::runtime_error(std::string("Invalid digit in base ") + std::to_string(base) + ": \'" + (char)c + "\'"));
             }
             v = (v * base) + d;
         }

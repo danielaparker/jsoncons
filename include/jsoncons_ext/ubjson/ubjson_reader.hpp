@@ -38,13 +38,13 @@ public:
         read(ec);
         if (ec)
         {
-            throw ser_error(ec,line(),column());
+            JSONCONS_THROW(ser_error(ec,line(),column()));
         }
     }
 
     void read(std::error_code& ec)
     {
-        try
+        JSONCONS_TRY
         {
             parser_.reset();
             parser_.parse(handler_, ec);
@@ -53,7 +53,7 @@ public:
                 return;
             }
         }
-        catch (const ser_error& e)
+        JSONCONS_CATCH(const ser_error& e)     
         {
             ec = e.code();
         }

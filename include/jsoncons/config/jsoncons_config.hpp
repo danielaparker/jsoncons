@@ -159,3 +159,33 @@ template<> inline char16_t const* name##_literal<char16_t>() { return JSONCONS_Q
 template<> inline char32_t const* name##_literal<char32_t>() { return JSONCONS_QUOTE(U,name); }
 
 #endif
+
+// Check if exceptions are disabled.
+#if defined( __cpp_exceptions) && __cpp_exceptions == 0
+# define JSONCONS_EXCEPTIONS 0
+#endif
+
+#if !defined(JSONCONS_EXCEPTIONS)
+#if __GNUC__ && !__EXCEPTIONS
+# define JSONCONS_EXCEPTIONS 0
+#elif _MSC_VER && (!_HAS_EXCEPTIONS)
+# define JSONCONS_EXCEPTIONS 0
+#endif
+#endif
+
+#if !defined(JSONCONS_EXCEPTIONS)
+# define JSONCONS_EXCEPTIONS 1
+#endif
+
+// allow to disable exceptions
+#if JSONCONS_EXCEPTIONS == 1
+    #define JSONCONS_THROW(exception) throw exception
+    #define JSONCONS_RETHROW throw
+    #define JSONCONS_TRY try
+    #define JSONCONS_CATCH(exception) catch(exception)
+#else
+    #define JSONCONS_THROW(exception) std::terminate()
+    #define JSONCONS_RETHROW std::terminate()
+    #define JSONCONS_TRY if(true)
+    #define JSONCONS_CATCH(exception) if(false)
+#endif

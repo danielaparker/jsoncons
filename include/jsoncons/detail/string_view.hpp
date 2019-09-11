@@ -18,6 +18,7 @@
 #include <exception>
 #include <stdexcept>
 #include <istream> // std::basic_istream
+#include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { namespace detail {
 
@@ -128,7 +129,7 @@ public:
     {
         if (pos >= length_)
         {
-            throw std::out_of_range("pos exceeds length");
+            JSONCONS_THROW(std::out_of_range("pos exceeds length"));
         }
         return data_[pos];
     }
@@ -153,7 +154,7 @@ public:
     {
         if (pos > length_)
         {
-            throw std::out_of_range("pos exceeds size");
+            JSONCONS_THROW(std::out_of_range("pos exceeds size"));
         }
         if (n == npos || pos + n > length_)
         {

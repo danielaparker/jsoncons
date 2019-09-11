@@ -85,7 +85,7 @@ private:
             unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            throw ser_error(result.ec,context.line(),context.column());
+            JSONCONS_THROW(ser_error(result.ec,context.line(),context.column()));
         }
         return other_handler_.name(target, context);
     }
@@ -98,7 +98,7 @@ private:
             unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            throw ser_error(result.ec,context.line(),context.column());
+            JSONCONS_THROW(ser_error(result.ec,context.line(),context.column()));
         }
         return other_handler_.string_value(target, tag, context);
     }
@@ -286,7 +286,7 @@ public:
         auto result = unicons::skip_bom(sv.begin(), sv.end());
         if (result.ec != unicons::encoding_errc())
         {
-            throw ser_error(result.ec,parser_.line(),parser_.column());
+            JSONCONS_THROW(ser_error(result.ec,parser_.line(),parser_.column()));
         }
         size_t offset = result.it - sv.begin();
         parser_.update(sv.data()+offset,sv.size()-offset);
@@ -321,13 +321,13 @@ public:
         read_next(ec);
         if (ec)
         {
-            throw ser_error(ec,parser_.line(),parser_.column());
+            JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
     }
 
     void read_next(std::error_code& ec)
     {
-        try
+        JSONCONS_TRY
         {
             if (source_.is_error())
             {
@@ -374,7 +374,7 @@ public:
                 }
             }
         }
-        catch (const ser_error& e)
+        JSONCONS_CATCH(const ser_error& e)     
         {
             ec = e.code();
         }
@@ -386,7 +386,7 @@ public:
         check_done(ec);
         if (ec)
         {
-            throw ser_error(ec,parser_.line(),parser_.column());
+            JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
     }
 
@@ -402,7 +402,7 @@ public:
 
     void check_done(std::error_code& ec)
     {
-        try
+        JSONCONS_TRY
         {
             if (source_.is_error())
             {
@@ -438,7 +438,7 @@ public:
                 }
             }
         }
-        catch (const ser_error& e)
+        JSONCONS_CATCH(const ser_error& e)     
         {
             ec = e.code();
         }

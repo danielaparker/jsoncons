@@ -654,17 +654,17 @@ public:
         evaluate(root, path.data(), path.length(), ec);
         if (ec)
         {
-            throw jsonpath_error(ec, line_, column_);
+            JSONCONS_THROW(jsonpath_error(ec, line_, column_));
         }
     }
 
     void evaluate(reference root, const string_view_type& path, std::error_code& ec)
     {
-        try
+        JSONCONS_TRY
         {
             evaluate(root, path.data(), path.length(), ec);
         }
-        catch (...)
+        JSONCONS_CATCH(...)
         {
             ec = jsonpath_errc::unidentified_error;
         }
@@ -899,13 +899,13 @@ public:
                     switch (*p_)
                     {
                         case ',':
-                            try
+                            JSONCONS_TRY
                             {
                                 auto val = Json::parse(buffer);
                                 auto temp = create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
-                            catch (const ser_error&)
+                            JSONCONS_CATCH(const ser_error&)     
                             {
                                 ec = jsonpath_errc::argument_parse_error;
                                 return;
@@ -916,13 +916,13 @@ public:
                             break;
                         case ')':
                         {
-                            try
+                            JSONCONS_TRY
                             {
                                 auto val = Json::parse(buffer);
                                 auto temp = create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
-                            catch (const ser_error&)
+                            JSONCONS_CATCH(const ser_error&)     
                             {
                                 ec = jsonpath_errc::argument_parse_error;
                                 return;
@@ -982,13 +982,13 @@ public:
                             advance_past_space_character();
                             break;
                         case ',':
-                            try
+                            JSONCONS_TRY
                             {
                                 auto val = Json::parse(buffer);
                                 auto temp = create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
-                            catch (const ser_error&)
+                            JSONCONS_CATCH(const ser_error&)     
                             {
                                 ec = jsonpath_errc::argument_parse_error;
                                 return;
@@ -1001,13 +1001,13 @@ public:
                             break;
                         case ')':
                         {
-                            try
+                            JSONCONS_TRY
                             {
                                 auto val = Json::parse(buffer);
                                 auto temp = create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
-                            catch (const ser_error&)
+                            JSONCONS_CATCH(const ser_error&)     
                             {
                                 ec = jsonpath_errc::argument_parse_error;
                                 return;

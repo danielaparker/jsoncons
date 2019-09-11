@@ -250,7 +250,7 @@ base16_to_integer(const CharT* s, size_t length)
                     x = c - ('A' - 10);
                     break;
                 default:
-                    throw std::runtime_error("Invalid hex digit");
+                    JSONCONS_THROW(std::runtime_error("Invalid hex digit"));
             }
             if (n < min_value_div_16)
             {
@@ -286,7 +286,7 @@ base16_to_integer(const CharT* s, size_t length)
                     x = c - ('A' - 10);
                     break;
                 default:
-                    throw std::runtime_error("Invalid hex digit");
+                    JSONCONS_THROW(std::runtime_error("Invalid hex digit"));
             }
             if (n > max_value_div_16)
             {
@@ -336,7 +336,7 @@ base16_to_integer(const CharT* s, size_t length)
                 x = c - ('A' - 10);
                 break;
             default:
-                throw std::runtime_error("Invalid hex digit");
+                JSONCONS_THROW(std::runtime_error("Invalid hex digit"));
         }
         if (n > max_value_div_16)
         {

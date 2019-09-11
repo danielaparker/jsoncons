@@ -100,11 +100,11 @@ public:
 
     ~basic_csv_encoder()
     {
-        try
+        JSONCONS_TRY
         {
             result_.flush();
         }
-        catch (...)
+        JSONCONS_CATCH(...)
         {
         }
     }

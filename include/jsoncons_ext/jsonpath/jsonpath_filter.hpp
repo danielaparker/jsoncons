@@ -149,120 +149,120 @@ public:
 
     virtual bool accept_single_node() const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual Json get_single_node() const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual bool exclaim() const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual bool eq_term(const term&) const 
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual bool eq(const Json&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual bool ne_term(const term&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual bool ne(const Json&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual bool regex_term(const term&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual bool regex2(const string_type&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual bool ampamp_term(const term&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual bool ampamp(const Json&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual bool pipepipe_term(const term&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual bool pipepipe(const Json&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual bool lt_term(const term&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual bool lt(const Json&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual bool gt_term(const term&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual bool gt(const Json&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
 
     virtual Json minus_term(const term&) const 
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual Json minus(const Json&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
 
     virtual Json left_minus(const Json&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
 
     virtual Json unary_minus() const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual Json plus_term(const term&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual Json plus(const Json&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual Json mult_term(const term&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual Json mult(const Json&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
 
     virtual Json div_term(const term&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
     virtual Json div(const Json&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
 
     virtual Json left_div(const Json&) const
     {
-        throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator);
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
 };
 
@@ -1377,7 +1377,7 @@ public:
                             break;
                         }
                         default:
-                            throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_);
+                            JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_));
                     }
                     ++p;
                     ++column_;
@@ -1395,7 +1395,7 @@ public:
                         auto it = binary_operators_.find(buffer);
                         if (it == binary_operators_.end())
                         {
-                            throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_);
+                            JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_));
                         }
                         buffer.clear();
                         buffer_line = buffer_column = 1;
@@ -1413,7 +1413,7 @@ public:
                         auto it = binary_operators_.find(buffer);
                         if (it == binary_operators_.end())
                         {
-                            throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_);
+                            JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_));
                         }
                         buffer.clear();
                         buffer_line = buffer_column = 1;
@@ -1426,7 +1426,7 @@ public:
                         auto it = binary_operators_.find(buffer);
                         if (it == binary_operators_.end())
                         {
-                            throw jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_);
+                            JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_));
                         }
                         buffer.clear();
                         buffer_line = buffer_column = 1;
@@ -1443,14 +1443,14 @@ public:
                         case ' ':case '\t':
                             if (buffer.length() > 0)
                             {
-                                try
+                                JSONCONS_TRY
                                 {
                                     auto val = Json::parse(buffer);
                                     push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
                                 }
-                                catch (const ser_error&)
+                                JSONCONS_CATCH(const ser_error&)     
                                 {
-                                    throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
+                                    JSONCONS_THROW(jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_));
                                 }
                                 buffer.clear();
                                 buffer_line = buffer_column = 1;
@@ -1480,14 +1480,14 @@ public:
                             {
                                 if (buffer.length() > 0)
                                 {
-                                    try
+                                    JSONCONS_TRY
                                     {
                                         auto val = Json::parse(buffer);
                                         push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
                                     }
-                                    catch (const ser_error&)
+                                    JSONCONS_CATCH(const ser_error&)     
                                     {
-                                        throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
+                                        JSONCONS_THROW(jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_));
                                     }
                                     buffer.clear();
                                     buffer_line = buffer_column = 1;
@@ -1501,14 +1501,14 @@ public:
                         case ')':
                             if (buffer.length() > 0)
                             {
-                                try
+                                JSONCONS_TRY
                                 {
                                     auto val = Json::parse(buffer);
                                     push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
                                 }
-                                catch (const ser_error&)
+                                JSONCONS_CATCH(const ser_error&)     
                                 {
-                                    throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
+                                    JSONCONS_THROW(jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_));
                                 }
                                 buffer.clear();
                                 buffer_line = buffer_column = 1;
@@ -1550,14 +1550,14 @@ public:
                             buffer.push_back('\"');
                             //if (buffer.length() > 0)
                             {
-                                try
+                                JSONCONS_TRY
                                 {
                                     auto val = Json::parse(buffer);
                                     push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
                                 }
-                                catch (const ser_error&)
+                                JSONCONS_CATCH(const ser_error&)     
                                 {
-                                    throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
+                                    JSONCONS_THROW(jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_));
                                 }
                                 buffer.clear();
                                 buffer_line = buffer_column = 1;
@@ -1588,14 +1588,14 @@ public:
                             break;
                         case '\"':
                             buffer.push_back(*p);
-                            try
+                            JSONCONS_TRY
                             {
                                 auto val = Json::parse(buffer);
                                 push_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(std::move(val))));
                             }
-                            catch (const ser_error&)
+                            JSONCONS_CATCH(const ser_error&)     
                             {
-                                throw jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_);
+                                JSONCONS_THROW(jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_));
                             }
                             buffer.clear();
                             buffer_line = buffer_column = 1;
@@ -1731,7 +1731,7 @@ public:
                         }
                         break;
                     default: 
-                        throw jsonpath_error(jsonpath_errc::invalid_filter,line_,column_);
+                        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter,line_,column_));
                         break;
                 };
                 break;
@@ -1764,7 +1764,7 @@ public:
                         }
                         break;
                     default: 
-                        throw jsonpath_error(jsonpath_errc::invalid_filter,line_,column_);
+                        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter,line_,column_));
                         break;
                 };
                 ++p;
@@ -1880,7 +1880,7 @@ public:
                             state = filter_state::regex;
                             break;
                         default: 
-                            throw jsonpath_error(jsonpath_errc::invalid_filter_expected_slash,line_,column_);
+                            JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_expected_slash,line_,column_));
                             break;
                     };
                     ++p;
@@ -1923,7 +1923,7 @@ public:
         }
         if (depth != 0)
         {
-            throw jsonpath_error(jsonpath_errc::invalid_filter_unbalanced_paren,line_,column_);
+            JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unbalanced_paren,line_,column_));
         }
         *end_ptr = p;
 

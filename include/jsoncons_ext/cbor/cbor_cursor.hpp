@@ -109,7 +109,7 @@ public:
         read_to(handler, ec);
         if (ec)
         {
-            throw ser_error(ec,parser_.line(),parser_.column());
+            JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
     }
 
@@ -129,7 +129,7 @@ public:
         next(ec);
         if (ec)
         {
-            throw ser_error(ec,parser_.line(),parser_.column());
+            JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
     }
 

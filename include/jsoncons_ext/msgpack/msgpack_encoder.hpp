@@ -80,11 +80,11 @@ public:
 
     ~basic_msgpack_encoder()
     {
-        try
+        JSONCONS_TRY
         {
             result_.flush();
         }
-        catch (...)
+        JSONCONS_CATCH(...)
         {
         }
     }
@@ -99,7 +99,7 @@ private:
 
     bool do_begin_object(semantic_tag, const ser_context&) override
     {
-        throw ser_error(msgpack_errc::object_length_required);
+        JSONCONS_THROW(ser_error(msgpack_errc::object_length_required));
     }
 
     bool do_begin_object(size_t length, semantic_tag, const ser_context&) override
@@ -138,11 +138,11 @@ private:
 
         if (stack_.back().count() < stack_.back().length())
         {
-            throw ser_error( msgpack_errc::too_few_items);
+            JSONCONS_THROW(ser_error( msgpack_errc::too_few_items));
         }
         else if (stack_.back().count() > stack_.back().length())
         {
-            throw ser_error( msgpack_errc::too_many_items);
+            JSONCONS_THROW(ser_error( msgpack_errc::too_many_items));
         }
 
         stack_.pop_back();
@@ -152,7 +152,7 @@ private:
 
     bool do_begin_array(semantic_tag, const ser_context&) override
     {
-        throw ser_error(msgpack_errc::array_length_required);
+        JSONCONS_THROW(ser_error(msgpack_errc::array_length_required));
     }
 
     bool do_begin_array(size_t length, semantic_tag, const ser_context&) override
@@ -184,11 +184,11 @@ private:
 
         if (stack_.back().count() < stack_.back().length())
         {
-            throw ser_error(msgpack_errc::too_few_items);
+            JSONCONS_THROW(ser_error(msgpack_errc::too_few_items));
         }
         else if (stack_.back().count() > stack_.back().length())
         {
-            throw ser_error(msgpack_errc::too_many_items);
+            JSONCONS_THROW(ser_error(msgpack_errc::too_many_items));
         }
 
         stack_.pop_back();
@@ -222,7 +222,7 @@ private:
         auto result = unicons::validate(sv.begin(), sv.end());
         if (result.ec != unicons::conv_errc())
         {
-            throw ser_error(msgpack_errc::invalid_utf8_text_string);
+            JSONCONS_THROW(ser_error(msgpack_errc::invalid_utf8_text_string));
         }
 
         const size_t length = sv.length();

@@ -36,7 +36,7 @@ public:
 
     const char* what() const noexcept override
     {
-        try
+        JSONCONS_TRY
         {
             std::ostringstream os;
             os << std::system_error::what();
@@ -51,7 +51,7 @@ public:
             const_cast<std::string&>(buffer_) = os.str();
             return buffer_.c_str();
         }
-        catch (...)
+        JSONCONS_CATCH(...)
         {
             return std::system_error::what();
         }

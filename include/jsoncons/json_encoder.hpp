@@ -85,7 +85,7 @@ size_t escape_string(const CharT* s, size_t length,
                     unicons::sequence_generator<const CharT*> g(it, end, unicons::conv_flags::strict);
                     if (g.done() || g.status() != unicons::conv_errc())
                     {
-                        throw ser_error(json_errc::illegal_codepoint);
+                        JSONCONS_THROW(ser_error(json_errc::illegal_codepoint));
                     }
                     uint32_t cp = g.get().codepoint();
                     it += (g.get().length() - 1);
@@ -375,11 +375,11 @@ public:
 
     ~basic_json_encoder()
     {
-        try
+        JSONCONS_TRY
         {
             result_.flush();
         }
-        catch (...)
+        JSONCONS_CATCH(...)
         {
         }
     }
@@ -1065,11 +1065,11 @@ public:
 
     ~basic_json_compressed_encoder()
     {
-        try
+        JSONCONS_TRY
         {
             result_.flush();
         }
-        catch (...)
+        JSONCONS_CATCH(...)
         {
         }
     }

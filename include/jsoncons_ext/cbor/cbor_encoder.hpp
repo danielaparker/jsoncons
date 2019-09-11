@@ -98,11 +98,11 @@ public:
 
     ~basic_cbor_encoder()
     {
-        try
+        JSONCONS_TRY
         {
             result_.flush();
         }
-        catch (...)
+        JSONCONS_CATCH(...)
         {
         }
     }
@@ -175,11 +175,11 @@ private:
         {
             if (stack_.back().count() < stack_.back().length())
             {
-                throw ser_error(cbor_errc::too_few_items);
+                JSONCONS_THROW(ser_error(cbor_errc::too_few_items));
             }
             if (stack_.back().count() > stack_.back().length())
             {
-                throw ser_error(cbor_errc::too_many_items);
+                JSONCONS_THROW(ser_error(cbor_errc::too_many_items));
             }
         }
 
@@ -247,11 +247,11 @@ private:
         {
             if (stack_.back().count() < stack_.back().length())
             {
-                throw ser_error(cbor_errc::too_few_items);
+                JSONCONS_THROW(ser_error(cbor_errc::too_few_items));
             }
             if (stack_.back().count() > stack_.back().length())
             {
-                throw ser_error(cbor_errc::too_many_items);
+                JSONCONS_THROW(ser_error(cbor_errc::too_many_items));
             }
         }
 
@@ -438,7 +438,7 @@ private:
                             state = decimal_parse_state::integer;
                             break;
                         default:
-                            throw std::invalid_argument("Invalid decimal string");
+                            JSONCONS_THROW(std::invalid_argument("Invalid decimal string"));
                     }
                     break;
                 }
@@ -457,7 +457,7 @@ private:
                             state = decimal_parse_state::fraction1;
                             break;
                         default:
-                            throw std::invalid_argument("Invalid decimal string");
+                            JSONCONS_THROW(std::invalid_argument("Invalid decimal string"));
                     }
                     break;
                 }
@@ -477,7 +477,7 @@ private:
                             state = decimal_parse_state::exp2;
                             break;
                         default:
-                            throw std::invalid_argument("Invalid decimal string");
+                            JSONCONS_THROW(std::invalid_argument("Invalid decimal string"));
                     }
                     break;
                 }
@@ -489,7 +489,7 @@ private:
                             exponent.push_back(c);
                             break;
                         default:
-                            throw std::invalid_argument("Invalid decimal string");
+                            JSONCONS_THROW(std::invalid_argument("Invalid decimal string"));
                     }
                     break;
                 }
@@ -502,7 +502,7 @@ private:
                             --scale;
                             break;
                         default:
-                            throw std::invalid_argument("Invalid decimal string");
+                            JSONCONS_THROW(std::invalid_argument("Invalid decimal string"));
                     }
                     break;
                 }
@@ -563,7 +563,7 @@ private:
                             state = hexfloat_parse_state::expect_x;
                             break;
                         default:
-                            throw std::invalid_argument("Invalid hexfloat string");
+                            JSONCONS_THROW(std::invalid_argument("Invalid hexfloat string"));
                     }
                     break;
                 }
@@ -575,7 +575,7 @@ private:
                             state = hexfloat_parse_state::expect_x;
                             break;
                         default:
-                            throw std::invalid_argument("Invalid hexfloat string");
+                            JSONCONS_THROW(std::invalid_argument("Invalid hexfloat string"));
                     }
                     break;
                 }
@@ -588,7 +588,7 @@ private:
                             state = hexfloat_parse_state::integer;
                             break;
                         default:
-                            throw std::invalid_argument("Invalid hexfloat string");
+                            JSONCONS_THROW(std::invalid_argument("Invalid hexfloat string"));
                     }
                     break;
                 }
@@ -607,7 +607,7 @@ private:
                             state = hexfloat_parse_state::fraction1;
                             break;
                         default:
-                            throw std::invalid_argument("Invalid hexfloat string");
+                            JSONCONS_THROW(std::invalid_argument("Invalid hexfloat string"));
                     }
                     break;
                 }
@@ -627,7 +627,7 @@ private:
                             state = hexfloat_parse_state::exp2;
                             break;
                         default:
-                            throw std::invalid_argument("Invalid hexfloat string");
+                            JSONCONS_THROW(std::invalid_argument("Invalid hexfloat string"));
                     }
                     break;
                 }
@@ -639,7 +639,7 @@ private:
                             exponent.push_back(c);
                             break;
                         default:
-                            throw std::invalid_argument("Invalid hexfloat string");
+                            JSONCONS_THROW(std::invalid_argument("Invalid hexfloat string"));
                     }
                     break;
                 }
@@ -652,7 +652,7 @@ private:
                             scale -= 4;
                             break;
                         default:
-                            throw std::invalid_argument("Invalid hexfloat string");
+                            JSONCONS_THROW(std::invalid_argument("Invalid hexfloat string"));
                     }
                     break;
                 }

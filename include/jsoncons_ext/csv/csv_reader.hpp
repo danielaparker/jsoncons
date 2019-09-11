@@ -128,7 +128,7 @@ public:
         auto result = unicons::skip_bom(sv.begin(), sv.end());
         if (result.ec != unicons::encoding_errc())
         {
-            throw ser_error(result.ec,parser_.line(),parser_.column());
+            JSONCONS_THROW(ser_error(result.ec,parser_.line(),parser_.column()));
         }
         size_t offset = result.it - sv.begin();
         parser_.update(sv.data()+offset,sv.size()-offset);
@@ -144,17 +144,17 @@ public:
         read(ec);
         if (ec)
         {
-            throw ser_error(ec,parser_.line(),parser_.column());
+            JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
     }
 
     void read(std::error_code& ec)
     {
-        try
+        JSONCONS_TRY
         {
             read_internal(ec);
         }
-        catch (const ser_error& e)
+        JSONCONS_CATCH(const ser_error& e)     
         {
             ec = e.code();
         }

@@ -93,7 +93,7 @@ public:
         increment(ec);
         if (ec)
         {
-            throw jsonpointer_error(ec);
+            JSONCONS_THROW(jsonpointer_error(ec));
         }
         return *this;
     }

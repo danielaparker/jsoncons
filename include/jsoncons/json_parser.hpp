@@ -500,7 +500,7 @@ public:
         check_done(ec);
         if (ec)
         {
-            throw ser_error(ec,line_,column_);
+            JSONCONS_THROW(ser_error(ec,line_,column_));
         }
     }
 
@@ -551,7 +551,7 @@ public:
         parse_some(handler, ec);
         if (ec)
         {
-            throw ser_error(ec,line_,column_);
+            JSONCONS_THROW(ser_error(ec,line_,column_));
         }
     }
 
@@ -580,7 +580,7 @@ public:
         finish_parse(handler, ec);
         if (ec)
         {
-            throw ser_error(ec,line_,column_);
+            JSONCONS_THROW(ser_error(ec,line_,column_));
         }
     }
 
@@ -2592,7 +2592,7 @@ escape_u9:
         finish_parse(handler, ec);
         if (ec)
         {
-            throw ser_error(ec,line_,column_);
+            JSONCONS_THROW(ser_error(ec,line_,column_));
         }
     }
 
@@ -2667,7 +2667,7 @@ private:
 
     void end_fraction_value(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
-        try
+        JSONCONS_TRY
         {
             if (options_.lossless_number())
             {
@@ -2679,7 +2679,7 @@ private:
                 continue_ = handler.double_value(d, semantic_tag::none, *this);
             }
         }
-        catch (...)
+        JSONCONS_CATCH(...)
         {
             continue_ = err_handler_(json_errc::invalid_number, *this);
             if (!continue_)

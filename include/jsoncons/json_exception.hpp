@@ -109,7 +109,7 @@ public:
 
     const char* what() const noexcept override
     {
-        try
+        JSONCONS_TRY
         {
             std::ostringstream os;
             os << this->code().message();
@@ -124,7 +124,7 @@ public:
             const_cast<std::string&>(buffer_) = os.str();
             return buffer_.c_str();
         }
-        catch (...)
+        JSONCONS_CATCH(...)
         {
             return std::system_error::what();
         }
@@ -171,15 +171,13 @@ JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error parse_error;
 
 #ifdef _DEBUG
 #define JSONCONS_ASSERT(x) if (!(x)) { \
-    throw jsoncons::json_runtime_error<std::runtime_error>("assertion '" #x "' failed at " __FILE__ ":" \
-            JSONCONS_STR(__LINE__)); }
+    JSONCONS_THROW(jsoncons::json_runtime_error<std::runtime_error>("assertion '" #x "' failed at " __FILE__ ":" \
+            JSONCONS_STR(__LINE__))); }
 #else
 #define JSONCONS_ASSERT(x) if (!(x)) { \
-    throw jsoncons::json_runtime_error<std::runtime_error>("assertion '" #x "' failed at  <> :" \
-            JSONCONS_STR( 0 )); }
+    JSONCONS_THROW(jsoncons::json_runtime_error<std::runtime_error>("assertion '" #x "' failed at  <> :" \
+            JSONCONS_STR( 0 ))); }
 #endif // _DEBUG
-
-#define JSONCONS_THROW(x) throw (x)
 
 }
 #endif

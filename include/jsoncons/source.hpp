@@ -112,7 +112,7 @@ public:
 
     size_t get(value_type& c)
     {
-        try
+        JSONCONS_TRY
         {
             int val = sbuf_->sbumpc();
             if (!(val == traits_type::eof()))
@@ -127,7 +127,7 @@ public:
                 return 0;
             }
         }
-        catch (const std::exception&)
+        JSONCONS_CATCH(const std::exception&)     
         {
             is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
             return 0;
@@ -136,7 +136,7 @@ public:
 
     int get()
     {
-        try
+        JSONCONS_TRY
         {
             int c = sbuf_->sbumpc();
             if (c == traits_type::eof())
@@ -149,7 +149,7 @@ public:
             }
             return c;
         }
-        catch (const std::exception&)
+        JSONCONS_CATCH(const std::exception&)     
         {
             is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
             return traits_type::eof();
@@ -158,7 +158,7 @@ public:
 
     void ignore(size_t count)
     {
-        try
+        JSONCONS_TRY
         {
             for (size_t i = 0; i < count; ++i)
             {
@@ -174,7 +174,7 @@ public:
                 }
             }
         }
-        catch (const std::exception&)
+        JSONCONS_CATCH(const std::exception&)     
         {
             is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
         }
@@ -182,7 +182,7 @@ public:
 
     int peek() 
     {
-        try
+        JSONCONS_TRY
         {
             int c = sbuf_->sgetc();
             if (c == traits_type::eof())
@@ -191,7 +191,7 @@ public:
             }
             return c;
         }
-        catch (const std::exception&)
+        JSONCONS_CATCH(const std::exception&)     
         {
             is_->clear(is_->rdstate() | std::ios::badbit);
             return traits_type::eof();
@@ -200,7 +200,7 @@ public:
 
     size_t read(value_type* p, size_t length)
     {
-        try
+        JSONCONS_TRY
         {
             std::streamsize count = sbuf_->sgetn(p, length); // never negative
             if (static_cast<size_t>(count) < length)
@@ -210,7 +210,7 @@ public:
             position_ += length;
             return static_cast<size_t>(count);
         }
-        catch (const std::exception&)
+        JSONCONS_CATCH(const std::exception&)     
         {
             is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
             return 0;
@@ -222,7 +222,7 @@ public:
     read(OutputIt p, size_t length)
     {
         size_t count = 0;
-        try
+        JSONCONS_TRY
         {
             for (count = 0; count < length; ++count)
             {
@@ -240,7 +240,7 @@ public:
             }
             return count;
         }
-        catch (const std::exception&)
+        JSONCONS_CATCH(const std::exception&)     
         {
             is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
             return count;
@@ -474,7 +474,7 @@ public:
 
     size_t get(value_type& c)
     {
-        try
+        JSONCONS_TRY
         {
             int val = sbuf_->sbumpc();
             if (!(val == traits_type::eof()))
@@ -489,7 +489,7 @@ public:
                 return 0;
             }
         }
-        catch (const std::exception&)
+        JSONCONS_CATCH(const std::exception&)     
         {
             is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
             return 0;
@@ -498,7 +498,7 @@ public:
 
     int get()
     {
-        try
+        JSONCONS_TRY
         {
             int c = sbuf_->sbumpc();
             if (c == traits_type::eof())
@@ -511,7 +511,7 @@ public:
             }
             return c;
         }
-        catch (const std::exception&)
+        JSONCONS_CATCH(const std::exception&)     
         {
             is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
             return traits_type::eof();
@@ -520,7 +520,7 @@ public:
 
     void ignore(size_t count)
     {
-        try
+        JSONCONS_TRY
         {
             for (size_t i = 0; i < count; ++i)
             {
@@ -536,7 +536,7 @@ public:
                 }
             }
         }
-        catch (const std::exception&)
+        JSONCONS_CATCH(const std::exception&)     
         {
             is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
         }
@@ -544,7 +544,7 @@ public:
 
     int peek() 
     {
-        try
+        JSONCONS_TRY
         {
             int c = sbuf_->sgetc();
             if (c == traits_type::eof())
@@ -553,7 +553,7 @@ public:
             }
             return c;
         }
-        catch (const std::exception&)
+        JSONCONS_CATCH(const std::exception&)     
         {
             is_->clear(is_->rdstate() | std::ios::badbit);
             return traits_type::eof();
@@ -564,7 +564,7 @@ public:
     size_t read(OutputIt p, size_t length)
     {
         size_t count = 0;
-        try
+        JSONCONS_TRY
         {
             for (count = 0; count < length; ++count)
             {
@@ -582,7 +582,7 @@ public:
             }
             return count;
         }
-        catch (const std::exception&)
+        JSONCONS_CATCH(const std::exception&)     
         {
             is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
             return count;

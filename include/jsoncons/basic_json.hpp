@@ -410,14 +410,14 @@ public:
             {
                 typename std::allocator_traits<Allocator>:: template rebind_alloc<byte_string_storage_type> alloc(allocator);
                 ptr_ = alloc.allocate(1);
-                try
+                JSONCONS_TRY
                 {
                     std::allocator_traits<string_holder_allocator_type>:: template rebind_traits<byte_string_storage_type>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
-                catch (...)
+                JSONCONS_CATCH(...)
                 {
                     alloc.deallocate(ptr_,1);
-                    throw;
+                    JSONCONS_RETHROW;
                 }
             }
         public:
@@ -500,14 +500,14 @@ public:
             {
                 array_allocator alloc(allocator);
                 ptr_ = alloc.allocate(1);
-                try
+                JSONCONS_TRY
                 {
                     std::allocator_traits<array_allocator>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
-                catch (...)
+                JSONCONS_CATCH(...)
                 {
                     alloc.deallocate(ptr_,1);
-                    throw;
+                    JSONCONS_RETHROW;
                 }
             }
         public:
@@ -582,14 +582,14 @@ public:
             {
                 object_allocator alloc(allocator);
                 ptr_ = alloc.allocate(1);
-                try
+                JSONCONS_TRY
                 {
                     std::allocator_traits<object_allocator>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
-                catch (...)
+                JSONCONS_CATCH(...)
                 {
                     alloc.deallocate(ptr_,1);
-                    throw;
+                    JSONCONS_RETHROW;
                 }
             }
         public:
@@ -1688,11 +1688,11 @@ public:
 
         size_t size() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().size();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return 0;
             }
@@ -1725,11 +1725,11 @@ public:
 
         bool is_null() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_null();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -1737,11 +1737,11 @@ public:
 
         bool empty() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().empty();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return true;
             }
@@ -1771,11 +1771,11 @@ public:
         template<class T, class... Args>
         bool is(Args&&... args) const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().template is<T>(std::forward<Args>(args)...);
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -1783,11 +1783,11 @@ public:
 
         bool is_string() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_string();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -1795,11 +1795,11 @@ public:
 
         bool is_string_view() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_string_view();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -1807,11 +1807,11 @@ public:
 
         bool is_byte_string() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_byte_string();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -1819,11 +1819,11 @@ public:
 
         bool is_byte_string_view() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_byte_string_view();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -1831,11 +1831,11 @@ public:
 
         bool is_bignum() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_bignum();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -1843,22 +1843,22 @@ public:
 
         bool is_number() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_number();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
         }
         bool is_bool() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_bool();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -1866,11 +1866,11 @@ public:
 
         bool is_object() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_object();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -1878,11 +1878,11 @@ public:
 
         bool is_array() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_array();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -1890,11 +1890,11 @@ public:
 
         bool is_int64() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_int64();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -1902,11 +1902,11 @@ public:
 
         bool is_uint64() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_uint64();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -1914,11 +1914,11 @@ public:
 
         bool is_double() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_double();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -2324,11 +2324,11 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::datetime")
         bool is_datetime() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_datetime();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -2337,11 +2337,11 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::timestamp")
         bool is_epoch_time() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_epoch_time();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -2384,11 +2384,11 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use is<int64_t>()")
         bool is_integer() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_int64();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -2397,11 +2397,11 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use is<uint64_t>()")
         bool is_uinteger() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_uint64();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -2410,11 +2410,11 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use is<unsigned long long>()")
         bool is_ulonglong() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_ulonglong();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -2423,11 +2423,11 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use is<long long>()")
         bool is_longlong() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return evaluate().is_longlong();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -2674,11 +2674,11 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use is_number()")
         bool is_numeric() const noexcept
         {
-            try
+            JSONCONS_TRY
             {
                 return is_number();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 return false;
             }
@@ -2721,7 +2721,7 @@ public:
         auto result = unicons::skip_bom(s.begin(), s.end());
         if (result.ec != unicons::encoding_errc())
         {
-            throw ser_error(result.ec);
+            JSONCONS_THROW(ser_error(result.ec));
         }
         size_t offset = result.it - s.begin();
         parser.update(s.data()+offset,s.size()-offset);
@@ -2768,7 +2768,7 @@ public:
         auto result = unicons::skip_bom(s.begin(), s.end());
         if (result.ec != unicons::encoding_errc())
         {
-            throw ser_error(result.ec);
+            JSONCONS_THROW(ser_error(result.ec));
         }
         size_t offset = result.it - s.begin();
         parser.update(s.data()+offset,s.size()-offset);
@@ -3520,12 +3520,12 @@ public:
                 return static_cast<bool>(var_.as_bignum());
             }
 
-            try
+            JSONCONS_TRY
             {
                 basic_json j = basic_json::parse(as_string_view());
                 return j.as_bool();
             }
-            catch (...)
+            JSONCONS_CATCH(...)
             {
                 JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a bool"));
             }

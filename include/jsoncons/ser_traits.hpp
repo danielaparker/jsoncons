@@ -32,7 +32,7 @@ T read_from(const Json& j, basic_staj_reader<CharT>& reader)
     T val = read_from<T>(j, reader, ec);
     if (ec)
     {
-        throw ser_error(ec, reader.context().line(), reader.context().column());
+        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
     }
     return val;
 }
