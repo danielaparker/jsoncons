@@ -1,3 +1,14 @@
+master
+------
+
+- Support compilation with exceptions disabled
+
+- Support stateful result and work allocators in
+
+    - json_decoder
+    - basic_json_reader
+    - basic_json_parser
+
 v0.133.0
 --------
 

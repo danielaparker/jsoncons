@@ -1688,6 +1688,10 @@ public:
 
         size_t size() const noexcept
         {
+            if (!contains(key_))
+            {
+                return 0;
+            }
             JSONCONS_TRY
             {
                 return evaluate().size();
@@ -1725,6 +1729,10 @@ public:
 
         bool is_null() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_null();
@@ -1737,6 +1745,10 @@ public:
 
         bool empty() const noexcept
         {
+            if (!contains(key_))
+            {
+                return true;
+            }
             JSONCONS_TRY
             {
                 return evaluate().empty();
@@ -1771,6 +1783,10 @@ public:
         template<class T, class... Args>
         bool is(Args&&... args) const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().template is<T>(std::forward<Args>(args)...);
@@ -1783,6 +1799,10 @@ public:
 
         bool is_string() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_string();
@@ -1795,6 +1815,10 @@ public:
 
         bool is_string_view() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_string_view();
@@ -1807,6 +1831,10 @@ public:
 
         bool is_byte_string() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_byte_string();
@@ -1819,6 +1847,10 @@ public:
 
         bool is_byte_string_view() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_byte_string_view();
@@ -1831,6 +1863,10 @@ public:
 
         bool is_bignum() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_bignum();
@@ -1843,6 +1879,10 @@ public:
 
         bool is_number() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_number();
@@ -1854,6 +1894,10 @@ public:
         }
         bool is_bool() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_bool();
@@ -1866,6 +1910,10 @@ public:
 
         bool is_object() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_object();
@@ -1878,6 +1926,10 @@ public:
 
         bool is_array() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_array();
@@ -1890,6 +1942,10 @@ public:
 
         bool is_int64() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_int64();
@@ -1902,6 +1958,10 @@ public:
 
         bool is_uint64() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_uint64();
@@ -1914,6 +1974,10 @@ public:
 
         bool is_double() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_double();
@@ -2324,6 +2388,10 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::datetime")
         bool is_datetime() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_datetime();
@@ -2337,6 +2405,10 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::timestamp")
         bool is_epoch_time() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_epoch_time();
@@ -2384,6 +2456,10 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use is<int64_t>()")
         bool is_integer() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_int64();
@@ -2397,6 +2473,10 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use is<uint64_t>()")
         bool is_uinteger() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_uint64();
@@ -2410,6 +2490,10 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use is<unsigned long long>()")
         bool is_ulonglong() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_ulonglong();
@@ -2423,6 +2507,10 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use is<long long>()")
         bool is_longlong() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return evaluate().is_longlong();
@@ -2674,6 +2762,10 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use is_number()")
         bool is_numeric() const noexcept
         {
+            if (!contains(key_))
+            {
+                return false;
+            }
             JSONCONS_TRY
             {
                 return is_number();
