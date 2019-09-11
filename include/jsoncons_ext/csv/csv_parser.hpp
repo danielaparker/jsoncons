@@ -141,36 +141,36 @@ namespace detail {
 
         parse_event(bool value, semantic_tag tag, const WorkAllocator& allocator)
             : event_type(staj_event_type::bool_value), 
-              bool_value(value), 
               string_value(allocator),
               byte_string_value(allocator),
+              bool_value(value), 
               tag(tag)
         {
         }
 
         parse_event(int64_t value, semantic_tag tag, const WorkAllocator& allocator)
             : event_type(staj_event_type::int64_value), 
-              int64_value(value), 
               string_value(allocator),
               byte_string_value(allocator),
+              int64_value(value), 
               tag(tag)
         {
         }
 
         parse_event(uint64_t value, semantic_tag tag, const WorkAllocator& allocator)
             : event_type(staj_event_type::uint64_value), 
-              uint64_value(value), 
               string_value(allocator),
               byte_string_value(allocator),
+              uint64_value(value), 
               tag(tag)
         {
         }
 
         parse_event(double value, semantic_tag tag, const WorkAllocator& allocator)
             : event_type(staj_event_type::double_value), 
-              double_value(value), 
               string_value(allocator),
               byte_string_value(allocator),
+              double_value(value), 
               tag(tag)
         {
         }
