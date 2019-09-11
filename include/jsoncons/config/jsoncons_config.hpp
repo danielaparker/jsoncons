@@ -168,8 +168,12 @@ template<> inline char32_t const* name##_literal<char32_t>() { return JSONCONS_Q
 #if !defined(JSONCONS_EXCEPTIONS)
 #if __GNUC__ && !__EXCEPTIONS
 # define JSONCONS_EXCEPTIONS 0
-#elif _MSC_VER && (!_HAS_EXCEPTIONS)
+#elif _MSC_VER 
+#if defined(_HAS_EXCEPTIONS) && _HAS_EXCEPTIONS == 0
 # define JSONCONS_EXCEPTIONS 0
+#elif !defined(_CPPUNWIND)
+# define JSONCONS_EXCEPTIONS 0
+#endif
 #endif
 #endif
 
