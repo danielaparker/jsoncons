@@ -47,9 +47,6 @@ struct sorted_policy
     template <class CharT, class CharTraits, class Allocator>
     using key_storage = std::basic_string<CharT, CharTraits,Allocator>;
 
-    template <class CharT, class CharTraits, class Allocator>
-    using string_storage = std::basic_string<CharT, CharTraits,Allocator>;
-
     typedef default_json_parsing parse_error_handler_type;
 };
 
