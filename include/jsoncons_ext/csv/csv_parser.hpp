@@ -222,7 +222,7 @@ namespace detail {
         typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
         typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_event<CharT,WorkAllocator>> parse_event_allocator_type;
         typedef std::vector<parse_event<CharT,WorkAllocator>, parse_event_allocator_type> parse_event_vector_type;
-        typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_event<CharT,WorkAllocator>> parse_event_vector_allocator_type;
+        typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_event_vector_type> parse_event_vector_allocator_type;
     private:
         WorkAllocator allocator_;
         size_t name_index_;
