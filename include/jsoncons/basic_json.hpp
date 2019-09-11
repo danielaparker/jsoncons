@@ -1688,7 +1688,7 @@ public:
 
         size_t size() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return 0;
             }
@@ -1724,12 +1724,13 @@ public:
 
         bool contains(const string_view_type& key) const 
         {
-            return evaluate().contains(key);
+
+            return parent_.contains(key_) ? evaluate().contains(key) : false;
         }
 
         bool is_null() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1745,7 +1746,7 @@ public:
 
         bool empty() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return true;
             }
@@ -1783,7 +1784,7 @@ public:
         template<class T, class... Args>
         bool is(Args&&... args) const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1799,7 +1800,7 @@ public:
 
         bool is_string() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1815,7 +1816,7 @@ public:
 
         bool is_string_view() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1831,7 +1832,7 @@ public:
 
         bool is_byte_string() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1847,7 +1848,7 @@ public:
 
         bool is_byte_string_view() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1863,7 +1864,7 @@ public:
 
         bool is_bignum() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1879,7 +1880,7 @@ public:
 
         bool is_number() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1894,7 +1895,7 @@ public:
         }
         bool is_bool() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1910,7 +1911,7 @@ public:
 
         bool is_object() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1926,7 +1927,7 @@ public:
 
         bool is_array() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1942,7 +1943,7 @@ public:
 
         bool is_int64() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1958,7 +1959,7 @@ public:
 
         bool is_uint64() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -1974,7 +1975,7 @@ public:
 
         bool is_double() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -2388,7 +2389,7 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::datetime")
         bool is_datetime() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -2405,7 +2406,7 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::timestamp")
         bool is_epoch_time() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -2456,7 +2457,7 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use is<int64_t>()")
         bool is_integer() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -2473,7 +2474,7 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use is<uint64_t>()")
         bool is_uinteger() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -2490,7 +2491,7 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use is<unsigned long long>()")
         bool is_ulonglong() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -2507,7 +2508,7 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use is<long long>()")
         bool is_longlong() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
@@ -2762,7 +2763,7 @@ public:
         JSONCONS_DEPRECATED_MSG("Instead, use is_number()")
         bool is_numeric() const noexcept
         {
-            if (!contains(key_))
+            if (!parent_.contains(key_))
             {
                 return false;
             }
