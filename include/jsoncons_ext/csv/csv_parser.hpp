@@ -93,14 +93,19 @@ struct default_csv_parsing
 
 namespace detail {
 
-    template <class CharT>
+    template <class CharT,class WorkAllocator>
     class parse_event
     {
+        typedef WorkAllocator work_allocator_type;
         typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
+        typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+        typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
+        typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
+        typedef basic_byte_string<byte_allocator_type> byte_string_type;
 
         staj_event_type event_type;
-        std::basic_string<CharT> string_value;
-        byte_string byte_string_value;
+        string_type string_value;
+        byte_string_type byte_string_value;
         union
         {
             bool bool_value;
@@ -110,38 +115,63 @@ namespace detail {
         };
         semantic_tag tag;
     public:
-        parse_event(staj_event_type event_type, semantic_tag tag=semantic_tag::none)
-            : event_type(event_type), tag(tag)
+        parse_event(staj_event_type event_type, semantic_tag tag, const WorkAllocator& allocator)
+            : event_type(event_type), 
+              string_value(allocator),
+              byte_string_value(allocator),
+              tag(tag)
         {
         }
 
-        parse_event(const string_view_type& value, semantic_tag tag)
-            : event_type(staj_event_type::string_value), string_value(value.data(),value.length()), tag(tag)
+        parse_event(const string_view_type& value, semantic_tag tag, const WorkAllocator& allocator)
+            : event_type(staj_event_type::string_value), 
+              string_value(value.data(),value.length(),allocator), 
+              byte_string_value(allocator),
+              tag(tag)
         {
         }
 
-        parse_event(const byte_string_view& value, semantic_tag tag)
-            : event_type(staj_event_type::byte_string_value), byte_string_value(value.data(),value.length()), tag(tag)
+        parse_event(const byte_string_view& value, semantic_tag tag, const WorkAllocator& allocator)
+            : event_type(staj_event_type::byte_string_value), 
+              string_value(allocator),
+              byte_string_value(value.data(),value.length(),allocator), 
+              tag(tag)
         {
         }
 
-        parse_event(bool value, semantic_tag tag)
-            : event_type(staj_event_type::bool_value), bool_value(value), tag(tag)
+        parse_event(bool value, semantic_tag tag, const WorkAllocator& allocator)
+            : event_type(staj_event_type::bool_value), 
+              bool_value(value), 
+              string_value(allocator),
+              byte_string_value(allocator),
+              tag(tag)
         {
         }
 
-        parse_event(int64_t value, semantic_tag tag)
-            : event_type(staj_event_type::int64_value), int64_value(value), tag(tag)
+        parse_event(int64_t value, semantic_tag tag, const WorkAllocator& allocator)
+            : event_type(staj_event_type::int64_value), 
+              int64_value(value), 
+              string_value(allocator),
+              byte_string_value(allocator),
+              tag(tag)
         {
         }
 
-        parse_event(uint64_t value, semantic_tag tag)
-            : event_type(staj_event_type::uint64_value), uint64_value(value), tag(tag)
+        parse_event(uint64_t value, semantic_tag tag, const WorkAllocator& allocator)
+            : event_type(staj_event_type::uint64_value), 
+              uint64_value(value), 
+              string_value(allocator),
+              byte_string_value(allocator),
+              tag(tag)
         {
         }
 
-        parse_event(double value, semantic_tag tag)
-            : event_type(staj_event_type::double_value), double_value(value), tag(tag)
+        parse_event(double value, semantic_tag tag, const WorkAllocator& allocator)
+            : event_type(staj_event_type::double_value), 
+              double_value(value), 
+              string_value(allocator),
+              byte_string_value(allocator),
+              tag(tag)
         {
         }
 
@@ -178,19 +208,23 @@ namespace detail {
         }
     };
 
-    template <class CharT, class Allocator>
+    template <class CharT, class WorkAllocator>
     class m_columns_filter : public basic_json_content_handler<CharT>
     {
     public:
         typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
         typedef CharT char_type;
-        typedef Allocator allocator_type;
-        typedef typename basic_json_options<CharT>::string_type string_type;
-        typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
-    public:
-    private:
-        typedef std::vector<parse_event<CharT>> parse_event_vector;
+        typedef WorkAllocator work_allocator_type;
 
+        typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+        typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
+
+        typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
+        typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_event<CharT,WorkAllocator>> parse_event_allocator_type;
+        typedef std::vector<parse_event<CharT,WorkAllocator>, parse_event_allocator_type> parse_event_vector_type;
+        typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_event<CharT,WorkAllocator>> parse_event_vector_allocator_type;
+    private:
+        WorkAllocator allocator_;
         size_t name_index_;
         int level_;
         cached_state state_;
@@ -198,11 +232,18 @@ namespace detail {
         size_t row_index_;
 
         std::vector<string_type, string_allocator_type> column_names_;
-        std::vector<parse_event_vector> cached_events_;
+        std::vector<parse_event_vector_type,parse_event_vector_allocator_type> cached_events_;
     public:
 
-        m_columns_filter()
-            : name_index_(0), level_(0), state_(cached_state::begin_object), column_index_(0), row_index_(0)
+        m_columns_filter(const WorkAllocator& allocator)
+            : allocator_(allocator),
+              name_index_(0), 
+              level_(0), 
+              state_(cached_state::begin_object), 
+              column_index_(0), 
+              row_index_(0),
+              column_names_(allocator),
+              cached_events_(allocator)
         {
         }
 
@@ -217,7 +258,7 @@ namespace detail {
             for (const auto& name : column_names)
             {
                 column_names_.push_back(name);
-                cached_events_.push_back(parse_event_vector());
+                cached_events_.emplace_back(allocator_);
             }
             name_index_ = 0;
             level_ = 0;
@@ -307,7 +348,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(staj_event_type::begin_array, tag);
+                cached_events_[name_index_].emplace_back(staj_event_type::begin_array, tag, allocator_);
                 
                 ++level_;
             }
@@ -318,7 +359,7 @@ namespace detail {
         {
             if (level_ > 0)
             {
-                cached_events_[name_index_].emplace_back(staj_event_type::end_array);
+                cached_events_[name_index_].emplace_back(staj_event_type::end_array, semantic_tag::none, allocator_);
                 ++name_index_;
                 --level_;
             }
@@ -338,7 +379,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(staj_event_type::null_value, tag);
+                cached_events_[name_index_].emplace_back(staj_event_type::null_value, tag, allocator_);
                 if (level_ == 0)
                 {
                     ++name_index_;
@@ -351,7 +392,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(value, tag);
+                cached_events_[name_index_].emplace_back(value, tag, allocator_);
 
                 if (level_ == 0)
                 {
@@ -367,7 +408,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(value, tag);
+                cached_events_[name_index_].emplace_back(value, tag, allocator_);
                 if (level_ == 0)
                 {
                     ++name_index_;
@@ -382,7 +423,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(value, tag);
+                cached_events_[name_index_].emplace_back(value, tag, allocator_);
                 if (level_ == 0)
                 {
                     ++name_index_;
@@ -397,7 +438,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(value, tag);
+                cached_events_[name_index_].emplace_back(value, tag, allocator_);
                 if (level_ == 0)
                 {
                     ++name_index_;
@@ -412,7 +453,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(value, tag);
+                cached_events_[name_index_].emplace_back(value, tag, allocator_);
                 if (level_ == 0)
                 {
                     ++name_index_;
@@ -425,7 +466,7 @@ namespace detail {
         {
             if (name_index_ < column_names_.size())
             {
-                cached_events_[name_index_].emplace_back(value, tag);
+                cached_events_[name_index_].emplace_back(value, tag, allocator_);
                 if (level_ == 0)
                 {
                     ++name_index_;
@@ -437,36 +478,30 @@ namespace detail {
 
 } // namespace detail
 
-template<class CharT,class Allocator=std::allocator<CharT>>
+template<class CharT,class WorkAllocator=std::allocator<CharT>>
 class basic_csv_parser : public ser_context
 {
     typedef basic_string_view<CharT> string_view_type;
     typedef CharT char_type;
-    typedef Allocator allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+    typedef WorkAllocator work_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
     typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<csv_mode> csv_mode_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<csv_type_info> csv_type_info_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::vector<string_type,string_allocator_type>> string_vector_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<csv_parse_state> csv_parse_state_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<csv_mode> csv_mode_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<csv_type_info> csv_type_info_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<std::vector<string_type,string_allocator_type>> string_vector_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<csv_parse_state> csv_parse_state_allocator_type;
 
     static const int default_depth = 3;
 
+    work_allocator_type allocator_;
     csv_parse_state state_;
-    detail::m_columns_filter<CharT,Allocator> m_columns_filter_;
-    std::vector<csv_mode,csv_mode_allocator_type> stack_;
     basic_json_content_handler<CharT>* handler_;
     std::function<bool(csv_errc,const ser_context&)> err_handler_;
     unsigned long column_;
     unsigned long line_;
-    string_type buffer_;
     int depth_;
     const basic_csv_decode_options<CharT>& options_;
-    std::vector<string_type,string_allocator_type> column_names_;
-    std::vector<std::vector<string_type,string_allocator_type>,string_vector_allocator_type> column_values_;
-    std::vector<csv_type_info,csv_type_info_allocator_type> column_types_;
-    std::vector<string_type,string_allocator_type> column_defaults_;
     size_t column_index_;
     size_t level_;
     size_t offset_;
@@ -476,29 +511,45 @@ class basic_csv_parser : public ser_context
     const CharT* input_ptr_;
     bool continue_;
     size_t header_line_;
+
+    detail::m_columns_filter<CharT,WorkAllocator> m_columns_filter_;
+    std::vector<csv_mode,csv_mode_allocator_type> stack_;
+    std::vector<string_type,string_allocator_type> column_names_;
+    std::vector<std::vector<string_type,string_allocator_type>,string_vector_allocator_type> column_values_;
+    std::vector<csv_type_info,csv_type_info_allocator_type> column_types_;
+    std::vector<string_type,string_allocator_type> column_defaults_;
     std::vector<csv_parse_state,csv_parse_state_allocator_type> state_stack_;
+    string_type buffer_;
 
 public:
-    basic_csv_parser()
+    basic_csv_parser(const WorkAllocator& allocator = WorkAllocator())
        : basic_csv_parser(basic_csv_options<CharT>::get_default_options(), 
-                          default_csv_parsing())
-    {
-    }
-
-    basic_csv_parser(const basic_csv_decode_options<CharT>& options)
-        : basic_csv_parser(options, 
-                           default_csv_parsing())
-    {
-    }
-
-    basic_csv_parser(std::function<bool(csv_errc,const ser_context&)> err_handler)
-        : basic_csv_parser(basic_csv_options<CharT>::get_default_options(), err_handler)
+                          default_csv_parsing(),
+                          allocator)
     {
     }
 
     basic_csv_parser(const basic_csv_decode_options<CharT>& options,
-                     std::function<bool(csv_errc,const ser_context&)> err_handler)
-       : handler_(nullptr),
+                     const WorkAllocator& allocator = WorkAllocator())
+        : basic_csv_parser(options, 
+                           default_csv_parsing(),
+                           allocator)
+    {
+    }
+
+    basic_csv_parser(std::function<bool(csv_errc,const ser_context&)> err_handler,
+                     const WorkAllocator& allocator = WorkAllocator())
+        : basic_csv_parser(basic_csv_options<CharT>::get_default_options(), 
+                           err_handler,
+                           allocator)
+    {
+    }
+
+    basic_csv_parser(const basic_csv_decode_options<CharT>& options,
+                     std::function<bool(csv_errc,const ser_context&)> err_handler,
+                     const WorkAllocator& allocator = WorkAllocator())
+       : allocator_(allocator),
+         handler_(nullptr),
          err_handler_(err_handler),
          options_(options),
          level_(0),
@@ -507,8 +558,15 @@ public:
          input_end_(nullptr),
          input_ptr_(nullptr),
          continue_(true),
-         header_line_(1)
-         
+         header_line_(1),
+         m_columns_filter_(allocator),
+         stack_(allocator),
+         column_names_(allocator),
+         column_values_(allocator),
+         column_types_(allocator),
+         column_defaults_(allocator),
+         state_stack_(allocator),
+         buffer_(allocator)
     {
         depth_ = default_depth;
         state_ = csv_parse_state::start;
@@ -560,7 +618,7 @@ public:
 
         for (const auto& name : options_.column_names())
         {
-            column_names_.emplace_back(name.data(),name.size());
+            column_names_.emplace_back(name.data(),name.size(),allocator_);
         }
         for (const auto& name : options_.column_types())
         {
@@ -568,7 +626,7 @@ public:
         }
         for (const auto& name : options_.column_defaults())
         {
-            column_defaults_.emplace_back(name.data(), name.size());
+            column_defaults_.emplace_back(name.data(), name.size(),allocator_);
         }
         if (options_.header_lines() > 0)
         {
@@ -1555,7 +1613,7 @@ private:
             {
                 case csv_column_type::integer_t:
                     {
-                        std::istringstream iss{ std::string(buffer_) };
+                        std::basic_istringstream<CharT,std::char_traits<CharT>,char_allocator_type> iss{buffer_};
                         int64_t val;
                         iss >> val;
                         if (!iss.fail())
@@ -1566,7 +1624,7 @@ private:
                         {
                             if (column_index_ - offset_ < column_defaults_.size() && column_defaults_[column_index_ - offset_].length() > 0)
                             {
-                                basic_json_parser<CharT> parser;
+                                basic_json_parser<CharT,work_allocator_type> parser(allocator_);
                                 parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
                                 parser.parse_some(*handler_);
                                 parser.finish_parse(*handler_);
@@ -1586,7 +1644,7 @@ private:
                         }
                         else
                         {
-                            std::istringstream iss{ std::string(buffer_) };
+                            std::basic_istringstream<CharT, std::char_traits<CharT>, char_allocator_type> iss{ buffer_ };
                             double val;
                             iss >> val;
                             if (!iss.fail())
@@ -1597,7 +1655,7 @@ private:
                             {
                                 if (column_index_ - offset_ < column_defaults_.size() && column_defaults_[column_index_ - offset_].length() > 0)
                                 {
-                                    basic_json_parser<CharT> parser;
+                                    basic_json_parser<CharT,work_allocator_type> parser(allocator_);
                                     parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
                                     parser.parse_some(*handler_);
                                     parser.finish_parse(*handler_);
@@ -1632,7 +1690,7 @@ private:
                         {
                             if (column_index_ - offset_ < column_defaults_.size() && column_defaults_[column_index_ - offset_].length() > 0)
                             {
-                                basic_json_parser<CharT> parser;
+                                basic_json_parser<CharT,work_allocator_type> parser(allocator_);
                                 parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
                                 parser.parse_some(*handler_);
                                 parser.finish_parse(*handler_);
@@ -1653,7 +1711,7 @@ private:
                     {
                         if (column_index_ < column_defaults_.size() + offset_ && column_defaults_[column_index_ - offset_].length() > 0)
                         {
-                            basic_json_parser<CharT> parser;
+                            basic_json_parser<CharT,work_allocator_type> parser(allocator_);
                             parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
                             parser.parse_some(*handler_);
                             parser.finish_parse(*handler_);

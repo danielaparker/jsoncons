@@ -7,6 +7,7 @@
 //#include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
 #include <jsoncons/json_reader.hpp>
+#include "../sample_allocators.hpp"
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -1433,4 +1434,33 @@ TEST_CASE("test_encode_decode csv string")
         CHECK(j1 == j2);
     }
 }
+
+#if !(defined(__GNUC__))
+TEST_CASE("csv_reader constructors")
+{
+    const std::string input = R"(Date,1Y,2Y,3Y,5Y
+2017-01-09,0.0062,0.0075,0.0083,0.011
+2017-01-08,0.0063,0.0076,0.0084,0.0112
+2017-01-08,0.0063,0.0076,0.0084,0.0112
+)";
+
+    SECTION("stateful allocator")
+    {
+        typedef basic_json<char,sorted_policy,FreelistAllocator<char>> my_json;
+
+        FreelistAllocator<char> my_allocator{1}; 
+
+        csv::csv_options options;
+        options.assume_header(true)
+               .mapping(csv::mapping_type::n_rows);
+
+        json_decoder<my_json,FreelistAllocator<char>> decoder(my_allocator,my_allocator);
+        csv::basic_csv_reader<char,stream_source<char>,FreelistAllocator<char>> reader(input, decoder, options, my_allocator);
+        //reader.read();
+
+        //my_json j = decoder.get_result();
+        //std::cout << pretty_print(j) << "\n";
+    }
+}
+#endif
 

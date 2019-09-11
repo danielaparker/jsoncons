@@ -50,10 +50,10 @@ class basic_csv_reader
 
     basic_csv_parser<CharT,WorkAllocator> parser_;
     Src source_;
-    std::vector<CharT,char_allocator_type> buffer_;
     size_t buffer_length_;
     bool eof_;
     bool begin_;
+    std::vector<CharT, char_allocator_type> buffer_;
 public:
     // Structural characters
     static const size_t default_max_buffer_length = 16384;
@@ -64,35 +64,41 @@ public:
 
     template <class Source>
     basic_csv_reader(Source&& source,
-                     basic_json_content_handler<CharT>& handler)
+                     basic_json_content_handler<CharT>& handler, 
+                     const WorkAllocator& allocator = WorkAllocator())
 
        : basic_csv_reader(std::forward<Source>(source), 
                           handler, 
                           basic_csv_options<CharT>::get_default_options(), 
-                          default_csv_parsing())
+                          default_csv_parsing(), 
+                          allocator)
     {
     }
 
     template <class Source>
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler,
-                     const basic_csv_options<CharT>& options)
+                     const basic_csv_options<CharT>& options, 
+                     const WorkAllocator& allocator = WorkAllocator())
 
         : basic_csv_reader(std::forward<Source>(source), 
                            handler, 
                            options, 
-                           default_csv_parsing())
+                           default_csv_parsing(),
+                           allocator)
     {
     }
 
     template <class Source>
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler,
-                     std::function<bool(csv_errc,const ser_context&)> err_handler)
+                     std::function<bool(csv_errc,const ser_context&)> err_handler, 
+                     const WorkAllocator& allocator = WorkAllocator())
         : basic_csv_reader(std::forward<Source>(source), 
                            handler, 
                            basic_csv_options<CharT>::get_default_options(), 
-                           err_handler)
+                           err_handler,
+                           allocator)
     {
     }
 
@@ -100,14 +106,16 @@ public:
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options,
-                     std::function<bool(csv_errc,const ser_context&)> err_handler,
+                     std::function<bool(csv_errc,const ser_context&)> err_handler, 
+                     const WorkAllocator& allocator = WorkAllocator(),
                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : handler_(handler),
-         parser_(options, err_handler),
+         parser_(options, err_handler, allocator),
          source_(std::forward<Source>(source)),
          buffer_length_(default_max_buffer_length),
          eof_(false),
-         begin_(true)
+         begin_(true),
+         buffer_(allocator)
     {
         buffer_.reserve(buffer_length_);
     }
@@ -116,13 +124,15 @@ public:
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options,
-                     std::function<bool(csv_errc,const ser_context&)> err_handler,
+                     std::function<bool(csv_errc,const ser_context&)> err_handler, 
+                     const WorkAllocator& allocator = WorkAllocator(),
                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : handler_(handler),
-         parser_(options, err_handler),
+         parser_(options, err_handler, allocator),
          buffer_length_(0),
          eof_(false),
-         begin_(false)
+         begin_(false),
+         buffer_(allocator)
     {
         basic_string_view<CharT> sv(std::forward<Source>(source));
         auto result = unicons::skip_bom(sv.begin(), sv.end());

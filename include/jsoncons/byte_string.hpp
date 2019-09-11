@@ -430,12 +430,13 @@ public:
 template <class Allocator = std::allocator<uint8_t>>
 class basic_byte_string
 {
-    std::vector<uint8_t,Allocator> data_;
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint8_t> byte_allocator_type;
+    std::vector<uint8_t,byte_allocator_type> data_;
 public:
     typedef byte_traits traits_type;
 
-    typedef typename std::vector<uint8_t,Allocator>::const_iterator const_iterator;
-    typedef typename std::vector<uint8_t,Allocator>::const_iterator iterator;
+    typedef typename std::vector<uint8_t,byte_allocator_type>::const_iterator const_iterator;
+    typedef typename std::vector<uint8_t,byte_allocator_type>::const_iterator iterator;
     typedef std::size_t size_type;
     typedef uint8_t value_type;
 
@@ -467,6 +468,7 @@ public:
     }
 
     basic_byte_string(basic_byte_string<Allocator>&& v)
+        : data_(v.get_allocator())
     {
         data_.swap(v.data_);
     }
@@ -484,9 +486,14 @@ public:
         }
     }
 
-    basic_byte_string(const uint8_t* data, size_t length)
-        : data_(data, data+length)
+    basic_byte_string(const uint8_t* data, size_t length, const Allocator& alloc = Allocator())
+        : data_(data, data+length,alloc)
     {
+    }
+
+    Allocator get_allocator() const
+    {
+        return data_.get_allocator();
     }
 
     basic_byte_string& operator=(const basic_byte_string& s) = default;
