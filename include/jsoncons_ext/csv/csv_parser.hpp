@@ -602,7 +602,7 @@ public:
         return input_ptr_ == input_end_;
     }
 
-    const std::vector<std::basic_string<CharT>>& column_labels() const
+    const std::vector<string_type,string_allocator_type>& column_labels() const
     {
         return column_names_;
     }

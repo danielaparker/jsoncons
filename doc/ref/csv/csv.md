@@ -10,7 +10,7 @@ The csv extension implements decode from and encode to the [CSV format](https://
 
 [basic_csv_options](basic_csv_options.md)
 
-[csv_reader](csv_reader.md)
+[basic_csv_reader](basic_csv_reader.md)
 
 [basic_csv_encoder](basic_csv_encoder.md)
 

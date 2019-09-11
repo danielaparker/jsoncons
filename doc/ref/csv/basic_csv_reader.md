@@ -1,15 +1,25 @@
-### jsoncons::csv::csv_reader
+### jsoncons::csv::basic_csv_reader
 
 ```c++
 #include <jsoncons_ext/csv/csv_reader.hpp>
 
-typedef basic_csv_reader<char,stream_source<char>> csv_reader
+template<
+    class CharT,
+    class Src=jsoncons::stream_source<CharT>,
+    class WorkAllocator=std::allocator<char>>
+class basic_csv_reader 
 ```
 
-The `csv_reader` class is an instantiation of the `basic_csv_reader` class template that uses `char` as the character type
-and `stream_source<char>` as the input source. It reads a [CSV file](http://tools.ietf.org/html/rfc4180) and produces JSON parse events.
+The `basic_csv_reader` class reads a [CSV file](http://tools.ietf.org/html/rfc4180) and produces JSON parse events.
 
-`csv_reader` is noncopyable and nonmoveable.
+`basic_csv_reader` is noncopyable and nonmoveable.
+
+Two specializations for common character types are defined:
+
+Type                       |Definition
+---------------------------|------------------------------
+csv_reader            |basic_csv_reader<char>
+wcsv_reader           |basic_csv_reader<wchar_t>
 
 #### Member types
 
@@ -22,37 +32,41 @@ source_type                |Src
 
     template <class Source>
     basic_csv_reader(Source&& source,
-                     basic_json_content_handler<CharT>& handler); // (1)
+                     basic_json_content_handler<CharT>& handler, 
+                     const WorkAllocator& allocator = WorkAllocator()); // (1)
 
 
     template <class Source>
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler,
-                     const basic_csv_options<CharT>& options); // (2)
+                     const basic_csv_options<CharT>& options, 
+                     const WorkAllocator& allocator = WorkAllocator()); // (2)
 
     template <class Source>
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler,
-                     std::function<bool(csv_errc,const ser_context&)> err_handler); // (3)
+                     std::function<bool(csv_errc,const ser_context&)> err_handler, 
+                     const WorkAllocator& allocator = WorkAllocator()); // (3)
 
     template <class Source>
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options,
-                     std::function<bool(csv_errc,const ser_context&)> err_handler); // (4)
+                     std::function<bool(csv_errc,const ser_context&)> err_handler, 
+                     const WorkAllocator& allocator = WorkAllocator()); // (4)
 
-(1) Constructs a `csv_reader` that reads from a character sequence or stream `source`
+(1) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`
 and a [json_content_handler](../json_content_handler.md) that receives
 JSON events. Uses default [basic_csv_options](basic_csv_options.md).
 
-(2) Constructs a `csv_reader` that  that reads from a character sequence or stream `source`, a [json_content_handler](../json_content_handler.md) that receives
+(2) Constructs a `basic_csv_reader` that  that reads from a character sequence or stream `source`, a [json_content_handler](../json_content_handler.md) that receives
 JSON events, and [basic_csv_options](basic_csv_options.md).
 
-(3) Constructs a `csv_reader` that reads from a character sequence or stream `source`, a [json_content_handler](../json_content_handler.md) that receives
+(3) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`, a [json_content_handler](../json_content_handler.md) that receives
 JSON events and the specified [parse_error_handler](../parse_error_handler.md).
 Uses default [basic_csv_options](basic_csv_options.md).
 
-(4) Constructs a `csv_reader` that reads from a character sequence or stream `source`, a [json_content_handler](../json_content_handler.md) that receives
+(4) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`, a [json_content_handler](../json_content_handler.md) that receives
 JSON events, [basic_csv_options](basic_csv_options.md),
 and the specified [parse_error_handler](../parse_error_handler.md).
 
@@ -63,7 +77,7 @@ content handler, and error handler passed in the constuctor, as `basic_csv_reade
 
 `source` - a value from which a `jsoncons::basic_string_view<char_type>` is constructible, 
 or a value from which a `source_type` is constructible. In the case that a `jsoncons::basic_string_view<char_type>` is constructible
-from `source`, `source` is dispatched immediately to the parser. Otherwise, the `csv_reader` reads from a `source_type` in chunks. 
+from `source`, `source` is dispatched immediately to the parser. Otherwise, the `basic_csv_reader` reads from a `source_type` in chunks. 
 
 #### Member functions
 
