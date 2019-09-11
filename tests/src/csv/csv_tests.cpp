@@ -1456,7 +1456,7 @@ TEST_CASE("csv_reader constructors")
 
         json_decoder<my_json,FreelistAllocator<char>> decoder(my_allocator,my_allocator);
         csv::basic_csv_reader<char,stream_source<char>,FreelistAllocator<char>> reader(input, decoder, options, my_allocator);
-        //reader.read();
+        reader.read();
 
         //my_json j = decoder.get_result();
         //std::cout << pretty_print(j) << "\n";
