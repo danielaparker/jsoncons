@@ -1692,14 +1692,7 @@ public:
             {
                 return 0;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().size();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return 0;
-            }
+            return evaluate().size();
         }
 
         storage_type type() const
@@ -1722,10 +1715,14 @@ public:
             return evaluate().get_allocator();
         }
 
-        bool contains(const string_view_type& key) const 
+        bool contains(const string_view_type& key) const noexcept
         {
+            if (!parent_.contains(key_))
+            {
+                return false;
+            }
 
-            return parent_.contains(key_) ? evaluate().contains(key) : false;
+            return evaluate().contains(key);
         }
 
         bool is_null() const noexcept
@@ -1734,14 +1731,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_null();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_null();
         }
 
         bool empty() const noexcept
@@ -1750,14 +1740,7 @@ public:
             {
                 return true;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().empty();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return true;
-            }
+            return evaluate().empty();
         }
 
         size_t capacity() const
@@ -1788,14 +1771,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().template is<T>(std::forward<Args>(args)...);
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().template is<T>(std::forward<Args>(args)...);
         }
 
         bool is_string() const noexcept
@@ -1804,14 +1780,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_string();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_string();
         }
 
         bool is_string_view() const noexcept
@@ -1820,14 +1789,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_string_view();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_string_view();
         }
 
         bool is_byte_string() const noexcept
@@ -1836,14 +1798,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_byte_string();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_byte_string();
         }
 
         bool is_byte_string_view() const noexcept
@@ -1852,14 +1807,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_byte_string_view();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_byte_string_view();
         }
 
         bool is_bignum() const noexcept
@@ -1868,14 +1816,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_bignum();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_bignum();
         }
 
         bool is_number() const noexcept
@@ -1884,14 +1825,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_number();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_number();
         }
         bool is_bool() const noexcept
         {
@@ -1899,14 +1833,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_bool();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_bool();
         }
 
         bool is_object() const noexcept
@@ -1915,14 +1842,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_object();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_object();
         }
 
         bool is_array() const noexcept
@@ -1931,14 +1851,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_array();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_array();
         }
 
         bool is_int64() const noexcept
@@ -1947,14 +1860,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_int64();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_int64();
         }
 
         bool is_uint64() const noexcept
@@ -1963,14 +1869,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_uint64();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_uint64();
         }
 
         bool is_double() const noexcept
@@ -1979,14 +1878,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_double();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_double();
         }
 
         string_view_type as_string_view() const 
@@ -2393,14 +2285,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_datetime();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_datetime();
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::timestamp")
@@ -2410,14 +2295,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_epoch_time();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_epoch_time();
         }
 
         template <class T>
@@ -2449,9 +2327,9 @@ public:
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use contains(const string_view_type&)")
-        bool has_key(const string_view_type& name) const
+        bool has_key(const string_view_type& name) const noexcept
         {
-            return evaluate().contains(name);
+            return contains(name);
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use is<int64_t>()")
@@ -2461,14 +2339,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_int64();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_int64();
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use is<uint64_t>()")
@@ -2478,14 +2349,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_uint64();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_uint64();
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use is<unsigned long long>()")
@@ -2495,14 +2359,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_ulonglong();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_ulonglong();
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use is<long long>()")
@@ -2512,14 +2369,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return evaluate().is_longlong();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return evaluate().is_longlong();
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use as<int>()")
@@ -2735,9 +2585,9 @@ public:
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use contains(const string_view_type&)")
-        bool has_member(const string_view_type& name) const
+        bool has_member(const string_view_type& name) const noexcept
         {
-            return evaluate().has_member(name);
+            return contains(name);
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use erase(const_object_iterator, const_object_iterator)")
@@ -2767,14 +2617,7 @@ public:
             {
                 return false;
             }
-            JSONCONS_TRY
-            {
-                return is_number();
-            }
-            JSONCONS_CATCH(...)
-            {
-                return false;
-            }
+            return is_number();
         }
 #endif
     };
@@ -3364,7 +3207,7 @@ public:
         }
     }
 
-    bool contains(const string_view_type& key) const
+    bool contains(const string_view_type& key) const noexcept
     {
         switch (var_.type())
         {
@@ -4720,7 +4563,7 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use contains(const string_view_type&)")
-    bool has_key(const string_view_type& name) const
+    bool has_key(const string_view_type& name) const noexcept
     {
         return contains(name);
     }
@@ -5001,7 +4844,7 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use contains(const string_view_type&)")
-    bool has_member(const string_view_type& name) const
+    bool has_member(const string_view_type& name) const noexcept
     {
         switch (var_.type())
         {

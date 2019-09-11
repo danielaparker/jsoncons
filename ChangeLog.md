@@ -3,6 +3,8 @@ master
 
 - Support compilation with exceptions disabled
 
+- `basic_json::contains` declared `noexcept` 
+
 - Support stateful result and work allocators in `json_decoder`
 
 - Support stateful work allocators in `basic_json_reader` and `basic_json_parser`

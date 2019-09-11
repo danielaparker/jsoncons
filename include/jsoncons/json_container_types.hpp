@@ -668,7 +668,7 @@ public:
         return members_[i].value();
     }
 
-    iterator find(const string_view_type& name)
+    iterator find(const string_view_type& name) noexcept
     {
         auto it = std::lower_bound(members_.begin(),members_.end(), name, 
                                    [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
@@ -676,7 +676,7 @@ public:
         return result;
     }
 
-    const_iterator find(const string_view_type& name) const
+    const_iterator find(const string_view_type& name) const noexcept
     {
         auto it = std::lower_bound(members_.begin(),members_.end(), 
                                    name, 
@@ -1403,7 +1403,7 @@ public:
         return members_[i].value();
     }
 
-    iterator find(const string_view_type& name)
+    iterator find(const string_view_type& name) noexcept
     {
         auto it = std::lower_bound(index_.begin(),index_.end(), name, 
                                     [&](size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
@@ -1417,7 +1417,7 @@ public:
         }
     }
 
-    const_iterator find(const string_view_type& name) const
+    const_iterator find(const string_view_type& name) const noexcept
     {
         auto it = std::lower_bound(index_.begin(),index_.end(), name, 
                                     [&](size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
@@ -1725,23 +1725,6 @@ public:
 
     void merge_or_update(iterator hint, json_object&& source)
     {
-/*
-        auto it = std::make_move_iterator(source.begin());
-        auto end = std::make_move_iterator(source.end());
-        for (; it != end; ++it)
-        {
-            auto pos = find(it->key());
-            if (pos == members_.end() )
-            {
-                hint = try_emplace(hint,it->key(),std::move(it->value()));
-            }
-            else
-            {
-                pos->value(std::move(it->value()));
-                hint = pos;
-            }
-        }
-*/
         size_t pos = hint - members_.begin();
         auto it = std::make_move_iterator(source.begin());
         auto end = std::make_move_iterator(source.end());
