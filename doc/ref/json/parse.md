@@ -36,7 +36,7 @@ Throws [ser_error](ser_error.md) if parsing fails.
 
 #### Parse from stream
 
-Input example.json:
+Input JSON file `example.json`:
 
 ```json
 {"File Format Options":{"Color Spaces":["sRGB","AdobeRGB","ProPhoto RGB"]}}

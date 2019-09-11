@@ -160,7 +160,7 @@ Function|Description|Result|Example
 
 ### Examples
 
-The examples below use the JSON text from [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) (booklist.json).
+The examples below use the input JSON file `booklist.json`, from [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/).
 
 ```json
 { "store": {

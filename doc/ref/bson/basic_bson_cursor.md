@@ -90,7 +90,7 @@ Returns the current [context](ser_context.md)
 
 ### Examples
 
-The example JSON text, `book_catalog.json`, is used in the example below.
+Input JSON file `book_catalog.json`:
 
 ```json
 [ 

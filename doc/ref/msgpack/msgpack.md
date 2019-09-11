@@ -29,7 +29,8 @@ object        |                  | map
 
 ### Examples
 
-Example file (book.json):
+Input JSON file `book.json`:
+
 ```json
 [
     {

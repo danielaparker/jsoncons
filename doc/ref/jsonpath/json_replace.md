@@ -35,7 +35,8 @@ Throws [jsonpath_error](jsonpath_error.md) if JSONPath evaluation fails.
 
 #### Change the price of a book
 
-Example file (booklist.json):
+Input JSON file `booklist.json`:
+
 ```json
 { "store": {
     "book": [ 

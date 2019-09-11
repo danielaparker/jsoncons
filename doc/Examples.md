@@ -10,7 +10,7 @@
 [Set a maximum nesting depth](#A5)  
 [Prevent the alphabetic sort of the outputted JSON, retaining the original insertion order](#A6)  
 [Parse a very large JSON file with json_cursor](#A7)  
-[Read a JSON text using stateful result and work allocators](#A9)  
+[Decode a JSON text using stateful result and work allocators](#A9)  
 
 ### Encode
 
@@ -298,7 +298,7 @@ A typical pull parsing application will repeatedly process the `current()`
 event and call `next()` to advance to the next event, until `done()` 
 returns `true`.
 
-The example JSON text, `book_catalog.json`:
+Input JSON file `book_catalog.json`:
 
 ```json
 [ 
@@ -409,7 +409,7 @@ end_array
 
 <div id="A9"/> 
 
-### Read a JSON text using stateful result and work allocators
+### Decode a JSON text using stateful result and work allocators
 
 ```c++
 // Given allocator my_alloc with a single-argument constructor my_alloc(int),

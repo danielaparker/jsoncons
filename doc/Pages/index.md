@@ -307,7 +307,8 @@ end_object
 <div id="A2"/>
 ### Reading JSON text from a file
 
-Example file (`books.json`):
+Input JSON file `books.json`:
+
 ```c++
 [
     {

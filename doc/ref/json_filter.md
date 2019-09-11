@@ -77,7 +77,8 @@ Output:
 
 #### Fix up names in an address book JSON file
 
-Example address book file (`address-book.json`):
+Input JSON file `address-book.json`:
+
 ```json
 {
     "address-book" : 
@@ -188,7 +189,8 @@ Output:
 Note that when filtering `json` events written from a `json` value to an output handler, contexual line and column information in the original file has been lost. 
 ```
 
-The new address book (`address-book-new.json`) with name fixes is
+The output JSON file `address-book-new.json` with name fixes is
+
 ```json
 {
     "address-book":
