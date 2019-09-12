@@ -1435,7 +1435,7 @@ TEST_CASE("test_encode_decode csv string")
     }
 }
 
-#if 0
+#if !defined(__GNUC__)
 TEST_CASE("csv_reader constructors")
 {
     const std::string input = R"(Date,1Y,2Y,3Y,5Y
@@ -1452,14 +1452,15 @@ TEST_CASE("csv_reader constructors")
 
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::mapping_type::n_rows);
+               .mapping(csv::mapping_type::n_objects);
 
         json_decoder<my_json,FreelistAllocator<char>> decoder(my_allocator,my_allocator);
         csv::basic_csv_reader<char,stream_source<char>,FreelistAllocator<char>> reader(input, decoder, options, my_allocator);
         reader.read();
 
         my_json j = decoder.get_result();
-        std::cout << pretty_print(j) << "\n";
+        CHECK(j.size() == 3);
+        //std::cout << pretty_print(j) << "\n";
     }
 }
 #endif

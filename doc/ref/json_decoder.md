@@ -104,3 +104,63 @@ Output:
 ]
 ```
 
+#### Decode a CSV text using stateful result and work allocators
+
+Input CSV file `bond_yields.csv`:
+
+```
+Date,1Y,2Y,3Y,5Y
+2017-01-09,0.0062,0.0075,0.0083,0.011
+2017-01-08,0.0063,0.0076,0.0084,0.0112
+2017-01-08,0.0063,0.0076,0.0084,0.0112
+```
+
+```c++
+int main()
+{
+    // Given allocator my_alloc with a single-argument constructor my_alloc(int),
+    // use my_alloc(1) to allocate basic_json memory, my_alloc(2) to allocate
+    // working memory used by json_decoder, and my_alloc(3) to allocate
+    // working memory used by basic_csv_reader. 
+
+    typedef basic_json<char,sorted_policy,my_alloc> my_json;
+
+    csv::csv_options options;
+    options.assume_header(true);
+
+    std::ifstream is("bond_yields.csv");
+    json_decoder<my_json,my_alloc> decoder(my_alloc(1),my_alloc(2));
+    csv::basic_csv_reader<char,stream_source<char>,FreelistAllocator<char>> reader(is, decoder, options, my_alloc(3));
+    reader.read();
+
+    my_json j = decoder.get_result();
+    std::cout << pretty_print(j) << "\n";
+}
+```
+Output:
+```
+[
+    {
+        "1Y": 0.0062,
+        "2Y": 0.0075,
+        "3Y": 0.0083,
+        "5Y": 0.011,
+        "Date": "2017-01-09"
+    },
+    {
+        "1Y": 0.0063,
+        "2Y": 0.0076,
+        "3Y": 0.0084,
+        "5Y": 0.0112,
+        "Date": "2017-01-08"
+    },
+    {
+        "1Y": 0.0063,
+        "2Y": 0.0076,
+        "3Y": 0.0084,
+        "5Y": 0.0112,
+        "Date": "2017-01-08"
+    }
+]
+```
+

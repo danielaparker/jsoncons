@@ -1380,7 +1380,7 @@ private:
                 {
                     stack_.back() = csv_mode::data;
                 }
-                column_values_.resize(column_names_.size());
+                column_values_.resize(column_names_.size(),std::vector<string_type,string_allocator_type>{allocator_});
                 switch (options_.mapping())
                 {
                     case mapping_type::n_rows:
