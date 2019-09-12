@@ -515,7 +515,6 @@ class basic_csv_parser : public ser_context
     detail::m_columns_filter<CharT,WorkAllocator> m_columns_filter_;
     std::vector<csv_mode,csv_mode_allocator_type> stack_;
     std::vector<string_type,string_allocator_type> column_names_;
-    std::vector<std::vector<string_type,string_allocator_type>,string_vector_allocator_type> column_values_;
     std::vector<csv_type_info,csv_type_info_allocator_type> column_types_;
     std::vector<string_type,string_allocator_type> column_defaults_;
     std::vector<csv_parse_state,csv_parse_state_allocator_type> state_stack_;
@@ -562,7 +561,6 @@ public:
          m_columns_filter_(allocator),
          stack_(allocator),
          column_names_(allocator),
-         column_values_(allocator),
          column_types_(allocator),
          column_defaults_(allocator),
          state_stack_(allocator),
@@ -1380,7 +1378,6 @@ private:
                 {
                     stack_.back() = csv_mode::data;
                 }
-                column_values_.resize(column_names_.size(),std::vector<string_type,string_allocator_type>{allocator_});
                 switch (options_.mapping())
                 {
                     case mapping_type::n_rows:
