@@ -11,8 +11,6 @@
 #include <type_traits>
 #include <utility>
 
-using namespace jsoncons;
-
 // From http://coliru.stacked-crooked.com/a/cfd0c5c5021596ad
 
 template <typename T>
