@@ -1435,7 +1435,7 @@ TEST_CASE("test_encode_decode csv string")
     }
 }
 
-#if !defined(__GNUC__)
+#if !(defined(__GNUC__ || (defined(_MSC_VER) && _MSC_VER == 1900)))
 TEST_CASE("csv_reader constructors")
 {
     const std::string input = R"(Date,1Y,2Y,3Y,5Y
