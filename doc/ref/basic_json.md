@@ -138,7 +138,7 @@ Returns the allocator associated with the basic_json value.
 
 <table border="0">
   <tr>
-    <td><code>bool contains(const string_view_type& key) const</code></td>
+    <td><code>bool contains(const string_view_type& key) const noexcept</code></td>
     <td>Returns <code>true</code> if an object has a member with the given `key`, otherwise <code>false</code></td> 
   </tr>
   <tr>
