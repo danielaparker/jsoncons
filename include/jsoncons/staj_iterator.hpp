@@ -79,13 +79,11 @@ public:
         }
     }
 
-    staj_array_iterator(staj_array_iterator&& other)
-        : reader_(other.reader_), valuep_(nullptr)
+    staj_array_iterator(staj_array_iterator&& other) noexcept
+        : reader_(nullptr), valuep_(nullptr)
     {
-        if (other.valuep_)
-        {
-            valuep_ = ::new(&storage_)T(std::move(*other.valuep_));
-        }
+        std::swap(reader_,other.reader_);
+        std::swap(valuep_,other.valuep_);
     }
 
     ~staj_array_iterator()
@@ -99,28 +97,22 @@ public:
     staj_array_iterator& operator=(const staj_array_iterator& other)
     {
         reader_ = other.reader_;
+        if (valuep_)
+        {
+            valuep_->~T();
+            valuep_ = nullptr;
+        }
         if (other.valuep_)
         {
             valuep_ = ::new(&storage_)T(*other.valuep_);
         }
-        else
-        {
-            valuep_ = nullptr;
-        }
         return *this;
     }
 
-    staj_array_iterator& operator=(staj_array_iterator&& other)
+    staj_array_iterator& operator=(staj_array_iterator&& other) noexcept
     {
-        reader_ = other.reader_;
-        if (other.valuep_)
-        {
-            valuep_ = ::new(&storage_)T(std::move(*other.valuep_));
-        }
-        else
-        {
-            valuep_ = nullptr;
-        }
+        std::swap(reader_,other.reader_);
+        std::swap(valuep_,other.valuep_);
         return *this;
     }
 
@@ -256,7 +248,7 @@ public:
         }
     }
 
-    staj_object_iterator(staj_object_iterator&& other)
+    staj_object_iterator(staj_object_iterator&& other) noexcept
         : reader_(other.reader_), kvp_(nullptr)
     {
         if (other.kvp_)
@@ -276,28 +268,22 @@ public:
     staj_object_iterator& operator=(const staj_object_iterator& other)
     {
         reader_ = other.reader_;
+        if (kvp_)
+        {
+            kvp_->~T();
+            kvp_ = nullptr;
+        }
         if (other.kvp_)
         {
             kvp_ = ::new(&storage_)value_type(*other.kvp_);
         }
-        else
-        {
-            kvp_ = nullptr;
-        }
         return *this;
     }
 
-    staj_object_iterator& operator=(staj_object_iterator&& other)
+    staj_object_iterator& operator=(staj_object_iterator&& other) noexcept
     {
-        reader_ = other.reader_;
-        if (other.kvp_)
-        {
-            kvp_ = ::new(&storage_)value_type(std::move(*other.kvp_));
-        }
-        else
-        {
-            kvp_ = nullptr;
-        }
+        std::swap(reader_,other.reader_);
+        std::swap(kvp_,other.kvp_);
         return *this;
     }
 
