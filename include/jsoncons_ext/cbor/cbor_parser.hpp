@@ -85,11 +85,14 @@ template <class Src,class WorkAllocator=std::allocator<char>>
 class basic_cbor_parser : public ser_context
 {
     typedef char char_type;
+    typedef std::char_traits<char> char_traits_type;
     typedef WorkAllocator work_allocator_type;
     typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
     typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<uint8_t> tag_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<uint64_t> tag_allocator_type;
     typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
+
+    typedef std::basic_string<char_type,char_traits_type,char_allocator_type> string_type;
 
     Src source_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
@@ -706,9 +709,9 @@ private:
         }
     }
 
-    std::string get_text_string(std::error_code& ec)
+    string_type get_text_string(std::error_code& ec)
     {
-        std::string s;
+        string_type s;
 
         jsoncons::cbor::detail::cbor_major_type major_type;
         uint8_t info;
@@ -1120,9 +1123,9 @@ private:
         return val;
     }
 
-    std::string get_array_as_decimal_string(std::error_code& ec)
+    string_type get_array_as_decimal_string(std::error_code& ec)
     {
-        std::string s;
+        string_type s;
 
         int c;
         if ((c=source_.get()) == Src::traits_type::eof())
@@ -1237,7 +1240,7 @@ private:
             }
         }
 
-        std::string result;
+        string_type result;
         if (s.size() > 0)
         {
             if (s[0] == '-')
@@ -1253,9 +1256,9 @@ private:
         return result;
     }
 
-    std::string get_array_as_hexfloat_string(std::error_code& ec)
+    string_type get_array_as_hexfloat_string(std::error_code& ec)
     {
-        std::string s;
+        string_type s;
 
         int c;
         if ((c=source_.get()) == Src::traits_type::eof())
