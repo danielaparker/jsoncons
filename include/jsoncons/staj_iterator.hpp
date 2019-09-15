@@ -25,7 +25,7 @@ class staj_array_iterator
     typedef typename Json::char_type char_type;
 
     basic_staj_reader<char_type>* reader_;
-    unsigned char memory_[sizeof(T)];
+    typename std::aligned_storage<sizeof(T), alignof(T)>::type storage_;
     T* valuep_;
 public:
     typedef T value_type;
@@ -75,7 +75,7 @@ public:
     {
         if (other.valuep_)
         {
-            valuep_ = ::new(memory_)T(*other.valuep_);
+            valuep_ = ::new(&storage_)T(*other.valuep_);
         }
     }
 
@@ -84,7 +84,7 @@ public:
     {
         if (other.valuep_)
         {
-            valuep_ = ::new(memory_)T(std::move(*other.valuep_));
+            valuep_ = ::new(&storage_)T(std::move(*other.valuep_));
         }
     }
 
@@ -101,7 +101,7 @@ public:
         reader_ = other.reader_;
         if (other.valuep_)
         {
-            valuep_ = ::new(memory_)T(*other.valuep_);
+            valuep_ = ::new(&storage_)T(*other.valuep_);
         }
         else
         {
@@ -115,7 +115,7 @@ public:
         reader_ = other.reader_;
         if (other.valuep_)
         {
-            valuep_ = ::new(memory_)T(std::move(*other.valuep_));
+            valuep_ = ::new(&storage_)T(std::move(*other.valuep_));
         }
         else
         {
@@ -206,7 +206,7 @@ public:
     typedef std::input_iterator_tag iterator_category;
 
 private:
-    unsigned char memory_[sizeof(value_type)];
+    unsigned char storage_[sizeof(value_type)];
     basic_staj_reader<char_type>* reader_;
     value_type* kvp_;
 public:
@@ -252,7 +252,7 @@ public:
     {
         if (other.kvp_)
         {
-            kvp_ = ::new(memory_)value_type(*other.kvp_);
+            kvp_ = ::new(&storage_)value_type(*other.kvp_);
         }
     }
 
@@ -261,7 +261,7 @@ public:
     {
         if (other.kvp_)
         {
-            kvp_ = ::new(memory_)value_type(std::move(*other.kvp_));
+            kvp_ = ::new(&storage_)value_type(std::move(*other.kvp_));
         }
     }
 
@@ -278,7 +278,7 @@ public:
         reader_ = other.reader_;
         if (other.kvp_)
         {
-            kvp_ = ::new(memory_)value_type(*other.kvp_);
+            kvp_ = ::new(&storage_)value_type(*other.kvp_);
         }
         else
         {
@@ -292,7 +292,7 @@ public:
         reader_ = other.reader_;
         if (other.kvp_)
         {
-            kvp_ = ::new(memory_)value_type(std::move(*other.kvp_));
+            kvp_ = ::new(&storage_)value_type(std::move(*other.kvp_));
         }
         else
         {
@@ -390,7 +390,7 @@ void staj_array_iterator<Json,T>::next()
             {
                 valuep_->~T();
             }
-            valuep_ = ::new(memory_)T(read_from<T>(Json(), *reader_));
+            valuep_ = ::new(&storage_)T(read_from<T>(Json(), *reader_));
         }
     }
 }
@@ -411,7 +411,7 @@ void staj_array_iterator<Json,T>::next(std::error_code& ec)
             {
                 valuep_->~T();
             }
-            valuep_ = ::new(memory_)T(read_from<T>(Json(), *reader_, ec));
+            valuep_ = ::new(&storage_)T(read_from<T>(Json(), *reader_, ec));
         }
     }
 }
@@ -431,7 +431,7 @@ void staj_object_iterator<Json,T>::next()
             {
                 kvp_->~value_type();
             }
-            kvp_ = ::new(memory_)value_type(std::move(key),read_from<T>(Json(), *reader_));
+            kvp_ = ::new(&storage_)value_type(std::move(key),read_from<T>(Json(), *reader_));
         }
     }
 }
@@ -459,7 +459,7 @@ void staj_object_iterator<Json,T>::next(std::error_code& ec)
             {
                 kvp_->~value_type();
             }
-            kvp_ = ::new(memory_)value_type(std::move(key),read_from<T>(Json(), *reader_, ec));
+            kvp_ = ::new(&storage_)value_type(std::move(key),read_from<T>(Json(), *reader_, ec));
         }
     }
 }
