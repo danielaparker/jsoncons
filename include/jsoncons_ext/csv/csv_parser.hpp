@@ -478,7 +478,7 @@ namespace detail {
 
 } // namespace detail
 
-template<class CharT,class WorkAllocator=std::allocator<CharT>>
+template<class CharT,class WorkAllocator=std::allocator<char>>
 class basic_csv_parser : public ser_context
 {
     typedef basic_string_view<CharT> string_view_type;

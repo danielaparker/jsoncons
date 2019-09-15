@@ -81,14 +81,21 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Src>
+template <class Src,class WorkAllocator=std::allocator<char>>
 class basic_cbor_parser : public ser_context
 {
+    typedef char char_type;
+    typedef WorkAllocator work_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<uint8_t> tag_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
+
     Src source_;
-    std::string text_buffer_;
-    std::vector<uint8_t> bytes_buffer_;
-    std::vector<uint64_t> tags_; 
-    std::vector<parse_state> state_stack_;
+    std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
+    std::vector<uint8_t,byte_allocator_type> bytes_buffer_;
+    std::vector<uint64_t,tag_allocator_type> tags_; 
+    std::vector<parse_state,parse_state_allocator_type> state_stack_;
     bool continue_;
     bool done_;
 public:
