@@ -368,7 +368,7 @@ public:
                 }
             }
 
-            void swap(long_string_data& val)
+            void swap(long_string_data& val) noexcept
             {
                 std::swap(val.ptr_,ptr_);
             }
@@ -455,7 +455,7 @@ public:
                 }
             }
 
-            void swap(byte_string_data& val)
+            void swap(byte_string_data& val) noexcept
             {
                 std::swap(val.ptr_,ptr_);
             }
@@ -552,7 +552,7 @@ public:
                 return ptr_->get_allocator();
             }
 
-            void swap(array_data& val)
+            void swap(array_data& val) noexcept
             {
                 std::swap(val.ptr_,ptr_);
             }
@@ -630,7 +630,7 @@ public:
                 }
             }
 
-            void swap(object_data& val)
+            void swap(object_data& val) noexcept
             {
                 std::swap(val.ptr_,ptr_);
             }
@@ -2257,7 +2257,7 @@ public:
         {
             evaluate().dump(os,options,line_indent);
         }
-        void swap(basic_json& val)
+        void swap(basic_json& val) 
         {
             evaluate_with_default().swap(val);
         }
@@ -4316,12 +4316,12 @@ public:
         return var_.tag();
     }
 
-    void swap(basic_json& b)
+    void swap(basic_json& b) noexcept 
     {
         var_.swap(b.var_);
     }
 
-    friend void swap(basic_json& a, basic_json& b)
+    friend void swap(basic_json& a, basic_json& b) noexcept
     {
         a.swap(b);
     }
@@ -5154,7 +5154,7 @@ private:
 };
 
 template <class Json>
-void swap(typename Json::key_value_type& a, typename Json::key_value_type& b)
+void swap(typename Json::key_value_type& a, typename Json::key_value_type& b) noexcept
 {
     a.swap(b);
 }

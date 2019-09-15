@@ -227,7 +227,7 @@ Throws `std::runtime_error` if not an object or null value.
     <td>Inserts another basic_json object's key-value pairs into a basic_json object, or assigns them if they already exist.</td>
   </tr>
   <tr>
-    <td><a>void swap(basic_json& val)</a></td>
+    <td><a>void swap(basic_json& val) noexcept</a></td>
     <td>Exchanges the content of the <code>basic_json</code> value with the content of <code>val</code>, which is another <code>basic_json</code> value</td>
   </tr>
 </table>
@@ -284,6 +284,6 @@ Inserts basic_json value into stream using the specified [basic_json_options](ba
     std::basic_ostream<char_type>& pretty_print(const basic_json& val, const basic_json_options<CharT>& options)  
 Inserts basic_json value into stream using the specified [basic_json_options](basic_json_options.md) if supplied.
 
-    void swap(basic_json& a, basic_json& b)
+    void swap(basic_json& a, basic_json& b) noexcept
 Exchanges the values of `a` and `b`
 

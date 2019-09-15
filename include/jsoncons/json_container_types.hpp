@@ -99,7 +99,7 @@ public:
         value_ = std::forward<T>(value);
     }
 
-    void swap(key_value& member)
+    void swap(key_value& member) noexcept
     {
         key_.swap(member.key_);
         value_.swap(member.value_);
@@ -319,7 +319,7 @@ public:
     {
     }
 
-    void swap(json_array<Json>& val)
+    void swap(json_array<Json>& val) noexcept
     {
         elements_.swap(val.elements_);
     }
@@ -608,7 +608,7 @@ public:
         }
     }
 
-    void swap(json_object& val)
+    void swap(json_object& val) noexcept
     {
         members_.swap(val.members_);
     }
@@ -1338,7 +1338,7 @@ public:
         }
     }
 
-    void swap(json_object& val)
+    void swap(json_object& val) noexcept
     {
         members_.swap(val.members_);
     }

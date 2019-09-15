@@ -206,7 +206,7 @@ public:
     {
         return !(it1.it_ == it2.it_);
     }
-    friend void swap(json_array_input_iterator& lhs, json_array_input_iterator& rhs)
+    friend void swap(json_array_input_iterator& lhs, json_array_input_iterator& rhs) noexcept
     {
         using std::swap;
         swap(lhs.it_,rhs.it_);
@@ -284,7 +284,7 @@ public:
     {
         return !(it1.it_ == it2.it_);
     }
-    friend void swap(json_object_input_iterator& lhs, json_object_input_iterator& rhs)
+    friend void swap(json_object_input_iterator& lhs, json_object_input_iterator& rhs) noexcept
     {
         using std::swap;
         swap(lhs.it_,rhs.it_);
