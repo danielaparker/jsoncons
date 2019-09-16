@@ -33,13 +33,13 @@ Member type                         |Definition
 
     byte_string(const byte_string& s); 
 
-    byte_string(byte_string&& s); 
+    byte_string(byte_string&& s) noexcept; 
 
 #### Assignment
 
     byte_string& operator=(const byte_string& s);
 
-    byte_string& operator=(byte_string&& s);
+    byte_string& operator=(byte_string&& s) noexcept;
 
 #### Iterators
 

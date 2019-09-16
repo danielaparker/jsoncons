@@ -76,7 +76,7 @@ public:
     {
     }
 
-    stream_source(stream_source&& other)
+    stream_source(stream_source&& other) noexcept
     {
         std::swap(is_,other.is_);
         std::swap(sbuf_,other.sbuf_);
@@ -87,7 +87,7 @@ public:
     {
     }
 
-    stream_source& operator=(stream_source&& other)
+    stream_source& operator=(stream_source&& other) noexcept
     {
         std::swap(is_,other.is_);
         std::swap(sbuf_,other.sbuf_);

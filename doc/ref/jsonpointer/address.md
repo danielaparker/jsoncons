@@ -10,8 +10,8 @@ Two specializations for common character types are defined:
 
 Type      |Definition
 ----------|------------------------------
-path      |`basic_address<char>`
-wpath     |`basic_address<wchar_t>`
+address      |`basic_address<char>`
+waddress     |`basic_address<wchar_t>`
 
 Objects of type `basic_address` represent JSON Pointer strings.
 

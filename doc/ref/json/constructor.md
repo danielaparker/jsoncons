@@ -5,13 +5,13 @@ basic_json(); // (1)
 
 basic_json(const allocator_type& allocator); // (2)
 
-basic_json(const basic_json& val); // (3)
+basic_json(const basic_json& other); // (3)
 
-basic_json(const basic_json& val, const allocator_type& allocator); // (4)
+basic_json(const basic_json& other, const allocator_type& allocator); // (4)
 
-basic_json(basic_json&& val) noexcept; // (5)
+basic_json(basic_json&& other) noexcept; // (5)
 
-basic_json(basic_json&& val, const allocator_type& allocator) noexcept; // (6)
+basic_json(basic_json&& other, const allocator_type& allocator) noexcept; // (6)
 
 basic_json(const array& val); // (7)
 

@@ -2815,7 +2815,7 @@ public:
     {
     }
 
-    basic_json(variant&& other)
+    basic_json(variant&& other) noexcept
         : var_(std::forward<variant>(other))
     {
     }

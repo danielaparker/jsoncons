@@ -112,10 +112,25 @@ public:
         }
     }
 
-    basic_bignum(basic_bignum<Allocator>&& other)
-        : basic_bignum_base<Allocator>(other.allocator()), neg_(other.neg_), dynamic_(false), length_(other.length_)
+    basic_bignum(basic_bignum<Allocator>&& other) noexcept
+        : basic_bignum_base<Allocator>(other.allocator()), neg_(other.neg_), dynamic_(other.dynamic_), length_(other.length_)
     {
-        initialize(std::move(other));
+        if (other.dynamic_)
+        {
+            capacity_ = other.capacity_;
+            data_ = other.data_;
+
+            other.data_ = other.values_;
+            other.dynamic_ = false;
+            other.length_ = 0;
+            other.neg_ = false;
+        }
+        else
+        {
+            values_[0] = other.data_[0];
+            values_[1] = other.data_[1];
+            data_ = values_;
+        }
     }
 
     template <typename CharT>
