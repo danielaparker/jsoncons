@@ -508,7 +508,7 @@ public:
 
     basic_byte_string& operator=(basic_byte_string&& other) noexcept
     {
-        data_.swap(other.data);
+        data_.swap(other.data_);
     }
 
     operator byte_string_view() const noexcept
