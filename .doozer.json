@@ -41,7 +41,7 @@
     },
     "jessie-i386": {
       "buildenv": "jessie-i386",
-      "builddeps": ["cmake", "make", "gcc gcc-c++"],
+      "builddeps": ["cmake", "make", "g++"],
       "environment": {
          "CXXFLAGS": "-std=c++11 -Wall -g3"
       },
