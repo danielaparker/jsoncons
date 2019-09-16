@@ -363,6 +363,7 @@ public:
     {
         std::swap(data_, other.data_);
         std::swap(length_, other.length_);
+        return *this;
     }
 
     const uint8_t* data() const
