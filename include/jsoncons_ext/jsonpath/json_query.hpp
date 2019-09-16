@@ -258,18 +258,21 @@ class jsonpath_evaluator : public ser_context
             : path(p),val_ptr(valp)
         {
         }
-        node_type(string_type&& p, pointer&& valp)
+
+        node_type(string_type&& p, pointer&& valp) noexcept
             : path(std::move(p)),val_ptr(valp)
         {
         }
         node_type(const node_type&) = default;
-        node_type(node_type&& other)
+
+        node_type(node_type&& other) noexcept
             : path(std::move(other.path)), val_ptr(other.val_ptr)
         {
 
         }
         node_type& operator=(const node_type&) = default;
-        node_type& operator=(node_type&& other) 
+
+        node_type& operator=(node_type&& other) noexcept
         {
             path.swap(other.path);
             val_ptr = other.val_ptr;

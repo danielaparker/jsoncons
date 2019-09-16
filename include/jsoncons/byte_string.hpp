@@ -350,11 +350,20 @@ public:
 
     byte_string_view(const byte_string_view&) = default;
 
-    byte_string_view(byte_string_view&&) = default;
+    byte_string_view(byte_string_view&&) noexcept
+        : data_(nullptr), length_(0)
+    {
+        std::swap(data_, other.data_);
+        std::swap(length_, other.length_);
+    }
 
     byte_string_view& operator=(const byte_string_view&) = default;
 
-    byte_string_view& operator=(byte_string_view&&) = default;
+    byte_string_view& operator=(byte_string_view&& other) noexcept
+    {
+        std::swap(data_, other.data_);
+        std::swap(length_, other.length_);
+    }
 
     const uint8_t* data() const
     {
@@ -467,10 +476,9 @@ public:
     {
     }
 
-    basic_byte_string(basic_byte_string<Allocator>&& v)
-        : data_(v.get_allocator())
+    basic_byte_string(basic_byte_string<Allocator>&& v) noexcept
+        : data_(std::move(v.data_))
     {
-        data_.swap(v.data_);
     }
 
     basic_byte_string(const byte_string_view& v, const Allocator& alloc)
@@ -498,7 +506,10 @@ public:
 
     basic_byte_string& operator=(const basic_byte_string& s) = default;
 
-    basic_byte_string& operator=(basic_byte_string&& s) = default;
+    basic_byte_string& operator=(basic_byte_string&& other) noexcept
+    {
+        data_.swap(other_.data);
+    }
 
     operator byte_string_view() const noexcept
     {
