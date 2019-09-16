@@ -101,7 +101,7 @@ at(key)        |`reference` or `value_type`|
 
 ### See also
 
-[basic_address](basic_address.md)
+[basic_json_ptr](basic_json_ptr.md)
 
 ### Examples
 
@@ -178,20 +178,20 @@ int main()
        }
     )");
 
-    jp::address addr;
-    addr /= "m~n";
-    addr /= "1";
+    jp::json_ptr ptr;
+    ptr /= "m~n";
+    ptr /= "1";
 
-    std::cout << "(1) " << addr << "\n\n";
+    std::cout << "(1) " << ptr << "\n\n";
 
     std::cout << "(2)\n";
-    for (const auto& item : addr)
+    for (const auto& item : ptr)
     {
         std::cout << item << "\n";
     }
     std::cout << "\n";
 
-    jsoncons::json item = jp::get(j, addr);
+    jsoncons::json item = jp::get(j, ptr);
     std::cout << "(3) " << item << "\n";
 }
 ```

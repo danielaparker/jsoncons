@@ -380,31 +380,31 @@ void jsonpointer_address_example()
        }
     )");
 
-    jsonpointer::address addr;
-    addr /= "m~n";
-    addr /= "1";
+    jsonpointer::json_ptr ptr;
+    ptr /= "m~n";
+    ptr /= "1";
 
-    std::cout << "(1) " << addr << "\n\n";
+    std::cout << "(1) " << ptr << "\n\n";
 
     std::cout << "(2)\n";
-    for (const auto& item : addr)
+    for (const auto& item : ptr)
     {
         std::cout << item << "\n";
     }
     std::cout << "\n";
 
-    json item = jsonpointer::get(j, addr);
+    json item = jsonpointer::get(j, ptr);
     std::cout << "(3) " << item << "\n";
 }
 
 void jsonpointer_address_iterator_example()
 {
-    jsonpointer::address addr("/store/book/1/author");
+    jsonpointer::json_ptr ptr("/store/book/1/author");
 
-    std::cout << "(1) " << addr << "\n\n";
+    std::cout << "(1) " << ptr << "\n\n";
 
     std::cout << "(2)\n";
-    for (const auto& token : addr)
+    for (const auto& token : ptr)
     {
         std::cout << token << "\n";
     }
@@ -414,16 +414,16 @@ void jsonpointer_address_iterator_example()
 
 void jsonpointer_address_append_tokens()
 {
-    jsonpointer::address addr;
+    jsonpointer::json_ptr ptr;
 
-    addr /= "a/b";
-    addr /= "";
-    addr /= "m~n";
+    ptr /= "a/b";
+    ptr /= "";
+    ptr /= "m~n";
 
-    std::cout << "(1) " << addr << "\n\n";
+    std::cout << "(1) " << ptr << "\n\n";
 
     std::cout << "(2)\n";
-    for (const auto& token : addr)
+    for (const auto& token : ptr)
     {
         std::cout << token << "\n";
     }
@@ -433,14 +433,14 @@ void jsonpointer_address_append_tokens()
 
 void jsonpointer_address_concatentae()
 {
-    jsonpointer::address addr("/a~1b");
+    jsonpointer::json_ptr ptr("/a~1b");
 
-    addr += jsonpointer::address("//m~0n");
+    ptr += jsonpointer::json_ptr("//m~0n");
 
-    std::cout << "(1) " << addr << "\n\n";
+    std::cout << "(1) " << ptr << "\n\n";
 
     std::cout << "(2)\n";
-    for (const auto& token : addr)
+    for (const auto& token : ptr)
     {
         std::cout << token << "\n";
     }

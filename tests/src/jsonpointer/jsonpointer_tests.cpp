@@ -235,30 +235,30 @@ TEST_CASE("jsonpointer path tests")
 {
     SECTION("/a~1b")
     {
-        jsonpointer::address p("/a~1b");
+        jsonpointer::json_ptr ptr("/a~1b");
 
-        auto it = p.begin();
-        auto end = p.end();
+        auto it = ptr.begin();
+        auto end = ptr.end();
 
         CHECK((*it++ == "a/b"));
         CHECK(it == end);
     }
     SECTION("/a~1b")
     {
-        jsonpointer::address p("/m~0n");
+        jsonpointer::json_ptr ptr("/m~0n");
 
-        auto it = p.begin();
-        auto end = p.end();
+        auto it = ptr.begin();
+        auto end = ptr.end();
 
         CHECK((*it++ == "m~n"));
         CHECK(it == end);
     }
     SECTION("/0/1")
     {
-        jsonpointer::address p("/0/1");
+        jsonpointer::json_ptr ptr("/0/1");
 
-        auto it = p.begin();
-        auto end = p.end();
+        auto it = ptr.begin();
+        auto end = ptr.end();
 
         CHECK((*it++ == "0"));
         CHECK((*it++ == "1"));
@@ -278,38 +278,38 @@ TEST_CASE("jsonpointer concatenation")
 
     SECTION("path append a/b")
     {
-        jsonpointer::address p;
-        p /= "a/b";
-        p /= "0";
+        jsonpointer::json_ptr ptr;
+        ptr /= "a/b";
+        ptr /= "0";
 
-        auto it = p.begin();
-        auto end = p.end();
+        auto it = ptr.begin();
+        auto end = ptr.end();
 
         CHECK((*it++ == "a/b"));
         CHECK((*it++ == "0"));
         CHECK(it == end);
 
         std::error_code ec;
-        json j = jsonpointer::get(example, p, ec);
+        json j = jsonpointer::get(example, ptr, ec);
         std::cout << j << "\n";
     }
 
     SECTION("concatenate two paths")
     {
-        jsonpointer::address p1;
-        p1 /= "m~n";
-        jsonpointer::address p2;
-        p2 /= "1";
-        jsonpointer::address p = p1 + p2;
+        jsonpointer::json_ptr ptr1;
+        ptr1 /= "m~n";
+        jsonpointer::json_ptr ptr2;
+        ptr2 /= "1";
+        jsonpointer::json_ptr ptr = ptr1 + ptr2;
 
-        auto it = p.begin();
-        auto end = p.end();
+        auto it = ptr.begin();
+        auto end = ptr.end();
 
         CHECK((*it++ == "m~n"));
         CHECK((*it++ == "1"));
         CHECK(it == end);
 
-        json j = jsonpointer::get(example, p);
+        json j = jsonpointer::get(example, ptr);
         std::cout << j << "\n";
     }
 }

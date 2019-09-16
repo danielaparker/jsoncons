@@ -44,9 +44,9 @@ enum class pointer_state
 
 } // detail
 
-// address_iterator
+// json_ptr_iterator
 template <class InputIt>
-class address_iterator
+class json_ptr_iterator
 {
     typedef typename std::iterator_traits<InputIt>::value_type char_type;
     typedef std::basic_string<char_type> string_type;
@@ -67,27 +67,27 @@ public:
     typedef const value_type& reference;
     typedef std::input_iterator_tag iterator_category;
 
-    address_iterator(base_iterator first, base_iterator last)
-        : address_iterator(first, last, first)
+    json_ptr_iterator(base_iterator first, base_iterator last)
+        : json_ptr_iterator(first, last, first)
     {
         std::error_code ec;
         increment(ec);
     }
 
-    address_iterator(base_iterator first, base_iterator last, base_iterator current)
+    json_ptr_iterator(base_iterator first, base_iterator last, base_iterator current)
         : path_ptr_(first), end_input_(last), p_(current), q_(current), state_(jsonpointer::detail::pointer_state::start)
     {
     }
 
-    address_iterator(const address_iterator&) = default;
+    json_ptr_iterator(const json_ptr_iterator&) = default;
 
-    address_iterator(address_iterator&&) = default;
+    json_ptr_iterator(json_ptr_iterator&&) = default;
 
-    address_iterator& operator=(const address_iterator&) = default;
+    json_ptr_iterator& operator=(const json_ptr_iterator&) = default;
 
-    address_iterator& operator=(address_iterator&&) = default;
+    json_ptr_iterator& operator=(json_ptr_iterator&&) = default;
 
-    address_iterator& operator++()
+    json_ptr_iterator& operator++()
     {
         std::error_code ec;
         increment(ec);
@@ -98,7 +98,7 @@ public:
         return *this;
     }
 
-    address_iterator& increment(std::error_code& ec)
+    json_ptr_iterator& increment(std::error_code& ec)
     {
         q_ = p_;
         buffer_.clear();
@@ -162,9 +162,9 @@ public:
         return *this;
     }
 
-    address_iterator operator++(int) // postfix increment
+    json_ptr_iterator operator++(int) // postfix increment
     {
-        address_iterator temp(*this);
+        json_ptr_iterator temp(*this);
         ++(*this);
         return temp;
     }
@@ -174,11 +174,11 @@ public:
         return buffer_;
     }
 
-    friend bool operator==(const address_iterator& it1, const address_iterator& it2)
+    friend bool operator==(const json_ptr_iterator& it1, const json_ptr_iterator& it2)
     {
         return it1.q_ == it2.q_;
     }
-    friend bool operator!=(const address_iterator& it1, const address_iterator& it2)
+    friend bool operator!=(const json_ptr_iterator& it1, const json_ptr_iterator& it2)
     {
         return !(it1 == it2);
     }
@@ -210,10 +210,10 @@ std::basic_string<CharT> escape_string(const std::basic_string<CharT>& s)
     return result;
 }
 
-// address
+// basic_json_ptr
 
 template <class CharT>
-class basic_address
+class basic_json_ptr
 {
 public:
     std::basic_string<CharT> path_;
@@ -222,34 +222,34 @@ public:
     typedef CharT char_type;
     typedef std::basic_string<char_type> string_type;
     typedef basic_string_view<char_type> string_view_type;
-    typedef address_iterator<typename string_type::const_iterator> const_iterator;
+    typedef json_ptr_iterator<typename string_type::const_iterator> const_iterator;
     typedef const_iterator iterator;
 
     // Constructors
-    basic_address()
+    basic_json_ptr()
     {
     }
-    explicit basic_address(const string_type& s)
+    explicit basic_json_ptr(const string_type& s)
         : path_(s)
     {
     }
-    explicit basic_address(string_type&& s)
+    explicit basic_json_ptr(string_type&& s)
         : path_(std::move(s))
     {
     }
-    explicit basic_address(const CharT* s)
+    explicit basic_json_ptr(const CharT* s)
         : path_(s)
     {
     }
 
-    basic_address(const basic_address&) = default;
+    basic_json_ptr(const basic_json_ptr&) = default;
 
-    basic_address(basic_address&&) = default;
+    basic_json_ptr(basic_json_ptr&&) = default;
 
     // operator=
-    basic_address& operator=(const basic_address&) = default;
+    basic_json_ptr& operator=(const basic_json_ptr&) = default;
 
-    basic_address& operator=(basic_address&&) = default;
+    basic_json_ptr& operator=(basic_json_ptr&&) = default;
 
     // Modifiers
 
@@ -258,7 +258,7 @@ public:
         path_.clear();
     }
 
-    basic_address& operator/=(const string_type& s)
+    basic_json_ptr& operator/=(const string_type& s)
     {
         path_.push_back('/');
         path_.append(escape_string(s));
@@ -266,7 +266,7 @@ public:
         return *this;
     }
 
-    basic_address& operator+=(const basic_address& p)
+    basic_json_ptr& operator+=(const basic_json_ptr& p)
     {
         path_.append(p.path_);
         return *this;
@@ -299,39 +299,46 @@ public:
     }
 
     // Non-member functions
-    friend basic_address<CharT> operator/(const basic_address<CharT>& lhs, const string_type& rhs)
+    friend basic_json_ptr<CharT> operator/(const basic_json_ptr<CharT>& lhs, const string_type& rhs)
     {
-        basic_address<CharT> p(lhs);
+        basic_json_ptr<CharT> p(lhs);
         p /= rhs;
         return p;
     }
 
-    friend basic_address<CharT> operator+( const basic_address<CharT>& lhs, const basic_address<CharT>& rhs )
+    friend basic_json_ptr<CharT> operator+( const basic_json_ptr<CharT>& lhs, const basic_json_ptr<CharT>& rhs )
     {
-        basic_address<CharT> p(lhs);
+        basic_json_ptr<CharT> p(lhs);
         p += rhs;
         return p;
     }
 
-    friend bool operator==( const basic_address& lhs, const basic_address& rhs )
+    friend bool operator==( const basic_json_ptr& lhs, const basic_json_ptr& rhs )
     {
         return lhs.path_ == rhs.path_;
     }
 
-    friend bool operator!=( const basic_address& lhs, const basic_address& rhs )
+    friend bool operator!=( const basic_json_ptr& lhs, const basic_json_ptr& rhs )
     {
         return lhs.path_ != rhs.path_;
     }
 
     friend std::basic_ostream<CharT>&
-    operator<<( std::basic_ostream<CharT>& os, const basic_address<CharT>& p )
+    operator<<( std::basic_ostream<CharT>& os, const basic_json_ptr<CharT>& p )
     {
         os << p.path_;
         return os;
     }
 };
 
-typedef basic_address<char> address;
+typedef basic_json_ptr<char> json_ptr;
+typedef basic_json_ptr<wchar_t> wjson_ptr;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+template<class CharT>
+using basic_address = basic_json_ptr<CharT>;
+JSONCONS_DEPRECATED_MSG("Instead, use json_ptr") typedef json_ptr address;
+#endif
 
 namespace detail {
 
@@ -679,8 +686,8 @@ public:
     {
         current_.push_back(root);
 
-        address_iterator<typename string_view_type::iterator> it(path.begin(), path.end());
-        address_iterator<typename string_view_type::iterator> end(path.begin(), path.end(), path.end());
+        json_ptr_iterator<typename string_view_type::iterator> it(path.begin(), path.end());
+        json_ptr_iterator<typename string_view_type::iterator> end(path.begin(), path.end(), path.end());
         while (it != end)
         {
             buffer_ = *it;

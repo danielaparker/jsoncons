@@ -14,8 +14,8 @@ When applied to a JSON array, the character `-` indicates one past the last elem
 ### Classes
 <table border="0">
   <tr>
-    <td><a href="basic_address.md">basic_address</a></td>
-    <td>Objects of type <code>basic_address</code> represent JSON Pointer addresses.</td> 
+    <td><a href="basic_json_ptr.md">basic_json_ptr</a></td>
+    <td>Objects of type <code>basic_json_ptr</code> represent JSON Pointer addresses.</td> 
   </tr>
 </table>
 
@@ -123,20 +123,20 @@ int main()
        }
     )");
 
-    jsonpointer::address addr;
-    addr /= "m~n";
-    addr /= "1";
+    jsonpointer::json_ptr ptr;
+    ptr /= "m~n";
+    ptr /= "1";
 
-    std::cout << "(1) " << addr << "\n\n";
+    std::cout << "(1) " << ptr << "\n\n";
 
     std::cout << "(2)\n";
-    for (const auto& item : addr)
+    for (const auto& item : ptr)
     {
         std::cout << item << "\n";
     }
     std::cout << "\n";
 
-    json item = jsonpointer::get(j, addr);
+    json item = jsonpointer::get(j, ptr);
     std::cout << "(3) " << item << "\n";
 }
 ```

@@ -1,6 +1,9 @@
 master
 ------
 
+- The name `jsonpointer::address` has been deprecated and renamed
+  to `jsonpointer::json_ptr`
+
 - Support compilation with exceptions disabled
 
 - `basic_json::contains` declared `noexcept` 
