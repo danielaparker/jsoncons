@@ -50,8 +50,8 @@ iterator    | An alias to `const_iterator`
     basic_json_ptr& operator/=(const string_type& s)
 First, appends the JSON Pointer separator `/`. Then appends the token s, escaping any `/` or `~` characters.
 
-    basic_json_ptr& operator+=(const basic_json_ptr& p)
-Concatenates the current pointer and the specified pointer `p`. 
+    basic_json_ptr& operator+=(const basic_json_ptr& ptr)
+Concatenates the current pointer and the specified pointer `ptr`. 
 
 #### Iterators
 
@@ -80,7 +80,7 @@ Concatenates two JSON Pointers. Effectively returns basic_json_ptr<CharT>(lhs) +
     bool operator!=(const basic_json_ptr<CharT>& lhs, const basic_json_ptr<CharT>& rhs);
 
     std::basic_ostream<CharT>&
-    operator<<(std::basic_ostream<CharT>& os, const basic_json_ptr<CharT>& p);
+    operator<<(std::basic_ostream<CharT>& os, const basic_json_ptr<CharT>& ptr);
 Performs stream output
 
 ### Examples
@@ -95,12 +95,12 @@ namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    jp::pointer p("/store/book/1/author");
+    jp::pointer ptr("/store/book/1/author");
 
-    std::cout << "(1) " << p << "\n\n";
+    std::cout << "(1) " << ptr << "\n\n";
 
     std::cout << "(2)\n";
-    for (const auto& token : p)
+    for (const auto& token : ptr)
     {
         std::cout << token << "\n";
     }
@@ -129,16 +129,16 @@ namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    jp::pointer p;
+    jp::pointer ptr;
 
-    p /= "a/b";
-    p /= "";
-    p /= "m~n";
+    ptr /= "a/b";
+    ptr /= "";
+    ptr /= "m~n";
 
-    std::cout << "(1) " << p << "\n\n";
+    std::cout << "(1) " << ptr << "\n\n";
 
     std::cout << "(2)\n";
-    for (const auto& token : p)
+    for (const auto& token : ptr)
     {
         std::cout << token << "\n";
     }
@@ -166,14 +166,14 @@ namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    jp::pointer p("/a~1b");
+    jp::pointer ptr("/a~1b");
 
-    p += jp::pointer("//m~0n");
+    ptr += jp::pointer("//m~0n");
 
-    std::cout << "(1) " << p << "\n\n";
+    std::cout << "(1) " << ptr << "\n\n";
 
     std::cout << "(2)\n";
-    for (const auto& token : p)
+    for (const auto& token : ptr)
     {
         std::cout << token << "\n";
     }
