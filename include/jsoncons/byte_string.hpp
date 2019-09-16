@@ -350,7 +350,7 @@ public:
 
     byte_string_view(const byte_string_view&) = default;
 
-    byte_string_view(byte_string_view&&) noexcept
+    byte_string_view(byte_string_view&& other) noexcept
         : data_(nullptr), length_(0)
     {
         std::swap(data_, other.data_);
@@ -508,7 +508,7 @@ public:
 
     basic_byte_string& operator=(basic_byte_string&& other) noexcept
     {
-        data_.swap(other_.data);
+        data_.swap(other.data);
     }
 
     operator byte_string_view() const noexcept
