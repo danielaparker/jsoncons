@@ -15,7 +15,7 @@ When applied to a JSON array, the character `-` indicates one past the last elem
 <table border="0">
   <tr>
     <td><a href="basic_json_ptr.md">basic_json_ptr</a></td>
-    <td>Objects of type <code>basic_json_ptr</code> represent JSON Pointer addresses.</td> 
+    <td>Objects of type <code>basic_json_ptr</code> represent a JSON Pointer.</td> 
   </tr>
 </table>
 
