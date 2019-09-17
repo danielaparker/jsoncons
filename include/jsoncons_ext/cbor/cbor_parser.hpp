@@ -95,17 +95,23 @@ class basic_cbor_parser : public ser_context
     typedef std::basic_string<char_type,char_traits_type,char_allocator_type> string_type;
 
     Src source_;
+    bool continue_;
+    bool done_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
     std::vector<uint8_t,byte_allocator_type> bytes_buffer_;
     std::vector<uint64_t,tag_allocator_type> tags_; 
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
-    bool continue_;
-    bool done_;
 public:
     template <class Source>
-    basic_cbor_parser(Source&& source)
+    basic_cbor_parser(Source&& source,
+                      const WorkAllocator allocator=WorkAllocator())
        : source_(std::forward<Source>(source)),
-         continue_(true), done_(false)
+         continue_(true), 
+         done_(false),
+         text_buffer_(allocator),
+         bytes_buffer_(allocator),
+         tags_(allocator),
+         state_stack_(allocator)
     {
         state_stack_.emplace_back(parse_mode::root,0);
     }

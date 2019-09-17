@@ -1,5 +1,7 @@
-master
-------
+v0.134.0
+--------
+
+- [Fixed Compilation issue #178](https://github.com/danielaparker/jsoncons/issues/178).
 
 - The name `jsonpointer::address` has been deprecated and renamed
   to `jsonpointer::json_ptr`

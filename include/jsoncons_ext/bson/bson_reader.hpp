@@ -21,15 +21,17 @@
 
 namespace jsoncons { namespace bson {
 
-template <class Src>
+template <class Src,class WorkAllocator=std::allocator<char>>
 class basic_bson_reader : public ser_context
 {
-    basic_bson_parser<Src> parser_;
+    basic_bson_parser<Src,WorkAllocator> parser_;
     json_content_handler& handler_;
 public:
     template <class Source>
-    basic_bson_reader(Source&& source, json_content_handler& handler)
-       : parser_(std::forward<Source>(source)),
+    basic_bson_reader(Source&& source, 
+                      json_content_handler& handler,
+                      const WorkAllocator allocator=WorkAllocator())
+       : parser_(std::forward<Source>(source), allocator),
          handler_(handler)
     {
     }

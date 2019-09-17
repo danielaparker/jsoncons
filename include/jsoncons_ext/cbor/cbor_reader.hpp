@@ -22,15 +22,17 @@
 
 namespace jsoncons { namespace cbor {
 
-template <class Src>
+template <class Src,class WorkAllocator=std::allocator<char>>
 class basic_cbor_reader : public ser_context
 {
-    basic_cbor_parser<Src> parser_;
+    basic_cbor_parser<Src,WorkAllocator> parser_;
     json_content_handler& handler_;
 public:
     template <class Source>
-    basic_cbor_reader(Source&& source, json_content_handler& handler)
-       : parser_(std::forward<Source>(source)),
+    basic_cbor_reader(Source&& source, 
+                      json_content_handler& handler,
+                      const WorkAllocator allocator=WorkAllocator())
+       : parser_(std::forward<Source>(source),allocator),
          handler_(handler)
     {
     }

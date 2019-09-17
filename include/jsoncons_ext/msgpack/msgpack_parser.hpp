@@ -37,19 +37,30 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Src>
+template <class Src,class WorkAllocator=std::allocator<char>>
 class basic_msgpack_parser : public ser_context
 {
+    typedef char char_type;
+    typedef std::char_traits<char> char_traits_type;
+    typedef WorkAllocator work_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
+
     Src source_;
-    std::vector<parse_state> state_stack_;
     bool continue_;
     bool done_;
-    std::string buffer_;
+    std::basic_string<char,std::char_traits<char>,char_allocator_type> buffer_;
+    std::vector<parse_state,parse_state_allocator_type> state_stack_;
 public:
     template <class Source>
-    basic_msgpack_parser(Source&& source)
+    basic_msgpack_parser(Source&& source,
+                         const WorkAllocator allocator=WorkAllocator())
        : source_(std::forward<Source>(source)),
-         continue_(true), done_(false)
+         continue_(true), 
+         done_(false),
+         buffer_(allocator),
+         state_stack_(allocator)
     {
         state_stack_.emplace_back(parse_mode::root,0);
     }
