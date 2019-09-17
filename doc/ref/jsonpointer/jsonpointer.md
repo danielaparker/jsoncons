@@ -19,7 +19,7 @@ When applied to a JSON array, the character `-` indicates one past the last elem
   </tr>
 </table>
 
-### Non-member functions
+### Functions
 
 <table border="0">
   <tr>
