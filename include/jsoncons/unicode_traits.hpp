@@ -189,6 +189,18 @@ std::error_code make_error_code(conv_errc result)
     return std::error_code(static_cast<int>(result),unicode_traits_error_category());
 }
 
+} // unicons
+} // jsoncons
+
+namespace std {
+    template<>
+    struct is_error_code_enum<jsoncons::unicons::conv_errc> : public true_type
+    {
+    };
+}
+
+namespace jsoncons { namespace unicons {
+
 // encoding_errc
 
 enum class encoding_errc
@@ -1478,10 +1490,6 @@ skip_bom(Iterator first, Iterator last) UNICONS_NOEXCEPT
 } // jsoncons
 
 namespace std {
-    template<>
-    struct is_error_code_enum<jsoncons::unicons::conv_errc> : public true_type
-    {
-    };
     template<>
     struct is_error_code_enum<jsoncons::unicons::encoding_errc> : public true_type
     {
