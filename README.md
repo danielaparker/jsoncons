@@ -83,7 +83,6 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 - [Roadmap](Roadmap.md)
 
 The library uses exceptions and in some cases `std::error_code`'s to report errors.
-If exceptions are disabled, throws become calls to `std::terminate`.
 
 ## Benchmarks
 
