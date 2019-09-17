@@ -6,8 +6,6 @@ v0.134.0
 - The name `jsonpointer::address` has been deprecated and renamed
   to `jsonpointer::json_ptr`
 
-- Support compilation with exceptions disabled
-
 - `basic_json::contains` declared `noexcept` 
 
 - Support stateful result and work allocators in `json_decoder`
