@@ -160,29 +160,28 @@ template<> inline char32_t const* name##_literal<char32_t>() { return JSONCONS_Q
 
 #endif
 
+#if (!defined(JSONCONS_NO_EXCEPTIONS))
 // Check if exceptions are disabled.
 #if defined( __cpp_exceptions) && __cpp_exceptions == 0
-# define JSONCONS_EXCEPTIONS 0
+# define JSONCONS_NO_EXCEPTIONS 1
+#endif
 #endif
 
-#if !defined(JSONCONS_EXCEPTIONS)
+#if !defined(JSONCONS_NO_EXCEPTIONS)
 #if __GNUC__ && !__EXCEPTIONS
-# define JSONCONS_EXCEPTIONS 0
+# define JSONCONS_NO_EXCEPTIONS 1
 #elif _MSC_VER 
 #if defined(_HAS_EXCEPTIONS) && _HAS_EXCEPTIONS == 0
-# define JSONCONS_EXCEPTIONS 0
+# define JSONCONS_NO_EXCEPTIONS 1
 #elif !defined(_CPPUNWIND)
-# define JSONCONS_EXCEPTIONS 0
-#endif
+# define JSONCONS_NO_EXCEPTIONS 1
 #endif
 #endif
 
-#if !defined(JSONCONS_EXCEPTIONS)
-# define JSONCONS_EXCEPTIONS 1
 #endif
 
 // allow to disable exceptions
-#if JSONCONS_EXCEPTIONS == 1
+#if !defined(JSONCONS_NO_EXCEPTIONS)
     #define JSONCONS_THROW(exception) throw exception
     #define JSONCONS_RETHROW throw
     #define JSONCONS_TRY try

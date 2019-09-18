@@ -20,12 +20,12 @@ TEST_CASE("test_filename_invalid")
 
     json_decoder<json> decoder;
 
-    try
+    JSONCONS_TRY
     {
         json_reader reader(is,decoder);
         reader.read_next();
     }
-    catch (const std::exception&)
+    JSONCONS_CATCH (const std::exception&)
     {
     }
     //CHECK(false == decoder.is_valid());
@@ -37,12 +37,12 @@ TEST_CASE("test_exception_left_brace")
     std::ifstream is(in_file);
 
     json_decoder<json> decoder;
-    try
+    JSONCONS_TRY
     {
         json_reader reader(is,decoder);
         reader.read_next();
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         CHECK(e.code() == json_errc::expected_comma_or_right_bracket);
         CHECK(14 == e.line());
@@ -56,13 +56,13 @@ TEST_CASE("test_exception_right_brace")
     std::ifstream is(in_file);
 
     json_decoder<json> decoder;
-    try
+    JSONCONS_TRY
     {
         json_reader reader(is,decoder);
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         //std::cout << e.what() << std::endl;
         CHECK(e.code() == json_errc::expected_comma_or_right_brace);
@@ -77,13 +77,13 @@ TEST_CASE("test_exception_array_eof")
     std::istringstream is("[100");
 
     json_decoder<json> decoder;
-    try
+    JSONCONS_TRY
     {
         json_reader reader(is,decoder);
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         CHECK(e.code() == json_errc::unexpected_eof);
         CHECK(1 == e.line());
@@ -97,13 +97,13 @@ TEST_CASE("test_exception_unicode_eof")
     std::istringstream is("[\"\\u");
 
     json_decoder<json> decoder;
-    try
+    JSONCONS_TRY
     {
         json_reader reader(is,decoder);
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         //std::cout << e.what() << std::endl;
         CHECK(e.code() == json_errc::unexpected_eof);
@@ -118,13 +118,13 @@ TEST_CASE("test_exception_tru_eof")
     std::istringstream is("[tru");
 
     json_decoder<json> decoder;
-    try
+    JSONCONS_TRY
     {
         json_reader reader(is,decoder);
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         //std::cout << e.what() << std::endl;
         CHECK(e.code() == json_errc::unexpected_eof);
@@ -139,13 +139,13 @@ TEST_CASE("test_exception_fals_eof")
     std::istringstream is("[fals");
 
     json_decoder<json> decoder;
-    try
+    JSONCONS_TRY
     {
         json_reader reader(is,decoder);
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         //std::cout << e.what() << std::endl;
         CHECK(e.code() == json_errc::unexpected_eof);
@@ -160,13 +160,13 @@ TEST_CASE("test_exception_nul_eof")
     std::istringstream is("[nul");
 
     json_decoder<json> decoder;
-    try
+    JSONCONS_TRY
     {
         json_reader reader(is,decoder);
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         //std::cout << e.what() << std::endl;
         CHECK(e.code() == json_errc::unexpected_eof);
@@ -181,13 +181,13 @@ TEST_CASE("test_exception_true_eof")
     std::istringstream is("[true");
 
     json_decoder<json> decoder;
-    try
+    JSONCONS_TRY
     {
         json_reader reader(is,decoder);
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         CHECK(e.code() == json_errc::unexpected_eof);
         CHECK(1 == e.line());
@@ -201,13 +201,13 @@ TEST_CASE("test_exception_false_eof")
     std::istringstream is("[false");
 
     json_decoder<json> decoder;
-    try
+    JSONCONS_TRY
     {
         json_reader reader(is,decoder);
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         CHECK(e.code() == json_errc::unexpected_eof);
         CHECK(1 == e.line());
@@ -221,13 +221,13 @@ TEST_CASE("test_exception_null_eof")
     std::istringstream is("[null");
 
     json_decoder<json> decoder;
-    try
+    JSONCONS_TRY
     {
         json_reader reader(is,decoder);
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         CHECK(e.code() == json_errc::unexpected_eof);
         CHECK(1 == e.line());
@@ -240,11 +240,11 @@ TEST_CASE("test_exception")
 {
     std::string input("{\"field1\":\n\"value}");
     REQUIRE_THROWS_AS(json::parse(input),ser_error);
-    try
+    JSONCONS_TRY
     {
         json::parse(input);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         CHECK((e.code() == json_errc::unexpected_eof && e.line() == 2 && e.column() == 9));
     }

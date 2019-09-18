@@ -108,13 +108,13 @@ TEST_CASE("json as<T>")
 
     SECTION("key not found")
     {
-        try
+        JSONCONS_TRY
         {
             json j;
             std::string s = j["empty"].as<std::string>();
             CHECK(false);
         }
-        catch (const std::out_of_range& e)
+        JSONCONS_CATCH (const std::out_of_range& e)
         {
             CHECK(e.what() == std::string("Key 'empty' not found"));
         }
@@ -826,12 +826,12 @@ TEST_CASE("test_value_not_found_and_defaults")
     obj["first_name"] = "Jane";
     obj["last_name"] = "Roe";
 
-    try
+    JSONCONS_TRY
     {
         auto val = obj["outdoor_experience"].as<std::string>();
         CHECK(false);
     }
-    catch (const std::out_of_range& e)
+    JSONCONS_CATCH (const std::out_of_range& e)
     {
         CHECK(e.what() == std::string("Key 'outdoor_experience' not found"));
     }
@@ -843,12 +843,12 @@ TEST_CASE("test_value_not_found_and_defaults")
 
     CHECK(experience == "");
 
-    try
+    JSONCONS_TRY
     {
         auto val = obj["first_aid_certification"].as<std::string>();
         CHECK(false);
     }
-    catch (const std::out_of_range& e)
+    JSONCONS_CATCH (const std::out_of_range& e)
     {
         CHECK(e.what() == std::string("Key 'first_aid_certification' not found"));
     }

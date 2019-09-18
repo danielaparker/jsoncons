@@ -1,3 +1,8 @@
+master
+------
+
+- Support compilation with exceptions disabled
+
 v0.134.0
 --------
 

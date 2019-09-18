@@ -36,12 +36,12 @@ TEST_CASE("test_parse_small_string1")
     std::string input = "\"String\"";
 
     json_decoder<json> decoder;
-    try
+    JSONCONS_TRY
     {
         json_reader reader(input,decoder);
         reader.read_next();
     }
-    catch (const std::exception&)
+    JSONCONS_CATCH (const std::exception&)
     {
     }
     CHECK(decoder.is_valid());
@@ -52,12 +52,12 @@ TEST_CASE("test_parse_small_string2")
     std::string input = "\"Str\\\"ing\"";
 
     json_decoder<json> decoder;
-    try
+    JSONCONS_TRY
     {
         json_reader reader(input, decoder);
         reader.read_next();
     }
-    catch (const std::exception&)
+    JSONCONS_CATCH (const std::exception&)
     {
     }
     CHECK(decoder.is_valid());
@@ -71,13 +71,13 @@ TEST_CASE("test_parse_small_string4")
     {
         std::istringstream is(input);
         json_decoder<json> decoder;
-        try
+        JSONCONS_TRY
         {
             json_reader reader(is, decoder);
             reader.buffer_length(i);
             reader.read_next();
         }
-        catch (const std::exception&)
+        JSONCONS_CATCH (const std::exception&)
         {
         }
         CHECK(decoder.is_valid());
@@ -92,13 +92,13 @@ TEST_CASE("test_parse_big_string1")
     {
         std::istringstream is(input);
         json_decoder<json> decoder;
-        try
+        JSONCONS_TRY
         {
             json_reader reader(is, decoder);
             reader.buffer_length(i);
             reader.read_next();
         }
-        catch (const std::exception&)
+        JSONCONS_CATCH (const std::exception&)
         {
         }
         CHECK(decoder.is_valid());
@@ -115,13 +115,13 @@ TEST_CASE("test_parse_big_string2")
         std::istringstream is(input);
         json_decoder<json> decoder;
         lenient_error_handler err_handler(json_errc::illegal_character_in_string);
-        try
+        JSONCONS_TRY
         {
             json_reader reader(is, decoder, err_handler);
             //reader.buffer_length(i);
             reader.read_next();
         }
-        catch (const std::exception&)
+        JSONCONS_CATCH (const std::exception&)
         {
         }
         CHECK(decoder.is_valid());

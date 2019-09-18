@@ -19,7 +19,7 @@ using namespace jsoncons::cbor;
 
 void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
 {
-    try
+    JSONCONS_TRY
     {
         std::error_code ec;
 
@@ -53,7 +53,7 @@ void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
         json j2 = decode_cbor<json>(is);
         REQUIRE(j2 == expected);
     }
-    catch (const std::exception& e)
+    JSONCONS_CATCH (const std::exception& e)
     {
         std::cout << e.what() << std::endl;
         std::cout << expected.to_string() << std::endl;

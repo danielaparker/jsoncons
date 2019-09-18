@@ -120,7 +120,7 @@ TEST_CASE("test_filter2")
 TEST_CASE("test_rename_name")
 {
     json j;
-    try
+    JSONCONS_TRY
     {
         j = json::parse(R"(
 {"store":
@@ -135,7 +135,7 @@ TEST_CASE("test_rename_name")
 }]}}
 )");
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         std::cout << e.what() << std::endl;
     }

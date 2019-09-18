@@ -1379,12 +1379,12 @@ TEST_CASE("csv detect bom")
     REQUIRE(j.size() == 1);
     ojson station = j[0];
     
-    try {
+    JSONCONS_TRY {
         auto it = station.find("stop_id");
         REQUIRE((it != station.object_range().end()));
         std::string stop_id = it->value().as<std::string>();
         CHECK((stop_id == "8220B007612"));
-    } catch (const std::exception& e) {
+    } JSONCONS_CATCH (const std::exception& e) {
         std::cout << e.what() << std::endl;
     }
 }

@@ -51,12 +51,12 @@ TEST_CASE("test_string_allocation")
         std::string input = "\"" + s + "\"";
 
         json_decoder<my_json,FreelistAllocator<char>> decoder(allocator, allocator2);
-        try
+        JSONCONS_TRY
         {
             json_reader reader(input,decoder);
             reader.read_next();
         }
-        catch (const std::exception&)
+        JSONCONS_CATCH (const std::exception&)
         {
         }
         CHECK(decoder.is_valid());

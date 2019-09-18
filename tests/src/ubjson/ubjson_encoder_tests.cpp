@@ -27,12 +27,12 @@ TEST_CASE("serialize array to ubjson")
     encoder.end_array();
     encoder.flush();
 
-    try
+    JSONCONS_TRY
     {
         json result = decode_ubjson<json>(v);
         std::cout << result << std::endl;
     }
-    catch (const std::exception& e)
+    JSONCONS_CATCH (const std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }

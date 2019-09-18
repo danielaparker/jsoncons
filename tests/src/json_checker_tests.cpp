@@ -29,11 +29,11 @@ TEST_CASE("test_fail2")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
     }
@@ -48,11 +48,11 @@ TEST_CASE("test_fail3")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
     }
@@ -67,11 +67,11 @@ TEST_CASE("test_fail4")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
     }
@@ -86,11 +86,11 @@ TEST_CASE("test_fail5")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
     }
@@ -105,11 +105,11 @@ TEST_CASE("test_fail6")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -125,11 +125,11 @@ TEST_CASE("test_fail7")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
     }
@@ -144,11 +144,11 @@ TEST_CASE("test_fail8")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -164,11 +164,11 @@ TEST_CASE("test_fail9")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -184,11 +184,11 @@ TEST_CASE("test_fail10")
 
     std::error_code err;
     
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
     }
@@ -203,11 +203,11 @@ TEST_CASE("test_fail11")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -223,11 +223,11 @@ TEST_CASE("test_fail12")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -243,11 +243,11 @@ TEST_CASE("test_fail13")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -263,11 +263,11 @@ TEST_CASE("test_fail14")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -283,11 +283,11 @@ TEST_CASE("test_fail15")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -303,11 +303,11 @@ TEST_CASE("test_fail16")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -323,11 +323,11 @@ TEST_CASE("test_fail17")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -342,13 +342,13 @@ TEST_CASE("test_fail18")
     std::string in_file = "./input/JSON_checker/fail18.json";
     std::ifstream is(in_file);
     REQUIRE(is);
-    try
+    JSONCONS_TRY
     {
         json_options options;
         options.max_nesting_depth(19);
         json::parse(is, options);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
          err = e.code();
          //std::cout << in_file << " " << e.what() << std::endl;
@@ -364,11 +364,11 @@ TEST_CASE("test_fail19")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -384,11 +384,11 @@ TEST_CASE("test_fail20")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -404,11 +404,11 @@ TEST_CASE("test_fail21")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -424,11 +424,11 @@ TEST_CASE("test_fail22")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -444,11 +444,11 @@ TEST_CASE("test_fail23")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -464,11 +464,11 @@ TEST_CASE("test_fail24")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -485,11 +485,11 @@ TEST_CASE("test_fail25")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -505,11 +505,11 @@ TEST_CASE("test_fail26")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -525,11 +525,11 @@ TEST_CASE("test_fail27")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -545,11 +545,11 @@ TEST_CASE("test_fail28")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -565,11 +565,11 @@ TEST_CASE("test_fail29")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -585,11 +585,11 @@ TEST_CASE("test_fail30")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -605,11 +605,11 @@ TEST_CASE("test_fail31")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -625,11 +625,11 @@ TEST_CASE("test_fail32")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -645,11 +645,11 @@ TEST_CASE("test_fail33")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -665,11 +665,11 @@ TEST_CASE("test_pass1")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         std::cout << in_file << " " << e.what() << std::endl;
         throw;
@@ -684,11 +684,11 @@ TEST_CASE("test_pass2")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         std::cout << in_file << " " << e.what() << std::endl;
         throw;
@@ -703,11 +703,11 @@ TEST_CASE("test_pass3")
 
     std::error_code err;
 
-    try
+    JSONCONS_TRY
     {
         json::parse(is);
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         std::cout << in_file << " " << e.what() << std::endl;
         throw;

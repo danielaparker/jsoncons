@@ -23,12 +23,12 @@ TEST_CASE("serialize object to bson")
     encoder.end_object();
     encoder.flush();
 
-    try
+    JSONCONS_TRY
     {
         json result = bson::decode_bson<json>(v);
         std::cout << result << std::endl;
     }
-    catch (const std::exception& e)
+    JSONCONS_CATCH (const std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
@@ -49,14 +49,14 @@ namespace jsoncons { namespace bson {
     void check_equal(const std::vector<uint8_t>& v, const std::vector<uint8_t>& expected)
     {
         test_equal(v, expected);
-        try
+        JSONCONS_TRY
         {
             json j = bson::decode_bson<json>(v);
             std::vector<uint8_t> u;
             bson::encode_bson(j, u);
             test_equal(v,u);
         }
-        catch (const std::exception& e)
+        JSONCONS_CATCH (const std::exception& e)
         {
             std::cout << e.what() << std::endl;
         }

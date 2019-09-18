@@ -28,12 +28,12 @@ TEST_CASE("serialize array to msgpack")
     //encoder.end_object();
     encoder.flush();
 
-    try
+    JSONCONS_TRY
     {
         json result = msgpack::decode_msgpack<json>(v);
         std::cout << result << std::endl;
     }
-    catch (const std::exception& e)
+    JSONCONS_CATCH (const std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }

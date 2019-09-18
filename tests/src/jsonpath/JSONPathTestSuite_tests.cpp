@@ -41,12 +41,12 @@ TEST_CASE("JSONPath Test Suite")
         {
             if (p.path().filename() == "document.json")
             {
-                try 
+                JSONCONS_TRY 
                 {
                     std::ifstream is(p.path().c_str());
                     document = ojson::parse(is);
                 }
-                catch(const std::exception& e)
+                JSONCONS_CATCH(const std::exception& e)
                 {
                     std::cerr << e.what() << std::endl;
                     return; 
@@ -66,14 +66,14 @@ TEST_CASE("JSONPath Test Suite")
             }
             else if (p.path().extension() == ".json")
             {
-                try
+                JSONCONS_TRY
                 {
                     ojson j;
                     std::ifstream is(p.path().c_str());
                     j = ojson::parse(is);
                     expected_dictionary[p.path().stem()] = j;
                 }
-                catch (const jsoncons::ser_error& e)
+                JSONCONS_CATCH (const jsoncons::ser_error& e)
                 {
                     std::cerr << e.what() << std::endl;
                     return; 
@@ -87,17 +87,17 @@ TEST_CASE("JSONPath Test Suite")
         auto it = expected_dictionary.find(pair.first);
         if (it != expected_dictionary.end())
         {
-            try
+            JSONCONS_TRY
             {
                 ojson result = json_query(document, pair.second);
                 CHECK(it->second == result);
             }
-            catch (const jsoncons::jsonpath::jsonpath_error& e)
+            JSONCONS_CATCH (const jsoncons::jsonpath::jsonpath_error& e)
             {
                 ojson result = json_query(document, pair.second);
                 std::cerr << pair.first << " " << pair.second << " " << e.what() << std::endl;
             }
-            catch (const std::exception& e)
+            JSONCONS_CATCH (const std::exception& e)
             {
                 std::cerr << e.what() << std::endl;
             }

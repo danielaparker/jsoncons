@@ -1171,7 +1171,7 @@ TEST_CASE("test_union_array_elements")
 TEST_CASE("test_replace")
 {
     json j;
-    try
+    JSONCONS_TRY
     {
         j = json::parse(R"(
 {"store":
@@ -1186,7 +1186,7 @@ TEST_CASE("test_replace")
 }]}}
 )");
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         std::cout << e.what() << std::endl;
     }

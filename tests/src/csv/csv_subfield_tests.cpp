@@ -55,13 +55,13 @@ NY,LON,TOR;LON
 ]
     )"_json;
 
-    try
+    JSONCONS_TRY
     {
         json j = csv::decode_csv<json>(s,options);
         CHECK(j == expected);
         //std::cout << pretty_print(j) << std::endl;
     }
-    catch (const std::exception& e)
+    JSONCONS_CATCH (const std::exception& e)
     {
         std::cerr << e.what() << std::endl;
     }
@@ -97,13 +97,13 @@ NY,LON,TOR;LON
 ]
     )"_json;
 
-    try
+    JSONCONS_TRY
     {
         json j = csv::decode_csv<json>(s,options);
         CHECK(j == expected);
         //std::cout << pretty_print(j) << std::endl;
     }
-    catch (const std::exception& e)
+    JSONCONS_CATCH (const std::exception& e)
     {
         std::cerr << e.what() << std::endl;
     }

@@ -51,11 +51,11 @@ struct jsonpath_fixture
 void test_error_code(const json& root, const std::string& path, std::error_code value, size_t line, size_t column)
 {
     REQUIRE_THROWS_AS(jsonpath::json_query(root,path),jsonpath::jsonpath_error);
-    try
+    JSONCONS_TRY
     {
         json result = jsonpath::json_query(root,path);
     }
-    catch (const jsonpath::jsonpath_error& e)
+    JSONCONS_CATCH (const jsonpath::jsonpath_error& e)
     {
         if (e.code() != value)
         {

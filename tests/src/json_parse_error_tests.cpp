@@ -15,11 +15,11 @@ using namespace jsoncons;
 void test_parse_error(const std::string& text, std::error_code ec)
 {
     REQUIRE_THROWS(json::parse(text));
-    try
+    JSONCONS_TRY
     {
         json::parse(text);        
     }
-    catch (const ser_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         if (e.code() != ec)
         {
