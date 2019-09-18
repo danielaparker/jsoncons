@@ -343,45 +343,38 @@ public:
 
     void check_done(std::error_code& ec)
     {
-        JSONCONS_TRY
+        if (source_.is_error())
         {
-            if (source_.is_error())
+            ec = csv_errc::source_error;
+            return;
+        }   
+        if (eof_)
+        {
+            parser_.check_done(ec);
+            if (ec) return;
+        }
+        else
+        {
+            while (!eof_)
             {
-                ec = csv_errc::source_error;
-                return;
-            }   
-            if (eof_)
-            {
-                parser_.check_done(ec);
-                if (ec) return;
-            }
-            else
-            {
-                while (!eof_)
+                if (parser_.source_exhausted())
                 {
-                    if (parser_.source_exhausted())
+                    if (!source_.eof())
                     {
-                        if (!source_.eof())
-                        {
-                            read_buffer(ec);     
-                            if (ec) return;
-                        }
-                        else
-                        {
-                            eof_ = true;
-                        }
-                    }
-                    if (!eof_)
-                    {
-                        parser_.check_done(ec);
+                        read_buffer(ec);     
                         if (ec) return;
                     }
+                    else
+                    {
+                        eof_ = true;
+                    }
+                }
+                if (!eof_)
+                {
+                    parser_.check_done(ec);
+                    if (ec) return;
                 }
             }
-        }
-        JSONCONS_CATCH(const ser_error& e)     
-        {
-            ec = e.code();
         }
     }
 

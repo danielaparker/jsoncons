@@ -160,14 +160,7 @@ public:
 
     void read(std::error_code& ec)
     {
-        JSONCONS_TRY
-        {
-            read_internal(ec);
-        }
-        JSONCONS_CATCH(const ser_error& e)     
-        {
-            ec = e.code();
-        }
+        read_internal(ec);
     }
 
     bool eof() const

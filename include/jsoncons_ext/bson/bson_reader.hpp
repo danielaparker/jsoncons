@@ -48,18 +48,11 @@ public:
 
     void read(std::error_code& ec)
     {
-        JSONCONS_TRY
+        parser_.reset();
+        parser_.parse(handler_, ec);
+        if (ec)
         {
-            parser_.reset();
-            parser_.parse(handler_, ec);
-            if (ec)
-            {
-                return;
-            }
-        }
-        JSONCONS_CATCH(const ser_error& e)     
-        {
-            ec = e.code();
+            return;
         }
     }
 
