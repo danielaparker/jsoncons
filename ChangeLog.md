@@ -1,6 +1,17 @@
 master
 ------
 
+New macros that generate the code to specialize `json_type_traits` from the getter and setter functions
+and serialize to given names:
+
+- `JSONCONS_GETTER_SETTER_TRAITS_NAMED_DECL(class_name,(getter_name0,setter_name0,"name0"),(getter_name1,setter_name1,"name1")...)`
+- `JSONCONS_STRICT_GETTER_SETTER_TRAITS_NAMED_DECL(class_name,(getter_name0,setter_name0,"name0"),(getter_name1,setter_name1,"name1")...) `
+
+- `JSONCONS_TEMPLATE_GETTER_SETTER_TRAITS_NAMED_DECL(num_template_params,class_name,(getter_name0,setter_name0,"name0"),(getter_name1,setter_name1,"name1")...) `
+- `JSONCONS_STRICT_TEMPLATE_GETTER_SETTER_TRAITS_NAMED_DECL(num_template_params,class_name,(getter_name0,setter_name0,"name0"),(getter_name1,setter_name1,"name1")...) `
+
+Support for disabling exceptions
+
 - Support compilation with exceptions disabled
 
 v0.134.0
