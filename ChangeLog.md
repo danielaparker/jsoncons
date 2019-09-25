@@ -1,5 +1,5 @@
-master
-------
+v0.135.0
+--------
 
 New macros that generate the code to specialize `json_type_traits` from the getter and setter functions
 and serialize to given names:
