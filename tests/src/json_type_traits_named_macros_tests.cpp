@@ -40,13 +40,13 @@ namespace json_type_traits_rename_macro_tests
         }
     };
 
-    struct book_without_defaults
+    struct book_no_defaults
     {
         std::string author;
         std::string title;
         double price;
 
-        friend std::ostream& operator<<(std::ostream& os, const book_without_defaults& b)
+        friend std::ostream& operator<<(std::ostream& os, const book_no_defaults& b)
         {
             std::cout << "author: " << b.author << ", title: " << b.title << ", price: " << b.price << "\n";
             return os;
@@ -141,6 +141,60 @@ namespace json_type_traits_rename_macro_tests
         }
     };
 
+    class book_with_getters_and_setters_no_defaults
+    {
+        std::string author_;
+        std::string title_;
+        double price_;
+    public:
+        book_with_getters_and_setters_no_defaults()
+            : price_(0)
+        {
+        }
+
+        book_with_getters_and_setters_no_defaults(const std::string& author,
+              const std::string& title,
+              double price)
+            : author_(author), title_(title), price_(price)
+        {
+        }
+
+        book_with_getters_and_setters_no_defaults(const book_with_getters_and_setters_no_defaults&) = default;
+        book_with_getters_and_setters_no_defaults(book_with_getters_and_setters_no_defaults&&) = default;
+        book_with_getters_and_setters_no_defaults& operator=(const book_with_getters_and_setters_no_defaults&) = default;
+        book_with_getters_and_setters_no_defaults& operator=(book_with_getters_and_setters_no_defaults&&) = default;
+
+        const std::string& get_author() const
+        {
+            return author_;
+        }
+
+        const std::string& get_title() const
+        {
+            return title_;
+        }
+
+        double get_price() const
+        {
+            return price_;
+        }
+
+        void set_author(const std::string& author)
+        {
+            author_ = author;
+        }
+
+        void set_title(const std::string& title)
+        {
+            title_ = title;
+        }
+
+        void set_price(double price)
+        {
+            price_ = price;
+        }
+    };
+
     template <typename T1>
     struct TemplatedStruct1
     {
@@ -161,12 +215,13 @@ namespace json_type_traits_rename_macro_tests
 namespace ns = json_type_traits_rename_macro_tests;
 
 JSONCONS_MEMBER_TRAITS_NAMED_DECL(ns::book,(author,"Author"),(title,"Title"),(price,"Price"))
-JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ns::book_without_defaults,(author,"Author"),(title,"Title"),(price,"Price"))
+JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ns::book_no_defaults,(author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL(ns::book_with_getters_and_ctor, (author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_TEMPLATE_MEMBER_TRAITS_NAMED_DECL(1,ns::TemplatedStruct1,(typeContent,"type-content"),(someString,"some-string"))
 JSONCONS_TEMPLATE_MEMBER_TRAITS_NAMED_DECL(2,ns::TemplatedStruct2,(aT1,"a-t1"),(aT2,"a-t2"))
 JSONCONS_ENUM_TRAITS_NAMED_DECL(ns::float_format, (scientific,"Exponential"), (fixed,"Fixed"), (hex,"Hex"), (general,"General"))
 JSONCONS_GETTER_SETTER_TRAITS_NAMED_DECL(ns::book_with_getters_and_setters, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"))
+JSONCONS_STRICT_GETTER_SETTER_TRAITS_NAMED_DECL(ns::book_with_getters_and_setters_no_defaults, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"))
 
 TEST_CASE("JSONCONS_MEMBER_TRAITS_NAMED_DECL tests")
 {
@@ -208,7 +263,7 @@ TEST_CASE("JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL tests")
     std::string a_title = "Kafka on the Shore";
     double a_price = 25.17;
 
-    ns::book_without_defaults book{an_author, a_title, a_price};
+    ns::book_no_defaults book{an_author, a_title, a_price};
 
     SECTION("book")
     {
@@ -218,7 +273,7 @@ TEST_CASE("JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL tests")
 
         json j = decode_json<json>(s);
 
-        REQUIRE(j.is<ns::book_without_defaults>() == true);
+        REQUIRE(j.is<ns::book_no_defaults>() == true);
 
         CHECK(j["Author"].as<std::string>() == an_author);
         CHECK(j["Title"].as<std::string>() == a_title);
@@ -228,7 +283,7 @@ TEST_CASE("JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL tests")
 
         CHECK(j == j2);
 
-        ns::book_without_defaults val = j.as<ns::book_without_defaults>();
+        ns::book_no_defaults val = j.as<ns::book_no_defaults>();
 
         CHECK(val.author == book.author);
         CHECK(val.title == book.title);
@@ -394,6 +449,49 @@ TEST_CASE("JSONCONS_GETTER_SETTER_TRAITS_NAMED_DECL tests")
     SECTION("to_json")
     {
         ns::book_with_getters_and_setters book(an_author,a_title,a_price);
+
+        json j(book);
+
+        CHECK(j["Author"].as<std::string>() == an_author);
+        CHECK(j["Title"].as<std::string>() == a_title);
+        CHECK(j["Price"].as<double>() == Approx(a_price).epsilon(0.001));
+    }
+}
+
+TEST_CASE("JSONCONS_STRICT_GETTER_SETTER_TRAITS_NAMED_DECL tests")
+{
+    std::string an_author = "Haruki Murakami"; 
+    std::string a_title = "Kafka on the Shore";
+    double a_price = 25.17;
+
+    SECTION("is")
+    {
+        json j;
+        j["Author"] = an_author;
+        j["Title"] = a_title;
+        j["Price"] = a_price;
+
+        bool val = j.is<ns::book_with_getters_and_setters_no_defaults>();
+        CHECK(val);
+    }
+
+    SECTION("as")
+    {
+        json j;
+        j["Author"] = an_author;
+        j["Title"] = a_title;
+        j["Price"] = a_price;
+
+        ns::book_with_getters_and_setters_no_defaults book = j.as<ns::book_with_getters_and_setters_no_defaults>();
+
+        CHECK(book.get_author() == an_author);
+        CHECK(book.get_title() == a_title);
+        CHECK(book.get_price() == Approx(a_price).epsilon(0.001));
+    }
+
+    SECTION("to_json")
+    {
+        ns::book_with_getters_and_setters_no_defaults book(an_author,a_title,a_price);
 
         json j(book);
 
