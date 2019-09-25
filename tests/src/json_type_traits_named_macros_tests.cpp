@@ -93,6 +93,11 @@ namespace json_type_traits_rename_macro_tests
         std::string title_;
         double price_;
     public:
+        book_with_getters_and_setters()
+            : price_(0)
+        {
+        }
+
         book_with_getters_and_setters(const std::string& author,
               const std::string& title,
               double price)
@@ -163,7 +168,6 @@ JSONCONS_TEMPLATE_MEMBER_TRAITS_NAMED_DECL(2,ns::TemplatedStruct2,(aT1,"a-t1"),(
 JSONCONS_ENUM_TRAITS_NAMED_DECL(ns::float_format, (scientific,"Exponential"), (fixed,"Fixed"), (hex,"Hex"), (general,"General"))
 JSONCONS_GETTER_SETTER_TRAITS_NAMED_DECL(ns::book_with_getters_and_setters, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"))
 
-#if 0
 TEST_CASE("JSONCONS_MEMBER_TRAITS_NAMED_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
@@ -355,13 +359,13 @@ TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL tests")
         CHECK(book.price() == Approx(a_price).epsilon(0.001));
     }
 }
-#endif
+
 TEST_CASE("JSONCONS_GETTER_SETTER_TRAITS_NAMED_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
     double a_price = 25.17;
-/*
+
     SECTION("is")
     {
         json j;
@@ -382,11 +386,11 @@ TEST_CASE("JSONCONS_GETTER_SETTER_TRAITS_NAMED_DECL tests")
 
         ns::book_with_getters_and_setters book = j.as<ns::book_with_getters_and_setters>();
 
-        CHECK(book.author() == an_author);
-        CHECK(book.title() == a_title);
-        CHECK(book.price() == Approx(a_price).epsilon(0.001));
+        CHECK(book.get_author() == an_author);
+        CHECK(book.get_title() == a_title);
+        CHECK(book.get_price() == Approx(a_price).epsilon(0.001));
     }
-*/
+
     SECTION("to_json")
     {
         ns::book_with_getters_and_setters book(an_author,a_title,a_price);

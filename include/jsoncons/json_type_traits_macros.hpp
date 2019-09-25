@@ -591,13 +591,13 @@ JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL_BASE(NumTemplateParams, ValueType, __VA_A
 #define JSONCONS_NAMED_IS3_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_IS3_ Member)
 #define JSONCONS_NAMED_IS3_(Getter, Setter, Name) if (!ajson.contains(Name)) return false;
 
+#define JSONCONS_NAMED_AS3(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_AS3_ Member)
+#define JSONCONS_NAMED_AS3_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_AS3_ Member)
+#define JSONCONS_NAMED_AS3_(Getter, Setter, Name) if (ajson.contains(Name)) {aval.Setter(ajson.at(Name).template as<typename std::decay<decltype(aval.Getter())>::type>());}
+
 #define JSONCONS_NAMED_TO_JSON3(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_TO_JSON3_ Member)
 #define JSONCONS_NAMED_TO_JSON3_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_TO_JSON3_ Member)
 #define JSONCONS_NAMED_TO_JSON3_(Getter, Setter, Name) ajson.try_emplace(Name, aval.Getter() );
-
-#define JSONCONS_NAMED_AS3(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_AS3_ Member),
-#define JSONCONS_NAMED_AS3_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_AS3_ Member)
-#define JSONCONS_NAMED_AS3_(Getter, Setter, Name) (ajson.at(Name)).template as<typename std::decay<decltype(((value_type*)nullptr)->Getter())>::type>()
  
 #define JSONCONS_GETTER_SETTER_TRAITS_NAMED_DECL_BASE(NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
@@ -615,7 +615,9 @@ namespace jsoncons \
         } \
         static value_type as(const Json& ajson) \
         { \
-            return value_type ( JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_AS3,, __VA_ARGS__) ); \
+            value_type aval{}; \
+            JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_AS3,, __VA_ARGS__) \
+            return aval; \
         } \
         static Json to_json(const value_type& aval, allocator_type allocator=allocator_type()) \
         { \
