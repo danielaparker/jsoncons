@@ -15,7 +15,7 @@
 
 using namespace jsoncons;
 
-namespace json_type_traits_rename_macro_tests
+namespace json_type_traits_named_macro_tests
 {
     struct book
     {
@@ -40,13 +40,13 @@ namespace json_type_traits_rename_macro_tests
         }
     };
 
-    struct book_no_defaults
+    struct book_undefaulted
     {
         std::string author;
         std::string title;
         double price;
 
-        friend std::ostream& operator<<(std::ostream& os, const book_no_defaults& b)
+        friend std::ostream& operator<<(std::ostream& os, const book_undefaulted& b)
         {
             std::cout << "author: " << b.author << ", title: " << b.title << ", price: " << b.price << "\n";
             return os;
@@ -141,28 +141,28 @@ namespace json_type_traits_rename_macro_tests
         }
     };
 
-    class book_with_getters_and_setters_no_defaults
+    class book_with_getters_and_setters_undefaulted
     {
         std::string author_;
         std::string title_;
         double price_;
     public:
-        book_with_getters_and_setters_no_defaults()
+        book_with_getters_and_setters_undefaulted()
             : price_(0)
         {
         }
 
-        book_with_getters_and_setters_no_defaults(const std::string& author,
+        book_with_getters_and_setters_undefaulted(const std::string& author,
               const std::string& title,
               double price)
             : author_(author), title_(title), price_(price)
         {
         }
 
-        book_with_getters_and_setters_no_defaults(const book_with_getters_and_setters_no_defaults&) = default;
-        book_with_getters_and_setters_no_defaults(book_with_getters_and_setters_no_defaults&&) = default;
-        book_with_getters_and_setters_no_defaults& operator=(const book_with_getters_and_setters_no_defaults&) = default;
-        book_with_getters_and_setters_no_defaults& operator=(book_with_getters_and_setters_no_defaults&&) = default;
+        book_with_getters_and_setters_undefaulted(const book_with_getters_and_setters_undefaulted&) = default;
+        book_with_getters_and_setters_undefaulted(book_with_getters_and_setters_undefaulted&&) = default;
+        book_with_getters_and_setters_undefaulted& operator=(const book_with_getters_and_setters_undefaulted&) = default;
+        book_with_getters_and_setters_undefaulted& operator=(book_with_getters_and_setters_undefaulted&&) = default;
 
         const std::string& get_author() const
         {
@@ -210,18 +210,18 @@ namespace json_type_traits_rename_macro_tests
     };
  
     enum class float_format {scientific = 1,fixed = 2,hex = 4,general = fixed | scientific};
-} // namespace json_type_traits_rename_macro_tests
+} // namespace json_type_traits_named_macro_tests
 
-namespace ns = json_type_traits_rename_macro_tests;
+namespace ns = json_type_traits_named_macro_tests;
 
 JSONCONS_MEMBER_TRAITS_NAMED_DECL(ns::book,(author,"Author"),(title,"Title"),(price,"Price"))
-JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ns::book_no_defaults,(author,"Author"),(title,"Title"),(price,"Price"))
+JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ns::book_undefaulted,(author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL(ns::book_with_getters_and_ctor, (author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_TEMPLATE_MEMBER_TRAITS_NAMED_DECL(1,ns::TemplatedStruct1,(typeContent,"type-content"),(someString,"some-string"))
 JSONCONS_TEMPLATE_MEMBER_TRAITS_NAMED_DECL(2,ns::TemplatedStruct2,(aT1,"a-t1"),(aT2,"a-t2"))
 JSONCONS_ENUM_TRAITS_NAMED_DECL(ns::float_format, (scientific,"Exponential"), (fixed,"Fixed"), (hex,"Hex"), (general,"General"))
 JSONCONS_GETTER_SETTER_TRAITS_NAMED_DECL(ns::book_with_getters_and_setters, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"))
-JSONCONS_STRICT_GETTER_SETTER_TRAITS_NAMED_DECL(ns::book_with_getters_and_setters_no_defaults, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"))
+JSONCONS_STRICT_GETTER_SETTER_TRAITS_NAMED_DECL(ns::book_with_getters_and_setters_undefaulted, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"))
 
 TEST_CASE("JSONCONS_MEMBER_TRAITS_NAMED_DECL tests")
 {
@@ -263,7 +263,7 @@ TEST_CASE("JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL tests")
     std::string a_title = "Kafka on the Shore";
     double a_price = 25.17;
 
-    ns::book_no_defaults book{an_author, a_title, a_price};
+    ns::book_undefaulted book{an_author, a_title, a_price};
 
     SECTION("book")
     {
@@ -273,7 +273,7 @@ TEST_CASE("JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL tests")
 
         json j = decode_json<json>(s);
 
-        REQUIRE(j.is<ns::book_no_defaults>() == true);
+        REQUIRE(j.is<ns::book_undefaulted>() == true);
 
         CHECK(j["Author"].as<std::string>() == an_author);
         CHECK(j["Title"].as<std::string>() == a_title);
@@ -283,7 +283,7 @@ TEST_CASE("JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL tests")
 
         CHECK(j == j2);
 
-        ns::book_no_defaults val = j.as<ns::book_no_defaults>();
+        ns::book_undefaulted val = j.as<ns::book_undefaulted>();
 
         CHECK(val.author == book.author);
         CHECK(val.title == book.title);
@@ -471,7 +471,7 @@ TEST_CASE("JSONCONS_STRICT_GETTER_SETTER_TRAITS_NAMED_DECL tests")
         j["Title"] = a_title;
         j["Price"] = a_price;
 
-        bool val = j.is<ns::book_with_getters_and_setters_no_defaults>();
+        bool val = j.is<ns::book_with_getters_and_setters_undefaulted>();
         CHECK(val);
     }
 
@@ -482,7 +482,7 @@ TEST_CASE("JSONCONS_STRICT_GETTER_SETTER_TRAITS_NAMED_DECL tests")
         j["Title"] = a_title;
         j["Price"] = a_price;
 
-        ns::book_with_getters_and_setters_no_defaults book = j.as<ns::book_with_getters_and_setters_no_defaults>();
+        ns::book_with_getters_and_setters_undefaulted book = j.as<ns::book_with_getters_and_setters_undefaulted>();
 
         CHECK(book.get_author() == an_author);
         CHECK(book.get_title() == a_title);
@@ -491,7 +491,7 @@ TEST_CASE("JSONCONS_STRICT_GETTER_SETTER_TRAITS_NAMED_DECL tests")
 
     SECTION("to_json")
     {
-        ns::book_with_getters_and_setters_no_defaults book(an_author,a_title,a_price);
+        ns::book_with_getters_and_setters_undefaulted book(an_author,a_title,a_price);
 
         json j(book);
 

@@ -40,6 +40,7 @@ void data_model_examples();
 void staj_iterator_examples();
 void bson_examples();
 void polymorphic_examples();
+void json_type_traits_macro_examples();
 
 void comment_example()
 {
@@ -493,6 +494,8 @@ int main()
         run_csv_examples();
 
         json_reader_examples();
+
+        json_type_traits_macro_examples();
     }
     catch (const std::exception& e)
     {
