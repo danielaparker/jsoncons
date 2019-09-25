@@ -53,23 +53,23 @@ namespace json_type_traits_rename_macro_tests
         }
     };
 
-    class book_with_getters
+    class book_with_getters_and_ctor
     {
         std::string author_;
         std::string title_;
         double price_;
     public:
-        book_with_getters(const std::string& author,
+        book_with_getters_and_ctor(const std::string& author,
               const std::string& title,
               double price)
             : author_(author), title_(title), price_(price)
         {
         }
 
-        book_with_getters(const book_with_getters&) = default;
-        book_with_getters(book_with_getters&&) = default;
-        book_with_getters& operator=(const book_with_getters&) = default;
-        book_with_getters& operator=(book_with_getters&&) = default;
+        book_with_getters_and_ctor(const book_with_getters_and_ctor&) = default;
+        book_with_getters_and_ctor(book_with_getters_and_ctor&&) = default;
+        book_with_getters_and_ctor& operator=(const book_with_getters_and_ctor&) = default;
+        book_with_getters_and_ctor& operator=(book_with_getters_and_ctor&&) = default;
 
         const std::string& author() const
         {
@@ -154,7 +154,7 @@ namespace json_type_traits_rename_macro_tests
           T1 aT1;
           T2 aT2;
     };
-
+ 
     enum class float_format {scientific = 1,fixed = 2,hex = 4,general = fixed | scientific};
 } // namespace json_type_traits_rename_macro_tests
 
@@ -162,7 +162,7 @@ namespace ns = json_type_traits_rename_macro_tests;
 
 JSONCONS_MEMBER_TRAITS_NAMED_DECL(ns::book,(author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ns::book_without_defaults,(author,"Author"),(title,"Title"),(price,"Price"))
-JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL(ns::book_with_getters, (author,"Author"),(title,"Title"),(price,"Price"))
+JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL(ns::book_with_getters_and_ctor, (author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_TEMPLATE_MEMBER_TRAITS_NAMED_DECL(1,ns::TemplatedStruct1,(typeContent,"type-content"),(someString,"some-string"))
 JSONCONS_TEMPLATE_MEMBER_TRAITS_NAMED_DECL(2,ns::TemplatedStruct2,(aT1,"a-t1"),(aT2,"a-t2"))
 JSONCONS_ENUM_TRAITS_NAMED_DECL(ns::float_format, (scientific,"Exponential"), (fixed,"Fixed"), (hex,"Hex"), (general,"General"))
@@ -331,12 +331,12 @@ TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL tests")
         j["Title"] = a_title;
         j["Price"] = a_price;
 
-        bool val = j.is<ns::book_with_getters>();
+        bool val = j.is<ns::book_with_getters_and_ctor>();
         CHECK(val);
     }
     SECTION("to_json")
     {
-        ns::book_with_getters book(an_author,a_title,a_price);
+        ns::book_with_getters_and_ctor book(an_author,a_title,a_price);
 
         json j(book);
 
@@ -352,7 +352,7 @@ TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL tests")
         j["Title"] = a_title;
         j["Price"] = a_price;
 
-        ns::book_with_getters book = j.as<ns::book_with_getters>();
+        ns::book_with_getters_and_ctor book = j.as<ns::book_with_getters_and_ctor>();
 
         CHECK(book.author() == an_author);
         CHECK(book.title() == a_title);

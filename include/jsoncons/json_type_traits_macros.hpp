@@ -100,8 +100,8 @@
 #define JSONCONS_AS(Prefix, Member) if (ajson.contains(JSONCONS_QUOTE(Prefix, Member))) {aval.Member = ajson.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(aval.Member)>();}
 #define JSONCONS_AS_LAST(Prefix, Member) if (ajson.contains(JSONCONS_QUOTE(Prefix, Member))) {aval.Member = ajson.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(aval.Member)>();}
 
-#define JSONCONS_MAND_AS(Prefix, Member) {aval.Member = ajson.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(aval.Member)>();}
-#define JSONCONS_MAND_AS_LAST(Prefix, Member) {aval.Member = ajson.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(aval.Member)>();}
+#define JSONCONS_STRICT_AS(Prefix, Member) {aval.Member = ajson.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(aval.Member)>();}
+#define JSONCONS_STRICT_AS_LAST(Prefix, Member) {aval.Member = ajson.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(aval.Member)>();}
  
 #define JSONCONS_IS2(Prefix, Member) if (!ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
 #define JSONCONS_IS2_LAST(Prefix, Member) if (!ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
@@ -221,13 +221,13 @@ namespace jsoncons \
 
 
 #define JSONCONS_STRICT_MEMBER_TRAITS_DECL(ValueType, ...)  \
-    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_MAND_AS,char,,0,ValueType,__VA_ARGS__) \
-    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_MAND_AS,wchar_t,L,0,ValueType,__VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_STRICT_AS,char,,0,ValueType,__VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_STRICT_AS,wchar_t,L,0,ValueType,__VA_ARGS__) \
   /**/
 
 #define JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
-    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_MAND_AS,char,,NumTemplateParams,ValueType,__VA_ARGS__) \
-    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_MAND_AS,wchar_t,L,NumTemplateParams,ValueType,__VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_STRICT_AS,char,,NumTemplateParams,ValueType,__VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_STRICT_AS,wchar_t,L,NumTemplateParams,ValueType,__VA_ARGS__) \
   /**/
  
 #define JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(CharT,Prefix,NumTemplateParams, ValueType, ...)  \
@@ -388,9 +388,9 @@ namespace jsoncons \
 #define JSONCONS_NAMED_AS_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_AS_ Member)
 #define JSONCONS_NAMED_AS_(Member, Name) if (ajson.contains(Name)) {aval.Member = ajson.at(Name).template as<decltype(aval.Member)>();}
 
-#define JSONCONS_MAND_RENAME_AS(Prefix, Member) JSONCONS_EXPAND(JSONCONS_MAND_RENAME_AS_ Member)
-#define JSONCONS_MAND_RENAME_AS_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_MAND_RENAME_AS_ Member)
-#define JSONCONS_MAND_RENAME_AS_(Member, Name) {aval.Member = ajson.at(Name).template as<decltype(aval.Member)>();}
+#define JSONCONS_STRICT_NAMED_AS(Prefix, Member) JSONCONS_EXPAND(JSONCONS_STRICT_NAMED_AS_ Member)
+#define JSONCONS_STRICT_NAMED_AS_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_STRICT_NAMED_AS_ Member)
+#define JSONCONS_STRICT_NAMED_AS_(Member, Name) {aval.Member = ajson.at(Name).template as<decltype(aval.Member)>();}
 
 #define JSONCONS_MEMBER_TRAITS_NAMED_DECL_BASE(As, NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
@@ -432,11 +432,11 @@ namespace jsoncons \
   /**/
 
 #define JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ValueType, ...)  \
-    JSONCONS_MEMBER_TRAITS_NAMED_DECL_BASE(JSONCONS_MAND_RENAME_AS, 0, ValueType, __VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_NAMED_DECL_BASE(JSONCONS_STRICT_NAMED_AS, 0, ValueType, __VA_ARGS__) \
   /**/
 
 #define JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_NAMED_DECL(NumTemplateParams, ValueType, ...)  \
-    JSONCONS_MEMBER_TRAITS_NAMED_DECL_BASE(JSONCONS_MAND_RENAME_AS, NumTemplateParams, ValueType, __VA_ARGS__) \
+    JSONCONS_MEMBER_TRAITS_NAMED_DECL_BASE(JSONCONS_STRICT_NAMED_AS, NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
 
 
@@ -539,17 +539,17 @@ namespace jsoncons \
 } \
     /**/
  
-#define JSONCONS_NAMED_IS2(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_IS2_ Member)
-#define JSONCONS_NAMED_IS2_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_IS2_ Member)
-#define JSONCONS_NAMED_IS2_(Member, Name) if (!ajson.contains(Name)) return false;
+#define JSONCONS_GETTER_CTOR_NAMED_IS(Prefix, Member) JSONCONS_EXPAND(JSONCONS_GETTER_CTOR_NAMED_IS_ Member)
+#define JSONCONS_GETTER_CTOR_NAMED_IS_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_GETTER_CTOR_NAMED_IS_ Member)
+#define JSONCONS_GETTER_CTOR_NAMED_IS_(Member, Name) if (!ajson.contains(Name)) return false;
 
-#define JSONCONS_NAMED_TO_JSON2(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_TO_JSON2_ Member)
-#define JSONCONS_NAMED_TO_JSON2_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_TO_JSON2_ Member)
-#define JSONCONS_NAMED_TO_JSON2_(Member, Name) ajson.try_emplace(Name, aval.Member() );
+#define JSONCONS_GETTER_CTOR_NAMED_TO_JSON(Prefix, Member) JSONCONS_EXPAND(JSONCONS_GETTER_CTOR_NAMED_TO_JSON_ Member)
+#define JSONCONS_GETTER_CTOR_NAMED_TO_JSON_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_GETTER_CTOR_NAMED_TO_JSON_ Member)
+#define JSONCONS_GETTER_CTOR_NAMED_TO_JSON_(Member, Name) ajson.try_emplace(Name, aval.Member() );
 
-#define JSONCONS_NAMED_AS2(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_AS2_ Member),
-#define JSONCONS_NAMED_AS2_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_AS2_ Member)
-#define JSONCONS_NAMED_AS2_(Member, Name) (ajson.at(Name)).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()
+#define JSONCONS_GETTER_CTOR_NAMED_AS(Prefix, Member) JSONCONS_EXPAND(JSONCONS_GETTER_CTOR_NAMED_AS_ Member),
+#define JSONCONS_GETTER_CTOR_NAMED_AS_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_GETTER_CTOR_NAMED_AS_ Member)
+#define JSONCONS_GETTER_CTOR_NAMED_AS_(Member, Name) (ajson.at(Name)).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()
  
 #define JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL_BASE(NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
@@ -562,17 +562,17 @@ namespace jsoncons \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
-            JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_IS2,, __VA_ARGS__)\
+            JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_NAMED_IS,, __VA_ARGS__)\
             return true; \
         } \
         static value_type as(const Json& ajson) \
         { \
-            return value_type ( JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_AS2,, __VA_ARGS__) ); \
+            return value_type ( JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_NAMED_AS,, __VA_ARGS__) ); \
         } \
         static Json to_json(const value_type& aval, allocator_type allocator=allocator_type()) \
         { \
             Json ajson(allocator); \
-            JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_TO_JSON2,, __VA_ARGS__) \
+            JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_NAMED_TO_JSON,, __VA_ARGS__) \
             return ajson; \
         } \
     }; \
@@ -583,23 +583,27 @@ namespace jsoncons \
 JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL_BASE(0, ValueType, __VA_ARGS__) \
   /**/
  
-#define JSONCONS_TEMPLATE_RENAME_GETTER_CTOR_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
+#define JSONCONS_TEMPLATE_NAMED_GETTER_CTOR_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
 JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL_BASE(NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
  
-#define JSONCONS_NAMED_IS3(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_IS3_ Member)
-#define JSONCONS_NAMED_IS3_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_IS3_ Member)
-#define JSONCONS_NAMED_IS3_(Getter, Setter, Name) if (!ajson.contains(Name)) return false;
+#define JSONCONS_GETTER_SETTER_IS(Prefix, Member) JSONCONS_EXPAND(JSONCONS_GETTER_SETTER_IS_ Member)
+#define JSONCONS_GETTER_SETTER_IS_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_GETTER_SETTER_IS_ Member)
+#define JSONCONS_GETTER_SETTER_IS_(Getter, Setter, Name) if (!ajson.contains(Name)) return false;
 
-#define JSONCONS_NAMED_AS3(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_AS3_ Member)
-#define JSONCONS_NAMED_AS3_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_AS3_ Member)
-#define JSONCONS_NAMED_AS3_(Getter, Setter, Name) if (ajson.contains(Name)) {aval.Setter(ajson.at(Name).template as<typename std::decay<decltype(aval.Getter())>::type>());}
+#define JSONCONS_GETTER_SETTER_TO_JSON(Prefix, Member) JSONCONS_EXPAND(JSONCONS_GETTER_SETTER_TO_JSON_ Member)
+#define JSONCONS_GETTER_SETTER_TO_JSON_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_GETTER_SETTER_TO_JSON_ Member)
+#define JSONCONS_GETTER_SETTER_TO_JSON_(Getter, Setter, Name) ajson.try_emplace(Name, aval.Getter() );
 
-#define JSONCONS_NAMED_TO_JSON3(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_TO_JSON3_ Member)
-#define JSONCONS_NAMED_TO_JSON3_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_NAMED_TO_JSON3_ Member)
-#define JSONCONS_NAMED_TO_JSON3_(Getter, Setter, Name) ajson.try_emplace(Name, aval.Getter() );
+#define JSONCONS_GETTER_SETTER_NAMED_AS(Prefix, Member) JSONCONS_EXPAND(JSONCONS_GETTER_SETTER_NAMED_AS_ Member)
+#define JSONCONS_GETTER_SETTER_NAMED_AS_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_GETTER_SETTER_NAMED_AS_ Member)
+#define JSONCONS_GETTER_SETTER_NAMED_AS_(Getter, Setter, Name) if (ajson.contains(Name)) {aval.Setter(ajson.at(Name).template as<typename std::decay<decltype(aval.Getter())>::type>());}
+
+#define JSONCONS_STRICT_GETTER_SETTER_NAMED_AS(Prefix, Member) JSONCONS_EXPAND(JSONCONS_STRICT_GETTER_SETTER_NAMED_AS_ Member)
+#define JSONCONS_STRICT_GETTER_SETTER_NAMED_AS_LAST(Prefix, Member) JSONCONS_EXPAND(JSONCONS_STRICT_GETTER_SETTER_NAMED_AS_ Member)
+#define JSONCONS_STRICT_GETTER_SETTER_NAMED_AS_(Getter, Setter, Name) {aval.Setter(ajson.at(Name).template as<typename std::decay<decltype(aval.Getter())>::type>());}
  
-#define JSONCONS_GETTER_SETTER_TRAITS_NAMED_DECL_BASE(NumTemplateParams, ValueType, ...)  \
+#define JSONCONS_GETTER_SETTER_TRAITS_NAMED_DECL_BASE(As, NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
 { \
     template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, NumTemplateParams)> \
@@ -610,19 +614,19 @@ namespace jsoncons \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
-            JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_IS3,, __VA_ARGS__)\
+            JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_SETTER_IS,, __VA_ARGS__)\
             return true; \
         } \
         static value_type as(const Json& ajson) \
         { \
             value_type aval{}; \
-            JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_AS3,, __VA_ARGS__) \
+            JSONCONS_VARIADIC_REP_N(As,, __VA_ARGS__) \
             return aval; \
         } \
         static Json to_json(const value_type& aval, allocator_type allocator=allocator_type()) \
         { \
             Json ajson(allocator); \
-            JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_TO_JSON3,, __VA_ARGS__) \
+            JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_SETTER_TO_JSON,, __VA_ARGS__) \
             return ajson; \
         } \
     }; \
@@ -630,11 +634,19 @@ namespace jsoncons \
   /**/
  
 #define JSONCONS_GETTER_SETTER_TRAITS_NAMED_DECL(ValueType, ...)  \
-JSONCONS_GETTER_SETTER_TRAITS_NAMED_DECL_BASE(0, ValueType, __VA_ARGS__) \
+JSONCONS_GETTER_SETTER_TRAITS_NAMED_DECL_BASE(JSONCONS_GETTER_SETTER_NAMED_AS, 0, ValueType, __VA_ARGS__) \
   /**/
  
-#define JSONCONS_TEMPLATE_RENAME_GETTER_SETTER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
-JSONCONS_GETTER_SETTER_TRAITS_NAMED_DECL_BASE(NumTemplateParams, ValueType, __VA_ARGS__) \
+#define JSONCONS_TEMPLATE_NAMED_GETTER_SETTER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
+JSONCONS_GETTER_SETTER_TRAITS_NAMED_DECL_BASE(JSONCONS_GETTER_SETTER_NAMED_AS, NumTemplateParams, ValueType, __VA_ARGS__) \
+  /**/
+ 
+#define JSONCONS_STRICT_GETTER_SETTER_TRAITS_NAMED_DECL(ValueType, ...)  \
+JSONCONS_GETTER_SETTER_TRAITS_NAMED_DECL_BASE(JSONCONS_STRICT_GETTER_SETTER_NAMED_AS, 0, ValueType, __VA_ARGS__) \
+  /**/
+ 
+#define JSONCONS_STRICT_TEMPLATE_GETTER_SETTER_NAMED_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
+JSONCONS_GETTER_SETTER_TRAITS_NAMED_DECL_BASE(JSONCONS_STRICT_GETTER_SETTER_NAMED_AS, NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
 
 #endif
