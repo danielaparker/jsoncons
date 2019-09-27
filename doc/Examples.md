@@ -954,7 +954,7 @@ public:
 
 } // namespace ns
 
-// Declare the traits
+// Declare the traits at global scope
 JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ns::Book1,(author,"Author"),(title,"Title"),(price,"Price"),(pub_date,"Publication Date"))
 JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ns::Book2,(author_,"Author"),(title_,"Title"),(price_,"Price"),(pub_date_,"Publication Date"))
 JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL(ns::Book3,(author,"Author"),(title,"Title"),(price,"Price"),(pub_date,"Publication Date"))
