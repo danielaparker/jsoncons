@@ -875,7 +875,7 @@ struct Book1
     std::string pub_date;
 };
 
-// #2 Class with private member data and default constructor   
+// #2 Class with private member data and private default constructor   
 class Book2
 {
     std::string author_;
