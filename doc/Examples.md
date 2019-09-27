@@ -663,47 +663,9 @@ biography, Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.
         "title": "The Path to Power: The Years of Lyndon Johnson I"
     }
 ]
-
-(2)
-
-fiction, Haruki Murakami, Kafka on the Shore, 25.170000
-biography, Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.990000
-
-[
-    {
-        "author": "Haruki Murakami",
-        "category": "fiction",
-        "price": 25.17,
-        "title": "Kafka on the Shore"
-    },
-    {
-        "author": "Robert A. Caro",
-        "category": "biography",
-        "price": 16.99,
-        "title": "The Path to Power: The Years of Lyndon Johnson I"
-    }
-]
-
-(3)
-
-fiction, Haruki Murakami, Kafka on the Shore, 25.170000
-biography, Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.990000
-
-[
-    {
-        "author": "Haruki Murakami",
-        "category": "fiction",
-        "price": 25.17,
-        "title": "Kafka on the Shore"
-    },
-    {
-        "author": "Robert A. Caro",
-        "category": "biography",
-        "price": 16.99,
-        "title": "The Path to Power: The Years of Lyndon Johnson I"
-    }
-]
 ```
+
+The output for (2), (3) and (4) is the same.
 
 <div id="G2"/>
 
@@ -923,67 +885,9 @@ biography, Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.
         "Title": "The Path to Power: The Years of Lyndon Johnson I"
     }
 ]
-
-(2)
-
-fiction, Haruki Murakami, Kafka on the Shore, 25.170000
-biography, Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.990000
-
-[
-    {
-        "Author": "Haruki Murakami",
-        "Category": "Fiction",
-        "Price": 25.17,
-        "Title": "Kafka on the Shore"
-    },
-    {
-        "Author": "Robert A. Caro",
-        "Category": "Biography",
-        "Price": 16.99,
-        "Title": "The Path to Power: The Years of Lyndon Johnson I"
-    }
-]
-
-(3)
-
-fiction, Haruki Murakami, Kafka on the Shore, 25.170000
-biography, Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.990000
-
-[
-    {
-        "Author": "Haruki Murakami",
-        "Category": "Fiction",
-        "Price": 25.17,
-        "Title": "Kafka on the Shore"
-    },
-    {
-        "Author": "Robert A. Caro",
-        "Category": "Biography",
-        "Price": 16.99,
-        "Title": "The Path to Power: The Years of Lyndon Johnson I"
-    }
-]
-
-(4)
-
-fiction, Haruki Murakami, Kafka on the Shore, 25.170000
-biography, Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.990000
-
-[
-    {
-        "Author": "Haruki Murakami",
-        "Category": "Fiction",
-        "Price": 25.17,
-        "Title": "Kafka on the Shore"
-    },
-    {
-        "Author": "Robert A. Caro",
-        "Category": "Biography",
-        "Price": 16.99,
-        "Title": "The Path to Power: The Years of Lyndon Johnson I"
-    }
-]
 ```
+
+The output for (2), (3) and (4) is the same.
 
 <div id="G3"/>
 
