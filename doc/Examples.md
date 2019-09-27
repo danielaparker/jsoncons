@@ -866,31 +866,33 @@ int main()
 
 namespace ns {
 
+enum class BookCategory {fiction,biography};
+
 // #1 Class with public member data and default constructor   
 struct Book1
 {
+    BookCategory category;
     std::string author;
     std::string title;
     double price;
-    std::string pub_date;
 };
 
 // #2 Class with private member data and default constructor   
 class Book2
 {
+    BookCategory category_;
     std::string author_;
     std::string title_;
     double price_;
-    std::string pub_date_;
     Book2() = default;
 
     JSONCONS_TYPE_TRAITS_FRIEND;
 public:
+    BookCategory category() const {return category_;}
+
     const std::string& author() const {return author_;}
 
     const std::string& title() const{return title_;}
-
-    const std::string& pub_date() const{return pub_date_;}
 
     double price() const{return price_;}
 };
@@ -898,16 +900,16 @@ public:
 // #3 Class with getters and initializing constructor
 class Book3
 {
+    BookCategory category_;
     std::string author_;
     std::string title_;
     double price_;
-    std::string pub_date_;
 public:
-    Book3(const std::string& author,
+    Book3(BookCategory category,
+          const std::string& author,
           const std::string& title,
-          double price,
-          const std::string& pub_date)
-        : author_(author), title_(title), price_(price), pub_date_(pub_date)
+          double price)
+        : category_(category), author_(author), title_(title), price_(price)
     {
     }
 
@@ -916,11 +918,11 @@ public:
     Book3& operator=(const Book3&) = default;
     Book3& operator=(Book3&&) = default;
 
+    BookCategory category() const {return category_;}
+
     const std::string& author() const{return author_;}
 
     const std::string& title() const{return title_;}
-
-    const std::string& pub_date() const{return pub_date_;}
 
     double price() const{return price_;}
 };
@@ -928,16 +930,19 @@ public:
 // #4 Class with getters, setters and default constructor
 class Book4
 {
+    BookCategory category_;
     std::string author_;
     std::string title_;
     double price_;
-    std::string pub_date_;
 public:
     Book4() = default;
     Book4(const Book4&) = default;
     Book4(Book4&&) = default;
     Book4& operator=(const Book4&) = default;
     Book4& operator=(Book4&&) = default;
+
+    BookCategory getCategory() const {return category_;}
+    void setCategory(const BookCategory& value) {category_ = value;}
 
     const std::string& getAuthor() const {return author_;}
     void setAuthor(const std::string& value) {author_ = value;}
@@ -947,24 +952,23 @@ public:
 
     double getPrice() const {return price_;}
     void setPrice(double value) {price_ = value;}
-
-    const std::string& getPubDate() const {return pub_date_;}
-    void setPubDate(const std::string& value) {pub_date_ = value;}
 };
 
 } // namespace ns
 
 // Declare the traits at global scope
-JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ns::Book1,(author,"Author"),(title,"Title"),
-                                                   (price,"Price"),(pub_date,"Publication Date"))
-JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ns::Book2,(author_,"Author"),(title_,"Title"),
-                                                   (price_,"Price"),(pub_date_,"Publication Date"))
-JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL(ns::Book3,(author,"Author"),(title,"Title"),
-                                                 (price,"Price"),(pub_date,"Publication Date"))
-JSONCONS_STRICT_GETTER_SETTER_TRAITS_NAMED_DECL(ns::Book4,(getAuthor,setAuthor,"Author"),
+JSONCONS_ENUM_TRAITS_NAMED_DECL(ns::BookCategory,(fiction,"Fiction"),(biography,"Biography"))
+
+JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ns::Book1,(category,"Category"),(author,"Author"),
+                                                   (title,"Title"),(price,"Price"))
+JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ns::Book2,(category_,"Category"),(author_,"Author"),
+                                                   (title_,"Title"),(price_,"Price"))
+JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL(ns::Book3,(category,"Category"),(author,"Author"),
+                                                 (title,"Title"),(price,"Price"))
+JSONCONS_STRICT_GETTER_SETTER_TRAITS_NAMED_DECL(ns::Book4,(getCategory,setCategory,"Category"),
+                                                          (getAuthor,setAuthor,"Author"),
                                                           (getTitle,setTitle,"Title"),
-                                                          (getPrice,setPrice,"Price"),
-                                                          (getPubDate,setPubDate,"Publication Date"))
+                                                          (getPrice,setPrice,"Price"))
 
 using namespace jsoncons; // for convenience
 
@@ -973,16 +977,16 @@ int main()
     const std::string input = R"(
     [
         {
+            "Category" : "Fiction",
             "Author" : "Haruki Murakami",
             "Title" : "Kafka on the Shore",
-            "Price" : 25.17,
-            "Publication Date" : "2006-01-03"
+            "Price" : 25.17
         },
         {
-            "Author" : "Charles Bukowski",
-            "Title" : "Pulp",
-            "Price" : 22.48,
-            "Publication Date" : "2002-05-31"
+            "Category" : "Biography",
+            "Author" : "Robert A. Caro",
+            "Title" : "The Path to Power: The Years of Lyndon Johnson I",
+            "Price" : 16.99
         }
     ]
     )";
@@ -993,8 +997,7 @@ int main()
     {
         std::cout << item.author << ", " 
                   << item.title << ", " 
-                  << item.price << ", " 
-                  << item.pub_date << "\n";
+                  << item.price << "\n";
     }
     std::cout << "\n";
     encode_json(books1, std::cout, indenting::indent);
@@ -1006,8 +1009,7 @@ int main()
     {
         std::cout << item.author() << ", " 
                   << item.title() << ", " 
-                  << item.price() << ", " 
-                  << item.pub_date() << "\n";
+                  << item.price() << "\n";
     }
     std::cout << "\n";
     encode_json(books2, std::cout, indenting::indent);
@@ -1019,8 +1021,7 @@ int main()
     {
         std::cout << item.author() << ", " 
                   << item.title() << ", " 
-                  << item.price() << ", " 
-                  << item.pub_date() << "\n";
+                  << item.price() << "\n";
     }
     std::cout << "\n";
     encode_json(books3, std::cout, indenting::indent);
@@ -1032,8 +1033,7 @@ int main()
     {
         std::cout << item.getAuthor() << ", " 
                   << item.getTitle() << ", " 
-                  << item.getPrice() << ", " 
-                  << item.getPubDate() << "\n";
+                  << item.getPrice() << "\n";
     }
     std::cout << "\n";
     encode_json(books4, std::cout, indenting::indent);
@@ -1044,81 +1044,81 @@ Output:
 ```
 (1)
 
-Haruki Murakami, Kafka on the Shore, 25.170000, 2006-01-03
-Charles Bukowski, Pulp, 22.480000, 2002-05-31
+Haruki Murakami, Kafka on the Shore, 25.170000
+Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.990000
 
 [
     {
         "Author": "Haruki Murakami",
+        "Category": "Fiction",
         "Price": 25.17,
-        "Publication Date": "2006-01-03",
         "Title": "Kafka on the Shore"
     },
     {
-        "Author": "Charles Bukowski",
-        "Price": 22.48,
-        "Publication Date": "2002-05-31",
-        "Title": "Pulp"
+        "Author": "Robert A. Caro",
+        "Category": "Biography",
+        "Price": 16.99,
+        "Title": "The Path to Power: The Years of Lyndon Johnson I"
     }
 ]
 
 (2)
 
-Haruki Murakami, Kafka on the Shore, 25.170000, 2006-01-03
-Charles Bukowski, Pulp, 22.480000, 2002-05-31
+Haruki Murakami, Kafka on the Shore, 25.170000
+Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.990000
 
 [
     {
         "Author": "Haruki Murakami",
+        "Category": "Fiction",
         "Price": 25.17,
-        "Publication Date": "2006-01-03",
         "Title": "Kafka on the Shore"
     },
     {
-        "Author": "Charles Bukowski",
-        "Price": 22.48,
-        "Publication Date": "2002-05-31",
-        "Title": "Pulp"
+        "Author": "Robert A. Caro",
+        "Category": "Biography",
+        "Price": 16.99,
+        "Title": "The Path to Power: The Years of Lyndon Johnson I"
     }
 ]
 
 (3)
 
-Haruki Murakami, Kafka on the Shore, 25.170000, 2006-01-03
-Charles Bukowski, Pulp, 22.480000, 2002-05-31
+Haruki Murakami, Kafka on the Shore, 25.170000
+Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.990000
 
 [
     {
         "Author": "Haruki Murakami",
+        "Category": "Fiction",
         "Price": 25.17,
-        "Publication Date": "2006-01-03",
         "Title": "Kafka on the Shore"
     },
     {
-        "Author": "Charles Bukowski",
-        "Price": 22.48,
-        "Publication Date": "2002-05-31",
-        "Title": "Pulp"
+        "Author": "Robert A. Caro",
+        "Category": "Biography",
+        "Price": 16.99,
+        "Title": "The Path to Power: The Years of Lyndon Johnson I"
     }
 ]
 
 (4)
 
-Haruki Murakami, Kafka on the Shore, 25.170000, 2006-01-03
-Charles Bukowski, Pulp, 22.480000, 2002-05-31
+Haruki Murakami, Kafka on the Shore, 25.170000
+Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.990000
 
 [
     {
         "Author": "Haruki Murakami",
+        "Category": "Fiction",
         "Price": 25.17,
-        "Publication Date": "2006-01-03",
         "Title": "Kafka on the Shore"
     },
     {
-        "Author": "Charles Bukowski",
-        "Price": 22.48,
-        "Publication Date": "2002-05-31",
-        "Title": "Pulp"
+        "Author": "Robert A. Caro",
+        "Category": "Biography",
+        "Price": 16.99,
+        "Title": "The Path to Power: The Years of Lyndon Johnson I"
     }
 ]
 ```
