@@ -22,8 +22,8 @@
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
 [Serialize with the C++ member names of the class](#G1)  
-[Serialize with given names using the `_NAMED_` macros](#G2)  
-[Serializing a templated class with the `_TEMPLATE_` macros](#G3)  
+[Serialize with the given names using the `_NAMED_` macros](#G2)  
+[Serialize a templated class with the `_TEMPLATE_` macros](#G3)  
 [Convert JSON to/from C++ data structures by specializing json_type_traits](#G4)  
 [Mapping to C++ data structures with and without defaults allowed](#G5)  
 [An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL](#G6)  
@@ -813,7 +813,7 @@ Output:
 
 <div id="G3"/>
 
-#### Serializing a templated class with the `_TEMPLATE_` macros
+#### Serialize a templated class with the `_TEMPLATE_` macros
 
 ```c++
 #include <cassert>
@@ -1073,7 +1073,7 @@ biography, Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.
 
 <div id="G2"/>
 
-#### Serialize with given names using the `_NAMED_` macros
+#### Serialize with the given names using the `_NAMED_` macros
 
 ```c++
 #include <jsoncons/json.hpp>
