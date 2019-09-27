@@ -940,19 +940,15 @@ public:
     Book4& operator=(Book4&&) = default;
 
     const std::string& getAuthor() const {return author_;}
-
-    const std::string& getTitle() const {return title_;}
-
-    double getPrice() const {return price_;}
-
-    const std::string& getPubDate() const {return pub_date_;}
-
     void setAuthor(const std::string& value) {author_ = value;}
 
+    const std::string& getTitle() const {return title_;}
     void setTitle(const std::string& value) {title_ = value;}
 
+    double getPrice() const {return price_;}
     void setPrice(double value) {price_ = value;}
 
+    const std::string& getPubDate() const {return pub_date_;}
     void setPubDate(const std::string& value) {pub_date_ = value;}
 };
 
