@@ -985,8 +985,8 @@ int main()
     ]
     )";
 
-    auto books1 = decode_json<std::vector<ns::Book1>>(input);
     std::cout << "(1)\n\n";
+    auto books1 = decode_json<std::vector<ns::Book1>>(input);
     for (const auto& item : books1)
     {
         std::cout << item.author << ", " 
@@ -998,8 +998,8 @@ int main()
     encode_json(books1, std::cout, indenting::indent);
     std::cout << "\n\n";
 
-    auto books2 = decode_json<std::vector<ns::Book2>>(input);
     std::cout << "(2)\n\n";
+    auto books2 = decode_json<std::vector<ns::Book2>>(input);
     for (const auto& item : books2)
     {
         std::cout << item.author() << ", " 
@@ -1011,8 +1011,8 @@ int main()
     encode_json(books2, std::cout, indenting::indent);
     std::cout << "\n\n";
 
-    auto books3 = decode_json<std::vector<ns::Book3>>(input);
     std::cout << "(3)\n\n";
+    auto books3 = decode_json<std::vector<ns::Book3>>(input);
     for (const auto& item : books3)
     {
         std::cout << item.author() << ", " 
@@ -1024,8 +1024,8 @@ int main()
     encode_json(books3, std::cout, indenting::indent);
     std::cout << "\n\n";
 
-    auto books4 = decode_json<std::vector<ns::Book4>>(input);
     std::cout << "(4)\n\n";
+    auto books4 = decode_json<std::vector<ns::Book4>>(input);
     for (const auto& item : books4)
     {
         std::cout << item.getAuthor() << ", " 
