@@ -492,372 +492,6 @@ See [basic_json_cursor](doc/ref/basic_json_cursor.md)
 
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
-<div id="G4"/>
-
-#### Specialize json_type_traits explicitly
-
-jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](doc/ref/decode_json.md) 
-and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
-Decode and encode work for all C++ classes that have 
-[json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
-defined. The standard library containers are already supported, 
-and your own types will be supported too if you specialize `json_type_traits`
-in the `jsoncons` namespace. 
-
-
-```c++
-#include <iostream>
-#include <jsoncons/json.hpp>
-#include <vector>
-#include <string>
-
-namespace ns {
-    struct book
-    {
-        std::string author;
-        std::string title;
-        double price;
-    };
-} // namespace ns
-
-namespace jsoncons {
-
-    template<class Json>
-    struct json_type_traits<Json, ns::book>
-    {
-        typedef typename Json::allocator_type allocator_type;
-
-        static bool is(const Json& j) noexcept
-        {
-            return j.is_object() && j.contains("author") && 
-                   j.contains("title") && j.contains("price");
-        }
-        static ns::book as(const Json& j)
-        {
-            ns::book val;
-            val.author = j.at("author").template as<std::string>();
-            val.title = j.at("title").template as<std::string>();
-            val.price = j.at("price").template as<double>();
-            return val;
-        }
-        static Json to_json(const ns::book& val, 
-                            allocator_type allocator=allocator_type())
-        {
-            Json j(allocator);
-            j.try_emplace("author", val.author);
-            j.try_emplace("title", val.title);
-            j.try_emplace("price", val.price);
-            return j;
-        }
-    };
-} // namespace jsoncons
-```
-
-To save typing and enhance readability, the jsoncons library defines macros, 
-so you could also write
-
-```c++
-JSONCONS_MEMBER_TRAITS_DECL(ns::book, author, title, price)
-```
-
-which expands to the code above.
-
-```c++
-using namespace jsoncons; // for convenience
-
-int main()
-{
-    const std::string s = R"(
-    [
-        {
-            "author" : "Haruki Murakami",
-            "title" : "Kafka on the Shore",
-            "price" : 25.17
-        },
-        {
-            "author" : "Charles Bukowski",
-            "title" : "Pulp",
-            "price" : 22.48
-        }
-    ]
-    )";
-
-    std::vector<ns::book> book_list = decode_json<std::vector<ns::book>>(s);
-
-    std::cout << "(1)\n";
-    for (const auto& item : book_list)
-    {
-        std::cout << item.author << ", " 
-                  << item.title << ", " 
-                  << item.price << "\n";
-    }
-
-    std::cout << "\n(2)\n";
-    encode_json(book_list, std::cout, indenting::indent);
-    std::cout << "\n\n";
-}
-```
-Output:
-```
-(1)
-Haruki Murakami, Kafka on the Shore, 25.17
-Charles Bukowski, Pulp, 22.48
-
-(2)
-[
-    {
-        "author": "Haruki Murakami",
-        "price": 25.17,
-        "title": "Kafka on the Shore"
-    },
-    {
-        "author": "Charles Bukowski",
-        "price": 22.48,
-        "title": "Pulp"
-    }
-]
-```
-
-<div id="G5"/>
-
-#### Mapping to C++ data structures with and without defaults allowed
-
-The macros `JSONCONS_MEMBER_TRAITS_DECL` and `JSONCONS_STRICT_MEMBER_TRAITS_DECL` both generate
-the code to specialize `json_type_traits` from member data. The difference is that `JSONCONS_MEMBER_TRAITS_DECL`
-does not require all member names to be present in the JSON data, while `JSONCONS_STRICT_MEMBER_TRAITS_DECL` does.
-
-```c++
-#include <iostream>
-#include <jsoncons/json.hpp>
-#include <vector>
-#include <string>
-
-namespace ns {
-
-    class Person
-    {
-    public:
-        Person(const std::string& name, const std::string& surname,
-               const std::string& ssn, unsigned int age)
-           : name(name), surname(surname), ssn(ssn), age(age) { }
-
-    private:
-        // Make json_type_traits specializations friends to give accesses to private members
-        JSONCONS_TYPE_TRAITS_FRIEND;
-
-        Person() : age(0) {}
-
-        std::string name;
-        std::string surname;
-        std::string ssn;
-        unsigned int age;
-    };
-
-} // namespace ns
-
-// Declare the traits. Specify which data members need to be serialized.
-JSONCONS_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
-
-int main()
-{
-    try
-    {
-        // Incomplete JSON data: field ssn missing
-        std::string data = R"({"name":"Rod","surname":"Bro","age":30})";
-        auto person = jsoncons::decode_json<ns::Person>(data);
-
-        std::string s;
-        jsoncons::encode_json(person, s, indenting::indent);
-        std::cout << s << "\n";
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << e.what() << "";
-    }
-}
-```
-Output:
-```
-{
-    "age": 30,
-    "name": "Rod",
-    "ssn": "",
-    "surname": "Bro"
-}
-```
-
-If all members of the JSON data must be present, use
-```
-JSONCONS_STRICT_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
-```
-instead. This will cause an exception to be thrown with the message
-```
-Key 'ssn' not found
-```
-
-<div id="G6"/>
-
-#### An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL
-
-This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS_DECL`
-and `JSONCONS_GETTER_CTOR_TRAITS_DECL` to specialize the 
-[json_type_traits](doc/ref/json_type_traits.md) for the enum type
-`ns::hiking_experience` and the classes `ns::hiking_reputon` and 
-`ns::hiking_reputation`.
-The macro `JSONCONS_ENUM_TRAITS_DECL` generates the code from
-the enum values, and the macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` 
-generates the code from the getter functions and a constructor. 
-These macro declarations must be placed outside any namespace blocks.
-
-```c++
-#include <cassert>
-#include <iostream>
-#include <jsoncons/json.hpp>
-
-namespace ns {
-    enum class hiking_experience {beginner,intermediate,advanced};
-
-    class hiking_reputon
-    {
-        std::string rater_;
-        hiking_experience assertion_;
-        std::string rated_;
-        double rating_;
-    public:
-        hiking_reputon(const std::string& rater,
-                       hiking_experience assertion,
-                       const std::string& rated,
-                       double rating)
-            : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating)
-        {
-        }
-
-        const std::string& rater() const {return rater_;}
-        hiking_experience assertion() const {return assertion_;}
-        const std::string& rated() const {return rated_;}
-        double rating() const {return rating_;}
-
-        friend bool operator==(const hiking_reputon& lhs, const hiking_reputon& rhs)
-        {
-            return lhs.rater_ == rhs.rater_ && lhs.assertion_ == rhs.assertion_ && 
-                   lhs.rated_ == rhs.rated_ && lhs.rating_ == rhs.rating_;
-        }
-
-        friend bool operator!=(const hiking_reputon& lhs, const hiking_reputon& rhs)
-        {
-            return !(lhs == rhs);
-        };
-    };
-
-    class hiking_reputation
-    {
-        std::string application_;
-        std::vector<hiking_reputon> reputons_;
-    public:
-        hiking_reputation(const std::string& application, 
-                          const std::vector<hiking_reputon>& reputons)
-            : application_(application), 
-              reputons_(reputons)
-        {}
-
-        const std::string& application() const { return application_;}
-        const std::vector<hiking_reputon>& reputons() const { return reputons_;}
-
-        friend bool operator==(const hiking_reputation& lhs, const hiking_reputation& rhs)
-        {
-            return (lhs.application_ == rhs.application_) && (lhs.reputons_ == rhs.reputons_);
-        }
-
-        friend bool operator!=(const hiking_reputation& lhs, const hiking_reputation& rhs)
-        {
-            return !(lhs == rhs);
-        };
-    };
-
-} // namespace ns
-
-// Declare the traits. Specify which data members need to be serialized.
-JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputation, application, reputons)
-
-using namespace jsoncons; // for convenience
-
-int main()
-{
-    ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum",ns::hiking_experience::advanced,"Marilyn C",0.90} });
-
-    std::string s;
-    encode_json(val, s, indenting::indent);
-    std::cout << s << "\n";
-
-    auto val2 = decode_json<ns::hiking_reputation>(s);
-
-    assert(val2 == val);
-}
-```
-Output:
-```
-{
-    "application": "hiking",
-    "reputons": [
-        {
-            "assertion": "advanced",
-            "rated": "Marilyn C",
-            "rater": "HikingAsylum",
-            "rating": 0.9
-        }
-    ]
-}
-```
-
-<div id="G3"/>
-
-#### Serialize a templated class with the `_TEMPLATE_` macros
-
-```c++
-#include <cassert>
-#include <jsoncons/json.hpp>
-
-namespace ns {
-    template <typename T1, typename T2>
-    struct TemplatedStruct
-    {
-          T1 aT1;
-          T2 aT2;
-
-          friend bool operator==(const TemplatedStruct& lhs, const TemplatedStruct& rhs)
-          {
-              return lhs.aT1 == rhs.aT1 && lhs.aT2 == rhs.aT2;  
-          }
-
-          friend bool operator!=(const TemplatedStruct& lhs, const TemplatedStruct& rhs)
-          {
-              return !(lhs == rhs);
-          }
-    };
-
-} // namespace ns
-
-// Declare the traits. Specify the number of template parameters and which data members need to be serialized.
-JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
-
-using namespace jsoncons; // for convenience
-
-int main()
-{
-    typedef ns::TemplatedStruct<int,std::wstring> value_type;
-
-    value_type val{1, L"sss"};
-
-    std::wstring s;
-    encode_json(val, s);
-
-    auto val2 = decode_json<value_type>(s);
-    assert(val2 == val);
-}
-```
-
 <div id="G1"/>
 
 #### Serialize with the C++ member names of the class
@@ -1349,6 +983,372 @@ biography, Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.
         "Title": "The Path to Power: The Years of Lyndon Johnson I"
     }
 ]
+```
+
+<div id="G3"/>
+
+#### Serialize a templated class with the `_TEMPLATE_` macros
+
+```c++
+#include <cassert>
+#include <jsoncons/json.hpp>
+
+namespace ns {
+    template <typename T1, typename T2>
+    struct TemplatedStruct
+    {
+          T1 aT1;
+          T2 aT2;
+
+          friend bool operator==(const TemplatedStruct& lhs, const TemplatedStruct& rhs)
+          {
+              return lhs.aT1 == rhs.aT1 && lhs.aT2 == rhs.aT2;  
+          }
+
+          friend bool operator!=(const TemplatedStruct& lhs, const TemplatedStruct& rhs)
+          {
+              return !(lhs == rhs);
+          }
+    };
+
+} // namespace ns
+
+// Declare the traits. Specify the number of template parameters and which data members need to be serialized.
+JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
+
+using namespace jsoncons; // for convenience
+
+int main()
+{
+    typedef ns::TemplatedStruct<int,std::wstring> value_type;
+
+    value_type val{1, L"sss"};
+
+    std::wstring s;
+    encode_json(val, s);
+
+    auto val2 = decode_json<value_type>(s);
+    assert(val2 == val);
+}
+```
+
+<div id="G4"/>
+
+#### Specialize json_type_traits explicitly
+
+jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](doc/ref/decode_json.md) 
+and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
+Decode and encode work for all C++ classes that have 
+[json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
+defined. The standard library containers are already supported, 
+and your own types will be supported too if you specialize `json_type_traits`
+in the `jsoncons` namespace. 
+
+
+```c++
+#include <iostream>
+#include <jsoncons/json.hpp>
+#include <vector>
+#include <string>
+
+namespace ns {
+    struct book
+    {
+        std::string author;
+        std::string title;
+        double price;
+    };
+} // namespace ns
+
+namespace jsoncons {
+
+    template<class Json>
+    struct json_type_traits<Json, ns::book>
+    {
+        typedef typename Json::allocator_type allocator_type;
+
+        static bool is(const Json& j) noexcept
+        {
+            return j.is_object() && j.contains("author") && 
+                   j.contains("title") && j.contains("price");
+        }
+        static ns::book as(const Json& j)
+        {
+            ns::book val;
+            val.author = j.at("author").template as<std::string>();
+            val.title = j.at("title").template as<std::string>();
+            val.price = j.at("price").template as<double>();
+            return val;
+        }
+        static Json to_json(const ns::book& val, 
+                            allocator_type allocator=allocator_type())
+        {
+            Json j(allocator);
+            j.try_emplace("author", val.author);
+            j.try_emplace("title", val.title);
+            j.try_emplace("price", val.price);
+            return j;
+        }
+    };
+} // namespace jsoncons
+```
+
+To save typing and enhance readability, the jsoncons library defines macros, 
+so you could also write
+
+```c++
+JSONCONS_MEMBER_TRAITS_DECL(ns::book, author, title, price)
+```
+
+which expands to the code above.
+
+```c++
+using namespace jsoncons; // for convenience
+
+int main()
+{
+    const std::string s = R"(
+    [
+        {
+            "author" : "Haruki Murakami",
+            "title" : "Kafka on the Shore",
+            "price" : 25.17
+        },
+        {
+            "author" : "Charles Bukowski",
+            "title" : "Pulp",
+            "price" : 22.48
+        }
+    ]
+    )";
+
+    std::vector<ns::book> book_list = decode_json<std::vector<ns::book>>(s);
+
+    std::cout << "(1)\n";
+    for (const auto& item : book_list)
+    {
+        std::cout << item.author << ", " 
+                  << item.title << ", " 
+                  << item.price << "\n";
+    }
+
+    std::cout << "\n(2)\n";
+    encode_json(book_list, std::cout, indenting::indent);
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+(1)
+Haruki Murakami, Kafka on the Shore, 25.17
+Charles Bukowski, Pulp, 22.48
+
+(2)
+[
+    {
+        "author": "Haruki Murakami",
+        "price": 25.17,
+        "title": "Kafka on the Shore"
+    },
+    {
+        "author": "Charles Bukowski",
+        "price": 22.48,
+        "title": "Pulp"
+    }
+]
+```
+
+<div id="G5"/>
+
+#### Mapping to C++ data structures with and without defaults allowed
+
+The macros `JSONCONS_MEMBER_TRAITS_DECL` and `JSONCONS_STRICT_MEMBER_TRAITS_DECL` both generate
+the code to specialize `json_type_traits` from member data. The difference is that `JSONCONS_MEMBER_TRAITS_DECL`
+does not require all member names to be present in the JSON data, while `JSONCONS_STRICT_MEMBER_TRAITS_DECL` does.
+
+```c++
+#include <iostream>
+#include <jsoncons/json.hpp>
+#include <vector>
+#include <string>
+
+namespace ns {
+
+    class Person
+    {
+    public:
+        Person(const std::string& name, const std::string& surname,
+               const std::string& ssn, unsigned int age)
+           : name(name), surname(surname), ssn(ssn), age(age) { }
+
+    private:
+        // Make json_type_traits specializations friends to give accesses to private members
+        JSONCONS_TYPE_TRAITS_FRIEND;
+
+        Person() : age(0) {}
+
+        std::string name;
+        std::string surname;
+        std::string ssn;
+        unsigned int age;
+    };
+
+} // namespace ns
+
+// Declare the traits. Specify which data members need to be serialized.
+JSONCONS_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
+
+int main()
+{
+    try
+    {
+        // Incomplete JSON data: field ssn missing
+        std::string data = R"({"name":"Rod","surname":"Bro","age":30})";
+        auto person = jsoncons::decode_json<ns::Person>(data);
+
+        std::string s;
+        jsoncons::encode_json(person, s, indenting::indent);
+        std::cout << s << "\n";
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << "";
+    }
+}
+```
+Output:
+```
+{
+    "age": 30,
+    "name": "Rod",
+    "ssn": "",
+    "surname": "Bro"
+}
+```
+
+If all members of the JSON data must be present, use
+```
+JSONCONS_STRICT_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
+```
+instead. This will cause an exception to be thrown with the message
+```
+Key 'ssn' not found
+```
+
+<div id="G6"/>
+
+#### An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL
+
+This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS_DECL`
+and `JSONCONS_GETTER_CTOR_TRAITS_DECL` to specialize the 
+[json_type_traits](doc/ref/json_type_traits.md) for the enum type
+`ns::hiking_experience` and the classes `ns::hiking_reputon` and 
+`ns::hiking_reputation`.
+The macro `JSONCONS_ENUM_TRAITS_DECL` generates the code from
+the enum values, and the macro `JSONCONS_GETTER_CTOR_TRAITS_DECL` 
+generates the code from the getter functions and a constructor. 
+These macro declarations must be placed outside any namespace blocks.
+
+```c++
+#include <cassert>
+#include <iostream>
+#include <jsoncons/json.hpp>
+
+namespace ns {
+    enum class hiking_experience {beginner,intermediate,advanced};
+
+    class hiking_reputon
+    {
+        std::string rater_;
+        hiking_experience assertion_;
+        std::string rated_;
+        double rating_;
+    public:
+        hiking_reputon(const std::string& rater,
+                       hiking_experience assertion,
+                       const std::string& rated,
+                       double rating)
+            : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating)
+        {
+        }
+
+        const std::string& rater() const {return rater_;}
+        hiking_experience assertion() const {return assertion_;}
+        const std::string& rated() const {return rated_;}
+        double rating() const {return rating_;}
+
+        friend bool operator==(const hiking_reputon& lhs, const hiking_reputon& rhs)
+        {
+            return lhs.rater_ == rhs.rater_ && lhs.assertion_ == rhs.assertion_ && 
+                   lhs.rated_ == rhs.rated_ && lhs.rating_ == rhs.rating_;
+        }
+
+        friend bool operator!=(const hiking_reputon& lhs, const hiking_reputon& rhs)
+        {
+            return !(lhs == rhs);
+        };
+    };
+
+    class hiking_reputation
+    {
+        std::string application_;
+        std::vector<hiking_reputon> reputons_;
+    public:
+        hiking_reputation(const std::string& application, 
+                          const std::vector<hiking_reputon>& reputons)
+            : application_(application), 
+              reputons_(reputons)
+        {}
+
+        const std::string& application() const { return application_;}
+        const std::vector<hiking_reputon>& reputons() const { return reputons_;}
+
+        friend bool operator==(const hiking_reputation& lhs, const hiking_reputation& rhs)
+        {
+            return (lhs.application_ == rhs.application_) && (lhs.reputons_ == rhs.reputons_);
+        }
+
+        friend bool operator!=(const hiking_reputation& lhs, const hiking_reputation& rhs)
+        {
+            return !(lhs == rhs);
+        };
+    };
+
+} // namespace ns
+
+// Declare the traits. Specify which data members need to be serialized.
+JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputation, application, reputons)
+
+using namespace jsoncons; // for convenience
+
+int main()
+{
+    ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum",ns::hiking_experience::advanced,"Marilyn C",0.90} });
+
+    std::string s;
+    encode_json(val, s, indenting::indent);
+    std::cout << s << "\n";
+
+    auto val2 = decode_json<ns::hiking_reputation>(s);
+
+    assert(val2 == val);
+}
+```
+Output:
+```
+{
+    "application": "hiking",
+    "reputons": [
+        {
+            "assertion": "advanced",
+            "rated": "Marilyn C",
+            "rater": "HikingAsylum",
+            "rating": 0.9
+        }
+    ]
+}
 ```
 
 <div id="G7"/>
