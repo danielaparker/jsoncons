@@ -21,13 +21,14 @@
 
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
-[Convert JSON to/from C++ data structures by specializing json_type_traits](#G1)  
-[Mapping to C++ data structures with and without defaults allowed](#G2)  
-[An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL](#G3)  
-[Serializing a templated class with the `_TEMPLATE_` macros](#G4)  
-[Serializing to given names with the `_NAMED_` macros](#G5)  
-[A polymorphic example](#G6)  
-[Convert JSON numbers to/from boost multiprecision numbers](#G7)
+[Serialize with the C++ member names of the class](#G1)  
+[Serialize with given names using the `_NAMED_` macros](#G2)  
+[Serializing a templated class with the `_TEMPLATE_` macros](#G3)  
+[Convert JSON to/from C++ data structures by specializing json_type_traits](#G4)  
+[Mapping to C++ data structures with and without defaults allowed](#G5)  
+[An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL](#G6)  
+[A polymorphic example](#G7)  
+[Convert JSON numbers to/from boost multiprecision numbers](#G8)
 
 ### Construct
 
@@ -491,7 +492,7 @@ See [basic_json_cursor](doc/ref/basic_json_cursor.md)
 
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
-<div id="G1"/>
+<div id="G4"/>
 
 #### Convert JSON to/from C++ data structures by specializing json_type_traits
 
@@ -617,7 +618,7 @@ Charles Bukowski, Pulp, 22.48
 ]
 ```
 
-<div id="G2"/>
+<div id="G5"/>
 
 #### Mapping to C++ data structures with and without defaults allowed
 
@@ -694,7 +695,7 @@ instead. This will cause an exception to be thrown with the message
 Key 'ssn' not found
 ```
 
-<div id="G3"/>
+<div id="G6"/>
 
 #### An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL
 
@@ -810,7 +811,7 @@ Output:
 }
 ```
 
-<div id="G4"/>
+<div id="G3"/>
 
 #### Serializing a templated class with the `_TEMPLATE_` macros
 
@@ -857,9 +858,222 @@ int main()
 }
 ```
 
-<div id="G5"/>
+<div id="G1"/>
 
-#### Serializing to given names with the `_NAMED_` macros
+#### Serialize with the C++ member names of the class
+
+```c++
+#include <jsoncons/json.hpp>
+
+namespace ns {
+
+enum class BookCategory {fiction,biography};
+
+std::ostream& operator<<(std::ostream& os, BookCategory c)
+{
+    switch(c)
+    {
+        case BookCategory::fiction: os << "fiction"; break;
+        case BookCategory::biography: os << "biography"; break;
+    }
+    return os;
+}
+
+// #1 Class with public member data and default constructor   
+struct Book1
+{
+    BookCategory category;
+    std::string author;
+    std::string title;
+    double price;
+};
+
+// #2 Class with private member data and default constructor   
+class Book2
+{
+    BookCategory category;
+    std::string author;
+    std::string title;
+    double price;
+    Book2() = default;
+
+    JSONCONS_TYPE_TRAITS_FRIEND;
+public:
+    BookCategory get_category() const {return category;}
+
+    const std::string& get_author() const {return author;}
+
+    const std::string& get_title() const{return title;}
+
+    double get_price() const{return price;}
+};
+
+// #3 Class with getters and initializing constructor
+class Book3
+{
+    BookCategory category_;
+    std::string author_;
+    std::string title_;
+    double price_;
+public:
+    Book3(BookCategory category,
+          const std::string& author,
+          const std::string& title,
+          double price)
+        : category_(category), author_(author), title_(title), price_(price)
+    {
+    }
+
+    Book3(const Book3&) = default;
+    Book3(Book3&&) = default;
+    Book3& operator=(const Book3&) = default;
+    Book3& operator=(Book3&&) = default;
+
+    BookCategory category() const {return category_;}
+
+    const std::string& author() const{return author_;}
+
+    const std::string& title() const{return title_;}
+
+    double price() const{return price_;}
+};
+
+} // namespace ns
+
+// Declare the traits at global scope
+JSONCONS_ENUM_TRAITS_DECL(ns::BookCategory,fiction,biography)
+
+JSONCONS_STRICT_MEMBER_TRAITS_DECL(ns::Book1,category,author,title,price)
+JSONCONS_STRICT_MEMBER_TRAITS_DECL(ns::Book2,category,author,title,price)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::Book3,category,author,title,price)
+
+using namespace jsoncons; // for convenience
+
+int main()
+{
+    const std::string input = R"(
+    [
+        {
+            "category" : "fiction",
+            "author" : "Haruki Murakami",
+            "title" : "Kafka on the Shore",
+            "price" : 25.17
+        },
+        {
+            "category" : "biography",
+            "author" : "Robert A. Caro",
+            "title" : "The Path to Power: The Years of Lyndon Johnson I",
+            "price" : 16.99
+        }
+    ]
+    )";
+
+    std::cout << "(1)\n\n";
+    auto books1 = decode_json<std::vector<ns::Book1>>(input);
+    for (const auto& item : books1)
+    {
+        std::cout << item.category << ", " 
+                  << item.author << ", " 
+                  << item.title << ", " 
+                  << item.price << "\n";
+    }
+    std::cout << "\n";
+    encode_json(books1, std::cout, indenting::indent);
+    std::cout << "\n\n";
+
+    std::cout << "(2)\n\n";
+    auto books2 = decode_json<std::vector<ns::Book2>>(input);
+    for (const auto& item : books2)
+    {
+        std::cout << item.get_category() << ", " 
+                  << item.get_author() << ", " 
+                  << item.get_title() << ", " 
+                  << item.get_price() << "\n";
+    }
+    std::cout << "\n";
+    encode_json(books2, std::cout, indenting::indent);
+    std::cout << "\n\n";
+
+    std::cout << "(3)\n\n";
+    auto books3 = decode_json<std::vector<ns::Book3>>(input);
+    for (const auto& item : books3)
+    {
+        std::cout << item.category() << ", " 
+                  << item.author() << ", " 
+                  << item.title() << ", " 
+                  << item.price() << "\n";
+    }
+    std::cout << "\n";
+    encode_json(books3, std::cout, indenting::indent);
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+(1)
+
+fiction, Haruki Murakami, Kafka on the Shore, 25.170000
+biography, Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.990000
+
+[
+    {
+        "author": "Haruki Murakami",
+        "category": "fiction",
+        "price": 25.17,
+        "title": "Kafka on the Shore"
+    },
+    {
+        "author": "Robert A. Caro",
+        "category": "biography",
+        "price": 16.99,
+        "title": "The Path to Power: The Years of Lyndon Johnson I"
+    }
+]
+
+(2)
+
+fiction, Haruki Murakami, Kafka on the Shore, 25.170000
+biography, Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.990000
+
+[
+    {
+        "author": "Haruki Murakami",
+        "category": "fiction",
+        "price": 25.17,
+        "title": "Kafka on the Shore"
+    },
+    {
+        "author": "Robert A. Caro",
+        "category": "biography",
+        "price": 16.99,
+        "title": "The Path to Power: The Years of Lyndon Johnson I"
+    }
+]
+
+(3)
+
+fiction, Haruki Murakami, Kafka on the Shore, 25.170000
+biography, Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.990000
+
+[
+    {
+        "author": "Haruki Murakami",
+        "category": "fiction",
+        "price": 25.17,
+        "title": "Kafka on the Shore"
+    },
+    {
+        "author": "Robert A. Caro",
+        "category": "biography",
+        "price": 16.99,
+        "title": "The Path to Power: The Years of Lyndon Johnson I"
+    }
+]
+```
+
+<div id="G2"/>
+
+#### Serialize with given names using the `_NAMED_` macros
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -1137,7 +1351,7 @@ biography, Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.
 ]
 ```
 
-<div id="G6"/>
+<div id="G7"/>
 
 #### A polymorphic example
 
@@ -1332,7 +1546,7 @@ Output:
 ]
 ```
 
-<div id="G7"/>
+<div id="G8"/>
 
 #### Convert JSON numbers to/from boost multiprecision numbers
 

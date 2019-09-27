@@ -40,7 +40,8 @@ void data_model_examples();
 void staj_iterator_examples();
 void bson_examples();
 void polymorphic_examples();
-void json_type_traits_macro_examples();
+void json_type_traits_macros_examples();
+void json_type_traits_macros_named_examples();
 
 void comment_example()
 {
@@ -495,7 +496,9 @@ int main()
 
         json_reader_examples();
 
-        json_type_traits_macro_examples();
+        json_type_traits_macros_named_examples();
+
+        json_type_traits_macros_examples();
     }
     catch (const std::exception& e)
     {

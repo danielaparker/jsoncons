@@ -127,7 +127,7 @@ JSONCONS_STRICT_GETTER_SETTER_TRAITS_NAMED_DECL(ns::Book4,(getCategory,setCatego
 
 using namespace jsoncons;
 
-void json_type_traits_book_examples()
+static void json_type_traits_book_examples()
 {
     const std::string input = R"(
     [
@@ -199,7 +199,7 @@ void json_type_traits_book_examples()
     std::cout << "\n\n";
 }
 
-void json_type_traits_macro_examples()
+void json_type_traits_macros_named_examples()
 {
     std::cout << "\njson_type_traits macro examples\n\n";
 
