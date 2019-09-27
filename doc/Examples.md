@@ -24,8 +24,8 @@
 [Convert JSON to/from C++ data structures by specializing json_type_traits](#G1)  
 [Mapping to C++ data structures with and without defaults allowed](#G2)  
 [An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL](#G3)  
-[Serializing a templated class with the _TEMPLATE_ macros](#G4)  
-[Serializing to given names with the _NAMED_ macros](#G5)  
+[Serializing a templated class with the `_TEMPLATE_` macros](#G4)  
+[Serializing to given names with the `_NAMED_` macros](#G5)  
 [A polymorphic example](#G6)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G7)
 
@@ -812,7 +812,7 @@ Output:
 
 <div id="G4"/>
 
-#### Serializing a templated class with the _TEMPLATE_ macros
+#### Serializing a templated class with the `_TEMPLATE_` macros
 
 ```c++
 #include <cassert>
@@ -859,14 +859,15 @@ int main()
 
 <div id="G5"/>
 
-#### Serializing to given names with the _NAMED_ macros
+#### Serializing to given names with the `_NAMED_` macros
 
 ```c++
 #include <jsoncons/json.hpp>
 
 namespace ns {
 
-struct book
+// #1 Class with public member data and default constructor   
+struct Book1
 {
     std::string author;
     std::string title;
@@ -874,14 +875,35 @@ struct book
     std::string pub_date;
 };
 
-class book_with_getters_and_ctor
+// #2 Class with private member data and default constructor   
+class Book2
+{
+    std::string author_;
+    std::string title_;
+    double price_;
+    std::string pub_date_;
+    Book2() = default;
+
+    JSONCONS_TYPE_TRAITS_FRIEND;
+public:
+    const std::string& author() const {return author_;}
+
+    const std::string& title() const{return title_;}
+
+    const std::string& pub_date() const{return pub_date_;}
+
+    double price() const{return price_;}
+};
+
+// #3 Class with getters and initializing constructor
+class Book3
 {
     std::string author_;
     std::string title_;
     double price_;
     std::string pub_date_;
 public:
-    book_with_getters_and_ctor(const std::string& author,
+    Book3(const std::string& author,
           const std::string& title,
           double price,
           const std::string& pub_date)
@@ -889,98 +911,64 @@ public:
     {
     }
 
-    book_with_getters_and_ctor(const book_with_getters_and_ctor&) = default;
-    book_with_getters_and_ctor(book_with_getters_and_ctor&&) = default;
-    book_with_getters_and_ctor& operator=(const book_with_getters_and_ctor&) = default;
-    book_with_getters_and_ctor& operator=(book_with_getters_and_ctor&&) = default;
+    Book3(const Book3&) = default;
+    Book3(Book3&&) = default;
+    Book3& operator=(const Book3&) = default;
+    Book3& operator=(Book3&&) = default;
 
-    const std::string& author() const
-    {
-        return author_;
-    }
+    const std::string& author() const{return author_;}
 
-    const std::string& title() const
-    {
-        return title_;
-    }
+    const std::string& title() const{return title_;}
 
-    const std::string& pub_date() const
-    {
-        return pub_date_;
-    }
+    const std::string& pub_date() const{return pub_date_;}
 
-    double price() const
-    {
-        return price_;
-    }
+    double price() const{return price_;}
 };
 
-class BookWithGettersAndSetters
+// #4 Class with getters, setters and default constructor
+class Book4
 {
     std::string author_;
     std::string title_;
     double price_;
     std::string pub_date_;
 public:
-    BookWithGettersAndSetters() = default;
-    BookWithGettersAndSetters(const BookWithGettersAndSetters&) = default;
-    BookWithGettersAndSetters(BookWithGettersAndSetters&&) = default;
-    BookWithGettersAndSetters& operator=(const BookWithGettersAndSetters&) = default;
-    BookWithGettersAndSetters& operator=(BookWithGettersAndSetters&&) = default;
+    Book4() = default;
+    Book4(const Book4&) = default;
+    Book4(Book4&&) = default;
+    Book4& operator=(const Book4&) = default;
+    Book4& operator=(Book4&&) = default;
 
-    const std::string& getAuthor() const
-    {
-        return author_;
-    }
+    const std::string& getAuthor() const {return author_;}
 
-    const std::string& getTitle() const
-    {
-        return title_;
-    }
+    const std::string& getTitle() const {return title_;}
 
-    double getPrice() const
-    {
-        return price_;
-    }
+    double getPrice() const {return price_;}
 
-    const std::string& getPubDate() const
-    {
-        return pub_date_;
-    }
+    const std::string& getPubDate() const {return pub_date_;}
 
-    void setAuthor(const std::string& value)
-    {
-        author_ = value;
-    }
+    void setAuthor(const std::string& value) {author_ = value;}
 
-    void setTitle(const std::string& value)
-    {
-        title_ = value;
-    }
+    void setTitle(const std::string& value) {title_ = value;}
 
-    void setPrice(double value)
-    {
-        price_ = value;
-    }
+    void setPrice(double value) {price_ = value;}
 
-    void setPubDate(const std::string& value)
-    {
-        pub_date_ = value;
-    }
+    void setPubDate(const std::string& value) {pub_date_ = value;}
 };
 
 } // namespace ns
 
-// Declare the traits. 
-JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ns::book,(author,"Author"),(title,"Title"),(price,"Price"),(pub_date,"Publication Date"))
-JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL(ns::book_with_getters_and_ctor,(author,"Author"),(title,"Title"),(price,"Price"),(pub_date,"Publication Date"))
-JSONCONS_STRICT_GETTER_SETTER_TRAITS_NAMED_DECL(ns::BookWithGettersAndSetters, (getAuthor,setAuthor,"Author"),(getTitle,setTitle,"Title"),(getPrice,setPrice,"Price"),(getPubDate,setPubDate,"Publication Date"))
+// Declare the traits
+JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ns::Book1,(author,"Author"),(title,"Title"),(price,"Price"),(pub_date,"Publication Date"))
+JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ns::Book2,(author_,"Author"),(title_,"Title"),(price_,"Price"),(pub_date_,"Publication Date"))
+JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL(ns::Book3,(author,"Author"),(title,"Title"),(price,"Price"),(pub_date,"Publication Date"))
+JSONCONS_STRICT_GETTER_SETTER_TRAITS_NAMED_DECL(ns::Book4, (getAuthor,setAuthor,"Author"),(getTitle,setTitle,"Title"),(getPrice,setPrice,"Price"),(getPubDate,setPubDate,"Publication Date"))
 
 using namespace jsoncons; // for convenience
 
 int main()
 {
-    const std::string s = R"(
+    const std::string input = R"(
     [
         {
             "Author" : "Haruki Murakami",
@@ -997,8 +985,8 @@ int main()
     ]
     )";
 
-    auto books1 = decode_json<std::vector<ns::book>>(s);
-    std::cout << "(1)\n";
+    auto books1 = decode_json<std::vector<ns::Book1>>(input);
+    std::cout << "(1)\n\n";
     for (const auto& item : books1)
     {
         std::cout << item.author << ", " 
@@ -1006,12 +994,12 @@ int main()
                   << item.price << ", " 
                   << item.pub_date << "\n";
     }
-    std::cout << "\n(2)\n";
+    std::cout << "\n";
     encode_json(books1, std::cout, indenting::indent);
     std::cout << "\n\n";
 
-    auto books2 = decode_json<std::vector<ns::book_with_getters_and_ctor>>(s);
-    std::cout << "(3)\n";
+    auto books2 = decode_json<std::vector<ns::Book2>>(input);
+    std::cout << "(2)\n\n";
     for (const auto& item : books2)
     {
         std::cout << item.author() << ", " 
@@ -1019,31 +1007,64 @@ int main()
                   << item.price() << ", " 
                   << item.pub_date() << "\n";
     }
-    std::cout << "\n(4)\n";
+    std::cout << "\n";
     encode_json(books2, std::cout, indenting::indent);
     std::cout << "\n\n";
 
-    auto books3 = decode_json<std::vector<ns::BookWithGettersAndSetters>>(s);
-    std::cout << "(5)\n";
+    auto books3 = decode_json<std::vector<ns::Book3>>(input);
+    std::cout << "(3)\n\n";
     for (const auto& item : books3)
+    {
+        std::cout << item.author() << ", " 
+                  << item.title() << ", " 
+                  << item.price() << ", " 
+                  << item.pub_date() << "\n";
+    }
+    std::cout << "\n";
+    encode_json(books3, std::cout, indenting::indent);
+    std::cout << "\n\n";
+
+    auto books4 = decode_json<std::vector<ns::Book4>>(input);
+    std::cout << "(4)\n\n";
+    for (const auto& item : books4)
     {
         std::cout << item.getAuthor() << ", " 
                   << item.getTitle() << ", " 
                   << item.getPrice() << ", " 
                   << item.getPubDate() << "\n";
     }
-    std::cout << "\n(6)\n";
-    encode_json(books3, std::cout, indenting::indent);
+    std::cout << "\n";
+    encode_json(books4, std::cout, indenting::indent);
     std::cout << "\n\n";
 }
 ```
 Output:
 ```
 (1)
+
 Haruki Murakami, Kafka on the Shore, 25.170000, 2006-01-03
 Charles Bukowski, Pulp, 22.480000, 2002-05-31
 
+[
+    {
+        "Author": "Haruki Murakami",
+        "Price": 25.17,
+        "Publication Date": "2006-01-03",
+        "Title": "Kafka on the Shore"
+    },
+    {
+        "Author": "Charles Bukowski",
+        "Price": 22.48,
+        "Publication Date": "2002-05-31",
+        "Title": "Pulp"
+    }
+]
+
 (2)
+
+Haruki Murakami, Kafka on the Shore, 25.170000, 2006-01-03
+Charles Bukowski, Pulp, 22.480000, 2002-05-31
+
 [
     {
         "Author": "Haruki Murakami",
@@ -1060,10 +1081,10 @@ Charles Bukowski, Pulp, 22.480000, 2002-05-31
 ]
 
 (3)
+
 Haruki Murakami, Kafka on the Shore, 25.170000, 2006-01-03
 Charles Bukowski, Pulp, 22.480000, 2002-05-31
 
-(4)
 [
     {
         "Author": "Haruki Murakami",
@@ -1079,11 +1100,11 @@ Charles Bukowski, Pulp, 22.480000, 2002-05-31
     }
 ]
 
-(5)
+(4)
+
 Haruki Murakami, Kafka on the Shore, 25.170000, 2006-01-03
 Charles Bukowski, Pulp, 22.480000, 2002-05-31
 
-(6)
 [
     {
         "Author": "Haruki Murakami",
