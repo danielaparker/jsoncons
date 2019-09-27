@@ -24,7 +24,7 @@
 [Serialize with the C++ member names of the class](#G1)  
 [Serialize with the given names using the `_NAMED_` macros](#G2)  
 [Serialize a templated class with the `_TEMPLATE_` macros](#G3)  
-[Convert JSON to/from C++ data structures by specializing json_type_traits](#G4)  
+[Specialize json_type_traits explicitly](#G4)  
 [Mapping to C++ data structures with and without defaults allowed](#G5)  
 [An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL](#G6)  
 [A polymorphic example](#G7)  
@@ -494,7 +494,7 @@ See [basic_json_cursor](doc/ref/basic_json_cursor.md)
 
 <div id="G4"/>
 
-#### Convert JSON to/from C++ data structures by specializing json_type_traits
+#### Specialize json_type_traits explicitly
 
 jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](doc/ref/decode_json.md) 
 and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
