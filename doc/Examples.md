@@ -961,8 +961,10 @@ JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ns::Book2,(author_,"Author"),(title_,"T
                                                    (price_,"Price"),(pub_date_,"Publication Date"))
 JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL(ns::Book3,(author,"Author"),(title,"Title"),
                                                  (price,"Price"),(pub_date,"Publication Date"))
-JSONCONS_STRICT_GETTER_SETTER_TRAITS_NAMED_DECL(ns::Book4,(getAuthor,setAuthor,"Author"),(getTitle,setTitle,"Title"),
-                                                          (getPrice,setPrice,"Price"),(getPubDate,setPubDate,"Publication Date"))
+JSONCONS_STRICT_GETTER_SETTER_TRAITS_NAMED_DECL(ns::Book4,(getAuthor,setAuthor,"Author"),
+                                                          (getTitle,setTitle,"Title"),
+                                                          (getPrice,setPrice,"Price"),
+                                                          (getPubDate,setPubDate,"Publication Date"))
 
 using namespace jsoncons; // for convenience
 
