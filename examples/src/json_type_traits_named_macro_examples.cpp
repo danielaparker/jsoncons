@@ -12,6 +12,16 @@ namespace json_type_traits_macro_examples_ns {
 
 enum class BookCategory {fiction,biography};
 
+std::ostream& operator<<(std::ostream& os, BookCategory c)
+{
+    switch(c)
+    {
+        case BookCategory::fiction: os << "fiction"; break;
+        case BookCategory::biography: os << "biography"; break;
+    }
+    return os;
+}
+
 // #1 Class with public member data and default constructor   
 struct Book1
 {
@@ -140,7 +150,8 @@ void json_type_traits_book_examples()
     auto books1 = decode_json<std::vector<ns::Book1>>(input);
     for (const auto& item : books1)
     {
-        std::cout << item.author << ", " 
+        std::cout << item.category << ", " 
+                  << item.author << ", " 
                   << item.title << ", " 
                   << item.price << "\n";
     }
@@ -152,7 +163,8 @@ void json_type_traits_book_examples()
     auto books2 = decode_json<std::vector<ns::Book2>>(input);
     for (const auto& item : books2)
     {
-        std::cout << item.author() << ", " 
+        std::cout << item.category() << ", " 
+                  << item.author() << ", " 
                   << item.title() << ", " 
                   << item.price() << "\n";
     }
@@ -164,7 +176,8 @@ void json_type_traits_book_examples()
     auto books3 = decode_json<std::vector<ns::Book3>>(input);
     for (const auto& item : books3)
     {
-        std::cout << item.author() << ", " 
+        std::cout << item.category() << ", " 
+                  << item.author() << ", " 
                   << item.title() << ", " 
                   << item.price() << "\n";
     }
@@ -176,7 +189,8 @@ void json_type_traits_book_examples()
     auto books4 = decode_json<std::vector<ns::Book4>>(input);
     for (const auto& item : books4)
     {
-        std::cout << item.getAuthor() << ", " 
+        std::cout << item.getCategory() << ", " 
+                  << item.getAuthor() << ", " 
                   << item.getTitle() << ", " 
                   << item.getPrice() << "\n";
     }
