@@ -46,12 +46,8 @@ The `jsoncons` library provides a number of macros that can be used to generate 
 for a user-defined class.
 
 ```c++
-JSONCONS_MEMBER_TRAITS_DECL(class_name,
-                            member_name0,
-                            member_name1,...) // (1)
-JSONCONS_STRICT_MEMBER_TRAITS_DECL(class_name,
-                                   member_name0,
-                                   member_name1,...) // (2)
+JSONCONS_MEMBER_TRAITS_DECL(class_name,member_name0,member_name1,...) // (1)
+JSONCONS_STRICT_MEMBER_TRAITS_DECL(class_name,member_name0,member_name1,...) // (2)
 JSONCONS_MEMBER_NAMED_TRAITS_DECL(class_name,
                                   (member_name0,"name0"),
                                   (member_name1,"name1")...) // (3)
