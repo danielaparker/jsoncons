@@ -172,20 +172,20 @@
 #define JSONCONS_REP_OF_1(Call, Expr, Pre, App)      Pre JSONCONS_EXPAND_CALL2(Call ## _LAST, Expr, 1) App
 #define JSONCONS_REP_OF_0(Call, Expr, Pre, App)
 
-#define JSONCONS_GENERATE_TEMPLATE_PARAMS(Call, Count) JSONCONS_REP_OF_N(Call, , , ,Count)
-#define JSONCONS_GENERATE_TEMPLATE_ARGS(Call, Count) JSONCONS_REP_OF_N(Call, ,<,>,Count)
-#define JSONCONS_GENERATE_TEMPLATE_PARAM(Expr, Id) , typename T ## Id
-#define JSONCONS_GENERATE_TEMPLATE_PARAM_LAST(Expr, Id) , typename T ## Id
-#define JSONCONS_GENERATE_TEMPLATE_ARG(Expr, Id) T ## Id,
-#define JSONCONS_GENERATE_TEMPLATE_ARG_LAST(Ex, Id) T ## Id 
+#define JSONCONS_GENERATE_TPL_PARAMS(Call, Count) JSONCONS_REP_OF_N(Call, , , ,Count)
+#define JSONCONS_GENERATE_TPL_ARGS(Call, Count) JSONCONS_REP_OF_N(Call, ,<,>,Count)
+#define JSONCONS_GENERATE_TPL_PARAM(Expr, Id) , typename T ## Id
+#define JSONCONS_GENERATE_TPL_PARAM_LAST(Expr, Id) , typename T ## Id
+#define JSONCONS_GENERATE_TPL_ARG(Expr, Id) T ## Id,
+#define JSONCONS_GENERATE_TPL_ARG_LAST(Ex, Id) T ## Id 
 
 #define JSONCONS_MEMBER_TRAITS_DECL_BASE(As,CharT,Prefix,NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
 { \
-    template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, NumTemplateParams)> \
-    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams), typename std::enable_if<std::is_same<typename Json::char_type,CharT>::value>::type> \
+    template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
+    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams), typename std::enable_if<std::is_same<typename Json::char_type,CharT>::value>::type> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams) value_type; \
+        typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
         typedef typename Json::allocator_type allocator_type; \
         static bool is(const Json& ajson) noexcept \
         { \
@@ -214,7 +214,7 @@ namespace jsoncons \
     JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_AS, wchar_t,L,0, ValueType, __VA_ARGS__) \
   /**/
 
-#define JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
+#define JSONCONS_TPL_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
     JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_AS, char,,NumTemplateParams, ValueType, __VA_ARGS__) \
     JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_AS, wchar_t,L,NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
@@ -225,7 +225,7 @@ namespace jsoncons \
     JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_STRICT_AS,wchar_t,L,0,ValueType,__VA_ARGS__) \
   /**/
 
-#define JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
+#define JSONCONS_STRICT_TPL_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
     JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_STRICT_AS,char,,NumTemplateParams,ValueType,__VA_ARGS__) \
     JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_STRICT_AS,wchar_t,L,NumTemplateParams,ValueType,__VA_ARGS__) \
   /**/
@@ -233,10 +233,10 @@ namespace jsoncons \
 #define JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(CharT,Prefix,NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
 { \
-    template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, NumTemplateParams)> \
-    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams), typename std::enable_if<std::is_same<typename Json::char_type,CharT>::value>::type> \
+    template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
+    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams), typename std::enable_if<std::is_same<typename Json::char_type,CharT>::value>::type> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams) value_type; \
+        typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
         typedef typename Json::allocator_type allocator_type; \
         static bool is(const Json& ajson) noexcept \
         { \
@@ -263,7 +263,7 @@ JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(char,,0, ValueType, __VA_ARGS__) \
 JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(wchar_t,L,0, ValueType, __VA_ARGS__) \
   /**/
  
-#define JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
+#define JSONCONS_TPL_GETTER_CTOR_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
 JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(char,,NumTemplateParams, ValueType, __VA_ARGS__) \
 JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(wchar_t,L,NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
@@ -389,10 +389,10 @@ namespace jsoncons \
 #define JSONCONS_MEMBER_NAMED_TRAITS_DECL_BASE(As, NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
 { \
-    template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, NumTemplateParams)> \
-    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams)> \
+    template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
+    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams) value_type; \
+        typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
         typedef typename Json::allocator_type allocator_type; \
         static bool is(const Json& ajson) noexcept \
         { \
@@ -421,7 +421,7 @@ namespace jsoncons \
     JSONCONS_MEMBER_NAMED_TRAITS_DECL_BASE(JSONCONS_NAMED_AS, 0, ValueType, __VA_ARGS__) \
   /**/
 
-#define JSONCONS_TEMPLATE_MEMBER_NAMED_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
+#define JSONCONS_TPL_MEMBER_NAMED_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
     JSONCONS_MEMBER_NAMED_TRAITS_DECL_BASE(JSONCONS_NAMED_AS, NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
 
@@ -429,7 +429,7 @@ namespace jsoncons \
     JSONCONS_MEMBER_NAMED_TRAITS_DECL_BASE(JSONCONS_STRICT_NAMED_AS, 0, ValueType, __VA_ARGS__) \
   /**/
 
-#define JSONCONS_STRICT_TEMPLATE_MEMBER_NAMED_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
+#define JSONCONS_STRICT_TPL_MEMBER_NAMED_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
     JSONCONS_MEMBER_NAMED_TRAITS_DECL_BASE(JSONCONS_STRICT_NAMED_AS, NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
 
@@ -548,10 +548,10 @@ namespace jsoncons \
 #define JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL_BASE(NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
 { \
-    template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, NumTemplateParams)> \
-    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams)> \
+    template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
+    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams) value_type; \
+        typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
         typedef typename Json::allocator_type allocator_type; \
         static bool is(const Json& ajson) noexcept \
         { \
@@ -577,7 +577,7 @@ namespace jsoncons \
 JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL_BASE(0, ValueType, __VA_ARGS__) \
   /**/
  
-#define JSONCONS_TEMPLATE_GETTER_CTOR_NAMED_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
+#define JSONCONS_TPL_GETTER_CTOR_NAMED_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
 JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL_BASE(NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
  
@@ -600,10 +600,10 @@ JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL_BASE(NumTemplateParams, ValueType, __VA_A
 #define JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL_BASE(As, NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
 { \
-    template<typename Json JSONCONS_GENERATE_TEMPLATE_PARAMS(JSONCONS_GENERATE_TEMPLATE_PARAM, NumTemplateParams)> \
-    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams)> \
+    template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
+    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TEMPLATE_ARGS(JSONCONS_GENERATE_TEMPLATE_ARG, NumTemplateParams) value_type; \
+        typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
         typedef typename Json::allocator_type allocator_type; \
         static bool is(const Json& ajson) noexcept \
         { \
@@ -639,7 +639,7 @@ JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL_BASE(JSONCONS_GETTER_SETTER_NAMED_AS, N
 JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL_BASE(JSONCONS_STRICT_GETTER_SETTER_NAMED_AS, 0, ValueType, __VA_ARGS__) \
   /**/
  
-#define JSONCONS_STRICT_TEMPLATE_GETTER_SETTER_NAMED_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
+#define JSONCONS_STRICT_TPL_GETTER_SETTER_NAMED_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
 JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL_BASE(JSONCONS_STRICT_GETTER_SETTER_NAMED_AS, NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
 
@@ -647,22 +647,22 @@ JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL_BASE(JSONCONS_STRICT_GETTER_SETTER_NAME
 #if !defined(JSONCONS_NO_DEPRECATED)
 #define JSONCONS_TYPE_TRAITS_DECL JSONCONS_MEMBER_TRAITS_DECL
 #define JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL JSONCONS_STRICT_MEMBER_TRAITS_DECL
-#define JSONCONS_TEMPLATE_STRICT_MEMBER_TRAITS_DECL JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_DECL
+#define JSONCONS_TPL_STRICT_MEMBER_TRAITS_DECL JSONCONS_STRICT_TPL_MEMBER_TRAITS_DECL
 
 #define JSONCONS_MEMBER_NAMED_TRAITS_DECL JSONCONS_MEMBER_TRAITS_NAMED_DECL
-#define JSONCONS_TEMPLATE_MEMBER_NAMED_TRAITS_DECL JSONCONS_TEMPLATE_MEMBER_TRAITS_NAMED_DECL
+#define JSONCONS_TPL_MEMBER_NAMED_TRAITS_DECL JSONCONS_TPL_MEMBER_TRAITS_NAMED_DECL
 #define JSONCONS_STRICT_MEMBER_NAMED_TRAITS_DECL JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL
-#define JSONCONS_STRICT_TEMPLATE_MEMBER_NAMED_TRAITS_DECL JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_NAMED_DECL
+#define JSONCONS_STRICT_TPL_MEMBER_NAMED_TRAITS_DECL JSONCONS_STRICT_TPL_MEMBER_TRAITS_NAMED_DECL
 
 #define JSONCONS_ENUM_NAMED_TRAITS_DECL JSONCONS_ENUM_TRAITS_NAMED_DECL
 
 #define JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL
-#define JSONCONS_TEMPLATE_GETTER_CTOR_NAMED_TRAITS_DECL JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_NAMED_DECL 
+#define JSONCONS_TPL_GETTER_CTOR_NAMED_TRAITS_DECL JSONCONS_TPL_GETTER_CTOR_TRAITS_NAMED_DECL 
 
 #define JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL JSONCONS_GETTER_SETTER_TRAITS_NAMED_DECL
 #define JSONCONS_TEMPLAT_GETTER_SETTER_NAMED_TRAITS_DECL JSONCONS_TEMPLAT_GETTER_SETTER_TRAITS_NAMED_DECL
 #define JSONCONS_STRICT_GETTER_SETTER_NAMED_TRAITS_DECL JSONCONS_STRICT_GETTER_SETTER_TRAITS_NAMED_DECL
-#define JSONCONS_STRICT_TEMPLATE_GETTER_SETTER_NAMED_TRAITS_DECL JSONCONS_STRICT_TEMPLATE_GETTER_SETTER_TRAITS_NAMED_DECL
+#define JSONCONS_STRICT_TPL_GETTER_SETTER_NAMED_TRAITS_DECL JSONCONS_STRICT_TPL_GETTER_SETTER_TRAITS_NAMED_DECL
 #endif
 
 

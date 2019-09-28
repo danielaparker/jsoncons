@@ -23,7 +23,7 @@
 
 [Serialize with the C++ member names of the class](#G1)  
 [Serialize with the given names using the `_NAMED_` macros](#G2)  
-[Serialize a templated class with the `_TEMPLATE_` macros](#G3)  
+[Serialize a templated class with the `_TPL_` macros](#G3)  
 [Specialize json_type_traits explicitly](#G4)  
 [Mapping to C++ data structures with and without defaults allowed](#G5)  
 [An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL](#G6)  
@@ -891,7 +891,7 @@ The output for (2), (3) and (4) is the same.
 
 <div id="G3"/>
 
-#### Serialize a templated class with the `_TEMPLATE_` macros
+#### Serialize a templated class with the `_TPL_` macros
 
 ```c++
 #include <cassert>
@@ -918,7 +918,7 @@ namespace ns {
 } // namespace ns
 
 // Declare the traits. Specify the number of template parameters and which data members need to be serialized.
-JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
+JSONCONS_TPL_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
 
 using namespace jsoncons; // for convenience
 

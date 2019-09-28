@@ -198,6 +198,6 @@ JSONCONS_MEMBER_TRAITS_DECL(ns::employee, employeeNo, name, title)
 // Declare the traits. Specify which data members need to be serialized.
 JSONCONS_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
 
-JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
+JSONCONS_TPL_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
 
 #endif
