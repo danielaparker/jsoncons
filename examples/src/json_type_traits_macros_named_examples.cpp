@@ -112,15 +112,15 @@ public:
 namespace ns = json_type_traits_macro_examples_ns;
 
 // Declare the traits at global scope
-JSONCONS_ENUM_TRAITS_NAMED_DECL(ns::BookCategory,(fiction,"Fiction"),(biography,"Biography"))
+JSONCONS_ENUM_NAMED_TRAITS_DECL(ns::BookCategory,(fiction,"Fiction"),(biography,"Biography"))
 
-JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ns::Book1,(category,"Category"),(author,"Author"),
+JSONCONS_STRICT_MEMBER_NAMED_TRAITS_DECL(ns::Book1,(category,"Category"),(author,"Author"),
                                                    (title,"Title"),(price,"Price"))
-JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL(ns::Book2,(category_,"Category"),(author_,"Author"),
+JSONCONS_STRICT_MEMBER_NAMED_TRAITS_DECL(ns::Book2,(category_,"Category"),(author_,"Author"),
                                                    (title_,"Title"),(price_,"Price"))
-JSONCONS_GETTER_CTOR_TRAITS_NAMED_DECL(ns::Book3,(category,"Category"),(author,"Author"),
+JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL(ns::Book3,(category,"Category"),(author,"Author"),
                                                  (title,"Title"),(price,"Price"))
-JSONCONS_STRICT_GETTER_SETTER_TRAITS_NAMED_DECL(ns::Book4,(getCategory,setCategory,"Category"),
+JSONCONS_STRICT_GETTER_SETTER_NAMED_TRAITS_DECL(ns::Book4,(getCategory,setCategory,"Category"),
                                                           (getAuthor,setAuthor,"Author"),
                                                           (getTitle,setTitle,"Title"),
                                                           (getPrice,setPrice,"Price"))
