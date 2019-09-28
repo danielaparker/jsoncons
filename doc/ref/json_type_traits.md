@@ -46,27 +46,53 @@ The `jsoncons` library provides a number of macros that can be used to generate 
 for a user-defined class.
 
 ```c++
-JSONCONS_MEMBER_TRAITS_DECL(class_name,member_name0,member_name1,...)                                 // (1)
-JSONCONS_STRICT_MEMBER_TRAITS_DECL(class_name,member_name0,member_name1,...)                          // (2)
-JSONCONS_MEMBER_NAMED_TRAITS_DECL(class_name,(member_name0,"name0"),(member_name1,"name1")...)        // (3)
+JSONCONS_MEMBER_TRAITS_DECL(class_name,
+                            member_name0,
+                            member_name1,...) // (1)
+JSONCONS_STRICT_MEMBER_TRAITS_DECL(class_name,
+                                   member_name0,
+                                   member_name1,...) // (2)
+JSONCONS_MEMBER_NAMED_TRAITS_DECL(class_name,
+                                  (member_name0,"name0"),
+                                  (member_name1,"name1")...) // (3)
 JSONCONS_STRICT_MEMBER_NAMED_TRAITS_DECL(class_name,
                                          (member_name0,"name0"),
                                          (member_name1,"name1")...) // (4)
 
-JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(num_template_params,class_name,member_name0,member_name1,...)                                 // (5)  
-JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_DECL(num_template_params,class_name,member_name0,member_name1,...)                          // (6)
-JSONCONS_TEMPLATE_MEMBER_NAMED_TRAITS_DECL(num_template_params,class_name,(member_name0,"name0"),(member_name1,"name1")...)        // (7)
-JSONCONS_STRICT_TEMPLATE_MEMBER_NAMED_TRAITS_DECL(num_template_params,class_name,(member_name0,"name0"),(member_name1,"name1")...) // (8)
+JSONCONS_TEMPLATE_MEMBER_TRAITS_DECL(num_template_params,
+                                     class_name,
+                                     member_name0,
+                                     member_name1,...) // (5)  
+JSONCONS_STRICT_TEMPLATE_MEMBER_TRAITS_DECL(num_template_params,
+                                            class_name,
+                                            member_name0,
+                                            member_name1,...) // (6)
+JSONCONS_TEMPLATE_MEMBER_NAMED_TRAITS_DECL(num_template_params,
+                                           class_name,
+                                           (member_name0,"name0"),
+                                           (member_name1,"name1")...) // (7)
+JSONCONS_STRICT_TEMPLATE_MEMBER_NAMED_TRAITS_DECL(num_template_params,
+                                                  class_name,
+                                                  (member_name0,"name0"),
+                                                  (member_name1,"name1")...) // (8)
 
-JSONCONS_ENUM_TRAITS_DECL(enum_type_name,identifier0,identifier1,...)                          // (9)
-JSONCONS_ENUM_NAMED_TRAITS_DECL(enum_type_name,(identifier0,"name0"),(identifier1,"name1")...) // (10)
+JSONCONS_ENUM_TRAITS_DECL(enum_type_name,
+                          identifier0,
+                          identifier1,...) // (9)
+JSONCONS_ENUM_NAMED_TRAITS_DECL(enum_type_name,
+                                (identifier0,"name0"),
+                                (identifier1,"name1")...) // (10)
 
-JSONCONS_GETTER_CTOR_TRAITS_DECL(class_name,getter_name0,getter_name1,...) // (11)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(class_name,
+                                 getter_name0,
+                                 getter_name1,...) // (11)
 JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL(class_name,
                                       (getter_name0,"name0"),
                                       (getter_name1,"name1")...) // (12)
 
-JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL(num_template_params,class_name,getter_name0,getter_name1,...) // (13)
+JSONCONS_TEMPLATE_GETTER_CTOR_TRAITS_DECL(num_template_params,
+                                          class_name,getter_name0,
+                                          getter_name1,...) // (13)
 JSONCONS_TEMPLATE_GETTER_CTOR_NAMED_TRAITS_DECL(num_template_params,
                                                 class_name,
                                                 (getter_name0,"name0"),
