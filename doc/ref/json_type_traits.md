@@ -186,7 +186,7 @@ requires that all member names be present in the JSON. The class template must h
 `class_name` - the name of a class or struct  
 `enum_name` - the name of an enum type or enum class type
 `num_template_params` - for a class template, the number of template parameters  
-`member_nameN` - the name of a class data member
+`member_nameN` - the name of a class data member  
 `getter_nameN` - the getter for a class data member 
 `(identifierN,"nameN")` - an enum identifier and corresponding JSON name  
 `(getter_nameN,"nameN")` - the getter for a class data member and corresponding JSON name  
