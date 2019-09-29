@@ -179,6 +179,10 @@ When decoding to a C++ data structure,
 (17) allows member names not present in the JSON to have default values, while the strict (18) 
 requires that all member names be present in the JSON. The class template must have a default constructor. 
 
+#### Parameters
+
+
+
 These macro declarations must be placed at global scope, outside any namespace blocks, and `class_name` must be a fully namespace qualified name.
 
 ### Specializations
