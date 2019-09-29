@@ -188,8 +188,8 @@ requires that all member names be present in the JSON. The class template must h
 `num_template_params` - for a class template, the number of template parameters  
 `member_nameN` - the name of a class data member
 `getter_nameN` - the getter for a class data member 
-`(identifierN,"nameN")` - an enum identifier and corresponding JSON name
-`(getter_nameN,"nameN")` - the getter for a class data member and corresponding JSON name
+`(identifierN,"nameN")` - an enum identifier and corresponding JSON name  
+`(getter_nameN,"nameN")` - the getter for a class data member and corresponding JSON name  
 `(getter_nameN,setter_nameN,"nameN")` - the getter and setter for a class data member, and corresponding JSON name
 
 These macro declarations must be placed at global scope, outside any namespace blocks, and `class_name` must be a fully namespace qualified name.
