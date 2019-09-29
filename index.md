@@ -25,7 +25,7 @@
 
 jsoncons is a C++, header-only library for constructing [JSON](http://www.json.org) and JSON-like
 data formats such as [CBOR](http://cbor.io/). For each supported data format, it enables you
-to work with data in that format in a number of ways:
+to work with the data in a number of ways:
 
 - As a variant-like data structure, [basic_json](doc/ref/basic_json.md) 
 
@@ -307,7 +307,8 @@ end_object
 <div id="A2"/>
 ### Reading JSON text from a file
 
-Example file (`books.json`):
+Input JSON file `books.json`:
+
 ```c++
 [
     {
@@ -618,7 +619,7 @@ produces
 ```
 By default, within objects, arrays of scalar values are displayed on the same line.
 
-The `pretty_print` function takes an optional second parameter, [json_options](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_options.md), that allows custom formatting of output.
+The `pretty_print` function takes an optional second parameter, [basic_json_options](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json_options.md), that allows custom formatting of output.
 To display the array scalar values on a new line, set the `object_array_line_splits` property to `line_split_kind::new_line`. The code
 ```c++
 json_options options;
@@ -838,9 +839,9 @@ Note that the allocator type allows you to supply a custom allocator. For exampl
 #include <boost/pool/pool_alloc.hpp>
 #include <jsoncons/json.hpp>
 
-typedef jsoncons::basic_json<char, boost::fast_pool_allocator<char>> myjson;
+typedef jsoncons::basic_json<char, boost::fast_pool_allocator<char>> my_json;
 
-myjson o;
+my_json o;
 
 o.insert_or_assign("FirstName","Joe");
 o.insert_or_assign("LastName","Smith");
