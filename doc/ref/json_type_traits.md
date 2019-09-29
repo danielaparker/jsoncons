@@ -42,6 +42,8 @@ which inherits from [false_type](http://www.cplusplus.com/reference/type_traits/
 This traits class may be specialized for a user-defined type with a [true_type](http://www.cplusplus.com/reference/type_traits/true_type/) value to
 inform the `jsoncons` library that the type is already specialized.  
 
+### Convenience Macros
+
 The `jsoncons` library provides a number of macros that can be used to generate the code to specialize `json_type_traits`
 for a user-defined class.
 
@@ -82,11 +84,11 @@ JSONCONS_STRICT_TPL_MEMBER_NAMED_TRAITS_DECL(num_template_params,
                                              (member_name0,"name0"),
                                              (member_name1,"name1")...) // (8)
 
-JSONCONS_ENUM_TRAITS_DECL(enum_type_name,
+JSONCONS_ENUM_TRAITS_DECL(enum_name,
                           identifier0,
                           identifier1,...) // (9)
 
-JSONCONS_ENUM_NAMED_TRAITS_DECL(enum_type_name,
+JSONCONS_ENUM_NAMED_TRAITS_DECL(enum_name,
                                 (identifier0,"name0"),
                                 (identifier1,"name1")...) // (10)
 
@@ -181,7 +183,14 @@ requires that all member names be present in the JSON. The class template must h
 
 #### Parameters
 
-
+`class_name` - the name of a class or struct  
+`enum_name` - the name of an enum type or enum class type
+`num_template_params` - for a class template, the number of template parameters  
+`member_nameN` - the name of a class data member
+`getter_nameN` - the getter for a class data member 
+`(identifierN,"nameN")` - an enum identifier and corresponding JSON name
+`(getter_nameN,"nameN")` - the getter for a class data member and corresponding JSON name
+`(getter_nameN,setter_nameN,"nameN")` - the getter and setter for a class data member, and corresponding JSON name
 
 These macro declarations must be placed at global scope, outside any namespace blocks, and `class_name` must be a fully namespace qualified name.
 
