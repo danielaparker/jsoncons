@@ -49,6 +49,7 @@ TEST_CASE("cbor tagged array tests")
         CHECK(j[0].as<double>() == std::numeric_limits<double>::lowest());
         CHECK(j[1].as<double>() == (std::numeric_limits<double>::max)());
     }
+#if 0
     SECTION("Tag 83, float128, big endian")
     {
         std::cout << "sizeof(long double): " << sizeof(long double) << "\n";
@@ -69,6 +70,7 @@ TEST_CASE("cbor tagged array tests")
         //CHECK(j[0].as<double>() == std::numeric_limits<double>::lowest());
         //CHECK(j[1].as<double>() == (std::numeric_limits<double>::max)());
     }
+#endif
     SECTION("Tag 85, float32, little endian")
     {
         const std::vector<uint8_t> input = {
@@ -101,6 +103,7 @@ TEST_CASE("cbor tagged array tests")
         CHECK(j[0].as<double>() == std::numeric_limits<double>::lowest());
         CHECK(j[1].as<double>() == (std::numeric_limits<double>::max)());
     }
+#if 0
     SECTION("Tag 87, float128, little endian")
     {
         std::cout << "sizeof(long double): " << sizeof(long double) << "\n";
@@ -121,5 +124,6 @@ TEST_CASE("cbor tagged array tests")
         //CHECK(j[0].as<double>() == std::numeric_limits<double>::lowest());
         //CHECK(j[1].as<double>() == (std::numeric_limits<double>::max)());
     }
+#endif
 } 
 
