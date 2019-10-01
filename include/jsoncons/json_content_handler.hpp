@@ -132,6 +132,20 @@ public:
         do_flush();
     }
 
+    bool typed_array(const double* data, size_t size, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+    {
+        return do_typed_array(data, size, tag, context);
+    }
+
+    bool typed_array(const float* data, size_t size, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+    {
+        return do_typed_array(data, size, tag, context);
+    }
+
     bool begin_object(semantic_tag tag=semantic_tag::none,
                       const ser_context& context=null_ser_context())
     {
@@ -380,6 +394,38 @@ private:
     }
 
     virtual bool do_end_object(const ser_context& context) = 0;
+
+    virtual bool do_typed_array(const float* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context())
+    {
+        bool more = begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            double_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = end_array(context);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const double* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context())
+    {
+        bool more = begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            double_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = end_array(context);
+        }
+        return more;
+    }
 
     virtual bool do_begin_array(semantic_tag, const ser_context& context) = 0;
 

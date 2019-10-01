@@ -149,8 +149,8 @@ public:
     {
         class data_base
         {
-            static const uint8_t major_type_shift = 0x04;
-            static const uint8_t additional_information_mask = (1U << 4) - 1;
+            static constexpr uint8_t major_type_shift = 0x04;
+            static constexpr uint8_t additional_information_mask = (1U << 4) - 1;
 
             uint8_t ext_type_;
         public:
