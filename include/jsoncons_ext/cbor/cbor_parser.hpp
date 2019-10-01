@@ -23,48 +23,60 @@ namespace jsoncons { namespace cbor {
 
 enum class parse_mode {root,before_done,array,indefinite_array,map_key,map_value,indefinite_map_key,indefinite_map_value};
 
-struct double_typed_array_arg_t {};
-constexpr double_typed_array_arg_t double_typed_array_arg = double_typed_array_arg_t();
-struct float_typed_array_arg_t {};
-constexpr float_typed_array_arg_t float_typed_array_arg = float_typed_array_arg_t();
+struct float_array_arg_t {};
+constexpr float_array_arg_t float_array_arg = float_array_arg_t();
+struct double_array_arg_t {};
+constexpr double_array_arg_t double_array_arg = double_array_arg_t();
+struct long_double_array_arg_t {};
+constexpr long_double_array_arg_t long_double_array_arg = long_double_array_arg_t();
+
+union typed_array_data_union
+{
+    float* float_data_;
+    double* double_data_;
+    long double* long_double_data_;
+};
 
 template <class Allocator=std::allocator<char>>
 class typed_array
 {
-    enum array_type {float_t = 1,double_t};
+    enum array_type {float_value = 1,double_value,long_double_value};
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<float> float_allocator_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<double> double_allocator_type;
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<long double> long_double_allocator_type;
 
     Allocator allocator_;
     array_type type_;
     size_t size_;
-    union
-    {
-        float* float_data_;
-        double* double_data_;
-    };
+    typed_array_data_union data_;
 public:
     typed_array(const Allocator& alloc)
-        : allocator_(alloc), type_(), size_(0)
+        : allocator_(alloc), type_(), size_(0), data_()
     {
     }
 
     typed_array(const typed_array& other)
-        : allocator_(other.allocator_), type_(other.type_), size_(other.size())
+        : allocator_(other.allocator_), type_(other.type_), size_(other.size()), data_()
     {
         switch (other.type_)
         {
-            case array_type::float_t:
+            case array_type::float_value:
             {
                 float_allocator_type alloc{ allocator_ };
-                float_data_ = alloc.allocate(size_);
+                data_.float_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::double_t:
+            case array_type::double_value:
             {
                 double_allocator_type alloc{allocator_};
-                double_data_ = alloc.allocate(size_);
+                data_.double_data_ = alloc.allocate(size_);
+                break;
+            }
+            case array_type::long_double_value:
+            {
+                long_double_allocator_type alloc{allocator_};
+                data_.long_double_data_ = alloc.allocate(size_);
                 break;
             }
             default:
@@ -77,34 +89,47 @@ public:
         swap(*this,other);
     }
 
-    typed_array(double_typed_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::double_t), size_(size)
-    {
-        double_allocator_type alloc(allocator_);
-        double_data_ = alloc.allocate(size);
-    }
-
-    typed_array(float_typed_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::float_t), size_(size)
+    typed_array(float_array_arg_t,size_t size, const Allocator& allocator)
+        : allocator_(allocator), type_(array_type::float_value), size_(size)
     {
         float_allocator_type alloc(allocator_);
-        float_data_ = alloc.allocate(size);
+        data_.float_data_ = alloc.allocate(size);
+    }
+
+    typed_array(double_array_arg_t,size_t size, const Allocator& allocator)
+        : allocator_(allocator), type_(array_type::double_value), size_(size)
+    {
+        double_allocator_type alloc(allocator_);
+        data_.double_data_ = alloc.allocate(size);
+    }
+
+    typed_array(long_double_array_arg_t,size_t size, const Allocator& allocator)
+        : allocator_(allocator), type_(array_type::long_double_value), size_(size)
+    {
+        long_double_allocator_type alloc(allocator_);
+        data_.long_double_data_ = alloc.allocate(size);
     }
 
     ~typed_array()
     {
         switch (type_)
         {
-            case array_type::float_t:
+            case array_type::float_value:
             {
                 float_allocator_type alloc(allocator_);
-                alloc.deallocate(float_data_, 1);
+                alloc.deallocate(data_.float_data_, 1);
                 break;
             }
-            case array_type::double_t:
+            case array_type::double_value:
             {
                 double_allocator_type alloc(allocator_);
-                alloc.deallocate(double_data_, 1);
+                alloc.deallocate(data_.double_data_, 1);
+                break;
+            }
+            case array_type::long_double_value:
+            {
+                long_double_allocator_type alloc(allocator_);
+                alloc.deallocate(data_.long_double_data_, 1);
                 break;
             }
             default:
@@ -126,87 +151,45 @@ public:
         return size_;
     }
 
-    float* data(float_typed_array_arg_t)
+    float* data(float_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::float_t);
-        return float_data_;
+        JSONCONS_ASSERT(type_ == array_type::float_value);
+        return data_.float_data_;
     }
 
-    const float* data(float_typed_array_arg_t) const
+    const float* data(float_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::float_t);
-        return float_data_;
+        JSONCONS_ASSERT(type_ == array_type::float_value);
+        return data_.float_data_;
     }
 
-    double* data(double_typed_array_arg_t)
+    double* data(double_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::double_t);
-        return double_data_;
+        JSONCONS_ASSERT(type_ == array_type::double_value);
+        return data_.double_data_;
     }
 
-    const double* data(double_typed_array_arg_t) const
+    const double* data(double_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::double_t);
-        return double_data_;
+        JSONCONS_ASSERT(type_ == array_type::double_value);
+        return data_.double_data_;
+    }
+
+    long double* data(long_double_array_arg_t)
+    {
+        JSONCONS_ASSERT(type_ == array_type::long_double_value);
+        return data_.long_double_data_;
+    }
+
+    const long double* data(long_double_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == array_type::long_double_value);
+        return data_.long_double_data_;
     }
 
     friend void swap(typed_array& a, typed_array& b) noexcept
     {
-        switch (a.type_)
-        {
-            case array_type::float_t:
-                switch (b.type_)
-                {
-                    case array_type::float_t:
-                        std::swap(a.float_data_,b.float_data_);
-                        break;
-                    case array_type::double_t:
-                    {
-                        double* p = b.double_data_;
-                        b.float_data_ = a.float_data_;
-                        a.double_data_ = p;
-                        break;
-                    }
-                    default:
-                        b.float_data_ = a.float_data_;
-                        break;
-                }
-                break;
-            case array_type::double_t:
-                switch (b.type_)
-                {
-                    case array_type::float_t:
-                    {
-                        float* p = b.float_data_;
-                        b.double_data_ = a.double_data_;
-                        a.float_data_ = p;
-                        break;
-                    }
-                    case array_type::double_t:
-                        std::swap(a.double_data_,b.double_data_);
-                        break;
-                    default:
-                        b.double_data_ = a.double_data_;
-                        break;
-                }
-                break;
-            default:
-                switch (b.type_)
-                {
-                    case array_type::float_t:
-                    {
-                        a.float_data_ = b.float_data_;
-                        break;
-                    }
-                    case array_type::double_t:
-                        a.double_data_ = b.double_data_;
-                        break;
-                    default:
-                        break;
-                }
-                break;
-        }
-
+        std::swap(a.data_,b.data_);
         std::swap(a.allocator_,b.allocator_);
         std::swap(a.type_,b.type_);
         std::swap(a.size_,b.size_);
@@ -1710,14 +1693,16 @@ private:
                 {
                     const uint8_t tag = (uint8_t)tags_.back();
                     const uint8_t e = (tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift; 
+                    const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
+                    const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
 
-                    const size_t bytes_per_elem = sizeof(float);
+                    const size_t bytes_per_elem = size_t(1) << (f + ll);
 
                     const uint8_t* p = v.data();
                     const uint8_t* last = v.data() + v.size();
 
                     size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<WorkAllocator>(float_typed_array_arg,size,allocator_);
+                    typed_array_ = typed_array<WorkAllocator>(float_array_arg,size,allocator_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -1728,9 +1713,9 @@ private:
                             case 1: val = jsoncons::detail::from_little_endian<float>(p,p+bytes_per_elem,&endp);break;
                             default: break;
                         }
-                        typed_array_.data(float_typed_array_arg)[i] = val;
+                        typed_array_.data(float_array_arg)[i] = val;
                     }
-                    continue_ = handler.typed_array(typed_array_.data(float_typed_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    continue_ = handler.typed_array(typed_array_.data(float_array_arg), typed_array_.size(), semantic_tag::none, *this);
                     break;
                 }
                 case 0x52:
@@ -1738,14 +1723,16 @@ private:
                 {
                     const uint8_t tag = (uint8_t)tags_.back();
                     const uint8_t e = (tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift; 
+                    const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
+                    const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
 
-                    const size_t bytes_per_elem = sizeof(double);
+                    const size_t bytes_per_elem = size_t(1) << (f + ll);
 
                     const uint8_t* p = v.data();
                     const uint8_t* last = v.data() + v.size();
 
                     size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<WorkAllocator>(double_typed_array_arg,size,allocator_);
+                    typed_array_ = typed_array<WorkAllocator>(double_array_arg,size,allocator_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -1756,9 +1743,39 @@ private:
                             case 1: val = jsoncons::detail::from_little_endian<double>(p,p+bytes_per_elem,&endp);break;
                             default: break;
                         }
-                        typed_array_.data(double_typed_array_arg)[i] = val;
+                        typed_array_.data(double_array_arg)[i] = val;
                     }
-                    continue_ = handler.typed_array(typed_array_.data(double_typed_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    continue_ = handler.typed_array(typed_array_.data(double_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    break;
+                }
+                case 0x53:
+                case 0x57:
+                {
+                    const uint8_t tag = (uint8_t)tags_.back();
+                    const uint8_t e = (tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift; 
+                    const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
+                    const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
+
+                    const size_t bytes_per_elem = size_t(1) << (f + ll);
+
+                    const uint8_t* p = v.data();
+                    const uint8_t* last = v.data() + v.size();
+
+                    size_t size = v.size()/bytes_per_elem;
+                    typed_array_ = typed_array<WorkAllocator>(long_double_array_arg,size,allocator_);
+                    for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                    {
+                        const uint8_t* endp = nullptr;
+                        long double val{ 0 };
+                        switch (e)
+                        {
+                            case 0: val = jsoncons::detail::from_big_endian<long double>(p,p+bytes_per_elem,&endp);break;
+                            case 1: val = jsoncons::detail::from_little_endian<long double>(p,p+bytes_per_elem,&endp);break;
+                            default: break;
+                        }
+                        typed_array_.data(long_double_array_arg)[i] = val;
+                    }
+                    continue_ = handler.typed_array(typed_array_.data(long_double_array_arg), typed_array_.size(), semantic_tag::none, *this);
                     break;
                 }
                 default:

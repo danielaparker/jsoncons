@@ -49,6 +49,26 @@ TEST_CASE("cbor tagged array tests")
         CHECK(j[0].as<double>() == std::numeric_limits<double>::lowest());
         CHECK(j[1].as<double>() == (std::numeric_limits<double>::max)());
     }
+    SECTION("Tag 83, float128, big endian")
+    {
+        std::cout << "sizeof(long double): " << sizeof(long double) << "\n";
+
+        const std::vector<uint8_t> input = {
+            0xD8, // Tag
+                0x53, // Tag 83, float128, little endian, typed array
+            0x58,0x20, // Byte string value of length 32
+                0xff,0xef,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+                0x7f,0xef,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
+        };
+
+        json j = cbor::decode_cbor<json>(input);
+        REQUIRE(j.is_array());
+        REQUIRE(j.size() == 2);
+
+        std::cout << pretty_print(j) << "\n";
+        //CHECK(j[0].as<double>() == std::numeric_limits<double>::lowest());
+        //CHECK(j[1].as<double>() == (std::numeric_limits<double>::max)());
+    }
     SECTION("Tag 85, float32, little endian")
     {
         const std::vector<uint8_t> input = {
@@ -80,6 +100,26 @@ TEST_CASE("cbor tagged array tests")
         REQUIRE(j.size() == 2);
         CHECK(j[0].as<double>() == std::numeric_limits<double>::lowest());
         CHECK(j[1].as<double>() == (std::numeric_limits<double>::max)());
+    }
+    SECTION("Tag 87, float128, little endian")
+    {
+        std::cout << "sizeof(long double): " << sizeof(long double) << "\n";
+
+        const std::vector<uint8_t> input = {
+            0xD8, // Tag
+                0x57, // Tag 87, float128, little endian, typed array
+            0x58,0x20, // Byte string value of length 32
+                0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xef,0xff,
+                0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xef,0x7f
+        };
+
+        json j = cbor::decode_cbor<json>(input);
+        REQUIRE(j.is_array());
+        REQUIRE(j.size() == 2);
+
+        std::cout << pretty_print(j) << "\n";
+        //CHECK(j[0].as<double>() == std::numeric_limits<double>::lowest());
+        //CHECK(j[1].as<double>() == (std::numeric_limits<double>::max)());
     }
 } 
 
