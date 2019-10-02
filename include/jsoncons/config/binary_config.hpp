@@ -130,9 +130,8 @@ enum class endian
      little = __ORDER_LITTLE_ENDIAN__,
      big    = __ORDER_BIG_ENDIAN__,
      native = __BYTE_ORDER__
-#    else
-#      error "Unable to determine byte order!"
-#    endif
+#else
+#error "Unable to determine byte order!"
 #endif
 };
   

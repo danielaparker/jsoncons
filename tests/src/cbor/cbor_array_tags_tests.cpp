@@ -19,6 +19,8 @@ TEST_CASE("cbor tagged array tests")
 {
     SECTION("Tag 64 (uint8 Typed Array)")
     {
+        std::cout << (int)detail::endian::native << "\n";
+
         const std::vector<uint8_t> input = {
             0xD8, // Tag
                 0x40, // Tag 64, uint8, Typed Array
