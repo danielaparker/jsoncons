@@ -1982,6 +1982,20 @@ private:
                     continue_ = handler.typed_array(typed_array_.data(uint8_array_arg), typed_array_.size(), semantic_tag::none, *this);
                     break;
                 }
+                case 0x44:
+                {
+                    const uint8_t* p = v.data();
+                    const uint8_t* last = v.data() + v.size();
+
+                    size_t size = v.size();
+                    typed_array_ = typed_array<WorkAllocator>(uint8_array_arg,size,allocator_);
+                    for (size_t i = 0; p < last; ++p, ++i)
+                    {
+                        typed_array_.data(uint8_array_arg)[i] = *p;
+                    }
+                    continue_ = handler.typed_array(typed_array_.data(uint8_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    break;
+                }
                 case 0x41:
                 case 0x45:
                 {

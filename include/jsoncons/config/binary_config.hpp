@@ -119,6 +119,22 @@
 #endif
 
 namespace jsoncons { namespace detail { 
+
+enum class endian
+{
+#ifdef _WIN32
+     little = 0,
+     big    = 1,
+     native = little
+#elif defined(__ORDER_LITTLE_ENDIAN__) && defined(__ORDER_BIG_ENDIAN__) && defined(__BYTE_ORDER__) 
+     little = __ORDER_LITTLE_ENDIAN__,
+     big    = __ORDER_BIG_ENDIAN__,
+     native = __BYTE_ORDER__
+#    else
+#      error "Unable to determine byte order!"
+#    endif
+#endif
+};
   
 class read_nbytes_failed : public std::invalid_argument, public virtual json_exception
 {
