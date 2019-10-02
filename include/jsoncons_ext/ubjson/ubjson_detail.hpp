@@ -9,7 +9,7 @@
 
 #include <string>
 #include <memory>
-#include <jsoncons/config/binary_detail.hpp>
+#include <jsoncons/config/binary_config.hpp>
 
 namespace jsoncons { namespace ubjson { namespace detail {
 

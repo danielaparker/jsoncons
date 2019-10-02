@@ -13,7 +13,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/config/binary_detail.hpp>
+#include <jsoncons/config/binary_config.hpp>
 #include <jsoncons_ext/ubjson/ubjson_detail.hpp>
 #include <jsoncons_ext/ubjson/ubjson_error.hpp>
 #include <jsoncons_ext/ubjson/ubjson_parser.hpp>

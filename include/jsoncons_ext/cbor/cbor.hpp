@@ -14,7 +14,7 @@
 #include <istream> // std::basic_istream
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_filter.hpp>
-#include <jsoncons/config/binary_detail.hpp>
+#include <jsoncons/config/binary_config.hpp>
 #include <jsoncons_ext/cbor/cbor_reader.hpp>
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>

@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CONFIG_BINARY_DETAIL_HPP
-#define JSONCONS_CONFIG_BINARY_DETAIL_HPP
+#ifndef JSONCONS_CONFIG_BINARY_CONFIG_HPP
+#define JSONCONS_CONFIG_BINARY_CONFIG_HPP
 
 #include <cfloat>
 #include <cstddef>
