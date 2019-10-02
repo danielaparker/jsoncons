@@ -2120,6 +2120,7 @@ private:
                     continue_ = handler.typed_array(typed_array_.data(double_array_arg), typed_array_.size(), semantic_tag::none, *this);
                     break;
                 }
+#if 0
                 case 0x53:
                 case 0x57:
                 {
@@ -2150,6 +2151,7 @@ private:
                     continue_ = handler.typed_array(typed_array_.data(long_double_array_arg), typed_array_.size(), semantic_tag::none, *this);
                     break;
                 }
+#endif
                 default:
                     continue_ = handler.byte_string_value(v, semantic_tag::none, *this);
                     break;
