@@ -64,9 +64,9 @@ union typed_array_data_union
 template <class Allocator=std::allocator<char>>
 class typed_array
 {
-    enum array_type {uint8_value=1,uint16_value,uint32_value,uint64_value,
-                     int8_value,int16_value,int32_value,int64_value, 
-                     float_value,double_value,long_double_value};
+    enum array_type {uint8_val=1,uint16_val,uint32_val,uint64_val,
+                     int8_val,int16_val,int32_val,int64_val, 
+                     float_val,double_val,long_double_val};
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint8_t> uint8_allocator_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint16_t> uint16_allocator_type;
@@ -95,67 +95,67 @@ public:
     {
         switch (other.type_)
         {
-            case array_type::uint8_value:
+            case array_type::uint8_val:
             {
                 uint8_allocator_type alloc{ allocator_ };
                 data_.uint8_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::uint16_value:
+            case array_type::uint16_val:
             {
                 uint16_allocator_type alloc{ allocator_ };
                 data_.uint16_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::uint32_value:
+            case array_type::uint32_val:
             {
                 uint32_allocator_type alloc{ allocator_ };
                 data_.uint32_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::uint64_value:
+            case array_type::uint64_val:
             {
                 uint64_allocator_type alloc{ allocator_ };
                 data_.uint64_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::int8_value:
+            case array_type::int8_val:
             {
                 int8_allocator_type alloc{ allocator_ };
                 data_.int8_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::int16_value:
+            case array_type::int16_val:
             {
                 int16_allocator_type alloc{ allocator_ };
                 data_.int16_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::int32_value:
+            case array_type::int32_val:
             {
                 int32_allocator_type alloc{ allocator_ };
                 data_.int32_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::int64_value:
+            case array_type::int64_val:
             {
                 int64_allocator_type alloc{ allocator_ };
                 data_.int64_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::float_value:
+            case array_type::float_val:
             {
                 float_allocator_type alloc{ allocator_ };
                 data_.float_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::double_value:
+            case array_type::double_val:
             {
                 double_allocator_type alloc{allocator_};
                 data_.double_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::long_double_value:
+            case array_type::long_double_val:
             {
                 long_double_allocator_type alloc{allocator_};
                 data_.long_double_data_ = alloc.allocate(size_);
@@ -171,77 +171,77 @@ public:
         swap(*this,other);
     }
     typed_array(uint8_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::uint8_value), size_(size)
+        : allocator_(allocator), type_(array_type::uint8_val), size_(size)
     {
         uint8_allocator_type alloc(allocator_);
         data_.uint8_data_ = alloc.allocate(size);
     }
 
     typed_array(uint16_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::uint16_value), size_(size)
+        : allocator_(allocator), type_(array_type::uint16_val), size_(size)
     {
         uint16_allocator_type alloc(allocator_);
         data_.uint16_data_ = alloc.allocate(size);
     }
 
     typed_array(uint32_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::uint32_value), size_(size)
+        : allocator_(allocator), type_(array_type::uint32_val), size_(size)
     {
         uint32_allocator_type alloc(allocator_);
         data_.uint32_data_ = alloc.allocate(size);
     }
 
     typed_array(uint64_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::uint64_value), size_(size)
+        : allocator_(allocator), type_(array_type::uint64_val), size_(size)
     {
         uint64_allocator_type alloc(allocator_);
         data_.uint64_data_ = alloc.allocate(size);
     }
 
     typed_array(int8_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::int8_value), size_(size)
+        : allocator_(allocator), type_(array_type::int8_val), size_(size)
     {
         int8_allocator_type alloc(allocator_);
         data_.int8_data_ = alloc.allocate(size);
     }
 
     typed_array(int16_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::int16_value), size_(size)
+        : allocator_(allocator), type_(array_type::int16_val), size_(size)
     {
         int16_allocator_type alloc(allocator_);
         data_.int16_data_ = alloc.allocate(size);
     }
 
     typed_array(int32_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::int32_value), size_(size)
+        : allocator_(allocator), type_(array_type::int32_val), size_(size)
     {
         int32_allocator_type alloc(allocator_);
         data_.int32_data_ = alloc.allocate(size);
     }
 
     typed_array(int64_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::int64_value), size_(size)
+        : allocator_(allocator), type_(array_type::int64_val), size_(size)
     {
         int64_allocator_type alloc(allocator_);
         data_.int64_data_ = alloc.allocate(size);
     }
 
     typed_array(float_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::float_value), size_(size)
+        : allocator_(allocator), type_(array_type::float_val), size_(size)
     {
         float_allocator_type alloc(allocator_);
         data_.float_data_ = alloc.allocate(size);
     }
 
     typed_array(double_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::double_value), size_(size)
+        : allocator_(allocator), type_(array_type::double_val), size_(size)
     {
         double_allocator_type alloc(allocator_);
         data_.double_data_ = alloc.allocate(size);
     }
 
     typed_array(long_double_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::long_double_value), size_(size)
+        : allocator_(allocator), type_(array_type::long_double_val), size_(size)
     {
         long_double_allocator_type alloc(allocator_);
         data_.long_double_data_ = alloc.allocate(size);
@@ -251,67 +251,67 @@ public:
     {
         switch (type_)
         {
-            case array_type::uint8_value:
+            case array_type::uint8_val:
             {
                 uint8_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.uint8_data_, 1);
                 break;
             }
-            case array_type::uint16_value:
+            case array_type::uint16_val:
             {
                 uint16_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.uint16_data_, 1);
                 break;
             }
-            case array_type::uint32_value:
+            case array_type::uint32_val:
             {
                 uint32_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.uint32_data_, 1);
                 break;
             }
-            case array_type::uint64_value:
+            case array_type::uint64_val:
             {
                 uint64_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.uint64_data_, 1);
                 break;
             }
-            case array_type::int8_value:
+            case array_type::int8_val:
             {
                 int8_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.int8_data_, 1);
                 break;
             }
-            case array_type::int16_value:
+            case array_type::int16_val:
             {
                 int16_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.int16_data_, 1);
                 break;
             }
-            case array_type::int32_value:
+            case array_type::int32_val:
             {
                 int32_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.int32_data_, 1);
                 break;
             }
-            case array_type::int64_value:
+            case array_type::int64_val:
             {
                 int64_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.int64_data_, 1);
                 break;
             }
-            case array_type::float_value:
+            case array_type::float_val:
             {
                 float_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.float_data_, 1);
                 break;
             }
-            case array_type::double_value:
+            case array_type::double_val:
             {
                 double_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.double_data_, 1);
                 break;
             }
-            case array_type::long_double_value:
+            case array_type::long_double_val:
             {
                 long_double_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.long_double_data_, 1);
@@ -338,120 +338,120 @@ public:
 
     uint8_t* data(uint8_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::uint8_value);
+        JSONCONS_ASSERT(type_ == array_type::uint8_val);
         return data_.uint8_data_;
     }
 
     const uint8_t* data(uint8_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::uint8_value);
+        JSONCONS_ASSERT(type_ == array_type::uint8_val);
         return data_.uint8_data_;
     }
     uint16_t* data(uint16_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::uint16_value);
+        JSONCONS_ASSERT(type_ == array_type::uint16_val);
         return data_.uint16_data_;
     }
 
     const uint16_t* data(uint16_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::uint16_value);
+        JSONCONS_ASSERT(type_ == array_type::uint16_val);
         return data_.uint16_data_;
     }
 
     uint32_t* data(uint32_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::uint32_value);
+        JSONCONS_ASSERT(type_ == array_type::uint32_val);
         return data_.uint32_data_;
     }
 
     const uint32_t* data(uint32_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::uint32_value);
+        JSONCONS_ASSERT(type_ == array_type::uint32_val);
         return data_.uint32_data_;
     }
 
     uint64_t* data(uint64_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::uint64_value);
+        JSONCONS_ASSERT(type_ == array_type::uint64_val);
         return data_.uint64_data_;
     }
 
     const uint64_t* data(uint64_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::uint64_value);
+        JSONCONS_ASSERT(type_ == array_type::uint64_val);
         return data_.uint64_data_;
     }
 
     int16_t* data(int16_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::int16_value);
+        JSONCONS_ASSERT(type_ == array_type::int16_val);
         return data_.int16_data_;
     }
 
     const int16_t* data(int16_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::int16_value);
+        JSONCONS_ASSERT(type_ == array_type::int16_val);
         return data_.int16_data_;
     }
 
     int32_t* data(int32_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::int32_value);
+        JSONCONS_ASSERT(type_ == array_type::int32_val);
         return data_.int32_data_;
     }
 
     const int32_t* data(int32_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::int32_value);
+        JSONCONS_ASSERT(type_ == array_type::int32_val);
         return data_.int32_data_;
     }
 
     int64_t* data(int64_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::int64_value);
+        JSONCONS_ASSERT(type_ == array_type::int64_val);
         return data_.int64_data_;
     }
 
     const int64_t* data(int64_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::int64_value);
+        JSONCONS_ASSERT(type_ == array_type::int64_val);
         return data_.int64_data_;
     }
 
     float* data(float_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::float_value);
+        JSONCONS_ASSERT(type_ == array_type::float_val);
         return data_.float_data_;
     }
 
     const float* data(float_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::float_value);
+        JSONCONS_ASSERT(type_ == array_type::float_val);
         return data_.float_data_;
     }
 
     double* data(double_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::double_value);
+        JSONCONS_ASSERT(type_ == array_type::double_val);
         return data_.double_data_;
     }
 
     const double* data(double_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::double_value);
+        JSONCONS_ASSERT(type_ == array_type::double_val);
         return data_.double_data_;
     }
 
     long double* data(long_double_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::long_double_value);
+        JSONCONS_ASSERT(type_ == array_type::long_double_val);
         return data_.long_double_data_;
     }
 
     const long double* data(long_double_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::long_double_value);
+        JSONCONS_ASSERT(type_ == array_type::long_double_val);
         return data_.long_double_data_;
     }
 
@@ -1954,6 +1954,110 @@ private:
                 case 0x17:
                 {
                     continue_ = handler.byte_string_value(v, semantic_tag::base16, *this);
+                    break;
+                }
+                case 0x40:
+                {
+                    const uint8_t* p = v.data();
+                    const uint8_t* last = v.data() + v.size();
+
+                    size_t size = v.size();
+                    typed_array_ = typed_array<WorkAllocator>(uint8_array_arg,size,allocator_);
+                    for (size_t i = 0; p < last; ++p, ++i)
+                    {
+                        typed_array_.data(uint8_array_arg)[i] = *p;
+                    }
+                    continue_ = handler.typed_array(typed_array_.data(uint8_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    break;
+                }
+                case 0x41:
+                case 0x4d:
+                {
+                    const uint8_t tag = (uint8_t)tags_.back();
+                    const uint8_t e = (tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift; 
+                    const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
+                    const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
+
+                    const size_t bytes_per_elem = size_t(1) << (f + ll);
+
+                    const uint8_t* p = v.data();
+                    const uint8_t* last = v.data() + v.size();
+
+                    size_t size = v.size()/bytes_per_elem;
+                    typed_array_ = typed_array<WorkAllocator>(uint16_array_arg,size,allocator_);
+                    for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                    {
+                        const uint8_t* endp = nullptr;
+                        uint16_t val{ 0 };
+                        switch (e)
+                        {
+                            case 0: val = jsoncons::detail::from_big_endian<uint16_t>(p,p+bytes_per_elem,&endp);break;
+                            case 1: val = jsoncons::detail::from_little_endian<uint16_t>(p,p+bytes_per_elem,&endp);break;
+                            default: break;
+                        }
+                        typed_array_.data(uint16_array_arg)[i] = val;
+                    }
+                    continue_ = handler.typed_array(typed_array_.data(uint16_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    break;
+                }
+                case 0x42:
+                case 0x4e:
+                {
+                    const uint8_t tag = (uint8_t)tags_.back();
+                    const uint8_t e = (tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift; 
+                    const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
+                    const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
+
+                    const size_t bytes_per_elem = size_t(1) << (f + ll);
+
+                    const uint8_t* p = v.data();
+                    const uint8_t* last = v.data() + v.size();
+
+                    size_t size = v.size()/bytes_per_elem;
+                    typed_array_ = typed_array<WorkAllocator>(uint32_array_arg,size,allocator_);
+                    for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                    {
+                        const uint8_t* endp = nullptr;
+                        uint32_t val{ 0 };
+                        switch (e)
+                        {
+                            case 0: val = jsoncons::detail::from_big_endian<uint32_t>(p,p+bytes_per_elem,&endp);break;
+                            case 1: val = jsoncons::detail::from_little_endian<uint32_t>(p,p+bytes_per_elem,&endp);break;
+                            default: break;
+                        }
+                        typed_array_.data(uint32_array_arg)[i] = val;
+                    }
+                    continue_ = handler.typed_array(typed_array_.data(uint32_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    break;
+                }
+                case 0x43:
+                case 0x4f:
+                {
+                    const uint8_t tag = (uint8_t)tags_.back();
+                    const uint8_t e = (tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift; 
+                    const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
+                    const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
+
+                    const size_t bytes_per_elem = size_t(1) << (f + ll);
+
+                    const uint8_t* p = v.data();
+                    const uint8_t* last = v.data() + v.size();
+
+                    size_t size = v.size()/bytes_per_elem;
+                    typed_array_ = typed_array<WorkAllocator>(uint64_array_arg,size,allocator_);
+                    for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                    {
+                        const uint8_t* endp = nullptr;
+                        uint64_t val{ 0 };
+                        switch (e)
+                        {
+                            case 0: val = jsoncons::detail::from_big_endian<uint64_t>(p,p+bytes_per_elem,&endp);break;
+                            case 1: val = jsoncons::detail::from_little_endian<uint64_t>(p,p+bytes_per_elem,&endp);break;
+                            default: break;
+                        }
+                        typed_array_.data(uint64_array_arg)[i] = val;
+                    }
+                    continue_ = handler.typed_array(typed_array_.data(uint64_array_arg), typed_array_.size(), semantic_tag::none, *this);
                     break;
                 }
                 case 0x51:

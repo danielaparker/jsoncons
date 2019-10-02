@@ -137,9 +137,6 @@ public:
 
     typedef json_object<key_type,basic_json> object;
 
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
-
     typedef typename object::iterator object_iterator;
     typedef typename object::const_iterator const_object_iterator;
     typedef typename array::iterator array_iterator;
@@ -405,11 +402,11 @@ public:
             template <typename... Args>
             void create(string_holder_allocator_type allocator, Args&& ... args)
             {
-                typename std::allocator_traits<Allocator>:: template rebind_alloc<byte_string_storage_type> alloc(allocator);
+                string_holder_allocator_type alloc(allocator);
                 ptr_ = alloc.allocate(1);
                 JSONCONS_TRY
                 {
-                    std::allocator_traits<string_holder_allocator_type>:: template rebind_traits<byte_string_storage_type>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                    std::allocator_traits<string_holder_allocator_type>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 JSONCONS_CATCH(...)
                 {
@@ -449,8 +446,8 @@ public:
             {
                 if (ptr_ != nullptr)
                 {
-                    typename std::allocator_traits<string_holder_allocator_type>:: template rebind_alloc<byte_string_storage_type> alloc(ptr_->get_allocator());
-                    std::allocator_traits<string_holder_allocator_type>:: template rebind_traits<byte_string_storage_type>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
+                    string_holder_allocator_type alloc(ptr_->get_allocator());
+                    std::allocator_traits<string_holder_allocator_type>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
                     alloc.deallocate(ptr_,1);
                 }
             }
@@ -489,6 +486,7 @@ public:
         // array_data
         class array_data final : public data_base
         {
+            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
             typedef typename std::allocator_traits<array_allocator>::pointer pointer;
             pointer ptr_;
 
@@ -541,8 +539,8 @@ public:
             {
                 if (ptr_ != nullptr)
                 {
-                    typename std::allocator_traits<array_allocator>:: template rebind_alloc<array> alloc(ptr_->get_allocator());
-                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
+                    array_allocator alloc(ptr_->get_allocator());
+                    std::allocator_traits<array_allocator>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
                     alloc.deallocate(ptr_,1);
                 }
             }
@@ -571,6 +569,7 @@ public:
         // object_data
         class object_data final : public data_base
         {
+            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
             typedef typename std::allocator_traits<object_allocator>::pointer pointer;
             pointer ptr_;
 
@@ -624,8 +623,8 @@ public:
             {
                 if (ptr_ != nullptr)
                 {
-                    typename std::allocator_traits<Allocator>:: template rebind_alloc<object> alloc(ptr_->get_allocator());
-                    std::allocator_traits<Allocator>:: template rebind_traits<object>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
+                    object_allocator alloc(ptr_->get_allocator());
+                    std::allocator_traits<object_allocator>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
                     alloc.deallocate(ptr_,1);
                 }
             }
