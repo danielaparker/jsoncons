@@ -300,6 +300,20 @@ void to_big_endian(double val, OutputIt d_first)
 
 template<typename T, class OutputIt>
 typename std::enable_if<std::is_integral<T>::value && 
+sizeof(T) == sizeof(uint16_t),void>::type
+to_little_endian(T val, OutputIt d_first)
+{
+    T x = JSONCONS_H_TO_LE16(val);
+
+    uint8_t where[sizeof(T)];
+    std::memcpy(where, &x, sizeof(T));
+
+    *d_first++ = where[0];
+    *d_first++ = where[1];
+}
+
+template<typename T, class OutputIt>
+typename std::enable_if<std::is_integral<T>::value && 
 sizeof(T) == sizeof(uint32_t),void>::type
 to_little_endian(T val, OutputIt d_first)
 {
