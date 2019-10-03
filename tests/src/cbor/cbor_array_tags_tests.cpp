@@ -430,6 +430,10 @@ TEST_CASE("cbor tagged array tests")
     SECTION("Tag 87, float128, little endian")
     {
         std::cout << "sizeof(long double): " << sizeof(long double) << "\n";
+
+        const uint8_t* endp = nullptr;
+        long double val;
+
         uint8_t buf[sizeof(long double)];
         auto x = std::numeric_limits<long double>::lowest();
         auto y = (std::numeric_limits<long double>::max)();
@@ -439,12 +443,18 @@ TEST_CASE("cbor tagged array tests")
             std::cout << std::hex << (int)b << " ";
         }
         std::cout << "\n";
+        val = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
+        std::cout << "float 128 val: " << val << "\n";
+
         memcpy(buf,&y,sizeof(long double));
         for (auto b : buf)
         {
             std::cout << std::hex << (int)b << " ";
         }
         std::cout << "\n\n";
+
+        val = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
+        std::cout << "float 128 val: " << val << "\n";
 
         const std::vector<uint8_t> input = {
             0xD8, // Tag
