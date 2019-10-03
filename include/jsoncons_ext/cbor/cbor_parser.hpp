@@ -2190,6 +2190,37 @@ private:
                     continue_ = handler.typed_array(typed_array_.data(int64_array_arg), typed_array_.size(), semantic_tag::none, *this);
                     break;
                 }
+                case 0x50:
+                case 0x54:
+                {
+                    const uint8_t tag = (uint8_t)tags_.back();
+                    const uint8_t e = (tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift; 
+                    const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
+                    const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
+
+                    const size_t bytes_per_elem = size_t(1) << (f + ll);
+
+                    const uint8_t* p = v.data();
+                    const uint8_t* last = v.data() + v.size();
+
+                    size_t size = v.size()/bytes_per_elem;
+                    typed_array_ = typed_array<WorkAllocator>(float_array_arg,size,allocator_);
+                    for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                    {
+                        const uint8_t* endp = nullptr;
+                        uint16_t val{ 0 };
+                        switch (e)
+                        {
+                            case 0: val = jsoncons::detail::from_big_endian<uint16_t>(p,p+bytes_per_elem,&endp);break;
+                            case 1: val = jsoncons::detail::from_little_endian<uint16_t>(p,p+bytes_per_elem,&endp);break;
+                            default: break;
+                        }
+                        double half = jsoncons::detail::decode_half(val);
+                        typed_array_.data(float_array_arg)[i] = static_cast<float>(half);
+                    }
+                    continue_ = handler.typed_array(typed_array_.data(float_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    break;
+                }
                 case 0x51:
                 case 0x55:
                 {
