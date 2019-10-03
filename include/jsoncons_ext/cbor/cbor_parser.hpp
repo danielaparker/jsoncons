@@ -2305,8 +2305,12 @@ private:
                             long double val{ 0 };
                             switch (e)
                             {
-                                case 0: val = jsoncons::detail::big_to_native<long double>(p,p+bytes_per_elem,&endp);break;
-                                case 1: val = jsoncons::detail::little_to_native<long double>(p,p+bytes_per_elem,&endp);break;
+                                case 0: val = jsoncons::detail::big_to_native<long double>(p,p+bytes_per_elem,&endp);
+                                    std::cout << "big_to_native: " << val << "\n";
+                                    break;
+                                case 1: val = jsoncons::detail::little_to_native<long double>(p,p+bytes_per_elem,&endp);
+                                    std::cout << "little_to_native: " << val << "\n";
+                                    break;
                                 default: break;
                             }
                             typed_array_.data(long_double_array_arg)[i] = val;
