@@ -122,7 +122,7 @@ private:
         buffer_.push_back(0x00);
 
         size_t length = buffer_.size() - stack_.back().offset();
-        jsoncons::detail::to_little_endian(static_cast<uint32_t>(length), buffer_.begin()+stack_.back().offset());
+        jsoncons::detail::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+stack_.back().offset());
 
         stack_.pop_back();
         if (stack_.empty())
@@ -153,7 +153,7 @@ private:
         buffer_.push_back(0x00);
 
         size_t length = buffer_.size() - stack_.back().offset();
-        jsoncons::detail::to_little_endian(static_cast<uint32_t>(length), buffer_.begin()+stack_.back().offset());
+        jsoncons::detail::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+stack_.back().offset());
 
         stack_.pop_back();
         if (stack_.empty())
@@ -218,7 +218,7 @@ private:
         }
         buffer_.push_back(0x00);
         size_t length = buffer_.size() - string_offset;
-        jsoncons::detail::to_little_endian(static_cast<uint32_t>(length), buffer_.begin()+offset);
+        jsoncons::detail::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+offset);
 
         return true;
     }
@@ -238,7 +238,7 @@ private:
             buffer_.push_back(c);
         }
         size_t length = buffer_.size() - string_offset;
-        jsoncons::detail::to_little_endian(static_cast<uint32_t>(length), buffer_.begin()+offset);
+        jsoncons::detail::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+offset);
 
         return true;
     }
@@ -257,11 +257,11 @@ private:
         }
         if (val >= (std::numeric_limits<int32_t>::lowest)() && val <= (std::numeric_limits<int32_t>::max)())
         {
-            jsoncons::detail::to_little_endian(static_cast<uint32_t>(val),std::back_inserter(buffer_));
+            jsoncons::detail::native_to_little(static_cast<uint32_t>(val),std::back_inserter(buffer_));
         }
         else if (val >= (std::numeric_limits<int64_t>::lowest)() && val <= (std::numeric_limits<int64_t>::max)())
         {
-            jsoncons::detail::to_little_endian(static_cast<int64_t>(val),std::back_inserter(buffer_));
+            jsoncons::detail::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
         }
         else
         {
@@ -285,11 +285,11 @@ private:
         }
         if (val <= (std::numeric_limits<int32_t>::max)())
         {
-            jsoncons::detail::to_little_endian(static_cast<uint32_t>(val),std::back_inserter(buffer_));
+            jsoncons::detail::native_to_little(static_cast<uint32_t>(val),std::back_inserter(buffer_));
         }
         else if (val <= (uint64_t)(std::numeric_limits<int64_t>::max)())
         {
-            jsoncons::detail::to_little_endian(static_cast<uint64_t>(val),std::back_inserter(buffer_));
+            jsoncons::detail::native_to_little(static_cast<uint64_t>(val),std::back_inserter(buffer_));
         }
         else
         {
@@ -305,7 +305,7 @@ private:
     {
         before_value(jsoncons::bson::detail::bson_format::double_cd);
 
-        jsoncons::detail::to_little_endian(val,std::back_inserter(buffer_));
+        jsoncons::detail::native_to_little(val,std::back_inserter(buffer_));
 
         return true;
     }

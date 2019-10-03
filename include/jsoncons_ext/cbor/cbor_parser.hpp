@@ -1390,7 +1390,7 @@ private:
             {
                 uint8_t buf[sizeof(uint16_t)];
                 source_.read(buf, sizeof(uint16_t));
-                val = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
+                val = jsoncons::detail::big_to_native<uint16_t>(buf,buf+sizeof(buf),&endp);
                 break;
             }
 
@@ -1398,7 +1398,7 @@ private:
             {
                 uint8_t buf[sizeof(uint32_t)];
                 source_.read(buf, sizeof(uint32_t));
-                val = jsoncons::detail::from_big_endian<uint32_t>(buf,buf+sizeof(buf),&endp);
+                val = jsoncons::detail::big_to_native<uint32_t>(buf,buf+sizeof(buf),&endp);
                 break;
             }
 
@@ -1406,7 +1406,7 @@ private:
             {
                 uint8_t buf[sizeof(uint64_t)];
                 source_.read(buf, sizeof(uint64_t));
-                val = jsoncons::detail::from_big_endian<uint64_t>(buf,buf+sizeof(buf),&endp);
+                val = jsoncons::detail::big_to_native<uint64_t>(buf,buf+sizeof(buf),&endp);
                 break;
             }
             default:
@@ -1459,7 +1459,7 @@ private:
                             {
                                 return val;
                             }
-                            auto x = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
+                            auto x = jsoncons::detail::big_to_native<uint16_t>(buf,buf+sizeof(buf),&endp);
                             val = static_cast<int64_t>(-1)- x;
                             break;
                         }
@@ -1471,7 +1471,7 @@ private:
                             {
                                 return val;
                             }
-                            auto x = jsoncons::detail::from_big_endian<uint32_t>(buf,buf+sizeof(buf),&endp);
+                            auto x = jsoncons::detail::big_to_native<uint32_t>(buf,buf+sizeof(buf),&endp);
                             val = static_cast<int64_t>(-1)- x;
                             break;
                         }
@@ -1483,7 +1483,7 @@ private:
                             {
                                 return val;
                             }
-                            auto x = jsoncons::detail::from_big_endian<uint64_t>(buf,buf+sizeof(buf),&endp);
+                            auto x = jsoncons::detail::big_to_native<uint64_t>(buf,buf+sizeof(buf),&endp);
                             val = static_cast<int64_t>(-1)- static_cast<int64_t>(x);
                             break;
                         }
@@ -1547,7 +1547,7 @@ private:
                     continue_ = false;
                     return 0;
                 }
-                uint16_t x = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
+                uint16_t x = jsoncons::detail::big_to_native<uint16_t>(buf,buf+sizeof(buf),&endp);
                 val = jsoncons::detail::decode_half(x);
                 break;
             }
@@ -1563,7 +1563,7 @@ private:
                     continue_ = false;
                     return 0;
                 }
-                val = jsoncons::detail::from_big_endian<float>(buf,buf+sizeof(buf),&endp);
+                val = jsoncons::detail::big_to_native<float>(buf,buf+sizeof(buf),&endp);
                 break;
             }
 
@@ -1577,7 +1577,7 @@ private:
                     continue_ = false;
                     return 0;
                 }
-                val = jsoncons::detail::from_big_endian<double>(buf,buf+sizeof(buf),&endp);
+                val = jsoncons::detail::big_to_native<double>(buf,buf+sizeof(buf),&endp);
                 break;
             }
             default:
@@ -2017,8 +2017,8 @@ private:
                         uint16_t val{ 0 };
                         switch (e)
                         {
-                            case 0: val = jsoncons::detail::from_big_endian<uint16_t>(p,p+bytes_per_elem,&endp);break;
-                            case 1: val = jsoncons::detail::from_little_endian<uint16_t>(p,p+bytes_per_elem,&endp);break;
+                            case 0: val = jsoncons::detail::big_to_native<uint16_t>(p,p+bytes_per_elem,&endp);break;
+                            case 1: val = jsoncons::detail::little_to_native<uint16_t>(p,p+bytes_per_elem,&endp);break;
                             default: break;
                         }
                         typed_array_.data(uint16_array_arg)[i] = val;
@@ -2047,8 +2047,8 @@ private:
                         uint32_t val{ 0 };
                         switch (e)
                         {
-                            case 0: val = jsoncons::detail::from_big_endian<uint32_t>(p,p+bytes_per_elem,&endp);break;
-                            case 1: val = jsoncons::detail::from_little_endian<uint32_t>(p,p+bytes_per_elem,&endp);break;
+                            case 0: val = jsoncons::detail::big_to_native<uint32_t>(p,p+bytes_per_elem,&endp);break;
+                            case 1: val = jsoncons::detail::little_to_native<uint32_t>(p,p+bytes_per_elem,&endp);break;
                             default: break;
                         }
                         typed_array_.data(uint32_array_arg)[i] = val;
@@ -2077,8 +2077,8 @@ private:
                         uint64_t val{ 0 };
                         switch (e)
                         {
-                            case 0: val = jsoncons::detail::from_big_endian<uint64_t>(p,p+bytes_per_elem,&endp);break;
-                            case 1: val = jsoncons::detail::from_little_endian<uint64_t>(p,p+bytes_per_elem,&endp);break;
+                            case 0: val = jsoncons::detail::big_to_native<uint64_t>(p,p+bytes_per_elem,&endp);break;
+                            case 1: val = jsoncons::detail::little_to_native<uint64_t>(p,p+bytes_per_elem,&endp);break;
                             default: break;
                         }
                         typed_array_.data(uint64_array_arg)[i] = val;
@@ -2121,8 +2121,8 @@ private:
                         int16_t val{ 0 };
                         switch (e)
                         {
-                            case 0: val = jsoncons::detail::from_big_endian<int16_t>(p,p+bytes_per_elem,&endp);break;
-                            case 1: val = jsoncons::detail::from_little_endian<int16_t>(p,p+bytes_per_elem,&endp);break;
+                            case 0: val = jsoncons::detail::big_to_native<int16_t>(p,p+bytes_per_elem,&endp);break;
+                            case 1: val = jsoncons::detail::little_to_native<int16_t>(p,p+bytes_per_elem,&endp);break;
                             default: break;
                         }
                         typed_array_.data(int16_array_arg)[i] = val;
@@ -2151,8 +2151,8 @@ private:
                         int32_t val{ 0 };
                         switch (e)
                         {
-                            case 0: val = jsoncons::detail::from_big_endian<int32_t>(p,p+bytes_per_elem,&endp);break;
-                            case 1: val = jsoncons::detail::from_little_endian<int32_t>(p,p+bytes_per_elem,&endp);break;
+                            case 0: val = jsoncons::detail::big_to_native<int32_t>(p,p+bytes_per_elem,&endp);break;
+                            case 1: val = jsoncons::detail::little_to_native<int32_t>(p,p+bytes_per_elem,&endp);break;
                             default: break;
                         }
                         typed_array_.data(int32_array_arg)[i] = val;
@@ -2181,8 +2181,8 @@ private:
                         int64_t val{ 0 };
                         switch (e)
                         {
-                            case 0: val = jsoncons::detail::from_big_endian<int64_t>(p,p+bytes_per_elem,&endp);break;
-                            case 1: val = jsoncons::detail::from_little_endian<int64_t>(p,p+bytes_per_elem,&endp);break;
+                            case 0: val = jsoncons::detail::big_to_native<int64_t>(p,p+bytes_per_elem,&endp);break;
+                            case 1: val = jsoncons::detail::little_to_native<int64_t>(p,p+bytes_per_elem,&endp);break;
                             default: break;
                         }
                         typed_array_.data(int64_array_arg)[i] = val;
@@ -2211,8 +2211,8 @@ private:
                         uint16_t val{ 0 };
                         switch (e)
                         {
-                            case 0: val = jsoncons::detail::from_big_endian<uint16_t>(p,p+bytes_per_elem,&endp);break;
-                            case 1: val = jsoncons::detail::from_little_endian<uint16_t>(p,p+bytes_per_elem,&endp);break;
+                            case 0: val = jsoncons::detail::big_to_native<uint16_t>(p,p+bytes_per_elem,&endp);break;
+                            case 1: val = jsoncons::detail::little_to_native<uint16_t>(p,p+bytes_per_elem,&endp);break;
                             default: break;
                         }
                         double half = jsoncons::detail::decode_half(val);
@@ -2242,8 +2242,8 @@ private:
                         float val{ 0 };
                         switch (e)
                         {
-                            case 0: val = jsoncons::detail::from_big_endian<float>(p,p+bytes_per_elem,&endp);break;
-                            case 1: val = jsoncons::detail::from_little_endian<float>(p,p+bytes_per_elem,&endp);break;
+                            case 0: val = jsoncons::detail::big_to_native<float>(p,p+bytes_per_elem,&endp);break;
+                            case 1: val = jsoncons::detail::little_to_native<float>(p,p+bytes_per_elem,&endp);break;
                             default: break;
                         }
                         typed_array_.data(float_array_arg)[i] = val;
@@ -2272,8 +2272,8 @@ private:
                         double val{ 0 };
                         switch (e)
                         {
-                            case 0: val = jsoncons::detail::from_big_endian<double>(p,p+bytes_per_elem,&endp);break;
-                            case 1: val = jsoncons::detail::from_little_endian<double>(p,p+bytes_per_elem,&endp);break;
+                            case 0: val = jsoncons::detail::big_to_native<double>(p,p+bytes_per_elem,&endp);break;
+                            case 1: val = jsoncons::detail::little_to_native<double>(p,p+bytes_per_elem,&endp);break;
                             default: break;
                         }
                         typed_array_.data(double_array_arg)[i] = val;
@@ -2281,7 +2281,7 @@ private:
                     continue_ = handler.typed_array(typed_array_.data(double_array_arg), typed_array_.size(), semantic_tag::none, *this);
                     break;
                 }
-#if 0
+
                 case 0x53:
                 case 0x57:
                 {
@@ -2291,28 +2291,36 @@ private:
                     const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
 
                     const size_t bytes_per_elem = size_t(1) << (f + ll);
-
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
-
-                    size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<WorkAllocator>(long_double_array_arg,size,allocator_);
-                    for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                    if (bytes_per_elem == sizeof(long double))
                     {
-                        const uint8_t* endp = nullptr;
-                        long double val{ 0 };
-                        switch (e)
+
+                        const uint8_t* p = v.data();
+                        const uint8_t* last = v.data() + v.size();
+
+                        size_t size = v.size()/bytes_per_elem;
+                        typed_array_ = typed_array<WorkAllocator>(long_double_array_arg,size,allocator_);
+                        for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
-                            case 0: val = jsoncons::detail::from_big_endian<long double>(p,p+bytes_per_elem,&endp);break;
-                            case 1: val = jsoncons::detail::from_little_endian<long double>(p,p+bytes_per_elem,&endp);break;
-                            default: break;
+                            const uint8_t* endp = nullptr;
+                            long double val{ 0 };
+                            switch (e)
+                            {
+                                case 0: val = jsoncons::detail::big_to_native<long double>(p,p+bytes_per_elem,&endp);break;
+                                case 1: val = jsoncons::detail::little_to_native<long double>(p,p+bytes_per_elem,&endp);break;
+                                default: break;
+                            }
+                            typed_array_.data(long_double_array_arg)[i] = val;
                         }
-                        typed_array_.data(long_double_array_arg)[i] = val;
+                        continue_ = handler.typed_array(typed_array_.data(long_double_array_arg), typed_array_.size(), semantic_tag::none, *this);
                     }
-                    continue_ = handler.typed_array(typed_array_.data(long_double_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    else
+                    {
+                        continue_ = handler.begin_array(semantic_tag::none, *this);
+                        continue_ = handler.end_array(*this);
+                    }
                     break;
                 }
-#endif
+
                 default:
                     continue_ = handler.byte_string_value(v, semantic_tag::none, *this);
                     break;

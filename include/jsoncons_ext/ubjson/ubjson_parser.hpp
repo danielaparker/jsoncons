@@ -334,7 +334,7 @@ private:
                     return;
                 }
                 const uint8_t* endp;
-                int8_t val = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
+                int8_t val = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
                 continue_ = handler.int64_value(val, semantic_tag::none, *this);
                 break;
             }
@@ -359,7 +359,7 @@ private:
                     return;
                 }
                 const uint8_t* endp;
-                int16_t val = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
+                int16_t val = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
                 continue_ = handler.int64_value(val, semantic_tag::none, *this);
                 break;
             }
@@ -373,7 +373,7 @@ private:
                     return;
                 }
                 const uint8_t* endp;
-                int32_t val = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
+                int32_t val = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
                 continue_ = handler.int64_value(val, semantic_tag::none, *this);
                 break;
             }
@@ -387,7 +387,7 @@ private:
                     return;
                 }
                 const uint8_t* endp;
-                int64_t val = jsoncons::detail::from_big_endian<int64_t>(buf,buf+sizeof(buf),&endp);
+                int64_t val = jsoncons::detail::big_to_native<int64_t>(buf,buf+sizeof(buf),&endp);
                 continue_ = handler.int64_value(val, semantic_tag::none, *this);
                 break;
             }
@@ -401,7 +401,7 @@ private:
                     return;
                 }
                 const uint8_t* endp;
-                float val = jsoncons::detail::from_big_endian<float>(buf,buf+sizeof(buf),&endp);
+                float val = jsoncons::detail::big_to_native<float>(buf,buf+sizeof(buf),&endp);
                 continue_ = handler.double_value(val, semantic_tag::none, *this);
                 break;
             }
@@ -415,7 +415,7 @@ private:
                     return;
                 }
                 const uint8_t* endp;
-                double val = jsoncons::detail::from_big_endian<double>(buf,buf+sizeof(buf),&endp);
+                double val = jsoncons::detail::big_to_native<double>(buf,buf+sizeof(buf),&endp);
                 continue_ = handler.double_value(val, semantic_tag::none, *this);
                 break;
             }
@@ -429,7 +429,7 @@ private:
                     return;
                 }
                 const uint8_t* endp;
-                char c = jsoncons::detail::from_big_endian<char>(buf,buf+sizeof(buf),&endp);
+                char c = jsoncons::detail::big_to_native<char>(buf,buf+sizeof(buf),&endp);
                 auto result = unicons::validate(&c,&c+1);
                 if (result.ec != unicons::conv_errc())
                 {
@@ -621,7 +621,7 @@ private:
                     return length;
                 }
                 const uint8_t* endp;
-                int8_t val = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
+                int8_t val = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
                 if (val >= 0)
                 {
                     length = val;
@@ -654,7 +654,7 @@ private:
                     return length;
                 }
                 const uint8_t* endp;
-                int16_t val = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
+                int16_t val = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
                 if (val >= 0)
                 {
                     length = val;
@@ -676,7 +676,7 @@ private:
                     return length;
                 }
                 const uint8_t* endp;
-                int32_t val = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
+                int32_t val = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
                 if (val >= 0)
                 {
                     length = val;
@@ -698,7 +698,7 @@ private:
                     return length;
                 }
                 const uint8_t* endp;
-                int64_t val = jsoncons::detail::from_big_endian<int64_t>(buf,buf+sizeof(buf),&endp);
+                int64_t val = jsoncons::detail::big_to_native<int64_t>(buf,buf+sizeof(buf),&endp);
                 if (val >= 0)
                 {
                     length = (size_t)val;

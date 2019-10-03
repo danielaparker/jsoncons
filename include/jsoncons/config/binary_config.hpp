@@ -32,78 +32,78 @@
 #if (defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 403)) || \
     (__has_builtin(__builtin_bswap64) && __has_builtin(__builtin_bswap32))
 #  if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#    define JSONCONS_BE64_TO_H     __builtin_bswap64
-#    define JSONCONS_H_TO_BE64     __builtin_bswap64
-#    define JSONCONS_BE32_TO_H      __builtin_bswap32
-#    define JSONCONS_H_TO_BE32      __builtin_bswap32
+#    define JSONCONS_BIG_64_TO_NATIVE     __builtin_bswap64
+#    define JSONCONS_NATIVE_TO_BIG_64     __builtin_bswap64
+#    define JSONCONS_BIG_32_TO_NATIVE      __builtin_bswap32
+#    define JSONCONS_NATIVE_TO_BIG_32      __builtin_bswap32
 #    ifdef __INTEL_COMPILER
-#      define JSONCONS_BE16_TO_H    _bswap16
-#      define JSONCONS_H_TO_BE16    _bswap16
+#      define JSONCONS_BIG_16_TO_NATIVE    _bswap16
+#      define JSONCONS_NATIVE_TO_BIG_16    _bswap16
 #    elif (__GNUC__ * 100 + __GNUC_MINOR__ >= 608) || __has_builtin(__builtin_bswap16)
-#      define JSONCONS_BE16_TO_H    __builtin_bswap16
-#      define JSONCONS_H_TO_BE16    __builtin_bswap16
+#      define JSONCONS_BIG_16_TO_NATIVE    __builtin_bswap16
+#      define JSONCONS_NATIVE_TO_BIG_16    __builtin_bswap16
 #    else
-#      define JSONCONS_BE16_TO_H(x) (((uint16_t)x >> 8) | ((uint16_t)x << 8))
-#      define JSONCONS_H_TO_BE16    JSONCONS_BE16_TO_H
+#      define JSONCONS_BIG_16_TO_NATIVE(x) (((uint16_t)x >> 8) | ((uint16_t)x << 8))
+#      define JSONCONS_NATIVE_TO_BIG_16    JSONCONS_BIG_16_TO_NATIVE
 #    endif
-#    define JSONCONS_LE64_TO_H
-#    define JSONCONS_H_TO_LE64
-#    define JSONCONS_LE32_TO_H
-#    define JSONCONS_H_TO_LE32
-#    define JSONCONS_LE16_TO_H
-#    define JSONCONS_H_TO_LE16
+#    define JSONCONS_LITTLE_64_TO_NATIVE
+#    define JSONCONS_NATIVE_TO_LITTLE_64
+#    define JSONCONS_LITTLE_32_TO_NATIVE
+#    define JSONCONS_NATIVE_TO_LITTLE_32
+#    define JSONCONS_LITTLE_16_TO_NATIVE
+#    define JSONCONS_NATIVE_TO_LITTLE_16
 #  else
-#    define JSONCONS_LE64_TO_H     __builtin_bswap64
-#    define JSONCONS_H_TO_LE64     __builtin_bswap64
-#    define JSONCONS_LE32_TO_H      __builtin_bswap32
-#    define JSONCONS_H_TO_LE32      __builtin_bswap32
+#    define JSONCONS_LITTLE_64_TO_NATIVE     __builtin_bswap64
+#    define JSONCONS_NATIVE_TO_LITTLE_64     __builtin_bswap64
+#    define JSONCONS_LITTLE_32_TO_NATIVE      __builtin_bswap32
+#    define JSONCONS_NATIVE_TO_LITTLE_32      __builtin_bswap32
 #    ifdef __INTEL_COMPILER
-#      define JSONCONS_LE16_TO_H    _bswap16
-#      define JSONCONS_H_TO_LE16    _bswap16
+#      define JSONCONS_LITTLE_16_TO_NATIVE    _bswap16
+#      define JSONCONS_NATIVE_TO_LITTLE_16    _bswap16
 #    elif (__GNUC__ * 100 + __GNUC_MINOR__ >= 608) || __has_builtin(__builtin_bswap16)
-#      define JSONCONS_LE16_TO_H    __builtin_bswap16
-#      define JSONCONS_H_TO_LE16    __builtin_bswap16
+#      define JSONCONS_LITTLE_16_TO_NATIVE    __builtin_bswap16
+#      define JSONCONS_NATIVE_TO_LITTLE_16    __builtin_bswap16
 #    else
-#      define JSONCONS_LE16_TO_H(x) (((uint16_t)x >> 8) | ((uint16_t)x << 8))
-#      define JSONCONS_H_TO_LE16    JSONCONS_LE16_TO_H
+#      define JSONCONS_LITTLE_16_TO_NATIVE(x) (((uint16_t)x >> 8) | ((uint16_t)x << 8))
+#      define JSONCONS_NATIVE_TO_LITTLE_16    JSONCONS_LITTLE_16_TO_NATIVE
 #    endif
-#    define JSONCONS_BE64_TO_H
-#    define JSONCONS_H_TO_BE64
-#    define JSONCONS_BE32_TO_H
-#    define JSONCONS_H_TO_BE32
-#    define JSONCONS_BE16_TO_H
-#    define JSONCONS_H_TO_BE16
+#    define JSONCONS_BIG_64_TO_NATIVE
+#    define JSONCONS_NATIVE_TO_BIG_64
+#    define JSONCONS_BIG_32_TO_NATIVE
+#    define JSONCONS_NATIVE_TO_BIG_32
+#    define JSONCONS_BIG_16_TO_NATIVE
+#    define JSONCONS_NATIVE_TO_BIG_16
 #  endif
 #elif defined(__sun)
 #  include <sys/byteorder.h>
 #elif defined(_MSC_VER)
 /* MSVC, which implies Windows, which implies little-endian and sizeof(long) == 4 */
-#  define JSONCONS_BE64_TO_H       _byteswap_uint64
-#  define JSONCONS_H_TO_BE64       _byteswap_uint64
-#  define JSONCONS_BE32_TO_H        _byteswap_ulong
-#  define JSONCONS_H_TO_BE32        _byteswap_ulong
-#  define JSONCONS_BE16_TO_H        _byteswap_ushort
-#  define JSONCONS_H_TO_BE16        _byteswap_ushort
-#  define JSONCONS_LE64_TO_H
-#  define JSONCONS_H_TO_LE64
-#  define JSONCONS_LE32_TO_H
-#  define JSONCONS_H_TO_LE32
-#  define JSONCONS_LE16_TO_H
-#  define JSONCONS_H_TO_LE16
+#  define JSONCONS_BIG_64_TO_NATIVE       _byteswap_uint64
+#  define JSONCONS_NATIVE_TO_BIG_64       _byteswap_uint64
+#  define JSONCONS_BIG_32_TO_NATIVE        _byteswap_ulong
+#  define JSONCONS_NATIVE_TO_BIG_32        _byteswap_ulong
+#  define JSONCONS_BIG_16_TO_NATIVE        _byteswap_ushort
+#  define JSONCONS_NATIVE_TO_BIG_16        _byteswap_ushort
+#  define JSONCONS_LITTLE_64_TO_NATIVE
+#  define JSONCONS_NATIVE_TO_LITTLE_64
+#  define JSONCONS_LITTLE_32_TO_NATIVE
+#  define JSONCONS_NATIVE_TO_LITTLE_32
+#  define JSONCONS_LITTLE_16_TO_NATIVE
+#  define JSONCONS_NATIVE_TO_LITTLE_16
 #endif
-#ifndef JSONCONS_BE16_TO_H
+#ifndef JSONCONS_BIG_16_TO_NATIVE
 #  include <arpa/inet.h>
-#  define JSONCONS_BE16_TO_H        ntohs
-#  define JSONCONS_H_TO_BE16        htons
+#  define JSONCONS_BIG_16_TO_NATIVE        ntohs
+#  define JSONCONS_NATIVE_TO_BIG_16        htons
 #endif
-#ifndef JSONCONS_BE32_TO_H
+#ifndef JSONCONS_BIG_32_TO_NATIVE
 #  include <arpa/inet.h>
-#  define JSONCONS_BE32_TO_H        ntohl
-#  define JSONCONS_H_TO_BE32        htonl
+#  define JSONCONS_BIG_32_TO_NATIVE        ntohl
+#  define JSONCONS_NATIVE_TO_BIG_32        htonl
 #endif
-#ifndef JSONCONS_BE64_TO_H
-#  define JSONCONS_BE64_TO_H       ntohll
-#  define JSONCONS_H_TO_BE64       htonll
+#ifndef JSONCONS_BIG_64_TO_NATIVE
+#  define JSONCONS_BIG_64_TO_NATIVE       ntohll
+#  define JSONCONS_NATIVE_TO_BIG_64       htonll
 /* ntohll isn't usually defined */
 #  ifndef ntohll
 #    if defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -134,7 +134,13 @@ enum class endian
 #error "Unable to determine byte order!"
 #endif
 };
-  
+
+struct uint128_holder
+{
+    uint64_t lo;
+    uint64_t hi;
+};
+
 class read_nbytes_failed : public std::invalid_argument, public virtual json_exception
 {
 public:
@@ -234,12 +240,12 @@ double decode_half(uint16_t half)
 #endif
 }
 
-// to_big_endian
+// native_to_big
 
 
 template<class T, class OutputIt>
 typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint8_t),void>::type
-to_big_endian(T val, OutputIt d_first)
+native_to_big(T val, OutputIt d_first)
 {
     *d_first = static_cast<uint8_t>(val);
 }
@@ -248,9 +254,9 @@ to_big_endian(T val, OutputIt d_first)
 template<typename T, class OutputIt>
 typename std::enable_if<std::is_integral<T>::value && 
 sizeof(T) == sizeof(uint16_t),void>::type
-to_big_endian(T val, OutputIt d_first)
+native_to_big(T val, OutputIt d_first)
 {
-    T x = JSONCONS_H_TO_BE16(val);
+    T x = JSONCONS_NATIVE_TO_BIG_16(val);
 
     uint8_t where[sizeof(T)];
     std::memcpy(where, &x, sizeof(T));
@@ -262,9 +268,9 @@ to_big_endian(T val, OutputIt d_first)
 template<typename T, class OutputIt>
 typename std::enable_if<std::is_integral<T>::value && 
 sizeof(T) == sizeof(uint32_t),void>::type
-to_big_endian(T val, OutputIt d_first)
+native_to_big(T val, OutputIt d_first)
 {
-    T x = JSONCONS_H_TO_BE32(val);
+    T x = JSONCONS_NATIVE_TO_BIG_32(val);
 
     uint8_t where[sizeof(T)];
     std::memcpy(where, &x, sizeof(T));
@@ -278,9 +284,9 @@ to_big_endian(T val, OutputIt d_first)
 template<typename T, class OutputIt>
 typename std::enable_if<std::is_integral<T>::value && 
 sizeof(T) == sizeof(uint64_t),void>::type
-to_big_endian(T val, OutputIt d_first)
+native_to_big(T val, OutputIt d_first)
 {
-    T x = JSONCONS_H_TO_BE64(val);
+    T x = JSONCONS_NATIVE_TO_BIG_64(val);
 
     uint8_t where[sizeof(T)];
     std::memcpy(where, &x, sizeof(T));
@@ -296,29 +302,29 @@ to_big_endian(T val, OutputIt d_first)
 }
 
 template<class OutputIt>
-void to_big_endian(float val, OutputIt d_first)
+void native_to_big(float val, OutputIt d_first)
 {
     uint32_t where;
     std::memcpy(&where,&val,sizeof(val));
-    to_big_endian(where, d_first);
+    native_to_big(where, d_first);
 }
 
 template<class OutputIt>
-void to_big_endian(double val, OutputIt d_first)
+void native_to_big(double val, OutputIt d_first)
 {
     uint64_t where;
     std::memcpy(&where,&val,sizeof(val));
-    to_big_endian(where, d_first);
+    native_to_big(where, d_first);
 }
 
-// to_little_endian
+// native_to_little
 
 template<typename T, class OutputIt>
 typename std::enable_if<std::is_integral<T>::value && 
 sizeof(T) == sizeof(uint16_t),void>::type
-to_little_endian(T val, OutputIt d_first)
+native_to_little(T val, OutputIt d_first)
 {
-    T x = JSONCONS_H_TO_LE16(val);
+    T x = JSONCONS_NATIVE_TO_LITTLE_16(val);
 
     uint8_t where[sizeof(T)];
     std::memcpy(where, &x, sizeof(T));
@@ -330,9 +336,9 @@ to_little_endian(T val, OutputIt d_first)
 template<typename T, class OutputIt>
 typename std::enable_if<std::is_integral<T>::value && 
 sizeof(T) == sizeof(uint32_t),void>::type
-to_little_endian(T val, OutputIt d_first)
+native_to_little(T val, OutputIt d_first)
 {
-    T x = JSONCONS_H_TO_LE32(val);
+    T x = JSONCONS_NATIVE_TO_LITTLE_32(val);
 
     uint8_t where[sizeof(T)];
     std::memcpy(where, &x, sizeof(T));
@@ -346,9 +352,9 @@ to_little_endian(T val, OutputIt d_first)
 template<typename T, class OutputIt>
 typename std::enable_if<std::is_integral<T>::value && 
 sizeof(T) == sizeof(uint64_t),void>::type
-to_little_endian(T val, OutputIt d_first)
+native_to_little(T val, OutputIt d_first)
 {
-    T x = JSONCONS_H_TO_LE64(val);
+    T x = JSONCONS_NATIVE_TO_LITTLE_64(val);
 
     uint8_t where[sizeof(T)];
     std::memcpy(where, &x, sizeof(T));
@@ -364,27 +370,27 @@ to_little_endian(T val, OutputIt d_first)
 }
 
 template<class OutputIt>
-void to_little_endian(float val, OutputIt d_first)
+void native_to_little(float val, OutputIt d_first)
 {
     uint32_t where;
     std::memcpy(&where,&val,sizeof(val));
-    to_little_endian(where, d_first);
+    native_to_little(where, d_first);
 }
 
 template<class OutputIt>
-void to_little_endian(double val, OutputIt d_first)
+void native_to_little(double val, OutputIt d_first)
 {
     uint64_t where;
     std::memcpy(&where,&val,sizeof(val));
-    to_little_endian(where, d_first);
+    native_to_little(where, d_first);
 }
 
-// from_big_endian
+// big_to_native
 
 template<class T>
 typename std::enable_if<std::is_integral<T>::value && 
 sizeof(T) == sizeof(uint8_t),T>::type
-from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first + sizeof(T) > last)
     {
@@ -401,7 +407,7 @@ from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 template<class T>
 typename std::enable_if<std::is_integral<T>::value && 
 sizeof(T) == sizeof(uint16_t),T>::type
-from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first + sizeof(T) > last)
     {
@@ -413,13 +419,13 @@ from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
         *endp = first + sizeof(T);
         T val;
         std::memcpy(&val,first,sizeof(T));
-        return JSONCONS_BE16_TO_H(val);
+        return JSONCONS_BIG_16_TO_NATIVE(val);
     }
 }
  
 template<class T>
 typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint32_t),T>::type
-from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first + sizeof(T) > last)
     {
@@ -431,13 +437,13 @@ from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
         *endp = first + sizeof(T);
         T val;
         std::memcpy(&val,first,sizeof(T));
-        return JSONCONS_BE32_TO_H(val);
+        return JSONCONS_BIG_32_TO_NATIVE(val);
     }
 }
 
 template<class T>
 typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint64_t),T>::type
-from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first + sizeof(T) > last)
     {
@@ -449,16 +455,56 @@ from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
         *endp = first + sizeof(T);
         T val;
         std::memcpy(&val,first,sizeof(T));
-        return JSONCONS_BE64_TO_H(val);
+        return JSONCONS_BIG_64_TO_NATIVE(val);
     }
+}
+
+template<class T>
+typename std::enable_if<endian::native == endian::big && sizeof(T) == 2*sizeof(uint64_t),T>::type
+big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+{
+    if (first + sizeof(T) > last)
+    {
+        *endp = first;
+        return 0;
+    }
+    *endp = first + sizeof(T);
+    T val;
+    std::memcpy(&val,first,sizeof(T));
+    return val;
+}
+
+template<class T>
+typename std::enable_if<endian::native == endian::little && sizeof(T) == 2*sizeof(uint64_t),T>::type
+big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+{
+    if (first + sizeof(T) > last)
+    {
+        *endp = first;
+        return 0;
+    }
+    *endp = first + sizeof(T);
+
+    uint64_t hi;
+    std::memcpy(&hi,first,sizeof(uint64_t));
+    uint64_t lo;
+    std::memcpy(&lo,first+sizeof(uint64_t),sizeof(uint64_t));
+
+    uint128_holder x;
+    x.lo = JSONCONS_BIG_64_TO_NATIVE(hi);
+    x.hi = JSONCONS_BIG_64_TO_NATIVE(lo);
+
+    T val;
+    std::memcpy(&val,&x,sizeof(T));
+    return val;
 }
 
 template<class T>
 typename std::enable_if<std::is_floating_point<T>::value && 
 sizeof(T) == sizeof(uint32_t),T>::type
-from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
-    uint32_t data = from_big_endian<uint32_t>(first,last,endp);
+    uint32_t data = big_to_native<uint32_t>(first,last,endp);
     T val;
     std::memcpy(&val,&data,sizeof(T));
     return val;
@@ -467,20 +513,20 @@ from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 template<class T>
 typename std::enable_if<std::is_floating_point<T>::value && 
 sizeof(T) == sizeof(uint64_t),T>::type
-from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
-    uint64_t data = from_big_endian<uint64_t>(first,last,endp);
+    uint64_t data = big_to_native<uint64_t>(first,last,endp);
     T val;
     std::memcpy(&val,&data,sizeof(T));
     return val;
 }
 
-// from_little_endian
+// little_to_native
 
 template<class T>
 typename std::enable_if<std::is_integral<T>::value && 
 sizeof(T) == sizeof(uint8_t),T>::type
-from_little_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first + sizeof(T) > last)
     {
@@ -497,7 +543,7 @@ from_little_endian(const uint8_t* first, const uint8_t* last, const uint8_t** en
 template<class T>
 typename std::enable_if<std::is_integral<T>::value && 
 sizeof(T) == sizeof(uint16_t),T>::type
-from_little_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first + sizeof(T) > last)
     {
@@ -509,13 +555,13 @@ from_little_endian(const uint8_t* first, const uint8_t* last, const uint8_t** en
         *endp = first + sizeof(T);
         T val;
         std::memcpy(&val,first,sizeof(T));
-        return JSONCONS_LE16_TO_H(val);
+        return JSONCONS_LITTLE_16_TO_NATIVE(val);
     }
 }
 
 template<class T>
 typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint32_t),T>::type
-from_little_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first + sizeof(T) > last)
     {
@@ -527,13 +573,13 @@ from_little_endian(const uint8_t* first, const uint8_t* last, const uint8_t** en
         *endp = first + sizeof(T);
         T val;
         std::memcpy(&val,first,sizeof(T));
-        return JSONCONS_LE32_TO_H(val);
+        return JSONCONS_LITTLE_32_TO_NATIVE(val);
     }
 }
 
 template<class T>
 typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint64_t),T>::type
-from_little_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first + sizeof(T) > last)
     {
@@ -545,16 +591,31 @@ from_little_endian(const uint8_t* first, const uint8_t* last, const uint8_t** en
         *endp = first + sizeof(T);
         T val;
         std::memcpy(&val,first,sizeof(T));
-        return JSONCONS_LE64_TO_H(val);
+        return JSONCONS_LITTLE_64_TO_NATIVE(val);
     }
+}
+
+template<class T>
+typename std::enable_if<endian::native == endian::little && sizeof(T) == 2*sizeof(uint64_t),T>::type
+little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+{
+    if (first + sizeof(T) > last)
+    {
+        *endp = first;
+        return 0;
+    }
+    *endp = first + sizeof(T);
+    T val;
+    std::memcpy(&val,first,sizeof(T));
+    return val;
 }
 
 template<class T>
 typename std::enable_if<std::is_floating_point<T>::value && 
 sizeof(T) == sizeof(uint32_t),T>::type
-from_little_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
-    uint32_t data = from_little_endian<uint32_t>(first,last,endp);
+    uint32_t data = little_to_native<uint32_t>(first,last,endp);
     T val;
     std::memcpy(&val,&data,sizeof(T));
     return val;
@@ -563,9 +624,9 @@ from_little_endian(const uint8_t* first, const uint8_t* last, const uint8_t** en
 template<class T>
 typename std::enable_if<std::is_floating_point<T>::value && 
 sizeof(T) == sizeof(uint64_t),T>::type
-from_little_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
-    uint64_t data = from_little_endian<uint64_t>(first,last,endp);
+    uint64_t data = little_to_native<uint64_t>(first,last,endp);
     T val;
     std::memcpy(&val,&data,sizeof(T));
     return val;

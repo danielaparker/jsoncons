@@ -255,7 +255,7 @@ private:
                         return;
                     }
                     const uint8_t* endp;
-                    float val = jsoncons::detail::from_big_endian<float>(buf,buf+sizeof(buf),&endp);
+                    float val = jsoncons::detail::big_to_native<float>(buf,buf+sizeof(buf),&endp);
                     continue_ = handler.double_value(val, semantic_tag::none, *this);
                     break;
                 }
@@ -270,7 +270,7 @@ private:
                         return;
                     }
                     const uint8_t* endp;
-                    double val = jsoncons::detail::from_big_endian<double>(buf,buf+sizeof(buf),&endp);
+                    double val = jsoncons::detail::big_to_native<double>(buf,buf+sizeof(buf),&endp);
                     continue_ = handler.double_value(val, semantic_tag::none, *this);
                     break;
                 }
@@ -293,7 +293,7 @@ private:
                         return;
                     }
                     const uint8_t* endp;
-                    uint16_t val = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
+                    uint16_t val = jsoncons::detail::big_to_native<uint16_t>(buf,buf+sizeof(buf),&endp);
                     continue_ = handler.uint64_value(val, semantic_tag::none, *this);
                     break;
                 }
@@ -308,7 +308,7 @@ private:
                         return;
                     }
                     const uint8_t* endp;
-                    uint32_t val = jsoncons::detail::from_big_endian<uint32_t>(buf,buf+sizeof(buf),&endp);
+                    uint32_t val = jsoncons::detail::big_to_native<uint32_t>(buf,buf+sizeof(buf),&endp);
                     continue_ = handler.uint64_value(val, semantic_tag::none, *this);
                     break;
                 }
@@ -323,7 +323,7 @@ private:
                         return;
                     }
                     const uint8_t* endp;
-                    uint64_t val = jsoncons::detail::from_big_endian<uint64_t>(buf,buf+sizeof(buf),&endp);
+                    uint64_t val = jsoncons::detail::big_to_native<uint64_t>(buf,buf+sizeof(buf),&endp);
                     continue_ = handler.uint64_value(val, semantic_tag::none, *this);
                     break;
                 }
@@ -338,7 +338,7 @@ private:
                         return;
                     }
                     const uint8_t* endp;
-                    int8_t val = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
+                    int8_t val = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
                     continue_ = handler.int64_value(val, semantic_tag::none, *this);
                     break;
                 }
@@ -353,7 +353,7 @@ private:
                         return;
                     }
                     const uint8_t* endp;
-                    int16_t val = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
+                    int16_t val = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
                     continue_ = handler.int64_value(val, semantic_tag::none, *this);
                     break;
                 }
@@ -368,7 +368,7 @@ private:
                         return;
                     }
                     const uint8_t* endp;
-                    int32_t val = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
+                    int32_t val = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
                     continue_ = handler.int64_value(val, semantic_tag::none, *this);
                     break;
                 }
@@ -383,7 +383,7 @@ private:
                         return;
                     }
                     const uint8_t* endp;
-                    int64_t val = jsoncons::detail::from_big_endian<int64_t>(buf,buf+sizeof(buf),&endp);
+                    int64_t val = jsoncons::detail::big_to_native<int64_t>(buf,buf+sizeof(buf),&endp);
                     continue_ = handler.int64_value(val, semantic_tag::none, *this);
                     break;
                 }
@@ -398,7 +398,7 @@ private:
                         return;
                     }
                     const uint8_t* endp;
-                    int8_t len = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
+                    int8_t len = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
 
                     buffer_.clear();
                     source_.read(std::back_inserter(buffer_), len);
@@ -427,7 +427,7 @@ private:
                         return;
                     }
                     const uint8_t* endp;
-                    int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
+                    int16_t len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
 
                     buffer_.clear();
                     source_.read(std::back_inserter(buffer_), len);
@@ -457,7 +457,7 @@ private:
                         return;
                     }
                     const uint8_t* endp;
-                    int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
+                    int32_t len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
 
                     buffer_.clear();
                     source_.read(std::back_inserter(buffer_), len);
@@ -487,7 +487,7 @@ private:
                         return;
                     }
                     const uint8_t* endp;
-                    int8_t len = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
+                    int8_t len = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
 
                     std::vector<uint8_t> v;
                     v.reserve(len);
@@ -514,7 +514,7 @@ private:
                         return;
                     }
                     const uint8_t* endp;
-                    int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
+                    int16_t len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
 
                     std::vector<uint8_t> v;
                     v.reserve(len);
@@ -541,7 +541,7 @@ private:
                         return;
                     }
                     const uint8_t* endp;
-                    int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
+                    int32_t len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
 
                     std::vector<uint8_t> v;
                     v.reserve(len);
@@ -625,7 +625,7 @@ private:
                         return;
                     }
                     const uint8_t* endp;
-                    int8_t len = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
+                    int8_t len = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
 
                     buffer_.clear();
                     source_.read(std::back_inserter(buffer_), len);
@@ -655,7 +655,7 @@ private:
                         return;
                     }
                     const uint8_t* endp;
-                    int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
+                    int16_t len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
 
                     buffer_.clear();
                     source_.read(std::back_inserter(buffer_), len);
@@ -679,7 +679,7 @@ private:
                         return;
                     }
                     const uint8_t* endp;
-                    int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
+                    int32_t len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
 
                     buffer_.clear();
                     source_.read(std::back_inserter(buffer_), len);
@@ -711,7 +711,7 @@ private:
                     return;
                 }
                 const uint8_t* endp;
-                len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
+                len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
                 break;
             }
             case jsoncons::msgpack::detail::msgpack_format::array32_cd: 
@@ -724,7 +724,7 @@ private:
                     return;
                 }
                 const uint8_t* endp;
-                len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
+                len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
                 break;
             }
             default:
@@ -757,7 +757,7 @@ private:
                     return;
                 }
                 const uint8_t* endp;
-                len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
+                len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
                 break; 
             }
             case jsoncons::msgpack::detail::msgpack_format::map32_cd : 
@@ -770,7 +770,7 @@ private:
                     return;
                 }
                 const uint8_t* endp;
-                len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
+                len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
                 break;
             }
             default:
