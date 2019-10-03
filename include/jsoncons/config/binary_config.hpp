@@ -485,10 +485,10 @@ big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
     }
     *endp = first + sizeof(T);
 
-    uint64_t hi;
-    std::memcpy(&hi,first,sizeof(uint64_t));
     uint64_t lo;
-    std::memcpy(&lo,first+sizeof(uint64_t),sizeof(uint64_t));
+    std::memcpy(&lo,first,sizeof(uint64_t));
+    uint64_t hi;
+    std::memcpy(&hi,first+sizeof(uint64_t),sizeof(uint64_t));
 
     uint128_holder x;
     x.lo = JSONCONS_BIG_64_TO_NATIVE(hi);
