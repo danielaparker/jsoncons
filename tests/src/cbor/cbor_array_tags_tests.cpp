@@ -430,6 +430,21 @@ TEST_CASE("cbor tagged array tests")
     SECTION("Tag 87, float128, little endian")
     {
         std::cout << "sizeof(long double): " << sizeof(long double) << "\n";
+        uint8_t buf[sizeof(long double)];
+        auto x = std::numeric_limits<long double>::lowest();
+        auto y = (std::numeric_limits<long double>::max)();
+        memcpy(buf,&x,sizeof(long double));
+        for (auto b : buf)
+        {
+            std::cout << std::hex << (int)b << " ";
+        }
+        std::cout << "\n";
+        memcpy(buf,&y,sizeof(long double));
+        for (auto b : buf)
+        {
+            std::cout << std::hex << (int)b << " ";
+        }
+        std::cout << "\n\n";
 
         const std::vector<uint8_t> input = {
             0xD8, // Tag
