@@ -31,8 +31,8 @@
 
 #if (defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 403)) || \
     (__has_builtin(__builtin_bswap64) && __has_builtin(__builtin_bswap32))
-#  JSONCONS_BYTE_SWAP_64 __builtin_bswap64
-#  JSONCONS_BYTE_SWAP_32 __builtin_bswap32
+#  define JSONCONS_BYTE_SWAP_64 __builtin_bswap64
+#  define JSONCONS_BYTE_SWAP_32 __builtin_bswap32
 #    ifdef __INTEL_COMPILER
 #      define JSONCONS_BYTE_SWAP_16 _bswap16
 #    elif (__GNUC__ * 100 + __GNUC_MINOR__ >= 608) || __has_builtin(__builtin_bswap16)
