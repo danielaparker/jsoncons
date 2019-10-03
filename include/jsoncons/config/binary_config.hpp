@@ -201,27 +201,61 @@ byte_swap(T val)
     return JSONCONS_BYTE_SWAP_64(val);
 }
 
-inline
-uint128_holder byte_swap(uint128_holder val)
+template<class T>
+typename std::enable_if<std::is_floating_point<T>::value && sizeof(T) == sizeof(uint32_t),T>::type
+byte_swap(T val)
+{
+    uint32_t x;
+    memcpy(&x,&val,sizeof(uint32_t));
+    uint32_t y = JSONCONS_BYTE_SWAP_32(x);
+    T val2;
+    memcpy(&val2,&y,sizeof(uint32_t));
+    return val2;
+}
+
+template<class T>
+typename std::enable_if<std::is_floating_point<T>::value && sizeof(T) == sizeof(uint64_t),T>::type
+byte_swap(T val)
+{
+    uint64_t x;
+    memcpy(&x,&val,sizeof(uint64_t));
+    uint64_t y = JSONCONS_BYTE_SWAP_64(x);
+    T val2;
+    memcpy(&val2,&y,sizeof(uint64_t));
+    return val2;
+}
+
+template<class T>
+typename std::enable_if<std::is_floating_point<T>::value && sizeof(T) == 2*sizeof(uint64_t),T>::type
+byte_swap(T val)
 {
     uint128_holder x;
-    x.lo = JSONCONS_BYTE_SWAP_64(val.hi);
-    x.hi = JSONCONS_BYTE_SWAP_64(val.lo);
+    uint8_t buf[2*sizeof(uint64_t)];
+    memcpy(buf,&val,2*sizeof(uint64_t));
+    std::memcpy(&x.lo,buf,sizeof(uint64_t));
+    std::memcpy(&x.hi,buf+sizeof(uint64_t),sizeof(uint64_t));
 
-    return x;
+    uint128_holder y;
+    y.lo = JSONCONS_BYTE_SWAP_64(x.hi);
+    y.hi = JSONCONS_BYTE_SWAP_64(x.lo);
+
+    T val2;
+    memcpy(&val2,&y,2*sizeof(uint64_t));
+
+    return val2;
 }
 
 // native_to_big
 
 template<class T, class OutputIt>
-typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint8_t),void>::type
+typename std::enable_if<sizeof(T) == sizeof(uint8_t),void>::type
 native_to_big(T val, OutputIt d_first)
 {
     *d_first = static_cast<uint8_t>(val);
 }
 
 template<typename T, class OutputIt>
-typename std::enable_if<endian::native == endian::big && std::is_integral<T>::value && sizeof(T) != sizeof(uint8_t),void>::type
+typename std::enable_if<endian::native == endian::big && sizeof(T) != sizeof(uint8_t),void>::type
 native_to_big(T val, OutputIt d_first)
 {
     uint8_t buf[sizeof(T)];
@@ -233,7 +267,7 @@ native_to_big(T val, OutputIt d_first)
 }
 
 template<typename T, class OutputIt>
-typename std::enable_if<endian::native == endian::little && std::is_integral<T>::value && sizeof(T) != sizeof(uint8_t), void>::type
+typename std::enable_if<endian::native == endian::little && sizeof(T) != sizeof(uint8_t), void>::type
 native_to_big(T val, OutputIt d_first)
 {
     T val2 = byte_swap(val);
@@ -243,57 +277,19 @@ native_to_big(T val, OutputIt d_first)
     {
         *d_first++ = item;
     }
-}
-
-template<class OutputIt>
-void native_to_big(float val, OutputIt d_first)
-{
-    uint32_t where;
-    std::memcpy(&where,&val,sizeof(val));
-    native_to_big(where, d_first);
-}
-
-template<class OutputIt>
-void native_to_big(double val, OutputIt d_first)
-{
-    uint64_t where;
-    std::memcpy(&where,&val,sizeof(val));
-    native_to_big(where, d_first);
-}
-
-template<class OutputIt,size_t n = sizeof(long double)>
-typename std::enable_if<n == sizeof(uint64_t),void>::type
-native_to_big(long double val, OutputIt d_first)
-{
-    uint64_t where;
-    std::memcpy(&where,&val,sizeof(val));
-    native_to_big(where, d_first);
-}
-
-template<class OutputIt,size_t n = sizeof(long double)>
-typename std::enable_if<n == 2*sizeof(uint64_t),void>::type
-native_to_big(long double val, OutputIt d_first)
-{
-    uint128_holder x;
-    uint64_t buf[2*sizeof(uint64_t)];
-    std::memcpy(buf, &val, 2*sizeof(uint64_t));
-    std::memcpy(&x.lo,buf,sizeof(uint64_t));
-    std::memcpy(&x.hi,buf+sizeof(uint64_t),sizeof(uint64_t));
-
-    native_to_big(x, d_first);
 }
 
 // native_to_little
 
 template<class T, class OutputIt>
-typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint8_t),void>::type
+typename std::enable_if<sizeof(T) == sizeof(uint8_t),void>::type
 native_to_little(T val, OutputIt d_first)
 {
     *d_first = static_cast<uint8_t>(val);
 }
 
 template<typename T, class OutputIt>
-typename std::enable_if<endian::native == endian::little && std::is_integral<T>::value && sizeof(T) != sizeof(uint8_t),void>::type
+typename std::enable_if<endian::native == endian::little && sizeof(T) != sizeof(uint8_t),void>::type
 native_to_little(T val, OutputIt d_first)
 {
     uint8_t buf[sizeof(T)];
@@ -305,7 +301,7 @@ native_to_little(T val, OutputIt d_first)
 }
 
 template<typename T, class OutputIt>
-typename std::enable_if<endian::native == endian::big && std::is_integral<T>::value && sizeof(T) != sizeof(uint8_t), void>::type
+typename std::enable_if<endian::native == endian::big && sizeof(T) != sizeof(uint8_t), void>::type
 native_to_little(T val, OutputIt d_first)
 {
     T val2 = byte_swap(val);
@@ -317,48 +313,10 @@ native_to_little(T val, OutputIt d_first)
     }
 }
 
-template<class OutputIt>
-void native_to_little(float val, OutputIt d_first)
-{
-    uint32_t where;
-    std::memcpy(&where,&val,sizeof(val));
-    native_to_little(where, d_first);
-}
-
-template<class OutputIt>
-void native_to_little(double val, OutputIt d_first)
-{
-    uint64_t where;
-    std::memcpy(&where,&val,sizeof(val));
-    native_to_little(where, d_first);
-}
-
-template<class OutputIt,size_t n = sizeof(long double)>
-typename std::enable_if<n == sizeof(uint64_t),void>::type
-native_to_little(long double val, OutputIt d_first)
-{
-    uint64_t where;
-    std::memcpy(&where,&val,sizeof(val));
-    native_to_little(where, d_first);
-}
-
-template<class OutputIt,size_t n = sizeof(long double)>
-typename std::enable_if<n == 2*sizeof(uint64_t),void>::type
-native_to_little(long double val, OutputIt d_first)
-{
-    uint128_holder x;
-    uint64_t buf[2*sizeof(uint64_t)];
-    std::memcpy(buf, &val, 2*sizeof(uint64_t));
-    std::memcpy(&x.lo,buf,sizeof(uint64_t));
-    std::memcpy(&x.hi,buf+sizeof(uint64_t),sizeof(uint64_t));
-
-    native_to_little(x, d_first);
-}
-
 // big_to_native
 
 template<class T>
-typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint8_t),T>::type
+typename std::enable_if<sizeof(T) == sizeof(uint8_t),T>::type
 big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first + sizeof(T) > last)
@@ -374,7 +332,7 @@ big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 }
 
 template<class T>
-typename std::enable_if<endian::native == endian::big && std::is_integral<T>::value && sizeof(T) != sizeof(uint8_t),T>::type
+typename std::enable_if<endian::native == endian::big && sizeof(T) != sizeof(uint8_t),T>::type
 big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first + sizeof(T) > last)
@@ -389,7 +347,7 @@ big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 }
 
 template<class T>
-typename std::enable_if<endian::native == endian::little && std::is_integral<T>::value && sizeof(T) != sizeof(uint8_t),T>::type
+typename std::enable_if<endian::native == endian::little && sizeof(T) != sizeof(uint8_t),T>::type
 big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first + sizeof(T) > last)
@@ -428,53 +386,11 @@ big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
     return val;
 }
 */
-template<class T>
-typename std::enable_if<std::is_floating_point<T>::value && 
-sizeof(T) == sizeof(uint32_t),T>::type
-big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
-{
-    uint32_t data = big_to_native<uint32_t>(first,last,endp);
-    T val;
-    std::memcpy(&val,&data,sizeof(T));
-    return val;
-}
-
-template<class T>
-typename std::enable_if<std::is_floating_point<T>::value && 
-sizeof(T) == sizeof(uint64_t),T>::type
-big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
-{
-    *endp = first + sizeof(T);
-    uint64_t data = big_to_native<uint64_t>(first,last,endp);
-    T val;
-    std::memcpy(&val,&data,sizeof(T));
-    return val;
-}
-
-template<class T>
-typename std::enable_if<std::is_floating_point<T>::value && 
-sizeof(T) == 2*sizeof(uint64_t),T>::type
-big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
-{
-    if (first + sizeof(T) > last)
-    {
-        *endp = first;
-        return 0;
-    }
-    *endp = first + sizeof(T);
-    uint128_holder x;
-    std::memcpy(&x.lo,first,sizeof(uint64_t));
-    std::memcpy(&x.hi,first+sizeof(uint64_t),sizeof(uint64_t));
-    uint128_holder y  = big_to_native<uint128_holder>(first,last,endp);
-    T val;
-    std::memcpy(&val,&y,sizeof(T));
-    return val;
-}
 
 // little_to_native
 
 template<class T>
-typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint8_t),T>::type
+typename std::enable_if<sizeof(T) == sizeof(uint8_t),T>::type
 little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first + sizeof(T) > last)
@@ -487,7 +403,7 @@ little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp
 }
 
 template<class T>
-typename std::enable_if<endian::native == endian::little && std::is_integral<T>::value && sizeof(T) != sizeof(uint8_t),T>::type
+typename std::enable_if<endian::native == endian::little && sizeof(T) != sizeof(uint8_t),T>::type
 little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first + sizeof(T) > last)
@@ -502,7 +418,7 @@ little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp
 }
 
 template<class T>
-typename std::enable_if<endian::native == endian::big && std::is_integral<T>::value && sizeof(T) != sizeof(uint8_t),T>::type
+typename std::enable_if<endian::native == endian::big && sizeof(T) != sizeof(uint8_t),T>::type
 little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first + sizeof(T) > last)
@@ -514,49 +430,6 @@ little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp
     T val;
     std::memcpy(&val,first,sizeof(T));
     return byte_swap(val);
-}
-
-template<class T>
-typename std::enable_if<std::is_floating_point<T>::value && 
-sizeof(T) == sizeof(uint32_t),T>::type
-little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
-{
-    uint32_t data = little_to_native<uint32_t>(first,last,endp);
-    T val;
-    std::memcpy(&val,&data,sizeof(T));
-    return val;
-}
-
-template<class T>
-typename std::enable_if<std::is_floating_point<T>::value && 
-sizeof(T) == sizeof(uint64_t),T>::type
-little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
-{
-    uint64_t data = little_to_native<uint64_t>(first,last,endp);
-    T val;
-    std::memcpy(&val,&data,sizeof(T));
-    return val;
-}
-
-template<class T>
-typename std::enable_if<std::is_floating_point<T>::value && 
-sizeof(T) == 2*sizeof(uint64_t),T>::type
-little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
-{
-    if (first + sizeof(T) > last)
-    {
-        *endp = first;
-        return 0;
-    }
-    *endp = first + sizeof(T);
-
-    uint128_holder x;
-    std::memcpy(&x.lo,first,sizeof(uint64_t));
-    std::memcpy(&x.hi,first+sizeof(uint64_t),sizeof(uint64_t));
-    uint128_holder y  = little_to_native<uint128_holder>(first,last,endp);
-    T val;
-    std::memcpy(&val,&y,sizeof(T));
-    return val;
 }
 
 }}
