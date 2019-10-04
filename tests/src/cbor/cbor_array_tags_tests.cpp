@@ -375,8 +375,7 @@ TEST_CASE("cbor tagged array tests")
         auto val2 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
         std::cout << "float 128 val2: " << val1 << "\n";
 
-        long double w = static_cast<long double>(std::numeric_limits<double>::lowest());
-        long double z = static_cast<long double>((std::numeric_limits<double>::max)());
+        long double w = -1;
         std::cout << "\n\n";
         memcpy(buf,&w,sizeof(long double));
         for (size_t i = sizeof(buf)-1; i+1 > 0; --i)
@@ -386,6 +385,7 @@ TEST_CASE("cbor tagged array tests")
         std::cout << "\n\n";
         auto val3 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
         std::cout << "float 128 val3: " << val3 << "\n";
+        long double z = 1;
         memcpy(buf,&z,sizeof(long double));
         for (size_t i = sizeof(buf) -1; i+1 > 0; --i)
         {
@@ -497,8 +497,7 @@ TEST_CASE("cbor tagged array tests")
         auto val2 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
         std::cout << "float 128 val2: " << val2 << "\n";
 
-        long double w = static_cast<long double>(std::numeric_limits<double>::lowest());
-        long double z = static_cast<long double>((std::numeric_limits<double>::max)());
+        long double w = -1;
         std::cout << "\n\n";
         memcpy(buf,&w,sizeof(long double));
         for (auto b : buf)
@@ -508,6 +507,7 @@ TEST_CASE("cbor tagged array tests")
         auto val3 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
         std::cout << "float 128 val3: " << val3 << "\n";
         std::cout << "\n\n";
+        long double z = 1;
         memcpy(buf,&z,sizeof(long double));
         for (auto b : buf)
         {
