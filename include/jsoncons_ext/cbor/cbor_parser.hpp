@@ -2204,7 +2204,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<WorkAllocator>(float_array_arg,size,allocator_);
+                    typed_array_ = typed_array<WorkAllocator>(double_array_arg,size,allocator_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2216,9 +2216,9 @@ private:
                             default: break;
                         }
                         double half = jsoncons::detail::decode_half(val);
-                        typed_array_.data(float_array_arg)[i] = static_cast<float>(half);
+                        typed_array_.data(double_array_arg)[i] = half;
                     }
-                    continue_ = handler.typed_array(typed_array_.data(float_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    continue_ = handler.typed_array(typed_array_.data(double_array_arg), typed_array_.size(), semantic_tag::none, *this);
                     break;
                 }
                 case 0x51:

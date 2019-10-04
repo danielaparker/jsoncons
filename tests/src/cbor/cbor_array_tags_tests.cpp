@@ -364,17 +364,19 @@ TEST_CASE("cbor tagged array tests")
             std::cout << std::hex << (int)buf[i] << " ";
         }
         std::cout << "\n";
-        auto val = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
-        std::cout << "float 128 val: " << val << "\n";
+        auto val1 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
+        std::cout << "float 128 val1: " << val1 << "\n";
 
         memcpy(buf,&y,sizeof(long double));
         for (size_t i = sizeof(buf) -1; i+1 > 0; --i)
         {
             std::cout << std::hex << (int)buf[i] << " ";
         }
+        auto val2 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
+        std::cout << "float 128 val2: " << val1 << "\n";
 
-        auto w = std::numeric_limits<double>::lowest();
-        auto z = (std::numeric_limits<double>::max)();
+        long double w = static_cast<long double>(std::numeric_limits<double>::lowest());
+        long double z = static_cast<long double>((std::numeric_limits<double>::max)());
         std::cout << "\n\n";
         memcpy(buf,&w,sizeof(long double));
         for (size_t i = sizeof(buf)-1; i+1 > 0; --i)
@@ -382,6 +384,8 @@ TEST_CASE("cbor tagged array tests")
             std::cout << std::hex << (int)buf[i] << " ";
         }
         std::cout << "\n\n";
+        auto val3 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
+        std::cout << "float 128 val3: " << val3 << "\n";
         memcpy(buf,&z,sizeof(long double));
         for (size_t i = sizeof(buf) -1; i+1 > 0; --i)
         {
@@ -389,8 +393,8 @@ TEST_CASE("cbor tagged array tests")
         }
         std::cout << "\n\n";
 
-        val = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
-        std::cout << "float 128 val: " << val << "\n";
+        auto val4 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
+        std::cout << "float 128 val4: " << val4 << "\n";
 
         const std::vector<uint8_t> input = {
             0xD8, // Tag
@@ -472,7 +476,6 @@ TEST_CASE("cbor tagged array tests")
         std::cout << "sizeof(long double): " << sizeof(long double) << "\n";
 
         const uint8_t* endp = nullptr;
-        long double val;
 
         uint8_t buf[sizeof(long double)];
         auto x = std::numeric_limits<long double>::lowest();
@@ -483,23 +486,27 @@ TEST_CASE("cbor tagged array tests")
             std::cout << std::hex << (int)b << " ";
         }
         std::cout << "\n";
-        val = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
-        std::cout << "float 128 val: " << val << "\n";
+        auto val1 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
+        std::cout << "float 128 val1: " << val1 << "\n";
 
         memcpy(buf,&y,sizeof(long double));
         for (auto b : buf)
         {
             std::cout << std::hex << (int)b << " ";
         }
+        auto val2 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
+        std::cout << "float 128 val2: " << val2 << "\n";
 
-        auto w = std::numeric_limits<double>::lowest();
-        auto z = (std::numeric_limits<double>::max)();
+        long double w = static_cast<long double>(std::numeric_limits<double>::lowest());
+        long double z = static_cast<long double>((std::numeric_limits<double>::max)());
         std::cout << "\n\n";
         memcpy(buf,&w,sizeof(long double));
         for (auto b : buf)
         {
             std::cout << std::hex << (int)b << " ";
         }
+        auto val3 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
+        std::cout << "float 128 val3: " << val3 << "\n";
         std::cout << "\n\n";
         memcpy(buf,&z,sizeof(long double));
         for (auto b : buf)
@@ -508,8 +515,8 @@ TEST_CASE("cbor tagged array tests")
         }
         std::cout << "\n\n";
 
-        val = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
-        std::cout << "float 128 val: " << val << "\n";
+        auto val4 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
+        std::cout << "float 128 val4: " << val4 << "\n";
 
         const std::vector<uint8_t> input = {
             0xD8, // Tag
