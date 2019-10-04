@@ -353,6 +353,44 @@ TEST_CASE("cbor tagged array tests")
     SECTION("Tag 83, float128, big endian")
     {
         std::cout << "sizeof(long double): " << sizeof(long double) << "\n";
+        const uint8_t* endp;
+
+        uint8_t buf[sizeof(long double)];
+        auto x = std::numeric_limits<long double>::lowest();
+        auto y = (std::numeric_limits<long double>::max)();
+        memcpy(buf,&x,sizeof(long double));
+        for (size_t i = sizeof(buf) -1; i+1 > 0; --i)
+        {
+            std::cout << std::hex << (int)buf[i] << " ";
+        }
+        std::cout << "\n";
+        auto val = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
+        std::cout << "float 128 val: " << val << "\n";
+
+        memcpy(buf,&y,sizeof(long double));
+        for (size_t i = sizeof(buf) -1; i+1 > 0; --i)
+        {
+            std::cout << std::hex << (int)buf[i] << " ";
+        }
+
+        auto w = std::numeric_limits<double>::lowest();
+        auto z = (std::numeric_limits<double>::max)();
+        std::cout << "\n\n";
+        memcpy(buf,&w,sizeof(long double));
+        for (size_t i = sizeof(buf)-1; i+1 > 0; --i)
+        {
+            std::cout << std::hex << (int)buf[i] << " ";
+        }
+        std::cout << "\n\n";
+        memcpy(buf,&z,sizeof(long double));
+        for (size_t i = sizeof(buf) -1; i+1 > 0; --i)
+        {
+            std::cout << std::hex << (int)buf[i] << " ";
+        }
+        std::cout << "\n\n";
+
+        val = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
+        std::cout << "float 128 val: " << val << "\n";
 
         const std::vector<uint8_t> input = {
             0xD8, // Tag
@@ -449,6 +487,21 @@ TEST_CASE("cbor tagged array tests")
         std::cout << "float 128 val: " << val << "\n";
 
         memcpy(buf,&y,sizeof(long double));
+        for (auto b : buf)
+        {
+            std::cout << std::hex << (int)b << " ";
+        }
+
+        auto w = std::numeric_limits<double>::lowest();
+        auto z = (std::numeric_limits<double>::max)();
+        std::cout << "\n\n";
+        memcpy(buf,&w,sizeof(long double));
+        for (auto b : buf)
+        {
+            std::cout << std::hex << (int)b << " ";
+        }
+        std::cout << "\n\n";
+        memcpy(buf,&z,sizeof(long double));
         for (auto b : buf)
         {
             std::cout << std::hex << (int)b << " ";
