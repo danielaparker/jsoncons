@@ -41,7 +41,7 @@
 #      define JSONCONS_BYTE_SWAP_16(x) (((uint16_t)x >> 8) | ((uint16_t)x << 8))
 #    endif
 #elif defined(_MSC_VER)
-// MSVC, which implies Windows, which implies little-endian and sizeof(long) == 4 
+// MSVC, which implies sizeof(long) == 4 
 #  define JSONCONS_BYTE_SWAP_64       _byteswap_uint64
 #  define JSONCONS_BYTE_SWAP_32        _byteswap_ulong
 #  define JSONCONS_BYTE_SWAP_16        _byteswap_ushort
@@ -53,7 +53,8 @@ namespace jsoncons { namespace detail {
 
 enum class endian
 {
-#ifdef _WIN32
+#if defined(_MSC_VER) 
+// MSVC, which implies Windows, which implies little-endian and sizeof(long) == 4 
      little = 0,
      big    = 1,
      native = little
@@ -281,15 +282,15 @@ native_to_big(T val, OutputIt d_first)
 
 // native_to_little
 
-template<class T, class OutputIt>
+/* template<class T, class OutputIt>
 typename std::enable_if<sizeof(T) == sizeof(uint8_t),void>::type
 native_to_little(T val, OutputIt d_first)
 {
     *d_first = static_cast<uint8_t>(val);
-}
+}*/
 
-template<typename T, class OutputIt>
-typename std::enable_if<endian::native == endian::little && sizeof(T) != sizeof(uint8_t),void>::type
+template<typename T, class OutputIt, class Endian = endian>
+typename std::enable_if<Endian::native == Endian::little,void>::type
 native_to_little(T val, OutputIt d_first)
 {
     uint8_t buf[sizeof(T)];
@@ -300,8 +301,8 @@ native_to_little(T val, OutputIt d_first)
     }
 }
 
-template<typename T, class OutputIt>
-typename std::enable_if<endian::native == endian::big && sizeof(T) != sizeof(uint8_t), void>::type
+template<typename T, class OutputIt, class Endian=endian>
+typename std::enable_if<Endian::native == Endian::big, void>::type
 native_to_little(T val, OutputIt d_first)
 {
     T val2 = byte_swap(val);
