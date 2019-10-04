@@ -248,15 +248,8 @@ byte_swap(T val)
 
 // native_to_big
 
-template<class T, class OutputIt>
-typename std::enable_if<sizeof(T) == sizeof(uint8_t),void>::type
-native_to_big(T val, OutputIt d_first)
-{
-    *d_first = static_cast<uint8_t>(val);
-}
-
-template<typename T, class OutputIt>
-typename std::enable_if<endian::native == endian::big && sizeof(T) != sizeof(uint8_t),void>::type
+template<typename T, class OutputIt, class Endian=endian>
+typename std::enable_if<Endian::native == Endian::big,void>::type
 native_to_big(T val, OutputIt d_first)
 {
     uint8_t buf[sizeof(T)];
@@ -267,8 +260,8 @@ native_to_big(T val, OutputIt d_first)
     }
 }
 
-template<typename T, class OutputIt>
-typename std::enable_if<endian::native == endian::little && sizeof(T) != sizeof(uint8_t), void>::type
+template<typename T, class OutputIt, class Endian=endian>
+typename std::enable_if<Endian::native == Endian::little,void>::type
 native_to_big(T val, OutputIt d_first)
 {
     T val2 = byte_swap(val);
@@ -281,13 +274,6 @@ native_to_big(T val, OutputIt d_first)
 }
 
 // native_to_little
-
-/* template<class T, class OutputIt>
-typename std::enable_if<sizeof(T) == sizeof(uint8_t),void>::type
-native_to_little(T val, OutputIt d_first)
-{
-    *d_first = static_cast<uint8_t>(val);
-}*/
 
 template<typename T, class OutputIt, class Endian = endian>
 typename std::enable_if<Endian::native == Endian::little,void>::type
@@ -316,24 +302,8 @@ native_to_little(T val, OutputIt d_first)
 
 // big_to_native
 
-template<class T>
-typename std::enable_if<sizeof(T) == sizeof(uint8_t),T>::type
-big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
-{
-    if (first + sizeof(T) > last)
-    {
-        *endp = first;
-        return 0;
-    }
-    else
-    {
-        *endp = first + sizeof(T);
-        return static_cast<T>(*(first));
-    }
-}
-
-template<class T>
-typename std::enable_if<endian::native == endian::big && sizeof(T) != sizeof(uint8_t),T>::type
+template<class T,class Endian=endian>
+typename std::enable_if<Endian::native == Endian::big,T>::type
 big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first + sizeof(T) > last)
@@ -347,8 +317,8 @@ big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
     return val;
 }
 
-template<class T>
-typename std::enable_if<endian::native == endian::little && sizeof(T) != sizeof(uint8_t),T>::type
+template<class T,class Endian=endian>
+typename std::enable_if<Endian::native == Endian::little,T>::type
 big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first + sizeof(T) > last)
@@ -362,49 +332,10 @@ big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
     return byte_swap(val);
 }
 
-/* template<class T>
-typename std::enable_if<endian::native == endian::little && sizeof(T) == 2*sizeof(uint64_t),T>::type
-big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
-{
-    if (first + sizeof(T) > last)
-    {
-        *endp = first;
-        return 0;
-    }
-    *endp = first + sizeof(T);
-
-    uint64_t lo;
-    std::memcpy(&lo,first,sizeof(uint64_t));
-    uint64_t hi;
-    std::memcpy(&hi,first+sizeof(uint64_t),sizeof(uint64_t));
-
-    uint128_holder x;
-    x.lo = JSONCONS_BIG_64_TO_NATIVE(hi);
-    x.hi = JSONCONS_BIG_64_TO_NATIVE(lo);
-
-    T val;
-    std::memcpy(&val,&x,sizeof(T));
-    return val;
-}
-*/
-
 // little_to_native
 
-template<class T>
-typename std::enable_if<sizeof(T) == sizeof(uint8_t),T>::type
-little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
-{
-    if (first + sizeof(T) > last)
-    {
-        *endp = first;
-        return 0;
-    }
-    *endp = first + sizeof(T);
-    return static_cast<T>(*(first));
-}
-
-template<class T>
-typename std::enable_if<endian::native == endian::little && sizeof(T) != sizeof(uint8_t),T>::type
+template<class T,class Endian=endian>
+typename std::enable_if<Endian::native == Endian::little,T>::type
 little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first + sizeof(T) > last)
@@ -418,8 +349,8 @@ little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp
     return val;
 }
 
-template<class T>
-typename std::enable_if<endian::native == endian::big && sizeof(T) != sizeof(uint8_t),T>::type
+template<class T,class Endian=endian>
+typename std::enable_if<Endian::native == Endian::big,T>::type
 little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first + sizeof(T) > last)
