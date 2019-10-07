@@ -110,7 +110,7 @@ std::ostream& operator<<(std::ostream& os, semantic_tag tag)
     JSONCONS_DEPRECATED_MSG("Instead, use semantic_tag") typedef semantic_tag semantic_tag_type;
 #endif
 
-template <class CharT>
+template <class CharT, class Float128T=long double>
 class basic_json_content_handler
 {
 public:
@@ -202,7 +202,7 @@ public:
         return do_typed_array(data, size, tag, context);
     }
 
-    bool typed_array(const long double* data, size_t size, 
+    bool typed_array(const Float128T* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context())
     {
@@ -618,11 +618,11 @@ private:
         return more;
     }
 
-    virtual bool do_typed_array(const long double* data, size_t size, 
+    virtual bool do_typed_array(const Float128T* data, size_t size, 
                                 semantic_tag tag=semantic_tag::none,
                                 const ser_context& context=null_ser_context())
     {
-        bool more = begin_array(tag,context);
+        /* bool more = begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
             double_value(static_cast<double>(*p),semantic_tag::none,context);
@@ -630,8 +630,8 @@ private:
         if (more)
         {
             more = end_array(context);
-        }
-        return more;
+        }*/
+        return true;
     }
 
     virtual bool do_begin_array(semantic_tag, const ser_context& context) = 0;
@@ -668,8 +668,8 @@ private:
     virtual bool do_bool_value(bool value, semantic_tag tag, const ser_context& context) = 0;
 };
 
-template <class CharT>
-class basic_null_json_content_handler final : public basic_json_content_handler<CharT>
+template <class CharT,class Float128T=void>
+class basic_null_json_content_handler final : public basic_json_content_handler<CharT,Float128T>
 {
 public:
     using typename basic_json_content_handler<CharT>::string_view_type;
