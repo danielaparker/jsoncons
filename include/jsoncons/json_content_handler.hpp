@@ -110,7 +110,7 @@ std::ostream& operator<<(std::ostream& os, semantic_tag tag)
     JSONCONS_DEPRECATED_MSG("Instead, use semantic_tag") typedef semantic_tag semantic_tag_type;
 #endif
 
-template <class CharT, class Float128T=long double>
+template <class CharT, class Float128T=void>
 class basic_json_content_handler
 {
 public:
