@@ -25,7 +25,7 @@
 namespace jsoncons { 
 namespace cbor {
 
-template<class Src=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
+template<class Src=jsoncons::binary_stream_source,class Float128T=void,class Allocator=std::allocator<char>>
 class basic_cbor_cursor : public basic_staj_reader<char>, private virtual ser_context
 {
 public:
@@ -113,9 +113,10 @@ public:
         }
     }
 
-    void read_to(basic_json_content_handler<char>& handler,
+    void read_to(basic_json_content_handler<char>& h,
                 std::error_code& ec) override
     {
+        cbor_content_handler<Float128T> handler(h);
         if (!staj_to_saj_event(event_handler_.event(), handler, *this))
         {
             return;
@@ -143,8 +144,9 @@ public:
         read_next(event_handler_, ec);
     }
 
-    void read_next(basic_json_content_handler<char>& handler, std::error_code& ec)
+    void read_next(basic_json_content_handler<char>& h, std::error_code& ec)
     {
+        cbor_content_handler<Float128T> handler(h);
         parser_.restart();
         while (!parser_.stopped())
         {

@@ -21,6 +21,270 @@
 
 namespace jsoncons { namespace cbor {
 
+template <class Float128T=void>
+class cbor_content_handler : public basic_json_filter<char>
+{
+public:
+    cbor_content_handler(basic_json_content_handler<char>& handler)
+        : basic_json_filter(handler)
+    {
+    }
+
+    bool typed_array(const uint8_t* data, size_t size, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+    {
+        return do_typed_array(data, size, tag, context);
+    }
+
+    bool typed_array(const uint16_t* data, size_t size, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+    {
+        return do_typed_array(data, size, tag, context);
+    }
+
+    bool typed_array(const uint32_t* data, size_t size, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+    {
+        return do_typed_array(data, size, tag, context);
+    }
+
+    bool typed_array(const uint64_t* data, size_t size, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+    {
+        return do_typed_array(data, size, tag, context);
+    }
+
+    bool typed_array(const int8_t* data, size_t size, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+    {
+        return do_typed_array(data, size, tag, context);
+    }
+
+    bool typed_array(const int16_t* data, size_t size, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+    {
+        return do_typed_array(data, size, tag, context);
+    }
+
+    bool typed_array(const int32_t* data, size_t size, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+    {
+        return do_typed_array(data, size, tag, context);
+    }
+
+    bool typed_array(const int64_t* data, size_t size, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+    {
+        return do_typed_array(data, size, tag, context);
+    }
+
+    bool typed_array(const float* data, size_t size, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+    {
+        return do_typed_array(data, size, tag, context);
+    }
+
+    bool typed_array(const double* data, size_t size, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+    {
+        return do_typed_array(data, size, tag, context);
+    }
+
+    bool typed_array(const Float128T* data, size_t size, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+    {
+        return do_typed_array(data, size, tag, context);
+    }
+private:
+
+    virtual bool do_typed_array(const uint8_t* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context())
+    {
+        bool more = begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            uint64_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = end_array(context);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const uint16_t* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context())
+    {
+        bool more = begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            uint64_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = end_array(context);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const uint32_t* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context())
+    {
+        bool more = begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            uint64_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = end_array(context);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const uint64_t* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context())
+    {
+        bool more = begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            uint64_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = end_array(context);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const int8_t* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context())
+    {
+        bool more = begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            int64_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = end_array(context);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const int16_t* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context())
+    {
+        bool more = begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            int64_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = end_array(context);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const int32_t* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context())
+    {
+        bool more = begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            int64_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = end_array(context);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const int64_t* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context())
+    {
+        bool more = begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            int64_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = end_array(context);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const float* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context())
+    {
+        bool more = begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            double_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = end_array(context);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const double* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context())
+    {
+        bool more = begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            double_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = end_array(context);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const Float128T* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context())
+    {
+        /* bool more = begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            double_value(static_cast<double>(*p),semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = end_array(context);
+        }*/
+        return true;
+    }
+};
+
 enum class parse_mode {root,before_done,array,indefinite_array,map_key,map_value,indefinite_map_key,indefinite_map_value};
 
 struct uint8_array_arg_t {};
@@ -634,7 +898,7 @@ public:
         return source_.position();
     }
 
-    void parse(json_content_handler& handler, std::error_code& ec)
+    void parse(cbor_content_handler<Float128T>& handler, std::error_code& ec)
     {
         while (!done_ && continue_)
         {
@@ -773,7 +1037,7 @@ public:
         }
     }
 private:
-    void read_item(json_content_handler& handler, std::error_code& ec)
+    void read_item(cbor_content_handler<Float128T>& handler, std::error_code& ec)
     {
         read_tags(ec);
         if (ec)
@@ -992,7 +1256,7 @@ private:
         tags_.clear();
     }
 
-    void begin_array(json_content_handler& handler, uint8_t info, std::error_code& ec)
+    void begin_array(cbor_content_handler<Float128T>& handler, uint8_t info, std::error_code& ec)
     {
         semantic_tag tag = semantic_tag::none;
         auto stringref_map = state_stack_.back().stringref_map;
@@ -1034,13 +1298,13 @@ private:
         }
     }
 
-    void end_array(json_content_handler& handler, std::error_code&)
+    void end_array(cbor_content_handler<Float128T>& handler, std::error_code&)
     {
         continue_ = handler.end_array(*this);
         state_stack_.pop_back();
     }
 
-    void begin_map(json_content_handler& handler, uint8_t info, std::error_code& ec)
+    void begin_map(cbor_content_handler<Float128T>& handler, uint8_t info, std::error_code& ec)
     {
         auto stringref_map = state_stack_.back().stringref_map;
         for (auto t : tags_)
@@ -1078,13 +1342,13 @@ private:
         }
     }
 
-    void end_map(json_content_handler& handler, std::error_code&)
+    void end_map(cbor_content_handler<Float128T>& handler, std::error_code&)
     {
         continue_ = handler.end_object(*this);
         state_stack_.pop_back();
     }
 
-    void read_name(json_content_handler& handler, std::error_code& ec)
+    void read_name(cbor_content_handler<Float128T>& handler, std::error_code& ec)
     {
         read_tags(ec);
         if (ec)
@@ -1186,7 +1450,9 @@ private:
                 text_buffer_.clear();
                 json_string_encoder encoder(text_buffer_);
                 basic_cbor_parser<Src,Float128T> reader(std::move(source_));
-                reader.parse(encoder, ec);
+
+                cbor_content_handler<Float128T> encoder2(encoder);
+                reader.parse(encoder2, ec);
                 source_ = std::move(reader.source_);
                 auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
                 if (result.ec != unicons::conv_errc())
@@ -1931,7 +2197,7 @@ private:
         }
     }
 
-    void handle_string(json_content_handler& handler, const basic_string_view<char>& v, std::error_code&)
+    void handle_string(cbor_content_handler<Float128T>& handler, const basic_string_view<char>& v, std::error_code&)
     {
         semantic_tag tag = semantic_tag::none;
         if (!tags_.empty())
@@ -1958,7 +2224,7 @@ private:
         continue_ = handler.string_value(v, tag, *this);
     }
 
-    void handle_byte_string(json_content_handler& handler, const byte_string_view& v, std::error_code& ec)
+    void handle_byte_string(cbor_content_handler<Float128T>& handler, const byte_string_view& v, std::error_code& ec)
     {
         if (!tags_.empty())
         {
@@ -2331,7 +2597,7 @@ private:
 
     template <class Float128T_ = Float128T>
     typename std::enable_if<std::is_void<Float128T_>::value,void>::type
-    handle_float128(json_content_handler& handler, const byte_string_view&, const uint8_t, std::error_code&)
+    handle_float128(cbor_content_handler<Float128T>& handler, const byte_string_view&, const uint8_t, std::error_code&)
     {
         continue_ = handler.begin_array(semantic_tag::none, *this);
         continue_ = handler.end_array(*this);
@@ -2339,7 +2605,7 @@ private:
 
     template <class Float128T_ = Float128T>
     typename std::enable_if<!std::is_void<Float128T_>::value,void>::type
-    handle_float128(json_content_handler& handler, const byte_string_view& v, const uint8_t tag, std::error_code&)
+    handle_float128(cbor_content_handler<Float128T>& handler, const byte_string_view& v, const uint8_t tag, std::error_code&)
     {
         const uint8_t e = (tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift; 
         const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
