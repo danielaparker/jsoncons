@@ -101,7 +101,8 @@ decode_cbor(std::istream& is)
 {
     jsoncons::json_decoder<T> decoder;
     auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
-    cbor_stream_reader reader(is, adaptor);
+    cbor_content_handler<> adaptor2(adaptor);
+    cbor_stream_reader reader(is, adaptor2);
     reader.read();
     return decoder.get_result();
 }
