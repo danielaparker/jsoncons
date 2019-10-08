@@ -268,9 +268,9 @@ private:
         return more;
     }
 
-    virtual bool do_typed_array(const Float128T* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context())
+    virtual bool do_typed_array(const Float128T* /*data*/, size_t /*size*/, 
+                                semantic_tag /*tag*/=semantic_tag::none,
+                                const ser_context& /*context*/=null_ser_context())
     {
         /* bool more = begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
