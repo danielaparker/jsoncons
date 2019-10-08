@@ -25,13 +25,306 @@
 namespace jsoncons { 
 namespace cbor {
 
+template <class Float128T>
+class cbor_staj_event_handler : public cbor_content_handler<Float128T>
+{
+    using super_type = cbor_content_handler<Float128T>;
+public:
+    using char_type = char;
+    using string_view_type = typename super_type::string_view_type;
+private:
+    std::function<bool(const basic_staj_event<char_type>&, const ser_context&)> filter_;
+    basic_staj_event<char_type> event_;
+public:
+    cbor_staj_event_handler()
+        : filter_(accept), event_(staj_event_type::null_value)
+    {
+    }
+
+    cbor_staj_event_handler(std::function<bool(const basic_staj_event<char_type>&, const ser_context&)> filter)
+        : filter_(filter), event_(staj_event_type::null_value)
+    {
+    }
+
+    const basic_staj_event<char_type>& event() const
+    {
+        return event_;
+    }
+
+private:
+    static bool accept(const basic_staj_event<char_type>&, const ser_context&) 
+    {
+        return true;
+    }
+
+    bool do_begin_object(semantic_tag tag, const ser_context& context) override
+    {
+        event_ = basic_staj_event<char_type>(staj_event_type::begin_object, tag);
+        return !filter_(event_, context);
+    }
+
+    bool do_end_object(const ser_context& context) override
+    {
+        event_ = basic_staj_event<char_type>(staj_event_type::end_object);
+        return !filter_(event_, context);
+    }
+
+    bool do_begin_array(semantic_tag tag, const ser_context& context) override
+    {
+        event_ = basic_staj_event<char_type>(staj_event_type::begin_array, tag);
+        return !filter_(event_, context);
+    }
+
+    bool do_end_array(const ser_context& context) override
+    {
+        event_ = basic_staj_event<char_type>(staj_event_type::end_array);
+        return !filter_(event_, context);
+    }
+
+    bool do_name(const string_view_type& name, const ser_context& context) override
+    {
+        event_ = basic_staj_event<char_type>(name, staj_event_type::name);
+        return !filter_(event_, context);
+    }
+
+    bool do_null_value(semantic_tag tag, const ser_context& context) override
+    {
+        event_ = basic_staj_event<char_type>(staj_event_type::null_value, tag);
+        return !filter_(event_, context);
+    }
+
+    bool do_bool_value(bool value, semantic_tag tag, const ser_context& context) override
+    {
+        event_ = basic_staj_event<char_type>(value, tag);
+        return !filter_(event_, context);
+    }
+
+    bool do_string_value(const string_view_type& s, semantic_tag tag, const ser_context& context) override
+    {
+        event_ = basic_staj_event<char_type>(s, staj_event_type::string_value, tag);
+        return !filter_(event_, context);
+    }
+
+    bool do_byte_string_value(const byte_string_view& s, 
+                              semantic_tag tag,
+                              const ser_context& context) override
+    {
+        event_ = basic_staj_event<char_type>(s, staj_event_type::byte_string_value, tag);
+        return !filter_(event_, context);
+    }
+
+    bool do_int64_value(int64_t value, 
+                        semantic_tag tag,
+                        const ser_context& context) override
+    {
+        event_ = basic_staj_event<char_type>(value, tag);
+        return !filter_(event_, context);
+    }
+
+    bool do_uint64_value(uint64_t value, 
+                         semantic_tag tag, 
+                         const ser_context& context) override
+    {
+        event_ = basic_staj_event<char_type>(value, tag);
+        return !filter_(event_, context);
+    }
+
+    bool do_double_value(double value, 
+                         semantic_tag tag, 
+                         const ser_context& context) override
+    {
+        event_ = basic_staj_event<char_type>(value, tag);
+        return !filter_(event_, context);
+    }
+
+    bool do_typed_array(const uint8_t* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context()) override
+    {
+        bool more = this->begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            this->uint64_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = this->end_array(context);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const uint16_t* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context()) override
+    {
+        bool more = this->begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            this->uint64_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = this->end_array(context);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const uint32_t* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context()) override
+    {
+        bool more = this->begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            this->uint64_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = this->end_array(context);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const uint64_t* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context()) override
+    {
+        bool more = this->begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            this->uint64_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = this->end_array(context);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const int8_t* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context()) override
+    {
+        bool more = this->begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            this->int64_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = this->end_array(context);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const int16_t* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context()) override
+    {
+        bool more = this->begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            this->int64_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = this->end_array(context);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const int32_t* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context()) override
+    {
+        bool more = this->begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            this->int64_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = this->end_array(context);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const int64_t* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context()) override
+    {
+        bool more = this->begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            this->int64_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = this->end_array(context);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const float* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context()) override
+    {
+        bool more = this->begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            this->double_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = this->end_array(context);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const double* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context()) override
+    {
+        bool more = this->begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            this->double_value(*p,semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = this->end_array(context);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const Float128T* /*data*/, size_t /*size*/, 
+                                semantic_tag /*tag*/=semantic_tag::none,
+                                const ser_context& /*context*/=null_ser_context()) override
+    {
+        /* bool more = this->begin_array(tag,context);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            this->double_value(static_cast<double>(*p),semantic_tag::none,context);
+        }
+        if (more)
+        {
+            more = this->end_array(context);
+        }*/
+        return true;
+    }
+
+    void do_flush() override
+    {
+    }
+};
+
 template<class Src=jsoncons::binary_stream_source,class Float128T=void,class Allocator=std::allocator<char>>
 class basic_cbor_cursor : public basic_staj_reader<char>, private virtual ser_context
 {
 public:
     typedef Allocator allocator_type;
 private:
-    basic_staj_event_handler<char> event_handler_;
+    cbor_staj_event_handler<Float128T> event_handler_;
 
     basic_cbor_parser<Src> parser_;
     bool eof_;
@@ -113,10 +406,9 @@ public:
         }
     }
 
-    void read_to(basic_json_content_handler<char>& h,
+    void read_to(basic_json_content_handler<char>& handler,
                 std::error_code& ec) override
     {
-        cbor_content_handler<Float128T> handler(h);
         if (!staj_to_saj_event(event_handler_.event(), handler, *this))
         {
             return;
@@ -146,7 +438,7 @@ public:
 
     void read_next(basic_json_content_handler<char>& h, std::error_code& ec)
     {
-        cbor_content_handler<Float128T> handler(h);
+        cbor_to_json_content_handler_adaptor<Float128T> handler(h);
         parser_.restart();
         while (!parser_.stopped())
         {

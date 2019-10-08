@@ -455,7 +455,7 @@ private:
 // basic_staj_event_handler
 
 template <class CharT>
-class basic_staj_event_handler final : public basic_json_content_handler<CharT>
+class basic_staj_event_handler : public basic_json_content_handler<CharT>
 {
 public:
     using typename basic_json_content_handler<CharT>::string_view_type;
