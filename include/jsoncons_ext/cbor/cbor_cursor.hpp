@@ -74,7 +74,7 @@ public:
         return event_;
     }
 
-    bool in_typed_array() const
+    bool is_typed_array() const
     {
         return type_ != typed_array_type();
     }
@@ -663,7 +663,7 @@ public:
 
     void read_next(std::error_code& ec)
     {
-        if (event_handler_.in_typed_array())
+        if (event_handler_.is_typed_array())
         {
             event_handler_.advance_typed_array();
         }
