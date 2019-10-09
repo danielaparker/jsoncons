@@ -1,3 +1,14 @@
+master
+------
+
+The next release will include support for the cbor extension
+[Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)
+
+Currently implemented:
+
+- Parsing byte string tags 64-82 and 84-86, and feeding to
+  json_content_handler as an array
+
 v0.136.0
 --------
 
