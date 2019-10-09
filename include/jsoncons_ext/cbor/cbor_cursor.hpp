@@ -74,13 +74,86 @@ public:
         return event_;
     }
 
-    typed_array_type array_type() const
+    bool in_typed_array() const
     {
-        return type_;
+        return type_ != typed_array_type();
     }
-    size_t size() const
+
+    void advance_typed_array()
     {
-        return size();
+        if (type_ != typed_array_type())
+        {
+            if (index_ < size_)
+            {
+                switch (type_)
+                {
+                    case typed_array_type::uint8_val:
+                    {
+                        this->uint64_value(data(uint8_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::uint16_val:
+                    {
+                        this->uint64_value(data(uint16_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::uint32_val:
+                    {
+                        this->uint64_value(data(uint32_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::uint64_val:
+                    {
+                        this->uint64_value(data(uint64_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::int8_val:
+                    {
+                        this->int64_value(data(int8_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::int16_val:
+                    {
+                        this->int64_value(data(int16_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::int32_val:
+                    {
+                        this->int64_value(data(int32_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::int64_val:
+                    {
+                        this->int64_value(data(int64_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::float_val:
+                    {
+                        this->double_value(data(float_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::double_val:
+                    {
+                        this->double_value(data(double_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::float128_val:
+                    {
+                        break;
+                    }
+                    default:
+                        break;
+                }
+                ++index_;
+            }
+            else
+            {
+                this->end_array();
+                type_ = typed_array_type();
+                size_ = 0;
+                index_ = 0;
+            }
+        }
     }
 
     const uint8_t* data(uint8_array_arg_t) const
@@ -475,9 +548,9 @@ class basic_cbor_cursor : public basic_staj_reader<char>, private virtual ser_co
 public:
     typedef Allocator allocator_type;
 private:
-    cbor_staj_event_handler<Float128T> event_handler_;
-
     basic_cbor_parser<Src> parser_;
+    cbor_staj_event_handler<Float128T> event_handler_;
+    size_t index_;
     bool eof_;
 
     // Noncopyable and nonmoveable
@@ -490,6 +563,7 @@ public:
     template <class Source>
     basic_cbor_cursor(Source&& source)
        : parser_(std::forward<Source>(source)),
+         index_(0), 
          eof_(false)
     {
         if (!done())
@@ -501,7 +575,9 @@ public:
     template <class Source>
     basic_cbor_cursor(Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter)
-       : parser_(std::forward<Source>(source)), event_handler_(filter),
+       : parser_(std::forward<Source>(source)), 
+         event_handler_(filter),
+         index_(0), 
          eof_(false)
     {
         if (!done())
@@ -516,6 +592,7 @@ public:
     basic_cbor_cursor(Source&& source, 
                       std::error_code& ec)
        : parser_(std::forward<Source>(source)),
+         index_(0), 
          eof_(false)
     {
         if (!done())
@@ -528,7 +605,9 @@ public:
     basic_cbor_cursor(Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter, 
                       std::error_code& ec)
-       : parser_(std::forward<Source>(source)), event_handler_(filter),
+       : parser_(std::forward<Source>(source)), 
+         event_handler_(filter),
+         index_(0), 
          eof_(false)
     {
         if (!done())
@@ -584,18 +663,23 @@ public:
 
     void read_next(std::error_code& ec)
     {
-
-        parser_.restart();
-        while (!parser_.stopped())
+        if (event_handler_.in_typed_array())
         {
-            parser_.parse(event_handler_, ec);
-            if (ec) return;
+            event_handler_.advance_typed_array();
+        }
+        else
+        {
+            parser_.restart();
+            while (!parser_.stopped())
+            {
+                parser_.parse(event_handler_, ec);
+                if (ec) return;
+            }
         }
     }
 
-    void read_next(basic_json_content_handler<char>& h, std::error_code& ec)
+    void read_next(basic_json_content_handler<char>& handler, std::error_code& ec)
     {
-        json_to_cbor_content_handler_adaptor<Float128T> handler(h);
         parser_.restart();
         while (!parser_.stopped())
         {
