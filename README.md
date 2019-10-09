@@ -45,7 +45,7 @@ _"I’m using your library for an external interface to pass data, as well as usin
 
 _"this software is great and the ability to have an xpath like facility is so useful"_
 
-_" I think this is the closest
+_"I think this is the closest
 cpp can get from languages with reflection behavior for serialization/deserialization"_
 
 _"really good"_ _"awesome project"_ _"very solid and very dependable"_ _"amazing work"_ _"Your repo rocks!!!!!"_

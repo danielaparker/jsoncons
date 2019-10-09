@@ -26,6 +26,22 @@ namespace jsoncons {
 namespace cbor {
 
 template <class Float128T>
+union const_typed_array_data_union
+{
+    const uint8_t* uint8_data_;
+    const uint16_t* uint16_data_;
+    const uint32_t* uint32_data_;
+    const uint64_t* uint64_data_;
+    const int8_t* int8_data_;
+    const int16_t* int16_data_;
+    const int32_t* int32_data_;
+    const int64_t* int64_data_;
+    const float* float_data_;
+    const double* double_data_;
+    const Float128T* float128_data_;
+};
+
+template <class Float128T>
 class cbor_staj_event_handler : public cbor_content_handler<Float128T>
 {
     using super_type = cbor_content_handler<Float128T>;
@@ -35,14 +51,21 @@ public:
 private:
     std::function<bool(const basic_staj_event<char_type>&, const ser_context&)> filter_;
     basic_staj_event<char_type> event_;
+
+    typed_array_type type_;
+    const_typed_array_data_union<Float128T> data_;
+    size_t size_;
+    size_t index_;
 public:
     cbor_staj_event_handler()
-        : filter_(accept), event_(staj_event_type::null_value)
+        : filter_(accept), event_(staj_event_type::null_value),
+          type_(), data_(), size_(0), index_(0)
     {
     }
 
     cbor_staj_event_handler(std::function<bool(const basic_staj_event<char_type>&, const ser_context&)> filter)
-        : filter_(filter), event_(staj_event_type::null_value)
+        : filter_(filter), event_(staj_event_type::null_value),
+          type_(), data_(), size_(0), index_(0)
     {
     }
 
@@ -51,6 +74,80 @@ public:
         return event_;
     }
 
+    typed_array_type array_type() const
+    {
+        return type_;
+    }
+    size_t size() const
+    {
+        return size();
+    }
+
+    const uint8_t* data(uint8_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::uint8_val);
+        return data_.uint8_data_;
+    }
+
+    const uint16_t* data(uint16_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::uint16_val);
+        return data_.uint16_data_;
+    }
+
+    const uint32_t* data(uint32_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::uint32_val);
+        return data_.uint32_data_;
+    }
+
+    const uint64_t* data(uint64_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::uint64_val);
+        return data_.uint64_data_;
+    }
+
+    const int8_t* data(int8_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::int8_val);
+        return data_.int8_data_;
+    }
+
+    const int16_t* data(int16_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::int16_val);
+        return data_.int16_data_;
+    }
+
+    const int32_t* data(int32_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::int32_val);
+        return data_.int32_data_;
+    }
+
+    const int64_t* data(int64_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::int64_val);
+        return data_.int64_data_;
+    }
+
+    const float* data(float_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::float_val);
+        return data_.float_data_;
+    }
+
+    const double* data(double_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::double_val);
+        return data_.double_data_;
+    }
+
+    const Float128T* data(float128_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::float128_val);
+        return data_.float128_data_;
+    }
 private:
     static bool accept(const basic_staj_event<char_type>&, const ser_context&) 
     {
@@ -138,10 +235,16 @@ private:
     }
 
     bool do_typed_array(const uint8_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) override
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override
     {
+        type_ = typed_array_type::uint8_val;
+        data_.uint8_data_ = data;
+        size_ = size;
+        index_ = 0;
         bool more = this->begin_array(tag,context);
+
+/*
         for (auto p = data; more && p < data+size; ++p)
         {
             this->uint64_value(*p,semantic_tag::none,context);
@@ -150,13 +253,20 @@ private:
         {
             more = this->end_array(context);
         }
+*/
         return more;
     }
 
     bool do_typed_array(const uint16_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) override
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override
     {
+        type_ = typed_array_type::uint16_val;
+        data_.uint16_data_ = data;
+        size_ = size;
+        index_ = 0;
+        bool more = this->begin_array(tag,context);
+/*
         bool more = this->begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
@@ -166,14 +276,20 @@ private:
         {
             more = this->end_array(context);
         }
+*/
         return more;
     }
 
     bool do_typed_array(const uint32_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) override
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override
     {
+        type_ = typed_array_type::uint32_val;
+        data_.uint32_data_ = data;
+        size_ = size;
+        index_ = 0;
         bool more = this->begin_array(tag,context);
+/*        bool more = this->begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
             this->uint64_value(*p,semantic_tag::none,context);
@@ -181,15 +297,20 @@ private:
         if (more)
         {
             more = this->end_array(context);
-        }
+        }*/
         return more;
     }
 
     bool do_typed_array(const uint64_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) override
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override
     {
+        type_ = typed_array_type::uint64_val;
+        data_.uint64_data_ = data;
+        size_ = size;
+        index_ = 0;
         bool more = this->begin_array(tag,context);
+        /*bool more = this->begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
             this->uint64_value(*p,semantic_tag::none,context);
@@ -197,15 +318,20 @@ private:
         if (more)
         {
             more = this->end_array(context);
-        }
+        }*/
         return more;
     }
 
     bool do_typed_array(const int8_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) override
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override
     {
+        type_ = typed_array_type::int8_val;
+        data_.int8_data_ = data;
+        size_ = size;
+        index_ = 0;
         bool more = this->begin_array(tag,context);
+        /* bool more = this->begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
             this->int64_value(*p,semantic_tag::none,context);
@@ -213,15 +339,20 @@ private:
         if (more)
         {
             more = this->end_array(context);
-        }
+        }*/
         return more;
     }
 
     bool do_typed_array(const int16_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) override
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override
     {
+        type_ = typed_array_type::int16_val;
+        data_.int16_data_ = data;
+        size_ = size;
+        index_ = 0;
         bool more = this->begin_array(tag,context);
+        /*bool more = this->begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
             this->int64_value(*p,semantic_tag::none,context);
@@ -229,15 +360,20 @@ private:
         if (more)
         {
             more = this->end_array(context);
-        }
+        }*/
         return more;
     }
 
     bool do_typed_array(const int32_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) override
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override
     {
+        type_ = typed_array_type::int32_val;
+        data_.int32_data_ = data;
+        size_ = size;
+        index_ = 0;
         bool more = this->begin_array(tag,context);
+        /*bool more = this->begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
             this->int64_value(*p,semantic_tag::none,context);
@@ -245,15 +381,20 @@ private:
         if (more)
         {
             more = this->end_array(context);
-        }
+        }*/
         return more;
     }
 
     bool do_typed_array(const int64_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) override
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override
     {
+        type_ = typed_array_type::int64_val;
+        data_.int64_data_ = data;
+        size_ = size;
+        index_ = 0;
         bool more = this->begin_array(tag,context);
+        /*bool more = this->begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
             this->int64_value(*p,semantic_tag::none,context);
@@ -261,15 +402,20 @@ private:
         if (more)
         {
             more = this->end_array(context);
-        }
+        }*/
         return more;
     }
 
     bool do_typed_array(const float* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) override
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override
     {
+        type_ = typed_array_type::float_val;
+        data_.float_data_ = data;
+        size_ = size;
+        index_ = 0;
         bool more = this->begin_array(tag,context);
+        /*bool more = this->begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
             this->double_value(*p,semantic_tag::none,context);
@@ -277,15 +423,20 @@ private:
         if (more)
         {
             more = this->end_array(context);
-        }
+        }*/
         return more;
     }
 
     bool do_typed_array(const double* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) override
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override
     {
+        type_ = typed_array_type::double_val;
+        data_.double_data_ = data;
+        size_ = size;
+        index_ = 0;
         bool more = this->begin_array(tag,context);
+        /*bool more = this->begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
             this->double_value(*p,semantic_tag::none,context);
@@ -293,7 +444,7 @@ private:
         if (more)
         {
             more = this->end_array(context);
-        }
+        }*/
         return more;
     }
 
@@ -433,12 +584,18 @@ public:
 
     void read_next(std::error_code& ec)
     {
-        read_next(event_handler_, ec);
+
+        parser_.restart();
+        while (!parser_.stopped())
+        {
+            parser_.parse(event_handler_, ec);
+            if (ec) return;
+        }
     }
 
     void read_next(basic_json_content_handler<char>& h, std::error_code& ec)
     {
-        cbor_to_json_content_handler_adaptor<Float128T> handler(h);
+        json_to_cbor_content_handler_adaptor<Float128T> handler(h);
         parser_.restart();
         while (!parser_.stopped())
         {

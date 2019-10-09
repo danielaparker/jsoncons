@@ -154,11 +154,17 @@ private:
 };
 
 template <class Float128T=void>
-class cbor_to_json_content_handler_adaptor : public basic_json_filter<char>
+class json_to_cbor_content_handler_adaptor : public cbor_content_handler<Float128T>
 {
+    using super_type = cbor_content_handler<Float128T>;
 public:
-    cbor_to_json_content_handler_adaptor(basic_json_content_handler<char>& handler)
-        : basic_json_filter(handler)
+    using char_type = char;
+    using string_view_type = typename super_type::string_view_type;
+private:
+    basic_json_content_handler<char_type>& to_handler_;
+public:
+    json_to_cbor_content_handler_adaptor(basic_json_content_handler<char>& handler)
+        : to_handler_(handler)
     {
     }
 
@@ -239,179 +245,265 @@ public:
         return do_typed_array(data, size, tag, context);
     }
 private:
-
-    virtual bool do_typed_array(const uint8_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context())
+private:
+    void do_flush() override
     {
-        bool more = begin_array(tag,context);
+        to_handler_.flush();
+    }
+
+    bool do_begin_object(semantic_tag tag, const ser_context& context) override
+    {
+        return to_handler_.begin_object(tag, context);
+    }
+
+    bool do_begin_object(size_t length, semantic_tag tag, const ser_context& context) override
+    {
+        return to_handler_.begin_object(length, tag, context);
+    }
+
+    bool do_end_object(const ser_context& context) override
+    {
+        return to_handler_.end_object(context);
+    }
+
+    bool do_begin_array(semantic_tag tag, const ser_context& context) override
+    {
+        return to_handler_.begin_array(tag, context);
+    }
+
+    bool do_begin_array(size_t length, semantic_tag tag, const ser_context& context) override
+    {
+        return to_handler_.begin_array(length, tag, context);
+    }
+
+    bool do_end_array(const ser_context& context) override
+    {
+        return to_handler_.end_array(context);
+    }
+
+    bool do_name(const string_view_type& name,
+                 const ser_context& context) override
+    {
+        return to_handler_.name(name, context);
+    }
+
+    bool do_string_value(const string_view_type& value,
+                         semantic_tag tag,
+                         const ser_context& context) override
+    {
+        return to_handler_.string_value(value, tag, context);
+    }
+
+    bool do_byte_string_value(const byte_string_view& b, 
+                              semantic_tag tag,
+                              const ser_context& context) override
+    {
+        return to_handler_.byte_string_value(b, tag, context);
+    }
+
+    bool do_double_value(double value, 
+                         semantic_tag tag,
+                         const ser_context& context) override
+    {
+        return to_handler_.double_value(value, tag, context);
+    }
+
+    bool do_int64_value(int64_t value,
+                        semantic_tag tag,
+                        const ser_context& context) override
+    {
+        return to_handler_.int64_value(value, tag, context);
+    }
+
+    bool do_uint64_value(uint64_t value,
+                         semantic_tag tag,
+                         const ser_context& context) override
+    {
+        return to_handler_.uint64_value(value, tag, context);
+    }
+
+    bool do_bool_value(bool value, semantic_tag tag, const ser_context& context) override
+    {
+        return to_handler_.bool_value(value, tag, context);
+    }
+
+    bool do_null_value(semantic_tag tag, const ser_context& context) override
+    {
+        return to_handler_.null_value(tag, context);
+    }
+
+    bool do_typed_array(const uint8_t* data, size_t size, 
+                                semantic_tag tag=semantic_tag::none,
+                                const ser_context& context=null_ser_context()) override
+    {
+        bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
-            uint64_value(*p,semantic_tag::none,context);
+            to_handler_.uint64_value(*p,semantic_tag::none,context);
         }
         if (more)
         {
-            more = end_array(context);
+            more = to_handler_.end_array(context);
         }
         return more;
     }
 
-    virtual bool do_typed_array(const uint16_t* data, size_t size, 
+    bool do_typed_array(const uint16_t* data, size_t size, 
                                 semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context())
+                                const ser_context& context=null_ser_context()) override
     {
-        bool more = begin_array(tag,context);
+        bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
-            uint64_value(*p,semantic_tag::none,context);
+            more = to_handler_.uint64_value(*p,semantic_tag::none,context);
         }
         if (more)
         {
-            more = end_array(context);
+            more = to_handler_.end_array(context);
         }
         return more;
     }
 
-    virtual bool do_typed_array(const uint32_t* data, size_t size, 
+    bool do_typed_array(const uint32_t* data, size_t size, 
                                 semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context())
+                                const ser_context& context=null_ser_context()) override
     {
-        bool more = begin_array(tag,context);
+        bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
-            uint64_value(*p,semantic_tag::none,context);
+            to_handler_.uint64_value(*p,semantic_tag::none,context);
         }
         if (more)
         {
-            more = end_array(context);
+            more = to_handler_.end_array(context);
         }
         return more;
     }
 
-    virtual bool do_typed_array(const uint64_t* data, size_t size, 
+    bool do_typed_array(const uint64_t* data, size_t size, 
                                 semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context())
+                                const ser_context& context=null_ser_context()) override
     {
-        bool more = begin_array(tag,context);
+        bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
-            uint64_value(*p,semantic_tag::none,context);
+            to_handler_.uint64_value(*p,semantic_tag::none,context);
         }
         if (more)
         {
-            more = end_array(context);
+            more = to_handler_.end_array(context);
         }
         return more;
     }
 
-    virtual bool do_typed_array(const int8_t* data, size_t size, 
+    bool do_typed_array(const int8_t* data, size_t size, 
                                 semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context())
+                                const ser_context& context=null_ser_context()) override
     {
-        bool more = begin_array(tag,context);
+        bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
-            int64_value(*p,semantic_tag::none,context);
+            more = to_handler_.int64_value(*p,semantic_tag::none,context);
         }
         if (more)
         {
-            more = end_array(context);
+            more = to_handler_.end_array(context);
         }
         return more;
     }
 
-    virtual bool do_typed_array(const int16_t* data, size_t size, 
+    bool do_typed_array(const int16_t* data, size_t size, 
                                 semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context())
+                                const ser_context& context=null_ser_context()) override
     {
-        bool more = begin_array(tag,context);
+        bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
-            int64_value(*p,semantic_tag::none,context);
+            more = to_handler_.int64_value(*p,semantic_tag::none,context);
         }
         if (more)
         {
-            more = end_array(context);
+            more = to_handler_.end_array(context);
         }
         return more;
     }
 
-    virtual bool do_typed_array(const int32_t* data, size_t size, 
+    bool do_typed_array(const int32_t* data, size_t size, 
                                 semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context())
+                                const ser_context& context=null_ser_context()) override
     {
-        bool more = begin_array(tag,context);
+        bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
-            int64_value(*p,semantic_tag::none,context);
+            more = to_handler_.int64_value(*p,semantic_tag::none,context);
         }
         if (more)
         {
-            more = end_array(context);
+            more = to_handler_.end_array(context);
         }
         return more;
     }
 
-    virtual bool do_typed_array(const int64_t* data, size_t size, 
+    bool do_typed_array(const int64_t* data, size_t size, 
                                 semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context())
+                                const ser_context& context=null_ser_context()) override
     {
-        bool more = begin_array(tag,context);
+        bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
-            int64_value(*p,semantic_tag::none,context);
+            more = to_handler_.int64_value(*p,semantic_tag::none,context);
         }
         if (more)
         {
-            more = end_array(context);
+            more = to_handler_.end_array(context);
         }
         return more;
     }
 
-    virtual bool do_typed_array(const float* data, size_t size, 
+    bool do_typed_array(const float* data, size_t size, 
                                 semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context())
+                                const ser_context& context=null_ser_context()) override
     {
-        bool more = begin_array(tag,context);
+        bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
-            double_value(*p,semantic_tag::none,context);
+            more = to_handler_.double_value(*p,semantic_tag::none,context);
         }
         if (more)
         {
-            more = end_array(context);
+            more = to_handler_.end_array(context);
         }
         return more;
     }
 
-    virtual bool do_typed_array(const double* data, size_t size, 
+    bool do_typed_array(const double* data, size_t size, 
                                 semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context())
+                                const ser_context& context=null_ser_context()) override
     {
-        bool more = begin_array(tag,context);
+        bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
-            double_value(*p,semantic_tag::none,context);
+            more = to_handler_.double_value(*p,semantic_tag::none,context);
         }
         if (more)
         {
-            more = end_array(context);
+            more = to_handler_.end_array(context);
         }
         return more;
     }
 
-    virtual bool do_typed_array(const Float128T* /*data*/, size_t /*size*/, 
+    bool do_typed_array(const Float128T* /*data*/, size_t /*size*/, 
                                 semantic_tag /*tag*/=semantic_tag::none,
-                                const ser_context& /*context*/=null_ser_context())
+                                const ser_context& /*context*/=null_ser_context()) override
     {
-        /* bool more = begin_array(tag,context);
+        /* bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
             double_value(static_cast<double>(*p),semantic_tag::none,context);
         }
         if (more)
         {
-            more = end_array(context);
+            more = to_handler_.end_array(context);
         }*/
         return true;
     }
@@ -442,6 +534,10 @@ constexpr double_array_arg_t double_array_arg = double_array_arg_t();
 struct float128_array_arg_t {};
 constexpr float128_array_arg_t float128_array_arg = float128_array_arg_t();
 
+enum typed_array_type {uint8_val=1,uint16_val,uint32_val,uint64_val,
+                      int8_val,int16_val,int32_val,int64_val, 
+                      float_val,double_val,float128_val};
+
 template <class Float128T>
 union typed_array_data_union
 {
@@ -461,10 +557,6 @@ union typed_array_data_union
 template <class Float128T = void, class Allocator=std::allocator<char>>
 class typed_array
 {
-    enum array_type {uint8_val=1,uint16_val,uint32_val,uint64_val,
-                     int8_val,int16_val,int32_val,int64_val, 
-                     float_val,double_val,float128_val};
-
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint8_t> uint8_allocator_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint16_t> uint16_allocator_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint32_t> uint32_allocator_type;
@@ -478,81 +570,81 @@ class typed_array
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<Float128T> float128_allocator_type;
 
     Allocator allocator_;
-    array_type type_;
-    size_t size_;
+    typed_array_type type_;
     typed_array_data_union<Float128T> data_;
+    size_t size_;
 public:
     typed_array(const Allocator& alloc)
-        : allocator_(alloc), type_(), size_(0), data_()
+        : allocator_(alloc), type_(), data_(), size_(0)
     {
     }
 
     typed_array(const typed_array& other)
-        : allocator_(other.allocator_), type_(other.type_), size_(other.size()), data_()
+        : allocator_(other.allocator_), type_(other.type_), data_(), size_(other.size())
     {
         switch (other.type_)
         {
-            case array_type::uint8_val:
+            case typed_array_type::uint8_val:
             {
                 uint8_allocator_type alloc{ allocator_ };
                 data_.uint8_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::uint16_val:
+            case typed_array_type::uint16_val:
             {
                 uint16_allocator_type alloc{ allocator_ };
                 data_.uint16_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::uint32_val:
+            case typed_array_type::uint32_val:
             {
                 uint32_allocator_type alloc{ allocator_ };
                 data_.uint32_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::uint64_val:
+            case typed_array_type::uint64_val:
             {
                 uint64_allocator_type alloc{ allocator_ };
                 data_.uint64_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::int8_val:
+            case typed_array_type::int8_val:
             {
                 int8_allocator_type alloc{ allocator_ };
                 data_.int8_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::int16_val:
+            case typed_array_type::int16_val:
             {
                 int16_allocator_type alloc{ allocator_ };
                 data_.int16_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::int32_val:
+            case typed_array_type::int32_val:
             {
                 int32_allocator_type alloc{ allocator_ };
                 data_.int32_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::int64_val:
+            case typed_array_type::int64_val:
             {
                 int64_allocator_type alloc{ allocator_ };
                 data_.int64_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::float_val:
+            case typed_array_type::float_val:
             {
                 float_allocator_type alloc{ allocator_ };
                 data_.float_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::double_val:
+            case typed_array_type::double_val:
             {
                 double_allocator_type alloc{allocator_};
                 data_.double_data_ = alloc.allocate(size_);
                 break;
             }
-            case array_type::float128_val:
+            case typed_array_type::float128_val:
             {
                 allocate_float128();
                 break;
@@ -567,77 +659,77 @@ public:
         swap(*this,other);
     }
     typed_array(uint8_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::uint8_val), size_(size)
+        : allocator_(allocator), type_(typed_array_type::uint8_val), size_(size)
     {
         uint8_allocator_type alloc(allocator_);
         data_.uint8_data_ = alloc.allocate(size);
     }
 
     typed_array(uint16_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::uint16_val), size_(size)
+        : allocator_(allocator), type_(typed_array_type::uint16_val), size_(size)
     {
         uint16_allocator_type alloc(allocator_);
         data_.uint16_data_ = alloc.allocate(size);
     }
 
     typed_array(uint32_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::uint32_val), size_(size)
+        : allocator_(allocator), type_(typed_array_type::uint32_val), size_(size)
     {
         uint32_allocator_type alloc(allocator_);
         data_.uint32_data_ = alloc.allocate(size);
     }
 
     typed_array(uint64_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::uint64_val), size_(size)
+        : allocator_(allocator), type_(typed_array_type::uint64_val), size_(size)
     {
         uint64_allocator_type alloc(allocator_);
         data_.uint64_data_ = alloc.allocate(size);
     }
 
     typed_array(int8_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::int8_val), size_(size)
+        : allocator_(allocator), type_(typed_array_type::int8_val), size_(size)
     {
         int8_allocator_type alloc(allocator_);
         data_.int8_data_ = alloc.allocate(size);
     }
 
     typed_array(int16_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::int16_val), size_(size)
+        : allocator_(allocator), type_(typed_array_type::int16_val), size_(size)
     {
         int16_allocator_type alloc(allocator_);
         data_.int16_data_ = alloc.allocate(size);
     }
 
     typed_array(int32_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::int32_val), size_(size)
+        : allocator_(allocator), type_(typed_array_type::int32_val), size_(size)
     {
         int32_allocator_type alloc(allocator_);
         data_.int32_data_ = alloc.allocate(size);
     }
 
     typed_array(int64_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::int64_val), size_(size)
+        : allocator_(allocator), type_(typed_array_type::int64_val), size_(size)
     {
         int64_allocator_type alloc(allocator_);
         data_.int64_data_ = alloc.allocate(size);
     }
 
     typed_array(float_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::float_val), size_(size)
+        : allocator_(allocator), type_(typed_array_type::float_val), size_(size)
     {
         float_allocator_type alloc(allocator_);
         data_.float_data_ = alloc.allocate(size);
     }
 
     typed_array(double_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::double_val), size_(size)
+        : allocator_(allocator), type_(typed_array_type::double_val), size_(size)
     {
         double_allocator_type alloc(allocator_);
         data_.double_data_ = alloc.allocate(size);
     }
 
     typed_array(float128_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(array_type::float128_val), size_(size)
+        : allocator_(allocator), type_(typed_array_type::float128_val), size_(size)
     {
         float128_allocator_type alloc(allocator_);
         data_.float128_data_ = alloc.allocate(size);
@@ -647,67 +739,67 @@ public:
     {
         switch (type_)
         {
-            case array_type::uint8_val:
+            case typed_array_type::uint8_val:
             {
                 uint8_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.uint8_data_, 1);
                 break;
             }
-            case array_type::uint16_val:
+            case typed_array_type::uint16_val:
             {
                 uint16_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.uint16_data_, 1);
                 break;
             }
-            case array_type::uint32_val:
+            case typed_array_type::uint32_val:
             {
                 uint32_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.uint32_data_, 1);
                 break;
             }
-            case array_type::uint64_val:
+            case typed_array_type::uint64_val:
             {
                 uint64_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.uint64_data_, 1);
                 break;
             }
-            case array_type::int8_val:
+            case typed_array_type::int8_val:
             {
                 int8_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.int8_data_, 1);
                 break;
             }
-            case array_type::int16_val:
+            case typed_array_type::int16_val:
             {
                 int16_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.int16_data_, 1);
                 break;
             }
-            case array_type::int32_val:
+            case typed_array_type::int32_val:
             {
                 int32_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.int32_data_, 1);
                 break;
             }
-            case array_type::int64_val:
+            case typed_array_type::int64_val:
             {
                 int64_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.int64_data_, 1);
                 break;
             }
-            case array_type::float_val:
+            case typed_array_type::float_val:
             {
                 float_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.float_data_, 1);
                 break;
             }
-            case array_type::double_val:
+            case typed_array_type::double_val:
             {
                 double_allocator_type alloc(allocator_);
                 alloc.deallocate(data_.double_data_, 1);
                 break;
             }
-            case array_type::float128_val:
+            case typed_array_type::float128_val:
             {
                 deallocate_float128();
                 break;
@@ -715,7 +807,7 @@ public:
             default:
                 break;
         }
-        type_ = array_type();
+        type_ = typed_array_type();
         size_ = 0;
     }
 
@@ -761,132 +853,132 @@ public:
 
     uint8_t* data(uint8_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::uint8_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::uint8_val);
         return data_.uint8_data_;
     }
 
     const uint8_t* data(uint8_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::uint8_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::uint8_val);
         return data_.uint8_data_;
     }
     uint16_t* data(uint16_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::uint16_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::uint16_val);
         return data_.uint16_data_;
     }
 
     const uint16_t* data(uint16_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::uint16_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::uint16_val);
         return data_.uint16_data_;
     }
 
     uint32_t* data(uint32_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::uint32_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::uint32_val);
         return data_.uint32_data_;
     }
 
     const uint32_t* data(uint32_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::uint32_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::uint32_val);
         return data_.uint32_data_;
     }
 
     uint64_t* data(uint64_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::uint64_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::uint64_val);
         return data_.uint64_data_;
     }
 
     const uint64_t* data(uint64_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::uint64_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::uint64_val);
         return data_.uint64_data_;
     }
 
     int8_t* data(int8_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::int8_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::int8_val);
         return data_.int8_data_;
     }
 
     const int8_t* data(int8_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::int8_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::int8_val);
         return data_.int8_data_;
     }
 
     int16_t* data(int16_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::int16_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::int16_val);
         return data_.int16_data_;
     }
 
     const int16_t* data(int16_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::int16_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::int16_val);
         return data_.int16_data_;
     }
 
     int32_t* data(int32_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::int32_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::int32_val);
         return data_.int32_data_;
     }
 
     const int32_t* data(int32_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::int32_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::int32_val);
         return data_.int32_data_;
     }
 
     int64_t* data(int64_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::int64_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::int64_val);
         return data_.int64_data_;
     }
 
     const int64_t* data(int64_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::int64_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::int64_val);
         return data_.int64_data_;
     }
 
     float* data(float_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::float_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::float_val);
         return data_.float_data_;
     }
 
     const float* data(float_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::float_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::float_val);
         return data_.float_data_;
     }
 
     double* data(double_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::double_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::double_val);
         return data_.double_data_;
     }
 
     const double* data(double_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::double_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::double_val);
         return data_.double_data_;
     }
 
     Float128T* data(float128_array_arg_t)
     {
-        JSONCONS_ASSERT(type_ == array_type::float128_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::float128_val);
         return data_.float128_data_;
     }
 
     const Float128T* data(float128_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == array_type::float128_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::float128_val);
         return data_.float128_data_;
     }
 
@@ -1030,7 +1122,13 @@ public:
         return source_.position();
     }
 
-    void parse(cbor_to_json_content_handler_adaptor<Float128T>& handler, std::error_code& ec)
+    void parse(basic_json_content_handler<char>& handler, std::error_code& ec)
+    {
+        json_to_cbor_content_handler_adaptor<Float128T> h(handler);
+        parse(h,ec);
+    }
+
+    void parse(cbor_content_handler<Float128T>& handler, std::error_code& ec)
     {
         while (!done_ && continue_)
         {
@@ -1169,7 +1267,7 @@ public:
         }
     }
 private:
-    void read_item(cbor_to_json_content_handler_adaptor<Float128T>& handler, std::error_code& ec)
+    void read_item(cbor_content_handler<Float128T>& handler, std::error_code& ec)
     {
         read_tags(ec);
         if (ec)
@@ -1388,7 +1486,7 @@ private:
         tags_.clear();
     }
 
-    void begin_array(cbor_to_json_content_handler_adaptor<Float128T>& handler, uint8_t info, std::error_code& ec)
+    void begin_array(cbor_content_handler<Float128T>& handler, uint8_t info, std::error_code& ec)
     {
         semantic_tag tag = semantic_tag::none;
         auto stringref_map = state_stack_.back().stringref_map;
@@ -1430,13 +1528,13 @@ private:
         }
     }
 
-    void end_array(cbor_to_json_content_handler_adaptor<Float128T>& handler, std::error_code&)
+    void end_array(cbor_content_handler<Float128T>& handler, std::error_code&)
     {
         continue_ = handler.end_array(*this);
         state_stack_.pop_back();
     }
 
-    void begin_map(cbor_to_json_content_handler_adaptor<Float128T>& handler, uint8_t info, std::error_code& ec)
+    void begin_map(cbor_content_handler<Float128T>& handler, uint8_t info, std::error_code& ec)
     {
         auto stringref_map = state_stack_.back().stringref_map;
         for (auto t : tags_)
@@ -1474,13 +1572,13 @@ private:
         }
     }
 
-    void end_map(cbor_to_json_content_handler_adaptor<Float128T>& handler, std::error_code&)
+    void end_map(cbor_content_handler<Float128T>& handler, std::error_code&)
     {
         continue_ = handler.end_object(*this);
         state_stack_.pop_back();
     }
 
-    void read_name(cbor_to_json_content_handler_adaptor<Float128T>& handler, std::error_code& ec)
+    void read_name(cbor_content_handler<Float128T>& handler, std::error_code& ec)
     {
         read_tags(ec);
         if (ec)
@@ -1583,8 +1681,7 @@ private:
                 json_string_encoder encoder(text_buffer_);
                 basic_cbor_parser<Src,Float128T> reader(std::move(source_));
 
-                cbor_to_json_content_handler_adaptor<Float128T> encoder2(encoder);
-                reader.parse(encoder2, ec);
+                reader.parse(encoder, ec);
                 source_ = std::move(reader.source_);
                 auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
                 if (result.ec != unicons::conv_errc())
@@ -2329,7 +2426,7 @@ private:
         }
     }
 
-    void handle_string(cbor_to_json_content_handler_adaptor<Float128T>& handler, const basic_string_view<char>& v, std::error_code&)
+    void handle_string(cbor_content_handler<Float128T>& handler, const basic_string_view<char>& v, std::error_code&)
     {
         semantic_tag tag = semantic_tag::none;
         if (!tags_.empty())
@@ -2356,7 +2453,7 @@ private:
         continue_ = handler.string_value(v, tag, *this);
     }
 
-    void handle_byte_string(cbor_to_json_content_handler_adaptor<Float128T>& handler, const byte_string_view& v, std::error_code& ec)
+    void handle_byte_string(cbor_content_handler<Float128T>& handler, const byte_string_view& v, std::error_code& ec)
     {
         if (!tags_.empty())
         {
@@ -2729,7 +2826,7 @@ private:
 
     template <class Float128T_ = Float128T>
     typename std::enable_if<std::is_void<Float128T_>::value,void>::type
-    handle_float128(cbor_to_json_content_handler_adaptor<Float128T>& handler, const byte_string_view&, const uint8_t, std::error_code&)
+    handle_float128(cbor_content_handler<Float128T>& handler, const byte_string_view&, const uint8_t, std::error_code&)
     {
         continue_ = handler.begin_array(semantic_tag::none, *this);
         continue_ = handler.end_array(*this);
@@ -2737,7 +2834,7 @@ private:
 
     template <class Float128T_ = Float128T>
     typename std::enable_if<!std::is_void<Float128T_>::value,void>::type
-    handle_float128(cbor_to_json_content_handler_adaptor<Float128T>& handler, const byte_string_view& v, const uint8_t tag, std::error_code&)
+    handle_float128(cbor_content_handler<Float128T>& handler, const byte_string_view& v, const uint8_t tag, std::error_code&)
     {
         const uint8_t e = (tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift; 
         const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
