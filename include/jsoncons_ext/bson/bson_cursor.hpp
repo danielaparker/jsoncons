@@ -57,7 +57,8 @@ public:
     template <class Source>
     basic_bson_cursor(Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter)
-       : parser_(std::forward<Source>(source)), event_handler_(filter),
+       : parser_(std::forward<Source>(source)), 
+         event_handler_(filter),
          eof_(false)
     {
         if (!done())

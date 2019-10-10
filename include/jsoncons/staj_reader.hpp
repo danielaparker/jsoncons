@@ -478,7 +478,7 @@ public:
         return event_;
     }
 private:
-    static bool accept(const basic_staj_event<CharT>&, const ser_context&) 
+    static constexpr bool accept(const basic_staj_event<CharT>&, const ser_context&) 
     {
         return true;
     }

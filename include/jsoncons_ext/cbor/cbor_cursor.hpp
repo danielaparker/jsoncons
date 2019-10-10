@@ -222,7 +222,7 @@ public:
         return data_.float128_data_;
     }
 private:
-    static bool accept(const basic_staj_event<char_type>&, const ser_context&) 
+    static constexpr bool accept(const basic_staj_event<char_type>&, const ser_context&) 
     {
         return true;
     }
