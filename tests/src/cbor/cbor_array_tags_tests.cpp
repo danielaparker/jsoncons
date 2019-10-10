@@ -15,7 +15,46 @@
 
 using namespace jsoncons;
 
-TEST_CASE("cbor tagged array tests")
+/*
+struct my_cbor_content_handler : public default_cbor_content_handler
+{
+    std::vector<double> v;
+
+    bool do_typed_array(const double* data, size_t size, 
+                        semantic_tag tag,
+                        const ser_context& context) override
+    {
+        v = std::vector<double>(data,size);
+        return false;
+    }
+};
+
+TEST_CASE("cbor typed array cursor tests")
+{
+    SECTION("Tag 86, float64, little endian")
+    {
+        const std::vector<uint8_t> input = {
+            0xD8, // Tag
+                0x56, // Tag 86, float64, little endian, Typed Array
+            0x50, // Byte string value of length 16
+                0xff,0xff,0xff,0xff,0xff,0xff,0xef,0xff,
+                0xff,0xff,0xff,0xff,0xff,0xff,0xef,0x7f
+        };
+
+        cbor::cbor_bytes_cursor cursor(input);
+        CHECK(cursor.current().event_type() == staj_event_type::begin_array);
+        CHECK(cursor.is_typed_array());
+
+        my_cbor_content_handler handler;
+        cursor.read_to(handler);
+        for (auto item : handler.v)
+        {
+            std::cout << v << "\n";
+        }
+    }
+}
+*/
+TEST_CASE("cbor typed array tests")
 {
     SECTION("Tag 64 (uint8 Typed Array)")
     {
@@ -352,50 +391,63 @@ TEST_CASE("cbor tagged array tests")
 
     SECTION("Tag 83, float128, big endian")
     {
-        std::cout << "sizeof(long double): " << sizeof(long double) << "\n";
+#if defined(__GNUC__)
+#include <quadmath.h>
+
+        char buf[128];
+
         const uint8_t* endp;
 
-        uint8_t buf[sizeof(long double)];
-        auto x = std::numeric_limits<long double>::lowest();
-        auto y = (std::numeric_limits<long double>::max)();
-        memcpy(buf,&x,sizeof(long double));
+        uint8_t buf[sizeof(__float128)];
+        auto y = FLT128_MAX;
+        auto x = -y;
+        memcpy(buf,&x,sizeof(__float128));
         for (size_t i = sizeof(buf) -1; i+1 > 0; --i)
         {
             std::cout << std::hex << (int)buf[i] << " ";
         }
         std::cout << "\n";
-        auto val1 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
-        std::cout << "float 128 val1: " << val1 << "\n";
+        auto val1 = jsoncons::detail::big_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
+        std::cout << "Float 128 val1: ";
+        quadmath_snprintf (buf, sizeof buf, "%Qa", val1);
+        std::cout << buf << "\n";
 
-        memcpy(buf,&y,sizeof(long double));
+        memcpy(buf,&y,sizeof(__float128));
         for (size_t i = sizeof(buf) -1; i+1 > 0; --i)
         {
             std::cout << std::hex << (int)buf[i] << " ";
         }
-        auto val2 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
-        std::cout << "float 128 val2: " << val2 << "\n";
+        auto val2 = jsoncons::detail::big_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
+        std::cout << "Float 128 val2: ";
+        quadmath_snprintf (buf, sizeof buf, "%Qa", val1);
+        std::cout << buf << "\n";
 
-        long double w = -1;
+        __float128 w = -1;
         std::cout << "\n\n";
-        memcpy(buf,&w,sizeof(long double));
+        memcpy(buf,&w,sizeof(__float128));
         for (size_t i = sizeof(buf)-1; i+1 > 0; --i)
         {
             std::cout << std::hex << (int)buf[i] << " ";
         }
         std::cout << "\n\n";
-        auto val3 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
-        std::cout << "float 128 val3: " << val3 << "\n";
-        long double z = 1;
-        memcpy(buf,&z,sizeof(long double));
+        auto val3 = jsoncons::detail::big_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
+        std::cout << "Float 128 val3: ";
+        quadmath_snprintf (buf, sizeof buf, "%Qa", val1);
+        std::cout << buf << "\n";
+        __float128 z = 1;
+        memcpy(buf,&z,sizeof(__float128));
         for (size_t i = sizeof(buf) -1; i+1 > 0; --i)
         {
             std::cout << std::hex << (int)buf[i] << " ";
         }
         std::cout << "\n\n";
 
-        auto val4 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
-        std::cout << "float 128 val4: " << val4 << "\n";
+        auto val4 = jsoncons::detail::big_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
+        std::cout << "Float 128 val4: ";
+        quadmath_snprintf (buf, sizeof buf, "%Qa", val1);
+        std::cout << buf << "\n";
 
+/*
         const std::vector<uint8_t> input = {
             0xD8, // Tag
                 0x53, // Tag 83, float128, little endian, Typed Array
@@ -403,16 +455,10 @@ TEST_CASE("cbor tagged array tests")
                 0x00,0x00,0x00,0x00,0x00,0x00,0xff,0xfe,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
                 0x00,0x00,0x7f,0xfe,0x56,0xbf,0xbf,0xff,0x80,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
                 0x00,0x00,0x7f,0xfe,0x56,0xbf,0x3f,0xff,0x80,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                0x00,0x00,0x00,0x00,0x00,0x00,0x7f,0xfe,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff 
+                0x00,0x00,0x00,0x00,0x00,0x00,0x7f,0xfe,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
+ */
         };
-
-        json j = cbor::decode_cbor<json>(input);
-        REQUIRE(j.is_array());
-        //REQUIRE(j.size() == 2);
-
-        std::cout << "Tag 83\n" << pretty_print(j) << "\n";
-        //CHECK(j[0].as<double>() == std::numeric_limits<double>::lowest());
-        //CHECK(j[1].as<double>() == (std::numeric_limits<double>::max)());
+#endif
     }
 
     SECTION("Tag 84, float16, little endian")
@@ -474,13 +520,15 @@ TEST_CASE("cbor tagged array tests")
     SECTION("Tag 87, float128, little endian")
     {
 #if defined(__GNUC__)
-        std::cout << "sizeof(__float128): " << sizeof(__float128) << "\n";
+#include <quadmath.h>
+
+        char buf[128];
 
         const uint8_t* endp = nullptr;
 
         uint8_t buf[sizeof(__float128)];
-        auto x = std::numeric_limits<__float128>::lowest();
-        auto y = (std::numeric_limits<__float128>::max)();
+        auto y = FLT128_MAX;
+        auto x = -y;
         memcpy(buf,&x,sizeof(__float128));
         for (auto b : buf)
         {
@@ -488,15 +536,21 @@ TEST_CASE("cbor tagged array tests")
         }
         std::cout << "\n";
         auto val1 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
-        std::cout << "float 128 val1: " << val1 << "\n";
-
+        //std::cout << "float 128 val1: " << val1 << "\n";
+        std::cout << "Float 128 val1: ";
+        quadmath_snprintf (buf, sizeof buf, "%Qa", val1);
+        std::cout << buf << "\n";
+    
         memcpy(buf,&y,sizeof(__float128));
         for (auto b : buf)
         {
             std::cout << std::hex << (int)b << " ";
         }
         auto val2 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
-        std::cout << "float 128 val2: " << val2 << "\n";
+        //std::cout << "float 128 val2: " << val2 << "\n";
+        std::cout << "Float 128 val2: ";
+        quadmath_snprintf (buf, sizeof buf, "%Qa", val2);
+        std::cout << buf << "\n";
 
         __float128 w = -1;
         std::cout << "\n\n";
@@ -506,8 +560,10 @@ TEST_CASE("cbor tagged array tests")
             std::cout << std::hex << (int)b << " ";
         }
         auto val3 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
-        std::cout << "float 128 val3: " << val3 << "\n";
-        std::cout << "\n\n";
+        std::cout << "Float 128 val3: ";
+        quadmath_snprintf (buf, sizeof buf, "%Qa", val3);
+        std::cout << buf << "\n";
+
         __float128 z = 1;
         memcpy(buf,&z,sizeof(__float128));
         for (auto b : buf)
@@ -517,7 +573,9 @@ TEST_CASE("cbor tagged array tests")
         std::cout << "\n\n";
 
         auto val4 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
-        std::cout << "float 128 val4: " << val4 << "\n";
+        std::cout << "Float 128 val4: ";
+        quadmath_snprintf (buf, sizeof buf, "%Qa", val4);
+        std::cout << buf << "\n";
 
         /* const std::vector<uint8_t> input = {
             0xD8, // Tag
@@ -529,13 +587,6 @@ TEST_CASE("cbor tagged array tests")
                 0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xfe,0x7f,0x00,0x00,0x00,0x00,0x00,0x00
         };
         */
-        //json j = cbor::decode_cbor<json>(input);
-        //REQUIRE(j.is_array());
-        //REQUIRE(j.size() == 2);
-
-        std::cout << "Tag 87\n" << pretty_print(j) << "\n";
-        //CHECK(j[0].as<double>() == std::numeric_limits<double>::lowest());
-        //CHECK(j[1].as<double>() == (std::numeric_limits<double>::max)());
 #endif
     }
 
