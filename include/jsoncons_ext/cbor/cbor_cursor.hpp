@@ -315,19 +315,7 @@ private:
         data_.uint8_data_ = data;
         size_ = size;
         index_ = 0;
-        bool more = this->begin_array(tag,context);
-
-/*
-        for (auto p = data; more && p < data+size; ++p)
-        {
-            this->uint64_value(*p,semantic_tag::none,context);
-        }
-        if (more)
-        {
-            more = this->end_array(context);
-        }
-*/
-        return more;
+        return this->begin_array(tag,context);
     }
 
     bool do_typed_array(const uint16_t* data, size_t size, 
@@ -338,19 +326,7 @@ private:
         data_.uint16_data_ = data;
         size_ = size;
         index_ = 0;
-        bool more = this->begin_array(tag,context);
-/*
-        bool more = this->begin_array(tag,context);
-        for (auto p = data; more && p < data+size; ++p)
-        {
-            this->uint64_value(*p,semantic_tag::none,context);
-        }
-        if (more)
-        {
-            more = this->end_array(context);
-        }
-*/
-        return more;
+        return this->begin_array(tag,context);
     }
 
     bool do_typed_array(const uint32_t* data, size_t size, 
@@ -361,17 +337,7 @@ private:
         data_.uint32_data_ = data;
         size_ = size;
         index_ = 0;
-        bool more = this->begin_array(tag,context);
-/*        bool more = this->begin_array(tag,context);
-        for (auto p = data; more && p < data+size; ++p)
-        {
-            this->uint64_value(*p,semantic_tag::none,context);
-        }
-        if (more)
-        {
-            more = this->end_array(context);
-        }*/
-        return more;
+        return this->begin_array(tag,context);
     }
 
     bool do_typed_array(const uint64_t* data, size_t size, 
@@ -382,17 +348,7 @@ private:
         data_.uint64_data_ = data;
         size_ = size;
         index_ = 0;
-        bool more = this->begin_array(tag,context);
-        /*bool more = this->begin_array(tag,context);
-        for (auto p = data; more && p < data+size; ++p)
-        {
-            this->uint64_value(*p,semantic_tag::none,context);
-        }
-        if (more)
-        {
-            more = this->end_array(context);
-        }*/
-        return more;
+        return this->begin_array(tag,context);
     }
 
     bool do_typed_array(const int8_t* data, size_t size, 
@@ -403,17 +359,7 @@ private:
         data_.int8_data_ = data;
         size_ = size;
         index_ = 0;
-        bool more = this->begin_array(tag,context);
-        /* bool more = this->begin_array(tag,context);
-        for (auto p = data; more && p < data+size; ++p)
-        {
-            this->int64_value(*p,semantic_tag::none,context);
-        }
-        if (more)
-        {
-            more = this->end_array(context);
-        }*/
-        return more;
+        return this->begin_array(tag,context);
     }
 
     bool do_typed_array(const int16_t* data, size_t size, 
@@ -424,17 +370,7 @@ private:
         data_.int16_data_ = data;
         size_ = size;
         index_ = 0;
-        bool more = this->begin_array(tag,context);
-        /*bool more = this->begin_array(tag,context);
-        for (auto p = data; more && p < data+size; ++p)
-        {
-            this->int64_value(*p,semantic_tag::none,context);
-        }
-        if (more)
-        {
-            more = this->end_array(context);
-        }*/
-        return more;
+        return this->begin_array(tag,context);
     }
 
     bool do_typed_array(const int32_t* data, size_t size, 
@@ -445,17 +381,7 @@ private:
         data_.int32_data_ = data;
         size_ = size;
         index_ = 0;
-        bool more = this->begin_array(tag,context);
-        /*bool more = this->begin_array(tag,context);
-        for (auto p = data; more && p < data+size; ++p)
-        {
-            this->int64_value(*p,semantic_tag::none,context);
-        }
-        if (more)
-        {
-            more = this->end_array(context);
-        }*/
-        return more;
+        return this->begin_array(tag,context);
     }
 
     bool do_typed_array(const int64_t* data, size_t size, 
@@ -466,17 +392,7 @@ private:
         data_.int64_data_ = data;
         size_ = size;
         index_ = 0;
-        bool more = this->begin_array(tag,context);
-        /*bool more = this->begin_array(tag,context);
-        for (auto p = data; more && p < data+size; ++p)
-        {
-            this->int64_value(*p,semantic_tag::none,context);
-        }
-        if (more)
-        {
-            more = this->end_array(context);
-        }*/
-        return more;
+        return this->begin_array(tag,context);
     }
 
     bool do_typed_array(const float* data, size_t size, 
@@ -487,17 +403,7 @@ private:
         data_.float_data_ = data;
         size_ = size;
         index_ = 0;
-        bool more = this->begin_array(tag,context);
-        /*bool more = this->begin_array(tag,context);
-        for (auto p = data; more && p < data+size; ++p)
-        {
-            this->double_value(*p,semantic_tag::none,context);
-        }
-        if (more)
-        {
-            more = this->end_array(context);
-        }*/
-        return more;
+        return this->begin_array(tag,context);
     }
 
     bool do_typed_array(const double* data, size_t size, 
@@ -508,32 +414,13 @@ private:
         data_.double_data_ = data;
         size_ = size;
         index_ = 0;
-        bool more = this->begin_array(tag,context);
-        /*bool more = this->begin_array(tag,context);
-        for (auto p = data; more && p < data+size; ++p)
-        {
-            this->double_value(*p,semantic_tag::none,context);
-        }
-        if (more)
-        {
-            more = this->end_array(context);
-        }*/
-        return more;
+        return this->begin_array(tag,context);
     }
 
     bool do_typed_array(const Float128T* /*data*/, size_t /*size*/, 
-                                semantic_tag /*tag*/=semantic_tag::none,
-                                const ser_context& /*context*/=null_ser_context()) override
+                        semantic_tag /*tag*/=semantic_tag::none,
+                        const ser_context& /*context*/=null_ser_context()) override
     {
-        /* bool more = this->begin_array(tag,context);
-        for (auto p = data; more && p < data+size; ++p)
-        {
-            this->double_value(static_cast<double>(*p),semantic_tag::none,context);
-        }
-        if (more)
-        {
-            more = this->end_array(context);
-        }*/
         return true;
     }
 
