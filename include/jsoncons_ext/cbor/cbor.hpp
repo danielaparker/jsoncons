@@ -13,7 +13,7 @@
 #include <type_traits> // std::enable_if
 #include <istream> // std::basic_istream
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_filter.hpp>
+#include <jsoncons/json_content_filter.hpp>
 #include <jsoncons/config/binary_config.hpp>
 #include <jsoncons_ext/cbor/cbor_reader.hpp>
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>

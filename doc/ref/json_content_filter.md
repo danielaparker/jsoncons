@@ -1,16 +1,16 @@
-### jsoncons::json_filter
+### jsoncons::json_content_filter
 
 ```c++
-#include <jsoncons/json_filter.hpp>
+#include <jsoncons/json_content_filter.hpp>
 
-typedef basic_json_filter<char> json_filter
+typedef basic_json_content_filter<char> json_content_filter
 ```
 
-The `json_filter` class is an instantiation of the `basic_json_filter` class template that uses `char` as the character type.
+The `json_content_filter` class is an instantiation of the `basic_json_content_filter` class template that uses `char` as the character type.
 
-`json_filter` is noncopyable and nonmoveable.
+`json_content_filter` is noncopyable and nonmoveable.
 
-![json_filter](./diagrams/json_filter.png)
+![json_content_filter](./diagrams/json_content_filter.png)
 
 #### Member types
 
@@ -20,9 +20,9 @@ Member type                         |Definition
 
 #### Constructors
 
-    json_filter(json_content_handler& handler)
-All JSON events that pass through the `json_filter` go to the specified `json_content_handler` (e.g. another filter.)
-You must ensure that the `handler` exists as long as does `json_filter`, as `json_filter` holds a pointer to but does not own this object.
+    json_content_filter(json_content_handler& handler)
+All JSON events that pass through the `json_content_filter` go to the specified `json_content_handler` (e.g. another filter.)
+You must ensure that the `handler` exists as long as does `json_content_filter`, as `json_content_filter` holds a pointer to but does not own this object.
 
 #### Accessors
 
@@ -40,7 +40,7 @@ Returns a reference to the JSON handler that sends json events to a destination 
 ```c++
 #include <sstream>
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_filter.hpp>
+#include <jsoncons/json_content_filter.hpp>
 
 using namespace jsoncons;
 
@@ -97,22 +97,22 @@ Input JSON file `address-book.json`:
 
 Suppose you want to break the name into a first name and last name, and report a warning when `name` does not contain a space or tab separated part. 
 
-You can achieve the desired result by subclassing the [json_filter](json_filter.md) class, overriding the default methods for receiving name and string value events, and passing modified events on to the parent [json_content_handler](json_content_handler.md) (which in this example will forward them to a [basic_json_encoder](basic_json_encoder.md).) 
+You can achieve the desired result by subclassing the [json_content_filter](json_content_filter.md) class, overriding the default methods for receiving name and string value events, and passing modified events on to the parent [json_content_handler](json_content_handler.md) (which in this example will forward them to a [basic_json_encoder](basic_json_encoder.md).) 
 ```c++
 #include <jsoncons/json_encoder.hpp>
-#include <jsoncons/json_filter.hpp>
+#include <jsoncons/json_content_filter.hpp>
 #include <jsoncons/json_reader.hpp>
 
 using namespace jsoncons;
 
 
-class name_fix_up_filter : public json_filter
+class name_fix_up_filter : public json_content_filter
 {
     std::string member_name_;
 
 public:
     name_fix_up_filter(json_content_handler& handler)
-        : json_filter(handler)
+        : json_content_filter(handler)
     {
     }
 

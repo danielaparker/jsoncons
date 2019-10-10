@@ -15,7 +15,7 @@
 #include <limits> // std::numeric_limits
 #include <functional> // std::function
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_filter.hpp>
+#include <jsoncons/json_content_filter.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/json_error.hpp>
@@ -31,7 +31,7 @@ namespace jsoncons {
 namespace detail {
 
 template <class CharT>
-class replacement_filter : public basic_json_filter<CharT>
+class replacement_filter : public basic_json_content_filter<CharT>
 {
     typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
     typedef typename basic_json_options<CharT>::string_type string_type;
@@ -53,7 +53,7 @@ public:
                        const string_type& nan_to_str,
                        const string_type& inf_to_str,
                        const string_type& neginf_to_str)
-        : basic_json_filter<CharT>(handler), 
+        : basic_json_content_filter<CharT>(handler), 
           is_str_to_nan_(is_str_to_nan),
           is_str_to_inf_(is_str_to_inf),
           is_str_to_neginf_(is_str_to_neginf), 

@@ -2,7 +2,7 @@
 // Distributed under Boost license
 
 #include <jsoncons/json_encoder.hpp>
-#include <jsoncons/json_filter.hpp>
+#include <jsoncons/json_content_filter.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json.hpp>
 #include <catch/catch.hpp>
@@ -22,14 +22,14 @@ struct warning
     size_t column_number;
 };
 
-class name_fix_up_filter : public json_filter
+class name_fix_up_filter : public json_content_filter
 {
     std::string member_name_;
 public:
     std::vector<warning> warnings;
 
     name_fix_up_filter(json_content_handler& handler)
-        : json_filter(handler)
+        : json_content_filter(handler)
     {
     }
 

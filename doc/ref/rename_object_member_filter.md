@@ -1,7 +1,7 @@
 ### jsoncons::rename_object_member_filter
 
 ```c++
-#include <jsoncons/json_filter.hpp>
+#include <jsoncons/json_content_filter.hpp>
 
 typedef basic_rename_object_member_filter<char> rename_object_member_filter;
 ```
@@ -23,7 +23,7 @@ Renames object member names.
 
 ### See also
 
-- [json_filter](json_filter.md)
+- [json_content_filter](json_content_filter.md)
 
 ### Examples
 
@@ -31,7 +31,7 @@ Renames object member names.
 
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_filter.hpp>
+#include <jsoncons/json_content_filter.hpp>
 
 using namespace jsoncons;
 

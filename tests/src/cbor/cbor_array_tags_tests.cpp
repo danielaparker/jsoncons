@@ -473,52 +473,53 @@ TEST_CASE("cbor tagged array tests")
 
     SECTION("Tag 87, float128, little endian")
     {
-        std::cout << "sizeof(long double): " << sizeof(long double) << "\n";
+#if defined(__GNUC__)
+        std::cout << "sizeof(__float128): " << sizeof(__float128) << "\n";
 
         const uint8_t* endp = nullptr;
 
-        uint8_t buf[sizeof(long double)];
-        auto x = std::numeric_limits<long double>::lowest();
-        auto y = (std::numeric_limits<long double>::max)();
-        memcpy(buf,&x,sizeof(long double));
+        uint8_t buf[sizeof(__float128)];
+        auto x = std::numeric_limits<__float128>::lowest();
+        auto y = (std::numeric_limits<__float128>::max)();
+        memcpy(buf,&x,sizeof(__float128));
         for (auto b : buf)
         {
             std::cout << std::hex << (int)b << " ";
         }
         std::cout << "\n";
-        auto val1 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
+        auto val1 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
         std::cout << "float 128 val1: " << val1 << "\n";
 
-        memcpy(buf,&y,sizeof(long double));
+        memcpy(buf,&y,sizeof(__float128));
         for (auto b : buf)
         {
             std::cout << std::hex << (int)b << " ";
         }
-        auto val2 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
+        auto val2 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
         std::cout << "float 128 val2: " << val2 << "\n";
 
-        long double w = -1;
+        __float128 w = -1;
         std::cout << "\n\n";
-        memcpy(buf,&w,sizeof(long double));
+        memcpy(buf,&w,sizeof(__float128));
         for (auto b : buf)
         {
             std::cout << std::hex << (int)b << " ";
         }
-        auto val3 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
+        auto val3 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
         std::cout << "float 128 val3: " << val3 << "\n";
         std::cout << "\n\n";
-        long double z = 1;
-        memcpy(buf,&z,sizeof(long double));
+        __float128 z = 1;
+        memcpy(buf,&z,sizeof(__float128));
         for (auto b : buf)
         {
             std::cout << std::hex << (int)b << " ";
         }
         std::cout << "\n\n";
 
-        auto val4 = jsoncons::detail::little_to_native<long double>(buf, buf + sizeof(long double), &endp);
+        auto val4 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
         std::cout << "float 128 val4: " << val4 << "\n";
 
-        const std::vector<uint8_t> input = {
+        /* const std::vector<uint8_t> input = {
             0xD8, // Tag
                 0x57, // Tag 87, float128, little endian, Typed Array
             0x58,0x40, // Byte string value of length 64
@@ -527,14 +528,15 @@ TEST_CASE("cbor tagged array tests")
                 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x80,0xff,0x3f,0xbf,0x56,0xfe,0x7f,0x00,0x00,
                 0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xfe,0x7f,0x00,0x00,0x00,0x00,0x00,0x00
         };
-
-        json j = cbor::decode_cbor<json>(input);
-        REQUIRE(j.is_array());
+        */
+        //json j = cbor::decode_cbor<json>(input);
+        //REQUIRE(j.is_array());
         //REQUIRE(j.size() == 2);
 
         std::cout << "Tag 87\n" << pretty_print(j) << "\n";
         //CHECK(j[0].as<double>() == std::numeric_limits<double>::lowest());
         //CHECK(j[1].as<double>() == (std::numeric_limits<double>::max)());
+#endif
     }
 
 } 

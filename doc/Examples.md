@@ -2044,7 +2044,7 @@ You can rename object members with the built in filter [rename_object_member_fil
 ```c++
 #include <sstream>
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_filter.hpp>
+#include <jsoncons/json_content_filter.hpp>
 
 using namespace jsoncons;
 
