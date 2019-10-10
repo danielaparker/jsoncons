@@ -36,19 +36,18 @@ private:
     std::function<bool(const basic_staj_event<char_type>&, const ser_context&)> filter_;
     basic_staj_event<char_type> event_;
 
-    typed_array_type type_;
     typed_array_view<Float128T> data_;
     size_t index_;
 public:
     cbor_staj_event_handler()
         : filter_(accept), event_(staj_event_type::null_value),
-          type_(), data_(), index_(0)
+          data_(), index_(0)
     {
     }
 
     cbor_staj_event_handler(std::function<bool(const basic_staj_event<char_type>&, const ser_context&)> filter)
         : filter_(filter), event_(staj_event_type::null_value),
-          type_(), data_(), index_(0)
+          data_(), index_(0)
     {
     }
 
@@ -68,7 +67,7 @@ public:
         {
             if (index_ < data_.size())
             {
-                switch (type_)
+                switch (data_.type())
                 {
                     case typed_array_type::uint8_value:
                     {
