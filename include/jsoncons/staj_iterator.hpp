@@ -198,7 +198,7 @@ public:
     typedef std::input_iterator_tag iterator_category;
 
 private:
-    unsigned char storage_[sizeof(value_type)];
+    typename std::aligned_storage<sizeof(value_type), alignof(value_type)>::type storage_;
     basic_staj_reader<char_type>* reader_;
     value_type* kvp_;
 public:

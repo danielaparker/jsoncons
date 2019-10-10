@@ -332,10 +332,10 @@ TEST_CASE("json_cursor object_value test")
     CHECK(reader.done());
 }
 
-class remove_mark_filter
+struct remove_mark_filter
 {
     bool reject_next_ = false;
-public:
+
     bool operator()(const staj_event& event, const ser_context&) 
     {
         if (event.event_type()  == staj_event_type::name &&
@@ -380,8 +380,7 @@ TEST_CASE("json_cursor with filter tests")
     ]
     )";
 
-    remove_mark_filter filter;
-    json_cursor reader(s, filter);
+    json_cursor reader(s, remove_mark_filter());
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == staj_event_type::begin_array);

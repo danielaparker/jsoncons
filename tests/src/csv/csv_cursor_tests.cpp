@@ -720,4 +720,140 @@ TEST_CASE("csv_cursor header, subfield no terminating new line test")
         CHECK(cursor.done());
     }
 }
+struct remove_mark_csv_filter
+{
+    bool reject_next_ = false;
+
+    bool operator()(const staj_event& event, const ser_context&) 
+    {
+        if (event.event_type()  == staj_event_type::name &&
+            event.get<jsoncons::string_view>() == "mark")
+        {
+            reject_next_ = true;
+            return false;
+        }
+        else if (reject_next_)
+        {
+            reject_next_ = false;
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+};
+
+TEST_CASE("csv_cursor with filter tests")
+{
+    auto j = ojson::parse(R"(
+    [
+        {
+            "enrollmentNo" : 100,
+            "firstName" : "Tom",
+            "lastName" : "Cochrane",
+            "mark" : 55
+        },
+        {
+            "enrollmentNo" : 101,
+            "firstName" : "Catherine",
+            "lastName" : "Smith",
+            "mark" : 95
+        },
+        {
+            "enrollmentNo" : 102,
+            "firstName" : "William",
+            "lastName" : "Skeleton",
+            "mark" : 60
+        }
+    ]
+    )");
+
+    std::string data;
+    csv::encode_csv(j, data);
+
+    csv::csv_options options;
+    options.assume_header(true);
+    csv::csv_cursor cursor(data, remove_mark_csv_filter(), options);
+
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::begin_array);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::begin_object);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::name);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::uint64_value);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::name);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::string_value);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::name);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::string_value);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::end_object);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::begin_object);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::name);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::uint64_value);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::name);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::string_value);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::name);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::string_value);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::end_object);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::begin_object);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::name);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::uint64_value);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::name);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::string_value);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::name);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::string_value);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::end_object);
+    cursor.next();
+    REQUIRE_FALSE(cursor.done());
+    CHECK(cursor.current().event_type() == staj_event_type::end_array);
+    cursor.next();
+    CHECK(cursor.done());
+}
 

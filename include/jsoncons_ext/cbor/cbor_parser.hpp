@@ -496,15 +496,6 @@ private:
                                 semantic_tag /*tag*/=semantic_tag::none,
                                 const ser_context& /*context*/=null_ser_context()) override
     {
-        /* bool more = to_handler_.begin_array(tag,context);
-        for (auto p = data; more && p < data+size; ++p)
-        {
-            double_value(static_cast<double>(*p),semantic_tag::none,context);
-        }
-        if (more)
-        {
-            more = to_handler_.end_array(context);
-        }*/
         return true;
     }
 };
