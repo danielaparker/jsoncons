@@ -26,6 +26,7 @@ private:
                         semantic_tag tag,
                         const ser_context& context) override
     {
+        std::cout << "do_typed_array size: " << size << "\n";
         v = std::vector<double>(data,data+size);
         return false;
     }
@@ -400,8 +401,8 @@ TEST_CASE("cbor typed array tests")
         const uint8_t* endp;
 
         uint8_t buf[sizeof(__float128)];
-        auto y = FLT128_MAX;
-        auto x = -y;
+        __float128 y = FLT128_MAX;
+        __float128 x = -y;
         memcpy(buf,&x,sizeof(__float128));
         for (size_t i = sizeof(buf) -1; i+1 > 0; --i)
         {
@@ -528,8 +529,8 @@ TEST_CASE("cbor typed array tests")
         const uint8_t* endp = nullptr;
 
         uint8_t buf[sizeof(__float128)];
-        auto y = FLT128_MAX;
-        auto x = -y;
+        __float128 y = FLT128_MAX;
+        __float128 x = -y;
         memcpy(buf,&x,sizeof(__float128));
         for (auto b : buf)
         {
