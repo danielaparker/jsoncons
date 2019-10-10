@@ -529,22 +529,6 @@ enum typed_array_type {uint8_value=1,uint16_value,uint32_value,uint64_value,
                       int8_value,int16_value,int32_value,int64_value, 
                       float_value,double_value,float128_value};
 
-template <class Float128T>
-union typed_array_data_union
-{
-    uint8_t* uint8_data_;
-    uint16_t* uint16_data_;
-    uint32_t* uint32_data_;
-    uint64_t* uint64_data_;
-    int8_t* int8_data_;
-    int16_t* int16_data_;
-    int32_t* int32_data_;
-    int64_t* int64_data_;
-    float* float_data_;
-    double* double_data_;
-    Float128T* float128_data_;
-};
-
 template <class Float128T = void, class Allocator=std::allocator<char>>
 class typed_array
 {
@@ -562,7 +546,20 @@ class typed_array
 
     Allocator allocator_;
     typed_array_type type_;
-    typed_array_data_union<Float128T> data_;
+    union 
+    {
+        uint8_t* uint8_data_;
+        uint16_t* uint16_data_;
+        uint32_t* uint32_data_;
+        uint64_t* uint64_data_;
+        int8_t* int8_data_;
+        int16_t* int16_data_;
+        int32_t* int32_data_;
+        int64_t* int64_data_;
+        float* float_data_;
+        double* double_data_;
+        Float128T* float128_data_;
+    } data_;
     size_t size_;
 public:
     typed_array(const Allocator& alloc)
@@ -981,6 +978,260 @@ public:
         std::swap(a.size_,b.size_);
     }
    
+};
+
+template <class Float128T = void>
+class typed_array_view
+{
+    typed_array_type type_;
+    union 
+    {
+        const uint8_t* uint8_data_;
+        const uint16_t* uint16_data_;
+        const uint32_t* uint32_data_;
+        const uint64_t* uint64_data_;
+        const int8_t* int8_data_;
+        const int16_t* int16_data_;
+        const int32_t* int32_data_;
+        const int64_t* int64_data_;
+        const float* float_data_;
+        const double* double_data_;
+        const Float128T* float128_data_;
+    } data_;
+    size_t size_;
+public:
+    typed_array_view()
+        : type_(), data_(), size_(0)
+    {
+    }
+
+    typed_array_view(const typed_array_view& other)
+        : type_(other.type_), data_(other.data_), size_(other.size())
+    {
+    }
+
+    typed_array_view(typed_array_view&& other)
+    {
+        swap(*this,other);
+    }
+
+    typed_array_view(const typed_array<Float128T>& other)
+        : type_(other.type_), data_(), size_(other.size())
+    {
+        switch (other.type_)
+        {
+            case typed_array_type::uint8_value:
+            {
+                data_.uint8_data_ = other.uint8_data_;
+                break;
+            }
+            case typed_array_type::uint16_value:
+            {
+                data_.uint16_data_ = other.uint16_data_;
+                break;
+            }
+            case typed_array_type::uint32_value:
+            {
+                data_.uint32_data_ = other.uint32_data_;
+                break;
+            }
+            case typed_array_type::uint64_value:
+            {
+                data_.uint64_data_ = other.uint64_data_;
+                break;
+            }
+            case typed_array_type::int8_value:
+            {
+                data_.int8_data_ = other.int8_data_;
+                break;
+            }
+            case typed_array_type::int16_value:
+            {
+                data_.int16_data_ = other.int16_data_;
+                break;
+            }
+            case typed_array_type::int32_value:
+            {
+                data_.int32_data_ = other.int32_data_;
+                break;
+            }
+            case typed_array_type::int64_value:
+            {
+                data_.int64_data_ = other.int64_data_;
+                break;
+            }
+            case typed_array_type::float_value:
+            {
+                data_.float_data_ = other.float_data_;
+                break;
+            }
+            case typed_array_type::double_value:
+            {
+                data_.double_data_ = other.double_data_;
+                break;
+            }
+            case typed_array_type::float128_value:
+            {
+                data_.float128_data_ = other.float128_data_;
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    typed_array_view(const uint8_t* data,size_t size)
+        : type_(typed_array_type::uint8_value), size_(size)
+    {
+        data_.uint8_data_ = data;
+    }
+
+    typed_array_view(const uint16_t* data,size_t size)
+        : type_(typed_array_type::uint16_value), size_(size)
+    {
+        data_.uint16_data_ = data;
+    }
+
+    typed_array_view(const uint32_t* data,size_t size)
+        : type_(typed_array_type::uint32_value), size_(size)
+    {
+        data_.uint32_data_ = data;
+    }
+
+    typed_array_view(const uint64_t* data,size_t size)
+        : type_(typed_array_type::uint64_value), size_(size)
+    {
+        data_.uint64_data_ = data;
+    }
+
+    typed_array_view(const int8_t* data,size_t size)
+        : type_(typed_array_type::int8_value), size_(size)
+    {
+        data_.int8_data_ = data;
+    }
+
+    typed_array_view(const int16_t* data,size_t size)
+        : type_(typed_array_type::int16_value), size_(size)
+    {
+        data_.int16_data_ = data;
+    }
+
+    typed_array_view(const int32_t* data,size_t size)
+        : type_(typed_array_type::int32_value), size_(size)
+    {
+        data_.int32_data_ = data;
+    }
+
+    typed_array_view(const int64_t* data,size_t size)
+        : type_(typed_array_type::int64_value), size_(size)
+    {
+        data_.int64_data_ = data;
+    }
+
+    typed_array_view(const float* data,size_t size)
+        : type_(typed_array_type::float_value), size_(size)
+    {
+        data_.float_data_ = data;
+    }
+
+    typed_array_view(const double* data,size_t size)
+        : type_(typed_array_type::double_value), size_(size)
+    {
+        data_.double_data_ = data;
+    }
+
+    typed_array_view(const Float128T* data,size_t size)
+        : type_(typed_array_type::float128_value), size_(size)
+    {
+        data_.float128_data_ = data;
+    }
+
+    typed_array_view& operator=(const typed_array_view& other)
+    {
+        typed_array_view temp(other);
+        swap(*this,temp);
+        return *this;
+    }
+
+    typed_array_type type() const {return type_;}
+
+    size_t size() const
+    {
+        return size_;
+    }
+
+    const uint8_t* data(uint8_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::uint8_value);
+        return data_.uint8_data_;
+    }
+
+    const uint16_t* data(uint16_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::uint16_value);
+        return data_.uint16_data_;
+    }
+
+    const uint32_t* data(uint32_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::uint32_value);
+        return data_.uint32_data_;
+    }
+
+    const uint64_t* data(uint64_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::uint64_value);
+        return data_.uint64_data_;
+    }
+
+    const int8_t* data(int8_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::int8_value);
+        return data_.int8_data_;
+    }
+
+    const int16_t* data(int16_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::int16_value);
+        return data_.int16_data_;
+    }
+
+    const int32_t* data(int32_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::int32_value);
+        return data_.int32_data_;
+    }
+
+    const int64_t* data(int64_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::int64_value);
+        return data_.int64_data_;
+    }
+
+    const float* data(float_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::float_value);
+        return data_.float_data_;
+    }
+
+    const double* data(double_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::double_value);
+        return data_.double_data_;
+    }
+
+    const Float128T* data(float128_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::float128_value);
+        return data_.float128_data_;
+    }
+
+    friend void swap(typed_array_view& a, typed_array_view& b) noexcept
+    {
+        std::swap(a.data_,b.data_);
+        std::swap(a.type_,b.type_);
+        std::swap(a.size_,b.size_);
+    }
 };
 
 struct mapped_string
