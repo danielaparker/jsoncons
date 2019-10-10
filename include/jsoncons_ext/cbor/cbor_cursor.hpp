@@ -87,57 +87,57 @@ public:
             {
                 switch (type_)
                 {
-                    case typed_array_type::uint8_val:
+                    case typed_array_type::uint8_value:
                     {
                         this->uint64_value(data(uint8_array_arg)[index_]);
                         break;
                     }
-                    case typed_array_type::uint16_val:
+                    case typed_array_type::uint16_value:
                     {
                         this->uint64_value(data(uint16_array_arg)[index_]);
                         break;
                     }
-                    case typed_array_type::uint32_val:
+                    case typed_array_type::uint32_value:
                     {
                         this->uint64_value(data(uint32_array_arg)[index_]);
                         break;
                     }
-                    case typed_array_type::uint64_val:
+                    case typed_array_type::uint64_value:
                     {
                         this->uint64_value(data(uint64_array_arg)[index_]);
                         break;
                     }
-                    case typed_array_type::int8_val:
+                    case typed_array_type::int8_value:
                     {
                         this->int64_value(data(int8_array_arg)[index_]);
                         break;
                     }
-                    case typed_array_type::int16_val:
+                    case typed_array_type::int16_value:
                     {
                         this->int64_value(data(int16_array_arg)[index_]);
                         break;
                     }
-                    case typed_array_type::int32_val:
+                    case typed_array_type::int32_value:
                     {
                         this->int64_value(data(int32_array_arg)[index_]);
                         break;
                     }
-                    case typed_array_type::int64_val:
+                    case typed_array_type::int64_value:
                     {
                         this->int64_value(data(int64_array_arg)[index_]);
                         break;
                     }
-                    case typed_array_type::float_val:
+                    case typed_array_type::float_value:
                     {
                         this->double_value(data(float_array_arg)[index_]);
                         break;
                     }
-                    case typed_array_type::double_val:
+                    case typed_array_type::double_value:
                     {
                         this->double_value(data(double_array_arg)[index_]);
                         break;
                     }
-                    case typed_array_type::float128_val:
+                    case typed_array_type::float128_value:
                     {
                         break;
                     }
@@ -158,67 +158,67 @@ public:
 
     const uint8_t* data(uint8_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_type::uint8_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::uint8_value);
         return data_.uint8_data_;
     }
 
     const uint16_t* data(uint16_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_type::uint16_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::uint16_value);
         return data_.uint16_data_;
     }
 
     const uint32_t* data(uint32_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_type::uint32_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::uint32_value);
         return data_.uint32_data_;
     }
 
     const uint64_t* data(uint64_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_type::uint64_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::uint64_value);
         return data_.uint64_data_;
     }
 
     const int8_t* data(int8_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_type::int8_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::int8_value);
         return data_.int8_data_;
     }
 
     const int16_t* data(int16_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_type::int16_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::int16_value);
         return data_.int16_data_;
     }
 
     const int32_t* data(int32_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_type::int32_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::int32_value);
         return data_.int32_data_;
     }
 
     const int64_t* data(int64_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_type::int64_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::int64_value);
         return data_.int64_data_;
     }
 
     const float* data(float_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_type::float_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::float_value);
         return data_.float_data_;
     }
 
     const double* data(double_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_type::double_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::double_value);
         return data_.double_data_;
     }
 
     const Float128T* data(float128_array_arg_t) const
     {
-        JSONCONS_ASSERT(type_ == typed_array_type::float128_val);
+        JSONCONS_ASSERT(type_ == typed_array_type::float128_value);
         return data_.float128_data_;
     }
 private:
@@ -311,7 +311,7 @@ private:
                         semantic_tag tag=semantic_tag::none,
                         const ser_context& context=null_ser_context()) override
     {
-        type_ = typed_array_type::uint8_val;
+        type_ = typed_array_type::uint8_value;
         data_.uint8_data_ = data;
         size_ = size;
         index_ = 0;
@@ -334,7 +334,7 @@ private:
                         semantic_tag tag=semantic_tag::none,
                         const ser_context& context=null_ser_context()) override
     {
-        type_ = typed_array_type::uint16_val;
+        type_ = typed_array_type::uint16_value;
         data_.uint16_data_ = data;
         size_ = size;
         index_ = 0;
@@ -357,7 +357,7 @@ private:
                         semantic_tag tag=semantic_tag::none,
                         const ser_context& context=null_ser_context()) override
     {
-        type_ = typed_array_type::uint32_val;
+        type_ = typed_array_type::uint32_value;
         data_.uint32_data_ = data;
         size_ = size;
         index_ = 0;
@@ -378,7 +378,7 @@ private:
                         semantic_tag tag=semantic_tag::none,
                         const ser_context& context=null_ser_context()) override
     {
-        type_ = typed_array_type::uint64_val;
+        type_ = typed_array_type::uint64_value;
         data_.uint64_data_ = data;
         size_ = size;
         index_ = 0;
@@ -399,7 +399,7 @@ private:
                         semantic_tag tag=semantic_tag::none,
                         const ser_context& context=null_ser_context()) override
     {
-        type_ = typed_array_type::int8_val;
+        type_ = typed_array_type::int8_value;
         data_.int8_data_ = data;
         size_ = size;
         index_ = 0;
@@ -420,7 +420,7 @@ private:
                         semantic_tag tag=semantic_tag::none,
                         const ser_context& context=null_ser_context()) override
     {
-        type_ = typed_array_type::int16_val;
+        type_ = typed_array_type::int16_value;
         data_.int16_data_ = data;
         size_ = size;
         index_ = 0;
@@ -441,7 +441,7 @@ private:
                         semantic_tag tag=semantic_tag::none,
                         const ser_context& context=null_ser_context()) override
     {
-        type_ = typed_array_type::int32_val;
+        type_ = typed_array_type::int32_value;
         data_.int32_data_ = data;
         size_ = size;
         index_ = 0;
@@ -462,7 +462,7 @@ private:
                         semantic_tag tag=semantic_tag::none,
                         const ser_context& context=null_ser_context()) override
     {
-        type_ = typed_array_type::int64_val;
+        type_ = typed_array_type::int64_value;
         data_.int64_data_ = data;
         size_ = size;
         index_ = 0;
@@ -483,7 +483,7 @@ private:
                         semantic_tag tag=semantic_tag::none,
                         const ser_context& context=null_ser_context()) override
     {
-        type_ = typed_array_type::float_val;
+        type_ = typed_array_type::float_value;
         data_.float_data_ = data;
         size_ = size;
         index_ = 0;
@@ -504,7 +504,7 @@ private:
                         semantic_tag tag=semantic_tag::none,
                         const ser_context& context=null_ser_context()) override
     {
-        type_ = typed_array_type::double_val;
+        type_ = typed_array_type::double_value;
         data_.double_data_ = data;
         size_ = size;
         index_ = 0;
