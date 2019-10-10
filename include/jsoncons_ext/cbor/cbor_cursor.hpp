@@ -399,6 +399,11 @@ public:
         }
     }
 
+    bool is_typed_array() const
+    {
+        return event_handler_.is_typed_array();
+    }
+
     bool done() const override
     {
         return parser_.done();
@@ -421,6 +426,25 @@ public:
 
     void read_to(basic_json_content_handler<char>& handler,
                 std::error_code& ec) override
+    {
+        if (!staj_to_saj_event(event_handler_.event(), handler, *this))
+        {
+            return;
+        }
+        read_next(handler, ec);
+    }
+
+    void read_to(cbor_content_handler<char>& handler) 
+    {
+        std::error_code ec;
+        read_to(handler, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
+        }
+    }
+
+    void read_to(cbor_content_handler<char>& handler, std::error_code& ec) 
     {
         if (!staj_to_saj_event(event_handler_.event(), handler, *this))
         {
@@ -462,6 +486,16 @@ public:
     }
 
     void read_next(basic_json_content_handler<char>& handler, std::error_code& ec)
+    {
+        parser_.restart();
+        while (!parser_.stopped())
+        {
+            parser_.parse(handler, ec);
+            if (ec) return;
+        }
+    }
+
+    void read_next(cbor_content_handler<char>& handler, std::error_code& ec)
     {
         parser_.restart();
         while (!parser_.stopped())

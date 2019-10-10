@@ -12,19 +12,21 @@
 #include <ctime>
 #include <limits>
 #include <catch/catch.hpp>
+#if defined(__GNUC__)
+#include <quadmath.h>
+#endif
 
 using namespace jsoncons;
 
-/*
-struct my_cbor_content_handler : public default_cbor_content_handler
+struct my_cbor_content_handler : public cbor::default_cbor_content_handler<>
 {
     std::vector<double> v;
-
+private:
     bool do_typed_array(const double* data, size_t size, 
                         semantic_tag tag,
                         const ser_context& context) override
     {
-        v = std::vector<double>(data,size);
+        v = std::vector<double>(data,data+size);
         return false;
     }
 };
@@ -49,11 +51,11 @@ TEST_CASE("cbor typed array cursor tests")
         cursor.read_to(handler);
         for (auto item : handler.v)
         {
-            std::cout << v << "\n";
+            std::cout << item << "\n";
         }
     }
 }
-*/
+
 TEST_CASE("cbor typed array tests")
 {
     SECTION("Tag 64 (uint8 Typed Array)")
@@ -392,7 +394,6 @@ TEST_CASE("cbor typed array tests")
     SECTION("Tag 83, float128, big endian")
     {
 #if defined(__GNUC__)
-#include <quadmath.h>
 
         char buffer[128];
 

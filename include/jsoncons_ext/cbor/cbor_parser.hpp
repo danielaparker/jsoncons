@@ -154,6 +154,171 @@ private:
 };
 
 template <class Float128T=void>
+class default_cbor_content_handler : public cbor_content_handler<Float128T>
+{
+    using super_type = basic_default_json_content_handler<char>;
+
+    bool parse_more_;
+public:
+    using char_type = char;
+    using string_view_type = typename super_type::string_view_type;
+
+    default_cbor_content_handler(bool parse_more = true)
+        : parse_more_(parse_more)
+    {
+    }
+private:
+    void do_flush() override
+    {
+    }
+
+    bool do_begin_object(semantic_tag, const ser_context&) override
+    {
+        return parse_more_;
+    }
+
+    bool do_end_object(const ser_context&) override
+    {
+        return parse_more_;
+    }
+
+    bool do_begin_array(semantic_tag, const ser_context&) override
+    {
+        return parse_more_;
+    }
+
+    bool do_end_array(const ser_context&) override
+    {
+        return parse_more_;
+    }
+
+    bool do_name(const string_view_type&, const ser_context&) override
+    {
+        return parse_more_;
+    }
+
+    bool do_null_value(semantic_tag, const ser_context&) override
+    {
+        return parse_more_;
+    }
+
+    bool do_string_value(const string_view_type&, semantic_tag, const ser_context&) override
+    {
+        return parse_more_;
+    }
+
+    bool do_byte_string_value(const byte_string_view&,
+                              semantic_tag, 
+                              const ser_context&) override
+    {
+        return parse_more_;
+    }
+
+    bool do_int64_value(int64_t, 
+                        semantic_tag, 
+                        const ser_context&) override
+    {
+        return parse_more_;
+    }
+
+    bool do_uint64_value(uint64_t, 
+                         semantic_tag, 
+                         const ser_context&) override
+    {
+        return parse_more_;
+    }
+
+    bool do_double_value(double, 
+                         semantic_tag,
+                         const ser_context&) override
+    {
+        return parse_more_;
+    }
+
+    bool do_bool_value(bool, semantic_tag, const ser_context&) override
+    {
+        return parse_more_;
+    }
+
+    bool do_typed_array(const uint8_t* data, size_t size, 
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override 
+    {
+        return parse_more_;
+    }
+
+    bool do_typed_array(const uint16_t* data, size_t size, 
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override 
+    {
+        return parse_more_;
+    }
+
+    bool do_typed_array(const uint32_t* data, size_t size, 
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override
+    {
+        return parse_more_;
+    }
+
+    bool do_typed_array(const uint64_t* data, size_t size, 
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override
+    {
+        return parse_more_;
+    }
+
+    bool do_typed_array(const int8_t* data, size_t size, 
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override 
+    {
+        return parse_more_;
+    }
+
+    bool do_typed_array(const int16_t* data, size_t size, 
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override 
+    {
+        return parse_more_;
+    }
+
+    bool do_typed_array(const int32_t* data, size_t size, 
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override 
+    {
+        return parse_more_;
+    }
+
+    bool do_typed_array(const int64_t* data, size_t size, 
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override 
+    {
+        return parse_more_;
+    }
+
+    bool do_typed_array(const float* data, size_t size, 
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override 
+    {
+        return parse_more_;
+    }
+
+    bool do_typed_array(const double* data, size_t size, 
+                        semantic_tag tag=semantic_tag::none,
+                        const ser_context& context=null_ser_context()) override 
+    {
+        return parse_more_;
+    }
+
+    bool do_typed_array(const Float128T* /*data*/, size_t /*size*/, 
+                        semantic_tag /*tag*/=semantic_tag::none,
+                        const ser_context& /*context*/=null_ser_context()) override 
+    {
+        return parse_more_;
+    }
+};
+
+template <class Float128T=void>
 class json_to_cbor_content_handler_adaptor : public cbor_content_handler<Float128T>
 {
     using super_type = cbor_content_handler<Float128T>;

@@ -29,7 +29,7 @@ class json_utf8_other_content_handler_adapter : public json_content_handler
 public:
     using json_content_handler::string_view_type;
 private:
-    basic_null_json_content_handler<CharT> default_content_handler_;
+    basic_default_json_content_handler<CharT> default_content_handler_;
     basic_json_content_handler<CharT>& other_handler_;
     //std::function<bool(json_errc,const ser_context&)> err_handler_;
 
@@ -148,7 +148,7 @@ private:
 
     static const size_t default_max_buffer_length = 16384;
 
-    basic_null_json_content_handler<CharT> default_content_handler_;
+    basic_default_json_content_handler<CharT> default_content_handler_;
 
     basic_json_content_handler<CharT>& handler_;
 
