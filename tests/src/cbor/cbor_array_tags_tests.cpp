@@ -523,7 +523,6 @@ TEST_CASE("cbor typed array tests")
     SECTION("Tag 87, float128, little endian")
     {
 #if defined(__GNUC__)
-#include <quadmath.h>
 
         char buffer[128];
 
