@@ -1,6 +1,14 @@
 master
 ------
 
+Bug fixes:
+
+- This version fixes a defect in the `erase` functions for
+  the order preserving `basic_json` specializations, in
+  particular, for `ojson` (issue 188.) 
+
+Enhancements:
+
 The next release will include support for the cbor extension
 [Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)
 
