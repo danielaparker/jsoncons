@@ -333,7 +333,6 @@ public:
 private:
     basic_cbor_parser<Src> parser_;
     cbor_staj_event_handler<Float128T> event_handler_;
-    size_t index_;
     bool eof_;
 
     // Noncopyable and nonmoveable
@@ -345,8 +344,7 @@ public:
 
     template <class Source>
     basic_cbor_cursor(Source&& source)
-       : parser_(std::forward<Source>(source)),
-         index_(0), 
+       : parser_(std::forward<Source>(source)), 
          eof_(false)
     {
         if (!done())
@@ -359,8 +357,7 @@ public:
     basic_cbor_cursor(Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter)
        : parser_(std::forward<Source>(source)), 
-         event_handler_(filter),
-         index_(0), 
+         event_handler_(filter), 
          eof_(false)
     {
         if (!done())
@@ -375,7 +372,6 @@ public:
     basic_cbor_cursor(Source&& source, 
                       std::error_code& ec)
        : parser_(std::forward<Source>(source)),
-         index_(0), 
          eof_(false)
     {
         if (!done())
@@ -390,7 +386,6 @@ public:
                       std::error_code& ec)
        : parser_(std::forward<Source>(source)), 
          event_handler_(filter),
-         index_(0), 
          eof_(false)
     {
         if (!done())

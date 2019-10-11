@@ -24,8 +24,8 @@ struct my_cbor_content_handler : public cbor::default_cbor_content_handler<>
     std::vector<double> v;
 private:
     bool do_typed_array(const double* data, size_t size, 
-                        semantic_tag tag,
-                        const ser_context& context) override
+                        semantic_tag,
+                        const ser_context&) override
     {
         std::cout << "do_typed_array size: " << size << "\n";
         v = std::vector<double>(data,data+size);
@@ -412,7 +412,7 @@ TEST_CASE("cbor typed array tests")
         std::cout << "\n";
         auto val1 = jsoncons::detail::big_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
         std::cout << "Float 128 val1: ";
-        quadmath_snprintf (buffer, sizeof buf, "%Qa", val1);
+        //quadmath_snprintf (buffer, sizeof buf, "%Qa", val1);
         std::cout << buf << "\n";
 
         memcpy(buf,&y,sizeof(__float128));
@@ -422,7 +422,7 @@ TEST_CASE("cbor typed array tests")
         }
         auto val2 = jsoncons::detail::big_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
         std::cout << "Float 128 val2: ";
-        quadmath_snprintf (buffer, sizeof buf, "%Qa", val1);
+        //quadmath_snprintf (buffer, sizeof buf, "%Qa", val1);
         std::cout << buf << "\n";
 
         __float128 w = -1;
@@ -435,7 +435,7 @@ TEST_CASE("cbor typed array tests")
         std::cout << "\n\n";
         auto val3 = jsoncons::detail::big_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
         std::cout << "Float 128 val3: ";
-        quadmath_snprintf (buffer, sizeof buf, "%Qa", val1);
+        //quadmath_snprintf (buffer, sizeof buf, "%Qa", val1);
         std::cout << buf << "\n";
         __float128 z = 1;
         memcpy(buf,&z,sizeof(__float128));
@@ -447,7 +447,7 @@ TEST_CASE("cbor typed array tests")
 
         auto val4 = jsoncons::detail::big_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
         std::cout << "Float 128 val4: ";
-        quadmath_snprintf (buffer, sizeof buf, "%Qa", val1);
+        //quadmath_snprintf (buffer, sizeof buf, "%Qa", val1);
         std::cout << buf << "\n";
 
 /*
@@ -540,7 +540,7 @@ TEST_CASE("cbor typed array tests")
         auto val1 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
         //std::cout << "float 128 val1: " << val1 << "\n";
         std::cout << "Float 128 val1: ";
-        quadmath_snprintf (buffer, sizeof buf, "%Qa", val1);
+        //quadmath_snprintf (buffer, sizeof buf, "%Qa", val1);
         std::cout << buf << "\n";
     
         memcpy(buf,&y,sizeof(__float128));
@@ -551,7 +551,7 @@ TEST_CASE("cbor typed array tests")
         auto val2 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
         //std::cout << "float 128 val2: " << val2 << "\n";
         std::cout << "Float 128 val2: ";
-        quadmath_snprintf (buffer, sizeof buf, "%Qa", val2);
+        //quadmath_snprintf (buffer, sizeof buf, "%Qa", val2);
         std::cout << buf << "\n";
 
         __float128 w = -1;
@@ -563,7 +563,7 @@ TEST_CASE("cbor typed array tests")
         }
         auto val3 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
         std::cout << "Float 128 val3: ";
-        quadmath_snprintf (buffer, sizeof buf, "%Qa", val3);
+        //quadmath_snprintf (buffer, sizeof buf, "%Qa", val3);
         std::cout << buf << "\n";
 
         __float128 z = 1;
@@ -576,7 +576,7 @@ TEST_CASE("cbor typed array tests")
 
         auto val4 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
         std::cout << "Float 128 val4: ";
-        quadmath_snprintf (buffer, sizeof buf, "%Qa", val4);
+        //quadmath_snprintf (buffer, sizeof buf, "%Qa", val4);
         std::cout << buf << "\n";
 
         /* const std::vector<uint8_t> input = {
