@@ -1447,6 +1447,7 @@ public:
 #else
             members_.erase(first,last);
 #endif
+            //build_index();
         }
     }
 
@@ -1914,17 +1915,36 @@ private:
 
     void erase_index_entries(size_t pos1, size_t pos2)
     {
+        constexpr size_t mark = size_t(-1);
+
+        JSONCONS_ASSERT(index_.size() < mark);
+
+        size_t count = 0;
         for (size_t i = 0; i < index_.size(); ++i)
         {
             if (index_[i] >= pos1 && index_[i] < pos2)
             {
-                index_.erase(index_.begin()+index_[i]);
-            }
-            else if (index_[i] > pos2)
-            {
-                --index_[i];
+                index_[i] = mark; // mark for deletion
+                ++count;
             }
         }
+        for (size_t i = 0; i < index_.size(); ++i)
+        {
+            if (index_[i] != mark && index_[i] > pos2)
+            {
+                JSONCONS_ASSERT(count <= index_[i]);
+                index_[i] -= count;
+            }
+        }
+        for (size_t i = index_.size(); i-- > 0 && count >= 0; )
+        {
+            if (index_[i] == mark)
+            {
+                index_.erase(index_.begin()+i);
+                --count;
+            }
+        }
+        JSONCONS_ASSERT(count == 0);
     }
 
     void build_index()
