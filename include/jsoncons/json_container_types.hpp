@@ -1897,7 +1897,7 @@ private:
         auto it = std::lower_bound(index_.begin(),index_.end(), key, 
                                    [&](size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
 
-        if (it != index_.end() && members_.at(*it).key() != key)
+        if (it != index_.end() && members_.at(*it).key() == key)
         {
             size_t pos = *it;
             size_t count = index_.size() - pos;

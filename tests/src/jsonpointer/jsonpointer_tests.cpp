@@ -321,13 +321,12 @@ TEST_CASE("[jsonpointer] Inserting object after deleting it")
     std::error_code ec;
 
     jsonpointer::insert_or_assign( oj, "/test", ojson(), ec );
-    std::cout << "After first insert: " << std::endl << pretty_print( oj ) << std::endl;
+    CHECK(oj.size() == 1);
 
     jsonpointer::remove( oj, "/test", ec );
-    std::cout << "After remove of the added object: " << std::endl << pretty_print( oj ) << std::endl;
+    CHECK(oj.size() == 0);
 
-    std::cout << "Befor second insert: " << std::endl;
     jsonpointer::insert_or_assign( oj, "/t", ojson(), ec );
-    std::cout << "After second insert: " << std::endl << pretty_print( oj ) << std::endl;
+    CHECK(oj.size() == 1);
 }
 
