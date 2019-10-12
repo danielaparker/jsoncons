@@ -1915,36 +1915,28 @@ private:
 
     void erase_index_entries(size_t pos1, size_t pos2)
     {
-        constexpr size_t mark = size_t(-1);
+        JSONCONS_ASSERT(pos1 <= pos2);
+        JSONCONS_ASSERT(pos2 <= index_.size());
 
-        JSONCONS_ASSERT(index_.size() < mark);
-
-        size_t count = 0;
+        const size_t offset = pos2 - pos1;
+        const size_t n = index_.size() - offset;
         for (size_t i = 0; i < index_.size(); ++i)
         {
-            if (index_[i] >= pos1 && index_[i] < pos2)
+            if (offset == index_.size())
             {
-                index_[i] = mark; // mark for deletion
-                ++count;
+                index_.erase(index_.begin()+i,index_.end());
+                i += offset;
             }
-        }
-        for (size_t i = 0; i < index_.size(); ++i)
-        {
-            if (index_[i] != mark && index_[i] > pos2)
-            {
-                JSONCONS_ASSERT(count <= index_[i]);
-                index_[i] -= count;
-            }
-        }
-        for (size_t i = index_.size(); i-- > 0 && count >= 0; )
-        {
-            if (index_[i] == mark)
+            else if (index_[i] >= pos1 && index_[i] < pos2)
             {
                 index_.erase(index_.begin()+i);
-                --count;
+            }
+            else if (index_[i] > pos2)
+            {
+                index_[i] -= offset;
             }
         }
-        JSONCONS_ASSERT(count == 0);
+        JSONCONS_ASSERT(index_.size() == n);
     }
 
     void build_index()
