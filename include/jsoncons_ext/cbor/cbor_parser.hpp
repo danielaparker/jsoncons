@@ -1537,7 +1537,7 @@ public:
 
     void advance_typed_array(basic_json_content_handler<char>& handler, std::error_code&)
     {
-        if (typed_array_.type() != typed_array_type())
+        while (more_ && typed_array_.type() != typed_array_type())
         {
             if (index_ < typed_array_.size())
             {
@@ -1617,7 +1617,7 @@ public:
         {
             advance_typed_array(handler, ec);
         }
-        else
+        if (more_)
         {
             json_to_cbor_content_handler_adaptor<Float128T> h(handler);
             parse(h,ec);

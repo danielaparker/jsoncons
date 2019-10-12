@@ -137,6 +137,84 @@ public:
         }
     }
 
+    bool dump(basic_json_content_handler<char>& handler, const ser_context& context)
+    {
+        bool more = staj_to_saj_event(event(), handler, context);
+        while (more && data_.type() != typed_array_type())
+        {
+            if (index_ < data_.size())
+            {
+                switch (data_.type())
+                {
+                    case typed_array_type::uint8_value:
+                    {
+                        more = handler.uint64_value(data_.data(uint8_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::uint16_value:
+                    {
+                        more = handler.uint64_value(data_.data(uint16_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::uint32_value:
+                    {
+                        more = handler.uint64_value(data_.data(uint32_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::uint64_value:
+                    {
+                        more = handler.uint64_value(data_.data(uint64_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::int8_value:
+                    {
+                        more = handler.int64_value(data_.data(int8_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::int16_value:
+                    {
+                        more = handler.int64_value(data_.data(int16_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::int32_value:
+                    {
+                        more = handler.int64_value(data_.data(int32_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::int64_value:
+                    {
+                        more = handler.int64_value(data_.data(int64_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::float_value:
+                    {
+                        more = handler.double_value(data_.data(float_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::double_value:
+                    {
+                        more = handler.double_value(data_.data(double_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::float128_value:
+                    {
+                        break;
+                    }
+                    default:
+                        break;
+                }
+                ++index_;
+            }
+            else
+            {
+                more = handler.end_array();
+                data_ = typed_array_view<Float128T>();
+                index_ = 0;
+            }
+        }
+        return more;
+    }
+
 private:
     static constexpr bool accept(const basic_staj_event<char_type>&, const ser_context&) 
     {
@@ -422,7 +500,7 @@ public:
     void read_to(basic_json_content_handler<char>& handler,
                 std::error_code& ec) override
     {
-        if (!staj_to_saj_event(event_handler_.event(), handler, *this))
+        if (!event_handler_.dump(handler, *this))
         {
             return;
         }

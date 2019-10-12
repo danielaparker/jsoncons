@@ -539,9 +539,9 @@ TEST_CASE("cbor typed array tests")
         std::cout << "\n";
         auto val1 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
         //std::cout << "float 128 val1: " << val1 << "\n";
-        std::cout << "Float 128 val1: ";
+        //std::cout << "Float 128 val1: ";
         //quadmath_snprintf (buffer, sizeof buf, "%Qa", val1);
-        std::cout << buf << "\n";
+        //std::cout << buf << "\n";
     
         memcpy(buf,&y,sizeof(__float128));
         for (auto b : buf)
@@ -550,9 +550,9 @@ TEST_CASE("cbor typed array tests")
         }
         auto val2 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
         //std::cout << "float 128 val2: " << val2 << "\n";
-        std::cout << "Float 128 val2: ";
+        //std::cout << "Float 128 val2: ";
         //quadmath_snprintf (buffer, sizeof buf, "%Qa", val2);
-        std::cout << buf << "\n";
+        //std::cout << buf << "\n";
 
         __float128 w = -1;
         std::cout << "\n\n";
@@ -562,9 +562,9 @@ TEST_CASE("cbor typed array tests")
             std::cout << std::hex << (int)b << " ";
         }
         auto val3 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
-        std::cout << "Float 128 val3: ";
+        //std::cout << "Float 128 val3: ";
         //quadmath_snprintf (buffer, sizeof buf, "%Qa", val3);
-        std::cout << buf << "\n";
+        //std::cout << buf << "\n";
 
         __float128 z = 1;
         memcpy(buf,&z,sizeof(__float128));
@@ -575,9 +575,9 @@ TEST_CASE("cbor typed array tests")
         std::cout << "\n\n";
 
         auto val4 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
-        std::cout << "Float 128 val4: ";
+        //std::cout << "Float 128 val4: ";
         //quadmath_snprintf (buffer, sizeof buf, "%Qa", val4);
-        std::cout << buf << "\n";
+        //std::cout << buf << "\n";
 
         /* const std::vector<uint8_t> input = {
             0xD8, // Tag
