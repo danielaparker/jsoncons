@@ -1,3 +1,14 @@
+v0.136.1
+--------
+
+Bug fixes:
+
+- This version fixes a defect in the `erase` functions for
+  the order preserving `basic_json` specializations, in
+  particular, for `ojson` (issue 188.) 
+
+--------
+
 v0.136.0
 --------
 
