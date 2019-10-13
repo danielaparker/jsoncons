@@ -10,7 +10,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include <map>
+#include <map> 
 #include <utility>
 #include <ctime>
 #include <new>
@@ -312,5 +312,21 @@ TEST_CASE("jsonpointer concatenation")
         json j = jsonpointer::get(example, ptr);
         std::cout << j << "\n";
     }
+}
+
+TEST_CASE("[jsonpointer] Inserting object after deleting it")
+{
+    ojson oj;
+
+    std::error_code ec;
+
+    jsonpointer::insert_or_assign( oj, "/test", ojson(), ec );
+    CHECK(oj.size() == 1);
+
+    jsonpointer::remove( oj, "/test", ec );
+    CHECK(oj.size() == 0);
+
+    jsonpointer::insert_or_assign( oj, "/t", ojson(), ec );
+    CHECK(oj.size() == 1);
 }
 

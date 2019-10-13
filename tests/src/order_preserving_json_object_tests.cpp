@@ -286,5 +286,30 @@ TEST_CASE("order preserving insert_or_assign")
         CHECK(it2->key() == std::string("c"));
         CHECK(it2->value().as<int>() == 3);
     }
-}
 
+    SECTION("erase all, then insert three, then erase one")
+    {
+        REQUIRE(o.size() == 3);
+
+        o.erase(o.begin(),o.end());
+        REQUIRE(o.size() == 0);
+
+        const std::string key1("key1");
+        const std::string value1("value1");
+        const std::string key2("key2");
+        const std::string value2("value2");
+        const std::string key3("key3");
+        const std::string value3("value3");
+
+        o.insert_or_assign(key2,value2);
+        CHECK(o.size() == 1);
+        o.insert_or_assign(key1,value1);
+        CHECK(o.size() == 2);
+        o.insert_or_assign(key3,value3);
+        CHECK(o.size() == 3);
+
+        o.erase(o.begin(),o.begin()+1);
+        CHECK(o.size() == 2);
+    }
+}
+ 
