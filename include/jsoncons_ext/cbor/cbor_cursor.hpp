@@ -215,6 +215,85 @@ public:
         return more;
     }
 
+    bool dump(cbor_content_handler<Float128T>& handler, const ser_context& context)
+    {
+        bool more = true;
+        if (data_.type() != typed_array_type())
+        {
+            more = handler.begin_array();
+            switch (data_.type())
+            {
+                case typed_array_type::uint8_value:
+                {
+                    more = handler.typed_array(data_.data(uint8_array_arg), data_.size() - index_);
+                    break;
+                }
+                case typed_array_type::uint16_value:
+                {
+                    more = handler.typed_array(data_.data(uint16_array_arg), data_.size() - index_);
+                    break;
+                }
+                case typed_array_type::uint32_value:
+                {
+                    more = handler.typed_array(data_.data(uint32_array_arg), data_.size() - index_);
+                    break;
+                }
+                case typed_array_type::uint64_value:
+                {
+                    more = handler.typed_array(data_.data(uint64_array_arg), data_.size() - index_);
+                    break;
+                }
+                case typed_array_type::int8_value:
+                {
+                    more = handler.typed_array(data_.data(int8_array_arg), data_.size() - index_);
+                    break;
+                }
+                case typed_array_type::int16_value:
+                {
+                    more = handler.typed_array(data_.data(int16_array_arg), data_.size() - index_);
+                    break;
+                }
+                case typed_array_type::int32_value:
+                {
+                    more = handler.typed_array(data_.data(int32_array_arg), data_.size() - index_);
+                    break;
+                }
+                case typed_array_type::int64_value:
+                {
+                    more = handler.typed_array(data_.data(int64_array_arg), data_.size() - index_);
+                    break;
+                }
+                case typed_array_type::float_value:
+                {
+                    more = handler.typed_array(data_.data(float_array_arg), data_.size() - index_);
+                    break;
+                }
+                case typed_array_type::double_value:
+                {
+                    more = handler.typed_array(data_.data(double_array_arg), data_.size() - index_);
+                    break;
+                }
+                case typed_array_type::float128_value:
+                {
+                    more = handler.typed_array(data_.data(float128_array_arg), data_.size() - index_);
+                    break;
+                }
+                default:
+                    break;
+            }
+            ++index_;
+            
+            more = handler.end_array();
+            data_ = typed_array_view<Float128T>();
+            index_ = 0;
+        }
+        else
+        {
+            more = staj_to_saj_event(event(), handler, context);        
+        }
+        return more;
+    }
+
 private:
     static constexpr bool accept(const basic_staj_event<char_type>&, const ser_context&) 
     {
@@ -507,7 +586,7 @@ public:
         read_next(handler, ec);
     }
 
-    void read_to(cbor_content_handler<char>& handler) 
+    void read_to(cbor_content_handler<Float128T>& handler) 
     {
         std::error_code ec;
         read_to(handler, ec);
@@ -517,9 +596,9 @@ public:
         }
     }
 
-    void read_to(cbor_content_handler<char>& handler, std::error_code& ec) 
+    void read_to(cbor_content_handler<Float128T>& handler, std::error_code& ec) 
     {
-        if (!staj_to_saj_event(event_handler_.event(), handler, *this))
+        if (!event_handler_.dump(handler, *this))
         {
             return;
         }
