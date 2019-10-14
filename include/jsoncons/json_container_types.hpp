@@ -1931,7 +1931,7 @@ private:
             {
                 index_.erase(index_.begin()+i);
             }
-            else if (index_[i] > pos2)
+            else if (index_[i] >= pos2)
             {
                 index_[i] -= offset;
             }
