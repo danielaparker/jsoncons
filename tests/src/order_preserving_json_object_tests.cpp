@@ -338,9 +338,13 @@ TEST_CASE("order preserving erase")
     SECTION("erase 1,2,3,4, insert 2,1,4,3, compare")
     {
         o.erase(key1);
+        REQUIRE(o.size() == 3);
         o.erase(key2);
+        REQUIRE(o.size() == 2);
         o.erase(key3);
+        REQUIRE(o.size() == 1);
         o.erase(key4);
+        REQUIRE(o.size() == 0);
         o.insert_or_assign(key2, value2);
         o.insert_or_assign(key1, value1);
         o.insert_or_assign(key4, value4);
@@ -388,7 +392,7 @@ TEST_CASE("order preserving erase")
         o.insert_or_assign(key2, value2);
         o.insert_or_assign(key1, value1);
         o.insert_or_assign(key4, value4);
-        o.insert_or_assign(key3, value3); 
+        o.insert_or_assign(key3, value3);
 
         CHECK((o == original));
     }

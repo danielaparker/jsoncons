@@ -1456,7 +1456,10 @@ public:
         auto pos = find(name);
         if (pos != members_.end())
         {
-            erase_index_entry(name);
+            size_t pos1 = pos - members_.begin();
+            size_t pos2 = pos1 + 1;
+
+            erase_index_entries(pos1, pos2);
 #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
             iterator it = members_.begin() + (pos - members_.begin());
             members_.erase(it);
@@ -1839,7 +1842,7 @@ public:
             }
         }
     }
- 
+
     bool operator==(const json_object& rhs) const
     {
         return members_ == rhs.members_;
@@ -1892,27 +1895,6 @@ private:
         }
     }
 
-    void erase_index_entry(const string_view_type& key)
-    {
-        auto it = std::lower_bound(index_.begin(),index_.end(), key, 
-                                   [&](size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
-
-        if (it != index_.end() && members_.at(*it).key() == key)
-        {
-            size_t pos = *it;
-            size_t count = index_.size() - pos;
-            for (size_t i = 0; i < index_.size() && count > 0; ++i)
-            {
-                if (index_[i] > pos)
-                {
-                    --index_[i];
-                    --count;
-                }
-            }
-            index_.erase(it);
-        }
-    }
-
     void erase_index_entries(size_t pos1, size_t pos2)
     {
         JSONCONS_ASSERT(pos1 <= pos2);
@@ -1931,7 +1913,10 @@ private:
             {
                 index_.erase(index_.begin()+i);
             }
-            else if (index_[i] >= pos2)
+        }
+        for (size_t i = 0; i < index_.size(); ++i)
+        {
+            if (index_[i] >= pos2)
             {
                 index_[i] -= offset;
             }
