@@ -27,6 +27,7 @@ public:
     virtual ~cbor_encode_options() = default;
 
     virtual bool pack_strings() const = 0; 
+    virtual bool use_typed_arrays() const = 0; 
 };
 
 class cbor_options : public virtual cbor_decode_options, 
@@ -34,6 +35,7 @@ class cbor_options : public virtual cbor_decode_options,
 {
 private:
     bool pack_strings_;
+    bool use_typed_arrays_;
 public:
 
     static const cbor_options& get_default_options()
@@ -46,7 +48,8 @@ public:
 //  Constructors
 
     cbor_options()
-        : pack_strings_(false)
+        : pack_strings_(false),
+          use_typed_arrays_(false)
     {
     }
 
@@ -58,6 +61,17 @@ public:
     cbor_options& pack_strings(bool value)
     {
         pack_strings_ = value;
+        return *this;
+    }
+
+    bool use_typed_arrays() const override
+    {
+        return use_typed_arrays_;
+    }
+
+    cbor_options& use_typed_arrays(bool value)
+    {
+        use_typed_arrays_ = value;
         return *this;
     }
 };
