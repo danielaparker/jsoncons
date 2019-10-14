@@ -1839,12 +1839,12 @@ public:
             }
         }
     }
-
+  
     bool operator==(const json_object& rhs) const
     {
         return members_ == rhs.members_;
     }
-
+ 
     bool operator<(const json_object& rhs) const
     {
         return members_ < rhs.members_;
@@ -1931,7 +1931,7 @@ private:
             {
                 index_.erase(index_.begin()+i);
             }
-            else if (index_[i] > pos2)
+            else if (index_[i] >= pos2)
             {
                 index_[i] -= offset;
             }

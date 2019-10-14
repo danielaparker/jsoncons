@@ -313,3 +313,96 @@ TEST_CASE("order preserving insert_or_assign")
     }
 }
 
+TEST_CASE("order preserving erase")
+{
+    json_object<std::string, ojson> o;
+
+    const std::string key1 = "key1";
+    const std::string key2 = "key2";
+    const std::string key3 = "key3";
+    const std::string key4 = "key4";
+
+    const std::string value1 = "value1";
+    const std::string value2 = "value2";
+    const std::string value3 = "value3";
+    const std::string value4 = "value4";
+
+    o.insert_or_assign(key2, value2);
+    o.insert_or_assign(key1, value1);
+    o.insert_or_assign(key4, value4);
+    o.insert_or_assign(key3, value3);
+    REQUIRE(o.size() == 4);
+
+    const json_object<std::string, ojson> original = o;
+
+    SECTION("erase 1,2,3,4, insert 2,1,4,3, compare")
+    {
+        o.erase(key1);
+        o.erase(key2);
+        o.erase(key3);
+        o.erase(key4);
+        o.insert_or_assign(key2, value2);
+        o.insert_or_assign(key1, value1);
+        o.insert_or_assign(key4, value4);
+        o.insert_or_assign(key3, value3);
+
+        CHECK((o == original));
+
+        o.erase(o.begin(),o.begin()+1);
+        REQUIRE(o.size() == 3);
+        o.erase(o.begin(),o.begin()+1);
+        REQUIRE(o.size() == 2);
+        o.erase(o.begin(),o.begin()+1);
+        REQUIRE(o.size() == 1);
+        o.erase(o.begin(),o.end());
+        REQUIRE(o.size() == 0);
+        o.insert_or_assign(key2, value2);
+        o.insert_or_assign(key1, value1);
+        o.insert_or_assign(key4, value4);
+        o.insert_or_assign(key3, value3);
+
+        CHECK((o == original));
+    }
+
+    SECTION("erase 4,3,2,1, insert 2,1,4,3, compare")
+    {
+        o.erase(key4);
+        o.erase(key3);
+        o.erase(key2);
+        o.erase(key1);
+        o.insert_or_assign(key2, value2);
+        o.insert_or_assign(key1, value1);
+        o.insert_or_assign(key4, value4);
+        o.insert_or_assign(key3, value3);
+
+        CHECK((o == original));
+
+        o.erase(o.begin()+3,o.end());
+        REQUIRE(o.size() == 3);
+        o.erase(o.begin()+2 ,o.end());
+        REQUIRE(o.size() == 2);
+        o.erase(o.begin()+1,o.end());
+        REQUIRE(o.size() == 1);
+        o.erase(o.begin(),o.end());
+        REQUIRE(o.size() == 0);
+        o.insert_or_assign(key2, value2);
+        o.insert_or_assign(key1, value1);
+        o.insert_or_assign(key4, value4);
+        o.insert_or_assign(key3, value3); 
+
+        CHECK((o == original));
+    } 
+
+    SECTION("erase 1-4, insert 2,1,4,3, compare")
+    {
+        o.erase(o.begin(),o.end());
+
+        o.insert_or_assign(key2, value2);
+        o.insert_or_assign(key1, value1);
+        o.insert_or_assign(key4, value4);
+        o.insert_or_assign(key3, value3);
+
+        CHECK((o == original));
+    }
+}
+  

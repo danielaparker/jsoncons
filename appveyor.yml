@@ -1,4 +1,4 @@
-build: false
+build: false 
 
 environment:
   vsversion: none
@@ -46,16 +46,6 @@ environment:
       vsversion: 2017
       arch: ARM
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017 
-
-    - platform: vs
-      GENERATOR: Visual Studio 16 2019
-      arch: x86
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019 
-
-    - platform: vs
-      GENERATOR: Visual Studio 16 2019
-      arch: 64
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019 
 
 init:
   - git config --global core.autocrlf input
