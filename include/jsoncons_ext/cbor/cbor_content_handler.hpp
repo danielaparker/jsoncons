@@ -108,44 +108,44 @@ public:
 private:
 
     virtual bool do_typed_array(const uint8_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const uint16_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const uint32_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const uint64_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const int8_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const int16_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const int32_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const int64_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const float* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const double* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const Float128T* /*data*/, size_t /*size*/, 
                                 semantic_tag /*tag*/=semantic_tag::none,
@@ -495,8 +495,8 @@ private:
     }
 
     bool do_typed_array(const uint8_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        semantic_tag tag,
+                        const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
@@ -511,8 +511,8 @@ private:
     }
 
     bool do_typed_array(const uint16_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        semantic_tag tag,
+                        const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
@@ -527,8 +527,8 @@ private:
     }
 
     bool do_typed_array(const uint32_t* data, size_t size, 
-                         semantic_tag tag=semantic_tag::none,
-                         const ser_context& context=null_ser_context()) override
+                         semantic_tag tag,
+                         const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
@@ -543,8 +543,8 @@ private:
     }
 
     bool do_typed_array(const uint64_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        semantic_tag tag,
+                        const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
@@ -559,8 +559,8 @@ private:
     }
 
     bool do_typed_array(const int8_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        semantic_tag tag,
+                        const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
@@ -575,8 +575,8 @@ private:
     }
 
     bool do_typed_array(const int16_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        semantic_tag tag,
+                        const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
@@ -591,8 +591,8 @@ private:
     }
 
     bool do_typed_array(const int32_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        semantic_tag tag,
+                        const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
@@ -607,8 +607,8 @@ private:
     }
 
     bool do_typed_array(const int64_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        semantic_tag tag,
+                        const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
@@ -623,8 +623,8 @@ private:
     }
 
     bool do_typed_array(const float* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        semantic_tag tag,
+                        const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
@@ -639,8 +639,8 @@ private:
     }
 
     bool do_typed_array(const double* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        semantic_tag tag,
+                        const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
@@ -655,8 +655,8 @@ private:
     }
 
     bool do_typed_array(const Float128T* /*data*/, size_t /*size*/, 
-                        semantic_tag /*tag*/=semantic_tag::none,
-                        const ser_context& /*context*/=null_ser_context()) override
+                        semantic_tag /*tag*/,
+                        const ser_context& /*context*/) override
     {
         return true;
     }
