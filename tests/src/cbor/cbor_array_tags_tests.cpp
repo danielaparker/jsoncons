@@ -395,73 +395,22 @@ TEST_CASE("cbor typed array tests")
 
     SECTION("Tag 83, float128, big endian")
     {
-#if defined(__GNUC__)
-
-        char buffer[128];
-
-        const uint8_t* endp;
-
-        uint8_t buf[sizeof(__float128)];
-        __float128 y = FLT128_MAX;
-        __float128 x = -y;
-        memcpy(buf,&x,sizeof(__float128));
-        for (size_t i = sizeof(buf) -1; i+1 > 0; --i)
-        {
-            std::cout << std::hex << (int)buf[i] << " ";
-        }
-        std::cout << "\n";
-        auto val1 = jsoncons::detail::big_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
-        std::cout << "Float 128 val1: ";
-        //quadmath_snprintf (buffer, sizeof buf, "%Qa", val1);
-        std::cout << buf << "\n";
-
-        memcpy(buf,&y,sizeof(__float128));
-        for (size_t i = sizeof(buf) -1; i+1 > 0; --i)
-        {
-            std::cout << std::hex << (int)buf[i] << " ";
-        }
-        auto val2 = jsoncons::detail::big_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
-        std::cout << "Float 128 val2: ";
-        //quadmath_snprintf (buffer, sizeof buf, "%Qa", val1);
-        std::cout << buf << "\n";
-
-        __float128 w = -1;
-        std::cout << "\n\n";
-        memcpy(buf,&w,sizeof(__float128));
-        for (size_t i = sizeof(buf)-1; i+1 > 0; --i)
-        {
-            std::cout << std::hex << (int)buf[i] << " ";
-        }
-        std::cout << "\n\n";
-        auto val3 = jsoncons::detail::big_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
-        std::cout << "Float 128 val3: ";
-        //quadmath_snprintf (buffer, sizeof buf, "%Qa", val1);
-        std::cout << buf << "\n";
-        __float128 z = 1;
-        memcpy(buf,&z,sizeof(__float128));
-        for (size_t i = sizeof(buf) -1; i+1 > 0; --i)
-        {
-            std::cout << std::hex << (int)buf[i] << " ";
-        }
-        std::cout << "\n\n";
-
-        auto val4 = jsoncons::detail::big_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
-        std::cout << "Float 128 val4: ";
-        //quadmath_snprintf (buffer, sizeof buf, "%Qa", val1);
-        std::cout << buf << "\n";
-
-/*
         const std::vector<uint8_t> input = {
             0xD8, // Tag
                 0x53, // Tag 83, float128, little endian, Typed Array
             0x58,0x40, // Byte string value of length 64
-                0x00,0x00,0x00,0x00,0x00,0x00,0xff,0xfe,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-                0x00,0x00,0x7f,0xfe,0x56,0xbf,0xbf,0xff,0x80,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                0x00,0x00,0x7f,0xfe,0x56,0xbf,0x3f,0xff,0x80,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                0x00,0x00,0x00,0x00,0x00,0x00,0x7f,0xfe,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
+                0xff,0xfe,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+                0x7f,0xfe,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+                0xbf,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+                0x3f,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
         };
- */
-#endif
+
+        //json j = cbor::decode_cbor<json>(input);
+        //REQUIRE(j.is_array());
+        //REQUIRE(j.size() == 2);
+
+        //CHECK(j[0].as<double>() == std::numeric_limits<double>::lowest());
+        //CHECK(j[1].as<double>() == (std::numeric_limits<double>::max)());
     }
 
     SECTION("Tag 84, float16, little endian")
@@ -522,74 +471,19 @@ TEST_CASE("cbor typed array tests")
 
     SECTION("Tag 87, float128, little endian")
     {
-#if defined(__GNUC__)
-
-        char buffer[128];
-
-        const uint8_t* endp = nullptr;
-
-        uint8_t buf[sizeof(__float128)];
-        __float128 y = FLT128_MAX;
-        __float128 x = -y;
-        memcpy(buf,&x,sizeof(__float128));
-        for (auto b : buf)
-        {
-            std::cout << std::hex << (int)b << " ";
-        }
-        std::cout << "\n";
-        auto val1 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
-        //std::cout << "float 128 val1: " << val1 << "\n";
-        //std::cout << "Float 128 val1: ";
-        //quadmath_snprintf (buffer, sizeof buf, "%Qa", val1);
-        //std::cout << buf << "\n";
-    
-        memcpy(buf,&y,sizeof(__float128));
-        for (auto b : buf)
-        {
-            std::cout << std::hex << (int)b << " ";
-        }
-        auto val2 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
-        //std::cout << "float 128 val2: " << val2 << "\n";
-        //std::cout << "Float 128 val2: ";
-        //quadmath_snprintf (buffer, sizeof buf, "%Qa", val2);
-        //std::cout << buf << "\n";
-
-        __float128 w = -1;
-        std::cout << "\n\n";
-        memcpy(buf,&w,sizeof(__float128));
-        for (auto b : buf)
-        {
-            std::cout << std::hex << (int)b << " ";
-        }
-        auto val3 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
-        //std::cout << "Float 128 val3: ";
-        //quadmath_snprintf (buffer, sizeof buf, "%Qa", val3);
-        //std::cout << buf << "\n";
-
-        __float128 z = 1;
-        memcpy(buf,&z,sizeof(__float128));
-        for (auto b : buf)
-        {
-            std::cout << std::hex << (int)b << " ";
-        }
-        std::cout << "\n\n";
-
-        auto val4 = jsoncons::detail::little_to_native<__float128>(buf, buf + sizeof(__float128), &endp);
-        //std::cout << "Float 128 val4: ";
-        //quadmath_snprintf (buffer, sizeof buf, "%Qa", val4);
-        //std::cout << buf << "\n";
-
-        /* const std::vector<uint8_t> input = {
+        const std::vector<uint8_t> input = {
             0xD8, // Tag
                 0x57, // Tag 87, float128, little endian, Typed Array
             0x58,0x40, // Byte string value of length 64
-                0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xfe,0xff,0x00,0x00,0x00,0x00,0x00,0x00,
-                0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x80,0xff,0xbf,0xbf,0x56,0xfe,0x7f,0x00,0x00,
-                0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x80,0xff,0x3f,0xbf,0x56,0xfe,0x7f,0x00,0x00,
-                0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xfe,0x7f,0x00,0x00,0x00,0x00,0x00,0x00
+                0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xfe,0xff,
+                0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xfe,0x7f,
+                0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0xbf,
+                0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0x3f 
         };
-        */
-#endif
+
+        //json j = cbor::decode_cbor<json>(input);
+        //REQUIRE(j.is_array());
+        //REQUIRE(j.size() == 2);
     }
 
 } 
