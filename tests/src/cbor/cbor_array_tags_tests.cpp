@@ -12,10 +12,6 @@
 #include <ctime>
 #include <limits>
 #include <catch/catch.hpp>
-#if defined(__GNUC__)
-#include <float.h>
-#include <quadmath.h>
-#endif
 
 using namespace jsoncons;
 
