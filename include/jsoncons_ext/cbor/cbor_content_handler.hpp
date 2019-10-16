@@ -29,6 +29,13 @@ public:
     using char_type = char;
     using string_view_type = typename super_type::string_view_type;
 
+    bool typed_array(const Float128T* data, size_t size, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+    {
+        return do_typed_array(data, size, tag, context);
+    }
+
     bool typed_array(const uint8_t* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context())
@@ -98,58 +105,50 @@ public:
     {
         return do_typed_array(data, size, tag, context);
     }
-
-    bool typed_array(const Float128T* data, size_t size, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
-    {
-        return do_typed_array(data, size, tag, context);
-    }
 private:
-
     virtual bool do_typed_array(const uint8_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const uint16_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const uint32_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const uint64_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const int8_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const int16_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const int32_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const int64_t* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const float* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const double* data, size_t size, 
-                                semantic_tag tag=semantic_tag::none,
-                                const ser_context& context=null_ser_context()) = 0;
+                                semantic_tag tag,
+                                const ser_context& context) = 0;
 
     virtual bool do_typed_array(const Float128T* /*data*/, size_t /*size*/, 
-                                semantic_tag /*tag*/=semantic_tag::none,
-                                const ser_context& /*context*/=null_ser_context()) = 0;
+                                semantic_tag /*tag*/,
+                                const ser_context& /*context*/) = 0;
 };
 
 template <class Float128T=void>
@@ -316,97 +315,20 @@ private:
 };
 
 template <class Float128T=void>
-class json_to_cbor_content_handler_adaptor : public cbor_content_handler<Float128T>
+class cbor_to_json_content_handler_adaptor : public cbor_content_handler<Float128T>
 {
     using super_type = cbor_content_handler<Float128T>;
 public:
     using char_type = char;
     using string_view_type = typename super_type::string_view_type;
+    using super_type::typed_array;
 private:
     basic_json_content_handler<char_type>& to_handler_;
 public:
-    json_to_cbor_content_handler_adaptor(basic_json_content_handler<char>& handler)
+    cbor_to_json_content_handler_adaptor(basic_json_content_handler<char>& handler)
         : to_handler_(handler)
     {
     }
-
-    bool typed_array(const uint8_t* data, size_t size, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
-    {
-        return do_typed_array(data, size, tag, context);
-    }
-
-    bool typed_array(const uint16_t* data, size_t size, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
-    {
-        return do_typed_array(data, size, tag, context);
-    }
-
-    bool typed_array(const uint32_t* data, size_t size, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
-    {
-        return do_typed_array(data, size, tag, context);
-    }
-
-    bool typed_array(const uint64_t* data, size_t size, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
-    {
-        return do_typed_array(data, size, tag, context);
-    }
-
-    bool typed_array(const int8_t* data, size_t size, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
-    {
-        return do_typed_array(data, size, tag, context);
-    }
-
-    bool typed_array(const int16_t* data, size_t size, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
-    {
-        return do_typed_array(data, size, tag, context);
-    }
-
-    bool typed_array(const int32_t* data, size_t size, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
-    {
-        return do_typed_array(data, size, tag, context);
-    }
-
-    bool typed_array(const int64_t* data, size_t size, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
-    {
-        return do_typed_array(data, size, tag, context);
-    }
-
-    bool typed_array(const float* data, size_t size, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
-    {
-        return do_typed_array(data, size, tag, context);
-    }
-
-    bool typed_array(const double* data, size_t size, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
-    {
-        return do_typed_array(data, size, tag, context);
-    }
-
-    bool typed_array(const Float128T* data, size_t size, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
-    {
-        return do_typed_array(data, size, tag, context);
-    }
-private:
 private:
     void do_flush() override
     {
@@ -495,13 +417,13 @@ private:
     }
 
     bool do_typed_array(const uint8_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                                semantic_tag tag,
+                                const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
-            to_handler_.uint64_value(*p,semantic_tag::none,context);
+            more = to_handler_.uint64_value(*p,semantic_tag::none,context);
         }
         if (more)
         {
@@ -511,8 +433,8 @@ private:
     }
 
     bool do_typed_array(const uint16_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                                semantic_tag tag,
+                                const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
@@ -527,13 +449,13 @@ private:
     }
 
     bool do_typed_array(const uint32_t* data, size_t size, 
-                         semantic_tag tag=semantic_tag::none,
-                         const ser_context& context=null_ser_context()) override
+                                semantic_tag tag,
+                                const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
-            to_handler_.uint64_value(*p,semantic_tag::none,context);
+            more = to_handler_.uint64_value(*p,semantic_tag::none,context);
         }
         if (more)
         {
@@ -543,13 +465,13 @@ private:
     }
 
     bool do_typed_array(const uint64_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                                semantic_tag tag,
+                                const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
         {
-            to_handler_.uint64_value(*p,semantic_tag::none,context);
+            more = to_handler_.uint64_value(*p,semantic_tag::none,context);
         }
         if (more)
         {
@@ -559,8 +481,8 @@ private:
     }
 
     bool do_typed_array(const int8_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                                semantic_tag tag,
+                                const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
@@ -575,8 +497,8 @@ private:
     }
 
     bool do_typed_array(const int16_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                                semantic_tag tag,
+                                const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
@@ -591,8 +513,8 @@ private:
     }
 
     bool do_typed_array(const int32_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                                semantic_tag tag,
+                                const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
@@ -607,8 +529,8 @@ private:
     }
 
     bool do_typed_array(const int64_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                                semantic_tag tag,
+                                const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
@@ -623,8 +545,8 @@ private:
     }
 
     bool do_typed_array(const float* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                                semantic_tag tag,
+                                const ser_context& context) override
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
@@ -639,8 +561,8 @@ private:
     }
 
     bool do_typed_array(const double* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                                semantic_tag tag,
+                                const ser_context& context)
     {
         bool more = to_handler_.begin_array(tag,context);
         for (auto p = data; more && p < data+size; ++p)
@@ -655,8 +577,8 @@ private:
     }
 
     bool do_typed_array(const Float128T* /*data*/, size_t /*size*/, 
-                        semantic_tag /*tag*/=semantic_tag::none,
-                        const ser_context& /*context*/=null_ser_context()) override
+                        semantic_tag /*tag*/,
+                        const ser_context& /*context*/) override
     {
         return true;
     }

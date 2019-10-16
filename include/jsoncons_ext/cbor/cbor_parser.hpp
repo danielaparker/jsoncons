@@ -978,7 +978,7 @@ public:
         }
         if (more_)
         {
-            json_to_cbor_content_handler_adaptor<Float128T> h(handler);
+            cbor_to_json_content_handler_adaptor<Float128T> h(handler);
             parse(h,ec);
         }
     }

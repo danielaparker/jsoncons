@@ -25,11 +25,11 @@ template <class Src,class Float128T = void,class WorkAllocator=std::allocator<ch
 class basic_cbor_reader : public ser_context
 {
     basic_cbor_parser<Src,Float128T,WorkAllocator> parser_;
-    json_to_cbor_content_handler_adaptor<Float128T>& handler_;
+    cbor_to_json_content_handler_adaptor<Float128T>& handler_;
 public:
     template <class Source>
     basic_cbor_reader(Source&& source, 
-                      json_to_cbor_content_handler_adaptor<Float128T>& handler,
+                      cbor_to_json_content_handler_adaptor<Float128T>& handler,
                       const WorkAllocator allocator=WorkAllocator())
        : parser_(std::forward<Source>(source),allocator),
          handler_(handler)
