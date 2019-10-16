@@ -389,8 +389,9 @@ private:
     }
 
     bool do_typed_array(const uint8_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context_arg) override
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code&) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -398,8 +399,9 @@ private:
     }
 
     bool do_typed_array(const uint16_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context_arg) override
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code&) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -407,8 +409,9 @@ private:
     }
 
     bool do_typed_array(const uint32_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context_arg) override
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code&) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -416,8 +419,9 @@ private:
     }
 
     bool do_typed_array(const uint64_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context_arg) override
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code&) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -425,8 +429,9 @@ private:
     }
 
     bool do_typed_array(const int8_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context_arg) override
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code&) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -434,8 +439,9 @@ private:
     }
 
     bool do_typed_array(const int16_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context_arg) override
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code&) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -443,8 +449,9 @@ private:
     }
 
     bool do_typed_array(const int32_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context_arg) override
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code&) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -452,8 +459,9 @@ private:
     }
 
     bool do_typed_array(const int64_t* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context_arg) override
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code&) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -461,8 +469,9 @@ private:
     }
 
     bool do_typed_array(const float* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context_arg) override
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code&) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -470,8 +479,9 @@ private:
     }
 
     bool do_typed_array(const double* data, size_t size, 
-                        semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context_arg) override
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code&) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -479,8 +489,9 @@ private:
     }
 
     bool do_typed_array(const Float128T* /*data*/, size_t /*size*/, 
-                        semantic_tag /*tag*/=semantic_tag::none,
-                        const ser_context& /*context*/=null_ser_context_arg) override
+                        semantic_tag /*tag*/,
+                        const ser_context& /*context*/,
+                        std::error_code&) override
     {
         return true;
     }

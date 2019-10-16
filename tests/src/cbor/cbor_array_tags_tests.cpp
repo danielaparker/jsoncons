@@ -21,7 +21,8 @@ struct my_cbor_content_handler : public cbor::default_cbor_content_handler<>
 private:
     bool do_typed_array(const double* data, size_t size, 
                         semantic_tag,
-                        const ser_context&) override
+                        const ser_context&,
+                        std::error_code&) override
     {
         std::cout << "do_typed_array size: " << size << "\n";
         v = std::vector<double>(data,data+size);
