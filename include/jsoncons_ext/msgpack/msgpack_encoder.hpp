@@ -202,7 +202,7 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const ser_context&) override
+    bool do_name(const string_view_type& name, const ser_context&, std::error_code&) override
     {
         write_string_value(name);
         return true;

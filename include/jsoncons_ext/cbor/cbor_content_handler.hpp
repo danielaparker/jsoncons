@@ -190,7 +190,7 @@ private:
         return parse_more_;
     }
 
-    bool do_name(const string_view_type&, const ser_context&) override
+    bool do_name(const string_view_type&, const ser_context&, std::error_code&) override
     {
         return parse_more_;
     }
@@ -367,9 +367,10 @@ private:
     }
 
     bool do_name(const string_view_type& name,
-                 const ser_context& context) override
+                 const ser_context& context,
+                 std::error_code& ec) override
     {
-        return to_handler_.name(name, context);
+        return to_handler_.name(name, context, ec);
     }
 
     bool do_string_value(const string_view_type& value,

@@ -77,7 +77,7 @@ private:
         return other_handler_.end_array(context, ec);
     }
 
-    bool do_name(const string_view_type& name, const ser_context& context) override
+    bool do_name(const string_view_type& name, const ser_context& context, std::error_code&) override
     {
         std::basic_string<CharT> target;
         auto result = unicons::convert(

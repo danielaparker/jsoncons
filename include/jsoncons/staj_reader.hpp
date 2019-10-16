@@ -507,7 +507,7 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_name(const string_view_type& name, const ser_context& context) override
+    bool do_name(const string_view_type& name, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(name, staj_event_type::name);
         return !filter_(event_, context);

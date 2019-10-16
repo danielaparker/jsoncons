@@ -19,7 +19,8 @@ public:
 
 private:
     bool do_name(const string_view_type& name, 
-                 const ser_context& context) override
+                 const ser_context& context,
+                 std::error_code&) override
     {
         member_name_ = std::string(name);
         if (member_name_ != "name")

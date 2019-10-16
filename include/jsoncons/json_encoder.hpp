@@ -559,7 +559,7 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const ser_context&) override
+    bool do_name(const string_view_type& name, const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().count() > 0)
@@ -1132,7 +1132,7 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const ser_context&) override
+    bool do_name(const string_view_type& name, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().count() > 0)
         {

@@ -368,9 +368,10 @@ namespace detail {
             return true;
         }
 
-        bool do_name(const string_view_type&, const ser_context&) override
+        bool do_name(const string_view_type&, const ser_context&, std::error_code& ec) override
         {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("unexpected name"));
+            ec = csv_errc::invalid_parse_state;
+            return false;
         }
 
         bool do_null_value(semantic_tag tag, const ser_context&, std::error_code&) override

@@ -183,12 +183,13 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const ser_context&) override
+    bool do_name(const string_view_type& name, const ser_context&, std::error_code& ec) override
     {
         auto result = unicons::validate(name.begin(), name.end());
         if (result.ec != unicons::conv_errc())
         {
-            JSONCONS_THROW(ser_error(ubjson_errc::invalid_utf8_text_string));
+            ec = ubjson_errc::invalid_utf8_text_string;
+            return false;
         }
 
         put_length(name.length());

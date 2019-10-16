@@ -241,7 +241,18 @@ public:
 
     bool name(const string_view_type& name, const ser_context& context=null_ser_context_arg)
     {
-        return do_name(name, context);
+        std::error_code ec;
+        bool more = do_name(name, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool name(const string_view_type& name, const ser_context& context, std::error_code& ec)
+    {
+        return do_name(name, context, ec);
     }
 
     bool string_value(const string_view_type& value, 
@@ -492,7 +503,7 @@ private:
 
     virtual bool do_end_array(const ser_context& context, std::error_code& ec) = 0;
 
-    virtual bool do_name(const string_view_type& name, const ser_context& context) = 0;
+    virtual bool do_name(const string_view_type& name, const ser_context& context, std::error_code&) = 0;
 
     virtual bool do_null_value(semantic_tag, const ser_context& context, std::error_code& ec) = 0;
 
@@ -715,7 +726,7 @@ private:
         return parse_more_;
     }
 
-    bool do_name(const string_view_type&, const ser_context&) override
+    bool do_name(const string_view_type&, const ser_context&, std::error_code&) override
     {
         return parse_more_;
     }

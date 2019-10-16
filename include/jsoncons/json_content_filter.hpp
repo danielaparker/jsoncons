@@ -92,9 +92,10 @@ private:
     }
 
     bool do_name(const string_view_type& name,
-                 const ser_context& context) override
+                 const ser_context& context,
+                 std::error_code& ec) override
     {
-        return to_handler_.name(name, context);
+        return to_handler_.name(name, context, ec);
     }
 
     bool do_string_value(const string_view_type& value,
@@ -165,15 +166,16 @@ public:
 
 private:
     bool do_name(const string_view_type& name,
-                 const ser_context& context) override
+                 const ser_context& context,
+                 std::error_code& ec) override
     {
         if (name == name_)
         {
-            return this->to_handler().name(new_name_,context);
+            return this->to_handler().name(new_name_,context, ec);
         }
         else
         {
-            return this->to_handler().name(name,context);
+            return this->to_handler().name(name,context,ec);
         }
     }
 };
@@ -256,15 +258,16 @@ private:
     }
 
     bool do_name(const string_view_type& name,
-                 const ser_context& context) override
+                 const ser_context& context,
+                 std::error_code& ec) override
     {
         std::basic_string<typename To::char_type> target;
         auto result = unicons::convert(name.begin(),name.end(),std::back_inserter(target),unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            JSONCONS_THROW(ser_error(result.ec));
+            ec = result.ec;
         }
-        return to_handler().name(target, context);
+        return to_handler().name(target, context, ec);
     }
 
     bool do_string_value(const string_view_type& value,

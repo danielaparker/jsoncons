@@ -111,12 +111,12 @@ public:
                     }
                     case typed_array_type::float_value:
                     {
-                        this->double_value(data_.data(float_array_arg)[index_], ec);
+                        this->double_value(data_.data(float_array_arg)[index_], semantic_tag::none, null_ser_context_arg, ec);
                         break;
                     }
                     case typed_array_type::double_value:
                     {
-                        this->double_value(data_.data(double_array_arg)[index_], ec);
+                        this->double_value(data_.data(double_array_arg)[index_], semantic_tag::none, null_ser_context_arg, ec);
                         break;
                     }
                     case typed_array_type::float128_value:
@@ -328,7 +328,7 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_name(const string_view_type& name, const ser_context& context) override
+    bool do_name(const string_view_type& name, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<char_type>(name, staj_event_type::name);
         return !filter_(event_, context);
