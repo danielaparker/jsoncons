@@ -22,6 +22,11 @@ void check_encode_cbor(const std::vector<uint8_t>& expected, const json& j)
 {
     std::vector<uint8_t> result;
     cbor::encode_cbor(j,result);
+
+    if (result.size() != expected.size())
+    {
+        std::cout << j << "\n";
+    }
     REQUIRE(result.size() == expected.size());
     for (size_t i = 0; i < expected.size(); ++i)
     {
@@ -87,8 +92,7 @@ TEST_CASE("cbor_encoder_test")
         CHECK((double)valf == val);
         check_encode_cbor({0xfa,0xcb,0x7f,0xff,0xff},json(val));
     }
-    // From https://en.wikipedia.org/wiki/Double-precision_floating-point_format
-    SECTION("0.333333333333333314829616256247390992939472198486328125")
+    // From https://en.wikipedia.org/wiki/Double-precision_floating-point_forma    SECTION("0.333333333333333314829616256247390992939472198486328125")
     {
         double val = 0.333333333333333314829616256247390992939472198486328125;
         float valf = (float)val;

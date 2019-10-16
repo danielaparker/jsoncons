@@ -670,7 +670,7 @@ private:
 
         result_.push_back(0xc5);
         do_begin_array((size_t)2, semantic_tag::none, context, ec);
-        if (!ec)
+        if (ec)
         {
             return;
         }
