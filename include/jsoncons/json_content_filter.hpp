@@ -231,7 +231,7 @@ private:
 
     bool do_end_object(const ser_context& context, std::error_code& ec) override
     {
-        return to_handler_->end_object(context);
+        return to_handler_->end_object(context, ec);
     }
 
     bool do_begin_array(semantic_tag tag, 
