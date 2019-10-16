@@ -132,9 +132,10 @@ private:
 
     bool do_uint64_value(uint64_t value,
                          semantic_tag tag,
-                         const ser_context& context) override
+                         const ser_context& context,
+                         std::error_code& ec) override
     {
-        return to_handler_.uint64_value(value, tag, context);
+        return to_handler_.uint64_value(value, tag, context, ec);
     }
 
     bool do_bool_value(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
@@ -313,9 +314,10 @@ private:
 
     bool do_uint64_value(uint64_t value,
                          semantic_tag tag,
-                         const ser_context& context) override
+                         const ser_context& context,
+                         std::error_code& ec) override
     {
-        return to_handler_->uint64_value(value, tag, context);
+        return to_handler_->uint64_value(value, tag, context, ec);
     }
 
     bool do_bool_value(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override

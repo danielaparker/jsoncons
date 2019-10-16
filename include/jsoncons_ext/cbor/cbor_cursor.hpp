@@ -372,7 +372,8 @@ private:
 
     bool do_uint64_value(uint64_t value, 
                          semantic_tag tag, 
-                         const ser_context& context) override
+                         const ser_context& context,
+                         std::error_code&) override
     {
         event_ = basic_staj_event<char_type>(value, tag);
         return !filter_(event_, context);

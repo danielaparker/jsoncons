@@ -280,7 +280,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code& ec) override
+    bool do_string_value(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code&) override
     {
         if (stack_.size() == 2)
         {
@@ -413,7 +413,8 @@ private:
 
     bool do_uint64_value(uint64_t val, 
                          semantic_tag, 
-                         const ser_context&) override
+                         const ser_context&,
+                         std::error_code&) override
     {
         if (stack_.size() == 2)
         {

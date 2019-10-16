@@ -271,7 +271,8 @@ private:
 
     bool do_uint64_value(uint64_t value, 
                          semantic_tag tag, 
-                         const ser_context&) override
+                         const ser_context&,
+                         std::error_code&) override
     {
         switch (structure_stack_.back().type_)
         {

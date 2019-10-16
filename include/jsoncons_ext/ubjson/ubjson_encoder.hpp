@@ -383,7 +383,8 @@ private:
 
     bool do_uint64_value(uint64_t val, 
                          semantic_tag, 
-                         const ser_context&) override
+                         const ser_context&,
+                         std::error_code&) override
     {
         if (val <= (std::numeric_limits<uint8_t>::max)())
         {

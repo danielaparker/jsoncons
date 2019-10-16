@@ -823,7 +823,8 @@ private:
 
     bool do_uint64_value(uint64_t value, 
                          semantic_tag, 
-                         const ser_context&) override
+                         const ser_context&,
+                         std::error_code&) override
     {
         if (!stack_.empty()) 
         {
@@ -1398,7 +1399,8 @@ private:
 
     bool do_uint64_value(uint64_t value, 
                          semantic_tag, 
-                         const ser_context&) override
+                         const ser_context&,
+                         std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
