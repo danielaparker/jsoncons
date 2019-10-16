@@ -103,7 +103,7 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
+    bool do_begin_object(semantic_tag, const ser_context&, std::error_code&) override
     {
         if (buffer_.size() > 0)
         {
