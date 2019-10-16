@@ -234,7 +234,8 @@ Returns `true` if the producer should continue streaming events, `false` otherwi
 Sets `ec` to indicate an error.
 
     virtual bool do_null_value(semantic_tag tag, 
-                               const ser_context& context) = 0;
+                               const ser_context& context,
+                               std::error_code& ec) = 0;
 Handles a null value. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.

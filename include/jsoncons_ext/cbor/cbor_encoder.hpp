@@ -272,7 +272,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag tag, const ser_context&) override
+    bool do_null_value(semantic_tag tag, const ser_context&, std::error_code&) override
     {
         if (tag == semantic_tag::undefined)
         {

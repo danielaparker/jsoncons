@@ -208,7 +208,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag, const ser_context&) override
+    bool do_null_value(semantic_tag, const ser_context&, std::error_code&) override
     {
         // nil
         jsoncons::detail::native_to_big(static_cast<uint8_t>(jsoncons::msgpack::detail::msgpack_format ::nil_cd), std::back_inserter(result_));

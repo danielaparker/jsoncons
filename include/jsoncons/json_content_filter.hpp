@@ -138,9 +138,9 @@ private:
         return to_handler_.bool_value(value, tag, context);
     }
 
-    bool do_null_value(semantic_tag tag, const ser_context& context) override
+    bool do_null_value(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return to_handler_.null_value(tag, context);
+        return to_handler_.null_value(tag, context, ec);
     }
 
 };
@@ -314,9 +314,9 @@ private:
         return to_handler_->bool_value(value, tag, context);
     }
 
-    bool do_null_value(semantic_tag tag, const ser_context& context) override
+    bool do_null_value(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return to_handler_->null_value(tag, context);
+        return to_handler_->null_value(tag, context, ec);
     }
 
 };

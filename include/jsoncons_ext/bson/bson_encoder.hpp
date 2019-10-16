@@ -178,7 +178,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag, const ser_context&) override
+    bool do_null_value(semantic_tag, const ser_context&, std::error_code&) override
     {
         before_value(jsoncons::bson::detail::bson_format::null_cd);
         return true;

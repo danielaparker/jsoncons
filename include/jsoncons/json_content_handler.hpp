@@ -310,7 +310,20 @@ public:
     bool null_value(semantic_tag tag = semantic_tag::none,
                     const ser_context& context=null_ser_context_arg) 
     {
-        return do_null_value(tag, context);
+        std::error_code ec;
+        bool more = do_null_value(tag, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool null_value(semantic_tag tag,
+                    const ser_context& context,
+                    std::error_code& ec) 
+    {
+        return do_null_value(tag, context, ec);
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -481,7 +494,7 @@ private:
 
     virtual bool do_name(const string_view_type& name, const ser_context& context) = 0;
 
-    virtual bool do_null_value(semantic_tag, const ser_context& context) = 0;
+    virtual bool do_null_value(semantic_tag, const ser_context& context, std::error_code& ec) = 0;
 
     virtual bool do_string_value(const string_view_type& value, semantic_tag tag, const ser_context& context) = 0;
 
@@ -707,7 +720,7 @@ private:
         return parse_more_;
     }
 
-    bool do_null_value(semantic_tag, const ser_context&) override
+    bool do_null_value(semantic_tag, const ser_context&, std::error_code&) override
     {
         return parse_more_;
     }

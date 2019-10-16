@@ -195,7 +195,7 @@ private:
         return parse_more_;
     }
 
-    bool do_null_value(semantic_tag, const ser_context&) override
+    bool do_null_value(semantic_tag, const ser_context&, std::error_code&) override
     {
         return parse_more_;
     }
@@ -413,9 +413,9 @@ private:
         return to_handler_.bool_value(value, tag, context);
     }
 
-    bool do_null_value(semantic_tag tag, const ser_context& context) override
+    bool do_null_value(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return to_handler_.null_value(tag, context);
+        return to_handler_.null_value(tag, context, ec);
     }
 
     bool do_typed_array(const uint8_t* data, size_t size, 
