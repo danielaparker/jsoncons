@@ -113,9 +113,10 @@ private:
 
     bool do_double_value(double value, 
                          semantic_tag tag,
-                         const ser_context& context) override
+                         const ser_context& context,
+                         std::error_code& ec) override
     {
-        return to_handler_.double_value(value, tag, context);
+        return to_handler_.double_value(value, tag, context, ec);
     }
 
     bool do_int64_value(int64_t value,
@@ -288,9 +289,10 @@ private:
 
     bool do_double_value(double value, 
                          semantic_tag tag,
-                         const ser_context& context) override
+                         const ser_context& context,
+                         std::error_code& ec) override
     {
-        return to_handler_->double_value(value, tag, context);
+        return to_handler_->double_value(value, tag, context, ec);
     }
 
     bool do_int64_value(int64_t value,

@@ -228,7 +228,8 @@ private:
 
     bool do_double_value(double, 
                          semantic_tag,
-                         const ser_context&) override
+                         const ser_context&,
+                         std::error_code&) override
     {
         return parse_more_;
     }
@@ -387,7 +388,8 @@ private:
 
     bool do_double_value(double value, 
                          semantic_tag tag,
-                         const ser_context& context) override
+                         const ser_context& context,
+                         std::error_code&) override
     {
         return to_handler_.double_value(value, tag, context);
     }

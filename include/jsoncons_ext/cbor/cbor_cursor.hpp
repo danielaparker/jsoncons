@@ -61,7 +61,7 @@ public:
         return data_.type() != typed_array_type();
     }
 
-    void advance_typed_array()
+    void advance_typed_array(std::error_code& ec)
     {
         if (data_.type() != typed_array_type())
         {
@@ -111,12 +111,12 @@ public:
                     }
                     case typed_array_type::float_value:
                     {
-                        this->double_value(data_.data(float_array_arg)[index_]);
+                        this->double_value(data_.data(float_array_arg)[index_], ec);
                         break;
                     }
                     case typed_array_type::double_value:
                     {
-                        this->double_value(data_.data(double_array_arg)[index_]);
+                        this->double_value(data_.data(double_array_arg)[index_], ec);
                         break;
                     }
                     case typed_array_type::float128_value:
@@ -378,7 +378,8 @@ private:
 
     bool do_double_value(double value, 
                          semantic_tag tag, 
-                         const ser_context& context) override
+                         const ser_context& context,
+                         std::error_code&) override
     {
         event_ = basic_staj_event<char_type>(value, tag);
         return !filter_(event_, context);
@@ -628,7 +629,7 @@ public:
     {
         if (event_handler_.is_typed_array())
         {
-            event_handler_.advance_typed_array();
+            event_handler_.advance_typed_array(ec);
         }
         else
         {

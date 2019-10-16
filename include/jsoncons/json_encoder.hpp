@@ -719,7 +719,8 @@ private:
 
     bool do_double_value(double value, 
                          semantic_tag,
-                         const ser_context& context) override
+                         const ser_context& context,
+                         std::error_code&) override
     {
         if (!stack_.empty()) 
         {
@@ -1307,7 +1308,8 @@ private:
 
     bool do_double_value(double value, 
                          semantic_tag,
-                         const ser_context& context) override
+                         const ser_context& context,
+                         std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {

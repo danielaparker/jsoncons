@@ -283,7 +283,21 @@ public:
                       semantic_tag tag = semantic_tag::none, 
                       const ser_context& context=null_ser_context_arg)
     {
-        return do_double_value(value, tag, context);
+        std::error_code ec;
+        bool more = do_double_value(value, tag, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool double_value(double value, 
+                      semantic_tag tag, 
+                      const ser_context& context,
+                      std::error_code& ec)
+    {
+        return do_double_value(value, tag, context, ec);
     }
 
     bool bool_value(bool value, 
@@ -477,7 +491,8 @@ private:
 
     virtual bool do_double_value(double value, 
                                  semantic_tag tag,
-                                 const ser_context& context) = 0;
+                                 const ser_context& context,
+                                 std::error_code& ec) = 0;
 
     virtual bool do_int64_value(int64_t value, 
                                 semantic_tag tag,
@@ -725,7 +740,8 @@ private:
 
     bool do_double_value(double, 
                          semantic_tag,
-                         const ser_context&) override
+                         const ser_context&,
+                         std::error_code&) override
     {
         return parse_more_;
     }

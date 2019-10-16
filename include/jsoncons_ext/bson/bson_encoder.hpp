@@ -301,7 +301,8 @@ private:
 
     bool do_double_value(double val, 
                          semantic_tag,
-                         const ser_context&) override
+                         const ser_context&,
+                         std::error_code&) override
     {
         before_value(jsoncons::bson::detail::bson_format::double_cd);
 

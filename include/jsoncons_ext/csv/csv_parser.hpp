@@ -417,7 +417,8 @@ namespace detail {
 
         bool do_double_value(double value,
                              semantic_tag tag, 
-                             const ser_context&) override
+                             const ser_context&,
+                             std::error_code&) override
         {
             if (name_index_ < column_names_.size())
             {
@@ -663,7 +664,7 @@ public:
             default:
                 handler_ = std::addressof(handler);
                 break;
-        }
+        } 
 
         const CharT* local_input_end = input_end_;
 

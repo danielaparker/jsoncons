@@ -557,7 +557,8 @@ private:
 
     bool do_double_value(double value, 
                          semantic_tag tag, 
-                         const ser_context& context) override
+                         const ser_context& context,
+                         std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
         return !filter_(event_, context);

@@ -143,7 +143,7 @@ using wstring_view = std::wstring_view;
 #define JSONCONS_STRING_LITERAL(name, ...) \
     template <class CharT> \
     const std::basic_string<CharT>& name##_literal() {\
-        static const CharT s[] = { __VA_ARGS__};\
+        static constexpr CharT s[] = { __VA_ARGS__};\
         static const std::basic_string<CharT> sv(s, sizeof(s) / sizeof(CharT));\
         return sv;\
     }
