@@ -97,12 +97,12 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag, const ser_context&) override
+    bool do_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
     {
         JSONCONS_THROW(ser_error(msgpack_errc::object_length_required));
     }
 
-    bool do_begin_object(size_t length, semantic_tag, const ser_context&) override
+    bool do_begin_object(size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
     {
         stack_.push_back(stack_item(msgpack_container_type::object, length));
 

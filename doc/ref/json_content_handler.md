@@ -132,7 +132,8 @@ Flushes whatever is buffered to the destination.
 #### Private virtual consumer interface
 
     virtual bool do_begin_object(semantic_tag tag, 
-                                 const ser_context& context) = 0;
+                                 const ser_context& context,
+                                 std::error_code& ec) = 0;
 Handles the beginning of an object of indefinite length. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -140,7 +141,8 @@ Sets `ec` to indicate an error.
 
     virtual bool do_begin_object(size_t length,
                                  semantic_tag tag, 
-                                 const ser_context& context) = 0;
+                                 const ser_context& context,
+                                 std::error_code& ec) = 0;
 Handles the beginning of an object of known length. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.

@@ -116,7 +116,7 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag, const ser_context&) override
+    bool do_begin_object(semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(cbor_container_type::indefinite_length_object));
         
@@ -124,7 +124,7 @@ private:
         return true;
     }
 
-    bool do_begin_object(size_t length, semantic_tag, const ser_context&) override
+    bool do_begin_object(size_t length, semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(cbor_container_type::object, length));
 

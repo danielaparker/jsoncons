@@ -334,9 +334,10 @@ namespace detail {
         {
         }
 
-        bool do_begin_object(semantic_tag, const ser_context&) override
+        bool do_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
         {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("unexpected begin_object"));
+            ec = csv_errc::unexpected_begin_object;
+            return false;
         }
 
         bool do_end_object(const ser_context&) override

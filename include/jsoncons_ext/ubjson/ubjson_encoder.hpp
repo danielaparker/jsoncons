@@ -97,7 +97,7 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag, const ser_context&) override
+    bool do_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
     {
         stack_.push_back(stack_item(ubjson_container_type::indefinite_length_object));
         result_.push_back(jsoncons::ubjson::detail::ubjson_format::start_object_marker);
@@ -105,7 +105,7 @@ private:
         return true;
     }
 
-    bool do_begin_object(size_t length, semantic_tag, const ser_context&) override
+    bool do_begin_object(size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
     {
         stack_.push_back(stack_item(ubjson_container_type::object, length));
         result_.push_back(jsoncons::ubjson::detail::ubjson_format::start_object_marker);

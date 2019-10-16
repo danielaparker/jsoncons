@@ -131,7 +131,7 @@ private:
     {
     }
 
-    bool do_begin_object(semantic_tag tag, const ser_context&) override
+    bool do_begin_object(semantic_tag tag, const ser_context&, std::error_code&) override
     {
         if (structure_stack_.back().type_ == structure_type::root_t)
         {

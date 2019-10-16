@@ -300,7 +300,7 @@ private:
         return true;
     }
 
-    bool do_begin_object(semantic_tag tag, const ser_context& context) override
+    bool do_begin_object(semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<char_type>(staj_event_type::begin_object, tag);
         return !filter_(event_, context);

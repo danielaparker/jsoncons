@@ -391,7 +391,7 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag, const ser_context&) override
+    bool do_begin_object(semantic_tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1082,7 +1082,7 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag, const ser_context&) override
+    bool do_begin_object(semantic_tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {

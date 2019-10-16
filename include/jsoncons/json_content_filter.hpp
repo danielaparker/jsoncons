@@ -61,14 +61,14 @@ private:
         to_handler_.flush();
     }
 
-    bool do_begin_object(semantic_tag tag, const ser_context& context) override
+    bool do_begin_object(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return to_handler_.begin_object(tag, context);
+        return to_handler_.begin_object(tag, context, ec);
     }
 
-    bool do_begin_object(size_t length, semantic_tag tag, const ser_context& context) override
+    bool do_begin_object(size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return to_handler_.begin_object(length, tag, context);
+        return to_handler_.begin_object(length, tag, context, ec);
     }
 
     bool do_end_object(const ser_context& context) override
@@ -215,16 +215,18 @@ private:
     }
 
     bool do_begin_object(semantic_tag tag, 
-                         const ser_context& context) override
+                         const ser_context& context,
+                         std::error_code& ec) override
     {
-        return to_handler_->begin_object(tag, context);
+        return to_handler_->begin_object(tag, context, ec);
     }
 
     bool do_begin_object(size_t length, 
                          semantic_tag tag, 
-                         const ser_context& context) override
+                         const ser_context& context,
+                         std::error_code& ec) override
     {
-        return to_handler_->begin_object(length, tag, context);
+        return to_handler_->begin_object(length, tag, context, ec);
     }
 
     bool do_end_object(const ser_context& context) override

@@ -57,9 +57,9 @@ private:
         other_handler_.flush();
     }
 
-    bool do_begin_object(semantic_tag tag, const ser_context& context) override
+    bool do_begin_object(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return other_handler_.begin_object(tag, context);
+        return other_handler_.begin_object(tag, context, ec);
     }
 
     bool do_end_object(const ser_context& context) override
