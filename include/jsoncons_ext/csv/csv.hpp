@@ -75,8 +75,11 @@ typename std::enable_if<!is_basic_json_class<T>::value,void>::type
 encode_csv(const T& val, std::basic_string<CharT>& s, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options())
 {
     typedef CharT char_type;
+    std::error_code ec;
     basic_csv_encoder<char_type,jsoncons::string_result<std::basic_string<char_type>>> encoder(s,options);
-    write_to(basic_json<CharT>(), val, encoder);
+    write_to(basic_json<CharT>(), val, encoder, ec);
+    if (ec)
+        JSONCONS_THROW(ser_error(ec));
 }
 
 template <class T, class CharT>
@@ -93,8 +96,11 @@ typename std::enable_if<!is_basic_json_class<T>::value,void>::type
 encode_csv(const T& val, std::basic_ostream<CharT>& os, const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options())
 {
     typedef CharT char_type;
+    std::error_code ec;
     basic_csv_encoder<char_type,jsoncons::stream_result<char_type>> encoder(os,options);
-    write_to(basic_json<CharT>(), val, encoder);
+    write_to(basic_json<CharT>(), val, encoder, ec);
+    if (ec)
+        JSONCONS_THROW(ser_error(ec));
 }
 
 }} // namespace csv namespace jsoncons 
