@@ -2009,7 +2009,7 @@ private:
             }
             default:
             {
-                ec = cbor_errc::invalid_decimal;
+                ec = cbor_errc::invalid_bigdec;
                 more_ = false;
                 return s;
             }
@@ -2075,7 +2075,7 @@ private:
             }
             default:
             {
-                ec = cbor_errc::invalid_decimal;
+                ec = cbor_errc::invalid_bigdec;
                 more_ = false;
                 return s;
             }

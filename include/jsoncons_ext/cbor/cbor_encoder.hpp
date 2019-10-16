@@ -445,7 +445,10 @@ private:
                             state = decimal_parse_state::integer;
                             break;
                         default:
-                            JSONCONS_THROW(std::invalid_argument("Invalid decimal string"));
+                        {
+                            ec = cbor_errc::invalid_bigdec;
+                            return false;
+                        }
                     }
                     break;
                 }
@@ -464,7 +467,10 @@ private:
                             state = decimal_parse_state::fraction1;
                             break;
                         default:
-                            JSONCONS_THROW(std::invalid_argument("Invalid decimal string"));
+                        {
+                            ec = cbor_errc::invalid_bigdec;
+                            return false;
+                        }
                     }
                     break;
                 }
@@ -484,7 +490,10 @@ private:
                             state = decimal_parse_state::exp2;
                             break;
                         default:
-                            JSONCONS_THROW(std::invalid_argument("Invalid decimal string"));
+                        {
+                            ec = cbor_errc::invalid_bigdec;
+                            return false;
+                        }
                     }
                     break;
                 }
@@ -496,7 +505,10 @@ private:
                             exponent.push_back(c);
                             break;
                         default:
-                            JSONCONS_THROW(std::invalid_argument("Invalid decimal string"));
+                        {
+                            ec = cbor_errc::invalid_bigdec;
+                            return false;
+                        }
                     }
                     break;
                 }
@@ -509,7 +521,10 @@ private:
                             --scale;
                             break;
                         default:
-                            JSONCONS_THROW(std::invalid_argument("Invalid decimal string"));
+                        {
+                            ec = cbor_errc::invalid_bigdec;
+                            return false;
+                        }
                     }
                     break;
                 }
@@ -524,7 +539,8 @@ private:
             auto result = jsoncons::detail::to_integer<int64_t>(exponent.data(), exponent.length());
             if (result.ec != jsoncons::detail::to_integer_errc())
             {
-                JSONCONS_THROW(json_runtime_error<std::invalid_argument>(make_error_code(result.ec).message()));
+                ec = make_error_code(result.ec);
+                return false;
             }
             scale += result.value;
         }
@@ -579,7 +595,7 @@ private:
                             break;
                         default:
                         {
-                            ec = cbor_errc::invalid_hexfloat_string;
+                            ec = cbor_errc::invalid_bigfloat;
                             return false;
                         }
                     }
@@ -594,7 +610,7 @@ private:
                             break;
                         default:
                         {
-                            ec = cbor_errc::invalid_hexfloat_string;
+                            ec = cbor_errc::invalid_bigfloat;
                             return false;
                         }
                     }
@@ -610,7 +626,7 @@ private:
                             break;
                         default:
                         {
-                            ec = cbor_errc::invalid_hexfloat_string;
+                            ec = cbor_errc::invalid_bigfloat;
                             return false;
                         }
                     }
@@ -632,7 +648,7 @@ private:
                             break;
                         default:
                         {
-                            ec = cbor_errc::invalid_hexfloat_string;
+                            ec = cbor_errc::invalid_bigfloat;
                             return false;
                         }
                     }
@@ -655,7 +671,7 @@ private:
                             break;
                         default:
                         {
-                            ec = cbor_errc::invalid_hexfloat_string;
+                            ec = cbor_errc::invalid_bigfloat;
                             return false;
                         }
                     }
@@ -670,7 +686,7 @@ private:
                             break;
                         default:
                         {
-                            ec = cbor_errc::invalid_hexfloat_string;
+                            ec = cbor_errc::invalid_bigfloat;
                             return false;
                         }
                     }
@@ -686,7 +702,7 @@ private:
                             break;
                         default:
                         {
-                            ec = cbor_errc::invalid_hexfloat_string;
+                            ec = cbor_errc::invalid_bigfloat;
                             return false;
                         }
                     }

@@ -18,14 +18,13 @@ enum class cbor_errc
     ok = 0,
     unexpected_eof,
     source_error,
-    invalid_decimal,
+    invalid_bigdec,
     invalid_bigfloat,
     invalid_utf8_text_string,
     too_many_items,
     too_few_items,
     number_too_large,
-    stringref_too_large,
-    invalid_hexfloat_string
+    stringref_too_large
 };
 
 class cbor_error_category_impl
@@ -44,7 +43,7 @@ public:
                 return "Unexpected end of file";
             case cbor_errc::source_error:
                 return "Source error";
-            case cbor_errc::invalid_decimal:
+            case cbor_errc::invalid_bigdec:
                 return "Invalid decimal";
             case cbor_errc::invalid_bigfloat:
                 return "Invalid bigfloat";
@@ -58,8 +57,6 @@ public:
                 return "Number exceeds implementation limits";
             case cbor_errc::stringref_too_large:
                 return "stringref exceeds stringref map size";
-            case cbor_errc::invalid_hexfloat_string:
-                return "Invalid hexfloat string";
             default:
                 return "Unknown CBOR parser error";
         }
