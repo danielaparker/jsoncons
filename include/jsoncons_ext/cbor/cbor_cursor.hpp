@@ -363,7 +363,8 @@ private:
 
     bool do_int64_value(int64_t value, 
                         semantic_tag tag,
-                        const ser_context& context) override
+                        const ser_context& context,
+                        std::error_code&) override
     {
         event_ = basic_staj_event<char_type>(value, tag);
         return !filter_(event_, context);

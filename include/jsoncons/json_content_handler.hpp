@@ -316,7 +316,21 @@ public:
                      semantic_tag tag = semantic_tag::none, 
                      const ser_context& context=null_ser_context_arg)
     {
-        return do_int64_value(value, tag, context);
+        std::error_code ec;
+        bool more = do_int64_value(value, tag, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool int64_value(int64_t value, 
+                     semantic_tag tag, 
+                     const ser_context& context,
+                     std::error_code& ec)
+    {
+        return do_int64_value(value, tag, context, ec);
     }
 
     bool uint64_value(uint64_t value, 
@@ -456,7 +470,7 @@ public:
     JSONCONS_DEPRECATED_MSG("Instead, use int64_value with semantic_tag::timestamp") 
     bool timestamp_value(int64_t val, const ser_context& context=null_ser_context_arg) 
     {
-        return do_int64_value(val, semantic_tag::timestamp, context);
+        return int64_value(val, semantic_tag::timestamp, context);
     }
 
     JSONCONS_DEPRECATED_MSG("Remove calls to this method, it doesn't do anything") 
@@ -528,7 +542,7 @@ public:
     JSONCONS_DEPRECATED_MSG("Instead, use int64_value with semantic_tag::timestamp") 
     bool epoch_time_value(int64_t val, const ser_context& context=null_ser_context_arg) 
     {
-        return do_int64_value(val, semantic_tag::timestamp, context);
+        return int64_value(val, semantic_tag::timestamp, context);
     }
 
 #endif
@@ -574,7 +588,8 @@ private:
 
     virtual bool do_int64_value(int64_t value, 
                                 semantic_tag tag,
-                                const ser_context& context) = 0;
+                                const ser_context& context,
+                                std::error_code& ec) = 0;
 
     virtual bool do_uint64_value(uint64_t value, 
                                  semantic_tag tag, 
@@ -805,7 +820,8 @@ private:
 
     bool do_int64_value(int64_t, 
                         semantic_tag, 
-                        const ser_context&) override
+                        const ser_context&,
+                        std::error_code&) override
     {
         return parse_more_;
     }

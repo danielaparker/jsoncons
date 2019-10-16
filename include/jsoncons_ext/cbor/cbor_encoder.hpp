@@ -420,10 +420,8 @@ private:
         }
     }
 
-    void write_decimal_value(const string_view_type& sv, const ser_context& context)
+    bool write_decimal_value(const string_view_type& sv, const ser_context& context, std::error_code& ec)
     {
-        std::error_code ec;
-
         decimal_parse_state state = decimal_parse_state::start;
         std::basic_string<char> s;
         std::basic_string<char> exponent;
@@ -518,10 +516,7 @@ private:
 
         result_.push_back(0xc4);
         do_begin_array((size_t)2, semantic_tag::none, context, ec);
-        if (ec)
-        {
-            return;
-        }
+        if (ec) {return false;}
         if (exponent.length() > 0)
         {
             auto result = jsoncons::detail::to_integer<int64_t>(exponent.data(), exponent.length());
@@ -531,12 +526,14 @@ private:
             }
             scale += result.value;
         }
-        do_int64_value(scale, semantic_tag::none, context);
+        do_int64_value(scale, semantic_tag::none, context, ec);
+        if (ec) {return false;}
 
         auto result = jsoncons::detail::to_integer<int64_t>(s.data(),s.length());
         if (result.ec == jsoncons::detail::to_integer_errc())
         {
-            do_int64_value(result.value, semantic_tag::none, context);
+            do_int64_value(result.value, semantic_tag::none, context, ec);
+            if (ec) {return false;}
         }
         else if (result.ec == jsoncons::detail::to_integer_errc::overflow)
         {
@@ -549,11 +546,13 @@ private:
             JSONCONS_THROW(json_runtime_error<std::invalid_argument>(make_error_code(result.ec).message()));
         }
         do_end_array(context, ec);
+
+        return true;
     }
 
-    void write_hexfloat_value(const string_view_type& sv, const ser_context& context)
+    bool write_hexfloat_value(const string_view_type& sv, const ser_context& context, std::error_code& ec)
     {
-        std::error_code ec;
+        bool more = true;
 
         hexfloat_parse_state state = hexfloat_parse_state::start;
         std::basic_string<char> s;
@@ -576,7 +575,10 @@ private:
                             state = hexfloat_parse_state::expect_x;
                             break;
                         default:
-                            JSONCONS_THROW(std::invalid_argument("Invalid hexfloat string"));
+                        {
+                            ec = cbor_errc::invalid_hexfloat_string;
+                            return false;
+                        }
                     }
                     break;
                 }
@@ -588,7 +590,10 @@ private:
                             state = hexfloat_parse_state::expect_x;
                             break;
                         default:
-                            JSONCONS_THROW(std::invalid_argument("Invalid hexfloat string"));
+                        {
+                            ec = cbor_errc::invalid_hexfloat_string;
+                            return false;
+                        }
                     }
                     break;
                 }
@@ -601,7 +606,10 @@ private:
                             state = hexfloat_parse_state::integer;
                             break;
                         default:
-                            JSONCONS_THROW(std::invalid_argument("Invalid hexfloat string"));
+                        {
+                            ec = cbor_errc::invalid_hexfloat_string;
+                            return false;
+                        }
                     }
                     break;
                 }
@@ -620,7 +628,10 @@ private:
                             state = hexfloat_parse_state::fraction1;
                             break;
                         default:
-                            JSONCONS_THROW(std::invalid_argument("Invalid hexfloat string"));
+                        {
+                            ec = cbor_errc::invalid_hexfloat_string;
+                            return false;
+                        }
                     }
                     break;
                 }
@@ -640,7 +651,10 @@ private:
                             state = hexfloat_parse_state::exp2;
                             break;
                         default:
-                            JSONCONS_THROW(std::invalid_argument("Invalid hexfloat string"));
+                        {
+                            ec = cbor_errc::invalid_hexfloat_string;
+                            return false;
+                        }
                     }
                     break;
                 }
@@ -652,7 +666,10 @@ private:
                             exponent.push_back(c);
                             break;
                         default:
-                            JSONCONS_THROW(std::invalid_argument("Invalid hexfloat string"));
+                        {
+                            ec = cbor_errc::invalid_hexfloat_string;
+                            return false;
+                        }
                     }
                     break;
                 }
@@ -665,7 +682,10 @@ private:
                             scale -= 4;
                             break;
                         default:
-                            JSONCONS_THROW(std::invalid_argument("Invalid hexfloat string"));
+                        {
+                            ec = cbor_errc::invalid_hexfloat_string;
+                            return false;
+                        }
                     }
                     break;
                 }
@@ -673,11 +693,9 @@ private:
         }
 
         result_.push_back(0xc5);
-        do_begin_array((size_t)2, semantic_tag::none, context, ec);
-        if (ec)
-        {
-            return;
-        }
+        more = do_begin_array((size_t)2, semantic_tag::none, context, ec);
+        if (!more) return more;
+
         if (exponent.length() > 0)
         {
             auto result = jsoncons::detail::base16_to_integer<int64_t>(exponent.data(), exponent.length());
@@ -687,12 +705,14 @@ private:
             }
             scale += result.value;
         }
-        do_int64_value(scale, semantic_tag::none, context);
+        more = do_int64_value(scale, semantic_tag::none, context, ec);
+        if (!more) return more;
 
         auto result = jsoncons::detail::base16_to_integer<int64_t>(s.data(),s.length());
         if (result.ec == jsoncons::detail::to_integer_errc())
         {
-            do_int64_value(result.value, semantic_tag::none, context);
+            more = do_int64_value(result.value, semantic_tag::none, context, ec);
+            if (!more) return more;
         }
         else if (result.ec == jsoncons::detail::to_integer_errc::overflow)
         {
@@ -704,10 +724,10 @@ private:
         {
             JSONCONS_THROW(json_runtime_error<std::invalid_argument>(make_error_code(result.ec).message()));
         }
-        do_end_array(context, ec);
+        return do_end_array(context, ec);
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context& context, std::error_code&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         switch (tag)
         {
@@ -720,13 +740,11 @@ private:
             }
             case semantic_tag::bigdec:
             {
-                write_decimal_value(sv, context);
-                break;
+                return write_decimal_value(sv, context, ec);
             }
             case semantic_tag::bigfloat:
             {
-                write_hexfloat_value(sv, context);
-                break;
+                return write_hexfloat_value(sv, context, ec);
             }
             case semantic_tag::datetime:
             {
@@ -901,7 +919,8 @@ private:
 
     bool do_int64_value(int64_t value, 
                         semantic_tag tag, 
-                        const ser_context&) override
+                        const ser_context&,
+                        std::error_code&) override
     {
         if (tag == semantic_tag::timestamp)
         {

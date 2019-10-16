@@ -247,7 +247,8 @@ private:
 
     bool do_int64_value(int64_t val, 
                         semantic_tag tag, 
-                        const ser_context&) override
+                        const ser_context&,
+                        std::error_code&) override
     {
         if (tag == semantic_tag::timestamp)
         {

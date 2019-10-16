@@ -178,7 +178,8 @@ Returns `true` if the producer should continue streaming events, `false` otherwi
 Sets `ec` to indicate an error.
 
     virtual bool do_name(const string_view_type& name, 
-                         const ser_context& context) = 0;
+                         const ser_context& context,
+                         std::error_code& ec) = 0;
 Handles the name part of a name-value pair inside an object. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter.  
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -186,7 +187,8 @@ Sets `ec` to indicate an error.
 
     virtual bool do_string_value(const string_view_type& val, 
                                  semantic_tag tag,
-                                 const ser_context& context) = 0;
+                                 const ser_context& context,
+                                 std::error_code& ec) = 0;
 Handles a string value. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -195,7 +197,7 @@ Sets `ec` to indicate an error.
     virtual bool do_byte_string_value(const byte_string_view& b, 
                                       semantic_tag tag,
                                       const ser_context& context,
-                                      std::error_code&) = 0;
+                                      std::error_code& ec) = 0;
 Handles a byte string value. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -203,7 +205,8 @@ Sets `ec` to indicate an error.
 
     virtual bool do_int64_value(int64_t value, 
                                 semantic_tag tag, 
-                                const ser_context& context) = 0;
+                                const ser_context& context,
+                                std::error_code& ec) = 0;
 Handles a signed integer value. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.

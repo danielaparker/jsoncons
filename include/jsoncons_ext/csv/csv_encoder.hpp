@@ -386,7 +386,8 @@ private:
 
     bool do_int64_value(int64_t val, 
                         semantic_tag, 
-                        const ser_context&) override
+                        const ser_context&,
+                        std::error_code&) override
     {
         if (stack_.size() == 2)
         {

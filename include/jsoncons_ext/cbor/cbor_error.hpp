@@ -24,7 +24,8 @@ enum class cbor_errc
     too_many_items,
     too_few_items,
     number_too_large,
-    stringref_too_large
+    stringref_too_large,
+    invalid_hexfloat_string
 };
 
 class cbor_error_category_impl
@@ -57,6 +58,8 @@ public:
                 return "Number exceeds implementation limits";
             case cbor_errc::stringref_too_large:
                 return "stringref exceeds stringref map size";
+            case cbor_errc::invalid_hexfloat_string:
+                return "Invalid hexfloat string";
             default:
                 return "Unknown CBOR parser error";
         }
