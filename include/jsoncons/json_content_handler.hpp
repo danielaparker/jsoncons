@@ -315,7 +315,21 @@ public:
                     semantic_tag tag = semantic_tag::none,
                     const ser_context& context=null_ser_context_arg) 
     {
-        return do_bool_value(value, tag, context);
+        std::error_code ec;
+        bool more = do_bool_value(value, tag, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool bool_value(bool value, 
+                    semantic_tag tag,
+                    const ser_context& context,
+                    std::error_code& ec) 
+    {
+        return do_bool_value(value, tag, context, ec);
     }
 
     bool null_value(semantic_tag tag = semantic_tag::none,
@@ -526,7 +540,7 @@ private:
                                  semantic_tag tag, 
                                  const ser_context& context) = 0;
 
-    virtual bool do_bool_value(bool value, semantic_tag tag, const ser_context& context) = 0;
+    virtual bool do_bool_value(bool value, semantic_tag tag, const ser_context& context, std::error_code&) = 0;
 
     // Default implementations
     virtual bool do_typed_array(const uint8_t* data, size_t size, 
@@ -770,7 +784,7 @@ private:
         return parse_more_;
     }
 
-    bool do_bool_value(bool, semantic_tag, const ser_context&) override
+    bool do_bool_value(bool, semantic_tag, const ser_context&, std::error_code&) override
     {
         return parse_more_;
     }

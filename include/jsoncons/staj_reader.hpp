@@ -519,7 +519,7 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_bool_value(bool value, semantic_tag tag, const ser_context& context) override
+    bool do_bool_value(bool value, semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
         return !filter_(event_, context);

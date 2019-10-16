@@ -227,7 +227,8 @@ Sets `ec` to indicate an error.
 
     virtual bool do_bool_value(bool value, 
                                semantic_tag tag, 
-                               const ser_context& context) = 0;
+                               const ser_context& context,
+                               std::error_code& ec) = 0;
 Handles a boolean value. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.

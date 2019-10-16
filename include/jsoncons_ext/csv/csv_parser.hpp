@@ -462,7 +462,7 @@ namespace detail {
             return true;
         }
 
-        bool do_bool_value(bool value, semantic_tag tag, const ser_context&) override
+        bool do_bool_value(bool value, semantic_tag tag, const ser_context&, std::error_code&) override
         {
             if (name_index_ < column_names_.size())
             {

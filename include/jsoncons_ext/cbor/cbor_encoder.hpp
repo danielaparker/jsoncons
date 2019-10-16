@@ -1033,7 +1033,7 @@ private:
         }
     }
 
-    bool do_bool_value(bool value, semantic_tag, const ser_context&) override
+    bool do_bool_value(bool value, semantic_tag, const ser_context&, std::error_code&) override
     {
         if (value)
         {

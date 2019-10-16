@@ -184,7 +184,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool val, semantic_tag, const ser_context&) override
+    bool do_bool_value(bool val, semantic_tag, const ser_context&, std::error_code& ec) override
     {
         before_value(jsoncons::bson::detail::bson_format::bool_cd);
         if (val)

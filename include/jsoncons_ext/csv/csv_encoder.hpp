@@ -435,7 +435,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool val, semantic_tag, const ser_context&) override
+    bool do_bool_value(bool val, semantic_tag, const ser_context&, std::error_code&) override
     {
         if (stack_.size() == 2)
         {

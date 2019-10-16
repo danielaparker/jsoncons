@@ -134,9 +134,9 @@ private:
         return to_handler_.uint64_value(value, tag, context);
     }
 
-    bool do_bool_value(bool value, semantic_tag tag, const ser_context& context) override
+    bool do_bool_value(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return to_handler_.bool_value(value, tag, context);
+        return to_handler_.bool_value(value, tag, context, ec);
     }
 
     bool do_null_value(semantic_tag tag, const ser_context& context, std::error_code& ec) override
@@ -312,9 +312,9 @@ private:
         return to_handler_->uint64_value(value, tag, context);
     }
 
-    bool do_bool_value(bool value, semantic_tag tag, const ser_context& context) override
+    bool do_bool_value(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return to_handler_->bool_value(value, tag, context);
+        return to_handler_->bool_value(value, tag, context, ec);
     }
 
     bool do_null_value(semantic_tag tag, const ser_context& context, std::error_code& ec) override

@@ -406,7 +406,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool val, semantic_tag, const ser_context&) override
+    bool do_bool_value(bool val, semantic_tag, const ser_context&, std::error_code&) override
     {
         // true and false
         result_.push_back(static_cast<uint8_t>(val ? jsoncons::ubjson::detail::ubjson_format::true_type : jsoncons::ubjson::detail::ubjson_format::false_type));
