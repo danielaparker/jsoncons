@@ -23,8 +23,8 @@ private:
     basic_json_content_handler<char_type>& to_handler_;
 
     // noncopyable and nonmoveable
-    basic_json_content_filter<char_type>(const basic_json_content_filter<char_type>&) = delete;
-    basic_json_content_filter<char_type>& operator=(const basic_json_content_filter<char_type>&) = delete;
+    basic_json_content_filter(const basic_json_content_filter&) = delete;
+    basic_json_content_filter& operator=(const basic_json_content_filter&) = delete;
 public:
     basic_json_content_filter(basic_json_content_handler<char_type>& handler)
         : to_handler_(handler)
