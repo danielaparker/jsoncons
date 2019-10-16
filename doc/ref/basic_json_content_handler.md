@@ -1,12 +1,21 @@
 ### jsoncons::basic_json_content_handler
 
 ```c++
+#include <jsoncons/json_content_handler.hpp>
+
 template <
     class CharT
 > class basic_json_content_handler
 ```
 
 Defines an interface for generating and receiving JSON events. 
+
+Typedefs for common character types are provided:
+
+Type                |Definition
+--------------------|------------------------------
+json_content_handler    |`basic_json_content_handler<char>`
+wjson_content_handler   |`basic_json_content_handler<wchar_t>`
 
 #### Member types
 
@@ -340,5 +349,5 @@ The overloads that take a `std::error_code&` parameter set it to the error code 
 
 #### See also
 
-- [semantic_tag](../semantic_tag.md)
+- [semantic_tag](semantic_tag.md)
 

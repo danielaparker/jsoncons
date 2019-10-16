@@ -17,39 +17,40 @@ template <class CharT>
 class basic_json_content_filter : public basic_json_content_handler<CharT>
 {
 public:
+    using typename basic_json_content_handler<CharT>::char_type;
     using typename basic_json_content_handler<CharT>::string_view_type;
 private:
-    basic_json_content_handler<CharT>& to_handler_;
+    basic_json_content_handler<char_type>& to_handler_;
 
     // noncopyable and nonmoveable
-    basic_json_content_filter<CharT>(const basic_json_content_filter<CharT>&) = delete;
-    basic_json_content_filter<CharT>& operator=(const basic_json_content_filter<CharT>&) = delete;
+    basic_json_content_filter<char_type>(const basic_json_content_filter<char_type>&) = delete;
+    basic_json_content_filter<char_type>& operator=(const basic_json_content_filter<char_type>&) = delete;
 public:
-    basic_json_content_filter(basic_json_content_handler<CharT>& handler)
+    basic_json_content_filter(basic_json_content_handler<char_type>& handler)
         : to_handler_(handler)
     {
     }
 
-    basic_json_content_handler<CharT>& to_handler()
+    basic_json_content_handler<char_type>& to_handler()
     {
         return to_handler_;
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use to_handler") 
-    basic_json_content_handler<CharT>& input_handler()
+    basic_json_content_handler<char_type>& input_handler()
     {
         return to_handler_;
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use to_handler") 
-    basic_json_content_handler<CharT>& downstream_handler()
+    basic_json_content_handler<char_type>& downstream_handler()
     {
         return to_handler_;
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use to_handler") 
-    basic_json_content_handler<CharT>& destination_handler()
+    basic_json_content_handler<char_type>& destination_handler()
     {
         return to_handler_;
     }

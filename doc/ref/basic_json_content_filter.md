@@ -1,33 +1,43 @@
-### jsoncons::json_content_filter
+### jsoncons::basic_json_content_filter
 
 ```c++
 #include <jsoncons/json_content_filter.hpp>
 
-typedef basic_json_content_filter<char> json_content_filter
+template <
+    class CharT
+> class basic_json_content_handler
 ```
 
-The `json_content_filter` class is an instantiation of the `basic_json_content_filter` class template that uses `char` as the character type.
+Defines an interface for filtering JSON events. 
 
-`json_content_filter` is noncopyable and nonmoveable.
+`basic_json_content_filter` is noncopyable and nonmoveable.
 
 ![json_content_filter](./diagrams/json_content_filter.png)
+
+Typedefs for common character types are provided:
+
+Type                |Definition
+--------------------|------------------------------
+json_content_filter    |`basic_json_content_filter<char>`
+wjson_content_filter   |`basic_json_content_filter<wchar_t>`
 
 #### Member types
 
 Member type                         |Definition
 ------------------------------------|------------------------------
-`string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 [string view](http://en.cppreference.com/w/cpp/string/basic_string_view) if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise proxied.  
+`char_type`|CharT
+`string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 [std::string view](http://en.cppreference.com/w/cpp/string/basic_string_view) if C++ 17 is detected or if `JSONCONS_HAS_STRING_VIEW` is defined, otherwise proxied.  
 
 #### Constructors
 
-    json_content_filter(json_content_handler& handler)
-All JSON events that pass through the `json_content_filter` go to the specified `json_content_handler` (e.g. another filter.)
-You must ensure that the `handler` exists as long as does `json_content_filter`, as `json_content_filter` holds a pointer to but does not own this object.
+    basic_json_content_filter(basic_json_content_handler<char_type>& handler)
+All JSON events that pass through the `basic_json_content_filter` go to the specified [handler](basic_json_content_handler.md).
+You must ensure that the `handler` exists as long as does `basic_json_content_filter`, as `basic_json_content_filter` holds a pointer to but does not own this object.
 
 #### Accessors
 
-    json_content_handler& to_handler()
-Returns a reference to the JSON handler that sends json events to a destination handler. 
+    basic_json_content_handler<char_type>& to_handler()
+Returns a reference to the JSON handler that sends json events to the destination handler. 
 
 ### See also
 
