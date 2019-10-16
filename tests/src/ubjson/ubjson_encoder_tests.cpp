@@ -15,7 +15,7 @@
 
 using namespace jsoncons;
 using namespace jsoncons::ubjson;
-#if 0
+
 TEST_CASE("serialize array to ubjson")
 {
     std::vector<uint8_t> v;
@@ -37,7 +37,7 @@ TEST_CASE("serialize array to ubjson")
         std::cout << e.what() << std::endl;
     }
 } 
-#endif
+
 TEST_CASE("Too many and too few items in UBJSON object or array")
 {
     std::error_code ec{};
