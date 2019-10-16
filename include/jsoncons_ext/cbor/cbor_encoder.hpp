@@ -190,14 +190,14 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag, const ser_context&) override
+    bool do_begin_array(semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(cbor_container_type::indefinite_length_array));
         result_.push_back(0x9f);
         return true;
     }
 
-    bool do_begin_array(size_t length, semantic_tag, const ser_context&) override
+    bool do_begin_array(size_t length, semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(cbor_container_type::array, length));
         if (length <= 0x17)
@@ -418,6 +418,8 @@ private:
 
     void write_decimal_value(const string_view_type& sv, const ser_context& context)
     {
+        std::error_code ec;
+
         decimal_parse_state state = decimal_parse_state::start;
         std::basic_string<char> s;
         std::basic_string<char> exponent;
@@ -511,7 +513,11 @@ private:
         }
 
         result_.push_back(0xc4);
-        do_begin_array((size_t)2, semantic_tag::none, context);
+        do_begin_array((size_t)2, semantic_tag::none, context, ec);
+        if (ec)
+        {
+            return;
+        }
         if (exponent.length() > 0)
         {
             auto result = jsoncons::detail::to_integer<int64_t>(exponent.data(), exponent.length());
@@ -543,6 +549,8 @@ private:
 
     void write_hexfloat_value(const string_view_type& sv, const ser_context& context)
     {
+        std::error_code ec;
+
         hexfloat_parse_state state = hexfloat_parse_state::start;
         std::basic_string<char> s;
         std::basic_string<char> exponent;
@@ -661,7 +669,11 @@ private:
         }
 
         result_.push_back(0xc5);
-        do_begin_array((size_t)2, semantic_tag::none, context);
+        do_begin_array((size_t)2, semantic_tag::none, context, ec);
+        if (!ec)
+        {
+            return;
+        }
         if (exponent.length() > 0)
         {
             auto result = jsoncons::detail::base16_to_integer<int64_t>(exponent.data(), exponent.length());

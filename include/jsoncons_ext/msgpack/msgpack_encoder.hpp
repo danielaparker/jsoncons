@@ -151,12 +151,13 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag, const ser_context&) override
+    bool do_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
     {
-        JSONCONS_THROW(ser_error(msgpack_errc::array_length_required));
+        ec = msgpack_errc::array_length_required;
+        return false;
     }
 
-    bool do_begin_array(size_t length, semantic_tag, const ser_context&) override
+    bool do_begin_array(size_t length, semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(msgpack_container_type::array, length));
         if (length <= 15)

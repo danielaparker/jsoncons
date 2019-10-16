@@ -155,15 +155,18 @@ Returns `true` if the producer should continue streaming events, `false` otherwi
 Sets `ec` to indicate an error.
 
     virtual bool do_begin_array(semantic_tag tag, 
-                                const ser_context& context) = 0;
+                                const ser_context& context,
+                                std::error_code& ec) = 0;
 Handles the beginning of an array of indefinite length. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 Sets `ec` to indicate an error.
 
     virtual bool do_begin_array(size_t length, 
-                                const ser_context& context);
-Handles the beginning of an array of known length. Defaults to calling `do_begin_array(semantic_tag, const ser_context& context)`. Contextual information including
+                                semantic_tag tag, 
+                                const ser_context& context,
+                                std::error_code& ec);
+Handles the beginning of an array of known length. Defaults to calling `do_begin_array(semantic_tag, const ser_context& context, std::error_code& ec)`. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 Sets `ec` to indicate an error.

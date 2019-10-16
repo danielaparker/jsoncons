@@ -67,9 +67,9 @@ private:
         return other_handler_.end_object(context);
     }
 
-    bool do_begin_array(semantic_tag tag, const ser_context& context) override
+    bool do_begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return other_handler_.begin_array(tag, context);
+        return other_handler_.begin_array(tag, context, ec);
     }
 
     bool do_end_array(const ser_context& context) override

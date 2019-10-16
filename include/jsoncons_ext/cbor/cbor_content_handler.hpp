@@ -180,7 +180,7 @@ private:
         return parse_more_;
     }
 
-    bool do_begin_array(semantic_tag, const ser_context&) override
+    bool do_begin_array(semantic_tag, const ser_context&, std::error_code&) override
     {
         return parse_more_;
     }
@@ -350,14 +350,14 @@ private:
         return to_handler_.end_object(context, ec);
     }
 
-    bool do_begin_array(semantic_tag tag, const ser_context& context) override
+    bool do_begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return to_handler_.begin_array(tag, context);
+        return to_handler_.begin_array(tag, context, ec);
     }
 
-    bool do_begin_array(size_t length, semantic_tag tag, const ser_context& context) override
+    bool do_begin_array(size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return to_handler_.begin_array(length, tag, context);
+        return to_handler_.begin_array(length, tag, context, ec);
     }
 
     bool do_end_array(const ser_context& context) override

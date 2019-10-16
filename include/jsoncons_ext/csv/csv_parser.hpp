@@ -342,7 +342,7 @@ namespace detail {
             return false;
         }
 
-        bool do_begin_array(semantic_tag tag, const ser_context&) override
+        bool do_begin_array(semantic_tag tag, const ser_context&, std::error_code&) override
         {
             if (name_index_ < column_names_.size())
             {

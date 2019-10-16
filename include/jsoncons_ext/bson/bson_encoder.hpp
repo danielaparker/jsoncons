@@ -135,7 +135,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag, const ser_context&) override
+    bool do_begin_array(semantic_tag, const ser_context&, std::error_code&) override
     {
         if (buffer_.size() > 0)
         {

@@ -138,7 +138,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag, const ser_context&) override
+    bool do_begin_array(semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(ubjson_container_type::indefinite_length_array));
         result_.push_back(jsoncons::ubjson::detail::ubjson_format::start_array_marker);
@@ -146,7 +146,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(size_t length, semantic_tag, const ser_context&) override
+    bool do_begin_array(size_t length, semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(ubjson_container_type::array, length));
         result_.push_back(jsoncons::ubjson::detail::ubjson_format::start_array_marker);

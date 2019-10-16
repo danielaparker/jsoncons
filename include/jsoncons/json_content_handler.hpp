@@ -191,14 +191,36 @@ public:
     bool begin_array(semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context_arg)
     {
-        return do_begin_array(tag, context);
+        std::error_code ec;
+        bool more = do_begin_array(tag, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec)
+    {
+        return do_begin_array(tag, context, ec);
     }
 
     bool begin_array(size_t length, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context_arg)
     {
-        return do_begin_array(length, tag, context);
+        std::error_code ec;
+        bool more = do_begin_array(length, tag, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool begin_array(size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec)
+    {
+        return do_begin_array(length, tag, context, ec);
     }
 
     bool end_array(const ser_context& context=null_ser_context_arg)
@@ -423,11 +445,11 @@ private:
 
     virtual bool do_end_object(const ser_context& context, std::error_code& ec) = 0;
 
-    virtual bool do_begin_array(semantic_tag, const ser_context& context) = 0;
+    virtual bool do_begin_array(semantic_tag, const ser_context& context, std::error_code& ec) = 0;
 
-    virtual bool do_begin_array(size_t, semantic_tag tag, const ser_context& context)
+    virtual bool do_begin_array(size_t, semantic_tag tag, const ser_context& context, std::error_code& ec)
     {
-        return do_begin_array(tag, context);
+        return do_begin_array(tag, context, ec);
     }
 
     virtual bool do_end_array(const ser_context& context) = 0;
@@ -644,7 +666,7 @@ private:
         return parse_more_;
     }
 
-    bool do_begin_array(semantic_tag, const ser_context&) override
+    bool do_begin_array(semantic_tag, const ser_context&, std::error_code&) override
     {
         return parse_more_;
     }

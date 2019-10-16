@@ -184,7 +184,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag, const ser_context&) override
+    bool do_begin_array(semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(false));
         if (stack_.size() == 2)
