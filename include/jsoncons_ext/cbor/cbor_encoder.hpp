@@ -422,6 +422,8 @@ private:
 
     bool write_decimal_value(const string_view_type& sv, const ser_context& context, std::error_code& ec)
     {
+        bool more = true;
+
         decimal_parse_state state = decimal_parse_state::start;
         std::basic_string<char> s;
         std::basic_string<char> exponent;
@@ -515,8 +517,8 @@ private:
         }
 
         result_.push_back(0xc4);
-        do_begin_array((size_t)2, semantic_tag::none, context, ec);
-        if (ec) {return false;}
+        more = do_begin_array((size_t)2, semantic_tag::none, context, ec);
+        if (!more) {return more;}
         if (exponent.length() > 0)
         {
             auto result = jsoncons::detail::to_integer<int64_t>(exponent.data(), exponent.length());
@@ -526,14 +528,14 @@ private:
             }
             scale += result.value;
         }
-        do_int64_value(scale, semantic_tag::none, context, ec);
-        if (ec) {return false;}
+        more = do_int64_value(scale, semantic_tag::none, context, ec);
+        if (!more) {return more;}
 
         auto result = jsoncons::detail::to_integer<int64_t>(s.data(),s.length());
         if (result.ec == jsoncons::detail::to_integer_errc())
         {
-            do_int64_value(result.value, semantic_tag::none, context, ec);
-            if (ec) {return false;}
+            more = do_int64_value(result.value, semantic_tag::none, context, ec);
+            if (!more) {return more;}
         }
         else if (result.ec == jsoncons::detail::to_integer_errc::overflow)
         {
@@ -543,11 +545,12 @@ private:
         }
         else
         {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>(make_error_code(result.ec).message()));
+            ec = make_error_code(result.ec);
+            return false;
         }
-        do_end_array(context, ec);
+        more = do_end_array(context, ec);
 
-        return true;
+        return more;
     }
 
     bool write_hexfloat_value(const string_view_type& sv, const ser_context& context, std::error_code& ec)
