@@ -18,6 +18,7 @@
 #include <jsoncons/result.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/bson/bson_detail.hpp>
+#include <jsoncons_ext/bson/bson_error.hpp>
 
 namespace jsoncons { namespace bson {
 
