@@ -194,7 +194,8 @@ Sets `ec` to indicate an error.
 
     virtual bool do_byte_string_value(const byte_string_view& b, 
                                       semantic_tag tag,
-                                      const ser_context& context) = 0;
+                                      const ser_context& context,
+                                      std::error_code&) = 0;
 Handles a byte string value. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.

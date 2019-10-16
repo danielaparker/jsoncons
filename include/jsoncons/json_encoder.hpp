@@ -612,7 +612,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty()) 
         {
@@ -647,7 +647,8 @@ private:
 
     bool do_byte_string_value(const byte_string_view& b, 
                               semantic_tag tag,
-                              const ser_context&) override
+                              const ser_context&,
+                              std::error_code&) override
     {
         if (!stack_.empty()) 
         {
@@ -720,7 +721,7 @@ private:
     bool do_double_value(double value, 
                          semantic_tag,
                          const ser_context& context,
-                         std::error_code&) override
+                         std::error_code& ec) override
     {
         if (!stack_.empty()) 
         {
@@ -745,7 +746,7 @@ private:
                 }
                 else if (options_.is_nan_to_str())
                 {
-                    do_string_value(options_.nan_to_str(), semantic_tag::none, context);
+                    do_string_value(options_.nan_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -762,7 +763,7 @@ private:
                 }
                 else if (options_.is_inf_to_str())
                 {
-                    do_string_value(options_.inf_to_str(), semantic_tag::none, context);
+                    do_string_value(options_.inf_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -779,7 +780,7 @@ private:
                 }
                 else if (options_.is_neginf_to_str())
                 {
-                    do_string_value(options_.neginf_to_str(), semantic_tag::none, context);
+                    do_string_value(options_.neginf_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -1213,7 +1214,7 @@ private:
         }
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1243,7 +1244,8 @@ private:
 
     bool do_byte_string_value(const byte_string_view& b, 
                               semantic_tag tag,
-                              const ser_context&) override
+                              const ser_context&,
+                              std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1309,7 +1311,7 @@ private:
     bool do_double_value(double value, 
                          semantic_tag,
                          const ser_context& context,
-                         std::error_code&) override
+                         std::error_code& ec) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1326,7 +1328,7 @@ private:
                 }
                 else if (options_.is_nan_to_str())
                 {
-                    do_string_value(options_.nan_to_str(), semantic_tag::none, context);
+                    do_string_value(options_.nan_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -1341,7 +1343,7 @@ private:
                 }
                 else if (options_.is_inf_to_str())
                 {
-                    do_string_value(options_.inf_to_str(), semantic_tag::none, context);
+                    do_string_value(options_.inf_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -1356,7 +1358,7 @@ private:
                 }
                 else if (options_.is_neginf_to_str())
                 {
-                    do_string_value(options_.neginf_to_str(), semantic_tag::none, context);
+                    do_string_value(options_.neginf_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {

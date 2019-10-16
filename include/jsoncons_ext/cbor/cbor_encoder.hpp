@@ -707,7 +707,7 @@ private:
         do_end_array(context, ec);
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context& context) override
+    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         switch (tag)
         {
@@ -768,7 +768,8 @@ private:
 
     bool do_byte_string_value(const byte_string_view& b, 
                               semantic_tag tag, 
-                              const ser_context&) override
+                              const ser_context&,
+                              std::error_code&) override
     {
         byte_string_chars_format encoding_hint;
         switch (tag)

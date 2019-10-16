@@ -200,14 +200,15 @@ private:
         return parse_more_;
     }
 
-    bool do_string_value(const string_view_type&, semantic_tag, const ser_context&) override
+    bool do_string_value(const string_view_type&, semantic_tag, const ser_context&, std::error_code&) override
     {
         return parse_more_;
     }
 
     bool do_byte_string_value(const byte_string_view&,
                               semantic_tag, 
-                              const ser_context&) override
+                              const ser_context&,
+                              std::error_code&) override
     {
         return parse_more_;
     }
@@ -375,16 +376,18 @@ private:
 
     bool do_string_value(const string_view_type& value,
                          semantic_tag tag,
-                         const ser_context& context) override
+                         const ser_context& context,
+                         std::error_code& ec) override
     {
-        return to_handler_.string_value(value, tag, context);
+        return to_handler_.string_value(value, tag, context, ec);
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
                               semantic_tag tag,
-                              const ser_context& context) override
+                              const ser_context& context,
+                              std::error_code& ec) override
     {
-        return to_handler_.byte_string_value(b, tag, context);
+        return to_handler_.byte_string_value(b, tag, context, ec);
     }
 
     bool do_double_value(double value, 

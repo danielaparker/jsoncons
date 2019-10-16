@@ -259,21 +259,57 @@ public:
                       semantic_tag tag = semantic_tag::none, 
                       const ser_context& context=null_ser_context_arg) 
     {
-        return do_string_value(value, tag, context);
+        std::error_code ec;
+        bool more = do_string_value(value, tag, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool string_value(const string_view_type& value, 
+                      semantic_tag tag, 
+                      const ser_context& context,
+                      std::error_code& ec) 
+    {
+        return do_string_value(value, tag, context, ec);
     }
 
     bool byte_string_value(const byte_string_view& b, 
                            semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=null_ser_context_arg)
     {
-        return do_byte_string_value(b, tag, context);
+        std::error_code ec;
+        bool more = do_byte_string_value(b, tag, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool byte_string_value(const byte_string_view& b, 
+                           semantic_tag tag, 
+                           const ser_context& context,
+                           std::error_code& ec)
+    {
+        return do_byte_string_value(b, tag, context, ec);
     }
 
     bool byte_string_value(const uint8_t* p, size_t size, 
                            semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=null_ser_context_arg)
     {
-        return do_byte_string_value(byte_string(p, size), tag, context);
+        return byte_string_value(byte_string(p, size), tag, context);
+    }
+
+    bool byte_string_value(const uint8_t* p, size_t size, 
+                           semantic_tag tag, 
+                           const ser_context& context,
+                           std::error_code& ec)
+    {
+        return byte_string_value(byte_string(p, size), tag, context, ec);
     }
 
     bool int64_value(int64_t value, 
@@ -373,7 +409,7 @@ public:
             default:
                 break;
         }
-        return do_byte_string_value(b, tag, context);
+        return byte_string_value(b, tag, context);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use byte_string_value(const byte_string_view&, semantic_tag=semantic_tag::none, const ser_context&=null_ser_context_arg") 
@@ -396,25 +432,25 @@ public:
             default:
                 break;
         }
-        return do_byte_string_value(byte_string(p, size), tag, context);
+        return byte_string_value(byte_string(p, size), tag, context);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use string_value with semantic_tag::bigint") 
     bool big_integer_value(const string_view_type& s, const ser_context& context=null_ser_context_arg) 
     {
-        return do_string_value(s, semantic_tag::bigint, context);
+        return string_value(s, semantic_tag::bigint, context);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use string_value with semantic_tag::bigdec") 
     bool big_decimal_value(const string_view_type& s, const ser_context& context=null_ser_context_arg) 
     {
-        return do_string_value(s, semantic_tag::bigdec, context);
+        return string_value(s, semantic_tag::bigdec, context);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use string_value with semantic_tag::datetime") 
     bool date_time_value(const string_view_type& s, const ser_context& context=null_ser_context_arg) 
     {
-        return do_string_value(s, semantic_tag::datetime, context);
+        return string_value(s, semantic_tag::datetime, context);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use int64_value with semantic_tag::timestamp") 
@@ -480,13 +516,13 @@ public:
     JSONCONS_DEPRECATED_MSG("Instead, use string_value with semantic_tag::bigint") 
     bool bignum_value(const string_view_type& s, const ser_context& context=null_ser_context_arg) 
     {
-        return do_string_value(s, semantic_tag::bigint, context);
+        return string_value(s, semantic_tag::bigint, context);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use string_value with semantic_tag::bigdec") 
     bool decimal_value(const string_view_type& s, const ser_context& context=null_ser_context_arg) 
     {
-        return do_string_value(s, semantic_tag::bigdec, context);
+        return string_value(s, semantic_tag::bigdec, context);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use int64_value with semantic_tag::timestamp") 
@@ -521,11 +557,15 @@ private:
 
     virtual bool do_null_value(semantic_tag, const ser_context& context, std::error_code& ec) = 0;
 
-    virtual bool do_string_value(const string_view_type& value, semantic_tag tag, const ser_context& context) = 0;
+    virtual bool do_string_value(const string_view_type& value, 
+                                 semantic_tag tag, 
+                                 const ser_context& context, 
+                                 std::error_code& ec) = 0;
 
     virtual bool do_byte_string_value(const byte_string_view& b, 
                                       semantic_tag tag, 
-                                      const ser_context& context) = 0;
+                                      const ser_context& context,
+                                      std::error_code& ec) = 0;
 
     virtual bool do_double_value(double value, 
                                  semantic_tag tag,
@@ -750,14 +790,15 @@ private:
         return parse_more_;
     }
 
-    bool do_string_value(const string_view_type&, semantic_tag, const ser_context&) override
+    bool do_string_value(const string_view_type&, semantic_tag, const ser_context&, std::error_code&) override
     {
         return parse_more_;
     }
 
     bool do_byte_string_value(const byte_string_view&,
                               semantic_tag, 
-                              const ser_context&) override
+                              const ser_context&,
+                              std::error_code&) override
     {
         return parse_more_;
     }

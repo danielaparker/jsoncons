@@ -100,16 +100,18 @@ private:
 
     bool do_string_value(const string_view_type& value,
                          semantic_tag tag,
-                         const ser_context& context) override
+                         const ser_context& context,
+                         std::error_code& ec) override
     {
-        return to_handler_.string_value(value, tag, context);
+        return to_handler_.string_value(value, tag, context, ec);
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
                               semantic_tag tag,
-                              const ser_context& context) override
+                              const ser_context& context,
+                              std::error_code& ec) override
     {
-        return to_handler_.byte_string_value(b, tag, context);
+        return to_handler_.byte_string_value(b, tag, context, ec);
     }
 
     bool do_double_value(double value, 
@@ -272,7 +274,8 @@ private:
 
     bool do_string_value(const string_view_type& value,
                          semantic_tag tag,
-                         const ser_context& context) override
+                         const ser_context& context,
+                         std::error_code& ec) override
     {
         std::basic_string<typename To::char_type> target;
         auto result = unicons::convert(value.begin(),value.end(),std::back_inserter(target),unicons::conv_flags::strict);
@@ -280,14 +283,15 @@ private:
         {
             JSONCONS_THROW(ser_error(result.ec));
         }
-        return to_handler().string_value(target, tag, context);
+        return to_handler().string_value(target, tag, context, ec);
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
                               semantic_tag tag,
-                              const ser_context& context) override
+                              const ser_context& context,
+                              std::error_code& ec) override
     {
-        return to_handler_->byte_string_value(b, tag, context);
+        return to_handler_->byte_string_value(b, tag, context, ec);
     }
 
     bool do_double_value(double value, 

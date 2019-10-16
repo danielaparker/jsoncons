@@ -280,7 +280,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag, const ser_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code& ec) override
     {
         if (stack_.size() == 2)
         {
@@ -306,7 +306,8 @@ private:
 
     bool do_byte_string_value(const byte_string_view& b, 
                               semantic_tag tag, 
-                              const ser_context& context) override
+                              const ser_context& context,
+                              std::error_code& ec) override
     {
         byte_string_chars_format encoding_hint;
         switch (tag)
@@ -332,19 +333,19 @@ private:
             case byte_string_chars_format::base16:
             {
                 encode_base16(b.begin(),b.end(),s);
-                do_string_value(s, semantic_tag::none, context);
+                do_string_value(s, semantic_tag::none, context, ec);
                 break;
             }
             case byte_string_chars_format::base64:
             {
                 encode_base64(b.begin(),b.end(),s);
-                do_string_value(s, semantic_tag::none, context);
+                do_string_value(s, semantic_tag::none, context, ec);
                 break;
             }
             case byte_string_chars_format::base64url:
             {
                 encode_base64url(b.begin(),b.end(),s);
-                do_string_value(s, semantic_tag::none, context);
+                do_string_value(s, semantic_tag::none, context, ec);
                 break;
             }
             default:

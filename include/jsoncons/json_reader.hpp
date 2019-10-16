@@ -90,7 +90,7 @@ private:
         return other_handler_.name(target, context);
     }
 
-    bool do_string_value(const string_view_type& value, semantic_tag tag, const ser_context& context) override
+    bool do_string_value(const string_view_type& value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         std::basic_string<CharT> target;
         auto result = unicons::convert(
@@ -98,7 +98,8 @@ private:
             unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            JSONCONS_THROW(ser_error(result.ec,context.line(),context.column()));
+            ec = result.ec;
+            return false;
         }
         return other_handler_.string_value(target, tag, context);
     }

@@ -184,7 +184,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool val, semantic_tag, const ser_context&, std::error_code& ec) override
+    bool do_bool_value(bool val, semantic_tag, const ser_context&, std::error_code&) override
     {
         before_value(jsoncons::bson::detail::bson_format::bool_cd);
         if (val)
@@ -199,7 +199,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag, const ser_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code& ec) override
     {
         before_value(jsoncons::bson::detail::bson_format::string_cd);
 
@@ -210,7 +210,8 @@ private:
         auto result = unicons::validate(sv.begin(), sv.end());
         if (result.ec != unicons::conv_errc())
         {
-            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Illegal unicode"));
+            ec = bson_errc::invalid_utf8_text_string;
+            return false;
         }
         for (auto c : sv)
         {
@@ -225,7 +226,8 @@ private:
 
     bool do_byte_string_value(const byte_string_view& b, 
                               semantic_tag, 
-                              const ser_context&) override
+                              const ser_context&,
+                              std::error_code&) override
     {
         before_value(jsoncons::bson::detail::bson_format::binary_cd);
 

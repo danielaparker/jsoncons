@@ -65,7 +65,8 @@ public:
 
     bool do_string_value(const string_view_type& s, 
                          semantic_tag tag, 
-                         const ser_context& context) override
+                         const ser_context& context,
+                         std::error_code&) override
     {
         if (tag == semantic_tag::none)
         {

@@ -216,7 +216,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag, const ser_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code&) override
     {
         write_string_value(sv);
         end_value();
@@ -264,7 +264,8 @@ private:
 
     bool do_byte_string_value(const byte_string_view& b, 
                               semantic_tag, 
-                              const ser_context&) override
+                              const ser_context&,
+                              std::error_code&) override
     {
 
         const size_t length = b.length();

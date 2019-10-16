@@ -41,14 +41,18 @@ private:
         member_name_ = std::string(name);
         if (member_name_ != "name")
         {
-            this->to_handler().name(name,context);
+            return this->to_handler().name(name, context, ec);
         }
-        return true;
+        else
+        {
+            return true;
+        }
     }
 
     bool do_string_value(const string_view_type& s,
                          semantic_tag tag,
-                         const ser_context& context) override
+                         const ser_context& context,
+                         std::error_code&) override
     {
         if (member_name_ == "name")
         {

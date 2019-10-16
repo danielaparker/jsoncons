@@ -215,7 +215,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         switch (structure_stack_.back().type_)
         {
@@ -231,7 +231,10 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const byte_string_view& b, semantic_tag tag, const ser_context&) override
+    bool do_byte_string_value(const byte_string_view& b, 
+                              semantic_tag tag, 
+                              const ser_context&,
+                              std::error_code&) override
     {
         switch (structure_stack_.back().type_)
         {

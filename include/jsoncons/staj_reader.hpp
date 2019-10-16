@@ -525,7 +525,7 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_string_value(const string_view_type& s, semantic_tag tag, const ser_context& context) override
+    bool do_string_value(const string_view_type& s, semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(s, staj_event_type::string_value, tag);
         return !filter_(event_, context);
@@ -533,7 +533,8 @@ private:
 
     bool do_byte_string_value(const byte_string_view& s, 
                               semantic_tag tag,
-                              const ser_context& context) override
+                              const ser_context& context,
+                              std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(s, staj_event_type::byte_string_value, tag);
         return !filter_(event_, context);

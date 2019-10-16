@@ -387,7 +387,7 @@ namespace detail {
             return true;
         }
 
-        bool do_string_value(const string_view_type& value, semantic_tag tag, const ser_context&) override
+        bool do_string_value(const string_view_type& value, semantic_tag tag, const ser_context&, std::error_code&) override
         {
             if (name_index_ < column_names_.size())
             {
@@ -403,7 +403,8 @@ namespace detail {
 
         bool do_byte_string_value(const byte_string_view& value,
                                   semantic_tag tag,
-                                  const ser_context&) override
+                                  const ser_context&,
+                                  std::error_code&) override
         {
             if (name_index_ < column_names_.size())
             {

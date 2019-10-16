@@ -130,7 +130,8 @@ private:
     }
 
     bool do_string_value(const string_view_type& s, 
-                         const ser_context& context) override
+                         const ser_context& context,
+                         std::error_code&) override
     {
         if (member_name_ == "name")
         {

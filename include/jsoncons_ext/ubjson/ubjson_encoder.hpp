@@ -209,7 +209,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code& ec) override
     {
         switch (tag)
         {
@@ -229,7 +229,8 @@ private:
         auto result = unicons::validate(sv.begin(), sv.end());
         if (result.ec != unicons::conv_errc())
         {
-            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Illegal unicode"));
+            ec = ubjson_errc::invalid_utf8_text_string;
+            return false;
         }
 
         put_length(sv.length());
@@ -269,7 +270,8 @@ private:
 
     bool do_byte_string_value(const byte_string_view& b, 
                               semantic_tag, 
-                              const ser_context&) override
+                              const ser_context&,
+                              std::error_code&) override
     {
 
         const size_t length = b.length();
