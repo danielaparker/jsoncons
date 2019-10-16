@@ -489,7 +489,7 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_end_object(const ser_context& context) override
+    bool do_end_object(const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::end_object);
         return !filter_(event_, context);
@@ -571,7 +571,8 @@ private:
 template<class CharT>
 bool staj_to_saj_event(const basic_staj_event<CharT>& ev,
                        basic_json_content_handler<CharT>& handler,
-                       const ser_context& context)
+                       const ser_context& context,
+                       std::error_code& ec)
 {
     switch (ev.event_type())
     {
@@ -580,9 +581,9 @@ bool staj_to_saj_event(const basic_staj_event<CharT>& ev,
         case staj_event_type::end_array:
             return handler.end_array(context);
         case staj_event_type::begin_object:
-            return handler.begin_object(ev.tag(), context);
+            return handler.begin_object(ev.tag(), context, ec);
         case staj_event_type::end_object:
-            return handler.end_object(context);
+            return handler.end_object(context, ec);
         case staj_event_type::name:
             return handler.name(ev.template get<jsoncons::basic_string_view<CharT>>(), context);
         case staj_event_type::string_value:

@@ -17,7 +17,7 @@ Member type                         |Definition
 #### Public producer interface
 
     bool begin_object(semantic_tag tag=semantic_tag::none,
-                      const ser_context& context=null_ser_context()); 
+                      const ser_context& context=null_ser_context_arg); 
 Indicates the begining of an object of indefinite length. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter.
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -25,39 +25,39 @@ Throws a [ser_error](ser_error.md) to indicate an error.
 
     bool begin_object(size_t length, 
                       semantic_tag tag=semantic_tag::none,
-                      const ser_context& context=null_ser_context()); 
+                      const ser_context& context=null_ser_context_arg); 
 Indicates the begining of an object of known length. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter.
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 Throws a [ser_error](ser_error.md) to indicate an error. 
 
-    bool end_object(const ser_context& context = null_ser_context())
+    bool end_object(const ser_context& context = null_ser_context_arg)
 Indicates the end of an object. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 Throws a [ser_error](ser_error.md) to indicate an error. 
 
     bool begin_array(semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context()); 
+                     const ser_context& context=null_ser_context_arg); 
 Indicates the beginning of an indefinite length array. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 Throws a [ser_error](ser_error.md) to indicate an error. 
 
     bool begin_array(semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context()); 
+                     const ser_context& context=null_ser_context_arg); 
 Indicates the beginning of an array of known length. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool end_array(const ser_context& context=null_ser_context()); 
+    bool end_array(const ser_context& context=null_ser_context_arg); 
 Indicates the end of an array. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 Throws a [ser_error](ser_error.md) to indicate an error. 
 
     bool name(const string_view_type& name, 
-              const ser_context& context=null_ser_context()); 
+              const ser_context& context=null_ser_context_arg); 
 Writes the name part of a name-value pair inside an object. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter.  
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -65,7 +65,7 @@ Throws a [ser_error](ser_error.md) to indicate an error.
 
     bool string_value(const string_view_type& value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context());
+                      const ser_context& context=null_ser_context_arg);
 Writes a string value. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -73,7 +73,7 @@ Throws a [ser_error](ser_error.md) to indicate an error.
 
     bool byte_string_value(const byte_string_view& b, 
                            semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context()); 
+                           const ser_context& context=null_ser_context_arg); 
 Writes a byte string value. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -81,7 +81,7 @@ Throws a [ser_error](ser_error.md) to indicate an error.
 
     bool byte_string_value(const uint8_t* p, size_t size, 
                            semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context()); 
+                           const ser_context& context=null_ser_context_arg); 
 Writes a byte string value. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -89,7 +89,7 @@ Throws a [ser_error](ser_error.md) to indicate an error.
 
     bool int64_value(int64_t value, 
                      semantic_tag tag = semantic_tag::none, 
-                     const ser_context& context=null_ser_context());
+                     const ser_context& context=null_ser_context_arg);
 Writes a signed integer value. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -97,7 +97,7 @@ Throws a [ser_error](ser_error.md) to indicate an error.
 
     bool uint64_value(uint64_t value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context()); 
+                      const ser_context& context=null_ser_context_arg); 
 Writes a non-negative integer value. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -105,7 +105,7 @@ Throws a [ser_error](ser_error.md) to indicate an error.
 
     bool double_value(double value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context()); 
+                      const ser_context& context=null_ser_context_arg); 
 Writes a floating point value. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -113,14 +113,14 @@ Throws a [ser_error](ser_error.md) to indicate an error.
 
     bool bool_value(bool value, 
                     semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context());  
+                    const ser_context& context=null_ser_context_arg);  
 Writes a boolean value. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 Throws a [ser_error](ser_error.md) to indicate an error. 
 
     bool null_value(semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context());  
+                    const ser_context& context=null_ser_context_arg);  
 Writes a null value. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -148,7 +148,7 @@ line and column number is provided in the [context](ser_context.md) parameter.
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 Sets `ec` to indicate an error.
 
-    virtual bool do_end_object(const ser_context& context) = 0;
+    virtual bool do_end_object(const ser_context& context, std::error_code& ec) = 0;
 Handles the end of an object. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.

@@ -143,7 +143,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const ser_context&) override
+    bool do_end_object(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(structure_stack_.size() > 0);
         JSONCONS_ASSERT(structure_stack_.back().type_ == structure_type::object_t);

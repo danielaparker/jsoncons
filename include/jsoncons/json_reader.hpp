@@ -62,7 +62,7 @@ private:
         return other_handler_.begin_object(tag, context, ec);
     }
 
-    bool do_end_object(const ser_context& context) override
+    bool do_end_object(const ser_context& context, std::error_code& ec) override
     {
         return other_handler_.end_object(context);
     }

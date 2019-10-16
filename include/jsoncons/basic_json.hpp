@@ -3107,7 +3107,22 @@ public:
 
     void dump(basic_json_content_handler<char_type>& handler) const
     {
-        dump_noflush(handler);
+        std::error_code ec;
+        dump_no_flush(handler, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec));
+        }
+        handler.flush();
+    }
+
+    void dump(basic_json_content_handler<char_type>& handler, std::error_code& ec) const
+    {
+        dump_no_flush(handler, ec);
+        if (ec)
+        {
+            return;
+        }
         handler.flush();
     }
 
@@ -5070,7 +5085,7 @@ public:
 
 private:
 
-    void dump_noflush(basic_json_content_handler<char_type>& handler) const
+    void dump_no_flush(basic_json_content_handler<char_type>& handler, std::error_code& ec) const
     {
         switch (var_.type())
         {
@@ -5099,19 +5114,19 @@ private:
                 handler.null_value(var_.tag());
                 break;
             case storage_type::empty_object_value:
-                handler.begin_object(0, var_.tag());
-                handler.end_object();
+                handler.begin_object(0, var_.tag(), null_ser_context_arg, ec);
+                handler.end_object(null_ser_context_arg, ec);
                 break;
             case storage_type::object_value:
                 {
-                    handler.begin_object(size(), var_.tag());
+                    handler.begin_object(size(), var_.tag(), null_ser_context_arg, ec);
                     const object& o = object_value();
                     for (const_object_iterator it = o.begin(); it != o.end(); ++it)
                     {
                         handler.name(string_view_type((it->key()).data(),it->key().length()));
-                        it->value().dump_noflush(handler);
+                        it->value().dump_no_flush(handler, ec);
                     }
-                    handler.end_object();
+                    handler.end_object(null_ser_context_arg, ec);
                 }
                 break;
             case storage_type::array_value:
@@ -5120,7 +5135,7 @@ private:
                     const array& o = array_value();
                     for (const_array_iterator it = o.begin(); it != o.end(); ++it)
                     {
-                        it->dump_noflush(handler);
+                        it->dump_no_flush(handler, ec);
                     }
                     handler.end_array();
                 }

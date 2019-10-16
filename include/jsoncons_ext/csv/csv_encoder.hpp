@@ -139,13 +139,13 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
+    bool do_begin_object(semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(true));
         return true;
     }
 
-    bool do_end_object(const ser_context&) override
+    bool do_end_object(const ser_context&, std::error_code&) override
     {
         if (stack_.size() == 2)
         {

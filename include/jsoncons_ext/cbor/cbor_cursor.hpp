@@ -137,9 +137,13 @@ public:
         }
     }
 
-    bool dump(basic_json_content_handler<char>& handler, const ser_context& context)
+    bool dump(basic_json_content_handler<char>& handler, const ser_context& context, std::error_code& ec)
     {
-        bool more = staj_to_saj_event(event(), handler, context);
+        bool more = staj_to_saj_event(event(), handler, context, ec);
+        if (ec)
+        {
+            return false;
+        }
         while (more && data_.type() != typed_array_type())
         {
             if (index_ < data_.size())
@@ -215,7 +219,7 @@ public:
         return more;
     }
 
-    bool dump(cbor_content_handler<Float128T>& handler, const ser_context& context)
+    bool dump(cbor_content_handler<Float128T>& handler, const ser_context& context, std::error_code& ec)
     {
         bool more = true;
         if (data_.type() != typed_array_type())
@@ -289,7 +293,7 @@ public:
         }
         else
         {
-            more = staj_to_saj_event(event(), handler, context);        
+            more = staj_to_saj_event(event(), handler, context, ec);        
         }
         return more;
     }
@@ -306,7 +310,7 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_end_object(const ser_context& context) override
+    bool do_end_object(const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<char_type>(staj_event_type::end_object);
         return !filter_(event_, context);
@@ -382,7 +386,7 @@ private:
 
     bool do_typed_array(const uint8_t* data, size_t size, 
                         semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        const ser_context& context=null_ser_context_arg) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -391,7 +395,7 @@ private:
 
     bool do_typed_array(const uint16_t* data, size_t size, 
                         semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        const ser_context& context=null_ser_context_arg) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -400,7 +404,7 @@ private:
 
     bool do_typed_array(const uint32_t* data, size_t size, 
                         semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        const ser_context& context=null_ser_context_arg) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -409,7 +413,7 @@ private:
 
     bool do_typed_array(const uint64_t* data, size_t size, 
                         semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        const ser_context& context=null_ser_context_arg) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -418,7 +422,7 @@ private:
 
     bool do_typed_array(const int8_t* data, size_t size, 
                         semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        const ser_context& context=null_ser_context_arg) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -427,7 +431,7 @@ private:
 
     bool do_typed_array(const int16_t* data, size_t size, 
                         semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        const ser_context& context=null_ser_context_arg) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -436,7 +440,7 @@ private:
 
     bool do_typed_array(const int32_t* data, size_t size, 
                         semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        const ser_context& context=null_ser_context_arg) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -445,7 +449,7 @@ private:
 
     bool do_typed_array(const int64_t* data, size_t size, 
                         semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        const ser_context& context=null_ser_context_arg) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -454,7 +458,7 @@ private:
 
     bool do_typed_array(const float* data, size_t size, 
                         semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        const ser_context& context=null_ser_context_arg) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -463,7 +467,7 @@ private:
 
     bool do_typed_array(const double* data, size_t size, 
                         semantic_tag tag=semantic_tag::none,
-                        const ser_context& context=null_ser_context()) override
+                        const ser_context& context=null_ser_context_arg) override
     {
         data_ = typed_array_view<Float128T>(data, size);
         index_ = 0;
@@ -472,7 +476,7 @@ private:
 
     bool do_typed_array(const Float128T* /*data*/, size_t /*size*/, 
                         semantic_tag /*tag*/=semantic_tag::none,
-                        const ser_context& /*context*/=null_ser_context()) override
+                        const ser_context& /*context*/=null_ser_context_arg) override
     {
         return true;
     }
@@ -579,7 +583,7 @@ public:
     void read_to(basic_json_content_handler<char>& handler,
                 std::error_code& ec) override
     {
-        if (!event_handler_.dump(handler, *this))
+        if (!event_handler_.dump(handler, *this, ec))
         {
             return;
         }
@@ -598,7 +602,7 @@ public:
 
     void read_to(cbor_content_handler<Float128T>& handler, std::error_code& ec) 
     {
-        if (!event_handler_.dump(handler, *this))
+        if (!event_handler_.dump(handler, *this, ec))
         {
             return;
         }

@@ -182,26 +182,25 @@ namespace detail {
 
         bool replay(basic_json_content_handler<CharT>& handler) const
         {
-            null_ser_context context;
             switch (event_type)
             {
                 case staj_event_type::begin_array:
-                    return handler.begin_array(tag, context);
+                    return handler.begin_array(tag, null_ser_context_arg);
                 case staj_event_type::end_array:
-                    return handler.end_array(context);
+                    return handler.end_array(null_ser_context_arg);
                 case staj_event_type::string_value:
-                    return handler.string_value(string_value, tag, context);
+                    return handler.string_value(string_value, tag, null_ser_context_arg);
                 case staj_event_type::byte_string_value:
                 case staj_event_type::null_value:
-                    return handler.null_value(tag, context);
+                    return handler.null_value(tag, null_ser_context_arg);
                 case staj_event_type::bool_value:
-                    return handler.bool_value(bool_value, tag, context);
+                    return handler.bool_value(bool_value, tag, null_ser_context_arg);
                 case staj_event_type::int64_value:
-                    return handler.int64_value(int64_value, tag, context);
+                    return handler.int64_value(int64_value, tag, null_ser_context_arg);
                 case staj_event_type::uint64_value:
-                    return handler.uint64_value(uint64_value, tag, context);
+                    return handler.uint64_value(uint64_value, tag, null_ser_context_arg);
                 case staj_event_type::double_value:
-                    return handler.double_value(double_value, tag, context);
+                    return handler.double_value(double_value, tag, null_ser_context_arg);
                 default:
                     return false;
             }
@@ -254,7 +253,6 @@ namespace detail {
 
         void initialize(const std::vector<string_type, string_allocator_type>& column_names)
         {
-            null_ser_context context;
             for (const auto& name : column_names)
             {
                 column_names_.push_back(name);
@@ -274,26 +272,24 @@ namespace detail {
 
         bool replay_parse_events(basic_json_content_handler<CharT>& handler)
         {
-            null_ser_context context;
-
             bool more = true;
             while (more)
             {
                 switch (state_)
                 {
                     case cached_state::begin_object:
-                        more = handler.begin_object(semantic_tag::none, context);
+                        more = handler.begin_object(semantic_tag::none, null_ser_context_arg);
                         column_index_ = 0;
                         state_ = cached_state::name;
                         break;
                     case cached_state::end_object:
-                        more = handler.end_object(context);
+                        more = handler.end_object(null_ser_context_arg);
                         state_ = cached_state::done;
                         break;
                     case cached_state::name:
                         if (column_index_ < column_names_.size())
                         {
-                            more = handler.name(column_names_[column_index_], context);
+                            more = handler.name(column_names_[column_index_], null_ser_context_arg);
                             state_ = cached_state::begin_array;
                         }
                         else
@@ -302,12 +298,12 @@ namespace detail {
                         }
                         break;
                     case cached_state::begin_array:
-                        more = handler.begin_array(semantic_tag::none, context);
+                        more = handler.begin_array(semantic_tag::none, null_ser_context_arg);
                         row_index_ = 0;
                         state_ = cached_state::item;
                         break;
                     case cached_state::end_array:
-                        more = handler.end_array(context);
+                        more = handler.end_array(null_ser_context_arg);
                         ++column_index_;
                         state_ = cached_state::name;
                         break;
@@ -336,13 +332,14 @@ namespace detail {
 
         bool do_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
         {
-            ec = csv_errc::unexpected_begin_object;
+            ec = csv_errc::invalid_parse_state;
             return false;
         }
 
-        bool do_end_object(const ser_context&) override
+        bool do_end_object(const ser_context&, std::error_code& ec) override
         {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("unexpected end_object"));
+            ec = csv_errc::invalid_parse_state;
+            return false;
         }
 
         bool do_begin_array(semantic_tag tag, const ser_context&) override
@@ -1231,8 +1228,8 @@ public:
                     break;
                 }
                 default:
-                    err_handler_(csv_errc::invalid_state, *this);
-                    ec = csv_errc::invalid_state;
+                    err_handler_(csv_errc::invalid_parse_state, *this);
+                    ec = csv_errc::invalid_parse_state;
                     more_ = false;
                     return;
             }

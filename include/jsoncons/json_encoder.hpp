@@ -459,7 +459,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const ser_context&) override
+    bool do_end_object(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         unindent();
@@ -1094,7 +1094,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const ser_context&) override
+    bool do_end_object(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         stack_.pop_back();

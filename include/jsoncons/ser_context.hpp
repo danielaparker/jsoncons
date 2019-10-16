@@ -41,6 +41,8 @@ private:
     size_t column() const override { return 0; }
 };
 
+const null_ser_context null_ser_context_arg = null_ser_context();
+
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use ser_context") typedef ser_context parsing_context;
 JSONCONS_DEPRECATED_MSG("Instead, use ser_context") typedef ser_context serializing_context;
