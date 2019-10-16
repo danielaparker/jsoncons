@@ -180,7 +180,7 @@ struct ser_traits<T,
     template <class CharT, class Json>
     static void serialize(const T& val, basic_json_content_handler<CharT>& receiver, std::error_code& ec)
     {
-        receiver.begin_object(val.size(), null_ser_context_arg, ec);
+        receiver.begin_object(val.size(), semantic_tag::none, null_ser_context_arg, ec);
         if (ec)
         {
             return;
@@ -190,7 +190,7 @@ struct ser_traits<T,
             receiver.name(it->first);
             ser_traits<mapped_type>::template serialize<CharT,Json>(it->second, receiver, ec);
         }
-        receiver.end_object(ec);
+        receiver.end_object(null_ser_context_arg, ec);
         if (ec)
         {
             return;
@@ -209,6 +209,17 @@ template <class T, class CharT, class Json>
 void write_to(const Json&, const T&val, basic_json_content_handler<CharT>& receiver, std::error_code& ec)
 {
     ser_traits<T>::template serialize<CharT,Json>(val, receiver, ec);
+}
+
+template <class T, class CharT, class Json>
+void write_to(const Json&, const T&val, basic_json_content_handler<CharT>& receiver)
+{
+    std::error_code ec;
+    ser_traits<T>::template serialize<CharT,Json>(val, receiver, ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec));
+    }
 }
 
 }
