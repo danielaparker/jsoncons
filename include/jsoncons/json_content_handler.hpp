@@ -127,11 +127,6 @@ public:
 
     virtual ~basic_json_content_handler() {}
 
-    void flush()
-    {
-        do_flush();
-    }
-
     bool begin_object(semantic_tag tag=semantic_tag::none,
                       const ser_context& context=null_ser_context_arg)
     {
@@ -142,13 +137,6 @@ public:
             JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
         }
         return more;
-    }
-
-    bool begin_object(semantic_tag tag,
-                      const ser_context& context,
-                      std::error_code& ec)
-    {
-        return do_begin_object(tag, context, ec);
     }
 
     bool begin_object(size_t length, 
@@ -164,14 +152,6 @@ public:
         return more;
     }
 
-    bool begin_object(size_t length, 
-                      semantic_tag tag, 
-                      const ser_context& context,
-                      std::error_code& ec)
-    {
-        return do_begin_object(length, tag, context, ec);
-    }
-
     bool end_object(const ser_context& context = null_ser_context_arg)
     {
         std::error_code ec;
@@ -181,11 +161,6 @@ public:
             JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
         }
         return more;
-    }
-
-    bool end_object(const ser_context& context, std::error_code& ec)
-    {
-        return do_end_object(context, ec);
     }
 
     bool begin_array(semantic_tag tag=semantic_tag::none,
@@ -198,11 +173,6 @@ public:
             JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
         }
         return more;
-    }
-
-    bool begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec)
-    {
-        return do_begin_array(tag, context, ec);
     }
 
     bool begin_array(size_t length, 
@@ -218,11 +188,6 @@ public:
         return more;
     }
 
-    bool begin_array(size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec)
-    {
-        return do_begin_array(length, tag, context, ec);
-    }
-
     bool end_array(const ser_context& context=null_ser_context_arg)
     {
         std::error_code ec;
@@ -232,11 +197,6 @@ public:
             JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
         }
         return more;
-    }
-
-    bool end_array(const ser_context& context, std::error_code& ec)
-    {
-        return do_end_array(context, ec);
     }
 
     bool name(const string_view_type& name, const ser_context& context=null_ser_context_arg)
@@ -250,129 +210,16 @@ public:
         return more;
     }
 
-    bool name(const string_view_type& name, const ser_context& context, std::error_code& ec)
-    {
-        return do_name(name, context, ec);
-    }
-
-    bool string_value(const string_view_type& value, 
-                      semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context_arg) 
+    bool null_value(semantic_tag tag = semantic_tag::none,
+                    const ser_context& context=null_ser_context_arg) 
     {
         std::error_code ec;
-        bool more = do_string_value(value, tag, context, ec);
+        bool more = do_null_value(tag, context, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
         }
         return more;
-    }
-
-    bool string_value(const string_view_type& value, 
-                      semantic_tag tag, 
-                      const ser_context& context,
-                      std::error_code& ec) 
-    {
-        return do_string_value(value, tag, context, ec);
-    }
-
-    bool byte_string_value(const byte_string_view& b, 
-                           semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context_arg)
-    {
-        std::error_code ec;
-        bool more = do_byte_string_value(b, tag, context, ec);
-        if (ec)
-        {
-            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
-        }
-        return more;
-    }
-
-    bool byte_string_value(const byte_string_view& b, 
-                           semantic_tag tag, 
-                           const ser_context& context,
-                           std::error_code& ec)
-    {
-        return do_byte_string_value(b, tag, context, ec);
-    }
-
-    bool byte_string_value(const uint8_t* p, size_t size, 
-                           semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context_arg)
-    {
-        return byte_string_value(byte_string(p, size), tag, context);
-    }
-
-    bool byte_string_value(const uint8_t* p, size_t size, 
-                           semantic_tag tag, 
-                           const ser_context& context,
-                           std::error_code& ec)
-    {
-        return byte_string_value(byte_string(p, size), tag, context, ec);
-    }
-
-    bool int64_value(int64_t value, 
-                     semantic_tag tag = semantic_tag::none, 
-                     const ser_context& context=null_ser_context_arg)
-    {
-        std::error_code ec;
-        bool more = do_int64_value(value, tag, context, ec);
-        if (ec)
-        {
-            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
-        }
-        return more;
-    }
-
-    bool int64_value(int64_t value, 
-                     semantic_tag tag, 
-                     const ser_context& context,
-                     std::error_code& ec)
-    {
-        return do_int64_value(value, tag, context, ec);
-    }
-
-    bool uint64_value(uint64_t value, 
-                      semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context_arg)
-    {
-        std::error_code ec;
-        bool more = do_uint64_value(value, tag, context, ec);
-        if (ec)
-        {
-            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
-        }
-        return more;
-    }
-
-    bool uint64_value(uint64_t value, 
-                      semantic_tag tag, 
-                      const ser_context& context,
-                      std::error_code& ec)
-    {
-        return do_uint64_value(value, tag, context, ec);
-    }
-
-    bool double_value(double value, 
-                      semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context_arg)
-    {
-        std::error_code ec;
-        bool more = do_double_value(value, tag, context, ec);
-        if (ec)
-        {
-            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
-        }
-        return more;
-    }
-
-    bool double_value(double value, 
-                      semantic_tag tag, 
-                      const ser_context& context,
-                      std::error_code& ec)
-    {
-        return do_double_value(value, tag, context, ec);
     }
 
     bool bool_value(bool value, 
@@ -388,6 +235,125 @@ public:
         return more;
     }
 
+    bool string_value(const string_view_type& value, 
+                      semantic_tag tag = semantic_tag::none, 
+                      const ser_context& context=null_ser_context_arg) 
+    {
+        std::error_code ec;
+        bool more = do_string_value(value, tag, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool byte_string_value(const byte_string_view& b, 
+                           semantic_tag tag=semantic_tag::none, 
+                           const ser_context& context=null_ser_context_arg)
+    {
+        std::error_code ec;
+        bool more = do_byte_string_value(b, tag, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool byte_string_value(const uint8_t* p, size_t size, 
+                           semantic_tag tag=semantic_tag::none, 
+                           const ser_context& context=null_ser_context_arg)
+    {
+        return byte_string_value(byte_string(p, size), tag, context);
+    }
+
+    bool uint64_value(uint64_t value, 
+                      semantic_tag tag = semantic_tag::none, 
+                      const ser_context& context=null_ser_context_arg)
+    {
+        std::error_code ec;
+        bool more = do_uint64_value(value, tag, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool int64_value(int64_t value, 
+                     semantic_tag tag = semantic_tag::none, 
+                     const ser_context& context=null_ser_context_arg)
+    {
+        std::error_code ec;
+        bool more = do_int64_value(value, tag, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool double_value(double value, 
+                      semantic_tag tag = semantic_tag::none, 
+                      const ser_context& context=null_ser_context_arg)
+    {
+        std::error_code ec;
+        bool more = do_double_value(value, tag, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool begin_object(semantic_tag tag,
+                      const ser_context& context,
+                      std::error_code& ec)
+    {
+        return do_begin_object(tag, context, ec);
+    }
+
+    bool begin_object(size_t length, 
+                      semantic_tag tag, 
+                      const ser_context& context,
+                      std::error_code& ec)
+    {
+        return do_begin_object(length, tag, context, ec);
+    }
+
+    bool end_object(const ser_context& context, std::error_code& ec)
+    {
+        return do_end_object(context, ec);
+    }
+
+    bool begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec)
+    {
+        return do_begin_array(tag, context, ec);
+    }
+
+    bool begin_array(size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec)
+    {
+        return do_begin_array(length, tag, context, ec);
+    }
+
+    bool end_array(const ser_context& context, std::error_code& ec)
+    {
+        return do_end_array(context, ec);
+    }
+
+    bool name(const string_view_type& name, const ser_context& context, std::error_code& ec)
+    {
+        return do_name(name, context, ec);
+    }
+
+    bool null_value(semantic_tag tag,
+                    const ser_context& context,
+                    std::error_code& ec) 
+    {
+        return do_null_value(tag, context, ec);
+    }
+
     bool bool_value(bool value, 
                     semantic_tag tag,
                     const ser_context& context,
@@ -396,23 +362,57 @@ public:
         return do_bool_value(value, tag, context, ec);
     }
 
-    bool null_value(semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context_arg) 
+    bool string_value(const string_view_type& value, 
+                      semantic_tag tag, 
+                      const ser_context& context,
+                      std::error_code& ec) 
     {
-        std::error_code ec;
-        bool more = do_null_value(tag, context, ec);
-        if (ec)
-        {
-            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
-        }
-        return more;
+        return do_string_value(value, tag, context, ec);
     }
 
-    bool null_value(semantic_tag tag,
-                    const ser_context& context,
-                    std::error_code& ec) 
+    bool byte_string_value(const byte_string_view& b, 
+                           semantic_tag tag, 
+                           const ser_context& context,
+                           std::error_code& ec)
     {
-        return do_null_value(tag, context, ec);
+        return do_byte_string_value(b, tag, context, ec);
+    }
+
+    bool byte_string_value(const uint8_t* p, size_t size, 
+                           semantic_tag tag, 
+                           const ser_context& context,
+                           std::error_code& ec)
+    {
+        return byte_string_value(byte_string(p, size), tag, context, ec);
+    }
+
+    bool uint64_value(uint64_t value, 
+                      semantic_tag tag, 
+                      const ser_context& context,
+                      std::error_code& ec)
+    {
+        return do_uint64_value(value, tag, context, ec);
+    }
+
+    bool int64_value(int64_t value, 
+                     semantic_tag tag, 
+                     const ser_context& context,
+                     std::error_code& ec)
+    {
+        return do_int64_value(value, tag, context, ec);
+    }
+
+    bool double_value(double value, 
+                      semantic_tag tag, 
+                      const ser_context& context,
+                      std::error_code& ec)
+    {
+        return do_double_value(value, tag, context, ec);
+    }
+
+    void flush()
+    {
+        do_flush();
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -512,7 +512,7 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use name(const string_view_type&, const ser_context&=null_ser_context_arg)") 
-    void name(const CharT* p, size_t length, const ser_context& context) 
+    void name(const char_type* p, size_t length, const ser_context& context) 
     {
         name(string_view_type(p, length), context);
     }
@@ -561,42 +561,61 @@ public:
 
 #endif
 private:
-    virtual void do_flush() = 0;
+    virtual bool do_begin_object(semantic_tag tag, 
+                                 const ser_context& context, 
+                                 std::error_code& ec) = 0;
 
-    virtual bool do_begin_object(semantic_tag, const ser_context& context, std::error_code& ec) = 0;
-
-    virtual bool do_begin_object(size_t, semantic_tag tag, const ser_context& context, std::error_code& ec)
+    virtual bool do_begin_object(size_t /*length*/, 
+                                 semantic_tag tag, 
+                                 const ser_context& context, 
+                                 std::error_code& ec)
     {
         return do_begin_object(tag, context, ec);
     }
 
-    virtual bool do_end_object(const ser_context& context, std::error_code& ec) = 0;
+    virtual bool do_end_object(const ser_context& context, 
+                               std::error_code& ec) = 0;
 
-    virtual bool do_begin_array(semantic_tag, const ser_context& context, std::error_code& ec) = 0;
+    virtual bool do_begin_array(semantic_tag tag, 
+                                const ser_context& context, 
+                                std::error_code& ec) = 0;
 
-    virtual bool do_begin_array(size_t, semantic_tag tag, const ser_context& context, std::error_code& ec)
+    virtual bool do_begin_array(size_t /*length*/, 
+                                semantic_tag tag, 
+                                const ser_context& context, 
+                                std::error_code& ec)
     {
         return do_begin_array(tag, context, ec);
     }
 
-    virtual bool do_end_array(const ser_context& context, std::error_code& ec) = 0;
+    virtual bool do_end_array(const ser_context& context, 
+                              std::error_code& ec) = 0;
 
-    virtual bool do_name(const string_view_type& name, const ser_context& context, std::error_code&) = 0;
+    virtual bool do_name(const string_view_type& name, 
+                         const ser_context& context, 
+                         std::error_code&) = 0;
 
-    virtual bool do_null_value(semantic_tag, const ser_context& context, std::error_code& ec) = 0;
+    virtual bool do_null_value(semantic_tag tag, 
+                               const ser_context& context, 
+                               std::error_code& ec) = 0;
+
+    virtual bool do_bool_value(bool value, 
+                               semantic_tag tag, 
+                               const ser_context& context, 
+                               std::error_code&) = 0;
 
     virtual bool do_string_value(const string_view_type& value, 
                                  semantic_tag tag, 
                                  const ser_context& context, 
                                  std::error_code& ec) = 0;
 
-    virtual bool do_byte_string_value(const byte_string_view& b, 
+    virtual bool do_byte_string_value(const byte_string_view& value, 
                                       semantic_tag tag, 
                                       const ser_context& context,
                                       std::error_code& ec) = 0;
 
-    virtual bool do_double_value(double value, 
-                                 semantic_tag tag,
+    virtual bool do_uint64_value(uint64_t value, 
+                                 semantic_tag tag, 
                                  const ser_context& context,
                                  std::error_code& ec) = 0;
 
@@ -605,12 +624,12 @@ private:
                                 const ser_context& context,
                                 std::error_code& ec) = 0;
 
-    virtual bool do_uint64_value(uint64_t value, 
-                                 semantic_tag tag, 
+    virtual bool do_double_value(double value, 
+                                 semantic_tag tag,
                                  const ser_context& context,
                                  std::error_code& ec) = 0;
 
-    virtual bool do_bool_value(bool value, semantic_tag tag, const ser_context& context, std::error_code&) = 0;
+    virtual void do_flush() = 0;
 
 };
 

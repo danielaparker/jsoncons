@@ -78,7 +78,7 @@ string_view_type           |
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
                       const WorkAllocator& allocator = WorkAllocator()); // (8)
 
-Constructors (1)-(4) use a default [json_content_handler](json_content_handler.md) that discards the JSON parse events, and are for validation only.
+Constructors (1)-(4) use a default [basic_json_content_handler](basic_json_content_handler.md) that discards the JSON parse events, and are for validation only.
 
 (1) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`, uses default [options](basic_json_decode_options.md) and a default [parse_error_handler](parse_error_handler.md).
 
@@ -94,25 +94,25 @@ and a specified [parse_error_handler](parse_error_handler.md).
 uses the specified [options](basic_json_decode_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
-Constructors (5)-(8) take a user supplied [json_content_handler](json_content_handler.md) that receives JSON parse events, such as a [json_decoder](json_decoder). 
+Constructors (5)-(8) take a user supplied [basic_json_content_handler](basic_json_content_handler.md) that receives JSON parse events, such as a [json_decoder](json_decoder). 
 
 (5) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`,
 emits JSON parse events to the specified 
-[json_content_handler](json_content_handler.md), and uses default [options](basic_json_decode_options.md)
+[basic_json_content_handler](basic_json_content_handler.md), and uses default [options](basic_json_decode_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
 (6) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`,
-emits JSON parse events to the specified [json_content_handler](json_content_handler.md) 
+emits JSON parse events to the specified [basic_json_content_handler](basic_json_content_handler.md) 
 and uses the specified [options](basic_json_decode_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
 (7) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`,
-emits JSON parse events to the specified [json_content_handler](json_content_handler.md) 
+emits JSON parse events to the specified [basic_json_content_handler](basic_json_content_handler.md) 
 and uses default [options](basic_json_decode_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
 (8) Constructs a `basic_json_reader` that reads from a character sequence or stream `source`,
-emits JSON parse events to the specified [json_content_handler](json_content_handler.md) and
+emits JSON parse events to the specified [basic_json_content_handler](basic_json_content_handler.md) and
 uses the specified [options](basic_json_decode_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
@@ -132,13 +132,13 @@ Returns `true` when there are no more JSON texts to be read from the stream, `fa
 
     void read(); // (1)
     void read(std::error_code& ec); // (2)
-Reads the next JSON text from the stream and reports JSON events to a [json_content_handler](json_content_handler.md), such as a [json_decoder](json_decoder.md).
+Reads the next JSON text from the stream and reports JSON events to a [basic_json_content_handler](basic_json_content_handler.md), such as a [json_decoder](json_decoder.md).
 Override (1) throws if parsing fails, or there are any unconsumed non-whitespace characters left in the input.
 Override (2) sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails or if there are any unconsumed non-whitespace characters left in the input.
 
     void read_next()
     void read_next(std::error_code& ec)
-Reads the next JSON text from the stream and reports JSON events to a [json_content_handler](json_content_handler.md), such as a [json_decoder](json_decoder.md).
+Reads the next JSON text from the stream and reports JSON events to a [basic_json_content_handler](basic_json_content_handler.md), such as a [json_decoder](json_decoder.md).
 Override (1) throws [ser_error](ser_error.md) if parsing fails.
 Override (2) sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
 

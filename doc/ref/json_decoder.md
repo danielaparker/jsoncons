@@ -34,7 +34,7 @@ Returns the json value `v` stored in the `deserializer` as `std::move(v)`. If be
 
 ### See also
 
-- [json_content_handler](json_content_handler.md)
+- [basic_json_content_handler](basic_json_content_handler.md)
 
 ### Examples
 

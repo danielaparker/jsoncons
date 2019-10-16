@@ -45,7 +45,7 @@ and uses the specified [csv options](basic_csv_options.md).
 
     virtual ~basic_csv_encoder()
 
-### Inherited from [basic_json_content_handler](../json_content_handler.md)
+### Inherited from [basic_json_content_handler](../basic_json_content_handler.md)
 
 #### Member functions
 

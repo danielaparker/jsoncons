@@ -44,7 +44,7 @@ void dump(basic_json_content_handler<char_type>& content_handler) const; // (9)
 
 (8) Dumps json value to stream using the specified [basic_json_options](../basic_json_options.md) and [indenting](../indenting.md). 
 
-(9) Emits json value to the [json_content_handler](../json_content_handler.md).
+(9) Emits json value to the [basic_json_content_handler](../basic_json_content_handler.md).
 
 ### Examples
 

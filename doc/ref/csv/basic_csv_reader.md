@@ -56,17 +56,17 @@ source_type                |Src
                      const WorkAllocator& allocator = WorkAllocator()); // (4)
 
 (1) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`
-and a [json_content_handler](../json_content_handler.md) that receives
+and a [basic_json_content_handler](../basic_json_content_handler.md) that receives
 JSON events. Uses default [basic_csv_options](basic_csv_options.md).
 
-(2) Constructs a `basic_csv_reader` that  that reads from a character sequence or stream `source`, a [json_content_handler](../json_content_handler.md) that receives
+(2) Constructs a `basic_csv_reader` that  that reads from a character sequence or stream `source`, a [basic_json_content_handler](../basic_json_content_handler.md) that receives
 JSON events, and [basic_csv_options](basic_csv_options.md).
 
-(3) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`, a [json_content_handler](../json_content_handler.md) that receives
+(3) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`, a [basic_json_content_handler](../basic_json_content_handler.md) that receives
 JSON events and the specified [parse_error_handler](../parse_error_handler.md).
 Uses default [basic_csv_options](basic_csv_options.md).
 
-(4) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`, a [json_content_handler](../json_content_handler.md) that receives
+(4) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`, a [basic_json_content_handler](../basic_json_content_handler.md) that receives
 JSON events, [basic_csv_options](basic_csv_options.md),
 and the specified [parse_error_handler](../parse_error_handler.md).
 
@@ -85,7 +85,7 @@ from `source`, `source` is dispatched immediately to the parser. Otherwise, the 
 Returns `true` when there is no more data to be read from the stream, `false` otherwise
 
     void read()
-Reports JSON related events for JSON objects, arrays, object members and array elements to a [json_content_handler](../json_content_handler.md), such as a [json_decoder](json_decoder.md).
+Reports JSON related events for JSON objects, arrays, object members and array elements to a [basic_json_content_handler](../basic_json_content_handler.md), such as a [json_decoder](json_decoder.md).
 Throws [ser_error](../ser_error.md) if parsing fails.
 
     size_t buffer_length() const

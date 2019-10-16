@@ -23,14 +23,14 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 #### Push Parsing API
 
-[json_content_handler](ref/json_content_handler.md)  
+[basic_json_content_handler](ref/basic_json_content_handler.md)  
 
 [json_parser](ref/json_parser.md)  
 [basic_json_reader](ref/basic_json_reader.md)  
 
 [json_decoder](ref/json_decoder.md)  
 
-[json_content_filter](ref/json_content_filter.md)  
+[basic_json_content_filter](ref/basic_json_content_filter.md)  
 [rename_object_member_filter](ref/rename_object_member_filter.md)  
 
 ### Extensions

@@ -102,7 +102,7 @@ Repeatedly calls `parse_some(handler)` until `finished()` returns `true`
 Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
 
     void skip_bom()
-Reads the next JSON text from the stream and reports JSON events to a [json_content_handler](json_content_handler.md), such as a [json_decoder](json_decoder.md).
+Reads the next JSON text from the stream and reports JSON events to a [basic_json_content_handler](basic_json_content_handler.md), such as a [json_decoder](json_decoder.md).
 Throws [ser_error](ser_error.md) if parsing fails.
 
     void check_done()

@@ -31,7 +31,7 @@ Returns a reference to the JSON handler that sends json events to a destination 
 
 ### See also
 
-- [json_content_handler](json_content_handler.md)
+- [basic_json_content_handler](basic_json_content_handler.md)
 
 ### Examples
 
@@ -97,7 +97,7 @@ Input JSON file `address-book.json`:
 
 Suppose you want to break the name into a first name and last name, and report a warning when `name` does not contain a space or tab separated part. 
 
-You can achieve the desired result by subclassing the [json_content_filter](json_content_filter.md) class, overriding the default methods for receiving name and string value events, and passing modified events on to the parent [json_content_handler](json_content_handler.md) (which in this example will forward them to a [basic_json_encoder](basic_json_encoder.md).) 
+You can achieve the desired result by subclassing the [basic_json_content_filter](basic_json_content_filter.md) class, overriding the default methods for receiving name and string value events, and passing modified events on to the parent [json_content_handler](basic_json_content_handler.md) (which in this example will forward them to a [basic_json_encoder](basic_json_encoder.md).) 
 ```c++
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_content_filter.hpp>

@@ -66,14 +66,14 @@ Returns the current [staj_event](staj_event.md).
 
     void read_to(json_content_handler& handler) override
 Sends the parse events from the current event to the
-matching completion event to the supplied [handler](json_content_handler.md)
+matching completion event to the supplied [handler](basic_json_content_handler.md)
 E.g., if the current event is `begin_object`, sends the `begin_object`
 event and all inbetween events until the matching `end_object` event.
 If a parsing error is encountered, throws a [ser_error](ser_error.md).
 
     void read_to(json_content_handler& handler, std::error_code& ec) override
 Sends the parse events from the current event to the
-matching completion event to the supplied [handler](json_content_handler.md)
+matching completion event to the supplied [handler](basic_json_content_handler.md)
 E.g., if the current event is `begin_object`, sends the `begin_object`
 event and all inbetween events until the matching `end_object` event.
 If a parsing error is encountered, sets `ec`.

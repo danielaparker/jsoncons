@@ -37,7 +37,7 @@ Constructs a new encoder that writes to the specified result.
 
     virtual ~basic_msgpack_encoder()
 
-### Inherited from [basic_json_content_handler](../json_content_handler.md)
+### Inherited from [basic_json_content_handler](../basic_json_content_handler.md)
 
 #### Member functions
 

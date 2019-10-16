@@ -108,7 +108,7 @@ None
 
 #### See also
 
-- [json_content_handler](json_content_handler.md)
+- [basic_json_content_handler](basic_json_content_handler.md)
 - [basic_json_options](basic_json_options.md)
     
 ### Examples
