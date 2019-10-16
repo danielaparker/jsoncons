@@ -15,7 +15,7 @@
 #include <limits> // std::numeric_limits
 #include <functional> // std::function
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_filter.hpp>
+#include <jsoncons/json_content_filter.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/json_error.hpp>
@@ -31,7 +31,7 @@ namespace jsoncons {
 namespace detail {
 
 template <class CharT>
-class replacement_filter : public basic_json_filter<CharT>
+class replacement_filter : public basic_json_content_filter<CharT>
 {
     typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
     typedef typename basic_json_options<CharT>::string_type string_type;
@@ -53,7 +53,7 @@ public:
                        const string_type& nan_to_str,
                        const string_type& inf_to_str,
                        const string_type& neginf_to_str)
-        : basic_json_filter<CharT>(handler), 
+        : basic_json_content_filter<CharT>(handler), 
           is_str_to_nan_(is_str_to_nan),
           is_str_to_inf_(is_str_to_inf),
           is_str_to_neginf_(is_str_to_neginf), 
@@ -199,7 +199,7 @@ class basic_json_parser : public ser_context
     const CharT* input_end_;
     const CharT* input_ptr_;
     json_parse_state state_;
-    bool continue_;
+    bool more_;
     bool done_;
 
     std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_buffer_;
@@ -242,7 +242,7 @@ public:
          input_end_(nullptr),
          input_ptr_(nullptr),
          state_(json_parse_state::start),
-         continue_(true),
+         more_(true),
          done_(false),
          string_buffer_(allocator),
          state_stack_(allocator)
@@ -288,12 +288,12 @@ public:
 
     bool stopped() const
     {
-        return !continue_;
+        return !more_;
     }
 
     bool finished() const
     {
-        return !continue_ && state_ != json_parse_state::before_done;
+        return !more_ && state_ != json_parse_state::before_done;
     }
 
     void skip_space()
@@ -369,8 +369,8 @@ public:
     {
         if (++nesting_depth_ > options_.max_nesting_depth())
         {
-            continue_ = err_handler_(json_errc::max_depth_exceeded, *this);
-            if (!continue_)
+            more_ = err_handler_(json_errc::max_depth_exceeded, *this);
+            if (!more_)
             {
                 ec = json_errc::max_depth_exceeded;
                 return;
@@ -378,7 +378,7 @@ public:
         } 
         push_state(json_parse_state::object);
         state_ = json_parse_state::expect_member_name_or_end;
-        continue_ = handler.begin_object(semantic_tag::none, *this);
+        more_ = handler.begin_object(semantic_tag::none, *this);
     }
 
     void end_object(basic_json_content_handler<CharT>& handler, std::error_code& ec)
@@ -387,27 +387,27 @@ public:
         {
             err_handler_(json_errc::unexpected_right_brace, *this);
             ec = json_errc::unexpected_right_brace;
-            continue_ = false;
+            more_ = false;
             return;
         }
         --nesting_depth_;
         state_ = pop_state();
         if (state_ == json_parse_state::object)
         {
-            continue_ = handler.end_object(*this);
+            more_ = handler.end_object(*this);
         }
         else if (state_ == json_parse_state::array)
         {
             err_handler_(json_errc::expected_comma_or_right_bracket, *this);
             ec = json_errc::expected_comma_or_right_bracket;
-            continue_ = false;
+            more_ = false;
             return;
         }
         else
         {
             err_handler_(json_errc::unexpected_right_brace, *this);
             ec = json_errc::unexpected_right_brace;
-            continue_ = false;
+            more_ = false;
             return;
         }
 
@@ -425,8 +425,8 @@ public:
     {
         if (++nesting_depth_ > options_.max_nesting_depth())
         {
-            continue_ = err_handler_(json_errc::max_depth_exceeded, *this);
-            if (!continue_)
+            more_ = err_handler_(json_errc::max_depth_exceeded, *this);
+            if (!more_)
             {
                 ec = json_errc::max_depth_exceeded;
                 return;
@@ -434,7 +434,7 @@ public:
         }
         push_state(json_parse_state::array);
         state_ = json_parse_state::expect_value_or_end;
-        continue_ = handler.begin_array(semantic_tag::none, *this);
+        more_ = handler.begin_array(semantic_tag::none, *this);
     }
 
     void end_array(basic_json_content_handler<CharT>& handler, std::error_code& ec)
@@ -443,27 +443,27 @@ public:
         {
             err_handler_(json_errc::unexpected_right_bracket, *this);
             ec = json_errc::unexpected_right_bracket;
-            continue_ = false;
+            more_ = false;
             return;
         }
         --nesting_depth_;
         state_ = pop_state();
         if (state_ == json_parse_state::array)
         {
-            continue_ = handler.end_array(*this);
+            more_ = handler.end_array(*this);
         }
         else if (state_ == json_parse_state::object)
         {
             err_handler_(json_errc::expected_comma_or_right_brace, *this);
             ec = json_errc::expected_comma_or_right_brace;
-            continue_ = false;
+            more_ = false;
             return;
         }
         else
         {
             err_handler_(json_errc::unexpected_right_bracket, *this);
             ec = json_errc::unexpected_right_bracket;
-            continue_ = false;
+            more_ = false;
             return;
         }
         if (parent() == json_parse_state::root)
@@ -482,7 +482,7 @@ public:
         state_stack_.reserve(initial_stack_capacity_);
         push_state(json_parse_state::root);
         state_ = json_parse_state::start;
-        continue_ = true;
+        more_ = true;
         done_ = false;
         line_ = 1;
         column_ = 1;
@@ -491,7 +491,7 @@ public:
 
     void restart()
     {
-        continue_ = true;
+        more_ = true;
     }
 
     void check_done()
@@ -517,8 +517,8 @@ public:
                 case ' ':
                     break;
                 default:
-                    continue_ = err_handler_(json_errc::extra_character, *this);
-                    if (!continue_)
+                    more_ = err_handler_(json_errc::extra_character, *this);
+                    if (!more_)
                     {
                         ec = json_errc::extra_character;
                         return;
@@ -599,12 +599,12 @@ public:
             handler.flush();
             done_ = true;
             state_ = json_parse_state::done;
-            continue_ = false;
+            more_ = false;
             return;
         }
         const CharT* local_input_end = input_end_;
 
-        if (input_ptr_ == local_input_end && continue_)
+        if (input_ptr_ == local_input_end && more_)
         {
             switch (state_)
             {
@@ -625,10 +625,10 @@ public:
                     handler.flush();
                     done_ = true;
                     state_ = json_parse_state::done;
-                    continue_ = false;
+                    more_ = false;
                     break;
                 case json_parse_state::done:
-                    continue_ = false;
+                    more_ = false;
                     break;
                 case json_parse_state::cr:
                     state_ = pop_state();
@@ -636,12 +636,12 @@ public:
                 default:
                     err_handler_(json_errc::unexpected_eof, *this);
                     ec = json_errc::unexpected_eof;
-                    continue_ = false;
+                    more_ = false;
                     return;
             }
         }
 
-        while ((input_ptr_ < local_input_end) && continue_)
+        while ((input_ptr_ < local_input_end) && more_)
         {
             switch (state_)
             {
@@ -649,7 +649,7 @@ public:
                     handler.flush();
                     done_ = true;
                     state_ = json_parse_state::done;
-                    continue_ = false;
+                    more_ = false;
                     break;
                 case json_parse_state::cr:
                     ++line_;
@@ -670,8 +670,8 @@ public:
                         switch (*input_ptr_)
                         {
                             JSONCONS_ILLEGAL_CONTROL_CHARACTER:
-                                continue_ = err_handler_(json_errc::illegal_control_character, *this);
-                                if (!continue_)
+                                more_ = err_handler_(json_errc::illegal_control_character, *this);
+                                if (!more_)
                                 {
                                     ec = json_errc::illegal_control_character;
                                     return;
@@ -759,17 +759,17 @@ public:
                             case '}':
                                 err_handler_(json_errc::unexpected_right_brace, *this);
                                 ec = json_errc::unexpected_right_brace;
-                                continue_ = false;
+                                more_ = false;
                                 return;
                             case ']':
                                 err_handler_(json_errc::unexpected_right_bracket, *this);
                                 ec = json_errc::unexpected_right_bracket;
-                                continue_ = false;
+                                more_ = false;
                                 return;
                             default:
                                 err_handler_(json_errc::invalid_json_text, *this);
                                 ec = json_errc::invalid_json_text;
-                                continue_ = false;
+                                more_ = false;
                                 return;
                         }
                     }
@@ -780,8 +780,8 @@ public:
                         switch (*input_ptr_)
                         {
                             JSONCONS_ILLEGAL_CONTROL_CHARACTER:
-                                continue_ = err_handler_(json_errc::illegal_control_character, *this);
-                                if (!continue_)
+                                more_ = err_handler_(json_errc::illegal_control_character, *this);
+                                if (!more_)
                                 {
                                     ec = json_errc::illegal_control_character;
                                     return;
@@ -830,8 +830,8 @@ public:
                             default:
                                 if (parent() == json_parse_state::array)
                                 {
-                                    continue_ = err_handler_(json_errc::expected_comma_or_right_bracket, *this);
-                                    if (!continue_)
+                                    more_ = err_handler_(json_errc::expected_comma_or_right_bracket, *this);
+                                    if (!more_)
                                     {
                                         ec = json_errc::expected_comma_or_right_bracket;
                                         return;
@@ -839,8 +839,8 @@ public:
                                 }
                                 else if (parent() == json_parse_state::object)
                                 {
-                                    continue_ = err_handler_(json_errc::expected_comma_or_right_brace, *this);
-                                    if (!continue_)
+                                    more_ = err_handler_(json_errc::expected_comma_or_right_brace, *this);
+                                    if (!more_)
                                     {
                                         ec = json_errc::expected_comma_or_right_brace;
                                         return;
@@ -857,8 +857,8 @@ public:
                         switch (*input_ptr_)
                         {
                             JSONCONS_ILLEGAL_CONTROL_CHARACTER:
-                                continue_ = err_handler_(json_errc::illegal_control_character, *this);
-                                if (!continue_)
+                                more_ = err_handler_(json_errc::illegal_control_character, *this);
+                                if (!more_)
                                 {
                                     ec = json_errc::illegal_control_character;
                                     return;
@@ -902,8 +902,8 @@ public:
                                 if (ec) return;
                                 break;
                             case '\'':
-                                continue_ = err_handler_(json_errc::single_quote, *this);
-                                if (!continue_)
+                                more_ = err_handler_(json_errc::single_quote, *this);
+                                if (!more_)
                                 {
                                     ec = json_errc::single_quote;
                                     return;
@@ -912,8 +912,8 @@ public:
                                 ++column_;
                                 break;
                             default:
-                                continue_ = err_handler_(json_errc::expected_name, *this);
-                                if (!continue_)
+                                more_ = err_handler_(json_errc::expected_name, *this);
+                                if (!more_)
                                 {
                                     ec = json_errc::expected_name;
                                     return;
@@ -929,8 +929,8 @@ public:
                         switch (*input_ptr_)
                         {
                             JSONCONS_ILLEGAL_CONTROL_CHARACTER:
-                                continue_ = err_handler_(json_errc::illegal_control_character, *this);
-                                if (!continue_)
+                                more_ = err_handler_(json_errc::illegal_control_character, *this);
+                                if (!more_)
                                 {
                                     ec = json_errc::illegal_control_character;
                                     return;
@@ -968,8 +968,8 @@ public:
                                 if (ec) return;
                                 break;
                             case '}':
-                                continue_ = err_handler_(json_errc::extra_comma, *this);
-                                if (!continue_)
+                                more_ = err_handler_(json_errc::extra_comma, *this);
+                                if (!more_)
                                 {
                                     ec = json_errc::extra_comma;
                                     return;
@@ -980,8 +980,8 @@ public:
                                 ++column_;
                                 break;
                             case '\'':
-                                continue_ = err_handler_(json_errc::single_quote, *this);
-                                if (!continue_)
+                                more_ = err_handler_(json_errc::single_quote, *this);
+                                if (!more_)
                                 {
                                     ec = json_errc::single_quote;
                                     return;
@@ -990,8 +990,8 @@ public:
                                 ++column_;
                                 break;
                             default:
-                                continue_ = err_handler_(json_errc::expected_name, *this);
-                                if (!continue_)
+                                more_ = err_handler_(json_errc::expected_name, *this);
+                                if (!more_)
                                 {
                                     ec = json_errc::expected_name;
                                     return;
@@ -1007,8 +1007,8 @@ public:
                         switch (*input_ptr_)
                         {
                             JSONCONS_ILLEGAL_CONTROL_CHARACTER:
-                                continue_ = err_handler_(json_errc::illegal_control_character, *this);
-                                if (!continue_)
+                                more_ = err_handler_(json_errc::illegal_control_character, *this);
+                                if (!more_)
                                 {
                                     ec = json_errc::illegal_control_character;
                                     return;
@@ -1042,8 +1042,8 @@ public:
                                 ++column_;
                                 break;
                             default:
-                                continue_ = err_handler_(json_errc::expected_colon, *this);
-                                if (!continue_)
+                                more_ = err_handler_(json_errc::expected_colon, *this);
+                                if (!more_)
                                 {
                                     ec = json_errc::expected_colon;
                                     return;
@@ -1060,8 +1060,8 @@ public:
                         switch (*input_ptr_)
                         {
                             JSONCONS_ILLEGAL_CONTROL_CHARACTER:
-                                continue_ = err_handler_(json_errc::illegal_control_character, *this);
-                                if (!continue_)
+                                more_ = err_handler_(json_errc::illegal_control_character, *this);
+                                if (!more_)
                                 {
                                     ec = json_errc::illegal_control_character;
                                     return;
@@ -1151,8 +1151,8 @@ public:
                             case ']':
                                 if (parent() == json_parse_state::array)
                                 {
-                                    continue_ = err_handler_(json_errc::extra_comma, *this);
-                                    if (!continue_)
+                                    more_ = err_handler_(json_errc::extra_comma, *this);
+                                    if (!more_)
                                     {
                                         ec = json_errc::extra_comma;
                                         return;
@@ -1162,8 +1162,8 @@ public:
                                 }
                                 else
                                 {
-                                    continue_ = err_handler_(json_errc::expected_value, *this);
-                                    if (!continue_)
+                                    more_ = err_handler_(json_errc::expected_value, *this);
+                                    if (!more_)
                                     {
                                         ec = json_errc::expected_value;
                                         return;
@@ -1173,8 +1173,8 @@ public:
                                 ++column_;
                                 break;
                             case '\'':
-                                continue_ = err_handler_(json_errc::single_quote, *this);
-                                if (!continue_)
+                                more_ = err_handler_(json_errc::single_quote, *this);
+                                if (!more_)
                                 {
                                     ec = json_errc::single_quote;
                                     return;
@@ -1183,8 +1183,8 @@ public:
                                 ++column_;
                                 break;
                             default:
-                                continue_ = err_handler_(json_errc::expected_value, *this);
-                                if (!continue_)
+                                more_ = err_handler_(json_errc::expected_value, *this);
+                                if (!more_)
                                 {
                                     ec = json_errc::expected_value;
                                     return;
@@ -1200,8 +1200,8 @@ public:
                         switch (*input_ptr_)
                         {
                             JSONCONS_ILLEGAL_CONTROL_CHARACTER:
-                                continue_ = err_handler_(json_errc::illegal_control_character, *this);
-                                if (!continue_)
+                                more_ = err_handler_(json_errc::illegal_control_character, *this);
+                                if (!more_)
                                 {
                                     ec = json_errc::illegal_control_character;
                                     return;
@@ -1295,8 +1295,8 @@ public:
                                 if (ec) {return;}
                                 break;
                             case '\'':
-                                continue_ = err_handler_(json_errc::single_quote, *this);
-                                if (!continue_)
+                                more_ = err_handler_(json_errc::single_quote, *this);
+                                if (!more_)
                                 {
                                     ec = json_errc::single_quote;
                                     return;
@@ -1305,8 +1305,8 @@ public:
                                 ++column_;
                                 break;
                             default:
-                                continue_ = err_handler_(json_errc::expected_value, *this);
-                                if (!continue_)
+                                more_ = err_handler_(json_errc::expected_value, *this);
+                                if (!more_)
                                 {
                                     ec = json_errc::expected_value;
                                     return;
@@ -1354,7 +1354,7 @@ public:
                         default:
                             err_handler_(json_errc::invalid_value, *this);
                             ec = json_errc::invalid_value;
-                            continue_ = false;
+                            more_ = false;
                             return;
                     }
                     break;
@@ -1367,7 +1367,7 @@ public:
                         default:
                             err_handler_(json_errc::invalid_value, *this);
                             ec = json_errc::invalid_value;
-                            continue_ = false;
+                            more_ = false;
                             return;
                     }
                     ++input_ptr_;
@@ -1377,7 +1377,7 @@ public:
                     switch (*input_ptr_)
                     {
                         case 'e':
-                            continue_ = handler.bool_value(true,  semantic_tag::none, *this);
+                            more_ = handler.bool_value(true,  semantic_tag::none, *this);
                             if (parent() == json_parse_state::root)
                             {
                                 state_ = json_parse_state::before_done;
@@ -1390,7 +1390,7 @@ public:
                         default:
                             err_handler_(json_errc::invalid_value, *this);
                             ec = json_errc::invalid_value;
-                            continue_ = false;
+                            more_ = false;
                             return;
                     }
                     ++input_ptr_;
@@ -1407,7 +1407,7 @@ public:
                         default:
                             err_handler_(json_errc::invalid_value, *this);
                             ec = json_errc::invalid_value;
-                            continue_ = false;
+                            more_ = false;
                             return;
                     }
                     break;
@@ -1420,7 +1420,7 @@ public:
                         default:
                             err_handler_(json_errc::invalid_value, *this);
                             ec = json_errc::invalid_value;
-                            continue_ = false;
+                            more_ = false;
                             return;
                     }
                     ++input_ptr_;
@@ -1435,7 +1435,7 @@ public:
                         default:
                             err_handler_(json_errc::invalid_value, *this);
                             ec = json_errc::invalid_value;
-                            continue_ = false;
+                            more_ = false;
                             return;
                     }
                     ++input_ptr_;
@@ -1445,7 +1445,7 @@ public:
                     switch (*input_ptr_)
                     {
                         case 'e':
-                            continue_ = handler.bool_value(false, semantic_tag::none, *this);
+                            more_ = handler.bool_value(false, semantic_tag::none, *this);
                             if (parent() == json_parse_state::root)
                             {
                                 state_ = json_parse_state::before_done;
@@ -1458,7 +1458,7 @@ public:
                         default:
                             err_handler_(json_errc::invalid_value, *this);
                             ec = json_errc::invalid_value;
-                            continue_ = false;
+                            more_ = false;
                             return;
                     }
                     ++input_ptr_;
@@ -1475,7 +1475,7 @@ public:
                         default:
                             err_handler_(json_errc::invalid_value, *this);
                             ec = json_errc::invalid_value;
-                            continue_ = false;
+                            more_ = false;
                             return;
                     }
                     break;
@@ -1488,7 +1488,7 @@ public:
                         default:
                             err_handler_(json_errc::invalid_value, *this);
                             ec = json_errc::invalid_value;
-                            continue_ = false;
+                            more_ = false;
                             return;
                     }
                     ++input_ptr_;
@@ -1498,7 +1498,7 @@ public:
                     switch (*input_ptr_)
                     {
                     case 'l':
-                        continue_ = handler.null_value(semantic_tag::none, *this);
+                        more_ = handler.null_value(semantic_tag::none, *this);
                         if (parent() == json_parse_state::root)
                         {
                             state_ = json_parse_state::before_done;
@@ -1511,7 +1511,7 @@ public:
                     default:
                         err_handler_(json_errc::invalid_value, *this);
                         ec = json_errc::invalid_value;
-                        continue_ = false;
+                        more_ = false;
                         return;
                     }
                     ++input_ptr_;
@@ -1523,8 +1523,8 @@ public:
                     {
                     case '*':
                         state_ = json_parse_state::slash_star;
-                        continue_ = err_handler_(json_errc::illegal_comment, *this);
-                        if (!continue_)
+                        more_ = err_handler_(json_errc::illegal_comment, *this);
+                        if (!more_)
                         {
                             ec = json_errc::illegal_comment;
                             return;
@@ -1532,16 +1532,16 @@ public:
                         break;
                     case '/':
                         state_ = json_parse_state::slash_slash;
-                        continue_ = err_handler_(json_errc::illegal_comment, *this);
-                        if (!continue_)
+                        more_ = err_handler_(json_errc::illegal_comment, *this);
+                        if (!more_)
                         {
                             ec = json_errc::illegal_comment;
                             return;
                         }
                         break;
                     default:    
-                        continue_ = err_handler_(json_errc::invalid_json_text, *this);
-                        if (!continue_)
+                        more_ = err_handler_(json_errc::invalid_json_text, *this);
+                        if (!more_)
                         {
                             ec = json_errc::invalid_json_text;
                             return;
@@ -1616,7 +1616,7 @@ public:
         {
             if (*(input_ptr_+1) == 'r' && *(input_ptr_+2) == 'u' && *(input_ptr_+3) == 'e')
             {
-                continue_ = handler.bool_value(true, semantic_tag::none, *this);
+                more_ = handler.bool_value(true, semantic_tag::none, *this);
                 input_ptr_ += 4;
                 column_ += 4;
                 if (parent() == json_parse_state::root)
@@ -1632,7 +1632,7 @@ public:
             {
                 err_handler_(json_errc::invalid_value, *this);
                 ec = json_errc::invalid_value;
-                continue_ = false;
+                more_ = false;
                 return;
             }
         }
@@ -1650,7 +1650,7 @@ public:
         {
             if (*(input_ptr_+1) == 'u' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 'l')
             {
-                continue_ = handler.null_value(semantic_tag::none, *this);
+                more_ = handler.null_value(semantic_tag::none, *this);
                 input_ptr_ += 4;
                 column_ += 4;
                 if (parent() == json_parse_state::root)
@@ -1666,7 +1666,7 @@ public:
             {
                 err_handler_(json_errc::invalid_value, *this);
                 ec = json_errc::invalid_value;
-                continue_ = false;
+                more_ = false;
                 return;
             }
         }
@@ -1684,7 +1684,7 @@ public:
         {
             if (*(input_ptr_+1) == 'a' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 's' && *(input_ptr_+4) == 'e')
             {
-                continue_ = handler.bool_value(false, semantic_tag::none, *this);
+                more_ = handler.bool_value(false, semantic_tag::none, *this);
                 input_ptr_ += 5;
                 column_ += 5;
                 if (parent() == json_parse_state::root)
@@ -1700,7 +1700,7 @@ public:
             {
                 err_handler_(json_errc::invalid_value, *this);
                 ec = json_errc::invalid_value;
-                continue_ = false;
+                more_ = false;
                 return;
             }
         }
@@ -1758,7 +1758,7 @@ minus_sign:
             default:
                 err_handler_(json_errc::expected_value, *this);
                 ec = json_errc::expected_value;
-                continue_ = false;
+                more_ = false;
                 return;
         }
 zero:
@@ -1828,13 +1828,13 @@ zero:
             case '0': case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                 err_handler_(json_errc::leading_zero, *this);
                 ec = json_errc::leading_zero;
-                continue_ = false;
+                more_ = false;
                 state_ = json_parse_state::zero;
                 return;
             default:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::invalid_number;
-                continue_ = false;
+                more_ = false;
                 state_ = json_parse_state::zero;
                 return;
         }
@@ -1910,7 +1910,7 @@ integer:
             default:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::invalid_number;
-                continue_ = false;
+                more_ = false;
                 state_ = json_parse_state::integer;
                 return;
         }
@@ -1930,7 +1930,7 @@ fraction1:
             default:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::invalid_number;
-                continue_ = false;
+                more_ = false;
                 state_ = json_parse_state::fraction1;
                 return;
         }
@@ -2001,7 +2001,7 @@ fraction2:
             default:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::invalid_number;
-                continue_ = false;
+                more_ = false;
                 state_ = json_parse_state::fraction2;
                 return;
         }
@@ -2030,7 +2030,7 @@ exp1:
             default:
                 err_handler_(json_errc::expected_value, *this);
                 ec = json_errc::expected_value;
-                continue_ = false;
+                more_ = false;
                 state_ = json_parse_state::exp1;
                 return;
         }
@@ -2050,7 +2050,7 @@ exp2:
             default:
                 err_handler_(json_errc::expected_value, *this);
                 ec = json_errc::expected_value;
-                continue_ = false;
+                more_ = false;
                 state_ = json_parse_state::exp2;
                 return;
         }
@@ -2117,7 +2117,7 @@ exp3:
             default:
                 err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::invalid_number;
-                continue_ = false;
+                more_ = false;
                 state_ = json_parse_state::exp3;
                 return;
         }
@@ -2168,8 +2168,8 @@ string_u1:
                 JSONCONS_ILLEGAL_CONTROL_CHARACTER:
                 {
                     column_ += (input_ptr_ - sb + 1);
-                    continue_ = err_handler_(json_errc::illegal_control_character, *this);
-                    if (!continue_)
+                    more_ = err_handler_(json_errc::illegal_control_character, *this);
+                    if (!more_)
                     {
                         ec = json_errc::illegal_control_character;
                         state_ = json_parse_state::string;
@@ -2184,8 +2184,8 @@ string_u1:
                 case '\r':
                 {
                     column_ += (input_ptr_ - sb + 1);
-                    continue_ = err_handler_(json_errc::illegal_character_in_string, *this);
-                    if (!continue_)
+                    more_ = err_handler_(json_errc::illegal_character_in_string, *this);
+                    if (!more_)
                     {
                         ec = json_errc::illegal_character_in_string;
                         state_ = json_parse_state::string;
@@ -2202,8 +2202,8 @@ string_u1:
                 {
                     ++line_;
                     column_ = 1;
-                    continue_ = err_handler_(json_errc::illegal_character_in_string, *this);
-                    if (!continue_)
+                    more_ = err_handler_(json_errc::illegal_character_in_string, *this);
+                    if (!more_)
                     {
                         ec = json_errc::illegal_character_in_string;
                         state_ = json_parse_state::string;
@@ -2217,8 +2217,8 @@ string_u1:
                 case '\t':
                 {
                     column_ += (input_ptr_ - sb + 1);
-                    continue_ = err_handler_(json_errc::illegal_character_in_string, *this);
-                    if (!continue_)
+                    more_ = err_handler_(json_errc::illegal_character_in_string, *this);
+                    if (!more_)
                     {
                         ec = json_errc::illegal_character_in_string;
                         state_ = json_parse_state::string;
@@ -2324,7 +2324,7 @@ escape:
         default:    
             err_handler_(json_errc::illegal_escaped_character, *this);
             ec = json_errc::illegal_escaped_character;
-            continue_ = false;
+            more_ = false;
             state_ = json_parse_state::escape;
             return;
         }
@@ -2429,7 +2429,7 @@ escape_expect_surrogate_pair1:
             default:
                 err_handler_(json_errc::expected_codepoint_surrogate_pair, *this);
                 ec = json_errc::expected_codepoint_surrogate_pair;
-                continue_ = false;
+                more_ = false;
                 state_ = json_parse_state::escape_expect_surrogate_pair1;
                 return;
             }
@@ -2451,7 +2451,7 @@ escape_expect_surrogate_pair2:
             default:
                 err_handler_(json_errc::expected_codepoint_surrogate_pair, *this);
                 ec = json_errc::expected_codepoint_surrogate_pair;
-                continue_ = false;
+                more_ = false;
                 state_ = json_parse_state::escape_expect_surrogate_pair2;
                 return;
             }
@@ -2541,40 +2541,40 @@ escape_u9:
         case unicons::conv_errc():
             break;
         case unicons::conv_errc::over_long_utf8_sequence:
-            continue_ = err_handler_(json_errc::over_long_utf8_sequence, *this);
-            if (!continue_)
+            more_ = err_handler_(json_errc::over_long_utf8_sequence, *this);
+            if (!more_)
             {
                 ec = json_errc::over_long_utf8_sequence;
                 return;
             }
             break;
         case unicons::conv_errc::unpaired_high_surrogate:
-            continue_ = err_handler_(json_errc::unpaired_high_surrogate, *this);
-            if (!continue_)
+            more_ = err_handler_(json_errc::unpaired_high_surrogate, *this);
+            if (!more_)
             {
                 ec = json_errc::unpaired_high_surrogate;
                 return;
             }
             break;
         case unicons::conv_errc::expected_continuation_byte:
-            continue_ = err_handler_(json_errc::expected_continuation_byte, *this);
-            if (!continue_)
+            more_ = err_handler_(json_errc::expected_continuation_byte, *this);
+            if (!more_)
             {
                 ec = json_errc::expected_continuation_byte;
                 return;
             }
             break;
         case unicons::conv_errc::illegal_surrogate_value:
-            continue_ = err_handler_(json_errc::illegal_surrogate_value, *this);
-            if (!continue_)
+            more_ = err_handler_(json_errc::illegal_surrogate_value, *this);
+            if (!more_)
             {
                 ec = json_errc::illegal_surrogate_value;
                 return;
             }
             break;
         default:
-            continue_ = err_handler_(json_errc::illegal_codepoint, *this);
-            if (!continue_)
+            more_ = err_handler_(json_errc::illegal_codepoint, *this);
+            if (!more_)
             {
                 ec = json_errc::illegal_codepoint;
                 return;
@@ -2642,11 +2642,11 @@ private:
         auto result = jsoncons::detail::to_integer<int64_t>(string_buffer_.data(), string_buffer_.length());
         if (result.ec == jsoncons::detail::to_integer_errc())
         {
-            continue_ = handler.int64_value(result.value, semantic_tag::none, *this);
+            more_ = handler.int64_value(result.value, semantic_tag::none, *this);
         }
         else // Must be overflow
         {
-            continue_ = handler.string_value(string_buffer_, semantic_tag::bigint, *this);
+            more_ = handler.string_value(string_buffer_, semantic_tag::bigint, *this);
         }
         after_value(ec);
     }
@@ -2656,11 +2656,11 @@ private:
         auto result = jsoncons::detail::to_integer<uint64_t>(string_buffer_.data(), string_buffer_.length());
         if (result.ec == jsoncons::detail::to_integer_errc())
         {
-            continue_ = handler.uint64_value(result.value, semantic_tag::none, *this);
+            more_ = handler.uint64_value(result.value, semantic_tag::none, *this);
         }
         else // Must be overflow
         {
-            continue_ = handler.string_value(string_buffer_, semantic_tag::bigint, *this);
+            more_ = handler.string_value(string_buffer_, semantic_tag::bigint, *this);
         }
         after_value(ec);
     }
@@ -2671,23 +2671,23 @@ private:
         {
             if (options_.lossless_number())
             {
-                continue_ = handler.string_value(string_buffer_, semantic_tag::bigdec, *this);
+                more_ = handler.string_value(string_buffer_, semantic_tag::bigdec, *this);
             }
             else
             {
                 double d = to_double_(string_buffer_.c_str(), string_buffer_.length());
-                continue_ = handler.double_value(d, semantic_tag::none, *this);
+                more_ = handler.double_value(d, semantic_tag::none, *this);
             }
         }
         JSONCONS_CATCH(...)
         {
-            continue_ = err_handler_(json_errc::invalid_number, *this);
-            if (!continue_)
+            more_ = err_handler_(json_errc::invalid_number, *this);
+            if (!more_)
             {
                 ec = json_errc::invalid_number;
                 return;
             }
-            continue_ = handler.null_value(semantic_tag::none, *this); // recovery
+            more_ = handler.null_value(semantic_tag::none, *this); // recovery
         }
 
         after_value(ec);
@@ -2704,8 +2704,8 @@ private:
             if (ec) return;
             break;
         default:
-            continue_ = err_handler_(json_errc::expected_value, *this);
-            if (!continue_)
+            more_ = err_handler_(json_errc::expected_value, *this);
+            if (!more_)
             {
                 ec = json_errc::expected_value;
                 return;
@@ -2726,8 +2726,8 @@ private:
             if (ec) return;
             break;
         default:
-            continue_ = err_handler_(json_errc::expected_value, *this);
-            if (!continue_)
+            more_ = err_handler_(json_errc::expected_value, *this);
+            if (!more_)
             {
                 ec = json_errc::expected_value;
                 return;
@@ -2748,22 +2748,22 @@ private:
         switch (parent())
         {
         case json_parse_state::member_name:
-            continue_ = handler.name(string_view_type(s, length), *this);
+            more_ = handler.name(string_view_type(s, length), *this);
             state_ = pop_state();
             state_ = json_parse_state::expect_colon;
             break;
         case json_parse_state::object:
         case json_parse_state::array:
-            continue_ = handler.string_value(string_view_type(s, length), semantic_tag::none, *this);
+            more_ = handler.string_value(string_view_type(s, length), semantic_tag::none, *this);
             state_ = json_parse_state::expect_comma_or_end;
             break;
         case json_parse_state::root:
-            continue_ = handler.string_value(string_view_type(s, length), semantic_tag::none, *this);
+            more_ = handler.string_value(string_view_type(s, length), semantic_tag::none, *this);
             state_ = json_parse_state::before_done;
             break;
         default:
-            continue_ = err_handler_(json_errc::invalid_json_text, *this);
-            if (!continue_)
+            more_ = err_handler_(json_errc::invalid_json_text, *this);
+            if (!more_)
             {
                 ec = json_errc::invalid_json_text;
                 return;
@@ -2785,8 +2785,8 @@ private:
         case json_parse_state::root:
             break;
         default:
-            continue_ = err_handler_(json_errc::invalid_json_text, *this);
-            if (!continue_)
+            more_ = err_handler_(json_errc::invalid_json_text, *this);
+            if (!more_)
             {
                 ec = json_errc::invalid_json_text;
                 return;
@@ -2807,8 +2807,8 @@ private:
             state_ = json_parse_state::before_done;
             break;
         default:
-            continue_ = err_handler_(json_errc::invalid_json_text, *this);
-            if (!continue_)
+            more_ = err_handler_(json_errc::invalid_json_text, *this);
+            if (!more_)
             {
                 ec = json_errc::invalid_json_text;
                 return;
@@ -2847,8 +2847,8 @@ private:
         }
         else
         {
-            continue_ = err_handler_(json_errc::invalid_hex_escape_sequence, *this);
-            if (!continue_)
+            more_ = err_handler_(json_errc::invalid_hex_escape_sequence, *this);
+            if (!more_)
             {
                 ec = json_errc::invalid_hex_escape_sequence;
                 return cp;

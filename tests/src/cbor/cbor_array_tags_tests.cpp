@@ -15,7 +15,46 @@
 
 using namespace jsoncons;
 
-TEST_CASE("cbor tagged array tests")
+struct my_cbor_content_handler : public cbor::default_cbor_content_handler<>
+{
+    std::vector<double> v;
+private:
+    bool do_typed_array(const double* data, size_t size, 
+                        semantic_tag,
+                        const ser_context&) override
+    {
+        std::cout << "do_typed_array size: " << size << "\n";
+        v = std::vector<double>(data,data+size);
+        return false;
+    }
+};
+
+TEST_CASE("cbor typed array cursor tests")
+{
+    SECTION("Tag 86, float64, little endian")
+    {
+        const std::vector<uint8_t> input = {
+            0xD8, // Tag
+                0x56, // Tag 86, float64, little endian, Typed Array
+            0x50, // Byte string value of length 16
+                0xff,0xff,0xff,0xff,0xff,0xff,0xef,0xff,
+                0xff,0xff,0xff,0xff,0xff,0xff,0xef,0x7f
+        };
+
+        cbor::cbor_bytes_cursor cursor(input);
+        CHECK(cursor.current().event_type() == staj_event_type::begin_array);
+        CHECK(cursor.is_typed_array());
+
+        my_cbor_content_handler handler;
+        cursor.read_to(handler);
+        for (auto item : handler.v)
+        {
+            std::cout << item << "\n";
+        }
+    }
+}
+
+TEST_CASE("cbor typed array tests")
 {
     SECTION("Tag 64 (uint8 Typed Array)")
     {

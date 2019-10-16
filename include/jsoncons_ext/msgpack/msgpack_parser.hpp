@@ -48,7 +48,7 @@ class basic_msgpack_parser : public ser_context
     typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
 
     Src source_;
-    bool continue_;
+    bool more_;
     bool done_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
@@ -57,7 +57,7 @@ public:
     basic_msgpack_parser(Source&& source,
                          const WorkAllocator allocator=WorkAllocator())
        : source_(std::forward<Source>(source)),
-         continue_(true), 
+         more_(true), 
          done_(false),
          buffer_(allocator),
          state_stack_(allocator)
@@ -67,14 +67,14 @@ public:
 
     void restart()
     {
-        continue_ = true;
+        more_ = true;
     }
 
     void reset()
     {
         state_stack_.clear();
         state_stack_.emplace_back(parse_mode::root,0);
-        continue_ = true;
+        more_ = true;
         done_ = false;
     }
 
@@ -85,7 +85,7 @@ public:
 
     bool stopped() const
     {
-        return !continue_;
+        return !more_;
     }
 
     size_t line() const override
@@ -100,7 +100,7 @@ public:
 
     void parse(json_content_handler& handler, std::error_code& ec)
     {
-        while (!done_ && continue_)
+        while (!done_ && more_)
         {
             switch (state_stack_.back().mode)
             {
@@ -163,7 +163,7 @@ public:
                 {
                     JSONCONS_ASSERT(state_stack_.size() == 1);
                     state_stack_.clear();
-                    continue_ = false;
+                    more_ = false;
                     done_ = true;
                     handler.flush();
                     break;
@@ -189,7 +189,7 @@ private:
             if (type <= 0x7f) 
             {
                 // positive fixint
-                continue_ = handler.uint64_value(type, semantic_tag::none, *this);
+                more_ = handler.uint64_value(type, semantic_tag::none, *this);
             }
             else if (type <= 0x8f) 
             {
@@ -218,13 +218,13 @@ private:
                     ec = msgpack_errc::invalid_utf8_text_string;
                     return;
                 }
-                continue_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this);
+                more_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this);
             }
         }
         else if (type >= 0xe0) 
         {
             // negative fixint
-            continue_ = handler.int64_value(static_cast<int8_t>(type), semantic_tag::none, *this);
+            more_ = handler.int64_value(static_cast<int8_t>(type), semantic_tag::none, *this);
         }
         else
         {
@@ -232,17 +232,17 @@ private:
             {
                 case jsoncons::msgpack::detail::msgpack_format::nil_cd: 
                 {
-                    continue_ = handler.null_value(semantic_tag::none, *this);
+                    more_ = handler.null_value(semantic_tag::none, *this);
                     break;
                 }
                 case jsoncons::msgpack::detail::msgpack_format::true_cd:
                 {
-                    continue_ = handler.bool_value(true, semantic_tag::none, *this);
+                    more_ = handler.bool_value(true, semantic_tag::none, *this);
                     break;
                 }
                 case jsoncons::msgpack::detail::msgpack_format::false_cd:
                 {
-                    continue_ = handler.bool_value(false, semantic_tag::none, *this);
+                    more_ = handler.bool_value(false, semantic_tag::none, *this);
                     break;
                 }
                 case jsoncons::msgpack::detail::msgpack_format::float32_cd: 
@@ -256,7 +256,7 @@ private:
                     }
                     const uint8_t* endp;
                     float val = jsoncons::detail::big_to_native<float>(buf,buf+sizeof(buf),&endp);
-                    continue_ = handler.double_value(val, semantic_tag::none, *this);
+                    more_ = handler.double_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -271,7 +271,7 @@ private:
                     }
                     const uint8_t* endp;
                     double val = jsoncons::detail::big_to_native<double>(buf,buf+sizeof(buf),&endp);
-                    continue_ = handler.double_value(val, semantic_tag::none, *this);
+                    more_ = handler.double_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -279,7 +279,7 @@ private:
                 {
                     uint8_t val{};
                     source_.get(val);
-                    continue_ = handler.uint64_value(val, semantic_tag::none, *this);
+                    more_ = handler.uint64_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -294,7 +294,7 @@ private:
                     }
                     const uint8_t* endp;
                     uint16_t val = jsoncons::detail::big_to_native<uint16_t>(buf,buf+sizeof(buf),&endp);
-                    continue_ = handler.uint64_value(val, semantic_tag::none, *this);
+                    more_ = handler.uint64_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -309,7 +309,7 @@ private:
                     }
                     const uint8_t* endp;
                     uint32_t val = jsoncons::detail::big_to_native<uint32_t>(buf,buf+sizeof(buf),&endp);
-                    continue_ = handler.uint64_value(val, semantic_tag::none, *this);
+                    more_ = handler.uint64_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -324,7 +324,7 @@ private:
                     }
                     const uint8_t* endp;
                     uint64_t val = jsoncons::detail::big_to_native<uint64_t>(buf,buf+sizeof(buf),&endp);
-                    continue_ = handler.uint64_value(val, semantic_tag::none, *this);
+                    more_ = handler.uint64_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -339,7 +339,7 @@ private:
                     }
                     const uint8_t* endp;
                     int8_t val = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
-                    continue_ = handler.int64_value(val, semantic_tag::none, *this);
+                    more_ = handler.int64_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -354,7 +354,7 @@ private:
                     }
                     const uint8_t* endp;
                     int16_t val = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
-                    continue_ = handler.int64_value(val, semantic_tag::none, *this);
+                    more_ = handler.int64_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -369,7 +369,7 @@ private:
                     }
                     const uint8_t* endp;
                     int32_t val = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
-                    continue_ = handler.int64_value(val, semantic_tag::none, *this);
+                    more_ = handler.int64_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -384,7 +384,7 @@ private:
                     }
                     const uint8_t* endp;
                     int64_t val = jsoncons::detail::big_to_native<int64_t>(buf,buf+sizeof(buf),&endp);
-                    continue_ = handler.int64_value(val, semantic_tag::none, *this);
+                    more_ = handler.int64_value(val, semantic_tag::none, *this);
                     break;
                 }
 
@@ -413,7 +413,7 @@ private:
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    continue_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this);
+                    more_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this);
                     break;
                 }
 
@@ -443,7 +443,7 @@ private:
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    continue_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this);
+                    more_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this);
                     break;
                 }
 
@@ -473,7 +473,7 @@ private:
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    continue_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this);
+                    more_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this);
                     break;
                 }
 
@@ -498,7 +498,7 @@ private:
                         return;
                     }
 
-                    continue_ = handler.byte_string_value(byte_string_view(v.data(),v.size()), 
+                    more_ = handler.byte_string_value(byte_string_view(v.data(),v.size()), 
                                                semantic_tag::none, 
                                                *this);
                     break;
@@ -525,7 +525,7 @@ private:
                         return;
                     }
 
-                    continue_ = handler.byte_string_value(byte_string_view(v.data(),v.size()), 
+                    more_ = handler.byte_string_value(byte_string_view(v.data(),v.size()), 
                                                semantic_tag::none, 
                                                *this);
                     break;
@@ -552,7 +552,7 @@ private:
                         return;
                     }
 
-                    continue_ = handler.byte_string_value(byte_string_view(v.data(),v.size()), 
+                    more_ = handler.byte_string_value(byte_string_view(v.data(),v.size()), 
                                                semantic_tag::none, 
                                                *this);
                     break;
@@ -609,7 +609,7 @@ private:
                 ec = msgpack_errc::invalid_utf8_text_string;
                 return;
             }
-            continue_ = handler.name(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
+            more_ = handler.name(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
         }
         else
         {
@@ -641,7 +641,7 @@ private:
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    continue_ = handler.name(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
+                    more_ = handler.name(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
                     break;
                 }
 
@@ -665,7 +665,7 @@ private:
                         return;
                     }
 
-                    continue_ = handler.name(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
+                    more_ = handler.name(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
                     break;
                 }
 
@@ -689,7 +689,7 @@ private:
                         return;
                     }
 
-                    continue_ = handler.name(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
+                    more_ = handler.name(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
                     break;
                 }
             }
@@ -733,12 +733,12 @@ private:
                 break;
         }
         state_stack_.emplace_back(parse_mode::array,len);
-        continue_ = handler.begin_array(len, semantic_tag::none, *this);
+        more_ = handler.begin_array(len, semantic_tag::none, *this);
     }
 
     void end_array(json_content_handler& handler, std::error_code&)
     {
-        continue_ = handler.end_array(*this);
+        more_ = handler.end_array(*this);
         state_stack_.pop_back();
     }
 
@@ -779,12 +779,12 @@ private:
                 break;
         }
         state_stack_.emplace_back(parse_mode::map_key,len);
-        continue_ = handler.begin_object(len, semantic_tag::none, *this);
+        more_ = handler.begin_object(len, semantic_tag::none, *this);
     }
 
     void end_map(json_content_handler& handler, std::error_code&)
     {
-        continue_ = handler.end_object(*this);
+        more_ = handler.end_object(*this);
         state_stack_.pop_back();
     }
 };

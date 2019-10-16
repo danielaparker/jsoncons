@@ -421,10 +421,16 @@ private:
 };
 
 template <class CharT>
-class basic_null_json_content_handler final : public basic_json_content_handler<CharT>
+class basic_default_json_content_handler : public basic_json_content_handler<CharT>
 {
+    bool parse_more_;
 public:
     using typename basic_json_content_handler<CharT>::string_view_type;
+
+    basic_default_json_content_handler(bool parse_more = true)
+        : parse_more_(parse_more)
+    {
+    }
 private:
     void do_flush() override
     {
@@ -432,78 +438,78 @@ private:
 
     bool do_begin_object(semantic_tag, const ser_context&) override
     {
-        return true;
+        return parse_more_;
     }
 
     bool do_end_object(const ser_context&) override
     {
-        return true;
+        return parse_more_;
     }
 
     bool do_begin_array(semantic_tag, const ser_context&) override
     {
-        return true;
+        return parse_more_;
     }
 
     bool do_end_array(const ser_context&) override
     {
-        return true;
+        return parse_more_;
     }
 
     bool do_name(const string_view_type&, const ser_context&) override
     {
-        return true;
+        return parse_more_;
     }
 
     bool do_null_value(semantic_tag, const ser_context&) override
     {
-        return true;
+        return parse_more_;
     }
 
     bool do_string_value(const string_view_type&, semantic_tag, const ser_context&) override
     {
-        return true;
+        return parse_more_;
     }
 
     bool do_byte_string_value(const byte_string_view&,
                               semantic_tag, 
                               const ser_context&) override
     {
-        return true;
+        return parse_more_;
     }
 
     bool do_int64_value(int64_t, 
                         semantic_tag, 
                         const ser_context&) override
     {
-        return true;
+        return parse_more_;
     }
 
     bool do_uint64_value(uint64_t, 
                          semantic_tag, 
                          const ser_context&) override
     {
-        return true;
+        return parse_more_;
     }
 
     bool do_double_value(double, 
                          semantic_tag,
                          const ser_context&) override
     {
-        return true;
+        return parse_more_;
     }
 
     bool do_bool_value(bool, semantic_tag, const ser_context&) override
     {
-        return true;
+        return parse_more_;
     }
 };
 
 typedef basic_json_content_handler<char> json_content_handler;
 typedef basic_json_content_handler<wchar_t> wjson_content_handler;
 
-typedef basic_null_json_content_handler<char> null_json_content_handler;
-typedef basic_null_json_content_handler<wchar_t> wnull_json_content_handler;
+typedef basic_default_json_content_handler<char> default_json_content_handler;
+typedef basic_default_json_content_handler<wchar_t> wdefault_json_content_handler;
 
 }
 
