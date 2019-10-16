@@ -138,65 +138,65 @@ Member type                         |Definition
 
 (1) Indicates the begining of an object of indefinite length.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (2) Indicates the begining of an object of known length. 
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (3) Indicates the end of an object.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (4) Indicates the beginning of an indefinite length array. 
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (5) Indicates the beginning of an array of known length. 
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (6) Indicates the end of an array.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (7) Writes the name part of an object name-value pair.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (8) Writes a null value. 
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (9) Writes a boolean value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (10) Writes a text string value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (11) Writes a byte string value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (12) Writes a byte string value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (13) Writes a non-negative integer value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (14) Writes a signed integer value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (15) Writes a floating point value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
-(16)-(30) Same as (1)-(15), except if a parse error is encountered, sets `ec` and returns `false`.
+(16)-(30) Same as (1)-(15), except sets `ec` and returns `false` on parse errors.
 
     void flush()
 Flushes whatever is buffered to the destination.
@@ -267,62 +267,76 @@ Flushes whatever is buffered to the destination.
 
 (1) Handles the beginning of an object of indefinite length.
 Returns `true` if the producer should generate more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (2) Handles the beginning of an object of known length.
 Returns `true` if the producer should generate more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (3) Handles the end of an object.
 Returns `true` if the producer should generate more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (4) Handles the beginning of an array of indefinite length.
 Returns `true` if the producer should generate more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (5) Handles the beginning of an array of known length.
 Returns `true` if the producer should generate more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (6) Handles the end of an array.
 Returns `true` if the producer should generate more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (7) Handles the name part of an object name-value pair.
 Returns `true` if the producer should generate more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (8) Handles a null value.
 Returns `true` if the producer should generate more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (9) Handles a boolean value. 
 Returns `true` if the producer should generate more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (10) Handles a string value.
 Returns `true` if the producer should generate more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (11) Handles a byte string value.
 Returns `true` if the producer should generate more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (12) Handles a non-negative integer value.
 Returns `true` if the producer should generate more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (13) Handles a signed integer value.
 Returns `true` if the producer should generate more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
 (14) Handles a floating point value. 
 Returns `true` if the producer should generate more events, `false` otherwise.
-If a parse error is encountered, throws a [ser_error](ser_error.md). 
+Throws a [ser_error](ser_error.md) on parse errors. 
 
     virtual void do_flush() = 0;
 Allows producers of json events to flush any buffered data.
+
+#### Parameters
+
+`tag` - a jsoncons semantic tag
+`context` - parse context information including line and column number
+`ec` - a parse error code
+
+#### Exceptions
+
+The overloads that do not take a `std::error_code&` parameter throw a
+[ser_error](ser_error.md) on parse errors, constructed with the error code as the error code argument
+and line and column from the `context`. 
+
+The overloads that take a `std::error_code&` parameter set it to the error code and return `false` on parse errors.
 
 #### See also
 
