@@ -171,7 +171,7 @@ line and column number is provided in the [context](ser_context.md) parameter.
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 Sets `ec` to indicate an error.
 
-    virtual bool do_end_array(const ser_context& context) = 0;
+    virtual bool do_end_array(const ser_context& context, std::error_code& ec) = 0;
 Handles the end of an array. Contextual information including
 line and column number is provided in the [context](ser_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.

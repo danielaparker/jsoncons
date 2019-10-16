@@ -185,7 +185,7 @@ private:
         return parse_more_;
     }
 
-    bool do_end_array(const ser_context&) override
+    bool do_end_array(const ser_context&, std::error_code&) override
     {
         return parse_more_;
     }
@@ -360,9 +360,9 @@ private:
         return to_handler_.begin_array(length, tag, context, ec);
     }
 
-    bool do_end_array(const ser_context& context) override
+    bool do_end_array(const ser_context& context, std::error_code& ec) override
     {
-        return to_handler_.end_array(context);
+        return to_handler_.end_array(context, ec);
     }
 
     bool do_name(const string_view_type& name,

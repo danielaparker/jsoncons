@@ -225,7 +225,18 @@ public:
 
     bool end_array(const ser_context& context=null_ser_context_arg)
     {
-        return do_end_array(context);
+        std::error_code ec;
+        bool more = do_end_array(context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool end_array(const ser_context& context, std::error_code& ec)
+    {
+        return do_end_array(context, ec);
     }
 
     bool name(const string_view_type& name, const ser_context& context=null_ser_context_arg)
@@ -452,7 +463,7 @@ private:
         return do_begin_array(tag, context, ec);
     }
 
-    virtual bool do_end_array(const ser_context& context) = 0;
+    virtual bool do_end_array(const ser_context& context, std::error_code& ec) = 0;
 
     virtual bool do_name(const string_view_type& name, const ser_context& context) = 0;
 
@@ -671,7 +682,7 @@ private:
         return parse_more_;
     }
 
-    bool do_end_array(const ser_context&) override
+    bool do_end_array(const ser_context&, std::error_code&) override
     {
         return parse_more_;
     }

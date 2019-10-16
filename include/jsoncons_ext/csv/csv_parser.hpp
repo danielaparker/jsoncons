@@ -353,7 +353,7 @@ namespace detail {
             return true;
         }
 
-        bool do_end_array(const ser_context&) override
+        bool do_end_array(const ser_context&, std::error_code&) override
         {
             if (level_ > 0)
             {

@@ -133,17 +133,19 @@ private:
         return true;
     }
 
-    bool do_end_object(const ser_context&, std::error_code&) override
+    bool do_end_object(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
 
         if (stack_.back().count() < stack_.back().length())
         {
-            JSONCONS_THROW(ser_error( msgpack_errc::too_few_items));
+            ec = msgpack_errc::too_few_items;
+            return false;
         }
         else if (stack_.back().count() > stack_.back().length())
         {
-            JSONCONS_THROW(ser_error( msgpack_errc::too_many_items));
+            ec = msgpack_errc::too_many_items;
+            return false;
         }
 
         stack_.pop_back();
@@ -180,17 +182,19 @@ private:
         return true;
     }
 
-    bool do_end_array(const ser_context&) override
+    bool do_end_array(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
 
         if (stack_.back().count() < stack_.back().length())
         {
-            JSONCONS_THROW(ser_error(msgpack_errc::too_few_items));
+            ec = msgpack_errc::too_few_items;
+            return false;
         }
         else if (stack_.back().count() > stack_.back().length())
         {
-            JSONCONS_THROW(ser_error(msgpack_errc::too_many_items));
+            ec = msgpack_errc::too_many_items;
+            return false;
         }
 
         stack_.pop_back();

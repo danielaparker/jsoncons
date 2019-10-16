@@ -72,9 +72,9 @@ private:
         return other_handler_.begin_array(tag, context, ec);
     }
 
-    bool do_end_array(const ser_context& context) override
+    bool do_end_array(const ser_context& context, std::error_code& ec) override
     {
-        return other_handler_.end_array(context);
+        return other_handler_.end_array(context, ec);
     }
 
     bool do_name(const string_view_type& name, const ser_context& context) override

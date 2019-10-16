@@ -322,7 +322,7 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_end_array(const ser_context& context) override
+    bool do_end_array(const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<char_type>(staj_event_type::end_array);
         return !filter_(event_, context);

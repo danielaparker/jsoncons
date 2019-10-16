@@ -165,7 +165,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const ser_context&, std::error_code&) override
+    bool do_end_object(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
@@ -176,11 +176,13 @@ private:
         {
             if (stack_.back().count() < stack_.back().length())
             {
-                JSONCONS_THROW(ser_error(cbor_errc::too_few_items));
+                ec = cbor_errc::too_few_items;
+                return false;
             }
             if (stack_.back().count() > stack_.back().length())
             {
-                JSONCONS_THROW(ser_error(cbor_errc::too_many_items));
+                ec = cbor_errc::too_many_items;
+                return false;
             }
         }
 
@@ -236,7 +238,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const ser_context&) override
+    bool do_end_array(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
 
@@ -248,11 +250,13 @@ private:
         {
             if (stack_.back().count() < stack_.back().length())
             {
-                JSONCONS_THROW(ser_error(cbor_errc::too_few_items));
+                ec = cbor_errc::too_few_items;
+                return false;
             }
             if (stack_.back().count() > stack_.back().length())
             {
-                JSONCONS_THROW(ser_error(cbor_errc::too_many_items));
+                ec = cbor_errc::too_many_items;
+                return false;
             }
         }
 
@@ -544,7 +548,7 @@ private:
         {
             JSONCONS_THROW(json_runtime_error<std::invalid_argument>(make_error_code(result.ec).message()));
         }
-        do_end_array(context);
+        do_end_array(context, ec);
     }
 
     void write_hexfloat_value(const string_view_type& sv, const ser_context& context)
@@ -700,7 +704,7 @@ private:
         {
             JSONCONS_THROW(json_runtime_error<std::invalid_argument>(make_error_code(result.ec).message()));
         }
-        do_end_array(context);
+        do_end_array(context, ec);
     }
 
     bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context& context) override
