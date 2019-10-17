@@ -26,9 +26,9 @@ namespace jsoncons {
 namespace cbor {
 
 template <class Float128T>
-class cbor_staj_event_handler : public cbor_content_handler<Float128T>
+class cbor_staj_event_handler : public basic_cbor_content_handler<Float128T>
 {
-    using super_type = cbor_content_handler<Float128T>;
+    using super_type = basic_cbor_content_handler<Float128T>;
 public:
     using char_type = char;
     using string_view_type = typename super_type::string_view_type;
@@ -219,7 +219,7 @@ public:
         return more;
     }
 
-    bool dump(cbor_content_handler<Float128T>& handler, const ser_context& context, std::error_code& ec)
+    bool dump(basic_cbor_content_handler<Float128T>& handler, const ser_context& context, std::error_code& ec)
     {
         bool more = true;
         if (data_.type() != typed_array_type())
@@ -605,7 +605,7 @@ public:
         read_next(handler, ec);
     }
 
-    void read_to(cbor_content_handler<Float128T>& handler) 
+    void read_to(basic_cbor_content_handler<Float128T>& handler) 
     {
         std::error_code ec;
         read_to(handler, ec);
@@ -615,7 +615,7 @@ public:
         }
     }
 
-    void read_to(cbor_content_handler<Float128T>& handler, std::error_code& ec) 
+    void read_to(basic_cbor_content_handler<Float128T>& handler, std::error_code& ec) 
     {
         if (!event_handler_.dump(handler, *this, ec))
         {
@@ -666,7 +666,7 @@ public:
         }
     }
 
-    void read_next(cbor_content_handler<char>& handler, std::error_code& ec)
+    void read_next(basic_cbor_content_handler<char>& handler, std::error_code& ec)
     {
         parser_.restart();
         while (!parser_.stopped())

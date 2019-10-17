@@ -8,7 +8,7 @@ template <
 > class basic_json_content_handler
 ```
 
-Defines an interface for generating and receiving JSON events. 
+Defines an interface for producing and consuming JSON events. 
 
 Typedefs for common character types are provided:
 

@@ -21,13 +21,14 @@
 namespace jsoncons { namespace cbor {
 
 template <class Float128T=void>
-class cbor_content_handler : public basic_json_content_handler<char>
+class basic_cbor_content_handler : public basic_json_content_handler<char>
 {
 public:
     using super_type = basic_json_content_handler<char>;
 public:
     using char_type = char;
     using string_view_type = typename super_type::string_view_type;
+    typedef Float128T float128_type; 
 
     bool typed_array(const uint8_t* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
@@ -159,7 +160,7 @@ public:
         return more;
     }
 
-    bool typed_array(const Float128T* data, size_t size, 
+    bool typed_array(const float128_type* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context_arg)
     {
@@ -293,14 +294,14 @@ private:
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
 
-    virtual bool do_typed_array(const Float128T* data, size_t size, 
+    virtual bool do_typed_array(const float128_type* data, size_t size, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
 };
 
 template <class Float128T=void>
-class default_cbor_content_handler : public cbor_content_handler<Float128T>
+class basic_default_cbor_content_handler : public basic_cbor_content_handler<Float128T>
 {
     using super_type = basic_default_json_content_handler<char>;
 
@@ -308,8 +309,9 @@ class default_cbor_content_handler : public cbor_content_handler<Float128T>
 public:
     using char_type = char;
     using string_view_type = typename super_type::string_view_type;
+    typedef Float128T float128_type; 
 
-    default_cbor_content_handler(bool parse_more = true)
+    basic_default_cbor_content_handler(bool parse_more = true)
         : parse_more_(parse_more)
     {
     }
@@ -468,7 +470,7 @@ private:
         return parse_more_;
     }
 
-    bool do_typed_array(const Float128T*, size_t, 
+    bool do_typed_array(const float128_type*, size_t, 
                         semantic_tag,
                         const ser_context&, 
                         std::error_code&) override 
@@ -478,12 +480,13 @@ private:
 };
 
 template <class Float128T=void>
-class cbor_to_json_content_handler_adaptor : public cbor_content_handler<Float128T>
+class cbor_to_json_content_handler_adaptor : public basic_cbor_content_handler<Float128T>
 {
-    using super_type = cbor_content_handler<Float128T>;
+    using super_type = basic_cbor_content_handler<Float128T>;
 public:
     using char_type = char;
     using string_view_type = typename super_type::string_view_type;
+    typedef Float128T float128_type; 
     using super_type::typed_array;
 private:
     basic_json_content_handler<char_type>& to_handler_;
@@ -586,9 +589,9 @@ private:
     }
 
     bool do_typed_array(const uint8_t* data, size_t size, 
-                                semantic_tag tag,
-                                const ser_context& context, 
-                                std::error_code& ec) override
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
     {
         bool more = to_handler_.begin_array(tag, context, ec);
         for (auto p = data; more && p < data+size; ++p)
@@ -603,8 +606,8 @@ private:
     }
 
     bool do_typed_array(const uint16_t* data, size_t size, 
-                                semantic_tag tag,
-                                const ser_context& context, 
+                        semantic_tag tag,
+                        const ser_context& context, 
                         std::error_code& ec) override
     {
         bool more = to_handler_.begin_array(tag, context, ec);
@@ -620,8 +623,8 @@ private:
     }
 
     bool do_typed_array(const uint32_t* data, size_t size, 
-                                semantic_tag tag,
-                                const ser_context& context, 
+                        semantic_tag tag,
+                        const ser_context& context, 
                         std::error_code& ec) override
     {
         bool more = to_handler_.begin_array(tag, context, ec);
@@ -637,8 +640,8 @@ private:
     }
 
     bool do_typed_array(const uint64_t* data, size_t size, 
-                                semantic_tag tag,
-                                const ser_context& context, 
+                        semantic_tag tag,
+                        const ser_context& context, 
                         std::error_code& ec) override
     {
         bool more = to_handler_.begin_array(tag, context, ec);
@@ -654,8 +657,8 @@ private:
     }
 
     bool do_typed_array(const int8_t* data, size_t size, 
-                                semantic_tag tag,
-                                const ser_context& context, 
+                        semantic_tag tag,
+                        const ser_context& context, 
                         std::error_code& ec) override
     {
         bool more = to_handler_.begin_array(tag,context, ec);
@@ -671,8 +674,8 @@ private:
     }
 
     bool do_typed_array(const int16_t* data, size_t size, 
-                                semantic_tag tag,
-                                const ser_context& context, 
+                        semantic_tag tag,
+                        const ser_context& context, 
                         std::error_code& ec) override
     {
         bool more = to_handler_.begin_array(tag,context, ec);
@@ -688,8 +691,8 @@ private:
     }
 
     bool do_typed_array(const int32_t* data, size_t size, 
-                                semantic_tag tag,
-                                const ser_context& context, 
+                        semantic_tag tag,
+                        const ser_context& context, 
                         std::error_code& ec) override
     {
         bool more = to_handler_.begin_array(tag,context, ec);
@@ -705,8 +708,8 @@ private:
     }
 
     bool do_typed_array(const int64_t* data, size_t size, 
-                                semantic_tag tag,
-                                const ser_context& context, 
+                        semantic_tag tag,
+                        const ser_context& context, 
                         std::error_code& ec) override
     {
         bool more = to_handler_.begin_array(tag,context, ec);
@@ -722,8 +725,8 @@ private:
     }
 
     bool do_typed_array(const float* data, size_t size, 
-                                semantic_tag tag,
-                                const ser_context& context, 
+                        semantic_tag tag,
+                        const ser_context& context, 
                         std::error_code& ec) override
     {
         bool more = to_handler_.begin_array(tag,context, ec);
@@ -739,8 +742,8 @@ private:
     }
 
     bool do_typed_array(const double* data, size_t size, 
-                                semantic_tag tag,
-                                const ser_context& context, 
+                        semantic_tag tag,
+                        const ser_context& context, 
                         std::error_code& ec)
     {
         bool more = to_handler_.begin_array(tag,context, ec);
@@ -755,7 +758,7 @@ private:
         return more;
     }
 
-    bool do_typed_array(const Float128T* /*data*/, size_t /*size*/, 
+    bool do_typed_array(const float128_type* /*data*/, size_t /*size*/, 
                         semantic_tag /*tag*/,
                         const ser_context& /*context*/, 
                         std::error_code&) override
@@ -763,6 +766,10 @@ private:
         return true;
     }
 };
+
+typedef basic_cbor_content_handler<void> cbor_content_handler;
+
+typedef basic_default_cbor_content_handler<void> default_cbor_content_handler;
 
 }}
 

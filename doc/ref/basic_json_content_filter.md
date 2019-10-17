@@ -5,7 +5,7 @@
 
 template <
     class CharT
-> class basic_json_content_handler
+> class basic_json_content_filter
 ```
 
 Defines an interface for filtering JSON events. 
