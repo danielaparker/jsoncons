@@ -26,15 +26,18 @@ namespace jsoncons { namespace cbor {
 enum class cbor_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template<class Result=jsoncons::binary_stream_result,class Float128T = void>
-class basic_cbor_encoder final : public basic_default_cbor_content_handler<Float128T>
+class basic_cbor_encoder final : public basic_cbor_content_handler<Float128T>
 {
+    using super_type = basic_cbor_content_handler<Float128T>;
+
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
     enum class hexfloat_parse_state { start, expect_0, expect_x, integer, exp1, exp2, fraction1 };
 
 public:
-    typedef char char_type;
     typedef Result result_type;
-    using typename basic_json_content_handler<char>::string_view_type;
+    using typename super_type::char_type;
+    using typename super_type::string_view_type;
+    using typename super_type::float128_type;
 
 private:
     struct stack_item
@@ -90,10 +93,7 @@ public:
     {
         if (options.pack_strings())
         {
-            // tag(256)
-            result_.push_back(0xd9);
-            result_.push_back(0x01);
-            result_.push_back(0x00);
+            write_tag(256);
         }
     }
 
@@ -372,11 +372,11 @@ private:
 
         if (signum == -1)
         {
-            result_.push_back(0xc3);
+            write_tag(3);
         }
         else
         {
-            result_.push_back(0xc2);
+            write_tag(2);
         }
 
         if (length <= 0x17)
@@ -531,7 +531,7 @@ private:
             }
         }
 
-        result_.push_back(0xc4);
+        write_tag(4);
         more = do_begin_array((size_t)2, semantic_tag::none, context, ec);
         if (!more) {return more;}
         if (exponent.length() > 0)
@@ -711,7 +711,7 @@ private:
             }
         }
 
-        result_.push_back(0xc5);
+        write_tag(5);
         more = do_begin_array((size_t)2, semantic_tag::none, context, ec);
         if (!more) return more;
 
@@ -767,7 +767,8 @@ private:
             }
             case semantic_tag::datetime:
             {
-                result_.push_back(0xc0);
+                write_tag(0);
+
                 write_string(sv);
                 end_value();
                 break;
@@ -913,7 +914,7 @@ private:
     {
         if (tag == semantic_tag::timestamp)
         {
-            result_.push_back(0xc1);
+            write_tag(1);
         }
 
         float valf = (float)val;
@@ -943,7 +944,7 @@ private:
     {
         if (tag == semantic_tag::timestamp)
         {
-            result_.push_back(0xc1);
+            write_tag(1);
         }
         if (value >= 0)
         {
@@ -1028,7 +1029,7 @@ private:
     {
         if (tag == semantic_tag::timestamp)
         {
-            result_.push_back(0xc1);
+            write_tag(1);
         }
 
         write_uint64_value(value);
@@ -1036,38 +1037,63 @@ private:
         return true;
     }
 
+    void write_tag(uint64_t value)
+    {
+        if (value <= 0x17)
+        {
+            result_.push_back(0xc0 | static_cast<uint8_t>(value)); 
+        } 
+        else if (value <=(std::numeric_limits<uint8_t>::max)())
+        {
+            result_.push_back(0xd8);
+            result_.push_back(static_cast<uint8_t>(value));
+        } 
+        else if (value <=(std::numeric_limits<uint16_t>::max)())
+        {
+            result_.push_back(0xd9);
+            jsoncons::detail::native_to_big(static_cast<uint16_t>(value), 
+                                            std::back_inserter(result_));
+        }
+        else if (value <=(std::numeric_limits<uint32_t>::max)())
+        {
+            result_.push_back(0xda);
+            jsoncons::detail::native_to_big(static_cast<uint32_t>(value), 
+                                            std::back_inserter(result_));
+        }
+        else 
+        {
+            result_.push_back(0xdb);
+            jsoncons::detail::native_to_big(static_cast<uint64_t>(value), 
+                                            std::back_inserter(result_));
+        }
+    }
+
     void write_uint64_value(uint64_t value) 
     {
         if (value <= 0x17)
         {
-            jsoncons::detail::native_to_big(static_cast<uint8_t>(value), 
-                                            std::back_inserter(result_));
+            result_.push_back(static_cast<uint8_t>(value));
         } 
         else if (value <=(std::numeric_limits<uint8_t>::max)())
         {
-            jsoncons::detail::native_to_big(static_cast<uint8_t>(0x18), 
-                                            std::back_inserter(result_));
-            jsoncons::detail::native_to_big(static_cast<uint8_t>(value), 
-                                            std::back_inserter(result_));
+            result_.push_back(static_cast<uint8_t>(0x18));
+            result_.push_back(static_cast<uint8_t>(value));
         } 
         else if (value <=(std::numeric_limits<uint16_t>::max)())
         {
-            jsoncons::detail::native_to_big(static_cast<uint8_t>(0x19), 
-                                            std::back_inserter(result_));
+            result_.push_back(static_cast<uint8_t>(0x19));
             jsoncons::detail::native_to_big(static_cast<uint16_t>(value), 
                                             std::back_inserter(result_));
         } 
         else if (value <=(std::numeric_limits<uint32_t>::max)())
         {
-            jsoncons::detail::native_to_big(static_cast<uint8_t>(0x1a), 
-                                            std::back_inserter(result_));
+            result_.push_back(static_cast<uint8_t>(0x1a));
             jsoncons::detail::native_to_big(static_cast<uint32_t>(value), 
                                             std::back_inserter(result_));
         } 
         else if (value <=(std::numeric_limits<uint64_t>::max)())
         {
-            jsoncons::detail::native_to_big(static_cast<uint8_t>(0x1b), 
-                                            std::back_inserter(result_));
+            result_.push_back(static_cast<uint8_t>(0x1b));
             jsoncons::detail::native_to_big(static_cast<uint64_t>(value), 
                                             std::back_inserter(result_));
         }
@@ -1085,6 +1111,210 @@ private:
         }
 
         end_value();
+        return true;
+    }
+
+    bool do_typed_array(const uint8_t* data, size_t size, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        bool more = this->begin_array(tag, context, ec);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            more = this->uint64_value(*p, semantic_tag::none, context, ec);
+        }
+        if (more)
+        {
+            more = this->end_array(context, ec);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const uint16_t* data, size_t size, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        bool more = this->begin_array(tag, context, ec);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            more = this->uint64_value(*p, semantic_tag::none, context, ec);
+        }
+        if (more)
+        {
+            more = this->end_array(context, ec);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const uint32_t* data, size_t size, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        bool more = this->begin_array(tag, context, ec);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            more = this->uint64_value(*p, semantic_tag::none, context, ec);
+        }
+        if (more)
+        {
+            more = this->end_array(context, ec);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const uint64_t* data, size_t size, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        bool more = this->begin_array(tag, context, ec);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            more = this->uint64_value(*p,semantic_tag::none,context, ec);
+        }
+        if (more)
+        {
+            more = this->end_array(context, ec);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const int8_t* data, size_t size, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        bool more = this->begin_array(tag,context, ec);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            more = this->int64_value(*p,semantic_tag::none,context, ec);
+        }
+        if (more)
+        {
+            more = this->end_array(context, ec);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const int16_t* data, size_t size, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        bool more = this->begin_array(tag,context, ec);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            more = this->int64_value(*p,semantic_tag::none,context, ec);
+        }
+        if (more)
+        {
+            more = this->end_array(context, ec);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const int32_t* data, size_t size, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        bool more = this->begin_array(tag,context, ec);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            more = this->int64_value(*p,semantic_tag::none,context, ec);
+        }
+        if (more)
+        {
+            more = this->end_array(context, ec);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const int64_t* data, size_t size, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        bool more = this->begin_array(tag,context, ec);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            more = this->int64_value(*p,semantic_tag::none,context, ec);
+        }
+        if (more)
+        {
+            more = this->end_array(context, ec);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const float* data, size_t size, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        bool more = this->begin_array(tag,context, ec);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            more = this->double_value(*p,semantic_tag::none,context, ec);
+        }
+        if (more)
+        {
+            more = this->end_array(context, ec);
+        }
+        return more;
+    }
+
+    bool do_typed_array(const double* data, size_t size, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec)
+    {
+        if (options_.use_typed_arrays())
+        {
+            return write_typed_array(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(), 
+                                     data, size, tag, context, ec);
+        }
+        else
+        {
+            bool more = this->begin_array(tag,context, ec);
+            for (auto p = data; more && p < data+size; ++p)
+            {
+                more = this->double_value(*p,semantic_tag::none,context, ec);
+            }
+            if (more)
+            {
+                more = this->end_array(context, ec);
+            }
+            return more;
+        }
+    }
+
+    bool do_typed_array(const float128_type* /*data*/, size_t /*size*/, 
+                        semantic_tag /*tag*/,
+                        const ser_context& /*context*/, 
+                        std::error_code&) override
+    {
+        return true;
+    }
+
+    bool write_typed_array(std::true_type, // little endian
+                           const double* data, size_t size, 
+                           semantic_tag tag,
+                           const ser_context& context, 
+                           std::error_code& ec)
+    {
+        return true;
+    }
+
+    bool write_typed_array(std::false_type, // big endian
+                           const double* data, size_t size, 
+                           semantic_tag tag,
+                           const ser_context& context, 
+                           std::error_code& ec)
+    {
         return true;
     }
 

@@ -54,7 +54,7 @@ namespace jsoncons { namespace detail {
 enum class endian
 {
 #if defined(_MSC_VER) 
-// MSVC, which implies Windows, which implies little-endian and sizeof(long) == 4 
+// MSVC, which implies Windows, which implies little-endian
      little = 0,
      big    = 1,
      native = little
@@ -65,6 +65,11 @@ enum class endian
 #else
 #error "Unable to determine byte order!"
 #endif
+};
+
+struct A
+{
+    static constexpr bool is_little_endian = endian::native == endian::little;
 };
 
 struct uint128_holder
