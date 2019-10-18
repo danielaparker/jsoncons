@@ -559,6 +559,11 @@ public:
         return data_.end();
     }
 
+    uint8_t* data()
+    {
+        return data_.data();
+    }
+
     const uint8_t* data() const
     {
         return data_.data();

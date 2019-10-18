@@ -306,9 +306,7 @@ private:
             }
             else
             {
-                // tag(25)
-                result_.push_back(0xd8); 
-                result_.push_back(0x19); 
+                write_tag(25);
                 write_uint64_value(it->second);
             }
         }
@@ -849,9 +847,7 @@ private:
             }
             else
             {
-                // tag(25)
-                result_.push_back(0xd8); 
-                result_.push_back(0x19); 
+                write_tag(25);
                 write_uint64_value(it->second);
             }
         }
@@ -1274,7 +1270,7 @@ private:
     {
         if (options_.use_typed_arrays())
         {
-            return write_typed_array(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(), 
+            return write_typed_array(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
                                      data, size, tag, context, ec);
         }
         else
@@ -1300,21 +1296,29 @@ private:
         return true;
     }
 
-    bool write_typed_array(std::true_type, // little endian
+    bool write_typed_array(std::true_type, // big endian
                            const double* data, size_t size, 
                            semantic_tag tag,
                            const ser_context& context, 
                            std::error_code& ec)
     {
+        write_tag(0x52);
+        std::vector<uint8_t> v(size*sizeof(double));
+        memcpy(v.data(),data,size*sizeof(double));
+        write_byte_string_value(byte_string_view(v.data(),v.size()));
         return true;
     }
 
-    bool write_typed_array(std::false_type, // big endian
+    bool write_typed_array(std::false_type, // little endian
                            const double* data, size_t size, 
                            semantic_tag tag,
                            const ser_context& context, 
                            std::error_code& ec)
     {
+        write_tag(0x56);
+        std::vector<uint8_t> v(size*sizeof(double));
+        memcpy(v.data(),data,size*sizeof(double));
+        write_byte_string_value(byte_string_view(v.data(),v.size()));
         return true;
     }
 
