@@ -1381,7 +1381,7 @@ private:
     }
 
     bool do_int64_value(int64_t value, 
-                        semantic_tag,
+                        semantic_tag tag,
                         const ser_context&,
                         std::error_code&) override
     {
@@ -1389,7 +1389,16 @@ private:
         {
             result_.push_back(',');
         }
-        jsoncons::detail::print_integer(value, result_);
+        switch (tag)
+        {
+            case semantic_tag::half:
+            {
+                double x = jsoncons::detail::decode_half(static_cast<uint16_t>(value));
+                fp_(x, result_);
+            }
+            default:
+                jsoncons::detail::print_integer(value, result_);
+        }
         if (!stack_.empty())
         {
             stack_.back().increment_count();
@@ -1398,7 +1407,7 @@ private:
     }
 
     bool do_uint64_value(uint64_t value, 
-                         semantic_tag, 
+                         semantic_tag tag, 
                          const ser_context&,
                          std::error_code&) override
     {
@@ -1406,7 +1415,16 @@ private:
         {
             result_.push_back(',');
         }
-        jsoncons::detail::print_uinteger(value, result_);
+        switch (tag)
+        {
+            case semantic_tag::half:
+            {
+                double x = jsoncons::detail::decode_half(static_cast<uint16_t>(value));
+                fp_(x, result_);
+            }
+            default:
+                jsoncons::detail::print_uinteger(value, result_);
+        }
         if (!stack_.empty())
         {
             stack_.back().increment_count();

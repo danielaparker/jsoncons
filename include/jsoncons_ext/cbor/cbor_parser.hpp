@@ -1281,6 +1281,15 @@ private:
                         source_.ignore(1);
                         break;
                     case 0x19: // Half-Precision Float (two-byte IEEE 754)
+                    {
+                        uint64_t val = get_uint64_value(ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        more_ = handler.uint64_value(val, semantic_tag::half, *this, ec);
+                        break;
+                    }
                     case 0x1a: // Single-Precision Float (four-byte IEEE 754)
                     case 0x1b: // Double-Precision Float (eight-byte IEEE 754)
                         double val = get_double(ec);
@@ -1914,7 +1923,7 @@ private:
         uint8_t info = get_additional_information_value(type);
         switch (info)
         {
-        case 0x19: // Half-Precision Float (two-byte IEEE 754)
+        /* case 0x19: // Half-Precision Float (two-byte IEEE 754)
             {
                 uint8_t buf[sizeof(uint16_t)];
                 source_.read(buf, sizeof(uint16_t));
@@ -1927,7 +1936,7 @@ private:
                 uint16_t x = jsoncons::detail::big_to_native<uint16_t>(buf,buf+sizeof(buf),&endp);
                 val = jsoncons::detail::decode_half(x);
                 break;
-            }
+            }*/
 
 
         case 0x1a: // Single-Precision Float (four-byte IEEE 754)

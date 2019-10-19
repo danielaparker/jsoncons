@@ -3535,22 +3535,27 @@ public:
             case storage_type::double_value:
                 return var_.double_data_cast()->value();
             case storage_type::int64_value:
-                return static_cast<double>(var_.int64_data_cast()->value());
+                switch (var_.tag())
+                {
+                    case semantic_tag::half:
+                    {
+                        uint16_t x = static_cast<uint16_t>(var_.int64_data_cast()->value());
+                        return jsoncons::detail::decode_half(x);
+                    }
+                    default:
+                        return static_cast<double>(var_.int64_data_cast()->value());
+                }
             case storage_type::uint64_value:
-                return static_cast<double>(var_.uint64_data_cast()->value());
-#if !defined(JSONCONS_NO_DEPRECATED)
-            case storage_type::array_value:
-                if (tag() == semantic_tag::bigfloat)
+                switch (tag())
                 {
-                    jsoncons::detail::string_to_double to_double;
-                    auto s = as_string();
-                    return to_double(s.c_str(), s.length());
+                    case semantic_tag::half:
+                    {
+                        uint16_t x = static_cast<uint16_t>(var_.uint64_data_cast()->value());
+                        return jsoncons::detail::decode_half(x);
+                    }
+                    default:
+                        return static_cast<double>(var_.uint64_data_cast()->value());
                 }
-                else
-                {
-                    JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
-                }
-#endif
             default:
                 JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
         }

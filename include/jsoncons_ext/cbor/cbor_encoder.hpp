@@ -1117,7 +1117,15 @@ private:
     {
         if (options_.use_typed_arrays())
         {
-            write_tag(0x40);
+            switch (tag)
+            {
+                case semantic_tag::clamped:
+                    write_tag(0x44);
+                    break;
+                default:
+                    write_tag(0x40);
+                    break;
+            }
             std::vector<uint8_t> v(size*sizeof(uint8_t));
             memcpy(v.data(),data,size*sizeof(uint8_t));
             write_byte_string_value(byte_string_view(v.data(),v.size()));
@@ -1125,10 +1133,10 @@ private:
         }
         else
         {
-            bool more = this->begin_array(tag, context, ec);
+            bool more = this->begin_array(semantic_tag::none, context, ec);
             for (auto p = data; more && p < data+size; ++p)
             {
-                more = this->uint64_value(*p, semantic_tag::none, context, ec);
+                more = this->uint64_value(*p, tag, context, ec);
             }
             if (more)
             {
@@ -1155,10 +1163,10 @@ private:
         }
         else
         {
-            bool more = this->begin_array(tag, context, ec);
+            bool more = this->begin_array(semantic_tag::none, context, ec);
             for (auto p = data; more && p < data+size; ++p)
             {
-                more = this->uint64_value(*p, semantic_tag::none, context, ec);
+                more = this->uint64_value(*p, tag, context, ec);
             }
             if (more)
             {
@@ -1185,7 +1193,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(tag, context, ec);
+            bool more = this->begin_array(semantic_tag::none, context, ec);
             for (auto p = data; more && p < data+size; ++p)
             {
                 more = this->uint64_value(*p, semantic_tag::none, context, ec);
@@ -1215,7 +1223,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(tag, context, ec);
+            bool more = this->begin_array(semantic_tag::none, context, ec);
             for (auto p = data; more && p < data+size; ++p)
             {
                 more = this->uint64_value(*p,semantic_tag::none,context, ec);
@@ -1229,7 +1237,7 @@ private:
     }
 
     bool do_typed_array(const int8_t* data, size_t size, 
-                        semantic_tag tag,
+                        semantic_tag,
                         const ser_context& context, 
                         std::error_code& ec) override
     {
@@ -1243,7 +1251,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(tag,context, ec);
+            bool more = this->begin_array(semantic_tag::none,context, ec);
             for (auto p = data; more && p < data+size; ++p)
             {
                 more = this->int64_value(*p,semantic_tag::none,context, ec);
@@ -1273,7 +1281,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(tag,context, ec);
+            bool more = this->begin_array(semantic_tag::none,context, ec);
             for (auto p = data; more && p < data+size; ++p)
             {
                 more = this->int64_value(*p,semantic_tag::none,context, ec);
@@ -1303,7 +1311,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(tag,context, ec);
+            bool more = this->begin_array(semantic_tag::none,context, ec);
             for (auto p = data; more && p < data+size; ++p)
             {
                 more = this->int64_value(*p,semantic_tag::none,context, ec);
@@ -1333,7 +1341,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(tag,context, ec);
+            bool more = this->begin_array(semantic_tag::none,context, ec);
             for (auto p = data; more && p < data+size; ++p)
             {
                 more = this->int64_value(*p,semantic_tag::none,context, ec);
@@ -1363,7 +1371,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(tag,context, ec);
+            bool more = this->begin_array(semantic_tag::none,context, ec);
             for (auto p = data; more && p < data+size; ++p)
             {
                 more = this->double_value(*p,semantic_tag::none,context, ec);
@@ -1393,7 +1401,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(tag,context, ec);
+            bool more = this->begin_array(semantic_tag::none,context, ec);
             for (auto p = data; more && p < data+size; ++p)
             {
                 more = this->double_value(*p,semantic_tag::none,context, ec);
@@ -1416,15 +1424,31 @@ private:
 
     void write_typed_array_tag(std::true_type, 
                                uint16_t,
-                               semantic_tag)
+                               semantic_tag tag)
     {
-        write_tag(0x41); // big endian
+        switch (tag)
+        {
+            case semantic_tag::half:
+                write_tag(0x50);
+                break;
+            default:
+                write_tag(0x41); // big endian
+                break;
+        }
     }
     void write_typed_array_tag(std::false_type,
                                uint16_t,
-                               semantic_tag)
+                               semantic_tag tag)
     {
-        write_tag(0x45);  // little endian
+        switch (tag)
+        {
+            case semantic_tag::half:
+                write_tag(0x54);
+                break;
+            default:
+                write_tag(0x45);  // little endian
+                break;
+        }
     }
 
     void write_typed_array_tag(std::true_type, 
