@@ -1083,7 +1083,7 @@ public:
                     }
                     return basic_bignum<UserAllocator>(as_string_view().data(), as_string_view().length());
                 case storage_type::half_value:
-                    return basic_bignum<UserAllocator>(decode_half(half_data_cast()->value()));
+                    return basic_bignum<UserAllocator>(jsoncons::detail::decode_half(half_data_cast()->value()));
                 case storage_type::double_value:
                     return basic_bignum<UserAllocator>(double_data_cast()->value());
                 case storage_type::int64_value:
@@ -1166,7 +1166,7 @@ public:
                         case storage_type::half_value:
                             return half_data_cast()->value() == rhs.half_data_cast()->value();
                         default:
-                            return variant(decode_half(half_data_cast()->value())) == rhs;
+                            return variant(jsoncons::detail::decode_half(half_data_cast()->value())) == rhs;
                     }
                     break;
                 case storage_type::double_value:
@@ -1177,7 +1177,7 @@ public:
                         case storage_type::uint64_value:
                             return double_data_cast()->value() == static_cast<double>(rhs.uint64_data_cast()->value());
                         case storage_type::half_value:
-                            return double_data_cast()->value() == decode_half(rhs.half_data_cast()->value());
+                            return double_data_cast()->value() == jsoncons::detail::decode_half(rhs.half_data_cast()->value());
                         case storage_type::double_value:
                             return double_data_cast()->value() == rhs.double_data_cast()->value();
                         default:
