@@ -1166,7 +1166,7 @@ public:
                         case storage_type::half_value:
                             return half_data_cast()->value() == rhs.half_data_cast()->value();
                         default:
-                            return variant(jsoncons::detail::decode_half(half_data_cast()->value())) == rhs;
+                            return variant(jsoncons::detail::decode_half(half_data_cast()->value()),semantic_tag::none) == rhs;
                     }
                     break;
                 case storage_type::double_value:
