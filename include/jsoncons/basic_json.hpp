@@ -1082,7 +1082,7 @@ public:
                         JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an integer"));
                     }
                     return basic_bignum<UserAllocator>(as_string_view().data(), as_string_view().length());
-                case storage_type::halve_value:
+                case storage_type::half_value:
                     return basic_bignum<UserAllocator>(decode_half(half_data_cast()->value()));
                 case storage_type::double_value:
                     return basic_bignum<UserAllocator>(double_data_cast()->value());

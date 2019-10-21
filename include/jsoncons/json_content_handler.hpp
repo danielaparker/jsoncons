@@ -41,7 +41,7 @@ enum class semantic_tag : uint8_t
     base64 = 0x08,
     base64url = 0x09,
     uri = 0x0a,
-    clamped = 0x0c
+    clamped = 0x0b
 #if !defined(JSONCONS_NO_DEPRECATED)
     , big_integer = bigint
     , big_decimal = bigdec
