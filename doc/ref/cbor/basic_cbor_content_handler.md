@@ -32,47 +32,51 @@ Member type                         |Definition
 
     bool typed_array(const uint8_t* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
 
     bool typed_array(const uint16_t* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
 
     bool typed_array(const uint32_t* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
 
     bool typed_array(const uint64_t* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
 
     bool typed_array(const int8_t* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
 
     bool typed_array(const int16_t* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
 
     bool typed_array(const int32_t* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
 
     bool typed_array(const int64_t* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
+
+    bool typed_array(half_arg_t, const uint16_t* data, size_t size, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
 
     bool typed_array(const float* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
 
     bool typed_array(const double* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
 
     bool typed_array(const float128_type* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
 
     bool typed_array(const uint8_t* data, size_t size, 
                      semantic_tag tag,
@@ -162,6 +166,11 @@ Member type                         |Definition
                                 std::error_code& ec) = 0;
 
     virtual bool do_typed_array(const int64_t* data, size_t size, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec) = 0;
+
+    virtual bool do_typed_array(half_arg_t, const uint16_t* data, size_t size, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;

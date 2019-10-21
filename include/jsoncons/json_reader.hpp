@@ -64,7 +64,7 @@ private:
 
     bool do_end_object(const ser_context& context, std::error_code& ec) override
     {
-        return other_handler_.end_object(context);
+        return other_handler_.end_object(context, ec);
     }
 
     bool do_begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec) override
@@ -77,7 +77,7 @@ private:
         return other_handler_.end_array(context, ec);
     }
 
-    bool do_name(const string_view_type& name, const ser_context& context, std::error_code&) override
+    bool do_name(const string_view_type& name, const ser_context& context, std::error_code& ec) override
     {
         std::basic_string<CharT> target;
         auto result = unicons::convert(
@@ -87,7 +87,7 @@ private:
         {
             JSONCONS_THROW(ser_error(result.ec,context.line(),context.column()));
         }
-        return other_handler_.name(target, context);
+        return other_handler_.name(target, context, ec);
     }
 
     bool do_string_value(const string_view_type& value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
@@ -101,7 +101,7 @@ private:
             ec = result.ec;
             return false;
         }
-        return other_handler_.string_value(target, tag, context);
+        return other_handler_.string_value(target, tag, context, ec);
     }
 
     bool do_int64_value(int64_t value, 
@@ -117,7 +117,15 @@ private:
                          const ser_context& context,
                          std::error_code& ec) override
     {
-        return other_handler_.uint64_value(value, tag, context);
+        return other_handler_.uint64_value(value, tag, context, ec);
+    }
+
+    bool do_half_value(double value, 
+                       semantic_tag tag,
+                       const ser_context& context,
+                       std::error_code& ec) override
+    {
+        return other_handler_.half_value(value, tag, context, ec);
     }
 
     bool do_double_value(double value, 

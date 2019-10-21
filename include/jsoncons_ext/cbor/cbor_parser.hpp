@@ -27,7 +27,6 @@ enum class parse_mode {root,before_done,array,indefinite_array,map_key,map_value
 struct uint8_array_arg_t {};
 constexpr uint8_array_arg_t uint8_array_arg = uint8_array_arg_t();
 struct uint16_array_arg_t {};
-constexpr uint16_array_arg_t uint16_array_arg = uint16_array_arg_t();
 struct uint32_array_arg_t {};
 constexpr uint32_array_arg_t uint32_array_arg = uint32_array_arg_t();
 struct uint64_array_arg_t {};
@@ -40,6 +39,9 @@ struct int32_array_arg_t {};
 constexpr int32_array_arg_t int32_array_arg = int32_array_arg_t();
 struct int64_array_arg_t {};
 constexpr int64_array_arg_t int64_array_arg = int64_array_arg_t();
+constexpr uint16_array_arg_t uint16_array_arg = uint16_array_arg_t();
+struct half_array_arg_t {};
+constexpr half_array_arg_t half_array_arg = half_array_arg_t();
 struct float_array_arg_t {};
 constexpr float_array_arg_t float_array_arg = float_array_arg_t();
 struct double_array_arg_t {};
@@ -49,7 +51,7 @@ constexpr float128_array_arg_t float128_array_arg = float128_array_arg_t();
 
 enum typed_array_type {uint8_value=1,uint16_value,uint32_value,uint64_value,
                       int8_value,int16_value,int32_value,int64_value, 
-                      float_value,double_value,float128_value};
+                      half_value, float_value,double_value,float128_value};
 
 template <class Float128T = void, class Allocator=std::allocator<char>>
 class typed_array
@@ -142,6 +144,12 @@ public:
                 data_.int64_data_ = alloc.allocate(size_);
                 break;
             }
+            case typed_array_type::half_value:
+            {
+                uint16_allocator_type alloc{ allocator_ };
+                data_.uint16_data_ = alloc.allocate(size_);
+                break;
+            }
             case typed_array_type::float_value:
             {
                 float_allocator_type alloc{ allocator_ };
@@ -222,6 +230,13 @@ public:
     {
         int64_allocator_type alloc(allocator_);
         data_.int64_data_ = alloc.allocate(size);
+    }
+
+    typed_array(half_array_arg_t, size_t size, const Allocator& allocator)
+        : allocator_(allocator), type_(typed_array_type::half_value), size_(size)
+    {
+        uint16_allocator_type alloc(allocator_);
+        data_.uint16_data_ = alloc.allocate(size);
     }
 
     typed_array(float_array_arg_t,size_t size, const Allocator& allocator)
@@ -461,6 +476,12 @@ public:
         return data_.int64_data_;
     }
 
+    uint16_t* data(half_array_arg_t)
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::half_value);
+        return data_.uint16_data_;
+    }
+
     float* data(float_array_arg_t)
     {
         JSONCONS_ASSERT(type_ == typed_array_type::float_value);
@@ -655,6 +676,12 @@ public:
         data_.int64_data_ = data;
     }
 
+    typed_array_view(half_array_arg_t, const uint16_t* data, size_t size)
+        : type_(typed_array_type::half_value), size_(size)
+    {
+        data_.uint16_data_ = data;
+    }
+
     typed_array_view(const float* data,size_t size)
         : type_(typed_array_type::float_value), size_(size)
     {
@@ -733,6 +760,12 @@ public:
     {
         JSONCONS_ASSERT(type_ == typed_array_type::int64_value);
         return data_.int64_data_;
+    }
+
+    const uint16_t* data(half_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::half_value);
+        return data_.uint16_data_;
     }
 
     const float* data(float_array_arg_t) const
@@ -940,6 +973,11 @@ public:
                     case typed_array_type::int64_value:
                     {
                         more_ = handler.int64_value(typed_array_.data(int64_array_arg)[index_]);
+                        break;
+                    }
+                    case typed_array_type::half_value:
+                    {
+                        more_ = handler.half_value(typed_array_.data(half_array_arg)[index_]);
                         break;
                     }
                     case typed_array_type::float_value:
@@ -1287,7 +1325,7 @@ private:
                         {
                             return;
                         }
-                        more_ = handler.uint64_value(val, semantic_tag::half, *this, ec);
+                        more_ = handler.half_value(static_cast<uint16_t>(val), semantic_tag::none, *this, ec);
                         break;
                     }
                     case 0x1a: // Single-Precision Float (four-byte IEEE 754)
@@ -1923,22 +1961,6 @@ private:
         uint8_t info = get_additional_information_value(type);
         switch (info)
         {
-        /* case 0x19: // Half-Precision Float (two-byte IEEE 754)
-            {
-                uint8_t buf[sizeof(uint16_t)];
-                source_.read(buf, sizeof(uint16_t));
-                if (source_.eof())
-                {
-                    ec = cbor_errc::unexpected_eof;
-                    more_ = false;
-                    return 0;
-                }
-                uint16_t x = jsoncons::detail::big_to_native<uint16_t>(buf,buf+sizeof(buf),&endp);
-                val = jsoncons::detail::decode_half(x);
-                break;
-            }*/
-
-
         case 0x1a: // Single-Precision Float (four-byte IEEE 754)
             {
                 uint8_t buf[sizeof(float)];
@@ -2590,7 +2612,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(double_array_arg,size,allocator_);
+                    typed_array_ = typed_array<Float128T,WorkAllocator>(half_array_arg,size,allocator_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2601,10 +2623,9 @@ private:
                             case 1: val = jsoncons::detail::little_to_native<uint16_t>(p,p+bytes_per_elem,&endp);break;
                             default: break;
                         }
-                        double half = jsoncons::detail::decode_half(val);
-                        typed_array_.data(double_array_arg)[i] = half;
+                        typed_array_.data(half_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(typed_array_.data(double_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    more_ = handler.typed_array(half_arg, typed_array_.data(half_array_arg), typed_array_.size(), semantic_tag::none, *this);
                     break;
                 }
                 case 0x51:

@@ -5119,24 +5119,24 @@ private:
                 handler.null_value(var_.tag());
                 break;
             case storage_type::empty_object_value:
-                handler.begin_object(0, var_.tag(), null_ser_context_arg, ec);
-                handler.end_object(null_ser_context_arg, ec);
+                handler.begin_object(0, var_.tag(), null_ser_context(), ec);
+                handler.end_object(null_ser_context(), ec);
                 break;
             case storage_type::object_value:
                 {
-                    handler.begin_object(size(), var_.tag(), null_ser_context_arg, ec);
+                    handler.begin_object(size(), var_.tag(), null_ser_context(), ec);
                     const object& o = object_value();
                     for (const_object_iterator it = o.begin(); it != o.end(); ++it)
                     {
                         handler.name(string_view_type((it->key()).data(),it->key().length()));
                         it->value().dump_no_flush(handler, ec);
                     }
-                    handler.end_object(null_ser_context_arg, ec);
+                    handler.end_object(null_ser_context(), ec);
                 }
                 break;
             case storage_type::array_value:
                 {
-                    handler.begin_array(size(), var_.tag(), null_ser_context_arg, ec);
+                    handler.begin_array(size(), var_.tag(), null_ser_context(), ec);
                     const array& o = array_value();
                     for (const_array_iterator it = o.begin(); it != o.end(); ++it)
                     {

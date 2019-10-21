@@ -251,13 +251,14 @@ private:
                         const ser_context&,
                         std::error_code&) override
     {
-        if (tag == semantic_tag::timestamp)
+        switch (tag)
         {
-            before_value(jsoncons::bson::detail::bson_format::datetime_cd);
-        }
-        else
-        {
-            before_value(jsoncons::bson::detail::bson_format::int64_cd);
+            case semantic_tag::timestamp:
+                before_value(jsoncons::bson::detail::bson_format::datetime_cd);
+                break;
+            default:
+                before_value(jsoncons::bson::detail::bson_format::int64_cd);
+                break;
         }
         if (val >= (std::numeric_limits<int32_t>::lowest)() && val <= (std::numeric_limits<int32_t>::max)())
         {
@@ -280,13 +281,14 @@ private:
                          const ser_context&,
                          std::error_code&) override
     {
-        if (tag == semantic_tag::timestamp)
+        switch (tag)
         {
-            before_value(jsoncons::bson::detail::bson_format::datetime_cd);
-        }
-        else
-        {
-            before_value(jsoncons::bson::detail::bson_format::int64_cd);
+            case semantic_tag::timestamp:
+                before_value(jsoncons::bson::detail::bson_format::datetime_cd);
+                break;
+            default:
+                before_value(jsoncons::bson::detail::bson_format::int64_cd);
+                break;
         }
         if (val <= (std::numeric_limits<int32_t>::max)())
         {

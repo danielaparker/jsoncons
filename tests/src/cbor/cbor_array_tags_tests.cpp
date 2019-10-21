@@ -334,6 +334,7 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[1].as<int64_t>() == int64_t(1));
         CHECK(j[2].as<int64_t>() == (std::numeric_limits<int64_t>::max)());
     }
+
     SECTION("Tag 80, float16, big endian")
     {
         const std::vector<uint8_t> input = {
@@ -355,6 +356,7 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[2].as<float>() == Approx(0.000061035).epsilon(0.00001));
         CHECK(j[3].as<float>() == 65504);
     }
+
     SECTION("Tag 81, float32, big endian")
     {
         const std::vector<uint8_t> input = {
@@ -478,6 +480,5 @@ TEST_CASE("cbor typed array tests")
         //REQUIRE(j.is_array());
         //REQUIRE(j.size() == 2);
     }
-
 } 
 

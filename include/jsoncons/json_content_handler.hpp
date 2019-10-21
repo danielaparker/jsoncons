@@ -12,6 +12,7 @@
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/json_options.hpp>
+#include <jsoncons/config/binary_config.hpp>
 
 namespace jsoncons {
 
@@ -20,6 +21,12 @@ namespace jsoncons {
 struct null_type
 {
 };
+
+struct half_arg_t
+{
+};
+
+constexpr half_arg_t half_arg = half_arg_t();
 
 enum class semantic_tag : uint8_t 
 {
@@ -130,7 +137,7 @@ public:
     virtual ~basic_json_content_handler() {}
 
     bool begin_object(semantic_tag tag=semantic_tag::none,
-                      const ser_context& context=null_ser_context_arg)
+                      const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_begin_object(tag, context, ec);
@@ -143,7 +150,7 @@ public:
 
     bool begin_object(size_t length, 
                       semantic_tag tag=semantic_tag::none, 
-                      const ser_context& context = null_ser_context_arg)
+                      const ser_context& context = null_ser_context())
     {
         std::error_code ec;
         bool more = do_begin_object(length, tag, context, ec);
@@ -154,7 +161,7 @@ public:
         return more;
     }
 
-    bool end_object(const ser_context& context = null_ser_context_arg)
+    bool end_object(const ser_context& context = null_ser_context())
     {
         std::error_code ec;
         bool more = do_end_object(context, ec);
@@ -166,7 +173,7 @@ public:
     }
 
     bool begin_array(semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_begin_array(tag, context, ec);
@@ -179,7 +186,7 @@ public:
 
     bool begin_array(size_t length, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_begin_array(length, tag, context, ec);
@@ -190,7 +197,7 @@ public:
         return more;
     }
 
-    bool end_array(const ser_context& context=null_ser_context_arg)
+    bool end_array(const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_end_array(context, ec);
@@ -201,7 +208,7 @@ public:
         return more;
     }
 
-    bool name(const string_view_type& name, const ser_context& context=null_ser_context_arg)
+    bool name(const string_view_type& name, const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_name(name, context, ec);
@@ -213,7 +220,7 @@ public:
     }
 
     bool null_value(semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context_arg) 
+                    const ser_context& context=null_ser_context()) 
     {
         std::error_code ec;
         bool more = do_null_value(tag, context, ec);
@@ -226,7 +233,7 @@ public:
 
     bool bool_value(bool value, 
                     semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context_arg) 
+                    const ser_context& context=null_ser_context()) 
     {
         std::error_code ec;
         bool more = do_bool_value(value, tag, context, ec);
@@ -239,7 +246,7 @@ public:
 
     bool string_value(const string_view_type& value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context_arg) 
+                      const ser_context& context=null_ser_context()) 
     {
         std::error_code ec;
         bool more = do_string_value(value, tag, context, ec);
@@ -252,7 +259,7 @@ public:
 
     bool byte_string_value(const byte_string_view& b, 
                            semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context_arg)
+                           const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_byte_string_value(b, tag, context, ec);
@@ -265,14 +272,14 @@ public:
 
     bool byte_string_value(const uint8_t* p, size_t size, 
                            semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context_arg)
+                           const ser_context& context=null_ser_context())
     {
         return byte_string_value(byte_string(p, size), tag, context);
     }
 
     bool uint64_value(uint64_t value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context_arg)
+                      const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_uint64_value(value, tag, context, ec);
@@ -285,7 +292,7 @@ public:
 
     bool int64_value(int64_t value, 
                      semantic_tag tag = semantic_tag::none, 
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_int64_value(value, tag, context, ec);
@@ -296,9 +303,22 @@ public:
         return more;
     }
 
+    bool half_value(uint16_t value, 
+                    semantic_tag tag = semantic_tag::none, 
+                    const ser_context& context=null_ser_context())
+    {
+        std::error_code ec;
+        bool more = do_half_value(value, tag, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
     bool double_value(double value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context_arg)
+                      const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_double_value(value, tag, context, ec);
@@ -404,6 +424,14 @@ public:
         return do_int64_value(value, tag, context, ec);
     }
 
+    bool half_value(uint16_t value, 
+                    semantic_tag tag, 
+                    const ser_context& context,
+                    std::error_code& ec)
+    {
+        return do_half_value(value, tag, context, ec);
+    }
+
     bool double_value(double value, 
                       semantic_tag tag, 
                       const ser_context& context,
@@ -419,11 +447,11 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-    JSONCONS_DEPRECATED_MSG("Instead, use const byte_string_view&, semantic_tag=semantic_tag::none, const ser_context&=null_ser_context_arg") 
+    JSONCONS_DEPRECATED_MSG("Instead, use const byte_string_view&, semantic_tag=semantic_tag::none, const ser_context&=null_ser_context()") 
     bool byte_string_value(const byte_string_view& b, 
                            byte_string_chars_format encoding_hint, 
                            semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context_arg)
+                           const ser_context& context=null_ser_context())
     {
         switch (encoding_hint)
         {
@@ -442,11 +470,11 @@ public:
         return byte_string_value(b, tag, context);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use byte_string_value(const byte_string_view&, semantic_tag=semantic_tag::none, const ser_context&=null_ser_context_arg") 
+    JSONCONS_DEPRECATED_MSG("Instead, use byte_string_value(const byte_string_view&, semantic_tag=semantic_tag::none, const ser_context&=null_ser_context()") 
     bool byte_string_value(const uint8_t* p, size_t size, 
                            byte_string_chars_format encoding_hint, 
                            semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context_arg)
+                           const ser_context& context=null_ser_context())
     {
         switch (encoding_hint)
         {
@@ -466,25 +494,25 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use string_value with semantic_tag::bigint") 
-    bool big_integer_value(const string_view_type& value, const ser_context& context=null_ser_context_arg) 
+    bool big_integer_value(const string_view_type& value, const ser_context& context=null_ser_context()) 
     {
         return string_value(value, semantic_tag::bigint, context);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use string_value with semantic_tag::bigdec") 
-    bool big_decimal_value(const string_view_type& value, const ser_context& context=null_ser_context_arg) 
+    bool big_decimal_value(const string_view_type& value, const ser_context& context=null_ser_context()) 
     {
         return string_value(value, semantic_tag::bigdec, context);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use string_value with semantic_tag::datetime") 
-    bool date_time_value(const string_view_type& value, const ser_context& context=null_ser_context_arg) 
+    bool date_time_value(const string_view_type& value, const ser_context& context=null_ser_context()) 
     {
         return string_value(value, semantic_tag::datetime, context);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use int64_value with semantic_tag::timestamp") 
-    bool timestamp_value(int64_t val, const ser_context& context=null_ser_context_arg) 
+    bool timestamp_value(int64_t val, const ser_context& context=null_ser_context()) 
     {
         return int64_value(val, semantic_tag::timestamp, context);
     }
@@ -513,50 +541,50 @@ public:
         end_document();
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use name(const string_view_type&, const ser_context&=null_ser_context_arg)") 
+    JSONCONS_DEPRECATED_MSG("Instead, use name(const string_view_type&, const ser_context&=null_ser_context())") 
     void name(const char_type* p, size_t length, const ser_context& context) 
     {
         name(string_view_type(p, length), context);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use uint64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context_arg)") 
+    JSONCONS_DEPRECATED_MSG("Instead, use uint64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
     void integer_value(int64_t value)
     {
         int64_value(value);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use int64_value(int64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context_arg)") 
+    JSONCONS_DEPRECATED_MSG("Instead, use int64_value(int64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
     void integer_value(int64_t value, const ser_context& context)
     {
         int64_value(value,context);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use uint64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context_arg)") 
+    JSONCONS_DEPRECATED_MSG("Instead, use uint64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
     void uinteger_value(uint64_t value)
     {
         uint64_value(value);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use uint64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context_arg)") 
+    JSONCONS_DEPRECATED_MSG("Instead, use uint64_value(uint64_t, semantic_tag = semantic_tag::none, const ser_context&=null_ser_context())") 
     void uinteger_value(uint64_t value, const ser_context& context)
     {
         uint64_value(value,context);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use string_value with semantic_tag::bigint") 
-    bool bignum_value(const string_view_type& value, const ser_context& context=null_ser_context_arg) 
+    bool bignum_value(const string_view_type& value, const ser_context& context=null_ser_context()) 
     {
         return string_value(value, semantic_tag::bigint, context);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use string_value with semantic_tag::bigdec") 
-    bool decimal_value(const string_view_type& value, const ser_context& context=null_ser_context_arg) 
+    bool decimal_value(const string_view_type& value, const ser_context& context=null_ser_context()) 
     {
         return string_value(value, semantic_tag::bigdec, context);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use int64_value with semantic_tag::timestamp") 
-    bool epoch_time_value(int64_t val, const ser_context& context=null_ser_context_arg) 
+    bool epoch_time_value(int64_t val, const ser_context& context=null_ser_context()) 
     {
         return int64_value(val, semantic_tag::timestamp, context);
     }
@@ -625,6 +653,17 @@ private:
                                 semantic_tag tag,
                                 const ser_context& context,
                                 std::error_code& ec) = 0;
+
+    virtual bool do_half_value(uint16_t value, 
+                               semantic_tag tag,
+                               const ser_context& context,
+                               std::error_code& ec)
+    {
+        return do_double_value(jsoncons::detail::decode_half(value),
+                               tag,
+                               context,
+                               ec);
+    }
 
     virtual bool do_double_value(double value, 
                                  semantic_tag tag,

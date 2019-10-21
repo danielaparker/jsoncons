@@ -32,7 +32,7 @@ public:
 
     bool typed_array(const uint8_t* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_typed_array(data, size, tag, context, ec);
@@ -45,7 +45,7 @@ public:
 
     bool typed_array(const uint16_t* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_typed_array(data, size, tag, context, ec);
@@ -58,7 +58,7 @@ public:
 
     bool typed_array(const uint32_t* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_typed_array(data, size, tag, context, ec);
@@ -71,7 +71,7 @@ public:
 
     bool typed_array(const uint64_t* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_typed_array(data, size, tag, context, ec);
@@ -84,7 +84,7 @@ public:
 
     bool typed_array(const int8_t* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_typed_array(data, size, tag, context, ec);
@@ -97,7 +97,7 @@ public:
 
     bool typed_array(const int16_t* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_typed_array(data, size, tag, context, ec);
@@ -110,7 +110,7 @@ public:
 
     bool typed_array(const int32_t* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_typed_array(data, size, tag, context, ec);
@@ -123,7 +123,7 @@ public:
 
     bool typed_array(const int64_t* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_typed_array(data, size, tag, context, ec);
@@ -134,9 +134,22 @@ public:
         return more;
     }
 
+    bool typed_array(half_arg_t, const uint16_t* data, size_t size,
+        semantic_tag tag = semantic_tag::none,
+        const ser_context& context = null_ser_context())
+    {
+        std::error_code ec;
+        bool more = do_typed_array(half_arg, data, size, tag, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
     bool typed_array(const float* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_typed_array(data, size, tag, context, ec);
@@ -149,7 +162,7 @@ public:
 
     bool typed_array(const double* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_typed_array(data, size, tag, context, ec);
@@ -162,7 +175,7 @@ public:
 
     bool typed_array(const float128_type* data, size_t size, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg)
+                     const ser_context& context=null_ser_context())
     {
         std::error_code ec;
         bool more = do_typed_array(data, size, tag, context, ec);
@@ -229,6 +242,13 @@ public:
         return do_typed_array(data, size, tag, context, ec);
     }
 
+    bool typed_array(half_arg_t arg, const uint16_t* data, size_t size, 
+                     semantic_tag tag,
+                     const ser_context& context, std::error_code& ec)
+    {
+        return do_typed_array(arg, data, size, tag, context, ec);
+    }
+
     bool typed_array(const float* data, size_t size, 
                      semantic_tag tag,
                      const ser_context& context, std::error_code& ec)
@@ -280,6 +300,11 @@ private:
                                 std::error_code& ec) = 0;
 
     virtual bool do_typed_array(const int64_t* data, size_t size, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec) = 0;
+
+    virtual bool do_typed_array(half_arg_t, const uint16_t* data, size_t size, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
@@ -387,6 +412,14 @@ private:
         return parse_more_;
     }
 
+    bool do_half_value(uint16_t, 
+                       semantic_tag,
+                       const ser_context&,
+                       std::error_code&) override
+    {
+        return parse_more_;
+    }
+
     bool do_bool_value(bool, semantic_tag, const ser_context&, std::error_code&) override
     {
         return parse_more_;
@@ -449,6 +482,12 @@ private:
     bool do_typed_array(const int64_t*, size_t, 
                         semantic_tag,
                         const ser_context&, 
+                        std::error_code&) override 
+    {
+        return parse_more_;
+    }
+
+    bool do_typed_array(half_arg_t, const uint16_t*, size_t, semantic_tag, const ser_context&, 
                         std::error_code&) override 
     {
         return parse_more_;
@@ -554,12 +593,20 @@ private:
         return to_handler_.byte_string_value(b, tag, context, ec);
     }
 
+    bool do_half_value(uint16_t value, 
+                       semantic_tag tag,
+                       const ser_context& context,
+                       std::error_code& ec) override
+    {
+        return to_handler_.half_value(value, tag, context, ec);
+    }
+
     bool do_double_value(double value, 
                          semantic_tag tag,
                          const ser_context& context,
-                         std::error_code&) override
+                         std::error_code& ec) override
     {
-        return to_handler_.double_value(value, tag, context);
+        return to_handler_.double_value(value, tag, context, ec);
     }
 
     bool do_int64_value(int64_t value,
@@ -573,9 +620,9 @@ private:
     bool do_uint64_value(uint64_t value,
                          semantic_tag tag,
                          const ser_context& context,
-                         std::error_code&) override
+                         std::error_code& ec) override
     {
-        return to_handler_.uint64_value(value, tag, context);
+        return to_handler_.uint64_value(value, tag, context, ec);
     }
 
     bool do_bool_value(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
@@ -716,6 +763,23 @@ private:
         for (auto p = data; more && p < data+size; ++p)
         {
             more = to_handler_.int64_value(*p,semantic_tag::none,context, ec);
+        }
+        if (more)
+        {
+            more = to_handler_.end_array(context, ec);
+        }
+        return more;
+    }
+
+    bool do_typed_array(half_arg_t, const uint16_t* data, size_t size, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        bool more = to_handler_.begin_array(tag, context, ec);
+        for (auto p = data; more && p < data+size; ++p)
+        {
+            more = to_handler_.half_value(*p, semantic_tag::none, context, ec);
         }
         if (more)
         {

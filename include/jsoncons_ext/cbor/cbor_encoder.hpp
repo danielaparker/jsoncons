@@ -1354,6 +1354,36 @@ private:
         }
     }
 
+    bool do_typed_array(half_arg_t, const uint16_t* data, size_t size, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        if (options_.use_typed_arrays())
+        {
+            write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
+                                  half_arg, 
+                                  tag);
+            std::vector<uint8_t> v(size*sizeof(uint16_t));
+            memcpy(v.data(),data,size*sizeof(uint16_t));
+            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            return true;
+        }
+        else
+        {
+            bool more = this->begin_array(semantic_tag::none, context, ec);
+            for (auto p = data; more && p < data+size; ++p)
+            {
+                more = this->half_value(*p, tag, context, ec);
+            }
+            if (more)
+            {
+                more = this->end_array(context, ec);
+            }
+            return more;
+        }
+    }
+
     bool do_typed_array(const float* data, size_t size, 
                         semantic_tag tag,
                         const ser_context& context, 
@@ -1424,31 +1454,15 @@ private:
 
     void write_typed_array_tag(std::true_type, 
                                uint16_t,
-                               semantic_tag tag)
+                               semantic_tag)
     {
-        switch (tag)
-        {
-            case semantic_tag::half:
-                write_tag(0x50);
-                break;
-            default:
-                write_tag(0x41); // big endian
-                break;
-        }
+        write_tag(0x41); // big endian
     }
     void write_typed_array_tag(std::false_type,
                                uint16_t,
-                               semantic_tag tag)
+                               semantic_tag)
     {
-        switch (tag)
-        {
-            case semantic_tag::half:
-                write_tag(0x54);
-                break;
-            default:
-                write_tag(0x45);  // little endian
-                break;
-        }
+        write_tag(0x54);
     }
 
     void write_typed_array_tag(std::true_type, 
@@ -1514,6 +1528,19 @@ private:
                                semantic_tag)
     {
         write_tag(0x4f);  // little endian
+    }
+
+    void write_typed_array_tag(std::true_type, 
+                               half_arg_t,
+                               semantic_tag)
+    {
+        write_tag(0x50);
+    }
+    void write_typed_array_tag(std::false_type,
+                               half_arg_t,
+                               semantic_tag)
+    {
+        write_tag(0x54);
     }
                         
     void write_typed_array_tag(std::true_type, 

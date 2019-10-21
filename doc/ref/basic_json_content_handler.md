@@ -27,56 +27,56 @@ Member type                         |Definition
 #### Public event producer interface
 
     bool begin_object(semantic_tag tag=semantic_tag::none,
-                      const ser_context& context=null_ser_context_arg); // (1)
+                      const ser_context& context=null_ser_context()); // (1)
 
     bool begin_object(size_t length, 
                       semantic_tag tag=semantic_tag::none, 
-                      const ser_context& context = null_ser_context_arg); // (2)
+                      const ser_context& context = null_ser_context()); // (2)
 
-    bool end_object(const ser_context& context = null_ser_context_arg); // (3)
+    bool end_object(const ser_context& context = null_ser_context()); // (3)
 
     bool begin_array(semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg); // (4)
+                     const ser_context& context=null_ser_context()); // (4)
 
     bool begin_array(size_t length, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context_arg); // (5)
+                     const ser_context& context=null_ser_context()); // (5)
 
-    bool end_array(const ser_context& context=null_ser_context_arg); // (6)
+    bool end_array(const ser_context& context=null_ser_context()); // (6)
 
     bool name(const string_view_type& name, 
-              const ser_context& context=null_ser_context_arg); // (7)
+              const ser_context& context=null_ser_context()); // (7)
 
     bool null_value(semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context_arg); // (8) 
+                    const ser_context& context=null_ser_context()); // (8) 
 
     bool bool_value(bool value, 
                     semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context_arg); // (9) 
+                    const ser_context& context=null_ser_context()); // (9) 
 
     bool string_value(const string_view_type& value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context_arg); // (10) 
+                      const ser_context& context=null_ser_context()); // (10) 
 
     bool byte_string_value(const byte_string_view& b, 
                            semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context_arg); // (11)
+                           const ser_context& context=null_ser_context()); // (11)
 
     bool byte_string_value(const uint8_t* p, size_t size, 
                            semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context_arg); // (12)
+                           const ser_context& context=null_ser_context()); // (12)
 
     bool uint64_value(uint64_t value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context_arg); // (13)
+                      const ser_context& context=null_ser_context()); // (13)
 
     bool int64_value(int64_t value, 
                      semantic_tag tag = semantic_tag::none, 
-                     const ser_context& context=null_ser_context_arg); // (14)
+                     const ser_context& context=null_ser_context()); // (14)
 
     bool double_value(double value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context_arg); // (15)
+                      const ser_context& context=null_ser_context()); // (15)
 
     bool begin_object(semantic_tag tag,
                       const ser_context& context,
@@ -269,10 +269,15 @@ Flushes whatever is buffered to the destination.
                                 const ser_context& context,
                                 std::error_code& ec) = 0; // (13)
 
+    virtual bool do_half_value(uint16_t value, 
+                               semantic_tag tag,
+                               const ser_context& context,
+                               std::error_code& ec) = 0; // (14)
+
     virtual bool do_double_value(double value, 
                                  semantic_tag tag,
                                  const ser_context& context,
-                                 std::error_code& ec) = 0; // (14)
+                                 std::error_code& ec) = 0; // (15)
 
 (1) Handles the beginning of an object of indefinite length.
 Returns `true` if the producer should generate more events, `false` otherwise.
@@ -326,7 +331,11 @@ Throws a [ser_error](ser_error.md) on parse errors.
 Returns `true` if the producer should generate more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(14) Handles a floating point value. 
+(14) Handles a half precision floating point value. 
+Returns `true` if the producer should generate more events, `false` otherwise.
+Throws a [ser_error](ser_error.md) on parse errors. 
+
+(15) Handles a double precision floating point value. 
 Returns `true` if the producer should generate more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 

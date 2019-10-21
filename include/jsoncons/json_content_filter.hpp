@@ -115,6 +115,14 @@ private:
         return to_handler_.byte_string_value(b, tag, context, ec);
     }
 
+    bool do_half_value(uint16_t value, 
+                       semantic_tag tag,
+                       const ser_context& context,
+                       std::error_code& ec) override
+    {
+        return to_handler_.double_value(value, tag, context, ec);
+    }
+
     bool do_double_value(double value, 
                          semantic_tag tag,
                          const ser_context& context,
@@ -295,6 +303,14 @@ private:
                               std::error_code& ec) override
     {
         return to_handler_->byte_string_value(b, tag, context, ec);
+    }
+
+    bool do_half_value(uint16_t value, 
+                       semantic_tag tag,
+                       const ser_context& context,
+                       std::error_code& ec) override
+    {
+        return to_handler_->half_value(value, tag, context, ec);
     }
 
     bool do_double_value(double value, 

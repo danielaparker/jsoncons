@@ -38,6 +38,7 @@ enum class staj_event_type
     bool_value,
     int64_value,
     uint64_value,
+    half_value,
     double_value
 };
 
@@ -101,6 +102,11 @@ std::ostream& operator<<(std::ostream& os, staj_event_type tag)
             os << "uint64_value";
             break;
         }
+        case staj_event_type::half_value:
+        {
+            os << "half_value";
+            break;
+        }
         case staj_event_type::double_value:
         {
             os << "double_value";
@@ -124,6 +130,7 @@ class basic_staj_event
         bool bool_value_;
         int64_t int64_value_;
         uint64_t uint64_value_;
+        uint16_t half_value_;
         double double_value_;
         const CharT* string_data_;
         const uint8_t* byte_string_data_;
@@ -158,6 +165,12 @@ public:
         : event_type_(staj_event_type::uint64_value), tag_(tag), length_(0)
     {
         value_.uint64_value_ = value;
+    }
+
+    basic_staj_event(half_arg_t, uint16_t value, semantic_tag tag)
+        : event_type_(staj_event_type::half_value), tag_(tag), length_(0)
+    {
+        value_.half_value_ = value;
     }
 
     basic_staj_event(double value, semantic_tag tag)
@@ -203,6 +216,14 @@ public:
         {
             jsoncons::string_result<T> result(s);
             jsoncons::detail::print_uinteger(value_.uint64_value_, result);
+            break;
+        }
+        case staj_event_type::half_value:
+        {
+            jsoncons::string_result<T> result(s);
+            jsoncons::detail::print_double f{float_chars_format::general,0};
+            double x = jsoncons::detail::decode_half(value_.half_value_);
+            f(x, result);
             break;
         }
         case staj_event_type::double_value:
@@ -404,6 +425,11 @@ private:
                 return static_cast<double>(value_.int64_value_);
             case staj_event_type::uint64_value:
                 return static_cast<double>(value_.uint64_value_);
+            case staj_event_type::half_value:
+            {
+                double x = jsoncons::detail::decode_half(value_.half_value_);
+                return static_cast<double>(x);
+            }
             default:
                 JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a double"));
         }

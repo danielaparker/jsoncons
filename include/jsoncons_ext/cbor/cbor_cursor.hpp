@@ -109,14 +109,19 @@ public:
                         this->int64_value(data_.data(int64_array_arg)[index_]);
                         break;
                     }
+                    case typed_array_type::half_value:
+                    {
+                        this->half_value(data_.data(half_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        break;
+                    }
                     case typed_array_type::float_value:
                     {
-                        this->double_value(data_.data(float_array_arg)[index_], semantic_tag::none, null_ser_context_arg, ec);
+                        this->double_value(data_.data(float_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
                         break;
                     }
                     case typed_array_type::double_value:
                     {
-                        this->double_value(data_.data(double_array_arg)[index_], semantic_tag::none, null_ser_context_arg, ec);
+                        this->double_value(data_.data(double_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
                         break;
                     }
                     case typed_array_type::float128_value:
@@ -379,6 +384,15 @@ private:
         return !filter_(event_, context);
     }
 
+    bool do_half_value(uint16_t value, 
+                       semantic_tag tag, 
+                       const ser_context& context,
+                       std::error_code&) override
+    {
+        event_ = basic_staj_event<char_type>(half_arg, value, tag);
+        return !filter_(event_, context);
+    }
+
     bool do_double_value(double value, 
                          semantic_tag tag, 
                          const ser_context& context,
@@ -459,6 +473,16 @@ private:
     }
 
     bool do_typed_array(const int64_t* data, size_t size, 
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code&) override
+    {
+        data_ = typed_array_view<Float128T>(data, size);
+        index_ = 0;
+        return this->begin_array(tag,context);
+    }
+
+    bool do_typed_array(half_arg_t, const uint16_t* data, size_t size, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code&) override
