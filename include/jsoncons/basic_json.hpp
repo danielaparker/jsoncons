@@ -83,13 +83,14 @@ enum class storage_type : uint8_t
     bool_value = 0x01,
     int64_value = 0x02,
     uint64_value = 0x03,
-    double_value = 0x04,
-    short_string_value = 0x05,
-    long_string_value = 0x06,
-    byte_string_value = 0x07,
-    array_value = 0x08,
-    empty_object_value = 0x09,
-    object_value = 0x0a
+    half_value = 0x04,
+    double_value = 0x05,
+    short_string_value = 0x06,
+    long_string_value = 0x07,
+    byte_string_value = 0x08,
+    array_value = 0x09,
+    empty_object_value = 0x0a,
+    object_value = 0x0b
 };
 
 template <class CharT, class ImplementationPolicy, class Allocator>
@@ -257,6 +258,28 @@ public:
             }
 
             uint64_t value() const
+            {
+                return val_;
+            }
+        };
+
+        class half_data final : public data_base
+        {
+            uint16_t val_;
+        public:
+            half_data(uint16_t val, semantic_tag tag = semantic_tag::none)
+                : data_base(storage_type::half_value, tag), 
+                  val_(val)
+            {
+            }
+
+            half_data(const half_data& val)
+                : data_base(val.ext_type()),
+                  val_(val.val_)
+            {
+            }
+
+            uint16_t value() const
             {
                 return val_;
             }
@@ -650,8 +673,8 @@ public:
         };
 
     private:
-        static const size_t data_size = static_max<sizeof(uint64_data),sizeof(double_data),sizeof(short_string_data), sizeof(long_string_data), sizeof(array_data), sizeof(object_data)>::value;
-        static const size_t data_align = static_max<alignof(uint64_data),alignof(double_data),alignof(short_string_data),alignof(long_string_data),alignof(array_data),alignof(object_data)>::value;
+        static const size_t data_size = static_max<sizeof(uint64_data),sizeof(half_data),sizeof(double_data),sizeof(short_string_data), sizeof(long_string_data), sizeof(array_data), sizeof(object_data)>::value;
+        static const size_t data_align = static_max<alignof(uint64_data),alignof(half_data),alignof(double_data),alignof(short_string_data),alignof(long_string_data),alignof(array_data),alignof(object_data)>::value;
 
         typedef typename std::aligned_storage<data_size,data_align>::type data_t;
 
@@ -678,6 +701,11 @@ public:
 		explicit variant(uint64_t val, semantic_tag tag) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))uint64_data(val, tag);
+        }
+
+        variant(half_arg_t, uint16_t val, semantic_tag tag) : data_{}
+        {
+            new(reinterpret_cast<void*>(&data_))half_data(val, tag);
         }
 
 		variant(double val, semantic_tag tag) : data_{}
@@ -834,6 +862,9 @@ public:
                     case storage_type::uint64_value:
                         new(reinterpret_cast<void*>(&data_))uint64_data(*(val.uint64_data_cast()));
                         break;
+                    case storage_type::half_value:
+                        new(reinterpret_cast<void*>(&data_))half_data(*(val.half_data_cast()));
+                        break;
                     case storage_type::double_value:
                         new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
                         break;
@@ -902,6 +933,11 @@ public:
         const uint64_data* uint64_data_cast() const
         {
             return reinterpret_cast<const uint64_data*>(&data_);
+        }
+
+        const half_data* half_data_cast() const
+        {
+            return reinterpret_cast<const half_data*>(&data_);
         }
 
         const double_data* double_data_cast() const
@@ -1046,6 +1082,8 @@ public:
                         JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an integer"));
                     }
                     return basic_bignum<UserAllocator>(as_string_view().data(), as_string_view().length());
+                case storage_type::halve_value:
+                    return basic_bignum<UserAllocator>(decode_half(half_data_cast()->value()));
                 case storage_type::double_value:
                     return basic_bignum<UserAllocator>(double_data_cast()->value());
                 case storage_type::int64_value:
@@ -1122,6 +1160,15 @@ public:
                             return false;
                     }
                     break;
+                case storage_type::half_value:
+                    switch (rhs.type())
+                    {
+                        case storage_type::half_value:
+                            return half_data_cast()->value() == rhs.half_data_cast()->value();
+                        default:
+                            return variant(decode_half(half_data_cast()->value())) == rhs;
+                    }
+                    break;
                 case storage_type::double_value:
                     switch (rhs.type())
                     {
@@ -1129,6 +1176,8 @@ public:
                             return double_data_cast()->value() == static_cast<double>(rhs.int64_data_cast()->value());
                         case storage_type::uint64_value:
                             return double_data_cast()->value() == static_cast<double>(rhs.uint64_data_cast()->value());
+                        case storage_type::half_value:
+                            return double_data_cast()->value() == decode_half(rhs.half_data_cast()->value());
                         case storage_type::double_value:
                             return double_data_cast()->value() == rhs.double_data_cast()->value();
                         default:
@@ -1366,6 +1415,9 @@ public:
                 case storage_type::uint64_value:
                     new(reinterpret_cast<void*>(&(other.data_)))uint64_data(*uint64_data_cast());
                     break;
+                case storage_type::half_value:
+                    new(reinterpret_cast<void*>(&(other.data_)))half_data(*half_data_cast());
+                    break;
                 case storage_type::double_value:
                     new(reinterpret_cast<void*>(&(other.data_)))double_data(*double_data_cast());
                     break;
@@ -1413,41 +1465,44 @@ public:
         {
             switch (val.type())
             {
-            case storage_type::null_value:
-                new(reinterpret_cast<void*>(&data_))null_data(*(val.null_data_cast()));
-                break;
-            case storage_type::empty_object_value:
-                new(reinterpret_cast<void*>(&data_))empty_object_data(*(val.empty_object_data_cast()));
-                break;
-            case storage_type::bool_value:
-                new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
-                break;
-            case storage_type::int64_value:
-                new(reinterpret_cast<void*>(&data_))int64_data(*(val.int64_data_cast()));
-                break;
-            case storage_type::uint64_value:
-                new(reinterpret_cast<void*>(&data_))uint64_data(*(val.uint64_data_cast()));
-                break;
-            case storage_type::double_value:
-                new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
-                break;
-            case storage_type::short_string_value:
-                new(reinterpret_cast<void*>(&data_))short_string_data(*(val.short_string_data_cast()));
-                break;
-            case storage_type::long_string_value:
-                new(reinterpret_cast<void*>(&data_))long_string_data(*(val.string_data_cast()));
-                break;
-            case storage_type::byte_string_value:
-                new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()));
-                break;
-            case storage_type::object_value:
-                new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()));
-                break;
-            case storage_type::array_value:
-                new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()));
-                break;
-            default:
-                break;
+                case storage_type::null_value:
+                    new(reinterpret_cast<void*>(&data_))null_data(*(val.null_data_cast()));
+                    break;
+                case storage_type::empty_object_value:
+                    new(reinterpret_cast<void*>(&data_))empty_object_data(*(val.empty_object_data_cast()));
+                    break;
+                case storage_type::bool_value:
+                    new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
+                    break;
+                case storage_type::int64_value:
+                    new(reinterpret_cast<void*>(&data_))int64_data(*(val.int64_data_cast()));
+                    break;
+                case storage_type::uint64_value:
+                    new(reinterpret_cast<void*>(&data_))uint64_data(*(val.uint64_data_cast()));
+                    break;
+                case storage_type::half_value:
+                    new(reinterpret_cast<void*>(&data_))half_data(*(val.half_data_cast()));
+                    break;
+                case storage_type::double_value:
+                    new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
+                    break;
+                case storage_type::short_string_value:
+                    new(reinterpret_cast<void*>(&data_))short_string_data(*(val.short_string_data_cast()));
+                    break;
+                case storage_type::long_string_value:
+                    new(reinterpret_cast<void*>(&data_))long_string_data(*(val.string_data_cast()));
+                    break;
+                case storage_type::byte_string_value:
+                    new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()));
+                    break;
+                case storage_type::object_value:
+                    new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()));
+                    break;
+                case storage_type::array_value:
+                    new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()));
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -3459,33 +3514,35 @@ public:
     {
         switch (var_.type())
         {
-        case storage_type::short_string_value:
-        case storage_type::long_string_value:
-            if (var_.tag() == semantic_tag::bigint)
-            {
-                return static_cast<bool>(var_.as_bignum());
-            }
+            case storage_type::short_string_value:
+            case storage_type::long_string_value:
+                if (var_.tag() == semantic_tag::bigint)
+                {
+                    return static_cast<bool>(var_.as_bignum());
+                }
 
-            JSONCONS_TRY
-            {
-                basic_json j = basic_json::parse(as_string_view());
-                return j.as_bool();
-            }
-            JSONCONS_CATCH(...)
-            {
+                JSONCONS_TRY
+                {
+                    basic_json j = basic_json::parse(as_string_view());
+                    return j.as_bool();
+                }
+                JSONCONS_CATCH(...)
+                {
+                    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a bool"));
+                }
+                break;
+            case storage_type::bool_value:
+                return var_.bool_data_cast()->value();
+            case storage_type::half_value:
+                return var_.half_data_cast()->value() != 0.0;
+            case storage_type::double_value:
+                return var_.double_data_cast()->value() != 0.0;
+            case storage_type::int64_value:
+                return var_.int64_data_cast()->value() != 0;
+            case storage_type::uint64_value:
+                return var_.uint64_data_cast()->value() != 0;
+            default:
                 JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a bool"));
-            }
-            break;
-        case storage_type::bool_value:
-            return var_.bool_data_cast()->value();
-        case storage_type::double_value:
-            return var_.double_data_cast()->value() != 0.0;
-        case storage_type::int64_value:
-            return var_.int64_data_cast()->value() != 0;
-        case storage_type::uint64_value:
-            return var_.uint64_data_cast()->value() != 0;
-        default:
-            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a bool"));
         }
     }
 
@@ -3498,8 +3555,8 @@ public:
     {
         switch (var_.type())
         {
-        case storage_type::short_string_value:
-        case storage_type::long_string_value:
+            case storage_type::short_string_value:
+            case storage_type::long_string_value:
             {
                 auto result = jsoncons::detail::to_integer<T>(as_string_view().data(), as_string_view().length());
                 if (result.ec != jsoncons::detail::to_integer_errc())
@@ -3508,16 +3565,18 @@ public:
                 }
                 return result.value;
             }
-        case storage_type::double_value:
-            return static_cast<T>(var_.double_data_cast()->value());
-        case storage_type::int64_value:
-            return static_cast<T>(var_.int64_data_cast()->value());
-        case storage_type::uint64_value:
-            return static_cast<T>(var_.uint64_data_cast()->value());
-        case storage_type::bool_value:
-            return static_cast<T>(var_.bool_data_cast()->value() ? 1 : 0);
-        default:
-            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an integer"));
+            case storage_type::half_value:
+                return static_cast<T>(var_.half_data_cast()->value());
+            case storage_type::double_value:
+                return static_cast<T>(var_.double_data_cast()->value());
+            case storage_type::int64_value:
+                return static_cast<T>(var_.int64_data_cast()->value());
+            case storage_type::uint64_value:
+                return static_cast<T>(var_.uint64_data_cast()->value());
+            case storage_type::bool_value:
+                return static_cast<T>(var_.bool_data_cast()->value() ? 1 : 0);
+            default:
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an integer"));
         }
     }
 
@@ -3532,30 +3591,14 @@ public:
                 // to_double() throws std::invalid_argument if conversion fails
                 return to_double(as_cstring(), as_string_view().length());
             }
+            case storage_type::half_value:
+                return jsoncons::detail::decode_half(var_.half_data_cast()->value());
             case storage_type::double_value:
                 return var_.double_data_cast()->value();
             case storage_type::int64_value:
-                switch (var_.tag())
-                {
-                    case semantic_tag::half:
-                    {
-                        uint16_t x = static_cast<uint16_t>(var_.int64_data_cast()->value());
-                        return jsoncons::detail::decode_half(x);
-                    }
-                    default:
-                        return static_cast<double>(var_.int64_data_cast()->value());
-                }
+                return static_cast<double>(var_.int64_data_cast()->value());
             case storage_type::uint64_value:
-                switch (tag())
-                {
-                    case semantic_tag::half:
-                    {
-                        uint16_t x = static_cast<uint16_t>(var_.uint64_data_cast()->value());
-                        return jsoncons::detail::decode_half(x);
-                    }
-                    default:
-                        return static_cast<double>(var_.uint64_data_cast()->value());
-                }
+                return static_cast<double>(var_.uint64_data_cast()->value());
             default:
                 JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
         }
@@ -5101,6 +5144,9 @@ private:
             case storage_type::byte_string_value:
                 handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length(), 
                                           var_.tag());
+                break;
+            case storage_type::half_value:
+                handler.half_value(var_.half_data_cast()->value(), var_.tag());
                 break;
             case storage_type::double_value:
                 handler.double_value(var_.double_data_cast()->value(), 
