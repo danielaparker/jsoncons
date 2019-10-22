@@ -62,17 +62,17 @@ Member type                         |Definition
                            semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=null_ser_context()); // (11)
 
-    bool byte_string_value(const uint8_t* p, size_t size, 
-                           semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context()); // (12)
-
     bool uint64_value(uint64_t value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context()); // (13)
+                      const ser_context& context=null_ser_context()); // (12)
 
     bool int64_value(int64_t value, 
                      semantic_tag tag = semantic_tag::none, 
-                     const ser_context& context=null_ser_context()); // (14)
+                     const ser_context& context=null_ser_context()); // (13)
+
+    bool half_value(uint16_t value, 
+                    semantic_tag tag = semantic_tag::none, 
+                    const ser_context& context=null_ser_context()); // (14)
 
     bool double_value(double value, 
                       semantic_tag tag = semantic_tag::none, 
@@ -125,20 +125,20 @@ Member type                         |Definition
                            const ser_context& context,
                            std::error_code& ec); // (26)
 
-    bool byte_string_value(const uint8_t* p, size_t size, 
-                           semantic_tag tag, 
-                           const ser_context& context,
-                           std::error_code& ec); // (27)
-
     bool uint64_value(uint64_t value, 
                       semantic_tag tag, 
                       const ser_context& context,
-                      std::error_code& ec); // (28)
+                      std::error_code& ec); // (27)
 
     bool int64_value(int64_t value, 
                      semantic_tag tag, 
                      const ser_context& context,
-                     std::error_code& ec); // (29)
+                     std::error_code& ec); // (28)
+
+    bool half_value(uint16_t value, 
+                    semantic_tag tag, 
+                    const ser_context& context,
+                    std::error_code& ec); // (29)
 
     bool double_value(double value, 
                       semantic_tag tag, 
@@ -189,19 +189,19 @@ Throws a [ser_error](ser_error.md) on parse errors.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(12) Writes a byte string value.
+(12) Writes a non-negative integer value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(13) Writes a non-negative integer value.
+(13) Writes a signed integer value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(14) Writes a signed integer value.
+(14) Writes a half precision floating point value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(15) Writes a floating point value.
+(15) Writes a double precision floating point value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
