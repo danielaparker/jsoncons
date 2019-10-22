@@ -2387,7 +2387,7 @@ private:
                     {
                         typed_array_.data(uint8_array_arg)[i] = *p;
                     }
-                    more_ = handler.typed_array(typed_array_.data(uint8_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    more_ = handler.typed_array(span<const uint8_t>(typed_array_.data(uint8_array_arg), typed_array_.size()), semantic_tag::none, *this);
                     break;
                 }
                 case 0x44:

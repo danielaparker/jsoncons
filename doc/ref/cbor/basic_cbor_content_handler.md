@@ -130,7 +130,7 @@ Member type                         |Definition
 
 #### Private event consumer interface
 
-    virtual bool do_typed_array(const uint8_t* data, size_t size, 
+    virtual bool do_typed_array(const span<const uint8_t>&, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;

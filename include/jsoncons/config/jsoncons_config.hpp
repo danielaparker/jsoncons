@@ -48,29 +48,6 @@
 #define JSONCONS_UNREACHABLE() do {} while (0)
 #endif
 
-// Follows boost 1_68
-#if !defined(JSONCONS_HAS_STRING_VIEW)
-#  if defined(__clang__)
-#   if (__cplusplus >= 201703)
-#    if __has_include(<string_view>)
-#     define JSONCONS_HAS_STRING_VIEW 1
-#    endif // __has_include(<string_view>)
-#   endif // (__cplusplus >= 201703)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
-#   if (__GNUC__ >= 7)
-#    if (__cplusplus >= 201703) || (defined(_HAS_CXX17) && _HAS_CXX17 == 1)
-#     define JSONCONS_HAS_STRING_VIEW 1
-#    endif // (__cplusplus >= 201703)
-#   endif // (__GNUC__ >= 7)
-#  endif // defined(__GNUC__)
-#  if defined(_MSC_VER)
-#   if (_MSC_VER >= 1910 && _HAS_CXX17)
-#    define JSONCONS_HAS_STRING_VIEW
-#   endif // (_MSC_VER >= 1910 && _HAS_CXX17)
-#  endif // defined(_MSC_VER)
-#endif // !defined(JSONCONS_HAS_STRING_VIEW)
-
 // Deprecated symbols markup
 #if (defined(__cplusplus) && __cplusplus >= 201402L)
 #define JSONCONS_DEPRECATED_MSG(msg) [[deprecated(msg)]]
@@ -122,21 +99,54 @@
 #define JSONCONS_HAS_FOPEN_S
 #endif
 
+// Follows boost 1_68
+#if !defined(JSONCONS_HAS_STRING_VIEW)
+#  if defined(__clang__)
+#   if (__cplusplus >= 201703)
+#    if __has_include(<string_view>)
+#     define JSONCONS_HAS_STRING_VIEW 1
+#    endif // __has_include(<string_view>)
+#   endif // (__cplusplus >= 201703)
+#  endif // defined(__clang__)
+#  if defined(__GNUC__)
+#   if (__GNUC__ >= 7)
+#    if (__cplusplus >= 201703) || (defined(_HAS_CXX17) && _HAS_CXX17 == 1)
+#     define JSONCONS_HAS_STRING_VIEW 1
+#    endif // (__cplusplus >= 201703)
+#   endif // (__GNUC__ >= 7)
+#  endif // defined(__GNUC__)
+#  if defined(_MSC_VER)
+#   if (_MSC_VER >= 1910 && _HAS_CXX17)
+#    define JSONCONS_HAS_STRING_VIEW
+#   endif // (_MSC_VER >= 1910 && _HAS_CXX17)
+#  endif // defined(_MSC_VER)
+#endif // !defined(JSONCONS_HAS_STRING_VIEW)
+
 #if !defined(JSONCONS_HAS_STRING_VIEW)
 #include <jsoncons/detail/string_view.hpp>
 namespace jsoncons {
-template <class CharT, class Traits = std::char_traits<CharT>>
-using basic_string_view = jsoncons::detail::basic_string_view<CharT, Traits>;
+using jsoncons::detail::basic_string_view;
 using string_view = basic_string_view<char, std::char_traits<char>>;
 using wstring_view = basic_string_view<wchar_t, std::char_traits<wchar_t>>;
 }
 #else 
 #include <string_view>
 namespace jsoncons {
-template <class CharT, class Traits = std::char_traits<CharT>>
-using basic_string_view = std::basic_string_view<CharT, Traits>;
-using string_view = std::string_view;
-using wstring_view = std::wstring_view;
+using std::basic_string_view;
+using std::string_view;
+using std::wstring_view;
+}
+#endif
+
+#if !defined(JSONCONS_HAS_SPAN)
+#include <jsoncons/detail/span.hpp>
+namespace jsoncons {
+using nonstd::span_lite::span;
+}
+#else 
+#include <span>
+namespace jsoncons {
+using std::span;
 }
 #endif
  

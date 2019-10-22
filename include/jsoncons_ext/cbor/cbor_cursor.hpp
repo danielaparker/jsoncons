@@ -402,12 +402,12 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_typed_array(const uint8_t* data, size_t size, 
+    bool do_typed_array(const span<const uint8_t>& v, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        data_ = typed_array_view<Float128T>(data, size);
+        data_ = typed_array_view<Float128T>(v.data(), v.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }

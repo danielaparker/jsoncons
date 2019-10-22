@@ -30,12 +30,12 @@ public:
     using string_view_type = typename super_type::string_view_type;
     typedef Float128T float128_type; 
 
-    bool typed_array(const uint8_t* data, size_t size, 
+    bool typed_array(const span<const uint8_t>& data, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context())
     {
         std::error_code ec;
-        bool more = do_typed_array(data, size, tag, context, ec);
+        bool more = do_typed_array(data, tag, context, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
@@ -186,11 +186,11 @@ public:
         return more;
     }
 
-    bool typed_array(const uint8_t* data, size_t size, 
+    bool typed_array(const span<const uint8_t>& v, 
                      semantic_tag tag,
                      const ser_context& context, std::error_code& ec)
     {
-        return do_typed_array(data, size, tag, context, ec);
+        return do_typed_array(v, tag, context, ec);
     }
 
     bool typed_array(const uint16_t* data, size_t size, 
@@ -264,7 +264,7 @@ public:
         return do_typed_array(data, size, tag, context, ec);
     }
 private:
-    virtual bool do_typed_array(const uint8_t* data, size_t size, 
+    virtual bool do_typed_array(const span<const uint8_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
@@ -425,7 +425,7 @@ private:
         return parse_more_;
     }
 
-    bool do_typed_array(const uint8_t*, size_t, 
+    bool do_typed_array(const span<const uint8_t>&, 
                         semantic_tag,
                         const ser_context&, 
                         std::error_code&) override 
@@ -635,13 +635,13 @@ private:
         return to_handler_.null_value(tag, context, ec);
     }
 
-    bool do_typed_array(const uint8_t* data, size_t size, 
+    bool do_typed_array(const span<const uint8_t>& v, 
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
     {
         bool more = to_handler_.begin_array(tag, context, ec);
-        for (auto p = data; more && p < data+size; ++p)
+        for (auto p = v.data(); more && p < v.data()+v.size(); ++p)
         {
             more = to_handler_.uint64_value(*p, semantic_tag::none, context, ec);
         }

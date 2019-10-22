@@ -1110,7 +1110,7 @@ private:
         return true;
     }
 
-    bool do_typed_array(const uint8_t* data, size_t size, 
+    bool do_typed_array(const span<const uint8_t>& v, 
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1126,15 +1126,15 @@ private:
                     write_tag(0x40);
                     break;
             }
-            std::vector<uint8_t> v(size*sizeof(uint8_t));
-            memcpy(v.data(),data,size*sizeof(uint8_t));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            std::vector<uint8_t> u(v.size()*sizeof(uint8_t));
+            memcpy(u.data(),v.data(),v.size()*sizeof(uint8_t));
+            write_byte_string_value(byte_string_view(u.data(),u.size()));
             return true;
         }
         else
         {
             bool more = this->begin_array(semantic_tag::none, context, ec);
-            for (auto p = data; more && p < data+size; ++p)
+            for (auto p = v.data(); more && p < v.data()+v.size(); ++p)
             {
                 more = this->uint64_value(*p, tag, context, ec);
             }
