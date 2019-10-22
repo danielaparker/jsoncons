@@ -2927,6 +2927,11 @@ public:
     {
     }
 
+    basic_json(half_arg_t, uint16_t value, semantic_tag tag)
+        : var_(half_arg, value, tag)
+    {
+    }
+
     basic_json(double val, semantic_tag tag)
         : var_(val, tag)
     {

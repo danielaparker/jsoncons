@@ -38,9 +38,7 @@ basic_json(const byte_string_view& bs,
            semantic_tag tag = semantic_tag::none, 
            const allocator_type& allocator); // (16)
 
-basic_json(const bignum& n); // (17)
-
-basic_json(const bignum& n, const allocator_type& allocator); // (18)
+basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none); // (17)
 ```
 
 (1) Constructs a `basic_json` value that holds an empty basic_json object. 
@@ -75,9 +73,7 @@ basic_json(const bignum& n, const allocator_type& allocator); // (18)
 
 (16) Constructs a `basic_json` value for a [byte_string](../byte_string.md) with supplied allocator.
 
-(17) Constructs a `basic_json` value for a [bignum](../bignum.md).
-
-(18) Constructs a `basic_json` value for a [bignum](../bignum.md) with supplied allocator.
+(17) Constructs a `basic_json` value for a half precision floating point number.
 
 ### Examples
 
