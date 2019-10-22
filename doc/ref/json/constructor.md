@@ -13,13 +13,13 @@ basic_json(basic_json&& other) noexcept; // (5)
 
 basic_json(basic_json&& other, const allocator_type& allocator) noexcept; // (6)
 
-basic_json(const array& val); // (7)
+basic_json(const array& val, semantic_tag tag = semantic_tag::none); // (7)
 
-basic_json(array&& val) noexcept; // (8)
+basic_json(array&& val, semantic_tag tag = semantic_tag::none) noexcept; // (8)
 
-basic_json(const object& val); // (9)
+basic_json(const object& val, semantic_tag tag = semantic_tag::none); // (9)
 
-basic_json(object&& val) noexcept; // (10)
+basic_json(object&& val, semantic_tag tag = semantic_tag::none) noexcept; // (10)
 
 template <class T>
 basic_json(const T& val); // (11)
