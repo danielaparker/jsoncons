@@ -20,7 +20,7 @@
 
 namespace jsoncons { namespace cbor {
 
-template <class Float128T=nullptr_t>
+template <class Float128T = std::nullptr_t>
 class basic_cbor_content_handler : public basic_json_content_handler<char>
 {
 public:
@@ -326,7 +326,7 @@ private:
                                 std::error_code& ec) = 0;
 };
 
-template <class Float128T=nullptr_t>
+template <class Float128T = std::nullptr_t>
 class basic_default_cbor_content_handler : public basic_cbor_content_handler<Float128T>
 {
     using super_type = basic_default_json_content_handler<char>;
@@ -527,7 +527,7 @@ private:
     }
 };
 
-template <class Float128T=nullptr_t>
+template <class Float128T = std::nullptr_t>
 class cbor_to_json_content_handler_adaptor : public basic_cbor_content_handler<Float128T>
 {
     using super_type = basic_cbor_content_handler<Float128T>;

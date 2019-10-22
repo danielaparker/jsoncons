@@ -53,7 +53,7 @@ enum typed_array_type {uint8_value=1,uint16_value,uint32_value,uint64_value,
                       int8_value,int16_value,int32_value,int64_value, 
                       half_value, float_value,double_value,float128_value};
 
-template <class Float128T=nullptr_t, class Allocator=std::allocator<char>>
+template <class Float128T = std::nullptr_t, class Allocator=std::allocator<char>>
 class typed_array
 {
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint8_t> uint8_allocator_type;
@@ -534,7 +534,7 @@ public:
    
 };
 
-template <class Float128T=nullptr_t>
+template <class Float128T = std::nullptr_t>
 class typed_array_view
 {
     typed_array_type type_;
@@ -858,7 +858,7 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Src,class Float128T=nullptr_t,class WorkAllocator=std::allocator<char>>
+template <class Src,class Float128T = std::nullptr_t,class WorkAllocator=std::allocator<char>>
 class basic_cbor_parser : public ser_context
 {
     typedef char char_type;

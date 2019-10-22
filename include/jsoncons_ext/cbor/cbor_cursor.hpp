@@ -525,7 +525,7 @@ private:
     }
 };
 
-template<class Src=jsoncons::binary_stream_source,class Float128T=nullptr_t,class Allocator=std::allocator<char>>
+template<class Src=jsoncons::binary_stream_source,class Float128T = std::nullptr_t,class Allocator=std::allocator<char>>
 class basic_cbor_cursor : public basic_staj_reader<char>, private virtual ser_context
 {
 public:
