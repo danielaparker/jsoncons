@@ -143,10 +143,17 @@ TEST_CASE("cbor typed array tests")
         json j = cbor::decode_cbor<json>(input);
         std::cout << "Tag 68\n" << pretty_print(j) << "\n";
         REQUIRE(j.is_array());
+        CHECK(j.tag() == semantic_tag::clamped);
         REQUIRE(j.size() == 3);
         CHECK(j[0].as<uint8_t>() == std::numeric_limits<uint8_t>::lowest());
         CHECK(j[1].as<uint8_t>() == uint8_t(1));
         CHECK(j[2].as<uint8_t>() == (std::numeric_limits<uint8_t>::max)());
+
+        auto v = cbor::decode_cbor<std::vector<uint8_t>>(input);
+        REQUIRE(v.size() == 3);
+        CHECK(v[0] == std::numeric_limits<uint8_t>::lowest());
+        CHECK(v[1] == uint8_t(1));
+        CHECK(v[2] == (std::numeric_limits<uint8_t>::max)());
     }
     SECTION("Tags 69 (uint16, little endian)")
     {
