@@ -146,7 +146,7 @@ TEST_CASE("test_string_not_equals_empty_object")
 
 TEST_CASE("test_byte_strings_equal")
 {
-    json o1(byte_string({'1','2','3','4','5','6','7','8','9}"));
+    json o1(byte_string({'1','2','3','4','5','6','7','8','9'}"));
     json o2(byte_string{'1','2','3','4','5','6','7','8','9'});
     json o3(byte_string{'1','2','3','4','5','6','7','8'});
 
