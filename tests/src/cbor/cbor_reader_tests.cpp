@@ -138,9 +138,9 @@ TEST_CASE("test_cbor_parsing")
     check_parse_cbor({0x5f,0x40,0xff}, json(byte_string()));
     check_parse_cbor({0x5f,0x40,0x40,0xff}, json(byte_string()));
 
-    check_parse_cbor({0x5f,0x43,'H','e','l',0x42,'l','o',0xff}, json(byte_string("Hello")));
-    check_parse_cbor({0x5f,0x41,'H',0x41,'e',0x41,'l',0x41,'l',0x41,'o',0xff}, json(byte_string("Hello")));
-    check_parse_cbor({0x5f,0x41,'H',0x41,'e',0x40,0x41,'l',0x41,'l',0x41,'o',0xff}, json(byte_string("Hello")));
+    check_parse_cbor({0x5f,0x43,'H','e','l',0x42,'l','o',0xff}, json(byte_string({'H','e','l','l','o'})));
+    check_parse_cbor({0x5f,0x41,'H',0x41,'e',0x41,'l',0x41,'l',0x41,'o',0xff}, json(byte_string({'H','e','l','l','o'})));
+    check_parse_cbor({0x5f,0x41,'H',0x41,'e',0x40,0x41,'l',0x41,'l',0x41,'o',0xff}, json(byte_string({'H','e','l','l','o'})));
 
     // text strings with undefined length
 

@@ -487,14 +487,6 @@ public:
     {
     }
 
-    basic_byte_string(const char* s)
-    {
-        while (*s)
-        {
-            data_.push_back(*s++);
-        }
-    }
-
     basic_byte_string(const uint8_t* data, size_t length, const Allocator& alloc = Allocator())
         : data_(data, data+length,alloc)
     {

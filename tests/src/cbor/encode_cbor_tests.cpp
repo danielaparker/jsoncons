@@ -104,9 +104,9 @@ TEST_CASE("cbor_encoder_test")
     check_encode_cbor({0x40},json(byte_string()));
     check_encode_cbor({0x41,' '},json(byte_string({' '})));
     check_encode_cbor({0x41,0},json(byte_string({0})));
-    check_encode_cbor({0x45,'H','e','l','l','o'},json(byte_string("Hello")));
+    check_encode_cbor({0x45,'H','e','l','l','o'},json(byte_string({'H','e','l','l','o'})));
     check_encode_cbor({0x58,0x18,'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'},
-                 json(byte_string("123456789012345678901234")));
+        json(byte_string({ '1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4' })));
 
     // text string
     check_encode_cbor({0x60},json(""));

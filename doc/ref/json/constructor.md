@@ -118,7 +118,7 @@ int main()
     std::cout << "(8) " << j8 << std::endl;
 
     const uint8_t bs[] = {'H','e','l','l','o'};
-    json j9(byte_string("Hello")); // A byte string
+    json j9(byte_string({'H','e','l','l','o'})); // A byte string
     std::cout << "(9) " << j9 << std::endl;
 
     std::vector<int> v = {10,20,30};

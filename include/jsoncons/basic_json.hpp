@@ -747,6 +747,11 @@ public:
             new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.length(), allocator);
         }
 
+        variant(byte_string_arg_t, const uint8_t* data, size_t length, semantic_tag tag, const Allocator& allocator) : data_{}
+        {
+            new(reinterpret_cast<void*>(&data_))byte_string_data(tag, data, length, allocator);
+        }
+
         variant(const basic_bignum<byte_allocator_type>& n) : data_{}
         {
             std::basic_string<char_type> s;
@@ -2976,15 +2981,16 @@ public:
     }
 
     explicit basic_json(const byte_string_view& bs, 
-                        semantic_tag tag = semantic_tag::none)
-        : var_(bs, tag)
+               semantic_tag tag = semantic_tag::none, 
+               const Allocator& allocator = Allocator())
+        : var_(byte_string_arg, bs.data(), bs.size(), tag, allocator)
     {
     }
 
-    basic_json(const byte_string_view& bs, 
-               semantic_tag tag, 
-               const Allocator& allocator)
-        : var_(bs, tag, allocator)
+    basic_json(byte_string_arg_t, const uint8_t* data, size_t size, 
+               semantic_tag tag = semantic_tag::none, 
+               const Allocator& allocator = Allocator())
+        : var_(byte_string_arg, data, size, tag, allocator)
     {
     }
 
