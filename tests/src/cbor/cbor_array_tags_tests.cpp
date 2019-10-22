@@ -19,13 +19,13 @@ struct my_cbor_content_handler : public cbor::default_cbor_content_handler
 {
     std::vector<double> v;
 private:
-    bool do_typed_array(const double* data, size_t size, 
+    bool do_typed_array(const span<const double>& data,  
                         semantic_tag,
                         const ser_context&,
                         std::error_code&) override
     {
-        std::cout << "do_typed_array size: " << size << "\n";
-        v = std::vector<double>(data,data+size);
+        std::cout << "do_typed_array size: " << data.size() << "\n";
+        v = std::vector<double>(data.begin(),data.end());
         return false;
     }
 };

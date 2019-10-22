@@ -25,7 +25,7 @@ namespace jsoncons { namespace cbor {
 
 enum class cbor_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
-template<class Result=jsoncons::binary_stream_result,class Float128T = void>
+template<class Result=jsoncons::binary_stream_result,class Float128T=nullptr_t>
 class basic_cbor_encoder final : public basic_cbor_content_handler<Float128T>
 {
     using super_type = basic_cbor_content_handler<Float128T>;
@@ -1126,15 +1126,13 @@ private:
                     write_tag(0x40);
                     break;
             }
-            std::vector<uint8_t> u(v.size()*sizeof(uint8_t));
-            memcpy(u.data(),v.data(),v.size()*sizeof(uint8_t));
-            write_byte_string_value(byte_string_view(u.data(),u.size()));
+            write_byte_string_value(byte_string_view(v.data(),v.size()));
             return true;
         }
         else
         {
             bool more = this->begin_array(semantic_tag::none, context, ec);
-            for (auto p = v.data(); more && p < v.data()+v.size(); ++p)
+            for (auto p = v.begin(); more && p != v.end(); ++p)
             {
                 more = this->uint64_value(*p, tag, context, ec);
             }
@@ -1146,7 +1144,7 @@ private:
         }
     }
 
-    bool do_typed_array(const uint16_t* data, size_t size, 
+    bool do_typed_array(const span<const uint16_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1156,15 +1154,15 @@ private:
             write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
                                   uint16_t(), 
                                   tag);
-            std::vector<uint8_t> v(size*sizeof(uint16_t));
-            memcpy(v.data(),data,size*sizeof(uint16_t));
+            std::vector<uint8_t> v(data.size()*sizeof(uint16_t));
+            memcpy(v.data(),data.data(),data.size()*sizeof(uint16_t));
             write_byte_string_value(byte_string_view(v.data(),v.size()));
             return true;
         }
         else
         {
             bool more = this->begin_array(semantic_tag::none, context, ec);
-            for (auto p = data; more && p < data+size; ++p)
+            for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->uint64_value(*p, tag, context, ec);
             }
@@ -1176,7 +1174,7 @@ private:
         }
     }
 
-    bool do_typed_array(const uint32_t* data, size_t size, 
+    bool do_typed_array(const span<const uint32_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1186,15 +1184,15 @@ private:
             write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
                                   uint32_t(), 
                                   tag);
-            std::vector<uint8_t> v(size*sizeof(uint32_t));
-            memcpy(v.data(),data,size*sizeof(uint32_t));
+            std::vector<uint8_t> v(data.size()*sizeof(uint32_t));
+            memcpy(v.data(), data.data(), data.size()*sizeof(uint32_t));
             write_byte_string_value(byte_string_view(v.data(),v.size()));
             return true;
         }
         else
         {
             bool more = this->begin_array(semantic_tag::none, context, ec);
-            for (auto p = data; more && p < data+size; ++p)
+            for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->uint64_value(*p, semantic_tag::none, context, ec);
             }
@@ -1206,7 +1204,7 @@ private:
         }
     }
 
-    bool do_typed_array(const uint64_t* data, size_t size, 
+    bool do_typed_array(const span<const uint64_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1216,15 +1214,15 @@ private:
             write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
                                   uint64_t(), 
                                   tag);
-            std::vector<uint8_t> v(size*sizeof(uint64_t));
-            memcpy(v.data(),data,size*sizeof(uint64_t));
+            std::vector<uint8_t> v(data.size()*sizeof(uint64_t));
+            memcpy(v.data(), data.data(), data.size()*sizeof(uint64_t));
             write_byte_string_value(byte_string_view(v.data(),v.size()));
             return true;
         }
         else
         {
             bool more = this->begin_array(semantic_tag::none, context, ec);
-            for (auto p = data; more && p < data+size; ++p)
+            for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->uint64_value(*p,semantic_tag::none,context, ec);
             }
@@ -1236,7 +1234,7 @@ private:
         }
     }
 
-    bool do_typed_array(const int8_t* data, size_t size, 
+    bool do_typed_array(const span<const int8_t>& data,  
                         semantic_tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1244,15 +1242,15 @@ private:
         if (options_.use_typed_arrays())
         {
             write_tag(0x48);
-            std::vector<uint8_t> v(size*sizeof(int8_t));
-            memcpy(v.data(),data,size*sizeof(int8_t));
+            std::vector<uint8_t> v(data.size()*sizeof(int8_t));
+            memcpy(v.data(), data.data(), data.size()*sizeof(int8_t));
             write_byte_string_value(byte_string_view(v.data(),v.size()));
             return true;
         }
         else
         {
             bool more = this->begin_array(semantic_tag::none,context, ec);
-            for (auto p = data; more && p < data+size; ++p)
+            for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->int64_value(*p,semantic_tag::none,context, ec);
             }
@@ -1264,7 +1262,7 @@ private:
         }
     }
 
-    bool do_typed_array(const int16_t* data, size_t size, 
+    bool do_typed_array(const span<const int16_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1274,15 +1272,15 @@ private:
             write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
                                   int16_t(), 
                                   tag);
-            std::vector<uint8_t> v(size*sizeof(int16_t));
-            memcpy(v.data(),data,size*sizeof(int16_t));
+            std::vector<uint8_t> v(data.size()*sizeof(int16_t));
+            memcpy(v.data(), data.data(), data.size()*sizeof(int16_t));
             write_byte_string_value(byte_string_view(v.data(),v.size()));
             return true;
         }
         else
         {
             bool more = this->begin_array(semantic_tag::none,context, ec);
-            for (auto p = data; more && p < data+size; ++p)
+            for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->int64_value(*p,semantic_tag::none,context, ec);
             }
@@ -1294,7 +1292,7 @@ private:
         }
     }
 
-    bool do_typed_array(const int32_t* data, size_t size, 
+    bool do_typed_array(const span<const int32_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1304,15 +1302,15 @@ private:
             write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
                                   int32_t(), 
                                   tag);
-            std::vector<uint8_t> v(size*sizeof(int32_t));
-            memcpy(v.data(),data,size*sizeof(int32_t));
+            std::vector<uint8_t> v(data.size()*sizeof(int32_t));
+            memcpy(v.data(), data.data(), data.size()*sizeof(int32_t));
             write_byte_string_value(byte_string_view(v.data(),v.size()));
             return true;
         }
         else
         {
             bool more = this->begin_array(semantic_tag::none,context, ec);
-            for (auto p = data; more && p < data+size; ++p)
+            for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->int64_value(*p,semantic_tag::none,context, ec);
             }
@@ -1324,7 +1322,7 @@ private:
         }
     }
 
-    bool do_typed_array(const int64_t* data, size_t size, 
+    bool do_typed_array(const span<const int64_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1334,15 +1332,15 @@ private:
             write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
                                   int64_t(), 
                                   tag);
-            std::vector<uint8_t> v(size*sizeof(int64_t));
-            memcpy(v.data(),data,size*sizeof(int64_t));
+            std::vector<uint8_t> v(data.size()*sizeof(int64_t));
+            memcpy(v.data(), data.data(), data.size()*sizeof(int64_t));
             write_byte_string_value(byte_string_view(v.data(),v.size()));
             return true;
         }
         else
         {
             bool more = this->begin_array(semantic_tag::none,context, ec);
-            for (auto p = data; more && p < data+size; ++p)
+            for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->int64_value(*p,semantic_tag::none,context, ec);
             }
@@ -1354,7 +1352,7 @@ private:
         }
     }
 
-    bool do_typed_array(half_arg_t, const uint16_t* data, size_t size, 
+    bool do_typed_array(half_arg_t, const span<const uint16_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1364,15 +1362,15 @@ private:
             write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
                                   half_arg, 
                                   tag);
-            std::vector<uint8_t> v(size*sizeof(uint16_t));
-            memcpy(v.data(),data,size*sizeof(uint16_t));
+            std::vector<uint8_t> v(data.size()*sizeof(uint16_t));
+            memcpy(v.data(),data.data(),data.size()*sizeof(uint16_t));
             write_byte_string_value(byte_string_view(v.data(),v.size()));
             return true;
         }
         else
         {
             bool more = this->begin_array(semantic_tag::none, context, ec);
-            for (auto p = data; more && p < data+size; ++p)
+            for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->half_value(*p, tag, context, ec);
             }
@@ -1384,7 +1382,7 @@ private:
         }
     }
 
-    bool do_typed_array(const float* data, size_t size, 
+    bool do_typed_array(const span<const float>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1394,15 +1392,15 @@ private:
             write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
                                   float(), 
                                   tag);
-            std::vector<uint8_t> v(size*sizeof(float));
-            memcpy(v.data(),data,size*sizeof(float));
+            std::vector<uint8_t> v(data.size()*sizeof(float));
+            memcpy(v.data(), data.data(), data.size()*sizeof(float));
             write_byte_string_value(byte_string_view(v.data(),v.size()));
             return true;
         }
         else
         {
             bool more = this->begin_array(semantic_tag::none,context, ec);
-            for (auto p = data; more && p < data+size; ++p)
+            for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->double_value(*p,semantic_tag::none,context, ec);
             }
@@ -1414,7 +1412,7 @@ private:
         }
     }
 
-    bool do_typed_array(const double* data, size_t size, 
+    bool do_typed_array(const span<const double>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec)
@@ -1424,15 +1422,15 @@ private:
             write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
                                   double(), 
                                   tag);
-            std::vector<uint8_t> v(size*sizeof(double));
-            memcpy(v.data(),data,size*sizeof(double));
+            std::vector<uint8_t> v(data.size()*sizeof(double));
+            memcpy(v.data(), data.data(), data.size()*sizeof(double));
             write_byte_string_value(byte_string_view(v.data(),v.size()));
             return true;
         }
         else
         {
             bool more = this->begin_array(semantic_tag::none,context, ec);
-            for (auto p = data; more && p < data+size; ++p)
+            for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->double_value(*p,semantic_tag::none,context, ec);
             }
@@ -1444,7 +1442,7 @@ private:
         }
     }
 
-    bool do_typed_array(const float128_type* /*data*/, size_t /*size*/, 
+    bool do_typed_array(const span<const float128_type>& /*data*/, 
                         semantic_tag /*tag*/,
                         const ser_context& /*context*/, 
                         std::error_code&) override

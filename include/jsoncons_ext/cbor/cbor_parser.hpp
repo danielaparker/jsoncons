@@ -53,7 +53,7 @@ enum typed_array_type {uint8_value=1,uint16_value,uint32_value,uint64_value,
                       int8_value,int16_value,int32_value,int64_value, 
                       half_value, float_value,double_value,float128_value};
 
-template <class Float128T = void, class Allocator=std::allocator<char>>
+template <class Float128T=nullptr_t, class Allocator=std::allocator<char>>
 class typed_array
 {
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint8_t> uint8_allocator_type;
@@ -337,7 +337,7 @@ public:
     }
 
     template <class Float128T_ = Float128T>
-    typename std::enable_if<!std::is_void<Float128T_>::value, void>::type
+    typename std::enable_if<!std::is_same<Float128T_,std::nullptr_t>::value, void>::type
     allocate_float128()
     {
         float128_allocator_type alloc{ allocator_ };
@@ -345,13 +345,13 @@ public:
     }
 
     template <class Float128T_ = Float128T>
-    typename std::enable_if<std::is_void<Float128T_>::value, void>::type
+    typename std::enable_if<std::is_same<Float128T_,nullptr_t>::value, void>::type
         allocate_float128()
     {
     }
 
     template <class Float128T_ = Float128T>
-    typename std::enable_if<!std::is_void<Float128T_>::value, void>::type
+    typename std::enable_if<!std::is_same<Float128T_,std::nullptr_t>::value, void>::type
         deallocate_float128()
     {
         float128_allocator_type alloc(allocator_);
@@ -359,7 +359,7 @@ public:
     }
 
     template <class Float128T_ = Float128T>
-    typename std::enable_if<std::is_void<Float128T_>::value, void>::type
+    typename std::enable_if<std::is_same<Float128T_,nullptr_t>::value, void>::type
         deallocate_float128()
     {
     }
@@ -392,130 +392,136 @@ public:
         JSONCONS_ASSERT(type_ == typed_array_type::uint8_value);
         return span<const uint8_t>(data_.uint8_data_, size_);
     }
-    uint16_t* data(uint16_array_arg_t)
+    span<uint16_t> data(uint16_array_arg_t)
     {
         JSONCONS_ASSERT(type_ == typed_array_type::uint16_value);
-        return data_.uint16_data_;
+        return span<uint16_t>(data_.uint16_data_, size_);
     }
 
-    const uint16_t* data(uint16_array_arg_t) const
+    span<const uint16_t> data(uint16_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::uint16_value);
-        return data_.uint16_data_;
+        return span<const uint16_t>(data_.uint16_data_, size_);
     }
 
-    uint32_t* data(uint32_array_arg_t)
+    span<uint32_t> data(uint32_array_arg_t)
     {
         JSONCONS_ASSERT(type_ == typed_array_type::uint32_value);
-        return data_.uint32_data_;
+        return span<uint32_t>(data_.uint32_data_, size_);
     }
 
-    const uint32_t* data(uint32_array_arg_t) const
+    span<const uint32_t> data(uint32_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::uint32_value);
-        return data_.uint32_data_;
+        return span<const uint32_t>(data_.uint32_data_, size_);
     }
 
-    uint64_t* data(uint64_array_arg_t)
+    span<uint64_t> data(uint64_array_arg_t)
     {
         JSONCONS_ASSERT(type_ == typed_array_type::uint64_value);
-        return data_.uint64_data_;
+        return span<uint64_t>(data_.uint64_data_, size_);
     }
 
-    const uint64_t* data(uint64_array_arg_t) const
+    span<const uint64_t> data(uint64_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::uint64_value);
-        return data_.uint64_data_;
+         span<const uint64_t>(data_.uint64_data_, size_);
     }
 
-    int8_t* data(int8_array_arg_t)
+    span<int8_t> data(int8_array_arg_t)
     {
         JSONCONS_ASSERT(type_ == typed_array_type::int8_value);
-        return data_.int8_data_;
+        return span<int8_t>(data_.int8_data_, size_);
     }
 
-    const int8_t* data(int8_array_arg_t) const
+    span<const int8_t> data(int8_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::int8_value);
-        return data_.int8_data_;
+        return span<const int8_t>(data_.int8_data_, size_);
     }
 
-    int16_t* data(int16_array_arg_t)
+    span<int16_t> data(int16_array_arg_t)
     {
         JSONCONS_ASSERT(type_ == typed_array_type::int16_value);
-        return data_.int16_data_;
+        return span<int16_t>(data_.int16_data_, size_);
     }
 
-    const int16_t* data(int16_array_arg_t) const
+    span<const int16_t> data(int16_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::int16_value);
-        return data_.int16_data_;
+        return span<const int16_t>(data_.int16_data_, size_);
     }
 
-    int32_t* data(int32_array_arg_t)
+    span<int32_t> data(int32_array_arg_t)
     {
         JSONCONS_ASSERT(type_ == typed_array_type::int32_value);
-        return data_.int32_data_;
+        return span<int32_t>(data_.int32_data_, size_);
     }
 
-    const int32_t* data(int32_array_arg_t) const
+    span<const int32_t> data(int32_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::int32_value);
-        return data_.int32_data_;
+        return span<const int32_t>(data_.int32_data_, size_);
     }
 
-    int64_t* data(int64_array_arg_t)
+    span<int64_t> data(int64_array_arg_t)
     {
         JSONCONS_ASSERT(type_ == typed_array_type::int64_value);
-        return data_.int64_data_;
+        return span<int64_t>(data_.int64_data_, size_);
     }
 
-    const int64_t* data(int64_array_arg_t) const
+    span<const int64_t> data(int64_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::int64_value);
-        return data_.int64_data_;
+        return span<const int64_t>(data_.int64_data_, size_);
     }
 
-    uint16_t* data(half_array_arg_t)
+    span<uint16_t> data(half_array_arg_t)
     {
         JSONCONS_ASSERT(type_ == typed_array_type::half_value);
-        return data_.uint16_data_;
+        return span<uint16_t>(data_.uint16_data_, size_);
     }
 
-    float* data(float_array_arg_t)
+    span<const uint16_t> data(half_array_arg_t) const
+    {
+        JSONCONS_ASSERT(type_ == typed_array_type::half_value);
+        return span<const uint16_t>(data_.uint16_data_, size_);
+    }
+
+    span<float> data(float_array_arg_t)
     {
         JSONCONS_ASSERT(type_ == typed_array_type::float_value);
-        return data_.float_data_;
+        return span<float>(data_.float_data_, size_);
     }
 
-    const float* data(float_array_arg_t) const
+    span<const float> data(float_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::float_value);
-        return data_.float_data_;
+        return span<const float>(data_.float_data_, size_);
     }
 
-    double* data(double_array_arg_t)
+    span<double> data(double_array_arg_t)
     {
         JSONCONS_ASSERT(type_ == typed_array_type::double_value);
-        return data_.double_data_;
+        return span<double>(data_.double_data_, size_);
     }
 
-    const double* data(double_array_arg_t) const
+    span<const double> data(double_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::double_value);
-        return data_.double_data_;
+        return span<const double>(data_.double_data_, size_);
     }
 
-    Float128T* data(float128_array_arg_t)
+    span<Float128T> data(float128_array_arg_t)
     {
         JSONCONS_ASSERT(type_ == typed_array_type::float128_value);
-        return data_.float128_data_;
+        return span<Float128T>(data_.float128_data_, size_);
     }
 
-    const Float128T* data(float128_array_arg_t) const
+    span<const Float128T> data(float128_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::float128_value);
-        return data_.float128_data_;
+        return span<const Float128T>(data_.float128_data_, size_);
     }
 
     friend void swap(typed_array& a, typed_array& b) noexcept
@@ -528,7 +534,7 @@ public:
    
 };
 
-template <class Float128T = void>
+template <class Float128T=nullptr_t>
 class typed_array_view
 {
     typed_array_type type_;
@@ -852,7 +858,7 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Src,class Float128T=void,class WorkAllocator=std::allocator<char>>
+template <class Src,class Float128T=nullptr_t,class WorkAllocator=std::allocator<char>>
 class basic_cbor_parser : public ser_context
 {
     typedef char char_type;
@@ -2431,7 +2437,7 @@ private:
                         }
                         typed_array_.data(uint16_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(typed_array_.data(uint16_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(uint16_array_arg), semantic_tag::none, *this);
                     break;
                 }
                 case 0x42:
@@ -2461,7 +2467,7 @@ private:
                         }
                         typed_array_.data(uint32_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(typed_array_.data(uint32_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(uint32_array_arg), semantic_tag::none, *this);
                     break;
                 }
                 case 0x43:
@@ -2491,7 +2497,7 @@ private:
                         }
                         typed_array_.data(uint64_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(typed_array_.data(uint64_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(uint64_array_arg), semantic_tag::none, *this);
                     break;
                 }
                 case 0x48:
@@ -2505,7 +2511,7 @@ private:
                     {
                         typed_array_.data(int8_array_arg)[i] = (int8_t)*p;
                     }
-                    more_ = handler.typed_array(typed_array_.data(int8_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(int8_array_arg), semantic_tag::none, *this);
                     break;
                 }
                 case 0x49:
@@ -2535,7 +2541,7 @@ private:
                         }
                         typed_array_.data(int16_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(typed_array_.data(int16_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(int16_array_arg), semantic_tag::none, *this);
                     break;
                 }
                 case 0x4a:
@@ -2565,7 +2571,7 @@ private:
                         }
                         typed_array_.data(int32_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(typed_array_.data(int32_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(int32_array_arg), semantic_tag::none, *this);
                     break;
                 }
                 case 0x4b:
@@ -2595,7 +2601,7 @@ private:
                         }
                         typed_array_.data(int64_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(typed_array_.data(int64_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(int64_array_arg), semantic_tag::none, *this);
                     break;
                 }
                 case 0x50:
@@ -2625,7 +2631,7 @@ private:
                         }
                         typed_array_.data(half_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(half_arg, typed_array_.data(half_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    more_ = handler.typed_array(half_arg, typed_array_.data(half_array_arg), semantic_tag::none, *this);
                     break;
                 }
                 case 0x51:
@@ -2655,7 +2661,7 @@ private:
                         }
                         typed_array_.data(float_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(typed_array_.data(float_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(float_array_arg), semantic_tag::none, *this);
                     break;
                 }
                 case 0x52:
@@ -2685,7 +2691,7 @@ private:
                         }
                         typed_array_.data(double_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(typed_array_.data(double_array_arg), typed_array_.size(), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(double_array_arg), semantic_tag::none, *this);
                     break;
                 }
 
@@ -2710,7 +2716,7 @@ private:
     }
 
     template <class Float128T_ = Float128T>
-    typename std::enable_if<std::is_void<Float128T_>::value,void>::type
+    typename std::enable_if<std::is_same<Float128T_,nullptr_t>::value,void>::type
     handle_float128(basic_cbor_content_handler<Float128T>& handler, const byte_string_view&, const uint8_t, std::error_code&)
     {
         more_ = handler.begin_array(semantic_tag::none, *this);
@@ -2718,7 +2724,7 @@ private:
     }
 
     template <class Float128T_ = Float128T>
-    typename std::enable_if<!std::is_void<Float128T_>::value,void>::type
+    typename std::enable_if<!std::is_same<Float128T_,std::nullptr_t>::value,void>::type
     handle_float128(basic_cbor_content_handler<Float128T>& handler, const byte_string_view& v, const uint8_t tag, std::error_code&)
     {
         const uint8_t e = (tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift; 
@@ -2750,7 +2756,7 @@ private:
                 }
                 typed_array_.data(float128_array_arg)[i] = val;
             }
-            more_ = handler.typed_array(typed_array_.data(float128_array_arg), typed_array_.size(), semantic_tag::none, *this);
+            more_ = handler.typed_array(typed_array_.data(float128_array_arg), semantic_tag::none, *this);
         }
     }
 
