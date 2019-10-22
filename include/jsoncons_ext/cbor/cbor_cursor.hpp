@@ -234,7 +234,7 @@ public:
             {
                 case typed_array_type::uint8_value:
                 {
-                    more = handler.typed_array(data_.data(uint8_array_arg), data_.size() - index_);
+                    more = handler.typed_array(data_.data(uint8_array_arg).last(data_.size() - index_));
                     break;
                 }
                 case typed_array_type::uint16_value:

@@ -381,16 +381,16 @@ public:
         return size_;
     }
 
-    uint8_t* data(uint8_array_arg_t)
+    span<uint8_t> data(uint8_array_arg_t)
     {
         JSONCONS_ASSERT(type_ == typed_array_type::uint8_value);
-        return data_.uint8_data_;
+        return span<uint8_t>(data_.uint8_data_, size_);
     }
 
-    const uint8_t* data(uint8_array_arg_t) const
+    span<const uint8_t> data(uint8_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::uint8_value);
-        return data_.uint8_data_;
+        return span<const uint8_t>(data_.uint8_data_, size_);
     }
     uint16_t* data(uint16_array_arg_t)
     {
@@ -2387,7 +2387,7 @@ private:
                     {
                         typed_array_.data(uint8_array_arg)[i] = *p;
                     }
-                    more_ = handler.typed_array(span<const uint8_t>(typed_array_.data(uint8_array_arg), typed_array_.size()), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(uint8_array_arg), semantic_tag::none, *this);
                     break;
                 }
                 case 0x44:
@@ -2401,7 +2401,7 @@ private:
                     {
                         typed_array_.data(uint8_array_arg)[i] = *p;
                     }
-                    more_ = handler.typed_array(typed_array_.data(uint8_array_arg), typed_array_.size(), semantic_tag::clamped, *this);
+                    more_ = handler.typed_array(typed_array_.data(uint8_array_arg), semantic_tag::clamped, *this);
                     break;
                 }
                 case 0x41:
