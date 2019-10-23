@@ -141,7 +141,7 @@ using std::wstring_view;
 #if !defined(JSONCONS_HAS_SPAN)
 #include <jsoncons/detail/span.hpp>
 namespace jsoncons {
-using nonstd::span_lite::span;
+using nonstd::jsoncons_span_lite::span;
 }
 #else 
 #include <span>

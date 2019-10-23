@@ -8,171 +8,171 @@
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef NONSTD_SPAN_HPP_INCLUDED
-#define NONSTD_SPAN_HPP_INCLUDED
+#ifndef JSONCONS_NONSTD_SPAN_HPP_INCLUDED
+#define JSONCONS_NONSTD_SPAN_HPP_INCLUDED
 
-#define span_lite_MAJOR  0
-#define span_lite_MINOR  6
-#define span_lite_PATCH  0
+#define jsoncons_span_lite_MAJOR  0
+#define jsoncons_span_lite_MINOR  6
+#define jsoncons_span_lite_PATCH  0
 
-#define span_lite_VERSION  span_STRINGIFY(span_lite_MAJOR) "." span_STRINGIFY(span_lite_MINOR) "." span_STRINGIFY(span_lite_PATCH)
+#define jsoncons_span_lite_VERSION  jsoncons_span_STRINGIFY(jsoncons_span_lite_MAJOR) "." jsoncons_span_STRINGIFY(jsoncons_span_lite_MINOR) "." jsoncons_span_STRINGIFY(jsoncons_span_lite_PATCH)
 
-#define span_STRINGIFY(  x )  span_STRINGIFY_( x )
-#define span_STRINGIFY_( x )  #x
+#define jsoncons_span_STRINGIFY(  x )  jsoncons_span_STRINGIFY_( x )
+#define jsoncons_span_STRINGIFY_( x )  #x
 
 // span configuration:
 
-#define span_SPAN_DEFAULT  0
-#define span_SPAN_NONSTD   1
-#define span_SPAN_STD      2
+#define jsoncons_span_SPAN_DEFAULT  0
+#define jsoncons_span_SPAN_NONSTD   1
+#define jsoncons_span_SPAN_STD      2
 
-#ifndef  span_CONFIG_SELECT_SPAN
-# define span_CONFIG_SELECT_SPAN  ( span_HAVE_STD_SPAN ? span_SPAN_STD : span_SPAN_NONSTD )
+#ifndef  jsoncons_span_CONFIG_SELECT_SPAN
+# define jsoncons_span_CONFIG_SELECT_SPAN  ( jsoncons_span_HAVE_STD_SPAN ? jsoncons_span_SPAN_STD : jsoncons_span_SPAN_NONSTD )
 #endif
 
-#ifndef  span_CONFIG_INDEX_TYPE
-# define span_CONFIG_INDEX_TYPE  std::ptrdiff_t
+#ifndef  jsoncons_span_CONFIG_INDEX_TYPE
+# define jsoncons_span_CONFIG_INDEX_TYPE  std::ptrdiff_t
 #endif
 
 // span configuration (features):
 
-#ifndef  span_FEATURE_WITH_CONTAINER
-#ifdef   span_FEATURE_WITH_CONTAINER_TO_STD
-# define span_FEATURE_WITH_CONTAINER  span_IN_STD( span_FEATURE_WITH_CONTAINER_TO_STD )
+#ifndef  jsoncons_span_FEATURE_WITH_CONTAINER
+#ifdef   jsoncons_span_FEATURE_WITH_CONTAINER_TO_STD
+# define jsoncons_span_FEATURE_WITH_CONTAINER  jsoncons_span_IN_STD( jsoncons_span_FEATURE_WITH_CONTAINER_TO_STD )
 #else
-# define span_FEATURE_WITH_CONTAINER  0
+# define jsoncons_span_FEATURE_WITH_CONTAINER  0
 #endif
 #endif
 
-#ifndef  span_FEATURE_CONSTRUCTION_FROM_STDARRAY_ELEMENT_TYPE
-# define span_FEATURE_CONSTRUCTION_FROM_STDARRAY_ELEMENT_TYPE  0
+#ifndef  jsoncons_span_FEATURE_CONSTRUCTION_FROM_STDARRAY_ELEMENT_TYPE
+# define jsoncons_span_FEATURE_CONSTRUCTION_FROM_STDARRAY_ELEMENT_TYPE  0
 #endif
 
-#ifndef  span_FEATURE_MEMBER_AT
-# define span_FEATURE_MEMBER_AT  0
+#ifndef  jsoncons_span_FEATURE_MEMBER_AT
+# define jsoncons_span_FEATURE_MEMBER_AT  0
 #endif
 
-#ifndef  span_FEATURE_MEMBER_BACK_FRONT
-# define span_FEATURE_MEMBER_BACK_FRONT  1
+#ifndef  jsoncons_span_FEATURE_MEMBER_BACK_FRONT
+# define jsoncons_span_FEATURE_MEMBER_BACK_FRONT  1
 #endif
 
-#ifndef  span_FEATURE_MEMBER_CALL_OPERATOR
-# define span_FEATURE_MEMBER_CALL_OPERATOR  0
+#ifndef  jsoncons_span_FEATURE_MEMBER_CALL_OPERATOR
+# define jsoncons_span_FEATURE_MEMBER_CALL_OPERATOR  0
 #endif
 
-#ifndef  span_FEATURE_MEMBER_SWAP
-# define span_FEATURE_MEMBER_SWAP  0
+#ifndef  jsoncons_span_FEATURE_MEMBER_SWAP
+# define jsoncons_span_FEATURE_MEMBER_SWAP  0
 #endif
 
-#ifndef  span_FEATURE_NON_MEMBER_FIRST_LAST_SUB
-# define span_FEATURE_NON_MEMBER_FIRST_LAST_SUB  0
+#ifndef  jsoncons_span_FEATURE_NON_MEMBER_FIRST_LAST_SUB
+# define jsoncons_span_FEATURE_NON_MEMBER_FIRST_LAST_SUB  0
 #endif
 
-#ifndef  span_FEATURE_COMPARISON
-# define span_FEATURE_COMPARISON  1  // Note: C++20 does not provide comparison
+#ifndef  jsoncons_span_FEATURE_COMPARISON
+# define jsoncons_span_FEATURE_COMPARISON  1  // Note: C++20 does not provide comparison
 #endif
 
-#ifndef  span_FEATURE_SAME
-# define span_FEATURE_SAME  0
+#ifndef  jsoncons_span_FEATURE_SAME
+# define jsoncons_span_FEATURE_SAME  0
 #endif
 
-#ifndef  span_FEATURE_MAKE_SPAN
-#ifdef   span_FEATURE_MAKE_SPAN_TO_STD
-# define span_FEATURE_MAKE_SPAN  span_IN_STD( span_FEATURE_MAKE_SPAN_TO_STD )
+#ifndef  jsoncons_span_FEATURE_MAKE_SPAN
+#ifdef   jsoncons_span_FEATURE_MAKE_SPAN_TO_STD
+# define jsoncons_span_FEATURE_MAKE_SPAN  jsoncons_span_IN_STD( jsoncons_span_FEATURE_MAKE_SPAN_TO_STD )
 #else
-# define span_FEATURE_MAKE_SPAN  0
+# define jsoncons_span_FEATURE_MAKE_SPAN  0
 #endif
 #endif
 
-#ifndef  span_FEATURE_BYTE_SPAN
-# define span_FEATURE_BYTE_SPAN  0
+#ifndef  jsoncons_span_FEATURE_BYTE_SPAN
+# define jsoncons_span_FEATURE_BYTE_SPAN  0
 #endif
 
 // Control presence of exception handling (try and auto discover):
 
-#ifndef span_CONFIG_NO_EXCEPTIONS
+#ifndef jsoncons_span_CONFIG_NO_EXCEPTIONS
 # if defined(__cpp_exceptions) || defined(__EXCEPTIONS) || defined(_CPPUNWIND)
-#  define span_CONFIG_NO_EXCEPTIONS  0
+#  define jsoncons_span_CONFIG_NO_EXCEPTIONS  0
 # else
-#  define span_CONFIG_NO_EXCEPTIONS  1
-#  undef  span_CONFIG_CONTRACT_VIOLATION_THROWS
-#  undef  span_CONFIG_CONTRACT_VIOLATION_TERMINATES
-#  define span_CONFIG_CONTRACT_VIOLATION_THROWS  0
-#  define span_CONFIG_CONTRACT_VIOLATION_TERMINATES  1
+#  define jsoncons_span_CONFIG_NO_EXCEPTIONS  1
+#  undef  jsoncons_span_CONFIG_CONTRACT_VIOLATION_THROWS
+#  undef  jsoncons_span_CONFIG_CONTRACT_VIOLATION_TERMINATES
+#  define jsoncons_span_CONFIG_CONTRACT_VIOLATION_THROWS  0
+#  define jsoncons_span_CONFIG_CONTRACT_VIOLATION_TERMINATES  1
 # endif
 #endif
 
 // Control pre- and postcondition violation behaviour:
 
-#if    defined( span_CONFIG_CONTRACT_LEVEL_ON )
-# define        span_CONFIG_CONTRACT_LEVEL_MASK  0x11
-#elif  defined( span_CONFIG_CONTRACT_LEVEL_OFF )
-# define        span_CONFIG_CONTRACT_LEVEL_MASK  0x00
-#elif  defined( span_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY )
-# define        span_CONFIG_CONTRACT_LEVEL_MASK  0x01
-#elif  defined( span_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY )
-# define        span_CONFIG_CONTRACT_LEVEL_MASK  0x10
+#if    defined( jsoncons_span_CONFIG_CONTRACT_LEVEL_ON )
+# define        jsoncons_span_CONFIG_CONTRACT_LEVEL_MASK  0x11
+#elif  defined( jsoncons_span_CONFIG_CONTRACT_LEVEL_OFF )
+# define        jsoncons_span_CONFIG_CONTRACT_LEVEL_MASK  0x00
+#elif  defined( jsoncons_span_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY )
+# define        jsoncons_span_CONFIG_CONTRACT_LEVEL_MASK  0x01
+#elif  defined( jsoncons_span_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY )
+# define        jsoncons_span_CONFIG_CONTRACT_LEVEL_MASK  0x10
 #else
-# define        span_CONFIG_CONTRACT_LEVEL_MASK  0x11
+# define        jsoncons_span_CONFIG_CONTRACT_LEVEL_MASK  0x11
 #endif
 
-#if    defined( span_CONFIG_CONTRACT_VIOLATION_THROWS )
-# define        span_CONFIG_CONTRACT_VIOLATION_THROWS_V  span_CONFIG_CONTRACT_VIOLATION_THROWS
+#if    defined( jsoncons_span_CONFIG_CONTRACT_VIOLATION_THROWS )
+# define        jsoncons_span_CONFIG_CONTRACT_VIOLATION_THROWS_V  jsoncons_span_CONFIG_CONTRACT_VIOLATION_THROWS
 #else
-# define        span_CONFIG_CONTRACT_VIOLATION_THROWS_V  0
+# define        jsoncons_span_CONFIG_CONTRACT_VIOLATION_THROWS_V  0
 #endif
 
-#if    defined( span_CONFIG_CONTRACT_VIOLATION_THROWS     ) && span_CONFIG_CONTRACT_VIOLATION_THROWS && \
-       defined( span_CONFIG_CONTRACT_VIOLATION_TERMINATES ) && span_CONFIG_CONTRACT_VIOLATION_TERMINATES
-# error Please define none or one of span_CONFIG_CONTRACT_VIOLATION_THROWS and span_CONFIG_CONTRACT_VIOLATION_TERMINATES to 1, but not both.
+#if    defined( jsoncons_span_CONFIG_CONTRACT_VIOLATION_THROWS     ) && jsoncons_span_CONFIG_CONTRACT_VIOLATION_THROWS && \
+       defined( jsoncons_span_CONFIG_CONTRACT_VIOLATION_TERMINATES ) && jsoncons_span_CONFIG_CONTRACT_VIOLATION_TERMINATES
+# error Please define none or one of jsoncons_span_CONFIG_CONTRACT_VIOLATION_THROWS and jsoncons_span_CONFIG_CONTRACT_VIOLATION_TERMINATES to 1, but not both.
 #endif
 
 // C++ language version detection (C++20 is speculative):
 // Note: VC14.0/1900 (VS2015) lacks too much from C++14.
 
-#ifndef   span_CPLUSPLUS
+#ifndef   jsoncons_span_CPLUSPLUS
 # if defined(_MSVC_LANG ) && !defined(__clang__)
-#  define span_CPLUSPLUS  (_MSC_VER == 1900 ? 201103L : _MSVC_LANG )
+#  define jsoncons_span_CPLUSPLUS  (_MSC_VER == 1900 ? 201103L : _MSVC_LANG )
 # else
-#  define span_CPLUSPLUS  __cplusplus
+#  define jsoncons_span_CPLUSPLUS  __cplusplus
 # endif
 #endif
 
-#define span_CPP98_OR_GREATER  ( span_CPLUSPLUS >= 199711L )
-#define span_CPP11_OR_GREATER  ( span_CPLUSPLUS >= 201103L )
-#define span_CPP14_OR_GREATER  ( span_CPLUSPLUS >= 201402L )
-#define span_CPP17_OR_GREATER  ( span_CPLUSPLUS >= 201703L )
-#define span_CPP20_OR_GREATER  ( span_CPLUSPLUS >= 202000L )
+#define jsoncons_span_CPP98_OR_GREATER  ( jsoncons_span_CPLUSPLUS >= 199711L )
+#define jsoncons_span_CPP11_OR_GREATER  ( jsoncons_span_CPLUSPLUS >= 201103L )
+#define jsoncons_span_CPP14_OR_GREATER  ( jsoncons_span_CPLUSPLUS >= 201402L )
+#define jsoncons_span_CPP17_OR_GREATER  ( jsoncons_span_CPLUSPLUS >= 201703L )
+#define jsoncons_span_CPP20_OR_GREATER  ( jsoncons_span_CPLUSPLUS >= 202000L )
 
 // C++ language version (represent 98 as 3):
 
-#define span_CPLUSPLUS_V  ( span_CPLUSPLUS / 100 - (span_CPLUSPLUS > 200000 ? 2000 : 1994) )
+#define jsoncons_span_CPLUSPLUS_V  ( jsoncons_span_CPLUSPLUS / 100 - (jsoncons_span_CPLUSPLUS > 200000 ? 2000 : 1994) )
 
-#define span_IN_STD( v )  ( ((v) == 98 ? 3 : (v)) >= span_CPLUSPLUS_V )
+#define jsoncons_span_IN_STD( v )  ( ((v) == 98 ? 3 : (v)) >= jsoncons_span_CPLUSPLUS_V )
 
-#define span_CONFIG(         feature )  ( span_CONFIG_##feature )
-#define span_FEATURE(        feature )  ( span_FEATURE_##feature )
-#define span_FEATURE_TO_STD( feature )  ( span_IN_STD( span_FEATURE( feature##_TO_STD ) ) )
+#define jsoncons_span_CONFIG(         feature )  ( jsoncons_span_CONFIG_##feature )
+#define jsoncons_span_FEATURE(        feature )  ( jsoncons_span_FEATURE_##feature )
+#define jsoncons_span_FEATURE_TO_STD( feature )  ( jsoncons_span_IN_STD( jsoncons_span_FEATURE( feature##_TO_STD ) ) )
 
 // Use C++20 std::span if available and requested:
 
-#if span_CPP20_OR_GREATER && defined(__has_include )
+#if jsoncons_span_CPP20_OR_GREATER && defined(__has_include )
 # if __has_include( <span> )
-#  define span_HAVE_STD_SPAN  1
+#  define jsoncons_span_HAVE_STD_SPAN  1
 # else
-#  define span_HAVE_STD_SPAN  0
+#  define jsoncons_span_HAVE_STD_SPAN  0
 # endif
 #else
-# define  span_HAVE_STD_SPAN  0
+# define  jsoncons_span_HAVE_STD_SPAN  0
 #endif
 
-#define  span_USES_STD_SPAN  ( (span_CONFIG_SELECT_SPAN == span_SPAN_STD) || ((span_CONFIG_SELECT_SPAN == span_SPAN_DEFAULT) && span_HAVE_STD_SPAN) )
+#define  jsoncons_span_USES_STD_SPAN  ( (jsoncons_span_CONFIG_SELECT_SPAN == jsoncons_span_SPAN_STD) || ((jsoncons_span_CONFIG_SELECT_SPAN == jsoncons_span_SPAN_DEFAULT) && jsoncons_span_HAVE_STD_SPAN) )
 
 //
 // Use C++20 std::span:
 //
 
-#if span_USES_STD_SPAN
+#if jsoncons_span_USES_STD_SPAN
 
 #include <span>
 
@@ -189,7 +189,7 @@ using std::span;
 // using std::operator>=;
 }  // namespace nonstd
 
-#else  // span_USES_STD_SPAN
+#else  // jsoncons_span_USES_STD_SPAN
 
 #include <algorithm>
 
@@ -207,45 +207,45 @@ using std::span;
 // MSVC++ 14.1 _MSC_VER >= 1910 (Visual Studio 2017)
 
 #if defined(_MSC_VER ) && !defined(__clang__)
-# define span_COMPILER_MSVC_VER      (_MSC_VER )
-# define span_COMPILER_MSVC_VERSION  (_MSC_VER / 10 - 10 * ( 5 + (_MSC_VER < 1900 ) ) )
+# define jsoncons_span_COMPILER_MSVC_VER      (_MSC_VER )
+# define jsoncons_span_COMPILER_MSVC_VERSION  (_MSC_VER / 10 - 10 * ( 5 + (_MSC_VER < 1900 ) ) )
 #else
-# define span_COMPILER_MSVC_VER      0
-# define span_COMPILER_MSVC_VERSION  0
+# define jsoncons_span_COMPILER_MSVC_VER      0
+# define jsoncons_span_COMPILER_MSVC_VERSION  0
 #endif
 
-#define span_COMPILER_VERSION( major, minor, patch )  ( 10 * ( 10 * (major) + (minor) ) + (patch) )
+#define jsoncons_span_COMPILER_VERSION( major, minor, patch )  ( 10 * ( 10 * (major) + (minor) ) + (patch) )
 
 #if defined(__clang__)
-# define span_COMPILER_CLANG_VERSION  span_COMPILER_VERSION(__clang_major__, __clang_minor__, __clang_patchlevel__)
+# define jsoncons_span_COMPILER_CLANG_VERSION  jsoncons_span_COMPILER_VERSION(__clang_major__, __clang_minor__, __clang_patchlevel__)
 #else
-# define span_COMPILER_CLANG_VERSION  0
+# define jsoncons_span_COMPILER_CLANG_VERSION  0
 #endif
 
 #if defined(__GNUC__) && !defined(__clang__)
-# define span_COMPILER_GNUC_VERSION  span_COMPILER_VERSION(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__)
+# define jsoncons_span_COMPILER_GNUC_VERSION  jsoncons_span_COMPILER_VERSION(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__)
 #else
-# define span_COMPILER_GNUC_VERSION  0
+# define jsoncons_span_COMPILER_GNUC_VERSION  0
 #endif
 
 // half-open range [lo..hi):
-#define span_BETWEEN( v, lo, hi )  ( (lo) <= (v) && (v) < (hi) )
+#define jsoncons_span_BETWEEN( v, lo, hi )  ( (lo) <= (v) && (v) < (hi) )
 
 // Compiler warning suppression:
 
 #if defined(__clang__)
 # pragma clang diagnostic push
 # pragma clang diagnostic ignored "-Wundef"
-# define span_RESTORE_WARNINGS()   _Pragma( "clang diagnostic pop" )
+# define jsoncons_span_RESTORE_WARNINGS()   _Pragma( "clang diagnostic pop" )
 
 #elif defined __GNUC__
 # pragma GCC   diagnostic push
 # pragma GCC   diagnostic ignored "-Wundef"
-# define span_RESTORE_WARNINGS()   _Pragma( "GCC diagnostic pop" )
+# define jsoncons_span_RESTORE_WARNINGS()   _Pragma( "GCC diagnostic pop" )
 
-#elif span_COMPILER_MSVC_VERSION >= 140
-# define span_DISABLE_MSVC_WARNINGS(codes)  __pragma(warning(push))  __pragma(warning(disable: codes))
-# define span_RESTORE_WARNINGS()            __pragma(warning(pop ))
+#elif jsoncons_span_COMPILER_MSVC_VERSION >= 140
+# define jsoncons_span_DISABLE_MSVC_WARNINGS(codes)  __pragma(warning(push))  __pragma(warning(disable: codes))
+# define jsoncons_span_RESTORE_WARNINGS()            __pragma(warning(pop ))
 
 // Suppress the following MSVC GSL warnings:
 // - C26439, gsl::f.6 : special function 'function' can be declared 'noexcept'
@@ -256,259 +256,259 @@ using std::span;
 // - C26481: gsl::b.1 : don't use pointer arithmetic. Use span instead
 // - C26490: gsl::t.1 : don't use reinterpret_cast
 
-span_DISABLE_MSVC_WARNINGS( 26439 26440 26472 26473 26481 26490 )
+jsoncons_span_DISABLE_MSVC_WARNINGS( 26439 26440 26472 26473 26481 26490 )
 
 #else
-# define span_RESTORE_WARNINGS()  /*empty*/
+# define jsoncons_span_RESTORE_WARNINGS()  /*empty*/
 #endif
 
 // Presence of language and library features:
 
-#define span_HAVE( feature )  ( span_HAVE_##feature )
+#define jsoncons_span_HAVE( feature )  ( jsoncons_span_HAVE_##feature )
 
 #ifdef _HAS_CPP0X
-# define span_HAS_CPP0X  _HAS_CPP0X
+# define jsoncons_span_HAS_CPP0X  _HAS_CPP0X
 #else
-# define span_HAS_CPP0X  0
+# define jsoncons_span_HAS_CPP0X  0
 #endif
 
-#define span_CPP11_80   (span_CPP11_OR_GREATER || span_COMPILER_MSVC_VER >= 1400)
-#define span_CPP11_90   (span_CPP11_OR_GREATER || span_COMPILER_MSVC_VER >= 1500)
-#define span_CPP11_100  (span_CPP11_OR_GREATER || span_COMPILER_MSVC_VER >= 1600)
-#define span_CPP11_110  (span_CPP11_OR_GREATER || span_COMPILER_MSVC_VER >= 1700)
-#define span_CPP11_120  (span_CPP11_OR_GREATER || span_COMPILER_MSVC_VER >= 1800)
-#define span_CPP11_140  (span_CPP11_OR_GREATER || span_COMPILER_MSVC_VER >= 1900)
+#define jsoncons_span_CPP11_80   (jsoncons_span_CPP11_OR_GREATER || jsoncons_span_COMPILER_MSVC_VER >= 1400)
+#define jsoncons_span_CPP11_90   (jsoncons_span_CPP11_OR_GREATER || jsoncons_span_COMPILER_MSVC_VER >= 1500)
+#define jsoncons_span_CPP11_100  (jsoncons_span_CPP11_OR_GREATER || jsoncons_span_COMPILER_MSVC_VER >= 1600)
+#define jsoncons_span_CPP11_110  (jsoncons_span_CPP11_OR_GREATER || jsoncons_span_COMPILER_MSVC_VER >= 1700)
+#define jsoncons_span_CPP11_120  (jsoncons_span_CPP11_OR_GREATER || jsoncons_span_COMPILER_MSVC_VER >= 1800)
+#define jsoncons_span_CPP11_140  (jsoncons_span_CPP11_OR_GREATER || jsoncons_span_COMPILER_MSVC_VER >= 1900)
 
-#define span_CPP14_000  (span_CPP14_OR_GREATER)
-#define span_CPP14_120  (span_CPP14_OR_GREATER || span_COMPILER_MSVC_VER >= 1800)
-#define span_CPP14_140  (span_CPP14_OR_GREATER || span_COMPILER_MSVC_VER >= 1900)
+#define jsoncons_span_CPP14_000  (jsoncons_span_CPP14_OR_GREATER)
+#define jsoncons_span_CPP14_120  (jsoncons_span_CPP14_OR_GREATER || jsoncons_span_COMPILER_MSVC_VER >= 1800)
+#define jsoncons_span_CPP14_140  (jsoncons_span_CPP14_OR_GREATER || jsoncons_span_COMPILER_MSVC_VER >= 1900)
 
-#define span_CPP17_000  (span_CPP17_OR_GREATER)
+#define jsoncons_span_CPP17_000  (jsoncons_span_CPP17_OR_GREATER)
 
 // Presence of C++11 language features:
 
-#define span_HAVE_ALIAS_TEMPLATE            span_CPP11_140
-#define span_HAVE_AUTO                      span_CPP11_100
-#define span_HAVE_CONSTEXPR_11              span_CPP11_140
-#define span_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  span_CPP11_120
-#define span_HAVE_EXPLICIT_CONVERSION       span_CPP11_140
-#define span_HAVE_INITIALIZER_LIST          span_CPP11_120
-#define span_HAVE_IS_DEFAULT                span_CPP11_140
-#define span_HAVE_IS_DELETE                 span_CPP11_140
-#define span_HAVE_NOEXCEPT                  span_CPP11_140
-#define span_HAVE_NULLPTR                   span_CPP11_100
-#define span_HAVE_STATIC_ASSERT             span_CPP11_100
+#define jsoncons_span_HAVE_ALIAS_TEMPLATE            jsoncons_span_CPP11_140
+#define jsoncons_span_HAVE_AUTO                      jsoncons_span_CPP11_100
+#define jsoncons_span_HAVE_CONSTEXPR_11              jsoncons_span_CPP11_140
+#define jsoncons_span_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  jsoncons_span_CPP11_120
+#define jsoncons_span_HAVE_EXPLICIT_CONVERSION       jsoncons_span_CPP11_140
+#define jsoncons_span_HAVE_INITIALIZER_LIST          jsoncons_span_CPP11_120
+#define jsoncons_span_HAVE_IS_DEFAULT                jsoncons_span_CPP11_140
+#define jsoncons_span_HAVE_IS_DELETE                 jsoncons_span_CPP11_140
+#define jsoncons_span_HAVE_NOEXCEPT                  jsoncons_span_CPP11_140
+#define jsoncons_span_HAVE_NULLPTR                   jsoncons_span_CPP11_100
+#define jsoncons_span_HAVE_STATIC_ASSERT             jsoncons_span_CPP11_100
 
 // Presence of C++14 language features:
 
-#define span_HAVE_CONSTEXPR_14              span_CPP14_000
+#define jsoncons_span_HAVE_CONSTEXPR_14              jsoncons_span_CPP14_000
 
 // Presence of C++17 language features:
 
-#define span_HAVE_DEPRECATED                span_CPP17_000
-#define span_HAVE_NODISCARD                 span_CPP17_000
-#define span_HAVE_NORETURN                  span_CPP17_000
+#define jsoncons_span_HAVE_DEPRECATED                jsoncons_span_CPP17_000
+#define jsoncons_span_HAVE_NODISCARD                 jsoncons_span_CPP17_000
+#define jsoncons_span_HAVE_NORETURN                  jsoncons_span_CPP17_000
 
 // MSVC: template parameter deduction guides since Visual Studio 2017 v15.7
 
-#define span_HAVE_DEDUCTION_GUIDES         (span_CPP17_OR_GREATER && ! span_BETWEEN( span_COMPILER_MSVC_VERSION, 1, 999 ))
+#define jsoncons_span_HAVE_DEDUCTION_GUIDES         (jsoncons_span_CPP17_OR_GREATER && ! jsoncons_span_BETWEEN( jsoncons_span_COMPILER_MSVC_VERSION, 1, 999 ))
 
 // Presence of C++ library features:
 
-#define span_HAVE_ADDRESSOF                 span_CPP17_000
-#define span_HAVE_ARRAY                     span_CPP11_110
-#define span_HAVE_BYTE                      span_CPP17_000
-#define span_HAVE_CONDITIONAL               span_CPP11_120
-#define span_HAVE_CONTAINER_DATA_METHOD    (span_CPP11_140 || ( span_COMPILER_MSVC_VERSION >= 90 && span_HAS_CPP0X ))
-#define span_HAVE_DATA                      span_CPP17_000
-#define span_HAVE_LONGLONG                  span_CPP11_80
-#define span_HAVE_REMOVE_CONST              span_CPP11_110
-#define span_HAVE_SNPRINTF                  span_CPP11_140
-#define span_HAVE_TYPE_TRAITS               span_CPP11_90
+#define jsoncons_span_HAVE_ADDRESSOF                 jsoncons_span_CPP17_000
+#define jsoncons_span_HAVE_ARRAY                     jsoncons_span_CPP11_110
+#define jsoncons_span_HAVE_BYTE                      jsoncons_span_CPP17_000
+#define jsoncons_span_HAVE_CONDITIONAL               jsoncons_span_CPP11_120
+#define jsoncons_span_HAVE_CONTAINER_DATA_METHOD    (jsoncons_span_CPP11_140 || ( jsoncons_span_COMPILER_MSVC_VERSION >= 90 && jsoncons_span_HAS_CPP0X ))
+#define jsoncons_span_HAVE_DATA                      jsoncons_span_CPP17_000
+#define jsoncons_span_HAVE_LONGLONG                  jsoncons_span_CPP11_80
+#define jsoncons_span_HAVE_REMOVE_CONST              jsoncons_span_CPP11_110
+#define jsoncons_span_HAVE_SNPRINTF                  jsoncons_span_CPP11_140
+#define jsoncons_span_HAVE_TYPE_TRAITS               jsoncons_span_CPP11_90
 
 // Presence of byte-lite:
 
 #ifdef NONSTD_BYTE_LITE_HPP
-# define span_HAVE_NONSTD_BYTE  1
+# define jsoncons_span_HAVE_NONSTD_BYTE  1
 #else
-# define span_HAVE_NONSTD_BYTE  0
+# define jsoncons_span_HAVE_NONSTD_BYTE  0
 #endif
 
 // C++ feature usage:
 
-#if span_HAVE_ADDRESSOF
-# define span_ADDRESSOF(x)  std::addressof(x)
+#if jsoncons_span_HAVE_ADDRESSOF
+# define jsoncons_span_ADDRESSOF(x)  std::addressof(x)
 #else
-# define span_ADDRESSOF(x)  (&x)
+# define jsoncons_span_ADDRESSOF(x)  (&x)
 #endif
 
-#if span_HAVE_CONSTEXPR_11
-# define span_constexpr constexpr
+#if jsoncons_span_HAVE_CONSTEXPR_11
+# define jsoncons_span_constexpr constexpr
 #else
-# define span_constexpr /*span_constexpr*/
+# define jsoncons_span_constexpr /*jsoncons_span_constexpr*/
 #endif
 
-#if span_HAVE_CONSTEXPR_14
-# define span_constexpr14 constexpr
+#if jsoncons_span_HAVE_CONSTEXPR_14
+# define jsoncons_span_constexpr14 constexpr
 #else
-# define span_constexpr14 /*span_constexpr*/
+# define jsoncons_span_constexpr14 /*jsoncons_span_constexpr*/
 #endif
 
-#if span_HAVE_EXPLICIT_CONVERSION
-# define span_explicit explicit
+#if jsoncons_span_HAVE_EXPLICIT_CONVERSION
+# define jsoncons_span_explicit explicit
 #else
-# define span_explicit /*explicit*/
+# define jsoncons_span_explicit /*explicit*/
 #endif
 
-#if span_HAVE_IS_DELETE
-# define span_is_delete = delete
+#if jsoncons_span_HAVE_IS_DELETE
+# define jsoncons_span_is_delete = delete
 #else
-# define span_is_delete
+# define jsoncons_span_is_delete
 #endif
 
-#if span_HAVE_IS_DELETE
-# define span_is_delete_access public
+#if jsoncons_span_HAVE_IS_DELETE
+# define jsoncons_span_is_delete_access public
 #else
-# define span_is_delete_access private
+# define jsoncons_span_is_delete_access private
 #endif
 
-#if span_HAVE_NOEXCEPT && ! span_CONFIG_CONTRACT_VIOLATION_THROWS_V
-# define span_noexcept noexcept
+#if jsoncons_span_HAVE_NOEXCEPT && ! jsoncons_span_CONFIG_CONTRACT_VIOLATION_THROWS_V
+# define jsoncons_span_noexcept noexcept
 #else
-# define span_noexcept /*noexcept*/
+# define jsoncons_span_noexcept /*noexcept*/
 #endif
 
-#if span_HAVE_NULLPTR
-# define span_nullptr nullptr
+#if jsoncons_span_HAVE_NULLPTR
+# define jsoncons_span_nullptr nullptr
 #else
-# define span_nullptr NULL
+# define jsoncons_span_nullptr NULL
 #endif
 
-#if span_HAVE_DEPRECATED
-# define span_deprecated(msg) [[deprecated(msg)]]
+#if jsoncons_span_HAVE_DEPRECATED
+# define jsoncons_span_deprecated(msg) [[deprecated(msg)]]
 #else
-# define span_deprecated(msg) /*[[deprecated]]*/
+# define jsoncons_span_deprecated(msg) /*[[deprecated]]*/
 #endif
 
-#if span_HAVE_NODISCARD
-# define span_nodiscard [[nodiscard]]
+#if jsoncons_span_HAVE_NODISCARD
+# define jsoncons_span_nodiscard [[nodiscard]]
 #else
-# define span_nodiscard /*[[nodiscard]]*/
+# define jsoncons_span_nodiscard /*[[nodiscard]]*/
 #endif
 
-#if span_HAVE_NORETURN
-# define span_noreturn [[noreturn]]
+#if jsoncons_span_HAVE_NORETURN
+# define jsoncons_span_noreturn [[noreturn]]
 #else
-# define span_noreturn /*[[noreturn]]*/
+# define jsoncons_span_noreturn /*[[noreturn]]*/
 #endif
 
 // Other features:
 
-#define span_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR  span_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
+#define jsoncons_span_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR  jsoncons_span_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
 
 // Additional includes:
 
-#if span_HAVE( ADDRESSOF )
+#if jsoncons_span_HAVE( ADDRESSOF )
 # include <memory>
 #endif
 
-#if span_HAVE( ARRAY )
+#if jsoncons_span_HAVE( ARRAY )
 # include <array>
 #endif
 
-#if span_HAVE( BYTE )
+#if jsoncons_span_HAVE( BYTE )
 # include <cstddef>
 #endif
 
-#if span_HAVE( DATA )
+#if jsoncons_span_HAVE( DATA )
 # include <iterator> // for std::data(), std::size()
 #endif
 
-#if span_HAVE( TYPE_TRAITS )
+#if jsoncons_span_HAVE( TYPE_TRAITS )
 # include <type_traits>
 #endif
 
-#if ! span_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+#if ! jsoncons_span_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
 # include <vector>
 #endif
 
-#if span_FEATURE( MEMBER_AT ) > 1
+#if jsoncons_span_FEATURE( MEMBER_AT ) > 1
 # include <cstdio>
 #endif
 
-#if ! span_CONFIG( NO_EXCEPTIONS )
+#if ! jsoncons_span_CONFIG( NO_EXCEPTIONS )
 # include <stdexcept>
 #endif
 
 // Contract violation
 
-#define span_ELIDE_CONTRACT_EXPECTS  ( 0 == ( span_CONFIG_CONTRACT_LEVEL_MASK & 0x01 ) )
-#define span_ELIDE_CONTRACT_ENSURES  ( 0 == ( span_CONFIG_CONTRACT_LEVEL_MASK & 0x10 ) )
+#define jsoncons_span_ELIDE_CONTRACT_EXPECTS  ( 0 == ( jsoncons_span_CONFIG_CONTRACT_LEVEL_MASK & 0x01 ) )
+#define jsoncons_span_ELIDE_CONTRACT_ENSURES  ( 0 == ( jsoncons_span_CONFIG_CONTRACT_LEVEL_MASK & 0x10 ) )
 
-#if span_ELIDE_CONTRACT_EXPECTS
-# define span_constexpr_exp    span_constexpr
-# define span_EXPECTS( cond )  /* Expect elided */
+#if jsoncons_span_ELIDE_CONTRACT_EXPECTS
+# define jsoncons_span_constexpr_exp    jsoncons_span_constexpr
+# define jsoncons_span_EXPECTS( cond )  /* Expect elided */
 #else
-# define span_constexpr_exp    span_constexpr14
-# define span_EXPECTS( cond )  span_CONTRACT_CHECK( "Precondition", cond )
+# define jsoncons_span_constexpr_exp    jsoncons_span_constexpr14
+# define jsoncons_span_EXPECTS( cond )  jsoncons_span_CONTRACT_CHECK( "Precondition", cond )
 #endif
 
-#if span_ELIDE_CONTRACT_ENSURES
-# define span_constexpr_ens    span_constexpr
-# define span_ENSURES( cond )  /* Ensures elided */
+#if jsoncons_span_ELIDE_CONTRACT_ENSURES
+# define jsoncons_span_constexpr_ens    jsoncons_span_constexpr
+# define jsoncons_span_ENSURES( cond )  /* Ensures elided */
 #else
-# define span_constexpr_ens    span_constexpr14
-# define span_ENSURES( cond )  span_CONTRACT_CHECK( "Postcondition", cond )
+# define jsoncons_span_constexpr_ens    jsoncons_span_constexpr14
+# define jsoncons_span_ENSURES( cond )  jsoncons_span_CONTRACT_CHECK( "Postcondition", cond )
 #endif
 
-#define span_CONTRACT_CHECK( type, cond ) \
+#define jsoncons_span_CONTRACT_CHECK( type, cond ) \
     cond ? static_cast< void >( 0 ) \
-         : nonstd::span_lite::detail::report_contract_violation( span_LOCATION( __FILE__, __LINE__ ) ": " type " violation." )
+         : nonstd::jsoncons_span_lite::detail::report_contract_violation( jsoncons_span_LOCATION( __FILE__, __LINE__ ) ": " type " violation." )
 
 #ifdef __GNUG__
-# define span_LOCATION( file, line )  file ":" span_STRINGIFY( line )
+# define jsoncons_span_LOCATION( file, line )  file ":" jsoncons_span_STRINGIFY( line )
 #else
-# define span_LOCATION( file, line )  file "(" span_STRINGIFY( line ) ")"
+# define jsoncons_span_LOCATION( file, line )  file "(" jsoncons_span_STRINGIFY( line ) ")"
 #endif
 
 // Method enabling
 
-#define span_REQUIRES_0(VA) \
+#define jsoncons_span_REQUIRES_0(VA) \
     template< bool B = (VA), typename std::enable_if<B, int>::type = 0 >
 
-#define span_REQUIRES_T(VA) \
-    , typename = typename std::enable_if< (VA), nonstd::span_lite::detail::enabler >::type
+#define jsoncons_span_REQUIRES_T(VA) \
+    , typename = typename std::enable_if< (VA), nonstd::jsoncons_span_lite::detail::enabler >::type
 
-#define span_REQUIRES_R(R, VA) \
+#define jsoncons_span_REQUIRES_R(R, VA) \
     typename std::enable_if< (VA), R>::type
 
-#define span_REQUIRES_A(VA) \
+#define jsoncons_span_REQUIRES_A(VA) \
     , typename std::enable_if< (VA), void*>::type = nullptr
 
 namespace nonstd {
-namespace span_lite {
+namespace jsoncons_span_lite {
 
 // [views.constants], constants
 
-typedef span_CONFIG_INDEX_TYPE index_t;
+typedef jsoncons_span_CONFIG_INDEX_TYPE index_t;
 
 typedef std::ptrdiff_t extent_t;
 
-span_constexpr const extent_t dynamic_extent = -1;
+jsoncons_span_constexpr const extent_t dynamic_extent = -1;
 
 template< class T, extent_t Extent = dynamic_extent >
 class span;
 
 // Tag to select span constructor taking a container (prevent ms-gsl warning C26426):
 
-struct with_container_t { span_constexpr with_container_t() span_noexcept {} };
-const  span_constexpr   with_container_t with_container;
+struct with_container_t { jsoncons_span_constexpr with_container_t() jsoncons_span_noexcept {} };
+const  jsoncons_span_constexpr   with_container_t with_container;
 
 // C++11 emulation:
 
 namespace std11 {
 
-#if span_HAVE( REMOVE_CONST )
+#if jsoncons_span_HAVE( REMOVE_CONST )
 
 using std::remove_cv;
 using std::remove_const;
@@ -528,9 +528,9 @@ struct remove_cv
     typedef typename std11::remove_volatile< typename std11::remove_const< T >::type >::type type;
 };
 
-#endif  // span_HAVE( REMOVE_CONST )
+#endif  // jsoncons_span_HAVE( REMOVE_CONST )
 
-#if span_HAVE( TYPE_TRAITS )
+#if jsoncons_span_HAVE( TYPE_TRAITS )
 
 using std::is_same;
 using std::integral_constant;
@@ -556,61 +556,61 @@ namespace std17 {
 
 template< bool v > struct bool_constant : std11::integral_constant<bool, v>{};
 
-#if span_CPP11_120
+#if jsoncons_span_CPP11_120
 
 template< class...>
 using void_t = void;
 
 #endif
 
-#if span_HAVE( DATA )
+#if jsoncons_span_HAVE( DATA )
 
 using std::data;
 using std::size;
 
-#elif span_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR
+#elif jsoncons_span_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR
 
 template< typename T, size_t N >
-inline span_constexpr auto size( const T(&)[N] ) span_noexcept -> size_t
+inline jsoncons_span_constexpr auto size( const T(&)[N] ) jsoncons_span_noexcept -> size_t
 {
     return N;
 }
 
 template< typename C >
-inline span_constexpr auto size( C const & cont ) -> decltype( cont.size() )
+inline jsoncons_span_constexpr auto size( C const & cont ) -> decltype( cont.size() )
 {
     return cont.size();
 }
 
 template< typename T, size_t N >
-inline span_constexpr auto data( T(&arr)[N] ) span_noexcept -> T*
+inline jsoncons_span_constexpr auto data( T(&arr)[N] ) jsoncons_span_noexcept -> T*
 {
     return &arr[0];
 }
 
 template< typename C >
-inline span_constexpr auto data( C & cont ) -> decltype( cont.data() )
+inline jsoncons_span_constexpr auto data( C & cont ) -> decltype( cont.data() )
 {
     return cont.data();
 }
 
 template< typename C >
-inline span_constexpr auto data( C const & cont ) -> decltype( cont.data() )
+inline jsoncons_span_constexpr auto data( C const & cont ) -> decltype( cont.data() )
 {
     return cont.data();
 }
 
 template< typename E >
-inline span_constexpr auto data( std::initializer_list<E> il ) span_noexcept -> E const *
+inline jsoncons_span_constexpr auto data( std::initializer_list<E> il ) jsoncons_span_noexcept -> E const *
 {
     return il.begin();
 }
 
-#endif // span_HAVE( DATA )
+#endif // jsoncons_span_HAVE( DATA )
 
-#if span_HAVE( BYTE )
+#if jsoncons_span_HAVE( BYTE )
 using std::byte;
-#elif span_HAVE( NONSTD_BYTE )
+#elif jsoncons_span_HAVE( NONSTD_BYTE )
 using nonstd::byte;
 #endif
 
@@ -622,21 +622,21 @@ namespace detail {
 
 /*enum*/ struct enabler{};
 
-#if span_HAVE( TYPE_TRAITS )
+#if jsoncons_span_HAVE( TYPE_TRAITS )
 
 template< class Q >
-struct is_span_oracle : std::false_type{};
+struct is_jsoncons_span_oracle : std::false_type{};
 
 template< class T, std::ptrdiff_t Extent >
-struct is_span_oracle< span<T, Extent> > : std::true_type{};
+struct is_jsoncons_span_oracle< span<T, Extent> > : std::true_type{};
 
 template< class Q >
-struct is_span : is_span_oracle< typename std::remove_cv<Q>::type >{};
+struct is_span : is_jsoncons_span_oracle< typename std::remove_cv<Q>::type >{};
 
 template< class Q >
 struct is_std_array_oracle : std::false_type{};
 
-#if span_HAVE( ARRAY )
+#if jsoncons_span_HAVE( ARRAY )
 
 template< class T, std::size_t Extent >
 struct is_std_array_oracle< std::array<T, Extent> > : std::true_type{};
@@ -655,7 +655,7 @@ struct is_array<T[]> : std::true_type {};
 template< class T, std::size_t N >
 struct is_array<T[N]> : std::true_type {};
 
-#if span_CPP11_140 && ! span_BETWEEN( span_COMPILER_GNUC_VERSION, 1, 500 )
+#if jsoncons_span_CPP11_140 && ! jsoncons_span_BETWEEN( jsoncons_span_COMPILER_GNUC_VERSION, 1, 500 )
 
 template< class, class = void >
 struct has_size_and_data : std::false_type{};
@@ -694,11 +694,11 @@ struct is_compatible_container : std17::bool_constant
     && is_compatible_element<C,E>::value
 >{};
 
-#else // span_CPP11_140
+#else // jsoncons_span_CPP11_140
 
 template<
     class C, class E
-        span_REQUIRES_T((
+        jsoncons_span_REQUIRES_T((
             ! is_span< C >::value
             && ! is_array< C >::value
             && ! is_std_array< C >::value
@@ -710,12 +710,12 @@ template<
 >
 struct is_compatible_container : std::true_type{};
 
-#endif // span_CPP11_140
+#endif // jsoncons_span_CPP11_140
 
-#endif // span_HAVE( TYPE_TRAITS )
+#endif // jsoncons_span_HAVE( TYPE_TRAITS )
 
-#if ! span_CONFIG( NO_EXCEPTIONS )
-#if   span_FEATURE( MEMBER_AT ) > 1
+#if ! jsoncons_span_CONFIG( NO_EXCEPTIONS )
+#if   jsoncons_span_FEATURE( MEMBER_AT ) > 1
 
 // format index and size:
 
@@ -744,7 +744,7 @@ inline void throw_out_of_range( index_t /*idx*/, index_t /*size*/ )
 #endif  // MEMBER_AT
 #endif  // NO_EXCEPTIONS
 
-#if span_CONFIG( CONTRACT_VIOLATION_THROWS_V )
+#if jsoncons_span_CONFIG( CONTRACT_VIOLATION_THROWS_V )
 
 struct contract_violation : std::logic_error
 {
@@ -758,23 +758,23 @@ inline void report_contract_violation( char const * msg )
     throw contract_violation( msg );
 }
 
-#else // span_CONFIG( CONTRACT_VIOLATION_THROWS_V )
+#else // jsoncons_span_CONFIG( CONTRACT_VIOLATION_THROWS_V )
 
-span_noreturn inline void report_contract_violation( char const * /*msg*/ ) span_noexcept
+jsoncons_span_noreturn inline void report_contract_violation( char const * /*msg*/ ) jsoncons_span_noexcept
 {
     std::terminate();
 }
 
-#endif // span_CONFIG( CONTRACT_VIOLATION_THROWS_V )
+#endif // jsoncons_span_CONFIG( CONTRACT_VIOLATION_THROWS_V )
 
 }  // namespace detail
 
 // Prevent signed-unsigned mismatch:
 
-#define span_sizeof(T)  static_cast<extent_t>( sizeof(T) )
+#define jsoncons_span_sizeof(T)  static_cast<extent_t>( sizeof(T) )
 
 template< class T >
-inline span_constexpr index_t to_size( T size )
+inline jsoncons_span_constexpr index_t to_size( T size )
 {
     return static_cast<index_t>( size );
 }
@@ -812,138 +812,138 @@ public:
 
     // 26.7.3.2 Constructors, copy, and assignment [span.cons]
 
-#if span_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-    span_REQUIRES_0(( Extent <= 0 ))
+#if jsoncons_span_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+    jsoncons_span_REQUIRES_0(( Extent <= 0 ))
 #endif
-    span_constexpr span() span_noexcept
-        : data_( span_nullptr )
+    jsoncons_span_constexpr span() jsoncons_span_noexcept
+        : data_( jsoncons_span_nullptr )
         , size_( 0 )
     {
-        // span_EXPECTS( data() == span_nullptr );
-        // span_EXPECTS( size() == 0 );
+        // jsoncons_span_EXPECTS( data() == jsoncons_span_nullptr );
+        // jsoncons_span_EXPECTS( size() == 0 );
     }
 
-    span_constexpr_exp span( pointer ptr, index_type count )
+    jsoncons_span_constexpr_exp span( pointer ptr, index_type count )
         : data_( ptr )
         , size_( count )
     {
-        span_EXPECTS(
-            ( ptr == span_nullptr && count == 0 ) ||
-            ( ptr != span_nullptr && count >= 0 )
+        jsoncons_span_EXPECTS(
+            ( ptr == jsoncons_span_nullptr && count == 0 ) ||
+            ( ptr != jsoncons_span_nullptr && count >= 0 )
         );
     }
 
-    span_constexpr_exp span( pointer firstElem, pointer lastElem )
+    jsoncons_span_constexpr_exp span( pointer firstElem, pointer lastElem )
         : data_( firstElem )
         , size_( to_size( std::distance( firstElem, lastElem ) ) )
     {
-        span_EXPECTS(
+        jsoncons_span_EXPECTS(
             std::distance( firstElem, lastElem ) >= 0
         );
     }
 
     template< size_t N
-#if span_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-        span_REQUIRES_T((
+#if jsoncons_span_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+        jsoncons_span_REQUIRES_T((
             (Extent == dynamic_extent || Extent == static_cast<extent_t>(N))
             && std::is_convertible< value_type(*)[], element_type(*)[] >::value
         ))
 #endif
     >
-    span_constexpr span( element_type ( &arr )[ N ] ) span_noexcept
-        : data_( span_ADDRESSOF( arr[0] ) )
+    jsoncons_span_constexpr span( element_type ( &arr )[ N ] ) jsoncons_span_noexcept
+        : data_( jsoncons_span_ADDRESSOF( arr[0] ) )
         , size_( N  )
     {}
 
-#if span_HAVE( ARRAY )
+#if jsoncons_span_HAVE( ARRAY )
 
     template< size_t N
-# if span_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-        span_REQUIRES_T((
+# if jsoncons_span_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+        jsoncons_span_REQUIRES_T((
             (Extent == dynamic_extent || Extent == static_cast<extent_t>(N))
             && std::is_convertible< value_type(*)[], element_type(*)[] >::value
         ))
 # endif
     >
-# if span_FEATURE( CONSTRUCTION_FROM_STDARRAY_ELEMENT_TYPE )
-        span_constexpr span( std::array< element_type, N > & arr ) span_noexcept
+# if jsoncons_span_FEATURE( CONSTRUCTION_FROM_STDARRAY_ELEMENT_TYPE )
+        jsoncons_span_constexpr span( std::array< element_type, N > & arr ) jsoncons_span_noexcept
 # else
-        span_constexpr span( std::array< value_type, N > & arr ) span_noexcept
+        jsoncons_span_constexpr span( std::array< value_type, N > & arr ) jsoncons_span_noexcept
 # endif
-        : data_( span_ADDRESSOF( arr[0] ) )
+        : data_( jsoncons_span_ADDRESSOF( arr[0] ) )
         , size_( to_size( arr.size() ) )
     {}
 
     template< size_t N
-# if span_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-        span_REQUIRES_T((
+# if jsoncons_span_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+        jsoncons_span_REQUIRES_T((
             (Extent == dynamic_extent || Extent == static_cast<extent_t>(N))
             && std::is_convertible< value_type(*)[], element_type(*)[] >::value
         ))
 # endif
     >
-    span_constexpr span( std::array< value_type, N> const & arr ) span_noexcept
-        : data_( span_ADDRESSOF( arr[0] ) )
+    jsoncons_span_constexpr span( std::array< value_type, N> const & arr ) jsoncons_span_noexcept
+        : data_( jsoncons_span_ADDRESSOF( arr[0] ) )
         , size_( to_size( arr.size() ) )
     {}
 
-#endif // span_HAVE( ARRAY )
+#endif // jsoncons_span_HAVE( ARRAY )
 
-#if span_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+#if jsoncons_span_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
     template< class Container
-        span_REQUIRES_T((
+        jsoncons_span_REQUIRES_T((
             detail::is_compatible_container< Container, element_type >::value
         ))
     >
-    span_constexpr span( Container & cont )
+    jsoncons_span_constexpr span( Container & cont )
         : data_( std17::data( cont ) )
         , size_( to_size( std17::size( cont ) ) )
     {}
 
     template< class Container
-        span_REQUIRES_T((
+        jsoncons_span_REQUIRES_T((
             std::is_const< element_type >::value
             && detail::is_compatible_container< Container, element_type >::value
         ))
     >
-    span_constexpr span( Container const & cont )
+    jsoncons_span_constexpr span( Container const & cont )
         : data_( std17::data( cont ) )
         , size_( to_size( std17::size( cont ) ) )
     {}
 
-#endif // span_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+#endif // jsoncons_span_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
 
-#if span_FEATURE( WITH_CONTAINER )
+#if jsoncons_span_FEATURE( WITH_CONTAINER )
 
     template< class Container >
-    span_constexpr span( with_container_t, Container & cont )
-        : data_( cont.size() == 0 ? span_nullptr : span_ADDRESSOF( cont[0] ) )
+    jsoncons_span_constexpr span( with_container_t, Container & cont )
+        : data_( cont.size() == 0 ? jsoncons_span_nullptr : jsoncons_span_ADDRESSOF( cont[0] ) )
         , size_( to_size( cont.size() ) )
     {}
 
     template< class Container >
-    span_constexpr span( with_container_t, Container const & cont )
-        : data_( cont.size() == 0 ? span_nullptr : const_cast<pointer>( span_ADDRESSOF( cont[0] ) ) )
+    jsoncons_span_constexpr span( with_container_t, Container const & cont )
+        : data_( cont.size() == 0 ? jsoncons_span_nullptr : const_cast<pointer>( jsoncons_span_ADDRESSOF( cont[0] ) ) )
         , size_( to_size( cont.size() ) )
     {}
 #endif
 
-#if span_HAVE( IS_DEFAULT )
-    span_constexpr span( span const & other ) span_noexcept = default;
+#if jsoncons_span_HAVE( IS_DEFAULT )
+    jsoncons_span_constexpr span( span const & other ) jsoncons_span_noexcept = default;
 
-    ~span() span_noexcept = default;
+    ~span() jsoncons_span_noexcept = default;
 
-    span_constexpr14 span & operator=( span const & other ) span_noexcept = default;
+    jsoncons_span_constexpr14 span & operator=( span const & other ) jsoncons_span_noexcept = default;
 #else
-    span_constexpr span( span const & other ) span_noexcept
+    jsoncons_span_constexpr span( span const & other ) jsoncons_span_noexcept
         : data_( other.data_ )
         , size_( other.size_ )
     {}
 
-    ~span() span_noexcept
+    ~span() jsoncons_span_noexcept
     {}
 
-    span_constexpr14 span & operator=( span const & other ) span_noexcept
+    jsoncons_span_constexpr14 span & operator=( span const & other ) jsoncons_span_noexcept
     {
         data_ = other.data_;
         size_ = other.size_;
@@ -953,49 +953,49 @@ public:
 #endif
 
     template< class OtherElementType, extent_type OtherExtent
-#if span_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-        span_REQUIRES_T((
+#if jsoncons_span_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+        jsoncons_span_REQUIRES_T((
             (Extent == dynamic_extent || Extent == OtherExtent)
             && std::is_convertible<OtherElementType(*)[], element_type(*)[]>::value
         ))
 #endif
     >
-    span_constexpr_exp span( span<OtherElementType, OtherExtent> const & other ) span_noexcept
+    jsoncons_span_constexpr_exp span( span<OtherElementType, OtherExtent> const & other ) jsoncons_span_noexcept
         : data_( reinterpret_cast<pointer>( other.data() ) )
         , size_( other.size() )
     {
-        span_EXPECTS( OtherExtent == dynamic_extent || other.size() == to_size(OtherExtent) );
+        jsoncons_span_EXPECTS( OtherExtent == dynamic_extent || other.size() == to_size(OtherExtent) );
     }
 
     // 26.7.3.3 Subviews [span.sub]
 
     template< extent_type Count >
-    span_constexpr_exp span< element_type, Count >
+    jsoncons_span_constexpr_exp span< element_type, Count >
     first() const
     {
-        span_EXPECTS( 0 <= Count && Count <= size() );
+        jsoncons_span_EXPECTS( 0 <= Count && Count <= size() );
 
         return span< element_type, Count >( data(), Count );
     }
 
     template< extent_type Count >
-    span_constexpr_exp span< element_type, Count >
+    jsoncons_span_constexpr_exp span< element_type, Count >
     last() const
     {
-        span_EXPECTS( 0 <= Count && Count <= size() );
+        jsoncons_span_EXPECTS( 0 <= Count && Count <= size() );
 
         return span< element_type, Count >( data() + (size() - Count), Count );
     }
 
-#if span_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+#if jsoncons_span_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
     template< index_type Offset, extent_type Count = dynamic_extent >
 #else
     template< index_type Offset, extent_type Count /*= dynamic_extent*/ >
 #endif
-    span_constexpr_exp span< element_type, Count >
+    jsoncons_span_constexpr_exp span< element_type, Count >
     subspan() const
     {
-        span_EXPECTS(
+        jsoncons_span_EXPECTS(
             ( 0 <= Offset && Offset <= size() ) &&
             ( Count == dynamic_extent || (0 <= Count && Count + Offset <= size()) )
         );
@@ -1004,26 +1004,26 @@ public:
             data() + Offset, Count != dynamic_extent ? Count : (Extent != dynamic_extent ? Extent - Offset : size() - Offset) );
     }
 
-    span_constexpr_exp span< element_type, dynamic_extent >
+    jsoncons_span_constexpr_exp span< element_type, dynamic_extent >
     first( index_type count ) const
     {
-        span_EXPECTS( 0 <= count && count <= size() );
+        jsoncons_span_EXPECTS( 0 <= count && count <= size() );
 
         return span< element_type, dynamic_extent >( data(), count );
     }
 
-    span_constexpr_exp span< element_type, dynamic_extent >
+    jsoncons_span_constexpr_exp span< element_type, dynamic_extent >
     last( index_type count ) const
     {
-        span_EXPECTS( 0 <= count && count <= size() );
+        jsoncons_span_EXPECTS( 0 <= count && count <= size() );
 
         return span< element_type, dynamic_extent >( data() + ( size() - count ), count );
     }
 
-    span_constexpr_exp span< element_type, dynamic_extent >
+    jsoncons_span_constexpr_exp span< element_type, dynamic_extent >
     subspan( index_type offset, index_type count = static_cast<index_type>(dynamic_extent) ) const
     {
-        span_EXPECTS(
+        jsoncons_span_EXPECTS(
             ( ( 0 <= offset  && offset <= size() ) ) &&
             ( count == static_cast<index_type>(dynamic_extent) || ( 0 <= count && offset + count <= size() ) )
         );
@@ -1034,50 +1034,50 @@ public:
 
     // 26.7.3.4 Observers [span.obs]
 
-    span_constexpr index_type size() const span_noexcept
+    jsoncons_span_constexpr index_type size() const jsoncons_span_noexcept
     {
         return size_;
     }
 
-    span_constexpr std::ptrdiff_t ssize() const span_noexcept
+    jsoncons_span_constexpr std::ptrdiff_t ssize() const jsoncons_span_noexcept
     {
         return static_cast<std::ptrdiff_t>( size_ );
     }
 
-    span_constexpr index_type size_bytes() const span_noexcept
+    jsoncons_span_constexpr index_type size_bytes() const jsoncons_span_noexcept
     {
         return size() * to_size( sizeof( element_type ) );
     }
 
-    span_nodiscard span_constexpr bool empty() const span_noexcept
+    jsoncons_span_nodiscard jsoncons_span_constexpr bool empty() const jsoncons_span_noexcept
     {
         return size() == 0;
     }
 
     // 26.7.3.5 Element access [span.elem]
 
-    span_constexpr_exp reference operator[]( index_type idx ) const
+    jsoncons_span_constexpr_exp reference operator[]( index_type idx ) const
     {
-        span_EXPECTS( 0 <= idx && idx < size() );
+        jsoncons_span_EXPECTS( 0 <= idx && idx < size() );
 
         return *( data() + idx );
     }
 
-#if span_FEATURE( MEMBER_CALL_OPERATOR )
-    span_deprecated("replace operator() with operator[]")
+#if jsoncons_span_FEATURE( MEMBER_CALL_OPERATOR )
+    jsoncons_span_deprecated("replace operator() with operator[]")
 
-    span_constexpr_exp reference operator()( index_type idx ) const
+    jsoncons_span_constexpr_exp reference operator()( index_type idx ) const
     {
-        span_EXPECTS( 0 <= idx && idx < size() );
+        jsoncons_span_EXPECTS( 0 <= idx && idx < size() );
 
         return *( data() + idx );
     }
 #endif
 
-#if span_FEATURE( MEMBER_AT )
-    span_constexpr14 reference at( index_type idx ) const
+#if jsoncons_span_FEATURE( MEMBER_AT )
+    jsoncons_span_constexpr14 reference at( index_type idx ) const
     {
-#if span_CONFIG( NO_EXCEPTIONS )
+#if jsoncons_span_CONFIG( NO_EXCEPTIONS )
         return this->operator[]( idx );
 #else
         if ( idx < 0 || size() <= idx )
@@ -1089,23 +1089,23 @@ public:
     }
 #endif
 
-    span_constexpr pointer data() const span_noexcept
+    jsoncons_span_constexpr pointer data() const jsoncons_span_noexcept
     {
         return data_;
     }
 
-#if span_FEATURE( MEMBER_BACK_FRONT )
+#if jsoncons_span_FEATURE( MEMBER_BACK_FRONT )
 
-    span_constexpr_exp reference front() const span_noexcept
+    jsoncons_span_constexpr_exp reference front() const jsoncons_span_noexcept
     {
-        span_EXPECTS( ! empty() );
+        jsoncons_span_EXPECTS( ! empty() );
 
         return *data();
     }
 
-    span_constexpr_exp reference back() const span_noexcept
+    jsoncons_span_constexpr_exp reference back() const jsoncons_span_noexcept
     {
-        span_EXPECTS( ! empty() );
+        jsoncons_span_EXPECTS( ! empty() );
 
         return *( data() + size() - 1 );
     }
@@ -1114,9 +1114,9 @@ public:
 
     // xx.x.x.x Modifiers [span.modifiers]
 
-#if span_FEATURE( MEMBER_SWAP )
+#if jsoncons_span_FEATURE( MEMBER_SWAP )
 
-    span_constexpr14 void swap( span & other ) span_noexcept
+    jsoncons_span_constexpr14 void swap( span & other ) jsoncons_span_noexcept
     {
         using std::swap;
         swap( data_, other.data_ );
@@ -1126,58 +1126,58 @@ public:
 
     // 26.7.3.6 Iterator support [span.iterators]
 
-    span_constexpr iterator begin() const span_noexcept
+    jsoncons_span_constexpr iterator begin() const jsoncons_span_noexcept
     {
-#if span_CPP11_OR_GREATER
+#if jsoncons_span_CPP11_OR_GREATER
         return { data() };
 #else
         return iterator( data() );
 #endif
     }
 
-    span_constexpr iterator end() const span_noexcept
+    jsoncons_span_constexpr iterator end() const jsoncons_span_noexcept
     {
-#if span_CPP11_OR_GREATER
+#if jsoncons_span_CPP11_OR_GREATER
         return { data() + size() };
 #else
         return iterator( data() + size() );
 #endif
     }
 
-    span_constexpr const_iterator cbegin() const span_noexcept
+    jsoncons_span_constexpr const_iterator cbegin() const jsoncons_span_noexcept
     {
-#if span_CPP11_OR_GREATER
+#if jsoncons_span_CPP11_OR_GREATER
         return { data() };
 #else
         return const_iterator( data() );
 #endif
     }
 
-    span_constexpr const_iterator cend() const span_noexcept
+    jsoncons_span_constexpr const_iterator cend() const jsoncons_span_noexcept
     {
-#if span_CPP11_OR_GREATER
+#if jsoncons_span_CPP11_OR_GREATER
         return { data() + size() };
 #else
         return const_iterator( data() + size() );
 #endif
     }
 
-    span_constexpr reverse_iterator rbegin() const span_noexcept
+    jsoncons_span_constexpr reverse_iterator rbegin() const jsoncons_span_noexcept
     {
         return reverse_iterator( end() );
     }
 
-    span_constexpr reverse_iterator rend() const span_noexcept
+    jsoncons_span_constexpr reverse_iterator rend() const jsoncons_span_noexcept
     {
         return reverse_iterator( begin() );
     }
 
-    span_constexpr const_reverse_iterator crbegin() const span_noexcept
+    jsoncons_span_constexpr const_reverse_iterator crbegin() const jsoncons_span_noexcept
     {
         return const_reverse_iterator ( cend() );
     }
 
-    span_constexpr const_reverse_iterator crend() const span_noexcept
+    jsoncons_span_constexpr const_reverse_iterator crend() const jsoncons_span_noexcept
     {
         return const_reverse_iterator( cbegin() );
     }
@@ -1189,7 +1189,7 @@ private:
 
 // class template argument deduction guides:
 
-#if span_HAVE( DEDUCTION_GUIDES )   // span_CPP17_OR_GREATER
+#if jsoncons_span_HAVE( DEDUCTION_GUIDES )   // jsoncons_span_CPP17_OR_GREATER
 
 template< class T, size_t N >
 span( T (&)[N] ) -> span<T, static_cast<extent_t>(N)>;
@@ -1206,15 +1206,15 @@ span( Container& ) -> span<typename Container::value_type>;
 template< class Container >
 span( Container const & ) -> span<const typename Container::value_type>;
 
-#endif // span_HAVE( DEDUCTION_GUIDES )
+#endif // jsoncons_span_HAVE( DEDUCTION_GUIDES )
 
 // 26.7.3.7 Comparison operators [span.comparison]
 
-#if span_FEATURE( COMPARISON )
-#if span_FEATURE( SAME )
+#if jsoncons_span_FEATURE( COMPARISON )
+#if jsoncons_span_FEATURE( SAME )
 
 template< class T1, extent_t E1, class T2, extent_t E2  >
-inline span_constexpr bool same( span<T1,E1> const & l, span<T2,E2> const & r ) span_noexcept
+inline jsoncons_span_constexpr bool same( span<T1,E1> const & l, span<T2,E2> const & r ) jsoncons_span_noexcept
 {
     return std11::is_same<T1, T2>::value
         && l.size() == r.size()
@@ -1224,236 +1224,236 @@ inline span_constexpr bool same( span<T1,E1> const & l, span<T2,E2> const & r ) 
 #endif
 
 template< class T1, extent_t E1, class T2, extent_t E2  >
-inline span_constexpr bool operator==( span<T1,E1> const & l, span<T2,E2> const & r )
+inline jsoncons_span_constexpr bool operator==( span<T1,E1> const & l, span<T2,E2> const & r )
 {
     return
-#if span_FEATURE( SAME )
+#if jsoncons_span_FEATURE( SAME )
         same( l, r ) ||
 #endif
         ( l.size() == r.size() && std::equal( l.begin(), l.end(), r.begin() ) );
 }
 
 template< class T1, extent_t E1, class T2, extent_t E2  >
-inline span_constexpr bool operator<( span<T1,E1> const & l, span<T2,E2> const & r )
+inline jsoncons_span_constexpr bool operator<( span<T1,E1> const & l, span<T2,E2> const & r )
 {
     return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 
 template< class T1, extent_t E1, class T2, extent_t E2  >
-inline span_constexpr bool operator!=( span<T1,E1> const & l, span<T2,E2> const & r )
+inline jsoncons_span_constexpr bool operator!=( span<T1,E1> const & l, span<T2,E2> const & r )
 {
     return !( l == r );
 }
 
 template< class T1, extent_t E1, class T2, extent_t E2  >
-inline span_constexpr bool operator<=( span<T1,E1> const & l, span<T2,E2> const & r )
+inline jsoncons_span_constexpr bool operator<=( span<T1,E1> const & l, span<T2,E2> const & r )
 {
     return !( r < l );
 }
 
 template< class T1, extent_t E1, class T2, extent_t E2  >
-inline span_constexpr bool operator>( span<T1,E1> const & l, span<T2,E2> const & r )
+inline jsoncons_span_constexpr bool operator>( span<T1,E1> const & l, span<T2,E2> const & r )
 {
     return ( r < l );
 }
 
 template< class T1, extent_t E1, class T2, extent_t E2  >
-inline span_constexpr bool operator>=( span<T1,E1> const & l, span<T2,E2> const & r )
+inline jsoncons_span_constexpr bool operator>=( span<T1,E1> const & l, span<T2,E2> const & r )
 {
     return !( l < r );
 }
 
-#endif // span_FEATURE( COMPARISON )
+#endif // jsoncons_span_FEATURE( COMPARISON )
 
 // 26.7.2.6 views of object representation [span.objectrep]
 
-#if span_HAVE( BYTE ) || span_HAVE( NONSTD_BYTE )
+#if jsoncons_span_HAVE( BYTE ) || jsoncons_span_HAVE( NONSTD_BYTE )
 
 template< class T, extent_t Extent >
-inline span_constexpr span< const std17::byte, ( (Extent == dynamic_extent) ? dynamic_extent : (span_sizeof(T) * Extent) ) >
-as_bytes( span<T,Extent> spn ) span_noexcept
+inline jsoncons_span_constexpr span< const std17::byte, ( (Extent == dynamic_extent) ? dynamic_extent : (jsoncons_span_sizeof(T) * Extent) ) >
+as_bytes( span<T,Extent> spn ) jsoncons_span_noexcept
 {
 #if 0
     return { reinterpret_cast< std17::byte const * >( spn.data() ), spn.size_bytes() };
 #else
-    return span< const std17::byte, ( (Extent == dynamic_extent) ? dynamic_extent : (span_sizeof(T) * Extent) ) >(
+    return span< const std17::byte, ( (Extent == dynamic_extent) ? dynamic_extent : (jsoncons_span_sizeof(T) * Extent) ) >(
         reinterpret_cast< std17::byte const * >( spn.data() ), spn.size_bytes() );  // NOLINT
 #endif
 }
 
 template< class T, extent_t Extent >
-inline span_constexpr span< std17::byte, ( (Extent == dynamic_extent) ? dynamic_extent : (span_sizeof(T) * Extent) ) >
-as_writeable_bytes( span<T,Extent> spn ) span_noexcept
+inline jsoncons_span_constexpr span< std17::byte, ( (Extent == dynamic_extent) ? dynamic_extent : (jsoncons_span_sizeof(T) * Extent) ) >
+as_writeable_bytes( span<T,Extent> spn ) jsoncons_span_noexcept
 {
 #if 0
     return { reinterpret_cast< std17::byte * >( spn.data() ), spn.size_bytes() };
 #else
-    return span< std17::byte, ( (Extent == dynamic_extent) ? dynamic_extent : (span_sizeof(T) * Extent) ) >(
+    return span< std17::byte, ( (Extent == dynamic_extent) ? dynamic_extent : (jsoncons_span_sizeof(T) * Extent) ) >(
         reinterpret_cast< std17::byte * >( spn.data() ), spn.size_bytes() );  // NOLINT
 #endif
 }
 
-#endif // span_HAVE( BYTE ) || span_HAVE( NONSTD_BYTE )
+#endif // jsoncons_span_HAVE( BYTE ) || jsoncons_span_HAVE( NONSTD_BYTE )
 
 // extensions: non-member views:
 // this feature implies the presence of make_span()
 
-#if span_FEATURE( NON_MEMBER_FIRST_LAST_SUB ) && span_CPP11_120
+#if jsoncons_span_FEATURE( NON_MEMBER_FIRST_LAST_SUB ) && jsoncons_span_CPP11_120
 
 template< extent_t Count, class T >
-span_constexpr auto
+jsoncons_span_constexpr auto
 first( T & t ) -> decltype( make_span(t).template first<Count>() )
 {
     return make_span( t ).template first<Count>();
 }
 
 template< class T >
-span_constexpr auto
+jsoncons_span_constexpr auto
 first( T & t, index_t count ) -> decltype( make_span(t).first(count) )
 {
     return make_span( t ).first( count );
 }
 
 template< extent_t Count, class T >
-span_constexpr auto
+jsoncons_span_constexpr auto
 last( T & t ) -> decltype( make_span(t).template last<Count>() )
 {
     return make_span(t).template last<Count>();
 }
 
 template< class T >
-span_constexpr auto
+jsoncons_span_constexpr auto
 last( T & t, extent_t count ) -> decltype( make_span(t).last(count) )
 {
     return make_span( t ).last( count );
 }
 
 template< index_t Offset, extent_t Count = dynamic_extent, class T >
-span_constexpr auto
+jsoncons_span_constexpr auto
 subspan( T & t ) -> decltype( make_span(t).template subspan<Offset, Count>() )
 {
     return make_span( t ).template subspan<Offset, Count>();
 }
 
 template< class T >
-span_constexpr auto
+jsoncons_span_constexpr auto
 subspan( T & t, index_t offset, extent_t count = dynamic_extent ) -> decltype( make_span(t).subspan(offset, count) )
 {
     return make_span( t ).subspan( offset, count );
 }
 
-#endif // span_FEATURE( NON_MEMBER_FIRST_LAST_SUB )
+#endif // jsoncons_span_FEATURE( NON_MEMBER_FIRST_LAST_SUB )
 
 // 27.8 Container and view access [iterator.container]
 
 template< class T, extent_t Extent /*= dynamic_extent*/ >
-span_constexpr std::size_t size( span<T,Extent> const & spn )
+jsoncons_span_constexpr std::size_t size( span<T,Extent> const & spn )
 {
     return static_cast<std::size_t>( spn.size() );
 }
 
 template< class T, extent_t Extent /*= dynamic_extent*/ >
-span_constexpr std::ptrdiff_t ssize( span<T,Extent> const & spn )
+jsoncons_span_constexpr std::ptrdiff_t ssize( span<T,Extent> const & spn )
 {
     return static_cast<std::ptrdiff_t>( spn.size() );
 }
 
-}  // namespace span_lite
+}  // namespace jsoncons_span_lite
 }  // namespace nonstd
 
 // make available in nonstd:
 
 namespace nonstd {
 
-using span_lite::dynamic_extent;
+using jsoncons_span_lite::dynamic_extent;
 
-using span_lite::span;
+using jsoncons_span_lite::span;
 
-using span_lite::with_container;
+using jsoncons_span_lite::with_container;
 
-#if span_FEATURE( COMPARISON )
-#if span_FEATURE( SAME )
-using span_lite::same;
+#if jsoncons_span_FEATURE( COMPARISON )
+#if jsoncons_span_FEATURE( SAME )
+using jsoncons_span_lite::same;
 #endif
 
-using span_lite::operator==;
-using span_lite::operator!=;
-using span_lite::operator<;
-using span_lite::operator<=;
-using span_lite::operator>;
-using span_lite::operator>=;
+using jsoncons_span_lite::operator==;
+using jsoncons_span_lite::operator!=;
+using jsoncons_span_lite::operator<;
+using jsoncons_span_lite::operator<=;
+using jsoncons_span_lite::operator>;
+using jsoncons_span_lite::operator>=;
 #endif
 
-#if span_HAVE( BYTE )
-using span_lite::as_bytes;
-using span_lite::as_writeable_bytes;
+#if jsoncons_span_HAVE( BYTE )
+using jsoncons_span_lite::as_bytes;
+using jsoncons_span_lite::as_writeable_bytes;
 #endif
 
-using span_lite::size;
-using span_lite::ssize;
+using jsoncons_span_lite::size;
+using jsoncons_span_lite::ssize;
 
 }  // namespace nonstd
 
-#endif  // span_USES_STD_SPAN
+#endif  // jsoncons_span_USES_STD_SPAN
 
 // make_span() [span-lite extension]:
 
-#if span_FEATURE( MAKE_SPAN ) || span_FEATURE( NON_MEMBER_FIRST_LAST_SUB )
+#if jsoncons_span_FEATURE( MAKE_SPAN ) || jsoncons_span_FEATURE( NON_MEMBER_FIRST_LAST_SUB )
 
 namespace nonstd {
-namespace span_lite {
+namespace jsoncons_span_lite {
 
 template< class T >
-inline span_constexpr span<T>
-make_span( T * ptr, index_t count ) span_noexcept
+inline jsoncons_span_constexpr span<T>
+make_span( T * ptr, index_t count ) jsoncons_span_noexcept
 {
     return span<T>( ptr, count );
 }
 
 template< class T >
-inline span_constexpr span<T>
-make_span( T * first, T * last ) span_noexcept
+inline jsoncons_span_constexpr span<T>
+make_span( T * first, T * last ) jsoncons_span_noexcept
 {
     return span<T>( first, last );
 }
 
 template< class T, size_t N >
-inline span_constexpr span<T, static_cast<extent_t>(N)>
-make_span( T ( &arr )[ N ] ) span_noexcept
+inline jsoncons_span_constexpr span<T, static_cast<extent_t>(N)>
+make_span( T ( &arr )[ N ] ) jsoncons_span_noexcept
 {
     return span<T, static_cast<extent_t>(N)>( &arr[ 0 ], N );
 }
 
-#if span_USES_STD_SPAN || span_HAVE( ARRAY )
+#if jsoncons_span_USES_STD_SPAN || jsoncons_span_HAVE( ARRAY )
 
 template< class T, size_t N >
-inline span_constexpr span<T, static_cast<extent_t>(N)>
-make_span( std::array< T, N > & arr ) span_noexcept
+inline jsoncons_span_constexpr span<T, static_cast<extent_t>(N)>
+make_span( std::array< T, N > & arr ) jsoncons_span_noexcept
 {
     return span<T, static_cast<extent_t>(N)>( arr );
 }
 
 template< class T, size_t N >
-inline span_constexpr span< const T, static_cast<extent_t>(N) >
-make_span( std::array< T, N > const & arr ) span_noexcept
+inline jsoncons_span_constexpr span< const T, static_cast<extent_t>(N) >
+make_span( std::array< T, N > const & arr ) jsoncons_span_noexcept
 {
     return span<const T, static_cast<extent_t>(N)>( arr );
 }
 
-#endif // span_HAVE( ARRAY )
+#endif // jsoncons_span_HAVE( ARRAY )
 
-#if span_USES_STD_SPAN || ( span_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) && span_HAVE( AUTO ) )
+#if jsoncons_span_USES_STD_SPAN || ( jsoncons_span_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) && jsoncons_span_HAVE( AUTO ) )
 
 template< class Container, class EP = decltype( std17::data(std::declval<Container&>())) >
-inline span_constexpr auto
-make_span( Container & cont ) span_noexcept -> span< typename std::remove_pointer<EP>::type >
+inline jsoncons_span_constexpr auto
+make_span( Container & cont ) jsoncons_span_noexcept -> span< typename std::remove_pointer<EP>::type >
 {
     return span< typename std::remove_pointer<EP>::type >( cont );
 }
 
 template< class Container, class EP = decltype( std17::data(std::declval<Container&>())) >
-inline span_constexpr auto
-make_span( Container const & cont ) span_noexcept -> span< const typename std::remove_pointer<EP>::type >
+inline jsoncons_span_constexpr auto
+make_span( Container const & cont ) jsoncons_span_noexcept -> span< const typename std::remove_pointer<EP>::type >
 {
     return span< const typename std::remove_pointer<EP>::type >( cont );
 }
@@ -1461,83 +1461,83 @@ make_span( Container const & cont ) span_noexcept -> span< const typename std::r
 #else
 
 template< class T, class Allocator >
-inline span_constexpr span<T>
-make_span( std::vector<T, Allocator> & cont ) span_noexcept
+inline jsoncons_span_constexpr span<T>
+make_span( std::vector<T, Allocator> & cont ) jsoncons_span_noexcept
 {
     return span<T>( with_container, cont );
 }
 
 template< class T, class Allocator >
-inline span_constexpr span<const T>
-make_span( std::vector<T, Allocator> const & cont ) span_noexcept
+inline jsoncons_span_constexpr span<const T>
+make_span( std::vector<T, Allocator> const & cont ) jsoncons_span_noexcept
 {
     return span<const T>( with_container, cont );
 }
 
-#endif // span_USES_STD_SPAN || ( ... )
+#endif // jsoncons_span_USES_STD_SPAN || ( ... )
 
-#if ! span_USES_STD_SPAN && span_FEATURE( WITH_CONTAINER )
+#if ! jsoncons_span_USES_STD_SPAN && jsoncons_span_FEATURE( WITH_CONTAINER )
 
 template< class Container >
-inline span_constexpr span<typename Container::value_type>
-make_span( with_container_t, Container & cont ) span_noexcept
+inline jsoncons_span_constexpr span<typename Container::value_type>
+make_span( with_container_t, Container & cont ) jsoncons_span_noexcept
 {
     return span< typename Container::value_type >( with_container, cont );
 }
 
 template< class Container >
-inline span_constexpr span<const typename Container::value_type>
-make_span( with_container_t, Container const & cont ) span_noexcept
+inline jsoncons_span_constexpr span<const typename Container::value_type>
+make_span( with_container_t, Container const & cont ) jsoncons_span_noexcept
 {
     return span< const typename Container::value_type >( with_container, cont );
 }
 
-#endif // ! span_USES_STD_SPAN && span_FEATURE( WITH_CONTAINER )
+#endif // ! jsoncons_span_USES_STD_SPAN && jsoncons_span_FEATURE( WITH_CONTAINER )
 
 
-}  // namespace span_lite
+}  // namespace jsoncons_span_lite
 }  // namespace nonstd
 
 // make available in nonstd:
 
 namespace nonstd {
-using span_lite::make_span;
+using jsoncons_span_lite::make_span;
 }  // namespace nonstd
 
-#endif // #if span_FEATURE_TO_STD( MAKE_SPAN )
+#endif // #if jsoncons_span_FEATURE_TO_STD( MAKE_SPAN )
 
-#if span_CPP11_OR_GREATER && span_FEATURE( BYTE_SPAN ) && ( span_HAVE( BYTE ) || span_HAVE( NONSTD_BYTE ) )
+#if jsoncons_span_CPP11_OR_GREATER && jsoncons_span_FEATURE( BYTE_SPAN ) && ( jsoncons_span_HAVE( BYTE ) || jsoncons_span_HAVE( NONSTD_BYTE ) )
 
 namespace nonstd {
-namespace span_lite {
+namespace jsoncons_span_lite {
 
 template< class T >
-inline span_constexpr auto
-byte_span( T & t ) span_noexcept -> span< std17::byte, span_sizeof(T) >
+inline jsoncons_span_constexpr auto
+byte_span( T & t ) jsoncons_span_noexcept -> span< std17::byte, jsoncons_span_sizeof(T) >
 {
-    return span< std17::byte, span_sizeof(t) >( reinterpret_cast< std17::byte * >( &t ), span_sizeof(T) );
+    return span< std17::byte, jsoncons_span_sizeof(t) >( reinterpret_cast< std17::byte * >( &t ), jsoncons_span_sizeof(T) );
 }
 
 template< class T >
-inline span_constexpr auto
-byte_span( T const & t ) span_noexcept -> span< const std17::byte, span_sizeof(T) >
+inline jsoncons_span_constexpr auto
+byte_span( T const & t ) jsoncons_span_noexcept -> span< const std17::byte, jsoncons_span_sizeof(T) >
 {
-    return span< const std17::byte, span_sizeof(t) >( reinterpret_cast< std17::byte const * >( &t ), span_sizeof(T) );
+    return span< const std17::byte, jsoncons_span_sizeof(t) >( reinterpret_cast< std17::byte const * >( &t ), jsoncons_span_sizeof(T) );
 }
 
-}  // namespace span_lite
+}  // namespace jsoncons_span_lite
 }  // namespace nonstd
 
 // make available in nonstd:
 
 namespace nonstd {
-using span_lite::byte_span;
+using jsoncons_span_lite::byte_span;
 }  // namespace nonstd
 
-#endif // span_FEATURE( BYTE_SPAN )
+#endif // jsoncons_span_FEATURE( BYTE_SPAN )
 
-#if ! span_USES_STD_SPAN
-span_RESTORE_WARNINGS()
-#endif  // span_USES_STD_SPAN
+#if ! jsoncons_span_USES_STD_SPAN
+jsoncons_span_RESTORE_WARNINGS()
+#endif  // jsoncons_span_USES_STD_SPAN
 
 #endif  // NONSTD_SPAN_HPP_INCLUDED
