@@ -1450,6 +1450,19 @@ private:
         return true;
     }
 
+    bool begin_multi_dim(const span<size_t>& shape,
+                         const ser_context& context, 
+                         std::error_code& ec) override
+    {
+        return true;
+    }
+
+    bool end_multi_dim(const ser_context& context,
+                       std::error_code& ec) override
+    {
+        return true;
+    }
+
     void write_typed_array_tag(std::true_type, 
                                uint16_t,
                                semantic_tag)

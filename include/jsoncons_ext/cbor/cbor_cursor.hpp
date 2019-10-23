@@ -32,11 +32,12 @@ class cbor_staj_event_handler : public basic_cbor_content_handler<Float128T>
 public:
     using char_type = char;
     using string_view_type = typename super_type::string_view_type;
+    using float128_type = typename super_type::float128_type;
 private:
     std::function<bool(const basic_staj_event<char_type>&, const ser_context&)> filter_;
     basic_staj_event<char_type> event_;
 
-    typed_array_view<Float128T> data_;
+    typed_array_view<float128_type> data_;
     size_t index_;
 public:
     cbor_staj_event_handler()
@@ -136,7 +137,7 @@ public:
             else
             {
                 this->end_array();
-                data_ = typed_array_view<Float128T>();
+                data_ = typed_array_view<float128_type>();
                 index_ = 0;
             }
         }
@@ -217,14 +218,14 @@ public:
             else
             {
                 more = handler.end_array();
-                data_ = typed_array_view<Float128T>();
+                data_ = typed_array_view<float128_type>();
                 index_ = 0;
             }
         }
         return more;
     }
 
-    bool dump(basic_cbor_content_handler<Float128T>& handler, const ser_context& context, std::error_code& ec)
+    bool dump(basic_cbor_content_handler<float128_type>& handler, const ser_context& context, std::error_code& ec)
     {
         bool more = true;
         if (data_.type() != typed_array_type())
@@ -293,7 +294,7 @@ public:
             ++index_;
             
             more = handler.end_array();
-            data_ = typed_array_view<Float128T>();
+            data_ = typed_array_view<float128_type>();
             index_ = 0;
         }
         else
@@ -407,7 +408,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        data_ = typed_array_view<Float128T>(v.data(), v.size());
+        data_ = typed_array_view<float128_type>(v.data(), v.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -417,7 +418,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        data_ = typed_array_view<Float128T>(data.data(), data.size());
+        data_ = typed_array_view<float128_type>(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -427,7 +428,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        data_ = typed_array_view<Float128T>(data.data(), data.size());
+        data_ = typed_array_view<float128_type>(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -437,7 +438,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        data_ = typed_array_view<Float128T>(data.data(), data.size());
+        data_ = typed_array_view<float128_type>(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -447,7 +448,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        data_ = typed_array_view<Float128T>(data.data(), data.size());
+        data_ = typed_array_view<float128_type>(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -457,7 +458,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        data_ = typed_array_view<Float128T>(data.data(), data.size());
+        data_ = typed_array_view<float128_type>(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -467,7 +468,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        data_ = typed_array_view<Float128T>(data.data(), data.size());
+        data_ = typed_array_view<float128_type>(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -477,7 +478,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        data_ = typed_array_view<Float128T>(data.data(), data.size());
+        data_ = typed_array_view<float128_type>(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -487,7 +488,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        data_ = typed_array_view<Float128T>(data.data(), data.size());
+        data_ = typed_array_view<float128_type>(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -497,7 +498,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        data_ = typed_array_view<Float128T>(data.data(), data.size());
+        data_ = typed_array_view<float128_type>(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -507,15 +508,28 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        data_ = typed_array_view<Float128T>(data.data(), data.size());
+        data_ = typed_array_view<float128_type>(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
 
-    bool do_typed_array(const span<const Float128T>& /*data*/, 
+    bool do_typed_array(const span<const float128_type>& /*data*/, 
                         semantic_tag /*tag*/,
                         const ser_context& /*context*/,
                         std::error_code&) override
+    {
+        return true;
+    }
+
+    bool begin_multi_dim(const span<size_t>& shape,
+                         const ser_context& context, 
+                         std::error_code& ec) override
+    {
+        return true;
+    }
+
+    bool end_multi_dim(const ser_context& context,
+                       std::error_code& ec) override
     {
         return true;
     }

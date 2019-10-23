@@ -42,74 +42,88 @@ enum class staj_event_type
     double_value
 };
 
-inline
-std::ostream& operator<<(std::ostream& os, staj_event_type tag)
+template <class CharT>
+std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_event_type tag)
 {
+    JSONCONS_ARRAY_OF_CHAR(CharT,begin_array_name,'b','e','g','i','n','_','a','r','r','a','y')
+    JSONCONS_ARRAY_OF_CHAR(CharT,end_array_name,'e','n','d','_','a','r','r','a','y')
+    JSONCONS_ARRAY_OF_CHAR(CharT,begin_object_name,'b','e','g','i','n','_','o','b','j','e','c','t')
+    JSONCONS_ARRAY_OF_CHAR(CharT,end_object_name,'e','n','d','_','o','b','j','e','c','t')
+    JSONCONS_ARRAY_OF_CHAR(CharT,name_name,'n','a','m','e')
+    JSONCONS_ARRAY_OF_CHAR(CharT,string_value_name,'s','t','r','i','n','g','_','v','a','l','u','e')
+    JSONCONS_ARRAY_OF_CHAR(CharT,byte_string_value_name,'b','y','t','e','_','s','t','r','i','n','g','_','v','a','l','u','e')
+    JSONCONS_ARRAY_OF_CHAR(CharT,null_value_name,'n','u','l','l','_','v','a','l','u','e')
+    JSONCONS_ARRAY_OF_CHAR(CharT,bool_value_name,'b','o','o','l','_','v','a','l','u','e')
+    JSONCONS_ARRAY_OF_CHAR(CharT,uint64_value_name,'u','i','n','t','6','4','_','v','a','l','u','e')
+    JSONCONS_ARRAY_OF_CHAR(CharT,int64_value_name,'i','n','t','6','4','_','v','a','l','u','e')
+    JSONCONS_ARRAY_OF_CHAR(CharT,half_value_name,'h','a','l','f','_','v','a','l','u','e')
+    JSONCONS_ARRAY_OF_CHAR(CharT,double_value_name,'d','o','u','b','l','e','_','v','a','l','u','e')
+
     switch (tag)
     {
         case staj_event_type::begin_array:
         {
-            os << "begin_array";
+            os << begin_array_name;
             break;
         }
         case staj_event_type::end_array:
         {
-            os << "end_array";
+            os << end_array_name;
             break;
         }
         case staj_event_type::begin_object:
         {
-            os << "begin_object";
+            os << begin_object_name;
             break;
         }
         case staj_event_type::end_object:
         {
-            os << "end_object";
+            os << end_object_name;
             break;
         }
         case staj_event_type::name:
         {
-            os << "name";
+            os << name_name;
             break;
         }
         case staj_event_type::string_value:
         {
-            os << "string_value";
+            os << string_value_name;
             break;
         }
         case staj_event_type::byte_string_value:
         {
-            os << "byte_string_value";
+            os << byte_string_value_name;
             break;
         }
         case staj_event_type::null_value:
         {
-            os << "null_value";
+            os << null_value_name;
             break;
         }
         case staj_event_type::bool_value:
         {
-            os << "bool_value";
+            os << bool_value_name;
             break;
         }
         case staj_event_type::int64_value:
         {
-            os << "int64_value";
+            os << int64_value_name;
             break;
         }
         case staj_event_type::uint64_value:
         {
-            os << "uint64_value";
+            os << uint64_value_name;
             break;
         }
         case staj_event_type::half_value:
         {
-            os << "half_value";
+            os << half_value_name;
             break;
         }
         case staj_event_type::double_value:
         {
-            os << "double_value";
+            os << double_value_name;
             break;
         }
     }

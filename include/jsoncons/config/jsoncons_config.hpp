@@ -157,6 +157,9 @@ using std::span;
         static const std::basic_string<CharT> sv(s, sizeof(s) / sizeof(CharT));\
         return sv;\
     }
+ 
+#define JSONCONS_ARRAY_OF_CHAR(CharT, name, ...) \
+    static constexpr CharT name[] = { __VA_ARGS__,0};
 
 #define JSONCONS_EXPAND(X) X    
 #define JSONCONS_QUOTE(Prefix, A) JSONCONS_EXPAND(Prefix ## #A)

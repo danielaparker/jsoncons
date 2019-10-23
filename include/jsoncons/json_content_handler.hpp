@@ -50,69 +50,82 @@ enum class semantic_tag : uint8_t
 #endif
 };
 
-inline
-std::ostream& operator<<(std::ostream& os, semantic_tag tag)
+template <class CharT>
+std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_tag tag)
 {
+    JSONCONS_ARRAY_OF_CHAR(CharT,na_name,'n','/','a')
+    JSONCONS_ARRAY_OF_CHAR(CharT,undefined_name,'u','n','d','e','f','i','n','e','d')
+    JSONCONS_ARRAY_OF_CHAR(CharT,datetime_name,'d','a','t','e','t','i','m','e')
+    JSONCONS_ARRAY_OF_CHAR(CharT,timestamp_name,'t','i','m','e','s','t','a','m','p')
+    JSONCONS_ARRAY_OF_CHAR(CharT,bigint_name,'b','i','g','i','n','t')
+    JSONCONS_ARRAY_OF_CHAR(CharT,bigdec_name,'b','i','g','d','e','c')
+    JSONCONS_ARRAY_OF_CHAR(CharT,bigfloat_name,'b','i','g','f','l','o','a','t')
+    JSONCONS_ARRAY_OF_CHAR(CharT,base16_name,'b','a','s','e','l','6')
+    JSONCONS_ARRAY_OF_CHAR(CharT,base64_name,'b','a','s','e','6','4')
+    JSONCONS_ARRAY_OF_CHAR(CharT,base64url_name,'b','a','s','e','6','4','u','r','l')
+    JSONCONS_ARRAY_OF_CHAR(CharT,uri_name,'u','r','i')
+    JSONCONS_ARRAY_OF_CHAR(CharT,clamped_name,'c','l','a','m','p','e','d')
+
     switch (tag)
     {
         case semantic_tag::none:
         {
-            os << "n/a";
+            os << na_name;
             break;
         }
         case semantic_tag::undefined:
         {
-            os << "undefined";
+            os << undefined_name;
             break;
         }
         case semantic_tag::datetime:
         {
-            os << "datetime";
+            os << datetime_name;
             break;
         }
         case semantic_tag::timestamp:
         {
-            os << "timestamp";
+            os << timestamp_name;
             break;
         }
         case semantic_tag::bigint:
         {
-            os << "bigint";
+            os << bigint_name;
             break;
         }
         case semantic_tag::bigdec:
         {
-            os << "bigdec";
+            os << bigdec_name;
             break;
         }
         case semantic_tag::bigfloat:
         {
-            os << "bigfloat";
+            os << bigfloat_name;
             break;
         }
         case semantic_tag::base16:
         {
-            os << "base16";
+            os << base16_name;
             break;
         }
         case semantic_tag::base64:
         {
-            os << "base64";
+            os << base64_name;
             break;
         }
         case semantic_tag::base64url:
         {
-            os << "base64url";
+            os << base64url_name;
             break;
         }
         case semantic_tag::uri:
         {
-            os << "uri";
+            os << uri_name;
             break;
         }
         case semantic_tag::clamped:
         {
-            os << "clamped";
+            os << clamped_name;
             break;
         }
     }

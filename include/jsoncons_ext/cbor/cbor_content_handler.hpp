@@ -324,6 +324,13 @@ private:
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
+
+    virtual bool begin_multi_dim(const span<size_t>& shape,
+                                 const ser_context& context, 
+                                 std::error_code& ec) = 0;
+
+    virtual bool end_multi_dim(const ser_context& context,
+                               std::error_code& ec) = 0;
 };
 
 template <class Float128T = std::nullptr_t>
@@ -522,6 +529,19 @@ private:
                         semantic_tag,
                         const ser_context&, 
                         std::error_code&) override 
+    {
+        return parse_more_;
+    }
+
+    bool begin_multi_dim(const span<size_t>& shape,
+                         const ser_context& context, 
+                         std::error_code& ec) override
+    {
+        return parse_more_;
+    }
+
+    bool end_multi_dim(const ser_context& context,
+                       std::error_code& ec) override
     {
         return parse_more_;
     }
@@ -836,6 +856,19 @@ private:
                         semantic_tag /*tag*/,
                         const ser_context& /*context*/, 
                         std::error_code&) override
+    {
+        return true;
+    }
+
+    bool begin_multi_dim(const span<size_t>& shape,
+                         const ser_context& context, 
+                         std::error_code& ec) override
+    {
+        return true;
+    }
+
+    bool end_multi_dim(const ser_context& context,
+                       std::error_code& ec) override
     {
         return true;
     }
