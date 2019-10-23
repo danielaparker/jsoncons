@@ -345,7 +345,7 @@ public:
     }
 
     template <class Float128T_ = Float128T>
-    typename std::enable_if<std::is_same<Float128T_,nullptr_t>::value, void>::type
+    typename std::enable_if<std::is_same<Float128T_,std::nullptr_t>::value, void>::type
         allocate_float128()
     {
     }
@@ -359,7 +359,7 @@ public:
     }
 
     template <class Float128T_ = Float128T>
-    typename std::enable_if<std::is_same<Float128T_,nullptr_t>::value, void>::type
+    typename std::enable_if<std::is_same<Float128T_,std::nullptr_t>::value, void>::type
         deallocate_float128()
     {
     }
@@ -2716,7 +2716,7 @@ private:
     }
 
     template <class Float128T_ = Float128T>
-    typename std::enable_if<std::is_same<Float128T_,nullptr_t>::value,void>::type
+    typename std::enable_if<std::is_same<Float128T_,std::nullptr_t>::value,void>::type
     handle_float128(basic_cbor_content_handler<Float128T>& handler, const byte_string_view&, const uint8_t, std::error_code&)
     {
         more_ = handler.begin_array(semantic_tag::none, *this);
