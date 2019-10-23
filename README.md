@@ -611,7 +611,7 @@ int main()
                 std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::byte_string_value:
-                std::cout << event.event_type() << ": " << event.get<jsoncons::byte_string_view>() << " " << "(" << event.tag() << ")\n";
+                std::cout << event.event_type() << ": " << event.get<jsoncons::span<const uint8_t>>() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::null_value:
                 std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
@@ -962,4 +962,4 @@ The macro `JSONCONS_MEMBER_TRAITS_DECL` was inspired by Martin York's [ThorsSeri
 jsoncons includes [Martin Moene's span-lite](https://github.com/martinmoene/span-lite) - a C++20-like span - distributed under the Boost Software License, Version 1.0. 
 
 Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.md)
-
+ 

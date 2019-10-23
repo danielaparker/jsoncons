@@ -841,9 +841,9 @@ private:
     }
 };
 
-typedef basic_cbor_content_handler<nullptr_t> cbor_content_handler;
+typedef basic_cbor_content_handler<std::nullptr_t> cbor_content_handler;
 
-typedef basic_default_cbor_content_handler<nullptr_t> default_cbor_content_handler;
+typedef basic_default_cbor_content_handler<std::nullptr_t> default_cbor_content_handler;
 
 }}
 
