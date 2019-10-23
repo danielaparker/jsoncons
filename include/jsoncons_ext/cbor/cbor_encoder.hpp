@@ -837,7 +837,7 @@ private:
             default:
                 break;
         }
-        if (options_.pack_strings() && b.length() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
+        if (options_.pack_strings() && b.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
         {
             auto it = bytestringref_map_.find(byte_string(b));
             if (it == bytestringref_map_.end())
@@ -862,38 +862,38 @@ private:
 
     void write_byte_string_value(const byte_string_view& b) 
     {
-        if (b.length() <= 0x17)
+        if (b.size() <= 0x17)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
-            jsoncons::detail::native_to_big(static_cast<uint8_t>(0x40 + b.length()), 
+            jsoncons::detail::native_to_big(static_cast<uint8_t>(0x40 + b.size()), 
                                             std::back_inserter(result_));
         }
-        else if (b.length() <= 0xff)
+        else if (b.size() <= 0xff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x58), 
                                             std::back_inserter(result_));
-            jsoncons::detail::native_to_big(static_cast<uint8_t>(b.length()), 
+            jsoncons::detail::native_to_big(static_cast<uint8_t>(b.size()), 
                                             std::back_inserter(result_));
         }
-        else if (b.length() <= 0xffff)
+        else if (b.size() <= 0xffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x59), 
                                             std::back_inserter(result_));
-            jsoncons::detail::native_to_big(static_cast<uint16_t>(b.length()), 
+            jsoncons::detail::native_to_big(static_cast<uint16_t>(b.size()), 
                                             std::back_inserter(result_));
         }
-        else if (b.length() <= 0xffffffff)
+        else if (b.size() <= 0xffffffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x5a), 
                                             std::back_inserter(result_));
-            jsoncons::detail::native_to_big(static_cast<uint32_t>(b.length()), 
+            jsoncons::detail::native_to_big(static_cast<uint32_t>(b.size()), 
                                             std::back_inserter(result_));
         }
-        else if (b.length() <= 0xffffffffffffffff)
+        else if (b.size() <= 0xffffffffffffffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x5b), 
                                             std::back_inserter(result_));
-            jsoncons::detail::native_to_big(static_cast<uint64_t>(b.length()), 
+            jsoncons::detail::native_to_big(static_cast<uint64_t>(b.size()), 
                                             std::back_inserter(result_));
         }
 

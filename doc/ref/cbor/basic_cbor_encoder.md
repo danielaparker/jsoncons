@@ -68,10 +68,6 @@ Constructs a new encoder that writes to the specified result.
                            semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=null_ser_context()); 
 
-    bool byte_string_value(const uint8_t* p, size_t size, 
-                           semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context()); 
-
     bool int64_value(int64_t value, 
                      semantic_tag tag = semantic_tag::none, 
                      const ser_context& context=null_ser_context());

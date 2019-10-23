@@ -30,162 +30,158 @@ Member type                         |Definition
 
 #### Public event producer interface
 
-    bool typed_array(const uint8_t* data, size_t size, 
+    bool typed_array(const span<const uint8_t>& data, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context())
 
-    bool typed_array(const uint16_t* data, size_t size, 
+    bool typed_array(const span<const uint16_t>& data, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context())
 
-    bool typed_array(const uint32_t* data, size_t size, 
+    bool typed_array(const span<const uint32_t>& data, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context())
 
-    bool typed_array(const uint64_t* data, size_t size, 
+    bool typed_array(const span<const uint64_t>& data, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context())
 
-    bool typed_array(const int8_t* data, size_t size, 
+    bool typed_array(const span<const int8_t>& data, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context())
 
-    bool typed_array(const int16_t* data, size_t size, 
+    bool typed_array(const span<const int16_t>& data, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context())
 
-    bool typed_array(const int32_t* data, size_t size, 
+    bool typed_array(const span<const int32_t>& data, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context())
 
-    bool typed_array(const int64_t* data, size_t size, 
+    bool typed_array(const span<const int64_t>& data, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context())
 
-    bool typed_array(half_arg_t, const uint16_t* data, size_t size, 
+    bool typed_array(half_arg_t, const span<const uint16_t>& data,
+        semantic_tag tag = semantic_tag::none,
+        const ser_context& context = null_ser_context())
+
+    bool typed_array(const span<const float>& data, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context())
 
-    bool typed_array(const float* data, size_t size, 
+    bool typed_array(const span<const double>& data, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context())
 
-    bool typed_array(const double* data, size_t size, 
+    bool typed_array(const span<const float128_type>& data, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context())
 
-    bool typed_array(const float128_type* data, size_t size, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
-
-    bool typed_array(const uint8_t* data, size_t size, 
+    bool typed_array(const span<const uint8_t>& v, 
                      semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec)
+                     const ser_context& context, std::error_code& ec)
 
-    bool typed_array(const uint16_t* data, size_t size, 
+    bool typed_array(const span<const uint16_t>& data, 
                      semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec)
+                     const ser_context& context, std::error_code& ec)
 
-    bool typed_array(const uint32_t* data, size_t size, 
+    bool typed_array(const span<const uint32_t>& data, 
                      semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec)
+                     const ser_context& context, std::error_code& ec)
 
-    bool typed_array(const uint64_t* data, size_t size, 
+    bool typed_array(const span<const uint64_t>& data, 
                      semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec)
+                     const ser_context& context, std::error_code& ec)
 
-    bool typed_array(const int8_t* data, size_t size, 
+    bool typed_array(const span<const int8_t>& data, 
                      semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec)
+                     const ser_context& context, std::error_code& ec)
 
-    bool typed_array(const int16_t* data, size_t size, 
+    bool typed_array(const span<const int16_t>& data, 
                      semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec)
+                     const ser_context& context, std::error_code& ec)
 
-    bool typed_array(const int32_t* data, size_t size, 
+    bool typed_array(const span<const int32_t>& data, 
                      semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec)
+                     const ser_context& context, std::error_code& ec)
 
-    bool typed_array(const int64_t* data, size_t size, 
+    bool typed_array(const span<const int64_t>& data, 
                      semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec)
+                     const ser_context& context, std::error_code& ec)
 
-    bool typed_array(const float* data, size_t size, 
+    bool typed_array(half_arg_t arg, const span<const uint16_t>& data, 
                      semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec)
+                     const ser_context& context, std::error_code& ec)
 
-    bool typed_array(const double* data, size_t size, 
+    bool typed_array(const span<const float>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, std::error_code& ec)
+
+    bool typed_array(const span<const double>& data, 
                      semantic_tag tag,
                      const ser_context& context, 
                      std::error_code& ec)
 
 #### Private event consumer interface
 
-    virtual bool do_typed_array(const span<const uint8_t>&, 
+    virtual bool do_typed_array(const span<const uint8_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
 
-    virtual bool do_typed_array(const uint16_t* data, size_t size, 
+    virtual bool do_typed_array(const span<const uint16_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
 
-    virtual bool do_typed_array(const uint32_t* data, size_t size, 
+    virtual bool do_typed_array(const span<const uint32_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
 
-    virtual bool do_typed_array(const uint64_t* data, size_t size, 
+    virtual bool do_typed_array(const span<const uint64_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
 
-    virtual bool do_typed_array(const int8_t* data, size_t size, 
+    virtual bool do_typed_array(const span<const int8_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
 
-    virtual bool do_typed_array(const int16_t* data, size_t size, 
+    virtual bool do_typed_array(const span<const int16_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
 
-    virtual bool do_typed_array(const int32_t* data, size_t size, 
+    virtual bool do_typed_array(const span<const int32_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
 
-    virtual bool do_typed_array(const int64_t* data, size_t size, 
+    virtual bool do_typed_array(const span<const int64_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
 
-    virtual bool do_typed_array(half_arg_t, const uint16_t* data, size_t size, 
+    virtual bool do_typed_array(half_arg_t, 
+                                const span<const uint16_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
 
-    virtual bool do_typed_array(const float* data, size_t size, 
+    virtual bool do_typed_array(const span<const float>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
 
-    virtual bool do_typed_array(const double* data, size_t size, 
+    virtual bool do_typed_array(const span<const double>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
 
-    virtual bool do_typed_array(const float128_type* data, size_t size, 
+    virtual bool do_typed_array(const span<const float128_type>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;

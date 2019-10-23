@@ -274,7 +274,7 @@ private:
                               std::error_code&) override
     {
 
-        const size_t length = b.length();
+        const size_t length = b.size();
         result_.push_back(jsoncons::ubjson::detail::ubjson_format::start_array_marker);
         jsoncons::detail::native_to_big(static_cast<uint8_t>(jsoncons::ubjson::detail::ubjson_format::type_marker), std::back_inserter(result_));
         jsoncons::detail::native_to_big(static_cast<uint8_t>(jsoncons::ubjson::detail::ubjson_format::uint8_type), std::back_inserter(result_));

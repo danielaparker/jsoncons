@@ -268,7 +268,7 @@ private:
                               std::error_code&) override
     {
 
-        const size_t length = b.length();
+        const size_t length = b.size();
         if (length <= (std::numeric_limits<uint8_t>::max)())
         {
             // str 8 stores a byte array whose length is upto (2^8)-1 bytes

@@ -739,12 +739,12 @@ public:
 
         variant(const byte_string_view& bs, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.length(), byte_allocator_type());
+            new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.size(), byte_allocator_type());
         }
 
         variant(const byte_string_view& bs, semantic_tag tag, const Allocator& allocator) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.length(), allocator);
+            new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.size(), allocator);
         }
 
         variant(const basic_bignum<byte_allocator_type>& n) : data_{}
