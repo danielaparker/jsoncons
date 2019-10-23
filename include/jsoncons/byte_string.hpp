@@ -370,12 +370,13 @@ public:
     {
         return data_;
     }
-
+#if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED_MSG("instead, use size()") 
     size_t length() const
     {
         return length_;
     }
-
+#endif
     size_t size() const
     {
         return length_;
@@ -398,15 +399,15 @@ public:
 
     int compare(const byte_string_view& s) const 
     {
-        const int rc = traits_type::compare(data_, s.data(), (std::min)(length_, s.length()));
-        return rc != 0 ? rc : (length_ == s.length() ? 0 : length_ < s.length() ? -1 : 1);
+        const int rc = traits_type::compare(data_, s.data(), (std::min)(length_, s.size()));
+        return rc != 0 ? rc : (length_ == s.size() ? 0 : length_ < s.size() ? -1 : 1);
     }
 
     template <class Allocator>
     int compare(const basic_byte_string<Allocator>& s) const 
     {
-        const int rc = traits_type::compare(data_, s.data(), (std::min)(length_, s.length()));
-        return rc != 0 ? rc : (length_ == s.length() ? 0 : length_ < s.length() ? -1 : 1);
+        const int rc = traits_type::compare(data_, s.data(), (std::min)(length_, s.size()));
+        return rc != 0 ? rc : (length_ == s.size() ? 0 : length_ < s.size() ? -1 : 1);
     }
 
     template <class CharT>
@@ -507,7 +508,7 @@ public:
 
     operator byte_string_view() const noexcept
     {
-        return byte_string_view(data(),length());
+        return byte_string_view(data(),size());
     }
 
     void reserve(size_t new_cap)
@@ -566,21 +567,24 @@ public:
         return data_.size();
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED_MSG("instead, use size()") 
     size_t length() const
     {
         return data_.size();
     }
+#endif
 
     int compare(const byte_string_view& s) const 
     {
-        const int rc = traits_type::compare(data(), s.data(), (std::min)(length(), s.length()));
-        return rc != 0 ? rc : (length() == s.length() ? 0 : length() < s.length() ? -1 : 1);
+        const int rc = traits_type::compare(data(), s.data(), (std::min)(size(), s.size()));
+        return rc != 0 ? rc : (size() == s.size() ? 0 : size() < s.size() ? -1 : 1);
     }
 
     int compare(const basic_byte_string& s) const 
     {
-        const int rc = traits_type::compare(data(), s.data(), (std::min)(length(), s.length()));
-        return rc != 0 ? rc : (length() == s.length() ? 0 : length() < s.length() ? -1 : 1);
+        const int rc = traits_type::compare(data(), s.data(), (std::min)(size(), s.size()));
+        return rc != 0 ? rc : (size() == s.size() ? 0 : size() < s.size() ? -1 : 1);
     }
 
     template <class CharT>

@@ -889,7 +889,7 @@ private:
             jsoncons::detail::native_to_big(static_cast<uint32_t>(b.size()), 
                                             std::back_inserter(result_));
         }
-        else if (b.size() <= 0xffffffffffffffff)
+        else // if (b.size() <= 0xffffffffffffffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x5b), 
                                             std::back_inserter(result_));

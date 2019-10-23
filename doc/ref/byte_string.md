@@ -59,8 +59,6 @@ Member type                         |Definition
 
     size_t size() const;
 
-    size_t length() const;
-
 #### Non-member functions
 
     bool operator==(const byte_string& lhs, const byte_string& rhs);

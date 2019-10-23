@@ -134,7 +134,7 @@ namespace detail {
         parse_event(const byte_string_view& value, semantic_tag tag, const WorkAllocator& allocator)
             : event_type(staj_event_type::byte_string_value), 
               string_value(allocator),
-              byte_string_value(value.data(),value.length(),allocator), 
+              byte_string_value(value.data(),value.size(),allocator), 
               tag(tag)
         {
         }

@@ -190,7 +190,7 @@ public:
     basic_staj_event(const byte_string_view& s,
         staj_event_type event_type,
         semantic_tag tag = semantic_tag::none)
-        : event_type_(event_type), tag_(tag), length_(s.length())
+        : event_type_(event_type), tag_(tag), length_(s.size())
     {
         value_.byte_string_data_ = s.data();
     }
