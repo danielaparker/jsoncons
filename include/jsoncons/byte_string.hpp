@@ -348,11 +348,6 @@ public:
     {
     }
 
-    byte_string_view(const span<const uint8_t>& v)
-        : data_(v.data()), length_(v.size())
-    {
-    }
-
     byte_string_view(const byte_string_view&) = default;
 
     byte_string_view(byte_string_view&& other) noexcept

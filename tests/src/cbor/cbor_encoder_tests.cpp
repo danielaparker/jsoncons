@@ -35,7 +35,7 @@ TEST_CASE("encode multi_dim array test")
     encoder.end_array();
     encoder.end_multi_dim();
 
-    byte_string_view bstr(v);
+    byte_string_view bstr(v.data(), v.size());
     std::cout << "bstr: " << bstr << "\n\n";
 
     for (auto ch : bstr)
