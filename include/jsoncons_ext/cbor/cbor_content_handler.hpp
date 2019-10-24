@@ -186,6 +186,29 @@ public:
         return more;
     }
 
+    bool begin_multi_dim(const span<const size_t>& shape,
+                         const ser_context& context=null_ser_context()) 
+    {
+        std::error_code ec;
+        bool more = do_begin_multi_dim(shape, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool end_multi_dim(const ser_context& context=null_ser_context()) 
+    {
+        std::error_code ec;
+        bool more = do_end_multi_dim(context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
     bool typed_array(const span<const uint8_t>& v, 
                      semantic_tag tag,
                      const ser_context& context, std::error_code& ec)
@@ -263,6 +286,19 @@ public:
     {
         return do_typed_array(data, tag, context, ec);
     }
+
+    bool begin_multi_dim(const span<const size_t>& shape,
+                         const ser_context& context, 
+                         std::error_code& ec) 
+    {
+        return do_begin_multi_dim(shape, context, ec);
+    }
+
+    bool end_multi_dim(const ser_context& context,
+                       std::error_code& ec) 
+    {
+        return do_end_multi_dim(context, ec);
+    }
 private:
     virtual bool do_typed_array(const span<const uint8_t>& data, 
                                 semantic_tag tag,
@@ -325,11 +361,11 @@ private:
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
 
-    virtual bool begin_multi_dim(const span<size_t>& shape,
+    virtual bool do_begin_multi_dim(const span<const size_t>& shape,
                                  const ser_context& context, 
                                  std::error_code& ec) = 0;
 
-    virtual bool end_multi_dim(const ser_context& context,
+    virtual bool do_end_multi_dim(const ser_context& context,
                                std::error_code& ec) = 0;
 };
 
@@ -533,15 +569,15 @@ private:
         return parse_more_;
     }
 
-    bool begin_multi_dim(const span<size_t>& shape,
-                         const ser_context& context, 
-                         std::error_code& ec) override
+    bool do_begin_multi_dim(const span<const size_t>&,
+                         const ser_context&, 
+                         std::error_code&) override
     {
         return parse_more_;
     }
 
-    bool end_multi_dim(const ser_context& context,
-                       std::error_code& ec) override
+    bool do_end_multi_dim(const ser_context&,
+                       std::error_code&) override
     {
         return parse_more_;
     }
@@ -860,15 +896,15 @@ private:
         return true;
     }
 
-    bool begin_multi_dim(const span<size_t>& shape,
-                         const ser_context& context, 
-                         std::error_code& ec) override
+    bool do_begin_multi_dim(const span<const size_t>&,
+                         const ser_context&, 
+                         std::error_code&) override
     {
         return true;
     }
 
-    bool end_multi_dim(const ser_context& context,
-                       std::error_code& ec) override
+    bool do_end_multi_dim(const ser_context&,
+                       std::error_code&) override
     {
         return true;
     }

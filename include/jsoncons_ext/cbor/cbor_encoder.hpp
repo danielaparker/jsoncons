@@ -1450,17 +1450,29 @@ private:
         return true;
     }
 
-    bool begin_multi_dim(const span<size_t>& shape,
-                         const ser_context& context, 
-                         std::error_code& ec) override
+    bool do_begin_multi_dim(const span<const size_t>& shape,
+                            const ser_context& context, 
+                            std::error_code& ec) override
     {
-        return true;
+        write_tag(40);
+        bool more = do_begin_array(2, semantic_tag::none, context, ec);
+        more = do_begin_array(shape.size(), semantic_tag::none, context, ec);
+        for (auto it = shape.begin(); more && it != shape.end(); ++it)
+        {
+            more = do_uint64_value(*it, semantic_tag::none, context, ec);
+        }
+        if (more)
+        {
+            more = do_end_array(context, ec);
+        }
+        return more;
     }
 
-    bool end_multi_dim(const ser_context& context,
-                       std::error_code& ec) override
+    bool do_end_multi_dim(const ser_context& context,
+                          std::error_code& ec) override
     {
-        return true;
+        bool more = do_end_array(context, ec);
+        return more;
     }
 
     void write_typed_array_tag(std::true_type, 

@@ -18,6 +18,37 @@
 
 using namespace jsoncons;
 
+TEST_CASE("encode multi_dim array test")
+{
+    std::vector<uint8_t> v;
+
+    cbor::cbor_bytes_encoder encoder(v);
+    std::vector<size_t> shape = { 2,3 };
+    encoder.begin_multi_dim(shape);
+    encoder.begin_array(6);
+    encoder.uint64_value(2);
+    encoder.uint64_value(4);
+    encoder.uint64_value(8);
+    encoder.uint64_value(4);
+    encoder.uint64_value(16);
+    encoder.uint64_value(256);
+    encoder.end_array();
+    encoder.end_multi_dim();
+
+    byte_string_view bstr(v);
+    std::cout << "bstr: " << bstr << "\n\n";
+
+    for (auto ch : bstr)
+    {
+        std::cout << (int)ch << " ";
+    }
+    std::cout << "\n\n";
+
+    auto j = cbor::decode_cbor<json>(v);
+    std::cout << pretty_print(j) << "\n\n";
+
+}
+
 TEST_CASE("test_serialize_to_stream")
 {
 json j = json::parse(R"(

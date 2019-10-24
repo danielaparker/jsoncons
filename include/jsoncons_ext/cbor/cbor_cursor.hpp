@@ -521,15 +521,15 @@ private:
         return true;
     }
 
-    bool begin_multi_dim(const span<size_t>& shape,
-                         const ser_context& context, 
-                         std::error_code& ec) override
+    bool do_begin_multi_dim(const span<const size_t>&,
+                         const ser_context&, 
+                         std::error_code&) override
     {
         return true;
     }
 
-    bool end_multi_dim(const ser_context& context,
-                       std::error_code& ec) override
+    bool do_end_multi_dim(const ser_context&,
+                       std::error_code&) override
     {
         return true;
     }

@@ -18,7 +18,7 @@
     const char* what() const noexcept
 Returns an error message
 
-#### Inherited from std::system_error
+### Inherited from std::system_error
 
     const std::error_code code() const noexcept
 Returns an error code for this exception

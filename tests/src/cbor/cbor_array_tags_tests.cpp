@@ -29,7 +29,7 @@ private:
         return false;
     }
 };
-#if 0
+
 TEST_CASE("cbor typed array cursor tests")
 {
     SECTION("Tag 86, float64, little endian")
@@ -54,7 +54,7 @@ TEST_CASE("cbor typed array cursor tests")
         }
     }
 }
-#endif
+
 TEST_CASE("cbor typed array tests")
 {
     SECTION("Tag 64 (uint8 Typed Array)")
@@ -76,7 +76,7 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[1].as<uint8_t>() == uint8_t(1));
         CHECK(j[2].as<uint8_t>() == (std::numeric_limits<uint8_t>::max)());
     }
-#if 0
+
     SECTION("Tags 65 (uint16, big endian)")
     {
         const std::vector<uint8_t> input = {
@@ -488,6 +488,5 @@ TEST_CASE("cbor typed array tests")
         //REQUIRE(j.is_array());
         //REQUIRE(j.size() == 2);
     }
-#endif
 } 
 
