@@ -39,7 +39,7 @@ You must ensure that the `handler` exists as long as does `basic_json_content_fi
     basic_json_content_handler<char_type>& to_handler()
 Returns a reference to the JSON handler that sends json events to the destination handler. 
 
-### Inherited from [jsoncons::basic_json_content_handler](basic_json_content_handler.md)
+#### Inherited from [jsoncons::basic_json_content_handler](basic_json_content_handler.md)
 
     bool begin_object(semantic_tag tag=semantic_tag::none,
                       const ser_context& context=null_ser_context()); // (1)

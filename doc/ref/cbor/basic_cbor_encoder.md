@@ -37,7 +37,7 @@ Constructs a new encoder that writes to the specified result.
     virtual ~basic_cbor_encoder()
 
 
-### Inherited from [jsoncons::basic_json_content_handler](basic_json_content_handler.md)
+#### Inherited from [jsoncons::basic_json_content_handler](basic_json_content_handler.md)
 
     bool begin_object(semantic_tag tag=semantic_tag::none,
                       const ser_context& context=null_ser_context()); // (1)

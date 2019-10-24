@@ -54,7 +54,7 @@ and uses the specified [json options](basic_json_options.md).
 
     virtual ~basic_json_encoder()
 
-### Inherited from [basic_json_content_handler](../basic_json_content_handler.md)
+#### Inherited from [basic_json_content_handler](../basic_json_content_handler.md)
 
 #### Member functions
 
