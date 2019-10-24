@@ -422,3 +422,4 @@ TEST_CASE("encode stringref")
     ojson j2 = cbor::decode_cbor<ojson>(buf);
     CHECK(j2 == j);
 }
+

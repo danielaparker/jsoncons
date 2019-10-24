@@ -900,18 +900,31 @@ private:
         return true;
     }
 
-    bool do_begin_multi_dim(const span<const size_t>&,
-                            semantic_tag,
-                            const ser_context&, 
-                            std::error_code&) override
+    bool do_begin_multi_dim(const span<const size_t>& shape,
+                            semantic_tag tag,
+                            const ser_context& context, 
+                            std::error_code& ec) override
     {
-        return true;
+        bool more = do_begin_array(2, tag, context, ec);
+        if (more)
+        {
+            more = do_begin_array(shape.size(), tag, context, ec);
+            for (auto it = shape.begin(); more && it != shape.end(); ++it)
+            {
+                do_uint64_value(*it, semantic_tag::none, context, ec);
+            }
+            if (more)
+            {
+                more = do_end_array(context, ec);
+            }
+        }
+        return more;
     }
 
-    bool do_end_multi_dim(const ser_context&,
-                       std::error_code&) override
+    bool do_end_multi_dim(const ser_context& context,
+                          std::error_code& ec) override
     {
-        return true;
+        return do_end_array(context, ec);
     }
 };
 

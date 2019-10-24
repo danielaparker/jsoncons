@@ -1051,6 +1051,7 @@ public:
                     {
                         produce_end_multi_dim(handler, ec);
                     }
+                    break;
                 }
                 case parse_mode::array:
                 {
@@ -1110,7 +1111,7 @@ public:
                     }
                     else
                     {
-                        end_map(handler, ec);
+                        produce_end_map(handler, ec);
                     }
                     break;
                 }
@@ -1135,7 +1136,7 @@ public:
                             return;
                         case 0xff:
                             source_.ignore(1);
-                            end_map(handler, ec);
+                            produce_end_map(handler, ec);
                             if (ec)
                             {
                                 return;
@@ -1416,7 +1417,7 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::map:
             {
-                begin_map(handler, info, ec);
+                produce_begin_map(handler, info, ec);
                 break;
             }
             default:
@@ -1473,7 +1474,7 @@ private:
         state_stack_.pop_back();
     }
 
-    void begin_map(basic_cbor_content_handler<Float128T>& handler, uint8_t info, std::error_code& ec)
+    void produce_begin_map(basic_cbor_content_handler<Float128T>& handler, uint8_t info, std::error_code& ec)
     {
         auto stringref_map = state_stack_.back().stringref_map;
         for (auto t : tags_)
@@ -1511,7 +1512,7 @@ private:
         }
     }
 
-    void end_map(basic_cbor_content_handler<Float128T>& handler, std::error_code&)
+    void produce_end_map(basic_cbor_content_handler<Float128T>& handler, std::error_code&)
     {
         more_ = handler.end_object(*this);
         state_stack_.pop_back();
