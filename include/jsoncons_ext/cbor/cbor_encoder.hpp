@@ -1451,10 +1451,19 @@ private:
     }
 
     bool do_begin_multi_dim(const span<const size_t>& shape,
+                            semantic_tag tag,
                             const ser_context& context, 
                             std::error_code& ec) override
     {
-        write_tag(40);
+        switch (tag)
+        {
+            case semantic_tag::column_major:
+                write_tag(1040);
+                break;
+            default:
+                write_tag(40);
+                break;
+        }
         bool more = do_begin_array(2, semantic_tag::none, context, ec);
         more = do_begin_array(shape.size(), semantic_tag::none, context, ec);
         for (auto it = shape.begin(); more && it != shape.end(); ++it)

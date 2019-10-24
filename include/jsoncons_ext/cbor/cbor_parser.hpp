@@ -22,7 +22,7 @@
 
 namespace jsoncons { namespace cbor {
 
-enum class parse_mode {root,before_done,array,indefinite_array,map_key,map_value,indefinite_map_key,indefinite_map_value};
+enum class parse_mode {root,before_done,array,indefinite_array,map_key,map_value,indefinite_map_key,indefinite_map_value,multi_dim};
 
 struct uint8_array_arg_t {};
 constexpr uint8_array_arg_t uint8_array_arg = uint8_array_arg_t();
@@ -56,6 +56,7 @@ enum typed_array_type {uint8_value=1,uint16_value,uint32_value,uint64_value,
 template <class Float128T = std::nullptr_t, class Allocator=std::allocator<char>>
 class typed_array
 {
+    typedef Float128T float128_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint8_t> uint8_allocator_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint16_t> uint16_allocator_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint32_t> uint32_allocator_type;
@@ -66,7 +67,7 @@ class typed_array
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<int64_t> int64_allocator_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<float> float_allocator_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<double> double_allocator_type;
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<Float128T> float128_allocator_type;
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<float128_type> float128_allocator_type;
 
     Allocator allocator_;
     typed_array_type type_;
@@ -82,7 +83,7 @@ class typed_array
         int64_t* int64_data_;
         float* float_data_;
         double* double_data_;
-        Float128T* float128_data_;
+        float128_type* float128_data_;
     } data_;
     size_t size_;
 public:
@@ -336,7 +337,7 @@ public:
         size_ = 0;
     }
 
-    template <class Float128T_ = Float128T>
+    template <class Float128T_ = float128_type>
     typename std::enable_if<!std::is_same<Float128T_,std::nullptr_t>::value, void>::type
     allocate_float128()
     {
@@ -344,13 +345,13 @@ public:
         data_.float128_data_ = alloc.allocate(size_);
     }
 
-    template <class Float128T_ = Float128T>
+    template <class Float128T_ = float128_type>
     typename std::enable_if<std::is_same<Float128T_,std::nullptr_t>::value, void>::type
         allocate_float128()
     {
     }
 
-    template <class Float128T_ = Float128T>
+    template <class Float128T_ = float128_type>
     typename std::enable_if<!std::is_same<Float128T_,std::nullptr_t>::value, void>::type
         deallocate_float128()
     {
@@ -358,7 +359,7 @@ public:
         alloc.deallocate(data_.float128_data_, 1);
     }
 
-    template <class Float128T_ = Float128T>
+    template <class Float128T_ = float128_type>
     typename std::enable_if<std::is_same<Float128T_,std::nullptr_t>::value, void>::type
         deallocate_float128()
     {
@@ -512,16 +513,16 @@ public:
         return span<const double>(data_.double_data_, size_);
     }
 
-    span<Float128T> data(float128_array_arg_t)
+    span<float128_type> data(float128_array_arg_t)
     {
         JSONCONS_ASSERT(type_ == typed_array_type::float128_value);
-        return span<Float128T>(data_.float128_data_, size_);
+        return span<float128_type>(data_.float128_data_, size_);
     }
 
-    span<const Float128T> data(float128_array_arg_t) const
+    span<const float128_type> data(float128_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::float128_value);
-        return span<const Float128T>(data_.float128_data_, size_);
+        return span<const float128_type>(data_.float128_data_, size_);
     }
 
     friend void swap(typed_array& a, typed_array& b) noexcept
@@ -554,6 +555,8 @@ class typed_array_view
     } data_;
     size_t size_;
 public:
+    typedef Float128T float128_type;
+
     typed_array_view()
         : type_(), data_(), size_(0)
     {
@@ -569,7 +572,7 @@ public:
         swap(*this,other);
     }
 
-    typed_array_view(const typed_array<Float128T>& other)
+    typed_array_view(const typed_array<float128_type>& other)
         : type_(other.type_), data_(), size_(other.size())
     {
         switch (other.type_)
@@ -700,7 +703,7 @@ public:
         data_.double_data_ = data;
     }
 
-    typed_array_view(const Float128T* data,size_t size)
+    typed_array_view(const float128_type* data,size_t size)
         : type_(typed_array_type::float128_value), size_(size)
     {
         data_.float128_data_ = data;
@@ -786,10 +789,10 @@ public:
         return span<const double>(data_.double_data_, size_);
     }
 
-    span<const Float128T> data(float128_array_arg_t) const
+    span<const float128_type> data(float128_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::float128_value);
-        return span<const Float128T>(data_.float128_data_, size_);
+        return span<const float128_type>(data_.float128_data_, size_);
     }
 
     friend void swap(typed_array_view& a, typed_array_view& b) noexcept
@@ -1033,6 +1036,22 @@ public:
         {
             switch (state_stack_.back().mode)
             {
+                case parse_mode::multi_dim:
+                {
+                    if (state_stack_.back().index == 0)
+                    {
+                        ++state_stack_.back().index;
+                        read_item(handler, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        produce_end_multi_dim(handler, ec);
+                    }
+                }
                 case parse_mode::array:
                 {
                     if (state_stack_.back().index < state_stack_.back().length)
@@ -1046,7 +1065,7 @@ public:
                     }
                     else
                     {
-                        end_array(handler, ec);
+                        produce_end_array(handler, ec);
                     }
                     break;
                 }
@@ -1061,7 +1080,7 @@ public:
                             return;
                         case 0xff:
                             source_.ignore(1);
-                            end_array(handler, ec);
+                            produce_end_array(handler, ec);
                             if (ec)
                             {
                                 return;
@@ -1357,29 +1376,41 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::array:
             {
-                if (!tags_.empty() && tags_.back() == 0x04)
+                if (!tags_.empty())
                 {
-                    text_buffer_ = get_array_as_decimal_string(ec);
-                    if (ec)
+                    switch (tags_.back())
                     {
-                        return;
+                        case 0x04:
+                            text_buffer_ = get_array_as_decimal_string(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            more_ = handler.string_value(text_buffer_, semantic_tag::bigdec);
+                            tags_.pop_back();
+                            break;
+                        case 0x05:
+                            text_buffer_ = get_array_as_hexfloat_string(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            more_ = handler.string_value(text_buffer_, semantic_tag::bigfloat);
+                            tags_.pop_back();
+                            break;
+                        case 40: // row major storage
+                            produce_begin_multi_dim(handler, ec);
+                            break;
+                        case 1040: // column major storage
+                            break;
+                        default:
+                            produce_begin_array(handler, info, ec);
+                            break;
                     }
-                    more_ = handler.string_value(text_buffer_, semantic_tag::bigdec);
-                    tags_.pop_back();
-                }
-                else if (!tags_.empty() && tags_.back() == 0x05)
-                {
-                    text_buffer_ = get_array_as_hexfloat_string(ec);
-                    if (ec)
-                    {
-                        return;
-                    }
-                    more_ = handler.string_value(text_buffer_, semantic_tag::bigfloat);
-                    tags_.pop_back();
                 }
                 else
                 {
-                    begin_array(handler, info, ec);
+                    produce_begin_array(handler, info, ec);
                 }
                 break;
             }
@@ -1394,7 +1425,7 @@ private:
         tags_.clear();
     }
 
-    void begin_array(basic_cbor_content_handler<Float128T>& handler, uint8_t info, std::error_code& ec)
+    void produce_begin_array(basic_cbor_content_handler<Float128T>& handler, uint8_t info, std::error_code& ec)
     {
         semantic_tag tag = semantic_tag::none;
         auto stringref_map = state_stack_.back().stringref_map;
@@ -1436,7 +1467,7 @@ private:
         }
     }
 
-    void end_array(basic_cbor_content_handler<Float128T>& handler, std::error_code&)
+    void produce_end_array(basic_cbor_content_handler<Float128T>& handler, std::error_code&)
     {
         more_ = handler.end_array(*this);
         state_stack_.pop_back();
@@ -2760,6 +2791,51 @@ private:
         }
     }
 
+    void produce_begin_multi_dim(basic_cbor_content_handler<Float128T>& handler, std::error_code& ec)
+    {
+        std::vector<size_t> shape;
+
+        int c;
+        if ((c=source_.get()) == Src::traits_type::eof())
+        {
+            ec = cbor_errc::unexpected_eof;
+            more_ = false;
+            return;
+        }
+        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type((uint8_t)c);
+        JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::array);
+       
+        uint64_t size = get_uint64_value(ec);
+        if (ec)
+        {
+            return;
+        }
+
+        if ((c=source_.peek()) == Src::traits_type::eof())
+        {
+            ec = cbor_errc::unexpected_eof;
+            more_ = false;
+            return;
+        }
+
+        for (size_t i = 0; more_ && i < size; ++i)
+        {
+            uint64_t dim = get_uint64_value(ec);
+            if (ec)
+            {
+                return;
+            }
+            shape.push_back(dim);
+        }
+        state_stack_.emplace_back(parse_mode::multi_dim, 0);
+        more_ = handler.begin_multi_dim(shape, semantic_tag::none, *this, ec);
+    }
+
+    void produce_end_multi_dim(basic_cbor_content_handler<Float128T>& handler, std::error_code&)
+    {
+        more_ = handler.end_multi_dim(*this);
+        state_stack_.pop_back();
+    }
 };
 
 }}

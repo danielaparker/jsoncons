@@ -522,8 +522,9 @@ private:
     }
 
     bool do_begin_multi_dim(const span<const size_t>&,
-                         const ser_context&, 
-                         std::error_code&) override
+                            semantic_tag,
+                            const ser_context&, 
+                            std::error_code&) override
     {
         return true;
     }
