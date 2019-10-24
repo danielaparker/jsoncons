@@ -44,7 +44,7 @@ class basic_csv_reader
     basic_csv_reader(const basic_csv_reader&) = delete; 
     basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
 
-    basic_default_json_content_handler<CharT> default_content_handler_;
+    basic_null_json_content_handler<CharT> default_content_handler_;
 
     basic_json_content_handler<CharT>& handler_;
 

@@ -692,13 +692,13 @@ private:
 };
 
 template <class CharT>
-class basic_default_json_content_handler : public basic_json_content_handler<CharT>
+class basic_null_json_content_handler final : public basic_json_content_handler<CharT>
 {
     bool parse_more_;
 public:
     using typename basic_json_content_handler<CharT>::string_view_type;
 
-    basic_default_json_content_handler(bool parse_more = true)
+    basic_null_json_content_handler(bool parse_more = true)
         : parse_more_(parse_more)
     {
     }
@@ -783,8 +783,8 @@ private:
 typedef basic_json_content_handler<char> json_content_handler;
 typedef basic_json_content_handler<wchar_t> wjson_content_handler;
 
-typedef basic_default_json_content_handler<char> default_json_content_handler;
-typedef basic_default_json_content_handler<wchar_t> wdefault_json_content_handler;
+typedef basic_null_json_content_handler<char> null_json_content_handler;
+typedef basic_null_json_content_handler<wchar_t> wnull_json_content_handler;
 
 }
 
