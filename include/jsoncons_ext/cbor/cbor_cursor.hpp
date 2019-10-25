@@ -197,7 +197,7 @@ public:
             {
                 state_ = cbor_cursor_state();
                 this->end_array(null_ser_context(), ec);
-                shape_ = span<const uint64_t>();
+                shape_ = span<const size_t>();
                 index_ = 0;
             }
         }
