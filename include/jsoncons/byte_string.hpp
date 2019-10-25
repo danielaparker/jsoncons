@@ -518,11 +518,6 @@ public:
         return *this;
     }
 
-    /* operator byte_string_view() const noexcept
-    {
-        return byte_string_view(data(),size());
-    }*/
-
     void reserve(size_t new_cap)
     {
         data_.reserve(new_cap);
