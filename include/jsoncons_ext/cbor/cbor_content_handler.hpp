@@ -187,7 +187,7 @@ public:
     }
 
     bool begin_multi_dim(const span<const size_t>& shape,
-                         semantic_tag tag = semantic_tag::row_major,
+                         semantic_tag tag = semantic_tag::multi_dim_row_major,
                          const ser_context& context=null_ser_context()) 
     {
         std::error_code ec;

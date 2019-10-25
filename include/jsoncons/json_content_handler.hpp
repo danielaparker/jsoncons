@@ -42,8 +42,8 @@ enum class semantic_tag : uint8_t
     base64url = 0x09,
     uri = 0x0a,
     clamped = 0x0b,
-    row_major = 0x0c,
-    column_major = 0x0d
+    multi_dim_row_major = 0x0c,
+    multi_dim_column_major = 0x0d
 #if !defined(JSONCONS_NO_DEPRECATED)
     , big_integer = bigint
     , big_decimal = bigdec
@@ -67,8 +67,8 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
     JSONCONS_ARRAY_OF_CHAR(CharT,base64url_name,'b','a','s','e','6','4','u','r','l')
     JSONCONS_ARRAY_OF_CHAR(CharT,uri_name,'u','r','i')
     JSONCONS_ARRAY_OF_CHAR(CharT,clamped_name,'c','l','a','m','p','e','d')
-    JSONCONS_ARRAY_OF_CHAR(CharT,row_major_name,'m','u','l','t','i','-','d','i','m','-','r','o','w','-','m','a','j','o','r')
-    JSONCONS_ARRAY_OF_CHAR(CharT,column_major_name,'m','u','l','t','i','-','d','i','m','-','c','o','l','u','m','n','-','m','a','j','o','r')
+    JSONCONS_ARRAY_OF_CHAR(CharT,multi_dim_row_major_name,'m','u','l','t','i','-','d','i','m','-','r','o','w','-','m','a','j','o','r')
+    JSONCONS_ARRAY_OF_CHAR(CharT,multi_dim_column_major_name,'m','u','l','t','i','-','d','i','m','-','c','o','l','u','m','n','-','m','a','j','o','r')
 
     switch (tag)
     {
@@ -132,14 +132,14 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
             os << clamped_name;
             break;
         }
-        case semantic_tag::row_major:
+        case semantic_tag::multi_dim_row_major:
         {
-            os << row_major_name;
+            os << multi_dim_row_major_name;
             break;
         }
-        case semantic_tag::column_major:
+        case semantic_tag::multi_dim_column_major:
         {
-            os << column_major_name;
+            os << multi_dim_column_major_name;
             break;
         }
     }

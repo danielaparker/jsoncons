@@ -18,7 +18,7 @@
 
 using namespace jsoncons;
 
-TEST_CASE("encode multi_dim array test")
+TEST_CASE("cbor encode multi dim array test")
 {
     std::vector<uint8_t> v;
 

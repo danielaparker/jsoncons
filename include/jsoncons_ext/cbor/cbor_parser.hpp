@@ -883,6 +883,7 @@ class basic_cbor_parser : public ser_context
     std::vector<uint64_t,tag_allocator_type> tags_; 
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     typed_array<Float128T,WorkAllocator> typed_array_;
+    std::vector<size_t> shape_;
     size_t index_;
 
 public:
@@ -1400,9 +1401,10 @@ private:
                             tags_.pop_back();
                             break;
                         case 40: // row major storage
-                            produce_begin_multi_dim(handler, ec);
+                            produce_begin_multi_dim(handler, semantic_tag::multi_dim_row_major, ec);
                             break;
                         case 1040: // column major storage
+                            produce_begin_multi_dim(handler, semantic_tag::multi_dim_column_major, ec);
                             break;
                         default:
                             produce_begin_array(handler, info, ec);
@@ -2792,9 +2794,11 @@ private:
         }
     }
 
-    void produce_begin_multi_dim(basic_cbor_content_handler<Float128T>& handler, std::error_code& ec)
+    void produce_begin_multi_dim(basic_cbor_content_handler<Float128T>& handler, 
+                                 semantic_tag tag,
+                                 std::error_code& ec)
     {
-        std::vector<size_t> shape;
+        shape_.clear();
 
         int c;
         if ((c=source_.get()) == Src::traits_type::eof())
@@ -2826,10 +2830,10 @@ private:
             {
                 return;
             }
-            shape.push_back(dim);
+            shape_.push_back(dim);
         }
         state_stack_.emplace_back(parse_mode::multi_dim, 0);
-        more_ = handler.begin_multi_dim(shape, semantic_tag::none, *this, ec);
+        more_ = handler.begin_multi_dim(shape_, tag, *this, ec);
     }
 
     void produce_end_multi_dim(basic_cbor_content_handler<Float128T>& handler, std::error_code&)

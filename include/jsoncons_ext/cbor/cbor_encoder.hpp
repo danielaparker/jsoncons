@@ -1457,7 +1457,7 @@ private:
     {
         switch (tag)
         {
-            case semantic_tag::column_major:
+            case semantic_tag::multi_dim_column_major:
                 write_tag(1040);
                 break;
             default:

@@ -30,6 +30,7 @@
 # define jsoncons_span_CONFIG_SELECT_SPAN  ( jsoncons_span_HAVE_STD_SPAN ? jsoncons_span_SPAN_STD : jsoncons_span_SPAN_NONSTD )
 #endif
 
+#define jsoncons_span_CONFIG_INDEX_TYPE size_t
 #ifndef  jsoncons_span_CONFIG_INDEX_TYPE
 # define jsoncons_span_CONFIG_INDEX_TYPE  std::ptrdiff_t
 #endif

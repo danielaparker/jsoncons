@@ -338,24 +338,24 @@ public:
     typedef std::size_t size_type;
     typedef uint8_t value_type;
 
-    byte_string_view()
+    constexpr byte_string_view() noexcept
         : data_(nullptr), length_(0)
     {
     }
 
-    byte_string_view(const uint8_t* data, size_t length)
+    constexpr byte_string_view(const uint8_t* data, size_t length) noexcept
         : data_(data), length_(length)
     {
     }
 
     template <class Container>
-    byte_string_view(const Container& cont, 
-                     typename std::enable_if<std::is_same<typename Container::value_type,uint8_t>::value>::type* = 0) 
+    constexpr byte_string_view(const Container& cont, 
+                               typename std::enable_if<std::is_same<typename Container::value_type,uint8_t>::value>::type* = 0) 
         : data_(cont.data()), length_(cont.size())
     {
     }
 
-    byte_string_view(const byte_string_view&) = default;
+    constexpr byte_string_view(const byte_string_view&) noexcept = default;
 
     byte_string_view(byte_string_view&& other) noexcept
         : data_(nullptr), length_(0)
@@ -373,7 +373,7 @@ public:
         return *this;
     }
 
-    const uint8_t* data() const
+    constexpr const uint8_t* data() const noexcept
     {
         return data_;
     }
@@ -384,7 +384,7 @@ public:
         return length_;
     }
 #endif
-    size_t size() const
+    constexpr size_t size() const noexcept
     {
         return length_;
     }
@@ -422,8 +422,6 @@ public:
     {
         std::basic_ostringstream<CharT> ss;
         ss.flags(std::ios::hex);
-        ss.precision(2);
-        ss.width(2);
         ss.fill('0');
 
         bool first = true;
@@ -437,7 +435,7 @@ public:
             {
                 ss << ' ';
             }
-            ss << (int)b;
+            ss << std::setw(2) << static_cast<int>(b);
         }
         os << ss.str();
         return os;

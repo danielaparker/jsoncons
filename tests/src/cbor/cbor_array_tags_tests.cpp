@@ -30,6 +30,23 @@ private:
     }
 };
 
+TEST_CASE("cbor multi dim row major cursor tests")
+{
+    SECTION("Tag 86, float64, little endian")
+    {
+        const std::vector<uint8_t> input = {
+            0xd8,0x28,0x82,0x82,0x02,0x03,0x86,0x02,0x04,0x08,0x04,0x10,0x19,0x01,0x00
+        };
+
+        cbor::cbor_bytes_cursor cursor(input);
+        for (; !cursor.done(); cursor.next())
+        {
+            const auto& event = cursor.current();
+            std::cout << event.event_type() << " " << event.tag() << "\n";
+        }
+    }
+}
+#if 0
 TEST_CASE("cbor typed array cursor tests")
 {
     SECTION("Tag 86, float64, little endian")
@@ -489,4 +506,4 @@ TEST_CASE("cbor typed array tests")
         //REQUIRE(j.size() == 2);
     }
 } 
-
+#endif
