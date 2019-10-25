@@ -15,6 +15,7 @@
 #include <memory> // std::allocator
 #include <iterator>
 #include <exception>
+#include <iomanip> // std::setw
 #include <initializer_list>
 #include <utility> // std::move
 #include <jsoncons/config/jsoncons_config.hpp>
