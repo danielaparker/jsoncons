@@ -348,6 +348,13 @@ public:
     {
     }
 
+    template <class Container>
+    byte_string_view(const Container& cont, 
+                     typename std::enable_if<std::is_same<typename Container::value_type,uint8_t>::value>::type* = 0) 
+        : data_(cont.data()), length_(cont.size())
+    {
+    }
+
     byte_string_view(const byte_string_view&) = default;
 
     byte_string_view(byte_string_view&& other) noexcept
@@ -446,10 +453,15 @@ class basic_byte_string
 public:
     typedef byte_traits traits_type;
 
+    typedef typename std::vector<uint8_t,byte_allocator_type>::value_type value_type;
+    typedef typename std::vector<uint8_t,byte_allocator_type>::size_type size_type;
+    typedef typename std::vector<uint8_t,byte_allocator_type>::difference_type difference_type;
+    typedef typename std::vector<uint8_t,byte_allocator_type>::reference reference;
+    typedef typename std::vector<uint8_t,byte_allocator_type>::const_reference const_reference;
+    typedef typename std::vector<uint8_t,byte_allocator_type>::pointer pointer;
+    typedef typename std::vector<uint8_t,byte_allocator_type>::const_pointer const_pointer;
+    typedef typename std::vector<uint8_t,byte_allocator_type>::iterator iterator;
     typedef typename std::vector<uint8_t,byte_allocator_type>::const_iterator const_iterator;
-    typedef typename std::vector<uint8_t,byte_allocator_type>::const_iterator iterator;
-    typedef std::size_t size_type;
-    typedef uint8_t value_type;
 
     basic_byte_string() = default;
 
@@ -506,10 +518,10 @@ public:
         return *this;
     }
 
-    operator byte_string_view() const noexcept
+    /* operator byte_string_view() const noexcept
     {
         return byte_string_view(data(),size());
-    }
+    }*/
 
     void reserve(size_t new_cap)
     {
@@ -543,6 +555,15 @@ public:
     }
 
     // iterator support 
+    iterator begin() noexcept
+    {
+        return data_.begin();
+    }
+    iterator end() noexcept
+    {
+        return data_.end();
+    }
+
     const_iterator begin() const noexcept
     {
         return data_.begin();
