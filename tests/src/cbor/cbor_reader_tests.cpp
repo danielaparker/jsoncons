@@ -116,16 +116,16 @@ TEST_CASE("test_cbor_parsing")
 
     // byte string
     std::vector<uint8_t> v;
-    check_parse_cbor({0x40},json(byte_string_view(v.data(),v.size())));
+    check_parse_cbor({0x40},json(byte_string_arg, byte_string_view(v.data(),v.size())));
     v = {' '};
-    check_parse_cbor({0x41,' '},json(byte_string_view(v.data(),v.size())));
+    check_parse_cbor({0x41,' '},json(byte_string_arg, byte_string_view(v.data(),v.size())));
     v = {0};
-    check_parse_cbor({0x41,0},json(byte_string_view(v.data(),v.size())));
+    check_parse_cbor({0x41,0},json(byte_string_arg, byte_string_view(v.data(),v.size())));
     v = {'H','e','l','l','o'};
-    check_parse_cbor({0x45,'H','e','l','l','o'},json(byte_string_view(v.data(),v.size())));
+    check_parse_cbor({0x45,'H','e','l','l','o'},json(byte_string_arg, byte_string_view(v.data(),v.size())));
     v = {'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'};
     check_parse_cbor({0x58,0x18,'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'},
-                 json(byte_string_view(v.data(),v.size())));
+                 json(byte_string_arg, byte_string_view(v.data(),v.size())));
 
     // string
     check_parse_cbor({0x60},json(""));
@@ -420,7 +420,7 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
 
     json expected = json::array();
     expected.emplace_back("foo");
-    expected.emplace_back(byte_string{ 'b','a','r' });
+    expected.emplace_back(byte_string_arg, std::vector<uint8_t>{ 'b','a','r' });
     expected.emplace_back("-18446744073709551617", semantic_tag::bigint);
     expected.emplace_back("-273.15", semantic_tag::bigdec);
     expected.emplace_back("273.15", semantic_tag::bigdec);

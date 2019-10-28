@@ -120,7 +120,7 @@ TEST_CASE("Compare msgpack packed item and jsoncons item")
     json expected = json::array();
 
     expected.emplace_back("foo");
-    expected.emplace_back(byte_string{ 'b','a','r' });
+    expected.emplace_back(byte_string_arg, std::vector<uint8_t>{ 'b','a','r' });
 
     json j = msgpack::decode_msgpack<json>(bytes);
 

@@ -73,7 +73,7 @@ TEST_CASE("json insert(first,last) test")
     }
 
     // Fails with xenial-armhf
-/*
+
     SECTION("move map into json")
     {
         std::map<std::string,double> m1 = {{"a",1},{"b",2},{"c",3}};
@@ -94,7 +94,6 @@ TEST_CASE("json insert(first,last) test")
         CHECK(it++->key() == "e");
         CHECK(it++->key() == "f");
     }
-*/
 }
 
 TEST_CASE("json as<T>")

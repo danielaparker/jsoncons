@@ -113,7 +113,7 @@ using namespace jsoncons;
 int main()
 {
     // construct byte string value
-    json j(byte_string({'H','e','l','l','o'}));
+    json j(byte_string_arg, std::vector<uint8_t>{'H','e','l','l','o'});
 
     std::vector<uint8_t> buf;
     cbor::encode_cbor(j, buf);

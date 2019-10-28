@@ -12,7 +12,7 @@ void data_model_example1()
     json j = json::array();
 
     j.emplace_back("foo");
-    j.emplace_back(byte_string{ 'b','a','r' });
+    j.emplace_back(byte_string_arg, std::vector<uint8_t>{ 'b','a','r' });
     j.emplace_back("-18446744073709551617", semantic_tag::bigint);
     j.emplace_back("273.15", semantic_tag::bigdec);
     j.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag::datetime);

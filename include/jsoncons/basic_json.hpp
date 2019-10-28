@@ -737,12 +737,12 @@ public:
             }
         }
 
-        variant(const byte_string_view& bs, semantic_tag tag) : data_{}
+        variant(byte_string_arg_t, const span<const uint8_t>& bs, semantic_tag tag) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.size(), byte_allocator_type());
         }
 
-        variant(const byte_string_view& bs, semantic_tag tag, const Allocator& allocator) : data_{}
+        variant(byte_string_arg_t, const span<const uint8_t>& bs, semantic_tag tag, const Allocator& allocator) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.size(), allocator);
         }
@@ -1515,6 +1515,7 @@ public:
             case value_kind::bool_value:
             case value_kind::int64_value:
             case value_kind::uint64_value:
+            case value_kind::half_value:
             case value_kind::double_value:
             case value_kind::short_string_value:
                 Init_(val);
@@ -1540,42 +1541,43 @@ public:
         {
             switch (val.kind())
             {
-            case value_kind::null_value:
-            case value_kind::empty_object_value:
-            case value_kind::double_value:
-            case value_kind::int64_value:
-            case value_kind::uint64_value:
-            case value_kind::bool_value:
-            case value_kind::short_string_value:
-                Init_(val);
-                break;
-            case value_kind::long_string_value:
+                case value_kind::null_value:
+                case value_kind::empty_object_value:
+                case value_kind::half_value:
+                case value_kind::double_value:
+                case value_kind::int64_value:
+                case value_kind::uint64_value:
+                case value_kind::bool_value:
+                case value_kind::short_string_value:
+                    Init_(val);
+                    break;
+                case value_kind::long_string_value:
                 {
                     new(reinterpret_cast<void*>(&data_))long_string_data(std::move(*val.string_data_cast()));
                     new(reinterpret_cast<void*>(&val.data_))null_data();
+                    break;
                 }
-                break;
-            case value_kind::byte_string_value:
+                case value_kind::byte_string_value:
                 {
                     new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*val.byte_string_data_cast()));
                     new(reinterpret_cast<void*>(&val.data_))null_data();
+                    break;
                 }
-                break;
-            case value_kind::array_value:
+                case value_kind::array_value:
                 {
                     new(reinterpret_cast<void*>(&data_))array_data(std::move(*val.array_data_cast()));
                     new(reinterpret_cast<void*>(&val.data_))null_data();
+                    break;
                 }
-                break;
-            case value_kind::object_value:
+                case value_kind::object_value:
                 {
                     new(reinterpret_cast<void*>(&data_))object_data(std::move(*val.object_data_cast()));
                     new(reinterpret_cast<void*>(&val.data_))null_data();
+                    break;
                 }
-                break;
-            default:
-                JSONCONS_UNREACHABLE();
-                break;
+                default:
+                    JSONCONS_UNREACHABLE();
+                    break;
             }
         }
 
@@ -1588,16 +1590,17 @@ public:
         {
             switch (val.kind())
             {
-            case value_kind::null_value:
-            case value_kind::empty_object_value:
-            case value_kind::double_value:
-            case value_kind::int64_value:
-            case value_kind::uint64_value:
-            case value_kind::bool_value:
-            case value_kind::short_string_value:
-                Init_(std::forward<variant>(val));
-                break;
-            case value_kind::long_string_value:
+                case value_kind::null_value:
+                case value_kind::empty_object_value:
+                case value_kind::half_value:
+                case value_kind::double_value:
+                case value_kind::int64_value:
+                case value_kind::uint64_value:
+                case value_kind::bool_value:
+                case value_kind::short_string_value:
+                    Init_(std::forward<variant>(val));
+                    break;
+                case value_kind::long_string_value:
                 {
                     if (a == val.string_data_cast()->get_allocator())
                     {
@@ -1607,9 +1610,9 @@ public:
                     {
                         Init_(val,a);
                     }
+                    break;
                 }
-                break;
-            case value_kind::byte_string_value:
+                case value_kind::byte_string_value:
                 {
                     if (a == val.byte_string_data_cast()->get_allocator())
                     {
@@ -1619,9 +1622,9 @@ public:
                     {
                         Init_(val,a);
                     }
+                    break;
                 }
-                break;
-            case value_kind::object_value:
+                case value_kind::object_value:
                 {
                     if (a == val.object_data_cast()->get_allocator())
                     {
@@ -1631,9 +1634,9 @@ public:
                     {
                         Init_(val,a);
                     }
+                    break;
                 }
-                break;
-            case value_kind::array_value:
+                case value_kind::array_value:
                 {
                     if (a == val.array_data_cast()->get_allocator())
                     {
@@ -1643,8 +1646,8 @@ public:
                     {
                         Init_(val,a);
                     }
+                    break;
                 }
-                break;
             default:
                 break;
             }
@@ -2980,10 +2983,20 @@ public:
     {
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED_MSG("Instead, use basic_json(byte_string_arg_t, const span<const uint8_t>&, semantic_tag = semantic_tag::none, const Allocator& = Allocator())")
     explicit basic_json(const byte_string_view& bs, 
                semantic_tag tag = semantic_tag::none, 
                const Allocator& allocator = Allocator())
-        : var_(bs, tag, allocator)
+        : var_(byte_string_arg, bs, tag, allocator)
+    {
+    }
+#endif
+
+    basic_json(byte_string_arg_t, const span<const uint8_t>& bs, 
+               semantic_tag tag = semantic_tag::none, 
+               const Allocator& allocator = Allocator())
+        : var_(byte_string_arg, bs, tag, allocator)
     {
     }
 
@@ -3388,6 +3401,7 @@ public:
         {
             case value_kind::int64_value:
             case value_kind::uint64_value:
+            case value_kind::half_value:
             case value_kind::double_value:
                 return true;
             case value_kind::short_string_value:
@@ -3395,10 +3409,6 @@ public:
                 return var_.tag() == semantic_tag::bigint ||
                        var_.tag() == semantic_tag::bigdec ||
                        var_.tag() == semantic_tag::bigfloat;
-#if !defined(JSONCONS_NO_DEPRECATED)
-            case value_kind::array_value:
-                return var_.tag() == semantic_tag::bigfloat;
-#endif
             default:
                 return false;
         }
@@ -4470,13 +4480,13 @@ public:
         {
             {
                 case byte_string_chars_format::base16:
-                    var_ = variant(bs, semantic_tag::base16);
+                    var_ = variant(byte_string_arg, bs, semantic_tag::base16);
                     break;
                 case byte_string_chars_format::base64:
-                    var_ = variant(bs, semantic_tag::base64);
+                    var_ = variant(byte_string_arg, bs, semantic_tag::base64);
                     break;
                 case byte_string_chars_format::base64url:
-                    var_ = variant(bs, semantic_tag::base64url);
+                    var_ = variant(byte_string_arg, bs, semantic_tag::base64url);
                     break;
                 default:
                     break;
@@ -4585,6 +4595,7 @@ public:
         dump(os,options,pprint ? indenting::indent : indenting::no_indent);
     }
 
+    JSONCONS_DEPRECATED_MSG("No replacement")
     size_t precision() const
     {
         switch (var_.kind())
@@ -4596,6 +4607,7 @@ public:
         }
     }
 
+    JSONCONS_DEPRECATED_MSG("No replacement")
     size_t decimal_places() const
     {
         switch (var_.kind())
@@ -4643,6 +4655,7 @@ public:
         return as_integer<uint64_t>();
     }
 
+    JSONCONS_DEPRECATED_MSG("No replacement")
     size_t double_precision() const
     {
         switch (var_.kind())
@@ -4681,6 +4694,7 @@ public:
     }
 
     template <class T>
+    JSONCONS_DEPRECATED_MSG("Instead, use insert_or_assign(const string_view_type&, T&&)")
     std::pair<object_iterator,bool> set(const string_view_type& name, T&& val)
     {
         return insert_or_assign(name, std::forward<T>(val));
@@ -5168,28 +5182,28 @@ private:
                 handler.end_object(null_ser_context(), ec);
                 break;
             case value_kind::object_value:
+            {
+                handler.begin_object(size(), var_.tag(), null_ser_context(), ec);
+                const object& o = object_value();
+                for (const_object_iterator it = o.begin(); it != o.end(); ++it)
                 {
-                    handler.begin_object(size(), var_.tag(), null_ser_context(), ec);
-                    const object& o = object_value();
-                    for (const_object_iterator it = o.begin(); it != o.end(); ++it)
-                    {
-                        handler.name(string_view_type((it->key()).data(),it->key().length()));
-                        it->value().dump_no_flush(handler, ec);
-                    }
-                    handler.end_object(null_ser_context(), ec);
+                    handler.name(string_view_type((it->key()).data(),it->key().length()));
+                    it->value().dump_no_flush(handler, ec);
                 }
+                handler.end_object(null_ser_context(), ec);
                 break;
+            }
             case value_kind::array_value:
+            {
+                handler.begin_array(size(), var_.tag(), null_ser_context(), ec);
+                const array& o = array_value();
+                for (const_array_iterator it = o.begin(); it != o.end(); ++it)
                 {
-                    handler.begin_array(size(), var_.tag(), null_ser_context(), ec);
-                    const array& o = array_value();
-                    for (const_array_iterator it = o.begin(); it != o.end(); ++it)
-                    {
-                        it->dump_no_flush(handler, ec);
-                    }
-                    handler.end_array();
+                    it->dump_no_flush(handler, ec);
                 }
+                handler.end_array();
                 break;
+            }
             default:
                 break;
         }

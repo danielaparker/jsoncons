@@ -168,7 +168,7 @@ void decode_byte_string_with_encoding_hint()
 void encode_cbor_byte_string()
 {
     // construct byte string value
-    json j(byte_string({'H','e','l','l','o'}));
+    json j(byte_string_arg, std::vector<uint8_t>{'H','e','l','l','o'});
 
     std::vector<uint8_t> buf;
     cbor::encode_cbor(j, buf);
@@ -187,7 +187,7 @@ void encode_cbor_byte_string()
 void encode_byte_string_with_encoding_hint()
 {
     // construct byte string value
-     json j1(byte_string({'H','e','l','l','o'}), semantic_tag::base64);
+     json j1(byte_string_arg, std::vector<uint8_t>{'H','e','l','l','o'}, semantic_tag::base64);
 
     std::vector<uint8_t> buf;
     cbor::encode_cbor(j1, buf);

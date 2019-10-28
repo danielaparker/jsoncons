@@ -330,7 +330,7 @@ class basic_byte_string;
 class byte_string_view
 {
     const uint8_t* data_;
-    size_t length_; 
+    size_t size_; 
 public:
     typedef byte_traits traits_type;
 
@@ -338,31 +338,39 @@ public:
     typedef const uint8_t* iterator;
     typedef std::size_t size_type;
     typedef uint8_t value_type;
+    typedef uint8_t& reference;
+    typedef const uint8_t& const_reference;
+    typedef std::ptrdiff_t difference_type;
+    typedef uint8_t* pointer;
+    typedef const uint8_t* const_pointer;
 
     constexpr byte_string_view() noexcept
-        : data_(nullptr), length_(0)
+        : data_(nullptr), size_(0)
     {
     }
 
     constexpr byte_string_view(const uint8_t* data, size_t length) noexcept
-        : data_(data), length_(length)
+        : data_(data), size_(length)
     {
     }
-
+/*
     template <class Container>
     constexpr byte_string_view(const Container& cont, 
                                typename std::enable_if<std::is_same<typename Container::value_type,uint8_t>::value>::type* = 0) 
-        : data_(cont.data()), length_(cont.size())
+        : data_(cont.data()), size_(cont.size())
     {
     }
+*/
+    template <class Allocator>
+    constexpr byte_string_view(const basic_byte_string<Allocator>& bs);
 
     constexpr byte_string_view(const byte_string_view&) noexcept = default;
 
     byte_string_view(byte_string_view&& other) noexcept
-        : data_(nullptr), length_(0)
+        : data_(nullptr), size_(0)
     {
         std::swap(data_, other.data_);
-        std::swap(length_, other.length_);
+        std::swap(size_, other.size_);
     }
 
     byte_string_view& operator=(const byte_string_view&) = default;
@@ -370,7 +378,7 @@ public:
     byte_string_view& operator=(byte_string_view&& other) noexcept
     {
         std::swap(data_, other.data_);
-        std::swap(length_, other.length_);
+        std::swap(size_, other.size_);
         return *this;
     }
 
@@ -382,12 +390,12 @@ public:
     JSONCONS_DEPRECATED_MSG("instead, use size()") 
     size_t length() const
     {
-        return length_;
+        return size_;
     }
 #endif
     constexpr size_t size() const noexcept
     {
-        return length_;
+        return size_;
     }
 
     // iterator support 
@@ -397,7 +405,7 @@ public:
     }
     const_iterator end() const noexcept
     {
-        return data_ + length_;
+        return data_ + size_;
     }
 
     uint8_t operator[](size_type pos) const 
@@ -407,15 +415,15 @@ public:
 
     int compare(const byte_string_view& s) const 
     {
-        const int rc = traits_type::compare(data_, s.data(), (std::min)(length_, s.size()));
-        return rc != 0 ? rc : (length_ == s.size() ? 0 : length_ < s.size() ? -1 : 1);
+        const int rc = traits_type::compare(data_, s.data(), (std::min)(size_, s.size()));
+        return rc != 0 ? rc : (size_ == s.size() ? 0 : size_ < s.size() ? -1 : 1);
     }
 
     template <class Allocator>
     int compare(const basic_byte_string<Allocator>& s) const 
     {
-        const int rc = traits_type::compare(data_, s.data(), (std::min)(length_, s.size()));
-        return rc != 0 ? rc : (length_ == s.size() ? 0 : length_ < s.size() ? -1 : 1);
+        const int rc = traits_type::compare(data_, s.data(), (std::min)(size_, s.size()));
+        return rc != 0 ? rc : (size_ == s.size() ? 0 : size_ < s.size() ? -1 : 1);
     }
 
     template <class CharT>
@@ -609,6 +617,12 @@ public:
         return os;
     }
 };
+
+template <class Allocator>
+constexpr byte_string_view::byte_string_view(const basic_byte_string<Allocator>& bs) 
+    : data_(bs.data()), size_(bs.size())
+{
+}
 
 // ==
 inline

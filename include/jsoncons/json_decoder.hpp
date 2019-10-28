@@ -240,10 +240,10 @@ private:
         {
             case structure_type::object_t:
             case structure_type::array_t:
-                item_stack_.emplace_back(std::forward<key_type>(name_), b, tag, byte_allocator_);
+                item_stack_.emplace_back(std::forward<key_type>(name_), byte_string_arg, b, tag, byte_allocator_);
                 break;
             case structure_type::root_t:
-                result_ = Json(b, tag, byte_allocator_);
+                result_ = Json(byte_string_arg, b, tag, byte_allocator_);
                 is_valid_ = true;
                 return false;
         }

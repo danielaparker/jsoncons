@@ -28,6 +28,12 @@ struct half_arg_t
 
 constexpr half_arg_t half_arg = half_arg_t();
 
+struct byte_string_arg_t
+{
+};
+
+constexpr byte_string_arg_t byte_string_arg = byte_string_arg_t();
+
 enum class semantic_tag : uint8_t 
 {
     none = 0,

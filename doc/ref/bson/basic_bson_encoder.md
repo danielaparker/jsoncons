@@ -239,7 +239,7 @@ int main()
     encoder.begin_array(); // The total number of bytes comprising 
                           // the bson document will be calculated
     encoder.string_value("cat");
-    encoder.byte_string_value(byte_string({'p','u','r','r'}));
+    encoder.byte_string_value(byte_string_arg, std::vector<uint8_t>{'p','u','r','r'});
     encoder.int64_value(1431027667, semantic_tag::timestamp);
     encoder.end_array();
     encoder.flush();
