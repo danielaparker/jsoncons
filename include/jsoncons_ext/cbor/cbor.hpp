@@ -1,4 +1,4 @@
-// Copyright 2017 Daniel Parker
+// Copyright 2017 Daniel Parkerstd
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -21,6 +21,58 @@
 #include <jsoncons/ser_traits.hpp>
 
 namespace jsoncons { namespace cbor {
+
+template <class T, class Enable = void>
+struct cbor_ser_traits
+{
+    template <class CharT, class Json>
+    static T deserialize(basic_staj_reader<CharT>& reader, 
+                         std::error_code& ec)
+    {
+        return ser_traits<T>::deserialize(reader, ec);
+    }
+
+    template <class CharT, class Json>
+    static void serialize(const T& val, 
+                          cbor_content_handler& encoder, 
+                          std::error_code& ec)
+    {
+        ser_traits<T>::serialize(val, encoder, ec);
+    }
+};
+
+template <class T>
+struct cbor_ser_traits<T,
+    typename std::enable_if<jsoncons::detail::is_vector_like<T>::value && 
+                            (std::is_same<typename T::value_type,uint8_t>::value ||  
+                             std::is_same<typename T::value_type,uint16_t>::value ||
+                             std::is_same<typename T::value_type,uint32_t>::value ||
+                             std::is_same<typename T::value_type,uint64_t>::value ||
+                             std::is_same<typename T::value_type,int8_t>::value ||  
+                             std::is_same<typename T::value_type,int16_t>::value ||
+                             std::is_same<typename T::value_type,int32_t>::value ||
+                             std::is_same<typename T::value_type,int64_t>::value ||
+                             std::is_same<typename T::value_type,float_t>::value ||
+                             std::is_same<typename T::value_type,double_t>::value)
+>::type>
+{
+    typedef typename T::value_type value_type;
+
+    template <class CharT, class Json>
+    static T deserialize(basic_staj_reader<CharT>& reader, 
+                         std::error_code& ec)
+    {
+        return ser_traits<T>::deserialize(reader, ec);
+    }
+
+    template <class CharT, class Json>
+    static void serialize(const T& val, 
+                          cbor_content_handler& encoder, 
+                          std::error_code& ec)
+    {
+        encoder.typed_array(span<value_type>(val), semantic_tag::none, null_parsing_context(), ec);
+    }
+};
 
 // encode_cbor
 
@@ -61,7 +113,7 @@ encode_cbor(const T& j, std::ostream& os, const cbor_encode_options& options)
     typedef typename T::char_type char_type;
     cbor_stream_encoder encoder(os, options);
     auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
-    j.dump(adaptor);
+    j.dump(encoder);
 }
 
 template<class T>
@@ -84,7 +136,7 @@ encode_cbor(const T& val,
             std::error_code& ec)
 {
     cbor_stream_encoder encoder(os, options);
-    ser_traits<T>::template serialize<char,json>(val, encoder, ec);
+    cbor_ser_traits<T>::template serialize<char,json>(val, encoder, ec);
 }
 
 // decode_cbor 

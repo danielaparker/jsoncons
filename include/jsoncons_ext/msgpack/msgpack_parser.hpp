@@ -117,7 +117,7 @@ public:
                     }
                     else
                     {
-                        end_array(handler, ec);
+                        produce_end_array(handler, ec);
                     }
                     break;
                 }
@@ -135,7 +135,7 @@ public:
                     }
                     else
                     {
-                        end_map(handler, ec);
+                        produce_end_map(handler, ec);
                     }
                     break;
                 }
@@ -193,11 +193,11 @@ private:
             }
             else if (type <= 0x8f) 
             {
-                begin_map(handler,type,ec); // fixmap
+                produce_begin_map(handler,type,ec); // fixmap
             }
             else if (type <= 0x9f) 
             {
-                begin_array(handler,type,ec); // fixarray
+                produce_begin_array(handler,type,ec); // fixarray
             }
             else 
             {
@@ -561,14 +561,14 @@ private:
                 case jsoncons::msgpack::detail::msgpack_format::array16_cd: 
                 case jsoncons::msgpack::detail::msgpack_format::array32_cd: 
                 {
-                    begin_array(handler,type,ec);
+                    produce_begin_array(handler,type,ec);
                     break;
                 }
 
                 case jsoncons::msgpack::detail::msgpack_format::map16_cd : 
                 case jsoncons::msgpack::detail::msgpack_format::map32_cd : 
                 {
-                    begin_map(handler, type, ec);
+                    produce_begin_map(handler, type, ec);
                     break;
                 }
 
@@ -696,7 +696,7 @@ private:
         }
     }
 
-    void begin_array(json_content_handler& handler, uint8_t type, std::error_code& ec)
+    void produce_begin_array(json_content_handler& handler, uint8_t type, std::error_code& ec)
     {
         size_t len = 0;
         switch (type)
@@ -736,13 +736,13 @@ private:
         more_ = handler.begin_array(len, semantic_tag::none, *this);
     }
 
-    void end_array(json_content_handler& handler, std::error_code&)
+    void produce_end_array(json_content_handler& handler, std::error_code&)
     {
         more_ = handler.end_array(*this);
         state_stack_.pop_back();
     }
 
-    void begin_map(json_content_handler& handler, uint8_t type, std::error_code& ec)
+    void produce_begin_map(json_content_handler& handler, uint8_t type, std::error_code& ec)
     {
         size_t len = 0;
         switch (type)
@@ -782,7 +782,7 @@ private:
         more_ = handler.begin_object(len, semantic_tag::none, *this);
     }
 
-    void end_map(json_content_handler& handler, std::error_code&)
+    void produce_end_map(json_content_handler& handler, std::error_code&)
     {
         more_ = handler.end_object(*this);
         state_stack_.pop_back();

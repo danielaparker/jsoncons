@@ -1458,7 +1458,7 @@ private:
             }
             default: // definite length
             {
-                size_t len = get_definite_length(ec);
+                size_t len = get_size(ec);
                 if (ec)
                 {
                     return;
@@ -1502,7 +1502,7 @@ private:
             }
             default: // definite_length
             {
-                size_t len = get_definite_length(ec);
+                size_t len = get_size(ec);
                 if (ec)
                 {
                     return;
@@ -1678,26 +1678,13 @@ private:
         return s;
     }
 
-    size_t get_definite_length(std::error_code& ec)
+    size_t get_size(std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(source_.eof()))
+        uint64_t u = get_uint64_value(ec);
+        if (ec)
         {
-            ec = cbor_errc::unexpected_eof;
-            more_ = false;
             return 0;
         }
-        switch (get_major_type((uint8_t)source_.peek()))
-        {
-            case jsoncons::cbor::detail::cbor_major_type::byte_string:
-            case jsoncons::cbor::detail::cbor_major_type::text_string:
-            case jsoncons::cbor::detail::cbor_major_type::array:
-            case jsoncons::cbor::detail::cbor_major_type::map:
-                break;
-            default:
-                return 0;
-        }
-
-        uint64_t u = get_uint64_value(ec);
         size_t len = (size_t)u;
         if (len != u)
         {
@@ -1794,7 +1781,7 @@ private:
             }
             default: // definite length
             {
-                size_t length = get_definite_length(ec);
+                size_t length = get_size(ec);
                 if (ec)
                 {
                     return;
@@ -2798,8 +2785,6 @@ private:
                                  semantic_tag tag,
                                  std::error_code& ec)
     {
-        shape_.clear();
-
         int c;
         if ((c=source_.get()) == Src::traits_type::eof())
         {
@@ -2809,29 +2794,14 @@ private:
         }
         jsoncons::cbor::detail::cbor_major_type major_type = get_major_type((uint8_t)c);
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::array);
+        uint8_t info = get_additional_information_value((uint8_t)c);
        
-        uint64_t size = get_uint64_value(ec);
+        read_shape(info, ec);   
         if (ec)
         {
             return;
         }
 
-        if ((c=source_.peek()) == Src::traits_type::eof())
-        {
-            ec = cbor_errc::unexpected_eof;
-            more_ = false;
-            return;
-        }
-
-        for (size_t i = 0; more_ && i < size; ++i)
-        {
-            uint64_t dim = get_uint64_value(ec);
-            if (ec)
-            {
-                return;
-            }
-            shape_.push_back(dim);
-        }
         state_stack_.emplace_back(parse_mode::multi_dim, 0);
         more_ = handler.begin_multi_dim(shape_, tag, *this, ec);
     }
@@ -2840,6 +2810,58 @@ private:
     {
         more_ = handler.end_multi_dim(*this);
         state_stack_.pop_back();
+    }
+
+    void read_shape(uint8_t info, std::error_code& ec)
+    {
+        shape_.clear();
+        switch (info)
+        {
+            case jsoncons::cbor::detail::additional_info::indefinite_length:
+            {
+                while (true)
+                {
+                    int c = source_.peek();
+                    switch (c)
+                    {
+                        case Src::traits_type::eof():
+                            ec = cbor_errc::unexpected_eof;
+                            more_ = false;
+                            return;
+                        case 0xff:
+                            source_.ignore(1);
+                            break;
+                        default:
+                            uint64_t dim = get_uint64_value(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            shape_.push_back(dim);
+                            break;
+                    }
+                }
+                break;
+            }
+            default:
+            {
+                size_t size = get_size(ec);
+                if (ec)
+                {
+                    return;
+                }
+                for (size_t i = 0; more_ && i < size; ++i)
+                {
+                    size_t dim = get_size(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                    shape_.push_back(dim);
+                }
+                break;
+            }
+        }
     }
 };
 

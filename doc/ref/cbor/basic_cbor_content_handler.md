@@ -18,7 +18,7 @@ Typedef for content handler using only standard C++ floating point types:
 
 Type                |Definition
 --------------------|------------------------------
-cbor_content_handler    |`basic_cbor_content_handler<void>`
+cbor_content_handler    |`basic_cbor_content_handler<std::nullptr>`
 
 #### Member types
 
