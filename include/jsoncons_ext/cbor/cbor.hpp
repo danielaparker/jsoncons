@@ -113,7 +113,7 @@ encode_cbor(const T& j, std::ostream& os, const cbor_encode_options& options)
     typedef typename T::char_type char_type;
     cbor_stream_encoder encoder(os, options);
     auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
-    j.dump(encoder);
+    j.dump(adaptor);
 }
 
 template<class T>
