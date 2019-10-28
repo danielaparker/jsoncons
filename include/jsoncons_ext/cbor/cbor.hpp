@@ -68,8 +68,23 @@ template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
 encode_cbor(const T& val, std::ostream& os, const cbor_encode_options& options)
 {
+    std::error_code ec;
+    encode_cbor(val, os, options, ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec));
+    }
+}
+
+template<class T>
+typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+encode_cbor(const T& val, 
+            std::ostream& os, 
+            const cbor_encode_options& options, 
+            std::error_code& ec)
+{
     cbor_stream_encoder encoder(os, options);
-    write_to(json(), val, encoder);
+    ser_traits<T>::template serialize<char,json>(val, encoder, ec);
 }
 
 // decode_cbor 

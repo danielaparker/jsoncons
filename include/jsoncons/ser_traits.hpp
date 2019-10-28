@@ -38,13 +38,13 @@ T read_from(const Json& j, basic_staj_reader<CharT>& reader)
 }
 
 template <class T, class CharT, class Json>
-void write_to(const T&val, basic_json_content_handler<CharT>& receiver, std::error_code& ec);
+void write_to(const T&val, basic_json_content_handler<CharT>& encoder, std::error_code& ec);
 
 template <class T, class CharT, class Json>
-void write_to(const T&val, basic_json_content_handler<CharT>& receiver)
+void write_to(const T&val, basic_json_content_handler<CharT>& encoder)
 {
     std::error_code ec;
-    write_to<T,CharT,Json>(val, receiver, ec);
+    write_to<T,CharT,Json>(val, encoder, ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, 0, 0));
@@ -61,7 +61,8 @@ template <class T, class Enable = void>
 struct ser_traits
 {
     template <class CharT, class Json>
-    static T deserialize(basic_staj_reader<CharT>& reader, std::error_code& ec)
+    static T deserialize(basic_staj_reader<CharT>& reader, 
+                         std::error_code& ec)
     {
         json_decoder<Json> decoder;
         reader.read_to(decoder, ec);
@@ -69,10 +70,12 @@ struct ser_traits
     }
 
     template <class CharT, class Json>
-    static void serialize(const T& val, basic_json_content_handler<CharT>& receiver, std::error_code&)
+    static void serialize(const T& val, 
+                          basic_json_content_handler<CharT>& encoder, 
+                          std::error_code&)
     {
         auto j = json_type_traits<Json, T>::to_json(val);
-        j.dump(receiver);
+        j.dump(encoder);
     }
 };
 
@@ -103,15 +106,15 @@ struct ser_traits<T,
     }
 
     template <class CharT, class Json>
-    static void serialize(const T& val, basic_json_content_handler<CharT>& receiver, std::error_code& ec)
+    static void serialize(const T& val, basic_json_content_handler<CharT>& encoder, std::error_code& ec)
     {
-        receiver.begin_array(val.size());
+        encoder.begin_array(val.size());
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            ser_traits<value_type>::template serialize<CharT,Json>(*it,receiver,ec);
+            ser_traits<value_type>::template serialize<CharT,Json>(*it,encoder,ec);
         }
-        receiver.end_array();
-        receiver.flush();
+        encoder.end_array();
+        encoder.flush();
     }
 };
 
@@ -139,15 +142,15 @@ struct ser_traits<std::array<T,N>>
     }
 
     template <class CharT, class Json>
-    static void serialize(const std::array<T, N>& val, basic_json_content_handler<CharT>& receiver, std::error_code& ec)
+    static void serialize(const std::array<T, N>& val, basic_json_content_handler<CharT>& encoder, std::error_code& ec)
     {
-        receiver.begin_array(val.size());
+        encoder.begin_array(val.size());
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            ser_traits<value_type>::template serialize<CharT,Json>(*it, receiver, ec);
+            ser_traits<value_type>::template serialize<CharT,Json>(*it, encoder, ec);
         }
-        receiver.end_array();
-        receiver.flush();
+        encoder.end_array();
+        encoder.flush();
     }
 };
 
@@ -178,24 +181,24 @@ struct ser_traits<T,
     }
 
     template <class CharT, class Json>
-    static void serialize(const T& val, basic_json_content_handler<CharT>& receiver, std::error_code& ec)
+    static void serialize(const T& val, basic_json_content_handler<CharT>& encoder, std::error_code& ec)
     {
-        receiver.begin_object(val.size(), semantic_tag::none, null_ser_context(), ec);
+        encoder.begin_object(val.size(), semantic_tag::none, null_ser_context(), ec);
         if (ec)
         {
             return;
         }
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            receiver.name(it->first);
-            ser_traits<mapped_type>::template serialize<CharT,Json>(it->second, receiver, ec);
+            encoder.name(it->first);
+            ser_traits<mapped_type>::template serialize<CharT,Json>(it->second, encoder, ec);
         }
-        receiver.end_object(null_ser_context(), ec);
+        encoder.end_object(null_ser_context(), ec);
         if (ec)
         {
             return;
         }
-        receiver.flush();
+        encoder.flush();
     }
 };
 
@@ -206,16 +209,16 @@ T read_from(const Json&, basic_staj_reader<CharT>& reader, std::error_code& ec)
 }
 
 template <class T, class CharT, class Json>
-void write_to(const Json&, const T&val, basic_json_content_handler<CharT>& receiver, std::error_code& ec)
+void write_to(const Json&, const T&val, basic_json_content_handler<CharT>& encoder, std::error_code& ec)
 {
-    ser_traits<T>::template serialize<CharT,Json>(val, receiver, ec);
+    ser_traits<T>::template serialize<CharT,Json>(val, encoder, ec);
 }
 
 template <class T, class CharT, class Json>
-void write_to(const Json&, const T&val, basic_json_content_handler<CharT>& receiver)
+void write_to(const Json&, const T&val, basic_json_content_handler<CharT>& encoder)
 {
     std::error_code ec;
-    ser_traits<T>::template serialize<CharT,Json>(val, receiver, ec);
+    ser_traits<T>::template serialize<CharT,Json>(val, encoder, ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec));
