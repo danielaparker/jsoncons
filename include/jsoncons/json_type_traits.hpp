@@ -924,7 +924,7 @@ public:
     static Json to_json(const basic_byte_string<Allocator>& val, 
                         const allocator_type& allocator = allocator_type())
     {
-        return Json(byte_string_arg, val, semantic_tag::none, allocator);
+        return Json(val, semantic_tag::none, allocator);
     }
 };
 

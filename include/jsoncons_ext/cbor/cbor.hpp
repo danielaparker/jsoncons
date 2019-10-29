@@ -29,7 +29,7 @@ struct cbor_ser_traits
     static T deserialize(basic_staj_reader<CharT>& reader, 
                          std::error_code& ec)
     {
-        return ser_traits<T>::deserialize(reader, ec);
+        return ser_traits<T>::template deserialize<CharT,Json>(reader, ec);
     }
 
     template <class CharT, class Json>
@@ -37,7 +37,7 @@ struct cbor_ser_traits
                           cbor_content_handler& encoder, 
                           std::error_code& ec)
     {
-        ser_traits<T>::serialize(val, encoder, ec);
+        ser_traits<T>::template serialize<CharT,Json>(val, encoder, ec);
     }
 };
 

@@ -267,8 +267,8 @@ void json_constructor_examples()
     json j8("Hello"); // A text string
     std::cout << "(8) " << j8 << std::endl;
 
-    const uint8_t bs[] = {'H','e','l','l','o'};
-    json j9(byte_string_arg, bs); // A byte string
+    std::vector<uint8_t> bs = {'H','e','l','l','o'};
+    json j9(byte_string_view(bs.data(), bs.size())); // A byte string
     std::cout << "(9) " << j9 << std::endl;
 
     std::vector<int> v = {10,20,30};

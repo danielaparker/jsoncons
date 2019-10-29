@@ -737,12 +737,12 @@ public:
             }
         }
 
-        variant(byte_string_arg_t, const span<const uint8_t>& bs, semantic_tag tag) : data_{}
+        variant(const byte_string_view& bs, semantic_tag tag) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.size(), byte_allocator_type());
         }
 
-        variant(byte_string_arg_t, const span<const uint8_t>& bs, semantic_tag tag, const Allocator& allocator) : data_{}
+        variant(const byte_string_view& bs, semantic_tag tag, const Allocator& allocator) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.size(), allocator);
         }
@@ -2983,20 +2983,10 @@ public:
     {
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use basic_json(byte_string_arg_t, const span<const uint8_t>&, semantic_tag = semantic_tag::none, const Allocator& = Allocator())")
     explicit basic_json(const byte_string_view& bs, 
                semantic_tag tag = semantic_tag::none, 
                const Allocator& allocator = Allocator())
-        : var_(byte_string_arg, bs, tag, allocator)
-    {
-    }
-#endif
-
-    basic_json(byte_string_arg_t, const span<const uint8_t>& bs, 
-               semantic_tag tag = semantic_tag::none, 
-               const Allocator& allocator = Allocator())
-        : var_(byte_string_arg, bs, tag, allocator)
+        : var_(bs, tag, allocator)
     {
     }
 
@@ -4480,13 +4470,13 @@ public:
         {
             {
                 case byte_string_chars_format::base16:
-                    var_ = variant(byte_string_arg, bs, semantic_tag::base16);
+                    var_ = variant(bs, semantic_tag::base16);
                     break;
                 case byte_string_chars_format::base64:
-                    var_ = variant(byte_string_arg, bs, semantic_tag::base64);
+                    var_ = variant(bs, semantic_tag::base64);
                     break;
                 case byte_string_chars_format::base64url:
-                    var_ = variant(byte_string_arg, bs, semantic_tag::base64url);
+                    var_ = variant(bs, semantic_tag::base64url);
                     break;
                 default:
                     break;

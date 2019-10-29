@@ -46,7 +46,7 @@ void is_as_examples()
 
 void byte_string_from_initializer_list()
 {
-    json j(byte_string_arg, std::vector<uint8_t>{'H','e','l','l','o'});
+    json j(byte_string{'H','e','l','l','o'});
     byte_string bs = j.as<byte_string>();
 
     std::cout << "(1) "<< bs << "\n\n";
@@ -63,7 +63,7 @@ void byte_string_from_initializer_list()
 
 void byte_string_from_char_array()
 {
-    json j(byte_string_arg, std::vector<uint8_t>{'H','e','l','l','o'});
+    json j(byte_string{'H','e','l','l','o'});
     byte_string bs = j.as<byte_string>();
 
     std::cout << "(1) "<< bs << "\n\n";

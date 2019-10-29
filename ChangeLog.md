@@ -15,12 +15,6 @@ Enhancements:
 
 Changes:
 
-- The basic_json constructor `basic_json(const byte_string_view&, semantic_tag=semantic_tag::none, const Allocator&=Allocator()`
-  has been deprecated. Instead, use `basic_json(byte_string_arg_t, const span<const uint8_t>&, semantic_tag=semantic_tag::none, const Allocator&=Allocator())`. For example,
-
-    std::vector<uint8_t> = {'H','e','l','l','o'};
-    json j(byte_string_arg, bs);
-
 - The name of the cbor encoder option `pack_strings` has been
   deprecated and renamed to `use_stringref`.
 

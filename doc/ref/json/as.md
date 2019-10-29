@@ -107,7 +107,7 @@ Output:
 
 #### Accessing a `json` byte string as a [byte_string](../byte_string.md)
 ```c++
-json j(byte_string_arg, std::vector<uint8_t>{'H','e','l','l','o'});
+json j(byte_string{'H','e','l','l','o'});
 byte_string bs = j.as<byte_string>();
 
 std::cout << bs << std::endl;
