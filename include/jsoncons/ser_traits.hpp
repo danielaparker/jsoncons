@@ -72,10 +72,10 @@ struct ser_traits
     template <class CharT, class Json>
     static void serialize(const T& val, 
                           basic_json_content_handler<CharT>& encoder, 
-                          std::error_code&)
+                          std::error_code& ec)
     {
         auto j = json_type_traits<Json, T>::to_json(val);
-        j.dump(encoder);
+        j.dump(encoder, ec);
     }
 };
 

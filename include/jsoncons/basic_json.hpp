@@ -5138,60 +5138,67 @@ private:
 
     void dump_no_flush(basic_json_content_handler<char_type>& handler, std::error_code& ec) const
     {
+        const null_ser_context context{};
         switch (var_.kind())
         {
             case value_kind::short_string_value:
             case value_kind::long_string_value:
-                handler.string_value(as_string_view(), var_.tag());
+                handler.string_value(as_string_view(), var_.tag(), context, ec);
                 break;
             case value_kind::byte_string_value:
                 handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length(), 
-                                          var_.tag());
+                                          var_.tag(), context, ec);
                 break;
             case value_kind::half_value:
-                handler.half_value(var_.half_data_cast()->value(), var_.tag());
+                handler.half_value(var_.half_data_cast()->value(), var_.tag(), context, ec);
                 break;
             case value_kind::double_value:
                 handler.double_value(var_.double_data_cast()->value(), 
-                                     var_.tag());
+                                     var_.tag(), context, ec);
                 break;
             case value_kind::int64_value:
-                handler.int64_value(var_.int64_data_cast()->value(), var_.tag());
+                handler.int64_value(var_.int64_data_cast()->value(), var_.tag(), context, ec);
                 break;
             case value_kind::uint64_value:
-                handler.uint64_value(var_.uint64_data_cast()->value(), var_.tag());
+                handler.uint64_value(var_.uint64_data_cast()->value(), var_.tag(), context, ec);
                 break;
             case value_kind::bool_value:
-                handler.bool_value(var_.bool_data_cast()->value(), var_.tag());
+                handler.bool_value(var_.bool_data_cast()->value(), var_.tag(), context, ec);
                 break;
             case value_kind::null_value:
-                handler.null_value(var_.tag());
+                handler.null_value(var_.tag(), context, ec);
                 break;
             case value_kind::empty_object_value:
-                handler.begin_object(0, var_.tag(), null_ser_context(), ec);
-                handler.end_object(null_ser_context(), ec);
+                handler.begin_object(0, var_.tag(), context, ec);
+                handler.end_object(context, ec);
                 break;
             case value_kind::object_value:
             {
-                handler.begin_object(size(), var_.tag(), null_ser_context(), ec);
+                bool more = handler.begin_object(size(), var_.tag(), context, ec);
                 const object& o = object_value();
-                for (const_object_iterator it = o.begin(); it != o.end(); ++it)
+                for (const_object_iterator it = o.begin(); more && it != o.end(); ++it)
                 {
-                    handler.name(string_view_type((it->key()).data(),it->key().length()));
+                    handler.name(string_view_type((it->key()).data(),it->key().length()), context, ec);
                     it->value().dump_no_flush(handler, ec);
                 }
-                handler.end_object(null_ser_context(), ec);
+                if (more)
+                {
+                    handler.end_object(context, ec);
+                }
                 break;
             }
             case value_kind::array_value:
             {
-                handler.begin_array(size(), var_.tag(), null_ser_context(), ec);
+                bool more = handler.begin_array(size(), var_.tag(), context, ec);
                 const array& o = array_value();
-                for (const_array_iterator it = o.begin(); it != o.end(); ++it)
+                for (const_array_iterator it = o.begin(); more && it != o.end(); ++it)
                 {
                     it->dump_no_flush(handler, ec);
                 }
-                handler.end_array();
+                if (more)
+                {
+                    handler.end_array(context, ec);
+                }
                 break;
             }
             default:
