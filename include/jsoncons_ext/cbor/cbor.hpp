@@ -70,7 +70,7 @@ struct cbor_ser_traits<T,
                           cbor_content_handler& encoder, 
                           std::error_code& ec)
     {
-        encoder.typed_array(span<value_type>(val), semantic_tag::none, null_ser_context(), ec);
+        encoder.typed_array(span<const value_type>(val), semantic_tag::none, null_ser_context(), ec);
     }
 };
 
@@ -96,14 +96,6 @@ encode_cbor(const T& j, std::vector<uint8_t>& v, const cbor_encode_options& opti
     cbor_bytes_encoder encoder(v, options);
     auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
     j.dump(adaptor);
-}
-
-template<class T>
-typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
-encode_cbor(const T& val, std::vector<uint8_t>& v, const cbor_encode_options& options)
-{
-    cbor_bytes_encoder encoder(v, options);
-    write_to(json(), val, encoder);
 }
 
 template<class T>
@@ -137,6 +129,26 @@ encode_cbor(const T& val,
 {
     cbor_stream_encoder encoder(os, options);
     cbor_ser_traits<T>::template serialize<char,json>(val, encoder, ec);
+}
+
+template<class T>
+typename std::enable_if<!is_basic_json_class<T>::value, void>::type
+encode_cbor(const T& val, std::vector<uint8_t>& v, const cbor_encode_options& options, std::error_code& ec)
+{
+    cbor_bytes_encoder encoder(v, options);
+    cbor_ser_traits<T>::template serialize<char, json>(val, encoder, ec);
+}
+
+template<class T>
+typename std::enable_if<!is_basic_json_class<T>::value, void>::type
+encode_cbor(const T& val, std::vector<uint8_t>& v, const cbor_encode_options& options)
+{
+    std::error_code ec;
+    encode_cbor(val, v, options, ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec));
+    }
 }
 
 // decode_cbor 

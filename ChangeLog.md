@@ -9,8 +9,9 @@ Bug fixes:
     
 Enhancements:
 
-The next release will include support for the cbor extension
-[Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)
+- Includes Martin Moene's span-lite to support a C++20-like span in the jsoncons namespace.  
+
+- Includes support for the cbor extension [Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)
 
 Changes:
 

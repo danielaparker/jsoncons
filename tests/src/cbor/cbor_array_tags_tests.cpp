@@ -92,6 +92,23 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[0].as<uint8_t>() == std::numeric_limits<uint8_t>::lowest());
         CHECK(j[1].as<uint8_t>() == uint8_t(1));
         CHECK(j[2].as<uint8_t>() == (std::numeric_limits<uint8_t>::max)());
+
+        auto u = cbor::decode_cbor<std::vector<uint8_t>>(input);
+        std::cout << "u:\n";
+        for (auto item : u)
+        {
+            std::cout << std::hex << (int)item << "\n";
+        }
+        std::cout << "\n";
+
+        std::vector<uint8_t> v;
+
+        cbor::cbor_options options;
+        options.use_typed_arrays(true);
+        cbor::encode_cbor(u, v, options);
+
+        std::cout << "v:\n";
+        std::cout << byte_string_view(v.data(), v.size()) << "\n";
     }
 
     SECTION("Tags 65 (uint16, big endian)")
