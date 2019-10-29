@@ -70,7 +70,7 @@ CBOR strings tagged with 33 and 34 are decoded into jsoncons strings tagged with
 jsoncons strings tagged with `semantic_tag::base64url` and `semantic_tag::base64` are encoded into CBOR strings tagged with 33 and 34.
 
 256, 25 [stringref-namespace, stringref](http://cbor.schmorp.de/stringref)  
-Tags 256 and 25 are automatically decoded when detected. They are encoded when CBOR option `pack_strings` is set to true.
+Tags 256 and 25 are automatically decoded when detected. They are encoded when CBOR option `use_stringref` is set to true.
 
 ### jsoncons - CBOR mappings
 

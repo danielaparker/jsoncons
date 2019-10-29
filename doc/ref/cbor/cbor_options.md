@@ -15,7 +15,7 @@ Constructs a `cbor_options` with default values.
 
 #### Modifiers
 
-    cbor_options& pack_strings(bool value)
+    cbor_options& use_stringref(bool value)
 
 If set to `true`, then encode will store text strings and
 byte strings once, and use string references to represent repeated occurences

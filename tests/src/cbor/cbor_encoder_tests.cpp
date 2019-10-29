@@ -407,7 +407,7 @@ TEST_CASE("encode stringref")
 )");
 
     cbor::cbor_options options;
-    options.pack_strings(true);
+    options.use_stringref(true);
     std::vector<uint8_t> buf;
 
     cbor::encode_cbor(j, buf, options);

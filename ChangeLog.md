@@ -6,16 +6,22 @@ Bug fixes:
 - This version fixes a defect in the `erase` functions for
   the order preserving `basic_json` specializations, in
   particular, for `ojson` (issue 188.) 
-
+    
 Enhancements:
 
 The next release will include support for the cbor extension
 [Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)
 
-Currently implemented:
+Changes:
 
-- Parsing byte string tags 64-82 and 84-86, and feeding to
-  json_content_handler as an array
+- The basic_json constructor `basic_json(const byte_string_view&, semantic_tag=semantic_tag::none, const Allocator&=Allocator()`
+  has been deprecated. Instead, use `basic_json(byte_string_arg_t, const span<const uint8_t>&, semantic_tag=semantic_tag::none, const Allocator&=Allocator())`. For example,
+
+    std::vector<uint8_t> = {'H','e','l','l','o'};
+    json j(byte_string_arg, bs);
+
+- The name of the cbor encoder option `pack_strings` has been
+  deprecated and renamed to `use_stringref`.
 
 v0.136.0
 --------

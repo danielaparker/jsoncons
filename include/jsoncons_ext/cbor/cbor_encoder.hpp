@@ -91,7 +91,7 @@ public:
     basic_cbor_encoder(result_type result, const cbor_encode_options& options)
        : result_(std::move(result)), options_(options)
     {
-        if (options.pack_strings())
+        if (options.use_stringref())
         {
             write_tag(256);
         }
@@ -295,7 +295,7 @@ private:
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Illegal unicode"));
         }
 
-        if (options_.pack_strings() && sv.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
+        if (options_.use_stringref() && sv.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
         {
             std::string s(sv);
             auto it = stringref_map_.find(s);
@@ -837,7 +837,7 @@ private:
             default:
                 break;
         }
-        if (options_.pack_strings() && b.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
+        if (options_.use_stringref() && b.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
         {
             auto it = bytestringref_map_.find(byte_string(b));
             if (it == bytestringref_map_.end())

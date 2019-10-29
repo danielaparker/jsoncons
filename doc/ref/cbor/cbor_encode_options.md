@@ -16,4 +16,4 @@ An abstract class that defines accessors for CBOR encoding options.
 
 #### Accessors
 
-    bool pack_strings() const;
+    bool use_stringref() const;
