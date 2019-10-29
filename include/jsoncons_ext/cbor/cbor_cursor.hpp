@@ -689,6 +689,11 @@ public:
         return parser_.done();
     }
 
+    bool is_typed_array() const
+    {
+        return event_handler_.is_typed_array();
+    }
+
     const basic_staj_event<char>& current() const override
     {
         return event_handler_.event();

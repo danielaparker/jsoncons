@@ -46,7 +46,7 @@ TEST_CASE("cbor multi dim row major cursor tests")
         }
     }
 }
-#if 0
+
 TEST_CASE("cbor typed array cursor tests")
 {
     SECTION("Tag 86, float64, little endian")
@@ -506,4 +506,4 @@ TEST_CASE("cbor typed array tests")
         //REQUIRE(j.size() == 2);
     }
 } 
-#endif
+
