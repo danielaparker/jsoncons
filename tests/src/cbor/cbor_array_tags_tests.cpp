@@ -19,6 +19,19 @@ static void check_native(std::true_type,
                          const std::vector<uint8_t>& u,
                          const std::vector<uint8_t>& v)
 {
+    if (u != v)
+    {
+        for (auto c : u)
+        {
+            std::cout << std::hex  << std::setw(2) << std::setfill('0') << (int)c << " ";
+        }
+        std::cout << "\n";
+        for (auto c : v)
+        {
+            std::cout << std::hex  << std::setw(2) << std::setfill('0') << (int)c << " ";
+        }
+        std::cout << "\n\n";
+    }
     CHECK((u == v));
 }
 
