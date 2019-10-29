@@ -70,7 +70,7 @@ struct cbor_ser_traits<T,
                           cbor_content_handler& encoder, 
                           std::error_code& ec)
     {
-        encoder.typed_array(span<value_type>(val), semantic_tag::none, null_parsing_context(), ec);
+        encoder.typed_array(span<value_type>(val), semantic_tag::none, null_ser_context(), ec);
     }
 };
 
