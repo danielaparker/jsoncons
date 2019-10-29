@@ -35,7 +35,7 @@ class cbor_options : public virtual cbor_decode_options,
                      public virtual cbor_encode_options
 {
 private:
-    bool pack_strings_;
+    bool use_stringref_;
     bool use_typed_arrays_;
 public:
 
@@ -49,19 +49,19 @@ public:
 //  Constructors
 
     cbor_options()
-        : pack_strings_(false),
+        : use_stringref_(false),
           use_typed_arrays_(false)
     {
     }
 
     bool use_stringref() const override
     {
-        return pack_strings_;
+        return use_stringref_;
     }
 
     cbor_options& use_stringref(bool value)
     {
-        pack_strings_ = value;
+        use_stringref_ = value;
         return *this;
     }
 
@@ -69,7 +69,7 @@ public:
     JSONCONS_DEPRECATED_MSG("instead, use key_value_type(bool)") typedef key_value_type kvp_type;
     cbor_options& pack_strings(bool value)
     {
-        pack_strings_ = value;
+        use_stringref_ = value;
         return *this;
     }
 #endif
