@@ -1494,7 +1494,7 @@ private:
                                uint16_t,
                                semantic_tag)
     {
-        write_tag(0x54);
+        write_tag(0x45);
     }
 
     void write_typed_array_tag(std::true_type, 

@@ -15,6 +15,19 @@
 
 using namespace jsoncons;
 
+static void check_native(std::true_type, 
+                         const std::vector<uint8_t>& u,
+                         const std::vector<uint8_t>& v)
+{
+    CHECK((u == v));
+}
+
+static void check_native(std::false_type, 
+                         const std::vector<uint8_t>&,
+                         const std::vector<uint8_t>&)
+{
+}
+
 struct my_cbor_content_handler : public cbor::default_cbor_content_handler
 {
     std::vector<double> v;
@@ -94,21 +107,11 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[2].as<uint8_t>() == (std::numeric_limits<uint8_t>::max)());
 
         auto u = cbor::decode_cbor<std::vector<uint8_t>>(input);
-        std::cout << "u:\n";
-        for (auto item : u)
-        {
-            std::cout << std::hex << (int)item << "\n";
-        }
-        std::cout << "\n";
-
         std::vector<uint8_t> v;
-
         cbor::cbor_options options;
         options.use_typed_arrays(true);
         cbor::encode_cbor(u, v, options);
-
-        std::cout << "v:\n";
-        std::cout << byte_string_view(v.data(), v.size()) << "\n";
+        CHECK((v == input));
     }
 
     SECTION("Tags 65 (uint16, big endian)")
@@ -127,6 +130,14 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[0].as<uint16_t>() == std::numeric_limits<uint16_t>::lowest());
         CHECK(j[1].as<uint16_t>() == uint16_t(1));
         CHECK(j[2].as<uint16_t>() == (std::numeric_limits<uint16_t>::max)());
+
+        auto u = cbor::decode_cbor<std::vector<uint16_t>>(input);
+        std::vector<uint8_t> v;
+        cbor::cbor_options options;
+        options.use_typed_arrays(true);
+        cbor::encode_cbor(u, v, options);
+        check_native(std::integral_constant<bool,jsoncons::detail::endian::native == jsoncons::detail::endian::big>(),
+                     input, v);
     }
     SECTION("Tag 66 (uint32, big endian)")
     {
@@ -146,7 +157,16 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[0].as<uint32_t>() == std::numeric_limits<uint32_t>::lowest());
         CHECK(j[1].as<uint32_t>() == uint32_t(1));
         CHECK(j[2].as<uint32_t>() == (std::numeric_limits<uint32_t>::max)());
+
+        auto u = cbor::decode_cbor<std::vector<uint32_t>>(input);
+        std::vector<uint8_t> v;
+        cbor::cbor_options options;
+        options.use_typed_arrays(true);
+        cbor::encode_cbor(u, v, options);
+        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(),
+            input, v);
     }
+
     SECTION("Tags 67 (uint64,big endian)")
     {
         const std::vector<uint8_t> input = {
@@ -165,7 +185,16 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[0].as<uint64_t>() == std::numeric_limits<uint64_t>::lowest());
         CHECK(j[1].as<uint64_t>() == uint64_t(1));
         CHECK(j[2].as<uint64_t>() == (std::numeric_limits<uint64_t>::max)());
+
+        auto u = cbor::decode_cbor<std::vector<uint64_t>>(input);
+        std::vector<uint8_t> v;
+        cbor::cbor_options options;
+        options.use_typed_arrays(true);
+        cbor::encode_cbor(u, v, options);
+        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(),
+            input, v);
     }
+
     SECTION("Tag 68 (uint8, Typed Array, clamped arithmetic)")
     {
         const std::vector<uint8_t> input = {
@@ -190,6 +219,7 @@ TEST_CASE("cbor typed array tests")
         CHECK(v[1] == uint8_t(1));
         CHECK(v[2] == (std::numeric_limits<uint8_t>::max)());
     }
+
     SECTION("Tags 69 (uint16, little endian)")
     {
         const std::vector<uint8_t> input = {
@@ -206,7 +236,16 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[0].as<uint16_t>() == std::numeric_limits<uint16_t>::lowest());
         CHECK(j[1].as<uint16_t>() == uint16_t(1));
         CHECK(j[2].as<uint16_t>() == (std::numeric_limits<uint16_t>::max)());
+
+        auto u = cbor::decode_cbor<std::vector<uint16_t>>(input);
+        std::vector<uint8_t> v;
+        cbor::cbor_options options;
+        options.use_typed_arrays(true);
+        cbor::encode_cbor(u, v, options);
+        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(),
+            input, v);
     }
+
     SECTION("Tags 70 (uint32, little endian)")
     {
         const std::vector<uint8_t> input = {
@@ -225,6 +264,14 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[0].as<uint32_t>() == std::numeric_limits<uint32_t>::lowest());
         CHECK(j[1].as<uint32_t>() == uint32_t(1));
         CHECK(j[2].as<uint32_t>() == (std::numeric_limits<uint32_t>::max)());
+
+        auto u = cbor::decode_cbor<std::vector<uint32_t>>(input);
+        std::vector<uint8_t> v;
+        cbor::cbor_options options;
+        options.use_typed_arrays(true);
+        cbor::encode_cbor(u, v, options);
+        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(),
+            input, v);
     }
     SECTION("Tag 71 (uint64,little endian)")
     {
@@ -244,6 +291,14 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[0].as<uint64_t>() == std::numeric_limits<uint64_t>::lowest());
         CHECK(j[1].as<uint64_t>() == uint64_t(1));
         CHECK(j[2].as<uint64_t>() == (std::numeric_limits<uint64_t>::max)());
+
+        auto u = cbor::decode_cbor<std::vector<uint64_t>>(input);
+        std::vector<uint8_t> v;
+        cbor::cbor_options options;
+        options.use_typed_arrays(true);
+        cbor::encode_cbor(u, v, options);
+        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(),
+            input, v);
     }
     SECTION("Tag 72 (int8)")
     {
@@ -261,6 +316,14 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[0].as<int8_t>() == std::numeric_limits<int8_t>::lowest());
         CHECK(j[1].as<int8_t>() == int8_t(1));
         CHECK(j[2].as<int8_t>() == (std::numeric_limits<int8_t>::max)());
+
+        auto u = cbor::decode_cbor<std::vector<int8_t>>(input);
+        std::vector<uint8_t> v;
+        cbor::cbor_options options;
+        options.use_typed_arrays(true);
+        cbor::encode_cbor(u, v, options);
+        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(),
+            input, v);
     }
     SECTION("Tag 73 (int16, big endian)")
     {
@@ -280,7 +343,20 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[0].as<int16_t>() == std::numeric_limits<int16_t>::lowest());
         CHECK(j[1].as<int16_t>() == int16_t(1));
         CHECK(j[2].as<int16_t>() == (std::numeric_limits<int16_t>::max)());
+
+        auto u = cbor::decode_cbor<std::vector<int16_t>>(input);
+        REQUIRE(u.size() == 3);
+        CHECK(u[0] == std::numeric_limits<int16_t>::lowest());
+        CHECK(u[1] == int16_t(1));
+        CHECK(u[2] == (std::numeric_limits<int16_t>::max)());
+        std::vector<uint8_t> v;
+        cbor::cbor_options options;
+        options.use_typed_arrays(true);
+        cbor::encode_cbor(u, v, options);
+        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(),
+            input, v);
     }
+
     SECTION("Tag 74 (int32, big endian)")
     {
         const std::vector<uint8_t> input = {
@@ -299,6 +375,18 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[0].as<int32_t>() == std::numeric_limits<int32_t>::lowest());
         CHECK(j[1].as<int32_t>() == int32_t(1));
         CHECK(j[2].as<int32_t>() == (std::numeric_limits<int32_t>::max)());
+
+        auto u = cbor::decode_cbor<std::vector<int32_t>>(input);
+        REQUIRE(u.size() == 3);
+        CHECK(u[0] == std::numeric_limits<int32_t>::lowest());
+        CHECK(u[1] == int32_t(1));
+        CHECK(u[2] == (std::numeric_limits<int32_t>::max)());
+        std::vector<uint8_t> v;
+        cbor::cbor_options options;
+        options.use_typed_arrays(true);
+        cbor::encode_cbor(u, v, options);
+        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(),
+            input, v);
     }
     SECTION("Tag 75 (int64,big endian)")
     {
@@ -318,6 +406,18 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[0].as<int64_t>() == std::numeric_limits<int64_t>::lowest());
         CHECK(j[1].as<int64_t>() == int64_t(1));
         CHECK(j[2].as<int64_t>() == (std::numeric_limits<int64_t>::max)());
+
+        auto u = cbor::decode_cbor<std::vector<int64_t>>(input);
+        REQUIRE(u.size() == 3);
+        CHECK(u[0] == std::numeric_limits<int64_t>::lowest());
+        CHECK(u[1] == int64_t(1));
+        CHECK(u[2] == (std::numeric_limits<int64_t>::max)());
+        std::vector<uint8_t> v;
+        cbor::cbor_options options;
+        options.use_typed_arrays(true);
+        cbor::encode_cbor(u, v, options);
+        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(),
+            input, v);
     }
     SECTION("Tag 77 (int16, little endian)")
     {
@@ -337,6 +437,18 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[0].as<int16_t>() == std::numeric_limits<int16_t>::lowest());
         CHECK(j[1].as<int16_t>() == int16_t(1));
         CHECK(j[2].as<int16_t>() == (std::numeric_limits<int16_t>::max)());
+
+        auto u = cbor::decode_cbor<std::vector<int16_t>>(input);
+        REQUIRE(u.size() == 3);
+        CHECK(u[0] == std::numeric_limits<int16_t>::lowest());
+        CHECK(u[1] == int16_t(1));
+        CHECK(u[2] == (std::numeric_limits<int16_t>::max)());
+        std::vector<uint8_t> v;
+        cbor::cbor_options options;
+        options.use_typed_arrays(true);
+        cbor::encode_cbor(u, v, options);
+        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(),
+            input, v);
     }
     SECTION("Tags 78 (int32, little endian)")
     {
@@ -356,7 +468,21 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[0].as<int32_t>() == std::numeric_limits<int32_t>::lowest());
         CHECK(j[1].as<int32_t>() == int32_t(1));
         CHECK(j[2].as<int32_t>() == (std::numeric_limits<int32_t>::max)());
+
+        auto u = cbor::decode_cbor<std::vector<int32_t>>(input);
+        REQUIRE(u.size() == 3);
+        CHECK(u[0] == std::numeric_limits<int32_t>::lowest());
+        CHECK(u[1] == int32_t(1));
+        CHECK(u[2] == (std::numeric_limits<int32_t>::max)());
+
+        std::vector<uint8_t> v;
+        cbor::cbor_options options;
+        options.use_typed_arrays(true);
+        cbor::encode_cbor(u, v, options);
+        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(),
+            input, v);
     }
+
     SECTION("Tag 79 (int64,little endian)")
     {
         const std::vector<uint8_t> input = {
@@ -375,6 +501,18 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[0].as<int64_t>() == std::numeric_limits<int64_t>::lowest());
         CHECK(j[1].as<int64_t>() == int64_t(1));
         CHECK(j[2].as<int64_t>() == (std::numeric_limits<int64_t>::max)());
+
+        auto u = cbor::decode_cbor<std::vector<int64_t>>(input);
+        REQUIRE(u.size() == 3);
+        CHECK(u[0] == std::numeric_limits<int64_t>::lowest());
+        CHECK(u[1] == int64_t(1));
+        CHECK(u[2] == (std::numeric_limits<int64_t>::max)());
+        std::vector<uint8_t> v;
+        cbor::cbor_options options;
+        options.use_typed_arrays(true);
+        cbor::encode_cbor(u, v, options);
+        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(),
+            input, v);
     }
 
     SECTION("Tag 80, float16, big endian")
@@ -415,6 +553,14 @@ TEST_CASE("cbor typed array tests")
         REQUIRE(j.size() == 2);
         CHECK(j[0].as<float>() == std::numeric_limits<float>::lowest());
         CHECK(j[1].as<float>() == (std::numeric_limits<float>::max)());
+
+        auto u = cbor::decode_cbor<std::vector<float>>(input);
+        std::vector<uint8_t> v;
+        cbor::cbor_options options;
+        options.use_typed_arrays(true);
+        cbor::encode_cbor(u, v, options);
+        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(),
+            input, v);
     }
     SECTION("Tag 82, float64, big endian")
     {
@@ -428,6 +574,14 @@ TEST_CASE("cbor typed array tests")
 
         //json j = cbor::decode_cbor<json>(input);
         //REQUIRE(j.is_array());
+
+        auto u = cbor::decode_cbor<std::vector<double>>(input);
+        std::vector<uint8_t> v;
+        cbor::cbor_options options;
+        options.use_typed_arrays(true);
+        cbor::encode_cbor(u, v, options);
+        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(),
+            input, v);
     }
 
     SECTION("Tag 83, float128, big endian")
@@ -487,6 +641,14 @@ TEST_CASE("cbor typed array tests")
         REQUIRE(j.size() == 2);
         CHECK(j[0].as<float>() == std::numeric_limits<float>::lowest());
         CHECK(j[1].as<float>() == (std::numeric_limits<float>::max)());
+
+        auto u = cbor::decode_cbor<std::vector<float>>(input);
+        std::vector<uint8_t> v;
+        cbor::cbor_options options;
+        options.use_typed_arrays(true);
+        cbor::encode_cbor(u, v, options);
+        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(),
+            input, v);
     }
     SECTION("Tag 86, float64, little endian")
     {
@@ -504,6 +666,14 @@ TEST_CASE("cbor typed array tests")
         REQUIRE(j.size() == 2);
         CHECK(j[0].as<double>() == std::numeric_limits<double>::lowest());
         CHECK(j[1].as<double>() == (std::numeric_limits<double>::max)());
+
+        auto u = cbor::decode_cbor<std::vector<double>>(input);
+        std::vector<uint8_t> v;
+        cbor::cbor_options options;
+        options.use_typed_arrays(true);
+        cbor::encode_cbor(u, v, options);
+        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(),
+            input, v);
     }
 
     SECTION("Tag 87, float128, little endian")
