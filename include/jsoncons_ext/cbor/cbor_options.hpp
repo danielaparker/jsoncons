@@ -66,7 +66,7 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("instead, use key_value_type(bool)") typedef key_value_type kvp_type;
+    JSONCONS_DEPRECATED_MSG("instead, use use_stringref(bool)")
     cbor_options& pack_strings(bool value)
     {
         use_stringref_ = value;
