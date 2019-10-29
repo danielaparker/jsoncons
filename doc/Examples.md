@@ -1984,7 +1984,7 @@ namespace jc=jsoncons;
 int main()
 {
     json j;
-    j["ByteString"] = byte_string({'H','e','l','l','o'});
+    j["ByteString"] = json(byte_string_arg, std::vector<uint8_t>{'H','e','l','l','o'});
     j["EncodedByteString"] = json("SGVsbG8=", semantic_tag::base64);
 
     std::cout << "(1)\n";

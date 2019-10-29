@@ -31,11 +31,13 @@ basic_json(const char_type* val); // (13)
 
 basic_json(const char_type* val, const allocator_type& allocator); // (14)
 
-basic_json(const byte_string_view& bs,
+basic_json(byte_string_arg_t, 
+           const span<const uint8_t>& bs,
            semantic_tag tag = semantic_tag::none); // (15)
 
-basic_json(const byte_string_view& bs, 
-           semantic_tag tag = semantic_tag::none, 
+basic_json(byte_string_arg_t, 
+           const span<const uint8_t>& bs, 
+           semantic_tag tag, 
            const allocator_type& allocator); // (16)
 
 basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none); // (17)
@@ -69,9 +71,9 @@ basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none); /
 
 (14) Constructs a `basic_json` value for a text string with supplied allocator.
 
-(15) Constructs a `basic_json` value for a [byte_string](../byte_string.md).
+(15) Constructs a `basic_json` value for a byte string with supplied allocator.
 
-(16) Constructs a `basic_json` value for a [byte_string](../byte_string.md) with supplied allocator.
+(16) Constructs a `basic_json` value for a byte string with supplied allocator.
 
 (17) Constructs a `basic_json` value for a half precision floating point number.
 
@@ -114,7 +116,7 @@ int main()
     std::cout << "(8) " << j8 << std::endl;
 
     const uint8_t bs[] = {'H','e','l','l','o'};
-    json j9(byte_string({'H','e','l','l','o'})); // A byte string
+    json j9(byte_string_arg, bs); // A byte string
     std::cout << "(9) " << j9 << std::endl;
 
     std::vector<int> v = {10,20,30};
