@@ -36,7 +36,7 @@ jsoncons is distributed under the [Boost Software License](http://www.boost.org/
 - [msgpack](doc/ref/msgpack/msgpack.md) implements decode from and encode to the [MessagePack](http://msgpack.org/index.html) data format.
 - [ubjson](doc/ref/ubjson/ubjson.md) implements decode from and encode to the [Universal Binary JSON Specification](http://ubjson.org/) data format.
 - [bson](doc/ref/bson/bson.md) implements decode from and encode to the [Binary JSON](http://bsonspec.org/) data format.
-- [csv](doc/ref/csv/csv.md) implements decode from and encode to CSV files/
+- [csv](doc/ref/csv/csv.md) implements decode from and encode to CSV files.
 
 ## What users say
 
