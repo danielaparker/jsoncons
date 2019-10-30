@@ -369,7 +369,7 @@ private:
                                     std::error_code& ec) = 0;
 
     virtual bool do_end_multi_dim(const ser_context& context,
-                               std::error_code& ec) = 0;
+                                  std::error_code& ec) = 0;
 };
 
 template <class Float128T = std::nullptr_t>

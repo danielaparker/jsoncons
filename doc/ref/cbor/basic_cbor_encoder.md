@@ -37,6 +37,125 @@ Constructs a new encoder that writes to the specified result.
     virtual ~basic_cbor_encoder()
 
 
+#### Inherited from [jsoncons::cbor::basic_cbor_content_handler](basic_cbor_content_handler.md)
+
+    bool typed_array(const span<const uint8_t>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+
+    bool typed_array(const span<const uint16_t>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+
+    bool typed_array(const span<const uint32_t>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+
+    bool typed_array(const span<const uint64_t>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+
+    bool typed_array(const span<const int8_t>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+
+    bool typed_array(const span<const int16_t>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+
+    bool typed_array(const span<const int32_t>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+
+    bool typed_array(const span<const int64_t>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+
+    bool typed_array(half_arg_t, const span<const uint16_t>& data,
+                     semantic_tag tag = semantic_tag::none,
+                     const ser_context& context = null_ser_context())
+
+    bool typed_array(const span<const float>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+
+    bool typed_array(const span<const double>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+
+    bool typed_array(const span<const float128_type>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+
+    bool begin_multi_dim(const span<const size_t>& shape,
+                         semantic_tag tag,
+                         const ser_context& context) 
+
+    bool end_multi_dim(const ser_context& context=null_ser_context()) 
+
+    bool typed_array(const span<const uint8_t>& v, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec)
+
+    bool typed_array(const span<const uint16_t>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec)
+
+    bool typed_array(const span<const uint32_t>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec)
+
+    bool typed_array(const span<const uint64_t>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec)
+
+    bool typed_array(const span<const int8_t>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec)
+
+    bool typed_array(const span<const int16_t>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec)
+
+    bool typed_array(const span<const int32_t>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec)
+
+    bool typed_array(const span<const int64_t>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec)
+
+    bool typed_array(half_arg_t arg, const span<const uint16_t>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec)
+
+    bool typed_array(const span<const float>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec)
+
+    bool typed_array(const span<const double>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec)
+
+    bool begin_multi_dim(const span<const size_t>& shape,
+                         semantic_tag tag,
+                         const ser_context& context, 
+                         std::error_code& ec) 
+
+    bool end_multi_dim(const ser_context& context,
+                       std::error_code& ec) 
+
 #### Inherited from [jsoncons::basic_json_content_handler](basic_json_content_handler.md)
 
     bool begin_object(semantic_tag tag=semantic_tag::none,
