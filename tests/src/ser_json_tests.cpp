@@ -178,16 +178,16 @@ TEST_CASE("hiking_reputation")
     SECTION("4")
     {
         std::string s;
-        encode_json(ojson(), val, s);
-        auto val2 = decode_json<ns::hiking_reputation>(ojson(), s);
+        encode_json(val, s, json_options(), indenting::no_indent, ojson());
+        auto val2 = decode_json<ns::hiking_reputation>(s, json_options(), ojson());
         CHECK(val2 == val);
     }
 
     SECTION("5")
     {
         std::string s;
-        encode_json(ojson(), val, s, indenting::indent);
-        auto val2 = decode_json<ns::hiking_reputation>(ojson(), s);
+        encode_json(val, s, json_options(), indenting::indent, ojson());
+        auto val2 = decode_json<ns::hiking_reputation>(s, json_options(), ojson());
         CHECK(val2 == val);
     }
 
@@ -195,8 +195,8 @@ TEST_CASE("hiking_reputation")
     {
         std::string s;
         json_options options;
-        encode_json(ojson(), val, s, options, indenting::indent);
-        auto val2 = decode_json<ns::hiking_reputation>(ojson(), s, options);
+        encode_json(val, s, options, indenting::indent, ojson());
+        auto val2 = decode_json<ns::hiking_reputation>(s, options, ojson());
         CHECK(val2 == val);
     }
 
@@ -228,16 +228,16 @@ TEST_CASE("hiking_reputation")
     SECTION("os 4")
     {
         std::stringstream os;
-        encode_json(ojson(), val, os);
-        auto val2 = decode_json<ns::hiking_reputation>(ojson(), os);
+        encode_json(val, os, json_options(), indenting::no_indent, ojson());
+        auto val2 = decode_json<ns::hiking_reputation>(os, json_options(), ojson());
         CHECK(val2 == val);
     }
 
     SECTION("os 5")
     {
         std::stringstream os;
-        encode_json(ojson(), val, os, indenting::indent);
-        auto val2 = decode_json<ns::hiking_reputation>(ojson(), os);
+        encode_json(val, os, json_options(), indenting::indent, ojson());
+        auto val2 = decode_json<ns::hiking_reputation>(os, json_options(), ojson());
         CHECK(val2 == val);
     }
 
@@ -245,8 +245,8 @@ TEST_CASE("hiking_reputation")
     {
         std::stringstream os;
         json_options options;
-        encode_json(ojson(), val, os, options, indenting::indent);
-        auto val2 = decode_json<ns::hiking_reputation>(ojson(), os, options);
+        encode_json(val, os, options, indenting::indent, ojson());
+        auto val2 = decode_json<ns::hiking_reputation>(os, options, ojson());
         CHECK(val2 == val);
     }
 }

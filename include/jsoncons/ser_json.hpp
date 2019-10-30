@@ -85,10 +85,10 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
 
 template <class T, class CharT>
 void encode_json(const T& val, 
-                 basic_json_content_handler<CharT>& receiver)
+                 basic_json_content_handler<CharT>& encoder)
 {
-    write_to(basic_json<CharT>(), val, receiver);
-    receiver.flush();
+    write_to(basic_json<CharT>(), val, encoder);
+    encoder.flush();
 }
 
 // to stream
@@ -190,10 +190,10 @@ void encode_json(const T& val,
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 void encode_json(const basic_json<CharT, ImplementationPolicy, Allocator>& j, 
                  const T& val,
-                 basic_json_content_handler<CharT>& receiver)
+                 basic_json_content_handler<CharT>& encoder)
 {
-    write_to(j, val, receiver);
-    receiver.flush();
+    write_to(j, val, encoder);
+    encoder.flush();
 }
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
@@ -266,6 +266,78 @@ void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
     else
     {
         basic_json_compressed_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s, basic_json_options<CharT>::get_default_options());
+        encode_json(j, val, encoder);
+    }
+}
+
+// decode_json
+
+template <class T, class CharT, class ImplementationPolicy, class Allocator>
+T decode_json(const std::basic_string<CharT>& s,
+              const basic_json_decode_options<CharT>& options,
+              const basic_json<CharT,ImplementationPolicy,Allocator>& j)
+{
+    basic_json_cursor<CharT> reader(s, options);
+    T val = read_from<T>(j, reader);
+    return val;
+}
+
+template <class T, class CharT, class ImplementationPolicy, class Allocator>
+T decode_json(std::basic_istream<CharT>& is,
+              const basic_json_decode_options<CharT>& options,
+              const basic_json<CharT,ImplementationPolicy,Allocator>& j)
+{
+    basic_json_cursor<CharT> reader(is, options);
+    T val = read_from<T>(j, reader);
+    return val;
+}
+
+// encode_json
+
+template <class T, class CharT, class ImplementationPolicy, class Allocator>
+void encode_json(const T& val,
+                 basic_json_content_handler<CharT>& encoder,
+                 const basic_json<CharT, ImplementationPolicy, Allocator>& j)
+{
+    write_to(j, val, encoder);
+    encoder.flush();
+}
+
+template <class T, class CharT, class ImplementationPolicy, class Allocator>
+void encode_json(const T& val,
+                 std::basic_string<CharT>& s,
+                 const basic_json_encode_options<CharT>& options, 
+                 indenting line_indent, 
+                 const basic_json<CharT,ImplementationPolicy,Allocator>& j)
+{ 
+    if (line_indent == indenting::indent)
+    {
+        basic_json_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s, options);
+        encode_json(val, encoder, j);
+    }
+    else
+    {
+        basic_json_compressed_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s, options);
+        encode_json(val, encoder, j);
+    }
+}
+
+
+template <class T, class CharT, class ImplementationPolicy, class Allocator>
+void encode_json(const T& val,
+                 std::basic_ostream<CharT>& os, 
+                 const basic_json_encode_options<CharT>& options, 
+                 indenting line_indent,
+                 const basic_json<CharT,ImplementationPolicy,Allocator>& j)
+{
+    if (line_indent == indenting::indent)
+    {
+        basic_json_encoder<CharT> encoder(os, options);
+        encode_json(j, val, encoder);
+    }
+    else
+    {
+        basic_json_compressed_encoder<CharT> encoder(os, options);
         encode_json(j, val, encoder);
     }
 }
