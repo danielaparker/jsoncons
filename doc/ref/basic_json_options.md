@@ -11,27 +11,27 @@ template<
 Specifies options for reading and writing JSON text. 
 
 Option|Reading|Writing
------------------------
-indent_size||The indent size, the default is 4.
-spaces_around_colon||Indicates [space option](spaces_option.md) for name separator (`:`). Default is space after.
-spaces_around_comma||Indicates [space option](spaces_option.md) for array value and object name/value pair separators (`,`). Default is space after.
-pad_inside_object_braces||Default is `false`
-pad_inside_array_brackets||Default is `false`
-bigint_format||Overrides [bignum format](bigint_chars_format.md) when serializing json. The default is [bigint_chars_format::base10](bigint_chars_format.md). 
-byte_string_format||Overrides [byte string format](byte_string_chars_format.md) when serializing json. The default is [byte_string_chars_format::base64url](byte_string_chars_format.md). 
-float_format||Overrides [floating point format](../float_chars_format.md) when serializing to JSON. The default is [float_chars_format::general](float_chars_format.md).
-precision||Overrides floating point precision when serializing json. The default is shortest representation.
-escape_all_non_ascii||Escape all non-ascii characters. The default is `false`.
-escape_solidus||Escape the solidus ('/') character. The default is `false`.
-nan_to_num||Sets a number replacement for `NaN` when writing JSON
-inf_to_num||Sets a number replacement for `Infinity` when writing JSON
-neginf_to_num||Sets a number replacement for `Negative Infinity` when writing JSON
+------|-------|----------
+indent_size| |The indent size, the default is 4.
+spaces_around_colon| |Indicates [space option](spaces_option.md) for name separator (`:`). Default is space after.
+spaces_around_comma| |Indicates [space option](spaces_option.md) for array value and object name/value pair separators (`,`). Default is space after.
+pad_inside_object_braces| |Default is `false`
+pad_inside_array_brackets| |Default is `false`
+bigint_format| |Overrides [bignum format](bigint_chars_format.md) when serializing json. The default is [bigint_chars_format::base10](bigint_chars_format.md). 
+byte_string_format| |Overrides [byte string format](byte_string_chars_format.md) when serializing json. The default is [byte_string_chars_format::base64url](byte_string_chars_format.md). 
+float_format| |Overrides [floating point format](../float_chars_format.md) when serializing to JSON. The default is [float_chars_format::general](float_chars_format.md).
+precision| |Overrides floating point precision when serializing json. The default is shortest representation.
+escape_all_non_ascii| |Escape all non-ascii characters. The default is `false`.
+escape_solidus| |Escape the solidus ('/') character. The default is `false`.
+nan_to_num| |Sets a number replacement for `NaN` when writing JSON
+inf_to_num| |Sets a number replacement for `Infinity` when writing JSON
+neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON
 nan_to_str|Used when reading JSON|Sets a string replacement for `NaN` when writing JSON
 inf_to_str|Used when reading JSON|Sets a string replacement for infinity when writing JSON
 neginf_to_str|used when reading JSON|Sets a string replacement for negative infinity when writing JSON
 lossless_number|If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`. Defaults to `false`.|
-new_line_chars||Defaults to "\n"
-line_length_limit||
+new_line_chars| |Defaults to "\n"
+line_length_limit| |
 
 max_nesting_depth|The maximum nesting depth allowed when parsing JSON. By default `jsoncons` can read a `JSON` text of arbitrarily large depth.|
 
