@@ -12,7 +12,7 @@ Specifies options for reading and writing JSON text.
 
 Option|Reading|Writing
 ------|-------|----------
-indent_size| |The indent size, the default is 4.
+indent_size| |The indent size, the default is 4
 spaces_around_colon| |Indicates [space option](spaces_option.md) for name separator (`:`). Default is space after.
 spaces_around_comma| |Indicates [space option](spaces_option.md) for array value and object name/value pair separators (`,`). Default is space after.
 pad_inside_object_braces| |Default is `false`
@@ -26,13 +26,13 @@ escape_solidus| |Escape the solidus ('/') character. The default is `false`.
 nan_to_num| |Sets a number replacement for `NaN` when writing JSON
 inf_to_num| |Sets a number replacement for `Infinity` when writing JSON
 neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON
-nan_to_str|Used when reading JSON|Sets a string replacement for `NaN` when writing JSON
-inf_to_str|Used when reading JSON|Sets a string replacement for infinity when writing JSON
-neginf_to_str|used when reading JSON|Sets a string replacement for negative infinity when writing JSON
-lossless_number|If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`. Defaults to `false`.|
+nan_to_str|Substitute string with `NaN`, if enabled|Sets a string replacement for `NaN` when writing JSON
+inf_to_str|Substitute string with `infinity`, if enabled|Sets a string replacement for infinity when writing JSON
+neginf_to_str|Substitute string with `negative infinity`, if enabled|Sets a string replacement for negative infinity when writing JSON
+lossless_number|If `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`. Defaults to `false`.|
 new_line_chars| |Defaults to "\n"
 line_length_limit| |
-max_nesting_depth|The maximum nesting depth allowed when parsing JSON. By default `jsoncons` can read a `JSON` text of arbitrarily large depth.|
+max_nesting_depth|Maximum nesting depth allowed when parsing JSON|
 object_object_line_splits| |For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
 array_object_line_splits| |For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
 object_array_line_splits| |For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::same_line](line_split_kind.md).
