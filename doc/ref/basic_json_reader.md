@@ -40,7 +40,7 @@ string_view_type           |
 
     template <class Source>
     basic_json_reader(Source&& source, 
-                      const basic_json_decode_options<CharT>& options, 
+                      const basic_json_options<CharT>& options, 
                       const WorkAllocator& allocator = WorkAllocator()); // (2)
 
     template <class Source>
@@ -50,7 +50,7 @@ string_view_type           |
 
     template <class Source>
     basic_json_reader(Source&& source, 
-                      const basic_json_decode_options<CharT>& options,
+                      const basic_json_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
                       const WorkAllocator& allocator = WorkAllocator()); // (4)
 
@@ -62,7 +62,7 @@ string_view_type           |
     template <class Source>
     basic_json_reader(Source&& source, 
                       basic_json_content_handler<CharT>& handler,
-                      const basic_json_decode_options<CharT>& options, 
+                      const basic_json_options<CharT>& options, 
                       const WorkAllocator& allocator = WorkAllocator()); // (6)
 
     template <class Source>
@@ -74,7 +74,7 @@ string_view_type           |
     template <class Source>
     basic_json_reader(Source&& source,
                       basic_json_content_handler<CharT>& handler, 
-                      const basic_json_decode_options<CharT>& options,
+                      const basic_json_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
                       const WorkAllocator& allocator = WorkAllocator()); // (8)
 

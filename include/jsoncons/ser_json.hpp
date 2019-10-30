@@ -22,7 +22,7 @@ namespace jsoncons {
 template <class T, class CharT>
 typename std::enable_if<is_basic_json_class<T>::value,T>::type
 decode_json(const std::basic_string<CharT>& s,
-            const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::get_default_options())
+            const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options())
 {
     jsoncons::json_decoder<T> decoder;
     basic_json_reader<CharT, string_source<CharT>> reader(s, decoder, options);
@@ -33,7 +33,7 @@ decode_json(const std::basic_string<CharT>& s,
 template <class T, class CharT>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_json(const std::basic_string<CharT>& s,
-            const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::get_default_options())
+            const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options())
 {
     basic_json_cursor<CharT> reader(s, options);
     T val = read_from<T>(basic_json<CharT>(), reader);
@@ -43,7 +43,7 @@ decode_json(const std::basic_string<CharT>& s,
 template <class T, class CharT>
 typename std::enable_if<is_basic_json_class<T>::value,T>::type
 decode_json(std::basic_istream<CharT>& is,
-            const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::get_default_options())
+            const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options())
 {
     jsoncons::json_decoder<T> decoder;
     basic_json_reader<CharT, stream_source<CharT>> reader(is, decoder, options);
@@ -54,7 +54,7 @@ decode_json(std::basic_istream<CharT>& is,
 template <class T, class CharT>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_json(std::basic_istream<CharT>& is,
-            const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::get_default_options())
+            const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options())
 {
     basic_json_cursor<CharT> reader(is, options);
     T val = read_from<T>(basic_json<CharT>(), reader);
@@ -64,7 +64,7 @@ decode_json(std::basic_istream<CharT>& is,
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
               const std::basic_string<CharT>& s,
-              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::get_default_options())
+              const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options())
 {
     basic_json_cursor<CharT> reader(s, options);
     T val = read_from<T>(j, reader);
@@ -74,7 +74,7 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
               std::basic_istream<CharT>& is,
-              const basic_json_decode_options<CharT>& options = basic_json_options<CharT>::get_default_options())
+              const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options())
 {
     basic_json_cursor<CharT> reader(is, options);
     T val = read_from<T>(j, reader);
@@ -97,7 +97,7 @@ template <class T, class CharT>
 typename std::enable_if<is_basic_json_class<T>::value>::type
 encode_json(const T& val,
             std::basic_ostream<CharT>& os, 
-            const basic_json_encode_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
+            const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
             indenting line_indent = indenting::no_indent)
 {
     if (line_indent == indenting::indent)
@@ -116,7 +116,7 @@ template <class T, class CharT>
 typename std::enable_if<!is_basic_json_class<T>::value>::type
 encode_json(const T& val,
             std::basic_ostream<CharT>& os, 
-            const basic_json_encode_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
+            const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
             indenting line_indent = indenting::no_indent)
 {
     if (line_indent == indenting::indent)
@@ -145,7 +145,7 @@ template <class T, class CharT>
 typename std::enable_if<is_basic_json_class<T>::value>::type
 encode_json(const T& val,
             std::basic_string<CharT>& s, 
-            const basic_json_encode_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
+            const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
             indenting line_indent = indenting::no_indent)
 {
     if (line_indent == indenting::indent)
@@ -164,7 +164,7 @@ template <class T, class CharT>
 typename std::enable_if<!is_basic_json_class<T>::value>::type
 encode_json(const T& val,
             std::basic_string<CharT>& s, 
-            const basic_json_encode_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
+            const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
             indenting line_indent = indenting::no_indent)
 {
     if (line_indent == indenting::indent)
@@ -200,7 +200,7 @@ template <class T, class CharT, class ImplementationPolicy, class Allocator>
 void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
                  const T& val,
                  std::basic_ostream<CharT>& os, 
-                 const basic_json_encode_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
+                 const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
                  indenting line_indent = indenting::no_indent)
 {
     if (line_indent == indenting::indent)
@@ -237,7 +237,7 @@ template <class T, class CharT, class ImplementationPolicy, class Allocator>
 void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
                  const T& val,
                  std::basic_string<CharT>& s, 
-                 const basic_json_encode_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
+                 const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
                  indenting line_indent = indenting::no_indent)
 { 
     if (line_indent == indenting::indent)
@@ -274,7 +274,7 @@ void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 T decode_json(const std::basic_string<CharT>& s,
-              const basic_json_decode_options<CharT>& options,
+              const basic_json_options<CharT>& options,
               const basic_json<CharT,ImplementationPolicy,Allocator>& j)
 {
     basic_json_cursor<CharT> reader(s, options);
@@ -284,7 +284,7 @@ T decode_json(const std::basic_string<CharT>& s,
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 T decode_json(std::basic_istream<CharT>& is,
-              const basic_json_decode_options<CharT>& options,
+              const basic_json_options<CharT>& options,
               const basic_json<CharT,ImplementationPolicy,Allocator>& j)
 {
     basic_json_cursor<CharT> reader(is, options);
@@ -306,7 +306,7 @@ void encode_json(const T& val,
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 void encode_json(const T& val,
                  std::basic_string<CharT>& s,
-                 const basic_json_encode_options<CharT>& options, 
+                 const basic_json_options<CharT>& options, 
                  indenting line_indent, 
                  const basic_json<CharT,ImplementationPolicy,Allocator>& j)
 { 
@@ -326,7 +326,7 @@ void encode_json(const T& val,
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 void encode_json(const T& val,
                  std::basic_ostream<CharT>& os, 
-                 const basic_json_encode_options<CharT>& options, 
+                 const basic_json_options<CharT>& options, 
                  indenting line_indent,
                  const basic_json<CharT,ImplementationPolicy,Allocator>& j)
 {

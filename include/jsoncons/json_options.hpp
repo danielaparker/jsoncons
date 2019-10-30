@@ -40,13 +40,14 @@ enum class byte_string_chars_format : uint8_t {none=0,base16,base64,base64url};
 
 enum class spaces_option{no_spaces=0,space_after,space_before,space_before_and_after};
 
+/*
 template <class CharT>
-class basic_json_decode_options
+class basic_json_options
 {
 public:
     typedef std::basic_string<CharT> string_type;
 
-    virtual ~basic_json_decode_options() = default;
+    virtual ~basic_json_options() = default;
 
     virtual size_t max_nesting_depth() const = 0;
 
@@ -66,12 +67,12 @@ public:
 };
 
 template <class CharT>
-class basic_json_encode_options
+class basic_json_options
 {
 public:
     typedef std::basic_string<CharT> string_type;
 
-    virtual ~basic_json_encode_options() = default;
+    virtual ~basic_json_options() = default;
 
     virtual size_t max_nesting_depth() const = 0;
 
@@ -133,10 +134,10 @@ public:
 
     virtual string_type neginf_to_str() const = 0;
 };
+*/
 
 template <class CharT>
-class basic_json_options : public virtual basic_json_decode_options<CharT>, 
-                           public virtual basic_json_encode_options<CharT>
+class basic_json_options
 {
 public:
     typedef CharT char_type;
@@ -238,25 +239,25 @@ public:
     }
 
 //  Properties
-    byte_string_chars_format byte_string_format() const override {return byte_string_format_;}
+    byte_string_chars_format byte_string_format() const  {return byte_string_format_;}
     basic_json_options&  byte_string_format(byte_string_chars_format value) {byte_string_format_ = value; return *this;}
 
-    bigint_chars_format bigint_format() const override {return bigint_format_;}
+    bigint_chars_format bigint_format() const  {return bigint_format_;}
     basic_json_options&  bigint_format(bigint_chars_format value) {bigint_format_ = value; return *this;}
 
-    line_split_kind object_object_line_splits() const override {return object_object_line_splits_;}
+    line_split_kind object_object_line_splits() const  {return object_object_line_splits_;}
     basic_json_options& object_object_line_splits(line_split_kind value) {object_object_line_splits_ = value; return *this;}
 
-    line_split_kind array_object_line_splits() const override {return array_object_line_splits_;}
+    line_split_kind array_object_line_splits() const  {return array_object_line_splits_;}
     basic_json_options& array_object_line_splits(line_split_kind value) {array_object_line_splits_ = value; return *this;}
 
-    line_split_kind object_array_line_splits() const override {return object_array_line_splits_;}
+    line_split_kind object_array_line_splits() const  {return object_array_line_splits_;}
     basic_json_options& object_array_line_splits(line_split_kind value) {object_array_line_splits_ = value; return *this;}
 
-    line_split_kind array_array_line_splits() const override {return array_array_line_splits_;}
+    line_split_kind array_array_line_splits() const  {return array_array_line_splits_;}
     basic_json_options& array_array_line_splits(line_split_kind value) {array_array_line_splits_ = value; return *this;}
 
-    size_t indent_size() const override
+    size_t indent_size() const 
     {
         return indent_size_;
     }
@@ -267,7 +268,7 @@ public:
         return *this;
     }
 
-    spaces_option spaces_around_colon() const override
+    spaces_option spaces_around_colon() const 
     {
         return spaces_around_colon_;
     }
@@ -278,7 +279,7 @@ public:
         return *this;
     }
 
-    spaces_option spaces_around_comma() const override
+    spaces_option spaces_around_comma() const 
     {
         return spaces_around_comma_;
     }
@@ -289,7 +290,7 @@ public:
         return *this;
     }
 
-    bool pad_inside_object_braces() const override
+    bool pad_inside_object_braces() const 
     {
         return pad_inside_object_braces_;
     }
@@ -300,7 +301,7 @@ public:
         return *this;
     }
 
-    bool pad_inside_array_brackets() const override
+    bool pad_inside_array_brackets() const 
     {
         return pad_inside_array_brackets_;
     }
@@ -311,7 +312,7 @@ public:
         return *this;
     }
 
-    string_type new_line_chars() const override
+    string_type new_line_chars() const 
     {
         return new_line_chars_;
     }
@@ -322,52 +323,52 @@ public:
         return *this;
     }
 
-    bool is_nan_to_num() const override
+    bool is_nan_to_num() const 
     {
         return is_nan_to_num_;
     }
 
-    bool is_inf_to_num() const override
+    bool is_inf_to_num() const 
     {
         return is_inf_to_num_;
     }
 
-    bool is_neginf_to_num() const override
+    bool is_neginf_to_num() const 
     {
         return is_neginf_to_num_ || is_inf_to_num_;
     }
 
-    bool is_nan_to_str() const override
+    bool is_nan_to_str() const 
     {
         return is_nan_to_str_;
     }
 
-    bool is_str_to_nan() const override
+    bool is_str_to_nan() const 
     {
         return is_str_to_nan_;
     }
 
-    bool is_inf_to_str() const override
+    bool is_inf_to_str() const 
     {
         return is_inf_to_str_;
     }
 
-    bool is_str_to_inf() const override
+    bool is_str_to_inf() const 
     {
         return is_str_to_inf_;
     }
 
-    bool is_neginf_to_str() const override
+    bool is_neginf_to_str() const 
     {
         return is_neginf_to_str_ || is_inf_to_str_;
     }
 
-    bool is_str_to_neginf() const override
+    bool is_str_to_neginf() const 
     {
         return is_str_to_neginf_ || is_str_to_inf_;
     }
 
-    string_type nan_to_num() const override
+    string_type nan_to_num() const 
     {
         if (is_nan_to_num_)
         {
@@ -393,7 +394,7 @@ public:
         return *this;
     }
 
-    string_type inf_to_num() const override
+    string_type inf_to_num() const 
     {
         if (is_inf_to_num_)
         {
@@ -419,7 +420,7 @@ public:
         return *this;
     }
 
-    string_type neginf_to_num() const override
+    string_type neginf_to_num() const 
     {
         if (is_neginf_to_num_)
         {
@@ -452,7 +453,7 @@ public:
         return *this;
     }
 
-    string_type nan_to_str() const override
+    string_type nan_to_str() const 
     {
         if (is_nan_to_str_)
         {
@@ -479,7 +480,7 @@ public:
         return *this;
     }
 
-    string_type inf_to_str() const override
+    string_type inf_to_str() const 
     {
         if (is_inf_to_str_)
         {
@@ -506,7 +507,7 @@ public:
         return *this;
     }
 
-    string_type neginf_to_str() const override
+    string_type neginf_to_str() const 
     {
         if (is_neginf_to_str_)
         {
@@ -540,7 +541,7 @@ public:
         return *this;
     }
 
-    bool lossless_number() const override
+    bool lossless_number() const 
     {
         return lossless_number_;
     }
@@ -551,7 +552,7 @@ public:
         return *this;
     }
 
-    size_t line_length_limit() const override
+    size_t line_length_limit() const 
     {
         return line_length_limit_;
     }
@@ -562,7 +563,7 @@ public:
         return *this;
     }
 
-    float_chars_format float_format() const override
+    float_chars_format float_format() const 
     {
         return float_format_;
     }
@@ -573,7 +574,7 @@ public:
         return *this;
     }
 
-    int precision() const override
+    int precision() const 
     {
         return precision_;
     }
@@ -584,7 +585,7 @@ public:
         return *this;
     }
 
-    bool escape_all_non_ascii() const override
+    bool escape_all_non_ascii() const 
     {
         return escape_all_non_ascii_;
     }
@@ -595,7 +596,7 @@ public:
         return *this;
     }
 
-    bool escape_solidus() const override
+    bool escape_solidus() const 
     {
         return escape_solidus_;
     }
@@ -606,7 +607,7 @@ public:
         return *this;
     }
 
-    size_t max_nesting_depth() const override
+    size_t max_nesting_depth() const 
     {
         return max_nesting_depth_;
     }
@@ -807,12 +808,6 @@ private:
 
 typedef basic_json_options<char> json_options;
 typedef basic_json_options<wchar_t> wjson_options;
-
-typedef basic_json_decode_options<char> json_decode_options;
-typedef basic_json_decode_options<wchar_t> wjson_decode_options;
-
-typedef basic_json_encode_options<char> json_encode_options;
-typedef basic_json_encode_options<wchar_t> wjson_encode_options;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("json_options") typedef json_options output_format;

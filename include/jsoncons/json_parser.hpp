@@ -187,7 +187,7 @@ class basic_json_parser : public ser_context
     static const size_t initial_string_buffer_capacity_ = 1024;
     static const int default_initial_stack_capacity_ = 100;
 
-    const basic_json_decode_options<CharT>& options_;
+    const basic_json_options<CharT>& options_;
 
     std::function<bool(json_errc,const ser_context&)> err_handler_;
     int initial_stack_capacity_;
@@ -223,12 +223,12 @@ public:
     {
     }
 
-    basic_json_parser(const basic_json_decode_options<CharT>& options, const WorkAllocator& allocator = WorkAllocator())
+    basic_json_parser(const basic_json_options<CharT>& options, const WorkAllocator& allocator = WorkAllocator())
         : basic_json_parser(options, default_json_parsing(), allocator)
     {
     }
 
-    basic_json_parser(const basic_json_decode_options<CharT>& options,
+    basic_json_parser(const basic_json_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
                       const WorkAllocator& allocator = WorkAllocator())
        : options_(options),

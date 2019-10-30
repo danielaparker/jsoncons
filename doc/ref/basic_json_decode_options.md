@@ -1,11 +1,11 @@
-### jsoncons::basic_json_decode_options
+### jsoncons::basic_json_options
 
 ```c++
 #include <jsoncons/json_options.hpp>
 
 template< 
     class CharT
-> class basic_json_decode_options;
+> class basic_json_options;
 ```
 
 An abstract class that defines accessors for JSON parsing options.
@@ -18,8 +18,8 @@ Typedefs for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------
-`json_decode_options`        |`basic_json_decode_options<char>`
-`wjson_decode_options`       |`basic_json_decode_options<wchar_t>`
+`json_decode_options`        |`basic_json_options<char>`
+`wjson_decode_options`       |`basic_json_options<wchar_t>`
 
 Member type                         |Definition
 ------------------------------------|------------------------------

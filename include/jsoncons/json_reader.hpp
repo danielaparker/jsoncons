@@ -189,7 +189,7 @@ public:
 
     template <class Source>
     basic_json_reader(Source&& source, 
-                      const basic_json_decode_options<CharT>& options, 
+                      const basic_json_options<CharT>& options, 
                       const WorkAllocator& allocator = WorkAllocator())
         : basic_json_reader(std::forward<Source>(source),
                             default_content_handler_,
@@ -213,7 +213,7 @@ public:
 
     template <class Source>
     basic_json_reader(Source&& source, 
-                      const basic_json_decode_options<CharT>& options,
+                      const basic_json_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
                       const WorkAllocator& allocator = WorkAllocator())
         : basic_json_reader(std::forward<Source>(source),
@@ -239,7 +239,7 @@ public:
     template <class Source>
     basic_json_reader(Source&& source, 
                       basic_json_content_handler<CharT>& handler,
-                      const basic_json_decode_options<CharT>& options, 
+                      const basic_json_options<CharT>& options, 
                       const WorkAllocator& allocator = WorkAllocator())
         : basic_json_reader(std::forward<Source>(source),
                             handler,
@@ -265,7 +265,7 @@ public:
     template <class Source>
     basic_json_reader(Source&& source,
                       basic_json_content_handler<CharT>& handler, 
-                      const basic_json_decode_options<CharT>& options,
+                      const basic_json_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
                       const WorkAllocator& allocator = WorkAllocator(),
                       typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
@@ -283,7 +283,7 @@ public:
     template <class Source>
     basic_json_reader(Source&& source,
                       basic_json_content_handler<CharT>& handler, 
-                      const basic_json_decode_options<CharT>& options,
+                      const basic_json_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
                       const WorkAllocator& allocator = WorkAllocator(),
                       typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)

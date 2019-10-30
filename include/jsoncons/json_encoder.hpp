@@ -289,7 +289,7 @@ private:
 
     size_t indent_size_;
 
-    const basic_json_encode_options<CharT>& options_;
+    const basic_json_options<CharT>& options_;
 
     jsoncons::detail::print_double fp_;
 
@@ -315,7 +315,7 @@ public:
     }
 
     basic_json_encoder(result_type result, 
-                       const basic_json_encode_options<CharT>& options)
+                       const basic_json_options<CharT>& options)
        : options_(options),
          fp_(options.float_format(), options.precision()),
          result_(std::move(result)), 
@@ -1045,7 +1045,7 @@ private:
         }
     };
 
-    const basic_json_encode_options<CharT>& options_;
+    const basic_json_options<CharT>& options_;
 
     std::vector<encoding_context> stack_;
     jsoncons::detail::print_double fp_;
@@ -1061,7 +1061,7 @@ public:
     }
 
     basic_json_compressed_encoder(result_type result, 
-                                     const basic_json_encode_options<CharT>& options)
+                                     const basic_json_options<CharT>& options)
        : options_(options),
          fp_(options.float_format(), options.precision()),
          result_(std::move(result))

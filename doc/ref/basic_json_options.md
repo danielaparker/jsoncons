@@ -8,13 +8,44 @@ template<
 > class basic_json_options;
 ```
 
-Specifies options for parsing and serializing JSON text. 
+Specifies options for reading and writing JSON text. 
+
+Option|Reading|Writing
+-----------------------
+indent_size||The indent size, the default is 4.
+spaces_around_colon||Indicates [space option](spaces_option.md) for name separator (`:`). Default is space after.
+spaces_around_comma||Indicates [space option](spaces_option.md) for array value and object name/value pair separators (`,`). Default is space after.
+pad_inside_object_braces||Default is `false`
+pad_inside_array_brackets||Default is `false`
+bigint_format||Overrides [bignum format](bigint_chars_format.md) when serializing json. The default is [bigint_chars_format::base10](bigint_chars_format.md). 
+byte_string_format||Overrides [byte string format](byte_string_chars_format.md) when serializing json. The default is [byte_string_chars_format::base64url](byte_string_chars_format.md). 
+float_format||Overrides [floating point format](../float_chars_format.md) when serializing to JSON. The default is [float_chars_format::general](float_chars_format.md).
+precision||Overrides floating point precision when serializing json. The default is shortest representation.
+escape_all_non_ascii||Escape all non-ascii characters. The default is `false`.
+escape_solidus||Escape the solidus ('/') character. The default is `false`.
+nan_to_num||Sets a number replacement for `NaN` when writing JSON
+inf_to_num||Sets a number replacement for `Infinity` when writing JSON
+neginf_to_num||Sets a number replacement for `Negative Infinity` when writing JSON
+nan_to_str|Used when reading JSON|Sets a string replacement for `NaN` when writing JSON
+inf_to_str|Used when reading JSON|Sets a string replacement for infinity when writing JSON
+neginf_to_str|used when reading JSON|Sets a string replacement for negative infinity when writing JSON
+lossless_number|If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`. Defaults to `false`.|
+new_line_chars||Defaults to "\n"
+line_length_limit||
+
+max_nesting_depth|The maximum nesting depth allowed when parsing JSON. By default `jsoncons` can read a `JSON` text of arbitrarily large depth.|
+
+object_object_line_splits||For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
+
+array_object_line_splits||For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
+
+object_array_line_splits||For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::same_line](line_split_kind.md).
+
+array_array_line_splits||For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind.md).
 
 The default floating point format is [float_chars_format::general](float_chars_format.md).
 The default precision is shortest representation, e.g. 1.1 read will remain `1.1` when written, and not become `1.1000000000000001` (an equivalent but longer representation.)
 Trailing zeros are removed, except one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.
-
-![basic_json_options](./diagrams/json_options.png)
 
 Typedefs for common character types are provided:
 
@@ -130,11 +161,6 @@ For an array whose parent is an array, set whether that array is split on a new 
 
     static const basic_json_options& get_default_options()
 Default JSON encode and decode options.
-
-### See also
-
-[basic_json_decode_options](basic_json_decode_options.md)
-[basic_json_encode_options](basic_json_encode_options.md)
 
 ### Examples
 
