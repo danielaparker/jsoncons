@@ -1,7 +1,7 @@
 ### jsoncons::cbor::basic_cbor_cursor
 
 ```c++
-#include <jsoncons/cbor_cursor.hpp>
+#include <jsoncons_ext/cbor/cbor_cursor.hpp>
 
 template<
     class Src=jsoncons::binary_stream_source,
@@ -116,7 +116,7 @@ Input JSON file `book_catalog.json`:
 #### Reading a JSON stream
 
 ```c++
-#include <jsoncons/cbor_cursor.hpp>
+#include <jsoncons_ext/cbor/cbor_cursor.hpp>
 #include <string>
 #include <fstream>
 
@@ -212,7 +212,7 @@ end_array
 #### Filtering a JSON stream
 
 ```c++
-#include <jsoncons/cbor_cursor.hpp>
+#include <jsoncons_ext/cbor/cbor_cursor.hpp>
 #include <string>
 #include <fstream>
 

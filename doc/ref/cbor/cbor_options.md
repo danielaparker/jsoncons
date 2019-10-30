@@ -1,7 +1,7 @@
 ### jsoncons::cbor::cbor_options
 
 ```c++
-#include <jsoncons/cbor/cbor_options.hpp>
+#include <jsoncons_ext/cbor/cbor_options.hpp>
 ```
 
 Specifies options for encoding and decoding CBOR.

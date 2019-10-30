@@ -1,7 +1,7 @@
-### jsoncons::bson::basic_msgpack_encoder
+### jsoncons::msgpack::basic_msgpack_encoder
 
 ```c++
-#include <jsoncons_ext/bson/msgpack_encoder.hpp>
+#include <jsoncons_ext/msgpack/msgpack_encoder.hpp>
 
 template<
     class Result>

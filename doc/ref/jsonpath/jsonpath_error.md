@@ -1,4 +1,4 @@
-### jsoncons::jsonpath_error
+### jsoncons::jsonpath::jsonpath_error
 
 ```c++
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>

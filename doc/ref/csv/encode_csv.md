@@ -3,7 +3,7 @@
 Encodes a C++ data structure into the CSV data format.
 
 ```c++
-#include <jsoncons_ext/csv/csv_encoder.hpp>
+#include <jsoncons_ext/csv/csv.hpp>
 
 template <class T,class CharT>
 void encode_csv(const T& val, 

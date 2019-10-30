@@ -9,11 +9,14 @@ enum class semantic_tag : uint8_t
     timestamp,
     bigint,
     bigdec,
+    bigfloat,
     base16,
     base64,
     base64url,
     uri,
-    bigfloat
+    clamped,
+    multi_dim_row_major,
+    multi_dim_column_major
 };
 ```
 

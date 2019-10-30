@@ -3,7 +3,7 @@
 Returns a `json` array of values or normalized path expressions selected from a root `json` structure.
 
 ```c++
-#include <jsoncons/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/json_query.hpp>
 
 enum class result_type {value,path};
 

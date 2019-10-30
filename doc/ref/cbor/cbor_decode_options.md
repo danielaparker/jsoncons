@@ -1,7 +1,7 @@
 ### jsoncons::cbor::cbor_decode_options
 
 ```c++
-#include <jsoncons/cbor/cbor_options.hpp>
+#include <jsoncons_ext/cbor/cbor_options.hpp>
 ```
 
 An abstract class that defines accessors for CBOR decoding options.
