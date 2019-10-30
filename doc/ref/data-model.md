@@ -5,8 +5,9 @@ booleans, numbers, strings, arrays, objects - plus byte strings. It has
 
 - null
 - bool
-- int64
 - uint64
+- int64
+- half
 - double
 - string
 - byte string
