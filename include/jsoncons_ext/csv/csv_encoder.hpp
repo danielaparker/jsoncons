@@ -70,7 +70,7 @@ private:
         string_type name_;
     };
     Result result_;
-    const basic_csv_encode_options<CharT>& options_;
+    const basic_csv_options<CharT>& options_;
     std::vector<stack_item> stack_;
     jsoncons::detail::print_double fp_;
     std::vector<string_type,string_allocator_type> column_names_;
@@ -88,7 +88,7 @@ public:
     }
 
     basic_csv_encoder(result_type result,
-                      const basic_csv_encode_options<CharT>& options)
+                      const basic_csv_options<CharT>& options)
        :
        result_(std::move(result)),
        options_(options),

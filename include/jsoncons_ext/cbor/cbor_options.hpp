@@ -15,24 +15,7 @@
 
 namespace jsoncons { namespace cbor {
 
-class cbor_decode_options
-{
-public:
-    virtual ~cbor_decode_options() = default;
-};
-
-class cbor_encode_options
-{
-public:
-    virtual ~cbor_encode_options() = default;
-
-    virtual bool use_stringref() const = 0;
-     
-    virtual bool use_typed_arrays() const = 0; 
-};
-
-class cbor_options : public virtual cbor_decode_options, 
-                     public virtual cbor_encode_options
+class cbor_options
 {
 private:
     bool use_stringref_;
@@ -54,7 +37,7 @@ public:
     {
     }
 
-    bool use_stringref() const override
+    bool use_stringref() const 
     {
         return use_stringref_;
     }
@@ -74,7 +57,7 @@ public:
     }
 #endif
 
-    bool use_typed_arrays() const override
+    bool use_typed_arrays() const 
     {
         return use_typed_arrays_;
     }

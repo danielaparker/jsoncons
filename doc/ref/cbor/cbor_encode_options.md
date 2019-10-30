@@ -1,4 +1,4 @@
-### jsoncons::cbor::cbor_encode_options
+### jsoncons::cbor::cbor_options
 
 ```c++
 #include <jsoncons_ext/cbor/cbor_options.hpp>
@@ -12,7 +12,7 @@ An abstract class that defines accessors for CBOR encoding options.
 
 #### Destructor
 
-    virtual ~cbor_encode_options();
+    virtual ~cbor_options();
 
 #### Accessors
 

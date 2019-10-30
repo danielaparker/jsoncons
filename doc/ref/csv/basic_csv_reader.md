@@ -51,7 +51,7 @@ source_type                |Src
     template <class Source>
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler,
-                     const basic_csv_decode_options<CharT>& options,
+                     const basic_csv_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
                      const WorkAllocator& allocator = WorkAllocator()); // (4)
 

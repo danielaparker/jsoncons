@@ -4,9 +4,7 @@
 #include <jsoncons_ext/cbor/cbor_options.hpp>
 ```
 
-Specifies options for encoding and decoding CBOR.
-
-![cbor_options](./diagrams/cbor_options.png)
+Specifies options for reading and writing CBOR.
 
 #### Constructors
 
@@ -37,6 +35,6 @@ Default CBOR encode and decode options.
 
 ### See also
 
-[cbor_decode_options](cbor_decode_options.md)
-[cbor_encode_options](cbor_encode_options.md)
+[cbor_options](cbor_decode_options.md)
+[cbor_options](cbor_encode_options.md)
 

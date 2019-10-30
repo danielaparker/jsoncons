@@ -74,7 +74,7 @@ private:
     };
     std::vector<stack_item> stack_;
     Result result_;
-    const cbor_encode_options& options_;
+    const cbor_options& options_;
 
     // Noncopyable and nonmoveable
     basic_cbor_encoder(const basic_cbor_encoder&) = delete;
@@ -88,7 +88,7 @@ public:
        : result_(std::move(result)), options_(cbor_options::get_default_options())
     {
     }
-    basic_cbor_encoder(result_type result, const cbor_encode_options& options)
+    basic_cbor_encoder(result_type result, const cbor_options& options)
        : result_(std::move(result)), options_(options)
     {
         if (options.use_stringref())

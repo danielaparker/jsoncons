@@ -30,13 +30,13 @@ wcsv_cursor    |basic_csv_cursor<wchar_t>
 
     template <class Source>
     basic_csv_cursor(Source&& source, 
-                     const basic_csv_decode_options<CharT>& options = basic_csv_options<CharT>::get_default_options(),
+                     const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options(),
                      std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing()); // (1)
 
     template <class Source>
     basic_csv_cursor(Source&& source, 
                       std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                      const basic_csv_decode_options<CharT>& options = basic_csv_options<CharT>::get_default_options(),
+                      const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options(),
                       std::function<bool(json_errc,const ser_context&)> err_handler = default_csv_parsing()); // (2)
 
 Constructors (1)-(2) read from a character sequence or stream and throw a 
@@ -47,7 +47,7 @@ Constructors (1)-(2) read from a character sequence or stream and throw a
 
     template <class Source>
     basic_csv_cursor(Source&& source, 
-                     const basic_csv_decode_options<CharT>& options,
+                     const basic_csv_options<CharT>& options,
                      std::error_code& ec); // (4)
 
     template <class Source>
@@ -58,19 +58,19 @@ Constructors (1)-(2) read from a character sequence or stream and throw a
     template <class Source>
     basic_csv_cursor(Source&& source, 
                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                     const basic_csv_decode_options<CharT>& options,
+                     const basic_csv_options<CharT>& options,
                      std::error_code& ec); // (6)
 
     template <class Source>
     basic_csv_cursor(Source&& source, 
                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                     const basic_csv_decode_options<CharT>& options,
+                     const basic_csv_options<CharT>& options,
                      std::error_code& ec); // (7)
 
     template <class Source>
     basic_csv_cursor(Source&& source, 
                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                     const basic_csv_decode_options<CharT>& options,
+                     const basic_csv_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
                      std::error_code& ec); // (8)
 
