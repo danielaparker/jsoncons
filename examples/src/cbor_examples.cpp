@@ -298,7 +298,7 @@ void encode_cbor_with_packed_strings()
 )");
 
     cbor::cbor_options options;
-    options.use_stringref(true);
+    options.pack_strings(true);
     std::vector<uint8_t> buf;
 
     cbor::encode_cbor(j, buf, options);

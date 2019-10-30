@@ -13,7 +13,7 @@ Constructs a `cbor_options` with default values.
 
 #### Modifiers
 
-    cbor_options& use_stringref(bool value)
+    cbor_options& pack_strings(bool value)
 
 If set to `true`, then encode will store text strings and
 byte strings once, and use string references to represent repeated occurences
@@ -28,7 +28,7 @@ will encode strings the usual CBOR way.
 This option does not affect decode - jsoncons will always decode
 string references if present.
 
-    cbor_options& use_typed_arrays(bool value)
+    cbor_options& enable_typed_arrays(bool value)
 
 This option does not affect decode - jsoncons will always decode
 typed arrays if present.

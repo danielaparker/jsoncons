@@ -19,7 +19,7 @@ class cbor_options
 {
 private:
     bool use_stringref_;
-    bool use_typed_arrays_;
+    bool enable_typed_arrays_;
 public:
 
     static const cbor_options& get_default_options()
@@ -33,38 +33,29 @@ public:
 
     cbor_options()
         : use_stringref_(false),
-          use_typed_arrays_(false)
+          enable_typed_arrays_(false)
     {
     }
 
-    bool use_stringref() const 
+    bool pack_strings() const 
     {
         return use_stringref_;
     }
 
-    cbor_options& use_stringref(bool value)
-    {
-        use_stringref_ = value;
-        return *this;
-    }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("instead, use use_stringref(bool)")
     cbor_options& pack_strings(bool value)
     {
         use_stringref_ = value;
         return *this;
     }
-#endif
 
-    bool use_typed_arrays() const 
+    bool enable_typed_arrays() const 
     {
-        return use_typed_arrays_;
+        return enable_typed_arrays_;
     }
 
-    cbor_options& use_typed_arrays(bool value)
+    cbor_options& enable_typed_arrays(bool value)
     {
-        use_typed_arrays_ = value;
+        enable_typed_arrays_ = value;
         return *this;
     }
 };
