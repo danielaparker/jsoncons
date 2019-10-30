@@ -740,12 +740,12 @@ private:
         {
             if ((std::isnan)(value))
             {
-                if (options_.is_nan_to_num())
+                if (options_.enable_nan_to_num())
                 {
                     result_.append(options_.nan_to_num().data(), options_.nan_to_num().length());
                     column_ += options_.nan_to_num().length();
                 }
-                else if (options_.is_nan_to_str())
+                else if (options_.enable_nan_to_str())
                 {
                     do_string_value(options_.nan_to_str(), semantic_tag::none, context, ec);
                 }
@@ -757,12 +757,12 @@ private:
             }
             else if (value == std::numeric_limits<double>::infinity())
             {
-                if (options_.is_inf_to_num())
+                if (options_.enable_inf_to_num())
                 {
                     result_.append(options_.inf_to_num().data(), options_.inf_to_num().length());
                     column_ += options_.inf_to_num().length();
                 }
-                else if (options_.is_inf_to_str())
+                else if (options_.enable_inf_to_str())
                 {
                     do_string_value(options_.inf_to_str(), semantic_tag::none, context, ec);
                 }
@@ -774,12 +774,12 @@ private:
             }
             else
             {
-                if (options_.is_neginf_to_num())
+                if (options_.enable_neginf_to_num())
                 {
                     result_.append(options_.neginf_to_num().data(), options_.neginf_to_num().length());
                     column_ += options_.neginf_to_num().length();
                 }
-                else if (options_.is_neginf_to_str())
+                else if (options_.enable_neginf_to_str())
                 {
                     do_string_value(options_.neginf_to_str(), semantic_tag::none, context, ec);
                 }
@@ -1325,11 +1325,11 @@ private:
         {
             if ((std::isnan)(value))
             {
-                if (options_.is_nan_to_num())
+                if (options_.enable_nan_to_num())
                 {
                     result_.append(options_.nan_to_num().data(), options_.nan_to_num().length());
                 }
-                else if (options_.is_nan_to_str())
+                else if (options_.enable_nan_to_str())
                 {
                     do_string_value(options_.nan_to_str(), semantic_tag::none, context, ec);
                 }
@@ -1340,11 +1340,11 @@ private:
             }
             else if (value == std::numeric_limits<double>::infinity())
             {
-                if (options_.is_inf_to_num())
+                if (options_.enable_inf_to_num())
                 {
                     result_.append(options_.inf_to_num().data(), options_.inf_to_num().length());
                 }
-                else if (options_.is_inf_to_str())
+                else if (options_.enable_inf_to_str())
                 {
                     do_string_value(options_.inf_to_str(), semantic_tag::none, context, ec);
                 }
@@ -1355,11 +1355,11 @@ private:
             }
             else 
             {
-                if (options_.is_neginf_to_num())
+                if (options_.enable_neginf_to_num())
                 {
                     result_.append(options_.neginf_to_num().data(), options_.neginf_to_num().length());
                 }
-                else if (options_.is_neginf_to_str())
+                else if (options_.enable_neginf_to_str())
                 {
                     do_string_value(options_.neginf_to_str(), semantic_tag::none, context, ec);
                 }

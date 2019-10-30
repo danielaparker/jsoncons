@@ -51,15 +51,15 @@ public:
 
     virtual size_t max_nesting_depth() const = 0;
 
-    virtual bool is_str_to_nan() const = 0;
+    virtual bool enable_str_to_nan() const = 0;
 
     virtual string_type nan_to_str() const = 0;
 
-    virtual bool is_str_to_inf() const = 0;
+    virtual bool enable_str_to_inf() const = 0;
 
     virtual string_type inf_to_str() const = 0;
 
-    virtual bool is_str_to_neginf() const = 0;
+    virtual bool enable_str_to_neginf() const = 0;
 
     virtual string_type neginf_to_str() const = 0;
 
@@ -110,27 +110,27 @@ public:
 
     virtual string_type new_line_chars() const = 0;
 
-    virtual bool is_nan_to_num() const = 0;
+    virtual bool enable_nan_to_num() const = 0;
 
     virtual string_type nan_to_num() const = 0;
 
-    virtual bool is_inf_to_num() const = 0;
+    virtual bool enable_inf_to_num() const = 0;
 
     virtual string_type inf_to_num() const = 0;
 
-    virtual bool is_neginf_to_num() const = 0;
+    virtual bool enable_neginf_to_num() const = 0;
 
     virtual string_type neginf_to_num() const = 0;
 
-    virtual bool is_nan_to_str() const = 0;
+    virtual bool enable_nan_to_str() const = 0;
 
     virtual string_type nan_to_str() const = 0;
 
-    virtual bool is_inf_to_str() const = 0;
+    virtual bool enable_inf_to_str() const = 0;
 
     virtual string_type inf_to_str() const = 0;
 
-    virtual bool is_neginf_to_str() const = 0;
+    virtual bool enable_neginf_to_str() const = 0;
 
     virtual string_type neginf_to_str() const = 0;
 };
@@ -171,15 +171,15 @@ private:
     bool pad_inside_array_brackets_;
     string_type new_line_chars_;
 
-    bool is_nan_to_num_;
-    bool is_inf_to_num_;
-    bool is_neginf_to_num_;
-    bool is_nan_to_str_;
-    bool is_inf_to_str_;
-    bool is_neginf_to_str_;
-    bool is_str_to_nan_;
-    bool is_str_to_inf_;
-    bool is_str_to_neginf_;
+    bool enable_nan_to_num_;
+    bool enable_inf_to_num_;
+    bool enable_neginf_to_num_;
+    bool enable_nan_to_str_;
+    bool enable_inf_to_str_;
+    bool enable_neginf_to_str_;
+    bool enable_str_to_nan_;
+    bool enable_str_to_inf_;
+    bool enable_str_to_neginf_;
 
     string_type nan_to_num_;
     string_type inf_to_num_;
@@ -224,15 +224,15 @@ public:
           spaces_around_comma_(spaces_option::space_after),
           pad_inside_object_braces_(false),
           pad_inside_array_brackets_(false),
-          is_nan_to_num_(false),
-          is_inf_to_num_(false),
-          is_neginf_to_num_(false),
-          is_nan_to_str_(false),
-          is_inf_to_str_(false),
-          is_neginf_to_str_(false),
-          is_str_to_nan_(false),
-          is_str_to_inf_(false),
-          is_str_to_neginf_(false),
+          enable_nan_to_num_(false),
+          enable_inf_to_num_(false),
+          enable_neginf_to_num_(false),
+          enable_nan_to_str_(false),
+          enable_inf_to_str_(false),
+          enable_neginf_to_str_(false),
+          enable_str_to_nan_(false),
+          enable_str_to_inf_(false),
+          enable_str_to_neginf_(false),
           lossless_number_(false)
     {
         new_line_chars_.push_back('\n');
@@ -323,54 +323,54 @@ public:
         return *this;
     }
 
-    bool is_nan_to_num() const 
+    bool enable_nan_to_num() const 
     {
-        return is_nan_to_num_;
+        return enable_nan_to_num_;
     }
 
-    bool is_inf_to_num() const 
+    bool enable_inf_to_num() const 
     {
-        return is_inf_to_num_;
+        return enable_inf_to_num_;
     }
 
-    bool is_neginf_to_num() const 
+    bool enable_neginf_to_num() const 
     {
-        return is_neginf_to_num_ || is_inf_to_num_;
+        return enable_neginf_to_num_ || enable_inf_to_num_;
     }
 
-    bool is_nan_to_str() const 
+    bool enable_nan_to_str() const 
     {
-        return is_nan_to_str_;
+        return enable_nan_to_str_;
     }
 
-    bool is_str_to_nan() const 
+    bool enable_str_to_nan() const 
     {
-        return is_str_to_nan_;
+        return enable_str_to_nan_;
     }
 
-    bool is_inf_to_str() const 
+    bool enable_inf_to_str() const 
     {
-        return is_inf_to_str_;
+        return enable_inf_to_str_;
     }
 
-    bool is_str_to_inf() const 
+    bool enable_str_to_inf() const 
     {
-        return is_str_to_inf_;
+        return enable_str_to_inf_;
     }
 
-    bool is_neginf_to_str() const 
+    bool enable_neginf_to_str() const 
     {
-        return is_neginf_to_str_ || is_inf_to_str_;
+        return enable_neginf_to_str_ || enable_inf_to_str_;
     }
 
-    bool is_str_to_neginf() const 
+    bool enable_str_to_neginf() const 
     {
-        return is_str_to_neginf_ || is_str_to_inf_;
+        return enable_str_to_neginf_ || enable_str_to_inf_;
     }
 
     string_type nan_to_num() const 
     {
-        if (is_nan_to_num_)
+        if (enable_nan_to_num_)
         {
             return nan_to_num_;
         }
@@ -388,7 +388,7 @@ public:
 
     basic_json_options& nan_to_num(const string_type& value) 
     {
-        is_nan_to_num_ = true;
+        enable_nan_to_num_ = true;
         nan_to_str_.clear();
         nan_to_num_ = value;
         return *this;
@@ -396,7 +396,7 @@ public:
 
     string_type inf_to_num() const 
     {
-        if (is_inf_to_num_)
+        if (enable_inf_to_num_)
         {
             return inf_to_num_;
         }
@@ -414,7 +414,7 @@ public:
 
     basic_json_options& inf_to_num(const string_type& value) 
     {
-        is_inf_to_num_ = true;
+        enable_inf_to_num_ = true;
         inf_to_str_.clear();
         inf_to_num_ = value;
         return *this;
@@ -422,11 +422,11 @@ public:
 
     string_type neginf_to_num() const 
     {
-        if (is_neginf_to_num_)
+        if (enable_neginf_to_num_)
         {
             return neginf_to_num_;
         }
-        else if (is_inf_to_num_)
+        else if (enable_inf_to_num_)
         {
             string_type s;
             s.push_back('-');
@@ -447,7 +447,7 @@ public:
 
     basic_json_options& neginf_to_num(const string_type& value) 
     {
-        is_neginf_to_num_ = true;
+        enable_neginf_to_num_ = true;
         neginf_to_str_.clear();
         neginf_to_num_ = value;
         return *this;
@@ -455,7 +455,7 @@ public:
 
     string_type nan_to_str() const 
     {
-        if (is_nan_to_str_)
+        if (enable_nan_to_str_)
         {
             return nan_to_str_;
         }
@@ -471,10 +471,10 @@ public:
         }
     }
 
-    basic_json_options& nan_to_str(const string_type& value, bool is_str_to_nan = true) 
+    basic_json_options& nan_to_str(const string_type& value, bool enable_inverse = true) 
     {
-        is_nan_to_str_ = true;
-        is_str_to_nan_ = is_str_to_nan;
+        enable_nan_to_str_ = true;
+        enable_str_to_nan_ = enable_inverse;
         nan_to_num_.clear();
         nan_to_str_ = value;
         return *this;
@@ -482,7 +482,7 @@ public:
 
     string_type inf_to_str() const 
     {
-        if (is_inf_to_str_)
+        if (enable_inf_to_str_)
         {
             return inf_to_str_;
         }
@@ -498,10 +498,10 @@ public:
         }
     }
 
-    basic_json_options& inf_to_str(const string_type& value, bool is_inf_to_str = true) 
+    basic_json_options& inf_to_str(const string_type& value, bool enable_inverse = true) 
     {
-        is_inf_to_str_ = true;
-        is_inf_to_str_ = is_inf_to_str;
+        enable_inf_to_str_ = true;
+        enable_inf_to_str_ = enable_inverse;
         inf_to_num_.clear();
         inf_to_str_ = value;
         return *this;
@@ -509,11 +509,11 @@ public:
 
     string_type neginf_to_str() const 
     {
-        if (is_neginf_to_str_)
+        if (enable_neginf_to_str_)
         {
             return neginf_to_str_;
         }
-        else if (is_inf_to_str_)
+        else if (enable_inf_to_str_)
         {
             string_type s;
             s.push_back('-');
@@ -532,10 +532,10 @@ public:
         }
     }
 
-    basic_json_options& neginf_to_str(const string_type& value, bool is_neginf_to_str = true) 
+    basic_json_options& neginf_to_str(const string_type& value, bool enable_inverse = true) 
     {
-        is_neginf_to_str_ = true;
-        is_neginf_to_str_ = is_neginf_to_str;
+        enable_neginf_to_str_ = true;
+        enable_neginf_to_str_ = enable_inverse;
         neginf_to_num_.clear();
         neginf_to_str_ = value;
         return *this;
@@ -659,13 +659,13 @@ public:
         return indent_size(value);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use is_nan_to_num() or is_nan_to_str()")
+    JSONCONS_DEPRECATED_MSG("Instead, use enable_nan_to_num() or enable_nan_to_str()")
     bool can_read_nan_replacement() const {return can_read_nan_replacement_;}
 
-    JSONCONS_DEPRECATED_MSG("Instead, use is_inf_to_num() or is_inf_to_str()")
+    JSONCONS_DEPRECATED_MSG("Instead, use enable_inf_to_num() or enable_inf_to_str()")
     bool can_read_pos_inf_replacement() const {return can_read_pos_inf_replacement_;}
 
-    JSONCONS_DEPRECATED_MSG("Instead, use is_neginf_to_num() or is_neginf_to_str()")
+    JSONCONS_DEPRECATED_MSG("Instead, use enable_neginf_to_num() or enable_neginf_to_str()")
     bool can_read_neg_inf_replacement() const {return can_read_neg_inf_replacement_;}
 
     bool can_write_nan_replacement() const {return !nan_replacement_.empty();}

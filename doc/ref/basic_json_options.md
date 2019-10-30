@@ -72,15 +72,15 @@ Constructs a `basic_json_options` with default values.
     void max_nesting_depth(size_t depth)
 The maximum nesting depth allowed when parsing JSON. By default `jsoncons` can read a `JSON` text of arbitrarily large depth.
 
-    basic_json_options& nan_to_str(const string_type& value, bool is_str_to_nan = true); 
+    basic_json_options& nan_to_str(const string_type& value, bool enable_inverse = true); 
 Sets a string replacement for `NaN` when writing JSON, and indicate whether it is also
 to be used when reading JSON.
 
-    basic_json_options& inf_to_str(const string_type& value, bool is_str_to_inf = true); 
+    basic_json_options& inf_to_str(const string_type& value, bool enable_inverse = true); 
 Sets a string replacement for infinity when writing JSON, and indicate whether it is also
 to be used when reading JSON.
 
-    basic_json_options& neginf_to_str(const string_type& value, bool is_str_to_neginf = true); // (4)
+    basic_json_options& neginf_to_str(const string_type& value, bool enable_inverse = true); // (4)
 Sets a string replacement for negative infinity when writing JSON, and indicate whether it is also
 to be used when reading JSON.
 

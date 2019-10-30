@@ -68,28 +68,28 @@ Escape all non-ascii characters. The default is `false`.
     virtual bool escape_solidus() const = 0
 Escape the solidus ('/') character. The default is `false`.
 
-    virtual bool is_nan_to_num() const = 0; 
-    virtual bool is_nan_to_str() const = 0; 
+    virtual bool enable_nan_to_num() const = 0; 
+    virtual bool enable_nan_to_str() const = 0; 
     virtual const string_type& nan_to_num() const = 0 
     virtual const string_type& nan_to_str() const = 0 
-Replace `NaN` with a number, if `is_nan_to_num()` returns `true`,
-or a string, if `is_nan_to_str()` returns `true`. If both
+Replace `NaN` with a number, if `enable_nan_to_num()` returns `true`,
+or a string, if `enable_nan_to_str()` returns `true`. If both
 return `false`, replace `NaN` with `null`.
 
-    virtual bool is_inf_to_num() const = 0;
-    virtual bool is_inf_to_str() const = 0;
+    virtual bool enable_inf_to_num() const = 0;
+    virtual bool enable_inf_to_str() const = 0;
     virtual const string_type& inf_to_num() const = 0 
     virtual const string_type& inf_to_str() const = 0 
-Replace positive infinity with a number, if `is_inf_to_num()` returns `true`,
-or a string, if `is_inf_to_str()` returns `true`. If both
+Replace positive infinity with a number, if `enable_inf_to_num()` returns `true`,
+or a string, if `enable_inf_to_str()` returns `true`. If both
 return `false`, replace positive infinity with `null`.
 
-    virtual bool is_neginf_to_num() const = 0
-    virtual bool is_neginf_to_str() const = 0
+    virtual bool enable_neginf_to_num() const = 0
+    virtual bool enable_neginf_to_str() const = 0
     virtual const string_type& neginf_to_num() const = 0 
     virtual const string_type& neginf_to_str() const = 0 
-Replace negative infinity with a number, if `is_neginf_to_num()` returns `true`,
-or a string, if `is_neginf_to_str()` returns true. If both
+Replace negative infinity with a number, if `enable_neginf_to_num()` returns `true`,
+or a string, if `enable_neginf_to_str()` returns true. If both
 return `false`, replace negative infinity with `null`.
 
     virtual string_type new_line_chars() const = 0

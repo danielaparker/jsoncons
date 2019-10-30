@@ -28,6 +28,11 @@ will encode strings the usual CBOR way.
 This option does not affect decode - jsoncons will always decode
 string references if present.
 
+    cbor_options& use_typed_arrays(bool value)
+
+This option does not affect decode - jsoncons will always decode
+typed arrays if present.
+
 #### Static member functions
 
     static const cbor_options& get_default_options()
