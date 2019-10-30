@@ -5,20 +5,19 @@
 
 enum class staj_event_type
 {
-    begin_object,
-    end_object,
     begin_array,
     end_array,
+    begin_object,
+    end_object,
     name,
     string_value,
     byte_string_value,
-    bigint_value,
-    bigdec_value,
+    null_value,
+    bool_value,
     int64_value,
     uint64_value,
-    double_value,
-    bool_value,
-    null_value
+    half_value,
+    double_value
 };
 ```
 
