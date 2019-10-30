@@ -7,8 +7,8 @@ booleans, numbers, strings, arrays, objects - plus byte strings. It has
 - bool
 - uint64
 - int64
-- half
-- double
+- half precision floating point
+- double precision floating point
 - string
 - byte string
 - array
