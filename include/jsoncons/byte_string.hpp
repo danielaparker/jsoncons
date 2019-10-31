@@ -387,7 +387,7 @@ public:
         return data_;
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("instead, use size()") 
+    JSONCONS_DEPRECATED_MSG("Instead, use size()") 
     size_t length() const
     {
         return size_;
@@ -591,7 +591,7 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("instead, use size()") 
+    JSONCONS_DEPRECATED_MSG("Instead, use size()") 
     size_t length() const
     {
         return data_.size();

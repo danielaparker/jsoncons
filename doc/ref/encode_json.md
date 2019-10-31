@@ -33,35 +33,23 @@ void encode_json(const T& val,
                  basic_json_content_handler<CharT>& receiver); // (5)
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
-void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
-                 const T& val,
+void encode_json(const T& val,
                  std::basic_ostream<CharT>& os, 
-                 const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
-                 indenting line_indent = indenting::no_indent); // (6)
+                 const basic_json_options<CharT>& options, 
+                 indenting line_indent,
+                 const basic_json<CharT,ImplementationPolicy,Allocator>& j); // (6)
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
-void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
-                 const T& val,
-                 std::basic_ostream<CharT>& os, 
-                 indenting line_indent); // (7)
-
-template <class T, class CharT, class ImplementationPolicy, class Allocator>
-void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
-                 const T& val,
+void encode_json(const T& val,
                  std::basic_string<CharT>& s, 
-                 const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
-                 indenting line_indent = indenting::no_indent); // (8)
+                 const basic_json_options<CharT>& options, 
+                 indenting line_indent,
+                 const basic_json<CharT,ImplementationPolicy,Allocator>& j); // (7)
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
-void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& j,
-                 const T& val,
-                 std::basic_string<CharT>& s, 
-                 indenting line_indent); // (9)
-
-template <class T, class CharT, class ImplementationPolicy, class Allocator>
-void encode_json(const basic_json<CharT, ImplementationPolicy, Allocator>& j, 
-                 const T& val,
-                 basic_json_content_handler<CharT>& receiver); // (10)
+void encode_json(const T& val,
+                 basic_json_content_handler<CharT>& receiver,
+                 const basic_json<CharT, ImplementationPolicy, Allocator>& j); // (8)
 ```
 
 (1) Encode `val` to output stream with the specified options and line indenting.
@@ -75,7 +63,7 @@ void encode_json(const basic_json<CharT, ImplementationPolicy, Allocator>& j,
 (5) Convert `val` to json events and stream through content handler.
 
 Functions (1)-(5) perform encodings using the default json type `basic_json<CharT>`.
-Functions (6)-(10) are the same but perform encodings using the supplied `basic_json`.
+Functions (6)-(8) are the same but perform encodings using the supplied `basic_json`.
 
 #### Parameters
 

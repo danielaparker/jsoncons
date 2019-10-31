@@ -124,8 +124,8 @@ public:
     JSONCONS_DEPRECATED_MSG("no replacement") typedef basic_json value_type;
     JSONCONS_DEPRECATED_MSG("no replacemment") typedef basic_json json_type;
     JSONCONS_DEPRECATED_MSG("no replacement") typedef std::basic_string<char_type> string_type;
-    JSONCONS_DEPRECATED_MSG("instead, use key_value_type") typedef key_value_type kvp_type;
-    JSONCONS_DEPRECATED_MSG("instead, use key_value_type") typedef key_value_type member_type;
+    JSONCONS_DEPRECATED_MSG("Instead, use key_value_type") typedef key_value_type kvp_type;
+    JSONCONS_DEPRECATED_MSG("Instead, use key_value_type") typedef key_value_type member_type;
 #endif
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
