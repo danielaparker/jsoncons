@@ -37,7 +37,7 @@ typename std::enable_if<!is_basic_json_class<T>::value,void>::type
 encode_ubjson(const T& val, std::vector<uint8_t>& v)
 {
     ubjson_bytes_encoder encoder(v);
-    write_to(json(), val, encoder);
+    write_to(val, encoder, json());
 }
 
 template<class T>
@@ -55,7 +55,7 @@ typename std::enable_if<!is_basic_json_class<T>::value,void>::type
 encode_ubjson(const T& val, std::ostream& os)
 {
     ubjson_stream_encoder encoder(os);
-    write_to(json(), val, encoder);
+    write_to(val, encoder, json());
 }
 
 // decode_ubjson
@@ -76,7 +76,7 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_ubjson(const std::vector<uint8_t>& v)
 {
     ubjson_bytes_cursor reader(v);
-    T val = read_from<T>(json(),reader);
+    T val = read_from<T>(reader, json());
     return val;
 }
 
@@ -96,7 +96,7 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_ubjson(std::istream& is)
 {
     ubjson_stream_cursor reader(is);
-    T val = read_from<T>(json(), reader);
+    T val = read_from<T>(reader, json());
     return val;
 }
 

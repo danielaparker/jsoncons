@@ -36,7 +36,7 @@ typename std::enable_if<!is_basic_json_class<T>::value,void>::type
 encode_bson(const T& val, std::vector<uint8_t>& v)
 {
     bson_bytes_encoder encoder(v);
-    write_to(json(), val, encoder);
+    write_to(val, encoder, json());
 }
 
 template<class T>
@@ -54,7 +54,7 @@ typename std::enable_if<!is_basic_json_class<T>::value,void>::type
 encode_bson(const T& val, std::ostream& os)
 {
     bson_stream_encoder encoder(os);
-    write_to(json(), val, encoder);
+    write_to(val, encoder, json());
 }
 
 // decode_bson

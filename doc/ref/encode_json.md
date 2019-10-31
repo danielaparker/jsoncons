@@ -37,19 +37,19 @@ void encode_json(const T& val,
                  std::basic_ostream<CharT>& os, 
                  const basic_json_options<CharT>& options, 
                  indenting line_indent,
-                 const basic_json<CharT,ImplementationPolicy,Allocator>& j); // (6)
+                 const basic_json<CharT,ImplementationPolicy,Allocator>& context_j); // (6)
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 void encode_json(const T& val,
                  std::basic_string<CharT>& s, 
                  const basic_json_options<CharT>& options, 
                  indenting line_indent,
-                 const basic_json<CharT,ImplementationPolicy,Allocator>& j); // (7)
+                 const basic_json<CharT,ImplementationPolicy,Allocator>& context_j); // (7)
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 void encode_json(const T& val,
                  basic_json_content_handler<CharT>& receiver,
-                 const basic_json<CharT, ImplementationPolicy, Allocator>& j); // (8)
+                 const basic_json<CharT, ImplementationPolicy, Allocator>& context_j); // (8)
 ```
 
 (1) Encode `val` to output stream with the specified options and line indenting.

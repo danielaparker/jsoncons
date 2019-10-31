@@ -38,7 +38,7 @@ encode_msgpack(const T& val, std::vector<uint8_t>& v)
 {
     std::error_code ec;
     msgpack_bytes_encoder encoder(v);
-    write_to(json(), val, encoder, ec);
+    write_to(val, encoder, json(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec));
@@ -60,7 +60,7 @@ typename std::enable_if<!is_basic_json_class<T>::value,void>::type
 encode_msgpack(const T& val, std::ostream& os)
 {
     msgpack_stream_encoder encoder(os);
-    write_to(json(), val, encoder);
+    write_to(val, encoder, json());
 }
 
 // decode_msgpack
@@ -86,7 +86,7 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_msgpack(const std::vector<uint8_t>& v)
 {
     msgpack_bytes_cursor reader(v);
-    T val = read_from<T>(json(),reader);
+    T val = read_from<T>(reader, json());
     return val;
 }
 
@@ -111,7 +111,7 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_msgpack(std::istream& is)
 {
     msgpack_stream_cursor reader(is);
-    T val = read_from<T>(json(), reader);
+    T val = read_from<T>(reader, json());
     return val;
 }
   

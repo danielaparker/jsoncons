@@ -20,12 +20,12 @@ T decode_json(const std::basic_string<CharT>& s,
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 T decode_json(std::basic_istream<CharT>& is,
               const basic_json_options<CharT>& options,
-              const basic_json<CharT,ImplementationPolicy,Allocator>& j); // (3)
+              const basic_json<CharT,ImplementationPolicy,Allocator>& context_j); // (3)
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 T decode_json(const std::basic_string<CharT>& s,
               const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(),
-              const basic_json<CharT,ImplementationPolicy,Allocator>& j); // (4)
+              const basic_json<CharT,ImplementationPolicy,Allocator>& context_j); // (4)
 ```
 
 (1) Reads a JSON string value into a type T if T is an instantiation of [basic_json](../basic_json.md) 

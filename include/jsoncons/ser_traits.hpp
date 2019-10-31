@@ -23,13 +23,13 @@
 namespace jsoncons {
 
 template <class T, class CharT, class Json>
-T read_from(const Json& j, basic_staj_reader<CharT>& reader, std::error_code& ec);
+T read_from(basic_staj_reader<CharT>& reader, const Json& context_j, std::error_code& ec);
 
 template <class T, class CharT, class Json>
-T read_from(const Json& j, basic_staj_reader<CharT>& reader)
+T read_from(basic_staj_reader<CharT>& reader, const Json& context_j)
 {
     std::error_code ec;
-    T val = read_from<T>(j, reader, ec);
+    T val = read_from<T>(reader, context_j, ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
@@ -74,8 +74,8 @@ struct ser_traits
                           basic_json_content_handler<CharT>& encoder, 
                           std::error_code& ec)
     {
-        auto j = json_type_traits<Json, T>::to_json(val);
-        j.dump(encoder, ec);
+        auto context_j = json_type_traits<Json, T>::to_json(val);
+        context_j.dump(encoder, ec);
     }
 };
 
@@ -203,19 +203,19 @@ struct ser_traits<T,
 };
 
 template <class T, class CharT, class Json>
-T read_from(const Json&, basic_staj_reader<CharT>& reader, std::error_code& ec)
+T read_from(basic_staj_reader<CharT>& reader, const Json&, std::error_code& ec)
 {
     return ser_traits<T>::template deserialize<CharT,Json>(reader,ec);
 }
 
 template <class T, class CharT, class Json>
-void write_to(const Json&, const T&val, basic_json_content_handler<CharT>& encoder, std::error_code& ec)
+void write_to(const T&val, basic_json_content_handler<CharT>& encoder, const Json&, std::error_code& ec)
 {
     ser_traits<T>::template serialize<CharT,Json>(val, encoder, ec);
 }
 
 template <class T, class CharT, class Json>
-void write_to(const Json&, const T&val, basic_json_content_handler<CharT>& encoder)
+void write_to(const T&val, basic_json_content_handler<CharT>& encoder, const Json&)
 {
     std::error_code ec;
     ser_traits<T>::template serialize<CharT,Json>(val, encoder, ec);
