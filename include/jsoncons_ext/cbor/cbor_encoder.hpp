@@ -1131,7 +1131,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(semantic_tag::none, context, ec);
+            bool more = this->begin_array(v.size(), semantic_tag::none, context, ec);
             for (auto p = v.begin(); more && p != v.end(); ++p)
             {
                 more = this->uint64_value(*p, tag, context, ec);
@@ -1161,7 +1161,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(semantic_tag::none, context, ec);
+            bool more = this->begin_array(data.size(), semantic_tag::none, context, ec);
             for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->uint64_value(*p, tag, context, ec);
@@ -1191,7 +1191,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(semantic_tag::none, context, ec);
+            bool more = this->begin_array(data.size(), semantic_tag::none, context, ec);
             for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->uint64_value(*p, semantic_tag::none, context, ec);
@@ -1221,7 +1221,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(semantic_tag::none, context, ec);
+            bool more = this->begin_array(data.size(), semantic_tag::none, context, ec);
             for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->uint64_value(*p,semantic_tag::none,context, ec);
@@ -1249,7 +1249,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(semantic_tag::none,context, ec);
+            bool more = this->begin_array(data.size(), semantic_tag::none,context, ec);
             for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->int64_value(*p,semantic_tag::none,context, ec);
@@ -1279,7 +1279,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(semantic_tag::none,context, ec);
+            bool more = this->begin_array(data.size(), semantic_tag::none,context, ec);
             for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->int64_value(*p,semantic_tag::none,context, ec);
@@ -1309,7 +1309,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(semantic_tag::none,context, ec);
+            bool more = this->begin_array(data.size(), semantic_tag::none,context, ec);
             for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->int64_value(*p,semantic_tag::none,context, ec);
@@ -1339,7 +1339,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(semantic_tag::none,context, ec);
+            bool more = this->begin_array(data.size(), semantic_tag::none,context, ec);
             for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->int64_value(*p,semantic_tag::none,context, ec);
@@ -1369,7 +1369,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(semantic_tag::none, context, ec);
+            bool more = this->begin_array(data.size(), semantic_tag::none, context, ec);
             for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->half_value(*p, tag, context, ec);
@@ -1399,7 +1399,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(semantic_tag::none,context, ec);
+            bool more = this->begin_array(data.size(), semantic_tag::none,context, ec);
             for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->double_value(*p,semantic_tag::none,context, ec);
@@ -1429,7 +1429,7 @@ private:
         }
         else
         {
-            bool more = this->begin_array(semantic_tag::none,context, ec);
+            bool more = this->begin_array(data.size(), semantic_tag::none,context, ec);
             for (auto p = data.begin(); more && p != data.end(); ++p)
             {
                 more = this->double_value(*p,semantic_tag::none,context, ec);

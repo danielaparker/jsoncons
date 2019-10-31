@@ -709,8 +709,8 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        bool more = to_handler_.begin_array(tag, context, ec);
-        for (auto p = v.data(); more && p < v.data()+v.size(); ++p)
+        bool more = to_handler_.begin_array(v.size(), tag, context, ec);
+        for (auto p = v.begin(); more && p != v.end(); ++p)
         {
             more = to_handler_.uint64_value(*p, semantic_tag::none, context, ec);
         }
@@ -721,13 +721,13 @@ private:
         return more;
     }
 
-    bool do_typed_array(const span<const uint16_t>& data, 
+    bool do_typed_array(const span<const uint16_t>& v, 
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        bool more = to_handler_.begin_array(tag, context, ec);
-        for (auto p = data.begin(); more && p != data.end(); ++p)
+        bool more = to_handler_.begin_array(v.size(), tag, context, ec);
+        for (auto p = v.begin(); more && p != v.end(); ++p)
         {
             more = to_handler_.uint64_value(*p, semantic_tag::none, context, ec);
         }
@@ -738,13 +738,13 @@ private:
         return more;
     }
 
-    bool do_typed_array(const span<const uint32_t>& data, 
+    bool do_typed_array(const span<const uint32_t>& v, 
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        bool more = to_handler_.begin_array(tag, context, ec);
-        for (auto p = data.begin(); more && p != data.end(); ++p)
+        bool more = to_handler_.begin_array(v.size(), tag, context, ec);
+        for (auto p = v.begin(); more && p != v.end(); ++p)
         {
             more = to_handler_.uint64_value(*p, semantic_tag::none, context, ec);
         }
@@ -755,13 +755,13 @@ private:
         return more;
     }
 
-    bool do_typed_array(const span<const uint64_t>& data, 
+    bool do_typed_array(const span<const uint64_t>& v, 
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        bool more = to_handler_.begin_array(tag, context, ec);
-        for (auto p = data.begin(); more && p != data.end(); ++p)
+        bool more = to_handler_.begin_array(v.size(), tag, context, ec);
+        for (auto p = v.begin(); more && p != v.end(); ++p)
         {
             more = to_handler_.uint64_value(*p,semantic_tag::none,context, ec);
         }
@@ -772,13 +772,13 @@ private:
         return more;
     }
 
-    bool do_typed_array(const span<const int8_t>& data, 
+    bool do_typed_array(const span<const int8_t>& v, 
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        bool more = to_handler_.begin_array(tag,context, ec);
-        for (auto p = data.begin(); more && p != data.end(); ++p)
+        bool more = to_handler_.begin_array(v.size(), tag,context, ec);
+        for (auto p = v.begin(); more && p != v.end(); ++p)
         {
             more = to_handler_.int64_value(*p,semantic_tag::none,context, ec);
         }
@@ -789,13 +789,13 @@ private:
         return more;
     }
 
-    bool do_typed_array(const span<const int16_t>& data, 
+    bool do_typed_array(const span<const int16_t>& v, 
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        bool more = to_handler_.begin_array(tag,context, ec);
-        for (auto p = data.begin(); more && p != data.end(); ++p)
+        bool more = to_handler_.begin_array(v.size(), tag,context, ec);
+        for (auto p = v.begin(); more && p != v.end(); ++p)
         {
             more = to_handler_.int64_value(*p,semantic_tag::none,context, ec);
         }
@@ -806,13 +806,13 @@ private:
         return more;
     }
 
-    bool do_typed_array(const span<const int32_t>& data, 
+    bool do_typed_array(const span<const int32_t>& v, 
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        bool more = to_handler_.begin_array(tag,context, ec);
-        for (auto p = data.begin(); more && p != data.end(); ++p)
+        bool more = to_handler_.begin_array(v.size(), tag,context, ec);
+        for (auto p = v.begin(); more && p != v.end(); ++p)
         {
             more = to_handler_.int64_value(*p,semantic_tag::none,context, ec);
         }
@@ -823,13 +823,13 @@ private:
         return more;
     }
 
-    bool do_typed_array(const span<const int64_t>& data, 
+    bool do_typed_array(const span<const int64_t>& v, 
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        bool more = to_handler_.begin_array(tag,context, ec);
-        for (auto p = data.begin(); more && p != data.end(); ++p)
+        bool more = to_handler_.begin_array(v.size(), tag,context, ec);
+        for (auto p = v.begin(); more && p != v.end(); ++p)
         {
             more = to_handler_.int64_value(*p,semantic_tag::none,context, ec);
         }
@@ -841,13 +841,13 @@ private:
     }
 
     bool do_typed_array(half_arg_t, 
-                        const span<const uint16_t>& data, 
+                        const span<const uint16_t>& v, 
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        bool more = to_handler_.begin_array(tag, context, ec);
-        for (auto p = data.begin(); more && p != data.end(); ++p)
+        bool more = to_handler_.begin_array(v.size(), tag, context, ec);
+        for (auto p = v.begin(); more && p != v.end(); ++p)
         {
             more = to_handler_.half_value(*p, semantic_tag::none, context, ec);
         }
@@ -858,13 +858,13 @@ private:
         return more;
     }
 
-    bool do_typed_array(const span<const float>& data, 
+    bool do_typed_array(const span<const float>& v, 
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        bool more = to_handler_.begin_array(tag,context, ec);
-        for (auto p = data.begin(); more && p != data.end(); ++p)
+        bool more = to_handler_.begin_array(v.size(), tag,context, ec);
+        for (auto p = v.begin(); more && p != v.end(); ++p)
         {
             more = to_handler_.double_value(*p,semantic_tag::none,context, ec);
         }
@@ -875,13 +875,13 @@ private:
         return more;
     }
 
-    bool do_typed_array(const span<const double>& data, 
+    bool do_typed_array(const span<const double>& v, 
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec)
     {
-        bool more = to_handler_.begin_array(tag,context, ec);
-        for (auto p = data.begin(); more && p != data.end(); ++p)
+        bool more = to_handler_.begin_array(v.size(), tag,context, ec);
+        for (auto p = v.begin(); more && p != v.end(); ++p)
         {
             more = to_handler_.double_value(*p,semantic_tag::none,context, ec);
         }

@@ -259,6 +259,21 @@ int main()
     {
         std::cout << std::defaultfloat << item << "\n";
     }
+    std::cout << "\n";
+
+    std::vector<uint8_t> output1;
+    cbor::encode_cbor(v, output1);
+
+    // output1 contains a classical CBOR array
+    std::cout << "(3)\n" << byte_string_view(output1.data(), output1.size()) << "\n\n";
+
+    std::vector<uint8_t> output2;
+    cbor::cbor_options options;
+    options.enable_typed_arrays(true);
+    cbor::encode_cbor(v, output2, options);
+
+    // output2 contains a float64, native endian, Typed Array 
+    std::cout << "(4)\n" << byte_string_view(output2.data(), output2.size()) << "\n\n";
 }
 ```
 
@@ -273,6 +288,12 @@ Output:
 (2)
 -1.79769e+308
 1.79769e+308
+
+(3)
+82 fb ff ef ff ff ff ff ff ff fb 7f ef ff ff ff ff ff ff
+
+(4)
+d8 56 50 ff ff ff ff ff ff ef ff ff ff ff ff ff ff ef 7f
 ```
 
 #### Decode Typed Arrays - multi-dimensional array tags 
