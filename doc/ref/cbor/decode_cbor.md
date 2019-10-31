@@ -303,14 +303,13 @@ int main()
 
     json j = cbor::decode_cbor<json>(input);
 
-    std::cout << "Tag: " << j.tag() << "\n\n";
+    std::cout << j.tag() << "\n";
     std::cout << pretty_print(j) << "\n";
 }
 ```
 Output:
 ```
-Tag: multi-dim-row-major
-
+multi-dim-row-major
 [
     [2, 3],
     [2, 4, 8, 4, 16, 256]

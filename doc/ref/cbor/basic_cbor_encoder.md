@@ -443,3 +443,45 @@ Output:
 83c349010000000000000000c48221c249010000000000000000c11a554bbfd3
 ```
 
+#### Encode Typed Arrays - multi-dimensional array tags 
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+
+int main()
+{
+    std::vector<uint8_t> v;
+
+    cbor::cbor_bytes_encoder encoder(v);
+    std::vector<size_t> shape = { 2,3 };
+    encoder.begin_multi_dim(shape, semantic_tag::multi_dim_column_major);
+    encoder.begin_array(6);
+    encoder.uint64_value(2);
+    encoder.uint64_value(4);
+    encoder.uint64_value(8);
+    encoder.uint64_value(4);
+    encoder.uint64_value(16);
+    encoder.uint64_value(256);
+    encoder.end_array();
+    encoder.end_multi_dim();
+
+    std::cout << "(1)\n" << byte_string_view(v.data(), v.size()) << "\n\n";
+
+    auto j = cbor::decode_cbor<json>(v);
+    std::cout << "(2) " << j.tag() << "\n";
+    std::cout << pretty_print(j) << "\n\n";
+}
+```
+Output:
+```
+(1)
+d9 04 10 82 82 02 03 86 02 04 08 04 10 19 01 00
+
+(2) multi-dim-column-major
+[
+    [2, 3],
+    [2, 4, 8, 4, 16, 256]
+]
+```
+
