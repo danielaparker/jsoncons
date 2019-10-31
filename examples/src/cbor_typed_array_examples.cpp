@@ -97,7 +97,34 @@ void encode_mult_dim_array()
     std::cout << pretty_print(j) << "\n\n";
 }
 
-}; // cbor_typed_array_examples
+void encode_half_array()
+{
+    std::vector<uint8_t> buffer;
+
+    cbor::cbor_options options;
+    options.enable_typed_arrays(true);
+    cbor::cbor_bytes_encoder encoder(buffer, options);
+
+    std::vector<uint16_t> values = {0x3bff,0x3c00,0x3c01,0x3555};
+    encoder.typed_array(half_arg, values);
+
+    std::cout << "(1)\n" << byte_string_view(buffer.data(), buffer.size()) << "\n\n";
+
+    auto j = cbor::decode_cbor<json>(buffer);
+
+    std::cout << "(2)\n";
+    for (auto item : j.array_range())
+    {
+        std::cout << std::boolalpha << item.is_half() 
+                  << " " << std::hex << (int)item.as<uint16_t>() 
+                  << " " << std::defaultfloat << item.as<double>() << "\n";
+    }
+    std::cout << "\n";
+
+    std::cout << "(3)\n" << pretty_print(j) << "\n\n";
+}
+
+} // cbor_typed_array_examples
 
 void run_cbor_typed_array_examples()
 {
@@ -105,6 +132,7 @@ void run_cbor_typed_array_examples()
     cbor_typed_array_examples::decode_float64_big_endian_array();
     cbor_typed_array_examples::decode_mult_dim_row_major();
     cbor_typed_array_examples::encode_mult_dim_array();
+    cbor_typed_array_examples::encode_half_array();
     std::cout << "\n\n";
 }
 

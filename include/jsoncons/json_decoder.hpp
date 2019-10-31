@@ -288,6 +288,25 @@ private:
         return true;
     }
 
+    bool do_half_value(uint16_t value, 
+                       semantic_tag tag,   
+                       const ser_context&,
+                       std::error_code&) override
+    {
+        switch (structure_stack_.back().type_)
+        {
+            case structure_type::object_t:
+            case structure_type::array_t:
+                item_stack_.emplace_back(std::forward<key_type>(name_), half_arg, value, tag);
+                break;
+            case structure_type::root_t:
+                result_ = Json(half_arg, value, tag);
+                is_valid_ = true;
+                return false;
+        }
+        return true;
+    }
+
     bool do_double_value(double value, 
                          semantic_tag tag,   
                          const ser_context&,

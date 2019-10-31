@@ -443,6 +443,60 @@ Output:
 83c349010000000000000000c48221c249010000000000000000c11a554bbfd3
 ```
 
+#### Encode Typed Arrays - array of half precision floating-point
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+#include <iomanip>
+
+int main()
+{
+    std::vector<uint8_t> buffer;
+
+    cbor::cbor_options options;
+    options.enable_typed_arrays(true);
+    cbor::cbor_bytes_encoder encoder(buffer, options);
+
+    std::vector<uint16_t> values = {0x3bff,0x3c00,0x3c01,0x3555};
+    encoder.typed_array(half_arg, values);
+
+    std::cout << "(1)\n" << byte_string_view(buffer.data(), buffer.size()) << "\n\n";
+
+    auto j = cbor::decode_cbor<json>(buffer);
+
+    std::cout << "(2)\n";
+    for (auto item : j.array_range())
+    {
+        std::cout << std::boolalpha << item.is_half() 
+                  << " " << std::hex << (int)item.as<uint16_t>() 
+                  << " " << std::defaultfloat << item.as<double>() << "\n";
+    }
+    std::cout << "\n";
+
+    std::cout << "(3)\n" << pretty_print(j) << "\n\n";
+}
+```
+Output
+```
+(1)
+d8 54 48 ff 3b 00 3c 01 3c 55 35
+
+(2)
+true 3bff 0.999512
+true 3c00 1
+true 3c01 1.00098
+true 3555 0.333252
+
+(3)
+[
+    0.99951171875,
+    1.0,
+    1.0009765625,
+    0.333251953125
+]
+```
+
 #### Encode Typed Arrays - multi-dimensional array tags 
 
 ```c++

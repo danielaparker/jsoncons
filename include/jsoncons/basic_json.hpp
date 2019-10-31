@@ -1925,6 +1925,15 @@ public:
             return evaluate().is_uint64();
         }
 
+        bool is_half() const noexcept
+        {
+            if (!parent_.contains(key_))
+            {
+                return false;
+            }
+            return evaluate().is_half();
+        }
+
         bool is_double() const noexcept
         {
             if (!parent_.contains(key_))
@@ -3378,6 +3387,11 @@ public:
     bool is_uint64() const noexcept
     {
         return var_.kind() == value_kind::uint64_value || (var_.kind() == value_kind::int64_value&& as_integer<int64_t>() >= 0);
+    }
+
+    bool is_half() const noexcept
+    {
+        return var_.kind() == value_kind::half_value;
     }
 
     bool is_double() const noexcept
