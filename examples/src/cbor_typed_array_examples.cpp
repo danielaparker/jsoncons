@@ -108,6 +108,7 @@ void encode_half_array()
     std::vector<uint16_t> values = {0x3bff,0x3c00,0x3c01,0x3555};
     encoder.typed_array(half_arg, values);
 
+    // buffer contains a half precision floating-point, native endian, Typed Array 
     std::cout << "(1)\n" << byte_string_view(buffer.data(), buffer.size()) << "\n\n";
 
     auto j = cbor::decode_cbor<json>(buffer);
