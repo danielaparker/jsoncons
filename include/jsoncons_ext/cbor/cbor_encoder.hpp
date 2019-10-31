@@ -36,8 +36,8 @@ class basic_cbor_encoder final : public basic_cbor_content_handler<Float128T>
 public:
     typedef Result result_type;
     using typename super_type::char_type;
-    using typename super_type::string_view_type;
     using typename super_type::float128_type;
+    using typename super_type::string_view_type;
 
 private:
     struct stack_item

@@ -4,8 +4,8 @@
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
 
 template<
-    class Result>
-> class basic_cbor_encoder : public jsoncons::json_content_handler
+    class Result,class Float128T = std::nullptr_t>
+> class basic_cbor_encoder final : public basic_cbor_content_handler<Float128T>
 ```
 
 `basic_cbor_encoder` is noncopyable
@@ -25,6 +25,7 @@ Type                       |Definition
 ---------------------------|------------------------------
 char_type                  |char
 result_type                |Result
+float128_type              |Float128T
 string_view_type           |
 
 #### Constructors

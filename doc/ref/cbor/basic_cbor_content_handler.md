@@ -5,7 +5,7 @@
 
 template <
     class Float128T
-> class basic_cbor_content_handler
+> class basic_cbor_content_handler : public basic_json_content_handler<char>
 ```
 
 Defines an interface for producing and consuming CBOR events, including [typed arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08). 
@@ -25,8 +25,8 @@ cbor_content_handler    |`basic_cbor_content_handler<std::nullptr>`
 Member type                         |Definition
 ------------------------------------|------------------------------
 `char_type`|char
-`string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 [std::string view](http://en.cppreference.com/w/cpp/string/basic_string_view) if C++ 17 is detected or if `JSONCONS_HAS_STRING_VIEW` is defined, otherwise proxied.  
 `float128_type`|Float128T
+`string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 [std::string view](http://en.cppreference.com/w/cpp/string/basic_string_view) if C++ 17 is detected or if `JSONCONS_HAS_STRING_VIEW` is defined, otherwise proxied.  
 
 #### Public event producer interface
 
