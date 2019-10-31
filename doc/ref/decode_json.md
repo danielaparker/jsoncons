@@ -72,7 +72,7 @@ Jane Doe: Sales
 John Smith: Software Engineer
 ```
 
-#### See also
+### See also
 
 - [encode_json](encode_json.md)
 

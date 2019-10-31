@@ -22,7 +22,7 @@ or if T supports [json_type_traits](../json_type_traits.md).
 
 Throws [ser_error](../ser_error.md) if parsing fails.
 
-#### See also
+### See also
 
 - [encode_ubjson](encode_ubjson.md) encodes a json value to the [Universal Binary JSON Specification](http://ubjson.org/) data format.
 

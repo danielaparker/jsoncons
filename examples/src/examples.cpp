@@ -42,6 +42,7 @@ void bson_examples();
 void polymorphic_examples();
 void json_type_traits_macros_examples();
 void json_type_traits_macros_named_examples();
+void run_cbor_typed_array_examples();
 
 void comment_example()
 {
@@ -499,6 +500,8 @@ int main()
         json_type_traits_macros_named_examples();
 
         json_type_traits_macros_examples();
+
+        run_cbor_typed_array_examples();
     }
     catch (const std::exception& e)
     {

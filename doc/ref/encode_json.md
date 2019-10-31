@@ -94,7 +94,7 @@ Functions (6)-(8) are the same but perform encodings using the supplied `basic_j
 
 None 
 
-#### See also
+### See also
 
 - [basic_json_content_handler](basic_json_content_handler.md)
 - [basic_json_options](basic_json_options.md)
@@ -180,7 +180,7 @@ Output:
 }
 ```
 
-#### See also
+### See also
 
 - [decode_json](decode_json.md)
 

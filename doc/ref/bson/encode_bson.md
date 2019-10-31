@@ -18,7 +18,7 @@ or support [json_type_traits](../json_type_traits.md).
 (2) Writes a value of type T into a binary stream in the BSON data format. Type T must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). 
 
-#### See also
+### See also
 
 - [decode_bson](decode_bson) decodes a [Bin­ary JSON](http://bsonspec.org/) data format to a json value.
 

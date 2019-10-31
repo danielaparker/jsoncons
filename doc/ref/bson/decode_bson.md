@@ -22,7 +22,7 @@ or if T supports [json_type_traits](../json_type_traits.md).
 
 Throws [ser_error](../ser_error.md) if parsing fails.
 
-#### See also
+### See also
 
 - [encode_bson](encode_bson.md) encodes a json value to the [Bin­ary JSON](http://bsonspec.org/) data format.
 

@@ -201,7 +201,7 @@ static void json_type_traits_book_examples()
 
 void json_type_traits_macros_named_examples()
 {
-    std::cout << "\njson_type_traits macro examples\n\n";
+    std::cout << "\njson_type_traits macro named examples\n\n";
 
     std::cout << std::setprecision(6);
 

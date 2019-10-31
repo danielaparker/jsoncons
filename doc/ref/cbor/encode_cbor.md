@@ -22,7 +22,7 @@ supplied or defaults.
 or support [json_type_traits](../json_type_traits.md). Uses the [encode options](cbor_options.md)
 supplied or defaults.
 
-#### See also
+### See also
 
 - [decode_cbor](decode_cbor) decodes a [Concise Binary Object Representation](http://cbor.io/) data format to a json value.
 
@@ -265,7 +265,7 @@ Output:
 d9010083a3646e616d6568436f636b7461696c65636f756e741901a16472616e6b04a3d8190304d81902190138d819006442617468a3d819021902b3d8190064466f6f64d8190304
 ```
 
-#### See also
+### See also
 
 - [byte_string](../byte_string.md)
 - [decode_cbor](decode_cbor.md) decodes a [Concise Binary Object Representation](http://cbor.io/) data format to a json value.

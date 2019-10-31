@@ -231,7 +231,93 @@ Output:
 ]
 ```
 
-#### See also
+#### Decode Typed Arrays - typed array tags
+
+jsoncons implements [Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08).
+Tags 64-82 and Tags 84-86 are automatically decoded when detected.
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+#include <iomanip>
+
+int main()
+{
+    const std::vector<uint8_t> input = {
+      0xd8,0x52, // Tag 82 (float64 big endian Typed Array)
+        0x50,    // Byte string value of length 16
+            0xff, 0xef, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0x7f, 0xef, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+    };
+
+    auto j = cbor::decode_cbor<json>(input);
+    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+
+    auto v = cbor::decode_cbor<std::vector<double>>(input);
+    std::cout << "(2)\n";
+    for (auto item : v)
+    {
+        std::cout << std::defaultfloat << item << "\n";
+    }
+}
+```
+
+Output:
+```
+(1)
+[
+    -1.7976931348623157e+308,
+    1.7976931348623157e+308
+]
+
+(2)
+-1.79769e+308
+1.79769e+308
+```
+
+#### Decode Typed Arrays - multi-dimensional array tags 
+
+jsoncons implements the tags for row-major and column-major order multi-dimensional arrays, as defined in [Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08).
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+
+int main()
+{
+    const std::vector<uint8_t> input = {
+      0xd8,0x28,     // Tag 40 (multi-dimensional row major array)
+        0x82,        // array(2)
+          0x82,      // array(2)
+            0x02,    // unsigned(2) 1st Dimension
+            0x03,    // unsigned(3) 2nd Dimension
+          0xd8,0x41,     // Tag 65 (uint16 big endian Typed Array)
+            0x4c,        // byte string(12)
+              0x00,0x02, // unsigned(2)
+              0x00,0x04, // unsigned(4)
+              0x00,0x08, // unsigned(8)
+              0x00,0x04, // unsigned(4)
+              0x00,0x10, // unsigned(16)
+              0x01,0x00  // unsigned(256)
+    };
+
+    json j = cbor::decode_cbor<json>(input);
+
+    std::cout << "Tag: " << j.tag() << "\n\n";
+    std::cout << pretty_print(j) << "\n";
+}
+```
+Output:
+```
+Tag: multi-dim-row-major
+
+[
+    [2, 3],
+    [2, 4, 8, 4, 16, 256]
+]
+```
+
+### See also
 
 - [byte_string](../byte_string.md)
 - [encode_cbor](encode_cbor.md) encodes a json value to the [Concise Binary Object Representation](http://cbor.io/) data format.
