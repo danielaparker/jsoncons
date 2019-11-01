@@ -13,6 +13,10 @@ Enhancements:
 
 - Includes support for the cbor extension [Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)
 
+Changes:
+
+- The CSV extension `quote_style_type` name has been deprecated and renamed to `quote_style_kind`.
+
 v0.136.0
 --------
 

@@ -29,12 +29,15 @@ enum class csv_column_type
     string_t,integer_t,float_t,boolean_t,repeat_t
 };
 
-enum class quote_style_type
+enum class quote_style_kind
 {
-    all,minimal,none,nonnumeric
+    minimal,all,none,nonnumeric
 };
 
-typedef quote_style_type quote_styles;
+#if !defined(JSONCONS_NO_DEPRECATED)
+JSONCONS_DEPRECATED_MSG("Instead, use quote_style_kind") typedef quote_style_kind quote_styles;
+JSONCONS_DEPRECATED_MSG("Instead, use quote_style_kind") typedef quote_style_kind quote_style_type;
+#endif
 
 enum class mapping_type
 {
@@ -74,15 +77,13 @@ protected:
     std::pair<char_type,bool> subfield_delimiter_;
     char_type quote_char_;
     char_type quote_escape_char_;
-    quote_style_type quote_style_;
     std::vector<string_type> column_names_;
 
     basic_csv_options_common()
         : field_delimiter_(','),
           subfield_delimiter_(std::make_pair(',',false)),
           quote_char_('\"'),
-          quote_escape_char_('\"'),
-          quote_style_(quote_style_type::minimal)
+          quote_escape_char_('\"')
     {
     }
 
@@ -110,11 +111,6 @@ public:
     char_type quote_escape_char() const 
     {
         return quote_escape_char_;
-    }
-
-    quote_style_type quote_style() const 
-    {
-        return quote_style_;
     }
 
     std::vector<string_type> column_names() const 
@@ -264,15 +260,22 @@ public:
     using typename super_type::char_type;
     using typename super_type::string_type;
 protected:
+    quote_style_kind quote_style_;
     float_chars_format float_format_;
     int precision_;
     string_type line_delimiter_;
 public:
     basic_csv_encode_options()
-      : float_format_(float_chars_format::general),
+      : quote_style_(quote_style_kind::minimal),
+        float_format_(float_chars_format::general),
         precision_(0)
     {
         line_delimiter_.push_back('\n');
+    }
+
+    quote_style_kind quote_style() const 
+    {
+        return quote_style_;
     }
 
     float_chars_format float_format() const 
@@ -302,7 +305,6 @@ public:
     using basic_csv_decode_options<CharT>::subfield_delimiter;
     using basic_csv_decode_options<CharT>::quote_char;
     using basic_csv_decode_options<CharT>::quote_escape_char;
-    using basic_csv_decode_options<CharT>::quote_style;
     using basic_csv_decode_options<CharT>::column_names;
     using basic_csv_decode_options<CharT>::header_lines; 
     using basic_csv_decode_options<CharT>::assume_header; 
@@ -325,6 +327,7 @@ public:
     using basic_csv_encode_options<CharT>::float_format;
     using basic_csv_encode_options<CharT>::precision;
     using basic_csv_encode_options<CharT>::line_delimiter;
+    using basic_csv_encode_options<CharT>::quote_style;
 
     static const size_t default_indent = 4;
 
@@ -480,7 +483,7 @@ public:
         return *this;
     }
 
-    basic_csv_options& quote_style(quote_style_type value)
+    basic_csv_options& quote_style(quote_style_kind value)
     {
         this->quote_style_ = value;
         return *this;

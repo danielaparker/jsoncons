@@ -240,8 +240,8 @@ private:
     bool string_value(const CharT* s, size_t length, AnyWriter& result)
     {
         bool quote = false;
-        if (options_.quote_style() == quote_style_type::all || options_.quote_style() == quote_style_type::nonnumeric ||
-            (options_.quote_style() == quote_style_type::minimal &&
+        if (options_.quote_style() == quote_style_kind::all || options_.quote_style() == quote_style_kind::nonnumeric ||
+            (options_.quote_style() == quote_style_kind::minimal &&
             (std::char_traits<CharT>::find(s, length, options_.field_delimiter()) != nullptr || std::char_traits<CharT>::find(s, length, options_.quote_char()) != nullptr)))
         {
             quote = true;

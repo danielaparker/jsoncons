@@ -14,12 +14,13 @@ Specifies options for reading and writing CSV data.
 
 Option|Reading|Writing
 ------|-------|----------
-field_delimiter|A delimiter character that indicates the end of a field. Default is `,`|Output field separator.
-subfield_delimiter|A delimiter character that indicates the end of a single value in a multi-valued field. Default is no multi-valued fields.|Output subfield separator
-quote_char|Quote character. Default is quote character "|Quote character.
-quote_escape_char|Character to escape quote character (by default the quote character is doubled). Default is quote character `"`.|Character to escape quote character
-quote_style|quote_style_type::all, quote_style_type::minimal, quote_style_type::none, or quote_style_type::nonnumeric. Default is quote_style_type::minimal|Quote style
-column_names|Use these column names when reading the file.|Use these column names when writing the file.
+line_delimiter|Not used. When reading, the parser accepts `\n`, `\r` and `\r\n`.|An end-of-line string that marks the end of a row. Default is \n.
+field_delimiter|A character that indicates the end of a field. Default is `,`.|Character to separate values.
+subfield_delimiter|A character that indicates the end of a single value in a multi-valued field. Default is no multi-valued fields.|Character to write between items in an array value.
+quote_char|A character to quote fields. Default is the double quote character `"`|A character to quote fields.
+quote_escape_char|A character to escape quote characters occuring inside quoted fields. The default is the double quote character (i.e. the quote character is doubled).|Character to escape quote characters occurring inside quoted fields. 
+quote_style| |Indicates what [quote_style](quote_style_type.md) to use when quoting fields. Default is minimal.
+column_names|Use these column names when reading the file.|Write these column names to the header line.
 header_lines|Number of header lines in the CSV text. Defaults to 1 if assume_header is true, otherwise 0|
 assume_header|Assume first row in file is header, use field names to construct objects. Default is `false`.|
 ignore_empty_values|Do not read CSV fields that have empty values. Default is `false`.|
@@ -38,7 +39,6 @@ mapping|mapping_type::n_rows, mapping_type::n_objects, mapping_type::m_columns. 
 max_lines|Maximum number of lines to read. Default is unlimited.|
 column_types|A comma separated list of data types corresponding to the columns in the file. The following data types are supported: string, integer, float and boolean. Example: "bool,float,string"}|
 column_defaults|A comma separated list of strings containing default json values corresponding to the columns in the file. Example: "false,0.0,"\"\""|
-line_delimiter| |String to write between records. Default is \n.
 float_format| |Overrides [floating point format](../float_chars_format.md) when serializing to CSV. The default is [float_chars_format::general](float_chars_format.md).
 precision| |Overrides floating point precision when serializing csv from json. The default is shortest representation.
 
@@ -133,8 +133,8 @@ Character to escape quote character (by default the quote character is doubled).
     basic_csv_options& comment_starter(char_type value);
 Character to comment out a line, must be at column 1. Default is no comments.
 
-    basic_csv_options& quote_style(quote_style_type value);
-quote_style_type::all, quote_style_type::minimal, quote_style_type::none, or quote_style_type::nonnumeric. Default is quote_style_type::minimal
+    basic_csv_options& quote_style(quote_style_kind value);
+quote_style_kind::all, quote_style_kind::minimal, quote_style_kind::none, or quote_style_kind::nonnumeric. Default is quote_style_kind::minimal
 
     basic_csv_options& mapping(mapping_type value);
 mapping_type::n_rows, mapping_type::n_objects, mapping_type::m_columns. If assume_header is true or column_names is not empty, defaults to mapping_type::n_rows, otherwise mapping_type::n_columns.
