@@ -356,7 +356,6 @@ int main()
             0x10,           // unsigned(16)  
             0x19,0x01,0x00  // unsigned(256) 
     };
-    // Source: [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)
 
     cbor::cbor_bytes_cursor cursor(input);
     for (; !cursor.done(); cursor.next())
