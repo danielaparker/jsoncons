@@ -96,9 +96,7 @@ protected:
     virtual ~basic_json_options_common() = default;
 
     basic_json_options_common(const basic_json_options_common&) = default;
-    basic_json_options_common(basic_json_options_common&&) = default;
     basic_json_options_common& operator=(const basic_json_options_common&) = default;
-    basic_json_options_common& operator=(basic_json_options_common&&) = default;
 
 public:
 
@@ -322,9 +320,7 @@ public:
     }
 
     basic_json_decode_options(const basic_json_decode_options&) = default;
-    basic_json_decode_options(basic_json_decode_options&&) = default;
     basic_json_decode_options& operator=(const basic_json_decode_options&) = default;
-    basic_json_decode_options& operator=(basic_json_decode_options&&) = default;
 
     bool lossless_number() const 
     {
@@ -395,9 +391,7 @@ public:
     }
 
     basic_json_encode_options(const basic_json_encode_options&) = default;
-    basic_json_encode_options(basic_json_encode_options&&) = default;
     basic_json_encode_options& operator=(const basic_json_encode_options&) = default;
-    basic_json_encode_options& operator=(basic_json_encode_options&&) = default;
 
     byte_string_chars_format byte_string_format() const  {return byte_string_format_;}
 
@@ -691,6 +685,12 @@ public:
     basic_json_options& lossless_number(bool value) 
     {
         this->lossless_number_ = value;
+        return *this;
+    }
+
+    basic_json_options& max_nesting_depth(size_t value)
+    {
+        this->max_nesting_depth_ = value;
         return *this;
     }
 
