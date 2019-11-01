@@ -14,7 +14,7 @@ Specifies options for reading and writing CSV data.
 
 Option|Reading|Writing
 ------|-------|----------
-line_delimiter|Not used. When reading, the parser accepts `\n`, `\r` and `\r\n`.|An end-of-line string that marks the end of a row. Default is \n.
+line_delimiter|Not used. When reading, the parser accepts `\n`, `\r` and `\r\n`.|An end-of-line string that marks the end of a row. Default is `\n`.
 field_delimiter|A character that indicates the end of a field. Default is `,`.|Character to separate values.
 subfield_delimiter|A character that indicates the end of a single value in a multi-valued field. Default is no multi-valued fields.|Character to write between items in an array value.
 quote_char|A character to quote fields. Default is the double quote character `"`|A character to quote fields.
@@ -116,10 +116,10 @@ A delimiter character that indicates the end of a field. Default is `,`
 A delimiter character that indicates the end of a single value in a multi-valued field. Default is no multi-valued fields.
 
     basic_csv_options& line_delimiter(string_type value);
-String to write between records. Default is \n.  
+String to write between records. Default is `\n`.  
 
     basic_csv_options& quote_char(char_type value);
-Quote character. Default is quote character "             
+Quote character. Default is quote character `"`             
 
     basic_csv_options& infer_types(bool value);
 Infer null, true, false, integers and floating point values in the CSV source. Default is `true`.
