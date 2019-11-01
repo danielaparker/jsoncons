@@ -79,18 +79,18 @@ struct cbor_ser_traits<T,
 template<class T>
 void encode_cbor(const T& j, std::vector<uint8_t>& v)
 {
-    encode_cbor(j,v,cbor_options::get_default_options());
+    encode_cbor(j,v,cbor_encode_options());
 }
 
 template<class T>
 void encode_cbor(const T& j, std::ostream& os)
 {
-    encode_cbor(j,os,cbor_options::get_default_options());
+    encode_cbor(j,os,cbor_encode_options());
 }
 
 template<class T>
 typename std::enable_if<is_basic_json_class<T>::value,void>::type 
-encode_cbor(const T& j, std::vector<uint8_t>& v, const cbor_options& options)
+encode_cbor(const T& j, std::vector<uint8_t>& v, const cbor_encode_options& options)
 {
     typedef typename T::char_type char_type;
     cbor_bytes_encoder encoder(v, options);
@@ -100,7 +100,7 @@ encode_cbor(const T& j, std::vector<uint8_t>& v, const cbor_options& options)
 
 template<class T>
 typename std::enable_if<is_basic_json_class<T>::value,void>::type 
-encode_cbor(const T& j, std::ostream& os, const cbor_options& options)
+encode_cbor(const T& j, std::ostream& os, const cbor_encode_options& options)
 {
     typedef typename T::char_type char_type;
     cbor_stream_encoder encoder(os, options);
@@ -110,7 +110,7 @@ encode_cbor(const T& j, std::ostream& os, const cbor_options& options)
 
 template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
-encode_cbor(const T& val, std::ostream& os, const cbor_options& options)
+encode_cbor(const T& val, std::ostream& os, const cbor_encode_options& options)
 {
     std::error_code ec;
     encode_cbor(val, os, options, ec);
@@ -124,7 +124,7 @@ template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
 encode_cbor(const T& val, 
             std::ostream& os, 
-            const cbor_options& options, 
+            const cbor_encode_options& options, 
             std::error_code& ec)
 {
     cbor_stream_encoder encoder(os, options);
@@ -133,7 +133,7 @@ encode_cbor(const T& val,
 
 template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value, void>::type
-encode_cbor(const T& val, std::vector<uint8_t>& v, const cbor_options& options, std::error_code& ec)
+encode_cbor(const T& val, std::vector<uint8_t>& v, const cbor_encode_options& options, std::error_code& ec)
 {
     cbor_bytes_encoder encoder(v, options);
     cbor_ser_traits<T>::template serialize<char, json>(val, encoder, ec);
@@ -141,7 +141,7 @@ encode_cbor(const T& val, std::vector<uint8_t>& v, const cbor_options& options, 
 
 template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value, void>::type
-encode_cbor(const T& val, std::vector<uint8_t>& v, const cbor_options& options)
+encode_cbor(const T& val, std::vector<uint8_t>& v, const cbor_encode_options& options)
 {
     std::error_code ec;
     encode_cbor(val, v, options, ec);

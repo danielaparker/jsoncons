@@ -15,23 +15,13 @@
 
 namespace jsoncons { namespace cbor {
 
-class cbor_options
+class cbor_encode_options
 {
-private:
+protected:
     bool use_stringref_;
     bool enable_typed_arrays_;
 public:
-
-    static const cbor_options& get_default_options()
-    {
-        static cbor_options options{};
-        return options;
-    }
-
-
-//  Constructors
-
-    cbor_options()
+    cbor_encode_options()
         : use_stringref_(false),
           enable_typed_arrays_(false)
     {
@@ -42,20 +32,27 @@ public:
         return use_stringref_;
     }
 
-    cbor_options& pack_strings(bool value)
-    {
-        use_stringref_ = value;
-        return *this;
-    }
-
     bool enable_typed_arrays() const 
     {
         return enable_typed_arrays_;
     }
+};
+
+class cbor_options : public cbor_encode_options
+{
+public:
+    using cbor_encode_options::pack_strings;
+    using cbor_encode_options::enable_typed_arrays;
+
+    cbor_options& pack_strings(bool value)
+    {
+        this->use_stringref_ = value;
+        return *this;
+    }
 
     cbor_options& enable_typed_arrays(bool value)
     {
-        enable_typed_arrays_ = value;
+        this->enable_typed_arrays_ = value;
         return *this;
     }
 };
