@@ -36,6 +36,7 @@ mapping|mapping_type::n_rows, mapping_type::n_objects, mapping_type::m_columns. 
 max_lines|Maximum number of lines to read. Default is unlimited.|
 column_types|A comma separated list of data types corresponding to the columns in the file. The following data types are supported: string, integer, float and boolean. Example: "bool,float,string"}|
 column_defaults|A comma separated list of strings containing default json values corresponding to the columns in the file. Example: "false,0.0,"\"\""|
+
 line_delimiter| |String to write between records. Default is \n.
 float_format| |Overrides [floating point format](../float_chars_format.md) when serializing to CSV. The default is [float_chars_format::general](float_chars_format.md).
 precision| |Overrides floating point precision when serializing csv from json. The default is shortest representation.

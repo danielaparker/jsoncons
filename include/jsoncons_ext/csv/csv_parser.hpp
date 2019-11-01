@@ -504,7 +504,7 @@ class basic_csv_parser : public ser_context
     unsigned long column_;
     unsigned long line_;
     int depth_;
-    const basic_csv_options<CharT>& options_;
+    const basic_csv_decode_options<CharT> options_;
     size_t column_index_;
     size_t level_;
     size_t offset_;
@@ -525,13 +525,13 @@ class basic_csv_parser : public ser_context
 
 public:
     basic_csv_parser(const WorkAllocator& allocator = WorkAllocator())
-       : basic_csv_parser(basic_csv_options<CharT>::get_default_options(), 
+       : basic_csv_parser(basic_csv_decode_options<CharT>(), 
                           default_csv_parsing(),
                           allocator)
     {
     }
 
-    basic_csv_parser(const basic_csv_options<CharT>& options,
+    basic_csv_parser(const basic_csv_decode_options<CharT>& options,
                      const WorkAllocator& allocator = WorkAllocator())
         : basic_csv_parser(options, 
                            default_csv_parsing(),
@@ -541,13 +541,13 @@ public:
 
     basic_csv_parser(std::function<bool(csv_errc,const ser_context&)> err_handler,
                      const WorkAllocator& allocator = WorkAllocator())
-        : basic_csv_parser(basic_csv_options<CharT>::get_default_options(), 
+        : basic_csv_parser(basic_csv_decode_options<CharT>(), 
                            err_handler,
                            allocator)
     {
     }
 
-    basic_csv_parser(const basic_csv_options<CharT>& options,
+    basic_csv_parser(const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
                      const WorkAllocator& allocator = WorkAllocator())
        : allocator_(allocator),

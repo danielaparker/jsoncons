@@ -57,7 +57,7 @@ public:
 
     template <class Source>
     basic_csv_cursor(Source&& source, 
-                     const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options(),
+                     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
                      std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing())
         : basic_csv_cursor(std::forward<Source>(source), 
                            accept,
@@ -69,7 +69,7 @@ public:
     template <class Source>
     basic_csv_cursor(Source&& source, 
                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                     const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options(),
+                     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
                      std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : event_handler_(filter),
@@ -89,7 +89,7 @@ public:
     template <class Source>
     basic_csv_cursor(Source&& source, 
                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                     const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options(),
+                     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
                      std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : event_handler_(filter),
@@ -118,7 +118,7 @@ public:
     basic_csv_cursor(Source&& source, std::error_code& ec)
         : basic_csv_cursor(std::forward<Source>(source),
                            accept,
-                           basic_csv_options<CharT>::get_default_options(),
+                           basic_csv_decode_options<CharT>(),
                            default_csv_parsing(),
                            ec)
     {
@@ -126,7 +126,7 @@ public:
 
     template <class Source>
     basic_csv_cursor(Source&& source, 
-                     const basic_csv_options<CharT>& options,
+                     const basic_csv_decode_options<CharT>& options,
                      std::error_code& ec)
         : basic_csv_cursor(std::forward<Source>(source),
                            accept,
@@ -142,7 +142,7 @@ public:
                            std::error_code& ec)
         : basic_csv_cursor(std::forward<Source>(source),
                            filter,
-                           basic_csv_options<CharT>::get_default_options(),
+                           basic_csv_decode_options<CharT>(),
                            default_csv_parsing(),
                            ec)
     {
@@ -151,7 +151,7 @@ public:
     template <class Source>
     basic_csv_cursor(Source&& source, 
                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                     const basic_csv_options<CharT>& options,
+                     const basic_csv_decode_options<CharT>& options,
                      std::error_code& ec)
         : basic_csv_cursor(std::forward<Source>(source),
                            filter,
@@ -164,7 +164,7 @@ public:
     template <class Source>
     basic_csv_cursor(Source&& source, 
                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                     const basic_csv_options<CharT>& options,
+                     const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
                      std::error_code& ec,
                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
@@ -185,7 +185,7 @@ public:
     template <class Source>
     basic_csv_cursor(Source&& source, 
                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                     const basic_csv_options<CharT>& options,
+                     const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
                      std::error_code& ec,
                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)

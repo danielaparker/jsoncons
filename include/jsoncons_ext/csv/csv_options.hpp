@@ -131,7 +131,129 @@ public:
     using typename super_type::char_type;
     using typename super_type::string_type;
 protected:
+    size_t header_lines_;
+    bool assume_header_;
+    bool ignore_empty_values_;
+    bool ignore_empty_lines_;
+    bool trim_leading_;
+    bool trim_trailing_;
+    bool trim_leading_inside_quotes_;
+    bool trim_trailing_inside_quotes_;
+    bool unquoted_empty_value_is_null_;
+    bool infer_types_;
+    bool lossless_number_;
+    char_type comment_starter_;
+    std::pair<mapping_type,bool> mapping_;
+    unsigned long max_lines_;
+    std::vector<csv_type_info> column_types_;
+    std::vector<string_type> column_defaults_;
 public:
+    basic_csv_decode_options()
+        : header_lines_(0),
+          assume_header_(false),
+          ignore_empty_values_(false),
+          ignore_empty_lines_(true),
+          trim_leading_(false),
+          trim_trailing_(false),
+          trim_leading_inside_quotes_(false),
+          trim_trailing_inside_quotes_(false),
+          unquoted_empty_value_is_null_(false),
+          infer_types_(true),
+          lossless_number_(false),
+          comment_starter_('\0'),
+          mapping_({mapping_type::n_rows,false}),
+          max_lines_((std::numeric_limits<unsigned long>::max)())
+    {}
+
+    size_t header_lines() const 
+    {
+        return (assume_header_ && header_lines_ <= 1) ? 1 : header_lines_;
+    }
+
+    bool assume_header() const 
+    {
+        return assume_header_;
+    }
+
+    bool ignore_empty_values() const 
+    {
+        return ignore_empty_values_;
+    }
+
+    bool ignore_empty_lines() const 
+    {
+        return ignore_empty_lines_;
+    }
+
+    bool trim_leading() const 
+    {
+        return trim_leading_;
+    }
+
+    bool trim_trailing() const 
+    {
+        return trim_trailing_;
+    }
+
+    bool trim_leading_inside_quotes() const 
+    {
+        return trim_leading_inside_quotes_;
+    }
+
+    bool trim_trailing_inside_quotes() const 
+    {
+        return trim_trailing_inside_quotes_;
+    }
+
+    bool trim() const 
+    {
+        return trim_leading_ && trim_trailing_;
+    }
+
+    bool trim_inside_quotes() const 
+    {
+        return trim_leading_inside_quotes_ && trim_trailing_inside_quotes_;
+    }
+
+    bool unquoted_empty_value_is_null() const 
+    {
+        return unquoted_empty_value_is_null_;
+    }
+
+    bool infer_types() const 
+    {
+        return infer_types_;
+    }
+
+    bool lossless_number() const 
+    {
+        return lossless_number_;
+    }
+
+    char_type comment_starter() const 
+    {
+        return comment_starter_;
+    }
+
+    mapping_type mapping() const 
+    {
+        return mapping_.second ? (mapping_.first) : (assume_header() || this->column_names_.size() > 0 ? mapping_type::n_objects : mapping_type::n_rows);
+    }
+
+    unsigned long max_lines() const 
+    {
+        return max_lines_;
+    }
+
+    std::vector<csv_type_info> column_types() const 
+    {
+        return column_types_;
+    }
+
+    std::vector<string_type> column_defaults() const 
+    {
+        return column_defaults_;
+    }
 };
 
 template <class CharT>
@@ -142,70 +264,13 @@ public:
     using typename super_type::char_type;
     using typename super_type::string_type;
 protected:
-public:
-};
-
-template <class CharT>
-class basic_csv_options : public basic_csv_decode_options<CharT>, public basic_csv_encode_options<CharT>  
-{
-    typedef CharT char_type;
-    typedef std::basic_string<CharT> string_type;
-
     float_chars_format float_format_;
     int precision_;
-    bool assume_header_;
-    bool ignore_empty_values_;
-    bool ignore_empty_lines_;
-    bool trim_leading_;
-    bool trim_trailing_;
-    bool trim_leading_inside_quotes_;
-    bool trim_trailing_inside_quotes_;
-    bool unquoted_empty_value_is_null_;
-    char_type comment_starter_;
-    std::pair<mapping_type,bool> mapping_;
-    unsigned long max_lines_;
-    size_t header_lines_;
     string_type line_delimiter_;
-    bool infer_types_;
-    bool lossless_number_;
-
-    std::vector<csv_type_info> column_types_;
-    std::vector<string_type> column_defaults_;
 public:
-    using basic_csv_decode_options<CharT>::field_delimiter;
-    using basic_csv_decode_options<CharT>::subfield_delimiter;
-    using basic_csv_decode_options<CharT>::quote_char;
-    using basic_csv_decode_options<CharT>::quote_escape_char;
-    using basic_csv_decode_options<CharT>::quote_style;
-    using basic_csv_decode_options<CharT>::column_names;
-
-    static const size_t default_indent = 4;
-
-    static const basic_csv_options& get_default_options()
-    {
-        static basic_csv_options<char_type> options{};
-        return options;
-    }
-
-//  Constructors
-
-    basic_csv_options() :
-        float_format_(float_chars_format::general),
-        precision_(0),
-        assume_header_(false),
-        ignore_empty_values_(false),
-        ignore_empty_lines_(true),
-        trim_leading_(false),
-        trim_trailing_(false),
-        trim_leading_inside_quotes_(false),
-        trim_trailing_inside_quotes_(false),
-        unquoted_empty_value_is_null_(false),
-        comment_starter_('\0'),
-        mapping_({mapping_type::n_rows,false}),
-        max_lines_((std::numeric_limits<unsigned long>::max)()),
-        header_lines_(0),
-        infer_types_(true),
-        lossless_number_(false)
+    basic_csv_encode_options()
+      : float_format_(float_chars_format::general),
+        precision_(0)
     {
         line_delimiter_.push_back('\n');
     }
@@ -215,143 +280,137 @@ public:
         return float_format_;
     }
 
-    basic_csv_options& float_format(float_chars_format value)
-    {
-        float_format_ = value;
-        return *this;
-    }
-
     int precision() const 
     {
         return precision_;
     }
 
-    basic_csv_options& precision(int value)
+    string_type line_delimiter() const
     {
-        precision_ = value;
+        return line_delimiter_;
+    }
+};
+
+template <class CharT>
+class basic_csv_options : public basic_csv_decode_options<CharT>, public basic_csv_encode_options<CharT>  
+{
+    typedef CharT char_type;
+    typedef std::basic_string<CharT> string_type;
+
+public:
+    using basic_csv_decode_options<CharT>::field_delimiter;
+    using basic_csv_decode_options<CharT>::subfield_delimiter;
+    using basic_csv_decode_options<CharT>::quote_char;
+    using basic_csv_decode_options<CharT>::quote_escape_char;
+    using basic_csv_decode_options<CharT>::quote_style;
+    using basic_csv_decode_options<CharT>::column_names;
+    using basic_csv_decode_options<CharT>::header_lines; 
+    using basic_csv_decode_options<CharT>::assume_header; 
+    using basic_csv_decode_options<CharT>::ignore_empty_values; 
+    using basic_csv_decode_options<CharT>::ignore_empty_lines; 
+    using basic_csv_decode_options<CharT>::trim_leading; 
+    using basic_csv_decode_options<CharT>::trim_trailing; 
+    using basic_csv_decode_options<CharT>::trim_leading_inside_quotes; 
+    using basic_csv_decode_options<CharT>::trim_trailing_inside_quotes; 
+    using basic_csv_decode_options<CharT>::trim; 
+    using basic_csv_decode_options<CharT>::trim_inside_quotes; 
+    using basic_csv_decode_options<CharT>::unquoted_empty_value_is_null; 
+    using basic_csv_decode_options<CharT>::infer_types; 
+    using basic_csv_decode_options<CharT>::lossless_number; 
+    using basic_csv_decode_options<CharT>::comment_starter; 
+    using basic_csv_decode_options<CharT>::mapping; 
+    using basic_csv_decode_options<CharT>::max_lines; 
+    using basic_csv_decode_options<CharT>::column_types; 
+    using basic_csv_decode_options<CharT>::column_defaults; 
+    using basic_csv_encode_options<CharT>::float_format;
+    using basic_csv_encode_options<CharT>::precision;
+    using basic_csv_encode_options<CharT>::line_delimiter;
+
+    static const size_t default_indent = 4;
+
+//  Constructors
+
+    basic_csv_options()
+    {
+    }
+
+    basic_csv_options& float_format(float_chars_format value)
+    {
+        this->float_format_ = value;
         return *this;
     }
 
-    size_t header_lines() const 
+    basic_csv_options& precision(int value)
     {
-        return (assume_header_ && header_lines_ <= 1) ? 1 : header_lines_;
+        this->precision_ = value;
+        return *this;
     }
 
     basic_csv_options& header_lines(size_t value)
     {
-        header_lines_ = value;
+        this->header_lines_ = value;
         return *this;
-    }
-
-    bool assume_header() const 
-    {
-        return assume_header_;
     }
 
     basic_csv_options& assume_header(bool value)
     {
-        assume_header_ = value;
+        this->assume_header_ = value;
         return *this;
-    }
-
-    bool ignore_empty_values() const 
-    {
-        return ignore_empty_values_;
     }
 
     basic_csv_options& ignore_empty_values(bool value)
     {
-        ignore_empty_values_ = value;
+        this->ignore_empty_values_ = value;
         return *this;
-    }
-
-    bool ignore_empty_lines() const 
-    {
-        return ignore_empty_lines_;
     }
 
     basic_csv_options& ignore_empty_lines(bool value)
     {
-        ignore_empty_lines_ = value;
+        this->ignore_empty_lines_ = value;
         return *this;
-    }
-
-    bool trim_leading() const 
-    {
-        return trim_leading_;
     }
 
     basic_csv_options& trim_leading(bool value)
     {
-        trim_leading_ = value;
+        this->trim_leading_ = value;
         return *this;
-    }
-
-    bool trim_trailing() const 
-    {
-        return trim_trailing_;
     }
 
     basic_csv_options& trim_trailing(bool value)
     {
-        trim_trailing_ = value;
+        this->trim_trailing_ = value;
         return *this;
-    }
-
-    bool trim_leading_inside_quotes() const 
-    {
-        return trim_leading_inside_quotes_;
     }
 
     basic_csv_options& trim_leading_inside_quotes(bool value)
     {
-        trim_leading_inside_quotes_ = value;
+        this->trim_leading_inside_quotes_ = value;
         return *this;
-    }
-
-    bool trim_trailing_inside_quotes() const 
-    {
-        return trim_trailing_inside_quotes_;
     }
 
     basic_csv_options& trim_trailing_inside_quotes(bool value)
     {
-        trim_trailing_inside_quotes_ = value;
+        this->trim_trailing_inside_quotes_ = value;
         return *this;
-    }
-
-    bool trim() const 
-    {
-        return trim_leading_ && trim_trailing_;
     }
 
     basic_csv_options& trim(bool value)
     {
-        trim_leading_ = value;
-        trim_trailing_ = value;
+        this->trim_leading_ = value;
+        this->trim_trailing_ = value;
         return *this;
-    }
-
-    bool trim_inside_quotes() const 
-    {
-        return trim_leading_inside_quotes_ && trim_trailing_inside_quotes_;
     }
 
     basic_csv_options& trim_inside_quotes(bool value)
     {
-        trim_leading_inside_quotes_ = value;
-        trim_trailing_inside_quotes_ = value;
+        this->trim_leading_inside_quotes_ = value;
+        this->trim_trailing_inside_quotes_ = value;
         return *this;
-    }
-
-    bool unquoted_empty_value_is_null() const 
-    {
-        return unquoted_empty_value_is_null_;
     }
 
     basic_csv_options& unquoted_empty_value_is_null(bool value)
     {
-        unquoted_empty_value_is_null_ = value;
+        this->unquoted_empty_value_is_null_ = value;
         return *this;
     }
 
@@ -361,25 +420,15 @@ public:
         return *this;
     }
 
-    std::vector<csv_type_info> column_types() const 
-    {
-        return column_types_;
-    }
-
     basic_csv_options& column_types(const string_type& types)
     {
-        column_types_ = parse_column_types(types);
+        this->column_types_ = parse_column_types(types);
         return *this;
-    }
-
-    std::vector<string_type> column_defaults() const 
-    {
-        return column_defaults_;
     }
 
     basic_csv_options& column_defaults(const string_type& defaults)
     {
-        column_defaults_ = parse_column_names(defaults);
+        this->column_defaults_ = parse_column_names(defaults);
         return *this;
     }
 
@@ -395,14 +444,9 @@ public:
         return *this;
     }
 
-    string_type line_delimiter() const 
-    {
-        return line_delimiter_;
-    }
-
     basic_csv_options& line_delimiter(string_type value)
     {
-        line_delimiter_ = value;
+        this->line_delimiter_ = value;
         return *this;
     }
 
@@ -412,25 +456,15 @@ public:
         return *this;
     }
 
-    bool infer_types() const 
-    {
-        return infer_types_;
-    }
-
     basic_csv_options& infer_types(bool value)
     {
-        infer_types_ = value;
+        this->infer_types_ = value;
         return *this;
-    }
-
-    bool lossless_number() const 
-    {
-        return lossless_number_;
     }
 
     basic_csv_options& lossless_number(bool value) 
     {
-        lossless_number_ = value;
+        this->lossless_number_ = value;
         return *this;
     }
 
@@ -440,20 +474,10 @@ public:
         return *this;
     }
 
-    char_type comment_starter() const 
-    {
-        return comment_starter_;
-    }
-
     basic_csv_options& comment_starter(char_type value)
     {
-        comment_starter_ = value;
+        this->comment_starter_ = value;
         return *this;
-    }
-
-    mapping_type mapping() const 
-    {
-        return mapping_.second ? (mapping_.first) : (assume_header() || this->column_names_.size() > 0 ? mapping_type::n_objects : mapping_type::n_rows);
     }
 
     basic_csv_options& quote_style(quote_style_type value)
@@ -464,18 +488,13 @@ public:
 
     basic_csv_options& mapping(mapping_type value)
     {
-        mapping_ = {value,true};
+        this->mapping_ = {value,true};
         return *this;
-    }
-
-    unsigned long max_lines() const 
-    {
-        return max_lines_;
     }
 
     basic_csv_options& max_lines(unsigned long value)
     {
-        max_lines_ = value;
+        this->max_lines_ = value;
         return *this;
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -483,7 +502,7 @@ public:
     JSONCONS_DEPRECATED_MSG("Instead, use float_format(float_chars_format)")
     basic_csv_options& floating_point_format(float_chars_format value)
     {
-        float_format_ = value;
+        this->float_format_ = value;
         return *this;
     }
 
@@ -497,7 +516,7 @@ public:
     JSONCONS_DEPRECATED_MSG("Instead, use column_defaults(const string_type&)")
     basic_csv_options& column_defaults(const std::vector<string_type>& value)
     {
-        column_defaults_ = value;
+        this->column_defaults_ = value;
         return *this;
     }
 
@@ -506,24 +525,24 @@ public:
     {
         if (value.size() > 0)
         {
-            column_types_.reserve(value.size());
+            this->column_types_.reserve(value.size());
             for (size_t i = 0; i < value.size(); ++i)
             {
                 if (value[i] == jsoncons::csv::detail::string_literal<char_type>()())
                 {
-                    column_types_.emplace_back(csv_column_type::string_t,0);
+                    this->column_types_.emplace_back(csv_column_type::string_t,0);
                 }
                 else if (value[i] == jsoncons::csv::detail::integer_literal<char_type>()())
                 {
-                    column_types_.emplace_back(csv_column_type::integer_t,0);
+                    this->column_types_.emplace_back(csv_column_type::integer_t,0);
                 }
                 else if (value[i] == jsoncons::csv::detail::float_literal<char_type>()())
                 {
-                    column_types_.emplace_back(csv_column_type::float_t,0);
+                    this->column_types_.emplace_back(csv_column_type::float_t,0);
                 }
                 else if (value[i] == jsoncons::csv::detail::boolean_literal<char_type>()())
                 {
-                    column_types_.emplace_back(csv_column_type::boolean_t,0);
+                    this->column_types_.emplace_back(csv_column_type::boolean_t,0);
                 }
             }
         }
