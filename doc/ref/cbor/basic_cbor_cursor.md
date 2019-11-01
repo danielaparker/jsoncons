@@ -268,6 +268,136 @@ Haruki Murakami
 Graham Greene
 ```
 
+#### Navigating Typed Arrays with cursor - multi-dimensional row major with typed array
+
+This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)
+
+```c++
+#include <jsoncons_ext/cbor/cbor_cursor.hpp>
+
+int main()
+{
+    const std::vector<uint8_t> input = {
+      0xd8,0x28,  // Tag 40 (multi-dimensional row major array)
+        0x82,     // array(2)
+          0x82,   // array(2)
+            0x02,    // unsigned(2) 1st Dimension
+            0x03,    // unsigned(3) 2nd Dimension
+        0xd8,0x41,     // Tag 65 (uint16 big endian Typed Array)
+          0x4c,        // byte string(12)
+            0x00,0x02, // unsigned(2)
+            0x00,0x04, // unsigned(4)
+            0x00,0x08, // unsigned(8)
+            0x00,0x04, // unsigned(4)
+            0x00,0x10, // unsigned(16)
+            0x01,0x00  // unsigned(256)
+    };
+
+    cbor::cbor_bytes_cursor cursor(input);
+    for (; !cursor.done(); cursor.next())
+    {
+        const auto& event = cursor.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::begin_array:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::end_array:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::uint64_value:
+                std::cout << event.event_type() << ": " << event.get<uint64_t>() << " " << "(" << event.tag() << ")\n";
+                break;
+            default:
+                std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+        }
+    }
+}
+```
+Output:
+```
+begin_array (multi-dim-row-major)
+begin_array (n/a)
+uint64_value: 2 (n/a)
+uint64_value: 3 (n/a)
+end_array (n/a)
+begin_array (n/a)
+uint64_value: 2 (n/a)
+uint64_value: 4 (n/a)
+uint64_value: 8 (n/a)
+uint64_value: 4 (n/a)
+uint64_value: 10 (n/a)
+uint64_value: 100 (n/a)
+end_array (n/a)
+end_array (n/a)
+```
+
+#### Navigating Typed Arrays with cursor - multi-dimensional column major with classical CBOR array
+
+This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)
+
+```c++
+#include <jsoncons_ext/cbor/cbor_cursor.hpp>
+
+int main()
+{
+    const std::vector<uint8_t> input = {
+      0xd9,0x04,0x10,  // Tag 1040 (multi-dimensional column major array)
+        0x82,     // array(2)
+          0x82,   // array(2)
+            0x02,    // unsigned(2) 1st Dimension
+            0x03,    // unsigned(3) 2nd Dimension
+          0x86,   // array(6)
+            0x02,           // unsigned(2)   
+            0x04,           // unsigned(4)   
+            0x08,           // unsigned(8)   
+            0x04,           // unsigned(4)   
+            0x10,           // unsigned(16)  
+            0x19,0x01,0x00  // unsigned(256) 
+    };
+    // Source: [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)
+
+    cbor::cbor_bytes_cursor cursor(input);
+    for (; !cursor.done(); cursor.next())
+    {
+        const auto& event = cursor.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::begin_array:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::end_array:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::uint64_value:
+                std::cout << event.event_type() << ": " << event.get<uint64_t>() << " " << "(" << event.tag() << ")\n";
+                break;
+            default:
+                std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+        }
+    }
+}
+```
+Output:
+```
+begin_array (multi-dim-column-major)
+begin_array (n/a)
+uint64_value: 2 (n/a)
+uint64_value: 3 (n/a)
+end_array (n/a)
+begin_array (n/a)
+uint64_value: 2 (n/a)
+uint64_value: 4 (n/a)
+uint64_value: 8 (n/a)
+uint64_value: 4 (n/a)
+uint64_value: 10 (n/a)
+uint64_value: 100 (n/a)
+end_array (n/a)
+end_array (n/a)
+```
+
 ### See also
 
 - [staj_reader](staj_reader.md) 

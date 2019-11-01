@@ -443,7 +443,7 @@ Output:
 83c349010000000000000000c48221c249010000000000000000c11a554bbfd3
 ```
 
-#### Encode Typed Arrays - array of half precision floating-point
+#### Encode Typed Array tags - array of half precision floating-point
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -498,7 +498,7 @@ true 3555 0.333252
 ]
 ```
 
-#### Encode Typed Arrays - multi-dimensional array tags 
+#### Encode Typed Array tags - multi-dimensional column major tag 
 
 ```c++
 #include <jsoncons/json.hpp>

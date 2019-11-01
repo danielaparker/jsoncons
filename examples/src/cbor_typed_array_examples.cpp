@@ -125,6 +125,85 @@ void encode_half_array()
     std::cout << "(3)\n" << pretty_print(j) << "\n\n";
 }
 
+void cursor_example_multi_dim_row_major_typed_array()
+{
+    const std::vector<uint8_t> input = {
+      0xd8,0x28,  // Tag 40 (multi-dimensional row major array)
+        0x82,     // array(2)
+          0x82,   // array(2)
+            0x02,    // unsigned(2) 1st Dimension
+            0x03,    // unsigned(3) 2nd Dimension
+        0xd8,0x41,     // Tag 65 (uint16 big endian Typed Array)
+          0x4c,        // byte string(12)
+            0x00,0x02, // unsigned(2)
+            0x00,0x04, // unsigned(4)
+            0x00,0x08, // unsigned(8)
+            0x00,0x04, // unsigned(4)
+            0x00,0x10, // unsigned(16)
+            0x01,0x00  // unsigned(256)
+    };
+
+    cbor::cbor_bytes_cursor cursor(input);
+    for (; !cursor.done(); cursor.next())
+    {
+        const auto& event = cursor.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::begin_array:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::end_array:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::uint64_value:
+                std::cout << event.event_type() << ": " << event.get<uint64_t>() << " " << "(" << event.tag() << ")\n";
+                break;
+            default:
+                std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+        }
+    }
+}
+
+void cursor_example_multi_dim_column_major_classical_cbor_array()
+{
+    const std::vector<uint8_t> input = {
+      0xd9,0x04,0x10,  // Tag 1040 (multi-dimensional column major array)
+        0x82,     // array(2)
+          0x82,   // array(2)
+            0x02,    // unsigned(2) 1st Dimension
+            0x03,    // unsigned(3) 2nd Dimension
+          0x86,   // array(6)
+            0x02,           // unsigned(2)   
+            0x04,           // unsigned(4)   
+            0x08,           // unsigned(8)   
+            0x04,           // unsigned(4)   
+            0x10,           // unsigned(16)  
+            0x19,0x01,0x00  // unsigned(256) 
+    };
+
+    cbor::cbor_bytes_cursor cursor(input);
+    for (; !cursor.done(); cursor.next())
+    {
+        const auto& event = cursor.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::begin_array:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::end_array:
+                std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+            case staj_event_type::uint64_value:
+                std::cout << event.event_type() << ": " << event.get<uint64_t>() << " " << "(" << event.tag() << ")\n";
+                break;
+            default:
+                std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";
+                break;
+        }
+    }
+}
+
 } // cbor_typed_array_examples
 
 void run_cbor_typed_array_examples()
@@ -134,6 +213,8 @@ void run_cbor_typed_array_examples()
     cbor_typed_array_examples::decode_mult_dim_row_major();
     cbor_typed_array_examples::encode_mult_dim_array();
     cbor_typed_array_examples::encode_half_array();
+    cbor_typed_array_examples::cursor_example_multi_dim_row_major_typed_array();
+    cbor_typed_array_examples::cursor_example_multi_dim_column_major_classical_cbor_array();
     std::cout << "\n\n";
 }
 
