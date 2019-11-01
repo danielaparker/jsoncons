@@ -7,9 +7,15 @@ enum class quote_style_kind
 {
     minimal,
     all,
-    none,
-    nonnumeric
+    nonnumeric,
+    none
 };
 ```
 
+Style      |Definition
+-----------|-----------
+minimal    | Only quote fields that contain special characters, such as a line, field or subfield delimiter, or a quote character.
+all        | Quote all fields
+nonnumeric | Quote all non-numeric fields
+none       | Never quote fields
 

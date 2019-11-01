@@ -31,7 +31,7 @@ enum class csv_column_type
 
 enum class quote_style_kind
 {
-    minimal,all,none,nonnumeric
+    minimal,all,nonnumeric,none
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
