@@ -144,7 +144,7 @@ Input JSON file `book_catalog.json`:
 ]
 ```
 
-#### Reading a JSON stream
+#### Read JSON parse events
 
 ```c++
 #include <jsoncons/json_cursor.hpp>
@@ -240,7 +240,7 @@ end_object
 end_array
 ```
 
-#### Filtering a JSON stream
+#### Filter JSON parse events
 
 ```c++
 #include <jsoncons/json_cursor.hpp>

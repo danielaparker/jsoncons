@@ -113,7 +113,7 @@ Input JSON file `book_catalog.json`:
 ]
 ```
 
-#### Reading a JSON stream
+#### Read CBOR parse events 
 
 ```c++
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
@@ -209,7 +209,7 @@ end_object
 end_array
 ```
 
-#### Filtering a JSON stream
+#### Filter CBOR parse events
 
 ```c++
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>

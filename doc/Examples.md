@@ -322,7 +322,7 @@ Input JSON file `book_catalog.json`:
 ]
 ```
 
-#### Reading the JSON stream
+#### Read JSON parse events
 ```c++
 std::ifstream is("book_catalog.json");
 
@@ -430,7 +430,7 @@ my_json j = decoder.get_result();
 std::cout << pretty_print(j) << "\n";
 ```
 
-#### Filtering the JSON stream
+#### Filter JSON parse events
 
 ```c++
 // A stream filter to filter out all events except name 
