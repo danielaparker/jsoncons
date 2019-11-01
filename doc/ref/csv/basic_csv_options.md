@@ -7,6 +7,9 @@ template<
     class CharT
 > class basic_csv_options;
 ```
+
+![basic_csv_options](./diagrams/basic_csv_options.png)
+
 Specifies options for reading and writing CSV data. 
 
 Option|Reading|Writing
@@ -140,10 +143,5 @@ mapping_type::n_rows, mapping_type::n_objects, mapping_type::m_columns. If assum
 
     basic_csv_options& max_lines(unsigned long value);
 Maximum number of lines to read. Default is unlimited.
-
-#### Static member functions
-
-    static const basic_csv_options& get_default_options()
-Default CSV encode and decode options.
 
 

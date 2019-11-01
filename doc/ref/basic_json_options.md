@@ -8,6 +8,8 @@ template<
 > class basic_json_options;
 ```
 
+![basic_json_options](./diagrams/basic_json_options.png)
+
 Specifies options for reading and writing JSON text. 
 
 Option|Reading|Writing
@@ -151,11 +153,6 @@ For an array whose parent is an object, set whether that array is split on a new
 
     basic_json_options& array_array_line_splits(line_split_kind value)
 For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind.md).
-
-#### Static member functions
-
-    static const basic_json_options& get_default_options()
-Default JSON encode and decode options.
 
 ### Examples
 

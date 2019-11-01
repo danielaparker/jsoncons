@@ -10,21 +10,21 @@ work for all C++ classes that have [json_type_traits](https://github.com/daniela
 ```c++
 template <class T, class CharT>
 T decode_json(std::basic_istream<CharT>& is,
-              const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options()); // (1)
+              const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>()); // (1)
 
 template <class T, class CharT>
 T decode_json(const std::basic_string<CharT>& s,
-              const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options()); // (2)
+              const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>()); // (2)
 
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 T decode_json(std::basic_istream<CharT>& is,
-              const basic_json_options<CharT>& options,
+              const basic_json_decode_options<CharT>& options,
               const basic_json<CharT,ImplementationPolicy,Allocator>& context_j); // (3)
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 T decode_json(const std::basic_string<CharT>& s,
-              const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(),
+              const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
               const basic_json<CharT,ImplementationPolicy,Allocator>& context_j); // (4)
 ```
 

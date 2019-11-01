@@ -8,12 +8,12 @@ Encodes a C++ data structure into the CSV data format.
 template <class T,class CharT>
 void encode_csv(const T& val, 
                 std::basic_string<CharT>& s, 
-                const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options())); // (1)
+                const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>()); // (1)
 
 template <class T, class CharT>
 void encode_csv(const T& val, 
                 std::basic_ostream<CharT>& os, 
-                const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options())); // (2)
+                const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>()); // (2)
 ```
 
 (1) Writes a value of type T into a string in the CSV data format. Type T must be an instantiation of [basic_json](../basic_json.md) 

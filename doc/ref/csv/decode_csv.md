@@ -7,11 +7,11 @@ Decodes a [comma-separated variables (CSV)](https://en.wikipedia.org/wiki/Comma-
 
 template <class T,class CharT>
 T decode_csv(const std::basic_string<CharT>& s, 
-             const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options())); // (1)
+             const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); // (1)
 
 template <class T,class CharT>
 T decode_csv(std::basic_istream<CharT>& is, 
-             const basic_csv_options<CharT>& options = basic_csv_options<CharT>::get_default_options())); // (2)
+             const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); // (2)
 ```
 
 (1) Reads a CSV string value into a type T if T is an instantiation of [basic_json](../basic_json.md) 

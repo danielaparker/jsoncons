@@ -33,13 +33,4 @@ string references if present.
 This option does not affect decode - jsoncons will always decode
 typed arrays if present.
 
-#### Static member functions
-
-    static const cbor_options& get_default_options()
-Default CBOR encode and decode options.
-
-### See also
-
-[cbor_options](cbor_decode_options.md)
-[cbor_options](cbor_encode_options.md)
 
