@@ -309,7 +309,8 @@ int main()
                 std::cout << event.event_type() << ": " << event.get<uint64_t>() << " " << "(" << event.tag() << ")\n";
                 break;
             default:
-                std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";
+                std::cout << "Unhandled event type " 
+                          << event.event_type() << " " << "(" << event.tag() << ")\n";
                 break;
         }
     }
@@ -373,7 +374,8 @@ int main()
                 std::cout << event.event_type() << ": " << event.get<uint64_t>() << " " << "(" << event.tag() << ")\n";
                 break;
             default:
-                std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";
+                std::cout << "Unhandled event type " 
+                          << event.event_type() << " " << "(" << event.tag() << ")\n";
                 break;
         }
     }

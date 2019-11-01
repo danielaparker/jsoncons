@@ -159,7 +159,8 @@ void cursor_example_multi_dim_row_major_typed_array()
                 std::cout << event.event_type() << ": " << event.get<uint64_t>() << " " << "(" << event.tag() << ")\n";
                 break;
             default:
-                std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";
+                std::cout << "Unhandled event type " 
+                          << event.event_type() << " " << "(" << event.tag() << ")\n";
                 break;
         }
     }
@@ -198,7 +199,8 @@ void cursor_example_multi_dim_column_major_classical_cbor_array()
                 std::cout << event.event_type() << ": " << event.get<uint64_t>() << " " << "(" << event.tag() << ")\n";
                 break;
             default:
-                std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";
+                std::cout << "Unhandled event type " 
+                          << event.event_type() << " " << "(" << event.tag() << ")\n";
                 break;
         }
     }
