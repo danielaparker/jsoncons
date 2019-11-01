@@ -198,7 +198,7 @@ public:
     typedef CharT char_type;
     using typename basic_json_content_handler<CharT>::string_view_type;
     typedef Result result_type;
-    typedef typename basic_json_options<CharT>::string_type string_type;
+    typedef typename basic_json_encode_options<CharT>::string_type string_type;
 
 private:
     enum class container_type {object, array};
@@ -289,7 +289,7 @@ private:
 
     size_t indent_size_;
 
-    const basic_json_options<CharT>& options_;
+    const basic_json_encode_options<CharT> options_;
 
     jsoncons::detail::print_double fp_;
 
@@ -310,12 +310,12 @@ private:
     basic_json_encoder& operator=(const basic_json_encoder&) = delete;
 public:
     basic_json_encoder(result_type result)
-        : basic_json_encoder(std::move(result), basic_json_options<CharT>::get_default_options())
+        : basic_json_encoder(std::move(result), basic_json_encode_options<CharT>())
     {
     }
 
     basic_json_encoder(result_type result, 
-                       const basic_json_options<CharT>& options)
+                       const basic_json_encode_options<CharT>& options)
        : options_(options),
          fp_(options.float_format(), options.precision()),
          result_(std::move(result)), 
@@ -1014,7 +1014,7 @@ public:
     typedef CharT char_type;
     using typename basic_json_content_handler<CharT>::string_view_type;
     typedef Result result_type;
-    typedef typename basic_json_options<CharT>::string_type string_type;
+    typedef typename basic_json_encode_options<CharT>::string_type string_type;
 
 private:
     enum class container_type {object, array};
@@ -1045,7 +1045,7 @@ private:
         }
     };
 
-    const basic_json_options<CharT>& options_;
+    const basic_json_encode_options<CharT> options_;
 
     std::vector<encoding_context> stack_;
     jsoncons::detail::print_double fp_;
@@ -1056,12 +1056,12 @@ private:
     basic_json_compressed_encoder& operator=(const basic_json_compressed_encoder&) = delete;
 public:
     basic_json_compressed_encoder(result_type result)
-        : basic_json_compressed_encoder(std::move(result), basic_json_options<CharT>::get_default_options())
+        : basic_json_compressed_encoder(std::move(result), basic_json_encode_options<CharT>())
     {
     }
 
     basic_json_compressed_encoder(result_type result, 
-                                     const basic_json_options<CharT>& options)
+                                     const basic_json_encode_options<CharT>& options)
        : options_(options),
          fp_(options.float_format(), options.precision()),
          result_(std::move(result))

@@ -34,7 +34,7 @@ template <class CharT>
 class replacement_filter : public basic_json_content_filter<CharT>
 {
     typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
-    typedef typename basic_json_options<CharT>::string_type string_type;
+    typedef typename basic_json_decode_options<CharT>::string_type string_type;
 
     bool enable_str_to_nan_;
     bool enable_str_to_inf_;
@@ -187,7 +187,7 @@ class basic_json_parser : public ser_context
     static const size_t initial_string_buffer_capacity_ = 1024;
     static const int default_initial_stack_capacity_ = 100;
 
-    const basic_json_options<CharT>& options_;
+    const basic_json_decode_options<CharT> options_;
 
     std::function<bool(json_errc,const ser_context&)> err_handler_;
     int initial_stack_capacity_;
@@ -214,21 +214,21 @@ class basic_json_parser : public ser_context
 
 public:
     basic_json_parser(const WorkAllocator& allocator = WorkAllocator())
-        : basic_json_parser(basic_json_options<CharT>::get_default_options(), default_json_parsing(), allocator)
+        : basic_json_parser(basic_json_decode_options<CharT>(), default_json_parsing(), allocator)
     {
     }
 
     basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler, const WorkAllocator& allocator = WorkAllocator())
-        : basic_json_parser(basic_json_options<CharT>::get_default_options(), err_handler, allocator)
+        : basic_json_parser(basic_json_decode_options<CharT>(), err_handler, allocator)
     {
     }
 
-    basic_json_parser(const basic_json_options<CharT>& options, const WorkAllocator& allocator = WorkAllocator())
+    basic_json_parser(const basic_json_decode_options<CharT>& options, const WorkAllocator& allocator = WorkAllocator())
         : basic_json_parser(options, default_json_parsing(), allocator)
     {
     }
 
-    basic_json_parser(const basic_json_options<CharT>& options,
+    basic_json_parser(const basic_json_decode_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
                       const WorkAllocator& allocator = WorkAllocator())
        : options_(options),
@@ -264,13 +264,13 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use basic_json_options<CharT>::max_nesting_depth()")
+    JSONCONS_DEPRECATED_MSG("Instead, use basic_json_decode_options<CharT>::max_nesting_depth()")
     size_t max_nesting_depth() const
     {
         return options_.max_nesting_depth();
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use basic_json_options<CharT>::max_nesting_depth(size_t)")
+    JSONCONS_DEPRECATED_MSG("Instead, use basic_json_decode_options<CharT>::max_nesting_depth(size_t)")
     void max_nesting_depth(size_t value)
     {
         options_.max_nesting_depth() = value;

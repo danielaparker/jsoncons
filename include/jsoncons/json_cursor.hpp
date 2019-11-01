@@ -56,7 +56,7 @@ public:
 
     template <class Source>
     basic_json_cursor(Source&& source, 
-                           const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(),
+                           const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
                            std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing())
         : basic_json_cursor(std::forward<Source>(source), 
                                  accept,
@@ -68,7 +68,7 @@ public:
     template <class Source>
     basic_json_cursor(Source&& source, 
                            std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                           const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(),
+                           const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
                            std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
                            typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : event_handler_(filter),
@@ -88,7 +88,7 @@ public:
     template <class Source>
     basic_json_cursor(Source&& source, 
                            std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                           const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(),
+                           const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
                            std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
                            typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : event_handler_(filter),
@@ -118,7 +118,7 @@ public:
                            std::error_code& ec)
         : basic_json_cursor(std::forward<Source>(source),
                                  accept,
-                                 basic_json_options<CharT>::get_default_options(),
+                                 basic_json_decode_options<CharT>(),
                                  default_json_parsing(),
                                  ec)
     {
@@ -126,7 +126,7 @@ public:
 
     template <class Source>
     basic_json_cursor(Source&& source, 
-                           const basic_json_options<CharT>& options,
+                           const basic_json_decode_options<CharT>& options,
                            std::error_code& ec)
         : basic_json_cursor(std::forward<Source>(source),
                                  accept,
@@ -142,7 +142,7 @@ public:
                            std::error_code& ec)
         : basic_json_cursor(std::forward<Source>(source),
                                  filter,
-                                 basic_json_options<CharT>::get_default_options(),
+                                 basic_json_decode_options<CharT>(),
                                  default_json_parsing(),
                                  ec)
     {
@@ -151,7 +151,7 @@ public:
     template <class Source>
     basic_json_cursor(Source&& source, 
                            std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                           const basic_json_options<CharT>& options,
+                           const basic_json_decode_options<CharT>& options,
                            std::error_code& ec)
         : basic_json_cursor(std::forward<Source>(source),
                                  filter,
@@ -164,7 +164,7 @@ public:
     template <class Source>
     basic_json_cursor(Source&& source, 
                            std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                           const basic_json_options<CharT>& options,
+                           const basic_json_decode_options<CharT>& options,
                            std::function<bool(json_errc,const ser_context&)> err_handler,
                            std::error_code& ec,
                            typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
@@ -185,7 +185,7 @@ public:
     template <class Source>
     basic_json_cursor(Source&& source, 
                            std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                           const basic_json_options<CharT>& options,
+                           const basic_json_decode_options<CharT>& options,
                            std::function<bool(json_errc,const ser_context&)> err_handler,
                            std::error_code& ec,
                            typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)

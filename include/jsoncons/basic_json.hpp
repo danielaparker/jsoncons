@@ -1977,13 +1977,13 @@ public:
         }
 
         template <class SAllocator=std::allocator<char_type>>
-        std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_options<char_type>& options) const
+        std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_encode_options<char_type>& options) const
         {
             return evaluate().as_string(options);
         }
 
         template <class SAllocator=std::allocator<char_type>>
-        std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_options<char_type>& options,
+        std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_encode_options<char_type>& options,
                               const SAllocator& allocator) const
         {
             return evaluate().as_string(options,allocator);
@@ -2285,14 +2285,14 @@ public:
 
         template <class SAllocator=std::allocator<char_type>>
         void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
-                  const basic_json_options<char_type>& options) const
+                  const basic_json_encode_options<char_type>& options) const
         {
             evaluate().dump(s,options);
         }
 
         template <class SAllocator=std::allocator<char_type>>
         void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
-                  const basic_json_options<char_type>& options,
+                  const basic_json_encode_options<char_type>& options,
                   indenting line_indent) const
         {
             evaluate().dump(s,options,line_indent);
@@ -2313,12 +2313,12 @@ public:
             evaluate().dump(os, line_indent);
         }
 
-        void dump(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options) const
+        void dump(std::basic_ostream<char_type>& os, const basic_json_decode_options<char_type>& options) const
         {
             evaluate().dump(os,options);
         }
 
-        void dump(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, indenting line_indent) const
+        void dump(std::basic_ostream<char_type>& os, const basic_json_decode_options<char_type>& options, indenting line_indent) const
         {
             evaluate().dump(os,options,line_indent);
         }
@@ -2476,8 +2476,8 @@ public:
             return evaluate().as_uinteger();
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, indenting)")
-        void dump(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, bool pprint) const
+        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&, indenting)")
+        void dump(std::basic_ostream<char_type>& os, const basic_json_encode_options<char_type>& options, bool pprint) const
         {
             evaluate().dump(os,options,pprint);
         }
@@ -2506,21 +2506,21 @@ public:
             evaluate().write(os);
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)")
-        void write(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options) const
+        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&)")
+        void write(std::basic_ostream<char_type>& os, const basic_json_encode_options<char_type>& options) const
         {
             evaluate().write(os,options);
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, indenting)")
-        void write(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, bool pprint) const
+        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&, indenting)")
+        void write(std::basic_ostream<char_type>& os, const basic_json_encode_options<char_type>& options, bool pprint) const
         {
             evaluate().write(os,options,pprint);
         }
 
         template <class SAllocator=std::allocator<char_type>>
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)")
-        std::basic_string<char_type,char_traits_type,SAllocator> to_string(const basic_json_options<char_type>& options, char_allocator_type& allocator = char_allocator_type()) const
+        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&)")
+        std::basic_string<char_type,char_traits_type,SAllocator> to_string(const basic_json_encode_options<char_type>& options, char_allocator_type& allocator = char_allocator_type()) const
         {
             return evaluate().to_string(options,allocator);
         }
@@ -2536,14 +2536,14 @@ public:
             evaluate().to_stream(os);
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)")
-        void to_stream(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options) const
+        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&)")
+        void to_stream(std::basic_ostream<char_type>& os, const basic_json_encode_options<char_type>& options) const
         {
             evaluate().to_stream(os,options);
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, indenting)")
-        void to_stream(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, bool pprint) const
+        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&, indenting)")
+        void to_stream(std::basic_ostream<char_type>& os, const basic_json_encode_options<char_type>& options, bool pprint) const
         {
             evaluate().to_stream(os,options,pprint);
         }
@@ -2733,13 +2733,13 @@ public:
         return decoder.get_result();
     }
 
-    static basic_json parse(std::basic_istream<char_type>& is, const basic_json_options<char_type>& options)
+    static basic_json parse(std::basic_istream<char_type>& is, const basic_json_decode_options<char_type>& options)
     {
         parse_error_handler_type err_handler;
         return parse(is,options,err_handler);
     }
 
-    static basic_json parse(std::basic_istream<char_type>& is, const basic_json_options<char_type>& options, std::function<bool(json_errc,const ser_context&)> err_handler)
+    static basic_json parse(std::basic_istream<char_type>& is, const basic_json_decode_options<char_type>& options, std::function<bool(json_errc,const ser_context&)> err_handler)
     {
         json_decoder<basic_json> handler;
         basic_json_reader<char_type,stream_source<char_type>> reader(is, handler, options, err_handler);
@@ -2752,13 +2752,13 @@ public:
         return handler.get_result();
     }
 
-    static basic_json parse(const string_view_type& s, const basic_json_options<char_type>& options)
+    static basic_json parse(const string_view_type& s, const basic_json_decode_options<char_type>& options)
     {
         parse_error_handler_type err_handler;
         return parse(s,options,err_handler);
     }
 
-    static basic_json parse(const string_view_type& s, const basic_json_options<char_type>& options, std::function<bool(json_errc,const ser_context&)> err_handler)
+    static basic_json parse(const string_view_type& s, const basic_json_decode_options<char_type>& options, std::function<bool(json_errc,const ser_context&)> err_handler)
     {
         json_decoder<basic_json> decoder;
         basic_json_parser<char_type> parser(options,err_handler);
@@ -3146,7 +3146,7 @@ public:
 
     template <class SAllocator=std::allocator<char_type>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
-              const basic_json_options<char_type>& options) const
+              const basic_json_encode_options<char_type>& options) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s, options);
@@ -3155,7 +3155,7 @@ public:
 
     template <class SAllocator=std::allocator<char_type>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
-              const basic_json_options<char_type>& options, 
+              const basic_json_encode_options<char_type>& options, 
               indenting line_indent) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
@@ -3212,13 +3212,13 @@ public:
         }
     }
 
-    void dump(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options) const
+    void dump(std::basic_ostream<char_type>& os, const basic_json_encode_options<char_type>& options) const
     {
         basic_json_compressed_encoder<char_type> encoder(os, options);
         dump(encoder);
     }
 
-    void dump(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, indenting line_indent) const
+    void dump(std::basic_ostream<char_type>& os, const basic_json_encode_options<char_type>& options, indenting line_indent) const
     {
         if (line_indent == indenting::indent)
         {
@@ -3243,7 +3243,7 @@ public:
     }
 
     template <class SAllocator=std::allocator<char_type>>
-    std::basic_string<char_type,char_traits_type,SAllocator> to_string(const basic_json_options<char_type>& options,
+    std::basic_string<char_type,char_traits_type,SAllocator> to_string(const basic_json_encode_options<char_type>& options,
                                                                           const SAllocator& allocator=SAllocator()) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
@@ -3641,23 +3641,23 @@ public:
     template <class SAllocator=std::allocator<char_type>>
     std::basic_string<char_type,char_traits_type,SAllocator> as_string() const 
     {
-        return as_string(basic_json_options<char_type>(),SAllocator());
+        return as_string(basic_json_encode_options<char_type>(),SAllocator());
     }
 
     template <class SAllocator=std::allocator<char_type>>
     std::basic_string<char_type,char_traits_type,SAllocator> as_string(const SAllocator& allocator) const 
     {
-        return as_string(basic_json_options<char_type>(),allocator);
+        return as_string(basic_json_encode_options<char_type>(),allocator);
     }
 
     template <class SAllocator=std::allocator<char_type>>
-    std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_options<char_type>& options) const 
+    std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_encode_options<char_type>& options) const 
     {
         return as_string(options,SAllocator());
     }
 
     template <class SAllocator=std::allocator<char_type>>
-    std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_options<char_type>& options,
+    std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_encode_options<char_type>& options,
                           const SAllocator& allocator) const 
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
@@ -4530,8 +4530,8 @@ public:
         }
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, indenting)")
-    void dump(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, bool pprint) const
+    JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&, indenting)")
+    void dump(std::basic_ostream<char_type>& os, const basic_json_encode_options<char_type>& options, bool pprint) const
     {
         if (pprint)
         {
@@ -4563,14 +4563,14 @@ public:
         dump(os);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)")
-    void write(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options) const
+    JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&)")
+    void write(std::basic_ostream<char_type>& os, const basic_json_encode_options<char_type>& options) const
     {
         dump(os,options);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, indenting)")
-    void write(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, bool pprint) const
+    JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&, indenting)")
+    void write(std::basic_ostream<char_type>& os, const basic_json_encode_options<char_type>& options, bool pprint) const
     {
         dump(os,options,pprint);
     }
@@ -4587,14 +4587,14 @@ public:
         dump(os);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&)")
-    void to_stream(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options) const
+    JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&)")
+    void to_stream(std::basic_ostream<char_type>& os, const basic_json_encode_options<char_type>& options) const
     {
         dump(os,options);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_options<char_type>&, indenting)")
-    void to_stream(std::basic_ostream<char_type>& os, const basic_json_options<char_type>& options, bool pprint) const
+    JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&, indenting)")
+    void to_stream(std::basic_ostream<char_type>& os, const basic_json_encode_options<char_type>& options, bool pprint) const
     {
         dump(os,options,pprint ? indenting::indent : indenting::no_indent);
     }

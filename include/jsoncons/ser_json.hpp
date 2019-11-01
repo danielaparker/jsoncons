@@ -22,7 +22,7 @@ namespace jsoncons {
 template <class T, class CharT>
 typename std::enable_if<is_basic_json_class<T>::value,T>::type
 decode_json(const std::basic_string<CharT>& s,
-            const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options())
+            const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
     jsoncons::json_decoder<T> decoder;
     basic_json_reader<CharT, string_source<CharT>> reader(s, decoder, options);
@@ -33,7 +33,7 @@ decode_json(const std::basic_string<CharT>& s,
 template <class T, class CharT>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_json(const std::basic_string<CharT>& s,
-            const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options())
+            const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
     basic_json_cursor<CharT> reader(s, options);
     T val = read_from<T>(reader, basic_json<CharT>());
@@ -43,7 +43,7 @@ decode_json(const std::basic_string<CharT>& s,
 template <class T, class CharT>
 typename std::enable_if<is_basic_json_class<T>::value,T>::type
 decode_json(std::basic_istream<CharT>& is,
-            const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options())
+            const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
     jsoncons::json_decoder<T> decoder;
     basic_json_reader<CharT, stream_source<CharT>> reader(is, decoder, options);
@@ -54,19 +54,16 @@ decode_json(std::basic_istream<CharT>& is,
 template <class T, class CharT>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_json(std::basic_istream<CharT>& is,
-            const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options())
+            const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
     basic_json_cursor<CharT> reader(is, options);
     T val = read_from<T>(reader, basic_json<CharT>());
     return val;
 }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
-JSONCONS_DEPRECATED_MSG("Instead, use decode_json(const std::basic_string<CharT>&, const basic_json_options<CharT>&, const basic_json<CharT,ImplementationPolicy,Allocator>&)")
-T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context_j,
-              const std::basic_string<CharT>& s,
-              const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options())
+T decode_json(const std::basic_string<CharT>& s,
+              const basic_json_decode_options<CharT>& options,
+              const basic_json<CharT,ImplementationPolicy,Allocator>& context_j)
 {
     basic_json_cursor<CharT> reader(s, options);
     T val = read_from<T>(reader, context_j);
@@ -74,10 +71,32 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context_j,
 }
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
-JSONCONS_DEPRECATED_MSG("Instead, use decode_json(const std::basic_istream<CharT>&, const basic_json_options<CharT>&, const basic_json<CharT,ImplementationPolicy,Allocator>&)")
+T decode_json(std::basic_istream<CharT>& is,
+              const basic_json_decode_options<CharT>& options,
+              const basic_json<CharT,ImplementationPolicy,Allocator>& context_j)
+{
+    basic_json_cursor<CharT> reader(is, options);
+    T val = read_from<T>(reader, context_j);
+    return val;
+}
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+template <class T, class CharT, class ImplementationPolicy, class Allocator>
+JSONCONS_DEPRECATED_MSG("Instead, use decode_json(const std::basic_string<CharT>&, const basic_json_decode_options<CharT>&, const basic_json<CharT,ImplementationPolicy,Allocator>&)")
+T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context_j,
+              const std::basic_string<CharT>& s,
+              const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
+{
+    basic_json_cursor<CharT> reader(s, options);
+    T val = read_from<T>(reader, context_j);
+    return val;
+}
+
+template <class T, class CharT, class ImplementationPolicy, class Allocator>
+JSONCONS_DEPRECATED_MSG("Instead, use decode_json(const std::basic_istream<CharT>&, const basic_json_decode_options<CharT>&, const basic_json<CharT,ImplementationPolicy,Allocator>&)")
 T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context_j,
               std::basic_istream<CharT>& is,
-              const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options())
+              const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
     basic_json_cursor<CharT> reader(is, options);
     T val = read_from<T>(reader, context_j);
@@ -101,7 +120,7 @@ template <class T, class CharT>
 typename std::enable_if<is_basic_json_class<T>::value>::type
 encode_json(const T& val,
             std::basic_ostream<CharT>& os, 
-            const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
+            const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>(), 
             indenting line_indent = indenting::no_indent)
 {
     if (line_indent == indenting::indent)
@@ -120,7 +139,7 @@ template <class T, class CharT>
 typename std::enable_if<!is_basic_json_class<T>::value>::type
 encode_json(const T& val,
             std::basic_ostream<CharT>& os, 
-            const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
+            const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>(), 
             indenting line_indent = indenting::no_indent)
 {
     if (line_indent == indenting::indent)
@@ -140,7 +159,7 @@ void encode_json(const T& val,
                  std::basic_ostream<CharT>& os, 
                  indenting line_indent)
 {
-    encode_json(val, os, basic_json_options<CharT>::get_default_options(), line_indent);
+    encode_json(val, os, basic_json_encode_options<CharT>(), line_indent);
 }
 
 // to string
@@ -149,7 +168,7 @@ template <class T, class CharT>
 typename std::enable_if<is_basic_json_class<T>::value>::type
 encode_json(const T& val,
             std::basic_string<CharT>& s, 
-            const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
+            const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>(), 
             indenting line_indent = indenting::no_indent)
 {
     if (line_indent == indenting::indent)
@@ -168,7 +187,7 @@ template <class T, class CharT>
 typename std::enable_if<!is_basic_json_class<T>::value>::type
 encode_json(const T& val,
             std::basic_string<CharT>& s, 
-            const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
+            const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>(), 
             indenting line_indent = indenting::no_indent)
 {
     if (line_indent == indenting::indent)
@@ -188,7 +207,7 @@ void encode_json(const T& val,
                  std::basic_string<CharT>& s, 
                  indenting line_indent)
 {
-    encode_json(val, s, basic_json_options<CharT>::get_default_options(), line_indent);
+    encode_json(val, s, basic_json_encode_options<CharT>(), line_indent);
 }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -203,11 +222,11 @@ void encode_json(const basic_json<CharT, ImplementationPolicy, Allocator>& conte
 }
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
-JSONCONS_DEPRECATED_MSG("Instead, use encode_json(const T& val,std::basic_ostream<CharT>&,const basic_json_options<CharT>&,indenting,const basic_json<CharT,ImplementationPolicy,Allocator>&)")
+JSONCONS_DEPRECATED_MSG("Instead, use encode_json(const T& val,std::basic_ostream<CharT>&,const basic_json_encode_options<CharT>&,indenting,const basic_json<CharT,ImplementationPolicy,Allocator>&)")
 void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context_j,
                  const T& val,
                  std::basic_ostream<CharT>& os, 
-                 const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
+                 const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>(), 
                  indenting line_indent = indenting::no_indent)
 {
     if (line_indent == indenting::indent)
@@ -223,7 +242,7 @@ void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context
 }
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
-JSONCONS_DEPRECATED_MSG("Instead, use encode_json(const T& val,std::basic_ostream<CharT>&,const basic_json_options<CharT>&,indenting,const basic_json<CharT,ImplementationPolicy,Allocator>&)")
+JSONCONS_DEPRECATED_MSG("Instead, use encode_json(const T& val,std::basic_ostream<CharT>&,const basic_json_encode_options<CharT>&,indenting,const basic_json<CharT,ImplementationPolicy,Allocator>&)")
 void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context_j,
                  const T& val,
                  std::basic_ostream<CharT>& os, 
@@ -231,22 +250,22 @@ void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_encoder<CharT> encoder(os, basic_json_options<CharT>::get_default_options());
+        basic_json_encoder<CharT> encoder(os, basic_json_encode_options<CharT>());
         encode_json(context_j, val, encoder);
     }
     else
     {
-        basic_json_compressed_encoder<CharT> encoder(os, basic_json_options<CharT>::get_default_options());
+        basic_json_compressed_encoder<CharT> encoder(os, basic_json_encode_options<CharT>());
         encode_json(context_j, val, encoder);
     }
 }
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
-JSONCONS_DEPRECATED_MSG("Instead, use encode_json(const T& val,std::basic_string<CharT>&,const basic_json_options<CharT>&,indenting,const basic_json<CharT,ImplementationPolicy,Allocator>&)")
+JSONCONS_DEPRECATED_MSG("Instead, use encode_json(const T& val,std::basic_string<CharT>&,const basic_json_encode_options<CharT>&,indenting,const basic_json<CharT,ImplementationPolicy,Allocator>&)")
 void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context_j,
                  const T& val,
                  std::basic_string<CharT>& s, 
-                 const basic_json_options<CharT>& options = basic_json_options<CharT>::get_default_options(), 
+                 const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>(), 
                  indenting line_indent = indenting::no_indent)
 { 
     if (line_indent == indenting::indent)
@@ -262,7 +281,7 @@ void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context
 }
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
-JSONCONS_DEPRECATED_MSG("Instead, use encode_json(const T& val,std::basic_string<CharT>&,const basic_json_options<CharT>&,indenting,const basic_json<CharT,ImplementationPolicy,Allocator>&)")
+JSONCONS_DEPRECATED_MSG("Instead, use encode_json(const T& val,std::basic_string<CharT>&,const basic_json_encode_options<CharT>&,indenting,const basic_json<CharT,ImplementationPolicy,Allocator>&)")
 void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context_j,
                  const T& val,
                  std::basic_string<CharT>& s, 
@@ -270,39 +289,16 @@ void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context
 { 
     if (line_indent == indenting::indent)
     {
-        basic_json_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s, basic_json_options<CharT>::get_default_options());
+        basic_json_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s, basic_json_encode_options<CharT>());
         encode_json(context_j, val, encoder);
     }
     else
     {
-        basic_json_compressed_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s, basic_json_options<CharT>::get_default_options());
+        basic_json_compressed_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s, basic_json_encode_options<CharT>());
         encode_json(context_j, val, encoder);
     }
 }
 #endif
-// decode_json
-
-template <class T, class CharT, class ImplementationPolicy, class Allocator>
-T decode_json(const std::basic_string<CharT>& s,
-              const basic_json_options<CharT>& options,
-              const basic_json<CharT,ImplementationPolicy,Allocator>& context_j)
-{
-    basic_json_cursor<CharT> reader(s, options);
-    T val = read_from<T>(reader, context_j);
-    return val;
-}
-
-template <class T, class CharT, class ImplementationPolicy, class Allocator>
-T decode_json(std::basic_istream<CharT>& is,
-              const basic_json_options<CharT>& options,
-              const basic_json<CharT,ImplementationPolicy,Allocator>& context_j)
-{
-    basic_json_cursor<CharT> reader(is, options);
-    T val = read_from<T>(reader, context_j);
-    return val;
-}
-
-// encode_json
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 void encode_json(const T& val,
@@ -316,7 +312,7 @@ void encode_json(const T& val,
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 void encode_json(const T& val,
                  std::basic_string<CharT>& s,
-                 const basic_json_options<CharT>& options, 
+                 const basic_json_encode_options<CharT>& options, 
                  indenting line_indent, 
                  const basic_json<CharT,ImplementationPolicy,Allocator>& context_j)
 { 
@@ -336,7 +332,7 @@ void encode_json(const T& val,
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 void encode_json(const T& val,
                  std::basic_ostream<CharT>& os, 
-                 const basic_json_options<CharT>& options, 
+                 const basic_json_encode_options<CharT>& options, 
                  indenting line_indent,
                  const basic_json<CharT,ImplementationPolicy,Allocator>& context_j)
 {
