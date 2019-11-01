@@ -48,7 +48,7 @@ class basic_ubjson_parser : public ser_context
     typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
 
     Src source_;
-    size_t nesting_depth_;
+    int nesting_depth_;
     bool more_;
     bool done_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;

@@ -316,13 +316,13 @@ public:
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth() on options")
-    size_t max_nesting_depth() const
+    int max_nesting_depth() const
     {
         return parser_.max_nesting_depth();
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth(size_t) on options")
-    void max_nesting_depth(size_t depth)
+    JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth(int) on options")
+    void max_nesting_depth(int depth)
     {
         parser_.max_nesting_depth(depth);
     }
@@ -482,7 +482,7 @@ public:
         return parser_.max_nesting_depth();
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth(size_t)")
+    JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth(int)")
     void max_depth(size_t depth)
     {
         parser_.max_nesting_depth(depth);

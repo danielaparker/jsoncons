@@ -312,11 +312,11 @@ public:
     using typename super_type::string_type;
 protected:
     bool lossless_number_;
-    size_t max_nesting_depth_;
+    int max_nesting_depth_;
 public:
     basic_json_decode_options()
         : lossless_number_(false),
-          max_nesting_depth_((std::numeric_limits<size_t>::max)())
+          max_nesting_depth_((std::numeric_limits<int>::max)())
     {
     }
 
@@ -328,7 +328,7 @@ public:
         return lossless_number_;
     }
 
-    size_t max_nesting_depth() const 
+    int max_nesting_depth() const 
     {
         return max_nesting_depth_;
     }
@@ -689,7 +689,7 @@ public:
         return *this;
     }
 
-    basic_json_options& max_nesting_depth(size_t value)
+    basic_json_options& max_nesting_depth(int value)
     {
         this->max_nesting_depth_ = value;
         return *this;

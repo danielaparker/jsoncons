@@ -71,7 +71,7 @@ Constructs a `basic_json_options` with default values.
 
 #### Modifiers
 
-    void max_nesting_depth(size_t depth)
+    void max_nesting_depth(int depth)
 The maximum nesting depth allowed when parsing JSON. By default `jsoncons` can read a `JSON` text of arbitrarily large depth.
 
     basic_json_options& nan_to_str(const string_type& value, bool enable_inverse = true); 

@@ -191,7 +191,7 @@ class basic_json_parser : public ser_context
 
     std::function<bool(json_errc,const ser_context&)> err_handler_;
     int initial_stack_capacity_;
-    size_t nesting_depth_;
+    int nesting_depth_;
     uint32_t cp_;
     uint32_t cp2_;
     size_t line_;
@@ -265,13 +265,13 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use basic_json_decode_options<CharT>::max_nesting_depth()")
-    size_t max_nesting_depth() const
+    int max_nesting_depth() const
     {
         return options_.max_nesting_depth();
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use basic_json_decode_options<CharT>::max_nesting_depth(size_t)")
-    void max_nesting_depth(size_t value)
+    JSONCONS_DEPRECATED_MSG("Instead, use basic_json_decode_options<CharT>::max_nesting_depth(int)")
+    void max_nesting_depth(int value)
     {
         options_.max_nesting_depth() = value;
     }
