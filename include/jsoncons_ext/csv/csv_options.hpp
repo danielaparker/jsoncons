@@ -64,7 +64,89 @@ struct csv_type_info
 };
 
 template <class CharT>
-class basic_csv_options 
+class basic_csv_options_common 
+{
+public:
+    typedef CharT char_type;
+    typedef std::basic_string<CharT> string_type;
+protected:
+    char_type field_delimiter_;
+    std::pair<char_type,bool> subfield_delimiter_;
+    char_type quote_char_;
+    char_type quote_escape_char_;
+    quote_style_type quote_style_;
+    std::vector<string_type> column_names_;
+
+    basic_csv_options_common()
+        : field_delimiter_(','),
+          subfield_delimiter_(std::make_pair(',',false)),
+          quote_char_('\"'),
+          quote_escape_char_('\"'),
+          quote_style_(quote_style_type::minimal)
+    {
+    }
+
+    basic_csv_options_common(const basic_csv_options_common&) = default;
+    basic_csv_options_common& operator=(const basic_csv_options_common&) = default;
+
+    virtual ~basic_csv_options_common() = default;
+public:
+
+    char_type field_delimiter() const 
+    {
+        return field_delimiter_;
+    }
+
+    const std::pair<char_type,bool>& subfield_delimiter() const 
+    {
+        return subfield_delimiter_;
+    }
+
+    char_type quote_char() const 
+    {
+        return quote_char_;
+    }
+
+    char_type quote_escape_char() const 
+    {
+        return quote_escape_char_;
+    }
+
+    quote_style_type quote_style() const 
+    {
+        return quote_style_;
+    }
+
+    std::vector<string_type> column_names() const 
+    {
+        return column_names_;
+    }
+};
+
+template <class CharT>
+class basic_csv_decode_options : public virtual basic_csv_options_common<CharT>
+{
+    using super_type = basic_csv_options_common<CharT>;
+public:
+    using typename super_type::char_type;
+    using typename super_type::string_type;
+protected:
+public:
+};
+
+template <class CharT>
+class basic_csv_encode_options : public virtual basic_csv_options_common<CharT>
+{
+    using super_type = basic_csv_options_common<CharT>;
+public:
+    using typename super_type::char_type;
+    using typename super_type::string_type;
+protected:
+public:
+};
+
+template <class CharT>
+class basic_csv_options : public basic_csv_decode_options<CharT>, public basic_csv_encode_options<CharT>  
 {
     typedef CharT char_type;
     typedef std::basic_string<CharT> string_type;
@@ -79,12 +161,7 @@ class basic_csv_options
     bool trim_leading_inside_quotes_;
     bool trim_trailing_inside_quotes_;
     bool unquoted_empty_value_is_null_;
-    char_type field_delimiter_;
-    std::pair<char_type,bool> subfield_delimiter_;
-    char_type quote_char_;
-    char_type quote_escape_char_;
     char_type comment_starter_;
-    quote_style_type quote_style_;
     std::pair<mapping_type,bool> mapping_;
     unsigned long max_lines_;
     size_t header_lines_;
@@ -92,10 +169,16 @@ class basic_csv_options
     bool infer_types_;
     bool lossless_number_;
 
-    std::vector<string_type> column_names_;
     std::vector<csv_type_info> column_types_;
     std::vector<string_type> column_defaults_;
 public:
+    using basic_csv_decode_options<CharT>::field_delimiter;
+    using basic_csv_decode_options<CharT>::subfield_delimiter;
+    using basic_csv_decode_options<CharT>::quote_char;
+    using basic_csv_decode_options<CharT>::quote_escape_char;
+    using basic_csv_decode_options<CharT>::quote_style;
+    using basic_csv_decode_options<CharT>::column_names;
+
     static const size_t default_indent = 4;
 
     static const basic_csv_options& get_default_options()
@@ -117,12 +200,7 @@ public:
         trim_leading_inside_quotes_(false),
         trim_trailing_inside_quotes_(false),
         unquoted_empty_value_is_null_(false),
-        field_delimiter_(','),
-        subfield_delimiter_(std::make_pair(',',false)),
-        quote_char_('\"'),
-        quote_escape_char_('\"'),
         comment_starter_('\0'),
-        quote_style_(quote_style_type::minimal),
         mapping_({mapping_type::n_rows,false}),
         max_lines_((std::numeric_limits<unsigned long>::max)()),
         header_lines_(0),
@@ -131,8 +209,6 @@ public:
     {
         line_delimiter_.push_back('\n');
     }
-
-//  Properties
 
     float_chars_format float_format() const 
     {
@@ -279,14 +355,9 @@ public:
         return *this;
     }
 
-    std::vector<string_type> column_names() const 
-    {
-        return column_names_;
-    }
-
     basic_csv_options& column_names(const string_type& names)
     {
-        column_names_ = parse_column_names(names);
+        this->column_names_ = parse_column_names(names);
         return *this;
     }
 
@@ -312,25 +383,15 @@ public:
         return *this;
     }
 
-    char_type field_delimiter() const 
-    {
-        return field_delimiter_;
-    }
-
-    const std::pair<char_type,bool>& subfield_delimiter() const 
-    {
-        return subfield_delimiter_;
-    }
-
     basic_csv_options& field_delimiter(char_type value)
     {
-        field_delimiter_ = value;
+        this->field_delimiter_ = value;
         return *this;
     }
 
     basic_csv_options& subfield_delimiter(char_type value)
     {
-        subfield_delimiter_ = std::make_pair(value,true);
+        this->subfield_delimiter_ = std::make_pair(value,true);
         return *this;
     }
 
@@ -345,14 +406,9 @@ public:
         return *this;
     }
 
-    char_type quote_char() const 
-    {
-        return quote_char_;
-    }
-
     basic_csv_options& quote_char(char_type value)
     {
-        quote_char_ = value;
+        this->quote_char_ = value;
         return *this;
     }
 
@@ -378,14 +434,9 @@ public:
         return *this;
     }
 
-    char_type quote_escape_char() const 
-    {
-        return quote_escape_char_;
-    }
-
     basic_csv_options& quote_escape_char(char_type value)
     {
-        quote_escape_char_ = value;
+        this->quote_escape_char_ = value;
         return *this;
     }
 
@@ -400,19 +451,14 @@ public:
         return *this;
     }
 
-    quote_style_type quote_style() const 
-    {
-        return quote_style_;
-    }
-
     mapping_type mapping() const 
     {
-        return mapping_.second ? (mapping_.first) : (assume_header() || column_names_.size() > 0 ? mapping_type::n_objects : mapping_type::n_rows);
+        return mapping_.second ? (mapping_.first) : (assume_header() || this->column_names_.size() > 0 ? mapping_type::n_objects : mapping_type::n_rows);
     }
 
     basic_csv_options& quote_style(quote_style_type value)
     {
-        quote_style_ = value;
+        this->quote_style_ = value;
         return *this;
     }
 
@@ -444,7 +490,7 @@ public:
     JSONCONS_DEPRECATED_MSG("Instead, use column_names(const string_type&)")
     basic_csv_options& column_names(const std::vector<string_type>& value)
     {
-        column_names_ = value;
+        this->column_names_ = value;
         return *this;
     }
 

@@ -74,7 +74,6 @@ protected:
     string_type inf_to_str_;
     string_type neginf_to_str_;
 
-protected:
     basic_json_options_common()
        :
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -267,6 +266,7 @@ public:
         }
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use enable_nan_to_num() or enable_nan_to_str()")
         bool can_read_nan_replacement() const { return can_read_nan_replacement_; }
 
@@ -300,6 +300,7 @@ public:
     {
         return neg_inf_replacement_;
     }
+#endif
 };
 
 template <class CharT>
