@@ -76,7 +76,7 @@ NY,LON,TOR;LON
 "NY","LON","TOR";"LON"
 )";
     csv::csv_options options;
-    options.mapping(csv::mapping_type::n_rows)
+    options.mapping_strategy(csv::csv_mapping_strategy::n_rows)
            .subfield_delimiter(';');
 
     json expected = R"(
@@ -119,7 +119,7 @@ NY,LON,TOR;LON
 )";
     csv::csv_options options;
     options.assume_header(true)
-           .mapping(csv::mapping_type::m_columns)
+           .mapping_strategy(csv::csv_mapping_strategy::m_columns)
            .subfield_delimiter(';');
 
     json expected = R"(

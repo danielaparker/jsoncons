@@ -15,7 +15,11 @@ Enhancements:
 
 Changes:
 
-- The CSV extension `quote_style_type` name has been deprecated and renamed to `quote_style_kind`.
+- The CSV extension enum name `quote_style_type` has been deprecated and renamed to `quote_style_kind`.
+
+- The CSV extension enum name `mapping_type` has been deprecated and renamed to `csv_mapping_strategy`.
+
+- The CSV extension function name `mapping` has been deprecated and renamed to `mapping_strategy`.
 
 v0.136.0
 --------

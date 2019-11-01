@@ -28,7 +28,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
     {
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::mapping_type::n_rows);
+               .mapping_strategy(csv::csv_mapping_strategy::n_rows);
         csv::csv_cursor cursor(data, options);
 
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
@@ -93,7 +93,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
     {
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::mapping_type::m_columns);
+               .mapping_strategy(csv::csv_mapping_strategy::m_columns);
         csv::csv_cursor cursor(data, options);
 
         CHECK(cursor.current().event_type() == staj_event_type::begin_object);
@@ -158,7 +158,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
     {
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::mapping_type::n_rows);
+               .mapping_strategy(csv::csv_mapping_strategy::n_rows);
         csv::csv_cursor cursor(data, options);
         /* for (; !cursor.done(); cursor.next())
         {
@@ -274,7 +274,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
     {
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::mapping_type::n_objects);
+               .mapping_strategy(csv::csv_mapping_strategy::n_objects);
         csv::csv_cursor cursor(data, options);
 /*
         for (; !cursor.done(); cursor.next())
@@ -594,7 +594,7 @@ TEST_CASE("csv_cursor n_rows, no header test")
     SECTION("test 1")
     {
         csv::csv_options options;
-        options.mapping(csv::mapping_type::n_rows)
+        options.mapping_strategy(csv::csv_mapping_strategy::n_rows)
                .assume_header(false);
 
         csv::csv_cursor cursor(data, options);
@@ -656,7 +656,7 @@ TEST_CASE("csv_cursor header, subfield no terminating new line test")
         csv::csv_options options;
         options.assume_header(true)
                .subfield_delimiter(';')
-               .mapping(csv::mapping_type::n_rows);
+               .mapping_strategy(csv::csv_mapping_strategy::n_rows);
         csv::csv_cursor cursor(data, options);
 
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
