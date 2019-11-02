@@ -77,8 +77,8 @@ Constructors (1)-(2) read from a character sequence or stream and throw a
 Constructors (3)-(8) read from a character sequence or stream and set `ec`
 if a parsing error is encountered while processing the initial event.
 
-Note: It is the programmer's responsibility to ensure that `basic_json_cursor` does not outlive any source, 
-content handler, and error handler passed in the constuctor, as `basic_json_cursor` holds pointers to but does not own these resources.
+Note: It is the programmer's responsibility to ensure that `basic_json_cursor` does not outlive any source or 
+content handler, as `basic_json_cursor` holds pointers to but does not own these resources.
 
 #### Parameters
 

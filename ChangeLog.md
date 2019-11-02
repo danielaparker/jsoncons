@@ -1,12 +1,16 @@
 v0.137.0
 --------
 
-Bug fixes:
+Defect fixes:
 
 - This version fixes a defect in the `erase` functions for
   the order preserving `basic_json` specializations, in
   particular, for `ojson` (issue 188.) This fix is also
   included in the 0.136.1 patched release. 
+
+- Fixes GCC 9.2 warning: ‘class jsoncons::json_exception’ 
+  has virtual functions and accessible non-virtual destructor,
+  contributed by KonstantinPlotnikov.
     
 Enhancements:
 

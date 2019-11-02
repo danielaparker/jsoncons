@@ -70,8 +70,8 @@ Uses default [basic_csv_options](basic_csv_options.md).
 JSON events, [basic_csv_options](basic_csv_options.md),
 and the specified [parse_error_handler](../parse_error_handler.md).
 
-Note: It is the programmer's responsibility to ensure that `basic_csv_reader` does not outlive any source, 
-content handler, and error handler passed in the constuctor, as `basic_csv_reader` holds pointers to but does not own these resources.
+Note: It is the programmer's responsibility to ensure that `basic_csv_reader` does not outlive any source or 
+content handler passed in the constuctor, as `basic_csv_reader` holds pointers to but does not own these resources.
 
 #### Parameters
 

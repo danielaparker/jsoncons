@@ -50,7 +50,7 @@ Constructor3 (3)-(4) read from a buffer or stream source and set `ec`
 if a parsing error is encountered while processing the initial event.
 
 Note: It is the programmer's responsibility to ensure that `basic_cbor_cursor` does not outlive any source passed in the constuctor, 
-as `basic_cbor_cursor` holds pointers to but does not own these resources.
+as `basic_cbor_cursor` holds a pointer to but does not own this object.
 
 #### Parameters
 
