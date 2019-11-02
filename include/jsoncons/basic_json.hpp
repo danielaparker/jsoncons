@@ -144,18 +144,18 @@ public:
 
     struct variant
     {
-        class data_base
+        class holder
         {
             static constexpr uint8_t major_type_shift = 0x04;
             static constexpr uint8_t additional_information_mask = (1U << 4) - 1;
 
             uint8_t ext_type_;
         public:
-            data_base(uint8_t type)
+            holder(uint8_t type)
                 : ext_type_(type)
             {}
 
-            data_base(value_kind data_type, semantic_tag semantic_type)
+            holder(value_kind data_type, semantic_tag semantic_type)
                 : ext_type_((static_cast<uint8_t>(data_type) << major_type_shift) | static_cast<uint8_t>(semantic_type))
             {}
 
@@ -178,39 +178,39 @@ public:
             }
         };
 
-        class null_data final : public data_base
+        class null_holder final : public holder
         {
         public:
-            null_data()
-                : data_base(value_kind::null_value, semantic_tag::none)
+            null_holder()
+                : holder(value_kind::null_value, semantic_tag::none)
             {
             }
-            null_data(semantic_tag tag)
-                : data_base(value_kind::null_value, tag)
+            null_holder(semantic_tag tag)
+                : holder(value_kind::null_value, tag)
             {
             }
         };
 
-        class empty_object_data final : public data_base
+        class empty_object_holder final : public holder
         {
         public:
-            empty_object_data(semantic_tag tag)
-                : data_base(value_kind::empty_object_value, tag)
+            empty_object_holder(semantic_tag tag)
+                : holder(value_kind::empty_object_value, tag)
             {
             }
         };  
 
-        class bool_data final : public data_base
+        class bool_holder final : public holder
         {
             bool val_;
         public:
-            bool_data(bool val, semantic_tag tag)
-                : data_base(value_kind::bool_value, tag),val_(val)
+            bool_holder(bool val, semantic_tag tag)
+                : holder(value_kind::bool_value, tag),val_(val)
             {
             }
 
-            bool_data(const bool_data& val)
-                : data_base(val.ext_type()),val_(val.val_)
+            bool_holder(const bool_holder& val)
+                : holder(val.ext_type()),val_(val.val_)
             {
             }
 
@@ -221,18 +221,18 @@ public:
 
         };
 
-        class int64_data final : public data_base
+        class int64_holder final : public holder
         {
             int64_t val_;
         public:
-            int64_data(int64_t val, 
+            int64_holder(int64_t val, 
                        semantic_tag tag = semantic_tag::none)
-                : data_base(value_kind::int64_value, tag),val_(val)
+                : holder(value_kind::int64_value, tag),val_(val)
             {
             }
 
-            int64_data(const int64_data& val)
-                : data_base(val.ext_type()),val_(val.val_)
+            int64_holder(const int64_holder& val)
+                : holder(val.ext_type()),val_(val.val_)
             {
             }
 
@@ -242,18 +242,18 @@ public:
             }
         };
 
-        class uint64_data final : public data_base
+        class uint64_holder final : public holder
         {
             uint64_t val_;
         public:
-            uint64_data(uint64_t val, 
+            uint64_holder(uint64_t val, 
                         semantic_tag tag = semantic_tag::none)
-                : data_base(value_kind::uint64_value, tag),val_(val)
+                : holder(value_kind::uint64_value, tag),val_(val)
             {
             }
 
-            uint64_data(const uint64_data& val)
-                : data_base(val.ext_type()),val_(val.val_)
+            uint64_holder(const uint64_holder& val)
+                : holder(val.ext_type()),val_(val.val_)
             {
             }
 
@@ -263,18 +263,18 @@ public:
             }
         };
 
-        class half_data final : public data_base
+        class half_holder final : public holder
         {
             uint16_t val_;
         public:
-            half_data(uint16_t val, semantic_tag tag = semantic_tag::none)
-                : data_base(value_kind::half_value, tag), 
+            half_holder(uint16_t val, semantic_tag tag = semantic_tag::none)
+                : holder(value_kind::half_value, tag), 
                   val_(val)
             {
             }
 
-            half_data(const half_data& val)
-                : data_base(val.ext_type()),
+            half_holder(const half_holder& val)
+                : holder(val.ext_type()),
                   val_(val.val_)
             {
             }
@@ -285,19 +285,19 @@ public:
             }
         };
 
-        class double_data final : public data_base
+        class double_holder final : public holder
         {
             double val_;
         public:
-            double_data(double val, 
+            double_holder(double val, 
                         semantic_tag tag = semantic_tag::none)
-                : data_base(value_kind::double_value, tag), 
+                : holder(value_kind::double_value, tag), 
                   val_(val)
             {
             }
 
-            double_data(const double_data& val)
-                : data_base(val.ext_type()),
+            double_holder(const double_holder& val)
+                : holder(val.ext_type()),
                   val_(val.val_)
             {
             }
@@ -308,7 +308,7 @@ public:
             }
         };
 
-        class short_string_data final : public data_base
+        class short_string_holder final : public holder
         {
             static const size_t capacity = 14/sizeof(char_type);
             uint8_t length_;
@@ -316,16 +316,16 @@ public:
         public:
             static const size_t max_length = (14 / sizeof(char_type)) - 1;
 
-            short_string_data(semantic_tag tag, const char_type* p, uint8_t length)
-                : data_base(value_kind::short_string_value, tag), length_(length)
+            short_string_holder(semantic_tag tag, const char_type* p, uint8_t length)
+                : holder(value_kind::short_string_value, tag), length_(length)
             {
                 JSONCONS_ASSERT(length <= max_length);
                 std::memcpy(data_,p,length*sizeof(char_type));
                 data_[length] = 0;
             }
 
-            short_string_data(const short_string_data& val)
-                : data_base(val.ext_type()), length_(val.length_)
+            short_string_holder(const short_string_holder& val)
+                : holder(val.ext_type()), length_(val.length_)
             {
                 std::memcpy(data_,val.data_,val.length_*sizeof(char_type));
                 data_[length_] = 0;
@@ -347,39 +347,39 @@ public:
             }
         };
 
-        // long_string_data
-        class long_string_data final : public data_base
+        // long_string_holder
+        class long_string_holder final : public holder
         {
             typedef typename jsoncons::detail::heap_only_string_factory<char_type, Allocator>::string_pointer pointer;
 
             pointer ptr_;
         public:
 
-            long_string_data(semantic_tag tag, const char_type* data, size_t length, const Allocator& a)
-                : data_base(value_kind::long_string_value, tag)
+            long_string_holder(semantic_tag tag, const char_type* data, size_t length, const Allocator& a)
+                : holder(value_kind::long_string_value, tag)
             {
                 ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(data,length,a);
             }
 
-            long_string_data(const long_string_data& val)
-                : data_base(val.ext_type())
+            long_string_holder(const long_string_holder& val)
+                : holder(val.ext_type())
             {
                 ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),val.get_allocator());
             }
 
-            long_string_data(long_string_data&& val) noexcept
-                : data_base(val.ext_type()), ptr_(nullptr)
+            long_string_holder(long_string_holder&& val) noexcept
+                : holder(val.ext_type()), ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
-            long_string_data(const long_string_data& val, const Allocator& a)
-                : data_base(val.ext_type())
+            long_string_holder(const long_string_holder& val, const Allocator& a)
+                : holder(val.ext_type())
             {
                 ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),a);
             }
 
-            ~long_string_data()
+            ~long_string_holder()
             {
                 if (ptr_ != nullptr)
                 {
@@ -387,7 +387,7 @@ public:
                 }
             }
 
-            void swap(long_string_data& val) noexcept
+            void swap(long_string_holder& val) noexcept
             {
                 std::swap(val.ptr_,ptr_);
             }
@@ -413,22 +413,22 @@ public:
             }
         };
 
-        // byte_string_data
-        class byte_string_data final : public data_base
+        // byte_string_holder
+        class byte_string_holder final : public holder
         {
-            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<byte_string_storage_type> string_holder_allocator_type;
-            typedef typename std::allocator_traits<string_holder_allocator_type>::pointer pointer;
+            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<byte_string_storage_type> byte_string_allocator_type;
+            typedef typename std::allocator_traits<byte_string_allocator_type>::pointer pointer;
 
             pointer ptr_;
 
             template <typename... Args>
-            void create(string_holder_allocator_type allocator, Args&& ... args)
+            void create(byte_string_allocator_type allocator, Args&& ... args)
             {
-                string_holder_allocator_type alloc(allocator);
+                byte_string_allocator_type alloc(allocator);
                 ptr_ = alloc.allocate(1);
                 JSONCONS_TRY
                 {
-                    std::allocator_traits<string_holder_allocator_type>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                    std::allocator_traits<byte_string_allocator_type>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 JSONCONS_CATCH(...)
                 {
@@ -438,43 +438,43 @@ public:
             }
         public:
 
-            byte_string_data(semantic_tag semantic_type, 
+            byte_string_holder(semantic_tag semantic_type, 
                              const uint8_t* data, size_t length, 
                              const Allocator& a)
-                : data_base(value_kind::byte_string_value, semantic_type)
+                : holder(value_kind::byte_string_value, semantic_type)
             {
-                create(string_holder_allocator_type(a), data, data+length, a);
+                create(byte_string_allocator_type(a), data, data+length, a);
             }
 
-            byte_string_data(const byte_string_data& val)
-                : data_base(val.ext_type())
+            byte_string_holder(const byte_string_holder& val)
+                : holder(val.ext_type())
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
-            byte_string_data(byte_string_data&& val) noexcept
-                : data_base(val.ext_type()), ptr_(nullptr)
+            byte_string_holder(byte_string_holder&& val) noexcept
+                : holder(val.ext_type()), ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
-            byte_string_data(const byte_string_data& val, const Allocator& a)
-                : data_base(val.ext_type())
+            byte_string_holder(const byte_string_holder& val, const Allocator& a)
+                : holder(val.ext_type())
             { 
-                create(string_holder_allocator_type(a), *(val.ptr_), a);
+                create(byte_string_allocator_type(a), *(val.ptr_), a);
             }
 
-            ~byte_string_data()
+            ~byte_string_holder()
             {
                 if (ptr_ != nullptr)
                 {
-                    string_holder_allocator_type alloc(ptr_->get_allocator());
-                    std::allocator_traits<string_holder_allocator_type>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
+                    byte_string_allocator_type alloc(ptr_->get_allocator());
+                    std::allocator_traits<byte_string_allocator_type>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
                     alloc.deallocate(ptr_,1);
                 }
             }
 
-            void swap(byte_string_data& val) noexcept
+            void swap(byte_string_holder& val) noexcept
             {
                 std::swap(val.ptr_,ptr_);
             }
@@ -505,8 +505,8 @@ public:
             }
         };
 
-        // array_data
-        class array_data final : public data_base
+        // array_holder
+        class array_holder final : public holder
         {
             typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
             typedef typename std::allocator_traits<array_allocator>::pointer pointer;
@@ -528,36 +528,36 @@ public:
                 }
             }
         public:
-            array_data(const array& val, semantic_tag tag)
-                : data_base(value_kind::array_value, tag)
+            array_holder(const array& val, semantic_tag tag)
+                : holder(value_kind::array_value, tag)
             {
                 create(val.get_allocator(), val);
             }
 
-            array_data(const array& val, semantic_tag tag, const Allocator& a)
-                : data_base(value_kind::array_value, tag)
+            array_holder(const array& val, semantic_tag tag, const Allocator& a)
+                : holder(value_kind::array_value, tag)
             {
                 create(array_allocator(a), val, a);
             }
 
-            array_data(const array_data& val)
-                : data_base(val.ext_type())
+            array_holder(const array_holder& val)
+                : holder(val.ext_type())
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
-            array_data(array_data&& val) noexcept
-                : data_base(val.ext_type()), ptr_(nullptr)
+            array_holder(array_holder&& val) noexcept
+                : holder(val.ext_type()), ptr_(nullptr)
             {
                 std::swap(val.ptr_, ptr_);
             }
 
-            array_data(const array_data& val, const Allocator& a)
-                : data_base(val.ext_type())
+            array_holder(const array_holder& val, const Allocator& a)
+                : holder(val.ext_type())
             {
                 create(array_allocator(a), *(val.ptr_), a);
             }
-            ~array_data()
+            ~array_holder()
             {
                 if (ptr_ != nullptr)
                 {
@@ -572,7 +572,7 @@ public:
                 return ptr_->get_allocator();
             }
 
-            void swap(array_data& val) noexcept
+            void swap(array_holder& val) noexcept
             {
                 std::swap(val.ptr_,ptr_);
             }
@@ -588,8 +588,8 @@ public:
             }
         };
 
-        // object_data
-        class object_data final : public data_base
+        // object_holder
+        class object_holder final : public holder
         {
             typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
             typedef typename std::allocator_traits<object_allocator>::pointer pointer;
@@ -611,37 +611,37 @@ public:
                 }
             }
         public:
-            explicit object_data(const object& val, semantic_tag tag)
-                : data_base(value_kind::object_value, tag)
+            explicit object_holder(const object& val, semantic_tag tag)
+                : holder(value_kind::object_value, tag)
             {
                 create(val.get_allocator(), val);
             }
 
-            explicit object_data(const object& val, semantic_tag tag, const Allocator& a)
-                : data_base(value_kind::object_value, tag)
+            explicit object_holder(const object& val, semantic_tag tag, const Allocator& a)
+                : holder(value_kind::object_value, tag)
             {
                 create(object_allocator(a), val, a);
             }
 
-            explicit object_data(const object_data& val)
-                : data_base(val.ext_type())
+            explicit object_holder(const object_holder& val)
+                : holder(val.ext_type())
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
-            explicit object_data(object_data&& val) noexcept
-                : data_base(val.ext_type()), ptr_(nullptr)
+            explicit object_holder(object_holder&& val) noexcept
+                : holder(val.ext_type()), ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
-            explicit object_data(const object_data& val, const Allocator& a)
-                : data_base(val.ext_type())
+            explicit object_holder(const object_holder& val, const Allocator& a)
+                : holder(val.ext_type())
             {
                 create(object_allocator(a), *(val.ptr_), a);
             }
 
-            ~object_data()
+            ~object_holder()
             {
                 if (ptr_ != nullptr)
                 {
@@ -651,7 +651,7 @@ public:
                 }
             }
 
-            void swap(object_data& val) noexcept
+            void swap(object_holder& val) noexcept
             {
                 std::swap(val.ptr_,ptr_);
             }
@@ -673,8 +673,8 @@ public:
         };
 
     private:
-        static const size_t data_size = static_max<sizeof(uint64_data),sizeof(half_data),sizeof(double_data),sizeof(short_string_data), sizeof(long_string_data), sizeof(array_data), sizeof(object_data)>::value;
-        static const size_t data_align = static_max<alignof(uint64_data),alignof(half_data),alignof(double_data),alignof(short_string_data),alignof(long_string_data),alignof(array_data),alignof(object_data)>::value;
+        static const size_t data_size = static_max<sizeof(uint64_holder),sizeof(half_holder),sizeof(double_holder),sizeof(short_string_holder), sizeof(long_string_holder), sizeof(array_holder), sizeof(object_holder)>::value;
+        static const size_t data_align = static_max<alignof(uint64_holder),alignof(half_holder),alignof(double_holder),alignof(short_string_holder),alignof(long_string_holder),alignof(array_holder),alignof(object_holder)>::value;
 
         typedef typename std::aligned_storage<data_size,data_align>::type data_t;
 
@@ -682,69 +682,69 @@ public:
     public:
 		variant(semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))empty_object_data(tag);
+            new(reinterpret_cast<void*>(&data_))empty_object_holder(tag);
         }
 
         explicit variant(null_type, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))null_data(tag);
+            new(reinterpret_cast<void*>(&data_))null_holder(tag);
         }
 
 		explicit variant(bool val, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))bool_data(val,tag);
+            new(reinterpret_cast<void*>(&data_))bool_holder(val,tag);
         }
 		explicit variant(int64_t val, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))int64_data(val, tag);
+            new(reinterpret_cast<void*>(&data_))int64_holder(val, tag);
         }
 		explicit variant(uint64_t val, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))uint64_data(val, tag);
+            new(reinterpret_cast<void*>(&data_))uint64_holder(val, tag);
         }
 
         variant(half_arg_t, uint16_t val, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))half_data(val, tag);
+            new(reinterpret_cast<void*>(&data_))half_holder(val, tag);
         }
 
 		variant(double val, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))double_data(val, tag);
+            new(reinterpret_cast<void*>(&data_))double_holder(val, tag);
         }
 
         variant(const char_type* s, size_t length, semantic_tag tag)
         {
-            if (length <= short_string_data::max_length)
+            if (length <= short_string_holder::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(tag, s, static_cast<uint8_t>(length));
+                new(reinterpret_cast<void*>(&data_))short_string_holder(tag, s, static_cast<uint8_t>(length));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(tag, s, length, char_allocator_type());
+                new(reinterpret_cast<void*>(&data_))long_string_holder(tag, s, length, char_allocator_type());
             }
         }
 
 		variant(const char_type* s, size_t length, semantic_tag tag, const Allocator& alloc) : data_{}
         {
-            if (length <= short_string_data::max_length)
+            if (length <= short_string_holder::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(tag, s, static_cast<uint8_t>(length));
+                new(reinterpret_cast<void*>(&data_))short_string_holder(tag, s, static_cast<uint8_t>(length));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(tag, s, length, char_allocator_type(alloc));
+                new(reinterpret_cast<void*>(&data_))long_string_holder(tag, s, length, char_allocator_type(alloc));
             }
         }
 
         variant(const byte_string_view& bs, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.size(), byte_allocator_type());
+            new(reinterpret_cast<void*>(&data_))byte_string_holder(tag, bs.data(), bs.size(), byte_allocator_type());
         }
 
         variant(const byte_string_view& bs, semantic_tag tag, const Allocator& allocator) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.size(), allocator);
+            new(reinterpret_cast<void*>(&data_))byte_string_holder(tag, bs.data(), bs.size(), allocator);
         }
 
         variant(const basic_bignum<byte_allocator_type>& n) : data_{}
@@ -752,13 +752,13 @@ public:
             std::basic_string<char_type> s;
             n.dump(s);
 
-            if (s.length() <= short_string_data::max_length)
+            if (s.length() <= short_string_holder::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag::bigint, s.data(), static_cast<uint8_t>(s.length()));
+                new(reinterpret_cast<void*>(&data_))short_string_holder(semantic_tag::bigint, s.data(), static_cast<uint8_t>(s.length()));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag::bigint, s.data(), s.length(), char_allocator_type());
+                new(reinterpret_cast<void*>(&data_))long_string_holder(semantic_tag::bigint, s.data(), s.length(), char_allocator_type());
             }
         }
 
@@ -767,30 +767,30 @@ public:
             std::basic_string<char_type> s;
             n.dump(s);
 
-            if (s.length() <= short_string_data::max_length)
+            if (s.length() <= short_string_holder::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag::bigint, s.data(), static_cast<uint8_t>(s.length()));
+                new(reinterpret_cast<void*>(&data_))short_string_holder(semantic_tag::bigint, s.data(), static_cast<uint8_t>(s.length()));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag::bigint, s.data(), s.length(), char_allocator_type(allocator));
+                new(reinterpret_cast<void*>(&data_))long_string_holder(semantic_tag::bigint, s.data(), s.length(), char_allocator_type(allocator));
             }
         }
 		variant(const object& val, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))object_data(val, tag);
+            new(reinterpret_cast<void*>(&data_))object_holder(val, tag);
         }
         variant(const object& val, semantic_tag tag, const Allocator& alloc) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))object_data(val, tag, alloc);
+            new(reinterpret_cast<void*>(&data_))object_holder(val, tag, alloc);
         }
         variant(const array& val, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))array_data(val, tag);
+            new(reinterpret_cast<void*>(&data_))array_holder(val, tag);
         }
         variant(const array& val, semantic_tag tag, const Allocator& alloc) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))array_data(val, tag, alloc);
+            new(reinterpret_cast<void*>(&data_))array_holder(val, tag, alloc);
         }
 
         variant(const variant& val)
@@ -824,16 +824,16 @@ public:
             switch (kind())
             {
                 case value_kind::long_string_value:
-                    reinterpret_cast<long_string_data*>(&data_)->~long_string_data();
+                    reinterpret_cast<long_string_holder*>(&data_)->~long_string_holder();
                     break;
                 case value_kind::byte_string_value:
-                    reinterpret_cast<byte_string_data*>(&data_)->~byte_string_data();
+                    reinterpret_cast<byte_string_holder*>(&data_)->~byte_string_holder();
                     break;
                 case value_kind::array_value:
-                    reinterpret_cast<array_data*>(&data_)->~array_data();
+                    reinterpret_cast<array_holder*>(&data_)->~array_holder();
                     break;
                 case value_kind::object_value:
-                    reinterpret_cast<object_data*>(&data_)->~object_data();
+                    reinterpret_cast<object_holder*>(&data_)->~object_holder();
                     break;
                 default:
                     break;
@@ -848,40 +848,40 @@ public:
                 switch (val.kind())
                 {
                     case value_kind::null_value:
-                        new(reinterpret_cast<void*>(&data_))null_data(*(val.null_data_cast()));
+                        new(reinterpret_cast<void*>(&data_))null_holder(*(val.null_holder_cast()));
                         break;
                     case value_kind::empty_object_value:
-                        new(reinterpret_cast<void*>(&data_))empty_object_data(*(val.empty_object_data_cast()));
+                        new(reinterpret_cast<void*>(&data_))empty_object_holder(*(val.empty_object_holder_cast()));
                         break;
                     case value_kind::bool_value:
-                        new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
+                        new(reinterpret_cast<void*>(&data_))bool_holder(*(val.bool_holder_cast()));
                         break;
                     case value_kind::int64_value:
-                        new(reinterpret_cast<void*>(&data_))int64_data(*(val.int64_data_cast()));
+                        new(reinterpret_cast<void*>(&data_))int64_holder(*(val.int64_holder_cast()));
                         break;
                     case value_kind::uint64_value:
-                        new(reinterpret_cast<void*>(&data_))uint64_data(*(val.uint64_data_cast()));
+                        new(reinterpret_cast<void*>(&data_))uint64_holder(*(val.uint64_holder_cast()));
                         break;
                     case value_kind::half_value:
-                        new(reinterpret_cast<void*>(&data_))half_data(*(val.half_data_cast()));
+                        new(reinterpret_cast<void*>(&data_))half_holder(*(val.half_holder_cast()));
                         break;
                     case value_kind::double_value:
-                        new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
+                        new(reinterpret_cast<void*>(&data_))double_holder(*(val.double_holder_cast()));
                         break;
                     case value_kind::short_string_value:
-                        new(reinterpret_cast<void*>(&data_))short_string_data(*(val.short_string_data_cast()));
+                        new(reinterpret_cast<void*>(&data_))short_string_holder(*(val.short_string_holder_cast()));
                         break;
                     case value_kind::long_string_value:
-                        new(reinterpret_cast<void*>(&data_))long_string_data(*(val.string_data_cast()));
+                        new(reinterpret_cast<void*>(&data_))long_string_holder(*(val.string_holder_cast()));
                         break;
                     case value_kind::byte_string_value:
-                        new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()));
+                        new(reinterpret_cast<void*>(&data_))byte_string_holder(*(val.byte_string_holder_cast()));
                         break;
                     case value_kind::array_value:
-                        new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()));
+                        new(reinterpret_cast<void*>(&data_))array_holder(*(val.array_holder_cast()));
                         break;
                     case value_kind::object_value:
-                        new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()));
+                        new(reinterpret_cast<void*>(&data_))object_holder(*(val.object_holder_cast()));
                         break;
                     default:
                         JSONCONS_UNREACHABLE();
@@ -902,92 +902,92 @@ public:
 
         value_kind kind() const
         {
-            return reinterpret_cast<const data_base*>(&data_)->kind();
+            return reinterpret_cast<const holder*>(&data_)->kind();
         }
 
         semantic_tag tag() const
         {
-            return reinterpret_cast<const data_base*>(&data_)->tag();
+            return reinterpret_cast<const holder*>(&data_)->tag();
         }
 
-        const null_data* null_data_cast() const
+        const null_holder* null_holder_cast() const
         {
-            return reinterpret_cast<const null_data*>(&data_);
+            return reinterpret_cast<const null_holder*>(&data_);
         }
 
-        const empty_object_data* empty_object_data_cast() const
+        const empty_object_holder* empty_object_holder_cast() const
         {
-            return reinterpret_cast<const empty_object_data*>(&data_);
+            return reinterpret_cast<const empty_object_holder*>(&data_);
         }
 
-        const bool_data* bool_data_cast() const
+        const bool_holder* bool_holder_cast() const
         {
-            return reinterpret_cast<const bool_data*>(&data_);
+            return reinterpret_cast<const bool_holder*>(&data_);
         }
 
-        const int64_data* int64_data_cast() const
+        const int64_holder* int64_holder_cast() const
         {
-            return reinterpret_cast<const int64_data*>(&data_);
+            return reinterpret_cast<const int64_holder*>(&data_);
         }
 
-        const uint64_data* uint64_data_cast() const
+        const uint64_holder* uint64_holder_cast() const
         {
-            return reinterpret_cast<const uint64_data*>(&data_);
+            return reinterpret_cast<const uint64_holder*>(&data_);
         }
 
-        const half_data* half_data_cast() const
+        const half_holder* half_holder_cast() const
         {
-            return reinterpret_cast<const half_data*>(&data_);
+            return reinterpret_cast<const half_holder*>(&data_);
         }
 
-        const double_data* double_data_cast() const
+        const double_holder* double_holder_cast() const
         {
-            return reinterpret_cast<const double_data*>(&data_);
+            return reinterpret_cast<const double_holder*>(&data_);
         }
 
-        const short_string_data* short_string_data_cast() const
+        const short_string_holder* short_string_holder_cast() const
         {
-            return reinterpret_cast<const short_string_data*>(&data_);
+            return reinterpret_cast<const short_string_holder*>(&data_);
         }
 
-        long_string_data* string_data_cast()
+        long_string_holder* string_holder_cast()
         {
-            return reinterpret_cast<long_string_data*>(&data_);
+            return reinterpret_cast<long_string_holder*>(&data_);
         }
 
-        const long_string_data* string_data_cast() const
+        const long_string_holder* string_holder_cast() const
         {
-            return reinterpret_cast<const long_string_data*>(&data_);
+            return reinterpret_cast<const long_string_holder*>(&data_);
         }
 
-        byte_string_data* byte_string_data_cast()
+        byte_string_holder* byte_string_holder_cast()
         {
-            return reinterpret_cast<byte_string_data*>(&data_);
+            return reinterpret_cast<byte_string_holder*>(&data_);
         }
 
-        const byte_string_data* byte_string_data_cast() const
+        const byte_string_holder* byte_string_holder_cast() const
         {
-            return reinterpret_cast<const byte_string_data*>(&data_);
+            return reinterpret_cast<const byte_string_holder*>(&data_);
         }
 
-        object_data* object_data_cast()
+        object_holder* object_holder_cast()
         {
-            return reinterpret_cast<object_data*>(&data_);
+            return reinterpret_cast<object_holder*>(&data_);
         }
 
-        const object_data* object_data_cast() const
+        const object_holder* object_holder_cast() const
         {
-            return reinterpret_cast<const object_data*>(&data_);
+            return reinterpret_cast<const object_holder*>(&data_);
         }
 
-        array_data* array_data_cast()
+        array_holder* array_holder_cast()
         {
-            return reinterpret_cast<array_data*>(&data_);
+            return reinterpret_cast<array_holder*>(&data_);
         }
 
-        const array_data* array_data_cast() const
+        const array_holder* array_holder_cast() const
         {
-            return reinterpret_cast<const array_data*>(&data_);
+            return reinterpret_cast<const array_holder*>(&data_);
         }
 
         size_t size() const
@@ -995,9 +995,9 @@ public:
             switch (kind())
             {
                 case value_kind::array_value:
-                    return array_data_cast()->value().size();
+                    return array_holder_cast()->value().size();
                 case value_kind::object_value:
-                    return object_data_cast()->value().size();
+                    return object_holder_cast()->value().size();
                 default:
                     return 0;
             }
@@ -1008,9 +1008,9 @@ public:
             switch (kind())
             {
                 case value_kind::short_string_value:
-                    return string_view_type(short_string_data_cast()->data(),short_string_data_cast()->length());
+                    return string_view_type(short_string_holder_cast()->data(),short_string_holder_cast()->length());
                 case value_kind::long_string_value:
-                    return string_view_type(string_data_cast()->data(),string_data_cast()->length());
+                    return string_view_type(string_holder_cast()->data(),string_holder_cast()->length());
                 default:
                     JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a string"));
             }
@@ -1053,7 +1053,7 @@ public:
                     break;
                 }
                 case value_kind::byte_string_value:
-                    return basic_byte_string<BAllocator>(byte_string_data_cast()->data(),byte_string_data_cast()->length());
+                    return basic_byte_string<BAllocator>(byte_string_holder_cast()->data(),byte_string_holder_cast()->length());
                 default:
                     JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a byte string"));
             }
@@ -1064,7 +1064,7 @@ public:
             switch (kind())
             {
             case value_kind::byte_string_value:
-                return byte_string_view(byte_string_data_cast()->data(),byte_string_data_cast()->length());
+                return byte_string_view(byte_string_holder_cast()->data(),byte_string_holder_cast()->length());
             default:
                 JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a byte string"));
             }
@@ -1083,15 +1083,15 @@ public:
                     }
                     return basic_bignum<UserAllocator>(as_string_view().data(), as_string_view().length());
                 case value_kind::half_value:
-                    return basic_bignum<UserAllocator>(jsoncons::detail::decode_half(half_data_cast()->value()));
+                    return basic_bignum<UserAllocator>(jsoncons::detail::decode_half(half_holder_cast()->value()));
                 case value_kind::double_value:
-                    return basic_bignum<UserAllocator>(double_data_cast()->value());
+                    return basic_bignum<UserAllocator>(double_holder_cast()->value());
                 case value_kind::int64_value:
-                    return basic_bignum<UserAllocator>(int64_data_cast()->value());
+                    return basic_bignum<UserAllocator>(int64_holder_cast()->value());
                 case value_kind::uint64_value:
-                    return basic_bignum<UserAllocator>(uint64_data_cast()->value());
+                    return basic_bignum<UserAllocator>(uint64_holder_cast()->value());
                 case value_kind::bool_value:
-                    return basic_bignum<UserAllocator>(bool_data_cast()->value() ? 1 : 0);
+                    return basic_bignum<UserAllocator>(bool_holder_cast()->value() ? 1 : 0);
                 default:
                     JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a bignum"));
             }
@@ -1129,7 +1129,7 @@ public:
                     switch (rhs.kind())
                     {
                         case value_kind::bool_value:
-                            return bool_data_cast()->value() == rhs.bool_data_cast()->value();
+                            return bool_holder_cast()->value() == rhs.bool_holder_cast()->value();
                         default:
                             return false;
                     }
@@ -1138,11 +1138,11 @@ public:
                     switch (rhs.kind())
                     {
                         case value_kind::int64_value:
-                            return int64_data_cast()->value() == rhs.int64_data_cast()->value();
+                            return int64_holder_cast()->value() == rhs.int64_holder_cast()->value();
                         case value_kind::uint64_value:
-                            return int64_data_cast()->value() >= 0 ? static_cast<uint64_t>(int64_data_cast()->value()) == rhs.uint64_data_cast()->value() : false;
+                            return int64_holder_cast()->value() >= 0 ? static_cast<uint64_t>(int64_holder_cast()->value()) == rhs.uint64_holder_cast()->value() : false;
                         case value_kind::double_value:
-                            return static_cast<double>(int64_data_cast()->value()) == rhs.double_data_cast()->value();
+                            return static_cast<double>(int64_holder_cast()->value()) == rhs.double_holder_cast()->value();
                         default:
                             return false;
                     }
@@ -1151,11 +1151,11 @@ public:
                     switch (rhs.kind())
                     {
                         case value_kind::int64_value:
-                            return rhs.int64_data_cast()->value() >= 0 ? uint64_data_cast()->value() == static_cast<uint64_t>(rhs.int64_data_cast()->value()) : false;
+                            return rhs.int64_holder_cast()->value() >= 0 ? uint64_holder_cast()->value() == static_cast<uint64_t>(rhs.int64_holder_cast()->value()) : false;
                         case value_kind::uint64_value:
-                            return uint64_data_cast()->value() == rhs.uint64_data_cast()->value();
+                            return uint64_holder_cast()->value() == rhs.uint64_holder_cast()->value();
                         case value_kind::double_value:
-                            return static_cast<double>(uint64_data_cast()->value()) == rhs.double_data_cast()->value();
+                            return static_cast<double>(uint64_holder_cast()->value()) == rhs.double_holder_cast()->value();
                         default:
                             return false;
                     }
@@ -1164,22 +1164,22 @@ public:
                     switch (rhs.kind())
                     {
                         case value_kind::half_value:
-                            return half_data_cast()->value() == rhs.half_data_cast()->value();
+                            return half_holder_cast()->value() == rhs.half_holder_cast()->value();
                         default:
-                            return variant(jsoncons::detail::decode_half(half_data_cast()->value()),semantic_tag::none) == rhs;
+                            return variant(jsoncons::detail::decode_half(half_holder_cast()->value()),semantic_tag::none) == rhs;
                     }
                     break;
                 case value_kind::double_value:
                     switch (rhs.kind())
                     {
                         case value_kind::int64_value:
-                            return double_data_cast()->value() == static_cast<double>(rhs.int64_data_cast()->value());
+                            return double_holder_cast()->value() == static_cast<double>(rhs.int64_holder_cast()->value());
                         case value_kind::uint64_value:
-                            return double_data_cast()->value() == static_cast<double>(rhs.uint64_data_cast()->value());
+                            return double_holder_cast()->value() == static_cast<double>(rhs.uint64_holder_cast()->value());
                         case value_kind::half_value:
-                            return double_data_cast()->value() == jsoncons::detail::decode_half(rhs.half_data_cast()->value());
+                            return double_holder_cast()->value() == jsoncons::detail::decode_half(rhs.half_holder_cast()->value());
                         case value_kind::double_value:
-                            return double_data_cast()->value() == rhs.double_data_cast()->value();
+                            return double_holder_cast()->value() == rhs.double_holder_cast()->value();
                         default:
                             return false;
                     }
@@ -1221,7 +1221,7 @@ public:
                     switch (rhs.kind())
                     {
                         case value_kind::array_value:
-                            return array_data_cast()->value() == rhs.array_data_cast()->value();
+                            return array_holder_cast()->value() == rhs.array_holder_cast()->value();
                         default:
                             return false;
                     }
@@ -1232,7 +1232,7 @@ public:
                         case value_kind::empty_object_value:
                             return size() == 0;
                         case value_kind::object_value:
-                            return object_data_cast()->value() == rhs.object_data_cast()->value();
+                            return object_holder_cast()->value() == rhs.object_holder_cast()->value();
                         default:
                             return false;
                     }
@@ -1273,7 +1273,7 @@ public:
                     switch (rhs.kind())
                     {
                         case value_kind::bool_value:
-                            return bool_data_cast()->value() < rhs.bool_data_cast()->value();
+                            return bool_holder_cast()->value() < rhs.bool_holder_cast()->value();
                         default:
                             return (int)kind() < (int)rhs.kind();
                     }
@@ -1282,11 +1282,11 @@ public:
                     switch (rhs.kind())
                     {
                         case value_kind::int64_value:
-                            return int64_data_cast()->value() < rhs.int64_data_cast()->value();
+                            return int64_holder_cast()->value() < rhs.int64_holder_cast()->value();
                         case value_kind::uint64_value:
-                            return int64_data_cast()->value() >= 0 ? static_cast<uint64_t>(int64_data_cast()->value()) < rhs.uint64_data_cast()->value() : true;
+                            return int64_holder_cast()->value() >= 0 ? static_cast<uint64_t>(int64_holder_cast()->value()) < rhs.uint64_holder_cast()->value() : true;
                         case value_kind::double_value:
-                            return static_cast<double>(int64_data_cast()->value()) < rhs.double_data_cast()->value();
+                            return static_cast<double>(int64_holder_cast()->value()) < rhs.double_holder_cast()->value();
                         default:
                             return (int)kind() < (int)rhs.kind();
                     }
@@ -1295,11 +1295,11 @@ public:
                     switch (rhs.kind())
                     {
                         case value_kind::int64_value:
-                            return rhs.int64_data_cast()->value() >= 0 ? uint64_data_cast()->value() < static_cast<uint64_t>(rhs.int64_data_cast()->value()) : true;
+                            return rhs.int64_holder_cast()->value() >= 0 ? uint64_holder_cast()->value() < static_cast<uint64_t>(rhs.int64_holder_cast()->value()) : true;
                         case value_kind::uint64_value:
-                            return uint64_data_cast()->value() < rhs.uint64_data_cast()->value();
+                            return uint64_holder_cast()->value() < rhs.uint64_holder_cast()->value();
                         case value_kind::double_value:
-                            return static_cast<double>(uint64_data_cast()->value()) < rhs.double_data_cast()->value();
+                            return static_cast<double>(uint64_holder_cast()->value()) < rhs.double_holder_cast()->value();
                         default:
                             return (int)kind() < (int)rhs.kind();
                     }
@@ -1308,11 +1308,11 @@ public:
                     switch (rhs.kind())
                     {
                         case value_kind::int64_value:
-                            return double_data_cast()->value() < static_cast<double>(rhs.int64_data_cast()->value());
+                            return double_holder_cast()->value() < static_cast<double>(rhs.int64_holder_cast()->value());
                         case value_kind::uint64_value:
-                            return double_data_cast()->value() < static_cast<double>(rhs.uint64_data_cast()->value());
+                            return double_holder_cast()->value() < static_cast<double>(rhs.uint64_holder_cast()->value());
                         case value_kind::double_value:
-                            return double_data_cast()->value() < rhs.double_data_cast()->value();
+                            return double_holder_cast()->value() < rhs.double_holder_cast()->value();
                         default:
                             return (int)kind() < (int)rhs.kind();
                     }
@@ -1354,7 +1354,7 @@ public:
                     switch (rhs.kind())
                     {
                         case value_kind::array_value:
-                            return array_data_cast()->value() < rhs.array_data_cast()->value();
+                            return array_holder_cast()->value() < rhs.array_holder_cast()->value();
                         default:
                             return (int)kind() < (int)rhs.kind();
                     }
@@ -1365,7 +1365,7 @@ public:
                         case value_kind::empty_object_value:
                             return false;
                         case value_kind::object_value:
-                            return object_data_cast()->value() < rhs.object_data_cast()->value();
+                            return object_holder_cast()->value() < rhs.object_holder_cast()->value();
                         default:
                             return (int)kind() < (int)rhs.kind();
                     }
@@ -1401,40 +1401,40 @@ public:
             switch (kind())
             {
                 case value_kind::null_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))null_data(*null_data_cast());
+                    new(reinterpret_cast<void*>(&(other.data_)))null_holder(*null_holder_cast());
                     break;
                 case value_kind::empty_object_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))empty_object_data(*empty_object_data_cast());
+                    new(reinterpret_cast<void*>(&(other.data_)))empty_object_holder(*empty_object_holder_cast());
                     break;
                 case value_kind::bool_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))bool_data(*bool_data_cast());
+                    new(reinterpret_cast<void*>(&(other.data_)))bool_holder(*bool_holder_cast());
                     break;
                 case value_kind::int64_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))int64_data(*int64_data_cast());
+                    new(reinterpret_cast<void*>(&(other.data_)))int64_holder(*int64_holder_cast());
                     break;
                 case value_kind::uint64_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))uint64_data(*uint64_data_cast());
+                    new(reinterpret_cast<void*>(&(other.data_)))uint64_holder(*uint64_holder_cast());
                     break;
                 case value_kind::half_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))half_data(*half_data_cast());
+                    new(reinterpret_cast<void*>(&(other.data_)))half_holder(*half_holder_cast());
                     break;
                 case value_kind::double_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))double_data(*double_data_cast());
+                    new(reinterpret_cast<void*>(&(other.data_)))double_holder(*double_holder_cast());
                     break;
                 case value_kind::short_string_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))short_string_data(*short_string_data_cast());
+                    new(reinterpret_cast<void*>(&(other.data_)))short_string_holder(*short_string_holder_cast());
                     break;
                 case value_kind::long_string_value:
-                    new(reinterpret_cast<void*>(&other.data_))long_string_data(std::move(*string_data_cast()));
+                    new(reinterpret_cast<void*>(&other.data_))long_string_holder(std::move(*string_holder_cast()));
                     break;
                 case value_kind::byte_string_value:
-                    new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(*byte_string_data_cast()));
+                    new(reinterpret_cast<void*>(&other.data_))byte_string_holder(std::move(*byte_string_holder_cast()));
                     break;
                 case value_kind::array_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(*array_data_cast()));
+                    new(reinterpret_cast<void*>(&(other.data_)))array_holder(std::move(*array_holder_cast()));
                     break;
                 case value_kind::object_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))object_data(std::move(*object_data_cast()));
+                    new(reinterpret_cast<void*>(&(other.data_)))object_holder(std::move(*object_holder_cast()));
                     break;
                 default:
                     JSONCONS_UNREACHABLE();
@@ -1443,16 +1443,16 @@ public:
             switch (temp.kind())
             {
                 case value_kind::long_string_value:
-                    new(reinterpret_cast<void*>(&data_))long_string_data(std::move(*temp.string_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))long_string_holder(std::move(*temp.string_holder_cast()));
                     break;
                 case value_kind::byte_string_value:
-                    new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*temp.byte_string_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))byte_string_holder(std::move(*temp.byte_string_holder_cast()));
                     break;
                 case value_kind::array_value:
-                    new(reinterpret_cast<void*>(&(data_)))array_data(std::move(*temp.array_data_cast()));
+                    new(reinterpret_cast<void*>(&(data_)))array_holder(std::move(*temp.array_holder_cast()));
                     break;
                 case value_kind::object_value:
-                    new(reinterpret_cast<void*>(&(data_)))object_data(std::move(*temp.object_data_cast()));
+                    new(reinterpret_cast<void*>(&(data_)))object_holder(std::move(*temp.object_holder_cast()));
                     break;
                 default:
                     std::swap(data_,temp.data_);
@@ -1466,40 +1466,40 @@ public:
             switch (val.kind())
             {
                 case value_kind::null_value:
-                    new(reinterpret_cast<void*>(&data_))null_data(*(val.null_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))null_holder(*(val.null_holder_cast()));
                     break;
                 case value_kind::empty_object_value:
-                    new(reinterpret_cast<void*>(&data_))empty_object_data(*(val.empty_object_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))empty_object_holder(*(val.empty_object_holder_cast()));
                     break;
                 case value_kind::bool_value:
-                    new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))bool_holder(*(val.bool_holder_cast()));
                     break;
                 case value_kind::int64_value:
-                    new(reinterpret_cast<void*>(&data_))int64_data(*(val.int64_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))int64_holder(*(val.int64_holder_cast()));
                     break;
                 case value_kind::uint64_value:
-                    new(reinterpret_cast<void*>(&data_))uint64_data(*(val.uint64_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))uint64_holder(*(val.uint64_holder_cast()));
                     break;
                 case value_kind::half_value:
-                    new(reinterpret_cast<void*>(&data_))half_data(*(val.half_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))half_holder(*(val.half_holder_cast()));
                     break;
                 case value_kind::double_value:
-                    new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))double_holder(*(val.double_holder_cast()));
                     break;
                 case value_kind::short_string_value:
-                    new(reinterpret_cast<void*>(&data_))short_string_data(*(val.short_string_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))short_string_holder(*(val.short_string_holder_cast()));
                     break;
                 case value_kind::long_string_value:
-                    new(reinterpret_cast<void*>(&data_))long_string_data(*(val.string_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))long_string_holder(*(val.string_holder_cast()));
                     break;
                 case value_kind::byte_string_value:
-                    new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))byte_string_holder(*(val.byte_string_holder_cast()));
                     break;
                 case value_kind::object_value:
-                    new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))object_holder(*(val.object_holder_cast()));
                     break;
                 case value_kind::array_value:
-                    new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))array_holder(*(val.array_holder_cast()));
                     break;
                 default:
                     break;
@@ -1521,16 +1521,16 @@ public:
                 Init_(val);
                 break;
             case value_kind::long_string_value:
-                new(reinterpret_cast<void*>(&data_))long_string_data(*(val.string_data_cast()),a);
+                new(reinterpret_cast<void*>(&data_))long_string_holder(*(val.string_holder_cast()),a);
                 break;
             case value_kind::byte_string_value:
-                new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()),a);
+                new(reinterpret_cast<void*>(&data_))byte_string_holder(*(val.byte_string_holder_cast()),a);
                 break;
             case value_kind::array_value:
-                new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()),a);
+                new(reinterpret_cast<void*>(&data_))array_holder(*(val.array_holder_cast()),a);
                 break;
             case value_kind::object_value:
-                new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()),a);
+                new(reinterpret_cast<void*>(&data_))object_holder(*(val.object_holder_cast()),a);
                 break;
             default:
                 break;
@@ -1553,26 +1553,26 @@ public:
                     break;
                 case value_kind::long_string_value:
                 {
-                    new(reinterpret_cast<void*>(&data_))long_string_data(std::move(*val.string_data_cast()));
-                    new(reinterpret_cast<void*>(&val.data_))null_data();
+                    new(reinterpret_cast<void*>(&data_))long_string_holder(std::move(*val.string_holder_cast()));
+                    new(reinterpret_cast<void*>(&val.data_))null_holder();
                     break;
                 }
                 case value_kind::byte_string_value:
                 {
-                    new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*val.byte_string_data_cast()));
-                    new(reinterpret_cast<void*>(&val.data_))null_data();
+                    new(reinterpret_cast<void*>(&data_))byte_string_holder(std::move(*val.byte_string_holder_cast()));
+                    new(reinterpret_cast<void*>(&val.data_))null_holder();
                     break;
                 }
                 case value_kind::array_value:
                 {
-                    new(reinterpret_cast<void*>(&data_))array_data(std::move(*val.array_data_cast()));
-                    new(reinterpret_cast<void*>(&val.data_))null_data();
+                    new(reinterpret_cast<void*>(&data_))array_holder(std::move(*val.array_holder_cast()));
+                    new(reinterpret_cast<void*>(&val.data_))null_holder();
                     break;
                 }
                 case value_kind::object_value:
                 {
-                    new(reinterpret_cast<void*>(&data_))object_data(std::move(*val.object_data_cast()));
-                    new(reinterpret_cast<void*>(&val.data_))null_data();
+                    new(reinterpret_cast<void*>(&data_))object_holder(std::move(*val.object_holder_cast()));
+                    new(reinterpret_cast<void*>(&val.data_))null_holder();
                     break;
                 }
                 default:
@@ -1602,7 +1602,7 @@ public:
                     break;
                 case value_kind::long_string_value:
                 {
-                    if (a == val.string_data_cast()->get_allocator())
+                    if (a == val.string_holder_cast()->get_allocator())
                     {
                         Init_rv_(std::forward<variant>(val), a, std::true_type());
                     }
@@ -1614,7 +1614,7 @@ public:
                 }
                 case value_kind::byte_string_value:
                 {
-                    if (a == val.byte_string_data_cast()->get_allocator())
+                    if (a == val.byte_string_holder_cast()->get_allocator())
                     {
                         Init_rv_(std::forward<variant>(val), a, std::true_type());
                     }
@@ -1626,7 +1626,7 @@ public:
                 }
                 case value_kind::object_value:
                 {
-                    if (a == val.object_data_cast()->get_allocator())
+                    if (a == val.object_holder_cast()->get_allocator())
                     {
                         Init_rv_(std::forward<variant>(val), a, std::true_type());
                     }
@@ -1638,7 +1638,7 @@ public:
                 }
                 case value_kind::array_value:
                 {
-                    if (a == val.array_data_cast()->get_allocator())
+                    if (a == val.array_holder_cast()->get_allocator())
                     {
                         Init_rv_(std::forward<variant>(val), a, std::true_type());
                     }
@@ -3264,19 +3264,19 @@ public:
         {
             case value_kind::long_string_value:
             {
-                return var_.string_data_cast()->get_allocator();
+                return var_.string_holder_cast()->get_allocator();
             }
             case value_kind::byte_string_value:
             {
-                return var_.byte_string_data_cast()->get_allocator();
+                return var_.byte_string_holder_cast()->get_allocator();
             }
             case value_kind::array_value:
             {
-                return var_.array_data_cast()->get_allocator();
+                return var_.array_holder_cast()->get_allocator();
             }
             case value_kind::object_value:
             {
-                return var_.object_data_cast()->get_allocator();
+                return var_.object_holder_cast()->get_allocator();
             }
             default:
                 return allocator_type();
@@ -3423,12 +3423,12 @@ public:
         switch (var_.kind())
         {
             case value_kind::byte_string_value:
-                return var_.byte_string_data_cast()->length() == 0;
+                return var_.byte_string_holder_cast()->length() == 0;
                 break;
             case value_kind::short_string_value:
-                return var_.short_string_data_cast()->length() == 0;
+                return var_.short_string_holder_cast()->length() == 0;
             case value_kind::long_string_value:
-                return var_.string_data_cast()->length() == 0;
+                return var_.string_holder_cast()->length() == 0;
             case value_kind::array_value:
                 return array_value().size() == 0;
             case value_kind::empty_object_value:
@@ -3545,15 +3545,15 @@ public:
                 }
                 break;
             case value_kind::bool_value:
-                return var_.bool_data_cast()->value();
+                return var_.bool_holder_cast()->value();
             case value_kind::half_value:
-                return var_.half_data_cast()->value() != 0.0;
+                return var_.half_holder_cast()->value() != 0.0;
             case value_kind::double_value:
-                return var_.double_data_cast()->value() != 0.0;
+                return var_.double_holder_cast()->value() != 0.0;
             case value_kind::int64_value:
-                return var_.int64_data_cast()->value() != 0;
+                return var_.int64_holder_cast()->value() != 0;
             case value_kind::uint64_value:
-                return var_.uint64_data_cast()->value() != 0;
+                return var_.uint64_holder_cast()->value() != 0;
             default:
                 JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a bool"));
         }
@@ -3579,15 +3579,15 @@ public:
                 return result.value;
             }
             case value_kind::half_value:
-                return static_cast<T>(var_.half_data_cast()->value());
+                return static_cast<T>(var_.half_holder_cast()->value());
             case value_kind::double_value:
-                return static_cast<T>(var_.double_data_cast()->value());
+                return static_cast<T>(var_.double_holder_cast()->value());
             case value_kind::int64_value:
-                return static_cast<T>(var_.int64_data_cast()->value());
+                return static_cast<T>(var_.int64_holder_cast()->value());
             case value_kind::uint64_value:
-                return static_cast<T>(var_.uint64_data_cast()->value());
+                return static_cast<T>(var_.uint64_holder_cast()->value());
             case value_kind::bool_value:
-                return static_cast<T>(var_.bool_data_cast()->value() ? 1 : 0);
+                return static_cast<T>(var_.bool_holder_cast()->value() ? 1 : 0);
             default:
                 JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an integer"));
         }
@@ -3605,13 +3605,13 @@ public:
                 return to_double(as_cstring(), as_string_view().length());
             }
             case value_kind::half_value:
-                return jsoncons::detail::decode_half(var_.half_data_cast()->value());
+                return jsoncons::detail::decode_half(var_.half_holder_cast()->value());
             case value_kind::double_value:
-                return var_.double_data_cast()->value();
+                return var_.double_holder_cast()->value();
             case value_kind::int64_value:
-                return static_cast<double>(var_.int64_data_cast()->value());
+                return static_cast<double>(var_.int64_holder_cast()->value());
             case value_kind::uint64_value:
-                return static_cast<double>(var_.uint64_data_cast()->value());
+                return static_cast<double>(var_.uint64_holder_cast()->value());
             default:
                 JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
         }
@@ -3677,18 +3677,18 @@ public:
                 switch (format)
                 {
                     case byte_string_chars_format::base64:
-                        encode_base64(var_.byte_string_data_cast()->begin(), 
-                                      var_.byte_string_data_cast()->end(),
+                        encode_base64(var_.byte_string_holder_cast()->begin(), 
+                                      var_.byte_string_holder_cast()->end(),
                                       s);
                         break;
                     case byte_string_chars_format::base16:
-                        encode_base16(var_.byte_string_data_cast()->begin(), 
-                                      var_.byte_string_data_cast()->end(),
+                        encode_base16(var_.byte_string_holder_cast()->begin(), 
+                                      var_.byte_string_holder_cast()->end(),
                                       s);
                         break;
                     default:
-                        encode_base64url(var_.byte_string_data_cast()->begin(), 
-                                         var_.byte_string_data_cast()->end(),
+                        encode_base64url(var_.byte_string_holder_cast()->begin(), 
+                                         var_.byte_string_holder_cast()->end(),
                                          s);
                         break;
                 }
@@ -3756,9 +3756,9 @@ public:
         switch (var_.kind())
         {
         case value_kind::short_string_value:
-            return var_.short_string_data_cast()->c_str();
+            return var_.short_string_holder_cast()->c_str();
         case value_kind::long_string_value:
-            return var_.string_data_cast()->c_str();
+            return var_.string_holder_cast()->c_str();
         default:
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a cstring"));
         }
@@ -4852,13 +4852,13 @@ public:
         switch (var_.kind())
         {
         case value_kind::double_value:
-            return static_cast<int>(var_.double_data_cast()->value());
+            return static_cast<int>(var_.double_holder_cast()->value());
         case value_kind::int64_value:
-            return static_cast<int>(var_.int64_data_cast()->value());
+            return static_cast<int>(var_.int64_holder_cast()->value());
         case value_kind::uint64_value:
-            return static_cast<int>(var_.uint64_data_cast()->value());
+            return static_cast<int>(var_.uint64_holder_cast()->value());
         case value_kind::bool_value:
-            return var_.bool_data_cast()->value() ? 1 : 0;
+            return var_.bool_holder_cast()->value() ? 1 : 0;
         default:
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an int"));
         }
@@ -4870,13 +4870,13 @@ public:
         switch (var_.kind())
         {
         case value_kind::double_value:
-            return static_cast<unsigned int>(var_.double_data_cast()->value());
+            return static_cast<unsigned int>(var_.double_holder_cast()->value());
         case value_kind::int64_value:
-            return static_cast<unsigned int>(var_.int64_data_cast()->value());
+            return static_cast<unsigned int>(var_.int64_holder_cast()->value());
         case value_kind::uint64_value:
-            return static_cast<unsigned int>(var_.uint64_data_cast()->value());
+            return static_cast<unsigned int>(var_.uint64_holder_cast()->value());
         case value_kind::bool_value:
-            return var_.bool_data_cast()->value() ? 1 : 0;
+            return var_.bool_holder_cast()->value() ? 1 : 0;
         default:
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an unsigned int"));
         }
@@ -4888,13 +4888,13 @@ public:
         switch (var_.kind())
         {
         case value_kind::double_value:
-            return static_cast<long>(var_.double_data_cast()->value());
+            return static_cast<long>(var_.double_holder_cast()->value());
         case value_kind::int64_value:
-            return static_cast<long>(var_.int64_data_cast()->value());
+            return static_cast<long>(var_.int64_holder_cast()->value());
         case value_kind::uint64_value:
-            return static_cast<long>(var_.uint64_data_cast()->value());
+            return static_cast<long>(var_.uint64_holder_cast()->value());
         case value_kind::bool_value:
-            return var_.bool_data_cast()->value() ? 1 : 0;
+            return var_.bool_holder_cast()->value() ? 1 : 0;
         default:
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a long"));
         }
@@ -4906,13 +4906,13 @@ public:
         switch (var_.kind())
         {
         case value_kind::double_value:
-            return static_cast<unsigned long>(var_.double_data_cast()->value());
+            return static_cast<unsigned long>(var_.double_holder_cast()->value());
         case value_kind::int64_value:
-            return static_cast<unsigned long>(var_.int64_data_cast()->value());
+            return static_cast<unsigned long>(var_.int64_holder_cast()->value());
         case value_kind::uint64_value:
-            return static_cast<unsigned long>(var_.uint64_data_cast()->value());
+            return static_cast<unsigned long>(var_.uint64_holder_cast()->value());
         case value_kind::bool_value:
-            return var_.bool_data_cast()->value() ? 1 : 0;
+            return var_.bool_holder_cast()->value() ? 1 : 0;
         default:
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an unsigned long"));
         }
@@ -5099,7 +5099,7 @@ public:
         switch (var_.kind())
         {
         case value_kind::array_value:
-            return var_.array_data_cast()->value();
+            return var_.array_holder_cast()->value();
         default:
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Bad array cast"));
             break;
@@ -5111,7 +5111,7 @@ public:
         switch (var_.kind())
         {
         case value_kind::array_value:
-            return var_.array_data_cast()->value();
+            return var_.array_holder_cast()->value();
         default:
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Bad array cast"));
             break;
@@ -5126,7 +5126,7 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case value_kind::object_value:
-            return var_.object_data_cast()->value();
+            return var_.object_holder_cast()->value();
         default:
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Bad object cast"));
             break;
@@ -5141,7 +5141,7 @@ public:
             const_cast<basic_json*>(this)->create_object_implicitly(); // HERE
             JSONCONS_FALLTHROUGH;
         case value_kind::object_value:
-            return var_.object_data_cast()->value();
+            return var_.object_holder_cast()->value();
         default:
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Bad object cast"));
             break;
@@ -5160,24 +5160,24 @@ private:
                 handler.string_value(as_string_view(), var_.tag(), context, ec);
                 break;
             case value_kind::byte_string_value:
-                handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length(), 
+                handler.byte_string_value(var_.byte_string_holder_cast()->data(), var_.byte_string_holder_cast()->length(), 
                                           var_.tag(), context, ec);
                 break;
             case value_kind::half_value:
-                handler.half_value(var_.half_data_cast()->value(), var_.tag(), context, ec);
+                handler.half_value(var_.half_holder_cast()->value(), var_.tag(), context, ec);
                 break;
             case value_kind::double_value:
-                handler.double_value(var_.double_data_cast()->value(), 
+                handler.double_value(var_.double_holder_cast()->value(), 
                                      var_.tag(), context, ec);
                 break;
             case value_kind::int64_value:
-                handler.int64_value(var_.int64_data_cast()->value(), var_.tag(), context, ec);
+                handler.int64_value(var_.int64_holder_cast()->value(), var_.tag(), context, ec);
                 break;
             case value_kind::uint64_value:
-                handler.uint64_value(var_.uint64_data_cast()->value(), var_.tag(), context, ec);
+                handler.uint64_value(var_.uint64_holder_cast()->value(), var_.tag(), context, ec);
                 break;
             case value_kind::bool_value:
-                handler.bool_value(var_.bool_data_cast()->value(), var_.tag(), context, ec);
+                handler.bool_value(var_.bool_holder_cast()->value(), var_.tag(), context, ec);
                 break;
             case value_kind::null_value:
                 handler.null_value(var_.tag(), context, ec);
