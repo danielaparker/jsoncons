@@ -11,7 +11,9 @@ Enhancements:
 
 - Includes Martin Moene's span-lite to support a C++20-like span in the jsoncons namespace.  
 
-- Includes support for the cbor extension [Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)
+- Includes enhancements to the CBOR encode and decode classes and functions to support the 
+  CBOR extension [Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08).
+  The implementation uses the span class.
 
 Changes:
 
@@ -20,6 +22,11 @@ Changes:
 - The CSV extension enum name `mapping_type` has been deprecated and renamed to `csv_mapping_strategy`.
 
 - The CSV extension function name `mapping` has been deprecated and renamed to `mapping_strategy`.
+
+- The `do_` virtual functions in `basic_json_content_handler` have been augmented with a `std::error_code`
+output parameter, e.g.
+
+    virtual bool do_begin_object(semantic_tag tag, const ser_context& context, std::error_code& ec) = 0;
 
 v0.136.0
 --------
