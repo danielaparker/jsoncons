@@ -74,3 +74,6 @@ to include copying the jsoncons_ext directory into the installation place
 
 - [mikewallis](https://github.com/mikewallis) for removing redundant macro continuation character in JSONCONS_TYPE_TRAITS_DECL
 
+- [KonstantinPlotnikov](https://github.com/KonstantinPlotnikov) for fixing GCC 9.2 warning: ‘class jsoncons::json_exception’ 
+has virtual functions and accessible non-virtual destructor
+
