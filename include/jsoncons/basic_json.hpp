@@ -3174,7 +3174,7 @@ public:
     void dump(basic_json_content_handler<char_type>& handler) const
     {
         std::error_code ec;
-        dump_no_flush(handler, ec);
+        dump_noflush(handler, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -3184,7 +3184,7 @@ public:
 
     void dump(basic_json_content_handler<char_type>& handler, std::error_code& ec) const
     {
-        dump_no_flush(handler, ec);
+        dump_noflush(handler, ec);
         if (ec)
         {
             return;
@@ -5150,7 +5150,7 @@ public:
 
 private:
 
-    void dump_no_flush(basic_json_content_handler<char_type>& handler, std::error_code& ec) const
+    void dump_noflush(basic_json_content_handler<char_type>& handler, std::error_code& ec) const
     {
         const null_ser_context context{};
         switch (var_.kind())
@@ -5193,7 +5193,7 @@ private:
                 for (const_object_iterator it = o.begin(); more && it != o.end(); ++it)
                 {
                     handler.name(string_view_type((it->key()).data(),it->key().length()), context, ec);
-                    it->value().dump_no_flush(handler, ec);
+                    it->value().dump_noflush(handler, ec);
                 }
                 if (more)
                 {
@@ -5207,7 +5207,7 @@ private:
                 const array& o = array_value();
                 for (const_array_iterator it = o.begin(); more && it != o.end(); ++it)
                 {
-                    it->dump_no_flush(handler, ec);
+                    it->dump_noflush(handler, ec);
                 }
                 if (more)
                 {
