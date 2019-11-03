@@ -9,8 +9,8 @@ null|
 bool|
 uint64|
 int64|
-half|double precision floating point
-double|double precision floating point
+half|Half precision floating point
+double|Double precision floating point
 string|
 byte string|
 array|
