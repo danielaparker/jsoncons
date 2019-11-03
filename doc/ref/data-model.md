@@ -3,16 +3,18 @@
 The jsoncons data model supports the familiar JSON types - nulls,
 booleans, numbers, strings, arrays, objects - plus byte strings. It has
 
-- null
-- bool
-- uint64
-- int64
-- half precision floating point
-- double precision floating point
-- string
-- byte string
-- array
-- object
+Type|Description
+----|-----------
+null|
+bool|
+uint64|
+int64|
+half|double precision floating point
+double|double precision floating point
+string|
+byte string|
+array|
+object|
 
 In addition, jsoncons supports semantic tagging of date-time values, timestamp values, big integers, 
 big decimals, bigfloats and binary encodings. This allows it to preserve these type semantics when parsing 
