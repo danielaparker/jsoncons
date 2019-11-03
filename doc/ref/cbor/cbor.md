@@ -75,7 +75,7 @@ Tags 256 and 25 are automatically decoded when detected. They are encoded when C
 64-87 [Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)  
 Tags 64-82 (excepting float128 big endian) and 84-86 (excepting float128 little endian) are automatically decoded when detected. They may be encoded when CBOR option `enable_typed_arrays` is set to true.
 
-#### Mappings between the CBOR and jsoncons data items.
+#### Mappings between CBOR and jsoncons data items
 
 CBOR data item|CBOR tag                                         | jsoncons data item|jsoncons tag  
 ---------------|------------------------------------------------| --------------|------------------

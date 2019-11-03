@@ -13,19 +13,19 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 [basic_msgpack_encoder](basic_msgpack_encoder.md)
 
-#### jsoncons-MessagePack mappings
+#### Mappings between MessagePack and jsoncons data items
 
-jsoncons data item|jsoncons tag|BSON data item
---------------|------------------|---------------
-null          |                  | nil
-bool          |                  | true or false
-int64         |                  | negative fixnum, int 8, int 16, int 32, int 64
-uint64        |                  | positive fixnum, uint 8, uint 16, uint 32, uint 64
-double        |                  | float32 or float64
-string        |                  | fixstr, str 8, str 16 or str 32
-byte_string   |                  | bin 8, bin 16 or bin 32
-array         |                  | array 
-object        |                  | map
+MessagePack data item                              | jsoncons data item|jsoncons tag  
+-------------------------------------------------- |---------------|------------------
+ nil                                               | null          |                  
+ true or false                                     | bool          |                  
+ negative fixnum, int 8, int 16, int 32, int 64    | int64         |                  
+ positive fixnum, uint 8, uint 16, uint 32, uint 64| uint64        |                  
+ float32 or float64                                | double        |                  
+ fixstr, str 8, str 16 or str 32                   | string        |                  
+ bin 8, bin 16 or bin 32                           | byte_string   |                  
+ array                                             | array         |                  
+ map                                               | object        |                  
 
 ### Examples
 

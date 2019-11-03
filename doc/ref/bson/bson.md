@@ -12,20 +12,20 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 [basic_bson_encoder](basic_bson_encoder.md)
 
-#### jsoncons-BSON mappings
+#### Mappings between BSON and jsoncons data items
 
-jsoncons data item|jsoncons tag|BSON data item
---------------|------------------|---------------
-null          |                  | null
-bool          |                  | true or false
-int64         |                  | int32 or int64
-int64         | timestamp        | datetime
-uint64        |                  | int32 or int64
-uint64        | timestamp        | datetime
-double        |                  | double
-string        |                  | string
-byte_string   |                  | binary
-array         |                  | 0x04 (array )
-object        |                  | 0x03 (document)
+BSON data item  | jsoncons data item  |jsoncons tag
+----------------|---------------------|------------
+ null           | null          |                  
+ true or false  | bool          |                  
+ int32 or int64 | int64         |                  
+ datetime       | int64         | timestamp        
+ int32 or int64 | uint64        |                  
+ datetime       | uint64        | timestamp        
+ double         | double        |                  
+ string         | string        |                  
+ binary         | byte_string   |                  
+ 0x04 (array )  | array         |                  
+ 0x03 (document)| object        |                  
 
 

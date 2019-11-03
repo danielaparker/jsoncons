@@ -12,21 +12,21 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 [basic_ubjson_encoder](basic_ubjson_encoder.md)
 
-#### jsoncons-ubjson mappings
+#### Mappings between UBJSON and jsoncons data items
 
-jsoncons data item|jsoncons tag|UBJSON data item
---------------|------------------|---------------
-null          |                  | null
-bool          |                  | true or false
-int64         |                  | uint8_t or integer
-uint64        |                  | uint8_t or integer
-double        |                  | float 32 or float 64
-string        |                  | string
-string        | bigint      | high precision number type
-string        | bigdec      | high precision number type
-byte_string   |                  | array of uint8_t
-array         |                  | array 
-object        |                  | object
+UBJSON data item           | jsoncons data item|jsoncons tag  
+---------------------------|---------------|------------------
+ null                      | null          |                  
+ true or false             | bool          |                  
+ uint8_t or integer        | int64         |                  
+ uint8_t or integer        | uint64        |                  
+ float 32 or float 64      | double        |                  
+ string                    | string        |                  
+ high precision number type| string        | bigint           
+ high precision number type| string        | bigdec           
+ array of uint8_t          | byte_string   |                  
+ array                     | array         |                  
+ object                    | object        |                  
 
 ## Examples
 

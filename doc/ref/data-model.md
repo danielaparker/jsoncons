@@ -37,7 +37,7 @@ multi_dim_column_major |
 
 ### Examples
 
-#### Mappings between the CBOR and jsoncons data items.
+#### Mappings between CBOR and jsoncons data items
 
 CBOR data item|CBOR tag                                         | jsoncons data item|jsoncons tag  
 ---------------|------------------------------------------------| --------------|------------------
