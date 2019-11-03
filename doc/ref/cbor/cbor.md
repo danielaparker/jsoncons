@@ -75,33 +75,34 @@ Tags 256 and 25 are automatically decoded when detected. They are encoded when C
 64-87 [Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)  
 Tags 64-82 (excepting float128 big endian) and 84-86 (excepting float128 little endian) are automatically decoded when detected. They may be encoded when CBOR option `enable_typed_arrays` is set to true.
 
-### jsoncons - CBOR mappings
+#### Mappings between the CBOR and jsoncons data items.
 
-jsoncons data item|jsoncons tag|CBOR data item|CBOR tag
---------------|------------------|---------------|--------
-null          |                  | null |&#160;
-null          | undefined        | undefined |&#160;
-bool          |                  | true or false |&#160;
-int64         |                  | unsigned or negative integer |&#160;
-int64         | timestamp        | unsigned or negative integer | 1 (epoch-based date/time)
-uint64        |                  | unsigned integer |&#160;
-uint64        | timestamp        | unsigned integer | 1 (epoch-based date/time)
-double        |                  | half-precision float, float, or double |&#160;
-double        | timestamp        | double | 1 (epoch-based date/time)
-string        |                  | string |&#160;
-string        | bigint      | byte string | 2 (positive bignum) or 2 (negative bignum)  
-string        | bigdec      | array | 4 (decimal fraction)
-string        | bigfloat      | array | 5 (bigfloat)
-string        | datetime        | string | 0 (date/time string) 
-string        | uri              | string | 32 (uri)
-string        | base64url        | string | 33 (base64url)
-string        | base64           | string | 34 (base64)
-byte_string   |                  | byte string |&#160;
-byte_string   | base64url        | byte string | 21 (Expected conversion to base64url encoding)
-byte_string   | base64           | byte string | 22 (Expected conversion to base64 encoding)
-byte_string   | base16           | byte string | 23 (Expected conversion to base16 encoding)
-array         |                  | array |&#160;
-object        |                  | map |&#160;
+CBOR data item|CBOR tag                                         | jsoncons data item|jsoncons tag  
+---------------|------------------------------------------------| --------------|------------------
+ null |&#160;                                                   | null          |                  
+ undefined |&#160;                                              | null          | undefined        
+ true or false |&#160;                                          | bool          |                  
+ unsigned or negative integer |&#160;                           | int64         |                  
+ unsigned or negative integer | 1 (epoch-based date/time)       | int64         | timestamp        
+ unsigned integer |&#160;                                       | uint64        |                  
+ unsigned integer | 1 (epoch-based date/time)                   | uint64        | timestamp        
+ half-precision float, float, or double |&#160;                 | half          |                  
+ float or double |&#160;                                        | double        |                  
+ double | 1 (epoch-based date/time)                             | double        | timestamp        
+ string |&#160;                                                 | string        |                  
+ byte string | 2 (positive bignum) or 2 (negative bignum)       | string        | bigint           
+ array | 4 (decimal fraction)                                   | string        | bigdec           
+ array | 5 (bigfloat)                                           | string        | bigfloat         
+ string | 0 (date/time string)                                  | string        | datetime         
+ string | 32 (uri)                                              | string        | uri              
+ string | 33 (base64url)                                        | string        | base64url        
+ string | 34 (base64)                                           | string        | base64           
+ byte string |&#160;                                            | byte_string   |                  
+ byte string | 21 (Expected conversion to base64url encoding)   | byte_string   | base64url        
+ byte string | 22 (Expected conversion to base64 encoding)      | byte_string   | base64           
+ byte string | 23 (Expected conversion to base16 encoding)      | byte_string   | base16           
+ array |&#160;                                                  | array         |                  
+ map |&#160;                                                    | object        |                  
 
 ## Examples
 
