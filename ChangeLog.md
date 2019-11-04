@@ -3,11 +3,6 @@ v0.137.0
 
 Defect fixes:
 
-- This version fixes a defect in the `erase` functions for
-  the order preserving `basic_json` specializations, in
-  particular, for `ojson` (issue 188.) This fix is also
-  included in the 0.136.1 patched release. 
-
 - Fixes GCC 9.2 warning: ‘class jsoncons::json_exception’ 
   has virtual functions and accessible non-virtual destructor,
   contributed by KonstantinPlotnikov.
@@ -32,6 +27,15 @@ Changes:
 output parameter, e.g.
 
     virtual bool do_begin_object(semantic_tag tag, const ser_context& context, std::error_code& ec) = 0;
+
+v0.136.1
+--------
+
+Defect fixes:
+
+- This version fixes a defect in the `erase` functions for
+  the order preserving `basic_json` specializations, in
+  particular, for `ojson` (issue 188.) 
 
 v0.136.0
 --------
