@@ -162,6 +162,28 @@ public:
           max_lines_((std::numeric_limits<size_t>::max)())
     {}
 
+    basic_csv_decode_options(const basic_csv_decode_options& other) = default;
+
+    basic_csv_decode_options(basic_csv_decode_options&& other)
+        : super_type(std::forward<basic_csv_decode_options>(other)),
+          assume_header_(other.assume_header_),
+          ignore_empty_values_(other.ignore_empty_values_),
+          ignore_empty_lines_(other.ignore_empty_lines_),
+          trim_leading_(other.trim_leading_),
+          trim_trailing_(other.trim_trailing_),
+          trim_leading_inside_quotes_(other.trim_leading_inside_quotes_),
+          trim_trailing_inside_quotes_(other.trim_trailing_inside_quotes_),
+          unquoted_empty_value_is_null_(other.unquoted_empty_value_is_null_),
+          infer_types_(other.infer_types_),
+          lossless_number_(other.lossless_number_),
+          comment_starter_(other.comment_starter_),
+          mapping_(other.mapping_),
+          header_lines_(other.header_lines_),
+          max_lines_(other.max_lines_),
+          column_types_(std::move(other.column_types_)),
+          column_defaults_(std::move(other.column_defaults_))
+    {}
+
     size_t header_lines() const 
     {
         return (assume_header_ && header_lines_ <= 1) ? 1 : header_lines_;
