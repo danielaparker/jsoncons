@@ -218,7 +218,7 @@ Throws a [ser_error](ser_error.md) on parse errors.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(16)-(30) Same as (1)-(15), except sets `ec` and returns `false` on parse errors.
+(16)-(30) Same as (1)-(15), except set `ec` and return `false` on serialization errors.
 
     void flush()
 Flushes whatever is buffered to the destination.

@@ -1,50 +1,69 @@
 ### `jsoncons::basic_json::dump`
 
 ```c++
-template <class SAllocator>
-void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const; // (1)
+    template <class SAllocator=std::allocator<char_type>>
+    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+              const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>(), 
+              indenting line_indent = indenting::no_indent) const; // (1)
 
-template <class SAllocator>
-void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
-          indenting line_indent) const; // (2)
+    template <class SAllocator=std::allocator<char_type>>
+    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
+              indenting line_indent) const; // (2)
 
-template <class SAllocator>
-void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
-          const json_options& options) const; // (3)
+    void dump(std::basic_ostream<char_type>& os, 
+              const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>(), 
+              indenting line_indent = indenting::no_indent) const; // (3)
 
-template <class SAllocator>
-void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
-          const basic_json_options<char_type>& options, 
-          indenting line_indent) const; // (4)
+    void dump(std::basic_ostream<char_type>& os, 
+              indenting line_indent) const; // (4)
 
-void dump(std::ostream& os) const; // (5)
+    void dump(basic_json_content_handler<char_type>& handler) const; // (5)
 
-void dump(std::ostream<char_type>& os, indenting line_indent) const; // (6)
+    template <class SAllocator=std::allocator<char_type>>
+    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+              const basic_json_encode_options<char_type>& options, 
+              indenting line_indent,
+              std::error_code& ec) const; // (6)
 
-void dump(std::ostream<char_type>& os, const json_options& options) const; // (7)
+    template <class SAllocator=std::allocator<char_type>>
+    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
+              indenting line_indent,
+              std::error_code& ec) const; // (7)
 
-void dump(std::ostream<char_type>& os, const json_options& options, indenting line_indent) const; // (8)
+    void dump(std::basic_ostream<char_type>& os, 
+              const basic_json_encode_options<char_type>& options, 
+              indenting line_indent,
+              std::error_code& ec) const; // (8)
 
-void dump(basic_json_content_handler<char_type>& content_handler) const; // (9)
+    void dump(std::basic_ostream<char_type>& os, 
+              indenting line_indent,
+              std::error_code& ec) const; // (9)
+
+    void dump(basic_json_content_handler<char_type>& handler, 
+              std::error_code& ec) const; // (10)
 ```
 
-(1) Dumps json value to string using default json_options.
+(1) Dumps a json value to a string using the specified [encoding options](../basic_json_options.md)
+    and [indenting](../indenting.md).
 
-(2) Dumps json value to string using default serialization options and the specified [indenting](../indenting.md). 
+(2) Dumps a json value to a string using the specified [indenting](../indenting.md).
 
-(3) Dumps json value to string using specified [basic_json_options](../basic_json_options.md). 
+(3) Dumps a json value to an output stream using the specified [encoding options](../basic_json_options.md)
+    and [indenting](../indenting.md).
 
-(4) Dumps json value to string using the specified [basic_json_options](../basic_json_options.md) and [indenting](../indenting.md). 
+(4) Dumps a json value to an output stream using the specified [indenting](../indenting.md).
 
-(5) Dumps json value to stream with default serialization options. 
+(5) Dumps a json value to the specified [content handler](../basic_json_content_handler.md).
 
-(6) Dumps json value to stream using default serialization options and the specified [indenting](../indenting.md). 
+(6) - (10) Same as (1)-(5), except set `ec` on serialization errors. 
 
-(7) Dumps json value to stream using specified [basic_json_options](../basic_json_options.md). 
+#### Exceptions
 
-(8) Dumps json value to stream using the specified [basic_json_options](../basic_json_options.md) and [indenting](../indenting.md). 
+The overloads that do not take a `std::error_code&` parameter throw a
+[ser_error](ser_error.md) on serialization errors, constructed with the error code as the error code argument
+and line and column from the `context`. 
 
-(9) Emits json value to the [basic_json_content_handler](../basic_json_content_handler.md).
+The overloads that take a `std::error_code&` parameter set it to the error code on serialization errors.
 
 ### Examples
 
