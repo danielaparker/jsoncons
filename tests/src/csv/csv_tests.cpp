@@ -51,14 +51,14 @@ TEST_CASE("n_objects_test")
     csv::csv_options options;
     options.assume_header(true);
 
-    options.mapping(csv::mapping_strategy::n_rows);
+    options.mapping(csv::mapping_kind::n_rows);
     csv::csv_reader reader1(bond_yields,decoder,options);
     reader1.read();
     ojson val1 = decoder.get_result();
     //std::cout << "\n(1)\n"<< pretty_print(val1) << "\n";
     CHECK(val1.size() == 4);
 
-    options.mapping(csv::mapping_strategy::n_objects);
+    options.mapping(csv::mapping_kind::n_objects);
     csv::csv_reader reader2(bond_yields,decoder,options);
     reader2.read();
     ojson val2 = decoder.get_result();
@@ -78,7 +78,7 @@ TEST_CASE("m_columns_test")
     json_decoder<ojson> decoder;
     csv::csv_options options;
     options.assume_header(true)
-           .mapping(csv::mapping_strategy::m_columns);
+           .mapping(csv::mapping_kind::m_columns);
 
     std::istringstream is(bond_yields);
     csv::csv_reader reader(is, decoder, options);
@@ -106,7 +106,7 @@ TEST_CASE("m_columns with ignore_empty_value")
     csv::csv_options options;
     options.assume_header(true)
            .ignore_empty_values(true)
-           .mapping(csv::mapping_strategy::m_columns);
+           .mapping(csv::mapping_kind::m_columns);
 
     std::istringstream is(bond_yields);
     csv::csv_reader reader(is, decoder, options);
@@ -1172,7 +1172,7 @@ TEST_CASE("Test decode_csv, terminating newline")
     {
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::mapping_strategy::m_columns);
+               .mapping(csv::mapping_kind::m_columns);
         auto j = csv::decode_csv<json>(data,options);
         REQUIRE(j.is_object());
         REQUIRE(j.size() == 1);
@@ -1213,7 +1213,7 @@ TEST_CASE("Test decode_csv, no terminating newline")
     {
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::mapping_strategy::m_columns);
+               .mapping(csv::mapping_kind::m_columns);
         auto j = csv::decode_csv<json>(data,options);
         REQUIRE(j.is_object());
         REQUIRE(j.size() == 1);
@@ -1266,7 +1266,7 @@ TEST_CASE("test_type_inference")
 
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::mapping_strategy::n_rows);
+               .mapping(csv::mapping_kind::n_rows);
 
         ojson j = csv::decode_csv<ojson>(input,options);
         REQUIRE(j == expected);
@@ -1313,7 +1313,7 @@ TEST_CASE("test_type_inference")
 
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::mapping_strategy::n_objects);
+               .mapping(csv::mapping_kind::n_objects);
         ojson j = csv::decode_csv<ojson>(input,options);
 
         REQUIRE(j == expected);
@@ -1334,7 +1334,7 @@ TEST_CASE("test_type_inference")
 
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::mapping_strategy::m_columns);
+               .mapping(csv::mapping_kind::m_columns);
         ojson j = csv::decode_csv<ojson>(input,options);
 
         REQUIRE(j == expected);
@@ -1351,7 +1351,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
 
     csv::csv_options options;
     options.assume_header(true)
-           .mapping(csv::mapping_strategy::n_objects)
+           .mapping(csv::mapping_kind::n_objects)
            .trim(true)
            .lossless_number(true);
 
@@ -1394,7 +1394,7 @@ TEST_CASE("test_encode_decode csv string")
     typedef std::vector<std::tuple<std::string,int>> cpp_type;
     std::string s1 = "\"a\",1\n\"b\",2";
     csv::csv_options options;
-    options.mapping(csv::mapping_strategy::n_rows)
+    options.mapping(csv::mapping_kind::n_rows)
            .assume_header(false);
 
     SECTION("string")
@@ -1452,7 +1452,7 @@ TEST_CASE("csv_reader constructors")
 
         csv::csv_options options;
         options.assume_header(true)
-               .mapping(csv::mapping_strategy::n_objects);
+               .mapping(csv::mapping_kind::n_objects);
 
         json_decoder<my_json,FreelistAllocator<char>> decoder(my_allocator,my_allocator);
         csv::basic_csv_reader<char,stream_source<char>,FreelistAllocator<char>> reader(input, decoder, options, my_allocator);

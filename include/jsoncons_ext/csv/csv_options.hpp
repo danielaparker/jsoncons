@@ -24,19 +24,19 @@ namespace detail {
     JSONCONS_STRING_LITERAL(boolean,'b','o','o','l','e','a','n')
 }
 
-enum class csv_column_type
+enum class csv_column_type : uint8_t 
 {
     string_t,integer_t,float_t,boolean_t,repeat_t
 };
 
-enum class quote_style_kind
+enum class quote_style_kind : uint8_t 
 {
     minimal,all,nonnumeric,none
 };
 
-enum class mapping_strategy
+enum class mapping_kind : uint8_t 
 {
-    n_rows, 
+    n_rows = 1, 
     n_objects, 
     m_columns
 };
@@ -44,7 +44,7 @@ enum class mapping_strategy
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use quote_style_kind") typedef quote_style_kind quote_styles;
 JSONCONS_DEPRECATED_MSG("Instead, use quote_style_kind") typedef quote_style_kind quote_style_type;
-JSONCONS_DEPRECATED_MSG("Instead, use mapping_strategy") typedef mapping_strategy mapping_type;
+JSONCONS_DEPRECATED_MSG("Instead, use mapping_kind") typedef mapping_kind mapping_type;
 #endif
 
 enum class column_state {sequence,label};
@@ -75,16 +75,16 @@ public:
     typedef std::basic_string<CharT> string_type;
 protected:
     char_type field_delimiter_;
-    std::pair<char_type,bool> subfield_delimiter_;
     char_type quote_char_;
     char_type quote_escape_char_;
+    std::pair<char_type,bool> subfield_delimiter_;
     std::vector<string_type> column_names_;
 
     basic_csv_options_common()
         : field_delimiter_(','),
-          subfield_delimiter_(std::make_pair(',',false)),
           quote_char_('\"'),
-          quote_escape_char_('\"')
+          quote_escape_char_('\"'),
+          subfield_delimiter_(std::make_pair(',',false))
     {
     }
 
@@ -128,7 +128,6 @@ public:
     using typename super_type::char_type;
     using typename super_type::string_type;
 protected:
-    size_t header_lines_;
     bool assume_header_;
     bool ignore_empty_values_;
     bool ignore_empty_lines_;
@@ -140,14 +139,14 @@ protected:
     bool infer_types_;
     bool lossless_number_;
     char_type comment_starter_;
-    std::pair<mapping_strategy,bool> mapping_strategy_;
+    std::pair<mapping_kind,bool> mapping_kind_;
+    size_t header_lines_;
     unsigned long max_lines_;
     std::vector<csv_type_info> column_types_;
     std::vector<string_type> column_defaults_;
 public:
     basic_csv_decode_options()
-        : header_lines_(0),
-          assume_header_(false),
+        : assume_header_(false),
           ignore_empty_values_(false),
           ignore_empty_lines_(true),
           trim_leading_(false),
@@ -158,7 +157,8 @@ public:
           infer_types_(true),
           lossless_number_(false),
           comment_starter_('\0'),
-          mapping_strategy_({mapping_strategy::n_rows,false}),
+          mapping_kind_({mapping_kind::n_rows,false}),
+          header_lines_(0),
           max_lines_((std::numeric_limits<unsigned long>::max)())
     {}
 
@@ -232,9 +232,9 @@ public:
         return comment_starter_;
     }
 
-    mapping_strategy mapping() const 
+    mapping_kind mapping() const 
     {
-        return mapping_strategy_.second ? (mapping_strategy_.first) : (assume_header() || this->column_names_.size() > 0 ? mapping_strategy::n_objects : mapping_strategy::n_rows);
+        return mapping_kind_.second ? (mapping_kind_.first) : (assume_header() || this->column_names_.size() > 0 ? mapping_kind::n_objects : mapping_kind::n_rows);
     }
 
     unsigned long max_lines() const 
@@ -490,9 +490,9 @@ public:
         return *this;
     }
 
-    basic_csv_options& mapping(mapping_strategy value)
+    basic_csv_options& mapping(mapping_kind value)
     {
-        this->mapping_strategy_ = {value,true};
+        this->mapping_kind_ = {value,true};
         return *this;
     }
 

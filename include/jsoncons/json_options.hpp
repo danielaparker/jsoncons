@@ -38,7 +38,7 @@ JSONCONS_DEPRECATED_MSG("Instead, use bigint_chars_format") typedef bigint_chars
 
 enum class byte_string_chars_format : uint8_t {none=0,base16,base64,base64url};
 
-enum class spaces_option{no_spaces=0,space_after,space_before,space_before_and_after};
+enum class spaces_option : uint8_t {no_spaces=0,space_after,space_before,space_before_and_after};
 
 
 template <class CharT>
