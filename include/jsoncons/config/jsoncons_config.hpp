@@ -205,3 +205,4 @@ template<> inline char32_t const* name##_literal<char32_t>() { return JSONCONS_Q
     #define JSONCONS_TRY if(true)
     #define JSONCONS_CATCH(exception) if(false)
 #endif
+

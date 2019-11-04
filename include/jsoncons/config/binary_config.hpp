@@ -15,10 +15,6 @@
 #include <type_traits> // std::enable_if
 #include <jsoncons/json_exception.hpp>
 
-#if defined(__apple_build_version__) && ((__clang_major__ < 8) || ((__clang_major__ == 8) && (__clang_minor__ < 1)))
-#define APPLE_MISSING_INTRINSICS 1
-#endif
-
 // The definitions below follow the definitions in compiler_support_p.h, https://github.com/01org/tinycbor
 // MIT license
 
@@ -38,16 +34,14 @@
 #      define JSONCONS_BYTE_SWAP_16 _bswap16
 #    elif (__GNUC__ * 100 + __GNUC_MINOR__ >= 608) || __has_builtin(__builtin_bswap16)
 #      define JSONCONS_BYTE_SWAP_16    __builtin_bswap16
-#    else
-#      define JSONCONS_BYTE_SWAP_16(x) (((uint16_t)x >> 8) | ((uint16_t)x << 8))
-#    endif
+#  endif
+#elif defined(__sun)
+#  include <sys/byteorder.h>
 #elif defined(_MSC_VER)
 // MSVC, which implies sizeof(long) == 4 
 #  define JSONCONS_BYTE_SWAP_64       _byteswap_uint64
-#  define JSONCONS_BYTE_SWAP_32        _byteswap_ulong
-#  define JSONCONS_BYTE_SWAP_16        _byteswap_ushort
-#else
-#      error "swap undefined"
+#  define JSONCONS_BYTE_SWAP_32       _byteswap_ulong
+#  define JSONCONS_BYTE_SWAP_16       _byteswap_ushort
 #endif
 
 namespace jsoncons { namespace detail { 
@@ -63,6 +57,14 @@ enum class endian
      little = __ORDER_LITTLE_ENDIAN__,
      big    = __ORDER_BIG_ENDIAN__,
      native = __BYTE_ORDER__
+#elif defined(_BIG_ENDIAN) && !defined(_LITTLE_ENDIAN)
+    little = 0,
+    big    = 1,
+    native = big
+#elif !defined(_BIG_ENDIAN) && defined(_LITTLE_ENDIAN)
+    little = 0,
+    big    = 1,
+    native = little
 #else
 #error "Unable to determine byte order!"
 #endif
@@ -114,6 +116,10 @@ static inline bool add_check_overflow(size_t v1, size_t v2, size_t *r)
 }
 
 }
+
+#if defined(__apple_build_version__) && ((__clang_major__ < 8) || ((__clang_major__ == 8) && (__clang_minor__ < 1)))
+#define APPLE_MISSING_INTRINSICS 1
+#endif
 
 inline 
 uint16_t encode_half(double val)
@@ -191,21 +197,36 @@ template<class T>
 typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint16_t),T>::type
 byte_swap(T val)
 {
+#if defined(JSONCONS_BYTE_SWAP_16)
     return JSONCONS_BYTE_SWAP_16(val);
+#else
+    return (static_cast<uint16_t>(val) >> 8) | (static_cast<uint16_t>(val) << 8);
+#endif
 }
  
 template<class T>
 typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint32_t),T>::type
 byte_swap(T val)
 {
+#if defined(JSONCONS_BYTE_SWAP_32)
     return JSONCONS_BYTE_SWAP_32(val);
+#else
+    uint32_t tmp = ((static_cast<uint32_t>(val) << 8) & 0xff00ff00) | ((static_cast<uint32_t>(val) >> 8) & 0xff00ff);
+    return (tmp << 16) | (tmp >> 16);
+#endif
 }
 
 template<class T>
 typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint64_t),T>::type
 byte_swap(T val)
 {
+#if defined(JSONCONS_BYTE_SWAP_64)
     return JSONCONS_BYTE_SWAP_64(val);
+#else
+    uint64_t tmp = ((static_cast<uint64_t>(val) & 0x00000000ffffffffull) << 32) | ((static_cast<uint64_t>(val) & 0xffffffff00000000ull) >> 32);
+    tmp = ((tmp & 0x0000ffff0000ffffull) << 16) | ((tmp & 0xffff0000ffff0000ull) >> 16);
+    return ((tmp & 0x00ff00ff00ff00ffull) << 8)  | ((tmp & 0xff00ff00ff00ff00ull) >> 8);
+#endif
 }
 
 template<class T>
@@ -214,7 +235,7 @@ byte_swap(T val)
 {
     uint32_t x;
     memcpy(&x,&val,sizeof(uint32_t));
-    uint32_t y = JSONCONS_BYTE_SWAP_32(x);
+    uint32_t y = byte_swap(x);
     T val2;
     memcpy(&val2,&y,sizeof(uint32_t));
     return val2;
@@ -226,7 +247,7 @@ byte_swap(T val)
 {
     uint64_t x;
     memcpy(&x,&val,sizeof(uint64_t));
-    uint64_t y = JSONCONS_BYTE_SWAP_64(x);
+    uint64_t y = byte_swap(x);
     T val2;
     memcpy(&val2,&y,sizeof(uint64_t));
     return val2;
@@ -243,8 +264,8 @@ byte_swap(T val)
     std::memcpy(&x.hi,buf+sizeof(uint64_t),sizeof(uint64_t));
 
     uint128_holder y;
-    y.lo = JSONCONS_BYTE_SWAP_64(x.hi);
-    y.hi = JSONCONS_BYTE_SWAP_64(x.lo);
+    y.lo = byte_swap(x.hi);
+    y.hi = byte_swap(x.lo);
 
     T val2;
     memcpy(&val2,&y,2*sizeof(uint64_t));
