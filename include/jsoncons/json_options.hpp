@@ -57,15 +57,15 @@ protected:
     string_type neg_inf_replacement_;
 #endif
 
-    bool enable_nan_to_num_;
-    bool enable_inf_to_num_;
-    bool enable_neginf_to_num_;
-    bool enable_nan_to_str_;
-    bool enable_inf_to_str_;
-    bool enable_neginf_to_str_;
-    bool enable_str_to_nan_;
-    bool enable_str_to_inf_;
-    bool enable_str_to_neginf_;
+    bool enable_nan_to_num_:1;
+    bool enable_inf_to_num_:1;
+    bool enable_neginf_to_num_:1;
+    bool enable_nan_to_str_:1;
+    bool enable_inf_to_str_:1;
+    bool enable_neginf_to_str_:1;
+    bool enable_str_to_nan_:1;
+    bool enable_str_to_inf_:1;
+    bool enable_str_to_neginf_:1;
 
     string_type nan_to_num_;
     string_type inf_to_num_;
@@ -313,7 +313,7 @@ public:
     using typename super_type::char_type;
     using typename super_type::string_type;
 protected:
-    bool lossless_number_;
+    bool lossless_number_:1;
     int max_nesting_depth_;
 public:
     basic_json_decode_options()
@@ -353,42 +353,41 @@ public:
     static const size_t indent_size_default = 4;
     static const size_t line_length_limit_default = 120;
 protected:
-    size_t indent_size_;
+    bool escape_all_non_ascii_:1;
+    bool escape_solidus_:1;
+    bool pad_inside_object_braces_:1;
+    bool pad_inside_array_brackets_:1;
     float_chars_format float_format_;
-    int precision_;
-    bool escape_all_non_ascii_;
-    bool escape_solidus_;
     byte_string_chars_format byte_string_format_;
     bigint_chars_format bigint_format_;
     line_split_kind object_object_line_splits_;
     line_split_kind object_array_line_splits_;
     line_split_kind array_array_line_splits_;
     line_split_kind array_object_line_splits_;
-    size_t line_length_limit_;
-
     spaces_option spaces_around_colon_;
     spaces_option spaces_around_comma_;
-    bool pad_inside_object_braces_;
-    bool pad_inside_array_brackets_;
+    int precision_;
+    size_t indent_size_;
+    size_t line_length_limit_;
     string_type new_line_chars_;
 public:
     basic_json_encode_options()
-        : indent_size_(indent_size_default),
-          float_format_(float_chars_format::general),
-          precision_(0),
-          escape_all_non_ascii_(false),
+        : escape_all_non_ascii_(false),
           escape_solidus_(false),
+          pad_inside_object_braces_(false),
+          pad_inside_array_brackets_(false),
+          float_format_(float_chars_format::general),
           byte_string_format_(byte_string_chars_format::none),
           bigint_format_(bigint_chars_format::base10),
           object_object_line_splits_(line_split_kind::multi_line),
           object_array_line_splits_(line_split_kind::same_line),
           array_array_line_splits_(line_split_kind::new_line),
           array_object_line_splits_(line_split_kind::multi_line),
-          line_length_limit_(line_length_limit_default),
           spaces_around_colon_(spaces_option::space_after),
           spaces_around_comma_(spaces_option::space_after),
-          pad_inside_object_braces_(false),
-          pad_inside_array_brackets_(false)
+          precision_(0),
+          indent_size_(indent_size_default),
+          line_length_limit_(line_length_limit_default)
     {
         new_line_chars_.push_back('\n');
     }

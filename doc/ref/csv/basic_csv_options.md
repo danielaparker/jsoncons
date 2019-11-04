@@ -139,7 +139,7 @@ Indicates what [quote_style](quote_style_type.md) to use when quoting fields. De
     basic_csv_options& mapping(mapping_kind value);
 Indicates what [mapping kind](mapping_kind.md) to use when parsing a CSV file into a `basic_json`. If assume_header is true or column_names is not empty, defaults to `mapping_kind::n_rows`, otherwise `mapping_kind::n_columns`.
 
-    basic_csv_options& max_lines(unsigned long value);
+    basic_csv_options& max_lines(size_t value);
 Maximum number of lines to read. Default is unlimited.
 
 

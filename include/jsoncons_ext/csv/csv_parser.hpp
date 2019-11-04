@@ -501,8 +501,8 @@ class basic_csv_parser : public ser_context
     csv_parse_state state_;
     basic_json_content_handler<CharT>* handler_;
     std::function<bool(csv_errc,const ser_context&)> err_handler_;
-    unsigned long column_;
-    unsigned long line_;
+    size_t column_;
+    size_t line_;
     int depth_;
     const basic_csv_decode_options<CharT> options_;
     size_t column_index_;

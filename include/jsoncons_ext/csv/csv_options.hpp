@@ -128,20 +128,20 @@ public:
     using typename super_type::char_type;
     using typename super_type::string_type;
 protected:
-    bool assume_header_;
-    bool ignore_empty_values_;
-    bool ignore_empty_lines_;
-    bool trim_leading_;
-    bool trim_trailing_;
-    bool trim_leading_inside_quotes_;
-    bool trim_trailing_inside_quotes_;
-    bool unquoted_empty_value_is_null_;
-    bool infer_types_;
-    bool lossless_number_;
+    bool assume_header_:1;
+    bool ignore_empty_values_:1;
+    bool ignore_empty_lines_:1;
+    bool trim_leading_:1;
+    bool trim_trailing_:1;
+    bool trim_leading_inside_quotes_:1;
+    bool trim_trailing_inside_quotes_:1;
+    bool unquoted_empty_value_is_null_:1;
+    bool infer_types_:1;
+    bool lossless_number_:1;
     char_type comment_starter_;
     mapping_kind mapping_;
     size_t header_lines_;
-    unsigned long max_lines_;
+    size_t max_lines_;
     std::vector<csv_type_info> column_types_;
     std::vector<string_type> column_defaults_;
 public:
@@ -159,7 +159,7 @@ public:
           comment_starter_('\0'),
           mapping_(),
           header_lines_(0),
-          max_lines_((std::numeric_limits<unsigned long>::max)())
+          max_lines_((std::numeric_limits<size_t>::max)())
     {}
 
     size_t header_lines() const 
@@ -237,7 +237,7 @@ public:
         return mapping_ != mapping_kind() ? mapping_ : (assume_header() || this->column_names_.size() > 0 ? mapping_kind::n_objects : mapping_kind::n_rows);
     }
 
-    unsigned long max_lines() const 
+    size_t max_lines() const 
     {
         return max_lines_;
     }
@@ -496,7 +496,7 @@ public:
         return *this;
     }
 
-    basic_csv_options& max_lines(unsigned long value)
+    basic_csv_options& max_lines(size_t value)
     {
         this->max_lines_ = value;
         return *this;
