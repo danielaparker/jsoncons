@@ -139,7 +139,7 @@ protected:
     bool infer_types_;
     bool lossless_number_;
     char_type comment_starter_;
-    std::pair<mapping_kind,bool> mapping_kind_;
+    mapping_kind mapping_;
     size_t header_lines_;
     unsigned long max_lines_;
     std::vector<csv_type_info> column_types_;
@@ -157,7 +157,7 @@ public:
           infer_types_(true),
           lossless_number_(false),
           comment_starter_('\0'),
-          mapping_kind_({mapping_kind::n_rows,false}),
+          mapping_(),
           header_lines_(0),
           max_lines_((std::numeric_limits<unsigned long>::max)())
     {}
@@ -234,7 +234,7 @@ public:
 
     mapping_kind mapping() const 
     {
-        return mapping_kind_.second ? (mapping_kind_.first) : (assume_header() || this->column_names_.size() > 0 ? mapping_kind::n_objects : mapping_kind::n_rows);
+        return mapping_ != mapping_kind() ? mapping_ : (assume_header() || this->column_names_.size() > 0 ? mapping_kind::n_objects : mapping_kind::n_rows);
     }
 
     unsigned long max_lines() const 
@@ -492,7 +492,7 @@ public:
 
     basic_csv_options& mapping(mapping_kind value)
     {
-        this->mapping_kind_ = {value,true};
+        this->mapping_ = value;
         return *this;
     }
 
