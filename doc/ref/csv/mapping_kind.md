@@ -1,19 +1,20 @@
-### jsoncons::csv::csv_mapping_strategy
+### jsoncons::csv::mapping_kind
 
 ```c++
 #include <jsoncons_ext/csv/csv_options.hpp>
 
-enum class csv_mapping_strategy
+enum class mapping_kind
 {
-    n_rows, 
+    n_rows = 1, 
     n_objects, 
     m_columns
 };
 ```
 
-Style     | Definition
-----------|-----------
+Value      |Definition
+-----------|-----------
 n_rows    | Map a CSV file to an array of arrays in a `basic_json`.
 n_objects | Map a CSV file to an array of objects in a `basic_json`.
 m_columns | Map a CSV file to an object with name/array-value pairs. 
+
 

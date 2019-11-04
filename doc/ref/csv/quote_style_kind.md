@@ -12,7 +12,7 @@ enum class quote_style_kind
 };
 ```
 
-Style      |Definition
+Value      |Definition
 -----------|-----------
 minimal    | Only quote fields that contain special characters, such as a line, field or subfield delimiter, or a quote character.
 all        | Quote all fields
