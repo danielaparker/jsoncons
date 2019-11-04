@@ -3,18 +3,18 @@
 ```c++
     template <class SAllocator=std::allocator<char_type>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
-              indenting line_indent) const; // (1)
+              indenting line_indent = indenting::no_indent) const; // (1)
 
     template <class SAllocator=std::allocator<char_type>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
-              const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>(), 
+              const basic_json_encode_options<char_type>& options, 
               indenting line_indent = indenting::no_indent) const; // (2)
 
     void dump(std::basic_ostream<char_type>& os, 
-              indenting line_indent) const; // (3)
+              indenting line_indent = indenting::no_indent) const; // (3)
 
     void dump(std::basic_ostream<char_type>& os, 
-              const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>(), 
+              const basic_json_encode_options<char_type>& options, 
               indenting line_indent = indenting::no_indent) const; // (4)
 
     void dump(basic_json_content_handler<char_type>& handler) const; // (5)
