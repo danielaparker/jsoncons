@@ -2,20 +2,20 @@
 
 ```c++
     template <class SAllocator=std::allocator<char_type>>
-    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
-              const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>(), 
-              indenting line_indent = indenting::no_indent) const; // (1)
+    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
+              indenting line_indent) const; // (1)
 
     template <class SAllocator=std::allocator<char_type>>
-    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
-              indenting line_indent) const; // (2)
+    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+              const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>(), 
+              indenting line_indent = indenting::no_indent) const; // (2)
+
+    void dump(std::basic_ostream<char_type>& os, 
+              indenting line_indent) const; // (3)
 
     void dump(std::basic_ostream<char_type>& os, 
               const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>(), 
-              indenting line_indent = indenting::no_indent) const; // (3)
-
-    void dump(std::basic_ostream<char_type>& os, 
-              indenting line_indent) const; // (4)
+              indenting line_indent = indenting::no_indent) const; // (4)
 
     void dump(basic_json_content_handler<char_type>& handler) const; // (5)
 
@@ -43,15 +43,15 @@
               std::error_code& ec) const; // (10)
 ```
 
-(1) Dumps a json value to a string using the specified [encoding options](../basic_json_options.md)
+(1) Dumps a json value to a string using the specified [indenting](../indenting.md).
+
+(2) Dumps a json value to a string using the specified [encoding options](../basic_json_options.md)
     and [indenting](../indenting.md).
 
-(2) Dumps a json value to a string using the specified [indenting](../indenting.md).
+(3) Dumps a json value to an output stream using the specified [indenting](../indenting.md).
 
-(3) Dumps a json value to an output stream using the specified [encoding options](../basic_json_options.md)
+(4) Dumps a json value to an output stream using the specified [encoding options](../basic_json_options.md)
     and [indenting](../indenting.md).
-
-(4) Dumps a json value to an output stream using the specified [indenting](../indenting.md).
 
 (5) Dumps a json value to the specified [content handler](../basic_json_content_handler.md).
 

@@ -488,8 +488,8 @@ public:
 };
 
 template <class CharT>
-class basic_json_options : public basic_json_decode_options<CharT>, 
-                           public basic_json_encode_options<CharT>
+class basic_json_options final: public basic_json_decode_options<CharT>, 
+                                public basic_json_encode_options<CharT>
 {
 public:
     typedef CharT char_type;

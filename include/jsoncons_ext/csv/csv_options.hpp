@@ -296,7 +296,7 @@ public:
 };
 
 template <class CharT>
-class basic_csv_options : public basic_csv_decode_options<CharT>, public basic_csv_encode_options<CharT>  
+class basic_csv_options final : public basic_csv_decode_options<CharT>, public basic_csv_encode_options<CharT>  
 {
     typedef CharT char_type;
     typedef std::basic_string<CharT> string_type;

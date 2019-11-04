@@ -2271,36 +2271,44 @@ public:
         }
 
         template <class SAllocator=std::allocator<char_type>>
-        void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
-                  const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>(), 
-                  indenting line_indent = indenting::no_indent) const
-        {
-            evaluate().dump(s, options, line_indent);
-        }
-
-        template <class SAllocator=std::allocator<char_type>>
         void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
-                  indenting line_indent) const
+                  indenting line_indent = indenting::no_indent) const
         {
             evaluate().dump(s, line_indent);
         }
 
         void dump(std::basic_ostream<char_type>& os, 
-                  const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>(), 
+                  indenting line_indent = indenting::no_indent) const
+        {
+            evaluate().dump(os, line_indent);
+        }
+
+        template <class SAllocator=std::allocator<char_type>>
+        void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+                  const basic_json_encode_options<char_type>& options, 
+                  indenting line_indent = indenting::no_indent) const
+        {
+            evaluate().dump(s, options, line_indent);
+        }
+
+        void dump(std::basic_ostream<char_type>& os, 
+                  const basic_json_encode_options<char_type>& options, 
                   indenting line_indent = indenting::no_indent) const
         {
             evaluate().dump(os, options, line_indent);
         }
 
-        void dump(std::basic_ostream<char_type>& os, 
-                  indenting line_indent) const
-        {
-            evaluate().dump(os, line_indent);
-        }
-
         void dump(basic_json_content_handler<char_type>& handler) const
         {
             evaluate().dump(handler);
+        }
+
+        template <class SAllocator=std::allocator<char_type>>
+        void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
+                  indenting line_indent,
+                  std::error_code& ec) const
+        {
+            evaluate().dump(s, line_indent, ec);
         }
 
         template <class SAllocator=std::allocator<char_type>>
@@ -2310,14 +2318,6 @@ public:
                   std::error_code& ec) const
         {
             evaluate().dump(s, options, line_indent, ec);
-        }
-
-        template <class SAllocator=std::allocator<char_type>>
-        void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
-                  indenting line_indent,
-                  std::error_code& ec) const
-        {
-            evaluate().dump(s, line_indent, ec);
         }
 
         void dump(std::basic_ostream<char_type>& os, 
@@ -3140,8 +3140,21 @@ public:
     }
 
     template <class SAllocator=std::allocator<char_type>>
+    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
+              indenting line_indent = indenting::no_indent) const
+    {
+        std::error_code ec;
+
+        dump(s, line_indent, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec));
+        }
+    }
+
+    template <class SAllocator=std::allocator<char_type>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
-              const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>(), 
+              const basic_json_encode_options<char_type>& options, 
               indenting line_indent = indenting::no_indent) const
     {
         std::error_code ec;
@@ -3153,13 +3166,12 @@ public:
         }
     }
 
-    template <class SAllocator=std::allocator<char_type>>
-    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
-              indenting line_indent) const
+    void dump(std::basic_ostream<char_type>& os, 
+              indenting line_indent = indenting::no_indent) const
     {
         std::error_code ec;
 
-        dump(s, line_indent, ec);
+        dump(os, line_indent, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -3167,24 +3179,12 @@ public:
     }
 
     void dump(std::basic_ostream<char_type>& os, 
-              const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>(), 
+              const basic_json_encode_options<char_type>& options, 
               indenting line_indent = indenting::no_indent) const
     {
         std::error_code ec;
 
         dump(os, options, line_indent, ec);
-        if (ec)
-        {
-            JSONCONS_THROW(ser_error(ec));
-        }
-    }
-
-    void dump(std::basic_ostream<char_type>& os, 
-              indenting line_indent) const
-    {
-        std::error_code ec;
-
-        dump(os, line_indent, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
