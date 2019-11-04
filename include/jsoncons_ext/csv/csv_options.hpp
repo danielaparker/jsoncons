@@ -34,7 +34,7 @@ enum class quote_style_kind
     minimal,all,nonnumeric,none
 };
 
-enum class csv_mapping_strategy
+enum class mapping_strategy
 {
     n_rows, 
     n_objects, 
@@ -44,7 +44,7 @@ enum class csv_mapping_strategy
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use quote_style_kind") typedef quote_style_kind quote_styles;
 JSONCONS_DEPRECATED_MSG("Instead, use quote_style_kind") typedef quote_style_kind quote_style_type;
-JSONCONS_DEPRECATED_MSG("Instead, use csv_mapping_strategy") typedef csv_mapping_strategy mapping_type;
+JSONCONS_DEPRECATED_MSG("Instead, use mapping_strategy") typedef mapping_strategy mapping_type;
 #endif
 
 enum class column_state {sequence,label};
@@ -140,7 +140,7 @@ protected:
     bool infer_types_;
     bool lossless_number_;
     char_type comment_starter_;
-    std::pair<csv_mapping_strategy,bool> mapping_strategy_;
+    std::pair<mapping_strategy,bool> mapping_strategy_;
     unsigned long max_lines_;
     std::vector<csv_type_info> column_types_;
     std::vector<string_type> column_defaults_;
@@ -158,7 +158,7 @@ public:
           infer_types_(true),
           lossless_number_(false),
           comment_starter_('\0'),
-          mapping_strategy_({csv_mapping_strategy::n_rows,false}),
+          mapping_strategy_({mapping_strategy::n_rows,false}),
           max_lines_((std::numeric_limits<unsigned long>::max)())
     {}
 
@@ -232,9 +232,9 @@ public:
         return comment_starter_;
     }
 
-    csv_mapping_strategy mapping_strategy() const 
+    mapping_strategy mapping() const 
     {
-        return mapping_strategy_.second ? (mapping_strategy_.first) : (assume_header() || this->column_names_.size() > 0 ? csv_mapping_strategy::n_objects : csv_mapping_strategy::n_rows);
+        return mapping_strategy_.second ? (mapping_strategy_.first) : (assume_header() || this->column_names_.size() > 0 ? mapping_strategy::n_objects : mapping_strategy::n_rows);
     }
 
     unsigned long max_lines() const 
@@ -251,14 +251,6 @@ public:
     {
         return column_defaults_;
     }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use mapping_strategy()")
-    csv_mapping_strategy mapping() const 
-    {
-        return mapping_strategy_.second ? (mapping_strategy_.first) : (assume_header() || this->column_names_.size() > 0 ? csv_mapping_strategy::n_objects : csv_mapping_strategy::n_rows);
-    }
-#endif
 };
 
 template <class CharT>
@@ -329,7 +321,7 @@ public:
     using basic_csv_decode_options<CharT>::infer_types; 
     using basic_csv_decode_options<CharT>::lossless_number; 
     using basic_csv_decode_options<CharT>::comment_starter; 
-    using basic_csv_decode_options<CharT>::mapping_strategy; 
+    using basic_csv_decode_options<CharT>::mapping; 
     using basic_csv_decode_options<CharT>::max_lines; 
     using basic_csv_decode_options<CharT>::column_types; 
     using basic_csv_decode_options<CharT>::column_defaults; 
@@ -498,7 +490,7 @@ public:
         return *this;
     }
 
-    basic_csv_options& mapping_strategy(csv_mapping_strategy value)
+    basic_csv_options& mapping(mapping_strategy value)
     {
         this->mapping_strategy_ = {value,true};
         return *this;
@@ -511,13 +503,6 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-
-    JSONCONS_DEPRECATED_MSG("Instead, use mapping_strategy(csv_mapping_strategy)")
-    basic_csv_options& mapping(csv_mapping_strategy value)
-    {
-        this->mapping_strategy_ = {value,true};
-        return *this;
-    }
 
     JSONCONS_DEPRECATED_MSG("Instead, use float_format(float_chars_format)")
     basic_csv_options& floating_point_format(float_chars_format value)

@@ -660,9 +660,9 @@ public:
 
     void parse_some(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
-        switch (options_.mapping_strategy())
+        switch (options_.mapping())
         {
-            case csv_mapping_strategy::m_columns:
+            case mapping_strategy::m_columns:
                 handler_ = &m_columns_filter_;
                 break;
             default:
@@ -767,7 +767,7 @@ public:
                             break;
                     }
                     more_ = handler_->end_array(*this);
-                    if (options_.mapping_strategy() == csv_mapping_strategy::m_columns)
+                    if (options_.mapping() == mapping_strategy::m_columns)
                     {
                         if (!m_columns_filter_.done())
                         {
@@ -823,11 +823,11 @@ public:
                     }
                     break;
                 case csv_parse_state::start:
-                    if (options_.mapping_strategy() != csv_mapping_strategy::m_columns)
+                    if (options_.mapping() != mapping_strategy::m_columns)
                     {
                         more_ = handler_->begin_array(semantic_tag::none, *this);
                     }
-                    if (!options_.assume_header() && options_.mapping_strategy() == csv_mapping_strategy::n_rows && options_.column_names().size() > 0)
+                    if (!options_.assume_header() && options_.mapping() == mapping_strategy::n_rows && options_.column_names().size() > 0)
                     {
                         column_index_ = 0;
                         state_ = csv_parse_state::column_labels;
@@ -1304,14 +1304,14 @@ private:
                 if (options_.assume_header() && line_ == header_line_)
                 {
                     column_names_.push_back(buffer_);
-                    if (options_.mapping_strategy() == csv_mapping_strategy::n_rows)
+                    if (options_.mapping() == mapping_strategy::n_rows)
                     {
                         more_ = handler_->string_value(buffer_, semantic_tag::none, *this);
                     }
                 }
                 break;
             case csv_mode::data:
-                if (options_.mapping_strategy() == csv_mapping_strategy::n_objects)
+                if (options_.mapping() == mapping_strategy::n_objects)
                 {
                     if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
@@ -1337,22 +1337,22 @@ private:
             case csv_mode::header:
                 if (options_.assume_header() && line_ == header_line_)
                 {
-                    if (options_.mapping_strategy() == csv_mapping_strategy::n_rows)
+                    if (options_.mapping() == mapping_strategy::n_rows)
                     {
                         more_ = handler_->begin_array(semantic_tag::none, *this);
                     }
                 }
                 break;
             case csv_mode::data:
-                switch (options_.mapping_strategy())
+                switch (options_.mapping())
                 {
-                    case csv_mapping_strategy::n_rows:
+                    case mapping_strategy::n_rows:
                         more_ = handler_->begin_array(semantic_tag::none, *this);
                         break;
-                    case csv_mapping_strategy::n_objects:
+                    case mapping_strategy::n_objects:
                         more_ = handler_->begin_object(semantic_tag::none, *this);
                         break;
-                    case csv_mapping_strategy::m_columns:
+                    case mapping_strategy::m_columns:
                         break;
                     default:
                         break;
@@ -1381,15 +1381,15 @@ private:
                 {
                     stack_.back() = csv_mode::data;
                 }
-                switch (options_.mapping_strategy())
+                switch (options_.mapping())
                 {
-                    case csv_mapping_strategy::n_rows:
+                    case mapping_strategy::n_rows:
                         if (options_.assume_header())
                         {
                             more_ = handler_->end_array(*this);
                         }
                         break;
-                    case csv_mapping_strategy::m_columns:
+                    case mapping_strategy::m_columns:
                         m_columns_filter_.initialize(column_names_);
                         break;
                     default:
@@ -1399,15 +1399,15 @@ private:
             case csv_mode::data:
             case csv_mode::subfields:
             {
-                switch (options_.mapping_strategy())
+                switch (options_.mapping())
                 {
-                    case csv_mapping_strategy::n_rows:
+                    case mapping_strategy::n_rows:
                         more_ = handler_->end_array(*this);
                         break;
-                    case csv_mapping_strategy::n_objects:
+                    case mapping_strategy::n_objects:
                         more_ = handler_->end_object(*this);
                         break;
-                    case csv_mapping_strategy::m_columns:
+                    case mapping_strategy::m_columns:
                         more_ = handler_->end_array(*this);
                         break;
                 }
@@ -1468,9 +1468,9 @@ private:
         {
             case csv_mode::data:
             case csv_mode::subfields:
-                switch (options_.mapping_strategy())
+                switch (options_.mapping())
                 {
-                case csv_mapping_strategy::n_rows:
+                case mapping_strategy::n_rows:
                     if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                     {
                         more_ = handler_->null_value(semantic_tag::none, *this);
@@ -1480,7 +1480,7 @@ private:
                         end_value(options_.infer_types());
                     }
                     break;
-                case csv_mapping_strategy::n_objects:
+                case mapping_strategy::n_objects:
                     if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
                         if (column_index_ < column_names_.size() + offset_)
@@ -1507,7 +1507,7 @@ private:
                         }
                     }
                     break;
-                case csv_mapping_strategy::m_columns:
+                case mapping_strategy::m_columns:
                     if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
                         end_value(options_.infer_types());
@@ -1534,12 +1534,12 @@ private:
                 {
                     trim_string_buffer(options_.trim_leading_inside_quotes(),options_.trim_trailing_inside_quotes());
                 }
-                switch (options_.mapping_strategy())
+                switch (options_.mapping())
                 {
-                case csv_mapping_strategy::n_rows:
+                case mapping_strategy::n_rows:
                     end_value(false);
                     break;
-                case csv_mapping_strategy::n_objects:
+                case mapping_strategy::n_objects:
                     if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
                         if (column_index_ < column_names_.size() + offset_)
@@ -1566,7 +1566,7 @@ private:
                         }
                     }
                     break;
-                case csv_mapping_strategy::m_columns:
+                case mapping_strategy::m_columns:
                     if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
                         end_value(options_.infer_types());

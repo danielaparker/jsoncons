@@ -1,5 +1,5 @@
-v0.137.0
---------
+master
+------
 
 Defect fixes:
 
@@ -19,9 +19,7 @@ Changes:
 
 - The CSV extension enum name `quote_style_type` has been deprecated and renamed to `quote_style_kind`.
 
-- The CSV extension enum name `mapping_type` has been deprecated and renamed to `csv_mapping_strategy`.
-
-- The CSV extension function name `mapping` has been deprecated and renamed to `mapping_strategy`.
+- The CSV extension enum name `mapping_type` has been deprecated and renamed to `mapping_strategy`.
 
 - The `do_` virtual functions in `basic_json_content_handler` have been augmented with a `std::error_code`
 output parameter, e.g.
