@@ -77,14 +77,14 @@ protected:
     char_type field_delimiter_;
     char_type quote_char_;
     char_type quote_escape_char_;
-    std::pair<char_type,bool> subfield_delimiter_;
+    char_type subfield_delimiter_;
     std::vector<string_type> column_names_;
 
     basic_csv_options_common()
         : field_delimiter_(','),
           quote_char_('\"'),
           quote_escape_char_('\"'),
-          subfield_delimiter_(std::make_pair(',',false))
+          subfield_delimiter_(char_type())
     {
     }
 
@@ -99,7 +99,7 @@ public:
         return field_delimiter_;
     }
 
-    const std::pair<char_type,bool>& subfield_delimiter() const 
+    const char_type subfield_delimiter() const 
     {
         return subfield_delimiter_;
     }
@@ -466,7 +466,7 @@ public:
 
     basic_csv_options& subfield_delimiter(char_type value)
     {
-        this->subfield_delimiter_ = std::make_pair(value,true);
+        this->subfield_delimiter_ = value;
         return *this;
     }
 

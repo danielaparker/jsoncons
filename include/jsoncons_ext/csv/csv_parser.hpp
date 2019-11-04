@@ -967,7 +967,7 @@ public:
                                 before_value();
                                 state_ = csv_parse_state::before_quoted_field;
                             }
-                            else if ((options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first))
+                            else if (options_.subfield_delimiter() != char_type() && curr_char == options_.subfield_delimiter())
                             {
                                 if (options_.trim_leading() || options_.trim_trailing())
                                 {
@@ -1107,7 +1107,7 @@ public:
                                 before_value();
                                 state_ = csv_parse_state::before_unquoted_field;
                             }
-                            else if (options_.subfield_delimiter().second && curr_char == options_.subfield_delimiter().first)
+                            else if (options_.subfield_delimiter() != char_type() && curr_char == options_.subfield_delimiter())
                             {
                                 if (options_.trim_leading() || options_.trim_trailing())
                                 {

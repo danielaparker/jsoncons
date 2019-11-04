@@ -165,6 +165,7 @@ int main()
             case staj_event_type::uint64_value:
                 std::cout << "uint64_value: " << event.get<uint64_t>() << "\n";
                 break;
+            case staj_event_type::half_value:
             case staj_event_type::double_value:
                 std::cout << "double_value: " << event.get<double>() << "\n";
                 break;
