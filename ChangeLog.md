@@ -17,6 +17,12 @@ Enhancements:
 
 Changes:
 
+- The `json_options` parameter to `precision()` has been changed from `int` to `int8_t`
+
+- The `json_options` parameter to `indent_size()` has been changed from `size_t` to `uint8_t`
+
+- The `csv_options` parameter to `precision()` has been changed from `int` to `int8_t`
+
 - The CSV extension enum name `quote_style_type` has been deprecated and renamed to `quote_style_kind`.
 
 - The CSV extension enum name `mapping_type` has been deprecated and renamed to `mapping_kind`.
