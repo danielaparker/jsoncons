@@ -64,7 +64,7 @@ Constructs a `basic_csv_options` with default values.
     basic_csv_options& float_format(float_chars_format value);
 Overrides [floating point format](../float_chars_format.md) when serializing to CSV. The default is [float_chars_format::general](float_chars_format.md).
 
-    basic_csv_options& precision(int value);
+    basic_csv_options& precision(int8_t value);
 Overrides floating point precision when serializing csv from json. The default is shortest representation.
 
     basic_csv_options& header_lines(size_t value);

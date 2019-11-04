@@ -350,7 +350,7 @@ public:
     using typename super_type::char_type;
     using typename super_type::string_type;
 
-    static const size_t indent_size_default = 4;
+    static const uint8_t indent_size_default = 4;
     static const size_t line_length_limit_default = 120;
 protected:
     bool escape_all_non_ascii_:1;
@@ -366,8 +366,8 @@ protected:
     line_split_kind array_object_line_splits_;
     spaces_option spaces_around_colon_;
     spaces_option spaces_around_comma_;
-    int precision_;
-    size_t indent_size_;
+    int8_t precision_;
+    uint8_t indent_size_;
     size_t line_length_limit_;
     string_type new_line_chars_;
 public:
@@ -407,7 +407,7 @@ public:
 
     line_split_kind array_array_line_splits() const  {return array_array_line_splits_;}
 
-    size_t indent_size() const 
+    uint8_t indent_size() const 
     {
         return indent_size_;
     }
@@ -447,7 +447,7 @@ public:
         return float_format_;
     }
 
-    int precision() const 
+    int8_t precision() const 
     {
         return precision_;
     }
@@ -467,7 +467,7 @@ public:
     bigint_chars_format bignum_format() const {return bigint_format_;}
 
     JSONCONS_DEPRECATED_MSG("Instead, use indent_size()")
-    size_t indent() const 
+    uint8_t indent() const 
     {
         return indent_size();
     }
@@ -648,7 +648,7 @@ public:
 
     basic_json_options& array_array_line_splits(line_split_kind value) {this->array_array_line_splits_ = value; return *this;}
 
-    basic_json_options& indent_size(size_t value)
+    basic_json_options& indent_size(uint8_t value)
     {
         this->indent_size_ = value;
         return *this;
@@ -708,7 +708,7 @@ public:
         return *this;
     }
 
-    basic_json_options& precision(int value)
+    basic_json_options& precision(int8_t value)
     {
         this->precision_ = value;
         return *this;
@@ -747,8 +747,8 @@ public:
         return *this;
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use indent_size(size_t)")
-    basic_json_options& indent(size_t value)
+    JSONCONS_DEPRECATED_MSG("Instead, use indent_size(uint8_t_t)")
+    basic_json_options& indent(uint8_t value)
     {
         return indent_size(value);
     }

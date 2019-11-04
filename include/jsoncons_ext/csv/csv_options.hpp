@@ -263,7 +263,7 @@ public:
 protected:
     quote_style_kind quote_style_;
     float_chars_format float_format_;
-    int precision_;
+    int8_t precision_;
     string_type line_delimiter_;
 public:
     basic_csv_encode_options()
@@ -284,7 +284,7 @@ public:
         return float_format_;
     }
 
-    int precision() const 
+    int8_t precision() const 
     {
         return precision_;
     }
@@ -344,7 +344,7 @@ public:
         return *this;
     }
 
-    basic_csv_options& precision(int value)
+    basic_csv_options& precision(int8_t value)
     {
         this->precision_ = value;
         return *this;
