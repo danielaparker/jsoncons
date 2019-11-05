@@ -1,7 +1,6 @@
 language: cpp
 dist: trusty
 sudo: required
-version: ~> 1.0
 
 matrix:
   include:
