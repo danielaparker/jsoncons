@@ -17,7 +17,7 @@
 
 namespace jsoncons {
 
-// decode_json 
+// decode_json
 
 template <class T, class CharT>
 typename std::enable_if<is_basic_json_class<T>::value,T>::type
