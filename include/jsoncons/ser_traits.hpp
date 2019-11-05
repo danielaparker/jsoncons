@@ -11,7 +11,7 @@
 #include <tuple>
 #include <array>
 #include <memory>
-#include <type_traits> // std::enable_if
+#include <type_traits> // std::enable_if, std::true_type, std::false_type
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/basic_json.hpp>
@@ -58,10 +58,31 @@ struct ser_traits
     template <class Json>
     static void serialize(const T& val, 
                           basic_json_content_handler<typename Json::char_type>& encoder,
+                          const Json& context_j, 
+                          std::error_code& ec)
+    {
+        serialize(std::integral_constant<bool, is_stateless<typename Json::allocator_type>::value>(),
+                  val, encoder, context_j, ec);
+    }
+private:
+    template <class Json>
+    static void serialize(std::true_type,
+                          const T& val, 
+                          basic_json_content_handler<typename Json::char_type>& encoder,
                           const Json& /*context_j*/, 
                           std::error_code& ec)
     {
         auto j = json_type_traits<Json, T>::to_json(val);
+        j.dump(encoder, ec);
+    }
+    template <class Json>
+    static void serialize(std::false_type, 
+                          const T& val, 
+                          basic_json_content_handler<typename Json::char_type>& encoder,
+                          const Json& context_j, 
+                          std::error_code& ec)
+    {
+        auto j = json_type_traits<Json, T>::to_json(val, context_j.get_allocator());
         j.dump(encoder, ec);
     }
 };
