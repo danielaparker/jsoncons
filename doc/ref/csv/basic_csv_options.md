@@ -35,7 +35,7 @@ unquoted_empty_value_is_null|Replace empty field with json null value. Default i
 infer_types|Infer null, true, false, integers and floating point values in the CSV source. Default is `true`.|
 lossless_number|If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`. Default is `false`.|
 comment_starter|Character to comment out a line, must be at column 1. Default is no comments.|
-mapping|Indicates what [mapping strategy] to use when parsing a CSV file into a `basic_json`. If assume_header is true or column_names is not empty, defaults to `mapping_strategy::n_rows`, otherwise `mapping_strategy::n_columns`.|
+mapping|Indicates what [mapping kind](mapping_kind.md) to use when parsing a CSV file into a `basic_json`. If assume_header is true or column_names is not empty, defaults to `mapping_kind::n_rows`, otherwise `mapping_kind::n_columns`.|
 max_lines|Maximum number of lines to read. Default is unlimited.|
 column_types|A comma separated list of data types corresponding to the columns in the file. The following data types are supported: string, integer, float and boolean. Example: "bool,float,string"}|
 column_defaults|A comma separated list of strings containing default json values corresponding to the columns in the file. Example: "false,0.0,"\"\""|
@@ -64,7 +64,7 @@ Constructs a `basic_csv_options` with default values.
     basic_csv_options& float_format(float_chars_format value);
 Overrides [floating point format](../float_chars_format.md) when serializing to CSV. The default is [float_chars_format::general](float_chars_format.md).
 
-    basic_csv_options& precision(int value);
+    basic_csv_options& precision(int8_t value);
 Overrides floating point precision when serializing csv from json. The default is shortest representation.
 
     basic_csv_options& header_lines(size_t value);
@@ -136,10 +136,10 @@ Character to comment out a line, must be at column 1. Default is no comments.
     basic_csv_options& quote_style(quote_style_kind value);
 Indicates what [quote_style](quote_style_type.md) to use when quoting fields. Default is minimal.
 
-    basic_csv_options& mapping(mapping_strategy value);
-Indicates what [mapping strategy] to use when parsing a CSV file into a `basic_json`. If assume_header is true or column_names is not empty, defaults to `mapping_strategy::n_rows`, otherwise `mapping_strategy::n_columns`.
+    basic_csv_options& mapping(mapping_kind value);
+Indicates what [mapping kind](mapping_kind.md) to use when parsing a CSV file into a `basic_json`. If assume_header is true or column_names is not empty, defaults to `mapping_kind::n_rows`, otherwise `mapping_kind::n_columns`.
 
-    basic_csv_options& max_lines(unsigned long value);
+    basic_csv_options& max_lines(size_t value);
 Maximum number of lines to read. Default is unlimited.
 
 

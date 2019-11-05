@@ -25,19 +25,21 @@ namespace jsoncons { namespace cbor {
 template <class T, class Enable = void>
 struct cbor_ser_traits
 {
-    template <class CharT, class Json>
-    static T deserialize(basic_staj_reader<CharT>& reader, 
+    template <class Json>
+    static T deserialize(basic_staj_reader<typename Json::char_type>& cursor, 
+                         const Json& context_j,
                          std::error_code& ec)
     {
-        return ser_traits<T>::template deserialize<CharT,Json>(reader, ec);
+        return ser_traits<T>::deserialize(cursor, context_j, ec);
     }
 
-    template <class CharT, class Json>
+    template <class Json>
     static void serialize(const T& val, 
                           cbor_content_handler& encoder, 
+                          const Json& context_j,
                           std::error_code& ec)
     {
-        ser_traits<T>::template serialize<CharT,Json>(val, encoder, ec);
+        ser_traits<T>::serialize(val, encoder, context_j, ec);
     }
 };
 
@@ -58,16 +60,18 @@ struct cbor_ser_traits<T,
 {
     typedef typename T::value_type value_type;
 
-    template <class CharT, class Json>
-    static T deserialize(basic_staj_reader<CharT>& reader, 
+    template <class Json>
+    static T deserialize(basic_staj_reader<typename Json::char_type>& cursor, 
+                         const Json& context_j,
                          std::error_code& ec)
     {
-        return ser_traits<T>::deserialize(reader, ec);
+        return ser_traits<T>::deserialize(cursor, context_j, ec);
     }
 
-    template <class CharT, class Json>
+    template <class Json>
     static void serialize(const T& val, 
                           cbor_content_handler& encoder, 
+                          const Json&,
                           std::error_code& ec)
     {
         encoder.typed_array(span<const value_type>(val), semantic_tag::none, null_ser_context(), ec);
@@ -128,7 +132,7 @@ encode_cbor(const T& val,
             std::error_code& ec)
 {
     cbor_stream_encoder encoder(os, options);
-    cbor_ser_traits<T>::template serialize<char,json>(val, encoder, ec);
+    cbor_ser_traits<T>::serialize(val, encoder, json(), ec);
 }
 
 template<class T>
@@ -136,7 +140,7 @@ typename std::enable_if<!is_basic_json_class<T>::value, void>::type
 encode_cbor(const T& val, std::vector<uint8_t>& v, const cbor_encode_options& options, std::error_code& ec)
 {
     cbor_bytes_encoder encoder(v, options);
-    cbor_ser_traits<T>::template serialize<char, json>(val, encoder, ec);
+    cbor_ser_traits<T>::serialize(val, encoder, json(), ec);
 }
 
 template<class T>
@@ -169,8 +173,13 @@ template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
 decode_cbor(const std::vector<uint8_t>& v)
 {
-    cbor_bytes_cursor reader(v);
-    T val = read_from<T>(reader, json());
+    cbor_bytes_cursor cursor(v);
+    std::error_code ec;
+    T val = ser_traits<T>::deserialize(cursor, json(), ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+    }
     return val;
 }
 
@@ -185,13 +194,18 @@ decode_cbor(std::istream& is)
     reader.read();
     return decoder.get_result();
 }
-
+ 
 template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
 decode_cbor(std::istream& is)
 {
-    cbor_stream_cursor reader(is);
-    T val = read_from<T>(reader, json());
+    cbor_stream_cursor cursor(is);
+    std::error_code ec;
+    T val = ser_traits<T>::deserialize(cursor, json(), ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+    }
     return val;
 }
   

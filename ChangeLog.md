@@ -1,5 +1,5 @@
-master
-------
+v0.137.0
+--------
 
 Defect fixes:
 
@@ -17,9 +17,15 @@ Enhancements:
 
 Changes:
 
+- The `json_options` parameter to `precision()` has been changed from `int` to `int8_t`
+
+- The `json_options` parameter to `indent_size()` has been changed from `size_t` to `uint8_t`
+
+- The `csv_options` parameter to `precision()` has been changed from `int` to `int8_t`
+
 - The CSV extension enum name `quote_style_type` has been deprecated and renamed to `quote_style_kind`.
 
-- The CSV extension enum name `mapping_type` has been deprecated and renamed to `mapping_strategy`.
+- The CSV extension enum name `mapping_type` has been deprecated and renamed to `mapping_kind`.
 
 - The `do_` virtual functions in `basic_json_content_handler` have been augmented with a `std::error_code`
 output parameter, e.g.

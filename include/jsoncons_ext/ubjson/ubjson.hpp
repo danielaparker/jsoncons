@@ -37,7 +37,12 @@ typename std::enable_if<!is_basic_json_class<T>::value,void>::type
 encode_ubjson(const T& val, std::vector<uint8_t>& v)
 {
     ubjson_bytes_encoder encoder(v);
-    write_to(val, encoder, json());
+    std::error_code ec;
+    ser_traits<T>::serialize(val, encoder, json(), ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec));
+    }
 }
 
 template<class T>
@@ -55,7 +60,12 @@ typename std::enable_if<!is_basic_json_class<T>::value,void>::type
 encode_ubjson(const T& val, std::ostream& os)
 {
     ubjson_stream_encoder encoder(os);
-    write_to(val, encoder, json());
+    std::error_code ec;
+    ser_traits<T>::serialize(val, encoder, json(), ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec));
+    }
 }
 
 // decode_ubjson
@@ -75,8 +85,13 @@ template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
 decode_ubjson(const std::vector<uint8_t>& v)
 {
-    ubjson_bytes_cursor reader(v);
-    T val = read_from<T>(reader, json());
+    ubjson_bytes_cursor cursor(v);
+    std::error_code ec;
+    T val = ser_traits<T>::deserialize(cursor, json(), ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+    }
     return val;
 }
 
@@ -95,8 +110,13 @@ template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
 decode_ubjson(std::istream& is)
 {
-    ubjson_stream_cursor reader(is);
-    T val = read_from<T>(reader, json());
+    ubjson_stream_cursor cursor(is);
+    std::error_code ec;
+    T val = ser_traits<T>::deserialize(cursor, json(), ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+    }
     return val;
 }
 

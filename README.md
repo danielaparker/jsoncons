@@ -626,6 +626,7 @@ int main()
             case staj_event_type::uint64_value:
                 std::cout << event.event_type() << ": " << event.get<uint64_t>() << " " << "(" << event.tag() << ")\n";
                 break;
+            case staj_event_type::half_value:
             case staj_event_type::double_value:
                 std::cout << event.event_type() << ": "  << event.get<double>() << " " << "(" << event.tag() << ")\n";
                 break;

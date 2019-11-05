@@ -39,9 +39,6 @@ wjson_cursor    |basic_json_cursor<wchar_t>
                       const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
                       std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); // (2)
 
-Constructors (1)-(2) read from a character sequence or stream and throw a 
-[ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
-
     template <class Source>
     basic_json_cursor(Source&& source, std::error_code& ec); // (3)
 
@@ -74,6 +71,9 @@ Constructors (1)-(2) read from a character sequence or stream and throw a
                       std::function<bool(json_errc,const ser_context&)> err_handler,
                       std::error_code& ec) // (8)
 
+
+Constructors (1)-(2) read from a character sequence or stream and throw a 
+[ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
 Constructors (3)-(8) read from a character sequence or stream and set `ec`
 if a parsing error is encountered while processing the initial event.
 

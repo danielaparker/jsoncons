@@ -376,7 +376,12 @@ void staj_array_iterator<Json,T>::next()
             {
                 valuep_->~T();
             }
-            valuep_ = ::new(&storage_)T(read_from<T>(*reader_, Json()));
+            std::error_code ec;
+            valuep_ = ::new(&storage_)T(ser_traits<T>::deserialize(*reader_, Json(), ec));
+            if (ec)
+            {
+                JSONCONS_THROW(ser_error(ec, reader_->context().line(), reader_->context().column()));
+            }
         }
     }
 }
@@ -397,7 +402,7 @@ void staj_array_iterator<Json,T>::next(std::error_code& ec)
             {
                 valuep_->~T();
             }
-            valuep_ = ::new(&storage_)T(read_from<T>(*reader_, Json(), ec));
+            valuep_ = ::new(&storage_)T(ser_traits<T>::deserialize(*reader_, Json(), ec));
         }
     }
 }
@@ -417,7 +422,12 @@ void staj_object_iterator<Json,T>::next()
             {
                 kvp_->~value_type();
             }
-            kvp_ = ::new(&storage_)value_type(std::move(key),read_from<T>(*reader_, Json()));
+            std::error_code ec;
+            kvp_ = ::new(&storage_)value_type(std::move(key),ser_traits<T>::deserialize(*reader_, Json(), ec));
+            if (ec)
+            {
+                JSONCONS_THROW(ser_error(ec, reader_->context().line(), reader_->context().column()));
+            }
         }
     }
 }
@@ -445,7 +455,7 @@ void staj_object_iterator<Json,T>::next(std::error_code& ec)
             {
                 kvp_->~value_type();
             }
-            kvp_ = ::new(&storage_)value_type(std::move(key),read_from<T>(*reader_, Json(), ec));
+            kvp_ = ::new(&storage_)value_type(std::move(key),ser_traits<T>::deserialize(*reader_, Json(), ec));
         }
     }
 }

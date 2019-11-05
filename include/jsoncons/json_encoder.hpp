@@ -287,8 +287,6 @@ private:
 
     };
 
-    size_t indent_size_;
-
     const basic_json_encode_options<CharT> options_;
 
     jsoncons::detail::print_double fp_;

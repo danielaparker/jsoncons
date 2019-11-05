@@ -53,7 +53,7 @@ Type                |Definition
 
 #### Member constants
 
-    static const size_t indent_size_default = 4;
+    static const uint8_t indent_size_default = 4;
 The default size indent is 4
 
     static const size_t line_length_limit_default = 120;
@@ -90,7 +90,7 @@ to be used when reading JSON.
 If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`.
 Defaults to `false`.
 
-    basic_json_options& indent_size(size_t value)
+    basic_json_options& indent_size(uint8_t value)
 The indent size, the default is 4.
 
     basic_json_options& spaces_around_colon(spaces_option value)
@@ -118,7 +118,7 @@ The default is [byte_string_chars_format::base64url](byte_string_chars_format.md
     basic_json_options& float_format(float_chars_format value);
 Overrides [floating point format](../float_chars_format.md) when serializing to JSON. The default is [float_chars_format::general](float_chars_format.md).
 
-    basic_json_options& precision(int value)
+    basic_json_options& precision(int8_t value)
 Overrides floating point precision when serializing json. 
 The default is shortest representation.
 
