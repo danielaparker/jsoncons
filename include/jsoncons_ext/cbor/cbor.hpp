@@ -175,7 +175,7 @@ decode_cbor(const std::vector<uint8_t>& v)
 {
     cbor_bytes_cursor reader(v);
     std::error_code ec;
-    T val = ser_traits<T>(reader, json(), ec);
+    T val = ser_traits<T>::deserialize(reader, json(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
@@ -201,7 +201,7 @@ decode_cbor(std::istream& is)
 {
     cbor_stream_cursor reader(is);
     std::error_code ec;
-    T val = ser_traits<T>(reader, json(), ec);
+    T val = ser_traits<T>::deserialize(reader, json(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
