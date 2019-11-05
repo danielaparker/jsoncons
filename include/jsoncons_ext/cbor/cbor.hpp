@@ -174,7 +174,12 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_cbor(const std::vector<uint8_t>& v)
 {
     cbor_bytes_cursor reader(v);
-    T val = read_from<T>(reader, json());
+    std::error_code ec;
+    T val = ser_traits<T>(reader, json(), ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+    }
     return val;
 }
 
@@ -189,13 +194,18 @@ decode_cbor(std::istream& is)
     reader.read();
     return decoder.get_result();
 }
-
+ 
 template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
 decode_cbor(std::istream& is)
 {
     cbor_stream_cursor reader(is);
-    T val = read_from<T>(reader, json());
+    std::error_code ec;
+    T val = ser_traits<T>(reader, json(), ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+    }
     return val;
 }
   

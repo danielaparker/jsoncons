@@ -22,24 +22,7 @@
 
 namespace jsoncons {
 
-template <class T, class CharT, class Json>
-T read_from(basic_staj_reader<CharT>& reader, const Json& context_j, std::error_code& ec);
-
-template <class T, class CharT, class Json>
-T read_from(basic_staj_reader<CharT>& reader, const Json& context_j)
-{
-    std::error_code ec;
-    T val = read_from<T>(reader, context_j, ec);
-    if (ec)
-    {
-        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
-    }
-    return val;
-}
-
 } // namespace jsoncons
-
-#include <jsoncons/staj_iterator.hpp>
 
 namespace jsoncons {
 
@@ -87,7 +70,11 @@ private:
         j.dump(encoder, ec);
     }
 };
+}
 
+#include <jsoncons/staj_iterator.hpp>
+
+namespace jsoncons {
 // specializations
 
 // vector like
@@ -225,12 +212,6 @@ struct ser_traits<T,
         encoder.flush();
     }
 };
-
-template <class T, class CharT, class Json>
-T read_from(basic_staj_reader<CharT>& reader, const Json& context_j, std::error_code& ec)
-{
-    return ser_traits<T>::deserialize(reader, context_j, ec);
-}
 
 }
 

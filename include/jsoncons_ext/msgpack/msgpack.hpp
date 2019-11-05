@@ -91,7 +91,12 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_msgpack(const std::vector<uint8_t>& v)
 {
     msgpack_bytes_cursor reader(v);
-    T val = read_from<T>(reader, json());
+    std::error_code ec;
+    T val = ser_traits<T>(reader, json(), ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+    }
     return val;
 }
 
@@ -116,7 +121,12 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_msgpack(std::istream& is)
 {
     msgpack_stream_cursor reader(is);
-    T val = read_from<T>(reader, json());
+    std::error_code ec;
+    T val = ser_traits<T>(reader, json(), ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+    }
     return val;
 }
   

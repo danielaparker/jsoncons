@@ -36,7 +36,12 @@ decode_json(const std::basic_string<CharT>& s,
             const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
     basic_json_cursor<CharT> reader(s, options);
-    T val = read_from<T>(reader, basic_json<CharT>());
+    std::error_code ec;
+    T val = ser_traits<T>::deserialize(reader, basic_json<CharT>(), ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+    }
     return val;
 }
 
@@ -57,7 +62,12 @@ decode_json(std::basic_istream<CharT>& is,
             const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
     basic_json_cursor<CharT> reader(is, options);
-    T val = read_from<T>(reader, basic_json<CharT>());
+    std::error_code ec;
+    T val = ser_traits<T>::deserialize(reader, basic_json<CharT>(), ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+    }
     return val;
 }
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
@@ -66,7 +76,12 @@ T decode_json(const std::basic_string<CharT>& s,
               const basic_json<CharT,ImplementationPolicy,Allocator>& context_j)
 {
     basic_json_cursor<CharT> reader(s, options);
-    T val = read_from<T>(reader, context_j);
+    std::error_code ec;
+    T val = ser_traits<T>::deserialize(reader, context_j, ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+    }
     return val;
 }
 
@@ -76,7 +91,12 @@ T decode_json(std::basic_istream<CharT>& is,
               const basic_json<CharT,ImplementationPolicy,Allocator>& context_j)
 {
     basic_json_cursor<CharT> reader(is, options);
-    T val = read_from<T>(reader, context_j);
+    std::error_code ec;
+    T val = ser_traits<T>::deserialize(reader, context_j, ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+    }
     return val;
 }
 
@@ -88,7 +108,12 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context_j,
               const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
     basic_json_cursor<CharT> reader(s, options);
-    T val = read_from<T>(reader, context_j);
+    std::error_code ec;
+    T val = ser_traits<T>::deserialize(reader, context_j, ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+    }
     return val;
 }
 
@@ -99,7 +124,12 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context_j,
               const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
     basic_json_cursor<CharT> reader(is, options);
-    T val = read_from<T>(reader, context_j);
+    std::error_code ec;
+    T val = ser_traits<T>::deserialize(reader, context_j, ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+    }
     return val;
 }
 #endif

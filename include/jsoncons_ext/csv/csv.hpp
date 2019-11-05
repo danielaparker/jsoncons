@@ -34,7 +34,12 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_csv(const std::basic_string<CharT>& s, const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
 {
     basic_csv_cursor<CharT> cursor(s, options);
-    T val = read_from<T>(cursor, basic_json<CharT>());
+    std::error_code ec;
+    T val = ser_traits<T>(reader, basic_json<CharT>(), ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+    }
     return val;
 }
 
@@ -56,7 +61,12 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_csv(std::basic_istream<CharT>& is, const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
 {
     basic_csv_cursor<CharT> cursor(is, options);
-    T val = read_from<T>(cursor, basic_json<CharT>());
+    std::error_code ec;
+    T val = ser_traits<T>(reader, basic_json<CharT>(), ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+    }
     return val;
 }
 // encode_csv
