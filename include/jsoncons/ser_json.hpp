@@ -35,12 +35,12 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_json(const std::basic_string<CharT>& s,
             const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
-    basic_json_cursor<CharT> reader(s, options);
+    basic_json_cursor<CharT> cursor(s, options);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(reader, basic_json<CharT>(), ec);
+    T val = ser_traits<T>::deserialize(cursor, basic_json<CharT>(), ec);
     if (ec)
     {
-        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+        JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
     }
     return val;
 }
@@ -61,12 +61,12 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_json(std::basic_istream<CharT>& is,
             const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
-    basic_json_cursor<CharT> reader(is, options);
+    basic_json_cursor<CharT> cursor(is, options);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(reader, basic_json<CharT>(), ec);
+    T val = ser_traits<T>::deserialize(cursor, basic_json<CharT>(), ec);
     if (ec)
     {
-        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+        JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
     }
     return val;
 }
@@ -75,12 +75,12 @@ T decode_json(const std::basic_string<CharT>& s,
               const basic_json_decode_options<CharT>& options,
               const basic_json<CharT,ImplementationPolicy,Allocator>& context_j)
 {
-    basic_json_cursor<CharT> reader(s, options);
+    basic_json_cursor<CharT> cursor(s, options);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(reader, context_j, ec);
+    T val = ser_traits<T>::deserialize(cursor, context_j, ec);
     if (ec)
     {
-        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+        JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
     }
     return val;
 }
@@ -90,12 +90,12 @@ T decode_json(std::basic_istream<CharT>& is,
               const basic_json_decode_options<CharT>& options,
               const basic_json<CharT,ImplementationPolicy,Allocator>& context_j)
 {
-    basic_json_cursor<CharT> reader(is, options);
+    basic_json_cursor<CharT> cursor(is, options);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(reader, context_j, ec);
+    T val = ser_traits<T>::deserialize(cursor, context_j, ec);
     if (ec)
     {
-        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+        JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
     }
     return val;
 }
@@ -107,12 +107,12 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context_j,
               const std::basic_string<CharT>& s,
               const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
-    basic_json_cursor<CharT> reader(s, options);
+    basic_json_cursor<CharT> cursor(s, options);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(reader, context_j, ec);
+    T val = ser_traits<T>::deserialize(cursor, context_j, ec);
     if (ec)
     {
-        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+        JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
     }
     return val;
 }
@@ -123,12 +123,12 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context_j,
               std::basic_istream<CharT>& is,
               const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
 {
-    basic_json_cursor<CharT> reader(is, options);
+    basic_json_cursor<CharT> cursor(is, options);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(reader, context_j, ec);
+    T val = ser_traits<T>::deserialize(cursor, context_j, ec);
     if (ec)
     {
-        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+        JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
     }
     return val;
 }

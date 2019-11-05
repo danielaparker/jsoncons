@@ -26,11 +26,11 @@ template <class T, class Enable = void>
 struct cbor_ser_traits
 {
     template <class Json>
-    static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+    static T deserialize(basic_staj_reader<typename Json::char_type>& cursor, 
                          const Json& context_j,
                          std::error_code& ec)
     {
-        return ser_traits<T>::deserialize(reader, context_j, ec);
+        return ser_traits<T>::deserialize(cursor, context_j, ec);
     }
 
     template <class Json>
@@ -61,11 +61,11 @@ struct cbor_ser_traits<T,
     typedef typename T::value_type value_type;
 
     template <class Json>
-    static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+    static T deserialize(basic_staj_reader<typename Json::char_type>& cursor, 
                          const Json& context_j,
                          std::error_code& ec)
     {
-        return ser_traits<T>::deserialize(reader, context_j, ec);
+        return ser_traits<T>::deserialize(cursor, context_j, ec);
     }
 
     template <class Json>
@@ -173,12 +173,12 @@ template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
 decode_cbor(const std::vector<uint8_t>& v)
 {
-    cbor_bytes_cursor reader(v);
+    cbor_bytes_cursor cursor(v);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(reader, json(), ec);
+    T val = ser_traits<T>::deserialize(cursor, json(), ec);
     if (ec)
     {
-        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+        JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
     }
     return val;
 }
@@ -199,12 +199,12 @@ template<class T>
 typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
 decode_cbor(std::istream& is)
 {
-    cbor_stream_cursor reader(is);
+    cbor_stream_cursor cursor(is);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(reader, json(), ec);
+    T val = ser_traits<T>::deserialize(cursor, json(), ec);
     if (ec)
     {
-        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+        JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
     }
     return val;
 }

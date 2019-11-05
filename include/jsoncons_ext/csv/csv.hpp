@@ -35,10 +35,10 @@ decode_csv(const std::basic_string<CharT>& s, const basic_csv_decode_options<Cha
 {
     basic_csv_cursor<CharT> cursor(s, options);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(reader, basic_json<CharT>(), ec);
+    T val = ser_traits<T>::deserialize(cursor, basic_json<CharT>(), ec);
     if (ec)
     {
-        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+        JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
     }
     return val;
 }
@@ -62,10 +62,10 @@ decode_csv(std::basic_istream<CharT>& is, const basic_csv_decode_options<CharT>&
 {
     basic_csv_cursor<CharT> cursor(is, options);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(reader, basic_json<CharT>(), ec);
+    T val = ser_traits<T>::deserialize(cursor, basic_json<CharT>(), ec);
     if (ec)
     {
-        JSONCONS_THROW(ser_error(ec, reader.context().line(), reader.context().column()));
+        JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
     }
     return val;
 }
