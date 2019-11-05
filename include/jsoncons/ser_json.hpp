@@ -110,7 +110,12 @@ template <class T, class CharT>
 void encode_json(const T& val, 
                  basic_json_content_handler<CharT>& encoder)
 {
-    write_to(val, encoder, basic_json<CharT>());
+    std::error_code ec;
+    ser_traits<T>::serialize(val, encoder, basic_json<CharT>(), ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec));
+    }
     encoder.flush();
 }
 
@@ -217,7 +222,12 @@ void encode_json(const basic_json<CharT, ImplementationPolicy, Allocator>& conte
                  const T& val,
                  basic_json_content_handler<CharT>& encoder)
 {
-    write_to(val, encoder, context_j);
+    std::error_code ec;
+    ser_traits<T>::serialize(val, encoder, context_j, ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec));
+    }
     encoder.flush();
 }
 
@@ -305,7 +315,12 @@ void encode_json(const T& val,
                  basic_json_content_handler<CharT>& encoder,
                  const basic_json<CharT, ImplementationPolicy, Allocator>& context_j)
 {
-    write_to(val, encoder, context_j);
+    std::error_code ec;
+    ser_traits<T>::serialize(val, encoder, context_j, ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec));
+    }
     encoder.flush();
 }
 

@@ -37,20 +37,6 @@ T read_from(basic_staj_reader<CharT>& reader, const Json& context_j)
     return val;
 }
 
-template <class T, class CharT, class Json>
-void write_to(const T&val, basic_json_content_handler<CharT>& encoder, std::error_code& ec);
-
-template <class T, class CharT, class Json>
-void write_to(const T&val, basic_json_content_handler<CharT>& encoder)
-{
-    std::error_code ec;
-    write_to<T,CharT,Json>(val, encoder, ec);
-    if (ec)
-    {
-        JSONCONS_THROW(ser_error(ec, 0, 0));
-    }
-}
-
 } // namespace jsoncons
 
 #include <jsoncons/staj_iterator.hpp>
@@ -216,23 +202,6 @@ template <class T, class CharT, class Json>
 T read_from(basic_staj_reader<CharT>& reader, const Json&, std::error_code& ec)
 {
     return ser_traits<T>::template deserialize<CharT,Json>(reader,ec);
-}
-
-template <class T, class CharT, class Json>
-void write_to(const T&val, basic_json_content_handler<CharT>& encoder, const Json& context_j, std::error_code& ec)
-{
-    ser_traits<T>::serialize(val, encoder, context_j, ec);
-}
-
-template <class T, class CharT, class Json>
-void write_to(const T&val, basic_json_content_handler<CharT>& encoder, const Json& context_j)
-{
-    std::error_code ec;
-    ser_traits<T>::serialize(val, encoder, context_j, ec);
-    if (ec)
-    {
-        JSONCONS_THROW(ser_error(ec));
-    }
 }
 
 }
