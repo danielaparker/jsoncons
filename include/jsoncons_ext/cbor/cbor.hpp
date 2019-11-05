@@ -25,11 +25,12 @@ namespace jsoncons { namespace cbor {
 template <class T, class Enable = void>
 struct cbor_ser_traits
 {
-    template <class CharT, class Json>
-    static T deserialize(basic_staj_reader<CharT>& reader, 
+    template <class Json>
+    static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+                         const Json& context_j,
                          std::error_code& ec)
     {
-        return ser_traits<T>::template deserialize<CharT,Json>(reader, ec);
+        return ser_traits<T>::deserialize(reader, context_j, ec);
     }
 
     template <class Json>
@@ -59,11 +60,12 @@ struct cbor_ser_traits<T,
 {
     typedef typename T::value_type value_type;
 
-    template <class CharT, class Json>
-    static T deserialize(basic_staj_reader<CharT>& reader, 
+    template <class Json>
+    static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+                         const Json& context_j,
                          std::error_code& ec)
     {
-        return ser_traits<T>::deserialize(reader, ec);
+        return ser_traits<T>::deserialize(reader, context_j, ec);
     }
 
     template <class Json>

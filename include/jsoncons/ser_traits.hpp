@@ -46,11 +46,12 @@ namespace jsoncons {
 template <class T, class Enable = void>
 struct ser_traits
 {
-    template <class CharT, class Json>
-    static T deserialize(basic_staj_reader<CharT>& reader, 
+    template <class Json>
+    static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+                         const Json& context_j, 
                          std::error_code& ec)
     {
-        json_decoder<Json> decoder;
+        json_decoder<Json> decoder(context_j.get_allocator());
         reader.read_to(decoder, ec);
         return decoder.get_result().template as<T>();
     }
@@ -98,8 +99,10 @@ struct ser_traits<T,
 {
     typedef typename T::value_type value_type;
 
-    template <class CharT, class Json>
-    static T deserialize(basic_staj_reader<CharT>& reader, std::error_code& ec)
+    template <class Json>
+    static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+                         const Json&, 
+                         std::error_code& ec)
     {
         T v;
         staj_array_iterator<Json,value_type> end;
@@ -136,8 +139,10 @@ struct ser_traits<std::array<T,N>>
 {
     typedef typename std::array<T,N>::value_type value_type;
 
-    template <class CharT,class Json>
-    static std::array<T, N> deserialize(basic_staj_reader<CharT>& reader, std::error_code& ec)
+    template <class Json>
+    static std::array<T, N> deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+                                        const Json&, 
+                                        std::error_code& ec)
     {
         std::array<T,N> v;
         v.fill(T{});
@@ -179,8 +184,10 @@ struct ser_traits<T,
     typedef typename T::value_type value_type;
     typedef typename T::key_type key_type;
 
-    template <class CharT, class Json>
-    static T deserialize(basic_staj_reader<CharT>& reader, std::error_code& ec)
+    template <class Json>
+    static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+                         const Json&, 
+                         std::error_code& ec)
     {
         T m;
         staj_object_iterator<Json,mapped_type> end;
@@ -220,9 +227,9 @@ struct ser_traits<T,
 };
 
 template <class T, class CharT, class Json>
-T read_from(basic_staj_reader<CharT>& reader, const Json&, std::error_code& ec)
+T read_from(basic_staj_reader<CharT>& reader, const Json& context_j, std::error_code& ec)
 {
-    return ser_traits<T>::template deserialize<CharT,Json>(reader,ec);
+    return ser_traits<T>::deserialize(reader, context_j, ec);
 }
 
 }
