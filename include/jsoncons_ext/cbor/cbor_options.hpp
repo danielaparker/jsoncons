@@ -38,7 +38,7 @@ public:
     }
 };
 
-class cbor_options : public cbor_encode_options
+class cbor_options final : public cbor_encode_options
 {
 public:
     using cbor_encode_options::pack_strings;

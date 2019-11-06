@@ -296,6 +296,17 @@ public:
         line_delimiter_.push_back('\n');
     }
 
+    basic_csv_encode_options(const basic_csv_encode_options& other) = default;
+
+    basic_csv_encode_options(basic_csv_encode_options&& other)
+        : super_type(std::forward<basic_csv_encode_options>(other)),
+          quote_style_(other.quote_style_),
+          float_format_(other.float_format_),
+          precision_(other.precision_),
+          line_delimiter_(std::move(other.line_delimiter_))
+    {
+    }
+
     quote_style_kind quote_style() const 
     {
         return quote_style_;
