@@ -477,8 +477,6 @@ int main()
 
         jsonpath_examples();
 
-        polymorphic_examples();
-
         json_cursor_examples();
 
         json_accessor_examples();
@@ -499,9 +497,11 @@ int main()
 
         json_type_traits_macros_named_examples();
 
+        run_cbor_typed_array_examples();
+
         json_type_traits_macros_examples();
 
-        run_cbor_typed_array_examples();
+        polymorphic_examples();
     }
     catch (const std::exception& e)
     {

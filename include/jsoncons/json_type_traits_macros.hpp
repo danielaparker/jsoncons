@@ -643,6 +643,38 @@ JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL_BASE(JSONCONS_STRICT_GETTER_SETTER_NAME
 JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL_BASE(JSONCONS_STRICT_GETTER_SETTER_NAMED_AS, NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
 
+#define JSONCONS_POLYMORPHIC_IS(BaseType, SubType) if (!ajson.is<SubType>()) return false;
+#define JSONCONS_POLYMORPHIC_IS_LAST(BaseType, SubType)  if (!ajson.is<SubType>()) return false;
+
+#define JSONCONS_POLYMORPHIC_AS(BaseType, SubType) if (ajson.is<SubType>()) return std::make_shared<SubType>(ajson.as<SubType>());
+#define JSONCONS_POLYMORPHIC_AS_LAST(BaseType, SubType)  if (ajson.is<SubType>()) return std::make_shared<SubType>(ajson.as<SubType>());
+
+#define JSONCONS_POLYMORPHIC_TO_JSON(BaseType, SubType) if (SubType* p = dynamic_cast<SubType*>(ptr.get())) {return Json(*p);}
+#define JSONCONS_POLYMORPHIC_TO_JSON_LAST(BaseType, SubType) if (SubType* p = dynamic_cast<SubType*>(ptr.get())) {return Json(*p);}
+
+#define JSONCONS_POLYMORPHIC_TRAITS_DECL(BaseType, ...)  \
+namespace jsoncons { \
+    template<class Json> \
+    struct json_type_traits<Json, std::shared_ptr<BaseType>> { \
+        static bool is(const Json& ajson, const BaseType& v) noexcept { \
+            if (!ajson.is_object()) return false; \
+            JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_IS, BaseType, __VA_ARGS__)\
+            return true; \
+        } \
+\
+        static std::shared_ptr<BaseType> as(const Json& ajson) { \
+            JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_AS, BaseType, __VA_ARGS__)\
+            return std::shared_ptr<BaseType>(); \
+        } \
+\
+        static Json to_json(const std::shared_ptr<BaseType>& ptr) { \
+            if (ptr.get() == nullptr) {return Json::null();} \
+            JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_TO_JSON, BaseType, __VA_ARGS__)\
+            return Json::null(); \
+        } \
+    }; \
+}  \
+  /**/
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 #define JSONCONS_TYPE_TRAITS_DECL JSONCONS_MEMBER_TRAITS_DECL
