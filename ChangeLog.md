@@ -1,3 +1,11 @@
+master
+-----
+
+Enhancements:
+
+- New convenience macro `JSONCONS_POLYMORPHIC_TRAITS_DECL`
+for generating `json_type_traits` for polymorphic types.
+
 v0.137.0
 --------
 

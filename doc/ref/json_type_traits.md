@@ -145,6 +145,8 @@ JSONCONS_STRICT_TPL_GETTER_SETTER_NAMED_TRAITS_DECL(num_template_params,
                                                     class_name,
                                                     (getter_name0,setter_name0,"name0"),
                                                     (getter_name1,setter_name1,"name1")...) // (18)
+
+JSONCONS_POLYMORPHIC_TRAITS_DECL(base_class_name,derived_class_name0,derived_class_name1,...) // (19)
 ```
 
 (1) - (4) generate the code to specialize `json_type_traits` from the member data of a class. 
@@ -199,6 +201,9 @@ The `num_template_params` parameter specifies the number of template parameters.
 When decoding to a C++ data structure, 
 (17) allows member names not present in the JSON to have default values, while the strict (18) 
 requires that all member names be present in the JSON. The class template must have a default constructor. 
+
+(19) generates the code to specialize `json_type_traits` for polymorphic types.
+`json_type_traits` must separately be specialized for each derived class.
 
 #### Parameters
 
