@@ -323,6 +323,14 @@ public:
     }
 
     basic_json_decode_options(const basic_json_decode_options&) = default;
+
+    basic_json_decode_options(basic_json_decode_options&& other)
+        : super_type(std::forward<basic_json_decode_options>(other)),
+                     lossless_number_(other.lossless_number_),
+                     max_nesting_depth_(other.max_nesting_depth_)
+    {
+    }
+
     basic_json_decode_options& operator=(const basic_json_decode_options&) = default;
 
     bool lossless_number() const 
@@ -393,6 +401,29 @@ public:
     }
 
     basic_json_encode_options(const basic_json_encode_options&) = default;
+
+    basic_json_encode_options(basic_json_encode_options&& other)
+        : super_type(std::forward<basic_json_encode_options>(other)),
+          escape_all_non_ascii_(other.escape_all_non_ascii_),
+          escape_solidus_(other.escape_solidus_),
+          pad_inside_object_braces_(other.pad_inside_object_braces_),
+          pad_inside_array_brackets_(other.pad_inside_array_brackets_),
+          float_format_(other.float_format_),
+          byte_string_format_(other.byte_string_format_),
+          bigint_format_(other.bigint_format_),
+          object_object_line_splits_(other.object_object_line_splits_),
+          object_array_line_splits_(other.object_array_line_splits_),
+          array_array_line_splits_(other.array_array_line_splits_),
+          array_object_line_splits_(other.array_object_line_splits_),
+          spaces_around_colon_(other.spaces_around_colon_),
+          spaces_around_comma_(other.spaces_around_comma_),
+          precision_(other.precision_),
+          indent_size_(other.indent_size_),
+          line_length_limit_(other.line_length_limit_),
+          new_line_chars_(std::move(other.new_line_chars))
+    {
+    }
+
     basic_json_encode_options& operator=(const basic_json_encode_options&) = default;
 
     byte_string_chars_format byte_string_format() const  {return byte_string_format_;}
@@ -528,10 +559,7 @@ public:
 
 //  Constructors
 
-    basic_json_options()
-    {
-    }
-
+    basic_json_options() = default;
     basic_json_options(const basic_json_options&) = default;
     basic_json_options(basic_json_options&&) = default;
     basic_json_options& operator=(const basic_json_options&) = default;

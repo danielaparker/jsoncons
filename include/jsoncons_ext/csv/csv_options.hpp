@@ -367,9 +367,11 @@ public:
 
 //  Constructors
 
-    basic_csv_options()
-    {
-    }
+    basic_csv_options() = default;
+    basic_csv_options(const basic_csv_options&) = default;
+    basic_csv_options(basic_csv_options&&) = default;
+    basic_csv_options& operator=(const basic_csv_options&) = default;
+    basic_csv_options& operator=(basic_csv_options&&) = default;
 
     basic_csv_options& float_format(float_chars_format value)
     {
