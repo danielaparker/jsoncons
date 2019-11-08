@@ -13,168 +13,141 @@ using namespace jsoncons;
 
 namespace ns {
 
-class Employee
-{
-    std::string firstName_;
-    std::string lastName_;
-public:
-    Employee(const std::string& firstName, const std::string& lastName)
-        : firstName_(firstName), lastName_(lastName)
+    class Employee
     {
-    }
-    virtual ~Employee() = default;
+        std::string firstName_;
+        std::string lastName_;
+    public:
+        Employee(const std::string& firstName, const std::string& lastName)
+            : firstName_(firstName), lastName_(lastName)
+        {
+        }
+        virtual ~Employee() = default;
 
-    virtual double calculatePay() const = 0;
+        virtual double calculatePay() const = 0;
 
-    const std::string& firstName() const {return firstName_;}
-    const std::string& lastName() const {return lastName_;}
-};
+        const std::string& firstName() const {return firstName_;}
+        const std::string& lastName() const {return lastName_;}
+    };
 
-class HourlyEmployee : public Employee
-{
-    double wage_;
-    unsigned hours_;
-public:
-    HourlyEmployee(const std::string& firstName, const std::string& lastName, 
-                   double wage, unsigned hours)
-        : Employee(firstName, lastName), 
-          wage_(wage), hours_(hours)
+    class HourlyEmployee : public Employee
     {
-    }
-    HourlyEmployee(const HourlyEmployee&) = default;
-    HourlyEmployee(HourlyEmployee&&) = default;
-    HourlyEmployee& operator=(const HourlyEmployee&) = default;
-    HourlyEmployee& operator=(HourlyEmployee&&) = default;
+        double wage_;
+        unsigned hours_;
+    public:
+        HourlyEmployee(const std::string& firstName, const std::string& lastName, 
+                       double wage, unsigned hours)
+            : Employee(firstName, lastName), 
+              wage_(wage), hours_(hours)
+        {
+        }
+        HourlyEmployee(const HourlyEmployee&) = default;
+        HourlyEmployee(HourlyEmployee&&) = default;
+        HourlyEmployee& operator=(const HourlyEmployee&) = default;
+        HourlyEmployee& operator=(HourlyEmployee&&) = default;
 
-    double wage() const {return wage_;}
+        double wage() const {return wage_;}
 
-    unsigned hours() const {return hours_;}
+        unsigned hours() const {return hours_;}
 
-    double calculatePay() const override
+        double calculatePay() const override
+        {
+            return wage_*hours_;
+        }
+    };
+
+    class CommissionedEmployee : public Employee
     {
-        return wage_*hours_;
-    }
-};
+        double baseSalary_;
+        double commission_;
+        unsigned sales_;
+    public:
+        CommissionedEmployee(const std::string& firstName, const std::string& lastName, 
+                             double baseSalary, double commission, unsigned sales)
+            : Employee(firstName, lastName), 
+              baseSalary_(baseSalary), commission_(commission), sales_(sales)
+        {
+        }
+        CommissionedEmployee(const CommissionedEmployee&) = default;
+        CommissionedEmployee(CommissionedEmployee&&) = default;
+        CommissionedEmployee& operator=(const CommissionedEmployee&) = default;
+        CommissionedEmployee& operator=(CommissionedEmployee&&) = default;
 
-class CommissionedEmployee : public Employee
-{
-    double baseSalary_;
-    double commission_;
-    unsigned sales_;
-public:
-    CommissionedEmployee(const std::string& firstName, const std::string& lastName, 
-                         double baseSalary, double commission, unsigned sales)
-        : Employee(firstName, lastName), 
-          baseSalary_(baseSalary), commission_(commission), sales_(sales)
-    {
-    }
-    CommissionedEmployee(const CommissionedEmployee&) = default;
-    CommissionedEmployee(CommissionedEmployee&&) = default;
-    CommissionedEmployee& operator=(const CommissionedEmployee&) = default;
-    CommissionedEmployee& operator=(CommissionedEmployee&&) = default;
+        double baseSalary() const
+        {
+            return baseSalary_;
+        }
 
-    double baseSalary() const
-    {
-        return baseSalary_;
-    }
+        double commission() const
+        {
+            return commission_;
+        }
 
-    double commission() const
-    {
-        return commission_;
-    }
+        unsigned sales() const
+        {
+            return sales_;
+        }
 
-    unsigned sales() const
-    {
-        return sales_;
-    }
+        double calculatePay() const override
+        {
+            return baseSalary_ + commission_*sales_;
+        }
+    };
 
-    double calculatePay() const override
-    {
-        return baseSalary_ + commission_*sales_;
-    }
-};
 } // ns
 
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, hours)
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
+JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
 
-namespace jsoncons {
-
-template<class Json>
-struct json_type_traits<Json, std::shared_ptr<ns::Employee>> 
+void employee_polymorphic_decode_example()
 {
-    static bool is(const Json& j) noexcept
-    { 
-        return j.is<ns::HourlyEmployee>() || j.is<ns::CommissionedEmployee>();
-    }
-    static std::shared_ptr<ns::Employee> as(const Json& j)
-    {   
-        if (j.at("type").as<std::string>() == "Hourly")
-        {
-            return std::make_shared<ns::HourlyEmployee>(j.as<ns::HourlyEmployee>());
-        }
-        else if (j.at("type").as<std::string>() == "Commissioned")
-        {
-            return std::make_shared<ns::CommissionedEmployee>(j.as<ns::CommissionedEmployee>());
-        }
-        else
-        {
-            throw std::runtime_error("Not an employee");
-        }
-    }
-    static Json to_json(const std::shared_ptr<ns::Employee>& ptr)
+    std::string input = R"(
+[
     {
-        if (ns::HourlyEmployee* p = dynamic_cast<ns::HourlyEmployee*>(ptr.get()))
-        {
-            Json j(*p);
-            j.try_emplace("type","Hourly");
-            return j;
-        }
-        else if (ns::CommissionedEmployee* p = dynamic_cast<ns::CommissionedEmployee*>(ptr.get()))
-        {
-            Json j(*p);
-            j.try_emplace("type","Commissioned");
-            return j;
-        }
-        else
-        {
-            throw std::runtime_error("Not an employee");
-        }
+        "firstName": "John",
+        "hours": 1000,
+        "lastName": "Smith",
+        "type": "Hourly",
+        "wage": 40.0
+    },
+    {
+        "baseSalary": 30000.0,
+        "commission": 0.25,
+        "firstName": "Jane",
+        "lastName": "Doe",
+        "sales": 1000,
+        "type": "Commissioned"
     }
-};
+]
+    )"; 
 
-} // jsoncons
+    auto v = jsoncons::decode_json<std::vector<std::shared_ptr<ns::Employee>>>(input);
 
-void employee_polymorphic_example()
+    for (auto p : v)
+    {
+        std::cout << p->firstName() << " " << p->lastName() << " " << p->calculatePay() << "\n";
+    }
+}
+
+void employee_polymorphic_encode_example()
 {
     std::vector<std::shared_ptr<ns::Employee>> v;
 
     v.push_back(std::make_shared<ns::HourlyEmployee>("John", "Smith", 40.0, 1000));
     v.push_back(std::make_shared<ns::CommissionedEmployee>("Jane", "Doe", 30000, 0.25, 1000));
 
-    json j(v);
+    jsoncons::json j(v);
     std::cout << pretty_print(j) << "\n\n";
-
-    assert(j[0].is<ns::HourlyEmployee>());
-    assert(!j[0].is<ns::CommissionedEmployee>());
-    assert(!j[1].is<ns::HourlyEmployee>());
-    assert(j[1].is<ns::CommissionedEmployee>());
-
-
-    for (size_t i = 0; i < j.size(); ++i)
-    {
-        auto p = j[i].as<std::shared_ptr<ns::Employee>>();
-        assert(p->firstName() == v[i]->firstName());
-        assert(p->lastName() == v[i]->lastName());
-        assert(p->calculatePay() == v[i]->calculatePay());
-    }
 }
 
 void polymorphic_examples()
 {
-    std::cout << "\nType extensibility examples\n\n";
+    std::cout << "\nPolymorhic examples\n\n";
 
-    employee_polymorphic_example();
+    employee_polymorphic_decode_example();
+
+    employee_polymorphic_encode_example();
 
     std::cout << std::endl;
 }
