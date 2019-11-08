@@ -67,7 +67,6 @@ private:
 
         bool is_object_;
         size_t count_;
-        string_type name_;
     };
     Result result_;
     const basic_csv_encode_options<CharT> options_;
@@ -77,6 +76,7 @@ private:
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,string_type>> string_string_allocator_type;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> buffered_line_;
+    string_type name_;
 
     // Noncopyable and nonmoveable
     basic_csv_encoder(const basic_csv_encoder&) = delete;
@@ -226,7 +226,7 @@ private:
     {
         if (stack_.size() == 2)
         {
-            stack_.back().name_ = string_type(name);
+            name_ = string_type(name);
             buffered_line_[string_type(name)] = std::basic_string<CharT>();
             if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
             {
@@ -262,7 +262,7 @@ private:
         {
             if (stack_.back().is_object())
             {
-                auto it = buffered_line_.find(stack_.back().name_);
+                auto it = buffered_line_.find(name_);
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
@@ -286,7 +286,7 @@ private:
         {
             if (stack_.back().is_object())
             {
-                auto it = buffered_line_.find(stack_.back().name_);
+                auto it = buffered_line_.find(name_);
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
@@ -366,7 +366,7 @@ private:
         {
             if (stack_.back().is_object())
             {
-                auto it = buffered_line_.find(stack_.back().name_);
+                auto it = buffered_line_.find(name_);
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
@@ -393,7 +393,7 @@ private:
         {
             if (stack_.back().is_object())
             {
-                auto it = buffered_line_.find(stack_.back().name_);
+                auto it = buffered_line_.find(name_);
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
@@ -420,7 +420,7 @@ private:
         {
             if (stack_.back().is_object())
             {
-                auto it = buffered_line_.find(stack_.back().name_);
+                auto it = buffered_line_.find(name_);
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
@@ -444,7 +444,7 @@ private:
         {
             if (stack_.back().is_object())
             {
-                auto it = buffered_line_.find(stack_.back().name_);
+                auto it = buffered_line_.find(name_);
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
