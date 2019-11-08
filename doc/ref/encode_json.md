@@ -62,8 +62,19 @@ void encode_json(const T& val,
 
 (5) Convert `val` to json events and stream through content handler.
 
-Functions (1)-(5) perform encodings using the default json type `basic_json<CharT>`.
-Functions (6)-(8) are the same but perform encodings using the supplied `basic_json`.
+(6) Encode `val` to string with the specified options and line indenting,
+    using the context object `context_j` as a prototype when encoding requires
+    a temporary `basic_json` value.
+
+(7) Encode `val` to output stream with the specified options and line indenting,
+    using the context object `context_j` as a prototype when encoding requires
+    a temporary `basic_json` value.
+
+(8) Convert `val` to json events and stream through content handler,
+    using the context object `context_j` as a prototype when encoding requires
+    a temporary `basic_json` value.
+
+Functions (6)-(8) only participate in overload resolution if `T` is not a `basic_json` type.  
 
 #### Parameters
 

@@ -136,19 +136,6 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context_j,
 
 // encode_json
 
-template <class T, class CharT>
-void encode_json(const T& val, 
-                 basic_json_content_handler<CharT>& encoder)
-{
-    std::error_code ec;
-    ser_traits<T>::serialize(val, encoder, basic_json<CharT>(), ec);
-    if (ec)
-    {
-        JSONCONS_THROW(ser_error(ec));
-    }
-    encoder.flush();
-}
-
 // to string
 
 template <class T, class CharT>
@@ -245,13 +232,12 @@ encode_json(const T& val,
     }
 }
 
-template <class T, class CharT, class ImplementationPolicy, class Allocator>
-void encode_json(const T& val,
-                 basic_json_content_handler<CharT>& encoder,
-                 const basic_json<CharT, ImplementationPolicy, Allocator>& context_j)
+template <class T, class CharT>
+void encode_json(const T& val, 
+                 basic_json_content_handler<CharT>& encoder)
 {
     std::error_code ec;
-    ser_traits<T>::serialize(val, encoder, context_j, ec);
+    ser_traits<T>::serialize(val, encoder, basic_json<CharT>(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec));
@@ -260,11 +246,12 @@ void encode_json(const T& val,
 }
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
-void encode_json(const T& val,
-                 std::basic_string<CharT>& s,
-                 const basic_json_encode_options<CharT>& options, 
-                 indenting line_indent, 
-                 const basic_json<CharT,ImplementationPolicy,Allocator>& context_j)
+typename std::enable_if<!is_basic_json_class<T>::value>::type
+encode_json(const T& val,
+            std::basic_string<CharT>& s,
+            const basic_json_encode_options<CharT>& options, 
+            indenting line_indent, 
+            const basic_json<CharT,ImplementationPolicy,Allocator>& context_j)
 { 
     if (line_indent == indenting::indent)
     {
@@ -280,11 +267,12 @@ void encode_json(const T& val,
 
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
-void encode_json(const T& val,
-                 std::basic_ostream<CharT>& os, 
-                 const basic_json_encode_options<CharT>& options, 
-                 indenting line_indent,
-                 const basic_json<CharT,ImplementationPolicy,Allocator>& context_j)
+typename std::enable_if<!is_basic_json_class<T>::value>::type
+encode_json(const T& val,
+            std::basic_ostream<CharT>& os, 
+            const basic_json_encode_options<CharT>& options, 
+            indenting line_indent,
+            const basic_json<CharT,ImplementationPolicy,Allocator>& context_j)
 {
     if (line_indent == indenting::indent)
     {
@@ -298,6 +286,20 @@ void encode_json(const T& val,
     }
 }
 
+template <class T, class CharT, class ImplementationPolicy, class Allocator>
+typename std::enable_if<!is_basic_json_class<T>::value>::type
+encode_json(const T& val,
+            basic_json_content_handler<CharT>& encoder,
+            const basic_json<CharT, ImplementationPolicy, Allocator>& context_j)
+{
+    std::error_code ec;
+    ser_traits<T>::serialize(val, encoder, context_j, ec);
+    if (ec)
+    {
+        JSONCONS_THROW(ser_error(ec));
+    }
+    encoder.flush();
+}
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
