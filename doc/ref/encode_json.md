@@ -30,7 +30,7 @@ void encode_json(const T& val,
 
 template <class T, class CharT>
 void encode_json(const T& val, 
-                 basic_json_content_handler<CharT>& receiver); // (5)
+                 basic_json_content_handler<CharT>& encoder); // (5)
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 void encode_json(const T& val,
@@ -48,7 +48,7 @@ void encode_json(const T& val,
 
 template <class T, class CharT, class ImplementationPolicy, class Allocator>
 void encode_json(const T& val,
-                 basic_json_content_handler<CharT>& receiver,
+                 basic_json_content_handler<CharT>& encoder,
                  const basic_json<CharT, ImplementationPolicy, Allocator>& context_j); // (8)
 ```
 
