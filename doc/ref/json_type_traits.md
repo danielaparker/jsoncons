@@ -203,7 +203,7 @@ When decoding to a C++ data structure,
 requires that all member names be present in the JSON. The class template must have a default constructor. 
 
 (19) generates the code to specialize `json_type_traits` for polymorphic types.
-`json_type_traits` must separately be specialized for each derived class.
+Each derived class must have a `json_type_traits<Json,derived_class_name>` specialization.
 
 #### Parameters
 
@@ -215,6 +215,9 @@ requires that all member names be present in the JSON. The class template must h
 `(identifierN,"nameN")` - an enum identifier and corresponding JSON name  
 `(getter_nameN,"nameN")` - the getter for a class data member and corresponding JSON name  
 `(getter_nameN,setter_nameN,"nameN")` - the getter and setter for a class data member, and corresponding JSON name
+`base_class_name` - the name of a base class 
+`derived_class_nameN` - a class that is derived from the base class,
+and that has a `json_type_traits<Json,derived_class_nameN>` specialization.
 
 These macro declarations must be placed at global scope, outside any namespace blocks, and `class_name` must be a fully namespace qualified name.
 
