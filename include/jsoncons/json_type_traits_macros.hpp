@@ -643,36 +643,36 @@ JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL_BASE(JSONCONS_STRICT_GETTER_SETTER_NAME
 JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL_BASE(JSONCONS_STRICT_GETTER_SETTER_NAMED_AS, NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
 
-#define JSONCONS_POLYMORPHIC_IS(BaseType, SubType) if (!ajson.template is<SubType>()) return false;
-#define JSONCONS_POLYMORPHIC_IS_LAST(BaseType, SubType)  if (!ajson.template is<SubType>()) return false;
+#define JSONCONS_POLYMORPHIC_IS(BaseClass, DerivedClass) if (!ajson.template is<DerivedClass>()) return false;
+#define JSONCONS_POLYMORPHIC_IS_LAST(BaseClass, DerivedClass)  if (!ajson.template is<DerivedClass>()) return false;
 
-#define JSONCONS_POLYMORPHIC_AS(BaseType, SubType) if (ajson.template is<SubType>()) return std::make_shared<SubType>(ajson.template as<SubType>());
-#define JSONCONS_POLYMORPHIC_AS_LAST(BaseType, SubType)  if (ajson.template is<SubType>()) return std::make_shared<SubType>(ajson.template as<SubType>());
+#define JSONCONS_POLYMORPHIC_AS(BaseClass, DerivedClass) if (ajson.template is<DerivedClass>()) return std::make_shared<DerivedClass>(ajson.template as<DerivedClass>());
+#define JSONCONS_POLYMORPHIC_AS_LAST(BaseClass, DerivedClass)  if (ajson.template is<DerivedClass>()) return std::make_shared<DerivedClass>(ajson.template as<DerivedClass>());
 
-#define JSONCONS_POLYMORPHIC_AS_SHARED_PTR(BaseType, SubType) if (ajson.template is<SubType>()) return std::make_shared<SubType>(ajson.template as<SubType>());
-#define JSONCONS_POLYMORPHIC_AS_SHARED_PTR_LAST(BaseType, SubType)  if (ajson.template is<SubType>()) return std::make_shared<SubType>(ajson.template as<SubType>());
+#define JSONCONS_POLYMORPHIC_AS_SHARED_PTR(BaseClass, DerivedClass) if (ajson.template is<DerivedClass>()) return std::make_shared<DerivedClass>(ajson.template as<DerivedClass>());
+#define JSONCONS_POLYMORPHIC_AS_SHARED_PTR_LAST(BaseClass, DerivedClass)  if (ajson.template is<DerivedClass>()) return std::make_shared<DerivedClass>(ajson.template as<DerivedClass>());
 
-#define JSONCONS_POLYMORPHIC_TO_JSON(BaseType, SubType) if (SubType* p = dynamic_cast<SubType*>(ptr.get())) {return Json(*p);}
-#define JSONCONS_POLYMORPHIC_TO_JSON_LAST(BaseType, SubType) if (SubType* p = dynamic_cast<SubType*>(ptr.get())) {return Json(*p);}
+#define JSONCONS_POLYMORPHIC_TO_JSON(BaseClass, DerivedClass) if (DerivedClass* p = dynamic_cast<DerivedClass*>(ptr.get())) {return Json(*p);}
+#define JSONCONS_POLYMORPHIC_TO_JSON_LAST(BaseClass, DerivedClass) if (DerivedClass* p = dynamic_cast<DerivedClass*>(ptr.get())) {return Json(*p);}
 
-#define JSONCONS_POLYMORPHIC_TRAITS_DECL(BaseType, ...)  \
+#define JSONCONS_POLYMORPHIC_TRAITS_DECL(BaseClass, ...)  \
 namespace jsoncons { \
     template<class Json> \
-    struct json_type_traits<Json, std::shared_ptr<BaseType>> { \
-        static bool is(const Json& ajson, const BaseType& v) noexcept { \
+    struct json_type_traits<Json, std::shared_ptr<BaseClass>> { \
+        static bool is(const Json& ajson, const BaseClass& v) noexcept { \
             if (!ajson.template is_object()) return false; \
-            JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_IS, BaseType, __VA_ARGS__)\
+            JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_IS, BaseClass, __VA_ARGS__)\
             return true; \
         } \
 \
-        static std::shared_ptr<BaseType> as(const Json& ajson) { \
-            JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_AS_SHARED_PTR, BaseType, __VA_ARGS__)\
-            return std::shared_ptr<BaseType>(); \
+        static std::shared_ptr<BaseClass> as(const Json& ajson) { \
+            JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_AS_SHARED_PTR, BaseClass, __VA_ARGS__)\
+            return std::shared_ptr<BaseClass>(); \
         } \
 \
-        static Json to_json(const std::shared_ptr<BaseType>& ptr) { \
+        static Json to_json(const std::shared_ptr<BaseClass>& ptr) { \
             if (ptr.get() == nullptr) {return Json::null();} \
-            JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_TO_JSON, BaseType, __VA_ARGS__)\
+            JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_TO_JSON, BaseClass, __VA_ARGS__)\
             return Json::null(); \
         } \
     }; \
