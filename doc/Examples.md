@@ -1384,7 +1384,7 @@ int main()
 ]
     )"; 
 
-    auto v = jsoncons::decode_json<std::vector<std::shared_ptr<ns::Employee>>>(input);
+    auto v = decode_json<std::vector<std::shared_ptr<ns::Employee>>>(input);
 
     std::cout << "(1)\n";
     for (auto p : v)
@@ -1396,7 +1396,7 @@ int main()
     encode_json(v, std::cout, indenting::indent);
 
     std::cout << "\n\n(3)\n";
-    jsoncons::json j(v);
+    json j(v);
     std::cout << pretty_print(j) << "\n\n";
 }
 ```
