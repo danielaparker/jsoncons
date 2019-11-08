@@ -27,7 +27,7 @@
 [Specialize json_type_traits explicitly](#G4)  
 [Mapping to C++ data structures with and without defaults allowed](#G5)  
 [An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL](#G6)  
-[A polymorphic example](#G7)  
+[Decode and encode of a polymorphic type based on the presence of properties](#G7)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G8)
 
 ### Construct
@@ -1257,13 +1257,14 @@ Output:
 
 <div id="G7"/>
 
-#### A polymorphic example
+#### Decode and encode of a polymorphic type based on the presence of properties
 
-This example makes use of the convenience macros `JSONCONS_GETTER_CTOR_TRAITS_DECL`
-and `JSONCONS_POLYMORPHIC_TRAITS_DECL`. 
-`JSONCONS_GETTER_CTOR_TRAITS_DECL` is used to generate the `json_type_traits` boilerplate
-from the getter functions and a constructor. `JSONCONS_POLYMORPHIC_TRAITS_DECL` is
-used to generate `json_type_traits` boilerplate for polymorphic types.
+This example uses the convenience macro `JSONCONS_GETTER_CTOR_TRAITS_DECL`
+to generate the `json_type_traits` boilerplate for the `HourlyEmployee` and `CommissionedEmployee` 
+derived classes, and `JSONCONS_POLYMORPHIC_TRAITS_DECL` to generate the `json_type_traits` boilerplate
+for a `std::shared_ptr` to an `Employee` base class. The type selection strategy is based
+on the presence of properties, in particular, to `wage` and `hours` being present in
+`HourlyEmployee` and absent in `CommissionedEmployee`.
 
 ```c++
 #include <cassert>

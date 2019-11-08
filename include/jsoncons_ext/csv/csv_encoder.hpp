@@ -84,11 +84,6 @@ private:
         {
         }
 
-        size_t count() const
-        {
-            return count_;
-        }
-
         bool is_object() const
         {
             return item_kind_ == stack_item_kind::object;
@@ -603,7 +598,7 @@ private:
     {
         if (!stack_.empty())
         {
-            if (!stack_.back().is_object() && stack_.back().count() > 0)
+            if (!stack_.back().is_object() && stack_.back().count_ > 0)
             {
                 result.push_back(options_.field_delimiter());
             }
