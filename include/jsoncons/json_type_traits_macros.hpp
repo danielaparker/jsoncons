@@ -643,8 +643,8 @@ JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL_BASE(JSONCONS_STRICT_GETTER_SETTER_NAME
 JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL_BASE(JSONCONS_STRICT_GETTER_SETTER_NAMED_AS, NumTemplateParams, ValueType, __VA_ARGS__) \
   /**/
 
-#define JSONCONS_POLYMORPHIC_IS(BaseClass, DerivedClass) if (!ajson.template is<DerivedClass>()) return false;
-#define JSONCONS_POLYMORPHIC_IS_LAST(BaseClass, DerivedClass)  if (!ajson.template is<DerivedClass>()) return false;
+#define JSONCONS_POLYMORPHIC_IS(BaseClass, DerivedClass) if (ajson.template is<DerivedClass>()) return true;
+#define JSONCONS_POLYMORPHIC_IS_LAST(BaseClass, DerivedClass)  if (ajson.template is<DerivedClass>()) return true;
 
 #define JSONCONS_POLYMORPHIC_AS(BaseClass, DerivedClass) if (ajson.template is<DerivedClass>()) return std::make_shared<DerivedClass>(ajson.template as<DerivedClass>());
 #define JSONCONS_POLYMORPHIC_AS_LAST(BaseClass, DerivedClass)  if (ajson.template is<DerivedClass>()) return std::make_shared<DerivedClass>(ajson.template as<DerivedClass>());
@@ -662,7 +662,7 @@ namespace jsoncons { \
         static bool is(const Json& ajson, const BaseClass& v) noexcept { \
             if (!ajson.is_object()) return false; \
             JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_IS, BaseClass, __VA_ARGS__)\
-            return true; \
+            return false; \
         } \
 \
         static std::shared_ptr<BaseClass> as(const Json& ajson) { \
