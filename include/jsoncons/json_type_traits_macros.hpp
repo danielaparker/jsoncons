@@ -660,12 +660,13 @@ namespace jsoncons { \
     template<class Json> \
     struct json_type_traits<Json, std::shared_ptr<BaseClass>> { \
         static bool is(const Json& ajson, const BaseClass& v) noexcept { \
-            if (!ajson.template is_object()) return false; \
+            if (!ajson.is_object()) return false; \
             JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_IS, BaseClass, __VA_ARGS__)\
             return true; \
         } \
 \
         static std::shared_ptr<BaseClass> as(const Json& ajson) { \
+            if (!ajson.is_object()) return std::shared_ptr<BaseClass>(); \
             JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_AS_SHARED_PTR, BaseClass, __VA_ARGS__)\
             return std::shared_ptr<BaseClass>(); \
         } \
