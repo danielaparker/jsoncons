@@ -587,10 +587,13 @@ Output:
 
 <div id="A7"/> 
 
-#### A polymorphic example using JSONCONS_GETTER_CTOR_TRAITS_DECL to generate the json_type_traits
+#### A polymorphic example
 
-`JSONCONS_GETTER_CTOR_TRAITS_DECL` is a macro that can be used to generate the `json_type_traits` boilerplate
-from the getter functions and a constructor.
+This example makes use of the convenience macros `JSONCONS_GETTER_CTOR_TRAITS_DECL`
+and `JSONCONS_POLYMORPHIC_TRAITS_DECL`. 
+`JSONCONS_GETTER_CTOR_TRAITS_DECL` is used to generate the `json_type_traits` boilerplate
+from the getter functions and a constructor. `JSONCONS_POLYMORPHIC_TRAITS_DECL` is
+used to generate `json_type_traits` boilerplate for polymorphic types.
 
 ```c++
 #include <cassert>
