@@ -12,9 +12,199 @@
 #include <utility>
 #include <ctime>
 #include <cstdint>
-#include "sample_types.hpp"
 
 using namespace jsoncons;
+
+namespace json_type_traits_macro_tests
+{
+
+    template <typename T1, typename T2>
+    struct TemplatedStruct
+    {
+          T1 aT1;
+          T2 aT2;
+    };
+
+    template <typename T1>
+    struct MyStruct
+    {
+          T1 typeContent;
+          std::string someString;
+    };
+
+    template <typename T1>
+    struct MyStruct2
+    {
+          T1 typeContent;
+          std::string someString;
+    };
+
+    template <typename T1>
+    struct MyStruct3
+    {
+        T1 typeContent_;
+        std::string someString_;
+    public:
+        MyStruct3(T1 typeContent, const std::string& someString)
+            : typeContent_(typeContent), someString_(someString)
+        {
+        }
+
+        const T1& typeContent() const {return typeContent_;}
+        const std::string& someString() const {return someString_;}
+    };
+
+    struct book
+    {
+        std::string author;
+        std::string title;
+        double price;
+
+        friend std::ostream& operator<<(std::ostream& os, const book& b)
+        {
+            std::cout << "author: " << b.author << ", title: " << b.title << ", price: " << b.price << "\n";
+            return os;
+        }
+    };
+    struct book2
+    {
+        std::string author;
+        std::string title;
+        double price;
+        std::string isbn;
+    };
+    class book3
+    {
+        std::string author_;
+        std::string title_;
+        double price_;
+    public:
+        book3(const std::string& author,
+              const std::string& title,
+              double price)
+            : author_(author), title_(title), price_(price)
+        {
+        }
+
+        book3(const book3&) = default;
+        book3(book3&&) = default;
+        book3& operator=(const book3&) = default;
+        book3& operator=(book3&&) = default;
+
+        const std::string& author() const
+        {
+            return author_;
+        }
+
+        const std::string& title() const
+        {
+            return title_;
+        }
+
+        double price() const
+        {
+            return price_;
+        }
+    };
+
+    enum class float_format {scientific = 1,fixed = 2,hex = 4,general = fixed | scientific};
+
+    class Employee
+    {
+        std::string firstName_;
+        std::string lastName_;
+    public:
+        Employee(const std::string& firstName, const std::string& lastName)
+            : firstName_(firstName), lastName_(lastName)
+        {
+        }
+        virtual ~Employee() = default;
+
+        virtual double calculatePay() const = 0;
+
+        const std::string& firstName() const {return firstName_;}
+        const std::string& lastName() const {return lastName_;}
+    };
+
+    class HourlyEmployee : public Employee
+    {
+        double wage_;
+        unsigned hours_;
+    public:
+        HourlyEmployee(const std::string& firstName, const std::string& lastName, 
+                       double wage, unsigned hours)
+            : Employee(firstName, lastName), 
+              wage_(wage), hours_(hours)
+        {
+        }
+        HourlyEmployee(const HourlyEmployee&) = default;
+        HourlyEmployee(HourlyEmployee&&) = default;
+        HourlyEmployee& operator=(const HourlyEmployee&) = default;
+        HourlyEmployee& operator=(HourlyEmployee&&) = default;
+
+        double wage() const {return wage_;}
+
+        unsigned hours() const {return hours_;}
+
+        double calculatePay() const override
+        {
+            return wage_*hours_;
+        }
+    };
+
+    class CommissionedEmployee : public Employee
+    {
+        double baseSalary_;
+        double commission_;
+        unsigned sales_;
+    public:
+        CommissionedEmployee(const std::string& firstName, const std::string& lastName, 
+                             double baseSalary, double commission, unsigned sales)
+            : Employee(firstName, lastName), 
+              baseSalary_(baseSalary), commission_(commission), sales_(sales)
+        {
+        }
+        CommissionedEmployee(const CommissionedEmployee&) = default;
+        CommissionedEmployee(CommissionedEmployee&&) = default;
+        CommissionedEmployee& operator=(const CommissionedEmployee&) = default;
+        CommissionedEmployee& operator=(CommissionedEmployee&&) = default;
+
+        double baseSalary() const
+        {
+            return baseSalary_;
+        }
+
+        double commission() const
+        {
+            return commission_;
+        }
+
+        unsigned sales() const
+        {
+            return sales_;
+        }
+
+        double calculatePay() const override
+        {
+            return baseSalary_ + commission_*sales_;
+        }
+    };
+} // namespace json_type_traits_macro_tests
+
+namespace ns = json_type_traits_macro_tests;
+
+JSONCONS_ENUM_TRAITS_DECL(ns::float_format, scientific, fixed, hex, general)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::book3, author, title, price)
+JSONCONS_MEMBER_TRAITS_DECL(ns::book,author,title,price)
+JSONCONS_MEMBER_TRAITS_DECL(ns::book2,author,title,price,isbn)
+JSONCONS_TPL_MEMBER_TRAITS_DECL(1,ns::MyStruct,typeContent,someString)
+JSONCONS_STRICT_TPL_MEMBER_TRAITS_DECL(1,ns::MyStruct2,typeContent,someString)
+JSONCONS_TPL_GETTER_CTOR_TRAITS_DECL(1,ns::MyStruct3,typeContent,someString)
+JSONCONS_TPL_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
+
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, hours)
+JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
+JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
 
 TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
 {
@@ -217,3 +407,55 @@ TEST_CASE("JSONCONS_ENUM_TRAITS_DECL tests")
     }
 }
 
+TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS_DECL tests")
+{
+    std::string input = R"(
+[
+    {
+        "firstName": "John",
+        "hours": 1000,
+        "lastName": "Smith",
+        "wage": 40.0
+    },
+    {
+        "baseSalary": 30000.0,
+        "commission": 0.25,
+        "firstName": "Jane",
+        "lastName": "Doe",
+        "sales": 1000
+    }
+]
+    )"; 
+
+    const std::string firstName0 = "John";
+    const std::string lastName0 = "Smith";
+    const double pay0 = 40000;
+    const std::string firstName1 = "Jane";
+    const std::string lastName1 = "Doe";
+    const double pay1 = 30250;
+
+    SECTION("decode test")
+    {
+
+        auto v = jsoncons::decode_json<std::vector<std::shared_ptr<ns::Employee>>>(input);
+        REQUIRE(v.size() == 2);
+        CHECK(v[0]->firstName() == firstName0);
+        CHECK(v[0]->lastName() == lastName0);
+        CHECK(v[0]->calculatePay() == pay0);
+        CHECK(v[1]->firstName() == firstName1);
+        CHECK(v[1]->lastName() == lastName1);
+        CHECK(v[1]->calculatePay() == pay1);
+    }
+    SECTION("encode test")
+    {
+        std::vector<std::shared_ptr<ns::Employee>> v;
+
+        v.push_back(std::make_shared<ns::HourlyEmployee>("John", "Smith", 40.0, 1000));
+        v.push_back(std::make_shared<ns::CommissionedEmployee>("Jane", "Doe", 30000, 0.25, 1000));
+
+        jsoncons::json j(v);
+
+        json expected = json::parse(input);
+        CHECK(j == expected);
+    }
+}

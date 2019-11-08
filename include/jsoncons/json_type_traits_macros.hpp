@@ -649,6 +649,12 @@ JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL_BASE(JSONCONS_STRICT_GETTER_SETTER_NAME
 #define JSONCONS_POLYMORPHIC_AS(BaseType, SubType) if (ajson.is<SubType>()) return std::make_shared<SubType>(ajson.as<SubType>());
 #define JSONCONS_POLYMORPHIC_AS_LAST(BaseType, SubType)  if (ajson.is<SubType>()) return std::make_shared<SubType>(ajson.as<SubType>());
 
+#define JSONCONS_POLYMORPHIC_AS_SHARED_PTR(BaseType, SubType) if (ajson.is<SubType>()) return std::make_shared<SubType>(ajson.as<SubType>());
+#define JSONCONS_POLYMORPHIC_AS_SHARED_PTR_LAST(BaseType, SubType)  if (ajson.is<SubType>()) return std::make_shared<SubType>(ajson.as<SubType>());
+
+#define JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR(BaseType, SubType) if (ajson.is<SubType>()) return std::unique_ptr<SubType>(new SubType(ajson.as<SubType>()));
+#define JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR_LAST(BaseType, SubType)  if (ajson.is<SubType>()) return std::unique_ptr<SubType>(new SubType(ajson.as<SubType>()));
+
 #define JSONCONS_POLYMORPHIC_TO_JSON(BaseType, SubType) if (SubType* p = dynamic_cast<SubType*>(ptr.get())) {return Json(*p);}
 #define JSONCONS_POLYMORPHIC_TO_JSON_LAST(BaseType, SubType) if (SubType* p = dynamic_cast<SubType*>(ptr.get())) {return Json(*p);}
 
@@ -663,7 +669,7 @@ namespace jsoncons { \
         } \
 \
         static std::shared_ptr<BaseType> as(const Json& ajson) { \
-            JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_AS, BaseType, __VA_ARGS__)\
+            JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_AS_SHARED_PTR, BaseType, __VA_ARGS__)\
             return std::shared_ptr<BaseType>(); \
         } \
 \
