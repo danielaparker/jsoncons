@@ -420,7 +420,7 @@ public:
           precision_(other.precision_),
           indent_size_(other.indent_size_),
           line_length_limit_(other.line_length_limit_),
-          new_line_chars_(std::move(other.new_line_chars))
+          new_line_chars_(std::move(other.new_line_chars_))
     {
     }
 
