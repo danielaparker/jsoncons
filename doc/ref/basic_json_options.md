@@ -69,6 +69,12 @@ Member type                         |Definition
     basic_json_options()
 Constructs a `basic_json_options` with default values. 
 
+    basic_json_options(const basic_json_options& other)
+Copy constructor. 
+
+    basic_json_options(basic_json_options&& other)
+Move constructor. 
+
 #### Modifiers
 
     void max_nesting_depth(int depth)

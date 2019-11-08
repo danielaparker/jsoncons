@@ -59,6 +59,12 @@ Member type                         |Definition
     basic_csv_options()
 Constructs a `basic_csv_options` with default values. 
 
+    basic_csv_options(const basic_csv_options& other)
+Copy constructor. 
+
+    basic_csv_options(basic_csv_options&& other)
+Move constructor. 
+
 #### Modifiers
 
     basic_csv_options& float_format(float_chars_format value);
