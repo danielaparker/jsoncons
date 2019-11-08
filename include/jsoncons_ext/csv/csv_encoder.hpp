@@ -27,6 +27,17 @@ namespace jsoncons { namespace csv {
 template<class CharT,class Result=jsoncons::stream_result<CharT>,class Allocator=std::allocator<CharT>>
 class basic_csv_encoder final : public basic_json_content_handler<CharT>
 {
+public:
+    typedef CharT char_type;
+    using typename basic_json_content_handler<CharT>::string_view_type;
+    typedef Result result_type;
+
+    typedef Allocator allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+    typedef std::basic_string<CharT, std::char_traits<CharT>, char_allocator_type> string_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
+
+private:
     static const std::array<CharT, 4>& null_k()
     {
         static constexpr std::array<CharT,4> k{'n','u','l','l'};
@@ -43,31 +54,52 @@ class basic_csv_encoder final : public basic_json_content_handler<CharT>
         return k;
     }
 
-public:
-    typedef CharT char_type;
-    using typename basic_json_content_handler<CharT>::string_view_type;
-    typedef Result result_type;
+    enum class encode_state
+    {
+        initial,
+        expect_m_columns,
+        expect_n_rows_or_n_objects,
+        expect_n_rows,
+        expect_n_objects
+    };
 
-    typedef Allocator allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
-    typedef std::basic_string<CharT, std::char_traits<CharT>, char_allocator_type> string_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
+    enum class stack_item_kind
+    {
+        n_rows,
+        n_objects,
+        m_columns,
+        object,
+        row,
+        column,
+        multi_valued_field
+    };
 
-private:
     struct stack_item
     {
-        stack_item(bool is_object)
-           : is_object_(is_object), count_(0)
+        stack_item_kind item_kind_;
+        size_t count_;
+
+        stack_item(stack_item_kind item_kind)
+           : item_kind_(item_kind), count_(0)
         {
-        }
-        bool is_object() const
-        {
-            return is_object_;
         }
 
-        bool is_object_;
-        size_t count_;
+        size_t count() const
+        {
+            return count_;
+        }
+
+        bool is_object() const
+        {
+            return item_kind_ == stack_item_kind::object;
+        }
+
+        stack_item_kind item_kind() const
+        {
+            return item_kind_;
+        }
     };
+
     Result result_;
     const basic_csv_encode_options<CharT> options_;
     std::vector<stack_item> stack_;
@@ -77,6 +109,8 @@ private:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,string_type>> string_string_allocator_type;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> buffered_line_;
     string_type name_;
+    encode_state state_;
+    size_t index_;
 
     // Noncopyable and nonmoveable
     basic_csv_encoder(const basic_csv_encoder&) = delete;
@@ -94,7 +128,9 @@ public:
        options_(options),
        stack_(),
        fp_(options.float_format(), options.precision()),
-       column_names_(options_.column_names())
+       column_names_(options_.column_names()),
+       state_(encode_state()),
+       index_(0)
     {
     }
 
@@ -141,7 +177,15 @@ private:
 
     bool do_begin_object(semantic_tag, const ser_context&, std::error_code&) override
     {
-        stack_.push_back(stack_item(true));
+        if (stack_.empty())
+        {
+            state_ = encode_state::expect_m_columns;
+        }
+        else if (state_ == encode_state::expect_n_rows_or_n_objects)
+        {
+            state_ = encode_state::expect_n_objects;
+        }
+        stack_.emplace_back(stack_item_kind::object);
         return true;
     }
 
@@ -186,7 +230,15 @@ private:
 
     bool do_begin_array(semantic_tag, const ser_context&, std::error_code&) override
     {
-        stack_.push_back(stack_item(false));
+        if (stack_.empty())
+        {
+            state_ = encode_state::expect_n_rows_or_n_objects;
+        }
+        else if (state_ == encode_state::expect_n_rows_or_n_objects)
+        {
+            state_ = encode_state::expect_n_rows;
+        }
+        stack_.emplace_back(stack_item_kind::row);
         if (stack_.size() == 2)
         {
             if (stack_[0].count_ == 0)
@@ -551,7 +603,7 @@ private:
     {
         if (!stack_.empty())
         {
-            if (!stack_.back().is_object_ && stack_.back().count_ > 0)
+            if (!stack_.back().is_object() && stack_.back().count() > 0)
             {
                 result.push_back(options_.field_delimiter());
             }
