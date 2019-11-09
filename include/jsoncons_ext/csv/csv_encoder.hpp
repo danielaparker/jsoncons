@@ -54,20 +54,10 @@ private:
         return k;
     }
 
-    enum class encode_state
-    {
-        initial,
-        expect_m_columns,
-        expect_n_rows_or_n_objects,
-        expect_n_rows,
-        expect_n_objects
-    };
-
     enum class stack_item_kind
     {
-        n_rows,
-        n_objects,
-        m_columns,
+        row_mapping,
+        column_mapping,
         object,
         row,
         column,
@@ -104,8 +94,7 @@ private:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,string_type>> string_string_allocator_type;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> buffered_line_;
     string_type name_;
-    encode_state state_;
-    size_t index_;
+    size_t column_index_;
 
     // Noncopyable and nonmoveable
     basic_csv_encoder(const basic_csv_encoder&) = delete;
@@ -124,8 +113,7 @@ public:
        stack_(),
        fp_(options.float_format(), options.precision()),
        column_names_(options_.column_names()),
-       state_(encode_state()),
-       index_(0)
+       column_index_(0)
     {
     }
 
@@ -170,18 +158,23 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+    bool do_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
     {
         if (stack_.empty())
         {
-            state_ = encode_state::expect_m_columns;
+            stack_.emplace_back(stack_item_kind::column_mapping);
+            column_index_ = 0;
+            return true;
         }
-        else if (state_ == encode_state::expect_n_rows_or_n_objects)
+        switch (stack_.back().item_kind_)
         {
-            state_ = encode_state::expect_n_objects;
+            case stack_item_kind::row_mapping:
+                stack_.emplace_back(stack_item_kind::object);
+                return true;
+            default: // error
+                ec = csv_errc::source_error;
+                return false;
         }
-        stack_.emplace_back(stack_item_kind::object);
-        return true;
     }
 
     bool do_end_object(const ser_context&, std::error_code&) override
@@ -223,37 +216,42 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+    bool do_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
     {
         if (stack_.empty())
         {
-            state_ = encode_state::expect_n_rows_or_n_objects;
+            stack_.emplace_back(stack_item_kind::row_mapping);
+            return true;
         }
-        else if (state_ == encode_state::expect_n_rows_or_n_objects)
+        switch (stack_.back().item_kind_)
         {
-            state_ = encode_state::expect_n_rows;
-        }
-        stack_.emplace_back(stack_item_kind::row);
-        if (stack_.size() == 2)
-        {
-            if (stack_[0].count_ == 0)
-            {
-                for (size_t i = 0; i < column_names_.size(); ++i)
+            case stack_item_kind::row_mapping:
+                stack_.emplace_back(stack_item_kind::row);
+                if (stack_[0].count_ == 0)
                 {
-                    if (i > 0)
+                    for (size_t i = 0; i < column_names_.size(); ++i)
                     {
-                        result_.push_back(options_.field_delimiter());
+                        if (i > 0)
+                        {
+                            result_.push_back(options_.field_delimiter());
+                        }
+                        result_.append(column_names_[i].data(),column_names_[i].length());
                     }
-                    result_.append(column_names_[i].data(),column_names_[i].length());
+                    if (column_names_.size() > 0)
+                    {
+                        result_.append(options_.line_delimiter().data(),
+                                      options_.line_delimiter().length());
+                    }
                 }
-                if (column_names_.size() > 0)
-                {
-                    result_.append(options_.line_delimiter().data(),
-                                  options_.line_delimiter().length());
-                }
-            }
+                return true;
+            case stack_item_kind::column_mapping:
+            case stack_item_kind::row:
+                stack_.emplace_back(stack_item_kind::multi_valued_field);
+                return true;
+            default: // error
+                ec = csv_errc::source_error;
+                return false;
         }
-        return true;
     }
 
     bool do_end_array(const ser_context&, std::error_code&) override
