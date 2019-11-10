@@ -680,7 +680,7 @@ public:
 
         data_t data_;
     public:
-		variant(semantic_tag tag) : data_{}
+        variant(semantic_tag tag) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))empty_object_box(tag);
         }
@@ -690,15 +690,15 @@ public:
             new(reinterpret_cast<void*>(&data_))null_box(tag);
         }
 
-		explicit variant(bool val, semantic_tag tag) : data_{}
+        explicit variant(bool val, semantic_tag tag) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))bool_box(val,tag);
         }
-		explicit variant(int64_t val, semantic_tag tag) : data_{}
+        explicit variant(int64_t val, semantic_tag tag) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))int64_box(val, tag);
         }
-		explicit variant(uint64_t val, semantic_tag tag) : data_{}
+        explicit variant(uint64_t val, semantic_tag tag) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))uint64_box(val, tag);
         }
@@ -708,7 +708,7 @@ public:
             new(reinterpret_cast<void*>(&data_))half_box(val, tag);
         }
 
-		variant(double val, semantic_tag tag) : data_{}
+        variant(double val, semantic_tag tag) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))double_box(val, tag);
         }
@@ -725,7 +725,7 @@ public:
             }
         }
 
-		variant(const char_type* s, size_t length, semantic_tag tag, const Allocator& alloc) : data_{}
+        variant(const char_type* s, size_t length, semantic_tag tag, const Allocator& alloc) : data_{}
         {
             if (length <= short_string_box::max_length)
             {
@@ -776,7 +776,7 @@ public:
                 new(reinterpret_cast<void*>(&data_))long_string_box(semantic_tag::bigint, s.data(), s.length(), char_allocator_type(allocator));
             }
         }
-		variant(const object& val, semantic_tag tag) : data_{}
+        variant(const object& val, semantic_tag tag) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))object_box(val, tag);
         }
@@ -3506,7 +3506,7 @@ public:
     template<class U=Allocator>
     void create_object_implicitly()
     {
-        create_object_implicitly(std::integral_constant<bool, is_stateless<U>::value>());
+        create_object_implicitly(is_stateless<U>());
     }
 
     void create_object_implicitly(std::false_type)

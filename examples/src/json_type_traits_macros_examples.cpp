@@ -17,12 +17,12 @@ struct Foo
 
 struct Bar : public Foo
 {
-    std::string bar;
+    static const int bar = 1;
 };
 
-struct Baz : public Foo
+struct Baz : public Foo 
 {
-    std::string baz;
+    static const int baz = 1;
 };
 
 enum class BookCategory {fiction,biography};
@@ -191,8 +191,8 @@ JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, 
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
 JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
 
-JSONCONS_STRICT_MEMBER_TRAITS_DECL(ns::Bar,bar)
-JSONCONS_STRICT_MEMBER_TRAITS_DECL(ns::Baz,baz)
+JSONCONS_MEMBER_TRAITS_DECL(ns::Bar,bar)
+JSONCONS_MEMBER_TRAITS_DECL(ns::Baz,baz)
 JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Foo, ns::Bar, ns::Baz)
 
 using namespace jsoncons;

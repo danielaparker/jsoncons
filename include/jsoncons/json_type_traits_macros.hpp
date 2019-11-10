@@ -91,27 +91,6 @@
 #define JSONCONS_VARIADIC_REP_OF_2(Call, Prefix, P2, ...)     JSONCONS_EXPAND_CALL4(Call, Prefix, P2) JSONCONS_EXPAND(JSONCONS_VARIADIC_REP_OF_1(Call, Prefix, __VA_ARGS__)) 
 #define JSONCONS_VARIADIC_REP_OF_1(Call, Prefix, P2)          JSONCONS_EXPAND(Call ## _LAST(Prefix, P2))
 
-#define JSONCONS_IS(Prefix, Member) if (!ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
-#define JSONCONS_IS_LAST(Prefix, Member) if (!ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
-
-#define JSONCONS_TO_JSON(Prefix, Member) ajson.try_emplace(JSONCONS_QUOTE(Prefix, Member), aval.Member);
-#define JSONCONS_TO_JSON_LAST(Prefix, Member) ajson.try_emplace(JSONCONS_QUOTE(Prefix, Member), aval.Member);
-
-#define JSONCONS_AS(Prefix, Member) if (ajson.contains(JSONCONS_QUOTE(Prefix, Member))) {aval.Member = ajson.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(aval.Member)>();}
-#define JSONCONS_AS_LAST(Prefix, Member) if (ajson.contains(JSONCONS_QUOTE(Prefix, Member))) {aval.Member = ajson.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(aval.Member)>();}
-
-#define JSONCONS_STRICT_AS(Prefix, Member) {aval.Member = ajson.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(aval.Member)>();}
-#define JSONCONS_STRICT_AS_LAST(Prefix, Member) {aval.Member = ajson.at(JSONCONS_QUOTE(Prefix, Member)).template as<decltype(aval.Member)>();}
- 
-#define JSONCONS_GETTER_CTOR_IS(Prefix, Member) if (!ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
-#define JSONCONS_GETTER_CTOR_IS_LAST(Prefix, Member) if (!ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
-
-#define JSONCONS_GETTER_CTOR_TO_JSON(Prefix, Member) ajson.try_emplace(JSONCONS_QUOTE(Prefix, Member), aval.Member() );
-#define JSONCONS_GETTER_CTOR_TO_JSON_LAST(Prefix, Member) ajson.try_emplace(JSONCONS_QUOTE(Prefix, Member), aval.Member() );
-
-#define JSONCONS_GETTER_CTOR_AS(Prefix, Member) (ajson.at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>(),
-#define JSONCONS_GETTER_CTOR_AS_LAST(Prefix, Member) (ajson.at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()
-
 #define JSONCONS_TYPE_TRAITS_FRIEND \
     template <class JSON,class T,class Enable> \
     friend struct jsoncons::json_type_traits
@@ -179,6 +158,27 @@
 #define JSONCONS_GENERATE_TPL_ARG(Expr, Id) T ## Id,
 #define JSONCONS_GENERATE_TPL_ARG_LAST(Ex, Id) T ## Id 
 
+#define JSONCONS_IS(Prefix, Member) if (!ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+#define JSONCONS_IS_LAST(Prefix, Member) if (!ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+
+#define JSONCONS_TO_JSON(Prefix, Member) ajson.try_emplace(JSONCONS_QUOTE(Prefix, Member), aval.Member);
+#define JSONCONS_TO_JSON_LAST(Prefix, Member) ajson.try_emplace(JSONCONS_QUOTE(Prefix, Member), aval.Member);
+
+#define JSONCONS_AS(Prefix, Member) if (ajson.contains(JSONCONS_QUOTE(Prefix, Member))) {set_member(std::is_const<decltype(aval.Member)>(),ajson,JSONCONS_QUOTE(Prefix, Member),aval.Member);}
+#define JSONCONS_AS_LAST(Prefix, Member) if (ajson.contains(JSONCONS_QUOTE(Prefix, Member))) {set_member(std::is_const<decltype(aval.Member)>(),ajson,JSONCONS_QUOTE(Prefix, Member),aval.Member);}
+
+#define JSONCONS_STRICT_AS(Prefix, Member) set_member(std::is_const<decltype(aval.Member)>(),ajson,JSONCONS_QUOTE(Prefix, Member),aval.Member);
+#define JSONCONS_STRICT_AS_LAST(Prefix, Member) set_member(std::is_const<decltype(aval.Member)>(),ajson,JSONCONS_QUOTE(Prefix, Member),aval.Member);
+ 
+#define JSONCONS_GETTER_CTOR_IS(Prefix, Member) if (!ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+#define JSONCONS_GETTER_CTOR_IS_LAST(Prefix, Member) if (!ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+
+#define JSONCONS_GETTER_CTOR_TO_JSON(Prefix, Member) ajson.try_emplace(JSONCONS_QUOTE(Prefix, Member), aval.Member() );
+#define JSONCONS_GETTER_CTOR_TO_JSON_LAST(Prefix, Member) ajson.try_emplace(JSONCONS_QUOTE(Prefix, Member), aval.Member() );
+
+#define JSONCONS_GETTER_CTOR_AS(Prefix, Member) (ajson.at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>(),
+#define JSONCONS_GETTER_CTOR_AS_LAST(Prefix, Member) (ajson.at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()
+
 #define JSONCONS_MEMBER_TRAITS_DECL_BASE(As,CharT,Prefix,NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
 { \
@@ -187,6 +187,7 @@ namespace jsoncons \
     { \
         typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
         typedef typename Json::allocator_type allocator_type; \
+        typedef typename Json::string_view_type string_view_type; \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
@@ -204,6 +205,16 @@ namespace jsoncons \
             Json ajson(allocator); \
             JSONCONS_VARIADIC_REP_N(JSONCONS_TO_JSON, Prefix, __VA_ARGS__) \
             return ajson; \
+        } \
+    private: \
+        template <class U> \
+        static void set_member(std::true_type, const Json&, const string_view_type&, U&) \
+        { \
+        } \
+        template <class U> \
+        static void set_member(std::false_type, const Json& j, const string_view_type& name, U& val) \
+        { \
+            val = j.at(name).template as<U>(); \
         } \
     }; \
 } \
