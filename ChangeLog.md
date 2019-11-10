@@ -8,10 +8,10 @@ Changes:
 Enhancements:
 
 - New convenience macro to master for generating `json_type_traits` for polymorphic types,
+based on the presence of properties,
 ```c++
 JSONCONS_POLYMORPHIC_TRAITS_DECL(base_class_name,derived_class_name0,derived_class_name1,...) 
 ```
-based on the presence of properties.
 
 v0.137.0
 --------
