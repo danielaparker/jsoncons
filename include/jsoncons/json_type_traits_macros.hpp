@@ -391,11 +391,11 @@ namespace jsoncons \
 
 #define JSONCONS_NAMED_AS(Prefix, Seq) JSONCONS_EXPAND(JSONCONS_NAMED_AS_ Seq)
 #define JSONCONS_NAMED_AS_LAST(Prefix, Seq) JSONCONS_EXPAND(JSONCONS_NAMED_AS_ Seq)
-#define JSONCONS_NAMED_AS_(Member, Name) if (ajson.contains(Name)) {aval.Member = ajson.at(Name).template as<decltype(aval.Member)>();}
+#define JSONCONS_NAMED_AS_(Member, Name) if (ajson.contains(Name)) {set_member(std::is_const<decltype(aval.Member)>(),ajson,Name,aval.Member);}
 
 #define JSONCONS_STRICT_NAMED_AS(Prefix, Seq) JSONCONS_EXPAND(JSONCONS_STRICT_NAMED_AS_ Seq)
 #define JSONCONS_STRICT_NAMED_AS_LAST(Prefix, Seq) JSONCONS_EXPAND(JSONCONS_STRICT_NAMED_AS_ Seq)
-#define JSONCONS_STRICT_NAMED_AS_(Member, Name) {aval.Member = ajson.at(Name).template as<decltype(aval.Member)>();}
+#define JSONCONS_STRICT_NAMED_AS_(Member, Name) set_member(std::is_const<decltype(aval.Member)>(),ajson,Name,aval.Member);
 
 #define JSONCONS_MEMBER_NAMED_TRAITS_DECL_BASE(As, NumTemplateParams, ValueType, ...)  \
 namespace jsoncons \
@@ -405,6 +405,7 @@ namespace jsoncons \
     { \
         typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
         typedef typename Json::allocator_type allocator_type; \
+        typedef typename Json::string_view_type string_view_type; \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
@@ -422,6 +423,16 @@ namespace jsoncons \
             Json ajson(allocator); \
             JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_TO_JSON,, __VA_ARGS__) \
             return ajson; \
+        } \
+    private: \
+        template <class U> \
+        static void set_member(std::true_type, const Json&, const string_view_type&, U&) \
+        { \
+        } \
+        template <class U> \
+        static void set_member(std::false_type, const Json& j, const string_view_type& name, U& val) \
+        { \
+            val = j.at(name).template as<U>(); \
         } \
     }; \
 } \
