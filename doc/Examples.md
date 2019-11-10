@@ -27,8 +27,9 @@
 [Specialize json_type_traits explicitly](#G4)  
 [Mapping to C++ data structures with and without defaults allowed](#G5)  
 [An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL](#G6)  
-[Decode and encode of a polymorphic type based on the presence of properties](#G7)  
-[Convert JSON numbers to/from boost multiprecision numbers](#G8)
+[Serialize a polymorphic type based on the presence of properties](#G7)  
+[Ensuring type selection is possible from derived to base type](#G8)
+[Convert JSON numbers to/from boost multiprecision numbers](#G9)
 
 ### Construct
 
@@ -531,7 +532,7 @@ class Book2
     double price;
     Book2() = default;
 
-    JSONCONS_TYPE_TRAITS_FRIEND;
+    JSONCONS_TYPE_TRAITS_FRIEND
 public:
     BookCategory get_category() const {return category;}
 
@@ -706,7 +707,7 @@ class Book2
     double price_;
     Book2() = default;
 
-    JSONCONS_TYPE_TRAITS_FRIEND;
+    JSONCONS_TYPE_TRAITS_FRIEND
 public:
     BookCategory category() const {return category_;}
 
@@ -1087,7 +1088,7 @@ namespace ns {
 
     private:
         // Make json_type_traits specializations friends to give accesses to private members
-        JSONCONS_TYPE_TRAITS_FRIEND;
+        JSONCONS_TYPE_TRAITS_FRIEND
 
         Person() : age(0) {}
 
@@ -1257,7 +1258,7 @@ Output:
 
 <div id="G7"/>
 
-#### Decode and encode of a polymorphic type based on the presence of properties
+#### Serialize a polymorphic type based on the presence of properties
 
 This example uses the convenience macro `JSONCONS_GETTER_CTOR_TRAITS_DECL`
 to generate the `json_type_traits` boilerplate for the `HourlyEmployee` and `CommissionedEmployee` 
@@ -1443,6 +1444,74 @@ Jane Doe, 30250
 ```
 
 <div id="G8"/>
+
+#### Ensuring type selection is possible from derived to base type
+
+```c++
+namespace ns {
+
+class Foo
+{
+public:
+    virtual ~Foo() = default;
+};
+
+class Bar : public Foo
+{
+    static const bool bar = true;
+    JSONCONS_TYPE_TRAITS_FRIEND
+};
+
+class Baz : public Foo 
+{
+    static const bool baz = true;
+    JSONCONS_TYPE_TRAITS_FRIEND
+};
+
+} // ns
+
+JSONCONS_MEMBER_TRAITS_DECL(ns::Bar,bar)
+JSONCONS_MEMBER_TRAITS_DECL(ns::Baz,baz)
+JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Foo, ns::Bar, ns::Baz)
+
+int main()
+{
+    std::vector<std::shared_ptr<ns::Foo>> u;
+    u.push_back(std::make_shared<ns::Bar>());
+    u.push_back(std::make_shared<ns::Baz>());
+
+    std::string buffer;
+    encode_json(u, buffer);
+    std::cout << "(1)\n" << buffer << "\n\n";
+
+    auto v = decode_json<std::vector<std::shared_ptr<ns::Foo>>>(buffer);
+
+    std::cout << "(2)\n";
+    for (auto ptr : v)
+    {
+        if (dynamic_cast<ns::Bar*>(ptr.get()))
+        {
+            std::cout << "A bar\n";
+        }
+        else if (dynamic_cast<ns::Baz*>(ptr.get()))
+        {
+            std::cout << "A baz\n";
+        } 
+    }
+}
+```
+
+Output:
+```
+(1)
+[{"bar":true},{"baz":true}]
+
+(2)
+A bar
+A baz
+```
+
+<div id="G9"/>
 
 #### Convert JSON numbers to/from boost multiprecision numbers
 

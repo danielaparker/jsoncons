@@ -40,7 +40,7 @@ class Book2
     double price_;
     Book2() = default;
 
-    JSONCONS_TYPE_TRAITS_FRIEND;
+    JSONCONS_TYPE_TRAITS_FRIEND
 public:
     BookCategory category() const {return category_;}
 

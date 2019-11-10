@@ -93,7 +93,7 @@
 
 #define JSONCONS_TYPE_TRAITS_FRIEND \
     template <class JSON,class T,class Enable> \
-    friend struct jsoncons::json_type_traits
+    friend struct jsoncons::json_type_traits;
 
 #define JSONCONS_EXPAND_CALL2(Call, Expr, Id) JSONCONS_EXPAND(Call(Expr, Id))
 

@@ -160,7 +160,7 @@ will make them accessible to `json_type_traits`, used so
 ```c++
 class MyClass
 {
-    JSONCONS_TYPE_TRAITS_FRIEND;
+    JSONCONS_TYPE_TRAITS_FRIEND
 ...
 };
 ```
@@ -234,9 +234,10 @@ These macro declarations must be placed at global scope, outside any namespace b
 [Extend json_type_traits to support `boost::gregorian` dates.](#A4)  
 [Specialize json_type_traits to support a book class.](#A5)  
 [Using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits](#A6)  
-[Decode and encode of a polymorphic type based on the presence of properties](#A7)  
-[Specialize json_type_traits for a container type that the jsoncons library also supports](#A8)  
-[Convert JSON to/from boost matrix](#A9)
+[Serialize a polymorphic type based on the presence of properties](#A7)  
+[Ensuring type selection is possible from derived to base type](#A8)
+[Specialize json_type_traits for a container type that the jsoncons library also supports](#A9)  
+[Convert JSON to/from boost matrix](#A10)
 
 <div id="A1"/> 
 
@@ -595,7 +596,7 @@ Output:
 
 <div id="A7"/> 
 
-#### Decode and encode of a polymorphic type based on the presence of properties
+#### Serialize a polymorphic type based on the presence of properties
 
 This example uses the convenience macro `JSONCONS_GETTER_CTOR_TRAITS_DECL`
 to generate the `json_type_traits` boilerplate for the `HourlyEmployee` and `CommissionedEmployee` 
@@ -780,7 +781,75 @@ Jane Doe, 30250
 ]
 ```
 
-<div id="A8"/> 
+<div id="A8"/>
+
+#### Ensuring type selection is possible from derived to base type
+
+```c++
+namespace ns {
+
+class Foo
+{
+public:
+    virtual ~Foo() = default;
+};
+
+class Bar : public Foo
+{
+    static const bool bar = true;
+    JSONCONS_TYPE_TRAITS_FRIEND
+};
+
+class Baz : public Foo 
+{
+    static const bool baz = true;
+    JSONCONS_TYPE_TRAITS_FRIEND
+};
+
+} // ns
+
+JSONCONS_MEMBER_TRAITS_DECL(ns::Bar,bar)
+JSONCONS_MEMBER_TRAITS_DECL(ns::Baz,baz)
+JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Foo, ns::Bar, ns::Baz)
+
+int main()
+{
+    std::vector<std::shared_ptr<ns::Foo>> u;
+    u.push_back(std::make_shared<ns::Bar>());
+    u.push_back(std::make_shared<ns::Baz>());
+
+    std::string buffer;
+    encode_json(u, buffer);
+    std::cout << "(1)\n" << buffer << "\n\n";
+
+    auto v = decode_json<std::vector<std::shared_ptr<ns::Foo>>>(buffer);
+
+    std::cout << "(2)\n";
+    for (auto ptr : v)
+    {
+        if (dynamic_cast<ns::Bar*>(ptr.get()))
+        {
+            std::cout << "A bar\n";
+        }
+        else if (dynamic_cast<ns::Baz*>(ptr.get()))
+        {
+            std::cout << "A baz\n";
+        } 
+    }
+}
+```
+
+Output:
+```
+(1)
+[{"bar":true},{"baz":true}]
+
+(2)
+A bar
+A baz
+```
+
+<div id="A9"/> 
 
 #### Specialize json_type_traits for a container type that the jsoncons library also supports
 
@@ -844,7 +913,7 @@ Output:
 {"1":2,"3":4}
 ```
 
-<div id="A9"/>
+<div id="A10"/>
 
 #### Convert JSON to/from boost matrix
 

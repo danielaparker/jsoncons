@@ -10,19 +10,22 @@
 
 namespace json_type_traits_macros_examples_ns {
 
-struct Foo
+class Foo
 {
+public:
     virtual ~Foo() = default;
 };
 
-struct Bar : public Foo
+class Bar : public Foo
 {
-    static const int bar = 1;
+    static const bool bar = true;
+    JSONCONS_TYPE_TRAITS_FRIEND
 };
 
-struct Baz : public Foo 
+class Baz : public Foo 
 {
-    static const int baz = 1;
+    static const bool baz = true;
+    JSONCONS_TYPE_TRAITS_FRIEND
 };
 
 enum class BookCategory {fiction,biography};
@@ -55,7 +58,7 @@ class Book2
     double price;
     Book2() = default;
 
-    JSONCONS_TYPE_TRAITS_FRIEND;
+    JSONCONS_TYPE_TRAITS_FRIEND
 public:
     BookCategory get_category() const {return category;}
 
@@ -296,20 +299,17 @@ void employee_polymorphic_example()
 
 void foo_bar_baz_example()
 {
-    std::string input = R"(
-[
-    {
-        "bar": ""
-    },
-    {
-        "baz": ""
-    }
-]
-    )"; 
+    std::vector<std::shared_ptr<ns::Foo>> u;
+    u.push_back(std::make_shared<ns::Bar>());
+    u.push_back(std::make_shared<ns::Baz>());
 
-    auto v = decode_json<std::vector<std::shared_ptr<ns::Foo>>>(input);
+    std::string buffer;
+    encode_json(u, buffer);
+    std::cout << "(1)\n" << buffer << "\n\n";
 
-    std::cout << "(1)\n";
+    auto v = decode_json<std::vector<std::shared_ptr<ns::Foo>>>(buffer);
+
+    std::cout << "(2)\n";
     for (auto ptr : v)
     {
         if (dynamic_cast<ns::Bar*>(ptr.get()))
@@ -321,9 +321,6 @@ void foo_bar_baz_example()
             std::cout << "A baz\n";
         } 
     }
-
-    std::cout << "\n(2)\n";
-    encode_json(v, std::cout);
 }
 
 void json_type_traits_macros_examples()

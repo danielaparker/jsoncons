@@ -65,7 +65,7 @@ namespace ns {
 
     private:
         // Make json_type_traits specializations friends to give accesses to private members
-        JSONCONS_TYPE_TRAITS_FRIEND;
+        JSONCONS_TYPE_TRAITS_FRIEND
 
         Person() : age(0) {}
 

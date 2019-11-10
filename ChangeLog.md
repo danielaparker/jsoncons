@@ -1,15 +1,17 @@
 master
 -----
 
+Changes:
+
+- It is no longer neccessay to place a semicolon after `JSONCONS_TYPE_TRAITS_FRIEND` 
+
 Enhancements:
 
-- New convenience macro `JSONCONS_POLYMORPHIC_TRAITS_DECL`
-for generating `json_type_traits` for polymorphic types.
-
-New convenience macro to master for generating `json_type_traits` for polymorphic types,
+- New convenience macro to master for generating `json_type_traits` for polymorphic types,
 ```c++
 JSONCONS_POLYMORPHIC_TRAITS_DECL(base_class_name,derived_class_name0,derived_class_name1,...) 
 ```
+based on the presence of properties.
 
 v0.137.0
 --------
