@@ -254,7 +254,7 @@ private:
                 stack_.emplace_back(stack_item_kind::object_multi_valued_field);
                 return true;
             case stack_item_kind::column_mapping:
-                return true;;
+                return true;
             case stack_item_kind::row:
                 begin_value(result_);
                 stack_.emplace_back(stack_item_kind::array_multi_valued_field);
