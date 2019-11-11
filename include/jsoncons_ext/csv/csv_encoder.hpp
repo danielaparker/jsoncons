@@ -179,36 +179,41 @@ private:
 
     bool do_end_object(const ser_context&, std::error_code&) override
     {
-        if (stack_.size() == 2)
+        JSONCONS_ASSERT(!stack_.empty());
+        switch (stack_.back().item_kind_)
         {
-            if (stack_[0].count_ == 0)
-            {
+            case stack_item_kind::object:
+                if (stack_[0].count_ == 0)
+                {
+                    for (size_t i = 0; i < column_names_.size(); ++i)
+                    {
+                        if (i > 0)
+                        {
+                            result_.push_back(options_.field_delimiter());
+                        }
+                        result_.append(column_names_[i].data(),
+                                      column_names_[i].length());
+                    }
+                    result_.append(options_.line_delimiter().data(),
+                                  options_.line_delimiter().length());
+                }
                 for (size_t i = 0; i < column_names_.size(); ++i)
                 {
                     if (i > 0)
                     {
                         result_.push_back(options_.field_delimiter());
                     }
-                    result_.append(column_names_[i].data(),
-                                  column_names_[i].length());
+                    auto it = buffered_line_.find(column_names_[i]);
+                    if (it != buffered_line_.end())
+                    {
+                        result_.append(it->second.data(),it->second.length());
+                        it->second.clear();
+                    }
                 }
-                result_.append(options_.line_delimiter().data(),
-                              options_.line_delimiter().length());
-            }
-            for (size_t i = 0; i < column_names_.size(); ++i)
-            {
-                if (i > 0)
-                {
-                    result_.push_back(options_.field_delimiter());
-                }
-                auto it = buffered_line_.find(column_names_[i]);
-                if (it != buffered_line_.end())
-                {
-                    result_.append(it->second.data(),it->second.length());
-                    it->second.clear();
-                }
-            }
-            result_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+                result_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+                break;
+            default:
+                break;
         }
         stack_.pop_back();
 
@@ -256,10 +261,16 @@ private:
 
     bool do_end_array(const ser_context&, std::error_code&) override
     {
-        if (stack_.size() == 2)
+        JSONCONS_ASSERT(!stack_.empty());
+        switch (stack_.back().item_kind_)
         {
-            result_.append(options_.line_delimiter().data(),
-                          options_.line_delimiter().length());
+            case stack_item_kind::row:
+            case stack_item_kind::column:
+                result_.append(options_.line_delimiter().data(),
+                              options_.line_delimiter().length());
+                break;
+            default:
+                break;
         }
         stack_.pop_back();
 
@@ -269,43 +280,31 @@ private:
 
     bool do_name(const string_view_type& name, const ser_context&, std::error_code&) override
     {
-        if (stack_.size() == 2)
+        JSONCONS_ASSERT(!stack_.empty());
+        switch (stack_.back().item_kind_)
         {
-            name_ = string_type(name);
-            buffered_line_[string_type(name)] = std::basic_string<CharT>();
-            if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
+            case stack_item_kind::object:
             {
-                column_names_.push_back(string_type(name));
+                name_ = string_type(name);
+                buffered_line_[string_type(name)] = std::basic_string<CharT>();
+                if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
+                {
+                    column_names_.push_back(string_type(name));
+                }
+                break;
             }
+            default:
+                break;
         }
-        return true;
-    }
-
-    template <class AnyWriter>
-    bool string_value(const CharT* s, size_t length, AnyWriter& result)
-    {
-        bool quote = false;
-        if (options_.quote_style() == quote_style_kind::all || options_.quote_style() == quote_style_kind::nonnumeric ||
-            (options_.quote_style() == quote_style_kind::minimal &&
-            (std::char_traits<CharT>::find(s, length, options_.field_delimiter()) != nullptr || std::char_traits<CharT>::find(s, length, options_.quote_char()) != nullptr)))
-        {
-            quote = true;
-            result.push_back(options_.quote_char());
-        }
-        escape_string(s, length, options_.quote_char(), options_.quote_escape_char(), result);
-        if (quote)
-        {
-            result.push_back(options_.quote_char());
-        }
-
         return true;
     }
 
     bool do_null_value(semantic_tag, const ser_context&, std::error_code&) override
     {
-        if (stack_.size() == 2)
+        JSONCONS_ASSERT(!stack_.empty());
+        switch (stack_.back().item_kind_)
         {
-            if (stack_.back().is_object())
+            case stack_item_kind::object:
             {
                 auto it = buffered_line_.find(name_);
                 if (it != buffered_line_.end())
@@ -316,20 +315,24 @@ private:
                     bo.flush();
                     it->second = s;
                 }
+                break;
             }
-            else
-            {
+            case stack_item_kind::row:
+            case stack_item_kind::column:
                 accept_null_value(result_);
-            }
+                break;
+            default:
+                break;
         }
         return true;
     }
 
     bool do_string_value(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code&) override
     {
-        if (stack_.size() == 2)
+        JSONCONS_ASSERT(!stack_.empty());
+        switch (stack_.back().item_kind_)
         {
-            if (stack_.back().is_object())
+            case stack_item_kind::object:
             {
                 auto it = buffered_line_.find(name_);
                 if (it != buffered_line_.end())
@@ -340,11 +343,14 @@ private:
                     bo.flush();
                     it->second = s;
                 }
+                break;
             }
-            else
-            {
+            case stack_item_kind::row:
+            case stack_item_kind::column:
                 value(sv,result_);
-            }
+                break;
+            default:
+                break;
         }
         return true;
     }
@@ -407,9 +413,10 @@ private:
                          const ser_context&,
                          std::error_code&) override
     {
-        if (stack_.size() == 2)
+        JSONCONS_ASSERT(!stack_.empty());
+        switch (stack_.back().item_kind_)
         {
-            if (stack_.back().is_object())
+            case stack_item_kind::object:
             {
                 auto it = buffered_line_.find(name_);
                 if (it != buffered_line_.end())
@@ -420,11 +427,14 @@ private:
                     bo.flush();
                     it->second = s;
                 }
+                break;
             }
-            else
-            {
+            case stack_item_kind::row:
+            case stack_item_kind::column:
                 value(val, result_);
-            }
+                break;
+            default:
+                break;
         }
         return true;
     }
@@ -434,9 +444,10 @@ private:
                         const ser_context&,
                         std::error_code&) override
     {
-        if (stack_.size() == 2)
+        JSONCONS_ASSERT(!stack_.empty());
+        switch (stack_.back().item_kind_)
         {
-            if (stack_.back().is_object())
+            case stack_item_kind::object:
             {
                 auto it = buffered_line_.find(name_);
                 if (it != buffered_line_.end())
@@ -447,11 +458,14 @@ private:
                     bo.flush();
                     it->second = s;
                 }
+                break;
             }
-            else
-            {
+            case stack_item_kind::row:
+            case stack_item_kind::column:
                 value(val,result_);
-            }
+                break;
+            default:
+                break;
         }
         return true;
     }
@@ -461,9 +475,10 @@ private:
                          const ser_context&,
                          std::error_code&) override
     {
-        if (stack_.size() == 2)
+        JSONCONS_ASSERT(!stack_.empty());
+        switch (stack_.back().item_kind_)
         {
-            if (stack_.back().is_object())
+            case stack_item_kind::object:
             {
                 auto it = buffered_line_.find(name_);
                 if (it != buffered_line_.end())
@@ -474,20 +489,24 @@ private:
                     bo.flush();
                     it->second = s;
                 }
+                break;
             }
-            else
-            {
+            case stack_item_kind::row:
+            case stack_item_kind::column:
                 value(val,result_);
-            }
+                break;
+            default:
+                break;
         }
         return true;
     }
 
     bool do_bool_value(bool val, semantic_tag, const ser_context&, std::error_code&) override
     {
-        if (stack_.size() == 2)
+        JSONCONS_ASSERT(!stack_.empty());
+        switch (stack_.back().item_kind_)
         {
-            if (stack_.back().is_object())
+            case stack_item_kind::object:
             {
                 auto it = buffered_line_.find(name_);
                 if (it != buffered_line_.end())
@@ -498,12 +517,35 @@ private:
                     bo.flush();
                     it->second = s;
                 }
+                break;
             }
-            else
-            {
+            case stack_item_kind::row:
+            case stack_item_kind::column:
                 value(val,result_);
-            }
+                break;
+            default:
+                break;
         }
+        return true;
+    }
+
+    template <class AnyWriter>
+    bool string_value(const CharT* s, size_t length, AnyWriter& result)
+    {
+        bool quote = false;
+        if (options_.quote_style() == quote_style_kind::all || options_.quote_style() == quote_style_kind::nonnumeric ||
+            (options_.quote_style() == quote_style_kind::minimal &&
+            (std::char_traits<CharT>::find(s, length, options_.field_delimiter()) != nullptr || std::char_traits<CharT>::find(s, length, options_.quote_char()) != nullptr)))
+        {
+            quote = true;
+            result.push_back(options_.quote_char());
+        }
+        escape_string(s, length, options_.quote_char(), options_.quote_escape_char(), result);
+        if (quote)
+        {
+            result.push_back(options_.quote_char());
+        }
+
         return true;
     }
 
@@ -594,12 +636,18 @@ private:
     template <class AnyWriter>
     void begin_value(AnyWriter& result)
     {
-        if (!stack_.empty())
+        JSONCONS_ASSERT(!stack_.empty());
+        switch (stack_.back().item_kind_)
         {
-            if (!stack_.back().is_object() && stack_.back().count_ > 0)
-            {
-                result.push_back(options_.field_delimiter());
-            }
+            case stack_item_kind::row:
+            case stack_item_kind::column:
+                if (stack_.back().count_ > 0)
+                {
+                    result.push_back(options_.field_delimiter());
+                }
+                break;
+            default:
+                break;
         }
     }
 
