@@ -28,7 +28,7 @@
 [Mapping to C++ data structures with and without defaults allowed](#G5)  
 [An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL](#G6)  
 [Serialize a polymorphic type based on the presence of properties](#G7)  
-[Ensuring type selection is possible from derived to base type](#G8)
+[Ensuring type selection is possible](#G8)
 [Convert JSON numbers to/from boost multiprecision numbers](#G9)
 
 ### Construct
@@ -1445,7 +1445,20 @@ Jane Doe, 30250
 
 <div id="G8"/>
 
-#### Ensuring type selection is possible from derived to base type
+#### Ensuring type selection is possible
+
+When deserializing a polymorphic type, jsoncons needs to know how
+to convert a json value to the proper derived class. In the Employee
+example above, the type selection strategy is based
+on the presence of properties in the derived classes. If
+derived classes cannot be distinguished in this way, 
+you can introduce extra properties. The convenience
+macros `JSONCONS_MEMBER_TRAITS_DECL`, `JSONCONS_STRICT_MEMBER_TRAITS_DECL`,
+`JSONCONS_TPL_MEMBER_TRAITS_DECL`, `JSONCONS_TPL_STRICT_MEMBER_TRAITS_DECL`,
+`JSONCONS_MEMBER_TRAITS_NAMED_DECL`, `JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL`,
+`JSONCONS_TPL_MEMBER_TRAITS_NAMED_DECL`, and `JSONCONS_TPL_STRICT_MEMBER_TRAITS_NAMED_DECL`
+allow you to introduce constant data members that are serialized and that 
+particpate in the type selection strategy during deserialization. 
 
 ```c++
 namespace ns {

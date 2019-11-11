@@ -235,7 +235,7 @@ These macro declarations must be placed at global scope, outside any namespace b
 [Specialize json_type_traits to support a book class.](#A5)  
 [Using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits](#A6)  
 [Serialize a polymorphic type based on the presence of properties](#A7)  
-[Ensuring type selection is possible from derived to base type](#A8)
+[Ensuring type selection is possible](#A8)
 [Specialize json_type_traits for a container type that the jsoncons library also supports](#A9)  
 [Convert JSON to/from boost matrix](#A10)
 
@@ -783,7 +783,20 @@ Jane Doe, 30250
 
 <div id="A8"/>
 
-#### Ensuring type selection is possible from derived to base type
+#### Ensuring type selection is possible
+
+When deserializing a polymorphic type, jsoncons needs to know how
+to convert a json value to the proper derived class. In the Employee
+example above, the type selection strategy is based
+on the presence of properties in the derived classes. If
+derived classes cannot be distinguished in this way, 
+you can introduce extra properties. The convenience
+macros `JSONCONS_MEMBER_TRAITS_DECL`, `JSONCONS_STRICT_MEMBER_TRAITS_DECL`,
+`JSONCONS_TPL_MEMBER_TRAITS_DECL`, `JSONCONS_TPL_STRICT_MEMBER_TRAITS_DECL`,
+`JSONCONS_MEMBER_TRAITS_NAMED_DECL`, `JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL`,
+`JSONCONS_TPL_MEMBER_TRAITS_NAMED_DECL`, and `JSONCONS_TPL_STRICT_MEMBER_TRAITS_NAMED_DECL`
+allow you to introduce constant data members that are serialized and that 
+particpate in the type selection strategy during deserialization. 
 
 ```c++
 namespace ns {
