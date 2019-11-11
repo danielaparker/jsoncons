@@ -61,7 +61,8 @@ private:
         object,
         row,
         column,
-        multi_valued_field
+        object_multi_valued_field,
+        array_multi_valued_field
     };
 
     struct stack_item
@@ -249,9 +250,14 @@ private:
                     }
                 }
                 return true;
+            case stack_item_kind::object:
+                stack_.emplace_back(stack_item_kind::object_multi_valued_field);
+                return true;
             case stack_item_kind::column_mapping:
+                return true;;
             case stack_item_kind::row:
-                stack_.emplace_back(stack_item_kind::multi_valued_field);
+                begin_value(result_);
+                stack_.emplace_back(stack_item_kind::array_multi_valued_field);
                 return true;
             default: // error
                 ec = csv_errc::source_error;
@@ -305,21 +311,27 @@ private:
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::object:
+            case stack_item_kind::object_multi_valued_field:
             {
                 auto it = buffered_line_.find(name_);
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_result<std::basic_string<CharT>> bo(s);
-                    accept_null_value(bo);
+                    write_null_value(bo);
                     bo.flush();
-                    it->second = s;
+                    if (!it->second.empty() && options_.subfield_delimiter() != char_type())
+                    {
+                        it->second.push_back(options_.subfield_delimiter());
+                    }
+                    it->second.append(s);
                 }
                 break;
             }
             case stack_item_kind::row:
             case stack_item_kind::column:
-                accept_null_value(result_);
+            case stack_item_kind::array_multi_valued_field:
+                write_null_value(result_);
                 break;
             default:
                 break;
@@ -333,6 +345,7 @@ private:
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::object:
+            case stack_item_kind::object_multi_valued_field:
             {
                 auto it = buffered_line_.find(name_);
                 if (it != buffered_line_.end())
@@ -341,12 +354,17 @@ private:
                     jsoncons::string_result<std::basic_string<CharT>> bo(s);
                     value(sv,bo);
                     bo.flush();
-                    it->second = s;
+                    if (!it->second.empty() && options_.subfield_delimiter() != char_type())
+                    {
+                        it->second.push_back(options_.subfield_delimiter());
+                    }
+                    it->second.append(s);
                 }
                 break;
             }
             case stack_item_kind::row:
             case stack_item_kind::column:
+            case stack_item_kind::array_multi_valued_field:
                 value(sv,result_);
                 break;
             default:
@@ -417,6 +435,7 @@ private:
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::object:
+            case stack_item_kind::object_multi_valued_field:
             {
                 auto it = buffered_line_.find(name_);
                 if (it != buffered_line_.end())
@@ -425,12 +444,17 @@ private:
                     jsoncons::string_result<std::basic_string<CharT>> bo(s);
                     value(val, bo);
                     bo.flush();
-                    it->second = s;
+                    if (!it->second.empty() && options_.subfield_delimiter() != char_type())
+                    {
+                        it->second.push_back(options_.subfield_delimiter());
+                    }
+                    it->second.append(s);
                 }
                 break;
             }
             case stack_item_kind::row:
             case stack_item_kind::column:
+            case stack_item_kind::array_multi_valued_field:
                 value(val, result_);
                 break;
             default:
@@ -448,6 +472,7 @@ private:
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::object:
+            case stack_item_kind::object_multi_valued_field:
             {
                 auto it = buffered_line_.find(name_);
                 if (it != buffered_line_.end())
@@ -456,12 +481,17 @@ private:
                     jsoncons::string_result<std::basic_string<CharT>> bo(s);
                     value(val,bo);
                     bo.flush();
-                    it->second = s;
+                    if (!it->second.empty() && options_.subfield_delimiter() != char_type())
+                    {
+                        it->second.push_back(options_.subfield_delimiter());
+                    }
+                    it->second.append(s);
                 }
                 break;
             }
             case stack_item_kind::row:
             case stack_item_kind::column:
+            case stack_item_kind::array_multi_valued_field:
                 value(val,result_);
                 break;
             default:
@@ -479,20 +509,26 @@ private:
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::object:
+            case stack_item_kind::object_multi_valued_field:
             {
                 auto it = buffered_line_.find(name_);
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_result<std::basic_string<CharT>> bo(s);
-                    value(val,bo);
+                    value(val, bo);
                     bo.flush();
-                    it->second = s;
+                    if (!it->second.empty() && options_.subfield_delimiter() != char_type())
+                    {
+                        it->second.push_back(options_.subfield_delimiter());
+                    }
+                    it->second.append(s);
                 }
                 break;
             }
             case stack_item_kind::row:
             case stack_item_kind::column:
+            case stack_item_kind::array_multi_valued_field:
                 value(val,result_);
                 break;
             default:
@@ -507,6 +543,7 @@ private:
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::object:
+            case stack_item_kind::object_multi_valued_field:
             {
                 auto it = buffered_line_.find(name_);
                 if (it != buffered_line_.end())
@@ -515,12 +552,17 @@ private:
                     jsoncons::string_result<std::basic_string<CharT>> bo(s);
                     value(val,bo);
                     bo.flush();
-                    it->second = s;
+                    if (!it->second.empty() && options_.subfield_delimiter() != char_type())
+                    {
+                        it->second.push_back(options_.subfield_delimiter());
+                    }
+                    it->second.append(s);
                 }
                 break;
             }
             case stack_item_kind::row:
             case stack_item_kind::column:
+            case stack_item_kind::array_multi_valued_field:
                 value(val,result_);
                 break;
             default:
@@ -625,7 +667,7 @@ private:
     }
 
     template <class AnyWriter>
-    bool accept_null_value(AnyWriter& result) 
+    bool write_null_value(AnyWriter& result) 
     {
         begin_value(result);
         result.append(null_k().data(), null_k().size());
@@ -644,6 +686,12 @@ private:
                 if (stack_.back().count_ > 0)
                 {
                     result.push_back(options_.field_delimiter());
+                }
+                break;
+            case stack_item_kind::array_multi_valued_field:
+                if (stack_.back().count_ > 0 && options_.subfield_delimiter() != char_type())
+                {
+                    result.push_back(options_.subfield_delimiter());
                 }
                 break;
             default:
