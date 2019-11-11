@@ -1457,7 +1457,7 @@ macros `JSONCONS_MEMBER_TRAITS_DECL`, `JSONCONS_STRICT_MEMBER_TRAITS_DECL`,
 `JSONCONS_TPL_MEMBER_TRAITS_DECL`, `JSONCONS_TPL_STRICT_MEMBER_TRAITS_DECL`,
 `JSONCONS_MEMBER_TRAITS_NAMED_DECL`, `JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL`,
 `JSONCONS_TPL_MEMBER_TRAITS_NAMED_DECL`, and `JSONCONS_TPL_STRICT_MEMBER_TRAITS_NAMED_DECL`
-allow you to introduce constant data members that are serialized and that 
+allow you to have constant data members that are serialized and that 
 particpate in the type selection strategy during deserialization. 
 
 ```c++
