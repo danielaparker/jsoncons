@@ -28,7 +28,7 @@
 [Mapping to C++ data structures with and without defaults allowed](#G5)  
 [An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_GETTER_CTOR_TRAITS_DECL](#G6)  
 [Serialize a polymorphic type based on the presence of properties](#G7)  
-[Ensuring type selection is possible](#G8)
+[Ensuring type selection is possible](#G8)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G9)
 
 ### Construct

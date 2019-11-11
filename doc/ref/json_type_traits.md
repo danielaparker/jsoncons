@@ -235,7 +235,7 @@ These macro declarations must be placed at global scope, outside any namespace b
 [Specialize json_type_traits to support a book class.](#A5)  
 [Using JSONCONS_MEMBER_TRAITS_DECL to generate the json_type_traits](#A6)  
 [Serialize a polymorphic type based on the presence of properties](#A7)  
-[Ensuring type selection is possible](#A8)
+[Ensuring type selection is possible](#A8)  
 [Specialize json_type_traits for a container type that the jsoncons library also supports](#A9)  
 [Convert JSON to/from boost matrix](#A10)
 
