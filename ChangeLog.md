@@ -17,7 +17,7 @@ JSONCONS_POLYMORPHIC_TRAITS_DECL(base_class_name,derived_class_name0,derived_cla
 `JSONCONS_TPL_MEMBER_TRAITS_DECL`, `JSONCONS_TPL_STRICT_MEMBER_TRAITS_DECL`,
 `JSONCONS_MEMBER_TRAITS_NAMED_DECL`, `JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL`,
 `JSONCONS_TPL_MEMBER_TRAITS_NAMED_DECL`, and `JSONCONS_TPL_STRICT_MEMBER_TRAITS_NAMED_DECL`
-now allow you to have constant data members that are serialized.
+now allow you to have `const` or `static const` data members that are serialized.
 
 v0.137.0
 --------

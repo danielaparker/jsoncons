@@ -214,7 +214,8 @@ in the derived classes.
 `class_name` - the name of a class or struct  
 `enum_name` - the name of an enum type or enum class type
 `num_template_params` - for a class template, the number of template parameters  
-`member_nameN` - the name of a class data member  
+`member_nameN` - the name of a class data member. Class data members may be `const` or
+`static const`, these members are one-way serialized.  
 `getter_nameN` - the getter for a class data member 
 `(identifierN,"nameN")` - an enum identifier and corresponding JSON name  
 `(getter_nameN,"nameN")` - the getter for a class data member and corresponding JSON name  
@@ -795,7 +796,7 @@ macros `JSONCONS_MEMBER_TRAITS_DECL`, `JSONCONS_STRICT_MEMBER_TRAITS_DECL`,
 `JSONCONS_TPL_MEMBER_TRAITS_DECL`, `JSONCONS_TPL_STRICT_MEMBER_TRAITS_DECL`,
 `JSONCONS_MEMBER_TRAITS_NAMED_DECL`, `JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL`,
 `JSONCONS_TPL_MEMBER_TRAITS_NAMED_DECL`, and `JSONCONS_TPL_STRICT_MEMBER_TRAITS_NAMED_DECL`
-allow you to have constant data members that are serialized and that 
+allow you to have `const` or `static const` data members that are serialized and that 
 particpate in the type selection strategy during deserialization. 
 
 ```c++
