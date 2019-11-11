@@ -681,7 +681,7 @@ JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL_BASE(JSONCONS_STRICT_GETTER_SETTER_NAME
 namespace jsoncons { \
     template<class Json> \
     struct json_type_traits<Json, std::shared_ptr<BaseClass>> { \
-        static bool is(const Json& ajson, const BaseClass& v) noexcept { \
+        static bool is(const Json& ajson) noexcept { \
             if (!ajson.is_object()) return false; \
             JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_IS, BaseClass, __VA_ARGS__)\
             return false; \
