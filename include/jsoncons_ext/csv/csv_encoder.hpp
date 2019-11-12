@@ -36,6 +36,7 @@ public:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
     typedef std::basic_string<CharT, std::char_traits<CharT>, char_allocator_type> string_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,string_type>> string_string_allocator_type;
 
 private:
     static const std::array<CharT, 4>& null_k()
@@ -62,7 +63,8 @@ private:
         row,
         column,
         object_multi_valued_field,
-        array_multi_valued_field
+        row_multi_valued_field,
+        column_multi_valued_field
     };
 
     struct stack_item
@@ -90,12 +92,12 @@ private:
     const basic_csv_encode_options<CharT> options_;
     std::vector<stack_item> stack_;
     jsoncons::detail::print_double fp_;
-    std::vector<string_type,string_allocator_type> column_names_;
+    std::vector<string_type,string_allocator_type> strings_buffer_;
 
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,string_type>> string_string_allocator_type;
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> buffered_line_;
     string_type name_;
     size_t column_index_;
+    size_t row_index_;
 
     // Noncopyable and nonmoveable
     basic_csv_encoder(const basic_csv_encoder&) = delete;
@@ -108,13 +110,13 @@ public:
 
     basic_csv_encoder(result_type result,
                       const basic_csv_encode_options<CharT>& options)
-       :
-       result_(std::move(result)),
-       options_(options),
-       stack_(),
-       fp_(options.float_format(), options.precision()),
-       column_names_(options_.column_names()),
-       column_index_(0)
+      : result_(std::move(result)),
+        options_(options),
+        stack_(),
+        fp_(options.float_format(), options.precision()),
+        strings_buffer_(options_.column_names()),
+        column_index_(0),
+        row_index_(1)
     {
     }
 
@@ -164,7 +166,6 @@ private:
         if (stack_.empty())
         {
             stack_.emplace_back(stack_item_kind::column_mapping);
-            column_index_ = 0;
             return true;
         }
         switch (stack_.back().item_kind_)
@@ -186,25 +187,25 @@ private:
             case stack_item_kind::object:
                 if (stack_[0].count_ == 0)
                 {
-                    for (size_t i = 0; i < column_names_.size(); ++i)
+                    for (size_t i = 0; i < strings_buffer_.size(); ++i)
                     {
                         if (i > 0)
                         {
                             result_.push_back(options_.field_delimiter());
                         }
-                        result_.append(column_names_[i].data(),
-                                      column_names_[i].length());
+                        result_.append(strings_buffer_[i].data(),
+                                      strings_buffer_[i].length());
                     }
                     result_.append(options_.line_delimiter().data(),
                                   options_.line_delimiter().length());
                 }
-                for (size_t i = 0; i < column_names_.size(); ++i)
+                for (size_t i = 0; i < strings_buffer_.size(); ++i)
                 {
                     if (i > 0)
                     {
                         result_.push_back(options_.field_delimiter());
                     }
-                    auto it = buffered_line_.find(column_names_[i]);
+                    auto it = buffered_line_.find(strings_buffer_[i]);
                     if (it != buffered_line_.end())
                     {
                         result_.append(it->second.data(),it->second.length());
@@ -213,12 +214,23 @@ private:
                 }
                 result_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
                 break;
+            case stack_item_kind::column_mapping:
+             {
+                 for (const auto& item : strings_buffer_)
+                 {
+                     result_.append(item.data(), item.size());
+                     result_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+                 }
+                 break;
+             }
             default:
                 break;
         }
         stack_.pop_back();
-
-        end_value();
+        if (!stack_.empty())
+        {
+            end_value();
+        }
         return true;
     }
 
@@ -235,15 +247,15 @@ private:
                 stack_.emplace_back(stack_item_kind::row);
                 if (stack_[0].count_ == 0)
                 {
-                    for (size_t i = 0; i < column_names_.size(); ++i)
+                    for (size_t i = 0; i < strings_buffer_.size(); ++i)
                     {
                         if (i > 0)
                         {
                             result_.push_back(options_.field_delimiter());
                         }
-                        result_.append(column_names_[i].data(),column_names_[i].length());
+                        result_.append(strings_buffer_[i].data(),strings_buffer_[i].length());
                     }
-                    if (column_names_.size() > 0)
+                    if (strings_buffer_.size() > 0)
                     {
                         result_.append(options_.line_delimiter().data(),
                                       options_.line_delimiter().length());
@@ -254,10 +266,27 @@ private:
                 stack_.emplace_back(stack_item_kind::object_multi_valued_field);
                 return true;
             case stack_item_kind::column_mapping:
+                stack_.emplace_back(stack_item_kind::column);
+                row_index_ = 1;
+                if (strings_buffer_.size() <= row_index_)
+                {
+                    strings_buffer_.resize(row_index_ + 1);
+                }
                 return true;
+            case stack_item_kind::column:
+            {
+                if (strings_buffer_.size() <= row_index_)
+                {
+                    strings_buffer_.resize(row_index_ + 1);
+                }                
+                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_index_]);
+                begin_value(bo);
+                stack_.emplace_back(stack_item_kind::column_multi_valued_field);
+                return true;
+            }
             case stack_item_kind::row:
                 begin_value(result_);
-                stack_.emplace_back(stack_item_kind::array_multi_valued_field);
+                stack_.emplace_back(stack_item_kind::row_multi_valued_field);
                 return true;
             default: // error
                 ec = csv_errc::source_error;
@@ -271,16 +300,21 @@ private:
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::row:
-            case stack_item_kind::column:
                 result_.append(options_.line_delimiter().data(),
                               options_.line_delimiter().length());
+                break;
+            case stack_item_kind::column:
+                ++column_index_;
                 break;
             default:
                 break;
         }
         stack_.pop_back();
 
-        end_value();
+        if (!stack_.empty())
+        {
+            end_value();
+        }
         return true;
     }
 
@@ -295,7 +329,20 @@ private:
                 buffered_line_[string_type(name)] = std::basic_string<CharT>();
                 if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
                 {
-                    column_names_.push_back(string_type(name));
+                    strings_buffer_.push_back(string_type(name));
+                }
+                break;
+            }
+            case stack_item_kind::column_mapping:
+            {
+                if (strings_buffer_.empty())
+                {
+                    strings_buffer_.push_back(string_type(name));
+                }
+                else
+                {
+                    strings_buffer_[0].push_back(options_.field_delimiter());
+                    strings_buffer_[0].append(string_type(name));
                 }
                 break;
             }
@@ -329,9 +376,10 @@ private:
                 break;
             }
             case stack_item_kind::row:
-            case stack_item_kind::column:
-            case stack_item_kind::array_multi_valued_field:
+            case stack_item_kind::row_multi_valued_field:
                 write_null_value(result_);
+                break;
+            case stack_item_kind::column:
                 break;
             default:
                 break;
@@ -363,9 +411,10 @@ private:
                 break;
             }
             case stack_item_kind::row:
-            case stack_item_kind::column:
-            case stack_item_kind::array_multi_valued_field:
+            case stack_item_kind::row_multi_valued_field:
                 value(sv,result_);
+                break;
+            case stack_item_kind::column:
                 break;
             default:
                 break;
@@ -453,9 +502,10 @@ private:
                 break;
             }
             case stack_item_kind::row:
-            case stack_item_kind::column:
-            case stack_item_kind::array_multi_valued_field:
+            case stack_item_kind::row_multi_valued_field:
                 value(val, result_);
+                break;
+            case stack_item_kind::column:
                 break;
             default:
                 break;
@@ -490,9 +540,10 @@ private:
                 break;
             }
             case stack_item_kind::row:
-            case stack_item_kind::column:
-            case stack_item_kind::array_multi_valued_field:
+            case stack_item_kind::row_multi_valued_field:
                 value(val,result_);
+                break;
+            case stack_item_kind::column:
                 break;
             default:
                 break;
@@ -516,7 +567,7 @@ private:
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_result<std::basic_string<CharT>> bo(s);
-                    value(val, bo);
+                    write_uint64_value(val, bo);
                     bo.flush();
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
@@ -527,10 +578,21 @@ private:
                 break;
             }
             case stack_item_kind::row:
-            case stack_item_kind::column:
-            case stack_item_kind::array_multi_valued_field:
-                value(val,result_);
+            case stack_item_kind::row_multi_valued_field:
+                write_uint64_value(val,result_);
                 break;
+            case stack_item_kind::column:
+            {
+                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_index_]);
+                write_uint64_value(val, bo);
+                break;
+            }
+            case stack_item_kind::column_multi_valued_field:
+            {
+                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_index_]);
+                write_uint64_value(val, bo);
+                break;
+            }
             default:
                 break;
         }
@@ -561,9 +623,10 @@ private:
                 break;
             }
             case stack_item_kind::row:
-            case stack_item_kind::column:
-            case stack_item_kind::array_multi_valued_field:
+            case stack_item_kind::row_multi_valued_field:
                 value(val,result_);
+                break;
+            case stack_item_kind::column:
                 break;
             default:
                 break;
@@ -638,7 +701,7 @@ private:
     }
 
     template <class AnyWriter>
-    void value(uint64_t val, AnyWriter& result)
+    void write_uint64_value(uint64_t val, AnyWriter& result)
     {
         begin_value(result);
 
@@ -665,7 +728,7 @@ private:
 
         end_value();
     }
-
+ 
     template <class AnyWriter>
     bool write_null_value(AnyWriter& result) 
     {
@@ -682,13 +745,19 @@ private:
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::row:
-            case stack_item_kind::column:
                 if (stack_.back().count_ > 0)
                 {
                     result.push_back(options_.field_delimiter());
                 }
                 break;
-            case stack_item_kind::array_multi_valued_field:
+            case stack_item_kind::column:
+                if (column_index_ > 0)
+                {
+                    result.push_back(options_.field_delimiter());
+                }
+                break;
+            case stack_item_kind::row_multi_valued_field:
+            case stack_item_kind::column_multi_valued_field:
                 if (stack_.back().count_ > 0 && options_.subfield_delimiter() != char_type())
                 {
                     result.push_back(options_.subfield_delimiter());
@@ -701,9 +770,22 @@ private:
 
     void end_value()
     {
-        if (!stack_.empty())
+        JSONCONS_ASSERT(!stack_.empty());
+        switch(stack_.back().item_kind_)
         {
-            ++stack_.back().count_;
+            case stack_item_kind::row:
+            {
+                ++stack_.back().count_;
+                break;
+            }
+            case stack_item_kind::column:
+            {
+                ++row_index_;
+                break;
+            }
+            default:
+                ++stack_.back().count_;
+                break;
         }
     }
 };

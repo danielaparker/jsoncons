@@ -166,7 +166,6 @@ public:
 
             value_kind kind() const 
             {
-
                 uint8_t value = ext_type_ >> major_type_shift;
                 return static_cast<value_kind>(value);
             }
