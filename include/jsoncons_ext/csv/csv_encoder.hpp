@@ -825,16 +825,21 @@ private:
                 break;
             case stack_item_kind::column:
             {
-                size_t base = 0;
-                for (size_t i = 0; i+1 < row_counts_.size(); ++i)
+                if (row_counts_.size() >= 3)
                 {
-                    if (row_counts_[i] <= row_counts_.back())
+                    for (size_t i = row_counts_.size()-2; i-- > 0;)
                     {
-                        result.push_back(options_.field_delimiter());
-                        ++base;
+                        if (row_counts_[i] <= row_counts_.back())
+                        {
+                            result.push_back(options_.field_delimiter());
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                 }
-                if (column_index_ > base)
+                if (column_index_ > 0)
                 {
                     result.push_back(options_.field_delimiter());
                 }
