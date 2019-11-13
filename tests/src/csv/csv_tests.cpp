@@ -956,7 +956,7 @@ TEST_CASE("csv_test1_repeat")
     2017-01-08,0.0063,0.0076,0.0084,0.0112,0.014
     )";    
 
-    auto result = csv::csv_options::parse_column_types("string,float*");
+    auto result = jsoncons::csv::detail::parse_column_types("string,float*");
     REQUIRE(result.size() == 3);
     CHECK(result[0].col_type == csv::csv_column_type::string_t);
     CHECK(result[0].level == 0);
@@ -968,7 +968,7 @@ TEST_CASE("csv_test1_repeat")
     CHECK(result[2].level == 0);
     CHECK(1 == result[2].rep_count);
 
-    auto result2 = csv::csv_options::parse_column_types("string,[float*]");
+    auto result2 = jsoncons::csv::detail::parse_column_types("string,[float*]");
     REQUIRE(result2.size() == 3);
     CHECK(result2[0].col_type == csv::csv_column_type::string_t);
     CHECK(result2[0].level == 0);
@@ -980,7 +980,7 @@ TEST_CASE("csv_test1_repeat")
     CHECK(result2[2].level == 1);
     CHECK(1 == result2[2].rep_count);
 
-    auto result3 = csv::csv_options::parse_column_types("string,[float]*");
+    auto result3 = jsoncons::csv::detail::parse_column_types("string,[float]*");
     REQUIRE(result3.size() == 3);
     CHECK(result3[0].col_type == csv::csv_column_type::string_t);
     CHECK(result3[0].level == 0);

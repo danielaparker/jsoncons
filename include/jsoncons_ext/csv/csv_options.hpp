@@ -67,6 +67,213 @@ struct csv_type_info
     size_t rep_count;
 };
 
+namespace detail {
+
+template <class CharT>
+std::vector<std::basic_string<CharT>> parse_column_names(const std::basic_string<CharT>& names)
+{
+    std::vector<std::basic_string<CharT>> column_names;
+
+    column_state state = column_state::sequence;
+    std::basic_string<CharT> buffer;
+
+    auto p = names.begin();
+    while (p != names.end())
+    {
+        switch (state)
+        {
+            case column_state::sequence:
+            {
+                switch (*p)
+                {
+                    case ' ': case '\t':case '\r': case '\n':
+                        ++p;
+                        break;
+                    default:
+                        buffer.clear();
+                        state = column_state::label;
+                        break;
+                }
+                break;
+            }
+            case column_state::label:
+            {
+                switch (*p)
+                {
+                case ',':
+                    column_names.push_back(buffer);
+                    buffer.clear();
+                    ++p;
+                    state = column_state::sequence;
+                    break;
+                default:
+                    buffer.push_back(*p);
+                    ++p;
+                    break;
+                }
+                break;
+            }
+        }
+    }
+    if (state == column_state::label)
+    {
+        column_names.push_back(buffer);
+        buffer.clear();
+    }
+    return column_names;
+}
+
+template <class CharT>
+std::vector<csv_type_info> parse_column_types(const std::basic_string<CharT>& types)
+{
+    using char_type = CharT;
+    const std::unordered_map<std::basic_string<CharT>,csv_column_type, std::hash<std::basic_string<CharT>>,std::equal_to<std::basic_string<CharT>>> type_dictionary =
+    {
+
+        {detail::string_literal<char_type>(),csv_column_type::string_t},
+        {detail::integer_literal<char_type>(),csv_column_type::integer_t},
+        {detail::float_literal<char_type>(),csv_column_type::float_t},
+        {detail::boolean_literal<char_type>(),csv_column_type::boolean_t}
+    };
+
+    std::vector<csv_type_info> column_types;
+
+    column_state state = column_state::sequence;
+    int depth = 0;
+    std::basic_string<CharT> buffer;
+
+    auto p = types.begin();
+    while (p != types.end())
+    {
+        switch (state)
+        {
+            case column_state::sequence:
+            {
+                switch (*p)
+                {
+                case ' ': case '\t':case '\r': case '\n':
+                    ++p;
+                    break;
+                case '[':
+                    ++depth;
+                    ++p;
+                    break;
+                case ']':
+                    JSONCONS_ASSERT(depth > 0);
+                    --depth;
+                    ++p;
+                    break;
+                case '*':
+                    {
+                        JSONCONS_ASSERT(column_types.size() != 0);
+                        size_t offset = 0;
+                        size_t level = column_types.size() > 0 ? column_types.back().level: 0;
+                        if (level > 0)
+                        {
+                            for (auto it = column_types.rbegin();
+                                 it != column_types.rend() && level == it->level;
+                                 ++it)
+                            {
+                                ++offset;
+                            }
+                        }
+                        else
+                        {
+                            offset = 1;
+                        }
+                        column_types.emplace_back(csv_column_type::repeat_t,depth,offset);
+                        ++p;
+                        break;
+                    }
+                default:
+                    buffer.clear();
+                    state = column_state::label;
+                    break;
+                }
+                break;
+            }
+            case column_state::label:
+            {
+                switch (*p)
+                {
+                    case '*':
+                    {
+                        auto it = type_dictionary.find(buffer);
+                        if (it != type_dictionary.end())
+                        {
+                            column_types.emplace_back(it->second,depth);
+                            buffer.clear();
+                        }
+                        else
+                        {
+                            JSONCONS_ASSERT(false);
+                        }
+                        state = column_state::sequence;
+                        break;
+                    }
+                    case ',':
+                    {
+                        auto it = type_dictionary.find(buffer);
+                        if (it != type_dictionary.end())
+                        {
+                            column_types.emplace_back(it->second,depth);
+                            buffer.clear();
+                        }
+                        else
+                        {
+                            JSONCONS_ASSERT(false);
+                        }
+                        ++p;
+                        state = column_state::sequence;
+                        break;
+                    }
+                    case ']':
+                    {
+                        JSONCONS_ASSERT(depth > 0);
+                        auto it = type_dictionary.find(buffer);
+                        if (it != type_dictionary.end())
+                        {
+                            column_types.emplace_back(it->second,depth);
+                            buffer.clear();
+                        }
+                        else
+                        {
+                            JSONCONS_ASSERT(false);
+                        }
+                        --depth;
+                        ++p;
+                        state = column_state::sequence;
+                        break;
+                    }
+                    default:
+                    {
+                        buffer.push_back(*p);
+                        ++p;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+    }
+    if (state == column_state::label)
+    {
+        auto it = type_dictionary.find(buffer);
+        if (it != type_dictionary.end())
+        {
+            column_types.emplace_back(it->second,depth);
+            buffer.clear();
+        }
+        else
+        {
+            JSONCONS_ASSERT(false);
+        }
+    }
+    return column_types;
+}
+
+} // detail
+
 template <class CharT>
 class basic_csv_options_common 
 {
@@ -612,19 +819,19 @@ public:
 
     basic_csv_options& column_names(const string_type& names)
     {
-        this->column_names_ = parse_column_names(names);
+        this->column_names_ = jsoncons::csv::detail::parse_column_names(names);
         return *this;
     }
 
     basic_csv_options& column_types(const string_type& types)
     {
-        this->column_types_ = parse_column_types(types);
+        this->column_types_ = jsoncons::csv::detail::parse_column_types(types);
         return *this;
     }
 
     basic_csv_options& column_defaults(const string_type& defaults)
     {
-        this->column_defaults_ = parse_column_names(defaults);
+        this->column_defaults_ = jsoncons::csv::detail::parse_column_names(defaults);
         return *this;
     }
 
@@ -694,6 +901,57 @@ public:
         return *this;
     }
 
+    basic_csv_options& nan_to_num(const string_type& value)
+    {
+        this->enable_nan_to_num_ = true;
+        this->nan_to_str_.clear();
+        this->nan_to_num_ = value;
+        return *this;
+    }
+
+    basic_csv_options& inf_to_num(const string_type& value)
+    {
+        this->enable_inf_to_num_ = true;
+        this->inf_to_str_.clear();
+        this->inf_to_num_ = value;
+        return *this;
+    }
+
+    basic_csv_options& neginf_to_num(const string_type& value)
+    {
+        this->enable_neginf_to_num_ = true;
+        this->neginf_to_str_.clear();
+        this->neginf_to_num_ = value;
+        return *this;
+    }
+
+    basic_csv_options& nan_to_str(const string_type& value, bool enable_inverse = true)
+    {
+        this->enable_nan_to_str_ = true;
+        this->enable_str_to_nan_ = enable_inverse;
+        this->nan_to_num_.clear();
+        this->nan_to_str_ = value;
+        return *this;
+    }
+
+    basic_csv_options& inf_to_str(const string_type& value, bool enable_inverse = true)
+    {
+        this->enable_inf_to_str_ = true;
+        this->enable_inf_to_str_ = enable_inverse;
+        this->inf_to_num_.clear();
+        this->inf_to_str_ = value;
+        return *this;
+    }
+
+    basic_csv_options& neginf_to_str(const string_type& value, bool enable_inverse = true)
+    {
+        this->enable_neginf_to_str_ = true;
+        this->enable_neginf_to_str_ = enable_inverse;
+        this->neginf_to_num_.clear();
+        this->neginf_to_str_ = value;
+        return *this;
+    }
+
 #if !defined(JSONCONS_NO_DEPRECATED)
 
     JSONCONS_DEPRECATED_MSG("Instead, use float_format(float_chars_format)")
@@ -703,206 +961,6 @@ public:
         return *this;
     }
 #endif
-
-    static std::vector<string_type> parse_column_names(const string_type& names)
-    {
-        std::vector<string_type> column_names;
-
-        column_state state = column_state::sequence;
-        string_type buffer;
-
-        auto p = names.begin();
-        while (p != names.end())
-        {
-            switch (state)
-            {
-                case column_state::sequence:
-                {
-                    switch (*p)
-                    {
-                        case ' ': case '\t':case '\r': case '\n':
-                            ++p;
-                            break;
-                        default:
-                            buffer.clear();
-                            state = column_state::label;
-                            break;
-                    }
-                    break;
-                }
-                case column_state::label:
-                {
-                    switch (*p)
-                    {
-                    case ',':
-                        column_names.push_back(buffer);
-                        buffer.clear();
-                        ++p;
-                        state = column_state::sequence;
-                        break;
-                    default:
-                        buffer.push_back(*p);
-                        ++p;
-                        break;
-                    }
-                    break;
-                }
-            }
-        }
-        if (state == column_state::label)
-        {
-            column_names.push_back(buffer);
-            buffer.clear();
-        }
-        return column_names;
-    }
-
-    static std::vector<csv_type_info> parse_column_types(const string_type& types)
-    {
-        const std::unordered_map<string_type,csv_column_type, std::hash<string_type>,std::equal_to<string_type>> type_dictionary =
-        {
-
-            {detail::string_literal<char_type>(),csv_column_type::string_t},
-            {detail::integer_literal<char_type>(),csv_column_type::integer_t},
-            {detail::float_literal<char_type>(),csv_column_type::float_t},
-            {detail::boolean_literal<char_type>(),csv_column_type::boolean_t}
-        };
-
-        std::vector<csv_type_info> column_types;
-
-        column_state state = column_state::sequence;
-        int depth = 0;
-        string_type buffer;
-
-        auto p = types.begin();
-        while (p != types.end())
-        {
-            switch (state)
-            {
-                case column_state::sequence:
-                {
-                    switch (*p)
-                    {
-                    case ' ': case '\t':case '\r': case '\n':
-                        ++p;
-                        break;
-                    case '[':
-                        ++depth;
-                        ++p;
-                        break;
-                    case ']':
-                        JSONCONS_ASSERT(depth > 0);
-                        --depth;
-                        ++p;
-                        break;
-                    case '*':
-                        {
-                            JSONCONS_ASSERT(column_types.size() != 0);
-                            size_t offset = 0;
-                            size_t level = column_types.size() > 0 ? column_types.back().level: 0;
-                            if (level > 0)
-                            {
-                                for (auto it = column_types.rbegin();
-                                     it != column_types.rend() && level == it->level;
-                                     ++it)
-                                {
-                                    ++offset;
-                                }
-                            }
-                            else
-                            {
-                                offset = 1;
-                            }
-                            column_types.emplace_back(csv_column_type::repeat_t,depth,offset);
-                            ++p;
-                            break;
-                        }
-                    default:
-                        buffer.clear();
-                        state = column_state::label;
-                        break;
-                    }
-                    break;
-                }
-                case column_state::label:
-                {
-                    switch (*p)
-                    {
-                        case '*':
-                        {
-                            auto it = type_dictionary.find(buffer);
-                            if (it != type_dictionary.end())
-                            {
-                                column_types.emplace_back(it->second,depth);
-                                buffer.clear();
-                            }
-                            else
-                            {
-                                JSONCONS_ASSERT(false);
-                            }
-                            state = column_state::sequence;
-                            break;
-                        }
-                        case ',':
-                        {
-                            auto it = type_dictionary.find(buffer);
-                            if (it != type_dictionary.end())
-                            {
-                                column_types.emplace_back(it->second,depth);
-                                buffer.clear();
-                            }
-                            else
-                            {
-                                JSONCONS_ASSERT(false);
-                            }
-                            ++p;
-                            state = column_state::sequence;
-                            break;
-                        }
-                        case ']':
-                        {
-                            JSONCONS_ASSERT(depth > 0);
-                            auto it = type_dictionary.find(buffer);
-                            if (it != type_dictionary.end())
-                            {
-                                column_types.emplace_back(it->second,depth);
-                                buffer.clear();
-                            }
-                            else
-                            {
-                                JSONCONS_ASSERT(false);
-                            }
-                            --depth;
-                            ++p;
-                            state = column_state::sequence;
-                            break;
-                        }
-                        default:
-                        {
-                            buffer.push_back(*p);
-                            ++p;
-                            break;
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-        if (state == column_state::label)
-        {
-            auto it = type_dictionary.find(buffer);
-            if (it != type_dictionary.end())
-            {
-                column_types.emplace_back(it->second,depth);
-                buffer.clear();
-            }
-            else
-            {
-                JSONCONS_ASSERT(false);
-            }
-        }
-        return column_types;
-    }
 
 };
 
