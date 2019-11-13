@@ -97,7 +97,7 @@ struct ser_traits<T,
 
         while (it != end && !ec)
         {
-            v.push_back(*it);
+            v.emplace_back(std::move(*it));
             it.increment(ec);
         }
         return v;
@@ -138,7 +138,7 @@ struct ser_traits<std::array<T,N>>
 
         for (size_t i = 0; it != end && i < N && !ec; ++i)
         {
-            v[i] = *it;
+            v[i] = std::move(*it);
             it.increment(ec);
         }
         return v;
@@ -182,7 +182,7 @@ struct ser_traits<T,
 
         while (it != end && !ec)
         {
-            m.emplace(it->first,it->second);
+            m.emplace(std::move(it->first),std::move(it->second));
             it.increment(ec);
         }
         return m;

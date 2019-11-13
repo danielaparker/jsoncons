@@ -97,7 +97,7 @@ private:
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> buffered_line_;
     string_type name_;
     size_t column_index_;
-    size_t row_index_;
+    std::vector<size_t> row_counts_;
 
     // Noncopyable and nonmoveable
     basic_csv_encoder(const basic_csv_encoder&) = delete;
@@ -115,8 +115,7 @@ public:
         stack_(),
         fp_(options.float_format(), options.precision()),
         strings_buffer_(options_.column_names()),
-        column_index_(0),
-        row_index_(1)
+        column_index_(0)
     {
     }
 
@@ -267,19 +266,19 @@ private:
                 return true;
             case stack_item_kind::column_mapping:
                 stack_.emplace_back(stack_item_kind::column);
-                row_index_ = 1;
-                if (strings_buffer_.size() <= row_index_)
+                row_counts_.push_back(1);
+                if (strings_buffer_.size() <= row_counts_.back())
                 {
-                    strings_buffer_.resize(row_index_ + 1);
+                    strings_buffer_.emplace_back();
                 }
                 return true;
             case stack_item_kind::column:
             {
-                if (strings_buffer_.size() <= row_index_)
+                if (strings_buffer_.size() <= row_counts_.back())
                 {
-                    strings_buffer_.resize(row_index_ + 1);
+                    strings_buffer_.emplace_back();
                 }                
-                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_index_]);
+                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
                 begin_value(bo);
                 stack_.emplace_back(stack_item_kind::column_multi_valued_field);
                 return true;
@@ -380,7 +379,21 @@ private:
                 write_null_value(result_);
                 break;
             case stack_item_kind::column:
+            {
+                if (strings_buffer_.size() <= row_counts_.back())
+                {
+                    strings_buffer_.emplace_back();
+                }
+                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                write_null_value(bo);
                 break;
+            }
+            case stack_item_kind::column_multi_valued_field:
+            {
+                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                write_null_value(bo);
+                break;
+            }
             default:
                 break;
         }
@@ -400,7 +413,7 @@ private:
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_result<std::basic_string<CharT>> bo(s);
-                    value(sv,bo);
+                    write_string_value(sv,bo);
                     bo.flush();
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
@@ -412,10 +425,24 @@ private:
             }
             case stack_item_kind::row:
             case stack_item_kind::row_multi_valued_field:
-                value(sv,result_);
+                write_string_value(sv,result_);
                 break;
             case stack_item_kind::column:
+            {
+                if (strings_buffer_.size() <= row_counts_.back())
+                {
+                    strings_buffer_.emplace_back();
+                }
+                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                write_string_value(sv,bo);
                 break;
+            }
+            case stack_item_kind::column_multi_valued_field:
+            {
+                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                write_string_value(sv,bo);
+                break;
+            }
             default:
                 break;
         }
@@ -491,7 +518,7 @@ private:
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_result<std::basic_string<CharT>> bo(s);
-                    value(val, bo);
+                    write_double_value(val, bo);
                     bo.flush();
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
@@ -503,10 +530,24 @@ private:
             }
             case stack_item_kind::row:
             case stack_item_kind::row_multi_valued_field:
-                value(val, result_);
+                write_double_value(val, result_);
                 break;
             case stack_item_kind::column:
+            {
+                if (strings_buffer_.size() <= row_counts_.back())
+                {
+                    strings_buffer_.emplace_back();
+                }
+                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                write_double_value(val, bo);
                 break;
+            }
+            case stack_item_kind::column_multi_valued_field:
+            {
+                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                write_double_value(val, bo);
+                break;
+            }
             default:
                 break;
         }
@@ -529,7 +570,7 @@ private:
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_result<std::basic_string<CharT>> bo(s);
-                    value(val,bo);
+                    write_int64_value(val,bo);
                     bo.flush();
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
@@ -541,10 +582,24 @@ private:
             }
             case stack_item_kind::row:
             case stack_item_kind::row_multi_valued_field:
-                value(val,result_);
+                write_int64_value(val,result_);
                 break;
             case stack_item_kind::column:
+            {
+                if (strings_buffer_.size() <= row_counts_.back())
+                {
+                    strings_buffer_.emplace_back();
+                }
+                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                write_int64_value(val, bo);
                 break;
+            }
+            case stack_item_kind::column_multi_valued_field:
+            {
+                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                write_int64_value(val, bo);
+                break;
+            }
             default:
                 break;
         }
@@ -583,13 +638,17 @@ private:
                 break;
             case stack_item_kind::column:
             {
-                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_index_]);
+                if (strings_buffer_.size() <= row_counts_.back())
+                {
+                    strings_buffer_.emplace_back();
+                }
+                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
                 write_uint64_value(val, bo);
                 break;
             }
             case stack_item_kind::column_multi_valued_field:
             {
-                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_index_]);
+                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
                 write_uint64_value(val, bo);
                 break;
             }
@@ -612,7 +671,7 @@ private:
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_result<std::basic_string<CharT>> bo(s);
-                    value(val,bo);
+                    write_bool_value(val,bo);
                     bo.flush();
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
@@ -624,10 +683,24 @@ private:
             }
             case stack_item_kind::row:
             case stack_item_kind::row_multi_valued_field:
-                value(val,result_);
+                write_bool_value(val,result_);
                 break;
             case stack_item_kind::column:
+            {
+                if (strings_buffer_.size() <= row_counts_.back())
+                {
+                    strings_buffer_.emplace_back();
+                }
+                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                write_bool_value(val, bo);
                 break;
+            }
+            case stack_item_kind::column_multi_valued_field:
+            {
+                jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
+                write_bool_value(val, bo);
+                break;
+            }
             default:
                 break;
         }
@@ -655,7 +728,7 @@ private:
     }
 
     template <class AnyWriter>
-    void value(const string_view_type& value, AnyWriter& result)
+    void write_string_value(const string_view_type& value, AnyWriter& result)
     {
         begin_value(result);
         string_value(value.data(),value.length(),result);
@@ -663,7 +736,7 @@ private:
     }
 
     template <class AnyWriter>
-    void value(double val, AnyWriter& result)
+    void write_double_value(double val, AnyWriter& result)
     {
         begin_value(result);
 
@@ -689,7 +762,7 @@ private:
     }
 
     template <class AnyWriter>
-    void value(int64_t val, AnyWriter& result)
+    void write_int64_value(int64_t val, AnyWriter& result)
     {
         begin_value(result);
 
@@ -713,7 +786,7 @@ private:
     }
 
     template <class AnyWriter>
-    void value(bool val, AnyWriter& result) 
+    void write_bool_value(bool val, AnyWriter& result) 
     {
         begin_value(result);
 
@@ -751,11 +824,22 @@ private:
                 }
                 break;
             case stack_item_kind::column:
-                if (column_index_ > 0)
+            {
+                size_t base = 0;
+                for (size_t i = 0; i+1 < row_counts_.size(); ++i)
+                {
+                    if (row_counts_[i] <= row_counts_.back())
+                    {
+                        result.push_back(options_.field_delimiter());
+                        ++base;
+                    }
+                }
+                if (column_index_ > base)
                 {
                     result.push_back(options_.field_delimiter());
                 }
                 break;
+            }
             case stack_item_kind::row_multi_valued_field:
             case stack_item_kind::column_multi_valued_field:
                 if (stack_.back().count_ > 0 && options_.subfield_delimiter() != char_type())
@@ -780,7 +864,7 @@ private:
             }
             case stack_item_kind::column:
             {
-                ++row_index_;
+                ++row_counts_.back();
                 break;
             }
             default:

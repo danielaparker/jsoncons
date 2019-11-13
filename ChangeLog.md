@@ -19,6 +19,13 @@ JSONCONS_POLYMORPHIC_TRAITS_DECL(base_class_name,derived_class_name0,derived_cla
 `JSONCONS_TPL_MEMBER_TRAITS_NAMED_DECL`, and `JSONCONS_TPL_STRICT_MEMBER_TRAITS_NAMED_DECL`
 now allow you to have `const` or `static const` data members that are serialized.
 
+Deprecated `basic_csv_options` functions removed:
+
+- basic_csv_options& column_names(const std::vector<string_type>&)
+- basic_csv_options& column_defaults(const std::vector<string_type>& value)
+- column_types(const std::vector<string_type>& value)
+(Instead, use the versions that take comma-delimited strings)
+
 v0.137.0
 --------
 

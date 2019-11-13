@@ -545,49 +545,6 @@ public:
         this->float_format_ = value;
         return *this;
     }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use column_names(const string_type&)")
-    basic_csv_options& column_names(const std::vector<string_type>& value)
-    {
-        this->column_names_ = value;
-        return *this;
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use column_defaults(const string_type&)")
-    basic_csv_options& column_defaults(const std::vector<string_type>& value)
-    {
-        this->column_defaults_ = value;
-        return *this;
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use column_types(const string_type&)")
-    basic_csv_options& column_types(const std::vector<string_type>& value)
-    {
-        if (value.size() > 0)
-        {
-            this->column_types_.reserve(value.size());
-            for (size_t i = 0; i < value.size(); ++i)
-            {
-                if (value[i] == jsoncons::csv::detail::string_literal<char_type>()())
-                {
-                    this->column_types_.emplace_back(csv_column_type::string_t,0);
-                }
-                else if (value[i] == jsoncons::csv::detail::integer_literal<char_type>()())
-                {
-                    this->column_types_.emplace_back(csv_column_type::integer_t,0);
-                }
-                else if (value[i] == jsoncons::csv::detail::float_literal<char_type>()())
-                {
-                    this->column_types_.emplace_back(csv_column_type::float_t,0);
-                }
-                else if (value[i] == jsoncons::csv::detail::boolean_literal<char_type>()())
-                {
-                    this->column_types_.emplace_back(csv_column_type::boolean_t,0);
-                }
-            }
-        }
-        return *this;
-    }
 #endif
 
     static std::vector<string_type> parse_column_names(const string_type& names)
