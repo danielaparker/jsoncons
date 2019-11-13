@@ -504,8 +504,8 @@ private:
 
     bool do_double_value(double val, 
                          semantic_tag, 
-                         const ser_context&,
-                         std::error_code&) override
+                         const ser_context& context,
+                         std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)
@@ -518,7 +518,7 @@ private:
                 {
                     std::basic_string<CharT> s;
                     jsoncons::string_result<std::basic_string<CharT>> bo(s);
-                    write_double_value(val, bo);
+                    write_double_value(val, context, bo, ec);
                     bo.flush();
                     if (!it->second.empty() && options_.subfield_delimiter() != char_type())
                     {
@@ -530,7 +530,7 @@ private:
             }
             case stack_item_kind::row:
             case stack_item_kind::row_multi_valued_field:
-                write_double_value(val, result_);
+                write_double_value(val, context, result_, ec);
                 break;
             case stack_item_kind::column:
             {
@@ -539,13 +539,13 @@ private:
                     strings_buffer_.emplace_back();
                 }
                 jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
-                write_double_value(val, bo);
+                write_double_value(val, context, bo, ec);
                 break;
             }
             case stack_item_kind::column_multi_valued_field:
             {
                 jsoncons::string_result<std::basic_string<CharT>> bo(strings_buffer_[row_counts_.back()]);
-                write_double_value(val, bo);
+                write_double_value(val, context, bo, ec);
                 break;
             }
             default:
@@ -736,21 +736,57 @@ private:
     }
 
     template <class AnyWriter>
-    void write_double_value(double val, AnyWriter& result)
+    void write_double_value(double val, const ser_context& context, AnyWriter& result, std::error_code& ec)
     {
         begin_value(result);
 
-        if ((std::isnan)(val))
+        if (!std::isfinite(val))
         {
-            result.append(null_k().data(), null_k().size());
-        }
-        else if (val == std::numeric_limits<double>::infinity())
-        {
-            result.append(null_k().data(), null_k().size());
-        }
-        else if (!(std::isfinite)(val))
-        {
-            result.append(null_k().data(), null_k().size());
+            if ((std::isnan)(val))
+            {
+                if (options_.enable_nan_to_num())
+                {
+                    result.append(options_.nan_to_num().data(), options_.nan_to_num().length());
+                }
+                else if (options_.enable_nan_to_str())
+                {
+                    do_string_value(options_.nan_to_str(), semantic_tag::none, context, ec);
+                }
+                else
+                {
+                    result.append(null_k().data(), null_k().size());
+                }
+            }
+            else if (val == std::numeric_limits<double>::infinity())
+            {
+                if (options_.enable_inf_to_num())
+                {
+                    result.append(options_.inf_to_num().data(), options_.inf_to_num().length());
+                }
+                else if (options_.enable_inf_to_str())
+                {
+                    do_string_value(options_.inf_to_str(), semantic_tag::none, context, ec);
+                }
+                else
+                {
+                    result.append(null_k().data(), null_k().size());
+                }
+            }
+            else
+            {
+                if (options_.enable_neginf_to_num())
+                {
+                    result.append(options_.neginf_to_num().data(), options_.neginf_to_num().length());
+                }
+                else if (options_.enable_neginf_to_str())
+                {
+                    do_string_value(options_.neginf_to_str(), semantic_tag::none, context, ec);
+                }
+                else
+                {
+                    result.append(null_k().data(), null_k().size());
+                }
+            }
         }
         else
         {

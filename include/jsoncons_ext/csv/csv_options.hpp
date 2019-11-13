@@ -78,13 +78,39 @@ protected:
     char_type quote_char_;
     char_type quote_escape_char_;
     char_type subfield_delimiter_;
+
+    bool enable_nan_to_num_:1;
+    bool enable_inf_to_num_:1;
+    bool enable_neginf_to_num_:1;
+    bool enable_nan_to_str_:1;
+    bool enable_inf_to_str_:1;
+    bool enable_neginf_to_str_:1;
+    bool enable_str_to_nan_:1;
+    bool enable_str_to_inf_:1;
+    bool enable_str_to_neginf_:1;
+
+    string_type nan_to_num_;
+    string_type inf_to_num_;
+    string_type neginf_to_num_;
+    string_type nan_to_str_;
+    string_type inf_to_str_;
+    string_type neginf_to_str_;
     std::vector<string_type> column_names_;
 
     basic_csv_options_common()
-        : field_delimiter_(','),
-          quote_char_('\"'),
-          quote_escape_char_('\"'),
-          subfield_delimiter_(char_type())
+      : field_delimiter_(','),
+        quote_char_('\"'),
+        quote_escape_char_('\"'),
+        subfield_delimiter_(char_type()),
+        enable_nan_to_num_(false),
+        enable_inf_to_num_(false),
+        enable_neginf_to_num_(false),
+        enable_nan_to_str_(false),
+        enable_inf_to_str_(false),
+        enable_neginf_to_str_(false),
+        enable_str_to_nan_(false),
+        enable_str_to_inf_(false),
+        enable_str_to_neginf_(false)
     {
     }
 
@@ -117,6 +143,137 @@ public:
     std::vector<string_type> column_names() const 
     {
         return column_names_;
+    }
+
+    bool enable_nan_to_num() const
+    {
+        return enable_nan_to_num_;
+    }
+
+    bool enable_inf_to_num() const
+    {
+        return enable_inf_to_num_;
+    }
+
+    bool enable_neginf_to_num() const
+    {
+        return enable_neginf_to_num_ || enable_inf_to_num_;
+    }
+
+    bool enable_nan_to_str() const
+    {
+        return enable_nan_to_str_;
+    }
+
+    bool enable_str_to_nan() const
+    {
+        return enable_str_to_nan_;
+    }
+
+    bool enable_inf_to_str() const
+    {
+        return enable_inf_to_str_;
+    }
+
+    bool enable_str_to_inf() const
+    {
+        return enable_str_to_inf_;
+    }
+
+    bool enable_neginf_to_str() const
+    {
+        return enable_neginf_to_str_ || enable_inf_to_str_;
+    }
+
+    bool enable_str_to_neginf() const
+    {
+        return enable_str_to_neginf_ || enable_str_to_inf_;
+    }
+
+    string_type nan_to_num() const
+    {
+        if (enable_nan_to_num_)
+        {
+            return nan_to_num_;
+        }
+        else
+        {
+            return nan_to_num_; // empty string
+        }
+    }
+
+    string_type inf_to_num() const
+    {
+        if (enable_inf_to_num_)
+        {
+            return inf_to_num_;
+        }
+        else
+        {
+            return inf_to_num_; // empty string
+        }
+    }
+
+    string_type neginf_to_num() const
+    {
+        if (enable_neginf_to_num_)
+        {
+            return neginf_to_num_;
+        }
+        else if (enable_inf_to_num_)
+        {
+            string_type s;
+            s.push_back('-');
+            s.append(inf_to_num_);
+            return s;
+        }
+        else
+        {
+            return neginf_to_num_; // empty string
+        }
+    }
+
+    string_type nan_to_str() const
+    {
+        if (enable_nan_to_str_)
+        {
+            return nan_to_str_;
+        }
+        else
+        {
+            return nan_to_str_; // empty string
+        }
+    }
+
+    string_type inf_to_str() const
+    {
+        if (enable_inf_to_str_)
+        {
+            return inf_to_str_;
+        }
+        else
+        {
+            return inf_to_str_; // empty string
+        }
+    }
+
+    string_type neginf_to_str() const
+    {
+        if (enable_neginf_to_str_)
+        {
+            return neginf_to_str_;
+        }
+        else if (enable_inf_to_str_)
+        {
+            string_type s;
+            s.push_back('-');
+            s.append(inf_to_str_);
+            return s;
+        }
+        else
+        {
+            return neginf_to_str_; // empty string
+        }
     }
 };
 
