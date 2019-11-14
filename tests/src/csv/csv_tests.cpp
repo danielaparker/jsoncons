@@ -18,6 +18,88 @@
 
 using namespace jsoncons;
 
+TEST_CASE("csv subfield delimiter tests")
+{
+#if 0
+    SECTION("n_objects tests")
+    {
+    const std::string input = R"(
+    [
+       {"a":[1,-2,3.0],"b":[true,false,null]},
+       {"a":["7","8","9"],"b":["10","11","12"]}
+    ]
+    )";
+
+       json j = json::parse(input);
+       //std::cout << pretty_print(j) << "\n\n";
+
+       csv::csv_options options;
+       options.assume_header(true)
+              .subfield_delimiter(';')
+              .quote_style(csv::quote_style_kind::nonnumeric)
+              .mapping(csv::mapping_kind::n_objects);
+
+       std::string output;
+       csv::encode_csv(j, output, options);
+       json other = csv::decode_csv<json>(output, options);
+       //std::cout << pretty_print(other) << "\n\n";
+
+       CHECK(j == other);
+    }
+
+    SECTION("n_rows tests")
+    {
+    const std::string input = R"(
+    [
+       [[1,2,3],[4,5,6]],
+       [[7,8,9],[10,11,12]]   
+    ]
+    )";
+
+       json j = json::parse(input);
+       //std::cout << pretty_print(j) << "\n\n";
+
+       csv::csv_options options;
+       options.subfield_delimiter(';');
+
+       std::string output;
+       csv::encode_csv(j, output, options);
+       json other = csv::decode_csv<json>(output, options);
+
+       CHECK(j == other);
+    }
+#endif
+    SECTION("m_columns tests")
+    {
+    const std::string input = R"(
+    {
+       "a" : [[1,true,null],[-4,5.5,"6"]],
+       "b" : [[7,8,9],[10,11,12]],
+       "c" : [15,16,17]       
+    }
+    )";
+
+       json j = json::parse(input);
+       std::cout << pretty_print(j) << "\n\n";
+
+       csv::csv_options options;
+       options.subfield_delimiter(';')
+              .quote_style(csv::quote_style_kind::nonnumeric)
+              .mapping(csv::mapping_kind::m_columns)
+              .assume_header(true)
+              .ignore_empty_values(true);
+
+       std::string output;
+       csv::encode_csv(j, output, options);
+       std::cout << output << "\n\n";
+
+       json other = csv::decode_csv<json>(output, options);
+       std::cout << other << "\n\n";
+
+       CHECK(j == other);
+    }
+}
+#if 0
 TEST_CASE("csv_test_empty_values_with_defaults x")
 {
     std::string input = "bool-f,string-f"
@@ -1464,4 +1546,4 @@ TEST_CASE("csv_reader constructors")
     }
 }
 #endif
-
+#endif

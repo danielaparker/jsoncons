@@ -1,6 +1,12 @@
 master
 -----
 
+Defect fix:
+
+- Fixes issue in `csv_parser` parsing a CSV file with `mapping_kind::m_columns`,
+  when parsing a quoted string containing a numeric value, processing it as a
+  number rather than as a string.  
+
 Changes:
 
 - It is no longer neccessay to place a semicolon after `JSONCONS_TYPE_TRAITS_FRIEND` 
@@ -18,6 +24,9 @@ JSONCONS_POLYMORPHIC_TRAITS_DECL(base_class_name,derived_class_name0,derived_cla
 `JSONCONS_MEMBER_TRAITS_NAMED_DECL`, `JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL`,
 `JSONCONS_TPL_MEMBER_TRAITS_NAMED_DECL`, and `JSONCONS_TPL_STRICT_MEMBER_TRAITS_NAMED_DECL`
 now allow you to have `const` or `static const` data members that are serialized.
+
+- `basic_csv_encoder` now supports json values that map to multi-valued fields and
+json objects where each member is a name-array pair.  
 
 Deprecated `basic_csv_options` functions removed:
 

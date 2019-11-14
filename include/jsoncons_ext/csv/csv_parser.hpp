@@ -1569,7 +1569,7 @@ private:
                 case mapping_kind::m_columns:
                     if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
-                        end_value(options_.infer_types());
+                        end_value(false);
                     }
                     else
                     {
