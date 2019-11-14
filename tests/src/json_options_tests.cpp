@@ -57,6 +57,7 @@ TEST_CASE("test_read_write_read_nan_replacement")
     std::ostringstream os;
     os << pretty_print(j, options);
 
+    std::cout << os.str() << "\n\n";
     json j2 = json::parse(os.str(),options);
 
     json expected;
@@ -436,3 +437,4 @@ TEST_CASE("json_options tests")
         CHECK(os.str() == s);
     }
 }
+

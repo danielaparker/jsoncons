@@ -12,6 +12,7 @@
 #include <vector>
 #include <stdexcept>
 #include <system_error>
+#include <unordered_map>
 #include <limits> // std::numeric_limits
 #include <functional> // std::function
 #include <jsoncons/json_exception.hpp>
@@ -29,70 +30,6 @@
 namespace jsoncons {
 
 namespace detail {
-
-template <class CharT>
-class replacement_filter : public basic_json_content_filter<CharT>
-{
-    typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
-    typedef typename basic_json_decode_options<CharT>::string_type string_type;
-
-    bool enable_str_to_nan_;
-    bool enable_str_to_inf_;
-    bool enable_str_to_neginf_;
-    string_type nan_to_str_;
-    string_type inf_to_str_;
-    string_type neginf_to_str_;
-
-public:
-    replacement_filter() = delete;
-
-    replacement_filter(basic_json_content_handler<CharT>& handler,     
-                       bool enable_str_to_nan,
-                       bool enable_str_to_inf,
-                       bool enable_str_to_neginf,     
-                       const string_type& nan_to_str,
-                       const string_type& inf_to_str,
-                       const string_type& neginf_to_str)
-        : basic_json_content_filter<CharT>(handler), 
-          enable_str_to_nan_(enable_str_to_nan),
-          enable_str_to_inf_(enable_str_to_inf),
-          enable_str_to_neginf_(enable_str_to_neginf), 
-          nan_to_str_(nan_to_str),
-          inf_to_str_(inf_to_str),
-          neginf_to_str_(neginf_to_str)
-    {
-    }
-
-    bool do_string_value(const string_view_type& s, 
-                         semantic_tag tag, 
-                         const ser_context& context,
-                         std::error_code&) override
-    {
-        if (tag == semantic_tag::none)
-        {
-            if (enable_str_to_nan_ && s == nan_to_str_)
-            {
-                return this->to_handler().double_value(std::nan(""), tag, context);
-            }
-            else if (enable_str_to_inf_ && s == inf_to_str_)
-            {
-                return this->to_handler().double_value(std::numeric_limits<double>::infinity(), tag, context);
-            }
-            else if (enable_str_to_neginf_ && s == neginf_to_str_)
-            {
-                return this->to_handler().double_value(-std::numeric_limits<double>::infinity(), tag, context);
-            }
-            else
-            {
-                return this->to_handler().string_value(s, tag, context);
-            }
-        }
-        else
-        {
-            return this->to_handler().string_value(s, tag, context);
-        }
-    }
-};
 
 }
 
@@ -179,7 +116,20 @@ JSONCONS_DEPRECATED_MSG("Instead, use strict_json_parsing") typedef strict_json_
 template <class CharT, class WorkAllocator = std::allocator<char>>
 class basic_json_parser : public ser_context
 {
+public:
+    using char_type = CharT;
     typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
+private:
+    struct string_maps_to_double
+    {
+        string_view_type s;
+
+        bool operator()(const std::pair<string_view_type,double>& val) const
+        {
+            return val.first == s;
+        }
+    };
+
     typedef WorkAllocator work_allocator_type;
     typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
     typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<json_parse_state> parse_state_allocator_type;
@@ -207,6 +157,7 @@ class basic_json_parser : public ser_context
     jsoncons::detail::string_to_double to_double_;
 
     std::vector<json_parse_state,parse_state_allocator_type> state_stack_;
+    std::vector<std::pair<string_view_type,double>> string_double_map_;
 
     // Noncopyable and nonmoveable
     basic_json_parser(const basic_json_parser&) = delete;
@@ -252,6 +203,19 @@ public:
 
         state_stack_.reserve(initial_stack_capacity_);
         push_state(json_parse_state::root);
+
+        if (options_.enable_str_to_nan())
+        {
+            string_double_map_.emplace_back(options_.nan_to_str(),std::nan(""));
+        }
+        if (options_.enable_str_to_inf())
+        {
+            string_double_map_.emplace_back(options_.inf_to_str(),std::numeric_limits<double>::infinity());
+        }
+        if (options_.enable_str_to_neginf())
+        {
+            string_double_map_.emplace_back(options_.neginf_to_str(),-std::numeric_limits<double>::infinity());
+        }
     }
 
     bool source_exhausted() const
@@ -379,7 +343,7 @@ public:
         } 
         push_state(json_parse_state::object);
         state_ = json_parse_state::expect_member_name_or_end;
-        more_ = handler.begin_object(semantic_tag::none, *this);
+        more_ = handler.begin_object(semantic_tag::none, *this, ec);
     }
 
     void end_object(basic_json_content_handler<CharT>& handler, std::error_code& ec)
@@ -395,7 +359,7 @@ public:
         state_ = pop_state();
         if (state_ == json_parse_state::object)
         {
-            more_ = handler.end_object(*this);
+            more_ = handler.end_object(*this, ec);
         }
         else if (state_ == json_parse_state::array)
         {
@@ -435,7 +399,7 @@ public:
         }
         push_state(json_parse_state::array);
         state_ = json_parse_state::expect_value_or_end;
-        more_ = handler.begin_array(semantic_tag::none, *this);
+        more_ = handler.begin_array(semantic_tag::none, *this, ec);
     }
 
     void end_array(basic_json_content_handler<CharT>& handler, std::error_code& ec)
@@ -451,7 +415,7 @@ public:
         state_ = pop_state();
         if (state_ == json_parse_state::array)
         {
-            more_ = handler.end_array(*this);
+            more_ = handler.end_array(*this, ec);
         }
         else if (state_ == json_parse_state::object)
         {
@@ -558,21 +522,7 @@ public:
 
     void parse_some(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
-        if (options_.enable_str_to_nan() || options_.enable_str_to_inf() || options_.enable_str_to_neginf())
-        {
-            jsoncons::detail::replacement_filter<CharT> h(handler,
-                                                          options_.enable_str_to_nan(),
-                                                          options_.enable_str_to_inf(),
-                                                          options_.enable_str_to_neginf(),
-                                                          options_.nan_to_str(),
-                                                          options_.inf_to_str(),
-                                                          options_.neginf_to_str());
-            parse_some_(h, ec);
-        }
-        else
-        {
-            parse_some_(handler, ec);
-        }
+        parse_some_(handler, ec);
     }
 
     void finish_parse(basic_json_content_handler<CharT>& handler)
@@ -1378,7 +1328,7 @@ public:
                     switch (*input_ptr_)
                     {
                         case 'e':
-                            more_ = handler.bool_value(true,  semantic_tag::none, *this);
+                            more_ = handler.bool_value(true,  semantic_tag::none, *this, ec);
                             if (parent() == json_parse_state::root)
                             {
                                 state_ = json_parse_state::before_done;
@@ -1446,7 +1396,7 @@ public:
                     switch (*input_ptr_)
                     {
                         case 'e':
-                            more_ = handler.bool_value(false, semantic_tag::none, *this);
+                            more_ = handler.bool_value(false, semantic_tag::none, *this, ec);
                             if (parent() == json_parse_state::root)
                             {
                                 state_ = json_parse_state::before_done;
@@ -1499,7 +1449,7 @@ public:
                     switch (*input_ptr_)
                     {
                     case 'l':
-                        more_ = handler.null_value(semantic_tag::none, *this);
+                        more_ = handler.null_value(semantic_tag::none, *this, ec);
                         if (parent() == json_parse_state::root)
                         {
                             state_ = json_parse_state::before_done;
@@ -1617,7 +1567,7 @@ public:
         {
             if (*(input_ptr_+1) == 'r' && *(input_ptr_+2) == 'u' && *(input_ptr_+3) == 'e')
             {
-                more_ = handler.bool_value(true, semantic_tag::none, *this);
+                more_ = handler.bool_value(true, semantic_tag::none, *this, ec);
                 input_ptr_ += 4;
                 column_ += 4;
                 if (parent() == json_parse_state::root)
@@ -1651,7 +1601,7 @@ public:
         {
             if (*(input_ptr_+1) == 'u' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 'l')
             {
-                more_ = handler.null_value(semantic_tag::none, *this);
+                more_ = handler.null_value(semantic_tag::none, *this, ec);
                 input_ptr_ += 4;
                 column_ += 4;
                 if (parent() == json_parse_state::root)
@@ -1685,7 +1635,7 @@ public:
         {
             if (*(input_ptr_+1) == 'a' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 's' && *(input_ptr_+4) == 'e')
             {
-                more_ = handler.bool_value(false, semantic_tag::none, *this);
+                more_ = handler.bool_value(false, semantic_tag::none, *this, ec);
                 input_ptr_ += 5;
                 column_ += 5;
                 if (parent() == json_parse_state::root)
@@ -2643,11 +2593,11 @@ private:
         auto result = jsoncons::detail::to_integer<int64_t>(string_buffer_.data(), string_buffer_.length());
         if (result.ec == jsoncons::detail::to_integer_errc())
         {
-            more_ = handler.int64_value(result.value, semantic_tag::none, *this);
+            more_ = handler.int64_value(result.value, semantic_tag::none, *this, ec);
         }
         else // Must be overflow
         {
-            more_ = handler.string_value(string_buffer_, semantic_tag::bigint, *this);
+            more_ = handler.string_value(string_buffer_, semantic_tag::bigint, *this, ec);
         }
         after_value(ec);
     }
@@ -2657,11 +2607,11 @@ private:
         auto result = jsoncons::detail::to_integer<uint64_t>(string_buffer_.data(), string_buffer_.length());
         if (result.ec == jsoncons::detail::to_integer_errc())
         {
-            more_ = handler.uint64_value(result.value, semantic_tag::none, *this);
+            more_ = handler.uint64_value(result.value, semantic_tag::none, *this, ec);
         }
         else // Must be overflow
         {
-            more_ = handler.string_value(string_buffer_, semantic_tag::bigint, *this);
+            more_ = handler.string_value(string_buffer_, semantic_tag::bigint, *this, ec);
         }
         after_value(ec);
     }
@@ -2672,12 +2622,12 @@ private:
         {
             if (options_.lossless_number())
             {
-                more_ = handler.string_value(string_buffer_, semantic_tag::bigdec, *this);
+                more_ = handler.string_value(string_buffer_, semantic_tag::bigdec, *this, ec);
             }
             else
             {
                 double d = to_double_(string_buffer_.c_str(), string_buffer_.length());
-                more_ = handler.double_value(d, semantic_tag::none, *this);
+                more_ = handler.double_value(d, semantic_tag::none, *this, ec);
             }
         }
         JSONCONS_CATCH(...)
@@ -2688,7 +2638,7 @@ private:
                 ec = json_errc::invalid_number;
                 return;
             }
-            more_ = handler.null_value(semantic_tag::none, *this); // recovery
+            more_ = handler.null_value(semantic_tag::none, *this, ec); // recovery
         }
 
         after_value(ec);
@@ -2739,6 +2689,7 @@ private:
 
     void end_string_value(const CharT* s, size_t length, basic_json_content_handler<CharT>& handler, std::error_code& ec) 
     {
+        string_view_type sv(s, length);
         auto result = unicons::validate(s,s+length);
         if (result.ec != unicons::conv_errc())
         {
@@ -2749,19 +2700,39 @@ private:
         switch (parent())
         {
         case json_parse_state::member_name:
-            more_ = handler.name(string_view_type(s, length), *this);
+            more_ = handler.name(sv, *this, ec);
             state_ = pop_state();
             state_ = json_parse_state::expect_colon;
             break;
         case json_parse_state::object:
         case json_parse_state::array:
-            more_ = handler.string_value(string_view_type(s, length), semantic_tag::none, *this);
+        {
+            auto it = std::find_if(string_double_map_.begin(), string_double_map_.end(), string_maps_to_double{ sv });
+            if (it != string_double_map_.end())
+            {
+                more_ = handler.double_value(it->second, semantic_tag::none, *this, ec);
+            }
+            else
+            {
+                more_ = handler.string_value(sv, semantic_tag::none, *this, ec);
+            }
             state_ = json_parse_state::expect_comma_or_end;
             break;
+        }
         case json_parse_state::root:
-            more_ = handler.string_value(string_view_type(s, length), semantic_tag::none, *this);
+        {
+            auto it = std::find_if(string_double_map_.begin(),string_double_map_.end(),string_maps_to_double{sv});
+            if (it != string_double_map_.end())
+            {
+                more_ = handler.double_value(it->second, semantic_tag::none, *this, ec);
+            }
+            else
+            {
+                more_ = handler.string_value(sv, semantic_tag::none, *this, ec);
+            }
             state_ = json_parse_state::before_done;
             break;
+        }
         default:
             more_ = err_handler_(json_errc::invalid_json_text, *this);
             if (!more_)
