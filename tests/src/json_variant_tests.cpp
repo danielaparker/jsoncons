@@ -38,65 +38,65 @@ TEST_CASE("test_move_constructor")
     json::variant var2(std::move(var1));
     //CHECK(value_kind::null_value == var1.kind());
     CHECK(value_kind::int64_value == var2.kind());
-    CHECK(var2.int64_box_cast()->value() == val1);
+    CHECK(var2.int64_holder_cast()->value() == val1);
 
     uint64_t val3 = 9999;
     json::variant var3(val3, semantic_tag::none);
     json::variant var4(std::move(var3));
     //CHECK(value_kind::null_value == var3.kind());
     CHECK(value_kind::uint64_value == var4.kind());
-    CHECK(var4.uint64_box_cast()->value() == val3);
+    CHECK(var4.uint64_holder_cast()->value() == val3);
 
     double val5 = 123456789.9;
     json::variant var5(val5, semantic_tag::none);
     json::variant var6(std::move(var5));
     //CHECK(value_kind::null_value == var5.kind());
     CHECK(value_kind::double_value == var6.kind());
-    CHECK(var6.double_box_cast()->value() == val5);
+    CHECK(var6.double_holder_cast()->value() == val5);
 
     std::string val7("Too long for small string");
     json::variant var7(val7.data(), val7.length(), semantic_tag::none);
     json::variant var8(std::move(var7));
     //CHECK(value_kind::null_value == var7.kind());
     CHECK(value_kind::long_string_value == var8.kind());
-    CHECK(val7 == var8.string_box_cast()->data());
-    CHECK(val7.length() == var8.string_box_cast()->length());
+    CHECK(val7 == var8.string_holder_cast()->data());
+    CHECK(val7.length() == var8.string_holder_cast()->length());
 
     std::string val9("Small string");
     json::variant var9(val9.data(), val9.length(), semantic_tag::none);
     json::variant var10(std::move(var9));
     //CHECK(value_kind::null_value == var9.kind());
     CHECK(value_kind::short_string_value == var10.kind());
-    CHECK(val9 == var10.short_string_box_cast()->data());
-    CHECK(val9.length() == var10.short_string_box_cast()->length());
+    CHECK(val9 == var10.short_string_holder_cast()->data());
+    CHECK(val9.length() == var10.short_string_holder_cast()->length());
 
     bool val11 = true;
     json::variant var11(val11, semantic_tag::none);
     json::variant var12(std::move(var11));
     //CHECK(value_kind::null_value == var11.kind());
     CHECK(value_kind::bool_value == var12.kind());
-    CHECK(var12.bool_box_cast()->value() == val11);
+    CHECK(var12.bool_holder_cast()->value() == val11);
 
     std::string val13("Too long for small string");
     json::variant var13(val13.data(), val13.length(), semantic_tag::none);
     json::variant var14(std::move(var13));
     //CHECK(value_kind::null_value == var13.kind());
     CHECK(value_kind::long_string_value == var14.kind());
-    CHECK(val13 == var14.string_box_cast()->data());
+    CHECK(val13 == var14.string_holder_cast()->data());
 
     json::object val15 = { {"first",1},{"second",2} };
     json::variant var15(val15, semantic_tag::none);
     json::variant var16(std::move(var15));
     CHECK(value_kind::null_value == var15.kind());
     CHECK(value_kind::object_value == var16.kind());
-    CHECK(val15 == var16.object_box_cast()->value());
+    CHECK(val15 == var16.object_holder_cast()->value());
 
     json::array val17 = {1,2,3,4};
     json::variant var17(val17, semantic_tag::none);
     json::variant var18(std::move(var17));
     CHECK(value_kind::null_value == var17.kind());
     CHECK(value_kind::array_value == var18.kind());
-    CHECK(val17 == var18.array_box_cast()->value());
+    CHECK(val17 == var18.array_holder_cast()->value());
 }
 
 TEST_CASE("test_copy_constructor")
@@ -106,56 +106,56 @@ TEST_CASE("test_copy_constructor")
     json::variant var2(var1);
     CHECK(value_kind::int64_value == var1.kind());
     CHECK(value_kind::int64_value == var2.kind());
-    CHECK(var2.int64_box_cast()->value() == val1);
+    CHECK(var2.int64_holder_cast()->value() == val1);
 
     uint64_t val3 = 123456789;
     json::variant var3(val3, semantic_tag::none);
     json::variant var4(var3);
     CHECK(value_kind::uint64_value == var3.kind());
     CHECK(value_kind::uint64_value == var4.kind());
-    CHECK(var4.uint64_box_cast()->value() == val3);
+    CHECK(var4.uint64_holder_cast()->value() == val3);
 
     double val5 = 123456789.9;
     json::variant var5(val5, semantic_tag::none);
     json::variant var6(var5);
     CHECK(value_kind::double_value == var5.kind());
     CHECK(value_kind::double_value == var6.kind());
-    CHECK(var6.double_box_cast()->value() == val5);
+    CHECK(var6.double_holder_cast()->value() == val5);
 
     std::string val9 = "Small string";
     json::variant var9(val9.data(), val9.length(), semantic_tag::none);
     json::variant var10(var9);
     CHECK(value_kind::short_string_value == var9.kind());
     CHECK(value_kind::short_string_value == var10.kind());
-    CHECK(var10.short_string_box_cast()->data() == val9);
+    CHECK(var10.short_string_holder_cast()->data() == val9);
 
     bool val11 = true;
     json::variant var11(val11, semantic_tag::none);
     json::variant var12(var11);
     CHECK(value_kind::bool_value == var11.kind());
     CHECK(value_kind::bool_value == var12.kind());
-    CHECK(var12.bool_box_cast()->value() == val11);
+    CHECK(var12.bool_holder_cast()->value() == val11);
 
     std::string val13 = "Too long for small string";
     json::variant var13(val13.data(), val13.length(), semantic_tag::none);
     json::variant var14(var13);
     CHECK(value_kind::long_string_value == var13.kind());
     CHECK(value_kind::long_string_value == var14.kind());
-    CHECK(var14.string_box_cast()->data() == val13);
+    CHECK(var14.string_holder_cast()->data() == val13);
 
     json::object val15 = { {"first",1},{"second",2} };
     json::variant var15(val15, semantic_tag::none);
     json::variant var16(var15);
     CHECK(value_kind::object_value == var15.kind());
     CHECK(value_kind::object_value == var16.kind());
-    CHECK(val15 == var16.object_box_cast()->value());
+    CHECK(val15 == var16.object_holder_cast()->value());
 
     json::array val17 = {1,2,3,4};
     json::variant var17(val17, semantic_tag::none);
     json::variant var18(var17);
     CHECK(value_kind::array_value == var17.kind());
     CHECK(value_kind::array_value == var18.kind());
-    CHECK(val17 == var18.array_box_cast()->value());
+    CHECK(val17 == var18.array_holder_cast()->value());
 }
 
 TEST_CASE("test_equals")
