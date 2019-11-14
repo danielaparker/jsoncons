@@ -69,11 +69,9 @@ struct csv_type_info
 
 namespace detail {
 
-template <class CharT>
-std::vector<std::basic_string<CharT>> parse_column_names(const std::basic_string<CharT>& names)
+template <class CharT,class Container>
+void parse_column_names(const std::basic_string<CharT>& names, Container& column_names)
 {
-    std::vector<std::basic_string<CharT>> column_names;
-
     column_state state = column_state::sequence;
     std::basic_string<CharT> buffer;
 
@@ -120,11 +118,10 @@ std::vector<std::basic_string<CharT>> parse_column_names(const std::basic_string
         column_names.push_back(buffer);
         buffer.clear();
     }
-    return column_names;
 }
 
-template <class CharT>
-std::vector<csv_type_info> parse_column_types(const std::basic_string<CharT>& types)
+template <class CharT,class Container>
+void parse_column_types(const std::basic_string<CharT>& types, Container& column_types)
 {
     using char_type = CharT;
     const std::unordered_map<std::basic_string<CharT>,csv_column_type, std::hash<std::basic_string<CharT>>,std::equal_to<std::basic_string<CharT>>> type_dictionary =
@@ -135,8 +132,6 @@ std::vector<csv_type_info> parse_column_types(const std::basic_string<CharT>& ty
         {detail::float_literal<char_type>(),csv_column_type::float_t},
         {detail::boolean_literal<char_type>(),csv_column_type::boolean_t}
     };
-
-    std::vector<csv_type_info> column_types;
 
     column_state state = column_state::sequence;
     int depth = 0;
@@ -269,7 +264,6 @@ std::vector<csv_type_info> parse_column_types(const std::basic_string<CharT>& ty
             JSONCONS_ASSERT(false);
         }
     }
-    return column_types;
 }
 
 } // detail
@@ -819,19 +813,19 @@ public:
 
     basic_csv_options& column_names(const string_type& names)
     {
-        this->column_names_ = jsoncons::csv::detail::parse_column_names(names);
+        jsoncons::csv::detail::parse_column_names(names, this->column_names_);
         return *this;
     }
 
     basic_csv_options& column_types(const string_type& types)
     {
-        this->column_types_ = jsoncons::csv::detail::parse_column_types(types);
+        jsoncons::csv::detail::parse_column_types(types, this->column_types_);
         return *this;
     }
 
     basic_csv_options& column_defaults(const string_type& defaults)
     {
-        this->column_defaults_ = jsoncons::csv::detail::parse_column_names(defaults);
+        jsoncons::csv::detail::parse_column_names(defaults, this->column_defaults_);
         return *this;
     }
 

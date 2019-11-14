@@ -20,7 +20,6 @@ using namespace jsoncons;
 
 TEST_CASE("csv subfield delimiter tests")
 {
-#if 0
     SECTION("n_objects tests")
     {
     const std::string input = R"(
@@ -68,7 +67,7 @@ TEST_CASE("csv subfield delimiter tests")
 
        CHECK(j == other);
     }
-#endif
+
     SECTION("m_columns tests")
     {
     const std::string input = R"(
@@ -80,7 +79,7 @@ TEST_CASE("csv subfield delimiter tests")
     )";
 
        json j = json::parse(input);
-       std::cout << pretty_print(j) << "\n\n";
+       //std::cout << pretty_print(j) << "\n\n";
 
        csv::csv_options options;
        options.subfield_delimiter(';')
@@ -91,15 +90,15 @@ TEST_CASE("csv subfield delimiter tests")
 
        std::string output;
        csv::encode_csv(j, output, options);
-       std::cout << output << "\n\n";
+       //std::cout << output << "\n\n";
 
        json other = csv::decode_csv<json>(output, options);
-       std::cout << other << "\n\n";
+       //std::cout << other << "\n\n";
 
        CHECK(j == other);
     }
 }
-#if 0
+
 TEST_CASE("csv_test_empty_values_with_defaults x")
 {
     std::string input = "bool-f,string-f"
@@ -1038,7 +1037,8 @@ TEST_CASE("csv_test1_repeat")
     2017-01-08,0.0063,0.0076,0.0084,0.0112,0.014
     )";    
 
-    auto result = jsoncons::csv::detail::parse_column_types(std::string("string,float*"));
+    std::vector<csv::csv_type_info> result;
+    jsoncons::csv::detail::parse_column_types(std::string("string,float*"), result);
     REQUIRE(result.size() == 3);
     CHECK(result[0].col_type == csv::csv_column_type::string_t);
     CHECK(result[0].level == 0);
@@ -1050,7 +1050,8 @@ TEST_CASE("csv_test1_repeat")
     CHECK(result[2].level == 0);
     CHECK(1 == result[2].rep_count);
 
-    auto result2 = jsoncons::csv::detail::parse_column_types(std::string("string,[float*]"));
+    std::vector<csv::csv_type_info> result2;
+    jsoncons::csv::detail::parse_column_types(std::string("string,[float*]"), result2);
     REQUIRE(result2.size() == 3);
     CHECK(result2[0].col_type == csv::csv_column_type::string_t);
     CHECK(result2[0].level == 0);
@@ -1062,7 +1063,8 @@ TEST_CASE("csv_test1_repeat")
     CHECK(result2[2].level == 1);
     CHECK(1 == result2[2].rep_count);
 
-    auto result3 = jsoncons::csv::detail::parse_column_types(std::string("string,[float]*"));
+    std::vector<csv::csv_type_info> result3;
+    jsoncons::csv::detail::parse_column_types(std::string("string,[float]*"), result3);
     REQUIRE(result3.size() == 3);
     CHECK(result3[0].col_type == csv::csv_column_type::string_t);
     CHECK(result3[0].level == 0);
@@ -1407,8 +1409,8 @@ TEST_CASE("test_type_inference")
 {
     "customer_name": ["John Roe", "Jane Doe", "Joe Bloggs", "John Smith"],
     "has_coupon": [true, false, false, false],
-    "phone_number": ["0272561313", "416-272-2561", 4162722561, null],
-    "zip_code": ["01001", 55416, 55416, "22313-1450"],
+    "phone_number": ["0272561313", "416-272-2561", "4162722561", null],
+    "zip_code": ["01001", 55416, "55416", "22313-1450"],
     "sales_tax_rate": [0.05, 0.15, 0.15, 0.15],
     "total_amount": [431.65, 480.7, 300.7, 300.7]
 }
@@ -1545,5 +1547,4 @@ TEST_CASE("csv_reader constructors")
         //std::cout << pretty_print(j) << "\n";
     }
 }
-#endif
 #endif
