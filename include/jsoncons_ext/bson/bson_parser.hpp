@@ -184,7 +184,7 @@ private:
         const uint8_t* endp;
         auto length = jsoncons::detail::little_to_native<int32_t>(buf, buf+sizeof(int32_t),&endp);
 
-        more_ = handler.begin_object(semantic_tag::none, *this);
+        more_ = handler.begin_object(semantic_tag::none, *this, ec);
         state_stack_.emplace_back(parse_mode::document,length);
     }
 
@@ -205,7 +205,7 @@ private:
         const uint8_t* endp;
         /* auto len = */ jsoncons::detail::little_to_native<int32_t>(buf, buf+sizeof(int32_t),&endp);
 
-        more_ = handler.begin_array(semantic_tag::none, *this);
+        more_ = handler.begin_array(semantic_tag::none, *this, ec);
         state_stack_.emplace_back(parse_mode::array,0);
     }
 
@@ -249,7 +249,7 @@ private:
                 }
                 const uint8_t* endp;
                 double res = jsoncons::detail::little_to_native<double>(buf,buf+sizeof(buf),&endp);
-                more_ = handler.double_value(res, semantic_tag::none, *this);
+                more_ = handler.double_value(res, semantic_tag::none, *this, ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::string_cd:
@@ -278,7 +278,7 @@ private:
                     ec = bson_errc::invalid_utf8_text_string;
                     return;
                 }
-                more_ = handler.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this);
+                more_ = handler.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this, ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::document_cd: 
@@ -294,7 +294,7 @@ private:
             }
             case jsoncons::bson::detail::bson_format::null_cd: 
             {
-                more_ = handler.null_value(semantic_tag::none, *this);
+                more_ = handler.null_value(semantic_tag::none, *this, ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::bool_cd:
@@ -305,7 +305,7 @@ private:
                     ec = bson_errc::unexpected_eof;
                     return;
                 }
-                more_ = handler.bool_value(val != 0, semantic_tag::none, *this);
+                more_ = handler.bool_value(val != 0, semantic_tag::none, *this, ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::int32_cd: 
@@ -318,7 +318,7 @@ private:
                 }
                 const uint8_t* endp;
                 auto val = jsoncons::detail::little_to_native<int32_t>(buf, buf+sizeof(int32_t),&endp);
-                more_ = handler.int64_value(val, semantic_tag::none, *this);
+                more_ = handler.int64_value(val, semantic_tag::none, *this, ec);
                 break;
             }
 
@@ -346,7 +346,7 @@ private:
                 }
                 const uint8_t* endp;
                 auto val = jsoncons::detail::little_to_native<int64_t>(buf, buf+sizeof(int64_t),&endp);
-                more_ = handler.int64_value(val, semantic_tag::none, *this);
+                more_ = handler.int64_value(val, semantic_tag::none, *this, ec);
                 break;
             }
 

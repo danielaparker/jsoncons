@@ -189,7 +189,7 @@ private:
             if (type <= 0x7f) 
             {
                 // positive fixint
-                more_ = handler.uint64_value(type, semantic_tag::none, *this);
+                more_ = handler.uint64_value(type, semantic_tag::none, *this, ec);
             }
             else if (type <= 0x8f) 
             {
@@ -218,13 +218,13 @@ private:
                     ec = msgpack_errc::invalid_utf8_text_string;
                     return;
                 }
-                more_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this);
+                more_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this, ec);
             }
         }
         else if (type >= 0xe0) 
         {
             // negative fixint
-            more_ = handler.int64_value(static_cast<int8_t>(type), semantic_tag::none, *this);
+            more_ = handler.int64_value(static_cast<int8_t>(type), semantic_tag::none, *this, ec);
         }
         else
         {
@@ -232,17 +232,17 @@ private:
             {
                 case jsoncons::msgpack::detail::msgpack_format::nil_cd: 
                 {
-                    more_ = handler.null_value(semantic_tag::none, *this);
+                    more_ = handler.null_value(semantic_tag::none, *this, ec);
                     break;
                 }
                 case jsoncons::msgpack::detail::msgpack_format::true_cd:
                 {
-                    more_ = handler.bool_value(true, semantic_tag::none, *this);
+                    more_ = handler.bool_value(true, semantic_tag::none, *this, ec);
                     break;
                 }
                 case jsoncons::msgpack::detail::msgpack_format::false_cd:
                 {
-                    more_ = handler.bool_value(false, semantic_tag::none, *this);
+                    more_ = handler.bool_value(false, semantic_tag::none, *this, ec);
                     break;
                 }
                 case jsoncons::msgpack::detail::msgpack_format::float32_cd: 
@@ -256,7 +256,7 @@ private:
                     }
                     const uint8_t* endp;
                     float val = jsoncons::detail::big_to_native<float>(buf,buf+sizeof(buf),&endp);
-                    more_ = handler.double_value(val, semantic_tag::none, *this);
+                    more_ = handler.double_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -271,7 +271,7 @@ private:
                     }
                     const uint8_t* endp;
                     double val = jsoncons::detail::big_to_native<double>(buf,buf+sizeof(buf),&endp);
-                    more_ = handler.double_value(val, semantic_tag::none, *this);
+                    more_ = handler.double_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -279,7 +279,7 @@ private:
                 {
                     uint8_t val{};
                     source_.get(val);
-                    more_ = handler.uint64_value(val, semantic_tag::none, *this);
+                    more_ = handler.uint64_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -294,7 +294,7 @@ private:
                     }
                     const uint8_t* endp;
                     uint16_t val = jsoncons::detail::big_to_native<uint16_t>(buf,buf+sizeof(buf),&endp);
-                    more_ = handler.uint64_value(val, semantic_tag::none, *this);
+                    more_ = handler.uint64_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -309,7 +309,7 @@ private:
                     }
                     const uint8_t* endp;
                     uint32_t val = jsoncons::detail::big_to_native<uint32_t>(buf,buf+sizeof(buf),&endp);
-                    more_ = handler.uint64_value(val, semantic_tag::none, *this);
+                    more_ = handler.uint64_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -324,7 +324,7 @@ private:
                     }
                     const uint8_t* endp;
                     uint64_t val = jsoncons::detail::big_to_native<uint64_t>(buf,buf+sizeof(buf),&endp);
-                    more_ = handler.uint64_value(val, semantic_tag::none, *this);
+                    more_ = handler.uint64_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -339,7 +339,7 @@ private:
                     }
                     const uint8_t* endp;
                     int8_t val = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
-                    more_ = handler.int64_value(val, semantic_tag::none, *this);
+                    more_ = handler.int64_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -354,7 +354,7 @@ private:
                     }
                     const uint8_t* endp;
                     int16_t val = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
-                    more_ = handler.int64_value(val, semantic_tag::none, *this);
+                    more_ = handler.int64_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -369,7 +369,7 @@ private:
                     }
                     const uint8_t* endp;
                     int32_t val = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
-                    more_ = handler.int64_value(val, semantic_tag::none, *this);
+                    more_ = handler.int64_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -384,7 +384,7 @@ private:
                     }
                     const uint8_t* endp;
                     int64_t val = jsoncons::detail::big_to_native<int64_t>(buf,buf+sizeof(buf),&endp);
-                    more_ = handler.int64_value(val, semantic_tag::none, *this);
+                    more_ = handler.int64_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -413,7 +413,7 @@ private:
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    more_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this);
+                    more_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -443,7 +443,7 @@ private:
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    more_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this);
+                    more_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -473,7 +473,7 @@ private:
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    more_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this);
+                    more_ = handler.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -733,7 +733,7 @@ private:
                 break;
         }
         state_stack_.emplace_back(parse_mode::array,len);
-        more_ = handler.begin_array(len, semantic_tag::none, *this);
+        more_ = handler.begin_array(len, semantic_tag::none, *this, ec);
     }
 
     void produce_end_array(json_content_handler& handler, std::error_code&)
@@ -779,7 +779,7 @@ private:
                 break;
         }
         state_stack_.emplace_back(parse_mode::map_key,len);
-        more_ = handler.begin_object(len, semantic_tag::none, *this);
+        more_ = handler.begin_object(len, semantic_tag::none, *this, ec);
     }
 
     void produce_end_map(json_content_handler& handler, std::error_code&)

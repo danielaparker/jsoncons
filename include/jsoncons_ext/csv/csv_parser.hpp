@@ -484,8 +484,20 @@ namespace detail {
 template<class CharT,class WorkAllocator=std::allocator<char>>
 class basic_csv_parser : public ser_context
 {
+public:
     typedef basic_string_view<CharT> string_view_type;
     typedef CharT char_type;
+private:
+    struct string_maps_to_double
+    {
+        string_view_type s;
+
+        bool operator()(const std::pair<string_view_type,double>& val) const
+        {
+            return val.first == s;
+        }
+    };
+
     typedef WorkAllocator work_allocator_type;
     typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
     typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
@@ -522,6 +534,7 @@ class basic_csv_parser : public ser_context
     std::vector<string_type,string_allocator_type> column_defaults_;
     std::vector<csv_parse_state,csv_parse_state_allocator_type> state_stack_;
     string_type buffer_;
+    std::vector<std::pair<string_view_type,double>> string_double_map_;
 
 public:
     basic_csv_parser(const WorkAllocator& allocator = WorkAllocator())
@@ -575,6 +588,18 @@ public:
         column_ = 1;
         column_index_ = 0;
         stack_.reserve(default_depth);
+        if (options_.enable_str_to_nan())
+        {
+            string_double_map_.emplace_back(options_.nan_to_str(),std::nan(""));
+        }
+        if (options_.enable_str_to_inf())
+        {
+            string_double_map_.emplace_back(options_.inf_to_str(),std::numeric_limits<double>::infinity());
+        }
+        if (options_.enable_str_to_neginf())
+        {
+            string_double_map_.emplace_back(options_.neginf_to_str(),-std::numeric_limits<double>::infinity());
+        }
         reset();
     }
 
@@ -678,14 +703,14 @@ public:
             {
                 case csv_parse_state::before_unquoted_field:
                 case csv_parse_state::before_last_unquoted_field:
-                    end_unquoted_string_value();
+                    end_unquoted_string_value(ec);
                     state_ = csv_parse_state::before_last_unquoted_field_tail;
                     break;
                 case csv_parse_state::before_last_unquoted_field_tail:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        more_ = handler_->end_array(*this);
+                        more_ = handler_->end_array(*this, ec);
                     }
                     ++column_index_;
                     state_ = csv_parse_state::end_record;
@@ -700,7 +725,7 @@ public:
                     }
                     if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
-                        before_value();
+                        before_value(ec);
                         state_ = csv_parse_state::before_unquoted_field;
                     }
                     else
@@ -711,7 +736,7 @@ public:
                         }
                         if (!(options_.ignore_empty_values() && buffer_.empty()))
                         {
-                            before_value();
+                            before_value(ec);
                             state_ = csv_parse_state::before_last_quoted_field;
                         }
                         else
@@ -722,7 +747,7 @@ public:
                     }
                     break;
                 case csv_parse_state::before_last_quoted_field:
-                    end_quoted_string_value();
+                    end_quoted_string_value(ec);
                     ++column_index_;
                     state_ = csv_parse_state::end_record;
                     break;
@@ -731,7 +756,7 @@ public:
                     {
                         if (!(options_.ignore_empty_values() && buffer_.empty()))
                         {
-                            before_value();
+                            before_value(ec);
                             ++column_;
                             state_ = csv_parse_state::before_last_quoted_field;
                         }
@@ -750,7 +775,7 @@ public:
                 case csv_parse_state::end_record:
                     if (column_index_ > 0)
                     {
-                        after_record();
+                        after_record(ec);
                     }
                     state_ = csv_parse_state::no_more_records;
                     break;
@@ -766,7 +791,7 @@ public:
                         default:
                             break;
                     }
-                    more_ = handler_->end_array(*this);
+                    more_ = handler_->end_array(*this, ec);
                     if (options_.mapping() == mapping_kind::m_columns)
                     {
                         if (!m_columns_filter_.done())
@@ -825,13 +850,13 @@ public:
                 case csv_parse_state::start:
                     if (options_.mapping() != mapping_kind::m_columns)
                     {
-                        more_ = handler_->begin_array(semantic_tag::none, *this);
+                        more_ = handler_->begin_array(semantic_tag::none, *this, ec);
                     }
                     if (!options_.assume_header() && options_.mapping() == mapping_kind::n_rows && options_.column_names().size() > 0)
                     {
                         column_index_ = 0;
                         state_ = csv_parse_state::column_labels;
-                        more_ = handler_->begin_array(semantic_tag::none, *this);
+                        more_ = handler_->begin_array(semantic_tag::none, *this, ec);
                     }
                     else
                     {
@@ -841,12 +866,12 @@ public:
                 case csv_parse_state::column_labels:
                     if (column_index_ < column_names_.size())
                     {
-                        more_ = handler_->string_value(column_names_[column_index_], semantic_tag::none, *this);
+                        more_ = handler_->string_value(column_names_[column_index_], semantic_tag::none, *this, ec);
                         ++column_index_;
                     }
                     else
                     {
-                        more_ = handler_->end_array(*this);
+                        more_ = handler_->end_array(*this, ec);
                         state_ = csv_parse_state::expect_comment_or_record; 
                         //stack_.back() = csv_mode::data;
                         column_index_ = 0;
@@ -948,7 +973,7 @@ public:
                             }
                             if (!(options_.ignore_empty_values() && buffer_.empty()))
                             {
-                                before_value();
+                                before_value(ec);
                                 state_ = csv_parse_state::before_last_quoted_field;
                             }
                             else
@@ -964,7 +989,7 @@ public:
                                 {
                                     trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                                 }
-                                before_value();
+                                before_value(ec);
                                 state_ = csv_parse_state::before_quoted_field;
                             }
                             else if (options_.subfield_delimiter() != char_type() && curr_char == options_.subfield_delimiter())
@@ -973,7 +998,7 @@ public:
                                 {
                                     trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                                 }
-                                before_value();
+                                before_value(ec);
                                 state_ = csv_parse_state::before_quoted_subfield;
                             }
                             break;
@@ -986,7 +1011,7 @@ public:
                     break;
                 }
                 case csv_parse_state::before_unquoted_field:
-                    end_unquoted_string_value();
+                    end_unquoted_string_value(ec);
                     state_ = csv_parse_state::before_unquoted_field_tail;
                     break;
                 case csv_parse_state::before_unquoted_field_tail:
@@ -994,7 +1019,7 @@ public:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        more_ = handler_->end_array(*this);
+                        more_ = handler_->end_array(*this, ec);
                     }
                     ++column_index_;
                     state_ = csv_parse_state::before_unquoted_string;
@@ -1007,7 +1032,7 @@ public:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        more_ = handler_->end_array(*this);
+                        more_ = handler_->end_array(*this, ec);
                     }
                     state_ = csv_parse_state::end_record;
                     ++column_;
@@ -1016,7 +1041,7 @@ public:
                 }
 
                 case csv_parse_state::before_last_unquoted_field:
-                    end_unquoted_string_value();
+                    end_unquoted_string_value(ec);
                     state_ = csv_parse_state::before_last_unquoted_field_tail;
                     break;
 
@@ -1024,7 +1049,7 @@ public:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        more_ = handler_->end_array(*this);
+                        more_ = handler_->end_array(*this, ec);
                     }
                     ++column_index_;
                     state_ = csv_parse_state::end_record;
@@ -1034,43 +1059,43 @@ public:
                     if (stack_.back() == csv_mode::data)
                     {
                         stack_.push_back(csv_mode::subfields);
-                        more_ = handler_->begin_array(semantic_tag::none, *this);
+                        more_ = handler_->begin_array(semantic_tag::none, *this, ec);
                     }
                     state_ = csv_parse_state::before_unquoted_subfield_tail;
                     break; 
                 case csv_parse_state::before_unquoted_subfield_tail:
-                    end_unquoted_string_value();
+                    end_unquoted_string_value(ec);
                     state_ = csv_parse_state::before_unquoted_string;
                     ++column_;
                     ++input_ptr_;
                     break;
                 case csv_parse_state::before_quoted_field:
-                    end_quoted_string_value();
+                    end_quoted_string_value(ec);
                     state_ = csv_parse_state::before_unquoted_field_tail; // return to unquoted
                     break;
                 case csv_parse_state::before_quoted_subfield:
                     if (stack_.back() == csv_mode::data)
                     {
                         stack_.push_back(csv_mode::subfields);
-                        more_ = handler_->begin_array(semantic_tag::none, *this);
+                        more_ = handler_->begin_array(semantic_tag::none, *this, ec);
                     }
                     state_ = csv_parse_state::before_quoted_subfield_tail;
                     break; 
                 case csv_parse_state::before_quoted_subfield_tail:
-                    end_quoted_string_value();
+                    end_quoted_string_value(ec);
                     state_ = csv_parse_state::before_unquoted_string;
                     ++column_;
                     ++input_ptr_;
                     break;
                 case csv_parse_state::before_last_quoted_field:
-                    end_quoted_string_value();
+                    end_quoted_string_value(ec);
                     state_ = csv_parse_state::before_last_quoted_field_tail;
                     break;
                 case csv_parse_state::before_last_quoted_field_tail:
                     if (stack_.back() == csv_mode::subfields)
                     {
                         stack_.pop_back();
-                        more_ = handler_->end_array(*this);
+                        more_ = handler_->end_array(*this, ec);
                     }
                     ++column_index_;
                     state_ = csv_parse_state::end_record;
@@ -1088,7 +1113,7 @@ public:
                             }
                             if (!(options_.ignore_empty_values() && buffer_.empty()))
                             {
-                                before_value();
+                                before_value(ec);
                                 state_ = csv_parse_state::before_last_unquoted_field;
                             }
                             else
@@ -1104,7 +1129,7 @@ public:
                                 {
                                     trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                                 }
-                                before_value();
+                                before_value(ec);
                                 state_ = csv_parse_state::before_unquoted_field;
                             }
                             else if (options_.subfield_delimiter() != char_type() && curr_char == options_.subfield_delimiter())
@@ -1113,7 +1138,7 @@ public:
                                 {
                                     trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                                 }
-                                before_value();
+                                before_value(ec);
                                 state_ = csv_parse_state::before_unquoted_subfield;
                             }
                             else if (curr_char == options_.quote_char())
@@ -1141,7 +1166,7 @@ public:
                         {
                             if (!options_.ignore_empty_lines())
                             {
-                                before_record();
+                                before_record(ec);
                                 state_ = csv_parse_state::end_record;
                             }
                             else
@@ -1156,7 +1181,7 @@ public:
                         case '\r':
                             if (!options_.ignore_empty_lines())
                             {
-                                before_record();
+                                before_record(ec);
                                 state_ = csv_parse_state::end_record;
                             }
                             else
@@ -1174,14 +1199,14 @@ public:
                             if (!options_.trim_leading())
                             {
                                 buffer_.push_back(static_cast<CharT>(curr_char));
-                                before_record();
+                                before_record(ec);
                                 state_ = csv_parse_state::unquoted_string;
                             }
                             ++column_;
                             ++input_ptr_;
                             break;
                         default:
-                            before_record();
+                            before_record(ec);
                             if (curr_char == options_.quote_char())
                             {
                                 buffer_.clear();
@@ -1206,7 +1231,7 @@ public:
                             ++line_;
                             column_ = 1;
                             state_ = csv_parse_state::expect_comment_or_record;
-                            after_record();
+                            after_record(ec);
                             ++input_ptr_;
                             break;
                         }
@@ -1214,7 +1239,7 @@ public:
                             ++line_;
                             column_ = 1;
                             state_ = csv_parse_state::expect_comment_or_record;
-                            after_record();
+                            after_record(ec);
                             push_state(state_);
                             state_ = csv_parse_state::cr;
                             ++input_ptr_;
@@ -1292,7 +1317,7 @@ public:
     }
 private:
     // name
-    void before_value()
+    void before_value(std::error_code& ec)
     {
         switch (stack_.back())
         {
@@ -1306,7 +1331,7 @@ private:
                     column_names_.push_back(buffer_);
                     if (options_.mapping() == mapping_kind::n_rows)
                     {
-                        more_ = handler_->string_value(buffer_, semantic_tag::none, *this);
+                        more_ = handler_->string_value(buffer_, semantic_tag::none, *this, ec);
                     }
                 }
                 break;
@@ -1317,7 +1342,7 @@ private:
                     {
                         if (column_index_ < column_names_.size() + offset_)
                         {
-                            more_ = handler_->name(column_names_[column_index_ - offset_], *this);
+                            more_ = handler_->name(column_names_[column_index_ - offset_], *this, ec);
                         }
                     }
                 }
@@ -1328,7 +1353,7 @@ private:
     }
 
     // begin_array or begin_record
-    void before_record()
+    void before_record(std::error_code& ec)
     {
         offset_ = 0;
 
@@ -1339,7 +1364,7 @@ private:
                 {
                     if (options_.mapping() == mapping_kind::n_rows)
                     {
-                        more_ = handler_->begin_array(semantic_tag::none, *this);
+                        more_ = handler_->begin_array(semantic_tag::none, *this, ec);
                     }
                 }
                 break;
@@ -1347,10 +1372,10 @@ private:
                 switch (options_.mapping())
                 {
                     case mapping_kind::n_rows:
-                        more_ = handler_->begin_array(semantic_tag::none, *this);
+                        more_ = handler_->begin_array(semantic_tag::none, *this, ec);
                         break;
                     case mapping_kind::n_objects:
-                        more_ = handler_->begin_object(semantic_tag::none, *this);
+                        more_ = handler_->begin_object(semantic_tag::none, *this, ec);
                         break;
                     case mapping_kind::m_columns:
                         break;
@@ -1364,13 +1389,13 @@ private:
     }
 
     // end_array, begin_array, string_value (headers)
-    void after_record()
+    void after_record(std::error_code& ec)
     {
         if (column_types_.size() > 0)
         {
             if (level_ > 0)
             {
-                more_ = handler_->end_array(*this);
+                more_ = handler_->end_array(*this, ec);
                 level_ = 0;
             }
         }
@@ -1386,7 +1411,7 @@ private:
                     case mapping_kind::n_rows:
                         if (options_.assume_header())
                         {
-                            more_ = handler_->end_array(*this);
+                            more_ = handler_->end_array(*this, ec);
                         }
                         break;
                     case mapping_kind::m_columns:
@@ -1402,13 +1427,13 @@ private:
                 switch (options_.mapping())
                 {
                     case mapping_kind::n_rows:
-                        more_ = handler_->end_array(*this);
+                        more_ = handler_->end_array(*this, ec);
                         break;
                     case mapping_kind::n_objects:
-                        more_ = handler_->end_object(*this);
+                        more_ = handler_->end_object(*this, ec);
                         break;
                     case mapping_kind::m_columns:
-                        more_ = handler_->end_array(*this);
+                        more_ = handler_->end_array(*this, ec);
                         break;
                 }
                 break;
@@ -1462,7 +1487,7 @@ private:
     /*
         end_array, begin_array, xxx_value (end_value)
     */
-    void end_unquoted_string_value() 
+    void end_unquoted_string_value(std::error_code& ec) 
     {
         switch (stack_.back())
         {
@@ -1473,11 +1498,11 @@ private:
                 case mapping_kind::n_rows:
                     if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                     {
-                        more_ = handler_->null_value(semantic_tag::none, *this);
+                        more_ = handler_->null_value(semantic_tag::none, *this, ec);
                     }
                     else
                     {
-                        end_value(options_.infer_types());
+                        end_value(options_.infer_types(), ec);
                     }
                     break;
                 case mapping_kind::n_objects:
@@ -1487,22 +1512,22 @@ private:
                         {
                             if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                             {
-                                more_ = handler_->null_value(semantic_tag::none, *this);
+                                more_ = handler_->null_value(semantic_tag::none, *this, ec);
                             }
                             else
                             {
-                                end_value(options_.infer_types());
+                                end_value(options_.infer_types(), ec);
                             }
                         }
                         else if (level_ > 0)
                         {
                             if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                             {
-                                more_ = handler_->null_value(semantic_tag::none, *this);
+                                more_ = handler_->null_value(semantic_tag::none, *this, ec);
                             }
                             else
                             {
-                                end_value(options_.infer_types());
+                                end_value(options_.infer_types(), ec);
                             }
                         }
                     }
@@ -1510,7 +1535,7 @@ private:
                 case mapping_kind::m_columns:
                     if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
-                        end_value(options_.infer_types());
+                        end_value(options_.infer_types(), ec);
                     }
                     else
                     {
@@ -1524,7 +1549,7 @@ private:
         }
     }
 
-    void end_quoted_string_value() 
+    void end_quoted_string_value(std::error_code& ec) 
     {
         switch (stack_.back())
         {
@@ -1537,7 +1562,7 @@ private:
                 switch (options_.mapping())
                 {
                 case mapping_kind::n_rows:
-                    end_value(false);
+                    end_value(false, ec);
                     break;
                 case mapping_kind::n_objects:
                     if (!(options_.ignore_empty_values() && buffer_.empty()))
@@ -1546,22 +1571,22 @@ private:
                         {
                             if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                             {
-                                more_ = handler_->null_value(semantic_tag::none, *this);
+                                more_ = handler_->null_value(semantic_tag::none, *this, ec);
                             }
                             else 
                             {
-                                end_value(false);
+                                end_value(false, ec);
                             }
                         }
                         else if (level_ > 0)
                         {
                             if (options_.unquoted_empty_value_is_null() && buffer_.length() == 0)
                             {
-                                more_ = handler_->null_value(semantic_tag::none, *this);
+                                more_ = handler_->null_value(semantic_tag::none, *this, ec);
                             }
                             else
                             {
-                                end_value(false);
+                                end_value(false, ec);
                             }
                         }
                     }
@@ -1569,7 +1594,7 @@ private:
                 case mapping_kind::m_columns:
                     if (!(options_.ignore_empty_values() && buffer_.empty()))
                     {
-                        end_value(false);
+                        end_value(false, ec);
                     }
                     else
                     {
@@ -1583,9 +1608,14 @@ private:
         }
     }
 
-    void end_value(bool infer_types)
+    void end_value(bool infer_types, std::error_code&  ec)
     {
-        if (column_index_ < column_types_.size() + offset_)
+        auto it = std::find_if(string_double_map_.begin(), string_double_map_.end(), string_maps_to_double{ buffer_ });
+        if (it != string_double_map_.end())
+        {
+            more_ = handler_->double_value(it->second, semantic_tag::none, *this, ec);
+        }
+        else if (column_index_ < column_types_.size() + offset_)
         {
             if (column_types_[column_index_ - offset_].col_type == csv_column_type::repeat_t)
             {
@@ -1594,19 +1624,19 @@ private:
                 {
                     if (column_index_ == offset_ || level_ > column_types_[column_index_-offset_].level)
                     {
-                        more_ = handler_->end_array(*this);
+                        more_ = handler_->end_array(*this, ec);
                     }
                     level_ = column_index_ == offset_ ? 0 : column_types_[column_index_ - offset_].level;
                 }
             }
             if (level_ < column_types_[column_index_ - offset_].level)
             {
-                more_ = handler_->begin_array(semantic_tag::none, *this);
+                more_ = handler_->begin_array(semantic_tag::none, *this, ec);
                 level_ = column_types_[column_index_ - offset_].level;
             }
             else if (level_ > column_types_[column_index_ - offset_].level)
             {
-                more_ = handler_->end_array(*this);
+                more_ = handler_->end_array(*this, ec);
                 level_ = column_types_[column_index_ - offset_].level;
             }
             switch (column_types_[column_index_ - offset_].col_type)
@@ -1618,7 +1648,7 @@ private:
                         iss >> val;
                         if (!iss.fail())
                         {
-                            more_ = handler_->int64_value(val, semantic_tag::none, *this);
+                            more_ = handler_->int64_value(val, semantic_tag::none, *this, ec);
                         }
                         else
                         {
@@ -1631,7 +1661,7 @@ private:
                             }
                             else
                             {
-                                more_ = handler_->null_value(semantic_tag::none, *this);
+                                more_ = handler_->null_value(semantic_tag::none, *this, ec);
                             }
                         }
                     }
@@ -1640,7 +1670,7 @@ private:
                     {
                         if (options_.lossless_number())
                         {
-                            more_ = handler_->string_value(buffer_,semantic_tag::bigdec, *this);
+                            more_ = handler_->string_value(buffer_,semantic_tag::bigdec, *this, ec);
                         }
                         else
                         {
@@ -1649,7 +1679,7 @@ private:
                             iss >> val;
                             if (!iss.fail())
                             {
-                                more_ = handler_->double_value(val, semantic_tag::none, *this);
+                                more_ = handler_->double_value(val, semantic_tag::none, *this, ec);
                             }
                             else
                             {
@@ -1662,7 +1692,7 @@ private:
                                 }
                                 else
                                 {
-                                    more_ = handler_->null_value(semantic_tag::none, *this);
+                                    more_ = handler_->null_value(semantic_tag::none, *this, ec);
                                 }
                             }
                         }
@@ -1672,19 +1702,19 @@ private:
                     {
                         if (buffer_.length() == 1 && buffer_[0] == '0')
                         {
-                            more_ = handler_->bool_value(false, semantic_tag::none, *this);
+                            more_ = handler_->bool_value(false, semantic_tag::none, *this, ec);
                         }
                         else if (buffer_.length() == 1 && buffer_[0] == '1')
                         {
-                            more_ = handler_->bool_value(true, semantic_tag::none, *this);
+                            more_ = handler_->bool_value(true, semantic_tag::none, *this, ec);
                         }
                         else if (buffer_.length() == 5 && ((buffer_[0] == 'f' || buffer_[0] == 'F') && (buffer_[1] == 'a' || buffer_[1] == 'A') && (buffer_[2] == 'l' || buffer_[2] == 'L') && (buffer_[3] == 's' || buffer_[3] == 'S') && (buffer_[4] == 'e' || buffer_[4] == 'E')))
                         {
-                            more_ = handler_->bool_value(false, semantic_tag::none, *this);
+                            more_ = handler_->bool_value(false, semantic_tag::none, *this, ec);
                         }
                         else if (buffer_.length() == 4 && ((buffer_[0] == 't' || buffer_[0] == 'T') && (buffer_[1] == 'r' || buffer_[1] == 'R') && (buffer_[2] == 'u' || buffer_[2] == 'U') && (buffer_[3] == 'e' || buffer_[3] == 'E')))
                         {
-                            more_ = handler_->bool_value(true, semantic_tag::none, *this);
+                            more_ = handler_->bool_value(true, semantic_tag::none, *this, ec);
                         }
                         else
                         {
@@ -1697,7 +1727,7 @@ private:
                             }
                             else
                             {
-                                more_ = handler_->null_value(semantic_tag::none, *this);
+                                more_ = handler_->null_value(semantic_tag::none, *this, ec);
                             }
                         }
                     }
@@ -1705,7 +1735,7 @@ private:
                 default:
                     if (buffer_.length() > 0)
                     {
-                        more_ = handler_->string_value(buffer_, semantic_tag::none, *this);
+                        more_ = handler_->string_value(buffer_, semantic_tag::none, *this, ec);
                     }
                     else
                     {
@@ -1718,7 +1748,7 @@ private:
                         }
                         else
                         {
-                            more_ = handler_->string_value(string_view_type(), semantic_tag::none, *this);
+                            more_ = handler_->string_value(string_view_type(), semantic_tag::none, *this, ec);
                         }
                     }
                     break;  
@@ -1728,11 +1758,11 @@ private:
         {
             if (infer_types)
             {
-                end_value_with_numeric_check();
+                end_value_with_numeric_check(ec);
             }
             else
             {
-                more_ = handler_->string_value(buffer_, semantic_tag::none, *this);
+                more_ = handler_->string_value(buffer_, semantic_tag::none, *this, ec);
             }
         }
     }
@@ -1756,7 +1786,7 @@ private:
     /*
         xxx_value 
     */
-    void end_value_with_numeric_check()
+    void end_value_with_numeric_check(std::error_code& ec)
     {
         numeric_check_state state = numeric_check_state::initial;
         bool is_negative = false;
@@ -1966,13 +1996,13 @@ private:
         switch (state)
         {
             case numeric_check_state::null:
-                more_ = handler_->null_value(semantic_tag::none, *this);
+                more_ = handler_->null_value(semantic_tag::none, *this, ec);
                 break;
             case numeric_check_state::boolean_true:
-                more_ = handler_->bool_value(true, semantic_tag::none, *this);
+                more_ = handler_->bool_value(true, semantic_tag::none, *this, ec);
                 break;
             case numeric_check_state::boolean_false:
-                more_ = handler_->bool_value(false, semantic_tag::none, *this);
+                more_ = handler_->bool_value(false, semantic_tag::none, *this, ec);
                 break;
             case numeric_check_state::zero:
             case numeric_check_state::integer:
@@ -1982,11 +2012,11 @@ private:
                     auto result = jsoncons::detail::to_integer<int64_t>(buffer_.data(), buffer_.length());
                     if (result.ec == jsoncons::detail::to_integer_errc())
                     {
-                        more_ = handler_->int64_value(result.value, semantic_tag::none, *this);
+                        more_ = handler_->int64_value(result.value, semantic_tag::none, *this, ec);
                     }
                     else // Must be overflow
                     {
-                        more_ = handler_->string_value(buffer_, semantic_tag::bigint, *this);
+                        more_ = handler_->string_value(buffer_, semantic_tag::bigint, *this, ec);
                     }
                 }
                 else
@@ -1994,11 +2024,11 @@ private:
                     auto result = jsoncons::detail::to_integer<uint64_t>(buffer_.data(), buffer_.length());
                     if (result.ec == jsoncons::detail::to_integer_errc())
                     {
-                        more_ = handler_->uint64_value(result.value, semantic_tag::none, *this);
+                        more_ = handler_->uint64_value(result.value, semantic_tag::none, *this, ec);
                     }
                     else if (result.ec == jsoncons::detail::to_integer_errc::overflow)
                     {
-                        more_ = handler_->string_value(buffer_, semantic_tag::bigint, *this);
+                        more_ = handler_->string_value(buffer_, semantic_tag::bigint, *this, ec);
                     }
                     else
                     {
@@ -2012,18 +2042,18 @@ private:
             {
                 if (options_.lossless_number())
                 {
-                    more_ = handler_->string_value(buffer_,semantic_tag::bigdec, *this);
+                    more_ = handler_->string_value(buffer_,semantic_tag::bigdec, *this, ec);
                 }
                 else
                 {
                     double d = to_double_(buffer.c_str(), buffer.length());
-                    more_ = handler_->double_value(d, semantic_tag::none, *this);
+                    more_ = handler_->double_value(d, semantic_tag::none, *this, ec);
                 }
                 break;
             }
             default:
             {
-                more_ = handler_->string_value(buffer_, semantic_tag::none, *this);
+                more_ = handler_->string_value(buffer_, semantic_tag::none, *this, ec);
                 break;
             }
         }

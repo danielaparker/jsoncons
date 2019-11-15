@@ -1330,15 +1330,15 @@ private:
                 switch (info)
                 {
                     case 0x14:
-                        more_ = handler.bool_value(false, semantic_tag::none, *this);
+                        more_ = handler.bool_value(false, semantic_tag::none, *this, ec);
                         source_.ignore(1);
                         break;
                     case 0x15:
-                        more_ = handler.bool_value(true, semantic_tag::none, *this);
+                        more_ = handler.bool_value(true, semantic_tag::none, *this, ec);
                         source_.ignore(1);
                         break;
                     case 0x16:
-                        more_ = handler.null_value(semantic_tag::none, *this);
+                        more_ = handler.null_value(semantic_tag::none, *this, ec);
                         source_.ignore(1);
                         break;
                     case 0x17:
@@ -1496,7 +1496,7 @@ private:
             case jsoncons::cbor::detail::additional_info::indefinite_length: 
             {
                 state_stack_.emplace_back(parse_mode::indefinite_map_key,0,stringref_map);
-                more_ = handler.begin_object(semantic_tag::none, *this);
+                more_ = handler.begin_object(semantic_tag::none, *this, ec);
                 source_.ignore(1);
                 break;
             }
@@ -1508,7 +1508,7 @@ private:
                     return;
                 }
                 state_stack_.emplace_back(parse_mode::map_key,len,stringref_map);
-                more_ = handler.begin_object(len, semantic_tag::none, *this);
+                more_ = handler.begin_object(len, semantic_tag::none, *this, ec);
                 break;
             }
         }
@@ -2414,7 +2414,7 @@ private:
                     {
                         typed_array_.data(uint8_array_arg)[i] = *p;
                     }
-                    more_ = handler.typed_array(typed_array_.data(uint8_array_arg), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(uint8_array_arg), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x44:
@@ -2458,7 +2458,7 @@ private:
                         }
                         typed_array_.data(uint16_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(typed_array_.data(uint16_array_arg), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(uint16_array_arg), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x42:
@@ -2488,7 +2488,7 @@ private:
                         }
                         typed_array_.data(uint32_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(typed_array_.data(uint32_array_arg), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(uint32_array_arg), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x43:
@@ -2518,7 +2518,7 @@ private:
                         }
                         typed_array_.data(uint64_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(typed_array_.data(uint64_array_arg), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(uint64_array_arg), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x48:
@@ -2532,7 +2532,7 @@ private:
                     {
                         typed_array_.data(int8_array_arg)[i] = (int8_t)*p;
                     }
-                    more_ = handler.typed_array(typed_array_.data(int8_array_arg), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(int8_array_arg), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x49:
@@ -2562,7 +2562,7 @@ private:
                         }
                         typed_array_.data(int16_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(typed_array_.data(int16_array_arg), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(int16_array_arg), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x4a:
@@ -2592,7 +2592,7 @@ private:
                         }
                         typed_array_.data(int32_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(typed_array_.data(int32_array_arg), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(int32_array_arg), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x4b:
@@ -2622,7 +2622,7 @@ private:
                         }
                         typed_array_.data(int64_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(typed_array_.data(int64_array_arg), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(int64_array_arg), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x50:
@@ -2652,7 +2652,7 @@ private:
                         }
                         typed_array_.data(half_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(half_arg, typed_array_.data(half_array_arg), semantic_tag::none, *this);
+                    more_ = handler.typed_array(half_arg, typed_array_.data(half_array_arg), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x51:
@@ -2682,7 +2682,7 @@ private:
                         }
                         typed_array_.data(float_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(typed_array_.data(float_array_arg), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(float_array_arg), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x52:
@@ -2712,7 +2712,7 @@ private:
                         }
                         typed_array_.data(double_array_arg)[i] = val;
                     }
-                    more_ = handler.typed_array(typed_array_.data(double_array_arg), semantic_tag::none, *this);
+                    more_ = handler.typed_array(typed_array_.data(double_array_arg), semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -2725,28 +2725,28 @@ private:
                 }
 
                 default:
-                    more_ = handler.byte_string_value(v, semantic_tag::none, *this);
+                    more_ = handler.byte_string_value(v, semantic_tag::none, *this, ec);
                     break;
             }
             tags_.clear();
         }
         else
         {
-            more_ = handler.byte_string_value(v, semantic_tag::none, *this);
+            more_ = handler.byte_string_value(v, semantic_tag::none, *this, ec);
         }
     }
 
     template <class Float128T_ = Float128T>
     typename std::enable_if<std::is_same<Float128T_,std::nullptr_t>::value,void>::type
-    handle_float128(basic_cbor_content_handler<Float128T>& handler, const byte_string_view&, const uint8_t, std::error_code&)
+    handle_float128(basic_cbor_content_handler<Float128T>& handler, const byte_string_view&, const uint8_t, std::error_code& ec)
     {
-        more_ = handler.begin_array(semantic_tag::none, *this);
+        more_ = handler.begin_array(semantic_tag::none, *this, ec);
         more_ = handler.end_array(*this);
     }
 
     template <class Float128T_ = Float128T>
     typename std::enable_if<!std::is_same<Float128T_,std::nullptr_t>::value,void>::type
-    handle_float128(basic_cbor_content_handler<Float128T>& handler, const byte_string_view& v, const uint8_t tag, std::error_code&)
+    handle_float128(basic_cbor_content_handler<Float128T>& handler, const byte_string_view& v, const uint8_t tag, std::error_code& ec)
     {
         const uint8_t e = (tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift; 
         const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
@@ -2777,7 +2777,7 @@ private:
                 }
                 typed_array_.data(float128_array_arg)[i] = val;
             }
-            more_ = handler.typed_array(typed_array_.data(float128_array_arg), semantic_tag::none, *this);
+            more_ = handler.typed_array(typed_array_.data(float128_array_arg), semantic_tag::none, *this, ec);
         }
     }
 
