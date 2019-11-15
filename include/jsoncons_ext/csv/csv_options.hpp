@@ -70,7 +70,8 @@ struct csv_type_info
 namespace detail {
 
 template <class CharT,class Container>
-void parse_column_names(const std::basic_string<CharT>& names, Container& column_names)
+void parse_column_names(const std::basic_string<CharT>& names, 
+                        Container& column_names)
 {
     column_state state = column_state::sequence;
     std::basic_string<CharT> buffer;
@@ -121,7 +122,8 @@ void parse_column_names(const std::basic_string<CharT>& names, Container& column
 }
 
 template <class CharT,class Container>
-void parse_column_types(const std::basic_string<CharT>& types, Container& column_types)
+void parse_column_types(const std::basic_string<CharT>& types, 
+                        Container& column_types)
 {
     using char_type = CharT;
     const std::unordered_map<std::basic_string<CharT>,csv_column_type, std::hash<std::basic_string<CharT>>,std::equal_to<std::basic_string<CharT>>> type_dictionary =
@@ -693,6 +695,15 @@ class basic_csv_options final : public basic_csv_decode_options<CharT>, public b
     typedef std::basic_string<CharT> string_type;
 
 public:
+    using basic_csv_decode_options<CharT>::enable_str_to_nan;
+    using basic_csv_decode_options<CharT>::enable_str_to_inf;
+    using basic_csv_decode_options<CharT>::enable_str_to_neginf;
+    using basic_csv_decode_options<CharT>::nan_to_str;
+    using basic_csv_decode_options<CharT>::inf_to_str;
+    using basic_csv_decode_options<CharT>::neginf_to_str;
+    using basic_csv_decode_options<CharT>::nan_to_num;
+    using basic_csv_decode_options<CharT>::inf_to_num;
+    using basic_csv_decode_options<CharT>::neginf_to_num;
     using basic_csv_decode_options<CharT>::field_delimiter;
     using basic_csv_decode_options<CharT>::subfield_delimiter;
     using basic_csv_decode_options<CharT>::quote_char;
