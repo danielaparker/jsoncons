@@ -73,6 +73,27 @@ Move constructor.
 
 #### Modifiers
 
+    basic_json_options& nan_to_str(const string_type& value, bool enable_inverse = true); 
+Sets a string replacement for `NaN` when writing JSON, and indicate whether it is also
+to be used when reading JSON.
+
+    basic_json_options& inf_to_str(const string_type& value, bool enable_inverse = true); 
+Sets a string replacement for infinity when writing JSON, and indicate whether it is also
+to be used when reading JSON.
+
+    basic_json_options& neginf_to_str(const string_type& value, bool enable_inverse = true); // (4)
+Sets a string replacement for negative infinity when writing JSON, and indicate whether it is also
+to be used when reading JSON.
+
+    basic_json_options& nan_to_num(const string_type& value); 
+Sets a number replacement for `NaN` when writing JSON
+
+    basic_json_options& inf_to_num(const string_type& value); 
+Sets a number replacement for `Infinity` when writing JSON
+
+    basic_json_options& neginf_to_num(const string_type& value); 
+Sets a number replacement for `Negative Infinity` when writing JSON
+
     basic_csv_options& float_format(float_chars_format value);
 Overrides [floating point format](../float_chars_format.md) when serializing to CSV. The default is [float_chars_format::general](float_chars_format.md).
 

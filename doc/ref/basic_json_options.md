@@ -92,6 +92,15 @@ to be used when reading JSON.
 Sets a string replacement for negative infinity when writing JSON, and indicate whether it is also
 to be used when reading JSON.
 
+    basic_json_options& nan_to_num(const string_type& value); 
+Sets a number replacement for `NaN` when writing JSON
+
+    basic_json_options& inf_to_num(const string_type& value); 
+Sets a number replacement for `Infinity` when writing JSON
+
+    basic_json_options& neginf_to_num(const string_type& value); 
+Sets a number replacement for `Negative Infinity` when writing JSON
+
     basic_json_options& lossless_number(bool value); 
 If set to `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`.
 Defaults to `false`.
@@ -133,15 +142,6 @@ Escape all non-ascii characters. The default is `false`.
 
     basic_json_options& escape_solidus(bool value)
 Escape the solidus ('/') character. The default is `false`.
-
-    basic_json_options& nan_to_num(const string_type& value); 
-Sets a number replacement for `NaN` when writing JSON
-
-    basic_json_options& inf_to_num(const string_type& value); 
-Sets a number replacement for `Infinity` when writing JSON
-
-    basic_json_options& neginf_to_num(const string_type& value); 
-Sets a number replacement for `Negative Infinity` when writing JSON
 
     basic_json_options& new_line_chars(const string_type& value)
 Defaults to "\n"
