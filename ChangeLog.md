@@ -28,6 +28,9 @@ now allow you to have `const` or `static const` data members that are serialized
 - `basic_csv_encoder` now supports json values that map to multi-valued fields and
 json objects where each member is a name-array pair.  
 
+- `basic_csv_parser` and `basic_csv_encoder` now support nan, infinity,
+and minus infinity substitution
+
 Deprecated `basic_csv_options` functions removed:
 
 - basic_csv_options& column_names(const std::vector<string_type>&)
