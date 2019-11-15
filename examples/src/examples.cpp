@@ -490,8 +490,6 @@ int main()
 
         type_extensibility_examples();
 
-        run_csv_examples();
-
         json_reader_examples();
 
         json_type_traits_macros_named_examples();
@@ -499,6 +497,8 @@ int main()
         run_cbor_typed_array_examples();
 
         json_type_traits_macros_examples();
+
+        run_csv_examples();
     }
     catch (const std::exception& e)
     {

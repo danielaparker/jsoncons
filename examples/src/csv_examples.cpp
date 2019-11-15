@@ -5,11 +5,120 @@
 #include <jsoncons_ext/csv/csv.hpp>
 #include <fstream>
 #include <iomanip>
+#include <cassert>
 #include "sample_types.hpp"
 
 using namespace jsoncons;
 
 namespace csv_examples {
+
+void encode_n_objects()
+{
+    const std::string input = R"(
+[
+    {
+        "customer_name": "John Roe",
+        "has_coupon": true,
+        "phone_number": "0272561313",
+        "zip_code": "01001",
+        "sales_tax_rate": 0.05,
+        "total_amount": 431.65
+    },
+    {
+        "customer_name": "Jane Doe",
+        "has_coupon": false,
+        "phone_number": "416-272-2561",
+        "zip_code": "55416",
+        "sales_tax_rate": 0.15,
+        "total_amount": 480.7
+    },
+    {
+        "customer_name": "Joe Bloggs",
+        "has_coupon": false,
+        "phone_number": "4162722561",
+        "zip_code": "55416",
+        "sales_tax_rate": 0.15,
+        "total_amount": 300.7
+    },
+    {
+        "customer_name": "John Smith",
+        "has_coupon": false,
+        "phone_number": null,
+        "zip_code": "22313-1450",
+        "sales_tax_rate": 0.15,
+        "total_amount": 300.7
+    }
+]
+    )";
+
+    ojson j = ojson::parse(input);
+
+    std::string output;
+    csv::csv_options ioptions;
+    ioptions.quote_style(csv::quote_style_kind::nonnumeric);
+    csv::encode_csv(j, output, ioptions);
+    std::cout << output << "\n\n";
+
+    csv::csv_options ooptions;
+    ooptions.assume_header(true);
+    ojson other = csv::decode_csv<ojson>(output, ooptions);
+    assert(other == j);
+}
+
+void encode_n_rows()
+{
+    const std::string input = R"(
+[
+    ["customer_name","has_coupon","phone_number","zip_code","sales_tax_rate","total_amount"],
+    ["John Roe",true,"0272561313","01001",0.05,431.65],
+    ["Jane Doe",false,"416-272-2561","55416",0.15,480.7],
+    ["Joe Bloggs",false,"4162722561","55416",0.15,300.7],
+    ["John Smith",false,null,"22313-1450",0.15,300.7]
+]
+    )";
+
+    json j = json::parse(input);
+
+    std::string output;
+    csv::csv_options ioptions;
+    ioptions.quote_style(csv::quote_style_kind::nonnumeric);
+    csv::encode_csv(j, output, ioptions);
+    std::cout << output << "\n\n";
+
+    csv::csv_options ooptions;
+    ooptions.assume_header(true)
+            .mapping(csv::mapping_kind::n_rows);
+    json other = csv::decode_csv<json>(output, ooptions);
+    assert(other == j);
+}
+
+void encode_m_columns()
+{
+    const std::string input = R"(
+{
+    "customer_name": ["John Roe","Jane Doe","Joe Bloggs","John Smith"],
+    "has_coupon": [true,false,false,false],
+    "phone_number": ["0272561313","416-272-2561","4162722561",null],
+    "zip_code": ["01001","55416","55416","22313-1450"],
+    "sales_tax_rate": [0.05,0.15,0.15,0.15],
+    "total_amount": [431.65,480.7,300.7,300.7]
+}
+    )";
+
+    ojson j = ojson::parse(input);
+
+    std::string output;
+    csv::csv_options ioptions;
+    ioptions.quote_style(csv::quote_style_kind::nonnumeric);
+    csv::encode_csv(j, output, ioptions);
+    std::cout << output << "\n\n";
+
+    csv::csv_options ooptions;
+    ooptions.assume_header(true)
+            .mapping(csv::mapping_kind::m_columns);
+    ojson other = csv::decode_csv<ojson>(output, ooptions);
+    assert(other == j);
+}
 
 void csv_source_to_json_value()
 {
@@ -569,6 +678,12 @@ void run_csv_examples()
     csv_examples::grouped_into_basic_json_records();
     std::cout << "\n";
     csv_examples::grouped_into_strongly_typed_records();
+    std::cout << "\n";
+    csv_examples::encode_n_objects();
+    std::cout << "\n";
+    csv_examples::encode_n_rows();
+    std::cout << "\n";
+    csv_examples::encode_m_columns();
     std::cout << "\n";
 
     std::cout << std::endl;
