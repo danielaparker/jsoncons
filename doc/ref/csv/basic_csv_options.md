@@ -133,13 +133,13 @@ Trim both leading and trailing whitespace inside quote characters. Default is `f
     basic_csv_options& unquoted_empty_value_is_null(bool value);
 Replace empty field with json null value. Default is `false`.         
 
-    basic_csv_options& column_names(const string_type& names);
+    basic_csv_options& column_names(const string_type& value);
 A comma separated list of names corresponding to the fields in the file. Example: "bool-field,float-field,string-field"
 
-    basic_csv_options& column_types(const string_type& types);
+    basic_csv_options& column_types(const string_type& value);
 A comma separated list of data types corresponding to the columns in the file. The following data types are supported: string, integer, float and boolean. Example: "bool,float,string"}
 
-    basic_csv_options& column_defaults(const string_type& defaults);
+    basic_csv_options& column_defaults(const string_type& value);
 A comma separated list of strings containing default json values corresponding to the columns in the file. Example: "false,0.0,"\"\""
 
     basic_csv_options& field_delimiter(char_type value);

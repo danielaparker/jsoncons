@@ -203,7 +203,6 @@ private:
             ec = csv_errc::source_error;
             return;
         }   
-        parser_.reset();
         while (!parser_.finished())
         {
             if (parser_.source_exhausted())

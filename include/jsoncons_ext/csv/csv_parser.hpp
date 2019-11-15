@@ -600,7 +600,40 @@ public:
         {
             string_double_map_.emplace_back(options_.neginf_to_str(),-std::numeric_limits<double>::infinity());
         }
-        reset();
+        stack_.push_back(csv_mode::initial);
+
+        std::vector<std::basic_string<CharT>> column_names;
+        std::vector<csv_type_info> column_types;
+        std::vector<std::basic_string<CharT>> column_defaults;
+
+        jsoncons::csv::detail::parse_column_names(options.column_names(), column_names);
+        jsoncons::csv::detail::parse_column_types(options.column_types(), column_types);
+        jsoncons::csv::detail::parse_column_names(options.column_defaults(), column_defaults);
+
+        for (const auto& name : column_names)
+        {
+            column_names_.emplace_back(name.data(),name.size(),allocator_);
+        }
+        for (const auto& name : column_types)
+        {
+            column_types_.push_back(name);
+        }
+        for (const auto& name : column_defaults)
+        {
+            column_defaults_.emplace_back(name.data(), name.size(),allocator_);
+        }
+        if (options_.header_lines() > 0)
+        {
+            stack_.push_back(csv_mode::header);
+        }
+        else
+        {
+            stack_.push_back(csv_mode::data);
+        }
+        state_ = csv_parse_state::start;
+        column_index_ = 0;
+        column_ = 1;
+        level_ = 0;
     }
 
     ~basic_csv_parser()
@@ -631,41 +664,6 @@ public:
     const std::vector<string_type,string_allocator_type>& column_labels() const
     {
         return column_names_;
-    }
-
-    void reset()
-    {
-        stack_.clear();
-        column_names_.clear();
-        column_types_.clear();
-        column_defaults_.clear();
-
-        stack_.push_back(csv_mode::initial);
-
-        for (const auto& name : options_.column_names())
-        {
-            column_names_.emplace_back(name.data(),name.size(),allocator_);
-        }
-        for (const auto& name : options_.column_types())
-        {
-            column_types_.push_back(name);
-        }
-        for (const auto& name : options_.column_defaults())
-        {
-            column_defaults_.emplace_back(name.data(), name.size(),allocator_);
-        }
-        if (options_.header_lines() > 0)
-        {
-            stack_.push_back(csv_mode::header);
-        }
-        else
-        {
-            stack_.push_back(csv_mode::data);
-        }
-        state_ = csv_parse_state::start;
-        column_index_ = 0;
-        column_ = 1;
-        level_ = 0;
     }
 
     void restart()

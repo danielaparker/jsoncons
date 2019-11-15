@@ -296,7 +296,7 @@ protected:
     string_type nan_to_str_;
     string_type inf_to_str_;
     string_type neginf_to_str_;
-    std::vector<string_type> column_names_;
+    string_type column_names_;
 
     basic_csv_options_common()
       : field_delimiter_(','),
@@ -341,7 +341,7 @@ public:
         return quote_escape_char_;
     }
 
-    std::vector<string_type> column_names() const 
+    string_type column_names() const 
     {
         return column_names_;
     }
@@ -500,8 +500,8 @@ protected:
     mapping_kind mapping_;
     size_t header_lines_;
     size_t max_lines_;
-    std::vector<csv_type_info> column_types_;
-    std::vector<string_type> column_defaults_;
+    string_type column_types_;
+    string_type column_defaults_;
 public:
     basic_csv_decode_options()
         : assume_header_(false),
@@ -622,12 +622,12 @@ public:
         return max_lines_;
     }
 
-    std::vector<csv_type_info> column_types() const 
+    string_type column_types() const 
     {
         return column_types_;
     }
 
-    std::vector<string_type> column_defaults() const 
+    string_type column_defaults() const 
     {
         return column_defaults_;
     }
@@ -811,21 +811,21 @@ public:
         return *this;
     }
 
-    basic_csv_options& column_names(const string_type& names)
+    basic_csv_options& column_names(const string_type& value)
     {
-        jsoncons::csv::detail::parse_column_names(names, this->column_names_);
+        this->column_names_ = value;
         return *this;
     }
 
-    basic_csv_options& column_types(const string_type& types)
+    basic_csv_options& column_types(const string_type& value)
     {
-        jsoncons::csv::detail::parse_column_types(types, this->column_types_);
+        this->column_types_ = value;
         return *this;
     }
 
-    basic_csv_options& column_defaults(const string_type& defaults)
+    basic_csv_options& column_defaults(const string_type& value)
     {
-        jsoncons::csv::detail::parse_column_names(defaults, this->column_defaults_);
+        this->column_defaults_ = value;
         return *this;
     }
 
