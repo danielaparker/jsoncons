@@ -14,6 +14,12 @@ Specifies options for reading and writing CSV data.
 
 Option|Reading|Writing
 ------|-------|----------
+nan_to_str|Substitute string with `NaN`, if enabled|Sets a string replacement for `NaN` when writing JSON
+inf_to_str|Substitute string with `infinity`, if enabled|Sets a string replacement for infinity when writing JSON
+neginf_to_str|Substitute string with `negative infinity`, if enabled|Sets a string replacement for negative infinity when writing JSON
+nan_to_num| |Sets a number replacement for `NaN` when writing JSON
+inf_to_num| |Sets a number replacement for `Infinity` when writing JSON
+neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON
 line_delimiter|Not used. When reading, the parser accepts `\n`, `\r` and `\r\n`.|An end-of-line string that marks the end of a row. Default is `\n`.
 field_delimiter|A character that indicates the end of a field. Default is `,`.|Character to separate values.
 subfield_delimiter|A character that indicates the end of a single value in a multi-valued field. Default is no multi-valued fields.|Character to write between items in an array value.

@@ -17,6 +17,9 @@ Option|Reading|Writing
 nan_to_str|Substitute string with `NaN`, if enabled|Sets a string replacement for `NaN` when writing JSON
 inf_to_str|Substitute string with `infinity`, if enabled|Sets a string replacement for infinity when writing JSON
 neginf_to_str|Substitute string with `negative infinity`, if enabled|Sets a string replacement for negative infinity when writing JSON
+nan_to_num| |Sets a number replacement for `NaN` when writing JSON
+inf_to_num| |Sets a number replacement for `Infinity` when writing JSON
+neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON
 lossless_number|If `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`. Defaults to `false`.|
 max_nesting_depth|Maximum nesting depth allowed when parsing JSON|
 indent_size| |The indent size, the default is 4
@@ -30,9 +33,6 @@ float_format| |Overrides [floating point format](../float_chars_format.md) when 
 precision| |Overrides floating point precision when serializing json. The default is shortest representation.
 escape_all_non_ascii| |Escape all non-ascii characters. The default is `false`.
 escape_solidus| |Escape the solidus ('/') character. The default is `false`.
-nan_to_num| |Sets a number replacement for `NaN` when writing JSON
-inf_to_num| |Sets a number replacement for `Infinity` when writing JSON
-neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON
 new_line_chars| |Defaults to "\n"
 line_length_limit| |
 object_object_line_splits| |For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
