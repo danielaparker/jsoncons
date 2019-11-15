@@ -116,8 +116,8 @@
 #   endif // (__GNUC__ >= 7)
 #  endif // defined(__GNUC__)
 #  if defined(_MSC_VER)
-#   if (_MSC_VER >= 1910 && _HAS_CXX17)
-#    define JSONCONS_HAS_STRING_VIEW
+#   if (_MSC_VER >= 1910 && defined(_HAS_CXX17) && (_HAS_CXX17 > 0))
+#    define JSONCONS_HAS_STRING_VIEW 1
 #   endif // (_MSC_VER >= 1910 && _HAS_CXX17)
 #  endif // defined(_MSC_VER)
 #endif // !defined(JSONCONS_HAS_STRING_VIEW)
