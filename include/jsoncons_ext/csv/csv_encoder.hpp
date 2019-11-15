@@ -116,12 +116,7 @@ public:
         fp_(options.float_format(), options.precision()),
         column_index_(0)
     {
-        std::vector<std::basic_string<CharT>> column_names;
-        jsoncons::csv::detail::parse_column_names(options.column_names(), column_names);
-        for (const auto& name : column_names)
-        {
-            strings_buffer_.emplace_back(name.data(),name.size());
-        }
+        jsoncons::csv::detail::parse_column_names(options.column_names(), strings_buffer_);
     }
 
     ~basic_csv_encoder()

@@ -71,10 +71,10 @@ namespace detail {
 
 template <class CharT,class Container>
 void parse_column_names(const std::basic_string<CharT>& names, 
-                        Container& column_names)
+                        Container& cont)
 {
     column_state state = column_state::sequence;
-    std::basic_string<CharT> buffer;
+    typename Container::value_type buffer(cont.get_allocator());
 
     auto p = names.begin();
     while (p != names.end())
@@ -100,7 +100,7 @@ void parse_column_names(const std::basic_string<CharT>& names,
                 switch (*p)
                 {
                 case ',':
-                    column_names.push_back(buffer);
+                    cont.push_back(buffer);
                     buffer.clear();
                     ++p;
                     state = column_state::sequence;
@@ -116,7 +116,7 @@ void parse_column_names(const std::basic_string<CharT>& names,
     }
     if (state == column_state::label)
     {
-        column_names.push_back(buffer);
+        cont.push_back(buffer);
         buffer.clear();
     }
 }
