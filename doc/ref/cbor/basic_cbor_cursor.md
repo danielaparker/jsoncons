@@ -283,7 +283,6 @@ private:
                         const ser_context&,
                         std::error_code&) override
     {
-        std::cout << "do_typed_array size: " << data.size() << "\n";
         v = std::vector<double>(data.begin(),data.end());
         return false;
     }
@@ -298,6 +297,8 @@ int main()
     options.enable_typed_arrays(true);
     cbor::encode_cbor(v, buffer, options);
 
+    std::cout << "(1)\n";
+    std::cout << byte_string_view(buffer.data(),buffer.size()) << "\n\n";
 /*
     0xd8, // Tag
         0x56, // Tag 86, float64, little endian, Typed Array
@@ -314,6 +315,7 @@ int main()
 
     my_cbor_content_handler handler;
     cursor.read(handler);
+    std::cout << "(2)\n";
     for (auto item : handler.v)
     {
         std::cout << item << "\n";
@@ -323,6 +325,10 @@ int main()
 ```
 Output:
 ```
+(1)
+d8 56 58 20 00 00 00 00 00 00 24 40 00 00 00 00 00 00 34 40 00 00 00 00 00 00 3e 40 00 00 00 00 00 00 44 40
+
+(2)
 10
 20
 30

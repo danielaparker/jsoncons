@@ -14,7 +14,7 @@ using namespace jsoncons;
 
 namespace cbor_examples {
 
-void serialize_to_cbor_buffer()
+void encode_to_cbor_buffer()
 {
     std::vector<uint8_t> buffer;
     cbor::cbor_bytes_encoder encoder(buffer);
@@ -51,7 +51,7 @@ void serialize_to_cbor_buffer()
 */ 
 }
 
-void serialize_to_cbor_stream()
+void encode_to_cbor_stream()
 {
     std::ostringstream os;
     cbor::cbor_stream_encoder encoder(os);
@@ -555,8 +555,8 @@ void run_cbor_examples()
     std::cout << "\ncbor examples\n\n";
     cbor_examples::encode_byte_string_with_encoding_hint();
     cbor_examples::encode_cbor_byte_string();
-    cbor_examples::serialize_to_cbor_buffer();
-    cbor_examples::serialize_to_cbor_stream();
+    cbor_examples::encode_to_cbor_buffer();
+    cbor_examples::encode_to_cbor_stream();
     cbor_examples::cbor_reputon_example();
     cbor_examples::query_cbor();
     cbor_examples::encode_cbor_with_packed_strings();

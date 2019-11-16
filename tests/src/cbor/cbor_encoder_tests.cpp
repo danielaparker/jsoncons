@@ -49,7 +49,7 @@ TEST_CASE("cbor encode multi dim array test")
 
 }
 
-TEST_CASE("test_serialize_to_stream")
+TEST_CASE("test_encode_to_stream")
 {
 json j = json::parse(R"(
 {

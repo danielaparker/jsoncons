@@ -8,7 +8,7 @@
 
 using namespace jsoncons;
 
-void serialize_to_bson()
+void encode_to_bson()
 {
     std::vector<uint8_t> buffer;
     bson::bson_bytes_encoder encoder(buffer);
@@ -48,7 +48,7 @@ void serialize_to_bson()
 void bson_examples()
 {
     std::cout << "\nbson examples\n\n";
-    serialize_to_bson();
+    encode_to_bson();
     std::cout << std::endl;
 }
 

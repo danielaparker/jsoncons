@@ -234,7 +234,7 @@ void serialize_array_of_arrays_to_comma_delimited()
     countries.dump(encoder);
 }
 
-void serialize_to_tab_delimited_file()
+void encode_to_tab_delimited_file()
 {
     std::string in_file = "./input/employees.json";
     std::ifstream is(in_file);
@@ -650,7 +650,7 @@ void run_csv_examples()
 {
     std::cout << "\nCSV examples\n\n";
     csv_examples::read_write_csv_tasks();
-    csv_examples::serialize_to_tab_delimited_file();
+    csv_examples::encode_to_tab_delimited_file();
     csv_examples::serialize_array_of_arrays_to_comma_delimited();
     csv_examples::serialize_books_to_csv_file();
     csv_examples::serialize_books_to_csv_file_with_reorder();
