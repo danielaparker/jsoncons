@@ -20,18 +20,12 @@ public:
     using typename basic_json_content_handler<CharT>::char_type;
     using typename basic_json_content_handler<CharT>::string_view_type;
 private:
-    basic_null_json_content_handler<CharT> default_handler_; 
     basic_json_content_handler<char_type>& to_handler_;
 
     // noncopyable and nonmoveable
     basic_json_content_filter(const basic_json_content_filter&) = delete;
     basic_json_content_filter& operator=(const basic_json_content_filter&) = delete;
 public:
-    basic_json_content_filter()
-        : to_handler_(default_handler_)
-    {
-    }
-
     basic_json_content_filter(basic_json_content_handler<char_type>& handler)
         : to_handler_(handler)
     {

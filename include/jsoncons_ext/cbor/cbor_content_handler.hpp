@@ -375,7 +375,7 @@ private:
 template <class Float128T = std::nullptr_t>
 class basic_default_cbor_content_handler : public basic_cbor_content_handler<Float128T>
 {
-    using super_type = basic_null_json_content_handler<char>;
+    using super_type = basic_default_json_content_handler<char>;
 
     bool parse_more_;
 public:
