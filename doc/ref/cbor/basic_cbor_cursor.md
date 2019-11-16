@@ -269,6 +269,63 @@ Haruki Murakami
 Graham Greene
 ```
 
+#### Read a typed array
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+#include <iostream>
+#include <iomanip>
+#include <cassert>
+
+struct my_cbor_content_handler : public cbor::default_cbor_content_handler
+{
+    std::vector<double> v;
+private:
+    bool do_typed_array(const span<const double>& data,  
+                        semantic_tag,
+                        const ser_context&,
+                        std::error_code&) override
+    {
+        std::cout << "do_typed_array size: " << data.size() << "\n";
+        v = std::vector<double>(data.begin(),data.end());
+        return false;
+    }
+};
+
+int main()
+{
+    const std::vector<uint8_t> input = {
+        0xd8, // Tag
+            0x56, // Tag 86, float64, little endian, Typed Array
+        0x58,0x20, // Byte string value of length 32 
+            0x00,0x00,0x00,0x00,0x00,0x00,0x24,0x40,
+            0x00,0x00,0x00,0x00,0x00,0x00,0x34,0x40, 
+            0x00,0x00,0x00,0x00,0x00,0x00,0x3e,0x40, 
+            0x00,0x00,0x00,0x00,0x00,0x00,0x44,0x40
+    };
+
+    cbor::cbor_bytes_cursor cursor(input);
+    assert(cursor.current().event_type() == staj_event_type::begin_array);
+    assert(cursor.is_typed_array());
+
+    my_cbor_content_handler handler;
+    cursor.read(handler);
+    for (auto item : handler.v)
+    {
+        std::cout << item << "\n";
+    }
+    std::cout << "\n";
+}
+```
+Output:
+```
+10
+20
+30
+40
+```
+
 #### Navigating Typed Arrays with cursor - multi-dimensional row major with typed array
 
 This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)
