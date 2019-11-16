@@ -809,6 +809,21 @@ public:
     {
         return parser_.column();
     }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_content_handler<char>&)")
+    void read_to(basic_json_content_handler<char>& handler)
+    {
+        read(handler);
+    }
+
+    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_content_handler<char>&, std::error_code&)")
+    void read_to(basic_json_content_handler<char>& handler,
+                 std::error_code& ec) 
+    {
+        read(handler, ec);
+    }
+#endif
 private:
 };
 

@@ -242,7 +242,7 @@ public:
     }
 
     void read(basic_json_content_handler<CharT>& handler,
-                std::error_code& ec) override
+              std::error_code& ec) override
     {
         if (!staj_to_saj_event(event_handler_.event(), handler, *this, ec))
         {
@@ -392,6 +392,21 @@ public:
     {
         return parser_.column();
     }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_content_handler<CharT>&)")
+    void read_to(basic_json_content_handler<CharT>& handler)
+    {
+        read(handler);
+    }
+
+    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_content_handler<CharT>&, std::error_code&)")
+    void read_to(basic_json_content_handler<CharT>& handler,
+                 std::error_code& ec)
+    {
+        read(handler, ec);
+    }
+#endif
 private:
 };
 
