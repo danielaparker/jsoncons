@@ -265,6 +265,8 @@ Haruki Murakami
 Graham Greene
 ```
 
+### Typed array examples
+
 #### Read a typed array
 
 ```c++
