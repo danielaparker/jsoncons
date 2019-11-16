@@ -38,7 +38,7 @@ encode_msgpack(const T& val, std::vector<uint8_t>& v)
 {
     msgpack_bytes_encoder encoder(v);
     std::error_code ec;
-    ser_traits<T>::serialize(val, encoder, json(), ec);
+    ser_traits<T>::encode(val, encoder, json(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec));
@@ -61,7 +61,7 @@ encode_msgpack(const T& val, std::ostream& os)
 {
     msgpack_stream_encoder encoder(os);
     std::error_code ec;
-    ser_traits<T>::serialize(val, encoder, json(), ec);
+    ser_traits<T>::encode(val, encoder, json(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec));
@@ -92,7 +92,7 @@ decode_msgpack(const std::vector<uint8_t>& v)
 {
     msgpack_bytes_cursor cursor(v);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(cursor, json(), ec);
+    T val = ser_traits<T>::decode(cursor, json(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -122,7 +122,7 @@ decode_msgpack(std::istream& is)
 {
     msgpack_stream_cursor cursor(is);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(cursor, json(), ec);
+    T val = ser_traits<T>::decode(cursor, json(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));

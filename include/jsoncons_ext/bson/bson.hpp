@@ -37,7 +37,7 @@ encode_bson(const T& val, std::vector<uint8_t>& v)
 {
     bson_bytes_encoder encoder(v);
     std::error_code ec;
-    ser_traits<T>::serialize(val, encoder, json(), ec);
+    ser_traits<T>::encode(val, encoder, json(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec));
@@ -60,7 +60,7 @@ encode_bson(const T& val, std::ostream& os)
 {
     bson_stream_encoder encoder(os);
     std::error_code ec;
-    ser_traits<T>::serialize(val, encoder, json(), ec);
+    ser_traits<T>::encode(val, encoder, json(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec));

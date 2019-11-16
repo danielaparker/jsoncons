@@ -30,7 +30,7 @@ template <class T, class Enable = void>
 struct ser_traits
 {
     template <class Json>
-    static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+    static T decode(basic_staj_reader<typename Json::char_type>& reader, 
                          const Json& context_j, 
                          std::error_code& ec)
     {
@@ -40,17 +40,17 @@ struct ser_traits
     }
 
     template <class Json>
-    static void serialize(const T& val, 
+    static void encode(const T& val, 
                           basic_json_content_handler<typename Json::char_type>& encoder,
                           const Json& context_j, 
                           std::error_code& ec)
     {
-        serialize(std::integral_constant<bool, is_stateless<typename Json::allocator_type>::value>(),
+        encode(std::integral_constant<bool, is_stateless<typename Json::allocator_type>::value>(),
                   val, encoder, context_j, ec);
     }
 private:
     template <class Json>
-    static void serialize(std::true_type,
+    static void encode(std::true_type,
                           const T& val, 
                           basic_json_content_handler<typename Json::char_type>& encoder,
                           const Json& /*context_j*/, 
@@ -60,7 +60,7 @@ private:
         j.dump(encoder, ec);
     }
     template <class Json>
-    static void serialize(std::false_type, 
+    static void encode(std::false_type, 
                           const T& val, 
                           basic_json_content_handler<typename Json::char_type>& encoder,
                           const Json& context_j, 
@@ -87,7 +87,7 @@ struct ser_traits<T,
     typedef typename T::value_type value_type;
 
     template <class Json>
-    static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+    static T decode(basic_staj_reader<typename Json::char_type>& reader, 
                          const Json&, 
                          std::error_code& ec)
     {
@@ -104,7 +104,7 @@ struct ser_traits<T,
     }
 
     template <class Json>
-    static void serialize(const T& val, 
+    static void encode(const T& val, 
                           basic_json_content_handler<typename Json::char_type>& encoder, 
                           const Json& context_j, 
                           std::error_code& ec)
@@ -112,7 +112,7 @@ struct ser_traits<T,
         encoder.begin_array(val.size());
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            ser_traits<value_type>::serialize(*it, encoder, context_j, ec);
+            ser_traits<value_type>::encode(*it, encoder, context_j, ec);
         }
         encoder.end_array();
         encoder.flush();
@@ -127,7 +127,7 @@ struct ser_traits<std::array<T,N>>
     typedef typename std::array<T,N>::value_type value_type;
 
     template <class Json>
-    static std::array<T, N> deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+    static std::array<T, N> decode(basic_staj_reader<typename Json::char_type>& reader, 
                                         const Json&, 
                                         std::error_code& ec)
     {
@@ -145,7 +145,7 @@ struct ser_traits<std::array<T,N>>
     }
 
     template <class Json>
-    static void serialize(const std::array<T, N>& val, 
+    static void encode(const std::array<T, N>& val, 
                           basic_json_content_handler<typename Json::char_type>& encoder, 
                           const Json& context_j, 
                           std::error_code& ec)
@@ -153,7 +153,7 @@ struct ser_traits<std::array<T,N>>
         encoder.begin_array(val.size());
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            ser_traits<value_type>::serialize(*it, encoder, context_j, ec);
+            ser_traits<value_type>::encode(*it, encoder, context_j, ec);
         }
         encoder.end_array();
         encoder.flush();
@@ -172,7 +172,7 @@ struct ser_traits<T,
     typedef typename T::key_type key_type;
 
     template <class Json>
-    static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+    static T decode(basic_staj_reader<typename Json::char_type>& reader, 
                          const Json&, 
                          std::error_code& ec)
     {
@@ -189,7 +189,7 @@ struct ser_traits<T,
     }
 
     template <class Json>
-    static void serialize(const T& val, 
+    static void encode(const T& val, 
                           basic_json_content_handler<typename Json::char_type>& encoder, 
                           const Json& context_j, 
                           std::error_code& ec)
@@ -202,7 +202,7 @@ struct ser_traits<T,
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
             encoder.name(it->first);
-            ser_traits<mapped_type>::serialize(it->second, encoder, context_j, ec);
+            ser_traits<mapped_type>::encode(it->second, encoder, context_j, ec);
         }
         encoder.end_object(null_ser_context(), ec);
         if (ec)

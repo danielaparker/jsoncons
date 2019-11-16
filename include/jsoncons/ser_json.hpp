@@ -37,7 +37,7 @@ decode_json(const std::basic_string<CharT>& s,
 {
     basic_json_cursor<CharT> cursor(s, options);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(cursor, basic_json<CharT>(), ec);
+    T val = ser_traits<T>::decode(cursor, basic_json<CharT>(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -63,7 +63,7 @@ decode_json(std::basic_istream<CharT>& is,
 {
     basic_json_cursor<CharT> cursor(is, options);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(cursor, basic_json<CharT>(), ec);
+    T val = ser_traits<T>::decode(cursor, basic_json<CharT>(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -77,7 +77,7 @@ T decode_json(const std::basic_string<CharT>& s,
 {
     basic_json_cursor<CharT> cursor(s, options);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(cursor, context_j, ec);
+    T val = ser_traits<T>::decode(cursor, context_j, ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -92,7 +92,7 @@ T decode_json(std::basic_istream<CharT>& is,
 {
     basic_json_cursor<CharT> cursor(is, options);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(cursor, context_j, ec);
+    T val = ser_traits<T>::decode(cursor, context_j, ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -109,7 +109,7 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context_j,
 {
     basic_json_cursor<CharT> cursor(s, options);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(cursor, context_j, ec);
+    T val = ser_traits<T>::decode(cursor, context_j, ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -125,7 +125,7 @@ T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context_j,
 {
     basic_json_cursor<CharT> cursor(is, options);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(cursor, context_j, ec);
+    T val = ser_traits<T>::decode(cursor, context_j, ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -237,7 +237,7 @@ void encode_json(const T& val,
                  basic_json_content_handler<CharT>& encoder)
 {
     std::error_code ec;
-    ser_traits<T>::serialize(val, encoder, basic_json<CharT>(), ec);
+    ser_traits<T>::encode(val, encoder, basic_json<CharT>(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec));
@@ -293,7 +293,7 @@ encode_json(const T& val,
             const basic_json<CharT, ImplementationPolicy, Allocator>& context_j)
 {
     std::error_code ec;
-    ser_traits<T>::serialize(val, encoder, context_j, ec);
+    ser_traits<T>::encode(val, encoder, context_j, ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec));
@@ -309,7 +309,7 @@ void encode_json(const basic_json<CharT, ImplementationPolicy, Allocator>& conte
                  basic_json_content_handler<CharT>& encoder)
 {
     std::error_code ec;
-    ser_traits<T>::serialize(val, encoder, context_j, ec);
+    ser_traits<T>::encode(val, encoder, context_j, ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec));

@@ -38,7 +38,7 @@ encode_ubjson(const T& val, std::vector<uint8_t>& v)
 {
     ubjson_bytes_encoder encoder(v);
     std::error_code ec;
-    ser_traits<T>::serialize(val, encoder, json(), ec);
+    ser_traits<T>::encode(val, encoder, json(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec));
@@ -61,7 +61,7 @@ encode_ubjson(const T& val, std::ostream& os)
 {
     ubjson_stream_encoder encoder(os);
     std::error_code ec;
-    ser_traits<T>::serialize(val, encoder, json(), ec);
+    ser_traits<T>::encode(val, encoder, json(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec));
@@ -87,7 +87,7 @@ decode_ubjson(const std::vector<uint8_t>& v)
 {
     ubjson_bytes_cursor cursor(v);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(cursor, json(), ec);
+    T val = ser_traits<T>::decode(cursor, json(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -112,7 +112,7 @@ decode_ubjson(std::istream& is)
 {
     ubjson_stream_cursor cursor(is);
     std::error_code ec;
-    T val = ser_traits<T>::deserialize(cursor, json(), ec);
+    T val = ser_traits<T>::decode(cursor, json(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
