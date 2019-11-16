@@ -90,7 +90,7 @@ TEST_CASE("cbor typed array cursor tests")
         CHECK(cursor.is_typed_array());
 
         my_cbor_content_handler handler;
-        cursor.read_to(handler);
+        cursor.read(handler);
         for (auto item : handler.v)
         {
             std::cout << item << "\n";

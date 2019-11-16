@@ -35,7 +35,7 @@ struct ser_traits
                          std::error_code& ec)
     {
         json_decoder<Json> decoder(context_j.get_allocator());
-        reader.read_to(decoder, ec);
+        reader.read(decoder, ec);
         return decoder.get_result().template as<T>();
     }
 

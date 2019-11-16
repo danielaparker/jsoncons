@@ -231,17 +231,17 @@ public:
         return event_handler_.event();
     }
 
-    void read_to(basic_json_content_handler<CharT>& handler) override
+    void read(basic_json_content_handler<CharT>& handler) override
     {
         std::error_code ec;
-        read_to(handler, ec);
+        read(handler, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
     }
 
-    void read_to(basic_json_content_handler<CharT>& handler,
+    void read(basic_json_content_handler<CharT>& handler,
                 std::error_code& ec) override
     {
         if (!staj_to_saj_event(event_handler_.event(), handler, *this, ec))

@@ -699,17 +699,17 @@ public:
         return event_handler_.event();
     }
 
-    void read_to(basic_json_content_handler<char>& handler) override
+    void read(basic_json_content_handler<char>& handler) override
     {
         std::error_code ec;
-        read_to(handler, ec);
+        read(handler, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
     }
 
-    void read_to(basic_json_content_handler<char>& handler,
+    void read(basic_json_content_handler<char>& handler,
                 std::error_code& ec) override
     {
         if (!event_handler_.dump(handler, *this, ec))
@@ -719,17 +719,17 @@ public:
         read_next(handler, ec);
     }
 
-    void read_to(basic_cbor_content_handler<Float128T>& handler) 
+    void read(basic_cbor_content_handler<Float128T>& handler) 
     {
         std::error_code ec;
-        read_to(handler, ec);
+        read(handler, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
     }
 
-    void read_to(basic_cbor_content_handler<Float128T>& handler, std::error_code& ec) 
+    void read(basic_cbor_content_handler<Float128T>& handler, std::error_code& ec) 
     {
         if (!event_handler_.dump(handler, *this, ec))
         {

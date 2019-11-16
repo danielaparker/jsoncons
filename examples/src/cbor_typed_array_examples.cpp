@@ -212,6 +212,44 @@ void cursor_example_multi_dim_column_major_classical_cbor_array()
     }
 }
 
+struct my_cbor_content_handler : public cbor::default_cbor_content_handler
+{
+    std::vector<double> v;
+private:
+    bool do_typed_array(const span<const double>& data,  
+                        semantic_tag,
+                        const ser_context&,
+                        std::error_code&) override
+    {
+        std::cout << "do_typed_array size: " << data.size() << "\n";
+        v = std::vector<double>(data.begin(),data.end());
+        return false;
+    }
+};
+
+void read_to_cbor_content_handler()
+{
+    const std::vector<uint8_t> input = {
+        0xd8, // Tag
+            0x56, // Tag 86, float64, little endian, Typed Array
+        0x50, // Byte string value of length 16
+            0xff,0xff,0xff,0xff,0xff,0xff,0xef,0xff,
+            0xff,0xff,0xff,0xff,0xff,0xff,0xef,0x7f
+    };
+
+    cbor::cbor_bytes_cursor cursor(input);
+    assert(cursor.current().event_type() == staj_event_type::begin_array);
+    assert(cursor.is_typed_array());
+
+    my_cbor_content_handler handler;
+    cursor.read(handler);
+    for (auto item : handler.v)
+    {
+        std::cout << item << "\n";
+    }
+    std::cout << "\n";
+}
+
 } // cbor_typed_array_examples
 
 void run_cbor_typed_array_examples()
@@ -223,6 +261,7 @@ void run_cbor_typed_array_examples()
     cbor_typed_array_examples::encode_half_array();
     cbor_typed_array_examples::cursor_example_multi_dim_row_major_typed_array();
     cbor_typed_array_examples::cursor_example_multi_dim_column_major_classical_cbor_array();
+    cbor_typed_array_examples::read_to_cbor_content_handler();
     std::cout << "\n\n";
 }
 
