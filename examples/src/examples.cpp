@@ -22,7 +22,6 @@ void container_examples();
 void wjson_examples();
 void serialization_examples();
 void type_extensibility_examples();
-void type_extensibility_examples2();
 void ojson_examples();
 void unicode_examples();
 void run_csv_examples();
@@ -441,8 +440,6 @@ int main()
         unicode_examples();
 
         parse_error_example();
-
-        type_extensibility_examples2();
 
         json_content_filter_examples();
 
