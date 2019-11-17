@@ -9,7 +9,6 @@ template <
 ```
 
 A [basic_json_content_handler](basic_json_content_handler.md) that discards all incoming json events. Serves as a base class for user defined content handlers.
-
 `basic_default_json_content_handler` is noncopyable and nonmoveable.
 
 ![basic_default_json_content_handler](./diagrams/basic_default_json_content_handler.png)
@@ -402,4 +401,8 @@ The output JSON file `address-book-new.json` with name fixes is
     ]
 }
 ```
+
+### See also
+
+- [basic_json_content_filter](basic_json_content_filter.md)
 
