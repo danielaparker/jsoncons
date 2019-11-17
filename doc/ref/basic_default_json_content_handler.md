@@ -8,7 +8,7 @@ template <
 > class basic_default_json_content_handler
 ```
 
-As a base class for user defined content handlers, discards all incoming json events. 
+A [basic_json_content_handler](basic_json_content_handler.md) that discards all incoming json events. Serves as a base class for user defined content handlers.
 
 `basic_default_json_content_handler` is noncopyable and nonmoveable.
 
