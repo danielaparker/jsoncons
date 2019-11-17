@@ -712,8 +712,8 @@ class basic_default_json_content_handler : public basic_json_content_handler<Cha
 public:
     using typename basic_json_content_handler<CharT>::string_view_type;
 
-    basic_default_json_content_handler(bool parse_more = true)
-        : parse_more_(parse_more)
+    basic_default_json_content_handler(bool continue_sending = true)
+        : parse_more_(continue_sending)
     {
     }
 private:

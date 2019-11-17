@@ -1,21 +1,25 @@
-### jsoncons::basic_json_content_handler
+### jsoncons::basic_default_json_content_handler
 
 ```c++
 #include <jsoncons/json_content_handler.hpp>
 
 template <
     class CharT
-> class basic_json_content_handler
+> class basic_default_json_content_handler
 ```
 
-Defines an interface for producing and consuming JSON events. 
+As a base class for user defined content handlers, discards all incoming json events. 
+
+`basic_default_json_content_handler` is noncopyable and nonmoveable.
+
+![basic_default_json_content_handler](./diagrams/basic_default_json_content_handler.png)
 
 Typedefs for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------
-json_content_handler    |`basic_json_content_handler<char>`
-wjson_content_handler   |`basic_json_content_handler<wchar_t>`
+default_json_content_handler    |`basic_default_json_content_handler<char>`
+wdefault_json_content_handler   |`basic_default_json_content_handler<wchar_t>`
 
 #### Member types
 
@@ -24,7 +28,15 @@ Member type                         |Definition
 `char_type`|CharT
 `string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 [std::string view](http://en.cppreference.com/w/cpp/string/basic_string_view) if C++ 17 is detected or if `JSONCONS_HAS_STRING_VIEW` is defined, otherwise proxied.  
 
-#### Public event producer interface
+#### Constructors
+
+    basic_default_json_content_handler(bool continue_sending = true)
+
+Constructs a `basic_default_json_content_handler`. The parameter
+`send_more` indicates whether the source of json events should continue 
+to send events.
+
+#### Inherited from [jsoncons::basic_json_content_handler](basic_json_content_handler.md)
 
     bool begin_object(semantic_tag tag=semantic_tag::none,
                       const ser_context& context=null_ser_context()); // (1)
@@ -210,155 +222,184 @@ Throws a [ser_error](ser_error.md) on parse errors.
     void flush()
 Flushes whatever is buffered to the destination.
 
-#### Private event consumer interface
-
-    virtual bool do_begin_object(semantic_tag tag, 
-                                 const ser_context& context, 
-                                 std::error_code& ec) = 0; // (1)
-
-    virtual bool do_begin_object(size_t length, 
-                                 semantic_tag tag, 
-                                 const ser_context& context, 
-                                 std::error_code& ec); // (2)
-
-    virtual bool do_end_object(const ser_context& context, 
-                               std::error_code& ec) = 0; // (3)
-
-    virtual bool do_begin_array(semantic_tag tag, 
-                                const ser_context& context, 
-                                std::error_code& ec) = 0; // (4)
-
-    virtual bool do_begin_array(size_t length, 
-                                semantic_tag tag, 
-                                const ser_context& context, 
-                                std::error_code& ec); // (5)
-
-    virtual bool do_end_array(const ser_context& context, 
-                              std::error_code& ec) = 0; // (6)
-
-    virtual bool do_name(const string_view_type& name, 
-                         const ser_context& context, 
-                         std::error_code&) = 0; // (7)
-
-    virtual bool do_null_value(semantic_tag tag, 
-                               const ser_context& context, 
-                               std::error_code& ec) = 0; // (8)
-
-    virtual bool do_bool_value(bool value, 
-                               semantic_tag tag, 
-                               const ser_context& context, 
-                               std::error_code&) = 0; // (9)
-
-    virtual bool do_string_value(const string_view_type& value, 
-                                 semantic_tag tag, 
-                                 const ser_context& context, 
-                                 std::error_code& ec) = 0; // (10)
-
-    virtual bool do_byte_string_value(const byte_string_view& value, 
-                                      semantic_tag tag, 
-                                      const ser_context& context,
-                                      std::error_code& ec) = 0; // (11)
-
-    virtual bool do_uint64_value(uint64_t value, 
-                                 semantic_tag tag, 
-                                 const ser_context& context,
-                                 std::error_code& ec) = 0; // (12)
-
-    virtual bool do_int64_value(int64_t value, 
-                                semantic_tag tag,
-                                const ser_context& context,
-                                std::error_code& ec) = 0; // (13)
-
-    virtual bool do_half_value(uint16_t value, 
-                               semantic_tag tag,
-                               const ser_context& context,
-                               std::error_code& ec) = 0; // (14)
-
-    virtual bool do_double_value(double value, 
-                                 semantic_tag tag,
-                                 const ser_context& context,
-                                 std::error_code& ec) = 0; // (15)
-
-(1) Handles the beginning of an object of indefinite length.
-Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
-
-(2) Handles the beginning of an object of known length.
-Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
-
-(3) Handles the end of an object.
-Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
-
-(4) Handles the beginning of an array of indefinite length.
-Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
-
-(5) Handles the beginning of an array of known length.
-Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
-
-(6) Handles the end of an array.
-Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
-
-(7) Handles the name part of an object name-value pair.
-Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
-
-(8) Handles a null value.
-Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
-
-(9) Handles a boolean value. 
-Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
-
-(10) Handles a string value.
-Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
-
-(11) Handles a byte string value.
-Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
-
-(12) Handles a non-negative integer value.
-Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
-
-(13) Handles a signed integer value.
-Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
-
-(14) Handles a half precision floating point value. 
-Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
-
-(15) Handles a double precision floating point value. 
-Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
-
-    virtual void do_flush() = 0;
-Allows producers of json events to flush any buffered data.
-
-#### Parameters
-
-`tag` - a jsoncons semantic tag
-`context` - parse context information including line and column number
-`ec` - a parse error code
-
-#### Exceptions
-
-The overloads that do not take a `std::error_code&` parameter throw a
-[ser_error](ser_error.md) on parse errors, constructed with the error code as the error code argument
-and line and column from the `context`. 
-
-The overloads that take a `std::error_code&` parameter set it to the error code and return `false` on parse errors.
-
 ### See also
 
-- [semantic_tag](semantic_tag.md)
+- [basic_json_content_handler](basic_json_content_handler.md)
 
-- [basic_default_json_content_handler](basic_default_json_content_handler.md)
+### Examples
+
+#### Rename object member names with the built in filter [rename_object_member_filter](rename_object_member_filter.md)
+
+```c++
+#include <sstream>
+#include <jsoncons/json.hpp>
+#include <jsoncons/default_json_content_handler.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    std::string s = R"({"first":1,"second":2,"fourth":3,"fifth":4})";    
+
+    json_stream_encoder encoder(std::cout);
+
+    // Filters can be chained
+    rename_object_member_filter filter2("fifth", "fourth", encoder);
+    rename_object_member_filter filter1("fourth", "third", filter2);
+
+    // A filter can be passed to any function that takes
+    // a json_content_handler ...
+    std::cout << "(1) ";
+    std::istringstream is(s);
+    json_reader reader(is, filter1);
+    reader.read();
+    std::cout << std::endl;
+
+    // or a json_content_handler    
+    std::cout << "(2) ";
+    ojson j = ojson::parse(s);
+    j.dump(filter1);
+    std::cout << std::endl;
+}
+```
+Output:
+```json
+(1) {"first":1,"second":2,"third":3,"fourth":4}
+(2) {"first":1,"second":2,"third":3,"fourth":4}
+```
+
+#### Fix up names in an address book JSON file
+
+Input JSON file `address-book.json`:
+
+```json
+{
+    "address-book" : 
+    [
+        {
+            "name":"Jane Roe",
+            "email":"jane.roe@example.com"
+        },
+        {
+             "name":"John",
+             "email" : "john.doe@example.com"
+         }
+    ]
+}
+```
+
+Suppose you want to break the name into a first name and last name, and report a warning when `name` does not contain a space or tab separated part. 
+
+You can achieve the desired result by subclassing the [basic_default_json_content_handler](basic_default_json_content_handler.md) class, overriding the default methods for receiving name and string value events, and passing modified events on to the parent [json_content_handler](basic_json_content_handler.md) (which in this example will forward them to a [basic_json_encoder](basic_json_encoder.md).) 
+```c++
+#include <jsoncons/json_encoder.hpp>
+#include <jsoncons/default_json_content_handler.hpp>
+#include <jsoncons/json_reader.hpp>
+
+using namespace jsoncons;
+
+
+class name_fix_up_filter : public default_json_content_handler
+{
+    std::string member_name_;
+
+public:
+    name_fix_up_filter(json_content_handler& handler)
+        : default_json_content_handler(handler)
+    {
+    }
+
+private:
+    bool do_name(const string_view_type& name, 
+                 const ser_context& context,
+                 std::error_code&) override
+    {
+        member_name_ = name;
+        if (member_name_ != "name")
+        {
+            this->to_handler().write_name(name, context);
+        }
+        return true;
+    }
+
+    bool do_string_value(const string_view_type& s, 
+                         const ser_context& context,
+                         std::error_code&) override
+    {
+        if (member_name_ == "name")
+        {
+            size_t end_first = val.find_first_of(" \t");
+            size_t start_last = val.find_first_not_of(" \t", end_first);
+            this->to_handler().write_name("first-name", context);
+            string_view_type first = val.substr(0, end_first);
+            this->to_handler().value(first, context);
+            if (start_last != string_view_type::npos)
+            {
+                this->to_handler().write_name("last-name", context);
+                string_view_type last = val.substr(start_last);
+                this->to_handler().value(last, context);
+            }
+            else
+            {
+                std::cerr << "Incomplete name \"" << s
+                   << "\" at line " << context.line()
+                   << " and column " << context.column() << std::endl;
+            }
+        }
+        else
+        {
+            this->to_handler().value(s, context);
+        }
+        return true;
+    }
+};
+```
+Configure a [rename_object_member_filter](rename_object_member_filter.md) to emit json events to a [basic_json_encoder](basic_json_encoder.md). 
+```c++
+std::ofstream os("output/new-address-book.json");
+json_encoder encoder(os, jsoncons::indenting::indent);
+name_fix_up_filter filter(encoder);
+```
+Parse the input and send the json events into the filter ...
+```c++
+std::cout << "(1) ";
+std::ifstream is("input/address-book.json");
+json_reader reader(is, filter);
+reader.read();
+std:: << "\n";
+```
+or read into a json value and write to the filter
+```c++
+std::cout << "(2) ";
+json j;
+is >> j;
+j.dump(filter);
+std:: << "\n";
+```
+Output:
+```
+(1) Incomplete name "John" at line 9 and column 26 
+(2) Incomplete name "John" at line 0 and column 0
+```
+Note that when filtering `json` events written from a `json` value to an output handler, contexual line and column information in the original file has been lost. 
+```
+
+The output JSON file `address-book-new.json` with name fixes is
+
+```json
+{
+    "address-book":
+    [
+        {
+            "first-name":"Jane",
+            "last-name":"Roe",
+            "email":"jane.roe@example.com"
+        },
+        {
+            "first-name":"John",
+            "email":"john.doe@example.com"
+        }
+    ]
+}
+```
 

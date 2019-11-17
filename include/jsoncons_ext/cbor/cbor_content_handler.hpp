@@ -383,8 +383,8 @@ public:
     using string_view_type = typename super_type::string_view_type;
     typedef Float128T float128_type; 
 
-    basic_default_cbor_content_handler(bool parse_more = true)
-        : parse_more_(parse_more)
+    basic_default_cbor_content_handler(bool continue_sending = true)
+        : parse_more_(continue_sending)
     {
     }
 private:
