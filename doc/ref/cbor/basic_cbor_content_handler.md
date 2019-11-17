@@ -14,7 +14,7 @@ Defines an interface for producing and consuming CBOR events, including [typed a
 
 ![basic_cbor_content_handler](./diagrams/basic_cbor_content_handler.png)
 
-Typedef for content handler using only standard C++ floating point types:
+A typedef is provided for content handlers using only standard C++ floating point types.
 
 Type                |Definition
 --------------------|------------------------------
@@ -219,6 +219,8 @@ Member type                         |Definition
                                   std::error_code& ec) = 0;
 
 ### See also
+
+- [basic_default_cbor_content_handler](basic_default_cbor_content_handler.md)
 
 - [basic_json_content_handler](../basic_json_content_handler.md)
 
