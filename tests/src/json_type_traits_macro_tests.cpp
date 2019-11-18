@@ -240,7 +240,7 @@ TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
         CHECK(val.price == Approx(book.price).epsilon(0.001));
     }
 }
-
+#if 0
 TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
@@ -459,3 +459,4 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS_DECL tests")
         CHECK(j == expected);
     }
 }
+#endif
