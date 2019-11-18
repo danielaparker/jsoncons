@@ -702,6 +702,70 @@ namespace jsoncons { \
 }  \
   /**/
 
+#define JSONCONS_PROPERTY_TO_JSON(Prefix, GetPrefix, SetPrefix, Property) JSONCONS_PROPERTY_TO_JSON_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property) 
+#define JSONCONS_PROPERTY_TO_JSON_LAST(Prefix, GetPrefix, SetPrefix, Property) JSONCONS_PROPERTY_TO_JSON_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property) 
+#define JSONCONS_PROPERTY_TO_JSON_(Prefix, Getter, Setter, Property) ajson.try_emplace(JSONCONS_QUOTE(Prefix, Property), aval.Getter() );
+
+#define JSONCONS_PROPERTY_AS(Prefix, GetPrefix, SetPrefix, Property) JSONCONS_PROPERTY_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property) 
+#define JSONCONS_PROPERTY_AS_LAST(Prefix, GetPrefix, SetPrefix, Property) JSONCONS_PROPERTY_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property)  
+#define JSONCONS_PROPERTY_AS_(Prefix, Getter, Setter, Property) if (ajson.contains(JSONCONS_QUOTE(Prefix, Property))) {aval.Setter(ajson.at(JSONCONS_QUOTE(Prefix, Property)).template as<typename std::decay<decltype(aval.Getter())>::type>());}
+
+#define JSONCONS_STRICT_PROPERTY_AS(Prefix, GetPrefix, SetPrefix, Property) JSONCONS_STRICT_PROPERTY_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property) 
+#define JSONCONS_STRICT_PROPERTY_AS_LAST(Prefix, GetPrefix, SetPrefix, Property) JSONCONS_STRICT_PROPERTY_AS_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property) 
+#define JSONCONS_STRICT_PROPERTY_AS_(Prefix, Getter, Setter, Property) {aval.Setter(ajson.at(JSONCONS_QUOTE(Prefix, Property)).template as<typename std::decay<decltype(aval.Getter())>::type>());}
+
+#define JSONCONS_PROPERTY_TRAITS_DECL_BASE(As,CharT,Prefix,NumTemplateParams, ValueType,GetPrefix,SetPrefix, ...)  \
+namespace jsoncons \
+{ \
+    template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
+    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams), typename std::enable_if<std::is_same<typename Json::char_type,CharT>::value>::type> \
+    { \
+        typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
+        typedef typename Json::allocator_type allocator_type; \
+        typedef typename Json::string_view_type string_view_type; \
+        static bool is(const Json& ajson) noexcept \
+        { \
+            if (!ajson.is_object()) return false; \
+            JSONCONS_VARIADIC_REP_N(JSONCONS_IS, Prefix,GetPrefix,SetPrefix, __VA_ARGS__)\
+            return true; \
+        } \
+        static value_type as(const Json& ajson) \
+        { \
+            value_type aval{}; \
+            JSONCONS_VARIADIC_REP_N(As, Prefix,GetPrefix,SetPrefix, __VA_ARGS__) \
+            return aval; \
+        } \
+        static Json to_json(const value_type& aval, allocator_type allocator=allocator_type()) \
+        { \
+            Json ajson(allocator); \
+            JSONCONS_VARIADIC_REP_N(JSONCONS_PROPERTY_TO_JSON, Prefix,GetPrefix,SetPrefix, __VA_ARGS__) \
+            return ajson; \
+        } \
+    }; \
+} \
+  /**/
+
+#define JSONCONS_PROPERTY_TRAITS_DECL(ValueType,GetPrefix,SetPrefix, ...)  \
+    JSONCONS_PROPERTY_TRAITS_DECL_BASE(JSONCONS_PROPERTY_AS, char,,0, ValueType,GetPrefix,SetPrefix, __VA_ARGS__) \
+    JSONCONS_PROPERTY_TRAITS_DECL_BASE(JSONCONS_PROPERTY_AS, wchar_t,L,0, ValueType,GetPrefix,SetPrefix, __VA_ARGS__) \
+  /**/
+
+#define JSONCONS_TPL_PROPERTY_TRAITS_DECL(NumTemplateParams, ValueType,GetPrefix,SetPrefix, ...)  \
+    JSONCONS_PROPERTY_TRAITS_DECL_BASE(JSONCONS_PROPERTY_AS, char,,NumTemplateParams, ValueType,GetPrefix,SetPrefix, __VA_ARGS__) \
+    JSONCONS_PROPERTY_TRAITS_DECL_BASE(JSONCONS_PROPERTY_AS, wchar_t,L,NumTemplateParams, ValueType,GetPrefix,SetPrefix, __VA_ARGS__) \
+  /**/
+
+
+#define JSONCONS_STRICT_PROPERTY_TRAITS_DECL(ValueType,GetPrefix,SetPrefix, ...)  \
+    JSONCONS_PROPERTY_TRAITS_DECL_BASE(JSONCONS_STRICT_PROPERTY_AS,char,,0,ValueType,GetPrefix,SetPrefix,__VA_ARGS__) \
+    JSONCONS_PROPERTY_TRAITS_DECL_BASE(JSONCONS_STRICT_PROPERTY_AS,wchar_t,L,0,ValueType,GetPrefix,SetPrefix,__VA_ARGS__) \
+  /**/
+
+#define JSONCONS_STRICT_TPL_PROPERTY_TRAITS_DECL(NumTemplateParams, ValueType,GetPrefix,SetPrefix, ...)  \
+    JSONCONS_PROPERTY_TRAITS_DECL_BASE(JSONCONS_STRICT_PROPERTY_AS,char,,NumTemplateParams,ValueType,GetPrefix,SetPrefix,__VA_ARGS__) \
+    JSONCONS_PROPERTY_TRAITS_DECL_BASE(JSONCONS_STRICT_PROPERTY_AS,wchar_t,L,NumTemplateParams,ValueType,GetPrefix,SetPrefix,__VA_ARGS__) \
+  /**/
+ 
 #if !defined(JSONCONS_NO_DEPRECATED)
 #define JSONCONS_TYPE_TRAITS_DECL JSONCONS_MEMBER_TRAITS_DECL
 #define JSONCONS_NONDEFAULT_MEMBER_TRAITS_DECL JSONCONS_STRICT_MEMBER_TRAITS_DECL

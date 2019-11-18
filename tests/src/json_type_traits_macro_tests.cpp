@@ -107,6 +107,53 @@ namespace json_type_traits_macro_tests
         }
     };
 
+    class book4
+    {
+        std::string author_;
+        std::string title_;
+        double price_;
+    public:
+        book4()
+            : author_(), title_(), price_()
+        {
+        }
+
+        book4(const book4&) = default;
+        book4(book4&&) = default;
+        book4& operator=(const book4&) = default;
+        book4& operator=(book4&&) = default;
+
+        const std::string& getAuthor() const
+        {
+            return author_;
+        }
+
+        void setAuthor(const std::string& value)
+        {
+            author_ = value;
+        }
+
+        const std::string& getTitle() const
+        {
+            return title_;
+        }
+
+        void setTitle(const std::string& value)
+        {
+            title_ = value;
+        }
+
+        double getPrice() const
+        {
+            return price_;
+        }
+
+        void setPrice(double value)
+        {
+            price_ = value;
+        }
+    };
+
     enum class float_format {scientific = 1,fixed = 2,hex = 4,general = fixed | scientific};
 
     class Employee
@@ -206,6 +253,8 @@ JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, 
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
 JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
 
+JSONCONS_PROPERTY_TRAITS_DECL(ns::book4, get, set, Author, Title, Price)
+
 TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
@@ -240,7 +289,7 @@ TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
         CHECK(val.price == Approx(book.price).epsilon(0.001));
     }
 }
-#if 0
+
 TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
@@ -459,4 +508,49 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS_DECL tests")
         CHECK(j == expected);
     }
 }
-#endif
+
+TEST_CASE("JSONCONS_PROPERTY_TRAITS_DECL tests")
+{
+    std::string an_author = "Haruki Murakami"; 
+    std::string a_title = "Kafka on the Shore";
+    double a_price = 25.17;
+
+    SECTION("is")
+    {
+        json j;
+        j["Author"] = an_author;
+        j["Title"] = a_title;
+        j["Price"] = a_price;
+
+        bool val = j.is<ns::book4>();
+        CHECK(val == true);
+    }
+    SECTION("to_json")
+    {
+        ns::book4 book;
+        book.setAuthor(an_author);
+        book.setTitle(a_title);
+        book.setPrice(a_price);
+
+        json j(book);
+
+        CHECK(j["Author"].as<std::string>() == an_author);
+        CHECK(j["Title"].as<std::string>() == a_title);
+        CHECK(j["Price"].as<double>() == Approx(a_price).epsilon(0.001));
+    }
+
+    SECTION("as")
+    {
+        json j;
+        j["Author"] = an_author;
+        j["Title"] = a_title;
+        j["Price"] = a_price;
+
+        ns::book4 book = j.as<ns::book4>();
+
+        CHECK(book.getAuthor() == an_author);
+        CHECK(book.getTitle() == a_title);
+        CHECK(book.getPrice() == Approx(a_price).epsilon(0.001));
+    }
+}
+
