@@ -182,7 +182,7 @@ struct ser_traits<T,
 
         while (it != end && !ec)
         {
-            m.try_emplace(it->first,(it->second).template as<mapped_type>());
+            m.emplace(std::make_pair(it->first,(it->second).template as<mapped_type>()));
             it.increment(ec);
         }
         return m;
