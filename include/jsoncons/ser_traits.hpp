@@ -97,7 +97,7 @@ struct ser_traits<T,
 
         while (it != end && !ec)
         {
-            v.emplace_back(it->as<value_type>());
+            v.emplace_back(it->template as<value_type>());
             it.increment(ec);
         }
         return v;
@@ -138,7 +138,7 @@ struct ser_traits<std::array<T,N>>
 
         for (size_t i = 0; it != end && i < N && !ec; ++i)
         {
-            v[i] = it->as<value_type>();
+            v[i] = it->template as<value_type>();
             it.increment(ec);
         }
         return v;
@@ -182,7 +182,7 @@ struct ser_traits<T,
 
         while (it != end && !ec)
         {
-            m.try_emplace(it->first,(it->second).as<mapped_type>());
+            m.try_emplace(it->first,(it->second).template as<mapped_type>());
             it.increment(ec);
         }
         return m;
