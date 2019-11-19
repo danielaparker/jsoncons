@@ -1263,7 +1263,7 @@ Output:
 This example uses the convenience macro `JSONCONS_GETTER_CTOR_TRAITS_DECL`
 to generate the `json_type_traits` boilerplate for the `HourlyEmployee` and `CommissionedEmployee` 
 derived classes, and `JSONCONS_POLYMORPHIC_TRAITS_DECL` to generate the `json_type_traits` boilerplate
-for a `std::shared_ptr` to an `Employee` base class. The type selection strategy is based
+for `std::shared_ptr<Employee>` and `std::unique_ptr<Employee>`. The type selection strategy is based
 on the presence of properties, in particular, to `wage` and `hours` being present in
 `HourlyEmployee` and absent in `CommissionedEmployee`.
 
