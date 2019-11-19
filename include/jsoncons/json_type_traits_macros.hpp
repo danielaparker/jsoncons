@@ -697,6 +697,24 @@ namespace jsoncons { \
             return Json::null(); \
         } \
     }; \
+    template<class Json> \
+    struct json_type_traits<Json, std::unique_ptr<BaseClass>> { \
+        static bool is(const Json& ajson) noexcept { \
+            if (!ajson.is_object()) return false; \
+            JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_IS, BaseClass,,, __VA_ARGS__)\
+            return false; \
+        } \
+        static std::unique_ptr<BaseClass> as(const Json& ajson) { \
+            if (!ajson.is_object()) return std::unique_ptr<BaseClass>(); \
+            JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR, BaseClass,,, __VA_ARGS__)\
+            return std::unique_ptr<BaseClass>(); \
+        } \
+        static Json to_json(const std::unique_ptr<BaseClass>& ptr) { \
+            if (ptr.get() == nullptr) {return Json::null();} \
+            JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_TO_JSON, BaseClass,,, __VA_ARGS__)\
+            return Json::null(); \
+        } \
+    }; \
 }  \
   /**/
 
