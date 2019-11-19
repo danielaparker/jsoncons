@@ -7,26 +7,24 @@
 #ifndef JSONCONS_JSON_TYPE_TRAITS_MACROS_HPP
 #define JSONCONS_JSON_TYPE_TRAITS_MACROS_HPP
 
-#include <array>
-#include <string>
-#include <vector>
-#include <valarray>
-#include <exception>
-#include <cstring>
-#include <utility>
 #include <algorithm> // std::swap
-#include <limits> // std::numeric_limits
-#include <type_traits> // std::enable_if
-#include <iterator> // std::iterator_traits, std::input_iterator_tag
-#include <jsoncons/config/jsoncons_config.hpp> // JSONCONS_EXPAND, JSONCONS_QUOTE
-#include <jsoncons/bignum.hpp>
-#include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/detail/type_traits.hpp>
-#include <string>
-#include <tuple>
-#include <map>
+#include <array>
+#include <cstring>
+#include <exception>
 #include <functional>
+#include <iterator> // std::iterator_traits, std::input_iterator_tag
+#include <jsoncons/bignum.hpp>
+#include <jsoncons/config/jsoncons_config.hpp> // JSONCONS_EXPAND, JSONCONS_QUOTE
+#include <jsoncons/detail/type_traits.hpp>
+#include <jsoncons/json_content_handler.hpp>
+#include <limits> // std::numeric_limits
 #include <memory>
+#include <string>
+#include <type_traits> // std::enable_if
+#include <unordered_map> // std::unordered_map
+#include <utility>
+#include <valarray>
+#include <jsoncons/json_type_traits.hpp>
 
 // Inspired by https://github.com/Loki-Astari/ThorsSerializer/blob/master/src/Serialize/Traits.h
 
@@ -677,6 +675,9 @@ JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL_BASE(JSONCONS_STRICT_GETTER_SETTER_NAME
 #define JSONCONS_POLYMORPHIC_TO_JSON(BaseClass, P2, P3, DerivedClass) if (DerivedClass* p = dynamic_cast<DerivedClass*>(ptr.get())) {return Json(*p);}
 #define JSONCONS_POLYMORPHIC_TO_JSON_LAST(BaseClass, P2, P3, DerivedClass) if (DerivedClass* p = dynamic_cast<DerivedClass*>(ptr.get())) {return Json(*p);}
 
+#define JSONCONS_REGISTER_POLYMORPHIC_TYPE(BaseClass, Json, P3, DerivedClass) \
+    PolymorphicTypeRegistry<Json,BaseClass>::get_dictionary().try_emplace(JSONCONS_QUOTE(,DerivedClass),std::unique_ptr<BaseClass>(new derived_type<Json,BaseClass,DerivedClass>()));
+
 #define JSONCONS_POLYMORPHIC_TRAITS_DECL(BaseClass, ...)  \
 namespace jsoncons { \
     template<class Json> \
@@ -788,9 +789,55 @@ namespace jsoncons \
 #define JSONCONS_STRICT_TPL_MEMBER_TRAITS_DECL                   JSONCONS_TPL_STRICT_MEMBER_TRAITS_DECL
 #define JSONCONS_STRICT_TPL_MEMBER_NAMED_TRAITS_DECL             JSONCONS_TPL_STRICT_MEMBER_NAMED_TRAITS_DECL
 #define JSONCONS_STRICT_TPL_GETTER_SETTER_NAMED_TRAITS_DECL      JSONCONS_TPL_STRICT_GETTER_SETTER_NAMED_TRAITS_DECL
-#define JSONCONS_STRICT_TPL_PROPERTY_TRAITS_DECL                 JSONCONS_TPL_STRICT_PROPERTY_TRAITS_DECL
 
 #endif
+
+namespace jsoncons {
+
+template <class Json, class T>
+struct base_type
+{
+    virtual bool is(const Json& j) = 0;
+    virtual std::shared_ptr<T> as(const Json& j) = 0;
+    virtual Json to_json(const std::shared_ptr<T>& ptr) = 0;
+};
+
+template <class Json, class Base,class Derived>
+struct derived_type : public base_type<Json,Base>
+{
+    bool is(const Json& j) override
+    {
+        return json_type_traits<Json, Derived>::is(j);
+    }
+    std::shared_ptr<Base> as(const Json& j) override
+    {
+        return std::make_shared<Derived>(json_type_traits<Json, Derived>::as(j));
+    }
+    Json to_json(const std::shared_ptr<Base>& ptr) override
+    {
+        if (ptr.get() == nullptr) 
+        { 
+            return Json::null(); 
+        }
+        if (Derived * p = dynamic_cast<Derived*>(ptr.get())) 
+        {
+            return json_type_traits<Json, Derived>::as(*p);
+        }
+        return Json::null();
+    }
+};
+
+template <class Json,class BaseType>
+struct PolymorphicTypeRegistry
+{
+    static std::unordered_map<std::string, std::unique_ptr<base_type<Json,BaseType>>>& get_dictionary()
+    {
+        static std::unordered_map<std::string, std::unique_ptr<base_type<Json,BaseType>>> dictionary;
+        return dictionary;
+    }
+};
+
+} // jsoncons
 
 
 #endif

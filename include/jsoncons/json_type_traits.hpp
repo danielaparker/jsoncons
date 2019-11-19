@@ -26,7 +26,6 @@
 #include <map>
 #include <functional>
 #include <memory>
-#include <jsoncons/json_type_traits_macros.hpp>
 
 namespace jsoncons {
 
