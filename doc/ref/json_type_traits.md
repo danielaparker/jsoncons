@@ -88,7 +88,7 @@ JSONCONS_TPL_MEMBER_TRAITS_DECL(num_template_params,
                                 member_name0,
                                 member_name1,...) // (5)  
 
-JSONCONS_STRICT_TPL_MEMBER_TRAITS_DECL(num_template_params,
+JSONCONS_TPL_STRICT_MEMBER_TRAITS_DECL(num_template_params,
                                        class_name,
                                        member_name0,
                                        member_name1,...) // (6)
@@ -98,7 +98,7 @@ JSONCONS_TPL_MEMBER_NAMED_TRAITS_DECL(num_template_params,
                                       (member_name0,"name0"),
                                       (member_name1,"name1")...) // (7)
 
-JSONCONS_STRICT_TPL_MEMBER_NAMED_TRAITS_DECL(num_template_params,
+JSONCONS_TPL_STRICT_MEMBER_NAMED_TRAITS_DECL(num_template_params,
                                              class_name,
                                              (member_name0,"name0"),
                                              (member_name1,"name1")...) // (8)
@@ -141,7 +141,7 @@ JSONCONS_TPL_GETTER_SETTER_NAMED_TRAITS_DECL(num_template_params,
                                              (getter_name0,setter_name0,"name0"),
                                              (getter_name1,setter_name1,"name1")...) // (17)
 
-JSONCONS_STRICT_TPL_GETTER_SETTER_NAMED_TRAITS_DECL(num_template_params,
+JSONCONS_TPL_STRICT_GETTER_SETTER_NAMED_TRAITS_DECL(num_template_params,
                                                     class_name,
                                                     (getter_name0,setter_name0,"name0"),
                                                     (getter_name1,setter_name1,"name1")...) // (18)

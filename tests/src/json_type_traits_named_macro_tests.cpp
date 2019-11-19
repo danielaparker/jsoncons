@@ -141,6 +141,60 @@ namespace json_type_traits_named_macro_tests
         }
     };
 
+    class book_with_properties
+    {
+        std::string author_;
+        std::string title_;
+        double price_;
+    public:
+        book_with_properties()
+            : price_(0)
+        {
+        }
+
+        book_with_properties(const std::string& author,
+              const std::string& title,
+              double price)
+            : author_(author), title_(title), price_(price)
+        {
+        }
+
+        book_with_properties(const book_with_properties&) = default;
+        book_with_properties(book_with_properties&&) = default;
+        book_with_properties& operator=(const book_with_properties&) = default;
+        book_with_properties& operator=(book_with_properties&&) = default;
+
+        const std::string& get_author() const
+        {
+            return author_;
+        }
+
+        const std::string& get_title() const
+        {
+            return title_;
+        }
+
+        double get_price() const
+        {
+            return price_;
+        }
+
+        void set_author(const std::string& author)
+        {
+            author_ = author;
+        }
+
+        void set_title(const std::string& title)
+        {
+            title_ = title;
+        }
+
+        void set_price(double price)
+        {
+            price_ = price;
+        }
+    };
+
     class book_with_getters_and_setters_undefaulted
     {
         std::string author_;
