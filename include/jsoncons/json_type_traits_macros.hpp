@@ -675,9 +675,6 @@ JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL_BASE(JSONCONS_STRICT_GETTER_SETTER_NAME
 #define JSONCONS_POLYMORPHIC_TO_JSON(BaseClass, P2, P3, DerivedClass) if (DerivedClass* p = dynamic_cast<DerivedClass*>(ptr.get())) {return Json(*p);}
 #define JSONCONS_POLYMORPHIC_TO_JSON_LAST(BaseClass, P2, P3, DerivedClass) if (DerivedClass* p = dynamic_cast<DerivedClass*>(ptr.get())) {return Json(*p);}
 
-#define JSONCONS_REGISTER_POLYMORPHIC_TYPE(BaseClass, Json, P3, DerivedClass) \
-    PolymorphicTypeRegistry<Json,BaseClass>::get_dictionary().try_emplace(JSONCONS_QUOTE(,DerivedClass),std::unique_ptr<BaseClass>(new derived_type<Json,BaseClass,DerivedClass>()));
-
 #define JSONCONS_POLYMORPHIC_TRAITS_DECL(BaseClass, ...)  \
 namespace jsoncons { \
     template<class Json> \
@@ -791,53 +788,5 @@ namespace jsoncons \
 #define JSONCONS_STRICT_TPL_GETTER_SETTER_NAMED_TRAITS_DECL      JSONCONS_TPL_STRICT_GETTER_SETTER_NAMED_TRAITS_DECL
 
 #endif
-
-namespace jsoncons {
-
-template <class Json, class T>
-struct base_type
-{
-    virtual bool is(const Json& j) = 0;
-    virtual std::shared_ptr<T> as(const Json& j) = 0;
-    virtual Json to_json(const std::shared_ptr<T>& ptr) = 0;
-};
-
-template <class Json, class Base,class Derived>
-struct derived_type : public base_type<Json,Base>
-{
-    bool is(const Json& j) override
-    {
-        return json_type_traits<Json, Derived>::is(j);
-    }
-    std::shared_ptr<Base> as(const Json& j) override
-    {
-        return std::make_shared<Derived>(json_type_traits<Json, Derived>::as(j));
-    }
-    Json to_json(const std::shared_ptr<Base>& ptr) override
-    {
-        if (ptr.get() == nullptr) 
-        { 
-            return Json::null(); 
-        }
-        if (Derived * p = dynamic_cast<Derived*>(ptr.get())) 
-        {
-            return json_type_traits<Json, Derived>::as(*p);
-        }
-        return Json::null();
-    }
-};
-
-template <class Json,class BaseType>
-struct PolymorphicTypeRegistry
-{
-    static std::unordered_map<std::string, std::unique_ptr<base_type<Json,BaseType>>>& get_dictionary()
-    {
-        static std::unordered_map<std::string, std::unique_ptr<base_type<Json,BaseType>>> dictionary;
-        return dictionary;
-    }
-};
-
-} // jsoncons
-
 
 #endif
