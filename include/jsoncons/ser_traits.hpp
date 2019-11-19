@@ -92,12 +92,12 @@ struct ser_traits<T,
                          std::error_code& ec)
     {
         T v;
-        staj_array_iterator<Json,value_type> end;
-        staj_array_iterator<Json,value_type> it(reader, ec);
+        staj_array_iterator<Json,Json> end;
+        staj_array_iterator<Json,Json> it(reader, ec);
 
         while (it != end && !ec)
         {
-            v.emplace_back(std::move(*it));
+            v.emplace_back(it->as<value_type>());
             it.increment(ec);
         }
         return v;
@@ -133,12 +133,12 @@ struct ser_traits<std::array<T,N>>
     {
         std::array<T,N> v;
         v.fill(T{});
-        staj_array_iterator<Json,value_type> end;
-        staj_array_iterator<Json,value_type> it(reader, ec);
+        staj_array_iterator<Json,Json> end;
+        staj_array_iterator<Json,Json> it(reader, ec);
 
         for (size_t i = 0; it != end && i < N && !ec; ++i)
         {
-            v[i] = std::move(*it);
+            v[i] = it->as<value_type>();
             it.increment(ec);
         }
         return v;
@@ -177,12 +177,12 @@ struct ser_traits<T,
                          std::error_code& ec)
     {
         T m;
-        staj_object_iterator<Json,mapped_type> end;
-        staj_object_iterator<Json,mapped_type> it(reader, ec);
+        staj_object_iterator<Json,Json> end;
+        staj_object_iterator<Json,Json> it(reader, ec);
 
         while (it != end && !ec)
         {
-            m.emplace(std::move(it->first),std::move(it->second));
+            m.try_emplace(it->first,(it->second).as<mapped_type>());
             it.increment(ec);
         }
         return m;
