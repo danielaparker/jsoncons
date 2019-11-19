@@ -483,9 +483,8 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS_DECL tests")
     const std::string lastName1 = "Doe";
     const double pay1 = 30250;
 
-    SECTION("decode shared_ptr test")
+    SECTION("decode vector of shared_ptr test")
     {
-
         auto v = jsoncons::decode_json<std::vector<std::shared_ptr<ns::Employee>>>(input);
         REQUIRE(v.size() == 2);
         CHECK(v[0]->firstName() == firstName0);
@@ -496,7 +495,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS_DECL tests")
         CHECK(v[1]->calculatePay() == pay1);
     }
 
-    SECTION("decode unique_ptr test")
+    SECTION("decode vector of unique_ptr test")
     {
 
         auto v = jsoncons::decode_json<std::vector<std::unique_ptr<ns::Employee>>>(input);
@@ -508,7 +507,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS_DECL tests")
         CHECK(v[1]->lastName() == lastName1);
         CHECK(v[1]->calculatePay() == pay1);
     }
-    SECTION("encode shared_ptr test")
+    SECTION("encode vector of shared_ptr test")
     {
         std::vector<std::shared_ptr<ns::Employee>> v;
 
@@ -520,7 +519,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS_DECL tests")
         json expected = json::parse(input);
         CHECK(j == expected);
     }
-    SECTION("encode unique_ptr test")
+    SECTION("encode vector of unique_ptr test")
     {
         std::vector<std::unique_ptr<ns::Employee>> v;
 
