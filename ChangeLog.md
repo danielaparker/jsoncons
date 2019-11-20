@@ -1,3 +1,29 @@
+master
+------
+
+Enhancements:
+
+- New convenience macro for generating `json_type_traits` from getter and setter functions
+that will serialize to the stringified property names,
+```c++
+JSONCONS_PROPERTY_TRAITS_DECL(class_name,get_prefix,set_prefix,
+                              property_name0,property_name1,...) 
+
+JSONCONS_STRICT_PROPERTY_TRAITS_DECL(class_name,get_prefix,set_prefix,
+                                     property_name0,property_name1,...) 
+
+JSONCONS_TPL_PROPERTY_TRAITS_DECL(num_template_params,
+                                  class_name,get_prefix,set_prefix,
+                                  property_name0,property_name1,...)   
+
+JSONCONS_TPL_STRICT_PROPERTY_TRAITS_DECL(num_template_params,
+                                         class_name,get_prefix,set_prefix,
+                                         property_name0,property_name1,...) 
+```
+
+- `JSONCONS_POLYMORPHIC_TRAITS_DECL` now specializes `json_type_traits`
+for `std::unique_ptr<base_class>` in addition to `std::shared_ptr<base_class>`. 
+
 v0.138.0
 --------
 
@@ -13,7 +39,7 @@ Changes:
 
 Enhancements:
 
-- New convenience macro to master for generating `json_type_traits` for polymorphic types,
+- New convenience macro for generating `json_type_traits` for polymorphic types,
 based on the presence of properties,
 ```c++
 JSONCONS_POLYMORPHIC_TRAITS_DECL(base_class_name,derived_class_name0,derived_class_name1,...) 
