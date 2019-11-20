@@ -299,18 +299,18 @@ void employee_polymorphic_example()
 
 void foo_bar_baz_example()
 {
-    std::vector<std::shared_ptr<ns::Foo>> u;
-    u.push_back(std::make_shared<ns::Bar>());
-    u.push_back(std::make_shared<ns::Baz>());
+    std::vector<std::unique_ptr<ns::Foo>> u;
+    u.emplace_back(new ns::Bar());
+    u.emplace_back(new ns::Baz());
 
     std::string buffer;
     encode_json(u, buffer);
     std::cout << "(1)\n" << buffer << "\n\n";
 
-    auto v = decode_json<std::vector<std::shared_ptr<ns::Foo>>>(buffer);
+    auto v = decode_json<std::vector<std::unique_ptr<ns::Foo>>>(buffer);
 
     std::cout << "(2)\n";
-    for (auto ptr : v)
+    for (const auto& ptr : v)
     {
         if (dynamic_cast<ns::Bar*>(ptr.get()))
         {
