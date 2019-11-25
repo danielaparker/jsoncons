@@ -186,8 +186,8 @@ namespace ns = json_type_traits_macros_examples_ns;
 // Declare the traits at global scope
 JSONCONS_ENUM_TRAITS_DECL(ns::BookCategory,fiction,biography)
 
-JSONCONS_STRICT_MEMBER_TRAITS_DECL(ns::Book1,category,author,title,price)
-JSONCONS_STRICT_MEMBER_TRAITS_DECL(ns::Book2,category,author,title,price)
+JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::Book1,category,author,title,price)
+JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::Book2,category,author,title,price)
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::Book3,category,author,title,price)
 
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, hours)

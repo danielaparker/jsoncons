@@ -67,37 +67,37 @@ The `jsoncons` library provides a number of macros that can be used to generate 
 for a user-defined class.
 
 ```c++
-JSONCONS_MEMBER_TRAITS_DECL(class_name,
+JSONCONS_MEMBER_TRAITS_DECL(class_name,num_mandatory_params,
                             member_name0,member_name1,...) // (1)
 
-JSONCONS_STRICT_MEMBER_TRAITS_DECL(class_name,
-                                   member_name0,member_name1,...) // (2)
+JSONCONS_ALL_MEMBER_TRAITS_DECL(class_name,
+                                member_name0,member_name1,...) // (2)
 
-JSONCONS_TPL_MEMBER_TRAITS_DECL(num_template_params,
-                                class_name,
-                                member_name0,member_name1,...) // (3)  
+JSONCONS_TPL_N_MEMBER_TRAITS_DECL(num_template_params,
+                                  class_name,num_mandatory_params,
+                                  member_name0,member_name1,...) // (3)  
 
-JSONCONS_TPL_STRICT_MEMBER_TRAITS_DECL(num_template_params,
-                                       class_name,
-                                       member_name0,member_name1,...) // (4)
+JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL(num_template_params,
+                                    class_name,
+                                    member_name0,member_name1,...) // (4)
 
-JSONCONS_MEMBER_NAMED_TRAITS_DECL(class_name,
-                                  (member_name0,"name0"),
-                                  (member_name1,"name1")...) // (5)
+JSONCONS_N_MEMBER_NAMED_TRAITS_DECL(class_name,num_mandatory_params,
+                                    (member_name0,"name0"),
+                                    (member_name1,"name1")...) // (5)
 
-JSONCONS_STRICT_MEMBER_NAMED_TRAITS_DECL(class_name,
-                                         (member_name0,"name0"),
-                                         (member_name1,"name1")...) // (6)
-
-JSONCONS_TPL_MEMBER_NAMED_TRAITS_DECL(num_template_params,
-                                      class_name,
+JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL(class_name,
                                       (member_name0,"name0"),
-                                      (member_name1,"name1")...) // (7)
+                                      (member_name1,"name1")...) // (6)
 
-JSONCONS_TPL_STRICT_MEMBER_NAMED_TRAITS_DECL(num_template_params,
-                                             class_name,
-                                             (member_name0,"name0"),
-                                             (member_name1,"name1")...) // (8)
+JSONCONS_TPL_N_MEMBER_NAMED_TRAITS_DECL(num_template_params,
+                                        class_name,num_mandatory_params,
+                                        (member_name0,"name0"),
+                                        (member_name1,"name1")...) // (7)
+
+JSONCONS_TPL_ALL_MEMBER_NAMED_TRAITS_DECL(num_template_params,
+                                          class_name,
+                                          (member_name0,"name0"),
+                                          (member_name1,"name1")...) // (8)
 
 JSONCONS_ENUM_TRAITS_DECL(enum_name,
                           identifier0,
@@ -124,37 +124,37 @@ JSONCONS_TPL_GETTER_CTOR_NAMED_TRAITS_DECL(num_template_params,
                                            (getter_name0,"name0"),
                                            (getter_name1,"name1")...) // (14)
 
-JSONCONS_PROPERTY_TRAITS_DECL(class_name,get_prefix,set_prefix,
-                              property_name0,property_name1,...) // (15)
+JSONCONS_N_PROPERTY_TRAITS_DECL(class_name,get_prefix,set_prefix,num_mandatory_params,
+                                property_name0,property_name1,...) // (15)
 
-JSONCONS_STRICT_PROPERTY_TRAITS_DECL(class_name,get_prefix,set_prefix,
-                                     property_name0,property_name1,...) // (16)
+JSONCONS_ALL_PROPERTY_TRAITS_DECL(class_name,get_prefix,set_prefix,
+                                  property_name0,property_name1,...) // (16)
 
-JSONCONS_TPL_PROPERTY_TRAITS_DECL(num_template_params,
-                                  class_name,get_prefix,set_prefix,
-                                  property_name0,property_name1,...) // (17)  
+JSONCONS_TPL_N_PROPERTY_TRAITS_DECL(num_template_params,
+                                    class_name,get_prefix,set_prefix,num_mandatory_params,
+                                    property_name0,property_name1,...) // (17)  
 
-JSONCONS_TPL_STRICT_PROPERTY_TRAITS_DECL(num_template_params,
-                                         class_name,get_prefix,set_prefix,
-                                         property_name0,property_name1,...) // (18)
+JSONCONS_TPL_ALL_PROPERTY_TRAITS_DECL(num_template_params,
+                                      class_name,get_prefix,set_prefix,
+                                      property_name0,property_name1,...) // (18)
 
-JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL(class_name,
-                                         (getter_name0,setter_name0,"name0"),
-                                         (getter_name1,setter_name1,"name1")...) // (19)
+JSONCONS_N_GETTER_SETTER_NAMED_TRAITS_DECL(class_name,num_mandatory_params,
+                                          (getter_name0,setter_name0,"name0"),
+                                          (getter_name1,setter_name1,"name1")...) // (19)
 
-JSONCONS_STRICT_GETTER_SETTER_NAMED_TRAITS_DECL(class_name,
-                                                (getter_name0,setter_name0,"name0"),
-                                                (getter_name1,setter_name1,"name1")...) // (20)
-
-JSONCONS_TPL_GETTER_SETTER_NAMED_TRAITS_DECL(num_template_params,
-                                             class_name,
+JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL(class_name,
                                              (getter_name0,setter_name0,"name0"),
-                                             (getter_name1,setter_name1,"name1")...) // (21)
+                                             (getter_name1,setter_name1,"name1")...) // (20)
 
-JSONCONS_TPL_STRICT_GETTER_SETTER_NAMED_TRAITS_DECL(num_template_params,
-                                                    class_name,
-                                                    (getter_name0,setter_name0,"name0"),
-                                                    (getter_name1,setter_name1,"name1")...) // (22)
+JSONCONS_TPL_N_GETTER_SETTER_NAMED_TRAITS_DECL(num_template_params,
+                                               class_name,num_mandatory_params,
+                                               (getter_name0,setter_name0,"name0"),
+                                               (getter_name1,setter_name1,"name1")...) // (21)
+
+JSONCONS_TPL_ALL_GETTER_SETTER_NAMED_TRAITS_DECL(num_template_params,
+                                                 class_name,
+                                                 (getter_name0,setter_name0,"name0"),
+                                                 (getter_name1,setter_name1,"name1")...) // (22)
 
 JSONCONS_POLYMORPHIC_TRAITS_DECL(base_class_name,derived_class_name0,derived_class_name1,...) // (23)
 ```
@@ -212,6 +212,7 @@ in the derived classes.
 #### Parameters
 
 `class_name` - the name of a class or struct  
+`num_mandatory_params` - the number of mandatory class data members or accessors 
 `enum_name` - the name of an enum type or enum class type
 `num_template_params` - for a class template, the number of template parameters  
 `member_nameN` - the name of a class data member. Class data members are normally modifiable, but may be `const` or
@@ -793,10 +794,10 @@ example above, the type selection strategy is based
 on the presence of properties in the derived classes. If
 derived classes cannot be distinguished in this way, 
 you can introduce extra properties. The convenience
-macros `JSONCONS_MEMBER_TRAITS_DECL`, `JSONCONS_STRICT_MEMBER_TRAITS_DECL`,
-`JSONCONS_TPL_MEMBER_TRAITS_DECL`, `JSONCONS_TPL_STRICT_MEMBER_TRAITS_DECL`,
-`JSONCONS_MEMBER_TRAITS_NAMED_DECL`, `JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL`,
-`JSONCONS_TPL_MEMBER_TRAITS_NAMED_DECL`, and `JSONCONS_TPL_STRICT_MEMBER_TRAITS_NAMED_DECL`
+macros `JSONCONS_MEMBER_TRAITS_DECL`, `JSONCONS_ALL_MEMBER_TRAITS_DECL`,
+`JSONCONS_TPL_MEMBER_TRAITS_DECL`, `JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL`,
+`JSONCONS_MEMBER_TRAITS_NAMED_DECL`, `JSONCONS_ALL_MEMBER_TRAITS_NAMED_DECL`,
+`JSONCONS_TPL_MEMBER_TRAITS_NAMED_DECL`, and `JSONCONS_TPL_ALL_MEMBER_TRAITS_NAMED_DECL`
 allow you to have `const` or `static const` data members that are serialized and that 
 particpate in the type selection strategy during deserialization. 
 

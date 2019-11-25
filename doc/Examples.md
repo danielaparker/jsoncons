@@ -578,8 +578,8 @@ public:
 // Declare the traits at global scope
 JSONCONS_ENUM_TRAITS_DECL(ns::BookCategory,fiction,biography)
 
-JSONCONS_STRICT_MEMBER_TRAITS_DECL(ns::Book1,category,author,title,price)
-JSONCONS_STRICT_MEMBER_TRAITS_DECL(ns::Book2,category,author,title,price)
+JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::Book1,category,author,title,price)
+JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::Book2,category,author,title,price)
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::Book3,category,author,title,price)
 
 using namespace jsoncons; // for convenience
@@ -780,13 +780,13 @@ public:
 // Declare the traits at global scope
 JSONCONS_ENUM_NAMED_TRAITS_DECL(ns::BookCategory,(fiction,"Fiction"),(biography,"Biography"))
 
-JSONCONS_STRICT_MEMBER_NAMED_TRAITS_DECL(ns::Book1,(category,"Category"),(author,"Author"),
+JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL(ns::Book1,(category,"Category"),(author,"Author"),
                                                    (title,"Title"),(price,"Price"))
-JSONCONS_STRICT_MEMBER_NAMED_TRAITS_DECL(ns::Book2,(category_,"Category"),(author_,"Author"),
+JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL(ns::Book2,(category_,"Category"),(author_,"Author"),
                                                    (title_,"Title"),(price_,"Price"))
 JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL(ns::Book3,(category,"Category"),(author,"Author"),
                                                  (title,"Title"),(price,"Price"))
-JSONCONS_STRICT_GETTER_SETTER_NAMED_TRAITS_DECL(ns::Book4,(getCategory,setCategory,"Category"),
+JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL(ns::Book4,(getCategory,setCategory,"Category"),
                                                           (getAuthor,setAuthor,"Author"),
                                                           (getTitle,setTitle,"Title"),
                                                           (getPrice,setPrice,"Price"))
@@ -1067,9 +1067,9 @@ Charles Bukowski, Pulp, 22.48
 
 #### Mapping to C++ data structures with and without defaults allowed
 
-The macros `JSONCONS_MEMBER_TRAITS_DECL` and `JSONCONS_STRICT_MEMBER_TRAITS_DECL` both generate
+The macros `JSONCONS_MEMBER_TRAITS_DECL` and `JSONCONS_ALL_MEMBER_TRAITS_DECL` both generate
 the code to specialize `json_type_traits` from member data. The difference is that `JSONCONS_MEMBER_TRAITS_DECL`
-does not require all member names to be present in the JSON data, while `JSONCONS_STRICT_MEMBER_TRAITS_DECL` does.
+does not require all member names to be present in the JSON data, while `JSONCONS_ALL_MEMBER_TRAITS_DECL` does.
 
 ```c++
 #include <iostream>
@@ -1133,7 +1133,7 @@ Output:
 
 If all members of the JSON data must be present, use
 ```
-JSONCONS_STRICT_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
+JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
 ```
 instead. This will cause an exception to be thrown with the message
 ```
@@ -1453,10 +1453,10 @@ example above, the type selection strategy is based
 on the presence of properties in the derived classes. If
 derived classes cannot be distinguished in this way, 
 you can introduce extra properties. The convenience
-macros `JSONCONS_MEMBER_TRAITS_DECL`, `JSONCONS_STRICT_MEMBER_TRAITS_DECL`,
-`JSONCONS_TPL_MEMBER_TRAITS_DECL`, `JSONCONS_TPL_STRICT_MEMBER_TRAITS_DECL`,
-`JSONCONS_MEMBER_TRAITS_NAMED_DECL`, `JSONCONS_STRICT_MEMBER_TRAITS_NAMED_DECL`,
-`JSONCONS_TPL_MEMBER_TRAITS_NAMED_DECL`, and `JSONCONS_TPL_STRICT_MEMBER_TRAITS_NAMED_DECL`
+macros `JSONCONS_MEMBER_TRAITS_DECL`, `JSONCONS_ALL_MEMBER_TRAITS_DECL`,
+`JSONCONS_TPL_MEMBER_TRAITS_DECL`, `JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL`,
+`JSONCONS_MEMBER_TRAITS_NAMED_DECL`, `JSONCONS_ALL_MEMBER_TRAITS_NAMED_DECL`,
+`JSONCONS_TPL_MEMBER_TRAITS_NAMED_DECL`, and `JSONCONS_TPL_ALL_MEMBER_TRAITS_NAMED_DECL`
 allow you to have `const` or `static const` data members that are serialized and that 
 particpate in the type selection strategy during deserialization. 
 
@@ -1966,7 +1966,7 @@ int main()
     std::cout << "(3) " << bn << "\n\n";
 
     // If your compiler supports extended integral types for which std::numeric_limits is specialized 
-#if (defined(__GNUC__) || defined(__clang__)) && (!defined(__STRICT_ANSI__) && defined(_GLIBCXX_USE_INT128))
+#if (defined(__GNUC__) || defined(__clang__)) && (!defined(__ALL_ANSI__) && defined(_GLIBCXX_USE_INT128))
     __int128 i = j.as<__int128>();
     std::cout << "(4) " << i << "\n\n";
 #endif

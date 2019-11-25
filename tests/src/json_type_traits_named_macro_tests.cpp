@@ -270,13 +270,13 @@ namespace json_type_traits_named_macro_tests
 namespace ns = json_type_traits_named_macro_tests;
 
 JSONCONS_MEMBER_NAMED_TRAITS_DECL(ns::book,(author,"Author"),(title,"Title"),(price,"Price"))
-JSONCONS_STRICT_MEMBER_NAMED_TRAITS_DECL(ns::book_undefaulted,(author,"Author"),(title,"Title"),(price,"Price"))
+JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL(ns::book_undefaulted,(author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL(ns::book_with_getters_and_ctor, (author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_TPL_MEMBER_NAMED_TRAITS_DECL(1,ns::TemplatedStruct1,(typeContent,"type-content"),(someString,"some-string"))
 JSONCONS_TPL_MEMBER_NAMED_TRAITS_DECL(2,ns::TemplatedStruct2,(aT1,"a-t1"),(aT2,"a-t2"))
 JSONCONS_ENUM_NAMED_TRAITS_DECL(ns::float_format, (scientific,"Exponential"), (fixed,"Fixed"), (hex,"Hex"), (general,"General"))
 JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL(ns::book_with_getters_and_setters, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"))
-JSONCONS_STRICT_GETTER_SETTER_NAMED_TRAITS_DECL(ns::book_with_getters_and_setters_undefaulted, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"))
+JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL(ns::book_with_getters_and_setters_undefaulted, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"))
 
 TEST_CASE("JSONCONS_MEMBER_NAMED_TRAITS_DECL tests")
 {
@@ -312,7 +312,7 @@ TEST_CASE("JSONCONS_MEMBER_NAMED_TRAITS_DECL tests")
     }
 } 
 
-TEST_CASE("JSONCONS_STRICT_MEMBER_NAMED_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
@@ -513,7 +513,7 @@ TEST_CASE("JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_STRICT_GETTER_SETTER_NAMED_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
