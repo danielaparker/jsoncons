@@ -1483,8 +1483,8 @@ class Baz : public Foo
 
 } // ns
 
-JSONCONS_MEMBER_TRAITS_DECL(ns::Bar,bar)
-JSONCONS_MEMBER_TRAITS_DECL(ns::Baz,baz)
+JSONCONS_N_MEMBER_TRAITS_DECL(ns::Bar,1,bar)
+JSONCONS_N_MEMBER_TRAITS_DECL(ns::Baz,1,baz)
 JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Foo, ns::Bar, ns::Baz)
 
 int main()
