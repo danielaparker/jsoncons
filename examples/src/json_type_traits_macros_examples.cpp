@@ -194,8 +194,8 @@ JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, 
 JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
 JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
 
-JSONCONS_MEMBER_TRAITS_DECL(ns::Bar,bar)
-JSONCONS_MEMBER_TRAITS_DECL(ns::Baz,baz)
+JSONCONS_N_MEMBER_TRAITS_DECL(ns::Bar,1,bar)
+JSONCONS_N_MEMBER_TRAITS_DECL(ns::Baz,1,baz)
 JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Foo, ns::Bar, ns::Baz)
 
 using namespace jsoncons;
