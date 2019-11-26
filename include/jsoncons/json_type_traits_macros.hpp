@@ -350,13 +350,13 @@ namespace jsoncons \
     JSONCONS_MEMBER_NAMED_TRAITS_DECL_BASE(JSONCONS_ALL_NAMED_AS, NumTemplateParams, ValueType, JSONCONS_NARGS(__VA_ARGS__), __VA_ARGS__) \
   /**/
  
-#define JSONCONS_GETTER_CTOR_IS(Prefix, P2, P3, Member) if (!ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+#define JSONCONS_GETTER_CTOR_IS(Prefix, P2, P3, Member) JSONCONS_GETTER_CTOR_IS_LAST(Prefix, P2, P3, Member)
 #define JSONCONS_GETTER_CTOR_IS_LAST(Prefix, P2, P3, Member) if (!ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
 
-#define JSONCONS_GETTER_CTOR_AS(Prefix, P2, P3, Member) (ajson.at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>(),
+#define JSONCONS_GETTER_CTOR_AS(Prefix, P2, P3, Member) JSONCONS_GETTER_CTOR_AS_LAST(Prefix, P2, P3, Member),
 #define JSONCONS_GETTER_CTOR_AS_LAST(Prefix, P2, P3, Member) (ajson.at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()
 
-#define JSONCONS_GETTER_CTOR_TO_JSON(Prefix, P2, P3, Member) ajson.try_emplace(JSONCONS_QUOTE(Prefix, Member), aval.Member() );
+#define JSONCONS_GETTER_CTOR_TO_JSON(Prefix, P2, P3, Member) JSONCONS_GETTER_CTOR_TO_JSON_LAST(Prefix, P2, P3, Member)
 #define JSONCONS_GETTER_CTOR_TO_JSON_LAST(Prefix, P2, P3, Member) ajson.try_emplace(JSONCONS_QUOTE(Prefix, Member), aval.Member() );
 
 #define JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(CharT,Prefix,NumTemplateParams, ValueType, ...)  \

@@ -255,7 +255,7 @@ JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Employee, ns::HourlyEmployee, ns::Commissio
 
 JSONCONS_N_PROPERTY_TRAITS_DECL(ns::book4, get, set, 3, Author, Title, Price)
 
-TEST_CASE("JSONCONS_MEMBER_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
