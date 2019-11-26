@@ -351,7 +351,7 @@ namespace jsoncons \
   /**/
  
 #define JSONCONS_GETTER_CTOR_IS(Prefix, P2, P3, Member) JSONCONS_GETTER_CTOR_IS_LAST(Prefix, P2, P3, Member)
-#define JSONCONS_GETTER_CTOR_IS_LAST(Prefix, P2, P3, Member) if (!ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
+#define JSONCONS_GETTER_CTOR_IS_LAST(Prefix, P2, P3, Member) count++; if (!ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
 
 #define JSONCONS_GETTER_CTOR_AS(Prefix, P2, P3, Member) JSONCONS_GETTER_CTOR_AS_LAST(Prefix, P2, P3, Member),
 #define JSONCONS_GETTER_CTOR_AS_LAST(Prefix, P2, P3, Member) (ajson.at(JSONCONS_QUOTE(Prefix, Member))).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()
@@ -359,7 +359,7 @@ namespace jsoncons \
 #define JSONCONS_GETTER_CTOR_TO_JSON(Prefix, P2, P3, Member) JSONCONS_GETTER_CTOR_TO_JSON_LAST(Prefix, P2, P3, Member)
 #define JSONCONS_GETTER_CTOR_TO_JSON_LAST(Prefix, P2, P3, Member) ajson.try_emplace(JSONCONS_QUOTE(Prefix, Member), aval.Member() );
 
-#define JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(CharT,Prefix,NumTemplateParams, ValueType, ...)  \
+#define JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(CharT,Prefix,NumTemplateParams, ValueType, NumMandatoryParams, ...)  \
 namespace jsoncons \
 { \
     template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
@@ -367,14 +367,17 @@ namespace jsoncons \
     { \
         typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
         typedef typename Json::allocator_type allocator_type; \
+        constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
+            size_t count = 0; \
             JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_IS, Prefix,,, __VA_ARGS__)\
             return true; \
         } \
         static value_type as(const Json& ajson) \
         { \
+            size_t count = 0; \
             return value_type ( JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_AS, Prefix,,, __VA_ARGS__) ); \
         } \
         static Json to_json(const value_type& aval, allocator_type allocator=allocator_type()) \
@@ -388,18 +391,18 @@ namespace jsoncons \
   /**/
  
 #define JSONCONS_GETTER_CTOR_TRAITS_DECL(ValueType, ...)  \
-JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(char,,0, ValueType, __VA_ARGS__) \
-JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(wchar_t,L,0, ValueType, __VA_ARGS__) \
+JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(char,,0, ValueType, JSONCONS_NARGS(__VA_ARGS__), __VA_ARGS__) \
+JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(wchar_t,L,0, ValueType, JSONCONS_NARGS(__VA_ARGS__), __VA_ARGS__) \
   /**/
  
 #define JSONCONS_TPL_GETTER_CTOR_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
-JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(char,,NumTemplateParams, ValueType, __VA_ARGS__) \
-JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(wchar_t,L,NumTemplateParams, ValueType, __VA_ARGS__) \
+JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(char,,NumTemplateParams, ValueType, JSONCONS_NARGS(__VA_ARGS__), __VA_ARGS__) \
+JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(wchar_t,L,NumTemplateParams, ValueType, JSONCONS_NARGS(__VA_ARGS__), __VA_ARGS__) \
   /**/
  
 #define JSONCONS_GETTER_CTOR_NAMED_IS(P1, P2, P3, Seq) JSONCONS_EXPAND(JSONCONS_GETTER_CTOR_NAMED_IS_ Seq)
 #define JSONCONS_GETTER_CTOR_NAMED_IS_LAST(P1, P2, P3, Seq) JSONCONS_EXPAND(JSONCONS_GETTER_CTOR_NAMED_IS_ Seq)
-#define JSONCONS_GETTER_CTOR_NAMED_IS_(Member, Name) if (!ajson.contains(Name)) return false;
+#define JSONCONS_GETTER_CTOR_NAMED_IS_(Member, Name) count++; if (!ajson.contains(Name)) return false;
 
 #define JSONCONS_GETTER_CTOR_NAMED_AS(P1, P2, P3, Seq) JSONCONS_EXPAND(JSONCONS_GETTER_CTOR_NAMED_AS_ Seq),
 #define JSONCONS_GETTER_CTOR_NAMED_AS_LAST(P1, P2, P3, Seq) JSONCONS_EXPAND(JSONCONS_GETTER_CTOR_NAMED_AS_ Seq)
@@ -409,7 +412,7 @@ JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(wchar_t,L,NumTemplateParams, ValueType, __
 #define JSONCONS_GETTER_CTOR_NAMED_TO_JSON_LAST(P1, P2, P3, Seq) JSONCONS_EXPAND(JSONCONS_GETTER_CTOR_NAMED_TO_JSON_ Seq)
 #define JSONCONS_GETTER_CTOR_NAMED_TO_JSON_(Member, Name) ajson.try_emplace(Name, aval.Member() );
  
-#define JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL_BASE(NumTemplateParams, ValueType, ...)  \
+#define JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL_BASE(NumTemplateParams, ValueType, NumMandatoryParams, ...)  \
 namespace jsoncons \
 { \
     template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> \
@@ -417,14 +420,17 @@ namespace jsoncons \
     { \
         typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
         typedef typename Json::allocator_type allocator_type; \
+        constexpr static size_t num_mandatory_params = NumMandatoryParams; \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
+            size_t count = 0; \
             JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_NAMED_IS,,,, __VA_ARGS__)\
             return true; \
         } \
         static value_type as(const Json& ajson) \
         { \
+            size_t count = 0; \
             return value_type ( JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_NAMED_AS,,,, __VA_ARGS__) ); \
         } \
         static Json to_json(const value_type& aval, allocator_type allocator=allocator_type()) \
@@ -438,11 +444,11 @@ namespace jsoncons \
   /**/
  
 #define JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL(ValueType, ...)  \
-JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL_BASE(0, ValueType, __VA_ARGS__) \
+JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL_BASE(0, ValueType, JSONCONS_NARGS(__VA_ARGS__), __VA_ARGS__) \
   /**/
  
 #define JSONCONS_TPL_GETTER_CTOR_NAMED_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
-JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL_BASE(NumTemplateParams, ValueType, __VA_ARGS__) \
+JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL_BASE(NumTemplateParams, ValueType, JSONCONS_NARGS(__VA_ARGS__), __VA_ARGS__) \
   /**/
 
 #define JSONCONS_ENUM_PAIR(Prefix, P2, P3, Member) {value_type::Member, JSONCONS_QUOTE(Prefix,Member)},
