@@ -241,16 +241,16 @@ namespace json_type_traits_macro_tests
 namespace ns = json_type_traits_macro_tests;
 
 JSONCONS_ENUM_TRAITS_DECL(ns::float_format, scientific, fixed, hex, general)
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::book3, author, title, price)
+JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::book3, author, title, price)
 JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::book,author,title,price)
 JSONCONS_N_MEMBER_TRAITS_DECL(ns::book2,3,author,title,price,isbn)
 JSONCONS_TPL_MEMBER_TRAITS_DECL(1,ns::MyStruct,typeContent,someString)
 JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL(1,ns::MyStruct2,typeContent,someString)
-JSONCONS_TPL_GETTER_CTOR_TRAITS_DECL(1,ns::MyStruct3,typeContent,someString)
+JSONCONS_TPL_ALL_GETTER_CTOR_TRAITS_DECL(1,ns::MyStruct3,typeContent,someString)
 JSONCONS_TPL_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
 
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, hours)
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
+JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, hours)
+JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
 JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
 
 JSONCONS_N_PROPERTY_TRAITS_DECL(ns::book4, get, set, 3, Author, Title, Price)
@@ -290,7 +290,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_GETTER_CTOR_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
@@ -391,7 +391,7 @@ TEST_CASE("JSONCONS_TPL_MEMBER_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_TPL_GETTER_CTOR_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_TPL_ALL_GETTER_CTOR_TRAITS_DECL tests")
 {
     SECTION("MyStruct<std::pair<int,int>>")
     {

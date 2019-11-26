@@ -107,7 +107,7 @@ JSONCONS_ENUM_NAMED_TRAITS_DECL(enum_name,
                                 (identifier0,"name0"),
                                 (identifier1,"name1")...) // (10)
 
-JSONCONS_GETTER_CTOR_TRAITS_DECL(class_name,
+JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(class_name,
                                  getter_name0,
                                  getter_name1,...) // (11)
 
@@ -115,7 +115,7 @@ JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL(class_name,
                                       (getter_name0,"name0"),
                                       (getter_name1,"name1")...) // (12)
 
-JSONCONS_TPL_GETTER_CTOR_TRAITS_DECL(num_template_params,
+JSONCONS_TPL_ALL_GETTER_CTOR_TRAITS_DECL(num_template_params,
                                      class_name,
                                      getter_name0,getter_name1,...) // (13)
 
@@ -566,8 +566,8 @@ using namespace jsoncons; // for convenience
 
 // Declare the traits. Specify which data members need to be serialized.
 JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputation, application, reputons)
+JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
+JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputation, application, reputons)
 
 int main()
 {
@@ -601,7 +601,7 @@ Output:
 
 #### Serialize a polymorphic type based on the presence of properties
 
-This example uses the convenience macro `JSONCONS_GETTER_CTOR_TRAITS_DECL`
+This example uses the convenience macro `JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL`
 to generate the `json_type_traits` boilerplate for the `HourlyEmployee` and `CommissionedEmployee` 
 derived classes, and `JSONCONS_POLYMORPHIC_TRAITS_DECL` to generate the `json_type_traits` boilerplate
 for `std::shared_ptr<Employee>` and `std::unique_ptr<Employee>`. The type selection strategy is based
@@ -701,8 +701,8 @@ public:
 
 } // ns
 
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, hours)
-JSONCONS_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
+JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, hours)
+JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
 JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
 
 int main()
