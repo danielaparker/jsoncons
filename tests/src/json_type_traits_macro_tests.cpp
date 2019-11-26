@@ -244,10 +244,10 @@ JSONCONS_ENUM_TRAITS_DECL(ns::float_format, scientific, fixed, hex, general)
 JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::book3, author, title, price)
 JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::book,author,title,price)
 JSONCONS_N_MEMBER_TRAITS_DECL(ns::book2,3,author,title,price,isbn)
-JSONCONS_TPL_MEMBER_TRAITS_DECL(1,ns::MyStruct,typeContent,someString)
+JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL(1,ns::MyStruct,typeContent,someString)
 JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL(1,ns::MyStruct2,typeContent,someString)
 JSONCONS_TPL_ALL_GETTER_CTOR_TRAITS_DECL(1,ns::MyStruct3,typeContent,someString)
-JSONCONS_TPL_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
+JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
 
 JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, hours)
 JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
@@ -332,7 +332,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_TPL_MEMBER_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL tests")
 {
     SECTION("MyStruct<std::pair<int,int>>")
     {
