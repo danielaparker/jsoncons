@@ -513,7 +513,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL tests 2")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";

@@ -533,7 +533,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_PROPERTY_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_N_PROPERTY_TRAITS_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";

@@ -100,8 +100,7 @@ JSONCONS_TPL_ALL_MEMBER_NAMED_TRAITS_DECL(num_template_params,
                                           (member_name1,"name1")...) // (8)
 
 JSONCONS_ENUM_TRAITS_DECL(enum_name,
-                          identifier0,
-                          identifier1,...) // (9)
+                          identifier0,identifier1,...) // (9)
 
 JSONCONS_ENUM_NAMED_TRAITS_DECL(enum_name,
                                 (identifier0,"name0"),
@@ -112,8 +111,7 @@ JSONCONS_N_GETTER_CTOR_TRAITS_DECL(class_name,num_mandatory_params,
                                    getter_name1,...) // (11)
 
 JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(class_name,
-                                     getter_name0,
-                                     getter_name1,...) // (12)
+                                     getter_name0,getter_name1,...) // (12)
 
 JSONCONS_TPL_N_GETTER_CTOR_TRAITS_DECL(num_template_params,
                                        class_name,num_mandatory_params,
@@ -177,9 +175,10 @@ JSONCONS_POLYMORPHIC_TRAITS_DECL(base_class_name,derived_class_name0,derived_cla
 ```
 
 (1)-(8) generate the code to specialize `json_type_traits` from the member data of a class. 
-(1)-(4) will serialize to the stringified member names, (5)-(8) will serialize to the given names. 
+(1)-(4) will serialize to the stringified member names, (5)-(8) will serialize to the provided names. 
 When decoding to a C++ data structure, 
-(1), (3), (5) and (7) allow member names not present in the JSON to have default values, while the strict (2), (4), (6) and (8) 
+(1), (3), (5) and (7) require that the first `num_mandatory_params` member names be present in the JSON,
+the rest can have default values. (2), (4), (6) and (8), however, 
 require that all member names be present in the JSON. The class must have a default constructor.
 If the member data or default constructor are private, the macro `JSONCONS_TYPE_TRAITS_FRIEND`
 will make them accessible to `json_type_traits`, used so
@@ -195,26 +194,30 @@ class MyClass
 (3)-(4) and (7)-(8) generate the code to specialize `json_type_traits` from the member data of a class template. 
 
 (9)-(10) generate the code to specialize `json_type_traits` from the identifiers of an enumeration.
-(9) will serialize to the stringified identifier names, (10) will serialize to the given names. 
+(9) will serialize to the stringified identifier names, (10) will serialize to the provided names. 
 
-(11)-(14) generate the code to specialize `json_type_traits` from the getter functions and a constructor of a class. 
-(11) and (13) will serialize to the stringified getter names, (12) and (14) will serialize to the given names. 
-When decoding to a C++ data strucure, all data members in the C++ object must be present in the JSON.
-The class must have a constructor such that the return types of the getter functions are convertible to
-its parameters, taken in order. 
-(13)-(14) generate the code to specialize `json_type_traits` from the getter functions and a constructor of a
+(11)-(18) generate the code to specialize `json_type_traits` from the getter functions and a constructor of a class. 
+(11)-(14) will serialize to the stringified getter names, (15)-(18) will serialize to the provided names. 
+When decoding to a C++ data structure, 
+(11), (13), (15) and (17) require that the first `num_mandatory_params` member names be present in the JSON,
+the rest can have default values. (12), (14), (16) and (18), however, 
+require that all member names be present in the JSON. The class must have a constructor such that the return types 
+of the getter functions are convertible to its parameters, taken in order. 
+(21)-(22) and (25)-(26) generate the code to specialize `json_type_traits` from the getter functions and a constructor of a
 class template.  
 
 (19)-(22) generate the code to specialize `json_type_traits` from the getter and setter functions of a
 class, and will serialize to the stringified property names. The getter and setter function names are
 formed from the concatenation of `get_prefix` and `set_prefix` with property name.
-(19) and (21) allow property names not present in the JSON to have default values, while the strict (20) and (22) 
-require that all property names be present in the JSON. (21)-(22) generate the code to specialize `json_type_traits` 
+(19) and (21) require that the first `num_mandatory_params` member names be present in the JSON,
+the rest can have default values. (20) and (22), however, 
+require that all member names be present in the JSON. (21)-(22) generate the code to specialize `json_type_traits` 
 from the getter and setter functions of a class template.
 
 (23)-(26) generate the code to specialize `json_type_traits` from the getter and setter functions of a
-class, and will serialize to the given names. When decoding to a C++ data structure, 
-(23) and (25) allow member names not present in the JSON to have default values, while the strict (24) and (26) 
+class, and will serialize to the provided names. When decoding to a C++ data structure, 
+(23) and (25) require that the first `num_mandatory_params` member names be present in the JSON,
+the rest can have default values. (24) and (26), however, 
 require that all member names be present in the JSON. The class must have a default constructor. 
 (25)-(26) generate the code to specialize `json_type_traits` from the getter and setter functions of a
 class template.
@@ -229,19 +232,19 @@ in the derived classes.
 #### Parameters
 
 `class_name` - the name of a class or struct  
-`num_mandatory_params` - the number of mandatory class data members or accessors 
-`enum_name` - the name of an enum type or enum class type
+`num_mandatory_params` - the number of mandatory class data members or accessors  
+`enum_name` - the name of an enum type or enum class type  
 `num_template_params` - for a class template, the number of template parameters  
 `member_nameN` - the name of a class data member. Class data members are normally modifiable, but may be `const` or
 `static const`, `const` or `static const` data members are one-way serialized.  
-`getter_nameN` - the getter for a class data member 
+`getter_nameN` - the getter for a class data member  
 `(identifierN,"nameN")` - an enum identifier and corresponding JSON name  
 `(getter_nameN,"nameN")` - the getter for a class data member and corresponding JSON name  
-`property_nameN` - the name of a class getter or setter stripped of its get or set prefix. 
-`(getter_nameN,setter_nameN,"nameN")` - the getter and setter for a class data member, and corresponding JSON name
-`base_class_name` - the name of a base class 
+`property_nameN` - the name of a class getter or setter stripped of its get or set prefix.  
+`(getter_nameN,setter_nameN,"nameN")` - the getter and setter for a class data member, and corresponding JSON name  
+`base_class_name` - the name of a base class  
 `derived_class_nameN` - a class that is derived from the base class,
-and that has a `json_type_traits<Json,derived_class_nameN>` specialization.
+and that has a `json_type_traits<Json,derived_class_nameN>` specialization.  
 
 These macro declarations must be placed at global scope, outside any namespace blocks, and `class_name`, 
 `base_class_name` and `derived_class_nameN` must be a fully namespace qualified names.

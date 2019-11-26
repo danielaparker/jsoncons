@@ -22,7 +22,7 @@
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
 [Serialize with the C++ member names of the class](#G1)  
-[Serialize with the given names using the `_NAMED_` macros](#G2)  
+[Serialize with the provided names using the `_NAMED_` macros](#G2)  
 [Serialize a templated class with the `_TPL_` macros](#G3)  
 [Specialize json_type_traits explicitly](#G4)  
 [Mapping to C++ data structures with and without defaults allowed](#G5)  
@@ -670,7 +670,7 @@ The output for (2), (3) and (4) is the same.
 
 <div id="G2"/>
 
-#### Serialize with the given names using the `_NAMED_` macros
+#### Serialize with the provided names using the `_NAMED_` macros
 
 ```c++
 #include <jsoncons/json.hpp>
