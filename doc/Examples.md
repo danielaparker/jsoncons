@@ -1002,7 +1002,7 @@ To save typing and enhance readability, the jsoncons library defines macros,
 so you could also write
 
 ```c++
-JSONCONS_MEMBER_TRAITS_DECL(ns::book, author, title, price)
+JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::book, author, title, price)
 ```
 
 which expands to the code above.
@@ -1067,8 +1067,8 @@ Charles Bukowski, Pulp, 22.48
 
 #### Mapping to C++ data structures with and without defaults allowed
 
-The macros `JSONCONS_MEMBER_TRAITS_DECL` and `JSONCONS_ALL_MEMBER_TRAITS_DECL` both generate
-the code to specialize `json_type_traits` from member data. The difference is that `JSONCONS_MEMBER_TRAITS_DECL`
+The macros `JSONCONS_N_MEMBER_TRAITS_DECL` and `JSONCONS_ALL_MEMBER_TRAITS_DECL` both generate
+the code to specialize `json_type_traits` from member data. The difference is that `JSONCONS_N_MEMBER_TRAITS_DECL`
 does not require all member names to be present in the JSON data, while `JSONCONS_ALL_MEMBER_TRAITS_DECL` does.
 
 ```c++
@@ -1101,7 +1101,7 @@ namespace ns {
 } // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
+JSONCONS_N_MEMBER_TRAITS_DECL(ns::Person, 2, name, surname, ssn, age)
 
 int main()
 {
@@ -1453,7 +1453,7 @@ example above, the type selection strategy is based
 on the presence of properties in the derived classes. If
 derived classes cannot be distinguished in this way, 
 you can introduce extra properties. The convenience
-macros `JSONCONS_MEMBER_TRAITS_DECL`, `JSONCONS_ALL_MEMBER_TRAITS_DECL`,
+macros `JSONCONS_N_MEMBER_TRAITS_DECL`, `JSONCONS_ALL_MEMBER_TRAITS_DECL`,
 `JSONCONS_TPL_MEMBER_TRAITS_DECL`, `JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL`,
 `JSONCONS_MEMBER_TRAITS_NAMED_DECL`, `JSONCONS_ALL_MEMBER_TRAITS_NAMED_DECL`,
 `JSONCONS_TPL_MEMBER_TRAITS_NAMED_DECL`, and `JSONCONS_TPL_ALL_MEMBER_TRAITS_NAMED_DECL`

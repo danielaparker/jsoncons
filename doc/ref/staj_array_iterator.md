@@ -151,7 +151,7 @@ namespace ns {
 
 } // namespace ns
 
-JSONCONS_MEMBER_TRAITS_DECL(ns::employee, employeeNo, name, title)
+JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::employee, employeeNo, name, title)
       
 int main()
 {
