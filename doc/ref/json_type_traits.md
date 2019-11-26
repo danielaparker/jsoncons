@@ -119,7 +119,7 @@ JSONCONS_TPL_ALL_GETTER_CTOR_TRAITS_DECL(num_template_params,
                                      class_name,
                                      getter_name0,getter_name1,...) // (13)
 
-JSONCONS_TPL_GETTER_CTOR_NAMED_TRAITS_DECL(num_template_params,
+JSONCONS_TPL_ALL_GETTER_CTOR_NAMED_TRAITS_DECL(num_template_params,
                                            class_name,
                                            (getter_name0,"name0"),
                                            (getter_name1,"name1")...) // (14)
