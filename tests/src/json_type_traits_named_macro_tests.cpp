@@ -271,7 +271,7 @@ namespace ns = json_type_traits_named_macro_tests;
 
 JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL(ns::book,(author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL(ns::book2,(author,"Author"),(title,"Title"),(price,"Price"))
-JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL(ns::book3, (author,"Author"),(title,"Title"),(price,"Price"))
+JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS_DECL(ns::book3, (author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_TPL_ALL_MEMBER_NAMED_TRAITS_DECL(1,ns::TemplatedStruct1,(typeContent,"type-content"),(someString,"some-string"))
 JSONCONS_TPL_ALL_MEMBER_NAMED_TRAITS_DECL(2,ns::TemplatedStruct2,(aT1,"a-t1"),(aT2,"a-t2"))
 JSONCONS_ENUM_NAMED_TRAITS_DECL(ns::float_format, (scientific,"Exponential"), (fixed,"Fixed"), (hex,"Hex"), (general,"General"))
@@ -428,7 +428,7 @@ TEST_CASE("JSONCONS_ENUM_NAMED_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";

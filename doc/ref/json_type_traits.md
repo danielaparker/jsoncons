@@ -111,7 +111,7 @@ JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(class_name,
                                  getter_name0,
                                  getter_name1,...) // (11)
 
-JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL(class_name,
+JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS_DECL(class_name,
                                       (getter_name0,"name0"),
                                       (getter_name1,"name1")...) // (12)
 

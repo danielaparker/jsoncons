@@ -784,7 +784,7 @@ JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL(ns::Book1,(category,"Category"),(author,"A
                                                    (title,"Title"),(price,"Price"))
 JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL(ns::Book2,(category_,"Category"),(author_,"Author"),
                                                    (title_,"Title"),(price_,"Price"))
-JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL(ns::Book3,(category,"Category"),(author,"Author"),
+JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS_DECL(ns::Book3,(category,"Category"),(author,"Author"),
                                                  (title,"Title"),(price,"Price"))
 JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL(ns::Book4,(getCategory,setCategory,"Category"),
                                                           (getAuthor,setAuthor,"Author"),
