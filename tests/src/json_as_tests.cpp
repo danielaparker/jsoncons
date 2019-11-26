@@ -53,7 +53,7 @@ TEST_CASE("json::as<jsoncons::bignum>()")
     }
 }
 
-#if (defined(__GNUC__) || defined(__clang__)) && (!defined(__ALL_ANSI__) && defined(_GLIBCXX_USE_INT128))
+#if (defined(__GNUC__) || defined(__clang__)) && (!defined(__STRICT_ANSI__) && defined(_GLIBCXX_USE_INT128))
 TEST_CASE("json::as<__int128>()")
 {
     std::string s = "-18446744073709551617";
