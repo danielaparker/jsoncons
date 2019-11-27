@@ -2832,7 +2832,7 @@ private:
                             source_.ignore(1);
                             break;
                         default:
-                            //uint64_t dim = get_uint64_value(ec);
+                        {
                             size_t dim = get_size(ec);
                             if (ec)
                             {
@@ -2840,6 +2840,7 @@ private:
                             }
                             shape_.push_back(dim);
                             break;
+                        }
                     }
                 }
                 break;
