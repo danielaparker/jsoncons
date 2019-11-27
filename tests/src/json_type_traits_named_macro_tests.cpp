@@ -128,28 +128,28 @@ namespace json_type_traits_named_macro_tests
         }
     };
 
-    class book4
+    class book3a
     {
         std::string author_;
         std::string title_;
         double price_;
     public:
-        book4()
+        book3a()
             : price_(0)
         {
         }
 
-        book4(const std::string& author,
+        book3a(const std::string& author,
               const std::string& title,
               double price)
             : author_(author), title_(title), price_(price)
         {
         }
 
-        book4(const book4&) = default;
-        book4(book4&&) = default;
-        book4& operator=(const book4&) = default;
-        book4& operator=(book4&&) = default;
+        book3a(const book3a&) = default;
+        book3a(book3a&&) = default;
+        book3a& operator=(const book3a&) = default;
+        book3a& operator=(book3a&&) = default;
 
         const std::string& get_author() const
         {
@@ -179,6 +179,72 @@ namespace json_type_traits_named_macro_tests
         void set_price(double price)
         {
             price_ = price;
+        }
+    };
+
+    class book3b
+    {
+        std::string author_;
+        std::string title_;
+        double price_;
+        std::string isbn_;
+    public:
+        book3b()
+            : author_(), title_(), price_(), isbn_()
+        {
+        }
+
+        book3b(const std::string& author,
+              const std::string& title,
+              double price,
+              const std::string& isbn)
+            : author_(author), title_(title), price_(price), isbn_(isbn)
+        {
+        }
+
+        book3b(const book3b&) = default;
+        book3b(book3b&&) = default;
+        book3b& operator=(const book3b&) = default;
+        book3b& operator=(book3b&&) = default;
+
+        const std::string& get_author() const
+        {
+            return author_;
+        }
+
+        void set_author(const std::string& value)
+        {
+            author_ = value;
+        }
+
+        const std::string& get_title() const
+        {
+            return title_;
+        }
+
+        void set_title(const std::string& value)
+        {
+            title_ = value;
+        }
+
+        double get_price() const
+        {
+            return price_;
+        }
+
+        void set_price(double value)
+        {
+            price_ = value;
+        }
+
+        const std::string& get_isbn() const
+        {
+            return isbn_;
+        }
+
+        void set_isbn(const std::string& value)
+        {
+            isbn_ = value;
         }
     };
 
@@ -236,60 +302,6 @@ namespace json_type_traits_named_macro_tests
         }
     };
 
-    class book6
-    {
-        std::string author_;
-        std::string title_;
-        double price_;
-    public:
-        book6()
-            : price_(0)
-        {
-        }
-
-        book6(const std::string& author,
-              const std::string& title,
-              double price)
-            : author_(author), title_(title), price_(price)
-        {
-        }
-
-        book6(const book6&) = default;
-        book6(book6&&) = default;
-        book6& operator=(const book6&) = default;
-        book6& operator=(book6&&) = default;
-
-        const std::string& get_author() const
-        {
-            return author_;
-        }
-
-        const std::string& get_title() const
-        {
-            return title_;
-        }
-
-        double get_price() const
-        {
-            return price_;
-        }
-
-        void set_author(const std::string& author)
-        {
-            author_ = author;
-        }
-
-        void set_title(const std::string& title)
-        {
-            title_ = title;
-        }
-
-        void set_price(double price)
-        {
-            price_ = price;
-        }
-    };
-
     template <typename T1>
     struct TemplatedStruct1
     {
@@ -314,11 +326,11 @@ JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL(ns::book1a,(author,"Author"),(title,"Title
 JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL(ns::book1b,(author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS_DECL(ns::book2a, (author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_N_GETTER_CTOR_NAMED_TRAITS_DECL(ns::book2b, 2, (author,"Author"),(title,"Title"),(price,"Price"), (isbn, "Isbn"))
+JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL(ns::book3a, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"))
+JSONCONS_N_GETTER_SETTER_NAMED_TRAITS_DECL(ns::book3b, 2, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"),(get_isbn,set_isbn,"Isbn"))
 JSONCONS_TPL_ALL_MEMBER_NAMED_TRAITS_DECL(1,ns::TemplatedStruct1,(typeContent,"type-content"),(someString,"some-string"))
 JSONCONS_TPL_ALL_MEMBER_NAMED_TRAITS_DECL(2,ns::TemplatedStruct2,(aT1,"a-t1"),(aT2,"a-t2"))
 JSONCONS_ENUM_NAMED_TRAITS_DECL(ns::float_format, (scientific,"Exponential"), (fixed,"Fixed"), (hex,"Hex"), (general,"General"))
-JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL(ns::book4, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"))
-JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL(ns::book6, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"))
 
 TEST_CASE("JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL tests 1")
 {
@@ -551,7 +563,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL tests")
         j["Title"] = a_title;
         j["Price"] = a_price;
 
-        bool val = j.is<ns::book4>();
+        bool val = j.is<ns::book3a>();
         CHECK(val);
     }
 
@@ -562,7 +574,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL tests")
         j["Title"] = a_title;
         j["Price"] = a_price;
 
-        ns::book4 book = j.as<ns::book4>();
+        ns::book3a book = j.as<ns::book3a>();
 
         CHECK(book.get_author() == an_author);
         CHECK(book.get_title() == a_title);
@@ -571,7 +583,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL tests")
 
     SECTION("to_json")
     {
-        ns::book4 book(an_author,a_title,a_price);
+        ns::book3a book(an_author,a_title,a_price);
 
         json j(book);
 
@@ -586,6 +598,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL tests 2")
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
     double a_price = 25.17;
+    std::string an_isbn = "1400079276";
 
     SECTION("is")
     {
@@ -594,7 +607,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL tests 2")
         j["Title"] = a_title;
         j["Price"] = a_price;
 
-        bool val = j.is<ns::book6>();
+        bool val = j.is<ns::book3b>();
         CHECK(val);
     }
 
@@ -605,7 +618,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL tests 2")
         j["Title"] = a_title;
         j["Price"] = a_price;
 
-        ns::book6 book = j.as<ns::book6>();
+        ns::book3b book = j.as<ns::book3b>();
 
         CHECK(book.get_author() == an_author);
         CHECK(book.get_title() == a_title);
@@ -614,13 +627,32 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL tests 2")
 
     SECTION("to_json")
     {
-        ns::book6 book(an_author,a_title,a_price);
+        ns::book3b book(an_author,a_title,a_price, an_isbn);
 
         json j(book);
 
         CHECK(j["Author"].as<std::string>() == an_author);
         CHECK(j["Title"].as<std::string>() == a_title);
         CHECK(j["Price"].as<double>() == Approx(a_price).epsilon(0.001));
+        CHECK(j["Isbn"].as<std::string>() == an_isbn);
+    }
+
+    SECTION("decode")
+    {
+        json j;
+        j["Author"] = an_author;
+        j["Title"] = a_title;
+
+        CHECK(j.is<ns::book3b>());
+        CHECK_FALSE(j.is<ns::book3a>());
+
+        std::string buffer;
+        j.dump(buffer);
+        auto book = decode_json<ns::book3b>(buffer);
+        CHECK(book.get_author() == an_author);
+        CHECK(book.get_title() == a_title);
+        CHECK(book.get_price() == double());
+        CHECK(book.get_isbn() == std::string());
     }
 }
 
