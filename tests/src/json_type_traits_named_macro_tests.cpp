@@ -17,23 +17,23 @@ using namespace jsoncons;
 
 namespace json_type_traits_named_macro_tests
 {
-    struct book
+    struct book1a
     {
         std::string author;
         std::string title;
         double price;
 
-        book()
+        book1a()
             : author(""), title(""), price(0)
         {
         }
 
-        book(const std::string& author, const std::string& title, double price)
+        book1a(const std::string& author, const std::string& title, double price)
             : author(author), title(title), price(price)
         {
         }
 
-        friend std::ostream& operator<<(std::ostream& os, const book& b)
+        friend std::ostream& operator<<(std::ostream& os, const book1a& b)
         {
             std::cout << "author: " << b.author << ", title: " << b.title << ", price: " << b.price << "\n";
             return os;
@@ -269,7 +269,7 @@ namespace json_type_traits_named_macro_tests
 
 namespace ns = json_type_traits_named_macro_tests;
 
-JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL(ns::book,(author,"Author"),(title,"Title"),(price,"Price"))
+JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL(ns::book1a,(author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL(ns::book2,(author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS_DECL(ns::book3, (author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_TPL_ALL_MEMBER_NAMED_TRAITS_DECL(1,ns::TemplatedStruct1,(typeContent,"type-content"),(someString,"some-string"))
@@ -284,9 +284,9 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL tests 1")
     std::string a_title = "Kafka on the Shore";
     double a_price = 25.17;
 
-    ns::book book{an_author, a_title, a_price};
+    ns::book1a book{an_author, a_title, a_price};
 
-    SECTION("book")
+    SECTION("book1a")
     {
         std::string s;
 
@@ -294,7 +294,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL tests 1")
 
         json j = decode_json<json>(s);
 
-        REQUIRE(j.is<ns::book>() == true);
+        REQUIRE(j.is<ns::book1a>() == true);
 
         CHECK(j["Author"].as<std::string>() == an_author);
         CHECK(j["Title"].as<std::string>() == a_title);
@@ -304,7 +304,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL tests 1")
 
         CHECK(j == j2);
 
-        ns::book val = j.as<ns::book>();
+        ns::book1a val = j.as<ns::book1a>();
 
         CHECK(val.author == book.author);
         CHECK(val.title == book.title);
@@ -320,7 +320,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL tests 2")
 
     ns::book2 book{an_author, a_title, a_price};
 
-    SECTION("book")
+    SECTION("book2")
     {
         std::string s;
 
