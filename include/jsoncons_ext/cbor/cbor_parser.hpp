@@ -2832,7 +2832,8 @@ private:
                             source_.ignore(1);
                             break;
                         default:
-                            uint64_t dim = get_uint64_value(ec);
+                            //uint64_t dim = get_uint64_value(ec);
+                            size_t dim = get_size(ec);
                             if (ec)
                             {
                                 return;
