@@ -341,10 +341,10 @@ namespace json_type_traits_macro_tests
 namespace ns = json_type_traits_macro_tests;
 
 JSONCONS_ENUM_TRAITS_DECL(ns::float_format, scientific, fixed, hex, general)
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::book2a, author, title, price)
-JSONCONS_N_GETTER_CTOR_TRAITS_DECL(ns::book2b, 3, author, title, price, isbn)
 JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::book1a,author,title,price)
 JSONCONS_N_MEMBER_TRAITS_DECL(ns::book1b,3,author,title,price,isbn)
+JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::book2a, author, title, price)
+JSONCONS_N_GETTER_CTOR_TRAITS_DECL(ns::book2b, 2, author, title, price, isbn)
 JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL(1,ns::MyStruct,typeContent,someString)
 JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL(1,ns::MyStruct2,typeContent,someString)
 JSONCONS_TPL_ALL_GETTER_CTOR_TRAITS_DECL(1,ns::MyStruct3,typeContent,someString)
@@ -355,7 +355,7 @@ JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastNa
 JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
 
 JSONCONS_ALL_PROPERTY_TRAITS_DECL(ns::book3a, get, set, Author, Title, Price)
-JSONCONS_N_PROPERTY_TRAITS_DECL(ns::book3b, get, set, 3, Author, Title, Price, Isbn)
+JSONCONS_N_PROPERTY_TRAITS_DECL(ns::book3b, get, set, 2, Author, Title, Price, Isbn)
 
 TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS_DECL tests")
 {
@@ -431,6 +431,67 @@ TEST_CASE("JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL tests")
         CHECK(book.author() == an_author);
         CHECK(book.title() == a_title);
         CHECK(book.price() == Approx(a_price).epsilon(0.001));
+    }
+}
+
+TEST_CASE("JSONCONS_N_GETTER_CTOR_TRAITS_DECL tests")
+{
+    std::string an_author = "Haruki Murakami"; 
+    std::string a_title = "Kafka on the Shore";
+    double a_price = 25.17;
+    std::string an_isbn = "1400079276";
+
+    SECTION("is")
+    {
+        json j;
+        j["author"] = an_author;
+        j["title"] = a_title;
+
+        CHECK(j.is<ns::book2b>() == true);
+        CHECK(j.is<ns::book2a>() == false); // has author, title, but not price
+
+        j["price"] = a_price;
+        CHECK(j.is<ns::book2a>() == true); // has author, title, price
+    }
+
+    SECTION("to_json")
+    {
+        ns::book2b book(an_author,a_title,a_price,an_isbn);
+
+        json j(book);
+
+        CHECK(j["author"].as<std::string>() == an_author);
+        CHECK(j["title"].as<std::string>() == a_title);
+        CHECK(j["price"].as<double>() == Approx(a_price).epsilon(0.001));
+        CHECK(j["isbn"].as<std::string>() == an_isbn);
+    }
+
+    SECTION("as")
+    {
+        json j;
+        j["author"] = an_author;
+        j["title"] = a_title;
+        j["price"] = a_price;
+
+        ns::book2b book = j.as<ns::book2b>();
+
+        CHECK(book.author() == an_author);
+        CHECK(book.title() == a_title);
+        CHECK(book.price() == Approx(a_price).epsilon(0.001));
+    }
+    SECTION("decode")
+    {
+        json j;
+        j["author"] = an_author;
+        j["title"] = a_title;
+
+        std::string buffer;
+        j.dump(buffer);
+        auto book = decode_json<ns::book2b>(buffer);
+        CHECK(book.author() == an_author);
+        CHECK(book.title() == a_title);
+        CHECK(book.price() == double());
+        CHECK(book.isbn() == std::string());
     }
 }
 
@@ -677,6 +738,86 @@ TEST_CASE("JSONCONS_N_PROPERTY_TRAITS_DECL tests")
         CHECK(book.getAuthor() == an_author);
         CHECK(book.getTitle() == a_title);
         CHECK(book.getPrice() == Approx(a_price).epsilon(0.001));
+    }
+    SECTION("decode")
+    {
+        json j;
+        j["author"] = an_author;
+        j["title"] = a_title;
+        j["price"] = a_price;
+
+        std::string buffer;
+        j.dump(buffer);
+        auto book = decode_json<ns::book2b>(buffer);
+        CHECK(book.author() == an_author);
+        CHECK(book.title() == a_title);
+        CHECK(book.price() == a_price);
+    }
+}
+
+TEST_CASE("JSONCONS_ALL_PROPERTY_TRAITS_DECL tests")
+{
+    std::string an_author = "Haruki Murakami"; 
+    std::string a_title = "Kafka on the Shore";
+    double a_price = 25.17;
+    std::string an_isbn = "1400079276";
+
+    SECTION("is")
+    {
+        json j;
+        j["Author"] = an_author;
+        j["Title"] = a_title;
+
+        CHECK(j.is<ns::book3b>() == true);
+        CHECK(j.is<ns::book3a>() == false);
+
+        j["Price"] = a_price;
+
+        CHECK(j.is<ns::book3b>() == true);
+        CHECK(j.is<ns::book3a>() == true);
+    }
+    SECTION("to_json")
+    {
+        ns::book3b book;
+        book.setAuthor(an_author);
+        book.setTitle(a_title);
+        book.setPrice(a_price);
+        book.setIsbn(an_isbn);
+
+        json j(book);
+
+        CHECK(j["Author"].as<std::string>() == an_author);
+        CHECK(j["Title"].as<std::string>() == a_title);
+        CHECK(j["Price"].as<double>() == Approx(a_price).epsilon(0.001));
+        CHECK(j["Isbn"].as<std::string>() == an_isbn);
+    }
+
+    SECTION("as")
+    {
+        json j;
+        j["Author"] = an_author;
+        j["Title"] = a_title;
+        j["Price"] = a_price;
+
+        auto book = j.as<ns::book3b>();
+
+        CHECK(book.getAuthor() == an_author);
+        CHECK(book.getTitle() == a_title);
+        CHECK(book.getPrice() == Approx(a_price).epsilon(0.001));
+    }
+    SECTION("decode")
+    {
+        json j;
+        j["Author"] = an_author;
+        j["Title"] = a_title;
+
+        std::string buffer;
+        j.dump(buffer);
+        auto book = decode_json<ns::book3b>(buffer);
+        CHECK(book.getAuthor() == an_author);
+        CHECK(book.getTitle() == a_title);
+        CHECK(book.getPrice() == double());
+        CHECK(book.getIsbn() == std::string());
     }
 }
 
