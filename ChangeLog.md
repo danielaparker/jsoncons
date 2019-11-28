@@ -113,7 +113,7 @@ keep the same meaning for backwards compatibility, the `_STRICT_` names are depr
 and renamed substituting `_ALL_` for `STRICT`.
 
 See [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md)
-for more information.
+for complete documentation of the convenience macros. 
 
 v0.139.0
 --------
