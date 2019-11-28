@@ -621,12 +621,13 @@ Output:
 
 #### Serialize a polymorphic type based on the presence of properties
 
-This example uses the convenience macro `JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL`
+This example uses the convenience macro `JSONCONS_N_GETTER_CTOR_TRAITS_DECL`
 to generate the `json_type_traits` boilerplate for the `HourlyEmployee` and `CommissionedEmployee` 
 derived classes, and `JSONCONS_POLYMORPHIC_TRAITS_DECL` to generate the `json_type_traits` boilerplate
 for `std::shared_ptr<Employee>` and `std::unique_ptr<Employee>`. The type selection strategy is based
-on the presence of properties, in particular, to `wage` and `hours` being present in
-`HourlyEmployee` and absent in `CommissionedEmployee`.
+on the presence of mandatory properties, in particular, to the `firstName`, `lastName`, and `wage` properties of an
+`HourlyEmployee`, and to the `firstName`, `lastName`, `baseSalary`, and `commission` properties of a `CommissionedEmployee`.
+Non-mandatory properties are not considered for the purpose of type selection.
 
 ```c++
 #include <cassert>
@@ -642,6 +643,7 @@ class Employee
 {
     std::string firstName_;
     std::string lastName_;
+    std::string socialSecurityNumber_;
 public:
     Employee(const std::string& firstName, const std::string& lastName)
         : firstName_(firstName), lastName_(lastName)
@@ -721,8 +723,8 @@ public:
 
 } // ns
 
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, hours)
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
+JSONCONS_N_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, 3, firstName, lastName, wage, hours)
+JSONCONS_N_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, 4, firstName, lastName, baseSalary, commission, sales)
 JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
 
 int main()
@@ -733,7 +735,6 @@ int main()
         "firstName": "John",
         "hours": 1000,
         "lastName": "Smith",
-        "type": "Hourly",
         "wage": 40.0
     },
     {
@@ -741,16 +742,15 @@ int main()
         "commission": 0.25,
         "firstName": "Jane",
         "lastName": "Doe",
-        "sales": 1000,
-        "type": "Commissioned"
+        "sales": 1000
     }
 ]
     )"; 
 
-    auto v = decode_json<std::vector<std::shared_ptr<ns::Employee>>>(input);
+    auto v = decode_json<std::vector<std::unique_ptr<ns::Employee>>>(input);
 
     std::cout << "(1)\n";
-    for (auto p : v)
+    for (const auto& p : v)
     {
         std::cout << p->firstName() << " " << p->lastName() << ", " << p->calculatePay() << "\n";
     }

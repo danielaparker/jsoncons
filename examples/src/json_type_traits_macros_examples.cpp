@@ -103,6 +103,7 @@ class Employee
 {
     std::string firstName_;
     std::string lastName_;
+    std::string socialSecurityNumber_;
 public:
     Employee(const std::string& firstName, const std::string& lastName)
         : firstName_(firstName), lastName_(lastName)
@@ -190,8 +191,8 @@ JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::Book1,category,author,title,price)
 JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::Book2,category,author,title,price)
 JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::Book3,category,author,title,price)
 
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, hours)
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
+JSONCONS_N_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, 3, firstName, lastName, wage, hours)
+JSONCONS_N_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, 4, firstName, lastName, baseSalary, commission, sales)
 JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
 
 JSONCONS_N_MEMBER_TRAITS_DECL(ns::Bar,1,bar)
@@ -267,7 +268,6 @@ void employee_polymorphic_example()
         "firstName": "John",
         "hours": 1000,
         "lastName": "Smith",
-        "type": "Hourly",
         "wage": 40.0
     },
     {
@@ -275,16 +275,15 @@ void employee_polymorphic_example()
         "commission": 0.25,
         "firstName": "Jane",
         "lastName": "Doe",
-        "sales": 1000,
-        "type": "Commissioned"
+        "sales": 1000
     }
 ]
     )"; 
 
-    auto v = decode_json<std::vector<std::shared_ptr<ns::Employee>>>(input);
+    auto v = decode_json<std::vector<std::unique_ptr<ns::Employee>>>(input);
 
     std::cout << "(1)\n";
-    for (auto p : v)
+    for (const auto& p : v)
     {
         std::cout << p->firstName() << " " << p->lastName() << ", " << p->calculatePay() << "\n";
     }
