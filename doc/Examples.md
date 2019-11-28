@@ -27,7 +27,7 @@
 [Specialize json_type_traits explicitly](#G4)  
 [Mapping to C++ data structures with and without defaults allowed](#G5)  
 [An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL](#G6)  
-[Serialize a polymorphic type based on the presence of properties](#G7)  
+[Serialize a polymorphic type based on the presence of members](#G7)  
 [Ensuring type selection is possible](#G8)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G9)
 
@@ -1258,15 +1258,15 @@ Output:
 
 <div id="G7"/>
 
-#### Serialize a polymorphic type based on the presence of properties
+#### Serialize a polymorphic type based on the presence of members
 
 This example uses the convenience macro `JSONCONS_N_GETTER_CTOR_TRAITS_DECL`
 to generate the `json_type_traits` boilerplate for the `HourlyEmployee` and `CommissionedEmployee` 
 derived classes, and `JSONCONS_POLYMORPHIC_TRAITS_DECL` to generate the `json_type_traits` boilerplate
 for `std::shared_ptr<Employee>` and `std::unique_ptr<Employee>`. The type selection strategy is based
-on the presence of mandatory properties, in particular, to the `firstName`, `lastName`, and `wage` properties of an
-`HourlyEmployee`, and to the `firstName`, `lastName`, `baseSalary`, and `commission` properties of a `CommissionedEmployee`.
-Non-mandatory properties are not considered for the purpose of type selection.
+on the presence of mandatory members, in particular, to the `firstName`, `lastName`, and `wage` members of an
+`HourlyEmployee`, and to the `firstName`, `lastName`, `baseSalary`, and `commission` members of a `CommissionedEmployee`.
+Non-mandatory members are not considered for the purpose of type selection.
 
 ```c++
 #include <cassert>
@@ -1450,9 +1450,9 @@ Jane Doe, 30250
 When deserializing a polymorphic type, jsoncons needs to know how
 to convert a json value to the proper derived class. In the Employee
 example above, the type selection strategy is based
-on the presence of properties in the derived classes. If
+on the presence of members in the derived classes. If
 derived classes cannot be distinguished in this way, 
-you can introduce extra properties. The convenience
+you can introduce extra members. The convenience
 macros `JSONCONS_N_MEMBER_TRAITS_DECL`, `JSONCONS_ALL_MEMBER_TRAITS_DECL`,
 `JSONCONS_TPL_N_MEMBER_TRAITS_DECL`, `JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL`,
 `JSONCONS_N_MEMBER_TRAITS_NAMED_DECL`, `JSONCONS_ALL_MEMBER_TRAITS_NAMED_DECL`,
