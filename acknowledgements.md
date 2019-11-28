@@ -77,3 +77,7 @@ to include copying the jsoncons_ext directory into the installation place
 - [KonstantinPlotnikov](https://github.com/KonstantinPlotnikov) for fixing GCC 9.2 warning: ‘class jsoncons::json_exception’ 
 has virtual functions and accessible non-virtual destructor
 
+- [patternoia](https://github.com/patternoia), [Twan Springeling](https://github.com/Hippid), [Leroy.H.Y](https://github.com/lhy0403)
+and [Rodrigo Broggi](https://github.com/rbroggi) for providing feedback and helpful suggestions regarding the `json_type_traits`
+convenience macros.
+
