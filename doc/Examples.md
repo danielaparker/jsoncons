@@ -1100,7 +1100,7 @@ namespace ns {
 
 } // namespace ns
 
-// Declare the traits. Specify which data members need to be serialized.
+// Declare the traits. Specify which data members need to be serialized, and how many are mandatory.
 JSONCONS_N_MEMBER_TRAITS_DECL(ns::Person, 2, name, surname, ssn, age)
 
 int main()
