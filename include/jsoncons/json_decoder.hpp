@@ -94,7 +94,7 @@ public:
           array_allocator_(rallocator),
           stack_item_allocator_(wallocator),
           size_t_allocator_(wallocator),
-          result_(rallocator),
+          result_(),
           name_(string_allocator_),
           item_stack_(stack_item_allocator_),
           structure_stack_(size_t_allocator_),

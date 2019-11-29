@@ -2895,29 +2895,33 @@ public:
     {
     }
 
-    basic_json(json_object_arg_t, 
-               const Allocator& alloc = Allocator()) 
-        : var_(object(alloc), semantic_tag::none)
+    explicit basic_json(json_object_arg_t, 
+                        semantic_tag tag = semantic_tag::none,
+                        const Allocator& alloc = Allocator()) 
+        : var_(object(alloc), tag)
     {
     }
 
     basic_json(json_object_arg_t, 
                std::initializer_list<std::pair<std::basic_string<char_type>,basic_json>> init, 
+               semantic_tag tag = semantic_tag::none, 
                const Allocator& alloc = Allocator()) 
-        : var_(object(init,alloc), semantic_tag::none)
+        : var_(object(init,alloc), tag)
     {
     }
 
-    basic_json(json_array_arg_t, 
-               const Allocator& alloc = Allocator()) 
-        : var_(array(alloc), semantic_tag::none)
+    explicit basic_json(json_array_arg_t, 
+                        semantic_tag tag = semantic_tag::none, 
+                        const Allocator& alloc = Allocator()) 
+        : var_(array(alloc), tag)
     {
     }
 
     basic_json(json_array_arg_t, 
                std::initializer_list<basic_json> init, 
+               semantic_tag tag = semantic_tag::none, 
                const Allocator& alloc = Allocator()) 
-        : var_(array(init,alloc), semantic_tag::none)
+        : var_(array(init,alloc), tag)
     {
     }
 
