@@ -354,8 +354,8 @@ JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wa
 JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
 JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
 
-JSONCONS_ALL_PROPERTY_TRAITS_DECL(ns::book3a, get, set, Author, Title, Price)
-JSONCONS_N_PROPERTY_TRAITS_DECL(ns::book3b, get, set, 2, Author, Title, Price, Isbn)
+JSONCONS_ALL_GETTER_SETTER_TRAITS_DECL(ns::book3a, get, set, Author, Title, Price)
+JSONCONS_N_GETTER_SETTER_TRAITS_DECL(ns::book3b, get, set, 2, Author, Title, Price, Isbn)
 
 TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS_DECL tests")
 {
@@ -696,7 +696,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_N_PROPERTY_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_N_GETTER_SETTER_TRAITS_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
@@ -755,7 +755,7 @@ TEST_CASE("JSONCONS_N_PROPERTY_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_ALL_PROPERTY_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
