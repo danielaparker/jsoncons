@@ -160,7 +160,7 @@ struct is_json_type_traits_declared<own_vector> : public std::true_type
 
 void own_vector_extensibility_example()
 {
-    json j = json::object{ {"1",2},{"3",4} };
+    json j(json_object_arg, {{"1",2},{"3",4}});
     assert(j.is<own_vector>());
     auto v = j.as<own_vector>();
     json j2 = v;

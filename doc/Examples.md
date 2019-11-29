@@ -1707,11 +1707,12 @@ image_sizing.insert_or_assign("Dimension 2",json::null());  // a null value
 or use an object initializer-list,
 
 ```c++
-json file_settings = json::object{
-    {"Image Format", "JPEG"},
-    {"Color Space", "sRGB"},
-    {"Limit File Size", true},
-    {"Limit File Size To", 10000}
+json file_settings( json_object_arg,{
+        {"Image Format", "JPEG"},
+        {"Color Space", "sRGB"},
+        {"Limit File Size", true},
+        {"Limit File Size To", 10000}
+    });
 };
 ```
 
@@ -1893,11 +1894,11 @@ for (auto val : j.array_range())
 #### Iterate over a json object
 
 ```c++
-json j = json::object{
+json j(json_object_arg, {
     {"author", "Haruki Murakami"},
     {"title", "Kafka on the Shore"},
     {"price", 25.17}
-};
+});
 
 for (const auto& member : j.object_range())
 {
@@ -1926,9 +1927,9 @@ If your compiler supports `std::string_view`, you can also use `j.as<std::string
 #### Given a string in a json object that represents a decimal number, assign it to a double
 
 ```c++
-json j = json::object{
+json j(json_objectarg, {
     {"price", "25.17"}
-};
+});
 
 double price = j["price"].as<double>();
 ```
@@ -1988,9 +1989,7 @@ Output:
 #### Look up a key, if found, return the value converted to type T, otherwise, return a default value of type T.
  
 ```c++
-json j = json::object{
-    {"price", "25.17"}
-};
+json j(json_object_arg, {{"price", "25.17"}});
 
 double price = j.get_with_default("price", 25.00); // returns 25.17
 

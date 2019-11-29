@@ -2893,6 +2893,20 @@ public:
     {
     }
 
+    basic_json(json_object_arg_t, 
+               std::initializer_list<array> init, 
+               const Allocator& alloc = Allocator()) 
+        : var_(object(init,alloc), semantic_tag::none)
+    {
+    }
+
+    basic_json(json_array_arg_t, 
+               std::initializer_list<basic_json> init, 
+               const Allocator& alloc = Allocator()) 
+        : var_(array(init,alloc), semantic_tag::none)
+    {
+    }
+
     basic_json(const variant& val)
         : var_(val)
     {

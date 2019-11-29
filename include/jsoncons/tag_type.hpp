@@ -22,17 +22,17 @@ struct half_arg_t
 
 constexpr half_arg_t half_arg = half_arg_t();
 
-struct array_arg_t
+struct json_array_arg_t
 {
 };
 
-constexpr array_arg_t array_arg = array_arg_t();
+constexpr json_array_arg_t json_array_arg = json_array_arg_t();
 
-struct object_arg_t
+struct json_object_arg_t
 {
 };
 
-constexpr object_arg_t object_arg = object_arg_t();
+constexpr json_object_arg_t json_object_arg = json_object_arg_t();
 
 struct byte_string_arg_t
 {

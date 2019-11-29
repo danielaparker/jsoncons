@@ -364,7 +364,7 @@ struct is_json_type_traits_declared<own_vector> : public std::true_type
 
 TEST_CASE("own_vector json_type_traits")
 {
-    json j = json::object{ {"1",2},{"3",4} };
+    json j(json_object_arg,{ {"1",2},{"3",4} });
     REQUIRE(j.is<own_vector>());
     auto v = j.as<own_vector>();
     REQUIRE(v.size() == 4);

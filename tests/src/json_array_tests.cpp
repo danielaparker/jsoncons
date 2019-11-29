@@ -63,8 +63,8 @@ TEST_CASE("test_assignment_to_initializer_list2")
 TEST_CASE("test_assignment_to_initializer_list3")
 {
     json val;
-    val["data"]["id"] = json::array{0,1,2,3,4,5,6,7};
-    val["data"]["item"] = json::array{json::object{{"first",1},{"second",2}}};
+    val["data"]["id"] = json(json_array_arg, {0,1,2,3,4,5,6,7});
+    val["data"]["item"] = json(json_array_arg, {json(json_object_arg, {{"first",1},{"second",2}})});
 
     json expected_id = json::parse(R"(
 [0,1,2,3,4,5,6,7]
