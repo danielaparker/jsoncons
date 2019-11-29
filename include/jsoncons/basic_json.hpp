@@ -421,9 +421,8 @@ public:
             pointer ptr_;
 
             template <typename... Args>
-            void create(byte_string_allocator_type allocator, Args&& ... args)
+            void create(byte_string_allocator_type alloc, Args&& ... args)
             {
-                byte_string_allocator_type alloc(allocator);
                 ptr_ = alloc.allocate(1);
                 JSONCONS_TRY
                 {
@@ -512,9 +511,8 @@ public:
             pointer ptr_;
 
             template <typename... Args>
-            void create(array_allocator allocator, Args&& ... args)
+            void create(array_allocator alloc, Args&& ... args)
             {
-                array_allocator alloc(allocator);
                 ptr_ = alloc.allocate(1);
                 JSONCONS_TRY
                 {
@@ -595,9 +593,8 @@ public:
             pointer ptr_;
 
             template <typename... Args>
-            void create(const Allocator& allocator, Args&& ... args)
+            void create(object_allocator alloc, Args&& ... args)
             {
-                object_allocator alloc(allocator);
                 ptr_ = alloc.allocate(1);
                 JSONCONS_TRY
                 {
@@ -2868,10 +2865,15 @@ public:
     {
     }
 
+//#if !defined(JSONCONS_NO_DEPRECATED)
+
+    //JSONCONS_DEPRECATED_MSG("Instead, use basic_json(json_object_t,const Allocator&)")
     explicit basic_json(const Allocator& allocator, semantic_tag tag = semantic_tag::none) 
         : var_(object(allocator),tag)
     {
     }
+
+//#endif
 
     basic_json(const basic_json& val)
         : var_(val.var_)
@@ -2894,9 +2896,21 @@ public:
     }
 
     basic_json(json_object_arg_t, 
+               const Allocator& alloc = Allocator()) 
+        : var_(object(alloc), semantic_tag::none)
+    {
+    }
+
+    basic_json(json_object_arg_t, 
                std::initializer_list<std::pair<std::basic_string<char_type>,basic_json>> init, 
                const Allocator& alloc = Allocator()) 
         : var_(object(init,alloc), semantic_tag::none)
+    {
+    }
+
+    basic_json(json_array_arg_t, 
+               const Allocator& alloc = Allocator()) 
+        : var_(array(alloc), semantic_tag::none)
     {
     }
 
