@@ -139,23 +139,23 @@ JSONCONS_TPL_ALL_GETTER_CTOR_NAMED_TRAITS_DECL(num_template_params,
                                                (getter_name0,"name0"),
                                                (getter_name1,"name1")...) // (18)
 
-JSONCONS_N_PROPERTY_TRAITS_DECL(class_name,get_prefix,set_prefix,num_mandatory,
-                                property_name0,property_name1,...) // (19)
+JSONCONS_N_GETTER_SETTER_TRAITS_DECL(class_name,get_prefix,set_prefix,num_mandatory,
+                                     property_name0,property_name1,...) // (19)
 
-JSONCONS_ALL_PROPERTY_TRAITS_DECL(class_name,get_prefix,set_prefix,
-                                  property_name0,property_name1,...) // (20)
+JSONCONS_ALL_GETTER_SETTER_TRAITS_DECL(class_name,get_prefix,set_prefix,
+                                       property_name0,property_name1,...) // (20)
 
-JSONCONS_TPL_N_PROPERTY_TRAITS_DECL(num_template_params,
-                                    class_name,get_prefix,set_prefix,num_mandatory,
-                                    property_name0,property_name1,...) // (21)  
+JSONCONS_TPL_N_GETTER_SETTER_TRAITS_DECL(num_template_params,
+                                        class_name,get_prefix,set_prefix,num_mandatory,
+                                        property_name0,property_name1,...) // (21)  
 
-JSONCONS_TPL_ALL_PROPERTY_TRAITS_DECL(num_template_params,
-                                      class_name,get_prefix,set_prefix,
-                                      property_name0,property_name1,...) // (22)
+JSONCONS_TPL_ALL_GETTER_SETTER_TRAITS_DECL(num_template_params,
+                                           class_name,get_prefix,set_prefix,
+                                           property_name0,property_name1,...) // (22)
 
 JSONCONS_N_GETTER_SETTER_NAMED_TRAITS_DECL(class_name,num_mandatory,
-                                          (getter_name0,setter_name0,"name0"),
-                                          (getter_name1,setter_name1,"name1")...) // (23)
+                                           (getter_name0,setter_name0,"name0"),
+                                           (getter_name1,setter_name1,"name1")...) // (23)
 
 JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL(class_name,
                                              (getter_name0,setter_name0,"name0"),
