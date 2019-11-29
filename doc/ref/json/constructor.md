@@ -13,6 +13,14 @@ basic_json(basic_json&& other) noexcept; // (5)
 
 basic_json(basic_json&& other, const allocator_type& allocator) noexcept; // (6)
 
+basic_json(json_object_arg_t, 
+           std::initializer_list<array> init, 
+           const Allocator& alloc = Allocator()); 
+
+basic_json(json_array_arg_t, 
+           std::initializer_list<basic_json> init, 
+           const Allocator& alloc = Allocator());
+
 basic_json(const array& val, semantic_tag tag = semantic_tag::none); // (7)
 
 basic_json(array&& val, semantic_tag tag = semantic_tag::none) noexcept; // (8)
