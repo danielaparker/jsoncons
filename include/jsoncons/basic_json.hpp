@@ -2894,7 +2894,7 @@ public:
     }
 
     basic_json(json_object_arg_t, 
-               std::initializer_list<array> init, 
+               std::initializer_list<std::pair<std::basic_string<char_type>,basic_json>> init, 
                const Allocator& alloc = Allocator()) 
         : var_(object(init,alloc), semantic_tag::none)
     {

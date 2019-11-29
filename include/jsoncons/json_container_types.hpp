@@ -279,16 +279,10 @@ public:
     {
     }
 
-    json_array(std::initializer_list<Json> init)
-        : allocator_holder<allocator_type>(), 
-          elements_(std::move(init))
-    {
-    }
-
-    json_array(std::initializer_list<Json> init, 
-               const allocator_type& allocator)
+    json_array(const std::initializer_list<Json>& init, 
+               const allocator_type& allocator = allocator_type())
         : allocator_holder<allocator_type>(allocator), 
-          elements_(std::move(init),value_allocator_type(allocator))
+          elements_(init,value_allocator_type(allocator))
     {
     }
     ~json_array()
@@ -549,38 +543,15 @@ public:
         members_.erase(it, members_.end());
     }
 
-    json_object(std::initializer_list<typename Json::array> init)
-    {
-        for (const auto& element : init)
-        {
-            if (element.size() != 2 || !element[0].is_string())
-            {
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Cannot create object from initializer list"));
-                break;
-            }
-        }
-        for (auto& element : init)
-        {
-            insert_or_assign(element[0].as_string_view(), std::move(element[1]));
-        }
-    }
-
-    json_object(std::initializer_list<typename Json::array> init, 
-                const allocator_type& allocator)
+    json_object(const std::initializer_list<std::pair<std::basic_string<char_type>,Json>>& init, 
+                const allocator_type& allocator = allocator_type())
         : allocator_holder<allocator_type>(allocator), 
           members_(key_value_allocator_type(allocator))
     {
-        for (const auto& element : init)
+        members_.reserve(init.size());
+        for (auto& item : init)
         {
-            if (element.size() != 2 || !element[0].is_string())
-            {
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Cannot create object from initializer list"));
-                break;
-            }
-        }
-        for (auto& element : init)
-        {
-            insert_or_assign(element[0].as_string_view(), std::move(element[1]));
+            insert_or_assign(item.first, item.second);
         }
     }
 
@@ -1278,39 +1249,16 @@ public:
         build_index();
     }
 
-    json_object(std::initializer_list<typename Json::array> init)
-    {
-        for (const auto& element : init)
-        {
-            if (element.size() != 2 || !element[0].is_string())
-            {
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Cannot create object from initializer list"));
-                break;
-            }
-        }
-        for (auto& element : init)
-        {
-            insert_or_assign(element[0].as_string_view(), std::move(element[1]));
-        }
-    }
-
-    json_object(std::initializer_list<typename Json::array> init, 
-                const allocator_type& allocator)
+    json_object(std::initializer_list<std::pair<std::basic_string<char_type>,Json>> init, 
+                const allocator_type& allocator = allocator_type())
         : allocator_holder<allocator_type>(allocator), 
           members_(key_value_allocator_type(allocator)), 
           index_(index_allocator_type(allocator))
     {
-        for (const auto& element : init)
+        members_.reserve(init.size());
+        for (auto& item : init)
         {
-            if (element.size() != 2 || !element[0].is_string())
-            {
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Cannot create object from initializer list"));
-                break;
-            }
-        }
-        for (auto& element : init)
-        {
-            insert_or_assign(element[0].as_string_view(), std::move(element[1]));
+            insert_or_assign(item.first, item.second);
         }
     }
 

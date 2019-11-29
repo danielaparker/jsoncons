@@ -14,7 +14,7 @@ using namespace jsoncons;
 
 TEST_CASE("json constructor tests")
 {
-    SECTION("json_object_arg")
+    SECTION("json json_object_arg")
     {
         json j1(json_object_arg, {{"one",1}});
         REQUIRE(j1.is_object());
@@ -27,7 +27,7 @@ TEST_CASE("json constructor tests")
         CHECK(j2.at("one").as<int>() == 1);
         CHECK(j2.at("two").as<int>() == 2);
     }
-    SECTION("json_array_arg")
+    SECTION("json json_array_arg")
     {
         json j1(json_array_arg, {1});
         REQUIRE(j1.is_array());
@@ -35,6 +35,32 @@ TEST_CASE("json constructor tests")
         CHECK(j1[0].as<int>() == 1);
 
         json j2(json_array_arg, {1,2});
+        REQUIRE(j2.is_array());
+        REQUIRE(j2.size() == 2);
+        CHECK(j2[0].as<int>() == 1);
+        CHECK(j2[1].as<int>() == 2);
+    }
+    SECTION("ojson json_object_arg")
+    {
+        ojson j1(json_object_arg, {{"one",1}});
+        REQUIRE(j1.is_object());
+        REQUIRE(j1.size() == 1);
+        CHECK(j1.at("one").as<int>() == 1);
+
+        ojson j2(json_object_arg, {{"one",1},{"two",2}});
+        REQUIRE(j2.is_object());
+        REQUIRE(j2.size() == 2);
+        CHECK(j2.at("one").as<int>() == 1);
+        CHECK(j2.at("two").as<int>() == 2);
+    }
+    SECTION("ojson json_array_arg")
+    {
+        ojson j1(json_array_arg, {1});
+        REQUIRE(j1.is_array());
+        REQUIRE(j1.size() == 1);
+        CHECK(j1[0].as<int>() == 1);
+
+        ojson j2(json_array_arg, {1,2});
         REQUIRE(j2.is_array());
         REQUIRE(j2.size() == 2);
         CHECK(j2[0].as<int>() == 1);
