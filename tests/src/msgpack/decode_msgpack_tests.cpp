@@ -99,7 +99,7 @@ TEST_CASE("decode_msgpack_arrays_and_maps")
     check_decode_msgpack({0x80}, json(json_object_arg));
 
     check_decode_msgpack({0x91,'\0'},json::parse("[0]"));
-    check_decode_msgpack({0x92,'\0','\0'}, json(json_array_arg, ({0,0}));
+    check_decode_msgpack({0x92,'\0','\0'}, json(json_array_arg, {0,0}));
     check_decode_msgpack({0x92,0x91,'\0','\0'}, json::parse("[[0],0]"));
     check_decode_msgpack({0x91,0xa5,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
 

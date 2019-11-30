@@ -156,7 +156,7 @@ TEST_CASE("test_cbor_parsing")
     {
         check_parse_cbor({0x80}, json(json_array_arg));
         check_parse_cbor({0x81,'\0'},json::parse("[0]"));
-        check_parse_cbor({0x82,'\0','\0'}, json(json_array_arg, ({0,0}));
+        check_parse_cbor({0x82,'\0','\0'}, json(json_array_arg, {0,0}));
         check_parse_cbor({0x82,0x81,'\0','\0'}, json::parse("[[0],0]"));
         check_parse_cbor({0x81,0x65,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
 
