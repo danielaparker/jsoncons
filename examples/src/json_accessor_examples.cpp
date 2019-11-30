@@ -112,7 +112,7 @@ void operator_at_examples()
 {
     json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
 
-    json color_spaces = json::array();
+    json color_spaces(json_array_arg);
     color_spaces.push_back("sRGB");
     color_spaces.push_back("AdobeRGB");
     color_spaces.push_back("ProPhoto RGB");

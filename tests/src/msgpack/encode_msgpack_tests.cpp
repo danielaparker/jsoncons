@@ -113,8 +113,8 @@ TEST_CASE("encode_msgpack_test")
 TEST_CASE("encode_msgpack_arrays_and_maps")
 {
     // fixarray
-    check_encode_msgpack({0x90},json::array());
-    check_encode_msgpack({0x80},json::object());
+    check_encode_msgpack({0x90}, json(json_array_arg));
+    check_encode_msgpack({0x80},json());
 
     check_encode_msgpack({0x91,'\0'},json::parse("[0]"));
     check_encode_msgpack({0x92,'\0','\0'},json::array({0,0}));

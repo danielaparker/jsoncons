@@ -9,7 +9,7 @@ using namespace jsoncons;
 
 void data_model_example1()
 {
-    json j = json::array();
+    json j(json_array_arg);
 
     j.emplace_back("foo");
     j.emplace_back(byte_string{ 'b','a','r' });

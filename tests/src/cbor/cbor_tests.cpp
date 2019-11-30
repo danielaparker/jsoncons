@@ -57,7 +57,7 @@ TEST_CASE("cbor_test")
     j1["min float"] = (std::numeric_limits<float>::lowest)();
     j1["String too long for small string optimization"] = "String too long for small string optimization";
 
-    json ja = json::array();
+    json ja(json_array_arg);
     ja.push_back(0);
     ja.push_back(1);
     ja.push_back(2);
@@ -122,7 +122,7 @@ TEST_CASE("cbor_test2")
     j1[L"S"] = L"S";
     j1[L"String too long for small string optimization"] = L"String too long for small string optimization";
 
-    wjson ja = wjson::array();
+    wjson ja(json_array_arg);
     ja.push_back(0);
     ja.push_back(1);
     ja.push_back(2);

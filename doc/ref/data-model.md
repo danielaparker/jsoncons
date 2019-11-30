@@ -76,7 +76,7 @@ using namespace jsoncons;
 
 int main()
 {
-    json j = json::array();
+    json j(json_array_arg);
 
     j.emplace_back("foo");
     j.emplace_back(byte_string{ 'b','a','r' });

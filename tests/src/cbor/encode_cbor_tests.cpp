@@ -118,8 +118,8 @@ TEST_CASE("cbor_encoder_test")
 
 TEST_CASE("cbor_arrays_and_maps")
 {
-    check_encode_cbor({ 0x80 }, json::array());
-    check_encode_cbor({ 0xa0 }, json::object());
+    check_encode_cbor({ 0x80 }, json(json_array_arg));
+    check_encode_cbor({ 0xa0 }, json());
 
     check_encode_cbor({ 0x81,'\0' }, json::parse("[0]"));
     check_encode_cbor({ 0x82,'\0','\0' }, json::array({ 0,0 }));

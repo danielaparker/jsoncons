@@ -154,7 +154,7 @@ TEST_CASE("test_cbor_parsing")
 
     SECTION ("arrays with definite length")
     {
-        check_parse_cbor({0x80},json::array());
+        check_parse_cbor({0x80}, json(json_array_arg));
         check_parse_cbor({0x81,'\0'},json::parse("[0]"));
         check_parse_cbor({0x82,'\0','\0'},json::array({0,0}));
         check_parse_cbor({0x82,0x81,'\0','\0'}, json::parse("[[0],0]"));
@@ -174,7 +174,7 @@ TEST_CASE("test_cbor_parsing")
 
     SECTION("arrays with indefinite length")
     {
-        //check_parse_cbor({0x9f,0xff},json::array());
+        //check_parse_cbor({0x9f,0xff}, json(json_array_arg));
         check_parse_cbor({0x9f,0x9f,0xff,0xff},json::parse("[[]]"));
 
         check_parse_cbor({0x9f,0x01,0x82,0x02,0x03,0x9f,0x04,0x05,0xff,0xff},json::parse("[1, [2, 3], [4, 5]]"));
@@ -418,7 +418,7 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
     encoder.end_array();
     encoder.flush();
 
-    json expected = json::array();
+    json expected(json_array_arg);
     expected.emplace_back("foo");
     expected.emplace_back(byte_string{ 'b','a','r' });
     expected.emplace_back("-18446744073709551617", semantic_tag::bigint);

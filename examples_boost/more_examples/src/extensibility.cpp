@@ -186,7 +186,7 @@ void boost_date_conversions()
     json deal;
     deal["maturity"] = date(2014,10,14);
 
-    json observation_dates = json::array();
+    json observation_dates(json_array_arg);
     observation_dates.push_back(date(2014,2,14));
     observation_dates.push_back(date(2014,2,21));
 

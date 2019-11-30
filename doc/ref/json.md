@@ -59,16 +59,16 @@ Output:
 ```
 #### Constructing basic_json structures
 ```c++
-basic_json root;
+json root;
 
-root["persons"] = basic_json::array();
+root["persons"] = json(json_array_arg);
 
-basic_json person;
+json person;
 person["first_name"] = "John";
 person["last_name"] = "Smith";
 person["birth_date"] = "1972-01-30";
 
-basic_json address;
+json address;
 address["city"] = "Toronto";
 address["country"] = "Canada";
 

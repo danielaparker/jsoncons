@@ -48,7 +48,7 @@ TEST_CASE("json empty object less")
 
     SECTION("object with no members")
     {
-        json j2 = json::object();
+        json j2(json_object_arg);
 
         CHECK_FALSE(j1 < j2);
     }
@@ -138,14 +138,14 @@ TEST_CASE("json long string less")
 
 TEST_CASE("json array of string less")
 {
-    json j1 = json::array();
+    json j1(json_array_arg);
     j1.push_back("b");
     j1.push_back("c");
     j1.push_back("d");
 
     SECTION("array")
     {
-        json j2 = json::array();
+        json j2(json_array_arg);
         j2.push_back("a");
         j2.push_back("b");
         j2.push_back("c");

@@ -121,8 +121,8 @@ TEST_CASE("encode_ubjson_test")
 }
 TEST_CASE("encode_ubjson_arrays_and_maps")
 {
-    check_encode_ubjson({'[','#','U',0x00},json::array());
-    check_encode_ubjson({'{','#','U',0x00},json::object());
+    check_encode_ubjson({'[','#','U',0x00}, json(json_array_arg));
+    check_encode_ubjson({'{','#','U',0x00},json());
     check_encode_ubjson({'[','#','U',0x01,'U',0x00},json::parse("[0]"));
     check_encode_ubjson({'[','#','U',0x02,'U',0x00,'U',0x00},json::parse("[0,0]"));
     check_encode_ubjson({'[','#','U',0x02,

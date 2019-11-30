@@ -11,7 +11,7 @@ Throws `std::runtime_error` if not an array.
 
 #### Creating an array of elements 
 ```c++
-json cities = json::array();       // an empty array
+json cities(json_array_arg);       // an empty array
 std::cout << cities << std::endl;  // output is "[]"
 
 cities.push_back("Toronto");  
@@ -28,7 +28,7 @@ Output:
 ```
 #### Creating an array of elements with reserved storage 
 ```c++
-json cities = json::array();  
+json cities(json_array_arg);  
 cities.reserve(10);  // storage is reserved
 std::cout << "capacity=" << cities.capacity() 
           << ", size=" << cities.size() << std::endl;

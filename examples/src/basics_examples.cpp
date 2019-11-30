@@ -58,7 +58,7 @@ void basics_json_example1()
     )");
 
     // Construct a booklist array
-    json booklist = json::array();
+    json booklist(json_array_arg);
 
     // For efficiency, reserve memory, to avoid reallocations
     booklist.reserve(4);

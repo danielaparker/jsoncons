@@ -91,7 +91,7 @@ void construct_json_from_vector()
 
 void add_element_to_array()
 {
-    json cities = json::array();  // an empty array
+    json cities(json_array_arg);  // an empty array
     std::cout << cities << std::endl;  // output is "[]"
     cities.push_back("Toronto");
     cities.push_back("Vancouver");
@@ -102,7 +102,7 @@ void add_element_to_array()
 
 void reserve_array_capacity()
 {
-    json cities = json::array();
+    json cities(json_array_arg);
     cities.reserve(10);  // storage is allocated
     std::cout << "capacity=" << cities.capacity() << ", size=" << cities.size() << std::endl;
 
@@ -117,7 +117,7 @@ void reserve_array_capacity()
 void make_empty_array()
 {
     std::cout << "empty array" <<std::endl;
-    json a = json::array();
+    json a(json_array_arg);
     std::cout << pretty_print(a) << std::endl;
 }
 
@@ -162,7 +162,7 @@ void make_1_dimensional_array_2()
     json a = json::make_array<1>(10,0);
     a[1] = 1;
     a[2] = 2;
-    a[3] = json::array();
+    a[3] = json(json_array_arg);
     std::cout << pretty_print(a) << std::endl;
 }
 

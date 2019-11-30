@@ -33,7 +33,7 @@ TEST_CASE("test_swap")
     json j7 = "String too large for small string";
     json j8 = json::parse("[1,2,3,4]");
     json j9;
-    json j10 = json::object();
+    json j10 = json(json_object_arg);
     j10["Name"] = "John Smith";
 
     check_swap(j1,j1);

@@ -57,7 +57,7 @@ void basics_wjson_example1()
     }
     )");
     // Construct a booklist array
-    wjson booklist = wjson::array();
+    wjson booklist(json_array_arg);
 
     // For efficiency, reserve memory, to avoid reallocations
     booklist.reserve(4);

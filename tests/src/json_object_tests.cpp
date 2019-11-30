@@ -773,7 +773,7 @@ TEST_CASE("test_is_type")
     CHECK(obj["object"].is_object());
     CHECK(obj["object"].is<json::object>());
 
-    obj["array"] = json::array();
+    obj["array"] = json(json_array_arg);
     CHECK(obj["array"].is_array());
     CHECK(obj["array"].is<json::array>());
 

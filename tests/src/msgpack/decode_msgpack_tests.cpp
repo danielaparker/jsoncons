@@ -95,7 +95,7 @@ TEST_CASE("decode_number_msgpack_test")
 TEST_CASE("decode_msgpack_arrays_and_maps")
 {
     // fixarray
-    check_decode_msgpack({0x90},json::array());
+    check_decode_msgpack({0x90}, json(json_array_arg));
     check_decode_msgpack({0x80},json::object());
 
     check_decode_msgpack({0x91,'\0'},json::parse("[0]"));
@@ -117,7 +117,7 @@ TEST_CASE("Compare msgpack packed item and jsoncons item")
     encoder.end_array();
     encoder.flush();
 
-    json expected = json::array();
+    json expected(json_array_arg);
 
     expected.emplace_back("foo");
     expected.emplace_back(byte_string{ 'b','a','r' });

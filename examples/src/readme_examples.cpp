@@ -273,7 +273,7 @@ namespace readme
 
         // Add some more elements
 
-        json another_array = json::array(); 
+        json another_array(json_array_arg); 
         another_array.emplace_back(byte_string({'P','u','s','s'}),
                                    semantic_tag::base64); // suggested conversion to base64
         another_array.emplace_back("273.15", semantic_tag::bigdec);

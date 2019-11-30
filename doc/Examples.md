@@ -1721,7 +1721,7 @@ json file_settings( json_object_arg,{
 #### Construct a json array
 
 ```c++
-json color_spaces = json::array(); // an empty array
+json color_spaces(json_array_arg); // an empty array
 color_spaces.push_back("sRGB");
 color_spaces.push_back("AdobeRGB");
 color_spaces.push_back("ProPhoto RGB");
@@ -1737,7 +1737,7 @@ json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
 #### Insert a new value in an array at a specific position
 
 ```c++
-json cities = json::array(); // an empty array
+json cities(json_array_arg); // an empty array
 cities.push_back("Toronto");  
 cities.push_back("Vancouver");
 // Insert "Montreal" at beginning of array

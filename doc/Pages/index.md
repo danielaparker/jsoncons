@@ -455,7 +455,7 @@ json file_settings(json::object_arg, {
 
 To construct a json array, initialize with the array type 
 ```c++
-json color_spaces = json::array();
+json color_spaces(json_array_arg);
 ```
 and add some elements
 ```c++
@@ -602,7 +602,7 @@ The `pretty_print` function applies stylistic formatting to JSON text. For examp
 ```c++
     json val;
 
-    val["verts"] = json::array{1, 2, 3};
+    val["verts"] = json(json_array_arg, {1, 2, 3});
     val["normals"] = json::array{1, 0, 1};
     val["uvs"] = json::array{0, 0, 1, 1};
 

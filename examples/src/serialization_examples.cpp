@@ -67,7 +67,7 @@ void serialization_example2()
 
     json val;
 
-    val["verts"] = json::array{1, 2, 3};
+    val["verts"] = json(json_array_arg, {1, 2, 3});
     val["normals"] = json::array{1, 0, 1};
     val["uvs"] = json::array{0, 0, 1, 1};
 

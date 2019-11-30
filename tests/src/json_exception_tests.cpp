@@ -23,14 +23,14 @@ TEST_CASE("test_object_at")
     REQUIRE_THROWS_AS(a.at("key2"), std::out_of_range);
     REQUIRE_THROWS_AS(static_cast<const json&>(a).at("key2"), std::out_of_range);
 
-    json b = json::array();
+    json b(json_array_arg);
     REQUIRE_THROWS_AS(b.at("key1"), std::runtime_error);
     REQUIRE_THROWS_AS(static_cast<const json&>(b).at("key1"), std::runtime_error);
 }
 
 TEST_CASE("test_object_find")
 {
-    json b = json::array();
+    json b(json_array_arg);
     b.resize(3);
     REQUIRE_THROWS_AS(b.find("key1"), std::runtime_error);
     REQUIRE_THROWS_AS(static_cast<const json&>(b).find("key1"), std::runtime_error);
@@ -40,7 +40,7 @@ TEST_CASE("test_object_find")
 
 TEST_CASE("test_array_at")
 {
-    json a = json::array();
+    json a(json_array_arg);
     REQUIRE_THROWS_AS(a.at(0), std::out_of_range);
     REQUIRE_THROWS_AS(static_cast<const json&>(a).at(0), std::out_of_range);
 
@@ -51,7 +51,7 @@ TEST_CASE("test_array_at")
 
 TEST_CASE("test_object_set")
 {
-    json b = json::array();
+    json b(json_array_arg);
     b.resize(3);
     REQUIRE_THROWS_AS(b.insert_or_assign("key1","value1"), std::runtime_error);
 }

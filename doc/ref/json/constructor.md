@@ -108,10 +108,10 @@ int main()
     json j1; // An empty object
     std::cout << "(1) " << j1 << std::endl;
 
-    json j2 = json::object({{"baz", "qux"}, {"foo", "bar"}}); // An object 
+    json j2 = json(json_object_arg, {{"baz", "qux"}, {"foo", "bar"}}); // An object 
     std::cout << "(2) " << j2 << std::endl;
 
-    json j3 = json::array({"bar", "baz"}); // An array 
+    json j3(json_array_arg, {"bar", "baz"}); // An array 
     std::cout << "(3) " << j3 << std::endl;
   
     json j4(json::null()); // A null value

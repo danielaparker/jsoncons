@@ -104,8 +104,8 @@ TEST_CASE("test_object_equals_empty_objects")
     json def_constructed_2;
     json parsed_1 = json::parse("{}");
     json parsed_2 = json::parse("{}");
-    json type_constructed_1 = json::object();
-    json type_constructed_2 = json::object();
+    json type_constructed_1 = json(json_object_arg);
+    json type_constructed_2 = json(json_object_arg);
 
     CHECK(def_constructed_1 == def_constructed_1);
     CHECK(parsed_1 == parsed_2);
@@ -120,8 +120,8 @@ TEST_CASE("test_object_equals_empty_arrays")
 {
     json parsed_1 = json::parse("[]");
     json parsed_2 = json::parse("[]");
-    json type_constructed_1 = json::array();
-    json type_constructed_2 = json::array();
+    json type_constructed_1(json_array_arg);
+    json type_constructed_2(json_array_arg);
 
     CHECK(parsed_1 == parsed_2);
     CHECK(type_constructed_1 == type_constructed_2);
@@ -131,8 +131,8 @@ TEST_CASE("test_object_equals_empty_arrays")
 
 TEST_CASE("test_empty_object_equal")
 {
-    CHECK(json() == json(json::object()));
-    CHECK(json(json::object()) == json());
+    CHECK(json() == json(json_object_arg));
+    CHECK(json(json_object_arg) == json());
 }
 
 TEST_CASE("test_string_not_equals_empty_object")

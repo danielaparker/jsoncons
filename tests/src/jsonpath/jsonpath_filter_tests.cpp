@@ -50,7 +50,7 @@ TEST_CASE("test_div")
     const char* pend;
     jsonpath_filter_parser<json> parser;
 
-    json context = json::array();
+    json context(json_array_arg);
     context.push_back(3);
 
     std::string s1 = "(3/1)";
@@ -84,7 +84,7 @@ TEST_CASE("test_mult")
     const char* pend;
     jsonpath_filter_parser<json> parser;
 
-    json context = json::array();
+    json context(json_array_arg);
     context.push_back(1);
     context.push_back(2);
 
@@ -119,7 +119,7 @@ TEST_CASE("test_minus")
     const char* pend;
     jsonpath_filter_parser<json> parser;
 
-    json context = json::array();
+    json context(json_array_arg);
     context.push_back(10.0);
 
     std::string s1 = "(3-1)";
@@ -153,7 +153,7 @@ TEST_CASE("test_lt")
     const char* pend;
     jsonpath_filter_parser<json> parser;
 
-    json context = json::array();
+    json context(json_array_arg);
     context.push_back(100);
     context.push_back(1);
 
@@ -193,7 +193,7 @@ TEST_CASE("test_lte")
     const char* pend;
     jsonpath_filter_parser<json> parser;
 
-    json context = json::array();
+    json context(json_array_arg);
     context.push_back(1);
 
     std::string s1 = "(3 <= 1)";
@@ -212,7 +212,7 @@ TEST_CASE("test_gt")
     const char* pend;
     jsonpath_filter_parser<json> parser;
 
-    json context = json::array();
+    json context(json_array_arg);
     context.push_back(1);
 
     std::string s1 = "(3 > 1)";
@@ -231,7 +231,7 @@ TEST_CASE("test_gte")
     const char* pend;
     jsonpath_filter_parser<json> parser;
 
-    json context = json::array();
+    json context(json_array_arg);
     context.push_back(1);
 
     std::string s1 = "(3 >= 1)";
@@ -250,7 +250,7 @@ TEST_CASE("test_eq")
     const char* pend;
     jsonpath_filter_parser<json> parser;
 
-    json context = json::array();
+    json context(json_array_arg);
     context.push_back(1);
 
     std::string s1 = "(3 == 1)";
@@ -279,7 +279,7 @@ TEST_CASE("test_precedence")
     const char* pend;
     jsonpath_filter_parser<json> parser;
 
-    json context = json::array();
+    json context(json_array_arg);
     context.push_back(1);
     context.push_back(2);
 
@@ -309,7 +309,7 @@ TEST_CASE("test_ne")
     const char* pend;
     jsonpath_filter_parser<json> parser;
 
-    json context = json::array();
+    json context(json_array_arg);
     context.push_back(1);
 
     std::string s1 = "(3 != 1)";
@@ -337,7 +337,7 @@ TEST_CASE("test_jsonpath_filter")
 {
     const char* pend;
     jsonpath_filter_parser<json> parser;
-    json parent = json::array();
+    json parent(json_array_arg);
     parent.push_back(1);
     parent.push_back(2);
 
@@ -362,7 +362,7 @@ TEST_CASE("test_jsonpath_filter_exclaim")
 {
     const char* pend;
     jsonpath_filter_parser<json> parser;
-    json parent = json::array();
+    json parent(json_array_arg);
     parent.push_back(1);
     parent.push_back(2);
 
@@ -396,7 +396,7 @@ TEST_CASE("test_jsonpath_filter_negative_numbers")
 {
     const char* pend;
     jsonpath_filter_parser<json> parser;
-    json parent = json::array();
+    json parent(json_array_arg);
     parent.push_back(1);
     parent.push_back(2);
 
@@ -445,7 +445,7 @@ TEST_CASE("test_jsonpath_filter_uni")
 {
     const char* pend;
     jsonpath_filter_parser<json> parser;
-    json parent = json::array();
+    json parent(json_array_arg);
     parent.push_back(1);
     parent.push_back(2);
 
@@ -465,7 +465,7 @@ TEST_CASE("test_jsonpath_filter_regex")
 {
     const char* pend;
     jsonpath_filter_parser<json> parser;
-    json parent = json::array();
+    json parent(json_array_arg);
     parent.push_back(1);
     parent.push_back(2);
 

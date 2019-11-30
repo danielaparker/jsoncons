@@ -80,7 +80,7 @@ TEST_CASE("test_assignment_to_initializer_list3")
 
 TEST_CASE("test_assign_initializer_list_of_object")
 {
-    json arr = json::array();
+    json arr(json_array_arg);
 
     json transaction;
     transaction["Debit"] = 10000;
@@ -111,7 +111,7 @@ TEST_CASE("test_initializer_list_of_objects")
 
 TEST_CASE("test_array_constructor")
 {
-    json arr = json::array();
+    json arr(json_array_arg);
     arr.resize(10,10.0);
     CHECK(arr.is_array());
     CHECK(arr.size() == 10);
@@ -120,7 +120,7 @@ TEST_CASE("test_array_constructor")
 
 TEST_CASE("test_make_array")
 {
-    json arr = json::array();
+    json arr(json_array_arg);
     CHECK(arr.size() == 0);
     arr.resize(10,10.0);
     CHECK(arr.is_array());
@@ -131,7 +131,7 @@ TEST_CASE("test_make_array")
 
 TEST_CASE("test_add_element_to_array")
 {
-    json arr = json::array();
+    json arr(json_array_arg);
     CHECK(arr.is_array());
     CHECK(arr.is<json::array>());
     arr.push_back("Toronto");
@@ -147,7 +147,7 @@ TEST_CASE("test_add_element_to_array")
 
 TEST_CASE("test_emplace_element_to_array")
 {
-    json a = json::array();
+    json a(json_array_arg);
     CHECK(a.is_array());
     CHECK(a.is<json::array>());
     a.emplace_back("Toronto");
@@ -163,7 +163,7 @@ TEST_CASE("test_emplace_element_to_array")
 
 TEST_CASE("test_array_add_pos")
 {
-    json arr = json::array();
+    json arr(json_array_arg);
     CHECK(arr.is_array());
     CHECK(arr.is<json::array>());
     arr.push_back("Toronto");
@@ -179,7 +179,7 @@ TEST_CASE("test_array_add_pos")
 
 TEST_CASE("test_array_erase_range")
 {
-    json arr = json::array();
+    json arr(json_array_arg);
     CHECK(arr.is_array());
     CHECK(arr.is<json::array>());
     arr.push_back("Toronto");
@@ -196,7 +196,7 @@ TEST_CASE("test_array_erase_range")
 
 TEST_CASE("test_reserve_array_capacity")
 {
-    json cities = json::array();
+    json cities(json_array_arg);
     CHECK(cities.is_array());
     CHECK(cities.is<json::array>());
     cities.reserve(10);  // storage is allocated
@@ -319,7 +319,7 @@ TEST_CASE("test_array_assign_vector_of_bool")
 
 TEST_CASE("test_array_add_null")
 {
-    json a = json::array();
+    json a(json_array_arg);
     a.push_back(jsoncons::null_type());
     a.push_back(json::null());
     CHECK(a[0].is_null());

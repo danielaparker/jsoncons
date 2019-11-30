@@ -1308,7 +1308,7 @@ TEST_CASE("Test decode_csv, no terminating newline")
 
 TEST_CASE("test encode_csv")
 {
-    json j = json::array();
+    json j(json_array_arg);
     j.push_back(json::object({ {"a",1},{"b",2} }));
 
     SECTION("To stream")

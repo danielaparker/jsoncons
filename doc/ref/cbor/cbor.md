@@ -450,7 +450,7 @@ using namespace jsoncons; // For convenience
 int main()
 {
     // Construct a json array of numbers
-    json j = json::array();
+    json j(json_array_arg);
 
     j.emplace_back(5.0);
 

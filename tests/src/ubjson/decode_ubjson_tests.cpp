@@ -123,8 +123,8 @@ TEST_CASE("decode_number_ubjson_test")
 
 TEST_CASE("decode_ubjson_arrays_and_maps")
 {
-    check_decode_ubjson({'[','#','U',0x00},json::array());
-    check_decode_ubjson({ '{','#','U',0x00 }, json::object());
+    check_decode_ubjson({'[','#','U',0x00}, json(json_array_arg));
+    check_decode_ubjson({ '{','#','U',0x00 }, json());
     
     check_decode_ubjson({'[','#','U',0x01,'U',0x00},json::parse("[0]"));
     check_decode_ubjson({'[','#','U',0x02,'U',0x00,'U',0x00},json::parse("[0,0]"));

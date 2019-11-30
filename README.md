@@ -700,7 +700,7 @@ using jsoncons::json;
 
 int main()
 {
-    json color_spaces = json::array();
+    json color_spaces(json_array_arg);
     color_spaces.push_back("sRGB");
     color_spaces.push_back("AdobeRGB");
     color_spaces.push_back("ProPhoto RGB");
@@ -819,7 +819,7 @@ int main()
 
     // Add some more elements
 
-    json another_array = json::array(); 
+    json another_array(json_array_arg); 
     another_array.emplace_back(byte_string({'P','u','s','s'}),
                                semantic_tag::base64); // suggested conversion to base64
     another_array.emplace_back("273.15", semantic_tag::bigdec);

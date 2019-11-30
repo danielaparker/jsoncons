@@ -2902,6 +2902,15 @@ public:
     {
     }
 
+    template<class InputIt>
+    basic_json(json_object_arg_t, 
+               InputIt first, InputIt last, 
+               semantic_tag tag = semantic_tag::none,
+               const Allocator& alloc = Allocator()) 
+        : var_(object(first,last,alloc), tag)
+    {
+    }
+
     basic_json(json_object_arg_t, 
                std::initializer_list<std::pair<std::basic_string<char_type>,basic_json>> init, 
                semantic_tag tag = semantic_tag::none, 
@@ -2914,6 +2923,15 @@ public:
                         semantic_tag tag = semantic_tag::none, 
                         const Allocator& alloc = Allocator()) 
         : var_(array(alloc), tag)
+    {
+    }
+
+    template<class InputIt>
+    basic_json(json_array_arg_t, 
+               InputIt first, InputIt last, 
+               semantic_tag tag = semantic_tag::none, 
+               const Allocator& alloc = Allocator()) 
+        : var_(array(first,last,alloc), tag)
     {
     }
 

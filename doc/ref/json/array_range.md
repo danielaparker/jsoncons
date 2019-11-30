@@ -12,7 +12,7 @@ Throws `std::runtime_error` if not an array.
 #### Range-based for loop
 
 ```c++
-json j = json::array{"Toronto", "Vancouver", "Montreal"};
+json j(json_array_arg, {"Toronto", "Vancouver", "Montreal"});
 
 for (const auto& val : j.array_range())
 {
@@ -28,7 +28,7 @@ Montreal
 
 #### Array iterator
 ```c++
-json j = json::array{"Toronto", "Vancouver", "Montreal"};
+json j(json_array_arg, {"Toronto", "Vancouver", "Montreal"});
 
 for (auto it = j.array_range().begin(); it != j.array_range().end(); ++it)
 {

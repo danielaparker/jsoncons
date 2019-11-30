@@ -66,7 +66,7 @@ TEST_CASE("test_assignment")
     root["myobject"]["bool_2"] = true;
     root["myobject"]["int_2"] = 0LL;
     root["myobject"]["string_2"] = "my string";
-    root["myarray"] = json::array();
+    root["myarray"] = json(json_array_arg);
 
     json double_2 = root["myobject"]["double_2"];
 
