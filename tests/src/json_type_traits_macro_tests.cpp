@@ -336,6 +336,54 @@ namespace json_type_traits_macro_tests
             return baseSalary_ + commission_*sales_;
         }
     };
+
+    enum class hiking_experience {beginner,intermediate,advanced};
+
+    struct hiking_reputon
+    {
+        std::string rater;
+        hiking_experience assertion;
+        std::string rated;
+        double rating;
+
+        friend bool operator==(const hiking_reputon& lhs, const hiking_reputon& rhs)
+        {
+            return lhs.rater == rhs.rater && lhs.assertion == rhs.assertion && 
+                   lhs.rated == rhs.rated && lhs.rating == rhs.rating;
+        }
+
+        friend bool operator!=(const hiking_reputon& lhs, const hiking_reputon& rhs)
+        {
+            return !(lhs == rhs);
+        };
+    };
+
+    class hiking_reputation
+    {
+        std::string application;
+        std::vector<hiking_reputon> reputons;
+
+        // Make json_type_traits specializations friends to give accesses to private members
+        JSONCONS_TYPE_TRAITS_FRIEND
+
+        hiking_reputation()
+        {
+        }
+    public:
+        hiking_reputation(const std::string& application, const std::vector<hiking_reputon>& reputons)
+            : application(application), reputons(reputons)
+        {}
+
+        friend bool operator==(const hiking_reputation& lhs, const hiking_reputation& rhs)
+        {
+            return (lhs.application == rhs.application) && (lhs.reputons == rhs.reputons);
+        }
+
+        friend bool operator!=(const hiking_reputation& lhs, const hiking_reputation& rhs)
+        {
+            return !(lhs == rhs);
+        };
+    };
 } // namespace json_type_traits_macro_tests
  
 namespace ns = json_type_traits_macro_tests;
@@ -356,6 +404,10 @@ JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Employee, ns::HourlyEmployee, ns::Commissio
 
 JSONCONS_ALL_GETTER_SETTER_TRAITS_DECL(ns::book3a, get, set, Author, Title, Price)
 JSONCONS_N_GETTER_SETTER_TRAITS_DECL(ns::book3b, get, set, 2, Author, Title, Price, Isbn)
+
+JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
+JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
+JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::hiking_reputation, application, reputons)
 
 TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS_DECL tests")
 {
@@ -818,6 +870,111 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS_DECL tests")
         CHECK(book.getTitle() == a_title);
         CHECK(book.getPrice() == double());
         CHECK(book.getIsbn() == std::string());
+    }
+}
+
+TEST_CASE("hiking_reputation")
+{
+    ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum",ns::hiking_experience::advanced,"Marilyn C",0.9} });
+
+    SECTION("1")
+    {
+        std::string s;
+        encode_json(val, s);
+        auto val2 = decode_json<ns::hiking_reputation>(s);
+        CHECK(val2 == val);
+    }
+
+    SECTION("2")
+    {
+        std::string s;
+        encode_json(val, s, indenting::indent);
+        auto val2 = decode_json<ns::hiking_reputation>(s);
+        CHECK(val2 == val);
+    }
+
+    SECTION("3")
+    {
+        std::string s;
+        json_options options;
+        encode_json(val, s, options, indenting::indent);
+        auto val2 = decode_json<ns::hiking_reputation>(s, options);
+        CHECK(val2 == val);
+    }
+
+    SECTION("4")
+    {
+        std::string s;
+        encode_json(val, s, json_options(), indenting::no_indent, ojson());
+        auto val2 = decode_json<ns::hiking_reputation>(s, json_options(), ojson());
+        CHECK(val2 == val);
+    }
+
+    SECTION("5")
+    {
+        std::string s;
+        encode_json(val, s, json_options(), indenting::indent, ojson());
+        auto val2 = decode_json<ns::hiking_reputation>(s, json_options(), ojson());
+        CHECK(val2 == val);
+    }
+
+    SECTION("6")
+    {
+        std::string s;
+        json_options options;
+        encode_json(val, s, options, indenting::indent, ojson());
+        auto val2 = decode_json<ns::hiking_reputation>(s, options, ojson());
+        CHECK(val2 == val);
+    }
+
+    SECTION("os 1")
+    {
+        std::stringstream os;
+        encode_json(val, os);
+        auto val2 = decode_json<ns::hiking_reputation>(os);
+        CHECK(val2 == val);
+    }
+
+    SECTION("os 2")
+    {
+        std::stringstream os;
+        encode_json(val, os, indenting::indent);
+        auto val2 = decode_json<ns::hiking_reputation>(os);
+        CHECK(val2 == val);
+    }
+
+    SECTION("os 3")
+    {
+        std::stringstream os;
+        json_options options;
+        encode_json(val, os, options, indenting::indent);
+        auto val2 = decode_json<ns::hiking_reputation>(os, options);
+        CHECK(val2 == val);
+    }
+
+    SECTION("os 4")
+    {
+        std::stringstream os;
+        encode_json(val, os, json_options(), indenting::no_indent, ojson());
+        auto val2 = decode_json<ns::hiking_reputation>(os, json_options(), ojson());
+        CHECK(val2 == val);
+    }
+
+    SECTION("os 5")
+    {
+        std::stringstream os;
+        encode_json(val, os, json_options(), indenting::indent, ojson());
+        auto val2 = decode_json<ns::hiking_reputation>(os, json_options(), ojson());
+        CHECK(val2 == val);
+    }
+
+    SECTION("os 6")
+    {
+        std::stringstream os;
+        json_options options;
+        encode_json(val, os, options, indenting::indent, ojson());
+        auto val2 = decode_json<ns::hiking_reputation>(os, options, ojson());
+        CHECK(val2 == val);
     }
 }
 
