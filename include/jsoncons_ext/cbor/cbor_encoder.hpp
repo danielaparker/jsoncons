@@ -1415,7 +1415,7 @@ private:
     bool do_typed_array(const span<const double>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
-                        std::error_code& ec)
+                        std::error_code& ec) override
     {
         if (options_.enable_typed_arrays())
         {
