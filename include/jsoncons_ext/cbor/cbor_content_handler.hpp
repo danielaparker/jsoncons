@@ -878,7 +878,7 @@ private:
     bool do_typed_array(const span<const double>& v, 
                         semantic_tag tag,
                         const ser_context& context, 
-                        std::error_code& ec)
+                        std::error_code& ec) override
     {
         bool more = to_handler_.begin_array(v.size(), tag,context, ec);
         for (auto p = v.begin(); more && p != v.end(); ++p)
