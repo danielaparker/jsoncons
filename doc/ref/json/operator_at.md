@@ -44,7 +44,7 @@ when this operator is used for reading but the key does not exist.
 ```c++
 int main()
 {
-    json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
+    json image_formats(json_array_arg, {"JPEG","PSD","TIFF","DNG"});
 
     json color_spaces(json_array_arg);
     color_spaces.push_back("sRGB");

@@ -1577,7 +1577,7 @@ int main()
     std::cout << "(1) " << std::setprecision(std::numeric_limits<multiprecision_type>::max_digits10)
         << x << "\n";
 
-    json j2 = json::array{x};
+    json j2(json_array_arg, {x});
     std::cout << "(2) " << j2[0].as<std::string>() << "\n";
 }
 ```
@@ -1729,7 +1729,7 @@ color_spaces.push_back("ProPhoto RGB");
 
 or use an array initializer-list,
 ```c++
-json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
+json image_formats(json_array_arg, {"JPEG","PSD","TIFF","DNG"});
 ```
 
 <div id="C3"/>
@@ -1881,7 +1881,7 @@ Output:
 #### Iterate over a json array
 
 ```c++
-json j = json::array{1,2,3,4};
+json j(json_array_arg, {1,2,3,4});
 
 for (auto val : j.array_range())
 {

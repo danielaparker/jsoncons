@@ -122,7 +122,7 @@ TEST_CASE("cbor_arrays_and_maps")
     check_encode_cbor({ 0xa0 }, json());
 
     check_encode_cbor({ 0x81,'\0' }, json::parse("[0]"));
-    check_encode_cbor({ 0x82,'\0','\0' }, json::array({ 0,0 }));
+    check_encode_cbor({ 0x82,'\0','\0' }, json(json_array_arg, { 0,0 }));
     check_encode_cbor({ 0x82,0x81,'\0','\0' }, json::parse("[[0],0]"));
     check_encode_cbor({ 0x81,0x65,'H','e','l','l','o' }, json::parse("[\"Hello\"]"));
 

@@ -13,13 +13,13 @@
 
 using namespace jsoncons;
 
-TEST_CASE("json = json::object(first,last)")
+TEST_CASE("json(json_object_arg, first, last)")
 {
     SECTION("copy map into json")
     {
         std::map<std::string,double> m = {{"c",1},{"b",2},{"a",3}};
 
-        json j = json::object(m.begin(),m.end());
+        json j(json_object_arg, m.begin(),m.end());
 
         REQUIRE(j.size() == 3);
         auto it = j.object_range().begin();
@@ -144,7 +144,7 @@ TEST_CASE("test_erase_member")
     CHECK(o.size() == 0);
 
     json a;
-    json b = json::object();
+    json b(json_object_arg);
     b["input-file"] = "config_file";
     json b_copy = b;
 

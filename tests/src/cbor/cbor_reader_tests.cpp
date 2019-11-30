@@ -156,7 +156,7 @@ TEST_CASE("test_cbor_parsing")
     {
         check_parse_cbor({0x80}, json(json_array_arg));
         check_parse_cbor({0x81,'\0'},json::parse("[0]"));
-        check_parse_cbor({0x82,'\0','\0'},json::array({0,0}));
+        check_parse_cbor({0x82,'\0','\0'}, json(json_array_arg, ({0,0}));
         check_parse_cbor({0x82,0x81,'\0','\0'}, json::parse("[[0],0]"));
         check_parse_cbor({0x81,0x65,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
 
@@ -169,7 +169,7 @@ TEST_CASE("test_cbor_parsing")
         check_parse_cbor({0x82,
                        0x5f,0xff,
                        0x5f,0xff},
-                      json::array{json(byte_string()),json(byte_string())});
+                       json(json_array_arg, {json(byte_string()),json(byte_string())}));
     }
 
     SECTION("arrays with indefinite length")
@@ -204,13 +204,13 @@ TEST_CASE("test_cbor_parsing")
 
     SECTION("maps with definite length")
     {
-        //check_parse_cbor({0xa0},json::object());
+        //check_parse_cbor({0xa0}, json(json_object_arg));
         check_parse_cbor({0xa1,0x62,'o','c',0x81,'\0'}, json::parse("{\"oc\": [0]}"));
         //check_parse_cbor({0xa1,0x62,'o','c',0x84,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
     }
     SECTION("maps with indefinite length")
     {
-        check_parse_cbor({0xbf,0xff},json::object());
+        check_parse_cbor({0xbf,0xff}, json(json_object_arg));
         check_parse_cbor({0xbf,0x64,'N','a','m','e',0xbf,0xff,0xff},json::parse("{\"Name\":{}}"));
 
         check_parse_cbor({0xbf,                       // Start indefinite-length map

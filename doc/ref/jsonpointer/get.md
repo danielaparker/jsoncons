@@ -34,23 +34,23 @@ get(const J& root, const typename J::string_view_type& path, std::error_code& ec
 
 (1) On success, returns the selected item by reference. 
 
-    json j = json::array{"baz","foo"};
+    json j(json_array_arg, {"baz","foo"});
     json& item = jsonpointer::get(j,"/0"); // "baz"
 
 (2) On success, returns the selected item by const reference.  
 
-    const json j = json::array{"baz","foo"};
+    const json j(json_array_arg, {"baz","foo"});
     const json& item = jsonpointer::get(j,"/1"); // "foo"
 
 (3) On success, returns the selected item by reference, otherwise an undefined item by reference.  
 
-    json j = json::array{"baz","foo"};
+    json j(json_array_arg, {"baz","foo"});
     std::error_code ec;
     json& item = jsonpointer::get(j,"/1",ec); // "foo"
 
 (4) On success, returns the selected item by const reference, otherwise an undefined item by const reference.  
 
-    const json j = json::array{"baz","foo"};
+    const json j(json_array_arg, {"baz","foo"});
     std::error_code ec;
     const json& item = jsonpointer::get(j,"/0",ec); // "baz"
 

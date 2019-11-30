@@ -17,7 +17,7 @@ void array_example1()
         std::cout << a << std::endl;
     }
     {
-        json j = json::array{1,true,"last"};
+        json j(json_array_arg, {1,true,"last"});
         auto d = j.as<std::deque<std::string>>();
         for (auto x : d)
         {
@@ -139,7 +139,7 @@ void array_range_based_for_loop()
     book3["author"] = "Haruki Murakami";
 
     // Constructing a json array with an initializer-list 
-    json booklist = json::array{book1, book2, book3};    
+    json booklist(json_array_arg, {book1, book2, book3});    
 
     for (const auto& book: booklist.array_range())
     {

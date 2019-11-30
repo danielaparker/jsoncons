@@ -252,8 +252,8 @@ Output:
     json val;
 
     val["verts"] = json(json_array_arg, {1, 2, 3});
-    val["normals"] = json::array{1, 0, 1};
-    val["uvs"] = json::array{0, 0, 1, 1};
+    val["normals"] = json(json_array_arg, {1, 0, 1});
+    val["uvs"] = json(json_array_arg, {0, 0, 1, 1});
 
     std::cout << "Default (same line)" << std::endl;
     std::cout << pretty_print(val) << std::endl;
@@ -322,15 +322,15 @@ Multi line
 
 ```c++
     json val;
-    val["data"]["id"] = json::array{0,1,2,3,4,5,6,7};
-    val["data"]["item"] = json::array{json::array{2},
-                                      json::array{4,5,2,3},
-                                      json::array{4},
-                                      json::array{4,5,2,3},
-                                      json::array{2},
-                                      json::array{4,5,3},
-                                      json::array{2},
-                                      json::array{4,3}};
+    val["data"]["id"] = json(json_array_arg, {0,1,2,3,4,5,6,7});
+    val["data"]["item"] = json(json_array_arg, {json(json_array_arg, {2}),
+                                      json(json_array_arg, {4,5,2,3}),
+                                      json(json_array_arg, {4}),
+                                      json(json_array_arg, {4,5,2,3}),
+                                      json(json_array_arg, {2}),
+                                      json(json_array_arg, {4,5,3}),
+                                      json(json_array_arg, {2}),
+                                      json(json_array_arg, {4,3})});
 
     std::cout << "Default (new line)" << std::endl;
     std::cout << pretty_print(val) << std::endl;

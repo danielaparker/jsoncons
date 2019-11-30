@@ -23,7 +23,7 @@ using namespace jsoncons;
 
 TEST_CASE("test_json_as_pair")
 {
-    json j = json::array{false,1};
+    json j(json_array_arg, {false,1});
     auto t = j.as<std::pair<bool,int>>();
     CHECK(std::get<0>(t) == false);
     CHECK(std::get<1>(t) == 1);
@@ -43,7 +43,7 @@ TEST_CASE("test_tuple_to_json")
 
 TEST_CASE("test_json_as_tuple")
 {
-    json j = json::array{false,1,"foo"};
+    json j(json_array_arg, {false,1,"foo"});
 
     auto t = j.as<std::tuple<bool,int,std::string>>();
 
@@ -63,7 +63,7 @@ TEST_CASE("test_characters")
     std::string s2 = a.as<std::string>();
     std::string t2 = b.as<std::string>();
 
-    json c = json::array{ "short","a long string" };
+    json c(json_array_arg, { "short","a long string" });
     auto u = c.as<std::vector<std::string>>();
 }
 
@@ -71,14 +71,14 @@ TEST_CASE("test_characters")
 
 TEST_CASE("test_is_json_vector")
 {
-    json a = json::array{0,1,2,3,4}; 
+    json a(json_array_arg, {0,1,2,3,4}); 
 
     CHECK(true == a.is<std::vector<uint64_t>>());
 }
 
 TEST_CASE("test_as_vector")
 {
-    json a = json::array{0,1,2,3,4}; 
+    json a(json_array_arg, {0,1,2,3,4}); 
     std::vector<int> v = a.as<std::vector<int>>();
 
     CHECK(v[0] == 0);
@@ -152,14 +152,14 @@ TEST_CASE("test_construct_const_vector_of_bool")
 
 TEST_CASE("test_is_json_valarray")
 {
-    json a = json::array{0,1,2,3,4}; 
+    json a(json_array_arg, {0,1,2,3,4}); 
 
     CHECK(true == a.is<std::valarray<uint64_t>>());
 }
 
 TEST_CASE("test_as_valarray")
 {
-    json a = json::array{0,1,2,3,4}; 
+    json a(json_array_arg, {0,1,2,3,4}); 
     std::valarray<int> v = a.as<std::valarray<int>>();
 
     CHECK(v[0] == 0);

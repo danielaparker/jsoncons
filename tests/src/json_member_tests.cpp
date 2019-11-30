@@ -143,15 +143,17 @@ TEST_CASE("json get_allocator() tests")
     SECTION("array")
     {
         json::allocator_type alloc;
-        json j = json::array(alloc);
+        json j(json_array_arg, semantic_tag::none, alloc);
 
+        REQUIRE(j.is_array());
         CHECK(j.get_allocator() == alloc);
     }
     SECTION("object")
     {
         json::allocator_type alloc;
-        json j(alloc);
+        json j(json_object_arg, semantic_tag::none, alloc);
 
+        REQUIRE(j.is_object());
         CHECK(j.get_allocator() == alloc);
     }
 }

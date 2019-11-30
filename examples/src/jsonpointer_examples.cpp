@@ -338,7 +338,7 @@ void jsonpointer_error_example()
 void jsonpointer_get_examples()
 {
     {
-        json j = json::array{"baz","foo"};
+        json j(json_array_arg, {"baz","foo"});
         json& item = jsonpointer::get(j,"/0");
         std::cout << "(1) " << item << std::endl;
 
@@ -351,19 +351,19 @@ void jsonpointer_get_examples()
         //std::cout << std::endl;
     }
     {
-        const json j = json::array{"baz","foo"};
+        const json j(json_array_arg, {"baz","foo"});
         const json& item = jsonpointer::get(j,"/1");
         std::cout << "(2) " << item << std::endl;
     }
     {
-        json j = json::array{"baz","foo"};
+        json j(json_array_arg, {"baz","foo"});
 
         std::error_code ec;
         json& item = jsonpointer::get(j,"/1",ec);
         std::cout << "(4) " << item << std::endl;
     }
     {
-        const json j = json::array{"baz","foo"};
+        const json j(json_array_arg, {"baz","foo"});
 
         std::error_code ec;
         const json& item = jsonpointer::get(j,"/0",ec);

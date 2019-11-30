@@ -247,7 +247,7 @@ void boost_multiprecison_conversions()
     std::cout << "(1) " << std::setprecision(std::numeric_limits<multiprecision_type>::max_digits10)
         << x << "\n";
 
-    json j2 = json::array{x};
+    json j2(json_array_arg,{x});
     std::cout << "(2) " << j2[0].as<std::string>() << "\n";
 }
 

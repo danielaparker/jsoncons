@@ -466,7 +466,7 @@ color_spaces.push_back("ProPhoto RGB");
 
 Or, use an array initializer-list:
 ```c++
-json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
+json image_formats(json_array_arg, {"JPEG","PSD","TIFF","DNG"});
 ```
 
 The `operator[]` provides another way for setting name-value pairs.
@@ -603,8 +603,8 @@ The `pretty_print` function applies stylistic formatting to JSON text. For examp
     json val;
 
     val["verts"] = json(json_array_arg, {1, 2, 3});
-    val["normals"] = json::array{1, 0, 1};
-    val["uvs"] = json::array{0, 0, 1, 1};
+    val["normals"] = json(json_array_arg, {1, 0, 1});
+    val["uvs"] = json(json_array_arg, {0, 0, 1, 1});
 
     std::cout << pretty_print(val) << std::endl;
 ```
