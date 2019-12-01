@@ -56,12 +56,12 @@ class basic_bson_parser : public ser_context
 public:
     template <class Source>
     basic_bson_parser(Source&& source,
-                      const WorkAllocator allocator=WorkAllocator())
+                      const WorkAllocator alloc=WorkAllocator())
        : source_(std::forward<Source>(source)), 
          more_(true), 
          done_(false),
-         text_buffer_(allocator),
-         state_stack_(allocator)
+         text_buffer_(alloc),
+         state_stack_(alloc)
     {
         state_stack_.emplace_back(parse_mode::root,0);
     }

@@ -33,7 +33,6 @@ void jsonpatch_examples();
 void run_cbor_examples();
 void run_ubjson_examples();
 void json_parser_examples();
-void byte_string_examples();
 void json_cursor_examples();
 void data_model_examples();
 void staj_iterator_examples();
@@ -41,6 +40,7 @@ void bson_examples();
 void json_type_traits_macros_examples();
 void json_type_traits_macros_named_examples();
 void run_cbor_typed_array_examples();
+void byte_string_examples();
 
 void comment_example()
 {

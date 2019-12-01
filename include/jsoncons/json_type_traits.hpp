@@ -634,9 +634,9 @@ struct json_type_traits<Json, T,
         return j;
     }
 
-    static Json to_json(const T& val, const allocator_type& allocator)
+    static Json to_json(const T& val, const allocator_type& alloc)
     {
-        Json j = typename Json::array(allocator);
+        Json j = typename Json::array(alloc);
         auto first = std::begin(val);
         auto last = std::end(val);
         size_t size = std::distance(first, last);
@@ -670,9 +670,9 @@ struct json_type_traits<Json, T,
         return Json(val, semantic_tag::none);
     }
 
-    static Json to_json(const T& val, const allocator_type& allocator)
+    static Json to_json(const T& val, const allocator_type& alloc)
     {
-        return Json(val, semantic_tag::none, allocator);
+        return Json(val, semantic_tag::none, alloc);
     }
 };
 
@@ -697,9 +697,9 @@ struct json_type_traits<Json, T,
         return Json(val, semantic_tag::none);
     }
 
-    static Json to_json(const T& val, const allocator_type& allocator)
+    static Json to_json(const T& val, const allocator_type& alloc)
     {
-        return Json(val, semantic_tag::none, allocator);
+        return Json(val, semantic_tag::none, alloc);
     }
 };
 
@@ -738,9 +738,9 @@ struct json_type_traits<Json, T,
         return j;
     }
 
-    static Json to_json(const T& val, const allocator_type& allocator)
+    static Json to_json(const T& val, const allocator_type& alloc)
     {
-        Json j = typename Json::object(val.begin(), val.end(), allocator);
+        Json j = typename Json::object(val.begin(), val.end(), alloc);
         return j;
     }
 };
@@ -792,9 +792,9 @@ struct json_type_traits<Json, std::array<E, N>>
     }
 
     static Json to_json(const std::array<E, N>& val, 
-                        const allocator_type& allocator)
+                        const allocator_type& alloc)
     {
-        Json j = typename Json::array(allocator);
+        Json j = typename Json::array(alloc);
         j.reserve(N);
         for (auto it = val.begin(); it != val.end(); ++it)
         {
@@ -921,9 +921,9 @@ public:
     }
     
     static Json to_json(const basic_byte_string<Allocator>& val, 
-                        const allocator_type& allocator = allocator_type())
+                        const allocator_type& alloc = allocator_type())
     {
-        return Json(val, semantic_tag::none, allocator);
+        return Json(val, semantic_tag::none, alloc);
     }
 };
 
@@ -1026,9 +1026,9 @@ struct json_type_traits<Json, std::valarray<T>>
         return j;
     } 
 
-    static Json to_json(const std::valarray<T>& val, const allocator_type& allocator)
+    static Json to_json(const std::valarray<T>& val, const allocator_type& alloc)
     {
-        Json j = typename Json::array(allocator);
+        Json j = typename Json::array(alloc);
         auto first = std::begin(val);
         auto last = std::end(val);
         size_t size = std::distance(first,last);

@@ -29,8 +29,8 @@ public:
     template <class Source>
     basic_ubjson_reader(Source&& source, 
                         json_content_handler& handler,
-                        const WorkAllocator allocator=WorkAllocator())
-        : parser_(std::forward<Source>(source), allocator), 
+                        const WorkAllocator alloc=WorkAllocator())
+        : parser_(std::forward<Source>(source), alloc), 
           handler_(handler)
     {
     }

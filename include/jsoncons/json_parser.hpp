@@ -164,24 +164,24 @@ private:
     basic_json_parser& operator=(const basic_json_parser&) = delete;
 
 public:
-    basic_json_parser(const WorkAllocator& allocator = WorkAllocator())
-        : basic_json_parser(basic_json_decode_options<CharT>(), default_json_parsing(), allocator)
+    basic_json_parser(const WorkAllocator& alloc = WorkAllocator())
+        : basic_json_parser(basic_json_decode_options<CharT>(), default_json_parsing(), alloc)
     {
     }
 
-    basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler, const WorkAllocator& allocator = WorkAllocator())
-        : basic_json_parser(basic_json_decode_options<CharT>(), err_handler, allocator)
+    basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler, const WorkAllocator& alloc = WorkAllocator())
+        : basic_json_parser(basic_json_decode_options<CharT>(), err_handler, alloc)
     {
     }
 
-    basic_json_parser(const basic_json_decode_options<CharT>& options, const WorkAllocator& allocator = WorkAllocator())
-        : basic_json_parser(options, default_json_parsing(), allocator)
+    basic_json_parser(const basic_json_decode_options<CharT>& options, const WorkAllocator& alloc = WorkAllocator())
+        : basic_json_parser(options, default_json_parsing(), alloc)
     {
     }
 
     basic_json_parser(const basic_json_decode_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
-                      const WorkAllocator& allocator = WorkAllocator())
+                      const WorkAllocator& alloc = WorkAllocator())
        : options_(options),
          err_handler_(err_handler),
          initial_stack_capacity_(default_initial_stack_capacity_),
@@ -196,8 +196,8 @@ public:
          state_(json_parse_state::start),
          more_(true),
          done_(false),
-         string_buffer_(allocator),
-         state_stack_(allocator)
+         string_buffer_(alloc),
+         state_stack_(alloc)
     {
         string_buffer_.reserve(initial_string_buffer_capacity_);
 

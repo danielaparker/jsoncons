@@ -7,25 +7,25 @@ using namespace jsoncons; // For brevity
 
 void construct_json_byte_string()
 {
-    byte_string bs = {'H','e','l','l','o'};
+    std::vector<uint8_t> bytes = {'H','e','l','l','o'};
 
     // default suggested encoding (base64url)
-    json j1(bs);
+    json j1(json_bstr_arg, bytes);
     std::cout << "(1) "<< j1 << "\n\n";
 
     // base64 suggested encoding
-    json j2(bs, semantic_tag::base64);
+    json j2(json_bstr_arg, bytes, semantic_tag::base64);
     std::cout << "(2) "<< j2 << "\n\n";
 
     // base16 suggested encoding
-    json j3(bs, semantic_tag::base16);
+    json j3(json_bstr_arg, bytes, semantic_tag::base16);
     std::cout << "(3) "<< j3 << "\n\n";
 }
 
 void retrieve_json_value_as_byte_string()
 {
     json j;
-    j["ByteString"] = byte_string({'H','e','l','l','o'});
+    j["ByteString"] = json(json_bstr_arg, std::vector<uint8_t>{ 'H','e','l','l','o' });
     j["EncodedByteString"] = json("SGVsbG8=", semantic_tag::base64);
 
     std::cout << "(1)\n";
@@ -59,9 +59,9 @@ void retrieve_json_value_as_byte_string()
 
 void serialize_json_byte_string()
 {
-    byte_string bs = {'H','e','l','l','o'};
+    byte_string bytes = {'H','e','l','l','o'};
 
-    json j(bs);
+    json j(bytes);
 
     // default
     std::cout << "(1) "<< j << "\n\n";

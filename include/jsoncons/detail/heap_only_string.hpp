@@ -20,20 +20,20 @@ namespace jsoncons { namespace detail {
 template <class Allocator>
 class heap_only_string_base
 {
-    Allocator allocator_;
+    Allocator alloc_;
 public:
     Allocator& get_allocator() 
     {
-        return allocator_;
+        return alloc_;
     }
 
     const Allocator& get_allocator() const
     {
-        return allocator_;
+        return alloc_;
     }
 protected:
-    heap_only_string_base(const Allocator& allocator)
-        : allocator_(allocator)
+    heap_only_string_base(const Allocator& alloc)
+        : alloc_(alloc)
     {
     }
 
@@ -78,8 +78,8 @@ private:
     {
 
     }
-    heap_only_string(const Allocator& allocator)
-        : heap_only_string_base<Allocator>(allocator), p_(nullptr), length_(0)
+    heap_only_string(const Allocator& alloc)
+        : heap_only_string_base<Allocator>(alloc), p_(nullptr), length_(0)
     {
 
     }
@@ -121,15 +121,15 @@ public:
     {
         return create(s, length, Allocator());
     }
-    static string_pointer create(const char_type* s, size_t length, const Allocator& allocator)
+    static string_pointer create(const char_type* s, size_t length, const Allocator& alloc)
     {
         size_t mem_size = aligned_size(length*sizeof(char_type));
 
-        byte_allocator_type alloc(allocator);
-        byte_pointer ptr = alloc.allocate(mem_size);
+        byte_allocator_type byte_alloc(alloc);
+        byte_pointer ptr = byte_alloc.allocate(mem_size);
 
         char* storage = to_plain_pointer(ptr);
-        raw_string_pointer_type ps = new(storage)heap_only_string<char_type,Allocator>(alloc);
+        raw_string_pointer_type ps = new(storage)heap_only_string<char_type,Allocator>(byte_alloc);
         auto psa = reinterpret_cast<string_storage*>(storage); 
 
         CharT* p = new(&psa->c)char_type[length + 1];
@@ -145,8 +145,8 @@ public:
         raw_string_pointer_type rawp = to_plain_pointer(ptr);
         char* p = reinterpret_cast<char*>(rawp);
         size_t mem_size = aligned_size(ptr->length_*sizeof(char_type));
-        byte_allocator_type alloc(ptr->get_allocator());
-        alloc.deallocate(p,mem_size);
+        byte_allocator_type byte_alloc(ptr->get_allocator());
+        byte_alloc.deallocate(p,mem_size);
     }
 };
 

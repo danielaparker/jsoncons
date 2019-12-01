@@ -55,12 +55,12 @@ class basic_msgpack_parser : public ser_context
 public:
     template <class Source>
     basic_msgpack_parser(Source&& source,
-                         const WorkAllocator allocator=WorkAllocator())
+                         const WorkAllocator alloc=WorkAllocator())
        : source_(std::forward<Source>(source)),
          more_(true), 
          done_(false),
-         buffer_(allocator),
-         state_stack_(allocator)
+         buffer_(alloc),
+         state_stack_(alloc)
     {
         state_stack_.emplace_back(parse_mode::root,0);
     }

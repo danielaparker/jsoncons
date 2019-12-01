@@ -30,8 +30,8 @@ public:
     template <class Source>
     basic_cbor_reader(Source&& source, 
                       cbor_to_json_content_handler_adaptor<Float128T>& handler,
-                      const WorkAllocator allocator=WorkAllocator())
-       : parser_(std::forward<Source>(source),allocator),
+                      const WorkAllocator alloc=WorkAllocator())
+       : parser_(std::forward<Source>(source),alloc),
          handler_(handler)
     {
     }

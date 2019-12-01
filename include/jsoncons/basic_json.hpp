@@ -733,14 +733,19 @@ public:
             }
         }
 
-        variant(const byte_string_view& bs, semantic_tag tag) : data_{}
+        variant(const byte_string_view& bytes, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_holder(tag, bs.data(), bs.size(), byte_allocator_type());
+            new(reinterpret_cast<void*>(&data_))byte_string_holder(tag, bytes.data(), bytes.size(), byte_allocator_type());
         }
 
-        variant(const byte_string_view& bs, semantic_tag tag, const Allocator& allocator) : data_{}
+        variant(const byte_string_view& bytes, semantic_tag tag, const Allocator& alloc) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_holder(tag, bs.data(), bs.size(), allocator);
+            new(reinterpret_cast<void*>(&data_))byte_string_holder(tag, bytes.data(), bytes.size(), alloc);
+        }
+
+        variant(json_bstr_arg_t, const span<const uint8_t>& bytes, semantic_tag tag, const Allocator& alloc) : data_{}
+        {
+            new(reinterpret_cast<void*>(&data_))byte_string_holder(tag, bytes.data(), bytes.size(), alloc);
         }
 
         variant(const basic_bignum<byte_allocator_type>& n) : data_{}
@@ -758,7 +763,7 @@ public:
             }
         }
 
-        variant(const basic_bignum<byte_allocator_type>& n, const Allocator& allocator) : data_{}
+        variant(const basic_bignum<byte_allocator_type>& n, const Allocator& alloc) : data_{}
         {
             std::basic_string<char_type> s;
             n.dump(s);
@@ -769,7 +774,7 @@ public:
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_holder(semantic_tag::bigint, s.data(), s.length(), char_allocator_type(allocator));
+                new(reinterpret_cast<void*>(&data_))long_string_holder(semantic_tag::bigint, s.data(), s.length(), char_allocator_type(alloc));
             }
         }
         variant(const object& val, semantic_tag tag) : data_{}
@@ -794,9 +799,9 @@ public:
             Init_(val);
         }
 
-        variant(const variant& val, const Allocator& allocator)
+        variant(const variant& val, const Allocator& alloc)
         {
-            Init_(val,allocator);
+            Init_(val,alloc);
         }
 
         variant(variant&& val) noexcept
@@ -804,9 +809,9 @@ public:
             Init_rv_(std::forward<variant>(val));
         }
 
-        variant(variant&& val, const Allocator& allocator) noexcept
+        variant(variant&& val, const Allocator& alloc) noexcept
         {
-            Init_rv_(std::forward<variant>(val), allocator,
+            Init_rv_(std::forward<variant>(val), alloc,
                      typename std::allocator_traits<Allocator>::propagate_on_container_move_assignment());
         }
 
@@ -1024,24 +1029,24 @@ public:
                     {
                         case semantic_tag::base16:
                         {
-                            basic_byte_string<BAllocator> bs;
+                            basic_byte_string<BAllocator> bytes;
                             auto s = as_string_view();
-                            decode_base16(s.begin(), s.end(), bs);
-                            return bs;
+                            decode_base16(s.begin(), s.end(), bytes);
+                            return bytes;
                         }
                         case semantic_tag::base64:
                         {
-                            basic_byte_string<BAllocator> bs;
+                            basic_byte_string<BAllocator> bytes;
                             auto s = as_string_view();
-                            decode_base64(s.begin(), s.end(), bs);
-                            return bs;
+                            decode_base64(s.begin(), s.end(), bytes);
+                            return bytes;
                         }
                         case semantic_tag::base64url:
                         {
-                            basic_byte_string<BAllocator> bs;
+                            basic_byte_string<BAllocator> bytes;
                             auto s = as_string_view();
-                            decode_base64url(s.begin(), s.end(), bs);
-                            return bs;
+                            decode_base64url(s.begin(), s.end(), bytes);
+                            return bytes;
                         }
                         default:
                             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a byte string"));
@@ -1961,9 +1966,9 @@ public:
         }
 
         template <class SAllocator=std::allocator<char_type>>
-        std::basic_string<char_type,char_traits_type,SAllocator> as_string(const SAllocator& allocator) const 
+        std::basic_string<char_type,char_traits_type,SAllocator> as_string(const SAllocator& alloc) const 
         {
-            return evaluate().as_string(allocator);
+            return evaluate().as_string(alloc);
         }
 
         template <typename BAllocator=std::allocator<uint8_t>>
@@ -1980,9 +1985,9 @@ public:
 
         template <class SAllocator=std::allocator<char_type>>
         std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_encode_options<char_type>& options,
-                              const SAllocator& allocator) const
+                              const SAllocator& alloc) const
         {
-            return evaluate().as_string(options,allocator);
+            return evaluate().as_string(options,alloc);
         }
 
         template<class T, class... Args>
@@ -2505,9 +2510,9 @@ public:
 
         template <class SAllocator=std::allocator<char_type>>
         JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_string<char_type,char_traits_type,SAllocator>&)")
-        std::basic_string<char_type,char_traits_type,SAllocator> to_string(const SAllocator& allocator = SAllocator()) const 
+        std::basic_string<char_type,char_traits_type,SAllocator> to_string(const SAllocator& alloc = SAllocator()) const 
         {
-            return evaluate().to_string(allocator);
+            return evaluate().to_string(alloc);
         }
         JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_content_handler<char_type>&)")
         void write(basic_json_content_handler<char_type>& handler) const
@@ -2535,9 +2540,9 @@ public:
 
         template <class SAllocator=std::allocator<char_type>>
         JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&)")
-        std::basic_string<char_type,char_traits_type,SAllocator> to_string(const basic_json_encode_options<char_type>& options, char_allocator_type& allocator = char_allocator_type()) const
+        std::basic_string<char_type,char_traits_type,SAllocator> to_string(const basic_json_encode_options<char_type>& options, char_allocator_type& alloc = char_allocator_type()) const
         {
-            return evaluate().to_string(options,allocator);
+            return evaluate().to_string(options,alloc);
         }
         JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_content_handler<char_type>&)")
         void to_stream(basic_json_content_handler<char_type>& handler) const
@@ -2805,25 +2810,25 @@ public:
         return basic_json(a);
     }
 
-    static basic_json make_array(const array& a, allocator_type allocator)
+    static basic_json make_array(const array& a, allocator_type alloc)
     {
-        return basic_json(variant(a, semantic_tag::none, allocator));
+        return basic_json(variant(a, semantic_tag::none, alloc));
     }
 
-    static basic_json make_array(std::initializer_list<basic_json> init, const Allocator& allocator = Allocator())
+    static basic_json make_array(std::initializer_list<basic_json> init, const Allocator& alloc = Allocator())
     {
-        return array(std::move(init),allocator);
+        return array(std::move(init),alloc);
     }
 
-    static basic_json make_array(size_t n, const Allocator& allocator = Allocator())
+    static basic_json make_array(size_t n, const Allocator& alloc = Allocator())
     {
-        return array(n,allocator);
+        return array(n,alloc);
     }
 
     template <class T>
-    static basic_json make_array(size_t n, const T& val, const Allocator& allocator = Allocator())
+    static basic_json make_array(size_t n, const T& val, const Allocator& alloc = Allocator())
     {
-        return basic_json::array(n, val,allocator);
+        return basic_json::array(n, val,alloc);
     }
 
     template <size_t dim>
@@ -2833,9 +2838,9 @@ public:
     }
 
     template <size_t dim, class T>
-    static typename std::enable_if<dim==1,basic_json>::type make_array(size_t n, const T& val, const Allocator& allocator = Allocator())
+    static typename std::enable_if<dim==1,basic_json>::type make_array(size_t n, const T& val, const Allocator& alloc = Allocator())
     {
-        return array(n,val,allocator);
+        return array(n,val,alloc);
     }
 
     template <size_t dim, typename... Args>
@@ -2868,8 +2873,8 @@ public:
 #if !defined(JSONCONS_NO_DEPRECATED)
 
     JSONCONS_DEPRECATED_MSG("Instead, use basic_json(json_object_t,semantic_tag,const Allocator&)")
-    explicit basic_json(const Allocator& allocator, semantic_tag tag = semantic_tag::none) 
-        : var_(object(allocator),tag)
+    explicit basic_json(const Allocator& alloc, semantic_tag tag = semantic_tag::none) 
+        : var_(object(alloc),tag)
     {
     }
 
@@ -2880,8 +2885,8 @@ public:
     {
     }
 
-    basic_json(const basic_json& val, const Allocator& allocator)
-        : var_(val.var_,allocator)
+    basic_json(const basic_json& val, const Allocator& alloc)
+        : var_(val.var_,alloc)
     {
     }
 
@@ -2891,7 +2896,7 @@ public:
     }
 
     basic_json(basic_json&& other, const Allocator&) noexcept
-        : var_(std::move(other.var_) /*,allocator*/ )
+        : var_(std::move(other.var_) /*,alloc*/ )
     {
     }
 
@@ -2980,8 +2985,8 @@ public:
     }
 
     template <class ParentT>
-    basic_json(const proxy<ParentT>& other, const Allocator& allocator)
-        : var_(other.evaluate().var_,allocator)
+    basic_json(const proxy<ParentT>& other, const Allocator& alloc)
+        : var_(other.evaluate().var_,alloc)
     {
     }
 
@@ -2992,8 +2997,8 @@ public:
     }
 
     template <class T>
-    basic_json(const T& val, const Allocator& allocator)
-        : var_(json_type_traits<basic_json,T>::to_json(val,allocator).var_)
+    basic_json(const T& val, const Allocator& alloc)
+        : var_(json_type_traits<basic_json,T>::to_json(val,alloc).var_)
     {
     }
 
@@ -3002,8 +3007,8 @@ public:
     {
     }
 
-    basic_json(const char_type* s, const Allocator& allocator)
-        : var_(s, char_traits_type::length(s), semantic_tag::none, allocator)
+    basic_json(const char_type* s, const Allocator& alloc)
+        : var_(s, char_traits_type::length(s), semantic_tag::none, alloc)
     {
     }
 
@@ -3049,31 +3054,38 @@ public:
     {
     }
 
-    basic_json(const string_view_type& sv, semantic_tag tag, const Allocator& allocator)
-        : var_(sv.data(), sv.length(), tag, allocator)
+    basic_json(const string_view_type& sv, semantic_tag tag, const Allocator& alloc)
+        : var_(sv.data(), sv.length(), tag, alloc)
     {
     }
 
     basic_json(const char_type *s, size_t length, 
-               semantic_tag tag, const Allocator& allocator)
-        : var_(s, length, tag, allocator)
+               semantic_tag tag, const Allocator& alloc)
+        : var_(s, length, tag, alloc)
     {
     }
 
-    explicit basic_json(const byte_string_view& bs, 
-               semantic_tag tag = semantic_tag::none, 
-               const Allocator& allocator = Allocator())
-        : var_(bs, tag, allocator)
+    explicit basic_json(const byte_string_view& bytes, 
+                        semantic_tag tag = semantic_tag::none, 
+                        const Allocator& alloc = Allocator())
+        : var_(bytes, tag, alloc)
     {
     }
 
-    explicit basic_json(const basic_bignum<byte_allocator_type>& bs)
-        : var_(bs)
+    basic_json(json_bstr_arg_t, const span<const uint8_t>& bytes, 
+               semantic_tag tag = semantic_tag::none,
+               const Allocator& alloc = Allocator())
+        : var_(json_bstr_arg, bytes, tag, alloc)
     {
     }
 
-    explicit basic_json(const basic_bignum<byte_allocator_type>& bs, const Allocator& allocator)
-    : var_(bs, byte_allocator_type(allocator))
+    explicit basic_json(const basic_bignum<byte_allocator_type>& bytes)
+        : var_(bytes)
+    {
+    }
+
+    explicit basic_json(const basic_bignum<byte_allocator_type>& bytes, const Allocator& alloc)
+    : var_(bytes, byte_allocator_type(alloc))
     {
     }
 
@@ -3332,10 +3344,10 @@ public:
     }
 
     template <class SAllocator=std::allocator<char_type>>
-    std::basic_string<char_type,char_traits_type,SAllocator> to_string(const char_allocator_type& allocator=SAllocator()) const noexcept
+    std::basic_string<char_type,char_traits_type,SAllocator> to_string(const char_allocator_type& alloc=SAllocator()) const noexcept
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
-        string_type s(allocator);
+        string_type s(alloc);
         basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s);
         dump(encoder);
         return s;
@@ -3343,10 +3355,10 @@ public:
 
     template <class SAllocator=std::allocator<char_type>>
     std::basic_string<char_type,char_traits_type,SAllocator> to_string(const basic_json_encode_options<char_type>& options,
-                                                                          const SAllocator& allocator=SAllocator()) const
+                                                                          const SAllocator& alloc=SAllocator()) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
-        string_type s(allocator);
+        string_type s(alloc);
         basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s,options);
         dump(encoder);
         return s;
@@ -3560,7 +3572,7 @@ public:
 
     void create_object_implicitly(std::false_type)
     {
-        static_assert(std::true_type::value, "Cannot create object implicitly - allocator is stateful.");
+        static_assert(std::true_type::value, "Cannot create object implicitly - alloc is stateful.");
     }
 
     void create_object_implicitly(std::true_type)
@@ -3744,9 +3756,9 @@ public:
     }
 
     template <class SAllocator=std::allocator<char_type>>
-    std::basic_string<char_type,char_traits_type,SAllocator> as_string(const SAllocator& allocator) const 
+    std::basic_string<char_type,char_traits_type,SAllocator> as_string(const SAllocator& alloc) const 
     {
-        return as_string(basic_json_encode_options<char_type>(),allocator);
+        return as_string(basic_json_encode_options<char_type>(),alloc);
     }
 
     template <class SAllocator=std::allocator<char_type>>
@@ -3757,7 +3769,7 @@ public:
 
     template <class SAllocator=std::allocator<char_type>>
     std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_encode_options<char_type>& options,
-                          const SAllocator& allocator) const 
+                          const SAllocator& alloc) const 
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         switch (var_.kind())
@@ -3765,11 +3777,11 @@ public:
             case value_kind::short_string_value:
             case value_kind::long_string_value:
             {
-                return string_type(as_string_view().data(),as_string_view().length(),allocator);
+                return string_type(as_string_view().data(),as_string_view().length(),alloc);
             }
             case value_kind::byte_string_value:
             {
-                string_type s(allocator);
+                string_type s(alloc);
                 byte_string_chars_format format = jsoncons::detail::resolve_byte_string_chars_format(options.byte_string_format(), 
                                                                                            byte_string_chars_format::none, 
                                                                                            byte_string_chars_format::base64url);
@@ -3795,7 +3807,7 @@ public:
             }
             case value_kind::array_value:
             {
-                string_type s(allocator);
+                string_type s(alloc);
 #if !defined(JSONCONS_NO_DEPRECATED)
                 if (tag() == semantic_tag::bigfloat)
                 {
@@ -3842,7 +3854,7 @@ public:
             }
             default:
             {
-                string_type s(allocator);
+                string_type s(alloc);
                 basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s,options);
                 dump(encoder);
                 return s;
@@ -4574,22 +4586,22 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use basic_json(const byte_string_view& ,semantic_tag)")
-    basic_json(const byte_string_view& bs, 
+    basic_json(const byte_string_view& bytes, 
                byte_string_chars_format encoding_hint,
                semantic_tag tag = semantic_tag::none)
-        : var_(bs, tag)
+        : var_(bytes, tag)
     {
         switch (encoding_hint)
         {
             {
                 case byte_string_chars_format::base16:
-                    var_ = variant(bs, semantic_tag::base16);
+                    var_ = variant(bytes, semantic_tag::base16);
                     break;
                 case byte_string_chars_format::base64:
-                    var_ = variant(bs, semantic_tag::base64);
+                    var_ = variant(bytes, semantic_tag::base64);
                     break;
                 case byte_string_chars_format::base64url:
-                    var_ = variant(bs, semantic_tag::base64url);
+                    var_ = variant(bytes, semantic_tag::base64url);
                     break;
                 default:
                     break;
@@ -4598,8 +4610,8 @@ public:
     }
 
     template<class InputIterator>
-    basic_json(InputIterator first, InputIterator last, const Allocator& allocator = Allocator())
-        : var_(first,last,allocator)
+    basic_json(InputIterator first, InputIterator last, const Allocator& alloc = Allocator())
+        : var_(first,last,alloc)
     {
     }
     JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_content_handler<char_type>&)")

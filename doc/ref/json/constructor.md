@@ -39,14 +39,15 @@ basic_json(const char_type* val); // (12)
 
 basic_json(const char_type* val, const allocator_type& allocator); // (13)
 
-basic_json(const byte_string_view& bs,
-           semantic_tag tag = semantic_tag::none); // (14)
-
 basic_json(const byte_string_view& bs, 
            semantic_tag tag = semantic_tag::none, 
-           const allocator_type& allocator); // (15)
+           const Allocator& allocator = Allocator()); // (14)
 
-basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none); // (16)
+basic_json(json_bstr_arg_t, const jsoncons::span<const uint8_t>& bytes, 
+           semantic_tag tag = semantic_tag::none,
+           const Allocator& alloc = Allocator()); // (15)
+
+basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none); // (15)
 ```
 
 (1) Constructs a `basic_json` value that holds an empty basic_json object. 
@@ -69,7 +70,7 @@ basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none); /
 
 (14) Constructs a `basic_json` value for a [byte_string](../byte_string.md).
 
-(15) Constructs a `basic_json` value for a [byte_string](../byte_string.md) with supplied allocator.
+(15) Constructs a `basic_json` value for a byte string from any container of `utf8_t`.
 
 (16) Constructs a `basic_json` value for a half precision floating point number.
 

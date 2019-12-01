@@ -39,21 +39,21 @@ public:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint64_t> basic_type_allocator_type;
 
 private:
-    basic_type_allocator_type allocator_;
+    basic_type_allocator_type alloc_;
 
 public:
     basic_bignum_base()
-        : allocator_()
+        : alloc_()
     {
     }
-    explicit basic_bignum_base(const allocator_type& allocator)
-        : allocator_(basic_type_allocator_type(allocator))
+    explicit basic_bignum_base(const allocator_type& alloc)
+        : alloc_(basic_type_allocator_type(alloc))
     {
     }
 
-    basic_type_allocator_type allocator() const
+    basic_type_allocator_type alloc() const
     {
-        return allocator_;
+        return alloc_;
     }
 };
 
@@ -61,7 +61,7 @@ template <class Allocator = std::allocator<uint64_t>>
 class basic_bignum : protected basic_bignum_base<Allocator>
 {
 private:
-    using basic_bignum_base<Allocator>::allocator;
+    using basic_bignum_base<Allocator>::alloc;
 
     static constexpr uint64_t max_basic_type = (std::numeric_limits<uint64_t>::max)();
     static constexpr uint64_t basic_type_bits = sizeof(uint64_t) * 8;  // Number of bits
@@ -88,13 +88,13 @@ public:
     {
     }
 
-    explicit basic_bignum(const Allocator& allocator)
-        : basic_bignum_base<Allocator>(allocator), values_{0,0}, data_(values_), neg_(false), dynamic_(false), length_(0)
+    explicit basic_bignum(const Allocator& alloc)
+        : basic_bignum_base<Allocator>(alloc), values_{0,0}, data_(values_), neg_(false), dynamic_(false), length_(0)
     {
     }
 
     basic_bignum(const basic_bignum<Allocator>& n)
-        : basic_bignum_base<Allocator>(n.allocator()), neg_(n.neg_), length_(n.length_)
+        : basic_bignum_base<Allocator>(n.alloc()), neg_(n.neg_), length_(n.length_)
     {
         if (!n.dynamic_)
         {
@@ -106,14 +106,14 @@ public:
         else
         {
             capacity_ = n.capacity_;
-            data_ = allocator().allocate(capacity_);
+            data_ = alloc().allocate(capacity_);
             dynamic_ = true;
             std::memcpy( data_, n.data_, n.length_*sizeof(uint64_t) );
         }
     }
 
     basic_bignum(basic_bignum<Allocator>&& other) noexcept
-        : basic_bignum_base<Allocator>(other.allocator()), neg_(other.neg_), dynamic_(other.dynamic_), length_(other.length_)
+        : basic_bignum_base<Allocator>(other.alloc()), neg_(other.neg_), dynamic_(other.dynamic_), length_(other.length_)
     {
         if (other.dynamic_)
         {
@@ -343,7 +343,7 @@ public:
     {
         if ( dynamic_ )
         {
-            allocator().deallocate(data_, capacity_);
+            alloc().deallocate(data_, capacity_);
         }
     }
 
@@ -1385,7 +1385,7 @@ private:
                delete[] data_;
            }
            capacity_ = round_up(length_);
-           data_ = allocator().allocate(capacity_);
+           data_ = alloc().allocate(capacity_);
            dynamic_ = true;
        }
     }
@@ -1439,7 +1439,7 @@ private:
         else
         {
             capacity_ = round_up( length_ );
-            data_ = allocator().allocate(capacity_);
+            data_ = alloc().allocate(capacity_);
             dynamic_ = true;
             if ( length_ > 0 )
             {
@@ -1503,7 +1503,7 @@ private:
 
             uint64_t* data_old = data_;
 
-            data_ = allocator().allocate(capacity_new);
+            data_ = alloc().allocate(capacity_new);
 
             if ( len_old > 0 )
             {
@@ -1511,7 +1511,7 @@ private:
             }
             if ( dynamic_ )
             {
-                allocator().deallocate(data_old,capacity_);
+                alloc().deallocate(data_old,capacity_);
             }
             capacity_ = capacity_new;
             dynamic_ = true;

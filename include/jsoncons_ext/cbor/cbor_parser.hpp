@@ -69,7 +69,7 @@ class typed_array
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<double> double_allocator_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<float128_type> float128_allocator_type;
 
-    Allocator allocator_;
+    Allocator alloc_;
     typed_array_type type_;
     union 
     {
@@ -88,78 +88,78 @@ class typed_array
     size_t size_;
 public:
     typed_array(const Allocator& alloc)
-        : allocator_(alloc), type_(), data_(), size_(0)
+        : alloc_(alloc), type_(), data_(), size_(0)
     {
     }
 
     typed_array(const typed_array& other)
-        : allocator_(other.allocator_), type_(other.type_), data_(), size_(other.size())
+        : alloc_(other.alloc_), type_(other.type_), data_(), size_(other.size())
     {
         switch (other.type_)
         {
             case typed_array_type::uint8_value:
             {
-                uint8_allocator_type alloc{ allocator_ };
+                uint8_allocator_type alloc{ alloc_ };
                 data_.uint8_data_ = alloc.allocate(size_);
                 break;
             }
             case typed_array_type::uint16_value:
             {
-                uint16_allocator_type alloc{ allocator_ };
+                uint16_allocator_type alloc{ alloc_ };
                 data_.uint16_data_ = alloc.allocate(size_);
                 break;
             }
             case typed_array_type::uint32_value:
             {
-                uint32_allocator_type alloc{ allocator_ };
+                uint32_allocator_type alloc{ alloc_ };
                 data_.uint32_data_ = alloc.allocate(size_);
                 break;
             }
             case typed_array_type::uint64_value:
             {
-                uint64_allocator_type alloc{ allocator_ };
+                uint64_allocator_type alloc{ alloc_ };
                 data_.uint64_data_ = alloc.allocate(size_);
                 break;
             }
             case typed_array_type::int8_value:
             {
-                int8_allocator_type alloc{ allocator_ };
+                int8_allocator_type alloc{ alloc_ };
                 data_.int8_data_ = alloc.allocate(size_);
                 break;
             }
             case typed_array_type::int16_value:
             {
-                int16_allocator_type alloc{ allocator_ };
+                int16_allocator_type alloc{ alloc_ };
                 data_.int16_data_ = alloc.allocate(size_);
                 break;
             }
             case typed_array_type::int32_value:
             {
-                int32_allocator_type alloc{ allocator_ };
+                int32_allocator_type alloc{ alloc_ };
                 data_.int32_data_ = alloc.allocate(size_);
                 break;
             }
             case typed_array_type::int64_value:
             {
-                int64_allocator_type alloc{ allocator_ };
+                int64_allocator_type alloc{ alloc_ };
                 data_.int64_data_ = alloc.allocate(size_);
                 break;
             }
             case typed_array_type::half_value:
             {
-                uint16_allocator_type alloc{ allocator_ };
+                uint16_allocator_type alloc{ alloc_ };
                 data_.uint16_data_ = alloc.allocate(size_);
                 break;
             }
             case typed_array_type::float_value:
             {
-                float_allocator_type alloc{ allocator_ };
+                float_allocator_type alloc{ alloc_ };
                 data_.float_data_ = alloc.allocate(size_);
                 break;
             }
             case typed_array_type::double_value:
             {
-                double_allocator_type alloc{allocator_};
+                double_allocator_type alloc{alloc_};
                 data_.double_data_ = alloc.allocate(size_);
                 break;
             }
@@ -178,86 +178,86 @@ public:
         swap(*this,other);
     }
     typed_array(uint8_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(typed_array_type::uint8_value), size_(size)
+        : alloc_(allocator), type_(typed_array_type::uint8_value), size_(size)
     {
-        uint8_allocator_type alloc(allocator_);
+        uint8_allocator_type alloc(alloc_);
         data_.uint8_data_ = alloc.allocate(size);
     }
 
     typed_array(uint16_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(typed_array_type::uint16_value), size_(size)
+        : alloc_(allocator), type_(typed_array_type::uint16_value), size_(size)
     {
-        uint16_allocator_type alloc(allocator_);
+        uint16_allocator_type alloc(alloc_);
         data_.uint16_data_ = alloc.allocate(size);
     }
 
     typed_array(uint32_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(typed_array_type::uint32_value), size_(size)
+        : alloc_(allocator), type_(typed_array_type::uint32_value), size_(size)
     {
-        uint32_allocator_type alloc(allocator_);
+        uint32_allocator_type alloc(alloc_);
         data_.uint32_data_ = alloc.allocate(size);
     }
 
     typed_array(uint64_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(typed_array_type::uint64_value), size_(size)
+        : alloc_(allocator), type_(typed_array_type::uint64_value), size_(size)
     {
-        uint64_allocator_type alloc(allocator_);
+        uint64_allocator_type alloc(alloc_);
         data_.uint64_data_ = alloc.allocate(size);
     }
 
     typed_array(int8_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(typed_array_type::int8_value), size_(size)
+        : alloc_(allocator), type_(typed_array_type::int8_value), size_(size)
     {
-        int8_allocator_type alloc(allocator_);
+        int8_allocator_type alloc(alloc_);
         data_.int8_data_ = alloc.allocate(size);
     }
 
     typed_array(int16_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(typed_array_type::int16_value), size_(size)
+        : alloc_(allocator), type_(typed_array_type::int16_value), size_(size)
     {
-        int16_allocator_type alloc(allocator_);
+        int16_allocator_type alloc(alloc_);
         data_.int16_data_ = alloc.allocate(size);
     }
 
     typed_array(int32_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(typed_array_type::int32_value), size_(size)
+        : alloc_(allocator), type_(typed_array_type::int32_value), size_(size)
     {
-        int32_allocator_type alloc(allocator_);
+        int32_allocator_type alloc(alloc_);
         data_.int32_data_ = alloc.allocate(size);
     }
 
     typed_array(int64_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(typed_array_type::int64_value), size_(size)
+        : alloc_(allocator), type_(typed_array_type::int64_value), size_(size)
     {
-        int64_allocator_type alloc(allocator_);
+        int64_allocator_type alloc(alloc_);
         data_.int64_data_ = alloc.allocate(size);
     }
 
     typed_array(half_array_arg_t, size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(typed_array_type::half_value), size_(size)
+        : alloc_(allocator), type_(typed_array_type::half_value), size_(size)
     {
-        uint16_allocator_type alloc(allocator_);
+        uint16_allocator_type alloc(alloc_);
         data_.uint16_data_ = alloc.allocate(size);
     }
 
     typed_array(float_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(typed_array_type::float_value), size_(size)
+        : alloc_(allocator), type_(typed_array_type::float_value), size_(size)
     {
-        float_allocator_type alloc(allocator_);
+        float_allocator_type alloc(alloc_);
         data_.float_data_ = alloc.allocate(size);
     }
 
     typed_array(double_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(typed_array_type::double_value), size_(size)
+        : alloc_(allocator), type_(typed_array_type::double_value), size_(size)
     {
-        double_allocator_type alloc(allocator_);
+        double_allocator_type alloc(alloc_);
         data_.double_data_ = alloc.allocate(size);
     }
 
     typed_array(float128_array_arg_t,size_t size, const Allocator& allocator)
-        : allocator_(allocator), type_(typed_array_type::float128_value), size_(size)
+        : alloc_(allocator), type_(typed_array_type::float128_value), size_(size)
     {
-        float128_allocator_type alloc(allocator_);
+        float128_allocator_type alloc(alloc_);
         data_.float128_data_ = alloc.allocate(size);
     }
 
@@ -267,61 +267,61 @@ public:
         {
             case typed_array_type::uint8_value:
             {
-                uint8_allocator_type alloc(allocator_);
+                uint8_allocator_type alloc(alloc_);
                 alloc.deallocate(data_.uint8_data_, 1);
                 break;
             }
             case typed_array_type::uint16_value:
             {
-                uint16_allocator_type alloc(allocator_);
+                uint16_allocator_type alloc(alloc_);
                 alloc.deallocate(data_.uint16_data_, 1);
                 break;
             }
             case typed_array_type::uint32_value:
             {
-                uint32_allocator_type alloc(allocator_);
+                uint32_allocator_type alloc(alloc_);
                 alloc.deallocate(data_.uint32_data_, 1);
                 break;
             }
             case typed_array_type::uint64_value:
             {
-                uint64_allocator_type alloc(allocator_);
+                uint64_allocator_type alloc(alloc_);
                 alloc.deallocate(data_.uint64_data_, 1);
                 break;
             }
             case typed_array_type::int8_value:
             {
-                int8_allocator_type alloc(allocator_);
+                int8_allocator_type alloc(alloc_);
                 alloc.deallocate(data_.int8_data_, 1);
                 break;
             }
             case typed_array_type::int16_value:
             {
-                int16_allocator_type alloc(allocator_);
+                int16_allocator_type alloc(alloc_);
                 alloc.deallocate(data_.int16_data_, 1);
                 break;
             }
             case typed_array_type::int32_value:
             {
-                int32_allocator_type alloc(allocator_);
+                int32_allocator_type alloc(alloc_);
                 alloc.deallocate(data_.int32_data_, 1);
                 break;
             }
             case typed_array_type::int64_value:
             {
-                int64_allocator_type alloc(allocator_);
+                int64_allocator_type alloc(alloc_);
                 alloc.deallocate(data_.int64_data_, 1);
                 break;
             }
             case typed_array_type::float_value:
             {
-                float_allocator_type alloc(allocator_);
+                float_allocator_type alloc(alloc_);
                 alloc.deallocate(data_.float_data_, 1);
                 break;
             }
             case typed_array_type::double_value:
             {
-                double_allocator_type alloc(allocator_);
+                double_allocator_type alloc(alloc_);
                 alloc.deallocate(data_.double_data_, 1);
                 break;
             }
@@ -341,7 +341,7 @@ public:
     typename std::enable_if<!std::is_same<Float128T_,std::nullptr_t>::value, void>::type
     allocate_float128()
     {
-        float128_allocator_type alloc{ allocator_ };
+        float128_allocator_type alloc{ alloc_ };
         data_.float128_data_ = alloc.allocate(size_);
     }
 
@@ -355,7 +355,7 @@ public:
     typename std::enable_if<!std::is_same<Float128T_,std::nullptr_t>::value, void>::type
         deallocate_float128()
     {
-        float128_allocator_type alloc(allocator_);
+        float128_allocator_type alloc(alloc_);
         alloc.deallocate(data_.float128_data_, 1);
     }
 
@@ -528,7 +528,7 @@ public:
     friend void swap(typed_array& a, typed_array& b) noexcept
     {
         std::swap(a.data_,b.data_);
-        std::swap(a.allocator_,b.allocator_);
+        std::swap(a.alloc_,b.alloc_);
         std::swap(a.type_,b.type_);
         std::swap(a.size_,b.size_);
     }
@@ -874,7 +874,7 @@ class basic_cbor_parser : public ser_context
 
     typedef std::basic_string<char_type,char_traits_type,char_allocator_type> string_type;
 
-    work_allocator_type allocator_;
+    work_allocator_type alloc_;
     Src source_;
     bool more_;
     bool done_;
@@ -889,16 +889,16 @@ class basic_cbor_parser : public ser_context
 public:
     template <class Source>
     basic_cbor_parser(Source&& source,
-                      const WorkAllocator allocator=WorkAllocator())
-       : allocator_(allocator),
+                      const WorkAllocator alloc=WorkAllocator())
+       : alloc_(alloc),
          source_(std::forward<Source>(source)),
          more_(true), 
          done_(false),
-         text_buffer_(allocator),
-         bytes_buffer_(allocator),
-         tags_(allocator),
-         state_stack_(allocator),
-         typed_array_(allocator),
+         text_buffer_(alloc),
+         bytes_buffer_(alloc),
+         tags_(alloc),
+         state_stack_(alloc),
+         typed_array_(alloc),
          index_(0)
     {
         state_stack_.emplace_back(parse_mode::root,0);
@@ -1012,7 +1012,7 @@ public:
             else
             {
                 more_ = handler.end_array();
-                typed_array_ = typed_array<Float128T,WorkAllocator>(allocator_);
+                typed_array_ = typed_array<Float128T,WorkAllocator>(alloc_);
                 index_ = 0;
             }
         }
@@ -2409,7 +2409,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     size_t size = v.size();
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(uint8_array_arg,size,allocator_);
+                    typed_array_ = typed_array<Float128T,WorkAllocator>(uint8_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; ++p, ++i)
                     {
                         typed_array_.data(uint8_array_arg)[i] = *p;
@@ -2423,7 +2423,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     size_t size = v.size();
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(uint8_array_arg,size,allocator_);
+                    typed_array_ = typed_array<Float128T,WorkAllocator>(uint8_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; ++p, ++i)
                     {
                         typed_array_.data(uint8_array_arg)[i] = *p;
@@ -2445,7 +2445,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(uint16_array_arg,size,allocator_);
+                    typed_array_ = typed_array<Float128T,WorkAllocator>(uint16_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2475,7 +2475,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(uint32_array_arg,size,allocator_);
+                    typed_array_ = typed_array<Float128T,WorkAllocator>(uint32_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2505,7 +2505,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(uint64_array_arg,size,allocator_);
+                    typed_array_ = typed_array<Float128T,WorkAllocator>(uint64_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2527,7 +2527,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     size_t size = v.size();
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(int8_array_arg,size,allocator_);
+                    typed_array_ = typed_array<Float128T,WorkAllocator>(int8_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; ++p, ++i)
                     {
                         typed_array_.data(int8_array_arg)[i] = (int8_t)*p;
@@ -2549,7 +2549,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(int16_array_arg,size,allocator_);
+                    typed_array_ = typed_array<Float128T,WorkAllocator>(int16_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2579,7 +2579,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(int32_array_arg,size,allocator_);
+                    typed_array_ = typed_array<Float128T,WorkAllocator>(int32_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2609,7 +2609,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(int64_array_arg,size,allocator_);
+                    typed_array_ = typed_array<Float128T,WorkAllocator>(int64_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2639,7 +2639,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(half_array_arg,size,allocator_);
+                    typed_array_ = typed_array<Float128T,WorkAllocator>(half_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2669,7 +2669,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(float_array_arg,size,allocator_);
+                    typed_array_ = typed_array<Float128T,WorkAllocator>(float_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2699,7 +2699,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(double_array_arg,size,allocator_);
+                    typed_array_ = typed_array<Float128T,WorkAllocator>(double_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2760,7 +2760,7 @@ private:
             const uint8_t* last = v.data() + v.size();
 
             size_t size = v.size()/bytes_per_elem;
-            typed_array_ = typed_array<Float128T,WorkAllocator>(float128_array_arg,size,allocator_);
+            typed_array_ = typed_array<Float128T,WorkAllocator>(float128_array_arg,size,alloc_);
             for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
             {
                 const uint8_t* endp = nullptr;

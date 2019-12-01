@@ -64,8 +64,8 @@ public:
     template <class T>
     key_value(key_type&& name, 
                    T&& val, 
-                   const allocator_type& allocator)
-        : key_(std::forward<key_type>(name)), value_(std::forward<T>(val), allocator)
+                   const allocator_type& alloc)
+        : key_(std::forward<key_type>(name)), value_(std::forward<T>(val), alloc)
     {
     }
 
@@ -230,31 +230,31 @@ public:
     {
     }
 
-    explicit json_array(const allocator_type& allocator)
-        : allocator_holder<allocator_type>(allocator), 
-          elements_(value_allocator_type(allocator))
+    explicit json_array(const allocator_type& alloc)
+        : allocator_holder<allocator_type>(alloc), 
+          elements_(value_allocator_type(alloc))
     {
     }
 
     explicit json_array(size_t n, 
-                        const allocator_type& allocator = allocator_type())
-        : allocator_holder<allocator_type>(allocator), 
-          elements_(n,Json(),value_allocator_type(allocator))
+                        const allocator_type& alloc = allocator_type())
+        : allocator_holder<allocator_type>(alloc), 
+          elements_(n,Json(),value_allocator_type(alloc))
     {
     }
 
     explicit json_array(size_t n, 
                         const Json& value, 
-                        const allocator_type& allocator = allocator_type())
-        : allocator_holder<allocator_type>(allocator), 
-          elements_(n,value,value_allocator_type(allocator))
+                        const allocator_type& alloc = allocator_type())
+        : allocator_holder<allocator_type>(alloc), 
+          elements_(n,value,value_allocator_type(alloc))
     {
     }
 
     template <class InputIterator>
-    json_array(InputIterator begin, InputIterator end, const allocator_type& allocator = allocator_type())
-        : allocator_holder<allocator_type>(allocator), 
-          elements_(begin,end,value_allocator_type(allocator))
+    json_array(InputIterator begin, InputIterator end, const allocator_type& alloc = allocator_type())
+        : allocator_holder<allocator_type>(alloc), 
+          elements_(begin,end,value_allocator_type(alloc))
     {
     }
     json_array(const json_array& val)
@@ -262,9 +262,9 @@ public:
           elements_(val.elements_)
     {
     }
-    json_array(const json_array& val, const allocator_type& allocator)
-        : allocator_holder<allocator_type>(allocator), 
-          elements_(val.elements_,value_allocator_type(allocator))
+    json_array(const json_array& val, const allocator_type& alloc)
+        : allocator_holder<allocator_type>(alloc), 
+          elements_(val.elements_,value_allocator_type(alloc))
     {
     }
 
@@ -273,16 +273,16 @@ public:
           elements_(std::move(val.elements_))
     {
     }
-    json_array(json_array&& val, const allocator_type& allocator)
-        : allocator_holder<allocator_type>(allocator), 
-          elements_(std::move(val.elements_),value_allocator_type(allocator))
+    json_array(json_array&& val, const allocator_type& alloc)
+        : allocator_holder<allocator_type>(alloc), 
+          elements_(std::move(val.elements_),value_allocator_type(alloc))
     {
     }
 
     json_array(const std::initializer_list<Json>& init, 
-               const allocator_type& allocator = allocator_type())
-        : allocator_holder<allocator_type>(allocator), 
-          elements_(init,value_allocator_type(allocator))
+               const allocator_type& alloc = allocator_type())
+        : allocator_holder<allocator_type>(alloc), 
+          elements_(init,value_allocator_type(alloc))
     {
     }
     ~json_array()
@@ -479,9 +479,9 @@ public:
     {
     }
 
-    explicit json_object(const allocator_type& allocator)
-        : allocator_holder<allocator_type>(allocator), 
-          members_(key_value_allocator_type(allocator))
+    explicit json_object(const allocator_type& alloc)
+        : allocator_holder<allocator_type>(alloc), 
+          members_(key_value_allocator_type(alloc))
     {
     }
 
@@ -497,14 +497,14 @@ public:
     {
     }
 
-    json_object(const json_object& val, const allocator_type& allocator) 
-        : allocator_holder<allocator_type>(allocator), 
-          members_(val.members_,key_value_allocator_type(allocator))
+    json_object(const json_object& val, const allocator_type& alloc) 
+        : allocator_holder<allocator_type>(alloc), 
+          members_(val.members_,key_value_allocator_type(alloc))
     {
     }
 
-    json_object(json_object&& val,const allocator_type& allocator) 
-        : allocator_holder<allocator_type>(allocator), members_(std::move(val.members_),key_value_allocator_type(allocator))
+    json_object(json_object&& val,const allocator_type& alloc) 
+        : allocator_holder<allocator_type>(alloc), members_(std::move(val.members_),key_value_allocator_type(alloc))
     {
     }
 
@@ -526,9 +526,9 @@ public:
 
     template<class InputIt>
     json_object(InputIt first, InputIt last, 
-                const allocator_type& allocator)
-        : allocator_holder<allocator_type>(allocator), 
-          members_(key_value_allocator_type(allocator))
+                const allocator_type& alloc)
+        : allocator_holder<allocator_type>(alloc), 
+          members_(key_value_allocator_type(alloc))
     {
         size_t count = std::distance(first,last);
         members_.reserve(count);
@@ -544,9 +544,9 @@ public:
     }
 
     json_object(const std::initializer_list<std::pair<std::basic_string<char_type>,Json>>& init, 
-                const allocator_type& allocator = allocator_type())
-        : allocator_holder<allocator_type>(allocator), 
-          members_(key_value_allocator_type(allocator))
+                const allocator_type& alloc = allocator_type())
+        : allocator_holder<allocator_type>(alloc), 
+          members_(key_value_allocator_type(alloc))
     {
         members_.reserve(init.size());
         for (auto& item : init)
@@ -1140,10 +1140,10 @@ public:
     json_object()
     {
     }
-    json_object(const allocator_type& allocator)
-        : allocator_holder<allocator_type>(allocator), 
-          members_(key_value_allocator_type(allocator)), 
-          index_(index_allocator_type(allocator))
+    json_object(const allocator_type& alloc)
+        : allocator_holder<allocator_type>(alloc), 
+          members_(key_value_allocator_type(alloc)), 
+          index_(index_allocator_type(alloc))
     {
     }
 
@@ -1161,17 +1161,17 @@ public:
     {
     }
 
-    json_object(const json_object& val, const allocator_type& allocator) 
-        : allocator_holder<allocator_type>(allocator), 
-          members_(val.members_,key_value_allocator_type(allocator)),
-          index_(val.index_,index_allocator_type(allocator))
+    json_object(const json_object& val, const allocator_type& alloc) 
+        : allocator_holder<allocator_type>(alloc), 
+          members_(val.members_,key_value_allocator_type(alloc)),
+          index_(val.index_,index_allocator_type(alloc))
     {
     }
 
-    json_object(json_object&& val,const allocator_type& allocator) 
-        : allocator_holder<allocator_type>(allocator), 
-          members_(std::move(val.members_),key_value_allocator_type(allocator)),
-          index_(std::move(val.index_),index_allocator_type(allocator))
+    json_object(json_object&& val,const allocator_type& alloc) 
+        : allocator_holder<allocator_type>(alloc), 
+          members_(std::move(val.members_),key_value_allocator_type(alloc)),
+          index_(std::move(val.index_),index_allocator_type(alloc))
     {
     }
 
@@ -1212,10 +1212,10 @@ public:
 
     template<class InputIt>
     json_object(InputIt first, InputIt last, 
-                const allocator_type& allocator)
-        : allocator_holder<allocator_type>(allocator), 
-          members_(key_value_allocator_type(allocator)), 
-          index_(index_allocator_type(allocator))
+                const allocator_type& alloc)
+        : allocator_holder<allocator_type>(alloc), 
+          members_(key_value_allocator_type(alloc)), 
+          index_(index_allocator_type(alloc))
     {
         size_t count = std::distance(first,last);
         members_.reserve(count);
@@ -1250,10 +1250,10 @@ public:
     }
 
     json_object(std::initializer_list<std::pair<std::basic_string<char_type>,Json>> init, 
-                const allocator_type& allocator = allocator_type())
-        : allocator_holder<allocator_type>(allocator), 
-          members_(key_value_allocator_type(allocator)), 
-          index_(index_allocator_type(allocator))
+                const allocator_type& alloc = allocator_type())
+        : allocator_holder<allocator_type>(alloc), 
+          members_(key_value_allocator_type(alloc)), 
+          index_(index_allocator_type(alloc))
     {
         members_.reserve(init.size());
         for (auto& item : init)

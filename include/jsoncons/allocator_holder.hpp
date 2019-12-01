@@ -15,20 +15,20 @@ class allocator_holder
 public:
     typedef Allocator allocator_type;
 private:
-    allocator_type allocator_;
+    allocator_type alloc_;
 public:
     allocator_holder()
-        : allocator_()
+        : alloc_()
     {
     }
-    allocator_holder(const allocator_type& allocator)
-        : allocator_(allocator)
+    allocator_holder(const allocator_type& alloc)
+        : alloc_(alloc)
     {
     }
 
     allocator_type get_allocator() const
     {
-        return allocator_;
+        return alloc_;
     }
 };
 

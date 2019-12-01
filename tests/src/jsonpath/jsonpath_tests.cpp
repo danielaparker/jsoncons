@@ -1071,19 +1071,19 @@ TEST_CASE("test_jsonpath_string_indexation")
     json val;
     val["about"] = "I\xe2\x82\xacJ";
 
-    json expected1 = json::array(1,"I");
+    json expected1 = json::make_array<1>(1,"I");
     json result1 = jsonpath::json_query(val, "$..about[0]");
     CHECK(result1 == expected1);
 
-    json expected2 = json::array(1,"\xe2\x82\xac");
+    json expected2 = json::make_array<1>(1,"\xe2\x82\xac");
     json result2 = jsonpath::json_query(val, "$..about[1]");
     CHECK(result2 == expected2);
 
-    json expected3 = json::array(1,"J");
+    json expected3 = json::make_array<1>(1,"J");
     json result3 = jsonpath::json_query(val, "$..about[2]");
     CHECK(result3 == expected3);
 
-    json expected4 = json::array(1,3);
+    json expected4 = json::make_array<1>(1,3);
     json result4 = jsonpath::json_query(val, "$..about.length");
     CHECK(result4 == expected4);
 }
