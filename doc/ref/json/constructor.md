@@ -3,95 +3,75 @@
 ```c++
 basic_json(); // (1)
 
-basic_json(const allocator_type& allocator); // (2)
+basic_json(const basic_json& other); // (2)
 
-basic_json(const basic_json& other); // (3)
+basic_json(const basic_json& other, const allocator_type& allocator); // (3)
 
-basic_json(const basic_json& other, const allocator_type& allocator); // (4)
+basic_json(basic_json&& other) noexcept; // (4)
 
-basic_json(basic_json&& other) noexcept; // (5)
-
-basic_json(basic_json&& other, const allocator_type& allocator) noexcept; // (6)
+basic_json(basic_json&& other, const allocator_type& allocator) noexcept; // (5)
 
 explicit basic_json(json_object_arg_t, 
                     semantic_tag tag = semantic_tag::none, 
-                    const Allocator& alloc = Allocator()); 
+                    const Allocator& alloc = Allocator()); // (6) 
 
 basic_json(json_object_arg_t, 
            std::initializer_list<array> init, 
            semantic_tag tag = semantic_tag::none, 
-           const Allocator& alloc = Allocator()); 
+           const Allocator& alloc = Allocator()); // (7)
 
 explicit basic_json(json_array_arg_t, 
                     semantic_tag tag = semantic_tag::none, 
-                    const Allocator& alloc = Allocator());
+                    const Allocator& alloc = Allocator()); // (8)
 
 basic_json(json_array_arg_t, 
            std::initializer_list<basic_json> init, 
            semantic_tag tag = semantic_tag::none, 
-           const Allocator& alloc = Allocator());
-
-basic_json(const array& val, semantic_tag tag = semantic_tag::none); // (7)
-
-basic_json(array&& val, semantic_tag tag = semantic_tag::none) noexcept; // (8)
-
-basic_json(const object& val, semantic_tag tag = semantic_tag::none); // (9)
-
-basic_json(object&& val, semantic_tag tag = semantic_tag::none) noexcept; // (10)
+           const Allocator& alloc = Allocator()); // (9)
 
 template <class T>
-basic_json(const T& val); // (11)
+basic_json(const T& val); // (10)
 
 template <class T>
-basic_json(const T& val, const allocator_type& allocator); // (12)
+basic_json(const T& val, const allocator_type& allocator); // (11)
 
-basic_json(const char_type* val); // (13)
+basic_json(const char_type* val); // (12)
 
-basic_json(const char_type* val, const allocator_type& allocator); // (14)
+basic_json(const char_type* val, const allocator_type& allocator); // (13)
 
 basic_json(const byte_string_view& bs,
-           semantic_tag tag = semantic_tag::none); // (15)
+           semantic_tag tag = semantic_tag::none); // (14)
 
 basic_json(const byte_string_view& bs, 
            semantic_tag tag = semantic_tag::none, 
-           const allocator_type& allocator); // (16)
+           const allocator_type& allocator); // (15)
 
-basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none); // (17)
+basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none); // (16)
 ```
 
 (1) Constructs a `basic_json` value that holds an empty basic_json object. 
 
-(2) Constructs a `basic_json` value that holds a basic_json object. 
+(2) Constructs a copy of val
 
-(3) Constructs a copy of val
+(3) Copy with allocator
 
-(4) Copy with allocator
+(4) Acquires the contents of val, leaving val a `null` value
 
-(5) Acquires the contents of val, leaving val a `null` value
+(5) Move with allocator
 
-(6) Move with allocator
+(10) Constructs a `basic_json` value for types supported in [json_type_traits](json_type_traits.md).
 
-(7) Constructs a `basic_json` value from a basic_json array
+(11) Constructs a `basic_json` value for types supported in [json_type_traits](json_type_traits.md) with allocator.
 
-(8) Acquires the contents of a basic_json array
+(12) Constructs a `basic_json` value for a text string.
 
-(9) Constructs a `basic_json` value from a basic_json object
+(13) Constructs a `basic_json` value for a text string with supplied allocator.
 
-(10) Acquires the contents of a basic_json object
+(14) Constructs a `basic_json` value for a [byte_string](../byte_string.md).
 
-(11) Constructs a `basic_json` value for types supported in [json_type_traits](json_type_traits.md).
+(15) Constructs a `basic_json` value for a [byte_string](../byte_string.md) with supplied allocator.
 
-(12) Constructs a `basic_json` value for types supported in [json_type_traits](json_type_traits.md) with allocator.
-
-(13) Constructs a `basic_json` value for a text string.
-
-(14) Constructs a `basic_json` value for a text string with supplied allocator.
-
-(15) Constructs a `basic_json` value for a [byte_string](../byte_string.md).
-
-(16) Constructs a `basic_json` value for a [byte_string](../byte_string.md) with supplied allocator.
-
-(17) Constructs a `basic_json` value for a half precision floating point number.
+(16) Constructs a `basic_json` value for a half precision floating point number.
 
 ### Examples
 
