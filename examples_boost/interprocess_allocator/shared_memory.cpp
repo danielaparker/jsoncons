@@ -41,18 +41,14 @@ int main(int argc, char *argv[])
                                                          "MySharedMemory", 65536);
 
       //Initialize shared memory STL-compatible allocator
-      const shmem_allocator allocator(segment.get_segment_manager());
+      const shmem_allocator alloc(segment.get_segment_manager());
 
       // Create json value with all dynamic allocations in shared memory
 
-      shm_json* j = segment.construct<shm_json>("my json")(shm_json::array(allocator));
+      shm_json* j = segment.construct<shm_json>("my json")(shm_json(json_array_arg, semantic_tag::none, alloc));
       j->push_back(10);
 
-      shm_json o(allocator);
-      //o.try_emplace("category", "reference",allocator);
-      //o.try_emplace("author", "Nigel Rees",allocator);
-      //o.try_emplace("title", "Sayings of the Century",allocator);
-      //o.try_emplace("price", 8.95, allocator);
+      shm_json o(json_object_arg, semantic_tag::none, alloc);
       o.insert_or_assign("category", "reference");
       o.insert_or_assign("author", "Nigel Rees");
       o.insert_or_assign("title", "Sayings of the Century");
@@ -60,7 +56,7 @@ int main(int argc, char *argv[])
 
       j->push_back(o);
 
-      shm_json a = shm_json::array(2,shm_json::object(allocator),allocator);
+      shm_json a = shm_json::array(2,shm_json(json_object_arg, semantic_tag::none, alloc),alloc);
       a[0]["first"] = 1;
 
       j->push_back(a);

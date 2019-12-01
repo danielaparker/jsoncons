@@ -2865,15 +2865,15 @@ public:
     {
     }
 
-//#if !defined(JSONCONS_NO_DEPRECATED)
+#if !defined(JSONCONS_NO_DEPRECATED)
 
-    //JSONCONS_DEPRECATED_MSG("Instead, use basic_json(json_object_t,const Allocator&)")
+    JSONCONS_DEPRECATED_MSG("Instead, use basic_json(json_object_t,semantic_tag,const Allocator&)")
     explicit basic_json(const Allocator& allocator, semantic_tag tag = semantic_tag::none) 
         : var_(object(allocator),tag)
     {
     }
 
-//#endif
+#endif
 
     basic_json(const basic_json& val)
         : var_(val.var_)

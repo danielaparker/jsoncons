@@ -196,9 +196,9 @@ namespace jsoncons \
             JSONCONS_VARIADIC_REP_N(As, Prefix,,, __VA_ARGS__) \
             return aval; \
         } \
-        static Json to_json(const value_type& aval, allocator_type allocator=allocator_type()) \
+        static Json to_json(const value_type& aval, allocator_type alloc=allocator_type()) \
         { \
-            Json ajson(allocator); \
+            Json ajson(json_object_arg, semantic_tag::none, alloc); \
             JSONCONS_VARIADIC_REP_N(JSONCONS_TO_JSON, Prefix,,, __VA_ARGS__) \
             return ajson; \
         } \
@@ -295,9 +295,9 @@ namespace jsoncons \
             JSONCONS_VARIADIC_REP_N(As,,,, __VA_ARGS__) \
             return aval; \
         } \
-        static Json to_json(const value_type& aval, allocator_type allocator=allocator_type()) \
+        static Json to_json(const value_type& aval, allocator_type alloc=allocator_type()) \
         { \
-            Json ajson(allocator); \
+            Json ajson(json_object_arg, semantic_tag::none, alloc); \
             JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_TO_JSON,,,, __VA_ARGS__) \
             return ajson; \
         } \
@@ -374,9 +374,9 @@ namespace jsoncons \
         { \
             return value_type ( JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_AS, Prefix,,, __VA_ARGS__) ); \
         } \
-        static Json to_json(const value_type& aval, allocator_type allocator=allocator_type()) \
+        static Json to_json(const value_type& aval, allocator_type alloc=allocator_type()) \
         { \
-            Json ajson(allocator); \
+            Json ajson(json_object_arg, semantic_tag::none, alloc); \
             JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_TO_JSON, Prefix,,, __VA_ARGS__) \
             return ajson; \
         } \
@@ -437,9 +437,9 @@ namespace jsoncons \
         { \
             return value_type ( JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_NAMED_AS,,,, __VA_ARGS__) ); \
         } \
-        static Json to_json(const value_type& aval, allocator_type allocator=allocator_type()) \
+        static Json to_json(const value_type& aval, allocator_type alloc=allocator_type()) \
         { \
-            Json ajson(allocator); \
+            Json ajson(json_object_arg, semantic_tag::none, alloc); \
             JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_NAMED_TO_JSON,,,, __VA_ARGS__) \
             return ajson; \
         } \
@@ -535,7 +535,7 @@ namespace jsoncons \
             } \
             return it->first; \
         } \
-        static Json to_json(value_type aval, allocator_type allocator=allocator_type()) \
+        static Json to_json(value_type aval, allocator_type alloc=allocator_type()) \
         { \
             static constexpr CharT empty_string[] = {0}; \
             auto first = get_values().first; \
@@ -554,7 +554,7 @@ namespace jsoncons \
                     JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
                 } \
             } \
-            return Json(it->second,allocator); \
+            return Json(it->second,alloc); \
         } \
     }; \
 } \
@@ -639,7 +639,7 @@ namespace jsoncons \
             } \
             return it->first; \
         } \
-        static Json to_json(value_type aval, allocator_type allocator=allocator_type()) \
+        static Json to_json(value_type aval, allocator_type alloc=allocator_type()) \
         { \
             static constexpr char_type empty_string[] = {0}; \
             auto first = get_values().first; \
@@ -658,7 +658,7 @@ namespace jsoncons \
                     JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
                 } \
             } \
-            return Json(it->second,allocator); \
+            return Json(it->second,alloc); \
         } \
     }; \
 } \
@@ -700,9 +700,9 @@ namespace jsoncons \
             JSONCONS_VARIADIC_REP_N(As, Prefix,GetPrefix,SetPrefix, __VA_ARGS__) \
             return aval; \
         } \
-        static Json to_json(const value_type& aval, allocator_type allocator=allocator_type()) \
+        static Json to_json(const value_type& aval, allocator_type alloc=allocator_type()) \
         { \
-            Json ajson(allocator); \
+            Json ajson(json_object_arg, semantic_tag::none, alloc); \
             JSONCONS_VARIADIC_REP_N(JSONCONS_PROPERTY_TO_JSON, Prefix,GetPrefix,SetPrefix, __VA_ARGS__) \
             return ajson; \
         } \
@@ -783,9 +783,9 @@ namespace jsoncons \
             JSONCONS_VARIADIC_REP_N(As,,,, __VA_ARGS__) \
             return aval; \
         } \
-        static Json to_json(const value_type& aval, allocator_type allocator=allocator_type()) \
+        static Json to_json(const value_type& aval, allocator_type alloc=allocator_type()) \
         { \
-            Json ajson(allocator); \
+            Json ajson(json_object_arg, semantic_tag::none, alloc); \
             JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_SETTER_TO_JSON,,,, __VA_ARGS__) \
             return ajson; \
         } \
