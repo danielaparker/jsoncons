@@ -1849,18 +1849,18 @@ namespace jc=jsoncons;
 
 int main()
 {
-    byte_string bs = {'H','e','l','l','o'};
+    std::vector<uint8_t> bytes = {'H','e','l','l','o'};
 
     // default suggested encoding (base64url)
-    json j1(bs);
+    json j1(json_bstr_arg, bytes);
     std::cout << "(1) "<< j1 << "\n\n";
 
     // base64 suggested encoding
-    json j2(bs, semantic_tag::base64);
+    json j2(json_bstr_arg, bytes, semantic_tag::base64);
     std::cout << "(2) "<< j2 << "\n\n";
 
     // base16 suggested encoding
-    json j3(bs, semantic_tag::base16);
+    json j3(json_bstr_arg, bytes, semantic_tag::base16);
     std::cout << "(3) "<< j3 << "\n\n";
 }
 ```
@@ -2057,26 +2057,22 @@ namespace jc=jsoncons;
 int main()
 {
     json j;
-    j["ByteString"] = byte_string({'H','e','l','l','o'});
+    j["ByteString"] = json(json_bstr_arg, std::vector<uint8_t>{ 'H','e','l','l','o' });
     j["EncodedByteString"] = json("SGVsbG8=", semantic_tag::base64);
 
     std::cout << "(1)\n";
     std::cout << pretty_print(j) << "\n\n";
 
-    // Retrieve a byte string as a jsoncons::byte_string
-    byte_string bs1 = j["ByteString"].as<byte_string>();
-    std::cout << "(2) " << bs1 << "\n\n";
-
-    // or alternatively as a std::vector<uint8_t>
+    // Retrieve a byte string as a std::vector<uint8_t>
     std::vector<uint8_t> v = j["ByteString"].as<std::vector<uint8_t>>();
 
     // Retrieve a byte string from a text string containing base64 character values
     byte_string bs2 = j["EncodedByteString"].as<byte_string>();
-    std::cout << "(3) " << bs2 << "\n\n";
+    std::cout << "(2) " << bs2 << "\n\n";
 
     // Retrieve a byte string view  to access the memory that's holding the byte string
     byte_string_view bsv3 = j["ByteString"].as<byte_string_view>();
-    std::cout << "(4) " << bsv3 << "\n\n";
+    std::cout << "(3) " << bsv3 << "\n\n";
 
     // Can't retrieve a byte string view of a text string 
     try
@@ -2085,7 +2081,7 @@ int main()
     }
     catch (const std::exception& e)
     {
-        std::cout << "(5) "<< e.what() << "\n\n";
+        std::cout << "(4) "<< e.what() << "\n\n";
     }
 }
 ```
@@ -2101,9 +2097,7 @@ Output:
 
 (3) 48 65 6c 6c 6f
 
-(4) 48 65 6c 6c 6f
-
-(5) Not a byte string
+(4) Not a byte string
 ```
 
 ### Search and Replace
