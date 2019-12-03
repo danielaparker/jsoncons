@@ -15,42 +15,54 @@ explicit basic_json(json_object_arg_t,
                     semantic_tag tag = semantic_tag::none, 
                     const Allocator& alloc = Allocator()); // (6) 
 
+template<class InputIt>
 basic_json(json_object_arg_t, 
-           std::initializer_list<array> init, 
+           InputIt first, InputIt last, 
+           semantic_tag tag = semantic_tag::none,
+           const Allocator& alloc = Allocator()); // (7) 
+
+basic_json(json_object_arg_t, 
+           std::initializer_list<std::pair<std::basic_string<char_type>,basic_json>> init, 
            semantic_tag tag = semantic_tag::none, 
-           const Allocator& alloc = Allocator()); // (7)
+           const Allocator& alloc = Allocator()); // (8)
 
 explicit basic_json(json_array_arg_t, 
                     semantic_tag tag = semantic_tag::none, 
-                    const Allocator& alloc = Allocator()); // (8)
+                    const Allocator& alloc = Allocator()); // (9)
+
+template<class InputIt>
+basic_json(json_array_arg_t, 
+           InputIt first, InputIt last, 
+           semantic_tag tag = semantic_tag::none, 
+           const Allocator& alloc = Allocator()); // (10) 
 
 basic_json(json_array_arg_t, 
            std::initializer_list<basic_json> init, 
            semantic_tag tag = semantic_tag::none, 
-           const Allocator& alloc = Allocator()); // (9)
+           const Allocator& alloc = Allocator()); // (11)
 
 template <class T>
-basic_json(const T& val); // (10)
+basic_json(const T& val); // (12)
 
 template <class T>
-basic_json(const T& val, const allocator_type& allocator); // (11)
+basic_json(const T& val, const allocator_type& allocator); // (13)
 
-basic_json(const char_type* val); // (12)
+basic_json(const char_type* val); // (14)
 
-basic_json(const char_type* val, const allocator_type& allocator); // (13)
+basic_json(const char_type* val, const allocator_type& allocator); // (15)
 
 basic_json(const byte_string_view& bs, 
            semantic_tag tag = semantic_tag::none, 
-           const Allocator& allocator = Allocator()); // (14)
+           const Allocator& allocator = Allocator()); // (16)
 
 basic_json(json_bstr_arg_t, const jsoncons::span<const uint8_t>& bytes, 
            semantic_tag tag = semantic_tag::none,
-           const Allocator& alloc = Allocator()); // (15)
+           const Allocator& alloc = Allocator()); // (17)
 
-basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none); // (15)
+basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none); // (18)
 ```
 
-(1) Constructs a `basic_json` value that holds an empty basic_json object. 
+(1) Constructs an empty json object. 
 
 (2) Constructs a copy of val
 
@@ -60,19 +72,37 @@ basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none); /
 
 (5) Move with allocator
 
-(10) Constructs a `basic_json` value for types supported in [json_type_traits](json_type_traits.md).
+(6) Constructs a json object with the provided [semantic_tag](../semantic_tag.md) and allocator.
 
-(11) Constructs a `basic_json` value for types supported in [json_type_traits](json_type_traits.md) with allocator.
+(7) Constructs a json object with the contents of the range `[first,last]`.
 
-(12) Constructs a `basic_json` value for a text string.
+(8) Constructs a json object with the contents of the initializer list `init`.
 
-(13) Constructs a `basic_json` value for a text string with supplied allocator.
+(6)-(8) use [json_object_arg_t](../json_object_arg_t.md) as first argument to disambiguate overloads that construct json objects.
 
-(14) Constructs a `basic_json` value for a [byte_string](../byte_string.md).
+(9) Constructs a json array with the provided [semantic_tag](../semantic_tag.md) and allocator.
 
-(15) Constructs a `basic_json` value for a byte string from any container of `utf8_t`.
+(9)-(11) use [json_array_arg_t](../json_aray_arg_t.md) as first argument to disambiguate overloads that construct json objects.
 
-(16) Constructs a `basic_json` value for a half precision floating point number.
+(10) Constructs a json array with the contents of the range `[first,last]`.
+
+(11) Constructs a json array with the contents of the initializer list `init`.
+
+(12) Constructs a `basic_json` value for types supported in [json_type_traits](json_type_traits.md).
+
+(13) Constructs a `basic_json` value for types supported in [json_type_traits](json_type_traits.md) with allocator.
+
+(14) Constructs a `basic_json` value for a text string.
+
+(15) Constructs a `basic_json` value for a text string with supplied allocator.
+
+(16) Constructs a `basic_json` value for a [byte_string](../byte_string.md).
+
+(17) Constructs a `basic_json` value for a byte string from any container of `utf8_t` values.
+(17) uses [json_bstr_arg_t](../json_bstr_arg_t.md) as first argument to disambiguate overloads that construct byte strings.
+
+(18) Constructs a `basic_json` value for a half precision floating point number.
+(17) uses [json_half_arg_t](../json_half_arg_t.md) as first argument to disambiguate overloads that construct half precision floating point numbers.
 
 ### Examples
 

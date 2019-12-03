@@ -78,7 +78,7 @@ struct json_type_traits
         static_assert(unimplemented<T>::value, "as not implemented");
     }
 
-    static Json to_json(const T&, allocator_type = allocator_type())
+    static Json to_json(const T&, const allocator_type& = allocator_type())
     {
         static_assert(unimplemented<T>::value, "to_json not implemented");
     }
@@ -432,7 +432,7 @@ struct json_type_traits<Json, typename Json::object>
     {
         return j.is_object();
     }
-    static Json to_json(const json_object& o)
+    static Json to_json(const json_object& o, const allocator_type& = allocator_type())
     {
         return Json(o,semantic_tag::none);
     }
@@ -448,7 +448,7 @@ struct json_type_traits<Json, typename Json::array>
     {
         return j.is_array();
     }
-    static Json to_json(const json_array& a)
+    static Json to_json(const json_array& a, const allocator_type& = allocator_type())
     {
         return Json(a, semantic_tag::none);
     }

@@ -415,18 +415,18 @@ public:
         // byte_string_holder
         class byte_string_holder final : public holder_base
         {
-            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<byte_string_storage_type> byte_string_allocator_type;
-            typedef typename std::allocator_traits<byte_string_allocator_type>::pointer pointer;
+            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<byte_string_storage_type> byte_allocator_type;
+            typedef typename std::allocator_traits<byte_allocator_type>::pointer pointer;
 
             pointer ptr_;
 
             template <typename... Args>
-            void create(byte_string_allocator_type alloc, Args&& ... args)
+            void create(byte_allocator_type alloc, Args&& ... args)
             {
                 ptr_ = alloc.allocate(1);
                 JSONCONS_TRY
                 {
-                    std::allocator_traits<byte_string_allocator_type>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                    std::allocator_traits<byte_allocator_type>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 JSONCONS_CATCH(...)
                 {
@@ -441,7 +441,7 @@ public:
                              const Allocator& a)
                 : holder_base(value_kind::byte_string_value, semantic_type)
             {
-                create(byte_string_allocator_type(a), data, data+length, a);
+                create(byte_allocator_type(a), data, data+length, a);
             }
 
             byte_string_holder(const byte_string_holder& val)
@@ -459,15 +459,15 @@ public:
             byte_string_holder(const byte_string_holder& val, const Allocator& a)
                 : holder_base(val.ext_type())
             { 
-                create(byte_string_allocator_type(a), *(val.ptr_), a);
+                create(byte_allocator_type(a), *(val.ptr_), a);
             }
 
             ~byte_string_holder()
             {
                 if (ptr_ != nullptr)
                 {
-                    byte_string_allocator_type alloc(ptr_->get_allocator());
-                    std::allocator_traits<byte_string_allocator_type>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
+                    byte_allocator_type alloc(ptr_->get_allocator());
+                    std::allocator_traits<byte_allocator_type>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
                     alloc.deallocate(ptr_,1);
                 }
             }
@@ -2916,18 +2916,18 @@ public:
     {
     }
 
+    explicit basic_json(json_array_arg_t, 
+                        semantic_tag tag = semantic_tag::none, 
+                        const Allocator& alloc = Allocator()) 
+        : var_(array(alloc), tag)
+    {
+    }
+
     basic_json(json_object_arg_t, 
                std::initializer_list<std::pair<std::basic_string<char_type>,basic_json>> init, 
                semantic_tag tag = semantic_tag::none, 
                const Allocator& alloc = Allocator()) 
         : var_(object(init,alloc), tag)
-    {
-    }
-
-    explicit basic_json(json_array_arg_t, 
-                        semantic_tag tag = semantic_tag::none, 
-                        const Allocator& alloc = Allocator()) 
-        : var_(array(alloc), tag)
     {
     }
 
