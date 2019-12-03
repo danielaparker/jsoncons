@@ -99,10 +99,10 @@ basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none); /
 (16) Constructs a `basic_json` value for a [byte_string](../byte_string.md).
 
 (17) Constructs a `basic_json` value for a byte string from any container of `utf8_t` values.
-(17) uses [json_bstr_arg_t](../json_bstr_arg_t.md) as first argument to disambiguate overloads that construct byte strings.
+Uses [json_bstr_arg_t](../json_bstr_arg_t.md) as first argument to disambiguate overloads that construct byte strings.
 
 (18) Constructs a `basic_json` value for a half precision floating point number.
-(17) uses [json_half_arg_t](../json_half_arg_t.md) as first argument to disambiguate overloads that construct half precision floating point numbers.
+Uses [json_half_arg_t](../json_half_arg_t.md) as first argument to disambiguate overloads that construct half precision floating point numbers.
 
 ### Examples
 
