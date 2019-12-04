@@ -1,3 +1,19 @@
+master
+------
+
+Name change:
+
+- The names `JSONCONS_ALL_PROPERTY_TRAITS_DECL`, `JSONCONS_N_PROPERTY_TRAITS_DECL`,
+`JSONCONS_TPL_ALL_PROPERTY_TRAITS_DECL` and `JSONCONS_N_PROPERTY_TRAITS_DECL`  
+have been deprecated and renamed to `JSONCONS_ALL_GETTER_SETTER_TRAITS_DECL`, 
+`JSONCONS_N_GETTER_SETTER_TRAITS_DECL`,`JSONCONS_TPL_ALL_GETTER_SETTER_TRAITS_DECL` 
+and `JSONCONS_TPL_N_GETTER_SETTER_TRAITS_DECL`. Rationale: naming consistency.  
+
+Enhancements:
+
+- New tag types `json_object_arg_t`, `json_array_arg_t` and `bstr_arg_t`
+have been introduced that make it simpler to construct `basic_json` values.
+
 v0.140.0
 --------
 

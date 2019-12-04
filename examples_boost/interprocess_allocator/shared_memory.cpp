@@ -57,9 +57,9 @@ int f1(int argc, char *argv[])
       //my_json a = my_json::array(2,my_json(json_object_arg, semantic_tag::none, alloc),alloc);
       //a[0]["first"] = 1;
 
-      my_json a(json_array_arg, semantic_tag::none, alloc);
+      //my_json a(json_array_arg, semantic_tag::none, alloc);
 
-      j->push_back(a);
+      //j->push_back(a);
 
       std::pair<my_json*, boost::interprocess::managed_shared_memory::size_type> res;
       res = segment.find<my_json>("MyJson1");
@@ -170,6 +170,6 @@ int f2(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-   return f2(argc, argv);
+   return f1(argc, argv);
 }
 
