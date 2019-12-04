@@ -35,8 +35,8 @@ void retrieve_json_value_as_byte_string()
     std::vector<uint8_t> v = j["ByteString"].as<std::vector<uint8_t>>();
 
     // Retrieve a byte string from a text string containing base64 character values
-    byte_string bs2 = j["EncodedByteString"].as<byte_string>();
-    std::cout << "(2) " << bs2 << "\n\n";
+    byte_string bytes2 = j["EncodedByteString"].as<byte_string>();
+    std::cout << "(2) " << bytes2 << "\n\n";
 
     // Retrieve a byte string view  to access the memory that's holding the byte string
     byte_string_view bsv3 = j["ByteString"].as<byte_string_view>();
