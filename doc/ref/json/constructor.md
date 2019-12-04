@@ -5,11 +5,11 @@ basic_json(); // (1)
 
 basic_json(const basic_json& other); // (2)
 
-basic_json(const basic_json& other, const allocator_type& allocator); // (3)
+basic_json(const basic_json& other, const allocator_type& alloc); // (3)
 
 basic_json(basic_json&& other) noexcept; // (4)
 
-basic_json(basic_json&& other, const allocator_type& allocator) noexcept; // (5)
+basic_json(basic_json&& other, const allocator_type& alloc) noexcept; // (5)
 
 explicit basic_json(json_object_arg_t, 
                     semantic_tag tag = semantic_tag::none, 
@@ -45,15 +45,15 @@ template <class T>
 basic_json(const T& val); // (12)
 
 template <class T>
-basic_json(const T& val, const allocator_type& allocator); // (13)
+basic_json(const T& val, const allocator_type& alloc); // (13)
 
 basic_json(const char_type* val); // (14)
 
-basic_json(const char_type* val, const allocator_type& allocator); // (15)
+basic_json(const char_type* val, const allocator_type& alloc); // (15)
 
 basic_json(const byte_string_view& bytes, 
            semantic_tag tag = semantic_tag::none, 
-           const Allocator& allocator = Allocator()); // (16)
+           const Allocator& alloc = Allocator()); // (16)
 
 basic_json(bstr_arg_t, const jsoncons::span<const uint8_t>& bytes, 
            semantic_tag tag = semantic_tag::none,

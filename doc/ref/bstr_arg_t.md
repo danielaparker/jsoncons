@@ -6,7 +6,7 @@ Defined in header `jsoncons/tag_type.hpp`
 struct bstr_arg_t {};
 ```
 
-`bstr_arg_t` is an empty class type used to disambiguate function overloads for byte strings.
+`bstr_arg_t` is an empty class type used to disambiguate constructor overloads for byte strings.
 
 ### See also
 

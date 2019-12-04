@@ -36,47 +36,47 @@ string_view_type           |
 
     template <class Source>
     explicit basic_json_reader(Source&& source, 
-                               const WorkAllocator& allocator = WorkAllocator()); // (1)
+                               const WorkAllocator& alloc = WorkAllocator()); // (1)
 
     template <class Source>
     basic_json_reader(Source&& source, 
                       const basic_json_options<CharT>& options, 
-                      const WorkAllocator& allocator = WorkAllocator()); // (2)
+                      const WorkAllocator& alloc = WorkAllocator()); // (2)
 
     template <class Source>
     basic_json_reader(Source&& source,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
-                      const WorkAllocator& allocator = WorkAllocator()); // (3)
+                      const WorkAllocator& alloc = WorkAllocator()); // (3)
 
     template <class Source>
     basic_json_reader(Source&& source, 
                       const basic_json_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
-                      const WorkAllocator& allocator = WorkAllocator()); // (4)
+                      const WorkAllocator& alloc = WorkAllocator()); // (4)
 
     template <class Source>
     basic_json_reader(Source&& source, 
                       basic_json_content_handler<CharT>& handler, 
-                      const WorkAllocator& allocator = WorkAllocator()); // (5)
+                      const WorkAllocator& alloc = WorkAllocator()); // (5)
 
     template <class Source>
     basic_json_reader(Source&& source, 
                       basic_json_content_handler<CharT>& handler,
                       const basic_json_options<CharT>& options, 
-                      const WorkAllocator& allocator = WorkAllocator()); // (6)
+                      const WorkAllocator& alloc = WorkAllocator()); // (6)
 
     template <class Source>
     basic_json_reader(Source&& source,
                       basic_json_content_handler<CharT>& handler,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
-                      const WorkAllocator& allocator = WorkAllocator()); // (7)
+                      const WorkAllocator& alloc = WorkAllocator()); // (7)
 
     template <class Source>
     basic_json_reader(Source&& source,
                       basic_json_content_handler<CharT>& handler, 
                       const basic_json_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
-                      const WorkAllocator& allocator = WorkAllocator()); // (8)
+                      const WorkAllocator& alloc = WorkAllocator()); // (8)
 
 Constructors (1)-(4) use a default [basic_json_content_handler](basic_json_content_handler.md) that discards the JSON parse events, and are for validation only.
 

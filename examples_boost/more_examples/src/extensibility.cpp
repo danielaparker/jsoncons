@@ -40,9 +40,9 @@ namespace jsoncons {
         }
 
         static Json to_json(boost::gregorian::date val, 
-                            typename Json::allocator_type allocator = Json::allocator_type())
+                            typename Json::allocator_type alloc = Json::allocator_type())
         {
-            return Json(to_iso_extended_string(val), allocator);
+            return Json(to_iso_extended_string(val), alloc);
         }
     };
 
@@ -139,7 +139,7 @@ namespace jsoncons {
         }
 
         static Json to_json(const boost::numeric::ublas::matrix<T>& val,
-                            allocator_type allocator = allocator_type())
+                            allocator_type alloc = allocator_type())
         {
             Json a = Json::template make_array<2>(val.size1(), val.size2(), T());
             for (size_t i = 0; i < val.size1(); ++i)

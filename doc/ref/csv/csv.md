@@ -149,9 +149,9 @@ struct json_type_traits<Json,boost::gregorian::date>
         return boost::gregorian::from_simple_string(s);
     }
     static Json to_json(boost::gregorian::date val, 
-                        typename Json::allocator_type allocator = Json::allocator_type())
+                        typename Json::allocator_type alloc = Json::allocator_type())
     {
-        return Json(to_iso_extended_string(val), allocator);
+        return Json(to_iso_extended_string(val), alloc);
     }
 };
 

@@ -6,7 +6,7 @@ Defined in header `jsoncons/tag_type.hpp`
 struct json_object_arg_t {};
 ```
 
-`json_object_arg_t` is an empty class type used to disambiguate function overloads for json objects.
+`json_object_arg_t` is an empty class type used to disambiguate constructor overloads for json objects.
 
 ### See also
 
