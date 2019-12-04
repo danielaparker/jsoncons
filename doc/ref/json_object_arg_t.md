@@ -1,5 +1,7 @@
 ### jsoncons::json_object_arg_t 
 
+Defined in header `jsoncons/tag_type.hpp`
+
 ```c++
 struct json_object_arg_t {};
 ```

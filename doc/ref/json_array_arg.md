@@ -1,5 +1,7 @@
 ### jsoncons::json_array_arg
 
+Defined in header `jsoncons/tag_type.hpp`
+
 ```c++
 constexpr json_array_arg_t json_array_arg = json_array_arg_t();
 ```

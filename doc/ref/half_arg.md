@@ -1,5 +1,7 @@
 ### jsoncons::half_arg
 
+Defined in header `jsoncons/tag_type.hpp`
+
 ```c++
 constexpr half_arg_t half_arg = half_arg_t();
 ```

@@ -1,5 +1,7 @@
 ### jsoncons::half_arg_t 
 
+Defined in header `jsoncons/tag_type.hpp`
+
 ```c++
 struct half_arg_t {};
 ```
