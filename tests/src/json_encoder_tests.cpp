@@ -13,15 +13,15 @@ using namespace jsoncons;
 
 TEST_CASE("test_byte_string_serialization")
 {
-    std::vector<uint8_t> bs = {'H','e','l','l','o'};
-    json j(byte_string_view(bs.data(), bs.size()));
+    std::vector<uint8_t> bytes = {'H','e','l','l','o'};
+    json j(byte_string_view(bytes.data(), bytes.size()));
 
     std::ostringstream os;
     os << j;
 
     std::string expected; 
     expected.push_back('\"');
-    encode_base64url(bs.begin(),bs.end(),expected);
+    encode_base64url(bytes.begin(),bytes.end(),expected);
     expected.push_back('\"');
 
     //std::cout << expected << " " << os.str() << std::endl;

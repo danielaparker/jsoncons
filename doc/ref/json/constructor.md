@@ -51,7 +51,7 @@ basic_json(const char_type* val); // (14)
 
 basic_json(const char_type* val, const allocator_type& allocator); // (15)
 
-basic_json(const byte_string_view& bs, 
+basic_json(const byte_string_view& bytes, 
            semantic_tag tag = semantic_tag::none, 
            const Allocator& allocator = Allocator()); // (16)
 
@@ -85,6 +85,7 @@ basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none); /
 (9)-(11) use [json_array_arg_t](../json_aray_arg_t.md) as first argument to disambiguate overloads that construct json objects.
 
 (10) Constructs a json array with the contents of the range `[first,last]`.
+`std::iterator_traits<InputIt>::value_type` must be convertible to `basic_json`. 
 
 (11) Constructs a json array with the contents of the initializer list `init`.
 
@@ -119,7 +120,7 @@ int main()
     json j1; // An empty object
     std::cout << "(1) " << j1 << std::endl;
 
-    json j2 = json(json_object_arg, {{"baz", "qux"}, {"foo", "bar"}}); // An object 
+    json j2(json_object_arg, {{"baz", "qux"}, {"foo", "bar"}}); // An object 
     std::cout << "(2) " << j2 << std::endl;
 
     json j3(json_array_arg, {"bar", "baz"}); // An array 
@@ -136,23 +137,23 @@ int main()
     json j6(x); // A double value
     std::cout << "(6) " << j6 << std::endl;
 
-    json j7(x,4); // A double value with specified precision
-    std::cout << "(7) " << j7 << std::endl;
-
     json j8("Hello"); // A text string
     std::cout << "(8) " << j8 << std::endl;
 
-    std::vector<uint8_t> bytes = {'H','e','l','l','o'};
-    json j9(bstr_arg_t,bytes); // A byte string
+    std::vector<int> v = {10,20,30};
+    json j9 = v; // From a sequence container
     std::cout << "(9) " << j9 << std::endl;
 
-    std::vector<int> v = {10,20,30};
-    json j10 = v; // From a sequence container
+    std::map<std::string, int> m{ {"one", 1}, {"two", 2}, {"three", 3} };
+    json j10 = m; // From an associative container
     std::cout << "(10) " << j10 << std::endl;
 
-    std::map<std::string, int> m{ {"one", 1}, {"two", 2}, {"three", 3} };
-    json j11 = m; // From an associative container
+    std::vector<uint8_t> bytes = {'H','e','l','l','o'};
+    json j11(bstr_arg, bytes); // A byte string
     std::cout << "(11) " << j11 << std::endl;
+
+    json j12(half_arg, 0x3bff);
+    std::cout << "(12) " << j12.as_double() << std::endl;
 }
 ```
 
@@ -162,10 +163,10 @@ int main()
 (3) ["bar","baz"]
 (4) null
 (5) true
-(6) 0.142857142857143
-(7) 0.1429
+(6) 0.14285714285714285
 (8) "Hello"
-(9) "SGVsbG8_"
-(10) [10,20,30]
-(11) {"one":1,"three":3,"two":2}
+(9) [10,20,30]
+(10) {"one":1,"three":3,"two":2}
+(11) "SGVsbG8"
+(12) 0.999512
 ```

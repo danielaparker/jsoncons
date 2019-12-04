@@ -362,7 +362,7 @@ public:
     }
 */
     template <class Allocator>
-    constexpr byte_string_view(const basic_byte_string<Allocator>& bs);
+    constexpr byte_string_view(const basic_byte_string<Allocator>& bytes);
 
     constexpr byte_string_view(const byte_string_view&) noexcept = default;
 
@@ -619,8 +619,8 @@ public:
 };
 
 template <class Allocator>
-constexpr byte_string_view::byte_string_view(const basic_byte_string<Allocator>& bs) 
-    : data_(bs.data()), size_(bs.size())
+constexpr byte_string_view::byte_string_view(const basic_byte_string<Allocator>& bytes) 
+    : data_(bytes.data()), size_(bytes.size())
 {
 }
 

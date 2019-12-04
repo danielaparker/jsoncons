@@ -807,7 +807,7 @@ struct mapped_string
 {
     jsoncons::cbor::detail::cbor_major_type type;
     std::string s;
-    std::vector<uint8_t> bs;
+    std::vector<uint8_t> bytes;
 
     mapped_string(const std::string& s)
         : type(jsoncons::cbor::detail::cbor_major_type::text_string), s(s)
@@ -819,13 +819,13 @@ struct mapped_string
     {
     }
 
-    mapped_string(const std::vector<uint8_t>& bs)
-        : type(jsoncons::cbor::detail::cbor_major_type::byte_string), bs(bs)
+    mapped_string(const std::vector<uint8_t>& bytes)
+        : type(jsoncons::cbor::detail::cbor_major_type::byte_string), bytes(bytes)
     {
     }
 
-    mapped_string(std::vector<uint8_t>&& bs)
-        : type(jsoncons::cbor::detail::cbor_major_type::byte_string), bs(std::move(bs))
+    mapped_string(std::vector<uint8_t>&& bytes)
+        : type(jsoncons::cbor::detail::cbor_major_type::byte_string), bytes(std::move(bytes))
     {
     }
 
@@ -1243,7 +1243,7 @@ private:
                         }
                         case jsoncons::cbor::detail::cbor_major_type::byte_string:
                         {
-                            handle_byte_string(handler, byte_string_view(str.bs.data(),str.bs.size()), ec);
+                            handle_byte_string(handler, byte_string_view(str.bytes.data(),str.bytes.size()), ec);
                             if (ec)
                             {
                                 return;
@@ -1604,7 +1604,7 @@ private:
                         case jsoncons::cbor::detail::cbor_major_type::byte_string:
                         {
                             text_buffer_.clear();
-                            encode_base64url(val.bs.begin(),val.bs.end(),text_buffer_);
+                            encode_base64url(val.bytes.begin(),val.bytes.end(),text_buffer_);
                             more_ = handler.name(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
                             break;
                         }

@@ -74,12 +74,12 @@ Member type                         |Definition
 
 ```c++
 json j(byte_string{'H','e','l','l','o'});
-byte_string bs = j.as<byte_string>();
+byte_string bytes = j.as<byte_string>();
 
-std::cout << "(1) "<< bs << "\n\n";
+std::cout << "(1) "<< bytes << "\n\n";
 
 std::cout << "(2) ";
-for (auto b : bs)
+for (auto b : bytes)
 {
     std::cout << (char)b;
 }
@@ -101,12 +101,12 @@ Output:
 
 ```c++
 json j(byte_string{'H','e','l','l','o'});
-byte_string bs = j.as<byte_string>();
+byte_string bytes = j.as<byte_string>();
 
-std::cout << "(1) "<< bs << "\n\n";
+std::cout << "(1) "<< bytes << "\n\n";
 
 std::cout << "(2) ";
-for (auto b : bs)
+for (auto b : bytes)
 {
     std::cout << (char)b;
 }

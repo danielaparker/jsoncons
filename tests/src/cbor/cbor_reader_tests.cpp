@@ -601,101 +601,101 @@ TEST_CASE("CBOR stringref tag 2")
 
         ojson j = decode_cbor<ojson>(v);
         
-        byte_string bs = j[0].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("1"));
+        byte_string bytes = j[0].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("1"));
         
-        bs = j[1].as<byte_string>(); // 0
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("222"));
+        bytes = j[1].as<byte_string>(); // 0
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("222"));
         
-        bs = j[2].as<byte_string>(); // 1
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("333"));
+        bytes = j[2].as<byte_string>(); // 1
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("333"));
         
-        bs = j[3].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("4"));
+        bytes = j[3].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("4"));
         
-        bs = j[4].as<byte_string>(); // 2
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("555"));
+        bytes = j[4].as<byte_string>(); // 2
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("555"));
         
-        bs = j[5].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("666"));
+        bytes = j[5].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("666"));
         
-        bs = j[6].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("777"));
+        bytes = j[6].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("777"));
         
-        bs = j[7].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("888"));
+        bytes = j[7].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("888"));
         
-        bs = j[8].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("999"));
+        bytes = j[8].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("999"));
 
-        bs = j[9].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("aaa"));
+        bytes = j[9].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("aaa"));
 
-        bs = j[10].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("bbb"));
+        bytes = j[10].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("bbb"));
 
-        bs = j[11].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("ccc"));
+        bytes = j[11].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("ccc"));
 
-        bs = j[12].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("ddd"));
+        bytes = j[12].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("ddd"));
 
-        bs = j[13].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("eee"));
+        bytes = j[13].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("eee"));
 
-        bs = j[14].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("fff"));
+        bytes = j[14].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("fff"));
 
-        bs = j[15].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("ggg"));
+        bytes = j[15].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("ggg"));
 
-        bs = j[16].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("hhh"));
+        bytes = j[16].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("hhh"));
 
-        bs = j[17].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("iii"));
+        bytes = j[17].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("iii"));
 
-        bs = j[18].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("jjj"));
+        bytes = j[18].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("jjj"));
 
-        bs = j[19].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("kkk"));
+        bytes = j[19].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("kkk"));
 
-        bs = j[20].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("lll"));
+        bytes = j[20].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("lll"));
 
-        bs = j[21].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("mmm"));
+        bytes = j[21].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("mmm"));
 
-        bs = j[22].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("nnn"));
+        bytes = j[22].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("nnn"));
 
-        bs = j[23].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("ooo"));
+        bytes = j[23].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("ooo"));
 
-        bs = j[24].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("ppp"));
+        bytes = j[24].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("ppp"));
 
-        bs = j[25].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("qqq"));
+        bytes = j[25].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("qqq"));
 
-        bs = j[26].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("rrr"));
+        bytes = j[26].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("rrr"));
 
-        bs = j[27].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("333"));
+        bytes = j[27].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("333"));
 
-        bs = j[28].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("ssss"));
+        bytes = j[28].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("ssss"));
 
-        bs = j[29].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("qqq"));
+        bytes = j[29].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("qqq"));
 
-        bs = j[30].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("rrr"));
+        bytes = j[30].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("rrr"));
 
-        bs = j[31].as<byte_string>();
-        CHECK(std::string(bs.begin(),bs.end()) == std::string("ssss"));
+        bytes = j[31].as<byte_string>();
+        CHECK(std::string(bytes.begin(),bytes.end()) == std::string("ssss"));
 }
 
 TEST_CASE("CBOR stringref tag 3")

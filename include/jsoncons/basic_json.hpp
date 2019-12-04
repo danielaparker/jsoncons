@@ -3012,7 +3012,7 @@ public:
     {
     }
 
-    basic_json(half_arg_t, uint16_t value, semantic_tag tag)
+    basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none)
         : var_(half_arg, value, tag)
     {
     }

@@ -122,14 +122,14 @@ TEST_CASE("test_byte_string_as_vector")
 
     REQUIRE(a.is_byte_string());
 
-    auto bs = a.as<byte_string>();
+    auto bytes = a.as<byte_string>();
 
-    REQUIRE(5 == bs.size());
-    CHECK('H' == bs[0]);
-    CHECK('e' == bs[1]);
-    CHECK('l' == bs[2]);
-    CHECK('l' == bs[3]);
-    CHECK('o' == bs[4]);
+    REQUIRE(5 == bytes.size());
+    CHECK('H' == bytes[0]);
+    CHECK('e' == bytes[1]);
+    CHECK('l' == bytes[2]);
+    CHECK('l' == bytes[3]);
+    CHECK('o' == bytes[4]);
 }
 /*
 TEST_CASE("test_own_vector")

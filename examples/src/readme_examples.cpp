@@ -293,8 +293,8 @@ namespace readme
 #endif
 
         // Get byte string value at position /1/1 as a byte_string
-        byte_string bs = j[1][1].as<byte_string>();
-        std::cout << "(8) " << bs << "\n\n";
+        byte_string bytes = j[1][1].as<byte_string>();
+        std::cout << "(8) " << bytes << "\n\n";
 
         // or alternatively as a std::vector<uint8_t>
         std::vector<uint8_t> u = j[1][1].as<std::vector<uint8_t>>();

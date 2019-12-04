@@ -140,10 +140,10 @@ void decode_cbor_byte_string()
     std::vector<uint8_t> buf = {0x45,'H','e','l','l','o'};
     json j = cbor::decode_cbor<json>(buf);
 
-    auto bs = j.as<byte_string>();
+    auto bytes = j.as<byte_string>();
 
     // byte_string to ostream displays as hex
-    std::cout << "(1) "<< bs << "\n\n";
+    std::cout << "(1) "<< bytes << "\n\n";
 
     // byte string value to JSON text becomes base64url
     std::cout << "(2) " << j << std::endl;
@@ -156,10 +156,10 @@ void decode_byte_string_with_encoding_hint()
     std::vector<uint8_t> buf = {0xd6,0x45,'H','e','l','l','o'};
     json j = cbor::decode_cbor<json>(buf);
 
-    auto bs = j.as<byte_string>();
+    auto bytes = j.as<byte_string>();
 
     // byte_string to ostream displays as hex
-    std::cout << "(1) "<< bs << "\n\n";
+    std::cout << "(1) "<< bytes << "\n\n";
 
     // byte string value to JSON text becomes base64
     std::cout << "(2) " << j << std::endl;

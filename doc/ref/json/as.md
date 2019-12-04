@@ -108,9 +108,9 @@ Output:
 #### Accessing a `json` byte string as a [byte_string](../byte_string.md)
 ```c++
 json j(byte_string{'H','e','l','l','o'});
-byte_string bs = j.as<byte_string>();
+byte_string bytes = j.as<byte_string>();
 
-std::cout << bs << std::endl;
+std::cout << bytes << std::endl;
 ```
 Output:
 ```
