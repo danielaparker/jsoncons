@@ -3022,15 +3022,15 @@ public:
     {
     }
 
-    template <class T>
-    basic_json(T val, semantic_tag tag, typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value>::type* = 0)
-        : var_(static_cast<int64_t>(val), tag)
+    template <class Unsigned>
+    basic_json(Unsigned val, semantic_tag tag, typename std::enable_if<std::is_integral<Unsigned>::value && !std::is_signed<Unsigned>::value>::type* = 0)
+        : var_(static_cast<uint64_t>(val), tag)
     {
     }
 
-    template <class T>
-    basic_json(T val, semantic_tag tag, typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value>::type* = 0)
-        : var_(static_cast<uint64_t>(val), tag)
+    template <class Signed>
+    basic_json(Signed val, semantic_tag tag, typename std::enable_if<std::is_integral<Signed>::value && std::is_signed<Signed>::value>::type* = 0)
+        : var_(static_cast<int64_t>(val), tag)
     {
     }
 
