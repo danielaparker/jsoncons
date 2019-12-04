@@ -55,7 +55,7 @@ basic_json(const byte_string_view& bs,
            semantic_tag tag = semantic_tag::none, 
            const Allocator& allocator = Allocator()); // (16)
 
-basic_json(json_bstr_arg_t, const jsoncons::span<const uint8_t>& bytes, 
+basic_json(bstr_arg_t, const jsoncons::span<const uint8_t>& bytes, 
            semantic_tag tag = semantic_tag::none,
            const Allocator& alloc = Allocator()); // (17)
 
@@ -99,10 +99,10 @@ basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none); /
 (16) Constructs a `basic_json` value for a [byte_string](../byte_string.md).
 
 (17) Constructs a `basic_json` value for a byte string from any container of `utf8_t` values.
-Uses [json_bstr_arg_t](../json_bstr_arg_t.md) as first argument to disambiguate overloads that construct byte strings.
+Uses [bstr_arg_t](../bstr_arg_t.md) as first argument to disambiguate overloads that construct byte strings.
 
 (18) Constructs a `basic_json` value for a half precision floating point number.
-Uses [json_half_arg_t](../json_half_arg_t.md) as first argument to disambiguate overloads that construct half precision floating point numbers.
+Uses [half_arg_t](../half_arg_t.md) as first argument to disambiguate overloads that construct half precision floating point numbers.
 
 ### Examples
 
@@ -142,8 +142,8 @@ int main()
     json j8("Hello"); // A text string
     std::cout << "(8) " << j8 << std::endl;
 
-    std::vector<uint8_t> bs = {'H','e','l','l','o'};
-    json j9(byte_string_view(bs.data(), bs.size())); // A byte string
+    std::vector<uint8_t> bytes = {'H','e','l','l','o'};
+    json j9(bstr_arg_t,bytes); // A byte string
     std::cout << "(9) " << j9 << std::endl;
 
     std::vector<int> v = {10,20,30};

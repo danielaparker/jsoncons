@@ -34,11 +34,11 @@ struct json_object_arg_t
 
 constexpr json_object_arg_t json_object_arg = json_object_arg_t();
 
-struct json_bstr_arg_t
+struct bstr_arg_t
 {
 };
 
-constexpr json_bstr_arg_t json_bstr_arg = json_bstr_arg_t();
+constexpr bstr_arg_t bstr_arg = bstr_arg_t();
 
 enum class semantic_tag : uint8_t 
 {

@@ -1852,15 +1852,15 @@ int main()
     std::vector<uint8_t> bytes = {'H','e','l','l','o'};
 
     // default suggested encoding (base64url)
-    json j1(json_bstr_arg, bytes);
+    json j1(bstr_arg, bytes);
     std::cout << "(1) "<< j1 << "\n\n";
 
     // base64 suggested encoding
-    json j2(json_bstr_arg, bytes, semantic_tag::base64);
+    json j2(bstr_arg, bytes, semantic_tag::base64);
     std::cout << "(2) "<< j2 << "\n\n";
 
     // base16 suggested encoding
-    json j3(json_bstr_arg, bytes, semantic_tag::base16);
+    json j3(bstr_arg, bytes, semantic_tag::base16);
     std::cout << "(3) "<< j3 << "\n\n";
 }
 ```
@@ -2057,7 +2057,7 @@ namespace jc=jsoncons;
 int main()
 {
     json j;
-    j["ByteString"] = json(json_bstr_arg, std::vector<uint8_t>{ 'H','e','l','l','o' });
+    j["ByteString"] = json(bstr_arg, std::vector<uint8_t>{ 'H','e','l','l','o' });
     j["EncodedByteString"] = json("SGVsbG8=", semantic_tag::base64);
 
     std::cout << "(1)\n";

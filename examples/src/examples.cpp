@@ -266,8 +266,8 @@ void json_constructor_examples()
     json j8("Hello"); // A text string
     std::cout << "(8) " << j8 << std::endl;
 
-    std::vector<uint8_t> bs = {'H','e','l','l','o'};
-    json j9(byte_string_view(bs.data(), bs.size())); // A byte string
+    std::vector<uint8_t> bytes = {'H','e','l','l','o'};
+    json j9(bstr_arg_t,bytes); // A byte string
     std::cout << "(9) " << j9 << std::endl;
 
     std::vector<int> v = {10,20,30};
@@ -299,6 +299,8 @@ void json_constructor_examples()
 
     json_options options;
     std::cout << pretty_print(arr) << std::endl;
+
+
 }
 
 void object_range_based_for_loop()
@@ -449,8 +451,6 @@ int main()
 
         comment_example();
 
-        json_constructor_examples();
-
         jsonpatch_examples();
 
         max_nesting_path_example();
@@ -496,6 +496,8 @@ int main()
         json_type_traits_macros_examples();
 
         byte_string_examples();
+
+        json_constructor_examples();
     }
     catch (const std::exception& e)
     {
