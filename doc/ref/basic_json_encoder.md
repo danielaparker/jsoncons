@@ -1,8 +1,8 @@
 ### jsoncons::basic_json_encoder
 
-```c++
-#include <jsoncons/json_encoder.hpp>
+Defined in header `jsoncons/json_encoder.hpp`
 
+```c++
 template<
     class CharT,
     class Result>
