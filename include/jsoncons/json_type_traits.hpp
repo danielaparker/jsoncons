@@ -930,6 +930,8 @@ public:
 template<class Json>
 struct json_type_traits<Json, byte_string_view>
 {
+    typedef typename Json::allocator_type allocator_type;
+
 public:
     static bool is(const Json& j) noexcept
     {
@@ -941,9 +943,9 @@ public:
         return j.as_byte_string_view();
     }
     
-    static Json to_json(const byte_string_view& val)
+    static Json to_json(const byte_string_view& val, const allocator_type& alloc = allocator_type())
     {
-        return Json(val);
+        return Json(val, semantic_tag::none, alloc);
     }
 };
 

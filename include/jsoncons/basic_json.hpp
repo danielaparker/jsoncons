@@ -3066,7 +3066,7 @@ public:
     }
 
     explicit basic_json(const byte_string_view& bytes, 
-                        semantic_tag tag = semantic_tag::none, 
+                        semantic_tag tag, 
                         const Allocator& alloc = Allocator())
         : var_(bytes, tag, alloc)
     {
