@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE( test1 )
 
     json root = json::parse(is);
     CHECK(root.is_object());
-    CHECK(root.is<json::object>());
+    CHECK(root.is_object());
 
     root["double_1"] = 10.0;
 

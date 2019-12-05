@@ -89,15 +89,15 @@ void introspection_example()
     }
     json val = json::parse(is);
     std::cout << std::boolalpha;
-    std::cout << "Is this an object? " << val.is<json::object>() << ", or an array? " << val.is<json::array>() << std::endl;
+    std::cout << "Is this an object? " << val.is_object() << ", or an array? " << val.is_array() << std::endl;
 
-    if (val.is<json::array>())
+    if (val.is_array())
     {
         for (size_t i = 0; i < val.size(); ++i)
         {
             json& elem = val[i];
-            std::cout << "Is element " << i << " an object? " << elem.is<json::object>() << std::endl;
-            if (elem.is<json::object>())
+            std::cout << "Is element " << i << " an object? " << elem.is_object() << std::endl;
+            if (elem.is_object())
             {
                 for (auto it = elem.object_range().begin(); it != elem.object_range().end(); ++it){
                     std::cout << "Is member " << it->key() << " a string? " << it->value().is<std::string>() << ", or a double? " << it->value().is<double>() << ", or perhaps an int? " << it->value().is<int>() << std::endl;

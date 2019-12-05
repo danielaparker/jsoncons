@@ -177,7 +177,7 @@ TEST_CASE("test_empty_object")
     json a;
     CHECK(a.size() == 0);
     CHECK(a.is_object());
-    CHECK(a.is<json::object>());
+    CHECK(a.is_object());
 
     json::object_iterator begin = a.object_range().begin();
     json::object_iterator end = a.object_range().end();
@@ -190,7 +190,7 @@ TEST_CASE("test_empty_object")
     a["key"] = "Hello";
     CHECK(a.size() == 1);
     CHECK(a.is_object());
-    CHECK(a.is<json::object>());
+    CHECK(a.is_object());
 }
 
 TEST_CASE("test_const_empty_object")
@@ -198,7 +198,7 @@ TEST_CASE("test_const_empty_object")
     const json b;
     CHECK(b.size() == 0);
     CHECK(b.is_object());
-    CHECK(b.is<json::object>());
+    CHECK(b.is_object());
 
     json::const_object_iterator begin = b.object_range().begin();
     json::const_object_iterator end = b.object_range().end();
@@ -214,13 +214,13 @@ TEST_CASE("test_empty_object_reserve")
     json c;
     CHECK(c.size() == 0);
     CHECK(c.is_object());
-    CHECK(c.is<json::object>());
+    CHECK(c.is_object());
     c.reserve(100);
     CHECK(c.capacity() == 100);
     c["key"] = "Hello";
     CHECK(c.size() == 1);
     CHECK(c.is_object());
-    CHECK(c.is<json::object>());
+    CHECK(c.is_object());
     CHECK(c.capacity() == 100);
 }
 
@@ -229,12 +229,12 @@ TEST_CASE("test_empty_object_copy")
     json a;
     CHECK(a.size() == 0);
     CHECK(a.is_object());
-    CHECK(a.is<json::object>());
+    CHECK(a.is_object());
 
     json b = a;
     CHECK(b.size() == 0);
     CHECK(b.is_object());
-    CHECK(b.is<json::object>());
+    CHECK(b.is_object());
 }
 
 TEST_CASE("test_empty_object_assignment")
@@ -242,27 +242,27 @@ TEST_CASE("test_empty_object_assignment")
     json a;
     CHECK(a.size() == 0);
     CHECK(a.is_object());
-    CHECK(a.is<json::object>());
+    CHECK(a.is_object());
 
     json b = json::make_array(10);
     CHECK(b.size() == 10);
     CHECK(b.is_array());
-    CHECK(b.is<json::array>());
+    CHECK(b.is_array());
 
     b = a;
     CHECK(b.size() == 0);
     CHECK(b.is_object());
-    CHECK(b.is<json::object>());
+    CHECK(b.is_object());
 
     json c;
     c["key"] = "value";
     CHECK(c.size() == 1);
     CHECK(c.is_object());
-    CHECK(c.is<json::object>());
+    CHECK(c.is_object());
     c = a;
     CHECK(c.size() == 0);
     CHECK(c.is_object());
-    CHECK(c.is<json::object>());
+    CHECK(c.is_object());
 }
 
 TEST_CASE("get_with_default test")
@@ -719,13 +719,13 @@ TEST_CASE("test_is_type")
 {
     json obj;
     CHECK(obj.is_object());
-    CHECK(obj.is<json::object>());
+    CHECK(obj.is_object());
 
     // tests for proxy is_type methods
     obj["string"] = "val1";
 
     CHECK(obj.is_object());
-    CHECK(obj.is<json::object>());
+    CHECK(obj.is_object());
 
     CHECK(obj["string"].is_string());
     CHECK(obj["string"].is<std::string>());
@@ -771,11 +771,11 @@ TEST_CASE("test_is_type")
 
     obj["object"] = json();
     CHECK(obj["object"].is_object());
-    CHECK(obj["object"].is<json::object>());
+    CHECK(obj["object"].is_object());
 
     obj["array"] = json(json_array_arg);
     CHECK(obj["array"].is_array());
-    CHECK(obj["array"].is<json::array>());
+    CHECK(obj["array"].is_array());
 
     // tests for json is_type methods
 

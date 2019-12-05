@@ -44,8 +44,6 @@ Member type                         |Definition
 `string_view_type`|`basic_string_view<char_type>`
 `key_type`|std::basic_string<char_type,char_traits_type,char_allocator_type>
 `key_value_type`|`key_value<key_type,basic_json>`
-`object`|`json_object<key_type,basic_json>`
-`array`|`json_array<basic_json>`
 `object_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to [key_value_type](json/key_value.md)
 `const_object_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to const [key_value_type](json/key_value.md)
 `array_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `basic_json`

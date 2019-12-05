@@ -59,11 +59,9 @@ Returns `true` if `is<int64_t>() || is<uint64_t>() is `true`, or if
 `is<std::string>()` is `true` and the string holds an integer value,
 otherwise `false`.
 
-(11) Same as `is<json::array>()`.  
-Returns `true` if the json value is an array, `false` otherwise.  
+(11) Returns `true` if the json value is an array, `false` otherwise.  
 
-(12) Same as `is<json::object>()`.  
-Returns `true` if the json value is an object, `false` otherwise.  
+(12) Returns `true` if the json value is an object, `false` otherwise.  
 
 ### Examples
 

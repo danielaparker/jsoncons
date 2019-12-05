@@ -133,7 +133,7 @@ TEST_CASE("test_add_element_to_array")
 {
     json j(json_array_arg);
     CHECK(j.is_array());
-    CHECK(j.is<json::array>());
+    CHECK(j.is_array());
     j.push_back("Toronto");
     j.push_back("Vancouver");
     j.insert(j.array_range().begin(),"Montreal");
@@ -149,7 +149,7 @@ TEST_CASE("test_emplace_element_to_array")
 {
     json a(json_array_arg);
     CHECK(a.is_array());
-    CHECK(a.is<json::array>());
+    CHECK(a.is_array());
     a.emplace_back("Toronto");
     a.emplace_back("Vancouver");
     a.emplace(a.array_range().begin(),"Montreal");
@@ -165,7 +165,7 @@ TEST_CASE("test_array_add_pos")
 {
     json arr(json_array_arg);
     CHECK(arr.is_array());
-    CHECK(arr.is<json::array>());
+    CHECK(arr.is_array());
     arr.push_back("Toronto");
     arr.push_back("Vancouver");
     arr.insert(arr.array_range().begin(),"Montreal");
@@ -181,7 +181,7 @@ TEST_CASE("test_array_erase_range")
 {
     json arr(json_array_arg);
     CHECK(arr.is_array());
-    CHECK(arr.is<json::array>());
+    CHECK(arr.is_array());
     arr.push_back("Toronto");
     arr.push_back("Vancouver");
     arr.insert(arr.array_range().begin(),"Montreal");
@@ -198,14 +198,14 @@ TEST_CASE("test_reserve_array_capacity")
 {
     json cities(json_array_arg);
     CHECK(cities.is_array());
-    CHECK(cities.is<json::array>());
+    CHECK(cities.is_array());
     cities.reserve(10);  // storage is allocated
     CHECK(cities.capacity() == 10);
     CHECK(cities.size() == 0);
 
     cities.push_back("Toronto");
     CHECK(cities.is_array());
-    CHECK(cities.is<json::array>());
+    CHECK(cities.is_array());
     CHECK(cities.capacity() == 10);
     CHECK(cities.size() == 1);
     cities.push_back("Vancouver");
