@@ -1,6 +1,8 @@
 ### jsoncons::json_decoder
 
-Defined in header `jsoncons/json_decoder.hpp`
+```c++
+#include <jsoncons/json_decoder.hpp>
+```
 
 ```c++
 template <class Json,class WorkAllocator>
