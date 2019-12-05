@@ -20,7 +20,7 @@ struct half_arg_t
 {
 };
 
-constexpr half_arg_tt half_arg = half_arg_t();
+constexpr half_arg_t half_arg = half_arg_t();
 
 struct json_array_arg_t
 {
