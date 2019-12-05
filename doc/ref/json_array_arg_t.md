@@ -1,6 +1,6 @@
 ### jsoncons::json_array_arg_t 
 
-Defined in header `jsoncons/tag_type.hpp`
+__`jsoncons/tag_type.hpp`__
 
 ```c++
 struct json_array_arg_t {};

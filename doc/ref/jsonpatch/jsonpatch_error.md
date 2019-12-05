@@ -1,6 +1,6 @@
 ### jsoncons::jsonpatch::jsonpatch_error
 
-Defined in header `jsoncons_ext/jsonpatch/jsonpatch_error.hpp`
+__`jsoncons_ext/jsonpatch/jsonpatch_error.hpp`__
 
 `jsoncons::jsonpatch::jsonpatch_error` defines an exception type for reporting failures in jsonpatch operations.
 

@@ -1,6 +1,6 @@
 ### jsoncons::cbor::decode_cbor
 
-Defined in header `jsoncons_ext/cbor/cbor.hpp`
+__`jsoncons_ext/cbor/cbor.hpp`__
 
 Decodes a [Concise Binary Object Representation](http://cbor.io/) data format into a C++ data structure.
 
