@@ -32,6 +32,7 @@
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/ser_traits.hpp>
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/detail/heap_only_string.hpp>
 

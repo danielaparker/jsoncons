@@ -14,7 +14,6 @@
 #include <type_traits> // std::enable_if, std::true_type, std::false_type
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/json_decoder.hpp>
-#include <jsoncons/basic_json.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_type_traits.hpp>
