@@ -24,7 +24,7 @@ Makes a multidimensional array with the number of dimensions specified as a temp
 
 #### Make an array of size 10 initialized with zeros
 ```c++
-json a = json::make_array<1>(10,0);
+json a = json::make_array(10,0); // angle brackets can be omitted when N = 1
 a[1] = 1;
 a[2] = 2;
 std::cout << pretty_print(a) << std::endl;

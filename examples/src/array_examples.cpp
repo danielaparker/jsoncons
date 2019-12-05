@@ -150,7 +150,7 @@ void array_range_based_for_loop()
 void make_1_dimensional_array_1()
 {
     std::cout << "1 dimensional array 1" <<std::endl;
-    json a = json::make_array<1>(10);
+    json a = json::make_array(10);
     a[1] = 1;
     a[2] = 2;
     std::cout << pretty_print(a) << std::endl;
@@ -159,7 +159,7 @@ void make_1_dimensional_array_1()
 void make_1_dimensional_array_2()
 {
     std::cout << "1 dimensional array 2" <<std::endl;
-    json a = json::make_array<1>(10,0);
+    json a = json::make_array(10,0);
     a[1] = 1;
     a[2] = 2;
     a[3] = json(json_array_arg);
