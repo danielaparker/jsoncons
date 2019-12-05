@@ -244,7 +244,7 @@ TEST_CASE("test_empty_object_assignment")
     CHECK(a.is_object());
     CHECK(a.is<json::object>());
 
-    json b = json::make_array<1>(10);
+    json b = json::make_array(10);
     CHECK(b.size() == 10);
     CHECK(b.is_array());
     CHECK(b.is<json::array>());
