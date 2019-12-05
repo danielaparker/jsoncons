@@ -1,8 +1,8 @@
 ### jsoncons::basic_json_options
 
-```c++
-#include <jsoncons/json_options.hpp>
+__`jsoncons/json_options.hpp`__
 
+```c++
 template< 
     class CharT
 > class basic_json_options;

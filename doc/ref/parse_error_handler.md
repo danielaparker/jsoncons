@@ -1,8 +1,6 @@
 ### jsoncons::parse_error_handler
 
-```c++
-#include <jsoncons/json_parser.hpp>
-```
+__`jsoncons/json_parser.hpp`__
 
 A `parse_error_handler` is a simple function, a functor or a lambda expression that receive arguments 
 `std::error_code` and const `ser_context&`, and returns a `bool`. The parser will report all errors

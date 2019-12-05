@@ -1,8 +1,8 @@
 ### jsoncons::byte_string_chars_format
 
-```c++
-#include <jsoncons/json_options.hpp>
+__`jsoncons/json_options.hpp`__
 
+```c++
 enum class byte_string_chars_format : uint8_t {base16, base64, base64url};
 ```
 

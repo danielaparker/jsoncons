@@ -1,8 +1,6 @@
 ### jsoncons::bstr_arg
 
-```c++
-#include <jsoncons/tag_type.hpp>
-```
+__`jsoncons/tag_type.hpp`__
 
 ```c++
 constexpr bstr_arg_t bstr_arg = bstr_arg_t();

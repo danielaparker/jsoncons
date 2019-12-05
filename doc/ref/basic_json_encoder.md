@@ -1,8 +1,6 @@
 ### jsoncons::basic_json_encoder
 
-```c++
-#include <jsoncons/json_encoder.hpp>
-```
+__`jsoncons/json_encoder.hpp`__
 
 ```c++
 template<
