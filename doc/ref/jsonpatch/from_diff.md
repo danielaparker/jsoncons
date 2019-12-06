@@ -1,10 +1,10 @@
 ### jsoncons::jsonpatch::from_diff
 
+__`jsoncons_ext/jsonpatch/jsonpatch.hpp`__
+
 Create a JSON Patch from a diff of two json documents.
 
 ```c++
-#include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
-
 template <class Json>
 Json from_diff(const Json& source, const Json& target)
 ```

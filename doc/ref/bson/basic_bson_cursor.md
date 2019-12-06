@@ -1,8 +1,8 @@
 ### jsoncons::bson::basic_bson_cursor
 
-```c++
-#include <jsoncons_ext/bson/bson_cursor.hpp>
+__`jsoncons_ext/bson/bson_cursor.hpp`__
 
+```c++
 template<
     class Src=jsoncons::binary_stream_source,
     class Allocator=std::allocator<char>>

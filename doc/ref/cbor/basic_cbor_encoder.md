@@ -1,8 +1,8 @@
 ### jsoncons::cbor::basic_cbor_encoder
 
-```c++
-#include <jsoncons_ext/cbor/cbor_encoder.hpp>
+__`jsoncons_ext/cbor/cbor_encoder.hpp`__
 
+```c++
 template<
     class Result,class Float128T = std::nullptr_t>
 > class basic_cbor_encoder final : public basic_cbor_content_handler<Float128T>

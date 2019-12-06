@@ -1,8 +1,8 @@
 ### jsoncons::json
 
-```c++
-#include <jsoncons/json.hpp>
+__`jsoncons/json.hpp`__
 
+```c++
 typedef basic_json<char,
                    ImplementationPolicy = sorted_policy,
                    Allocator = std::allocator<char>> json

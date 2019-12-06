@@ -1,8 +1,8 @@
 ### jsoncons::basic_default_cbor_content_handler
 
-```c++
-#include <jsoncons_ext/cbor/cbor_content_handler.hpp>
+__`jsoncons_ext/cbor/cbor_content_handler.hpp`__
 
+```c++
 template <
     class Float128T
 > class basic_default_cbor_content_handler

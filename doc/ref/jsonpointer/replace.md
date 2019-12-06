@@ -1,10 +1,10 @@
 ### jsoncons::jsonpointer::replace
 
+__`jsoncons_ext/jsonpointer/jsonpointer.hpp`__
+
 Replace a `json` element or member.
 
 ```c++
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-
 template<class J>
 void replace(J& target, const typename J::string_view_type& path, const J& value); 
 

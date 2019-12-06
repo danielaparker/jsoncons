@@ -1,10 +1,10 @@
 ### jsoncons::jsonpath::json_query
 
+__`jsoncons_ext/jsonpath/json_query.hpp`__
+
 Returns a `json` array of values or normalized path expressions selected from a root `json` structure.
 
 ```c++
-#include <jsoncons_ext/jsonpath/json_query.hpp>
-
 enum class result_type {value,path};
 
 template<Json>

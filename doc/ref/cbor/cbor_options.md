@@ -1,8 +1,6 @@
 ### jsoncons::cbor::cbor_options
 
-```c++
-#include <jsoncons_ext/cbor/cbor_options.hpp>
-```
+__`jsoncons_ext/cbor/cbor_options.hpp`__
 
 Specifies options for reading and writing CBOR.
 

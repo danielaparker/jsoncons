@@ -1,8 +1,8 @@
 ### jsoncons::rename_object_member_filter
 
-```c++
-#include <jsoncons/json_content_filter.hpp>
+__`jsoncons/json_content_filter.hpp`__
 
+```c++
 typedef basic_rename_object_member_filter<char> rename_object_member_filter;
 ```
 The `rename_object_member_filter` class is an instantiation of the `basic_rename_object_member_filter` class template that uses `char` as the character type. 

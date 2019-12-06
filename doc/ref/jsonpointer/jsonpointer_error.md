@@ -1,8 +1,7 @@
 ### jsoncons::jsonpointer::jsonpointer_error
 
-```c++
-#include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
-```
+__`jsoncons_ext/jsonpointer/jsonpointer_error.hpp`__
+
 `jsoncons::jsonpointer::jsonpointer_error` defines an exception type for reporting failures in jsonpointer operations.
 
 ![jsonpointer_error](./diagrams/jsonpointer_error.png)

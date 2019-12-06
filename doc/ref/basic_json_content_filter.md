@@ -1,8 +1,8 @@
 ### jsoncons::basic_json_content_filter
 
-```c++
-#include <jsoncons/json_content_filter.hpp>
+__`jsoncons/json_content_filter.hpp`__
 
+```c++
 template <
     class CharT
 > class basic_json_content_filter

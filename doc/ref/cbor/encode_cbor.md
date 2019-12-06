@@ -1,8 +1,8 @@
 ### jsoncons::cbor::encode_cbor
 
-```c++
-#include <jsoncons_ext/cbor/cbor.hpp>
+__`jsoncons_ext/cbor/cbor.hpp`__
 
+```c++
 template<class T>
 void encode_cbor(const T& val, std::vector<uint8_t>& buffer, 
                  const cbor_encode_options& options = cbor_encode_options()); // (1)

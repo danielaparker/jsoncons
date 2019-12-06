@@ -1,8 +1,8 @@
 ### jsoncons::staj_reader
 
-```c++
-#include <jsoncons/staj_reader.hpp>
+__`jsoncons/staj_reader.hpp`__
 
+```c++
 typedef basic_staj_reader<char> staj_reader
 ```
 

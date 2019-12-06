@@ -1,8 +1,8 @@
 ### jsoncons::ubjson::basic_ubjson_encoder
 
-```c++
-#include <jsoncons_ext/ubjson/ubjson_encoder.hpp>
+__`jsoncons_ext/ubjson/ubjson_encoder.hpp`__
 
+```c++
 template<
     class Result>
 > class basic_ubjson_encoder : public jsoncons::json_content_handler

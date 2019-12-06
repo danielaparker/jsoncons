@@ -1,8 +1,8 @@
 ### jsoncons::csv::quote_style_kind
 
-```c++
-#include <jsoncons_ext/csv/csv_options.hpp>
+__`jsoncons_ext/csv/csv_options.hpp`__
 
+```c++
 enum class quote_style_kind
 {
     minimal,

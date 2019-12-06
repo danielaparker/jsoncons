@@ -1,8 +1,8 @@
 ### jsoncons::json_parser
 
-```c++
-#include <jsoncons/json_parser.hpp>
+__`jsoncons/json_parser.hpp`__
 
+```c++
 typedef basic_json_parser<char> json_parser
 ```
 

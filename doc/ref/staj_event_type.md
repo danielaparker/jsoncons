@@ -1,8 +1,8 @@
 ### jsoncons::staj_event_type
 
-```c++
-#include <jsoncons/staj_reader.hpp>
+__`jsoncons/staj_reader.hpp`__
 
+```c++
 enum class staj_event_type
 {
     begin_array,

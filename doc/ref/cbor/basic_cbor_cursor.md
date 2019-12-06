@@ -1,8 +1,8 @@
 ### jsoncons::cbor::basic_cbor_cursor
 
-```c++
-#include <jsoncons_ext/cbor/cbor_cursor.hpp>
+__`jsoncons_ext/cbor/cbor_cursor.hpp`__
 
+```c++
 template<
     class Src=jsoncons::binary_stream_source,
     class Allocator=std::allocator<char>>
