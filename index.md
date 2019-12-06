@@ -445,17 +445,17 @@ image_sizing.insert_or_assign("Dimension 2",json::null());  // a null value
 
 Or, use an object initializer-list:
 ```c++
-json file_settings = json::object{
+json file_settings(json::object_arg, {
     {"Image Format", "JPEG"},
     {"Color Space", "sRGB"},
     {"Limit File Size", true},
     {"Limit File Size To", 10000}
-};
+});
 ```
 
 To construct a json array, initialize with the array type 
 ```c++
-json color_spaces = json::array();
+json color_spaces(json_array_arg);
 ```
 and add some elements
 ```c++
@@ -466,7 +466,7 @@ color_spaces.push_back("ProPhoto RGB");
 
 Or, use an array initializer-list:
 ```c++
-json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
+json image_formats(json_array_arg, {"JPEG","PSD","TIFF","DNG"});
 ```
 
 The `operator[]` provides another way for setting name-value pairs.
@@ -602,9 +602,9 @@ The `pretty_print` function applies stylistic formatting to JSON text. For examp
 ```c++
     json val;
 
-    val["verts"] = json::array{1, 2, 3};
-    val["normals"] = json::array{1, 0, 1};
-    val["uvs"] = json::array{0, 0, 1, 1};
+    val["verts"] = json(json_array_arg, {1, 2, 3});
+    val["normals"] = json(json_array_arg, {1, 0, 1});
+    val["uvs"] = json(json_array_arg, {0, 0, 1, 1});
 
     std::cout << pretty_print(val) << std::endl;
 ```
