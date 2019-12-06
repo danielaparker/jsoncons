@@ -170,6 +170,6 @@ int f2(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-   return f1(argc, argv);
+   return f2(argc, argv);
 }
 
