@@ -12,7 +12,8 @@ and `JSONCONS_TPL_N_GETTER_SETTER_TRAITS_DECL`. Rationale: naming consistency.
 Enhancements:
 
 - New tag types `json_object_arg_t`, `json_array_arg_t` and `bstr_arg_t`
-have been introduced that make it simpler to construct `basic_json` values.
+have been introduced that make it simpler to construct `basic_json` values
+of objects, arrays and byte strings.
 
 v0.140.0
 --------
