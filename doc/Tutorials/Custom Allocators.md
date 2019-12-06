@@ -25,7 +25,7 @@ j.insert_or_assign("LastName","Smith");
 
 using namespace jsoncons;
 
-typedef boost::interprocess::allocator<int,
+typedef boost::interprocess::allocator<char,
         boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
 
 struct boost_sorted_policy : public sorted_policy
@@ -40,12 +40,10 @@ struct boost_sorted_policy : public sorted_policy
     using string_storage = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
 };
 
-typedef basic_json<char,boost_sorted_policy,shmem_allocator> shm_json;
+typedef basic_json<char,boost_sorted_policy,shmem_allocator> my_json;
 
 int main(int argc, char *argv[])
 {
-   typedef std::pair<double, int> MyType;
-
    if(argc == 1){  //Parent process
       //Remove shared memory on construction and destruction
       struct shm_remove
@@ -59,14 +57,14 @@ int main(int argc, char *argv[])
                                                          "MySharedMemory", 65536);
 
       //Initialize shared memory STL-compatible allocator
-      const shmem_allocator allocator(segment.get_segment_manager());
+      const shmem_allocator alloc(segment.get_segment_manager());
 
       // Create json value with all dynamic allocations in shared memory
 
-      shm_json* j = segment.construct<shm_json>("my json")(shm_json::array(allocator));
+      shm_json* j = segment.construct<shm_json>("MyJson")(json_array_arg, semantic_tag::none, alloc);
       j->push_back(10);
 
-      shm_json o(allocator);
+      shm_json o(json_object_arg, semantic_tag::none, alloc);
       o.insert_or_assign("category", "reference");
       o.insert_or_assign("author", "Nigel Rees");
       o.insert_or_assign("title", "Sayings of the Century");
@@ -74,13 +72,13 @@ int main(int argc, char *argv[])
 
       j->push_back(o);
 
-      shm_json a = shm_json::array(2,shm_json::object(allocator),allocator);
+      shm_json a = shm_json::array(2,shm_json(object_arg_t,semantic_tag::none,alloc),alloc);
       a[0]["first"] = 1;
 
       j->push_back(a);
 
       std::pair<shm_json*, boost::interprocess::managed_shared_memory::size_type> res;
-      res = segment.find<shm_json>("my json");
+      res = segment.find<shm_json>("MyJson");
 
       std::cout << "Parent:" << std::endl;
       std::cout << pretty_print(*(res.first)) << std::endl;
@@ -92,7 +90,7 @@ int main(int argc, char *argv[])
 
 
       //Check child has destroyed all objects
-      if(segment.find<MyType>("my json").first)
+      if(segment.find<my_json>("MyJson").first)
          return 1;
    }
    else{
@@ -101,7 +99,7 @@ int main(int argc, char *argv[])
                                                          "MySharedMemory");
 
       std::pair<shm_json*, boost::interprocess::managed_shared_memory::size_type> res;
-      res = segment.find<shm_json>("my json");
+      res = segment.find<shm_json>("MyJson");
 
       if (res.first != nullptr)
       {
@@ -114,7 +112,7 @@ int main(int argc, char *argv[])
       }
 
       //We're done, delete all the objects
-      segment.destroy<shm_json>("my json");
+      segment.destroy<shm_json>("MyJson");
    }
    return 0;
 }

@@ -43,7 +43,7 @@ int f1(int argc, char *argv[])
 
       // Create json value with all dynamic allocations in shared memory
 
-      my_json* j = segment.construct<my_json>("MyJson1")(my_json(json_array_arg, semantic_tag::none, alloc));
+      my_json* j = segment.construct<my_json>("MyJson1")(json_array_arg, semantic_tag::none, alloc);
       j->push_back(10);
 
       my_json o(json_object_arg, semantic_tag::none, alloc);

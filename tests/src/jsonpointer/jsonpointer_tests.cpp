@@ -167,7 +167,7 @@ TEST_CASE("test_add_array_value")
     { "foo": ["bar", ["abc", "def"]] }
     )");
 
-    check_insert_or_assign(example,"/foo/-", json::array({"abc", "def"}), expected);
+    check_insert_or_assign(example,"/foo/-", json(json_array_arg, {"abc", "def"}), expected);
 }
 
 // remove
