@@ -45,7 +45,7 @@ struct ser_traits_default
     }
 
     template <class Json>
-    static const bool is(const Json& j)
+    static bool is(const Json& j)
     {
         return json_type_traits<Json,T>::is(j);
     }
@@ -94,7 +94,7 @@ template <class T, class Enable = void>
 struct ser_traits
 {
     template <class Json>
-    static const bool is(const Json& j)
+    static bool is(const Json& j)
     {
         return ser_traits_default<T>::is(j);
     }
@@ -151,7 +151,7 @@ struct ser_traits<T,
     typedef typename T::value_type value_type;
 
     template <class Json>
-    static const bool is(const Json& j)
+    static bool is(const Json& j)
     {
         return ser_traits_default<T>::is(j);
     }
@@ -209,7 +209,7 @@ struct ser_traits<std::array<T,N>>
     typedef typename std::array<T,N>::value_type value_type;
 
     template <class Json>
-    static const bool is(const Json& j)
+    static bool is(const Json& j)
     {
         return ser_traits_default<std::array<T,N>>::is(j);
     }
@@ -273,7 +273,7 @@ struct ser_traits<T,
     typedef typename T::key_type key_type;
 
     template <class Json>
-    static const bool is(const Json& j)
+    static bool is(const Json& j)
     {
         return ser_traits_default<T>::is(j);
     }
