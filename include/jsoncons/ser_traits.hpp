@@ -93,7 +93,6 @@ private:
 template <class T, class Enable = void>
 struct ser_traits
 {
-
     template <class Json>
     static const bool is(const Json& j)
     {
@@ -152,6 +151,24 @@ struct ser_traits<T,
     typedef typename T::value_type value_type;
 
     template <class Json>
+    static const bool is(const Json& j)
+    {
+        return ser_traits_default<T>::is(j);
+    }
+
+    template <class Json>
+    static T as(const Json& j)
+    {
+        return ser_traits_default<T>::as(j);
+    }
+
+    template <class Json>
+    static Json to_json(const T& val)
+    {
+        return ser_traits_default<T>::template to_json<Json>(val);
+    }
+
+    template <class Json>
     static T decode(basic_staj_reader<typename Json::char_type>& reader, 
                          const Json&, 
                          std::error_code& ec)
@@ -192,9 +209,28 @@ struct ser_traits<std::array<T,N>>
     typedef typename std::array<T,N>::value_type value_type;
 
     template <class Json>
+    static const bool is(const Json& j)
+    {
+        return ser_traits_default<std::array<T,N>>::is(j);
+    }
+
+    template <class Json>
+    static std::array<T,N> as(const Json& j)
+    {
+        return ser_traits_default<std::array<T,N>>::as(j);
+    }
+
+    template <class Json>
+    static Json to_json(const std::array<T,N>& val)
+    {
+        return ser_traits_default<std::array<T,N>>::template to_json<Json>(val);
+    }
+
+
+    template <class Json>
     static std::array<T, N> decode(basic_staj_reader<typename Json::char_type>& reader, 
-                                        const Json&, 
-                                        std::error_code& ec)
+                                   const Json&, 
+                                   std::error_code& ec)
     {
         std::array<T,N> v;
         v.fill(T{});
@@ -211,9 +247,9 @@ struct ser_traits<std::array<T,N>>
 
     template <class Json>
     static void encode(const std::array<T, N>& val, 
-                          basic_json_content_handler<typename Json::char_type>& encoder, 
-                          const Json& context_j, 
-                          std::error_code& ec)
+                       basic_json_content_handler<typename Json::char_type>& encoder, 
+                       const Json& context_j, 
+                       std::error_code& ec)
     {
         encoder.begin_array(val.size());
         for (auto it = std::begin(val); it != std::end(val); ++it)
@@ -235,6 +271,25 @@ struct ser_traits<T,
     typedef typename T::mapped_type mapped_type;
     typedef typename T::value_type value_type;
     typedef typename T::key_type key_type;
+
+    template <class Json>
+    static const bool is(const Json& j)
+    {
+        return ser_traits_default<T>::is(j);
+    }
+
+    template <class Json>
+    static T as(const Json& j)
+    {
+        return ser_traits_default<T>::as(j);
+    }
+
+    template <class Json>
+    static Json to_json(const T& val)
+    {
+        return ser_traits_default<T>::template to_json<Json>(val);
+    }
+
 
     template <class Json>
     static T decode(basic_staj_reader<typename Json::char_type>& reader, 
