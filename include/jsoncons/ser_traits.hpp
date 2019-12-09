@@ -94,6 +94,12 @@ template <class T, class Enable = void>
 struct ser_traits
 {
     template <class Json>
+    static constexpr bool is_compatible()
+    {
+        return json_type_traits<Json,T>::is_compatible;
+    }
+
+    template <class Json>
     static bool is(const Json& j)
     {
         return ser_traits_default<T>::is(j);
@@ -142,10 +148,10 @@ namespace jsoncons {
 // specializations
 
 // vector like
-
 template <class T>
 struct ser_traits<T,
-    typename std::enable_if<!is_json_type_traits_declared<T>::value && jsoncons::detail::is_vector_like<T>::value
+    typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+             jsoncons::detail::is_vector_like<T>::value
 >::type>
 {
     typedef typename T::value_type value_type;
@@ -153,19 +159,78 @@ struct ser_traits<T,
     template <class Json>
     static bool is(const Json& j)
     {
-        return ser_traits_default<T>::is(j);
+        bool result = j.is_array();
+        if (result)
+        {
+            for (const auto& item : j.array_range())
+            {
+                if (!item.template is<value_type>())
+                {
+                    result = false;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    template <class Json,class Ty = T>
+    static typename std::enable_if<!(std::is_integral<Ty>::value && !std::is_same<Ty,bool>::value),T>::type
+    as(const Json& j)
+    {
+        if (j.is_array())
+        {
+            T v(jsoncons::detail::json_array_input_iterator<Json, value_type>(j.array_range().begin()),
+                jsoncons::detail::json_array_input_iterator<Json, value_type>(j.array_range().end()));
+            return v;
+        }
+        else
+        {
+            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Attempt to cast json non-array to array"));
+        }
+    }
+
+    template <class Json,class Ty = T>
+    static typename std::enable_if<std::is_integral<Ty>::value && !std::is_same<Ty,bool>::value,T>::type
+    as(const Json& j)
+    {
+        if (j.is_array())
+        {
+            T v(jsoncons::detail::json_array_input_iterator<Json, value_type>(j.array_range().begin()),
+                jsoncons::detail::json_array_input_iterator<Json, value_type>(j.array_range().end()));
+            return v;
+        }
+        else if (j.is_byte_string_view())
+        {
+            T v(j.as_byte_string_view().begin(),j.as_byte_string_view().end());
+            return v;
+        }
+        else if (j.is_byte_string())
+        {
+            auto s = j.as_byte_string();
+            T v(s.begin(),s.end());
+            return v;
+        }
+        else
+        {
+            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Attempt to cast json non-array to array"));
+        }
     }
 
     template <class Json>
-    static T as(const Json& j)
+    static Json to_json(const T& val, 
+                        const typename Json::allocator_type& alloc = typename Json::allocator_type())
     {
-        return ser_traits_default<T>::as(j);
-    }
-
-    template <class Json>
-    static Json to_json(const T& val)
-    {
-        return ser_traits_default<T>::template to_json<Json>(val);
+        Json j(json_array_arg, semantic_tag::none, alloc);
+        auto first = std::begin(val);
+        auto last = std::end(val);
+        size_t size = std::distance(first, last);
+        j.reserve(size);
+        for (auto it = first; it != last; ++it)
+        {
+            j.push_back(*it);
+        }
+        return j;
     }
 
     template <class Json>

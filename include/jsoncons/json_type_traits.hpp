@@ -552,12 +552,12 @@ struct json_type_traits<Json, std::vector<bool>::reference>
         return Json(val, semantic_tag::none);
     }
 };
-
+/*
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
                         typename std::enable_if<!is_json_type_traits_declared<T>::value && jsoncons::detail::is_compatible_array_type<Json,T>::value>::type>
 {
-    typedef typename std::iterator_traits<typename T::iterator>::value_type element_type;
+    typedef typename std::iterator_traits<typename T::iterator>::value_type value_type;
     typedef typename Json::allocator_type allocator_type;
 
     static bool is(const Json& j) noexcept
@@ -565,9 +565,9 @@ struct json_type_traits<Json, T,
         bool result = j.is_array();
         if (result)
         {
-            for (auto e : j.array_range())
+            for (const auto& item : j.array_range())
             {
-                if (!e.template is<element_type>())
+                if (!item.template is<value_type>())
                 {
                     result = false;
                     break;
@@ -577,14 +577,14 @@ struct json_type_traits<Json, T,
         return result;
     }
 
-    template <class Ty = element_type>
+    template <class Ty = value_type>
     static typename std::enable_if<!(std::is_integral<Ty>::value && !std::is_same<Ty,bool>::value),T>::type
     as(const Json& j)
     {
         if (j.is_array())
         {
-            T v(jsoncons::detail::json_array_input_iterator<Json, element_type>(j.array_range().begin()),
-                jsoncons::detail::json_array_input_iterator<Json, element_type>(j.array_range().end()));
+            T v(jsoncons::detail::json_array_input_iterator<Json, value_type>(j.array_range().begin()),
+                jsoncons::detail::json_array_input_iterator<Json, value_type>(j.array_range().end()));
             return v;
         }
         else
@@ -593,14 +593,14 @@ struct json_type_traits<Json, T,
         }
     }
 
-    template <class Ty = element_type>
+    template <class Ty = value_type>
     static typename std::enable_if<std::is_integral<Ty>::value && !std::is_same<Ty,bool>::value,T>::type
     as(const Json& j)
     {
         if (j.is_array())
         {
-            T v(jsoncons::detail::json_array_input_iterator<Json, element_type>(j.array_range().begin()),
-                jsoncons::detail::json_array_input_iterator<Json, element_type>(j.array_range().end()));
+            T v(jsoncons::detail::json_array_input_iterator<Json, value_type>(j.array_range().begin()),
+                jsoncons::detail::json_array_input_iterator<Json, value_type>(j.array_range().end()));
             return v;
         }
         else if (j.is_byte_string_view())
@@ -648,6 +648,7 @@ struct json_type_traits<Json, T,
         return j;
     }
 };
+*/
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
