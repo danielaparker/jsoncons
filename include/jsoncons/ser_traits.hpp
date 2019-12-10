@@ -276,19 +276,43 @@ struct ser_traits<std::array<T,N>>
     template <class Json>
     static bool is(const Json& j)
     {
-        return ser_traits_default<std::array<T,N>>::is(j);
+        bool result = j.is_array() && j.size() == N;
+        if (result)
+        {
+            for (auto e : j.array_range())
+            {
+                if (!e.template is<value_type>())
+                {
+                    result = false;
+                    break;
+                }
+            }
+        }
+        return result;
     }
 
     template <class Json>
     static std::array<T,N> as(const Json& j)
     {
-        return ser_traits_default<std::array<T,N>>::as(j);
+        std::array<T, N> buff;
+        JSONCONS_ASSERT(j.size() == N);
+        for (size_t i = 0; i < N; i++)
+        {
+            buff[i] = j[i].template as<T>();
+        }
+        return buff;
     }
 
     template <class Json>
-    static Json to_json(const std::array<T,N>& val)
+    static Json to_json(const std::array<T,N>& val, const typename Json::allocator_type& alloc = typename Json::allocator_type())
     {
-        return ser_traits_default<std::array<T,N>>::template to_json<Json>(val);
+        Json j(json_array_arg, semantic_tag::none, alloc);
+        j.reserve(N);
+        for (auto it = val.begin(); it != val.end(); ++it)
+        {
+            j.push_back(*it);
+        }
+        return j;
     }
 
 
@@ -340,19 +364,30 @@ struct ser_traits<T,
     template <class Json>
     static bool is(const Json& j)
     {
-        return ser_traits_default<T>::is(j);
+        bool result = j.is_object();
+        for (auto member : j.object_range())
+        {
+            if (!member.value().template is<mapped_type>())
+            {
+                result = false;
+            }
+        }
+        return result;
     }
 
     template <class Json>
     static T as(const Json& j)
     {
-        return ser_traits_default<T>::as(j);
+        T v(jsoncons::detail::json_object_input_iterator<Json,value_type>(j.object_range().begin()),
+            jsoncons::detail::json_object_input_iterator<Json,value_type>(j.object_range().end()));
+        return v;
     }
 
     template <class Json>
-    static Json to_json(const T& val)
+    static Json to_json(const T& val, const typename Json::allocator_type& alloc = typename Json::allocator_type())
     {
-        return ser_traits_default<T>::template to_json<Json>(val);
+        Json j = Json(json_object_arg, val.begin(), val.end(), semantic_tag::none, alloc);
+        return j;
     }
 
 

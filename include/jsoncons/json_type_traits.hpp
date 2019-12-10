@@ -703,7 +703,7 @@ struct json_type_traits<Json, T,
         return Json(val, semantic_tag::none, alloc);
     }
 };
-
+/*
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
                         typename std::enable_if<!is_json_type_traits_declared<T>::value && jsoncons::detail::is_compatible_object_type<Json,T>::value>::type
@@ -745,7 +745,6 @@ struct json_type_traits<Json, T,
         return j;
     }
 };
-
 template<class Json, class E, size_t N>
 struct json_type_traits<Json, std::array<E, N>>
 {
@@ -804,6 +803,7 @@ struct json_type_traits<Json, std::array<E, N>>
         return j;
     }
 };
+*/
 
 namespace detail
 {
