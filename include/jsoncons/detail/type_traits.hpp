@@ -221,8 +221,19 @@ struct is_vector_like<T,
 >::type> 
     : std::true_type {};
 
-}
+// is_constructible_from_const_pointer_and_size
 
-}
+template <class T, class Enable=void>
+struct is_constructible_from_const_pointer_and_size : std::false_type {};
+
+template <class T>
+struct is_constructible_from_const_pointer_and_size<T, 
+    typename std::enable_if<std::is_constructible<T,typename T::const_pointer,typename T::size_type>::value
+>::type> 
+    : std::true_type {};
+
+} // detail
+
+} // jsoncons
 
 #endif

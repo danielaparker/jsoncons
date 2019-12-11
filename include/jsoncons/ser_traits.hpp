@@ -178,16 +178,18 @@ struct ser_traits<T,
     static typename std::enable_if<!(std::is_integral<Ty>::value && !std::is_same<Ty,bool>::value),T>::type
     as(const Json& j)
     {
-        if (j.is_array())
-        {
-            T v(jsoncons::detail::json_array_input_iterator<Json, value_type>(j.array_range().begin()),
-                jsoncons::detail::json_array_input_iterator<Json, value_type>(j.array_range().end()));
-            return v;
-        }
-        else
+        if (!j.is_array())
         {
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Attempt to cast json non-array to array"));
         }
+        T result;
+        result.reserve(j.size());
+        for (const auto& item : j.array_range())
+        {
+            result.emplace_back(item.as<value_type>());
+        }
+
+        return result;
     }
 
     template <class Json,class Ty = T>
@@ -196,9 +198,14 @@ struct ser_traits<T,
     {
         if (j.is_array())
         {
-            T v(jsoncons::detail::json_array_input_iterator<Json, value_type>(j.array_range().begin()),
-                jsoncons::detail::json_array_input_iterator<Json, value_type>(j.array_range().end()));
-            return v;
+            T result;
+            result.reserve(j.size());
+            for (const auto& item : j.array_range())
+            {
+                result.emplace_back(item.as<value_type>());
+            }
+
+            return result;
         }
         else if (j.is_byte_string_view())
         {
@@ -354,7 +361,9 @@ struct ser_traits<std::array<T,N>>
 
 template <class T>
 struct ser_traits<T,
-    typename std::enable_if<!is_json_type_traits_declared<T>::value && jsoncons::detail::is_map_like<T>::value
+    typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+                            jsoncons::detail::is_map_like<T>::value &&
+                            jsoncons::detail::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
 >::type>
 {
     typedef typename T::mapped_type mapped_type;
@@ -378,9 +387,13 @@ struct ser_traits<T,
     template <class Json>
     static T as(const Json& j)
     {
-        T v(jsoncons::detail::json_object_input_iterator<Json,value_type>(j.object_range().begin()),
-            jsoncons::detail::json_object_input_iterator<Json,value_type>(j.object_range().end()));
-        return v;
+        T result;
+        for (const auto& item : j.object_range())
+        {
+            result.emplace(key_type(item.key().data(),item.key().size()), item.value().as<mapped_type>());
+        }
+
+        return result;
     }
 
     template <class Json>
