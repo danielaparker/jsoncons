@@ -186,7 +186,7 @@ struct ser_traits<T,
         result.reserve(j.size());
         for (const auto& item : j.array_range())
         {
-            result.emplace_back(item.as<value_type>());
+            result.emplace_back(item.template as<value_type>());
         }
 
         return result;
@@ -202,7 +202,7 @@ struct ser_traits<T,
             result.reserve(j.size());
             for (const auto& item : j.array_range())
             {
-                result.push_back(item.as<value_type>());
+                result.push_back(item.template as<value_type>());
             }
 
             return result;
@@ -390,7 +390,7 @@ struct ser_traits<T,
         T result;
         for (const auto& item : j.object_range())
         {
-            result.emplace(key_type(item.key().data(),item.key().size()), item.value().as<mapped_type>());
+            result.emplace(key_type(item.key().data(),item.key().size()), item.value().template as<mapped_type>());
         }
 
         return result;
