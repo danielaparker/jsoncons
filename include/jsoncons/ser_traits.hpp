@@ -186,7 +186,7 @@ struct ser_traits<T,
         result.reserve(j.size());
         for (const auto& item : j.array_range())
         {
-            result.emplace_back(item.template as<value_type>());
+            result.push_back(item.template as<value_type>());
         }
 
         return result;
@@ -251,7 +251,7 @@ struct ser_traits<T,
 
         while (it != end && !ec)
         {
-            v.emplace_back(it->template as<value_type>());
+            v.push_back(it->template as<value_type>());
             it.increment(ec);
         }
         return v;
