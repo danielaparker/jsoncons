@@ -242,17 +242,20 @@ struct ser_traits<T,
 
     template <class Json>
     static T decode(basic_staj_reader<typename Json::char_type>& reader, 
-                         const Json&, 
-                         std::error_code& ec)
+                    const Json& context_j, 
+                    std::error_code& ec)
     {
         T v;
-        staj_array_iterator<Json,Json> end;
-        staj_array_iterator<Json,Json> it(reader, ec);
 
-        while (it != end && !ec)
+        if (reader.current().event_type() != staj_event_type::begin_array)
         {
-            v.push_back(it->template as<value_type>());
-            it.increment(ec);
+            return v;
+        }
+        reader.next(ec);
+        while (reader.current().event_type() != staj_event_type::end_array && !ec)
+        {
+            v.push_back(ser_traits<value_type>::decode(reader, context_j, ec));
+            reader.next(ec);
         }
         return v;
     }

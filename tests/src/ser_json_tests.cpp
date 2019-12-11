@@ -109,6 +109,25 @@ TEST_CASE("convert_array_test")
     }
 }
 
+TEST_CASE("convert vector of vector test")
+{
+    std::vector<double> u{1,2,3,4};
+    std::vector<std::vector<double>> v{u,u};
+
+    std::string s;
+    jsoncons::encode_json(v,s);
+    auto result = jsoncons::decode_json<std::vector<std::vector<double>>>(s);
+    REQUIRE(result.size() == v.size());
+    for (const auto& item : result)
+    {
+        REQUIRE(item.size() == u.size());
+        CHECK(item[0] == 1);
+        CHECK(item[1] == 2);
+        CHECK(item[2] == 3);
+        CHECK(item[3] == 4);
+    }
+}
+
 #if !(defined(__GNUC__) && __GNUC__ <= 5)
 TEST_CASE("convert_tuple_test")
 {
