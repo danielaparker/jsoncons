@@ -202,7 +202,7 @@ struct ser_traits<T,
             result.reserve(j.size());
             for (const auto& item : j.array_range())
             {
-                result.emplace_back(item.as<value_type>());
+                result.push_back(item.as<value_type>());
             }
 
             return result;
