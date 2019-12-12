@@ -1991,9 +1991,9 @@ public:
         }
 
         template<class T, class... Args>
-        T as(Args&&... args) const
+        T as() const
         {
-            return evaluate().template as<T>(std::forward<Args>(args)...);
+            return evaluate().template as<T>();
         }
         bool as_bool() const
         {
