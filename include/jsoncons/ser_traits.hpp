@@ -208,15 +208,9 @@ struct ser_traits<T,
 
             return result;
         }
-        else if (j.is_byte_string_view())
-        {
-            T v(j.as_byte_string_view().begin(),j.as_byte_string_view().end());
-            return v;
-        }
         else if (j.is_byte_string())
         {
-            auto s = j.as_byte_string();
-            T v(s.begin(),s.end());
+            T v(j.as_byte_string_view().begin(),j.as_byte_string_view().end());
             return v;
         }
         else
