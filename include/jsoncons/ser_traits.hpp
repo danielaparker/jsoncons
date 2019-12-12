@@ -22,12 +22,66 @@
 namespace jsoncons {
 
 template <class T>
+struct ser_traits_default;
+
+template <class T, class Enable = void>
+struct ser_traits
+{
+    template <class Json>
+    static constexpr bool is_compatible()
+    {
+        return json_type_traits<Json,T>::is_compatible;
+    }
+
+    template <class Json>
+    static bool is(const Json& j)
+    {
+        return json_type_traits<Json,T>::is(j);
+    }
+
+    template <class Json>
+    static T as(const Json& j)
+    {
+        return json_type_traits<Json,T>::as(j);
+    }
+
+    template <class Json>
+    static Json to_json(const T& val)
+    {
+        return json_type_traits<Json,T>::to_json(val);
+    }
+
+    template <class Json>
+    static Json to_json(const T& val, const typename Json::allocator_type& alloc)
+    {
+        return json_type_traits<Json, T>::to_json(val, alloc);
+    }
+
+    template <class Json>
+    static T decode(basic_staj_reader<typename Json::char_type>& reader, 
+                    const Json& context_j, 
+                    std::error_code& ec)
+    {
+        return ser_traits_default<T>::decode(reader, context_j, ec);
+    }
+
+    template <class Json>
+    static void encode(const T& val, 
+                       basic_json_content_handler<typename Json::char_type>& encoder,
+                       const Json& context_j, 
+                       std::error_code& ec)
+    {
+        ser_traits_default<T>::encode(val, encoder, context_j, ec);
+    }
+};
+
+template <class T>
 struct ser_traits_default
 {
     template <class Json>
     static T decode(basic_staj_reader<typename Json::char_type>& reader, 
-                         const Json& context_j, 
-                         std::error_code& ec)
+                    const Json& context_j, 
+                    std::error_code& ec)
     {
         json_decoder<Json> decoder(context_j.get_allocator());
         reader.read(decoder, ec);
@@ -36,9 +90,9 @@ struct ser_traits_default
 
     template <class Json>
     static void encode(const T& val, 
-                          basic_json_content_handler<typename Json::char_type>& encoder,
-                          const Json& context_j, 
-                          std::error_code& ec)
+                       basic_json_content_handler<typename Json::char_type>& encoder,
+                       const Json& context_j, 
+                       std::error_code& ec)
     {
         encode(std::integral_constant<bool, is_stateless<typename Json::allocator_type>::value>(),
                   val, encoder, context_j, ec);
@@ -70,74 +124,23 @@ struct ser_traits_default
 private:
     template <class Json>
     static void encode(std::true_type,
-                          const T& val, 
-                          basic_json_content_handler<typename Json::char_type>& encoder,
-                          const Json& /*context_j*/, 
-                          std::error_code& ec)
+                       const T& val, 
+                       basic_json_content_handler<typename Json::char_type>& encoder,
+                       const Json& /*context_j*/, 
+                       std::error_code& ec)
     {
-        auto j = json_type_traits<Json, T>::to_json(val);
+        auto j = ser_traits<T>::template to_json<Json>(val);
         j.dump(encoder, ec);
     }
     template <class Json>
     static void encode(std::false_type, 
-                          const T& val, 
-                          basic_json_content_handler<typename Json::char_type>& encoder,
-                          const Json& context_j, 
-                          std::error_code& ec)
-    {
-        auto j = json_type_traits<Json, T>::to_json(val, context_j.get_allocator());
-        j.dump(encoder, ec);
-    }
-};
-
-template <class T, class Enable = void>
-struct ser_traits
-{
-    template <class Json>
-    static constexpr bool is_compatible()
-    {
-        return json_type_traits<Json,T>::is_compatible;
-    }
-
-    template <class Json>
-    static bool is(const Json& j)
-    {
-        return ser_traits_default<T>::is(j);
-    }
-
-    template <class Json>
-    static T as(const Json& j)
-    {
-        return ser_traits_default<T>::as(j);
-    }
-
-    template <class Json>
-    static Json to_json(const T& val)
-    {
-        return ser_traits_default<T>::template to_json<Json>(val);
-    }
-
-    template <class Json>
-    static Json to_json(const T& val, const typename Json::allocator_type& alloc)
-    {
-        return ser_traits_default<T>::template to_json<Json>(val, alloc);
-    }
-
-    template <class Json>
-    static T decode(basic_staj_reader<typename Json::char_type>& reader, 
-                    const Json& context_j, 
-                    std::error_code& ec)
-    {
-        return ser_traits_default<T>::decode(reader, context_j, ec);
-    }
-
-    template <class Json>
-    static void encode(const T& val, 
+                       const T& val, 
                        basic_json_content_handler<typename Json::char_type>& encoder,
                        const Json& context_j, 
                        std::error_code& ec)
     {
-        ser_traits_default<T>::encode(val, encoder, context_j, ec);
+        auto j = ser_traits<T>::template to_json<Json>(val, context_j.get_allocator());
+        j.dump(encoder, ec);
     }
 };
 
