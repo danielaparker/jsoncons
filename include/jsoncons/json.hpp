@@ -10,6 +10,7 @@
 #include <jsoncons/basic_json.hpp>
 #include <jsoncons/ser_json.hpp>
 #include <jsoncons/json_type_traits_macros.hpp>
+#include <jsoncons/staj_iterator.hpp>
 
 #endif
 
