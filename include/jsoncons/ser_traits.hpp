@@ -140,11 +140,7 @@ struct ser_traits
         ser_traits_default<T>::encode(val, encoder, context_j, ec);
     }
 };
-}
 
-#include <jsoncons/staj_iterator.hpp>
-
-namespace jsoncons {
 // specializations
 
 // vector like
@@ -325,21 +321,22 @@ struct ser_traits<std::array<T,N>>
         return j;
     }
 
-
     template <class Json>
     static std::array<T, N> decode(basic_staj_reader<typename Json::char_type>& reader, 
-                                   const Json&, 
+                                   const Json& context_j, 
                                    std::error_code& ec)
     {
         std::array<T,N> v;
         v.fill(T{});
-        staj_array_iterator<Json,Json> end;
-        staj_array_iterator<Json,Json> it(reader, ec);
-
-        for (size_t i = 0; it != end && i < N && !ec; ++i)
+        if (reader.current().event_type() != staj_event_type::begin_array)
         {
-            v[i] = it->template as<value_type>();
-            it.increment(ec);
+            return v;
+        }
+        reader.next(ec);
+        for (size_t i = 0; i < N && reader.current().event_type() != staj_event_type::end_array && !ec; ++i)
+        {
+            v[i] = ser_traits<value_type>::decode(reader, context_j, ec);
+            reader.next(ec);
         }
         return v;
     }
@@ -409,19 +406,25 @@ struct ser_traits<T,
 
     template <class Json>
     static T decode(basic_staj_reader<typename Json::char_type>& reader, 
-                         const Json&, 
-                         std::error_code& ec)
+                    const Json& context_j, 
+                    std::error_code& ec)
     {
-        T m;
-        staj_object_iterator<Json,Json> end;
-        staj_object_iterator<Json,Json> it(reader, ec);
-
-        while (it != end && !ec)
+        T val;
+        if (reader.current().event_type() != staj_event_type::begin_object)
         {
-            m.emplace(std::make_pair(it->first,(it->second).template as<mapped_type>()));
-            it.increment(ec);
+            return val;
         }
-        return m;
+        reader.next(ec);
+
+        while (reader.current().event_type() != staj_event_type::end_object && !ec)
+        {
+            JSONCONS_ASSERT(reader.current().event_type() == staj_event_type::name);
+            auto key = reader.current(). template get<key_type>();
+            reader.next(ec);
+            val.emplace(std::move(key),ser_traits<mapped_type>::decode(reader, context_j, ec));
+            reader.next(ec);
+        }
+        return val;
     }
 
     template <class Json>
