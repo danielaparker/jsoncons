@@ -381,12 +381,12 @@ namespace jsoncons \
             return true; \
         } \
         template <typename Json> \
-        static typename std::enable_if<std::is_same<typename Json::char_type,char>::value,value_type>::type as(const Json& ajson) \
+        static typename std::enable_if<std::is_same<typename Json::char_type,char>::value,value_type>::type as(const Json& ajson, std::error_code&) \
         { \
             return value_type ( JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_AS,,,, __VA_ARGS__) ); \
         } \
         template <typename Json> \
-        static typename std::enable_if<std::is_same<typename Json::char_type,wchar_t>::value,value_type>::type as(const Json& ajson) \
+        static typename std::enable_if<std::is_same<typename Json::char_type,wchar_t>::value,value_type>::type as(const Json& ajson, std::error_code&) \
         { \
             return value_type ( JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_AS,L,,, __VA_ARGS__) ); \
         } \

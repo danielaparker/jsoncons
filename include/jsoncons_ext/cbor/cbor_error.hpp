@@ -15,7 +15,7 @@ namespace jsoncons { namespace cbor {
 
 enum class cbor_errc
 {
-    ok = 0,
+    success = 0,
     unexpected_eof,
     source_error,
     invalid_bigdec,

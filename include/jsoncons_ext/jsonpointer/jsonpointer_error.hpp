@@ -39,7 +39,7 @@ public:
 
 enum class jsonpointer_errc 
 {
-    ok = 0,
+    success = 0,
     expected_slash = 1,
     index_exceeds_array_size,
     expected_0_or_1,

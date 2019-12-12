@@ -14,7 +14,7 @@ namespace jsoncons { namespace csv {
 
     enum class csv_errc : int
     {
-        ok = 0,
+        success = 0,
         unexpected_eof = 1,
         source_error,
         expected_quote,

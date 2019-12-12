@@ -3629,9 +3629,15 @@ public:
     }
 
     template<class T, class... Args>
-    T as(Args&&... args) const
+    T as() const
     {
-        return ser_traits<T>::as(*this,std::forward<Args>(args)...);
+        std::error_code ec;
+        T val = ser_traits<T>::as(*this,ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec));
+        }
+        return val;
     }
 
     bool as_bool() const 

@@ -20,7 +20,7 @@
 
 namespace jsoncons { namespace detail {
 
-enum class to_integer_errc : uint8_t {ok=0,overflow,invalid_digit};
+enum class to_integer_errc : uint8_t {success=0,overflow,invalid_digit};
 
 template <class T>
 struct to_integer_result

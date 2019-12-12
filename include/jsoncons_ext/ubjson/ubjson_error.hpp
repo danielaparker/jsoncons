@@ -14,7 +14,7 @@ namespace jsoncons { namespace ubjson {
 
 enum class ubjson_errc
 {
-    ok = 0,
+    success = 0,
     unexpected_eof = 1,
     source_error,
     count_required_after_type,

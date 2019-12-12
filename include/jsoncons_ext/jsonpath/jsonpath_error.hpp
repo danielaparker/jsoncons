@@ -83,7 +83,7 @@ public:
 
 enum class jsonpath_errc 
 {
-    ok = 0,
+    success = 0,
     expected_root,
     expected_current_node,
     expected_right_bracket,

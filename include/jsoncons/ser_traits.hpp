@@ -18,6 +18,7 @@
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/staj_reader.hpp>
+#include <jsoncons/conversion_error.hpp>
 
 namespace jsoncons {
 
@@ -40,7 +41,7 @@ struct ser_traits
     }
 
     template <class Json>
-    static T as(const Json& j)
+    static T as(const Json& j, std::error_code&)
     {
         return json_type_traits<Json,T>::as(j);
     }
@@ -105,7 +106,7 @@ struct ser_traits_default
     }
 
     template <class Json>
-    static T as(const Json& j)
+    static T as(const Json& j, std::error_code&)
     {
         return json_type_traits<Json,T>::as(j);
     }
@@ -175,13 +176,14 @@ struct ser_traits<T,
 
     template <class Json,class Ty = T>
     static typename std::enable_if<!(std::is_integral<Ty>::value && !std::is_same<Ty,bool>::value),T>::type
-    as(const Json& j)
+    as(const Json& j, std::error_code& ec)
     {
+        T result;
         if (!j.is_array())
         {
-            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Attempt to cast json non-array to array"));
+            ec = conversion_errc::json_not_vector;
+            return result;
         }
-        T result;
         result.reserve(j.size());
         for (const auto& item : j.array_range())
         {
@@ -193,7 +195,7 @@ struct ser_traits<T,
 
     template <class Json,class Ty = T>
     static typename std::enable_if<std::is_integral<Ty>::value && !std::is_same<Ty,bool>::value,T>::type
-    as(const Json& j)
+    as(const Json& j, std::error_code& ec)
     {
         if (j.is_array())
         {
@@ -219,7 +221,8 @@ struct ser_traits<T,
         }
         else
         {
-            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Attempt to cast json non-array to array"));
+            ec = conversion_errc::json_not_vector;
+            return T();
         }
     }
 
@@ -301,7 +304,7 @@ struct ser_traits<std::array<T,N>>
     }
 
     template <class Json>
-    static std::array<T,N> as(const Json& j)
+    static std::array<T,N> as(const Json& j, std::error_code& ec)
     {
         std::array<T, N> buff;
         JSONCONS_ASSERT(j.size() == N);
@@ -388,7 +391,7 @@ struct ser_traits<T,
     }
 
     template <class Json>
-    static T as(const Json& j)
+    static T as(const Json& j, std::error_code& )
     {
         T result;
         for (const auto& item : j.object_range())
