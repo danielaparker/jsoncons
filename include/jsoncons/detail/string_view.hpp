@@ -18,7 +18,7 @@
 #include <exception>
 #include <stdexcept>
 #include <istream> // std::basic_istream
-#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 
 namespace jsoncons { namespace detail {
 

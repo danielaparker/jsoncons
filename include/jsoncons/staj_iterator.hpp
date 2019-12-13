@@ -25,8 +25,7 @@ class staj_array_iterator
     typedef typename Json::char_type char_type;
 
     basic_staj_reader<char_type>* reader_;
-    typename std::aligned_storage<sizeof(T), alignof(T)>::type storage_;
-    T* valuep_;
+    optional<T> value_;
 public:
     typedef T value_type;
     typedef std::ptrdiff_t difference_type;
@@ -35,12 +34,12 @@ public:
     typedef std::input_iterator_tag iterator_category;
 
     staj_array_iterator() noexcept
-        : reader_(nullptr), valuep_(nullptr)
+        : reader_(nullptr)
     {
     }
 
     staj_array_iterator(basic_staj_reader<char_type>& reader)
-        : reader_(std::addressof(reader)), valuep_(nullptr)
+        : reader_(std::addressof(reader))
     {
         if (reader_->current().event_type() == staj_event_type::begin_array)
         {
@@ -54,7 +53,7 @@ public:
 
     staj_array_iterator(basic_staj_reader<char_type>& reader,
                         std::error_code& ec)
-        : reader_(std::addressof(reader)), valuep_(nullptr)
+        : reader_(std::addressof(reader))
     {
         if (reader_->current().event_type() == staj_event_type::begin_array)
         {
@@ -71,59 +70,42 @@ public:
     }
 
     staj_array_iterator(const staj_array_iterator& other)
-        : reader_(other.reader_), valuep_(nullptr)
+        : reader_(other.reader_), value_(other.value_)
     {
-        if (other.valuep_)
-        {
-            valuep_ = ::new(&storage_)T(*other.valuep_);
-        }
     }
 
     staj_array_iterator(staj_array_iterator&& other) noexcept
-        : reader_(nullptr), valuep_(nullptr)
+        : reader_(nullptr), value_(std::move(other.value_))
     {
         std::swap(reader_,other.reader_);
-        std::swap(valuep_,other.valuep_);
     }
 
     ~staj_array_iterator()
     {
-        if (valuep_)
-        {
-            valuep_->~T();
-        }
     }
 
     staj_array_iterator& operator=(const staj_array_iterator& other)
     {
         reader_ = other.reader_;
-        if (valuep_)
-        {
-            valuep_->~T();
-            valuep_ = nullptr;
-        }
-        if (other.valuep_)
-        {
-            valuep_ = ::new(&storage_)T(*other.valuep_);
-        }
+        value_ = other.value;
         return *this;
     }
 
     staj_array_iterator& operator=(staj_array_iterator&& other) noexcept
     {
         std::swap(reader_,other.reader_);
-        std::swap(valuep_,other.valuep_);
+        value_.swap(other.value_);
         return *this;
     }
 
     const T& operator*() const
     {
-        return *valuep_;
+        return value_.value();
     }
 
     const T* operator->() const
     {
-        return valuep_;
+        return value_.operator->();
     }
 
     staj_array_iterator& operator++()
@@ -198,18 +180,17 @@ public:
     typedef std::input_iterator_tag iterator_category;
 
 private:
-    typename std::aligned_storage<sizeof(value_type), alignof(value_type)>::type storage_;
     basic_staj_reader<char_type>* reader_;
-    value_type* kvp_;
+    optional<value_type> key_value_;
 public:
 
     staj_object_iterator() noexcept
-        : reader_(nullptr), kvp_(nullptr)
+        : reader_(nullptr)
     {
     }
 
     staj_object_iterator(basic_staj_reader<char_type>& reader)
-        : reader_(std::addressof(reader)), kvp_(nullptr)
+        : reader_(std::addressof(reader))
     {
         if (reader_->current().event_type() == staj_event_type::begin_object)
         {
@@ -223,7 +204,7 @@ public:
 
     staj_object_iterator(basic_staj_reader<char_type>& reader, 
                          std::error_code& ec)
-        : reader_(std::addressof(reader)), kvp_(nullptr)
+        : reader_(std::addressof(reader))
     {
         if (reader_->current().event_type() == staj_event_type::begin_object)
         {
@@ -240,61 +221,41 @@ public:
     }
 
     staj_object_iterator(const staj_object_iterator& other)
-        : reader_(other.reader_), kvp_(nullptr)
+        : reader_(other.reader_), key_value_(other.key_value_)
     {
-        if (other.kvp_)
-        {
-            kvp_ = ::new(&storage_)value_type(*other.kvp_);
-        }
     }
 
     staj_object_iterator(staj_object_iterator&& other) noexcept
-        : reader_(other.reader_), kvp_(nullptr)
+        : reader_(other.reader_), key_value_(std::move(other.key_value_))
     {
-        if (other.kvp_)
-        {
-            kvp_ = ::new(&storage_)value_type(std::move(*other.kvp_));
-        }
     }
 
     ~staj_object_iterator()
     {
-        if (kvp_)
-        {
-            kvp_->~value_type();
-        }
     }
 
     staj_object_iterator& operator=(const staj_object_iterator& other)
     {
         reader_ = other.reader_;
-        if (kvp_)
-        {
-            kvp_->~T();
-            kvp_ = nullptr;
-        }
-        if (other.kvp_)
-        {
-            kvp_ = ::new(&storage_)value_type(*other.kvp_);
-        }
+        key_value_ = other.key_value_;
         return *this;
     }
 
     staj_object_iterator& operator=(staj_object_iterator&& other) noexcept
     {
         std::swap(reader_,other.reader_);
-        std::swap(kvp_,other.kvp_);
+        std::swap(key_value_,other.key_value_);
         return *this;
     }
 
     const value_type& operator*() const
     {
-        return *kvp_;
+        return key_value_.value();
     }
 
     const value_type* operator->() const
     {
-        return kvp_;
+        return key_value_.operator->();
     }
 
     staj_object_iterator& operator++()
@@ -372,12 +333,8 @@ void staj_array_iterator<Json,T>::next()
         reader_->next();
         if (!done())
         {
-            if (valuep_)
-            {
-                valuep_->~T();
-            }
             std::error_code ec;
-            valuep_ = ::new(&storage_)T(ser_traits<T>::decode(*reader_, Json(), ec));
+            value_ = ser_traits<T>::decode(*reader_, Json(), ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, reader_->context().line(), reader_->context().column()));
@@ -398,11 +355,7 @@ void staj_array_iterator<Json,T>::next(std::error_code& ec)
         }
         if (!done())
         {
-            if (valuep_)
-            {
-                valuep_->~T();
-            }
-            valuep_ = ::new(&storage_)T(ser_traits<T>::decode(*reader_, Json(), ec));
+            value_ = ser_traits<T>::decode(*reader_, Json(), ec);
         }
     }
 }
@@ -418,12 +371,8 @@ void staj_object_iterator<Json,T>::next()
         reader_->next();
         if (!done())
         {
-            if (kvp_)
-            {
-                kvp_->~value_type();
-            }
             std::error_code ec;
-            kvp_ = ::new(&storage_)value_type(std::move(key),ser_traits<T>::decode(*reader_, Json(), ec));
+            key_value_ = value_type(std::move(key),ser_traits<T>::decode(*reader_, Json(), ec));
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, reader_->context().line(), reader_->context().column()));
@@ -451,11 +400,7 @@ void staj_object_iterator<Json,T>::next(std::error_code& ec)
         }
         if (!done())
         {
-            if (kvp_)
-            {
-                kvp_->~value_type();
-            }
-            kvp_ = ::new(&storage_)value_type(std::move(key),ser_traits<T>::decode(*reader_, Json(), ec));
+            key_value_ = value_type(std::move(key),ser_traits<T>::decode(*reader_, Json(), ec));
         }
     }
 }
