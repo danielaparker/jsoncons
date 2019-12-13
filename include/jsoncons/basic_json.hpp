@@ -1990,10 +1990,16 @@ public:
             return evaluate().as_string(options,alloc);
         }
 
-        template<class T, class... Args>
+        template<class T>
         T as() const
         {
             return evaluate().template as<T>();
+        }
+
+        template<class T>
+        T as(std::error_code& ec) const
+        {
+            return evaluate().template as<T>(ec);
         }
         bool as_bool() const
         {
@@ -3628,16 +3634,22 @@ public:
         }
     }
 
-    template<class T, class... Args>
+    template<class T>
     T as() const
     {
         std::error_code ec;
-        T val = ser_traits<T>::as(*this,ec);
+        T val = as<T>(ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
         }
         return val;
+    }
+
+    template<class T>
+    T as(std::error_code& ec) const
+    {
+        return ser_traits<T>::as(*this,ec);
     }
 
     bool as_bool() const 

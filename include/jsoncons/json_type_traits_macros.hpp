@@ -229,19 +229,19 @@ namespace jsoncons \
             JSONCONS_VARIADIC_REP_N(JSONCONS_TO_JSON,L,,, __VA_ARGS__) \
             return ajson; \
         } \
-        template <class J> \
-        static value_type decode(basic_staj_reader<typename J::char_type>& reader, const J& context_j, std::error_code& ec) \
+        template <class Json> \
+        static value_type decode(basic_staj_reader<typename Json::char_type>& reader, const Json& context_j, std::error_code& ec) \
         { return ser_traits_default<value_type>::decode(reader, context_j, ec); } \
-        template <class J> \
-        static void encode(const value_type& val, basic_json_content_handler<typename J::char_type>& encoder, const J& context_j, std::error_code& ec) \
+        template <class Json> \
+        static void encode(const value_type& val, basic_json_content_handler<typename Json::char_type>& encoder, const Json& context_j, std::error_code& ec) \
         { ser_traits_default<value_type>::encode(val, encoder, context_j, ec); } \
     private: \
-        template <class J, class U> \
-        static void set_member(std::true_type, const J&, const typename J::string_view_type&, U&) \
+        template <class Json, class U> \
+        static void set_member(std::true_type, const Json&, const typename Json::string_view_type&, U&) \
         { \
         } \
-        template <class J, class U> \
-        static void set_member(std::false_type, const J& j, const typename J::string_view_type& name, U& val) \
+        template <class Json, class U> \
+        static void set_member(std::false_type, const Json& j, const typename Json::string_view_type& name, U& val) \
         { \
             val = j.at(name).template as<U>(); \
         } \
