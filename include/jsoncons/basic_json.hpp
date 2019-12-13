@@ -1997,7 +1997,7 @@ public:
         }
 
         template<class T>
-        T as(std::error_code& ec) const
+        optional<T> as(std::error_code& ec) const
         {
             return evaluate().template as<T>(ec);
         }
@@ -3638,16 +3638,16 @@ public:
     T as() const
     {
         std::error_code ec;
-        T val = as<T>(ec);
+        optional<T> val(as<T>(ec));
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
         }
-        return val;
+        return std::move(val.value());
     }
 
     template<class T>
-    T as(std::error_code& ec) const
+    optional<T> as(std::error_code& ec) const
     {
         return ser_traits<T>::as(*this,ec);
     }

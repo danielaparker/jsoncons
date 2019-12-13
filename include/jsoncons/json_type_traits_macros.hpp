@@ -169,10 +169,10 @@
 #define JSONCONS_IS_LAST(Prefix, P2, P3, Member, Count) if ((num_params-Count) < num_mandatory_params1 && !ajson.contains(JSONCONS_QUOTE(Prefix, Member))) return false;
 
 #define JSONCONS_AS(Prefix,P2,P3, Member, Count) JSONCONS_AS_LAST(Prefix,P2,P3, Member, Count)
-#define JSONCONS_AS_LAST(Prefix,P2,P3, Member, Count) if ((num_params-Count) < num_mandatory_params2 || ajson.contains(JSONCONS_QUOTE(Prefix, Member))) {set_member(std::is_const<decltype(aval.Member)>(),ajson,JSONCONS_QUOTE(Prefix, Member),aval.Member);}
+#define JSONCONS_AS_LAST(Prefix,P2,P3, Member, Count) if ((num_params-Count) < num_mandatory_params2 || ajson.contains(JSONCONS_QUOTE(Prefix, Member))) {set_member(std::is_const<decltype(aval.Member)>(),ajson,JSONCONS_QUOTE(Prefix, Member),aval.Member, ec);}
 
 #define JSONCONS_ALL_AS(Prefix, P2,P3,Member, Count) JSONCONS_ALL_AS_LAST(Prefix,P2,P3, Member, Count)
-#define JSONCONS_ALL_AS_LAST(Prefix,P2,P3, Member, Count) set_member(std::is_const<decltype(aval.Member)>(),ajson,JSONCONS_QUOTE(Prefix, Member),aval.Member);
+#define JSONCONS_ALL_AS_LAST(Prefix,P2,P3, Member, Count) set_member(std::is_const<decltype(aval.Member)>(),ajson,JSONCONS_QUOTE(Prefix, Member),aval.Member, ec);
 
 #define JSONCONS_TO_JSON(Prefix, P2, P3, Member, Count) JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Count)
 #define JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Count) ajson.try_emplace(JSONCONS_QUOTE(Prefix, Member), aval.Member);
@@ -202,18 +202,18 @@ namespace jsoncons \
             return true; \
         } \
         template <typename Json> \
-        static typename std::enable_if<std::is_same<typename Json::char_type,char>::value,value_type>::type as(const Json& ajson, std::error_code&) \
+        static typename std::enable_if<std::is_same<typename Json::char_type,char>::value,optional<value_type>>::type as(const Json& ajson, std::error_code& ec) \
         { \
             value_type aval{}; \
             JSONCONS_VARIADIC_REP_N(As,,,, __VA_ARGS__) \
-            return aval; \
+            return optional<value_type>(std::move(aval)); \
         } \
         template <typename Json> \
-        static typename std::enable_if<std::is_same<typename Json::char_type,wchar_t>::value,value_type>::type as(const Json& ajson, std::error_code&) \
+        static typename std::enable_if<std::is_same<typename Json::char_type,wchar_t>::value,optional<value_type>>::type as(const Json& ajson, std::error_code& ec) \
         { \
             value_type aval{}; \
             JSONCONS_VARIADIC_REP_N(As,L,,, __VA_ARGS__) \
-            return aval; \
+            return optional<value_type>(std::move(aval)); \
         } \
         template <typename Json> \
         static typename std::enable_if<std::is_same<typename Json::char_type,char>::value,Json>::type to_json(const value_type& aval, typename Json::allocator_type alloc=typename Json::allocator_type()) \
@@ -237,13 +237,13 @@ namespace jsoncons \
         { ser_traits_default<value_type>::encode(val, encoder, context_j, ec); } \
     private: \
         template <class Json, class U> \
-        static void set_member(std::true_type, const Json&, const typename Json::string_view_type&, U&) \
+        static void set_member(std::true_type, const Json&, const typename Json::string_view_type&, U&, std::error_code&) \
         { \
         } \
         template <class Json, class U> \
-        static void set_member(std::false_type, const Json& j, const typename Json::string_view_type& name, U& val) \
+        static void set_member(std::false_type, const Json& j, const typename Json::string_view_type& name, U& val, std::error_code& ec) \
         { \
-            val = j.at(name).template as<U>(); \
+            auto o = j.at(name).template as<U>(ec); if (!ec) val = o.value(); \
         } \
     }; \
 } \
