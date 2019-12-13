@@ -30,9 +30,9 @@ namespace detail
         {
         }
 
-        template <class U=T,
-                  class = typename std::enable_if<std::is_copy_constructible<U>::value>::type>
-        optional(const optional& other)
+        template <class U=T>
+        optional(const optional& other,
+                 typename std::enable_if<std::is_copy_constructible<U>::value>::type* = 0)
             : valuep_(nullptr)
         {
             if (other)
@@ -47,9 +47,18 @@ namespace detail
             std::swap(valuep_,other.valuep_);
         }
 
-        template <class U = value_type,
-                  class = typename std::enable_if<std::is_constructible<T,U&&>::value>::type>
-        constexpr optional( U&& value )
+        template <class U = T>
+        constexpr optional( U&& value,
+                            typename std::enable_if<std::is_constructible<T, U&&>::value &&
+                            std::is_convertible<T, U&&>::value>::type * = 0) // (8)
+            : valuep_(::new(&storage_)value_type(std::forward<U>(value)))
+        {
+        }
+
+        template <class U = T>
+        explicit constexpr optional( U&& value,
+                                     typename std::enable_if<std::is_constructible<T, U&&>::value &&
+                                                            !std::is_convertible<T, U&&>::value>::type* = 0) // (8)
             : valuep_(::new(&storage_)value_type(std::forward<U>(value)))
         {
         }
@@ -63,21 +72,27 @@ namespace detail
 
         constexpr optional& operator=( const optional& other )
         {
-            if (valuep_)
+            if (this != &other)
             {
-                valuep_->~T();
-                valuep_ = nullptr;
-            }
-            if (other)
-            {
-                valuep_ = ::new(&storage_)value_type(other);
+                if (valuep_)
+                {
+                    valuep_->~T();
+                    valuep_ = nullptr;
+                }
+                if (other)
+                {
+                    valuep_ = ::new(&storage_)value_type(other);
+                }
             }
             return *this;
         }
 
         constexpr optional& operator=( optional&& other ) noexcept
         {
-            std::swap(valuep_, other.valuep_);
+            if (this != &other)
+            {
+                std::swap(valuep_, other.valuep_);
+            }
             return *this;
         }
 
