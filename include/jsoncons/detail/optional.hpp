@@ -30,7 +30,9 @@ namespace detail
         {
         }
 
-        optional( const optional& other )
+        template <class U=T>
+        optional( const optional& other,
+                  typename std::enable_if<std::is_copy_constructible<U>::value>::type* = 0 )
             : valuep_(nullptr)
         {
             if (other)
@@ -46,10 +48,10 @@ namespace detail
         }
 
         template <class U = value_type>
-        constexpr optional( U&& value )
-            : valuep_(nullptr)
+        constexpr optional( U&& value,
+                            typename std::enable_if<std::is_constructible<T,U&&>::value>::type* = 0  )
+            : valuep_(::new(&storage_)value_type(std::forward<U>(value)))
         {
-            valuep_ = ::new(&storage_)value_type(std::forward<U>(value));
         }
         ~optional()
         {
