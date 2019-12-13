@@ -30,9 +30,9 @@ namespace detail
         {
         }
 
-        template <class U=T>
-        optional( const optional& other,
-                  typename std::enable_if<std::is_copy_constructible<U>::value>::type* = 0 )
+        template <class U=T,
+                  class = typename std::enable_if<std::is_copy_constructible<U>::value>::type>
+        optional(const optional& other)
             : valuep_(nullptr)
         {
             if (other)
@@ -47,9 +47,9 @@ namespace detail
             std::swap(valuep_,other.valuep_);
         }
 
-        template <class U = value_type>
-        constexpr optional( U&& value,
-                            typename std::enable_if<std::is_constructible<T,U&&>::value>::type* = 0  )
+        template <class U = value_type,
+                  class = typename std::enable_if<std::is_constructible<T,U&&>::value>::type>
+        constexpr optional( U&& value )
             : valuep_(::new(&storage_)value_type(std::forward<U>(value)))
         {
         }
