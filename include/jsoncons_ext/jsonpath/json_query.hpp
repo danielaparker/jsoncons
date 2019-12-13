@@ -1765,8 +1765,17 @@ public:
     {
         if (state_stack_.back().is_union)
         {
-            std::set<node_type, node_less> temp(nodes_.begin(), nodes_.end());
-            stack_.push_back(std::vector<node_type>(temp.begin(),temp.end()));
+            std::set<node_type, node_less> index;
+            std::vector<node_type> temp;
+            for (const auto& node : nodes_)
+            {
+                if (index.count(node) == 0)
+                {
+                    temp.emplace_back(node);
+                    index.emplace(node);
+                }
+            }
+            stack_.emplace_back(std::move(temp));
         }
         else
         {

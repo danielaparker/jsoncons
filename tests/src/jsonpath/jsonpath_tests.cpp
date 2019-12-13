@@ -195,7 +195,7 @@ TEST_CASE("jsonpath store tests")
     SECTION("$.store[book[3].title,book[?(@.price > 10)].title]")
     {
         json result = jsonpath::json_query(store,"$.store[book[3].title,book[?(@.price > 10)].title]");
-        json expected = json::parse(R"(["Sword of Honour","The Lord of the Rings"])");
+        json expected = json::parse(R"(["The Lord of the Rings","Sword of Honour"])");
         CHECK(result == expected);
     }
 
@@ -1645,7 +1645,7 @@ TEST_CASE("jsonpath array union test")
     SECTION("Test 1")
     {
         json expected = json::parse(R"(
-[[0,1,2,3,4,5,6,7,8,9],[1,2,3,4,1,2,3,4]]
+[[1,2,3,4,1,2,3,4],[0,1,2,3,4,5,6,7,8,9]]
 )");
         json result = jsonpath::json_query(root,"$[0,1,2]");
         CHECK(result == expected);
