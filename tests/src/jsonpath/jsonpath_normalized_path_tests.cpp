@@ -224,8 +224,8 @@ TEST_CASE("jsonpath array union normalized path test")
 
     SECTION("$[0,1,2]")
     {
-        json expected = json::parse(R"([[0,1,2,3,4,5,6,7,8,9],[1,2,3,4,1,2,3,4]])");
-        json expected_path = json::parse(R"( ["$[1]","$[0]"])"); 
+        json expected = json::parse(R"([[1,2,3,4,1,2,3,4],[0,1,2,3,4,5,6,7,8,9]])");
+        json expected_path = json::parse(R"( ["$[0]","$[1]"])"); 
 
         std::string path = "$[0,1,2]";
         json result = json_query(root, path);
