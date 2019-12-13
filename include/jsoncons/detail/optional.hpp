@@ -30,7 +30,7 @@ namespace detail
         {
         }
 
-        constexpr optional( const optional& other )
+        optional( const optional& other )
             : valuep_(nullptr)
         {
             if (other)
@@ -39,7 +39,7 @@ namespace detail
             }
         }
 
-        constexpr optional( optional&& other ) noexcept
+        optional( optional&& other ) noexcept
             : valuep_(nullptr)
         {
             std::swap(valuep_,other.valuep_);
