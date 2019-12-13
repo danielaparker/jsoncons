@@ -203,6 +203,12 @@ namespace jsoncons \
             JSONCONS_VARIADIC_REP_N(JSONCONS_TO_JSON, Prefix,,, __VA_ARGS__) \
             return ajson; \
         } \
+        template <class J> \
+        static value_type decode(basic_staj_reader<typename J::char_type>& reader, const J& context_j, std::error_code& ec) \
+        { return ser_traits_default<value_type>::decode(reader, context_j, ec); } \
+        template <class J> \
+        static void encode(const value_type& val, basic_json_content_handler<typename J::char_type>& encoder, const J& context_j, std::error_code& ec) \
+        { ser_traits_default<value_type>::encode(val, encoder, context_j, ec); } \
     private: \
         template <class J, class U> \
         static void set_member(std::true_type, const J&, const typename J::string_view_type&, U&) \
