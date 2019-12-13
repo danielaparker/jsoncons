@@ -95,7 +95,9 @@
 
 #define JSONCONS_TYPE_TRAITS_FRIEND \
     template <class JSON,class T,class Enable> \
-    friend struct jsoncons::json_type_traits;
+    friend struct jsoncons::json_type_traits; \
+    template <class T,class Enable> \
+    friend struct jsoncons::ser_traits; 
 
 #define JSONCONS_EXPAND_CALL2(Call, Expr, Id) JSONCONS_EXPAND(Call(Expr, Id))
 
@@ -178,29 +180,53 @@
 #define JSONCONS_MEMBER_TRAITS_DECL_BASE(As,CharT,Prefix,NumTemplateParams,ValueType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons \
 { \
-    template<typename Json JSONCONS_GENERATE_MORE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
-    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams), typename std::enable_if<std::is_same<typename Json::char_type,CharT>::value>::type> \
+    template< JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams) > \
+    struct ser_traits<ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) > \
     { \
         typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
-        static bool is(const Json& ajson) noexcept \
+        template <typename Json> \
+        static typename std::enable_if<std::is_same<typename Json::char_type,char>::value,bool>::type is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
-            JSONCONS_VARIADIC_REP_N(JSONCONS_IS, Prefix,,, __VA_ARGS__)\
+            JSONCONS_VARIADIC_REP_N(JSONCONS_IS,,,, __VA_ARGS__)\
             return true; \
         } \
-        static value_type as(const Json& ajson) \
+        template <typename Json> \
+        static typename std::enable_if<std::is_same<typename Json::char_type,wchar_t>::value,bool>::type is(const Json& ajson) noexcept \
+        { \
+            if (!ajson.is_object()) return false; \
+            JSONCONS_VARIADIC_REP_N(JSONCONS_IS,L,,, __VA_ARGS__)\
+            return true; \
+        } \
+        template <typename Json> \
+        static typename std::enable_if<std::is_same<typename Json::char_type,char>::value,value_type>::type as(const Json& ajson, std::error_code&) \
         { \
             value_type aval{}; \
-            JSONCONS_VARIADIC_REP_N(As, Prefix,,, __VA_ARGS__) \
+            JSONCONS_VARIADIC_REP_N(As,,,, __VA_ARGS__) \
             return aval; \
         } \
-        static Json to_json(const value_type& aval, const typename Json::allocator_type& alloc=typename Json::allocator_type()) \
+        template <typename Json> \
+        static typename std::enable_if<std::is_same<typename Json::char_type,wchar_t>::value,value_type>::type as(const Json& ajson, std::error_code&) \
+        { \
+            value_type aval{}; \
+            JSONCONS_VARIADIC_REP_N(As,L,,, __VA_ARGS__) \
+            return aval; \
+        } \
+        template <typename Json> \
+        static typename std::enable_if<std::is_same<typename Json::char_type,char>::value,Json>::type to_json(const value_type& aval, typename Json::allocator_type alloc=typename Json::allocator_type()) \
         { \
             Json ajson(json_object_arg, semantic_tag::none, alloc); \
-            JSONCONS_VARIADIC_REP_N(JSONCONS_TO_JSON, Prefix,,, __VA_ARGS__) \
+            JSONCONS_VARIADIC_REP_N(JSONCONS_TO_JSON,,,, __VA_ARGS__) \
+            return ajson; \
+        } \
+        template <typename Json> \
+        static typename std::enable_if<std::is_same<typename Json::char_type,wchar_t>::value,Json>::type to_json(const value_type& aval, typename Json::allocator_type alloc=typename Json::allocator_type()) \
+        { \
+            Json ajson(json_object_arg, semantic_tag::none, alloc); \
+            JSONCONS_VARIADIC_REP_N(JSONCONS_TO_JSON,L,,, __VA_ARGS__) \
             return ajson; \
         } \
         template <class J> \
@@ -225,39 +251,32 @@ namespace jsoncons \
 
 #define JSONCONS_N_MEMBER_TRAITS_DECL(ValueType,NumMandatoryParams,...)  \
     JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_AS, char,,0, ValueType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
-    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_AS, wchar_t,L,0, ValueType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
   /**/
 
 #define JSONCONS_TPL_N_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType,NumMandatoryParams, ...)  \
     JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_AS, char,,NumTemplateParams, ValueType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
-    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_AS, wchar_t,L,NumTemplateParams, ValueType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
   /**/
 
 #define JSONCONS_TPL_N_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType,NumMandatoryParams, ...)  \
     JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_AS, char,,NumTemplateParams, ValueType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
-    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_AS, wchar_t,L,NumTemplateParams, ValueType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
   /**/
 
 #define JSONCONS_ALL_MEMBER_TRAITS_DECL(ValueType, ...)  \
     JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_ALL_AS,char,,0,ValueType, JSONCONS_NARGS(__VA_ARGS__), JSONCONS_NARGS(__VA_ARGS__),__VA_ARGS__) \
-    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_ALL_AS,wchar_t,L,0,ValueType, JSONCONS_NARGS(__VA_ARGS__), JSONCONS_NARGS(__VA_ARGS__),__VA_ARGS__) \
   /**/
 
 #define JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
     JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_ALL_AS,char,,NumTemplateParams,ValueType, JSONCONS_NARGS(__VA_ARGS__), JSONCONS_NARGS(__VA_ARGS__),__VA_ARGS__) \
-    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_ALL_AS,wchar_t,L,NumTemplateParams,ValueType, JSONCONS_NARGS(__VA_ARGS__), JSONCONS_NARGS(__VA_ARGS__),__VA_ARGS__) \
   /**/
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
 #define JSONCONS_MEMBER_TRAITS_DECL(ValueType, ...)  \
     JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_AS, char,,0, ValueType, JSONCONS_NARGS(__VA_ARGS__), 0, __VA_ARGS__) \
-    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_AS, wchar_t,L,0, ValueType, JSONCONS_NARGS(__VA_ARGS__), 0, __VA_ARGS__) \
   /**/
 
 #define JSONCONS_TPL_MEMBER_TRAITS_DECL(NumTemplateParams, ValueType, ...)  \
     JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_AS, char,,NumTemplateParams, ValueType, JSONCONS_NARGS(__VA_ARGS__), 0, __VA_ARGS__) \
-    JSONCONS_MEMBER_TRAITS_DECL_BASE(JSONCONS_AS, wchar_t,L,NumTemplateParams, ValueType, JSONCONS_NARGS(__VA_ARGS__), 0, __VA_ARGS__) \
   /**/
 
 #endif
