@@ -300,31 +300,40 @@ namespace jsoncons \
 #define JSONCONS_MEMBER_NAMED_TRAITS_DECL_BASE(As, NumTemplateParams, ValueType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons \
 { \
-    template<typename Json JSONCONS_GENERATE_MORE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
-    struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
+    template< JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams) > \
+    struct ser_traits<ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) > \
     { \
         typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
+        template <typename Json> \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
             JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_IS,,,, __VA_ARGS__)\
             return true; \
         } \
-        static value_type as(const Json& ajson) \
+        template <typename Json> \
+        static value_type as(const Json& ajson, std::error_code&) \
         { \
             value_type aval{}; \
             JSONCONS_VARIADIC_REP_N(As,,,, __VA_ARGS__) \
             return aval; \
         } \
+        template <typename Json> \
         static Json to_json(const value_type& aval, const typename Json::allocator_type& alloc=typename Json::allocator_type()) \
         { \
             Json ajson(json_object_arg, semantic_tag::none, alloc); \
             JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_TO_JSON,,,, __VA_ARGS__) \
             return ajson; \
         } \
+        template <class Json> \
+        static value_type decode(basic_staj_reader<typename Json::char_type>& reader, const Json& context_j, std::error_code& ec) \
+        { return ser_traits_default<value_type>::decode(reader, context_j, ec); } \
+        template <class Json> \
+        static void encode(const value_type& val, basic_json_content_handler<typename Json::char_type>& encoder, const Json& context_j, std::error_code& ec) \
+        { ser_traits_default<value_type>::encode(val, encoder, context_j, ec); } \
     private: \
         template <class J, class U> \
         static void set_member(std::true_type, const J&, const typename J::string_view_type&, U&) \
