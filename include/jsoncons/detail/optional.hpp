@@ -105,7 +105,12 @@ namespace detail
             return valuep_ != nullptr;
         }
 
-        constexpr T& value() &
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4702)
+#endif // _MSC_VER
+
+        T& value() &
         {
             if (valuep_ == nullptr)
             {
@@ -122,13 +127,16 @@ namespace detail
             }
             return *valuep_;
         }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif  // _MSC_VER
 
-        constexpr const T* operator->() const
+        const T* operator->() const
         {
             return valuep_;
         }
 
-        constexpr T* operator->()
+        T* operator->()
         {
             return valuep_;
         }
@@ -138,7 +146,7 @@ namespace detail
             return value();
         }
 
-        constexpr T& operator*() &
+        T& operator*() &
         {
             return value();
         }
