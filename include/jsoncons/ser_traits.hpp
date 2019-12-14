@@ -41,7 +41,7 @@ struct ser_traits
     }
 
     template <class Json>
-    static optional<T> as(const Json& j, std::error_code&)
+    static T as(const Json& j)
     {
         return json_type_traits<Json,T>::as(j);
     }
@@ -106,7 +106,7 @@ struct ser_traits_default
     }
 
     template <class Json>
-    static optional<T> as(const Json& j, std::error_code&)
+    static T as(const Json& j)
     {
         return json_type_traits<Json,T>::as(j);
     }
@@ -175,14 +175,13 @@ struct ser_traits<T,
     }
 
     template <class Json,class Ty = T>
-    static typename std::enable_if<!(std::is_integral<Ty>::value && !std::is_same<Ty,bool>::value),optional<T>>::type
-    as(const Json& j, std::error_code& ec)
+    static typename std::enable_if<!(std::is_integral<Ty>::value && !std::is_same<Ty,bool>::value),T>::type
+    as(const Json& j)
     {
         T result;
         if (!j.is_array())
         {
-            ec = conversion_errc::json_not_vector;
-            return result;
+            JSONCONS_THROW(ser_error(conversion_errc::json_not_vector));
         }
         result.reserve(j.size());
         for (const auto& item : j.array_range())
@@ -194,8 +193,8 @@ struct ser_traits<T,
     }
 
     template <class Json,class Ty = T>
-    static typename std::enable_if<std::is_integral<Ty>::value && !std::is_same<Ty,bool>::value,optional<T>>::type
-    as(const Json& j, std::error_code& ec)
+    static typename std::enable_if<std::is_integral<Ty>::value && !std::is_same<Ty,bool>::value,T>::type
+    as(const Json& j)
     {
         if (j.is_array())
         {
@@ -203,12 +202,7 @@ struct ser_traits<T,
             result.reserve(j.size());
             for (const auto& item : j.array_range())
             {
-                optional<T> o = item.template as<value_type>(ec);
-                if (ec)
-                {
-                    return o;
-                }
-                result.push_back(std::move(o.value()));
+                result.push_back(item.template as<value_type>());
             }
 
             return result;
@@ -220,8 +214,7 @@ struct ser_traits<T,
         }
         else
         {
-            ec = conversion_errc::json_not_vector;
-            return T();
+            JSONCONS_THROW(ser_error(conversion_errc::json_not_vector));
         }
     }
 
@@ -303,15 +296,15 @@ struct ser_traits<std::array<T,N>>
     }
 
     template <class Json>
-    static optional<std::array<T,N>> as(const Json& j, std::error_code& ec)
+    static std::array<T,N> as(const Json& j)
     {
-        std::array<T, N> a;
+        std::array<T, N> buff;
         JSONCONS_ASSERT(j.size() == N);
         for (size_t i = 0; i < N; i++)
         {
-            a[i] = j[i].template as<T>();
+            buff[i] = j[i].template as<T>();
         }
-        return optional<std::array<T,N>>(a);
+        return buff;
     }
 
     template <class Json>
@@ -390,7 +383,7 @@ struct ser_traits<T,
     }
 
     template <class Json>
-    static optional<T> as(const Json& j, std::error_code& )
+    static T as(const Json& j)
     {
         T result;
         for (const auto& item : j.object_range())
@@ -398,7 +391,7 @@ struct ser_traits<T,
             result.emplace(key_type(item.key().data(),item.key().size()), item.value().template as<mapped_type>());
         }
 
-        return optional<T>(std::move(result));
+        return result;
     }
 
     template <class Json>
