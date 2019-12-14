@@ -98,30 +98,6 @@ struct ser_traits_default
         encode(std::integral_constant<bool, is_stateless<typename Json::allocator_type>::value>(),
                   val, encoder, context_j, ec);
     }
-
-    template <class Json>
-    static bool is(const Json& j)
-    {
-        return json_type_traits<Json,T>::is(j);
-    }
-
-    template <class Json>
-    static T as(const Json& j)
-    {
-        return json_type_traits<Json,T>::as(j);
-    }
-
-    template <class Json>
-    static Json to_json(const T& val)
-    {
-        return json_type_traits<Json,T>::to_json(val);
-    }
-
-    template <class Json>
-    static Json to_json(const T& val, const typename Json::allocator_type& alloc)
-    {
-        return json_type_traits<Json, T>::to_json(val, alloc);
-    }
 private:
     template <class Json>
     static void encode(std::true_type,
