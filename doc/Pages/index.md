@@ -675,7 +675,7 @@ You can rename object member names with the built in filter [rename_object_membe
 ```c++
 #include <sstream>
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_content_filter.hpp>
+#include <jsoncons/json_filter.hpp>
 
 using namespace jsoncons;
 
@@ -709,7 +709,7 @@ Output:
 (1) {"first":1,"second":2,"third":3,"fourth":4}
 (2) {"first":1,"second":2,"third":3,"fourth":4}
 ```
-Or define and use your own filters. See [basic_json_content_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json_content_filter.md) for details.
+Or define and use your own filters. See [basic_json_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json_filter.md) for details.
 <div id="A8"/>
 ### JSONPath
 

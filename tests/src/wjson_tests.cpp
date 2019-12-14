@@ -3,7 +3,7 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <jsoncons/json_content_filter.hpp>
+#include <jsoncons/json_filter.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>

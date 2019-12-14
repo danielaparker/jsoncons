@@ -4,16 +4,16 @@
 #include <string>
 #include <sstream>
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_content_filter.hpp>
+#include <jsoncons/json_filter.hpp>
 #include <fstream>
 
 using namespace jsoncons;
 
-class name_fix_up_filter : public json_content_filter
+class name_fix_up_filter : public json_filter
 {
 public:
     name_fix_up_filter(json_content_handler& handler)
-        : json_content_filter(handler)
+        : json_filter(handler)
     {
     }
 
@@ -118,9 +118,9 @@ void change_member_name_example()
     std::cout << std::endl;
 }
 
-void json_content_filter_examples()
+void json_filter_examples()
 {
-    std::cout << "\njson_content_filter examples\n\n";
+    std::cout << "\njson_filter examples\n\n";
     name_fix_up_example1();
     name_fix_up_example2();
     change_member_name_example();

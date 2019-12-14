@@ -1,25 +1,25 @@
-### jsoncons::basic_json_content_filter
+### jsoncons::basic_json_filter
 
-__`jsoncons/json_content_filter.hpp`__
+__`jsoncons/json_filter.hpp`__
 
 ```c++
 template <
     class CharT
-> class basic_json_content_filter
+> class basic_json_filter
 ```
 
 Defines an interface for filtering JSON events. 
 
-`basic_json_content_filter` is noncopyable and nonmoveable.
+`basic_json_filter` is noncopyable and nonmoveable.
 
-![json_content_filter](./diagrams/json_content_filter.png)
+![json_filter](./diagrams/json_filter.png)
 
 Typedefs for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------
-json_content_filter    |`basic_json_content_filter<char>`
-wjson_content_filter   |`basic_json_content_filter<wchar_t>`
+json_filter    |`basic_json_filter<char>`
+wjson_filter   |`basic_json_filter<wchar_t>`
 
 #### Member types
 
@@ -30,9 +30,9 @@ Member type                         |Definition
 
 #### Constructors
 
-    basic_json_content_filter(basic_json_content_handler<char_type>& handler)
-All JSON events that pass through the `basic_json_content_filter` go to the specified [handler](basic_json_content_handler.md).
-You must ensure that the `handler` exists as long as does `basic_json_content_filter`, as `basic_json_content_filter` holds a pointer to but does not own this object.
+    basic_json_filter(basic_json_content_handler<char_type>& handler)
+All JSON events that pass through the `basic_json_filter` go to the specified [handler](basic_json_content_handler.md).
+You must ensure that the `handler` exists as long as does `basic_json_filter`, as `basic_json_filter` holds a pointer to but does not own this object.
 
 #### Accessors
 
@@ -236,7 +236,7 @@ Flushes whatever is buffered to the destination.
 ```c++
 #include <sstream>
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_content_filter.hpp>
+#include <jsoncons/json_filter.hpp>
 
 using namespace jsoncons;
 
@@ -293,22 +293,22 @@ Input JSON file `address-book.json`:
 
 Suppose you want to break the name into a first name and last name, and report a warning when `name` does not contain a space or tab separated part. 
 
-You can achieve the desired result by subclassing the [basic_json_content_filter](basic_json_content_filter.md) class, overriding the default methods for receiving name and string value events, and passing modified events on to the parent [json_content_handler](basic_json_content_handler.md) (which in this example will forward them to a [basic_json_encoder](basic_json_encoder.md).) 
+You can achieve the desired result by subclassing the [basic_json_filter](basic_json_filter.md) class, overriding the default methods for receiving name and string value events, and passing modified events on to the parent [json_content_handler](basic_json_content_handler.md) (which in this example will forward them to a [basic_json_encoder](basic_json_encoder.md).) 
 ```c++
 #include <jsoncons/json_encoder.hpp>
-#include <jsoncons/json_content_filter.hpp>
+#include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_reader.hpp>
 
 using namespace jsoncons;
 
 
-class name_fix_up_filter : public json_content_filter
+class name_fix_up_filter : public json_filter
 {
     std::string member_name_;
 
 public:
     name_fix_up_filter(json_content_handler& handler)
-        : json_content_filter(handler)
+        : json_filter(handler)
     {
     }
 

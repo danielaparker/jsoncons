@@ -16,7 +16,7 @@ void json_reader_examples();
 void readme_examples();
 void basics_examples();
 void basics_wexamples();
-void json_content_filter_examples();
+void json_filter_examples();
 void array_examples();
 void container_examples();
 void wjson_examples();
@@ -382,7 +382,7 @@ int main()
 
         parse_error_example();
 
-        json_content_filter_examples();
+        json_filter_examples();
 
         msgpack_examples();
 

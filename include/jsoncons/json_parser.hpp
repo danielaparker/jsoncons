@@ -16,7 +16,7 @@
 #include <limits> // std::numeric_limits
 #include <functional> // std::function
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_content_filter.hpp>
+#include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/json_error.hpp>

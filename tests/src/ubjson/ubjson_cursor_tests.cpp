@@ -77,7 +77,7 @@ TEST_CASE("ubjson_cursor reputon test")
     }
 }
 
-struct remove_mark_ubjson_content_filter
+struct remove_mark_ubjson_filter
 {
     bool reject_next_ = false;
 
@@ -129,7 +129,7 @@ TEST_CASE("ubjson_cursor with filter tests")
     std::vector<uint8_t> data;
     ubjson::encode_ubjson(j, data);
 
-    ubjson::ubjson_bytes_cursor cursor(data, remove_mark_ubjson_content_filter());
+    ubjson::ubjson_bytes_cursor cursor(data, remove_mark_ubjson_filter());
 
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::begin_array);

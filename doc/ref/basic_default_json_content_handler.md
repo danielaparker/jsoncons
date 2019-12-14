@@ -37,5 +37,5 @@ consuming an event, accept more events.
 
 ### See also
 
-- [basic_json_content_filter](basic_json_content_filter.md)
+- [basic_json_filter](basic_json_filter.md)
 
