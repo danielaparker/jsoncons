@@ -530,11 +530,11 @@ JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL_BASE(NumTemplateParams, ValueType,NumMand
 #define JSONCONS_ENUM_PAIR(Prefix, P2, P3, Member, Count) {value_type::Member, JSONCONS_QUOTE(Prefix,Member)},
 #define JSONCONS_ENUM_PAIR_LAST(Prefix, P2, P3, Member, Count) {value_type::Member, JSONCONS_QUOTE(Prefix,Member)}
 
-#define JSONCONS_ENUM_TRAITS_DECL_BASE(CharT,Prefix,EnumType, ...)  \
+#define JSONCONS_ENUM_TRAITS_DECL_BASE(EnumType, ...)  \
 namespace jsoncons \
 { \
-    template<typename Json> \
-    struct json_type_traits<Json, EnumType, typename std::enable_if<std::is_same<typename Json::char_type,CharT>::value>::type> \
+    template<> \
+    struct ser_traits<EnumType> \
     { \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
         typedef EnumType value_type; \
@@ -556,6 +556,7 @@ namespace jsoncons \
             return v; \
         } \
         \
+        template <typename Json> \
         static bool is(const Json& ajson) noexcept \
         { \
             typedef typename Json::char_type char_type; \
@@ -575,6 +576,7 @@ namespace jsoncons \
                                    { return item.second == s; }); \
             return it != last; \
         } \
+        template <typename Json> \
         static value_type as(const Json& ajson) \
         { \
             typedef typename Json::char_type char_type; \
@@ -608,6 +610,7 @@ namespace jsoncons \
             } \
             return it->first; \
         } \
+        template <typename Json> \
         static Json to_json(value_type aval, const typename Json::allocator_type& alloc=typename Json::allocator_type()) \
         { \
             typedef typename Json::char_type char_type; \
@@ -630,13 +633,18 @@ namespace jsoncons \
             } \
             return Json(it->second,alloc); \
         } \
+        template <class Json> \
+        static value_type decode(basic_staj_reader<typename Json::char_type>& reader, const Json& context_j, std::error_code& ec) \
+        { return ser_traits_default<value_type>::decode(reader, context_j, ec); } \
+        template <class Json> \
+        static void encode(const value_type& val, basic_json_content_handler<typename Json::char_type>& encoder, const Json& context_j, std::error_code& ec) \
+        { ser_traits_default<value_type>::encode(val, encoder, context_j, ec); } \
     }; \
 } \
     /**/
 
 #define JSONCONS_ENUM_TRAITS_DECL(EnumType, ...)  \
-    JSONCONS_ENUM_TRAITS_DECL_BASE(char,,EnumType,__VA_ARGS__) \
-    JSONCONS_ENUM_TRAITS_DECL_BASE(wchar_t,L,EnumType,__VA_ARGS__) \
+    JSONCONS_ENUM_TRAITS_DECL_BASE(EnumType,__VA_ARGS__) \
     /**/
 
 #define JSONCONS_NAMED_ENUM_PAIR(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_NAMED_ENUM_PAIR_ Seq),
