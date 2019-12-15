@@ -18,27 +18,31 @@ struct null_type
 
 struct half_arg_t
 {
+    explicit half_arg_t() = default; 
 };
 
-constexpr half_arg_t half_arg = half_arg_t();
+constexpr half_arg_t half_arg{};
 
 struct json_array_arg_t
 {
+    explicit json_array_arg_t() = default; 
 };
 
-constexpr json_array_arg_t json_array_arg = json_array_arg_t();
+constexpr json_array_arg_t json_array_arg{};
 
 struct json_object_arg_t
 {
+    explicit json_object_arg_t() = default; 
 };
 
-constexpr json_object_arg_t json_object_arg = json_object_arg_t();
+constexpr json_object_arg_t json_object_arg{};
 
 struct byte_string_arg_t
 {
+    explicit byte_string_arg_t() = default; 
 };
 
-constexpr byte_string_arg_t byte_string_arg = byte_string_arg_t();
+constexpr byte_string_arg_t byte_string_arg{};
 
 enum class semantic_tag : uint8_t 
 {
@@ -161,7 +165,7 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use semantic_tag") typedef semantic_tag semantic_tag_type;
     JSONCONS_DEPRECATED_MSG("Instead, use byte_string_arg_t") typedef byte_string_arg_t bstr_arg_t;
-    constexpr byte_string_arg_t bstr_arg = byte_string_arg_t();
+    constexpr byte_string_arg_t bstr_arg{};
 #endif
 
 }

@@ -120,6 +120,19 @@ Uses [half_arg_t](../half_arg_t.md) as first argument to disambiguate overloads 
 (21) Constructs a `basic_json` value for a byte string from any container of `utf8_t` values.
 Uses [byte_string_arg_t](../byte_string_arg_t.md) as first argument to disambiguate overloads that construct byte strings.
 
+### Helpers
+
+Helper                |Definition
+--------------------|------------------------------
+[json_object_arg][../json_object_arg.md] |    
+[json_object_arg_t][../json_object_arg_t.md] | json object construction tag
+[json_array_arg][../json_array_arg.md] |
+[json_array_arg_t][../json_array_arg_t.md] | json array construction tag
+[byte_string_arg][../byte_string_arg.md] |
+[byte_string_arg_t][../byte_string_arg_t.md] | byte string construction tag
+[half_arg][../half_arg.md] |
+[half_arg_t][../half_arg_t.md] | half precision floating point number construction tag
+
 ### Examples
 
 ```c++

@@ -3,7 +3,7 @@
 __`jsoncons/tag_type.hpp`__
 
 ```c++
-struct json_array_arg_t {};
+struct json_array_arg_t {explicit json_array_arg_t() = default;};
 ```
 
 `json_array_arg_t` is an empty class type used to disambiguate constructor overloads for json arrays.

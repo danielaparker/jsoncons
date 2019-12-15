@@ -3,7 +3,7 @@
 __`jsoncons/tag_type.hpp`__
 
 ```c++
-constexpr json_object_arg_t json_object_arg = json_object_arg_t();
+constexpr json_object_arg_t json_object_arg{};
 ```
 
 A constant of type [json_object_arg_t](json_object_arg_t.md) used as first argument to disambiguate constructor overloads for json objects.
