@@ -537,13 +537,22 @@ namespace jsoncons \
     struct json_type_traits<Json, EnumType, typename std::enable_if<std::is_same<typename Json::char_type,CharT>::value>::type> \
     { \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
+        typedef typename Json::char_type char_type; \
         typedef EnumType value_type; \
         template <class ChT> using mapped_type = std::pair<EnumType,std::basic_string<ChT>>; \
         \
-        static const std::vector<mapped_type<CharT>>& get_values() \
+        static const std::vector<mapped_type<char>>& get_values(char) \
         { \
-            static const std::vector<mapped_type<CharT>> v = { \
-                JSONCONS_VARIADIC_REP_N(JSONCONS_ENUM_PAIR, Prefix,,, __VA_ARGS__)\
+            static const std::vector<mapped_type<char>> v = { \
+                JSONCONS_VARIADIC_REP_N(JSONCONS_ENUM_PAIR,,,, __VA_ARGS__)\
+            };\
+            return v; \
+        } \
+        \
+        static const std::vector<mapped_type<wchar_t>>& get_values(wchar_t) \
+        { \
+            static const std::vector<mapped_type<wchar_t>> v = { \
+                JSONCONS_VARIADIC_REP_N(JSONCONS_ENUM_PAIR,L,,, __VA_ARGS__)\
             };\
             return v; \
         } \
@@ -552,8 +561,8 @@ namespace jsoncons \
         { \
             typedef typename Json::string_view_type string_view_type; \
             if (!ajson.is_string()) return false; \
-            auto first = std::begin(get_values()); \
-            auto last = std::end(get_values()); \
+            auto first = std::begin(get_values(char_type{})); \
+            auto last = std::end(get_values(char_type{})); \
             const string_view_type s = ajson.template as<string_view_type>(); \
             if (s.empty() && std::find_if(first, last, \
                                           [](const mapped_type<CharT>& item) -> bool \
@@ -574,8 +583,8 @@ namespace jsoncons \
                 JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
             } \
             const string_view_type s = ajson.template as<string_view_type>(); \
-            auto first = std::begin(get_values()); \
-            auto last = std::end(get_values()); \
+            auto first = std::begin(get_values(char_type{})); \
+            auto last = std::end(get_values(char_type{})); \
             if (s.empty() && std::find_if(first, last, \
                                           [](const mapped_type<CharT>& item) -> bool \
                                           { return item.first == value_type(); }) == last) \
@@ -601,8 +610,8 @@ namespace jsoncons \
         static Json to_json(value_type aval, const typename Json::allocator_type& alloc=typename Json::allocator_type()) \
         { \
             static constexpr CharT empty_string[] = {0}; \
-            auto first = std::begin(get_values()); \
-            auto last = std::end(get_values()); \
+            auto first = std::begin(get_values(char_type{})); \
+            auto last = std::end(get_values(char_type{})); \
             auto it = std::find_if(first, last, \
                                    [aval](const mapped_type<CharT>& item) -> bool \
                                    { return item.first == aval; }); \
@@ -641,11 +650,11 @@ namespace jsoncons \
         typedef typename Json::char_type char_type; \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
         typedef EnumType value_type; \
-        typedef std::pair<EnumType,std::basic_string<char_type>> mapped_type; \
+        template <class ChT> using mapped_type = std::pair<EnumType,std::basic_string<ChT>>; \
         \
-        static const std::vector<mapped_type>& get_values() \
+        static const std::vector<mapped_type<typename Json::char_type>>& get_values() \
         { \
-            static const std::vector<mapped_type> v = { \
+            static const std::vector<mapped_type<typename Json::char_type>> v = { \
                 JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_ENUM_PAIR, ,,, __VA_ARGS__)\
             };\
             return v; \
@@ -659,13 +668,13 @@ namespace jsoncons \
             auto last = std::end(get_values()); \
             const string_view_type s = ajson.template as<string_view_type>(); \
             if (s.empty() && std::find_if(first, last, \
-                                          [](const mapped_type& item) -> bool \
+                                          [](const mapped_type<typename Json::char_type>& item) -> bool \
                                           { return item.first == value_type(); }) == last) \
             { \
                 return true; \
             } \
             auto it = std::find_if(first, last, \
-                                   [&](const mapped_type& item) -> bool \
+                                   [&](const mapped_type<typename Json::char_type>& item) -> bool \
                                    { return item.second == s; }); \
             return it != last; \
         } \
@@ -680,13 +689,13 @@ namespace jsoncons \
             auto first = std::begin(get_values()); \
             auto last = std::end(get_values()); \
             if (s.empty() && std::find_if(first, last, \
-                                          [](const mapped_type& item) -> bool \
+                                          [](const mapped_type<typename Json::char_type>& item) -> bool \
                                           { return item.first == value_type(); }) == last) \
             { \
                 return value_type(); \
             } \
             auto it = std::find_if(first, last, \
-                                   [&](const mapped_type& item) -> bool \
+                                   [&](const mapped_type<typename Json::char_type>& item) -> bool \
                                    { return item.second == s; }); \
             if (it == last) \
             { \
@@ -707,7 +716,7 @@ namespace jsoncons \
             auto first = std::begin(get_values()); \
             auto last = std::end(get_values()); \
             auto it = std::find_if(first, last, \
-                                   [aval](const mapped_type& item) -> bool \
+                                   [aval](const mapped_type<typename Json::char_type>& item) -> bool \
                                    { return item.first == aval; }); \
             if (it == last) \
             { \
