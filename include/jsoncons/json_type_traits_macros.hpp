@@ -537,7 +537,6 @@ namespace jsoncons \
     struct json_type_traits<Json, EnumType, typename std::enable_if<std::is_same<typename Json::char_type,CharT>::value>::type> \
     { \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
-        typedef typename Json::char_type char_type; \
         typedef EnumType value_type; \
         template <class ChT> using mapped_type = std::pair<EnumType,std::basic_string<ChT>>; \
         \
@@ -559,24 +558,26 @@ namespace jsoncons \
         \
         static bool is(const Json& ajson) noexcept \
         { \
+            typedef typename Json::char_type char_type; \
             typedef typename Json::string_view_type string_view_type; \
             if (!ajson.is_string()) return false; \
             auto first = std::begin(get_values(char_type{})); \
             auto last = std::end(get_values(char_type{})); \
             const string_view_type s = ajson.template as<string_view_type>(); \
             if (s.empty() && std::find_if(first, last, \
-                                          [](const mapped_type<CharT>& item) -> bool \
+                                          [](const mapped_type<char_type>& item) -> bool \
                                           { return item.first == value_type(); }) == last) \
             { \
                 return true; \
             } \
             auto it = std::find_if(first, last, \
-                                   [&](const mapped_type<CharT>& item) -> bool \
+                                   [&](const mapped_type<char_type>& item) -> bool \
                                    { return item.second == s; }); \
             return it != last; \
         } \
         static value_type as(const Json& ajson) \
         { \
+            typedef typename Json::char_type char_type; \
             typedef typename Json::string_view_type string_view_type; \
             if (!ajson.is_string()) \
             { \
@@ -586,13 +587,13 @@ namespace jsoncons \
             auto first = std::begin(get_values(char_type{})); \
             auto last = std::end(get_values(char_type{})); \
             if (s.empty() && std::find_if(first, last, \
-                                          [](const mapped_type<CharT>& item) -> bool \
+                                          [](const mapped_type<char_type>& item) -> bool \
                                           { return item.first == value_type(); }) == last) \
             { \
                 return value_type(); \
             } \
             auto it = std::find_if(first, last, \
-                                   [&](const mapped_type<CharT>& item) -> bool \
+                                   [&](const mapped_type<char_type>& item) -> bool \
                                    { return item.second == s; }); \
             if (it == last) \
             { \
@@ -609,11 +610,12 @@ namespace jsoncons \
         } \
         static Json to_json(value_type aval, const typename Json::allocator_type& alloc=typename Json::allocator_type()) \
         { \
-            static constexpr CharT empty_string[] = {0}; \
+            typedef typename Json::char_type char_type; \
+            static constexpr char_type empty_string[] = {0}; \
             auto first = std::begin(get_values(char_type{})); \
             auto last = std::end(get_values(char_type{})); \
             auto it = std::find_if(first, last, \
-                                   [aval](const mapped_type<CharT>& item) -> bool \
+                                   [aval](const mapped_type<char_type>& item) -> bool \
                                    { return item.first == aval; }); \
             if (it == last) \
             { \
