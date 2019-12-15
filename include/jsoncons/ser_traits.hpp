@@ -150,8 +150,8 @@ struct ser_traits<T,
         return result;
     }
 
-    template <class Json,class Ty = T>
-    static typename std::enable_if<!(std::is_integral<Ty>::value && !std::is_same<Ty,bool>::value),T>::type
+    template <class Json,class Ty = value_type>
+    static typename std::enable_if<!std::is_same<Ty,uint8_t>::value,T>::type
     as(const Json& j)
     {
         T result;
@@ -168,8 +168,8 @@ struct ser_traits<T,
         return result;
     }
 
-    template <class Json,class Ty = T>
-    static typename std::enable_if<std::is_integral<Ty>::value && !std::is_same<Ty,bool>::value,T>::type
+    template <class Json,class Ty = value_type>
+    static typename std::enable_if<std::is_same<Ty,uint8_t>::value,T>::type
     as(const Json& j)
     {
         if (j.is_array())

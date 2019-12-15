@@ -242,6 +242,19 @@ TEST_CASE("test_as_map2")
     CHECK(std::string("1") == o2["first"].as<std::string>());
 }
 
+TEST_CASE("byte string container")
+{
+    SECTION("as<std::vector>")
+    {
+        std::vector<uint8_t> bytes = {'H', 'e', 'l', 'l', 'o'};
+        json j(byte_string_arg, bytes);
+
+        auto v = j.as<std::vector<uint8_t>>();
+
+        json other(byte_string_arg, v);
+    }
+}
+
 TEST_CASE("test_from_stl_container")
 {
     std::vector<int> a_vector{1, 2, 3, 4};

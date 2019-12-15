@@ -46,7 +46,7 @@ void json_constructor_examples()
     std::cout << "(10) " << j10 << std::endl;
 
     std::vector<uint8_t> bytes = {'H','e','l','l','o'};
-    json j11(bstr_arg, bytes); // A byte string
+    json j11(byte_string_arg, bytes); // A byte string
     std::cout << "(11) " << j11 << std::endl;
 
     json j12(half_arg, 0x3bff);

@@ -34,11 +34,11 @@ struct json_object_arg_t
 
 constexpr json_object_arg_t json_object_arg = json_object_arg_t();
 
-struct bstr_arg_t
+struct byte_string_arg_t
 {
 };
 
-constexpr bstr_arg_t bstr_arg = bstr_arg_t();
+constexpr byte_string_arg_t byte_string_arg = byte_string_arg_t();
 
 enum class semantic_tag : uint8_t 
 {
@@ -160,6 +160,8 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use semantic_tag") typedef semantic_tag semantic_tag_type;
+    JSONCONS_DEPRECATED_MSG("Instead, use byte_string_arg_t") typedef byte_string_arg_t bstr_arg_t;
+    constexpr byte_string_arg_t bstr_arg = byte_string_arg_t();
 #endif
 
 }

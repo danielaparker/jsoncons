@@ -743,7 +743,7 @@ public:
             new(reinterpret_cast<void*>(&data_))byte_string_holder(tag, bytes.data(), bytes.size(), alloc);
         }
 
-        variant(bstr_arg_t, const span<const uint8_t>& bytes, semantic_tag tag, const Allocator& alloc) : data_{}
+        variant(byte_string_arg_t, const span<const uint8_t>& bytes, semantic_tag tag, const Allocator& alloc) : data_{}
         {
             new(reinterpret_cast<void*>(&data_))byte_string_holder(tag, bytes.data(), bytes.size(), alloc);
         }
@@ -3072,10 +3072,10 @@ public:
     {
     }
 
-    basic_json(bstr_arg_t, const span<const uint8_t>& bytes, 
+    basic_json(byte_string_arg_t, const span<const uint8_t>& bytes, 
                semantic_tag tag = semantic_tag::none,
                const Allocator& alloc = Allocator())
-        : var_(bstr_arg, bytes, tag, alloc)
+        : var_(byte_string_arg, bytes, tag, alloc)
     {
     }
 
