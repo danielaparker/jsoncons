@@ -654,21 +654,23 @@ namespace jsoncons \
 #define JSONCONS_ENUM_NAMED_TRAITS_DECL(EnumType, ...)  \
 namespace jsoncons \
 { \
-    template<typename Json> \
-    struct json_type_traits<Json, EnumType> \
+    template<> \
+    struct ser_traits<EnumType> \
     { \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
         typedef EnumType value_type; \
-        template <class ChT> using mapped_type = std::pair<EnumType,std::basic_string<ChT>>; \
+        template <class CharT> using mapped_type = std::pair<EnumType,std::basic_string<CharT>>; \
         \
-        static const std::vector<mapped_type<char>>& get_values(char) \
+        template<typename CharT> \
+        static typename std::enable_if<std::is_same<CharT,char>::value,const std::vector<mapped_type<char>>&>::type get_values(CharT) \
         { \
             static const std::vector<mapped_type<char>> v = { \
                 JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_ENUM_PAIR, ,,, __VA_ARGS__)\
             };\
             return v; \
         } \
-        static const std::vector<mapped_type<wchar_t>>& get_values(wchar_t) \
+        template<typename CharT> \
+        static typename std::enable_if<std::is_same<CharT,wchar_t>::value,const std::vector<mapped_type<wchar_t>>&>::type get_values(CharT) \
         { \
             static const std::vector<mapped_type<wchar_t>> v = { \
                 JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_ENUM_PAIR, ,,, __VA_ARGS__)\
@@ -676,6 +678,7 @@ namespace jsoncons \
             return v; \
         } \
         \
+        template<typename Json> \
         static bool is(const Json& ajson) noexcept \
         { \
             typedef typename Json::char_type char_type; \
@@ -695,6 +698,7 @@ namespace jsoncons \
                                    { return item.second == s; }); \
             return it != last; \
         } \
+        template<typename Json> \
         static value_type as(const Json& ajson) \
         { \
             typedef typename Json::char_type char_type; \
@@ -728,6 +732,7 @@ namespace jsoncons \
             } \
             return it->first; \
         } \
+        template<typename Json> \
         static Json to_json(value_type aval, const typename Json::allocator_type& alloc=typename Json::allocator_type()) \
         { \
             typedef typename Json::char_type char_type; \
