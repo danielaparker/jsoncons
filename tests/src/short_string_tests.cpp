@@ -16,16 +16,16 @@ using namespace jsoncons;
 TEST_CASE("test_small_string")
 {
     json s("ABCD");
-    CHECK(s.kind() == jsoncons::value_kind::short_string_value);
+    CHECK(s.storage() == jsoncons::storage_type::short_string_value);
     CHECK(s.as<std::string>() == std::string("ABCD"));
 
     json t(s);
-    CHECK(t.kind() == jsoncons::value_kind::short_string_value);
+    CHECK(t.storage() == jsoncons::storage_type::short_string_value);
     CHECK(t.as<std::string>() == std::string("ABCD"));
 
     json q;
     q = s;
-    CHECK(q.kind() == jsoncons::value_kind::short_string_value);
+    CHECK(q.storage() == jsoncons::storage_type::short_string_value);
     CHECK(q.as<std::string>() == std::string("ABCD"));
 }
 
