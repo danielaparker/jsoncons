@@ -750,6 +750,12 @@ namespace jsoncons \
             } \
             return Json(it->second,alloc); \
         } \
+        template <class Json> \
+        static value_type decode(basic_staj_reader<typename Json::char_type>& reader, const Json& context_j, std::error_code& ec) \
+        { return ser_traits_default<value_type>::decode(reader, context_j, ec); } \
+        template <class Json> \
+        static void encode(const value_type& val, basic_json_content_handler<typename Json::char_type>& encoder, const Json& context_j, std::error_code& ec) \
+        { ser_traits_default<value_type>::encode(val, encoder, context_j, ec); } \
     }; \
 } \
     /**/
