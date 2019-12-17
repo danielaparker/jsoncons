@@ -313,7 +313,7 @@ public:
             uint8_t length_;
             char_type data_[capacity];
         public:
-            static const size_t max_length = (14 / sizeof(char_type)) - 1;
+            static constexpr size_t max_length = (14 / sizeof(char_type)) - 1;
 
             short_string_storage(semantic_tag tag, const char_type* p, uint8_t length)
                 : storage_base(storage_type::short_string_value, tag), length_(length)
@@ -678,46 +678,46 @@ public:
     public:
         variant(semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))empty_object_storage(tag);
+            ::new(&data_)empty_object_storage(tag);
         }
 
         explicit variant(null_type, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))null_storage(tag);
+            ::new(&data_)null_storage(tag);
         }
 
         explicit variant(bool val, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))bool_storage(val,tag);
+            ::new(&data_)bool_storage(val,tag);
         }
         explicit variant(int64_t val, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))int64_storage(val, tag);
+            ::new(&data_)int64_storage(val, tag);
         }
         explicit variant(uint64_t val, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))uint64_storage(val, tag);
+            ::new(&data_)uint64_storage(val, tag);
         }
 
         variant(half_arg_t, uint16_t val, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))half_storage(val, tag);
+            ::new(&data_)half_storage(val, tag);
         }
 
         variant(double val, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))double_storage(val, tag);
+            ::new(&data_)double_storage(val, tag);
         }
 
         variant(const char_type* s, size_t length, semantic_tag tag)
         {
             if (length <= short_string_storage::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_storage(tag, s, static_cast<uint8_t>(length));
+                ::new(&data_)short_string_storage(tag, s, static_cast<uint8_t>(length));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_storage(tag, s, length, char_allocator_type());
+                ::new(&data_)long_string_storage(tag, s, length, char_allocator_type());
             }
         }
 
@@ -725,27 +725,27 @@ public:
         {
             if (length <= short_string_storage::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_storage(tag, s, static_cast<uint8_t>(length));
+                ::new(&data_)short_string_storage(tag, s, static_cast<uint8_t>(length));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_storage(tag, s, length, char_allocator_type(alloc));
+                ::new(&data_)long_string_storage(tag, s, length, char_allocator_type(alloc));
             }
         }
 
         variant(const byte_string_view& bytes, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_storage(tag, bytes.data(), bytes.size(), byte_allocator_type());
+            ::new(&data_)byte_string_storage(tag, bytes.data(), bytes.size(), byte_allocator_type());
         }
 
         variant(const byte_string_view& bytes, semantic_tag tag, const Allocator& alloc) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_storage(tag, bytes.data(), bytes.size(), alloc);
+            ::new(&data_)byte_string_storage(tag, bytes.data(), bytes.size(), alloc);
         }
 
         variant(byte_string_arg_t, const span<const uint8_t>& bytes, semantic_tag tag, const Allocator& alloc) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_storage(tag, bytes.data(), bytes.size(), alloc);
+            ::new(&data_)byte_string_storage(tag, bytes.data(), bytes.size(), alloc);
         }
 
         variant(const basic_bignum<byte_allocator_type>& n) : data_{}
@@ -755,11 +755,11 @@ public:
 
             if (s.length() <= short_string_storage::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_storage(semantic_tag::bigint, s.data(), static_cast<uint8_t>(s.length()));
+                ::new(&data_)short_string_storage(semantic_tag::bigint, s.data(), static_cast<uint8_t>(s.length()));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_storage(semantic_tag::bigint, s.data(), s.length(), char_allocator_type());
+                ::new(&data_)long_string_storage(semantic_tag::bigint, s.data(), s.length(), char_allocator_type());
             }
         }
 
@@ -770,28 +770,28 @@ public:
 
             if (s.length() <= short_string_storage::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_storage(semantic_tag::bigint, s.data(), static_cast<uint8_t>(s.length()));
+                ::new(&data_)short_string_storage(semantic_tag::bigint, s.data(), static_cast<uint8_t>(s.length()));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_storage(semantic_tag::bigint, s.data(), s.length(), char_allocator_type(alloc));
+                ::new(&data_)long_string_storage(semantic_tag::bigint, s.data(), s.length(), char_allocator_type(alloc));
             }
         }
         variant(const object& val, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))object_storage(val, tag);
+            ::new(&data_)object_storage(val, tag);
         }
         variant(const object& val, semantic_tag tag, const Allocator& alloc) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))object_storage(val, tag, alloc);
+            ::new(&data_)object_storage(val, tag, alloc);
         }
         variant(const array& val, semantic_tag tag) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))array_storage(val, tag);
+            ::new(&data_)array_storage(val, tag);
         }
         variant(const array& val, semantic_tag tag, const Allocator& alloc) : data_{}
         {
-            new(reinterpret_cast<void*>(&data_))array_storage(val, tag, alloc);
+            ::new(&data_)array_storage(val, tag, alloc);
         }
 
         variant(const variant& val)
@@ -849,40 +849,40 @@ public:
                 switch (val.storage())
                 {
                     case storage_type::null_value:
-                        new(reinterpret_cast<void*>(&data_))null_storage(*(val.null_storage_cast()));
+                        ::new(&data_)null_storage(*(val.null_storage_cast()));
                         break;
                     case storage_type::empty_object_value:
-                        new(reinterpret_cast<void*>(&data_))empty_object_storage(*(val.empty_object_storage_cast()));
+                        ::new(&data_)empty_object_storage(*(val.empty_object_storage_cast()));
                         break;
                     case storage_type::bool_value:
-                        new(reinterpret_cast<void*>(&data_))bool_storage(*(val.bool_storage_cast()));
+                        ::new(&data_)bool_storage(*(val.bool_storage_cast()));
                         break;
                     case storage_type::int64_value:
-                        new(reinterpret_cast<void*>(&data_))int64_storage(*(val.int64_storage_cast()));
+                        ::new(&data_)int64_storage(*(val.int64_storage_cast()));
                         break;
                     case storage_type::uint64_value:
-                        new(reinterpret_cast<void*>(&data_))uint64_storage(*(val.uint64_storage_cast()));
+                        ::new(&data_)uint64_storage(*(val.uint64_storage_cast()));
                         break;
                     case storage_type::half_value:
-                        new(reinterpret_cast<void*>(&data_))half_storage(*(val.half_storage_cast()));
+                        ::new(&data_)half_storage(*(val.half_storage_cast()));
                         break;
                     case storage_type::double_value:
-                        new(reinterpret_cast<void*>(&data_))double_storage(*(val.double_storage_cast()));
+                        ::new(&data_)double_storage(*(val.double_storage_cast()));
                         break;
                     case storage_type::short_string_value:
-                        new(reinterpret_cast<void*>(&data_))short_string_storage(*(val.short_string_storage_cast()));
+                        ::new(&data_)short_string_storage(*(val.short_string_storage_cast()));
                         break;
                     case storage_type::long_string_value:
-                        new(reinterpret_cast<void*>(&data_))long_string_storage(*(val.string_storage_cast()));
+                        ::new(&data_)long_string_storage(*(val.string_storage_cast()));
                         break;
                     case storage_type::byte_string_value:
-                        new(reinterpret_cast<void*>(&data_))byte_string_storage(*(val.byte_string_storage_cast()));
+                        ::new(&data_)byte_string_storage(*(val.byte_string_storage_cast()));
                         break;
                     case storage_type::array_value:
-                        new(reinterpret_cast<void*>(&data_))array_storage(*(val.array_storage_cast()));
+                        ::new(&data_)array_storage(*(val.array_storage_cast()));
                         break;
                     case storage_type::object_value:
-                        new(reinterpret_cast<void*>(&data_))object_storage(*(val.object_storage_cast()));
+                        ::new(&data_)object_storage(*(val.object_storage_cast()));
                         break;
                     default:
                         JSONCONS_UNREACHABLE();
@@ -1402,40 +1402,40 @@ public:
             switch (storage())
             {
                 case storage_type::null_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))null_storage(*null_storage_cast());
+                    ::new((&(other.data_)))null_storage(*null_storage_cast());
                     break;
                 case storage_type::empty_object_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))empty_object_storage(*empty_object_storage_cast());
+                    ::new((&(other.data_)))empty_object_storage(*empty_object_storage_cast());
                     break;
                 case storage_type::bool_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))bool_storage(*bool_storage_cast());
+                    ::new((&(other.data_)))bool_storage(*bool_storage_cast());
                     break;
                 case storage_type::int64_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))int64_storage(*int64_storage_cast());
+                    ::new((&(other.data_)))int64_storage(*int64_storage_cast());
                     break;
                 case storage_type::uint64_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))uint64_storage(*uint64_storage_cast());
+                    ::new((&(other.data_)))uint64_storage(*uint64_storage_cast());
                     break;
                 case storage_type::half_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))half_storage(*half_storage_cast());
+                    ::new((&(other.data_)))half_storage(*half_storage_cast());
                     break;
                 case storage_type::double_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))double_storage(*double_storage_cast());
+                    ::new((&(other.data_)))double_storage(*double_storage_cast());
                     break;
                 case storage_type::short_string_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))short_string_storage(*short_string_storage_cast());
+                    ::new((&(other.data_)))short_string_storage(*short_string_storage_cast());
                     break;
                 case storage_type::long_string_value:
-                    new(reinterpret_cast<void*>(&other.data_))long_string_storage(std::move(*string_storage_cast()));
+                    ::new((&other.data_))long_string_storage(std::move(*string_storage_cast()));
                     break;
                 case storage_type::byte_string_value:
-                    new(reinterpret_cast<void*>(&other.data_))byte_string_storage(std::move(*byte_string_storage_cast()));
+                    ::new((&other.data_))byte_string_storage(std::move(*byte_string_storage_cast()));
                     break;
                 case storage_type::array_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))array_storage(std::move(*array_storage_cast()));
+                    ::new((&(other.data_)))array_storage(std::move(*array_storage_cast()));
                     break;
                 case storage_type::object_value:
-                    new(reinterpret_cast<void*>(&(other.data_)))object_storage(std::move(*object_storage_cast()));
+                    ::new((&(other.data_)))object_storage(std::move(*object_storage_cast()));
                     break;
                 default:
                     JSONCONS_UNREACHABLE();
@@ -1444,16 +1444,16 @@ public:
             switch (temp.storage())
             {
                 case storage_type::long_string_value:
-                    new(reinterpret_cast<void*>(&data_))long_string_storage(std::move(*temp.string_storage_cast()));
+                    ::new(&data_)long_string_storage(std::move(*temp.string_storage_cast()));
                     break;
                 case storage_type::byte_string_value:
-                    new(reinterpret_cast<void*>(&data_))byte_string_storage(std::move(*temp.byte_string_storage_cast()));
+                    ::new(&data_)byte_string_storage(std::move(*temp.byte_string_storage_cast()));
                     break;
                 case storage_type::array_value:
-                    new(reinterpret_cast<void*>(&(data_)))array_storage(std::move(*temp.array_storage_cast()));
+                    ::new((&(data_)))array_storage(std::move(*temp.array_storage_cast()));
                     break;
                 case storage_type::object_value:
-                    new(reinterpret_cast<void*>(&(data_)))object_storage(std::move(*temp.object_storage_cast()));
+                    ::new((&(data_)))object_storage(std::move(*temp.object_storage_cast()));
                     break;
                 default:
                     std::swap(data_,temp.data_);
@@ -1467,40 +1467,40 @@ public:
             switch (val.storage())
             {
                 case storage_type::null_value:
-                    new(reinterpret_cast<void*>(&data_))null_storage(*(val.null_storage_cast()));
+                    ::new(&data_)null_storage(*(val.null_storage_cast()));
                     break;
                 case storage_type::empty_object_value:
-                    new(reinterpret_cast<void*>(&data_))empty_object_storage(*(val.empty_object_storage_cast()));
+                    ::new(&data_)empty_object_storage(*(val.empty_object_storage_cast()));
                     break;
                 case storage_type::bool_value:
-                    new(reinterpret_cast<void*>(&data_))bool_storage(*(val.bool_storage_cast()));
+                    ::new(&data_)bool_storage(*(val.bool_storage_cast()));
                     break;
                 case storage_type::int64_value:
-                    new(reinterpret_cast<void*>(&data_))int64_storage(*(val.int64_storage_cast()));
+                    ::new(&data_)int64_storage(*(val.int64_storage_cast()));
                     break;
                 case storage_type::uint64_value:
-                    new(reinterpret_cast<void*>(&data_))uint64_storage(*(val.uint64_storage_cast()));
+                    ::new(&data_)uint64_storage(*(val.uint64_storage_cast()));
                     break;
                 case storage_type::half_value:
-                    new(reinterpret_cast<void*>(&data_))half_storage(*(val.half_storage_cast()));
+                    ::new(&data_)half_storage(*(val.half_storage_cast()));
                     break;
                 case storage_type::double_value:
-                    new(reinterpret_cast<void*>(&data_))double_storage(*(val.double_storage_cast()));
+                    ::new(&data_)double_storage(*(val.double_storage_cast()));
                     break;
                 case storage_type::short_string_value:
-                    new(reinterpret_cast<void*>(&data_))short_string_storage(*(val.short_string_storage_cast()));
+                    ::new(&data_)short_string_storage(*(val.short_string_storage_cast()));
                     break;
                 case storage_type::long_string_value:
-                    new(reinterpret_cast<void*>(&data_))long_string_storage(*(val.string_storage_cast()));
+                    ::new(&data_)long_string_storage(*(val.string_storage_cast()));
                     break;
                 case storage_type::byte_string_value:
-                    new(reinterpret_cast<void*>(&data_))byte_string_storage(*(val.byte_string_storage_cast()));
+                    ::new(&data_)byte_string_storage(*(val.byte_string_storage_cast()));
                     break;
                 case storage_type::object_value:
-                    new(reinterpret_cast<void*>(&data_))object_storage(*(val.object_storage_cast()));
+                    ::new(&data_)object_storage(*(val.object_storage_cast()));
                     break;
                 case storage_type::array_value:
-                    new(reinterpret_cast<void*>(&data_))array_storage(*(val.array_storage_cast()));
+                    ::new(&data_)array_storage(*(val.array_storage_cast()));
                     break;
                 default:
                     break;
@@ -1522,16 +1522,16 @@ public:
                 Init_(val);
                 break;
             case storage_type::long_string_value:
-                new(reinterpret_cast<void*>(&data_))long_string_storage(*(val.string_storage_cast()),a);
+                ::new(&data_)long_string_storage(*(val.string_storage_cast()),a);
                 break;
             case storage_type::byte_string_value:
-                new(reinterpret_cast<void*>(&data_))byte_string_storage(*(val.byte_string_storage_cast()),a);
+                ::new(&data_)byte_string_storage(*(val.byte_string_storage_cast()),a);
                 break;
             case storage_type::array_value:
-                new(reinterpret_cast<void*>(&data_))array_storage(*(val.array_storage_cast()),a);
+                ::new(&data_)array_storage(*(val.array_storage_cast()),a);
                 break;
             case storage_type::object_value:
-                new(reinterpret_cast<void*>(&data_))object_storage(*(val.object_storage_cast()),a);
+                ::new(&data_)object_storage(*(val.object_storage_cast()),a);
                 break;
             default:
                 break;
@@ -1554,26 +1554,26 @@ public:
                     break;
                 case storage_type::long_string_value:
                 {
-                    new(reinterpret_cast<void*>(&data_))long_string_storage(std::move(*val.string_storage_cast()));
-                    new(reinterpret_cast<void*>(&val.data_))null_storage();
+                    ::new(&data_)long_string_storage(std::move(*val.string_storage_cast()));
+                    ::new((&val.data_))null_storage();
                     break;
                 }
                 case storage_type::byte_string_value:
                 {
-                    new(reinterpret_cast<void*>(&data_))byte_string_storage(std::move(*val.byte_string_storage_cast()));
-                    new(reinterpret_cast<void*>(&val.data_))null_storage();
+                    ::new(&data_)byte_string_storage(std::move(*val.byte_string_storage_cast()));
+                    ::new((&val.data_))null_storage();
                     break;
                 }
                 case storage_type::array_value:
                 {
-                    new(reinterpret_cast<void*>(&data_))array_storage(std::move(*val.array_storage_cast()));
-                    new(reinterpret_cast<void*>(&val.data_))null_storage();
+                    ::new(&data_)array_storage(std::move(*val.array_storage_cast()));
+                    ::new((&val.data_))null_storage();
                     break;
                 }
                 case storage_type::object_value:
                 {
-                    new(reinterpret_cast<void*>(&data_))object_storage(std::move(*val.object_storage_cast()));
-                    new(reinterpret_cast<void*>(&val.data_))null_storage();
+                    ::new(&data_)object_storage(std::move(*val.object_storage_cast()));
+                    ::new((&val.data_))null_storage();
                     break;
                 }
                 default:

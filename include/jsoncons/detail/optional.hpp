@@ -70,7 +70,7 @@ namespace detail
             }
         }
 
-        constexpr optional& operator=( const optional& other )
+        optional& operator=( const optional& other )
         {
             if (this != &other)
             {
@@ -87,7 +87,7 @@ namespace detail
             return *this;
         }
 
-        constexpr optional& operator=( optional&& other ) noexcept
+        optional& operator=( optional&& other ) noexcept
         {
             if (this != &other)
             {

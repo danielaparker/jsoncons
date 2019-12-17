@@ -661,31 +661,17 @@ namespace jsoncons \
         typedef EnumType value_type; \
         template <class CharT> using mapped_type = std::pair<EnumType,std::basic_string<CharT>>; \
         \
-        template<typename CharT> \
-        static typename std::enable_if<std::is_same<CharT,char>::value,const std::vector<mapped_type<char>>&>::type get_values(CharT) \
-        { \
-            static const std::vector<mapped_type<char>> v = { \
-                JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_ENUM_PAIR, ,,, __VA_ARGS__)\
-            };\
-            return v; \
-        } \
-        template<typename CharT> \
-        static typename std::enable_if<std::is_same<CharT,wchar_t>::value,const std::vector<mapped_type<wchar_t>>&>::type get_values(CharT) \
-        { \
-            static const std::vector<mapped_type<wchar_t>> v = { \
-                JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_ENUM_PAIR, ,,, __VA_ARGS__)\
-            };\
-            return v; \
-        } \
-        \
         template<typename Json> \
         static bool is(const Json& ajson) noexcept \
         { \
             typedef typename Json::char_type char_type; \
             typedef typename Json::string_view_type string_view_type; \
+            static const std::vector<mapped_type<char_type>> v = { \
+                JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_ENUM_PAIR, ,,, __VA_ARGS__)\
+            };\
             if (!ajson.is_string()) return false; \
-            auto first = std::begin(get_values(char_type{})); \
-            auto last = std::end(get_values(char_type{})); \
+            auto first = std::begin(v); \
+            auto last = std::end(v); \
             const string_view_type s = ajson.template as<string_view_type>(); \
             if (s.empty() && std::find_if(first, last, \
                                           [](const mapped_type<char_type>& item) -> bool \
@@ -703,13 +689,16 @@ namespace jsoncons \
         { \
             typedef typename Json::char_type char_type; \
             typedef typename Json::string_view_type string_view_type; \
+            static const std::vector<mapped_type<char_type>> v = { \
+                JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_ENUM_PAIR, ,,, __VA_ARGS__)\
+            };\
             if (!ajson.is_string()) \
             { \
                 JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
             } \
             const string_view_type s = ajson.template as<string_view_type>(); \
-            auto first = std::begin(get_values(char_type{})); \
-            auto last = std::end(get_values(char_type{})); \
+            auto first = std::begin(v); \
+            auto last = std::end(v); \
             if (s.empty() && std::find_if(first, last, \
                                           [](const mapped_type<char_type>& item) -> bool \
                                           { return item.first == value_type(); }) == last) \
@@ -737,8 +726,11 @@ namespace jsoncons \
         { \
             typedef typename Json::char_type char_type; \
             static constexpr char_type empty_string[] = {0}; \
-            auto first = std::begin(get_values(char_type{})); \
-            auto last = std::end(get_values(char_type{})); \
+            static const std::vector<mapped_type<char_type>> v = { \
+                JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_ENUM_PAIR, ,,, __VA_ARGS__)\
+            };\
+            auto first = std::begin(v); \
+            auto last = std::end(v); \
             auto it = std::find_if(first, last, \
                                    [aval](const mapped_type<char_type>& item) -> bool \
                                    { return item.first == aval; }); \
