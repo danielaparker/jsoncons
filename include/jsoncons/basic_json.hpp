@@ -1402,28 +1402,28 @@ public:
             switch (storage())
             {
                 case storage_type::null_value:
-                    ::new((&(other.data_)))null_storage(null_storage_cast());
+                    ::new(&(other.data_))null_storage(null_storage_cast());
                     break;
                 case storage_type::empty_object_value:
-                    ::new((&(other.data_)))empty_object_storage(empty_object_storage_cast());
+                    ::new(&(other.data_))empty_object_storage(empty_object_storage_cast());
                     break;
                 case storage_type::bool_value:
-                    ::new((&(other.data_)))bool_storage(bool_storage_cast());
+                    ::new(&(other.data_))bool_storage(bool_storage_cast());
                     break;
                 case storage_type::int64_value:
-                    ::new((&(other.data_)))int64_storage(int64_storage_cast());
+                    ::new(&(other.data_))int64_storage(int64_storage_cast());
                     break;
                 case storage_type::uint64_value:
-                    ::new((&(other.data_)))uint64_storage(uint64_storage_cast());
+                    ::new(&(other.data_))uint64_storage(uint64_storage_cast());
                     break;
                 case storage_type::half_value:
-                    ::new((&(other.data_)))half_storage(half_storage_cast());
+                    ::new(&(other.data_))half_storage(half_storage_cast());
                     break;
                 case storage_type::double_value:
-                    ::new((&(other.data_)))double_storage(double_storage_cast());
+                    ::new(&(other.data_))double_storage(double_storage_cast());
                     break;
                 case storage_type::short_string_value:
-                    ::new((&(other.data_)))short_string_storage(short_string_storage_cast());
+                    ::new(&(other.data_))short_string_storage(short_string_storage_cast());
                     break;
                 case storage_type::long_string_value:
                     ::new((&other.data_))long_string_storage(std::move(string_storage_cast()));
@@ -1432,10 +1432,10 @@ public:
                     ::new((&other.data_))byte_string_storage(std::move(byte_string_storage_cast()));
                     break;
                 case storage_type::array_value:
-                    ::new((&(other.data_)))array_storage(std::move(array_storage_cast()));
+                    ::new(&(other.data_))array_storage(std::move(array_storage_cast()));
                     break;
                 case storage_type::object_value:
-                    ::new((&(other.data_)))object_storage(std::move(object_storage_cast()));
+                    ::new(&(other.data_))object_storage(std::move(object_storage_cast()));
                     break;
                 default:
                     JSONCONS_UNREACHABLE();

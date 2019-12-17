@@ -20,7 +20,7 @@
 #include <iterator> // std::iterator_traits, std::input_iterator_tag
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/detail/type_traits.hpp>
+#include <jsoncons/detail/more_type_traits.hpp>
 #include <string>
 #include <tuple>
 #include <map>

@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_TYPE_TRAITS_HPP
-#define JSONCONS_DETAIL_TYPE_TRAITS_HPP
+#ifndef JSONCONS_DETAIL_MORE_TYPE_TRAITS_HPP
+#define JSONCONS_DETAIL_MORE_TYPE_TRAITS_HPP
 
 #include <stdexcept>
 #include <string>
@@ -15,8 +15,8 @@
 #include <iterator> // std::iterator_traits
 #include <exception>
 #include <array>
-#include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json_exception.hpp>
+#include <utility> // std::declval
+#include <jsoncons/config/compiler_support.hpp>
 
 namespace jsoncons
 {
@@ -84,8 +84,6 @@ struct type_wrapper<const T&>
 inline
 char to_hex_character(uint8_t c)
 {
-    JSONCONS_ASSERT(c <= 0xF);
-
     return (char)((c < 10) ? ('0' + c) : ('A' - 10 + c));
 }
 
@@ -199,12 +197,12 @@ struct is_map_like<T,
                    typename std::enable_if<!std::is_void<typename T::mapped_type>::value>::type> 
     : std::true_type {};
 
-// is_array_like
+// is_std_array
 template<class T>
-struct is_array_like : std::false_type {};
+struct is_std_array : std::false_type {};
 
 template<class E, size_t N>
-struct is_array_like<std::array<E, N>> : std::true_type {};
+struct is_std_array<std::array<E, N>> : std::true_type {};
 
 // is_vector_like
 
@@ -215,7 +213,7 @@ template <class T>
 struct is_vector_like<T, 
                       typename std::enable_if<!std::is_void<typename T::value_type>::value &&
                                               !std::is_void<typename std::iterator_traits<typename T::iterator>::value_type>::value &&
-                                              !is_array_like<T>::value && 
+                                              !is_std_array<T>::value && 
                                               !has_char_traits_member_type<T>::value && 
                                               !is_map_like<T>::value 
 >::type> 
@@ -231,6 +229,38 @@ struct is_constructible_from_const_pointer_and_size<T,
     typename std::enable_if<std::is_constructible<T,typename T::const_pointer,typename T::size_type>::value
 >::type> 
     : std::true_type {};
+
+// has_size_and_data
+
+template<class T, class Enable=void >
+struct has_data_and_size : std::false_type{};
+
+template< class C >
+struct has_data_and_size
+<
+    C, 
+    typename std::enable_if<!std::is_void<decltype(std::declval<C>().size())>::value &&
+                            !std::is_void<decltype(std::declval<C>().data())>::value>::type
+> : std::true_type{};
+
+
+template<class C, class E, class Enable=void >
+struct is_compatible_element : std::false_type {};
+
+template< class C, class E >
+struct is_compatible_element
+<
+    C, E, 
+    typename std::enable_if<!std::is_void<decltype(std::declval<C>().data())>::value>::type >
+        : std::is_convertible< typename std::remove_pointer<decltype(std::declval<C>().data() )>::type(*)[], E(*)[] >
+{};
+
+/* template< class Q >
+struct is_span : std::false_type{};
+
+template< class T, size_t Extent >
+struct is_span< span<T, Extent> > : std::true_type{};
+*/
 
 } // detail
 
