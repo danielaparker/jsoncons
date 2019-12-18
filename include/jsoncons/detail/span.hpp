@@ -49,6 +49,7 @@ namespace detail
         static constexpr std::size_t extent = Extent;
 
         constexpr span() noexcept
+            : data_(nullptr), size_(0)
         {
         }
         constexpr span(pointer data, size_type size)
