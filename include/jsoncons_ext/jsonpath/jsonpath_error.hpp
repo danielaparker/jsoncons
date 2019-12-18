@@ -15,18 +15,18 @@ namespace jsoncons { namespace jsonpath {
 class jsonpath_error : public std::system_error, public virtual json_exception
 {
     std::string buffer_;
-    size_t line_number_;
-    size_t column_number_;
+    std::size_t line_number_;
+    std::size_t column_number_;
 public:
     jsonpath_error(std::error_code ec)
         : std::system_error(ec), line_number_(0), column_number_(0)
     {
     }
-    jsonpath_error(std::error_code ec, size_t position)
+    jsonpath_error(std::error_code ec, std::size_t position)
         : std::system_error(ec), line_number_(0), column_number_(position)
     {
     }
-    jsonpath_error(std::error_code ec, size_t line, size_t column)
+    jsonpath_error(std::error_code ec, std::size_t line, std::size_t column)
         : std::system_error(ec), line_number_(line), column_number_(column)
     {
     }
@@ -57,24 +57,24 @@ public:
         }
     }
 
-    size_t line() const noexcept
+    std::size_t line() const noexcept
     {
         return line_number_;
     }
 
-    size_t column() const noexcept
+    std::size_t column() const noexcept
     {
         return column_number_;
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use line()")
-    size_t line_number() const noexcept
+    std::size_t line_number() const noexcept
     {
         return line();
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use column()")
-    size_t column_number() const noexcept
+    std::size_t column_number() const noexcept
     {
         return column();
     }

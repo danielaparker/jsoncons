@@ -70,7 +70,7 @@ private:
     struct stack_item
     {
         stack_item_kind item_kind_;
-        size_t count_;
+        std::size_t count_;
 
         stack_item(stack_item_kind item_kind)
            : item_kind_(item_kind), count_(0)
@@ -96,7 +96,7 @@ private:
 
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> buffered_line_;
     string_type name_;
-    size_t column_index_;
+    std::size_t column_index_;
     std::vector<size_t> row_counts_;
 
     // Noncopyable and nonmoveable
@@ -134,7 +134,7 @@ private:
 
     template<class AnyWriter>
     void escape_string(const CharT* s,
-                       size_t length,
+                       std::size_t length,
                        CharT quote_char, CharT quote_escape_char,
                        AnyWriter& result)
     {
@@ -708,7 +708,7 @@ private:
     }
 
     template <class AnyWriter>
-    bool string_value(const CharT* s, size_t length, AnyWriter& result)
+    bool string_value(const CharT* s, std::size_t length, AnyWriter& result)
     {
         bool quote = false;
         if (options_.quote_style() == quote_style_kind::all || options_.quote_style() == quote_style_kind::nonnumeric ||

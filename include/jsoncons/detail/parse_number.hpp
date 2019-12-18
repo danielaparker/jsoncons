@@ -65,7 +65,7 @@ std::error_code make_error_code(to_integer_errc e)
 }
 
 template <class CharT>
-bool is_integer(const CharT* s, size_t length)
+bool is_integer(const CharT* s, std::size_t length)
 {
     const CharT* end = s + length; 
     if (s == end)
@@ -91,7 +91,7 @@ bool is_integer(const CharT* s, size_t length)
 }
 
 template <class CharT>
-bool is_uinteger(const CharT* s, size_t length)
+bool is_uinteger(const CharT* s, std::size_t length)
 {
     const CharT* end = s + length; 
     if (s == end)
@@ -117,7 +117,7 @@ bool is_uinteger(const CharT* s, size_t length)
 
 template <class T, class CharT>
 typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,to_integer_result<T>>::type
-to_integer(const CharT* s, size_t length)
+to_integer(const CharT* s, std::size_t length)
 {
     static_assert(std::numeric_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
@@ -184,7 +184,7 @@ to_integer(const CharT* s, size_t length)
 
 template <class T, class CharT>
 typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value,to_integer_result<T>>::type
-to_integer(const CharT* s, size_t length)
+to_integer(const CharT* s, std::size_t length)
 {
     static_assert(std::numeric_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
@@ -221,7 +221,7 @@ to_integer(const CharT* s, size_t length)
 
 template <class T, class CharT>
 typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,to_integer_result<T>>::type
-base16_to_integer(const CharT* s, size_t length)
+base16_to_integer(const CharT* s, std::size_t length)
 {
     static_assert(std::numeric_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
@@ -309,7 +309,7 @@ base16_to_integer(const CharT* s, size_t length)
 
 template <class T, class CharT>
 typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value,to_integer_result<T>>::type
-base16_to_integer(const CharT* s, size_t length)
+base16_to_integer(const CharT* s, std::size_t length)
 {
     static_assert(std::numeric_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
@@ -379,7 +379,7 @@ public:
 
     template <class CharT>
     typename std::enable_if<std::is_same<CharT,char>::value,double>::type
-    operator()(const CharT* s, size_t) const
+    operator()(const CharT* s, std::size_t) const
     {
         CharT *end = nullptr;
         double val = _strtod_l(s, &end, locale_);
@@ -392,7 +392,7 @@ public:
 
     template <class CharT>
     typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
-    operator()(const CharT* s, size_t) const
+    operator()(const CharT* s, std::size_t) const
     {
         CharT *end = nullptr;
         double val = _wcstod_l(s, &end, locale_);
@@ -431,7 +431,7 @@ public:
 
     template <class CharT>
     typename std::enable_if<std::is_same<CharT,char>::value,double>::type
-    operator()(const CharT* s, size_t length) const
+    operator()(const CharT* s, std::size_t length) const
     {
         char *end = nullptr;
         double val = strtold_l(s, &end, locale_);
@@ -444,7 +444,7 @@ public:
 
     template <class CharT>
     typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
-    operator()(const CharT* s, size_t length) const
+    operator()(const CharT* s, std::size_t length) const
     {
         CharT *end = nullptr;
         double val = wcstold_l(s, &end, locale_);
@@ -490,7 +490,7 @@ public:
 
     template <class CharT>
     typename std::enable_if<std::is_same<CharT,char>::value,double>::type
-    operator()(const CharT* s, size_t /*length*/) const
+    operator()(const CharT* s, std::size_t /*length*/) const
     {
         CharT *end = nullptr;
         double val = strtod(s, &end);
@@ -503,7 +503,7 @@ public:
 
     template <class CharT>
     typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
-    operator()(const CharT* s, size_t /*length*/) const
+    operator()(const CharT* s, std::size_t /*length*/) const
     {
         CharT *end = nullptr;
         double val = wcstod(s, &end);

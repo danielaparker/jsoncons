@@ -47,7 +47,7 @@ private:
     cbor_cursor_state state_;
     typed_array_view<float128_type> data_;
     span<const size_t> shape_;
-    size_t index_;
+    std::size_t index_;
 public:
     cbor_staj_event_handler()
         : filter_(accept), event_(staj_event_type::null_value),
@@ -800,12 +800,12 @@ public:
         return eof_;
     }
 
-    size_t line() const override
+    std::size_t line() const override
     {
         return parser_.line();
     }
 
-    size_t column() const override
+    std::size_t column() const override
     {
         return parser_.column();
     }

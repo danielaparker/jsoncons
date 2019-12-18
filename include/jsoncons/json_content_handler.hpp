@@ -168,7 +168,7 @@ public:
         return more;
     }
 
-    bool byte_string_value(const uint8_t* p, size_t size, 
+    bool byte_string_value(const uint8_t* p, std::size_t size, 
                            semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=null_ser_context())
     {
@@ -298,7 +298,7 @@ public:
         return do_byte_string_value(b, tag, context, ec);
     }
 
-    bool byte_string_value(const uint8_t* p, size_t size, 
+    bool byte_string_value(const uint8_t* p, std::size_t size, 
                            semantic_tag tag, 
                            const ser_context& context,
                            std::error_code& ec)
@@ -369,7 +369,7 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use byte_string_value(const byte_string_view&, semantic_tag=semantic_tag::none, const ser_context&=null_ser_context()") 
-    bool byte_string_value(const uint8_t* p, size_t size, 
+    bool byte_string_value(const uint8_t* p, std::size_t size, 
                            byte_string_chars_format encoding_hint, 
                            semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=null_ser_context())
@@ -440,7 +440,7 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use name(const string_view_type&, const ser_context&=null_ser_context())") 
-    void name(const char_type* p, size_t length, const ser_context& context) 
+    void name(const char_type* p, std::size_t length, const ser_context& context) 
     {
         name(string_view_type(p, length), context);
     }

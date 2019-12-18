@@ -57,7 +57,7 @@ Member type                         |Definition
 
 #### Capacity
 
-    size_t size() const;
+    std::size_t size() const;
 
 #### Non-member functions
 

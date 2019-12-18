@@ -43,20 +43,20 @@ private:
     struct stack_item
     {
         cbor_container_type type_;
-        size_t length_;
-        size_t count_;
+        std::size_t length_;
+        std::size_t count_;
 
-        stack_item(cbor_container_type type, size_t length = 0)
+        stack_item(cbor_container_type type, std::size_t length = 0)
            : type_(type), length_(length), count_(0)
         {
         }
 
-        size_t length() const
+        std::size_t length() const
         {
             return length_;
         }
 
-        size_t count() const
+        std::size_t count() const
         {
             return count_;
         }
@@ -82,7 +82,7 @@ private:
 
     std::map<std::string,size_t> stringref_map_;
     std::map<byte_string,size_t> bytestringref_map_;
-    size_t next_stringref_ = 0;
+    std::size_t next_stringref_ = 0;
 public:
     explicit basic_cbor_encoder(result_type result)
        : result_(std::move(result)), options_(cbor_encode_options())
@@ -366,7 +366,7 @@ private:
         int signum;
         std::vector<uint8_t> data;
         n.dump(signum, data);
-        size_t length = data.size();
+        std::size_t length = data.size();
 
         if (signum == -1)
         {

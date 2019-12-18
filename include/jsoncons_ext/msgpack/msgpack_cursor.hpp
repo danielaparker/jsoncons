@@ -165,12 +165,12 @@ public:
         return eof_;
     }
 
-    size_t line() const override
+    std::size_t line() const override
     {
         return parser_.line();
     }
 
-    size_t column() const override
+    std::size_t column() const override
     {
         return parser_.column();
     }

@@ -62,7 +62,7 @@ public:
 
     const char_type* c_str() const { return to_plain_pointer(p_); }
     const char_type* data() const { return to_plain_pointer(p_); }
-    size_t length() const { return length_; }
+    std::size_t length() const { return length_; }
 
     using heap_only_string_base<Allocator>::get_allocator;
 
@@ -117,13 +117,13 @@ public:
         return sizeof(storage_type) + n;
     }
 public:
-    static string_pointer create(const char_type* s, size_t length)
+    static string_pointer create(const char_type* s, std::size_t length)
     {
         return create(s, length, Allocator());
     }
-    static string_pointer create(const char_type* s, size_t length, const Allocator& alloc)
+    static string_pointer create(const char_type* s, std::size_t length, const Allocator& alloc)
     {
-        size_t mem_size = aligned_size(length*sizeof(char_type));
+        std::size_t mem_size = aligned_size(length*sizeof(char_type));
 
         byte_allocator_type byte_alloc(alloc);
         byte_pointer ptr = byte_alloc.allocate(mem_size);
@@ -144,7 +144,7 @@ public:
     {
         raw_string_pointer_type rawp = to_plain_pointer(ptr);
         char* p = reinterpret_cast<char*>(rawp);
-        size_t mem_size = aligned_size(ptr->length_*sizeof(char_type));
+        std::size_t mem_size = aligned_size(ptr->length_*sizeof(char_type));
         byte_allocator_type byte_alloc(ptr->get_allocator());
         byte_alloc.deallocate(p,mem_size);
     }

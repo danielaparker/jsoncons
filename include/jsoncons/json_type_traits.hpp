@@ -669,7 +669,7 @@ struct json_type_traits<Json, std::valarray<T>>
         Json j = typename Json::array();
         auto first = std::begin(val);
         auto last = std::end(val);
-        size_t size = std::distance(first,last);
+        std::size_t size = std::distance(first,last);
         j.reserve(size);
         for (auto it = first; it != last; ++it)
         {
@@ -683,7 +683,7 @@ struct json_type_traits<Json, std::valarray<T>>
         Json j = typename Json::array(alloc);
         auto first = std::begin(val);
         auto last = std::end(val);
-        size_t size = std::distance(first,last);
+        std::size_t size = std::distance(first,last);
         j.reserve(size);
         for (auto it = first; it != last; ++it)
         {

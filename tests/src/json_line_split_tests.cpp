@@ -14,10 +14,10 @@ using namespace jsoncons::literals;
 
 bool are_equal(const std::string& s1, const std::string& s2)
 {
-    size_t len1 = s1.size();
-    size_t len2 = s2.size();
+    std::size_t len1 = s1.size();
+    std::size_t len2 = s2.size();
 
-    size_t len = std::min(len1,len2);
+    std::size_t len = std::min(len1,len2);
 
     for (size_t i = 0; i < len; ++i)
     {

@@ -60,7 +60,7 @@ private:
     basic_null_istream<CharT> null_is_;
     std::basic_istream<CharT>* is_;
     std::basic_streambuf<CharT>* sbuf_;
-    size_t position_;
+    std::size_t position_;
 
     // Noncopyable 
     stream_source(const stream_source&) = delete;
@@ -105,12 +105,12 @@ public:
         return is_->bad();  
     }
 
-    size_t position() const
+    std::size_t position() const
     {
         return position_;
     }
 
-    size_t get(value_type& c)
+    std::size_t get(value_type& c)
     {
         JSONCONS_TRY
         {
@@ -198,7 +198,7 @@ public:
         }
     }
 
-    size_t read(value_type* p, size_t length)
+    std::size_t read(value_type* p, std::size_t length)
     {
         JSONCONS_TRY
         {
@@ -219,9 +219,9 @@ public:
 
     template <class OutputIt>
     typename std::enable_if<!std::is_same<OutputIt,value_type*>::value,size_t>::type
-    read(OutputIt p, size_t length)
+    read(OutputIt p, std::size_t length)
     {
-        size_t count = 0;
+        std::size_t count = 0;
         JSONCONS_TRY
         {
             for (count = 0; count < length; ++count)
@@ -285,7 +285,7 @@ public:
     {
     }
 
-    string_source(const value_type* data, size_t size)
+    string_source(const value_type* data, std::size_t size)
         : data_(data), input_ptr_(data), input_end_(data+size), eof_(size == 0)  
     {
     }
@@ -318,12 +318,12 @@ public:
         return false;  
     }
 
-    size_t position() const
+    std::size_t position() const
     {
         return (input_ptr_ - data_)/sizeof(value_type) + 1;
     }
 
-    size_t get(value_type& c)
+    std::size_t get(value_type& c)
     {
         if (input_ptr_ < input_end_)
         {
@@ -354,7 +354,7 @@ public:
 
     void ignore(size_t count)
     {
-        size_t len;
+        std::size_t len;
         if ((size_t)(input_end_ - input_ptr_) < count)
         {
             len = input_end_ - input_ptr_;
@@ -372,9 +372,9 @@ public:
         return input_ptr_ < input_end_ ? *input_ptr_ : traits_type::eof();
     }
 
-    size_t read(value_type* p, size_t length)
+    std::size_t read(value_type* p, std::size_t length)
     {
-        size_t len;
+        std::size_t len;
         if ((size_t)(input_end_ - input_ptr_) < length)
         {
             len = input_end_ - input_ptr_;
@@ -391,9 +391,9 @@ public:
 
     template <class OutputIt>
     typename std::enable_if<!std::is_same<OutputIt,value_type*>::value,size_t>::type
-    read(OutputIt d_first, size_t count)
+    read(OutputIt d_first, std::size_t count)
     {
-        size_t len;
+        std::size_t len;
         if ((size_t)(input_end_ - input_ptr_) < count)
         {
             len = input_end_ - input_ptr_;
@@ -422,7 +422,7 @@ private:
     basic_null_istream<char> null_is_;
     std::istream* is_;
     std::streambuf* sbuf_;
-    size_t position_;
+    std::size_t position_;
 
     // Noncopyable 
     binary_stream_source(const binary_stream_source&) = delete;
@@ -467,12 +467,12 @@ public:
         return is_->bad();  
     }
 
-    size_t position() const
+    std::size_t position() const
     {
         return position_;
     }
 
-    size_t get(value_type& c)
+    std::size_t get(value_type& c)
     {
         JSONCONS_TRY
         {
@@ -561,9 +561,9 @@ public:
     }
 
     template <class OutputIt>
-    size_t read(OutputIt p, size_t length)
+    std::size_t read(OutputIt p, std::size_t length)
     {
-        size_t count = 0;
+        std::size_t count = 0;
         JSONCONS_TRY
         {
             for (count = 0; count < length; ++count)
@@ -624,7 +624,7 @@ public:
     {
     }
 
-    bytes_source(const value_type* data, size_t size)
+    bytes_source(const value_type* data, std::size_t size)
         : data_(data), 
           input_ptr_(data), 
           input_end_(data+size), 
@@ -646,12 +646,12 @@ public:
         return false;  
     }
 
-    size_t position() const
+    std::size_t position() const
     {
         return input_ptr_ - data_ + 1;
     }
 
-    size_t get(value_type& c)
+    std::size_t get(value_type& c)
     {
         if (input_ptr_ < input_end_)
         {
@@ -682,7 +682,7 @@ public:
 
     void ignore(size_t count)
     {
-        size_t len;
+        std::size_t len;
         if ((size_t)(input_end_ - input_ptr_) < count)
         {
             len = input_end_ - input_ptr_;
@@ -700,9 +700,9 @@ public:
         return input_ptr_ < input_end_ ? *input_ptr_ : traits_type::eof();
     }
 
-    size_t read(value_type* p, size_t length)
+    std::size_t read(value_type* p, std::size_t length)
     {
-        size_t len;
+        std::size_t len;
         if ((size_t)(input_end_ - input_ptr_) < length)
         {
             len = input_end_ - input_ptr_;
@@ -719,9 +719,9 @@ public:
 
     template <class OutputIt>
     typename std::enable_if<!std::is_same<OutputIt,value_type*>::value,size_t>::type
-    read(OutputIt d_first, size_t count)
+    read(OutputIt d_first, std::size_t count)
     {
-        size_t len;
+        std::size_t len;
         if ((size_t)(input_end_ - input_ptr_) < count)
         {
             len = input_end_ - input_ptr_;

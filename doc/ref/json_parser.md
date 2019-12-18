@@ -61,7 +61,7 @@ Note: It is the programmer's responsibility to ensure that `json_reader` does no
 #### Member functions
 
     void update(const string_view_type& sv)
-    void update(const char* data, size_t length)
+    void update(const char* data, std::size_t length)
 Update the parser with a chunk of JSON
 
     bool done() const
@@ -112,11 +112,11 @@ Throws [ser_error](ser_error.md) if parsing fails.
     void check_done(std::error_code& ec)
 Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
 
-    size_t reset() const
+    std::size_t reset() const
 Resets the state of the parser to its initial state. In this state
 `stopped()` returns `false` and `done()` returns `false`.
 
-    size_t restart() const
+    std::size_t restart() const
 Resets the `stopped` state of the parser to `false`, allowing parsing
 to continue.
 

@@ -74,13 +74,13 @@ private:
 
     union
     {
-        size_t capacity_;
+        std::size_t capacity_;
         uint64_t values_[2];
     };
     uint64_t* data_;
     bool      neg_;
     bool      dynamic_;
-    size_t    length_;
+    std::size_t    length_;
 public:
 //  Constructors and Destructor
     basic_bignum()
@@ -148,7 +148,7 @@ public:
     }
 
     template <typename CharT>
-    basic_bignum(const CharT* data, size_t length)
+    basic_bignum(const CharT* data, std::size_t length)
         : values_{0,0}
     {
         initialize(data, length);
@@ -162,7 +162,7 @@ public:
     }
 
     template <typename CharT>
-    basic_bignum(const CharT* data, size_t length, uint8_t base)
+    basic_bignum(const CharT* data, std::size_t length, uint8_t base)
         : values_{0,0}
     {
         initialize(data, length, base);
@@ -193,7 +193,7 @@ public:
         }
     }
 
-    basic_bignum(int signum, const uint8_t* str, size_t n)
+    basic_bignum(int signum, const uint8_t* str, std::size_t n)
         : values_{0,0}
     {
         if (n > 0)
@@ -347,7 +347,7 @@ public:
         }
     }
 
-    size_t capacity() const { return dynamic_ ? capacity_ : 2; }
+    std::size_t capacity() const { return dynamic_ ? capacity_ : 2; }
 
 //  Operators
     bool operator!() const
@@ -441,7 +441,7 @@ public:
 
     basic_bignum& operator*=( uint64_t y )
     {
-        size_t len0 = length();
+        std::size_t len0 = length();
         uint64_t hi;
         uint64_t lo;
         uint64_t dig = data_[0];
@@ -449,7 +449,7 @@ public:
 
         incr_length( length() + 1 );
 
-        size_t i = 0;
+        std::size_t i = 0;
         for (i = 0; i < len0; i++ )
         {
             DDproduct( dig, y, hi, lo );
@@ -491,7 +491,7 @@ public:
                 *this *= y.data_[0];
             else
             {
-                size_t lenProd = length() + y.length(), jA, jB;
+                std::size_t lenProd = length() + y.length(), jA, jB;
                 uint64_t sumHi = 0, sumLo, hi, lo,
                 sumLo_old, sumHi_old, carry=0;
                 basic_bignum<Allocator> x = *this;
@@ -542,7 +542,7 @@ public:
 
     basic_bignum& operator<<=( uint64_t k )
     {
-        size_t q = (size_t)(k / basic_type_bits);
+        std::size_t q = (size_t)(k / basic_type_bits);
         if ( q ) // Increase length_ by q:
         {
             incr_length(length() + q);
@@ -568,7 +568,7 @@ public:
 
     basic_bignum& operator>>=(uint64_t k)
     {
-        size_t q = (size_t)(k / basic_type_bits);
+        std::size_t q = (size_t)(k / basic_type_bits);
         if ( q >= length() )
         {
             set_length( 0 );
@@ -586,7 +586,7 @@ public:
             }
         }
 
-        size_t n = (size_t)(length() - 1);
+        std::size_t n = (size_t)(length() - 1);
         int64_t k1 = basic_type_bits - k;
         uint64_t mask = (1 << k) - 1;
         for (size_t i = 0; i <= n; i++)
@@ -669,7 +669,7 @@ public:
 
     basic_bignum& operator&=( const basic_bignum<Allocator>& a )
     {
-        size_t old_length = length();
+        std::size_t old_length = length();
 
         set_length( (std::min)( length(), a.length() ) );
 
@@ -826,7 +826,7 @@ public:
             {
                 v.divide( LP10, v, R, true );
                 r = (R.length() ? R.data_[0] : 0);
-                for ( size_t j=0; j < ip10; j++ )
+                for ( std::size_t j=0; j < ip10; j++ )
                 {
                     data[--n] = char(r % 10 + '0');
                     r /= 10;
@@ -881,7 +881,7 @@ public:
             {
                 v.divide( LP10, v, R, true );
                 r = (R.length() ? R.data_[0] : 0);
-                for ( size_t j=0; j < ip10; j++ )
+                for ( std::size_t j=0; j < ip10; j++ )
                 {
                     uint8_t c = r % 16;
                     data[--n] = (c < 10) ? ('0' + c) : ('A' - 10 + c);
@@ -1221,11 +1221,11 @@ private:
         return (qHi << basic_type_halfBits) + qLo;
     }
 
-    void subtractmul( uint64_t* a, uint64_t* b, size_t n, uint64_t& q ) const
+    void subtractmul( uint64_t* a, uint64_t* b, std::size_t n, uint64_t& q ) const
     // a -= q * b: b in n positions; correct q if necessary
     {
         uint64_t hi, lo, d, carry = 0;
-        size_t i;
+        std::size_t i;
         for ( i = 0; i < n; i++ )
         {
             DDproduct( b[i], q, hi, lo );
@@ -1255,7 +1255,7 @@ private:
 
     int normalize( basic_bignum<Allocator>& denom, basic_bignum<Allocator>& num, int& x ) const
     {
-        size_t r = denom.length() - 1;
+        std::size_t r = denom.length() - 1;
         uint64_t y = denom.data_[r];
 
         x = 0;
@@ -1341,8 +1341,8 @@ private:
         }
         basic_bignum<Allocator> num0 = num, denom0 = denom;
         int second_done = normalize(denom, num, x);
-        size_t l = denom.length() - 1;
-        size_t n = num.length() - 1;
+        std::size_t l = denom.length() - 1;
+        std::size_t n = num.length() - 1;
         quot.set_length(n - l);
         for (size_t i=quot.length(); i-- > 0; )
             quot.data_[i] = 0;
@@ -1354,7 +1354,7 @@ private:
             quot.incr_length(quot.length() + 1);
         }
         uint64_t d = denom.data_[l];
-        for ( size_t k = n; k > l; k-- )
+        for ( std::size_t k = n; k > l; k-- )
         {
             uint64_t q = DDquotient(rem.data_[k], rem.data_[k-1], d);
             subtractmul( rem.data_ + k - l - 1, denom.data_, l + 1, q );
@@ -1369,7 +1369,7 @@ private:
         }
     }
 
-    size_t length() const { return length_; }
+    std::size_t length() const { return length_; }
     uint64_t* begin() { return data_; }
     const uint64_t* begin() const { return data_; }
     uint64_t* end() { return data_ + length_; }
@@ -1390,7 +1390,7 @@ private:
        }
     }
 
-    size_t round_up(size_t i) const // Find suitable new block size
+    std::size_t round_up(size_t i) const // Find suitable new block size
     {
         return (i/word_length + 1) * word_length;
     }
@@ -1492,14 +1492,14 @@ private:
         }
     }
 
-    void incr_length( size_t len_new )
+    void incr_length( std::size_t len_new )
     {
-        size_t len_old = length_;
+        std::size_t len_old = length_;
         length_ = len_new;  // length_ > len_old
 
         if ( length_ > capacity() )
         {
-            size_t capacity_new = round_up( length_ );
+            std::size_t capacity_new = round_up( length_ );
 
             uint64_t* data_old = data_;
 
@@ -1524,7 +1524,7 @@ private:
     }
 
     template <typename CharT>
-    void initialize(const CharT* data, size_t length)
+    void initialize(const CharT* data, std::size_t length)
     {
         bool neg;
         if (*data == '-')
@@ -1560,7 +1560,7 @@ private:
     }
 
     template <typename CharT>
-    void initialize(const CharT* data, size_t length, uint8_t base)
+    void initialize(const CharT* data, std::size_t length, uint8_t base)
     {
         if (!(base >= 2 && base <= 16))
         {

@@ -14,9 +14,18 @@ namespace detail
 {
     constexpr std::size_t dynamic_extent = (std::numeric_limits<std::size_t>::max)();
 
+    template< class T, std::size_t Extent = dynamic_extent>
+    class span;
+
+    template<class T>
+    struct is_span : std::false_type{};
+
+    template< class T>
+    struct is_span<span<T>> : std::true_type{};
+
     template<
         class T,
-        std::size_t Extent = dynamic_extent
+        std::size_t Extent
     > class span
     {
     public:
@@ -46,14 +55,14 @@ namespace detail
 
         template <typename C>
         constexpr span(C& c,
-                       typename std::enable_if<!is_std_array<C>::value && is_compatible_element<C,element_type>::value && has_data_and_size<C>::value>::type* = 0)
+                       typename std::enable_if<!is_span<C>::value && !is_std_array<C>::value && is_compatible_element<C,element_type>::value && has_data_and_size<C>::value>::type* = 0)
             : data_(c.data()), size_(c.size())
         {
         }
 
         template <typename C>
         constexpr span(const C& c,
-                       typename std::enable_if<!is_std_array<C>::value && is_compatible_element<C,element_type>::value && has_data_and_size<C>::value>::type* = 0)
+                       typename std::enable_if<!is_span<C>::value && !is_std_array<C>::value && is_compatible_element<C,element_type>::value && has_data_and_size<C>::value>::type* = 0)
             : data_(c.data()), size_(c.size())
         {
         }

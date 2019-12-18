@@ -41,7 +41,7 @@ struct PathConstructor
     typedef typename Json::string_view_type string_view_type;
     typedef std::basic_string<char_type> string_type;
 
-    string_type operator()(const string_type& path, size_t index) const
+    string_type operator()(const string_type& path, std::size_t index) const
     {
         char_type buf[255];
         char_type* p = buf;
@@ -81,7 +81,7 @@ struct VoidPathConstructor
     typedef std::basic_string<char_type> string_type;
     typedef typename Json::string_view_type string_view_type;
 
-    string_type operator()(const string_type&, size_t) const
+    string_type operator()(const string_type&, std::size_t) const
     {
         return string_type{};
     }
@@ -271,7 +271,7 @@ struct operator_properties
 {
     typedef std::function<Json(const term<Json>&, const term<Json>&)> operator_type;
 
-    size_t precedence_level;
+    std::size_t precedence_level;
     bool is_right_associative;
     operator_type op;
 };
@@ -284,7 +284,7 @@ public:
     typedef std::function<Json(const term<Json>&, const term<Json>&)> operator_type;
 private:
     token_type type_;
-    size_t precedence_level_;
+    std::size_t precedence_level_;
     bool is_right_associative_;
     std::shared_ptr<term<Json>> operand_ptr_;
     unary_operator_type unary_operator_;
@@ -365,7 +365,7 @@ public:
         return type_ == token_type::rparen; 
     }
 
-    size_t precedence_level() const
+    std::size_t precedence_level() const
     {
         return precedence_level_;
     }
@@ -694,11 +694,11 @@ class path_term final : public term<Json>
     typedef std::basic_string<char_type> string_type;
 
     string_type path_;
-    size_t line_;
-    size_t column_;
+    std::size_t line_;
+    std::size_t column_;
     Json nodes_;
 public:
-    path_term(const string_type& path, size_t line, size_t column)
+    path_term(const string_type& path, std::size_t line, std::size_t column)
         : path_(path), line_(line), column_(column)
     {
     }
@@ -1042,8 +1042,8 @@ class jsonpath_filter_parser
     std::vector<filter_state> state_stack_;
     std::vector<filter_path_mode> path_mode_stack_;
 
-    size_t line_;
-    size_t column_;
+    std::size_t line_;
+    std::size_t column_;
 
     static const operator_properties<Json> op_properties_[];
 
@@ -1086,17 +1086,17 @@ public:
         : line_(1), column_(1)
     {
     }
-    jsonpath_filter_parser(size_t line, size_t column)
+    jsonpath_filter_parser(size_t line, std::size_t column)
         : line_(line), column_(column)
     {
     }
 
-    size_t line() const
+    std::size_t line() const
     {
         return line_;
     }
 
-    size_t column() const
+    std::size_t column() const
     {
         return column_;
     }
@@ -1180,8 +1180,8 @@ public:
         state_stack_.clear();
 
         string_type buffer;
-        size_t buffer_line = 1;
-        size_t buffer_column = 1;
+        std::size_t buffer_line = 1;
+        std::size_t buffer_column = 1;
 
         int depth = 0;
         filter_state state = filter_state::start;

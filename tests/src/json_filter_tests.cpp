@@ -18,8 +18,8 @@ using namespace jsoncons;
 struct warning
 {
     std::string name;
-    size_t line_number;
-    size_t column_number;
+    std::size_t line_number;
+    std::size_t column_number;
 };
 
 class name_fix_up_filter : public json_filter
@@ -56,8 +56,8 @@ private:
     {
         if (member_name_ == "name")
         {
-            size_t end_first = s.find_first_of(" \t");
-            size_t start_last = s.find_first_not_of(" \t", end_first);
+            std::size_t end_first = s.find_first_of(" \t");
+            std::size_t start_last = s.find_first_not_of(" \t", end_first);
             this->to_handler().name("first-name", context);
             string_view_type first = s.substr(0, end_first);
             this->to_handler().string_value(first, tag, context);

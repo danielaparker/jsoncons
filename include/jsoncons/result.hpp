@@ -49,7 +49,7 @@ public:
         : os_(std::addressof(os)), buffer_(default_buffer_length), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
     {
     }
-    stream_result(std::basic_ostream<CharT>& os, size_t buflen)
+    stream_result(std::basic_ostream<CharT>& os, std::size_t buflen)
     : os_(std::addressof(os)), buffer_(buflen), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
     {
     }
@@ -68,9 +68,9 @@ public:
         p_ = buffer_.data();
     }
 
-    void append(const CharT* s, size_t length)
+    void append(const CharT* s, std::size_t length)
     {
-        size_t diff = end_buffer_ - p_;
+        std::size_t diff = end_buffer_ - p_;
         if (diff >= length)
         {
             std::memcpy(p_, s, length*sizeof(CharT));
@@ -99,7 +99,7 @@ public:
     }
 private:
 
-    size_t buffer_length() const
+    std::size_t buffer_length() const
     {
         return p_ - begin_buffer_;
     }
@@ -136,7 +136,7 @@ public:
           p_(begin_buffer_)
     {
     }
-    binary_stream_result(std::basic_ostream<char>& os, size_t buflen)
+    binary_stream_result(std::basic_ostream<char>& os, std::size_t buflen)
         : os_(std::addressof(os)), 
           buffer_(buflen), 
           begin_buffer_(buffer_.data()), 
@@ -158,9 +158,9 @@ public:
         p_ = buffer_.data();
     }
 
-    void append(const uint8_t* s, size_t length)
+    void append(const uint8_t* s, std::size_t length)
     {
-        size_t diff = end_buffer_ - p_;
+        std::size_t diff = end_buffer_ - p_;
         if (diff >= length)
         {
             std::memcpy(p_, s, length*sizeof(uint8_t));
@@ -189,7 +189,7 @@ public:
     }
 private:
 
-    size_t buffer_length() const
+    std::size_t buffer_length() const
     {
         return p_ - begin_buffer_;
     }
@@ -230,7 +230,7 @@ public:
     {
     }
 
-    void append(const value_type* s, size_t length)
+    void append(const value_type* s, std::size_t length)
     {
         s_->insert(s_->end(), s, s+length);
     }
@@ -268,7 +268,7 @@ public:
     {
     }
 
-    void append(const uint8_t* s, size_t length)
+    void append(const uint8_t* s, std::size_t length)
     {
         s_.insert(s_.end(), s, s+length);
     }

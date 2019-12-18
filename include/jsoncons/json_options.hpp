@@ -376,7 +376,7 @@ protected:
     spaces_option spaces_around_comma_;
     int8_t precision_;
     uint8_t indent_size_;
-    size_t line_length_limit_;
+    std::size_t line_length_limit_;
     string_type new_line_chars_;
 public:
     basic_json_encode_options()
@@ -468,7 +468,7 @@ public:
         return new_line_chars_;
     }
 
-    size_t line_length_limit() const 
+    std::size_t line_length_limit() const 
     {
         return line_length_limit_;
     }

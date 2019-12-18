@@ -201,7 +201,7 @@ struct ser_traits<T,
         Json j(json_array_arg, semantic_tag::none, alloc);
         auto first = std::begin(val);
         auto last = std::end(val);
-        size_t size = std::distance(first, last);
+        std::size_t size = std::distance(first, last);
         j.reserve(size);
         for (auto it = first; it != last; ++it)
         {
@@ -248,7 +248,7 @@ struct ser_traits<T,
 
 // std::array
 
-template <class T, size_t N>
+template <class T, std::size_t N>
 struct ser_traits<std::array<T,N>>
 {
     typedef typename std::array<T,N>::value_type value_type;

@@ -25,11 +25,11 @@ enum class parse_mode {root,before_done,document,array,value};
 struct parse_state 
 {
     parse_mode mode; 
-    size_t length;
+    std::size_t length;
     uint8_t type;
-    size_t index;
+    std::size_t index;
 
-    parse_state(parse_mode mode, size_t length, uint8_t type = 0)
+    parse_state(parse_mode mode, std::size_t length, uint8_t type = 0)
         : mode(mode), length(length), type(type), index(0)
     {
     }
@@ -89,12 +89,12 @@ public:
         return !more_;
     }
 
-    size_t line() const override
+    std::size_t line() const override
     {
         return 0;
     }
 
-    size_t column() const override
+    std::size_t column() const override
     {
         return source_.position();
     }

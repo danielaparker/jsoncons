@@ -30,7 +30,7 @@ template <class InputIt, class Container>
 typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value,size_t>::type
 encode_base64_generic(InputIt first, InputIt last, const char alphabet[65], Container& result)
 {
-    size_t count = 0;
+    std::size_t count = 0;
     unsigned char a3[3];
     unsigned char a4[4];
     unsigned char fill = alphabet[64];
@@ -264,7 +264,7 @@ template <class InputIt,class Container>
 typename std::enable_if<std::true_type::value && sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
 decode_base16(InputIt first, InputIt last, Container& result)
 {
-    size_t len = std::distance(first,last);
+    std::size_t len = std::distance(first,last);
     if (len & 1) 
     {
         JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Cannot decode encoded base16 string - odd length"));
@@ -330,7 +330,7 @@ class basic_byte_string;
 class byte_string_view
 {
     const uint8_t* data_;
-    size_t size_; 
+    std::size_t size_; 
 public:
     typedef byte_traits traits_type;
 
@@ -349,7 +349,7 @@ public:
     {
     }
 
-    constexpr byte_string_view(const uint8_t* data, size_t length) noexcept
+    constexpr byte_string_view(const uint8_t* data, std::size_t length) noexcept
         : data_(data), size_(length)
     {
     }
@@ -388,7 +388,7 @@ public:
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use size()") 
-    size_t length() const
+    std::size_t length() const
     {
         return size_;
     }
@@ -507,7 +507,7 @@ public:
     {
     }
 
-    basic_byte_string(const uint8_t* data, size_t length, const Allocator& alloc = Allocator())
+    basic_byte_string(const uint8_t* data, std::size_t length, const Allocator& alloc = Allocator())
         : data_(data, data+length,alloc)
     {
     }
@@ -535,13 +535,13 @@ public:
         data_.push_back(b);
     }
 
-    void assign(const uint8_t* s, size_t count)
+    void assign(const uint8_t* s, std::size_t count)
     {
         data_.clear();
         data_.insert(s, s+count);
     }
 
-    void append(const uint8_t* s, size_t count)
+    void append(const uint8_t* s, std::size_t count)
     {
         data_.insert(s, s+count);
     }
@@ -585,14 +585,14 @@ public:
         return data_.data();
     }
 
-    size_t size() const
+    std::size_t size() const
     {
         return data_.size();
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use size()") 
-    size_t length() const
+    std::size_t length() const
     {
         return data_.size();
     }

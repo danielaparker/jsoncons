@@ -169,7 +169,7 @@ private:
     source_type source_;
     bool eof_;
     bool begin_;
-    size_t buffer_length_;
+    std::size_t buffer_length_;
     std::vector<CharT,char_allocator_type> buffer_;
 
     // Noncopyable and nonmoveable
@@ -300,11 +300,11 @@ public:
         {
             JSONCONS_THROW(ser_error(result.ec,parser_.line(),parser_.column()));
         }
-        size_t offset = result.it - sv.begin();
+        std::size_t offset = result.it - sv.begin();
         parser_.update(sv.data()+offset,sv.size()-offset);
     }
 
-    size_t buffer_length() const
+    std::size_t buffer_length() const
     {
         return buffer_length_;
     }
@@ -395,12 +395,12 @@ public:
         }
     }
 
-    size_t line() const
+    std::size_t line() const
     {
         return parser_.line();
     }
 
-    size_t column() const
+    std::size_t column() const
     {
         return parser_.column();
     }
@@ -465,7 +465,7 @@ public:
 #if !defined(JSONCONS_NO_DEPRECATED)
 
     JSONCONS_DEPRECATED_MSG("Instead, use buffer_length()")
-    size_t buffer_capacity() const
+    std::size_t buffer_capacity() const
     {
         return buffer_length_;
     }
@@ -477,7 +477,7 @@ public:
         buffer_.reserve(buffer_length_);
     }
     JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth()")
-    size_t max_depth() const
+    std::size_t max_depth() const
     {
         return parser_.max_nesting_depth();
     }
@@ -495,7 +495,7 @@ private:
     {
         buffer_.clear();
         buffer_.resize(buffer_length_);
-        size_t count = source_.read(buffer_.data(), buffer_length_);
+        std::size_t count = source_.read(buffer_.data(), buffer_length_);
         buffer_.resize(static_cast<size_t>(count));
         if (buffer_.size() == 0)
         {
@@ -509,7 +509,7 @@ private:
                 ec = result.ec;
                 return;
             }
-            size_t offset = result.it - buffer_.begin();
+            std::size_t offset = result.it - buffer_.begin();
             parser_.update(buffer_.data()+offset,buffer_.size()-offset);
             begin_ = false;
         }

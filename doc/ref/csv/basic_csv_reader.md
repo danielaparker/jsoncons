@@ -88,7 +88,7 @@ Returns `true` when there is no more data to be read from the stream, `false` ot
 Reports JSON related events for JSON objects, arrays, object members and array elements to a [basic_json_content_handler](../basic_json_content_handler.md), such as a [json_decoder](json_decoder.md).
 Throws [ser_error](../ser_error.md) if parsing fails.
 
-    size_t buffer_length() const
+    std::size_t buffer_length() const
 
     void buffer_length(size_t length)
 

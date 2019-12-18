@@ -27,7 +27,7 @@ class basic_string_view
 {
 private:
     const CharT* data_;
-    size_t length_;
+    std::size_t length_;
 public:
     typedef CharT value_type;
     typedef const CharT& const_reference;
@@ -42,7 +42,7 @@ public:
         : data_(nullptr), length_(0)
     {
     }
-    basic_string_view(const CharT* data, size_t length)
+    basic_string_view(const CharT* data, std::size_t length)
         : data_(data), length_(length)
     {
     }
@@ -100,12 +100,12 @@ public:
 
     // capacity
 
-    size_t size() const
+    std::size_t size() const
     {
         return length_;
     }
 
-    size_t length() const
+    std::size_t length() const
     {
         return length_;
     }

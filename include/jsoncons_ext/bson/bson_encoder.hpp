@@ -35,21 +35,21 @@ private:
     struct stack_item
     {
         jsoncons::bson::detail::bson_container_type type_;
-        size_t offset_;
-        size_t name_offset_;
-        size_t index_;
+        std::size_t offset_;
+        std::size_t name_offset_;
+        std::size_t index_;
 
-        stack_item(jsoncons::bson::detail::bson_container_type type, size_t offset)
+        stack_item(jsoncons::bson::detail::bson_container_type type, std::size_t offset)
            : type_(type), offset_(offset), name_offset_(0), index_(0)
         {
         }
 
-        size_t offset() const
+        std::size_t offset() const
         {
             return offset_;
         }
 
-        size_t member_offset() const
+        std::size_t member_offset() const
         {
             return name_offset_;
         }
@@ -59,7 +59,7 @@ private:
             name_offset_ = offset;
         }
 
-        size_t next_index()
+        std::size_t next_index()
         {
             return index_++;
         }
@@ -122,7 +122,7 @@ private:
 
         buffer_.push_back(0x00);
 
-        size_t length = buffer_.size() - stack_.back().offset();
+        std::size_t length = buffer_.size() - stack_.back().offset();
         jsoncons::detail::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+stack_.back().offset());
 
         stack_.pop_back();
@@ -153,7 +153,7 @@ private:
 
         buffer_.push_back(0x00);
 
-        size_t length = buffer_.size() - stack_.back().offset();
+        std::size_t length = buffer_.size() - stack_.back().offset();
         jsoncons::detail::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+stack_.back().offset());
 
         stack_.pop_back();
@@ -204,9 +204,9 @@ private:
     {
         before_value(jsoncons::bson::detail::bson_format::string_cd);
 
-        size_t offset = buffer_.size();
+        std::size_t offset = buffer_.size();
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
-        size_t string_offset = buffer_.size();
+        std::size_t string_offset = buffer_.size();
 
         auto result = unicons::validate(sv.begin(), sv.end());
         if (result.ec != unicons::conv_errc())
@@ -219,7 +219,7 @@ private:
             buffer_.push_back(c);
         }
         buffer_.push_back(0x00);
-        size_t length = buffer_.size() - string_offset;
+        std::size_t length = buffer_.size() - string_offset;
         jsoncons::detail::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+offset);
 
         return true;
@@ -232,15 +232,15 @@ private:
     {
         before_value(jsoncons::bson::detail::bson_format::binary_cd);
 
-        size_t offset = buffer_.size();
+        std::size_t offset = buffer_.size();
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
-        size_t string_offset = buffer_.size();
+        std::size_t string_offset = buffer_.size();
 
         for (auto c : b)
         {
             buffer_.push_back(c);
         }
-        size_t length = buffer_.size() - string_offset;
+        std::size_t length = buffer_.size() - string_offset;
         jsoncons::detail::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+offset);
 
         return true;

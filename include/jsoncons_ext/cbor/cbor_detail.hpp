@@ -58,7 +58,7 @@ namespace additional_info
 inline
 size_t min_length_for_stringref(uint64_t index)
 {
-    size_t n;
+    std::size_t n;
     if (index <= 23)
     {
         n = 3;

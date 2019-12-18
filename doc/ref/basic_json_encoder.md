@@ -88,7 +88,7 @@ and uses the specified [json options](basic_json_options.md).
                            semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=null_ser_context()); 
 
-    bool byte_string_value(const uint8_t* p, size_t size, 
+    bool byte_string_value(const uint8_t* p, std::size_t size, 
                            semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=null_ser_context()); 
 

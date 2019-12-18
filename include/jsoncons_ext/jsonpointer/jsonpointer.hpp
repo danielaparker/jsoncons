@@ -57,8 +57,8 @@ class json_ptr_iterator
     base_iterator p_;
     base_iterator q_;
     jsonpointer::detail::pointer_state state_;
-    size_t line_;
-    size_t column_;
+    std::size_t line_;
+    std::size_t column_;
     std::basic_string<char_type> buffer_;
 public:
     typedef string_type value_type;
@@ -410,8 +410,8 @@ class jsonpointer_evaluator : public ser_context
     using reference = JReference;
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JReference>::type>::value,typename J::const_pointer,typename J::pointer>::type;
 
-    size_t line_;
-    size_t column_;
+    std::size_t line_;
+    std::size_t column_;
     string_type buffer_;
     std::vector<handle_type<J,JReference>> current_;
 public:
@@ -484,7 +484,7 @@ public:
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                size_t index = result.value;
+                std::size_t index = result.value;
                 if (index > current_.back().get().size())
                 {
                     ec = jsonpointer_errc::index_exceeds_array_size;
@@ -537,7 +537,7 @@ public:
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                size_t index = result.value;
+                std::size_t index = result.value;
                 if (index > current_.back().get().size())
                 {
                     ec = jsonpointer_errc::index_exceeds_array_size;
@@ -599,7 +599,7 @@ public:
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                size_t index = result.value;
+                std::size_t index = result.value;
                 if (index >= current_.back().get().size())
                 {
                     ec = jsonpointer_errc::index_exceeds_array_size;
@@ -654,7 +654,7 @@ public:
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                size_t index = result.value;
+                std::size_t index = result.value;
                 if (index >= current_.back().get().size())
                 {
                     ec = jsonpointer_errc::index_exceeds_array_size;
@@ -728,7 +728,7 @@ public:
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                size_t index = result.value;
+                std::size_t index = result.value;
                 if (index >= current.back().get().size())
                 {
                     ec = jsonpointer_errc::index_exceeds_array_size;
@@ -755,12 +755,12 @@ public:
 
     // ser_context
 
-    size_t line() const override
+    std::size_t line() const override
     {
         return line_;
     }
 
-    size_t column() const override
+    std::size_t column() const override
     {
         return column_;
     }

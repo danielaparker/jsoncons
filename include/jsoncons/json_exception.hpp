@@ -47,7 +47,7 @@ class key_not_found : public std::out_of_range, public virtual json_exception
 {
 public:
     template <class CharT>
-    explicit key_not_found(const CharT* key, size_t length) noexcept
+    explicit key_not_found(const CharT* key, std::size_t length) noexcept
         : std::out_of_range("")
     {
         buffer_.append("Key '");
@@ -70,7 +70,7 @@ class not_an_object : public std::runtime_error, public virtual json_exception
 {
 public:
     template <class CharT>
-    explicit not_an_object(const CharT* key, size_t length) noexcept
+    explicit not_an_object(const CharT* key, std::size_t length) noexcept
         : std::runtime_error("")
     {
         buffer_.append("Attempting to access or modify '");
@@ -96,11 +96,11 @@ public:
         : std::system_error(ec), line_number_(0), column_number_(0)
     {
     }
-    ser_error(std::error_code ec, size_t position)
+    ser_error(std::error_code ec, std::size_t position)
         : std::system_error(ec), line_number_(0), column_number_(position)
     {
     }
-    ser_error(std::error_code ec, size_t line, size_t column)
+    ser_error(std::error_code ec, std::size_t line, std::size_t column)
         : std::system_error(ec), line_number_(line), column_number_(column)
     {
     }
@@ -131,33 +131,33 @@ public:
         }
     }
 
-    size_t line() const noexcept
+    std::size_t line() const noexcept
     {
         return line_number_;
     }
 
-    size_t column() const noexcept
+    std::size_t column() const noexcept
     {
         return column_number_;
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use line()")
-    size_t line_number() const noexcept
+    std::size_t line_number() const noexcept
     {
         return line();
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use column()")
-    size_t column_number() const noexcept
+    std::size_t column_number() const noexcept
     {
         return column();
     }
 #endif
 private:
     std::string buffer_;
-    size_t line_number_;
-    size_t column_number_;
+    std::size_t line_number_;
+    std::size_t column_number_;
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)

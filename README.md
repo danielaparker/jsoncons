@@ -961,7 +961,5 @@ The jsoncons implementation of the Grisu3 algorithm for printing floating-point 
 
 The macro `JSONCONS_ALL_MEMBER_TRAITS_DECL` was inspired by Martin York's [ThorsSerializer](https://github.com/Loki-Astari/ThorsSerializer)
 
-jsoncons includes [Martin Moene's span-lite](https://github.com/martinmoene/span-lite) - a C++20-like span - distributed under the Boost Software License, Version 1.0. 
-
 Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.md)
  

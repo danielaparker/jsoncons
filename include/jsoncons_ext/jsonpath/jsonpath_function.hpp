@@ -147,7 +147,7 @@ private:
                         return Json();
                     }
                     const auto& arg = args[0];
-                    size_t count = 0;
+                    std::size_t count = 0;
                     while (count < arg.size())
                     {
                         ++count;

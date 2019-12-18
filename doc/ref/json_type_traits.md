@@ -966,7 +966,7 @@ namespace jsoncons {
             }
             if (val.size() > 0)
             {
-                size_t n = val[0].size();
+                std::size_t n = val[0].size();
                 for (const auto& a: val.array_range())
                 {
                     if (!(a.is_array() && a.size() == n))
@@ -989,8 +989,8 @@ namespace jsoncons {
         {
             if (val.is_array() && val.size() > 0)
             {
-                size_t m = val.size();
-                size_t n = 0;
+                std::size_t m = val.size();
+                std::size_t n = 0;
                 for (const auto& a : val.array_range())
                 {
                     if (a.size() > n)

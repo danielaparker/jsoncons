@@ -144,8 +144,8 @@ private:
     int nesting_depth_;
     uint32_t cp_;
     uint32_t cp2_;
-    size_t line_;
-    size_t column_;
+    std::size_t line_;
+    std::size_t column_;
     const CharT* begin_input_;
     const CharT* input_end_;
     const CharT* input_ptr_;
@@ -503,7 +503,7 @@ public:
         update(sv.data(),sv.length());
     }
 
-    void update(const CharT* data, size_t length)
+    void update(const CharT* data, std::size_t length)
     {
         begin_input_ = data;
         input_end_ = data + length;
@@ -2556,8 +2556,8 @@ escape_u9:
         }
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use update(const CharT*, size_t)")
-    void set_source(const CharT* data, size_t length)
+    JSONCONS_DEPRECATED_MSG("Instead, use update(const CharT*, std::size_t)")
+    void set_source(const CharT* data, std::size_t length)
     {
         begin_input_ = data;
         input_end_ = data + length;
@@ -2565,12 +2565,12 @@ escape_u9:
     }
 #endif
 
-    size_t line() const override
+    std::size_t line() const override
     {
         return line_;
     }
 
-    size_t column() const override
+    std::size_t column() const override
     {
         return column_;
     }
@@ -2687,7 +2687,7 @@ private:
         }
     }
 
-    void end_string_value(const CharT* s, size_t length, basic_json_content_handler<CharT>& handler, std::error_code& ec) 
+    void end_string_value(const CharT* s, std::size_t length, basic_json_content_handler<CharT>& handler, std::error_code& ec) 
     {
         string_view_type sv(s, length);
         auto result = unicons::validate(s,s+length);

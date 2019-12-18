@@ -25,10 +25,10 @@ enum class parse_mode {root,before_done,array,map_key,map_value};
 struct parse_state 
 {
     parse_mode mode; 
-    size_t length;
-    size_t index;
+    std::size_t length;
+    std::size_t index;
 
-    parse_state(parse_mode mode, size_t length)
+    parse_state(parse_mode mode, std::size_t length)
         : mode(mode), length(length), index(0)
     {
     }
@@ -88,12 +88,12 @@ public:
         return !more_;
     }
 
-    size_t line() const override
+    std::size_t line() const override
     {
         return 0;
     }
 
-    size_t column() const override
+    std::size_t column() const override
     {
         return source_.position();
     }
@@ -698,7 +698,7 @@ private:
 
     void produce_begin_array(json_content_handler& handler, uint8_t type, std::error_code& ec)
     {
-        size_t len = 0;
+        std::size_t len = 0;
         switch (type)
         {
             case jsoncons::msgpack::detail::msgpack_format::array16_cd: 
@@ -744,7 +744,7 @@ private:
 
     void produce_begin_map(json_content_handler& handler, uint8_t type, std::error_code& ec)
     {
-        size_t len = 0;
+        std::size_t len = 0;
         switch (type)
         {
             case jsoncons::msgpack::detail::msgpack_format::map16_cd:

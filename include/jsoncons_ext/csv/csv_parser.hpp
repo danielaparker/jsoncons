@@ -224,11 +224,11 @@ namespace detail {
         typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_event_vector_type> parse_event_vector_allocator_type;
     private:
         WorkAllocator alloc_;
-        size_t name_index_;
+        std::size_t name_index_;
         int level_;
         cached_state state_;
-        size_t column_index_;
-        size_t row_index_;
+        std::size_t column_index_;
+        std::size_t row_index_;
 
         std::vector<string_type, string_allocator_type> column_names_;
         std::vector<parse_event_vector_type,parse_event_vector_allocator_type> cached_events_;
@@ -513,19 +513,19 @@ private:
     csv_parse_state state_;
     basic_json_content_handler<CharT>* handler_;
     std::function<bool(csv_errc,const ser_context&)> err_handler_;
-    size_t column_;
-    size_t line_;
+    std::size_t column_;
+    std::size_t line_;
     int depth_;
     const basic_csv_decode_options<CharT> options_;
-    size_t column_index_;
-    size_t level_;
-    size_t offset_;
+    std::size_t column_index_;
+    std::size_t level_;
+    std::size_t offset_;
     jsoncons::detail::string_to_double to_double_; 
     const CharT* begin_input_;
     const CharT* input_end_;
     const CharT* input_ptr_;
     bool more_;
-    size_t header_line_;
+    std::size_t header_line_;
 
     detail::m_columns_filter<CharT,WorkAllocator> m_columns_filter_;
     std::vector<csv_mode,csv_mode_allocator_type> stack_;
@@ -1281,19 +1281,19 @@ public:
         update(sv.data(),sv.length());
     }
 
-    void update(const CharT* data, size_t length)
+    void update(const CharT* data, std::size_t length)
     {
         begin_input_ = data;
         input_end_ = data + length;
         input_ptr_ = begin_input_;
     }
 
-    size_t line() const override
+    std::size_t line() const override
     {
         return line_;
     }
 
-    size_t column() const override
+    std::size_t column() const override
     {
         return column_;
     }
@@ -1428,8 +1428,8 @@ private:
 
     void trim_string_buffer(bool trim_leading, bool trim_trailing)
     {
-        size_t start = 0;
-        size_t length = buffer_.length();
+        std::size_t start = 0;
+        std::size_t length = buffer_.length();
         if (trim_leading)
         {
             bool done = false;

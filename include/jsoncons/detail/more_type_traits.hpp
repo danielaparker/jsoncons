@@ -22,7 +22,7 @@ namespace jsoncons
 {
 // static_max
 
-template <size_t arg1, size_t ... argn>
+template <size_t arg1, std::size_t ... argn>
 struct static_max;
 
 template <size_t arg>
@@ -31,7 +31,7 @@ struct static_max<arg>
     static const size_t value = arg;
 };
 
-template <size_t arg1, size_t arg2, size_t ... argn>
+template <size_t arg1, std::size_t arg2, std::size_t ... argn>
 struct static_max<arg1,arg2,argn ...>
 {
     static const size_t value = arg1 >= arg2 ? 
@@ -201,7 +201,7 @@ struct is_map_like<T,
 template<class T>
 struct is_std_array : std::false_type {};
 
-template<class E, size_t N>
+template<class E, std::size_t N>
 struct is_std_array<std::array<E, N>> : std::true_type {};
 
 // is_vector_like
@@ -254,13 +254,6 @@ struct is_compatible_element
     typename std::enable_if<!std::is_void<decltype(std::declval<C>().data())>::value>::type >
         : std::is_convertible< typename std::remove_pointer<decltype(std::declval<C>().data() )>::type(*)[], E(*)[] >
 {};
-
-/* template< class Q >
-struct is_span : std::false_type{};
-
-template< class T, size_t Extent >
-struct is_span< span<T, Extent> > : std::true_type{};
-*/
 
 } // detail
 

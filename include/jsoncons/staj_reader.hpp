@@ -149,7 +149,7 @@ class basic_staj_event
         const CharT* string_data_;
         const uint8_t* byte_string_data_;
     } value_;
-    size_t length_;
+    std::size_t length_;
 public:
     typedef basic_string_view<CharT> string_view_type;
 

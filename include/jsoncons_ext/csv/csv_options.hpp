@@ -55,7 +55,7 @@ struct csv_type_info
     csv_type_info(const csv_type_info&) = default;
     csv_type_info(csv_type_info&&) = default;
 
-    csv_type_info(csv_column_type ctype, size_t lev, size_t repcount = 0)
+    csv_type_info(csv_column_type ctype, std::size_t lev, std::size_t repcount = 0)
     {
         col_type = ctype;
         level = lev;
@@ -63,8 +63,8 @@ struct csv_type_info
     }
 
     csv_column_type col_type;
-    size_t level;
-    size_t rep_count;
+    std::size_t level;
+    std::size_t rep_count;
 };
 
 namespace detail {
@@ -163,8 +163,8 @@ void parse_column_types(const std::basic_string<CharT>& types,
                 case '*':
                     {
                         JSONCONS_ASSERT(column_types.size() != 0);
-                        size_t offset = 0;
-                        size_t level = column_types.size() > 0 ? column_types.back().level: 0;
+                        std::size_t offset = 0;
+                        std::size_t level = column_types.size() > 0 ? column_types.back().level: 0;
                         if (level > 0)
                         {
                             for (auto it = column_types.rbegin();
@@ -500,8 +500,8 @@ protected:
     bool lossless_number_:1;
     char_type comment_starter_;
     mapping_kind mapping_;
-    size_t header_lines_;
-    size_t max_lines_;
+    std::size_t header_lines_;
+    std::size_t max_lines_;
     string_type column_types_;
     string_type column_defaults_;
 public:
@@ -544,7 +544,7 @@ public:
           column_defaults_(std::move(other.column_defaults_))
     {}
 
-    size_t header_lines() const 
+    std::size_t header_lines() const 
     {
         return (assume_header_ && header_lines_ <= 1) ? 1 : header_lines_;
     }
@@ -619,7 +619,7 @@ public:
         return mapping_ != mapping_kind() ? mapping_ : (assume_header() || this->column_names_.size() > 0 ? mapping_kind::n_objects : mapping_kind::n_rows);
     }
 
-    size_t max_lines() const 
+    std::size_t max_lines() const 
     {
         return max_lines_;
     }

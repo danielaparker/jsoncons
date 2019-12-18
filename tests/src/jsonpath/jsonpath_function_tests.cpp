@@ -62,7 +62,7 @@ TEST_CASE("jsonpath function tests")
     {
         json result = jsonpath::json_query(store,"count($.store.book[*])");
 
-        size_t expected = 4;
+        std::size_t expected = 4;
 
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<size_t>() == expected);

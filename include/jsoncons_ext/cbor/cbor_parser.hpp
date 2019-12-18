@@ -85,7 +85,7 @@ class typed_array
         double* double_data_;
         float128_type* float128_data_;
     } data_;
-    size_t size_;
+    std::size_t size_;
 public:
     typed_array(const Allocator& alloc)
         : alloc_(alloc), type_(), data_(), size_(0)
@@ -233,7 +233,7 @@ public:
         data_.int64_data_ = alloc.allocate(size);
     }
 
-    typed_array(half_array_arg_t, size_t size, const Allocator& allocator)
+    typed_array(half_array_arg_t, std::size_t size, const Allocator& allocator)
         : alloc_(allocator), type_(typed_array_type::half_value), size_(size)
     {
         uint16_allocator_type alloc(alloc_);
@@ -377,7 +377,7 @@ public:
         return type_;
     }
 
-    size_t size() const
+    std::size_t size() const
     {
         return size_;
     }
@@ -553,7 +553,7 @@ class typed_array_view
         const double* double_data_;
         const Float128T* float128_data_;
     } data_;
-    size_t size_;
+    std::size_t size_;
 public:
     typedef Float128T float128_type;
 
@@ -685,7 +685,7 @@ public:
         data_.int64_data_ = data;
     }
 
-    typed_array_view(half_array_arg_t, const uint16_t* data, size_t size)
+    typed_array_view(half_array_arg_t, const uint16_t* data, std::size_t size)
         : type_(typed_array_type::half_value), size_(size)
     {
         data_.uint16_data_ = data;
@@ -718,7 +718,7 @@ public:
 
     typed_array_type type() const {return type_;}
 
-    size_t size() const
+    std::size_t size() const
     {
         return size_;
     }
@@ -843,16 +843,16 @@ typedef std::vector<mapped_string> stringref_map_type;
 struct parse_state 
 {
     parse_mode mode; 
-    size_t length;
-    size_t index;
+    std::size_t length;
+    std::size_t index;
     std::shared_ptr<stringref_map_type> stringref_map; 
 
-    parse_state(parse_mode mode, size_t length)
+    parse_state(parse_mode mode, std::size_t length)
         : mode(mode), length(length), index(0)
     {
     }
 
-    parse_state(parse_mode mode, size_t length, std::shared_ptr<stringref_map_type> stringref_map)
+    parse_state(parse_mode mode, std::size_t length, std::shared_ptr<stringref_map_type> stringref_map)
         : mode(mode), length(length), index(0), stringref_map(stringref_map)
     {
     }
@@ -884,7 +884,7 @@ class basic_cbor_parser : public ser_context
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     typed_array<Float128T,WorkAllocator> typed_array_;
     std::vector<size_t> shape_;
-    size_t index_;
+    std::size_t index_;
 
 public:
     template <class Source>
@@ -927,12 +927,12 @@ public:
         return !more_;
     }
 
-    size_t line() const override
+    std::size_t line() const override
     {
         return 0;
     }
 
-    size_t column() const override
+    std::size_t column() const override
     {
         return source_.position();
     }
@@ -1458,7 +1458,7 @@ private:
             }
             default: // definite length
             {
-                size_t len = get_size(ec);
+                std::size_t len = get_size(ec);
                 if (ec)
                 {
                     return;
@@ -1502,7 +1502,7 @@ private:
             }
             default: // definite_length
             {
-                size_t len = get_size(ec);
+                std::size_t len = get_size(ec);
                 if (ec)
                 {
                     return;
@@ -1678,14 +1678,14 @@ private:
         return s;
     }
 
-    size_t get_size(std::error_code& ec)
+    std::size_t get_size(std::error_code& ec)
     {
         uint64_t u = get_uint64_value(ec);
         if (ec)
         {
             return 0;
         }
-        size_t len = (size_t)u;
+        std::size_t len = (size_t)u;
         if (len != u)
         {
             ec = cbor_errc::number_too_large;
@@ -1781,7 +1781,7 @@ private:
             }
             default: // definite length
             {
-                size_t length = get_size(ec);
+                std::size_t length = get_size(ec);
                 if (ec)
                 {
                     return;
@@ -2408,7 +2408,7 @@ private:
                     const uint8_t* p = v.data();
                     const uint8_t* last = v.data() + v.size();
 
-                    size_t size = v.size();
+                    std::size_t size = v.size();
                     typed_array_ = typed_array<Float128T,WorkAllocator>(uint8_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; ++p, ++i)
                     {
@@ -2422,7 +2422,7 @@ private:
                     const uint8_t* p = v.data();
                     const uint8_t* last = v.data() + v.size();
 
-                    size_t size = v.size();
+                    std::size_t size = v.size();
                     typed_array_ = typed_array<Float128T,WorkAllocator>(uint8_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; ++p, ++i)
                     {
@@ -2439,12 +2439,12 @@ private:
                     const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
                     const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
 
-                    const size_t bytes_per_elem = size_t(1) << (f + ll);
+                    const size_t bytes_per_elem = std::size_t(1) << (f + ll);
 
                     const uint8_t* p = v.data();
                     const uint8_t* last = v.data() + v.size();
 
-                    size_t size = v.size()/bytes_per_elem;
+                    std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<Float128T,WorkAllocator>(uint16_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
@@ -2469,12 +2469,12 @@ private:
                     const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
                     const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
 
-                    const size_t bytes_per_elem = size_t(1) << (f + ll);
+                    const size_t bytes_per_elem = std::size_t(1) << (f + ll);
 
                     const uint8_t* p = v.data();
                     const uint8_t* last = v.data() + v.size();
 
-                    size_t size = v.size()/bytes_per_elem;
+                    std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<Float128T,WorkAllocator>(uint32_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
@@ -2499,12 +2499,12 @@ private:
                     const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
                     const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
 
-                    const size_t bytes_per_elem = size_t(1) << (f + ll);
+                    const size_t bytes_per_elem = std::size_t(1) << (f + ll);
 
                     const uint8_t* p = v.data();
                     const uint8_t* last = v.data() + v.size();
 
-                    size_t size = v.size()/bytes_per_elem;
+                    std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<Float128T,WorkAllocator>(uint64_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
@@ -2526,7 +2526,7 @@ private:
                     const uint8_t* p = v.data();
                     const uint8_t* last = v.data() + v.size();
 
-                    size_t size = v.size();
+                    std::size_t size = v.size();
                     typed_array_ = typed_array<Float128T,WorkAllocator>(int8_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; ++p, ++i)
                     {
@@ -2543,12 +2543,12 @@ private:
                     const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
                     const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
 
-                    const size_t bytes_per_elem = size_t(1) << (f + ll);
+                    const size_t bytes_per_elem = std::size_t(1) << (f + ll);
 
                     const uint8_t* p = v.data();
                     const uint8_t* last = v.data() + v.size();
 
-                    size_t size = v.size()/bytes_per_elem;
+                    std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<Float128T,WorkAllocator>(int16_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
@@ -2573,12 +2573,12 @@ private:
                     const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
                     const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
 
-                    const size_t bytes_per_elem = size_t(1) << (f + ll);
+                    const size_t bytes_per_elem = std::size_t(1) << (f + ll);
 
                     const uint8_t* p = v.data();
                     const uint8_t* last = v.data() + v.size();
 
-                    size_t size = v.size()/bytes_per_elem;
+                    std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<Float128T,WorkAllocator>(int32_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
@@ -2603,12 +2603,12 @@ private:
                     const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
                     const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
 
-                    const size_t bytes_per_elem = size_t(1) << (f + ll);
+                    const size_t bytes_per_elem = std::size_t(1) << (f + ll);
 
                     const uint8_t* p = v.data();
                     const uint8_t* last = v.data() + v.size();
 
-                    size_t size = v.size()/bytes_per_elem;
+                    std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<Float128T,WorkAllocator>(int64_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
@@ -2633,12 +2633,12 @@ private:
                     const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
                     const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
 
-                    const size_t bytes_per_elem = size_t(1) << (f + ll);
+                    const size_t bytes_per_elem = std::size_t(1) << (f + ll);
 
                     const uint8_t* p = v.data();
                     const uint8_t* last = v.data() + v.size();
 
-                    size_t size = v.size()/bytes_per_elem;
+                    std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<Float128T,WorkAllocator>(half_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
@@ -2663,12 +2663,12 @@ private:
                     const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
                     const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
 
-                    const size_t bytes_per_elem = size_t(1) << (f + ll);
+                    const size_t bytes_per_elem = std::size_t(1) << (f + ll);
 
                     const uint8_t* p = v.data();
                     const uint8_t* last = v.data() + v.size();
 
-                    size_t size = v.size()/bytes_per_elem;
+                    std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<Float128T,WorkAllocator>(float_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
@@ -2693,12 +2693,12 @@ private:
                     const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
                     const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
 
-                    const size_t bytes_per_elem = size_t(1) << (f + ll);
+                    const size_t bytes_per_elem = std::size_t(1) << (f + ll);
 
                     const uint8_t* p = v.data();
                     const uint8_t* last = v.data() + v.size();
 
-                    size_t size = v.size()/bytes_per_elem;
+                    std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<Float128T,WorkAllocator>(double_array_arg,size,alloc_);
                     for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
@@ -2752,14 +2752,14 @@ private:
         const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
         const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
 
-        const size_t bytes_per_elem = size_t(1) << (f + ll);
+        const size_t bytes_per_elem = std::size_t(1) << (f + ll);
         if (bytes_per_elem == sizeof(Float128T))
         {
 
             const uint8_t* p = v.data();
             const uint8_t* last = v.data() + v.size();
 
-            size_t size = v.size()/bytes_per_elem;
+            std::size_t size = v.size()/bytes_per_elem;
             typed_array_ = typed_array<Float128T,WorkAllocator>(float128_array_arg,size,alloc_);
             for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
             {
@@ -2833,7 +2833,7 @@ private:
                             break;
                         default:
                         {
-                            size_t dim = get_size(ec);
+                            std::size_t dim = get_size(ec);
                             if (ec)
                             {
                                 return;
@@ -2847,14 +2847,14 @@ private:
             }
             default:
             {
-                size_t size = get_size(ec);
+                std::size_t size = get_size(ec);
                 if (ec)
                 {
                     return;
                 }
                 for (size_t i = 0; more_ && i < size; ++i)
                 {
-                    size_t dim = get_size(ec);
+                    std::size_t dim = get_size(ec);
                     if (ec)
                     {
                         return;

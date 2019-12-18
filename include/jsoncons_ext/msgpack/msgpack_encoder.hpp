@@ -37,20 +37,20 @@ private:
     struct stack_item
     {
         msgpack_container_type type_;
-        size_t length_;
-        size_t count_;
+        std::size_t length_;
+        std::size_t count_;
 
-        stack_item(msgpack_container_type type, size_t length = 0)
+        stack_item(msgpack_container_type type, std::size_t length = 0)
            : type_(type), length_(length), count_(0)
         {
         }
 
-        size_t length() const
+        std::size_t length() const
         {
             return length_;
         }
 
-        size_t count() const
+        std::size_t count() const
         {
             return count_;
         }

@@ -58,9 +58,9 @@ private:
     struct structure_info
     {
         structure_type type_;
-        size_t offset_;
+        std::size_t offset_;
 
-        structure_info(structure_type type, size_t offset)
+        structure_info(structure_type type, std::size_t offset)
             : type_(type), offset_(offset)
         {
         }

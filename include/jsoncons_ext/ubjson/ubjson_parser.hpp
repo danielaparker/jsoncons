@@ -24,11 +24,11 @@ enum class parse_mode {root,before_done,array,indefinite_array,strongly_typed_ar
 struct parse_state 
 {
     parse_mode mode; 
-    size_t length;
+    std::size_t length;
     uint8_t type;
-    size_t index;
+    std::size_t index;
 
-    parse_state(parse_mode mode, size_t length, uint8_t type = 0)
+    parse_state(parse_mode mode, std::size_t length, uint8_t type = 0)
         : mode(mode), length(length), type(type), index(0)
     {
     }
@@ -90,12 +90,12 @@ public:
         return !more_;
     }
 
-    size_t line() const override
+    std::size_t line() const override
     {
         return 0;
     }
 
-    size_t column() const override
+    std::size_t column() const override
     {
         return source_.position();
     }
@@ -441,7 +441,7 @@ private:
             }
             case jsoncons::ubjson::detail::ubjson_format::string_type: 
             {
-                size_t length = get_length(ec);
+                std::size_t length = get_length(ec);
                 if (ec)
                 {
                     return;
@@ -464,7 +464,7 @@ private:
             }
             case jsoncons::ubjson::detail::ubjson_format::high_precision_number_type: 
             {
-                size_t length = get_length(ec);
+                std::size_t length = get_length(ec);
                 if (ec)
                 {
                     return;
@@ -518,7 +518,7 @@ private:
             if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::count_marker)
             {
                 source_.ignore(1);
-                size_t length = get_length(ec);
+                std::size_t length = get_length(ec);
                 state_stack_.emplace_back(parse_mode::strongly_typed_array,length,item_type);
                 more_ = handler.begin_array(length, semantic_tag::none, *this, ec);
             }
@@ -531,7 +531,7 @@ private:
         else if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::count_marker)
         {
             source_.ignore(1);
-            size_t length = get_length(ec);
+            std::size_t length = get_length(ec);
             state_stack_.emplace_back(parse_mode::array,length);
             more_ = handler.begin_array(length, semantic_tag::none, *this, ec);
         }
@@ -562,7 +562,7 @@ private:
             if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::count_marker)
             {
                 source_.ignore(1);
-                size_t length = get_length(ec);
+                std::size_t length = get_length(ec);
                 state_stack_.emplace_back(parse_mode::strongly_typed_map_key,length,item_type);
                 more_ = handler.begin_object(length, semantic_tag::none, *this, ec);
             }
@@ -577,7 +577,7 @@ private:
             if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::count_marker)
             {
                 source_.ignore(1);
-                size_t length = get_length(ec);
+                std::size_t length = get_length(ec);
                 state_stack_.emplace_back(parse_mode::map_key,length);
                 more_ = handler.begin_object(length, semantic_tag::none, *this, ec);
             }
@@ -595,9 +595,9 @@ private:
         state_stack_.pop_back();
     }
 
-    size_t get_length(std::error_code& ec)
+    std::size_t get_length(std::error_code& ec)
     {
-        size_t length = 0;
+        std::size_t length = 0;
         if (JSONCONS_UNLIKELY(source_.eof()))
         {
             ec = ubjson_errc::unexpected_eof;
@@ -726,7 +726,7 @@ private:
 
     void read_name(json_content_handler& handler, std::error_code& ec)
     {
-        size_t length = get_length(ec);
+        std::size_t length = get_length(ec);
         if (ec)
         {
             return;

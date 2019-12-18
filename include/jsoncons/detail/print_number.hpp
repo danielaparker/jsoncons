@@ -27,7 +27,7 @@ size_t print_integer(int64_t value, Result& result)
 {
     typedef typename Result::value_type char_type;
 
-    size_t count = 0;
+    std::size_t count = 0;
 
     char_type buf[255];
     uint64_t u = (value < 0) ? static_cast<uint64_t>(-value) : static_cast<uint64_t>(value);
@@ -58,7 +58,7 @@ size_t print_uinteger(uint64_t value, Result& result)
 {
     typedef typename Result::value_type char_type;
 
-    size_t count = 0;
+    std::size_t count = 0;
 
     char_type buf[255];
     char_type *p = buf;
@@ -82,7 +82,7 @@ size_t integer_to_hex_string(int64_t value, Result& result)
 {
     typedef typename Result::value_type char_type;
 
-    size_t count = 0;
+    std::size_t count = 0;
 
     char_type buf[255];
     uint64_t u = (value < 0) ? static_cast<uint64_t>(-value) : static_cast<uint64_t>(value);
@@ -113,7 +113,7 @@ size_t uinteger_to_hex_string(uint64_t value, Result& result)
 {
     typedef typename Result::value_type char_type;
 
-    size_t count = 0;
+    std::size_t count = 0;
 
     char_type buf[255];
     char_type *p = buf;
@@ -133,7 +133,7 @@ size_t uinteger_to_hex_string(uint64_t value, Result& result)
 // print_double
 
 template<class Result>
-void dump_buffer(const char *buffer, size_t length, char decimal_point, Result& result)
+void dump_buffer(const char *buffer, std::size_t length, char decimal_point, Result& result)
 {
     const char *sbeg = buffer;
     const char *send = sbeg + length;
@@ -380,9 +380,9 @@ public:
     }
 
     template<class Result>
-    size_t operator()(double val, Result& result)
+    std::size_t operator()(double val, Result& result)
     {
-        size_t count = 0;
+        std::size_t count = 0;
 
         char number_buffer[200];
         int length = 0;

@@ -42,7 +42,7 @@ private:
     basic_csv_parser<CharT,Allocator> parser_;
     source_type source_;
     std::vector<CharT,char_allocator_type> buffer_;
-    size_t buffer_length_;
+    std::size_t buffer_length_;
     bool eof_;
     bool begin_;
 
@@ -104,7 +104,7 @@ public:
         {
             JSONCONS_THROW(ser_error(result.ec,parser_.line(),parser_.column()));
         }
-        size_t offset = result.it - sv.begin();
+        std::size_t offset = result.it - sv.begin();
         parser_.update(sv.data()+offset,sv.size()-offset);
         if (!done())
         {
@@ -202,7 +202,7 @@ public:
             ec = result.ec;
             return;
         }
-        size_t offset = result.it - sv.begin();
+        std::size_t offset = result.it - sv.begin();
         parser_.update(sv.data()+offset,sv.size()-offset);
         if (!done())
         {
@@ -210,7 +210,7 @@ public:
         }
     }
 
-    size_t buffer_length() const
+    std::size_t buffer_length() const
     {
         return buffer_length_;
     }
@@ -275,7 +275,7 @@ public:
     {
         buffer_.clear();
         buffer_.resize(buffer_length_);
-        size_t count = source_.read(buffer_.data(), buffer_length_);
+        std::size_t count = source_.read(buffer_.data(), buffer_length_);
         buffer_.resize(static_cast<size_t>(count));
         if (buffer_.size() == 0)
         {
@@ -289,7 +289,7 @@ public:
                 ec = result.ec;
                 return;
             }
-            size_t offset = result.it - buffer_.begin();
+            std::size_t offset = result.it - buffer_.begin();
             parser_.update(buffer_.data()+offset,buffer_.size()-offset);
             begin_ = false;
         }
@@ -383,12 +383,12 @@ public:
         return eof_;
     }
 
-    size_t line() const override
+    std::size_t line() const override
     {
         return parser_.line();
     }
 
-    size_t column() const override
+    std::size_t column() const override
     {
         return parser_.column();
     }

@@ -26,11 +26,11 @@
 
 namespace jsoncons { namespace detail {
 template <class CharT, class Result>
-size_t escape_string(const CharT* s, size_t length,
+size_t escape_string(const CharT* s, std::size_t length,
                      bool escape_all_non_ascii, bool escape_solidus,
                      Result& result)
 {
-    size_t count = 0;
+    std::size_t count = 0;
     const CharT* begin = s;
     const CharT* end = s + length;
     for (const CharT* it = begin; it != end; ++it)
@@ -206,15 +206,15 @@ private:
     class encoding_context
     {
         container_type type_;
-        size_t count_;
+        std::size_t count_;
         line_split_kind line_splits_;
         bool indent_before_;
         bool new_line_after_;
-        size_t begin_pos_;
-        size_t data_pos_;
+        std::size_t begin_pos_;
+        std::size_t data_pos_;
     public:
         encoding_context(container_type type, line_split_kind split_lines, bool indent_once,
-                              size_t begin_pos, size_t data_pos)
+                              std::size_t begin_pos, std::size_t data_pos)
            : type_(type), count_(0), line_splits_(split_lines), indent_before_(indent_once), new_line_after_(false),
              begin_pos_(begin_pos), data_pos_(data_pos)
         {
@@ -225,17 +225,17 @@ private:
             data_pos_ = pos;
         }
 
-        size_t begin_pos() const
+        std::size_t begin_pos() const
         {
             return begin_pos_;
         }
 
-        size_t data_pos() const
+        std::size_t data_pos() const
         {
             return data_pos_;
         }
 
-        size_t count() const
+        std::size_t count() const
         {
             return count_;
         }
@@ -295,7 +295,7 @@ private:
 
     std::vector<encoding_context> stack_;
     int indent_amount_;
-    size_t column_;
+    std::size_t column_;
     std::basic_string<CharT> colon_str_;
     std::basic_string<CharT> comma_str_;
     std::basic_string<CharT> open_object_brace_str_;
@@ -583,7 +583,7 @@ private:
             stack_.back().set_position(column_);
         }
         result_.push_back('\"');
-        size_t length = jsoncons::detail::escape_string(name.data(), name.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),result_);
+        std::size_t length = jsoncons::detail::escape_string(name.data(), name.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),result_);
         result_.push_back('\"');
         result_.append(colon_str_.data(),colon_str_.length());
         column_ += (length+2+colon_str_.length());
@@ -633,7 +633,7 @@ private:
             default:
             {
                 result_.push_back('\"');
-                size_t length = jsoncons::detail::escape_string(sv.data(), sv.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),result_);
+                std::size_t length = jsoncons::detail::escape_string(sv.data(), sv.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),result_);
                 result_.push_back('\"');
                 column_ += (length+2);
                 break;
@@ -686,7 +686,7 @@ private:
             case byte_string_chars_format::base16:
             {
                 result_.push_back('\"');
-                size_t length = encode_base16(b.begin(),b.end(),result_);
+                std::size_t length = encode_base16(b.begin(),b.end(),result_);
                 result_.push_back('\"');
                 column_ += (length + 2);
                 break;
@@ -694,7 +694,7 @@ private:
             case byte_string_chars_format::base64:
             {
                 result_.push_back('\"');
-                size_t length = encode_base64(b.begin(), b.end(), result_);
+                std::size_t length = encode_base64(b.begin(), b.end(), result_);
                 result_.push_back('\"');
                 column_ += (length + 2);
                 break;
@@ -702,7 +702,7 @@ private:
             case byte_string_chars_format::base64url:
             {
                 result_.push_back('\"');
-                size_t length = encode_base64url(b.begin(),b.end(),result_);
+                std::size_t length = encode_base64url(b.begin(),b.end(),result_);
                 result_.push_back('\"');
                 column_ += (length + 2);
                 break;
@@ -790,7 +790,7 @@ private:
         }
         else
         {
-            size_t length = fp_(value, result_);
+            std::size_t length = fp_(value, result_);
             column_ += length;
         }
 
@@ -814,7 +814,7 @@ private:
                 break_line();
             }
         }
-        size_t length = jsoncons::detail::print_integer(value, result_);
+        std::size_t length = jsoncons::detail::print_integer(value, result_);
         column_ += length;
         end_value();
         return true;
@@ -836,7 +836,7 @@ private:
                 break_line();
             }
         }
-        size_t length = jsoncons::detail::print_uinteger(value, result_);
+        std::size_t length = jsoncons::detail::print_uinteger(value, result_);
         column_ += length;
         end_value();
         return true;
@@ -911,7 +911,7 @@ private:
                     result_.push_back('~');
                     ++column_;
                 }
-                size_t length = encode_base64(v.begin(), v.end(), result_);
+                std::size_t length = encode_base64(v.begin(), v.end(), result_);
                 result_.push_back('\"');
                 column_ += (length+2);
                 break;
@@ -929,7 +929,7 @@ private:
                     result_.push_back('~');
                     ++column_;
                 }
-                size_t length = encode_base64url(v.begin(), v.end(), result_);
+                std::size_t length = encode_base64url(v.begin(), v.end(), result_);
                 result_.push_back('\"');
                 column_ += (length+2);
                 break;
@@ -1020,14 +1020,14 @@ private:
     class encoding_context
     {
         container_type type_;
-        size_t count_;
+        std::size_t count_;
     public:
         encoding_context(container_type type)
            : type_(type), count_(0)
         {
         }
 
-        size_t count() const
+        std::size_t count() const
         {
             return count_;
         }

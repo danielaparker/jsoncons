@@ -245,7 +245,7 @@ void fill_exponent(int K, Result& result)
 }
 
 template <class Result>
-void prettify_string(const char *buffer, size_t length, int k, int min_exp, int max_exp, Result& result)
+void prettify_string(const char *buffer, std::size_t length, int k, int min_exp, int max_exp, Result& result)
 {
     int nb_digits = (int)length;
     int offset;

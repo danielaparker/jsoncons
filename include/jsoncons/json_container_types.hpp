@@ -293,9 +293,9 @@ public:
         elements_.swap(val.elements_);
     }
 
-    size_t size() const {return elements_.size();}
+    std::size_t size() const {return elements_.size();}
 
-    size_t capacity() const {return elements_.capacity();}
+    std::size_t capacity() const {return elements_.capacity();}
 
     void clear() {elements_.clear();}
 
@@ -316,7 +316,7 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use erase(const_iterator, const_iterator)")
-    void remove_range(size_t from_index, size_t to_index) 
+    void remove_range(size_t from_index, std::size_t to_index) 
     {
         JSONCONS_ASSERT(from_index <= to_index);
         JSONCONS_ASSERT(to_index <= elements_.size());
@@ -510,7 +510,7 @@ public:
     template<class InputIt>
     json_object(InputIt first, InputIt last)
     {
-        size_t count = std::distance(first,last);
+        std::size_t count = std::distance(first,last);
         members_.reserve(count);
         for (auto s = first; s != last; ++s)
         {
@@ -529,7 +529,7 @@ public:
         : allocator_holder<allocator_type>(alloc), 
           members_(key_value_allocator_type(alloc))
     {
-        size_t count = std::distance(first,last);
+        std::size_t count = std::distance(first,last);
         members_.reserve(count);
         for (auto s = first; s != last; ++s)
         {
@@ -579,9 +579,9 @@ public:
         return members_.end();
     }
 
-    size_t size() const {return members_.size();}
+    std::size_t size() const {return members_.size();}
 
-    size_t capacity() const {return members_.capacity();}
+    std::size_t capacity() const {return members_.capacity();}
 
     void clear() {members_.clear();}
 
@@ -665,7 +665,7 @@ public:
     template<class InputIt, class Convert>
     void insert(InputIt first, InputIt last, Convert convert)
     {
-        size_t count = std::distance(first,last);
+        std::size_t count = std::distance(first,last);
         members_.reserve(members_.size() + count);
         for (auto s = first; s != last; ++s)
         {
@@ -683,7 +683,7 @@ public:
     {
         if (first != last)
         {
-            size_t count = std::distance(first,last);
+            std::size_t count = std::distance(first,last);
             members_.reserve(members_.size() + count);
 
             auto it = find(convert(*first).key());
@@ -1177,7 +1177,7 @@ public:
     template<class InputIt>
     json_object(InputIt first, InputIt last)
     {
-        size_t count = std::distance(first,last);
+        std::size_t count = std::distance(first,last);
         members_.reserve(count);
         for (auto s = first; s != last; ++s)
         {
@@ -1186,7 +1186,7 @@ public:
 
         build_index();
         auto last_unique = std::unique(index_.begin(), index_.end(),
-            [&](size_t a, size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
+            [&](size_t a, std::size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
 
         if (last_unique != index_.end())
         {
@@ -1216,7 +1216,7 @@ public:
           members_(key_value_allocator_type(alloc)), 
           index_(index_allocator_type(alloc))
     {
-        size_t count = std::distance(first,last);
+        std::size_t count = std::distance(first,last);
         members_.reserve(count);
         for (auto s = first; s != last; ++s)
         {
@@ -1225,7 +1225,7 @@ public:
 
         build_index();
         auto last_unique = std::unique(index_.begin(), index_.end(),
-            [&](size_t a, size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
+            [&](size_t a, std::size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
 
         if (last_unique != index_.end())
         {
@@ -1286,9 +1286,9 @@ public:
         return members_.end();
     }
 
-    size_t size() const {return members_.size();}
+    std::size_t size() const {return members_.size();}
 
-    size_t capacity() const {return members_.capacity();}
+    std::size_t capacity() const {return members_.capacity();}
 
     void clear() 
     {
@@ -1356,8 +1356,8 @@ public:
 
     void erase(const_iterator first, const_iterator last) 
     {
-        size_t pos1 = first == members_.end() ? members_.size() : first - members_.begin();
-        size_t pos2 = last == members_.end() ? members_.size() : last - members_.begin();
+        std::size_t pos1 = first == members_.end() ? members_.size() : first - members_.begin();
+        std::size_t pos2 = last == members_.end() ? members_.size() : last - members_.begin();
 
         if (pos1 < members_.size() && pos2 <= members_.size())
         {
@@ -1379,8 +1379,8 @@ public:
         auto pos = find(name);
         if (pos != members_.end())
         {
-            size_t pos1 = pos - members_.begin();
-            size_t pos2 = pos1 + 1;
+            std::size_t pos1 = pos - members_.begin();
+            std::size_t pos2 = pos1 + 1;
 
             erase_index_entries(pos1, pos2);
 #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
@@ -1395,7 +1395,7 @@ public:
     template<class InputIt, class Convert>
     void insert(InputIt first, InputIt last, Convert convert)
     {
-        size_t count = std::distance(first,last);
+        std::size_t count = std::distance(first,last);
         members_.reserve(members_.size() + count);
         for (auto s = first; s != last; ++s)
         {
@@ -1404,7 +1404,7 @@ public:
 
         build_index();
         auto last_unique = std::unique(index_.begin(), index_.end(),
-            [&](size_t a, size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
+            [&](size_t a, std::size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
 
         if (last_unique != index_.end())
         {
@@ -1430,7 +1430,7 @@ public:
     template<class InputIt, class Convert>
     void insert(sorted_unique_range_tag, InputIt first, InputIt last, Convert convert)
     {
-        size_t count = std::distance(first,last);
+        std::size_t count = std::distance(first,last);
 
         members_.reserve(members_.size() + count);
         for (auto s = first; s != last; ++s)
@@ -1491,7 +1491,7 @@ public:
         }
         else
         {
-            size_t pos = hint - members_.begin();
+            std::size_t pos = hint - members_.begin();
             auto result = insert_index_entry(key,pos);
 
             if (result.second)
@@ -1519,7 +1519,7 @@ public:
         }
         else
         {
-            size_t pos = hint - members_.begin();
+            std::size_t pos = hint - members_.begin();
             auto result = insert_index_entry(key,pos);
 
             if (result.second)
@@ -1564,11 +1564,11 @@ public:
 
     void merge(iterator hint, const json_object& source)
     {
-        size_t pos = hint - members_.begin();
+        std::size_t pos = hint - members_.begin();
         for (auto it = source.begin(); it != source.end(); ++it)
         {
             hint = try_emplace(hint, it->key(),it->value());
-            size_t newpos = hint - members_.begin();
+            std::size_t newpos = hint - members_.begin();
             if (newpos == pos)
             {
                 ++hint;
@@ -1583,14 +1583,14 @@ public:
 
     void merge(iterator hint, json_object&& source)
     {
-        size_t pos = hint - members_.begin();
+        std::size_t pos = hint - members_.begin();
 
         auto it = std::make_move_iterator(source.begin());
         auto end = std::make_move_iterator(source.end());
         for (; it != end; ++it)
         {
             hint = try_emplace(hint, it->key(), std::move(it->value()));
-            size_t newpos = hint - members_.begin();
+            std::size_t newpos = hint - members_.begin();
             if (newpos == pos)
             {
                 ++hint;
@@ -1633,11 +1633,11 @@ public:
 
     void merge_or_update(iterator hint, const json_object& source)
     {
-        size_t pos = hint - members_.begin();
+        std::size_t pos = hint - members_.begin();
         for (auto it = source.begin(); it != source.end(); ++it)
         {
             hint = insert_or_assign(hint, it->key(),it->value());
-            size_t newpos = hint - members_.begin();
+            std::size_t newpos = hint - members_.begin();
             if (newpos == pos)
             {
                 ++hint;
@@ -1652,13 +1652,13 @@ public:
 
     void merge_or_update(iterator hint, json_object&& source)
     {
-        size_t pos = hint - members_.begin();
+        std::size_t pos = hint - members_.begin();
         auto it = std::make_move_iterator(source.begin());
         auto end = std::make_move_iterator(source.end());
         for (; it != end; ++it)
         {
             hint = insert_or_assign(hint, it->key(),std::move(it->value()));
-            size_t newpos = hint - members_.begin();
+            std::size_t newpos = hint - members_.begin();
             if (newpos == pos)
             {
                 ++hint;
@@ -1721,7 +1721,7 @@ public:
         }
         else
         {
-            size_t pos = hint - members_.begin();
+            std::size_t pos = hint - members_.begin();
             auto result = insert_index_entry(key, pos);
 
             if (result.second)
@@ -1748,7 +1748,7 @@ public:
         }
         else
         {
-            size_t pos = hint - members_.begin();
+            std::size_t pos = hint - members_.begin();
             auto result = insert_index_entry(key, pos);
 
             if (result.second)
@@ -1777,7 +1777,7 @@ public:
     }
 private:
 
-    std::pair<size_t,bool> insert_index_entry(const string_view_type& key, size_t pos)
+    std::pair<size_t,bool> insert_index_entry(const string_view_type& key, std::size_t pos)
     {
         JSONCONS_ASSERT(pos <= index_.size());
 
@@ -1786,7 +1786,7 @@ private:
 
         if (it == index_.end())
         {
-            size_t count = index_.size() - pos;
+            std::size_t count = index_.size() - pos;
             for (size_t i = 0; count > 0 && i < index_.size(); ++i)
             {
                 if (index_[i] >= pos)
@@ -1800,7 +1800,7 @@ private:
         }
         else if (members_.at(*it).key() != key)
         {
-            size_t count = index_.size() - pos;
+            std::size_t count = index_.size() - pos;
             for (size_t i = 0; count > 0 && i < index_.size(); ++i)
             {
                 if (index_[i] >= pos)
@@ -1818,7 +1818,7 @@ private:
         }
     }
 
-    void erase_index_entries(size_t pos1, size_t pos2)
+    void erase_index_entries(size_t pos1, std::size_t pos2)
     {
         JSONCONS_ASSERT(pos1 <= pos2);
         JSONCONS_ASSERT(pos2 <= index_.size());
@@ -1856,7 +1856,7 @@ private:
             index_.push_back(i);
         }
         std::stable_sort(index_.begin(),index_.end(),
-                         [&](size_t a, size_t b) -> bool {return members_.at(a).key().compare(members_.at(b).key()) < 0;});
+                         [&](size_t a, std::size_t b) -> bool {return members_.at(a).key().compare(members_.at(b).key()) < 0;});
     }
 
     json_object& operator=(const json_object&) = delete;

@@ -48,7 +48,7 @@ struct jsonpath_fixture
     }
 };
 
-void test_error_code(const json& root, const std::string& path, std::error_code value, size_t line, size_t column)
+void test_error_code(const json& root, const std::string& path, std::error_code value, std::size_t line, std::size_t column)
 {
     REQUIRE_THROWS_AS(jsonpath::json_query(root,path),jsonpath::jsonpath_error);
     JSONCONS_TRY

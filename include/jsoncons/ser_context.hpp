@@ -20,13 +20,13 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use line()")
-    size_t line_number() const
+    std::size_t line_number() const
     {
         return line();
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use column()")
-    size_t column_number() const 
+    std::size_t column_number() const 
     {
         return column();
     }
@@ -36,9 +36,9 @@ public:
 class null_ser_context : public ser_context
 {
 private:
-    size_t line() const override { return 0; }
+    std::size_t line() const override { return 0; }
 
-    size_t column() const override { return 0; }
+    std::size_t column() const override { return 0; }
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)

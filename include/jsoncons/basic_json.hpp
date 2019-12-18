@@ -354,7 +354,7 @@ public:
             pointer ptr_;
         public:
 
-            long_string_storage(semantic_tag tag, const char_type* data, size_t length, const Allocator& a)
+            long_string_storage(semantic_tag tag, const char_type* data, std::size_t length, const Allocator& a)
                 : storage_base(storage_type::long_string_value, tag)
             {
                 ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(data,length,a);
@@ -401,7 +401,7 @@ public:
                 return ptr_->c_str();
             }
 
-            size_t length() const
+            std::size_t length() const
             {
                 return ptr_->length();
             }
@@ -437,7 +437,7 @@ public:
         public:
 
             byte_string_storage(semantic_tag semantic_type, 
-                             const uint8_t* data, size_t length, 
+                             const uint8_t* data, std::size_t length, 
                              const Allocator& a)
                 : storage_base(storage_type::byte_string_value, semantic_type)
             {
@@ -482,7 +482,7 @@ public:
                 return ptr_->data();
             }
 
-            size_t length() const
+            std::size_t length() const
             {
                 return ptr_->size();
             }
@@ -709,7 +709,7 @@ public:
             ::new(&data_)double_storage(val, tag);
         }
 
-        variant(const char_type* s, size_t length, semantic_tag tag)
+        variant(const char_type* s, std::size_t length, semantic_tag tag)
         {
             if (length <= short_string_storage::max_length)
             {
@@ -721,7 +721,7 @@ public:
             }
         }
 
-        variant(const char_type* s, size_t length, semantic_tag tag, const Allocator& alloc) : data_{}
+        variant(const char_type* s, std::size_t length, semantic_tag tag, const Allocator& alloc) : data_{}
         {
             if (length <= short_string_storage::max_length)
             {
@@ -991,7 +991,7 @@ public:
             return *reinterpret_cast<const array_storage*>(&data_);
         }
 
-        size_t size() const
+        std::size_t size() const
         {
             switch (storage())
             {
@@ -1740,7 +1740,7 @@ public:
             return evaluate().array_range();
         }
 
-        size_t size() const noexcept
+        std::size_t size() const noexcept
         {
             if (!parent_.contains(key_))
             {
@@ -1759,7 +1759,7 @@ public:
             return evaluate().tag();
         }
 
-        size_t count(const string_view_type& name) const
+        std::size_t count(const string_view_type& name) const
         {
             return evaluate().count(name);
         }
@@ -1797,7 +1797,7 @@ public:
             return evaluate().empty();
         }
 
-        size_t capacity() const
+        std::size_t capacity() const
         {
             return evaluate().capacity();
         }
@@ -2673,7 +2673,7 @@ public:
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use erase(const_object_iterator, const_object_iterator)")
-        void remove_range(size_t from_index, size_t to_index)
+        void remove_range(size_t from_index, std::size_t to_index)
         {
             evaluate().remove_range(from_index, to_index);
         }
@@ -2741,7 +2741,7 @@ public:
         {
             JSONCONS_THROW(ser_error(result.ec));
         }
-        size_t offset = result.it - s.begin();
+        std::size_t offset = result.it - s.begin();
         parser.update(s.data()+offset,s.size()-offset);
         parser.parse_some(decoder);
         parser.finish_parse(decoder);
@@ -2788,7 +2788,7 @@ public:
         {
             JSONCONS_THROW(ser_error(result.ec));
         }
-        size_t offset = result.it - s.begin();
+        std::size_t offset = result.it - s.begin();
         parser.update(s.data()+offset,s.size()-offset);
         parser.parse_some(decoder);
         parser.finish_parse(decoder);
@@ -3034,7 +3034,7 @@ public:
     {
     }
 
-    basic_json(const char_type *s, size_t length, semantic_tag tag = semantic_tag::none)
+    basic_json(const char_type *s, std::size_t length, semantic_tag tag = semantic_tag::none)
         : var_(s, length, tag)
     {
     }
@@ -3059,7 +3059,7 @@ public:
     {
     }
 
-    basic_json(const char_type *s, size_t length, 
+    basic_json(const char_type *s, std::size_t length, 
                semantic_tag tag, const Allocator& alloc)
         : var_(s, length, tag, alloc)
     {
@@ -3154,7 +3154,7 @@ public:
         return !(lhs < rhs);
     }
 
-    size_t size() const noexcept
+    std::size_t size() const noexcept
     {
         switch (var_.storage())
         {
@@ -3409,7 +3409,7 @@ public:
         }
     }
 
-    size_t count(const string_view_type& name) const
+    std::size_t count(const string_view_type& name) const
     {
         switch (var_.storage())
         {
@@ -3420,7 +3420,7 @@ public:
                 {
                     return 0;
                 }
-                size_t count = 0;
+                std::size_t count = 0;
                 while (it != object_range().end()&& it->key() == name)
                 {
                     ++count;
@@ -3551,7 +3551,7 @@ public:
         }
     }
 
-    size_t capacity() const
+    std::size_t capacity() const
     {
         switch (var_.storage())
         {
@@ -4535,14 +4535,14 @@ public:
 #if !defined(JSONCONS_NO_DEPRECATED)
 
     JSONCONS_DEPRECATED_MSG("Instead, use parse(const string_view_type&)")
-    static basic_json parse(const char_type* s, size_t length)
+    static basic_json parse(const char_type* s, std::size_t length)
     {
         parse_error_handler_type err_handler;
         return parse(s,length,err_handler);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use parse(const string_view_type&, parse_error_handler)")
-    static basic_json parse(const char_type* s, size_t length, std::function<bool(json_errc,const ser_context&)> err_handler)
+    static basic_json parse(const char_type* s, std::size_t length, std::function<bool(json_errc,const ser_context&)> err_handler)
     {
         return parse(string_view_type(s,length),err_handler);
     }
@@ -4717,7 +4717,7 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("No replacement")
-    size_t precision() const
+    std::size_t precision() const
     {
         switch (var_.storage())
         {
@@ -4729,7 +4729,7 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("No replacement")
-    size_t decimal_places() const
+    std::size_t decimal_places() const
     {
         switch (var_.storage())
         {
@@ -4777,7 +4777,7 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("No replacement")
-    size_t double_precision() const
+    std::size_t double_precision() const
     {
         switch (var_.storage())
         {
@@ -5052,7 +5052,7 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use erase(const_object_iterator, const_object_iterator)")
-    void remove_range(size_t from_index, size_t to_index)
+    void remove_range(size_t from_index, std::size_t to_index)
     {
         switch (var_.storage())
         {
@@ -5107,26 +5107,26 @@ public:
         return make_array(n,val);
     }
     template<size_t size>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(size_t, size_t)")
-    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n)
+    JSONCONS_DEPRECATED_MSG("Instead, use make_array(size_t, std::size_t)")
+    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, std::size_t n)
     {
         return make_array<2>(m, n);
     }
     template<size_t size,typename T>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(size_t, size_t, T)")
-    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n, T val)
+    JSONCONS_DEPRECATED_MSG("Instead, use make_array(size_t, std::size_t, T)")
+    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, std::size_t n, T val)
     {
         return make_array<2>(m, n, val);
     }
     template<size_t size>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(size_t, size_t, size_t)")
-    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k)
+    JSONCONS_DEPRECATED_MSG("Instead, use make_array(size_t, std::size_t, std::size_t)")
+    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, std::size_t n, std::size_t k)
     {
         return make_array<3>(m, n, k);
     }
     template<size_t size,typename T>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(size_t, size_t, size_t, T)")
-    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k, T val)
+    JSONCONS_DEPRECATED_MSG("Instead, use make_array(size_t, std::size_t, std::size_t, T)")
+    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, std::size_t n, std::size_t k, T val)
     {
         return make_array<3>(m, n, k, val);
     }

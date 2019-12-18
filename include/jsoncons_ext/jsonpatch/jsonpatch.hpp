@@ -112,7 +112,7 @@ namespace detail {
 
         if (source.is_array() && target.is_array())
         {
-            size_t common = (std::min)(source.size(),target.size());
+            std::size_t common = (std::min)(source.size(),target.size());
             for (size_t i = 0; i < common; ++i)
             {
                 std::basic_ostringstream<char_type> ss; 
