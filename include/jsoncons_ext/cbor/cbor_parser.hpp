@@ -53,10 +53,9 @@ enum typed_array_type {uint8_value=1,uint16_value,uint32_value,uint64_value,
                       int8_value,int16_value,int32_value,int64_value, 
                       half_value, float_value,double_value,float128_value};
 
-template <class Float128T = std::nullptr_t, class Allocator=std::allocator<char>>
+template <class Allocator=std::allocator<char>>
 class typed_array
 {
-    typedef Float128T float128_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint8_t> uint8_allocator_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint16_t> uint16_allocator_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint32_t> uint32_allocator_type;
@@ -67,7 +66,6 @@ class typed_array
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<int64_t> int64_allocator_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<float> float_allocator_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<double> double_allocator_type;
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<float128_type> float128_allocator_type;
 
     Allocator alloc_;
     typed_array_type type_;
@@ -83,7 +81,6 @@ class typed_array
         int64_t* int64_data_;
         float* float_data_;
         double* double_data_;
-        float128_type* float128_data_;
     } data_;
     std::size_t size_;
 public:
@@ -165,7 +162,6 @@ public:
             }
             case typed_array_type::float128_value:
             {
-                allocate_float128();
                 break;
             }
             default:
@@ -254,13 +250,6 @@ public:
         data_.double_data_ = alloc.allocate(size);
     }
 
-    typed_array(float128_array_arg_t,size_t size, const Allocator& allocator)
-        : alloc_(allocator), type_(typed_array_type::float128_value), size_(size)
-    {
-        float128_allocator_type alloc(alloc_);
-        data_.float128_data_ = alloc.allocate(size);
-    }
-
     ~typed_array()
     {
         switch (type_)
@@ -327,7 +316,6 @@ public:
             }
             case typed_array_type::float128_value:
             {
-                deallocate_float128();
                 break;
             }
             default:
@@ -335,34 +323,6 @@ public:
         }
         type_ = typed_array_type();
         size_ = 0;
-    }
-
-    template <class Float128T_ = float128_type>
-    typename std::enable_if<!std::is_same<Float128T_,std::nullptr_t>::value, void>::type
-    allocate_float128()
-    {
-        float128_allocator_type alloc{ alloc_ };
-        data_.float128_data_ = alloc.allocate(size_);
-    }
-
-    template <class Float128T_ = float128_type>
-    typename std::enable_if<std::is_same<Float128T_,std::nullptr_t>::value, void>::type
-        allocate_float128()
-    {
-    }
-
-    template <class Float128T_ = float128_type>
-    typename std::enable_if<!std::is_same<Float128T_,std::nullptr_t>::value, void>::type
-        deallocate_float128()
-    {
-        float128_allocator_type alloc(alloc_);
-        alloc.deallocate(data_.float128_data_, 1);
-    }
-
-    template <class Float128T_ = float128_type>
-    typename std::enable_if<std::is_same<Float128T_,std::nullptr_t>::value, void>::type
-        deallocate_float128()
-    {
     }
 
     typed_array& operator=(const typed_array& other)
@@ -512,7 +472,7 @@ public:
         JSONCONS_ASSERT(type_ == typed_array_type::double_value);
         return span<const double>(data_.double_data_, size_);
     }
-
+/*
     span<float128_type> data(float128_array_arg_t)
     {
         JSONCONS_ASSERT(type_ == typed_array_type::float128_value);
@@ -524,7 +484,7 @@ public:
         JSONCONS_ASSERT(type_ == typed_array_type::float128_value);
         return span<const float128_type>(data_.float128_data_, size_);
     }
-
+*/
     friend void swap(typed_array& a, typed_array& b) noexcept
     {
         std::swap(a.data_,b.data_);
@@ -569,60 +529,59 @@ public:
         swap(*this,other);
     }
 
-    template <class Float128T>
-    typed_array_view(const typed_array<Float128T>& other)
-        : type_(other.type_), data_(), size_(other.size())
+    typed_array_view(const typed_array<>& other)
+        : type_(other.type()), data_(), size_(other.size())
     {
-        switch (other.type_)
+        switch (other.type())
         {
             case typed_array_type::uint8_value:
             {
-                data_.uint8_data_ = other.uint8_data_;
+                data_.uint8_data_ = other.data(uint8_array_arg).data();
                 break;
             }
             case typed_array_type::uint16_value:
             {
-                data_.uint16_data_ = other.uint16_data_;
+                data_.uint16_data_ = other.data(uint16_array_arg).data();
                 break;
             }
             case typed_array_type::uint32_value:
             {
-                data_.uint32_data_ = other.uint32_data_;
+                data_.uint32_data_ = other.data(uint32_array_arg).data();
                 break;
             }
             case typed_array_type::uint64_value:
             {
-                data_.uint64_data_ = other.uint64_data_;
+                data_.uint64_data_ = other.data(uint64_array_arg).data();
                 break;
             }
             case typed_array_type::int8_value:
             {
-                data_.int8_data_ = other.int8_data_;
+                data_.int8_data_ = other.data(int8_array_arg).data();
                 break;
             }
             case typed_array_type::int16_value:
             {
-                data_.int16_data_ = other.int16_data_;
+                data_.int16_data_ = other.data(int16_array_arg).data();
                 break;
             }
             case typed_array_type::int32_value:
             {
-                data_.int32_data_ = other.int32_data_;
+                data_.int32_data_ = other.data(int32_array_arg).data();
                 break;
             }
             case typed_array_type::int64_value:
             {
-                data_.int64_data_ = other.int64_data_;
+                data_.int64_data_ = other.data(int64_array_arg).data();
                 break;
             }
             case typed_array_type::float_value:
             {
-                data_.float_data_ = other.float_data_;
+                data_.float_data_ = other.data(float_array_arg).data();
                 break;
             }
             case typed_array_type::double_value:
             {
-                data_.double_data_ = other.double_data_;
+                data_.double_data_ = other.data(double_array_arg).data();
                 break;
             }
             case typed_array_type::float128_value:
@@ -867,7 +826,7 @@ class basic_cbor_parser : public ser_context
     std::vector<uint8_t,byte_allocator_type> bytes_buffer_;
     std::vector<uint64_t,tag_allocator_type> tags_; 
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
-    typed_array<Float128T,WorkAllocator> typed_array_;
+    typed_array<WorkAllocator> typed_array_;
     std::vector<std::size_t> shape_;
     std::size_t index_;
 
@@ -997,7 +956,7 @@ public:
             else
             {
                 more_ = handler.end_array();
-                typed_array_ = typed_array<Float128T,WorkAllocator>(alloc_);
+                typed_array_ = typed_array<WorkAllocator>(alloc_);
                 index_ = 0;
             }
         }
@@ -2394,7 +2353,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size();
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(uint8_array_arg,size,alloc_);
+                    typed_array_ = typed_array<WorkAllocator>(uint8_array_arg,size,alloc_);
                     for (std::size_t i = 0; p < last; ++p, ++i)
                     {
                         typed_array_.data(uint8_array_arg)[i] = *p;
@@ -2408,7 +2367,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size();
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(uint8_array_arg,size,alloc_);
+                    typed_array_ = typed_array<WorkAllocator>(uint8_array_arg,size,alloc_);
                     for (std::size_t i = 0; p < last; ++p, ++i)
                     {
                         typed_array_.data(uint8_array_arg)[i] = *p;
@@ -2430,7 +2389,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(uint16_array_arg,size,alloc_);
+                    typed_array_ = typed_array<WorkAllocator>(uint16_array_arg,size,alloc_);
                     for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2460,7 +2419,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(uint32_array_arg,size,alloc_);
+                    typed_array_ = typed_array<WorkAllocator>(uint32_array_arg,size,alloc_);
                     for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2490,7 +2449,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(uint64_array_arg,size,alloc_);
+                    typed_array_ = typed_array<WorkAllocator>(uint64_array_arg,size,alloc_);
                     for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2512,7 +2471,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size();
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(int8_array_arg,size,alloc_);
+                    typed_array_ = typed_array<WorkAllocator>(int8_array_arg,size,alloc_);
                     for (std::size_t i = 0; p < last; ++p, ++i)
                     {
                         typed_array_.data(int8_array_arg)[i] = (int8_t)*p;
@@ -2534,7 +2493,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(int16_array_arg,size,alloc_);
+                    typed_array_ = typed_array<WorkAllocator>(int16_array_arg,size,alloc_);
                     for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2564,7 +2523,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(int32_array_arg,size,alloc_);
+                    typed_array_ = typed_array<WorkAllocator>(int32_array_arg,size,alloc_);
                     for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2594,7 +2553,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(int64_array_arg,size,alloc_);
+                    typed_array_ = typed_array<WorkAllocator>(int64_array_arg,size,alloc_);
                     for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2624,7 +2583,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(half_array_arg,size,alloc_);
+                    typed_array_ = typed_array<WorkAllocator>(half_array_arg,size,alloc_);
                     for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2654,7 +2613,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(float_array_arg,size,alloc_);
+                    typed_array_ = typed_array<WorkAllocator>(float_array_arg,size,alloc_);
                     for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2684,7 +2643,7 @@ private:
                     const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size()/bytes_per_elem;
-                    typed_array_ = typed_array<Float128T,WorkAllocator>(double_array_arg,size,alloc_);
+                    typed_array_ = typed_array<WorkAllocator>(double_array_arg,size,alloc_);
                     for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
@@ -2745,7 +2704,7 @@ private:
             const uint8_t* last = v.data() + v.size();
 
             std::size_t size = v.size()/bytes_per_elem;
-            typed_array_ = typed_array<Float128T,WorkAllocator>(float128_array_arg,size,alloc_);
+            typed_array_ = typed_array<WorkAllocator>(float128_array_arg,size,alloc_);
             for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
             {
                 const uint8_t* endp = nullptr;
