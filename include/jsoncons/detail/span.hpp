@@ -45,6 +45,8 @@ namespace detail
         pointer data_;
         size_type size_;
     public:
+        static constexpr std::size_t extent = Extent;
+
         constexpr span() noexcept
         {
         }
@@ -55,15 +57,22 @@ namespace detail
 
         template <typename C>
         constexpr span(C& c,
-                       typename std::enable_if<!is_std_array<C>::value && is_compatible_element<C,element_type>::value && has_data_and_size<C>::value>::type* = 0)
+                       typename std::enable_if<!is_span<C>::value && !is_std_array<C>::value && is_compatible_element<C,element_type>::value && has_data_and_size<C>::value>::type* = 0)
             : data_(c.data()), size_(c.size())
         {
         }
 
         template <typename C>
         constexpr span(const C& c,
-                       typename std::enable_if<!is_std_array<C>::value && is_compatible_element<C,element_type>::value && has_data_and_size<C>::value>::type* = 0)
+                       typename std::enable_if<!is_span<C>::value && !is_std_array<C>::value && is_compatible_element<C,element_type>::value && has_data_and_size<C>::value>::type* = 0)
             : data_(c.data()), size_(c.size())
+        {
+        }
+
+        template <class U, std::size_t N>
+        constexpr span(const span<U, N>& s,
+                       typename std::enable_if<(N == dynamic_extent || N == extent) && std::is_convertible<U(*)[], element_type(*)[]>::value>::type* = 0) noexcept
+            : data_(s.data()), size_(s.size())
         {
         }
 

@@ -243,7 +243,6 @@ struct has_data_and_size
                             !std::is_void<decltype(std::declval<C>().data())>::value>::type
 > : std::true_type{};
 
-
 template<class C, class E, class Enable=void >
 struct is_compatible_element : std::false_type {};
 
