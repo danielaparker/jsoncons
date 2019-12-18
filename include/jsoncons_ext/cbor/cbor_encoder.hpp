@@ -26,9 +26,9 @@ namespace jsoncons { namespace cbor {
 enum class cbor_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template<class Result=jsoncons::binary_stream_result,class Float128T = std::nullptr_t>
-class basic_cbor_encoder final : public basic_cbor_content_handler<Float128T>
+class basic_cbor_encoder final : public cbor_content_handler
 {
-    using super_type = basic_cbor_content_handler<Float128T>;
+    using super_type = cbor_content_handler;
 
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
     enum class hexfloat_parse_state { start, expect_0, expect_x, integer, exp1, exp2, fraction1 };
@@ -36,7 +36,6 @@ class basic_cbor_encoder final : public basic_cbor_content_handler<Float128T>
 public:
     typedef Result result_type;
     using typename super_type::char_type;
-    using typename super_type::float128_type;
     using typename super_type::string_view_type;
 
 private:
@@ -1441,15 +1440,15 @@ private:
             return more;
         }
     }
-
-    bool do_typed_array(const span<const float128_type>& /*data*/, 
-                        semantic_tag /*tag*/,
-                        const ser_context& /*context*/, 
+/*
+    bool do_typed_array(const span<const float128_type>&, 
+                        semantic_tag,
+                        const ser_context&, 
                         std::error_code&) override
     {
         return true;
     }
-
+*/
     bool do_begin_multi_dim(const span<const size_t>& shape,
                             semantic_tag tag,
                             const ser_context& context, 

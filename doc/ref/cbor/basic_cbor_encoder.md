@@ -5,7 +5,7 @@ __`jsoncons_ext/cbor/cbor_encoder.hpp`__
 ```c++
 template<
     class Result,class Float128T = std::nullptr_t>
-> class basic_cbor_encoder final : public basic_cbor_content_handler<Float128T>
+> class basic_cbor_encoder final : public cbor_content_handler
 ```
 
 `basic_cbor_encoder` is noncopyable

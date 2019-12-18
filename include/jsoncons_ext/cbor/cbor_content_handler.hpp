@@ -20,15 +20,13 @@
 
 namespace jsoncons { namespace cbor {
 
-template <class Float128T = std::nullptr_t>
-class basic_cbor_content_handler : public basic_json_content_handler<char>
+class cbor_content_handler : public basic_json_content_handler<char>
 {
 public:
     using super_type = basic_json_content_handler<char>;
 public:
     using char_type = char;
     using string_view_type = typename super_type::string_view_type;
-    typedef Float128T float128_type; 
 
     bool typed_array(const span<const uint8_t>& data, 
                      semantic_tag tag=semantic_tag::none,
@@ -172,7 +170,7 @@ public:
         }
         return more;
     }
-
+/*
     bool typed_array(const span<const float128_type>& data, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context())
@@ -185,7 +183,7 @@ public:
         }
         return more;
     }
-
+*/
     bool begin_multi_dim(const span<const size_t>& shape,
                          semantic_tag tag = semantic_tag::multi_dim_row_major,
                          const ser_context& context=null_ser_context()) 
@@ -357,12 +355,12 @@ private:
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
-
+/*
     virtual bool do_typed_array(const span<const float128_type>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
-
+*/
     virtual bool do_begin_multi_dim(const span<const size_t>& shape,
                                     semantic_tag tag,
                                     const ser_context& context, 
@@ -372,8 +370,7 @@ private:
                                   std::error_code& ec) = 0;
 };
 
-template <class Float128T = std::nullptr_t>
-class basic_default_cbor_content_handler : public basic_cbor_content_handler<Float128T>
+class default_cbor_content_handler : public cbor_content_handler
 {
     using super_type = basic_default_json_content_handler<char>;
 
@@ -381,9 +378,8 @@ class basic_default_cbor_content_handler : public basic_cbor_content_handler<Flo
 public:
     using char_type = char;
     using string_view_type = typename super_type::string_view_type;
-    typedef Float128T float128_type; 
 
-    basic_default_cbor_content_handler(bool accept_more = true)
+    default_cbor_content_handler(bool accept_more = true)
         : parse_more_(accept_more)
     {
     }
@@ -563,7 +559,7 @@ private:
     {
         return parse_more_;
     }
-
+/*
     bool do_typed_array(const span<const float128_type>&, 
                         semantic_tag,
                         const ser_context&, 
@@ -571,7 +567,7 @@ private:
     {
         return parse_more_;
     }
-
+*/
     bool do_begin_multi_dim(const span<const size_t>&,
                             semantic_tag,
                             const ser_context&, 
@@ -587,14 +583,12 @@ private:
     }
 };
 
-template <class Float128T = std::nullptr_t>
-class cbor_to_json_content_handler_adaptor : public basic_cbor_content_handler<Float128T>
+class cbor_to_json_content_handler_adaptor : public cbor_content_handler
 {
-    using super_type = basic_cbor_content_handler<Float128T>;
+    using super_type = cbor_content_handler;
 public:
     using char_type = char;
     using string_view_type = typename super_type::string_view_type;
-    typedef Float128T float128_type; 
     using super_type::typed_array;
 private:
     basic_json_content_handler<char_type>& to_handler_;
@@ -891,15 +885,15 @@ private:
         }
         return more;
     }
-
-    bool do_typed_array(const span<const float128_type>& /*data*/, 
-                        semantic_tag /*tag*/,
-                        const ser_context& /*context*/, 
+/*
+    bool do_typed_array(const span<const float128_type>&, 
+                        semantic_tag,
+                        const ser_context&, 
                         std::error_code&) override
     {
         return true;
     }
-
+*/
     bool do_begin_multi_dim(const span<const size_t>& shape,
                             semantic_tag tag,
                             const ser_context& context, 
@@ -927,10 +921,6 @@ private:
         return do_end_array(context, ec);
     }
 };
-
-typedef basic_cbor_content_handler<std::nullptr_t> cbor_content_handler;
-
-typedef basic_default_cbor_content_handler<std::nullptr_t> default_cbor_content_handler;
 
 }}
 

@@ -970,12 +970,12 @@ public:
         }
         if (more_)
         {
-            cbor_to_json_content_handler_adaptor<Float128T> h(handler);
+            cbor_to_json_content_handler_adaptor h(handler);
             parse(h,ec);
         }
     }
 
-    void parse(basic_cbor_content_handler<Float128T>& handler, std::error_code& ec)
+    void parse(cbor_content_handler& handler, std::error_code& ec)
     {
         while (!done_ && more_)
         {
@@ -1131,7 +1131,7 @@ public:
         }
     }
 private:
-    void read_item(basic_cbor_content_handler<Float128T>& handler, std::error_code& ec)
+    void read_item(cbor_content_handler& handler, std::error_code& ec)
     {
         read_tags(ec);
         if (ec)
@@ -1372,7 +1372,7 @@ private:
         tags_.clear();
     }
 
-    void produce_begin_array(basic_cbor_content_handler<Float128T>& handler, uint8_t info, std::error_code& ec)
+    void produce_begin_array(cbor_content_handler& handler, uint8_t info, std::error_code& ec)
     {
         semantic_tag tag = semantic_tag::none;
         auto stringref_map = state_stack_.back().stringref_map;
@@ -1414,13 +1414,13 @@ private:
         }
     }
 
-    void produce_end_array(basic_cbor_content_handler<Float128T>& handler, std::error_code&)
+    void produce_end_array(cbor_content_handler& handler, std::error_code&)
     {
         more_ = handler.end_array(*this);
         state_stack_.pop_back();
     }
 
-    void produce_begin_map(basic_cbor_content_handler<Float128T>& handler, uint8_t info, std::error_code& ec)
+    void produce_begin_map(cbor_content_handler& handler, uint8_t info, std::error_code& ec)
     {
         auto stringref_map = state_stack_.back().stringref_map;
         for (auto t : tags_)
@@ -1458,13 +1458,13 @@ private:
         }
     }
 
-    void produce_end_map(basic_cbor_content_handler<Float128T>& handler, std::error_code&)
+    void produce_end_map(cbor_content_handler& handler, std::error_code&)
     {
         more_ = handler.end_object(*this);
         state_stack_.pop_back();
     }
 
-    void read_name(basic_cbor_content_handler<Float128T>& handler, std::error_code& ec)
+    void read_name(cbor_content_handler& handler, std::error_code& ec)
     {
         read_tags(ec);
         if (ec)
@@ -2283,7 +2283,7 @@ private:
         }
     }
 
-    void handle_string(basic_cbor_content_handler<Float128T>& handler, const basic_string_view<char>& v, std::error_code&)
+    void handle_string(cbor_content_handler& handler, const basic_string_view<char>& v, std::error_code&)
     {
         semantic_tag tag = semantic_tag::none;
         if (!tags_.empty())
@@ -2310,7 +2310,7 @@ private:
         more_ = handler.string_value(v, tag, *this);
     }
 
-    void handle_byte_string(basic_cbor_content_handler<Float128T>& handler, const byte_string_view& v, std::error_code& ec)
+    void handle_byte_string(cbor_content_handler& handler, const byte_string_view& v, std::error_code& ec)
     {
         if (!tags_.empty())
         {
@@ -2682,7 +2682,7 @@ private:
 
     template <class Float128T_ = Float128T>
     typename std::enable_if<std::is_same<Float128T_,std::nullptr_t>::value,void>::type
-    handle_float128(basic_cbor_content_handler<Float128T>& handler, const byte_string_view&, const uint8_t, std::error_code& ec)
+    handle_float128(cbor_content_handler& handler, const byte_string_view&, const uint8_t, std::error_code& ec)
     {
         more_ = handler.begin_array(semantic_tag::none, *this, ec);
         more_ = handler.end_array(*this);
@@ -2690,7 +2690,7 @@ private:
 
     template <class Float128T_ = Float128T>
     typename std::enable_if<!std::is_same<Float128T_,std::nullptr_t>::value,void>::type
-    handle_float128(basic_cbor_content_handler<Float128T>& handler, const byte_string_view& v, const uint8_t tag, std::error_code& ec)
+    handle_float128(cbor_content_handler& handler, const byte_string_view& v, const uint8_t tag, std::error_code& ec)
     {
         const uint8_t e = (tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift; 
         const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
@@ -2725,7 +2725,7 @@ private:
         }
     }
 
-    void produce_begin_multi_dim(basic_cbor_content_handler<Float128T>& handler, 
+    void produce_begin_multi_dim(cbor_content_handler& handler, 
                                  semantic_tag tag,
                                  std::error_code& ec)
     {
@@ -2750,7 +2750,7 @@ private:
         more_ = handler.begin_multi_dim(shape_, tag, *this, ec);
     }
 
-    void produce_end_multi_dim(basic_cbor_content_handler<Float128T>& handler, std::error_code& ec)
+    void produce_end_multi_dim(cbor_content_handler& handler, std::error_code& ec)
     {
         more_ = handler.end_multi_dim(*this, ec);
         state_stack_.pop_back();

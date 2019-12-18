@@ -163,7 +163,7 @@ decode_cbor(const std::vector<uint8_t>& v)
 {
     jsoncons::json_decoder<T> decoder;
     auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
-    cbor_to_json_content_handler_adaptor<> h(adaptor);
+    cbor_to_json_content_handler_adaptor h(adaptor);
     basic_cbor_reader<jsoncons::bytes_source> reader(v, h);
     reader.read();
     return decoder.get_result();
@@ -189,7 +189,7 @@ decode_cbor(std::istream& is)
 {
     jsoncons::json_decoder<T> decoder;
     auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
-    cbor_to_json_content_handler_adaptor<> adaptor2(adaptor);
+    cbor_to_json_content_handler_adaptor adaptor2(adaptor);
     cbor_stream_reader reader(is, adaptor2);
     reader.read();
     return decoder.get_result();
