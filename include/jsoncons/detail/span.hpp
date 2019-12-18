@@ -135,7 +135,7 @@ namespace detail
             return const_reverse_iterator(begin()); 
         }
 
-        constexpr span<element_type, dynamic_extent>
+        span<element_type, dynamic_extent>
         first(std::size_t count) const
         {
             JSONCONS_ASSERT(count <= size());
@@ -143,7 +143,7 @@ namespace detail
             return span< element_type, dynamic_extent >( data(), count );
         }
 
-        constexpr span<element_type, dynamic_extent>
+        span<element_type, dynamic_extent>
         last(std::size_t count) const
         {
             JSONCONS_ASSERT(count <= size());
@@ -151,7 +151,7 @@ namespace detail
             return span<element_type, dynamic_extent>(data() + ( size() - count ), count);
         }
 
-        constexpr span<element_type, dynamic_extent>
+        span<element_type, dynamic_extent>
         subspan(std::size_t offset, std::size_t count = dynamic_extent) const
         {
             JSONCONS_ASSERT(offset <= size() && (count == dynamic_extent || (offset + count <= size())));

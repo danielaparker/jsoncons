@@ -41,7 +41,7 @@ static void check_native(std::false_type,
 {
 }
 
-struct my_cbor_content_handler : public cbor::default_cbor_content_handler
+struct my_cbor_content_handler : public default_json_content_handler
 {
     std::vector<double> v;
 private:
