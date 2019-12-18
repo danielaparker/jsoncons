@@ -45,7 +45,7 @@ private:
     basic_staj_event<char_type> event_;
 
     cbor_cursor_state state_;
-    typed_array_view<float128_type> data_;
+    typed_array_view data_;
     span<const size_t> shape_;
     std::size_t index_;
 public:
@@ -173,7 +173,7 @@ public:
             {
                 this->end_array();
                 state_ = cbor_cursor_state();
-                data_ = typed_array_view<float128_type>();
+                data_ = typed_array_view();
                 index_ = 0;
             }
         }
@@ -279,7 +279,7 @@ public:
             {
                 more = handler.end_array();
                 state_ = cbor_cursor_state();
-                data_ = typed_array_view<float128_type>();
+                data_ = typed_array_view();
                 index_ = 0;
             }
         }
@@ -344,11 +344,11 @@ public:
                     more = handler.typed_array(data_.data(double_array_arg).last(data_.size() - index_));
                     break;
                 }
-                case typed_array_type::float128_value:
-                {
-                    more = handler.typed_array(data_.data(float128_array_arg).last(data_.size() - index_));
-                    break;
-                }
+                //case typed_array_type::float128_value:
+                //{
+                    //more = handler.typed_array(data_.data(float128_array_arg).last(data_.size() - index_));
+                    //break;
+                //}
                 default:
                     break;
             }
@@ -356,7 +356,7 @@ public:
             
             more = handler.end_array();
             state_ = cbor_cursor_state();
-            data_ = typed_array_view<float128_type>();
+            data_ = typed_array_view();
             index_ = 0;
         }
         else
@@ -471,7 +471,7 @@ private:
                         std::error_code& ec) override
     {
         state_ = cbor_cursor_state::typed_array;
-        data_ = typed_array_view<float128_type>(v.data(), v.size());
+        data_ = typed_array_view(v.data(), v.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -482,7 +482,7 @@ private:
                         std::error_code& ec) override
     {
         state_ = cbor_cursor_state::typed_array;
-        data_ = typed_array_view<float128_type>(data.data(), data.size());
+        data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -493,7 +493,7 @@ private:
                         std::error_code& ec) override
     {
         state_ = cbor_cursor_state::typed_array;
-        data_ = typed_array_view<float128_type>(data.data(), data.size());
+        data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -504,7 +504,7 @@ private:
                         std::error_code& ec) override
     {
         state_ = cbor_cursor_state::typed_array;
-        data_ = typed_array_view<float128_type>(data.data(), data.size());
+        data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -515,7 +515,7 @@ private:
                         std::error_code& ec) override
     {
         state_ = cbor_cursor_state::typed_array;
-        data_ = typed_array_view<float128_type>(data.data(), data.size());
+        data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -526,7 +526,7 @@ private:
                         std::error_code& ec) override
     {
         state_ = cbor_cursor_state::typed_array;
-        data_ = typed_array_view<float128_type>(data.data(), data.size());
+        data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -537,7 +537,7 @@ private:
                         std::error_code& ec) override
     {
         state_ = cbor_cursor_state::typed_array;
-        data_ = typed_array_view<float128_type>(data.data(), data.size());
+        data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -548,7 +548,7 @@ private:
                         std::error_code& ec) override
     {
         state_ = cbor_cursor_state::typed_array;
-        data_ = typed_array_view<float128_type>(data.data(), data.size());
+        data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -559,7 +559,7 @@ private:
                         std::error_code& ec) override
     {
         state_ = cbor_cursor_state::typed_array;
-        data_ = typed_array_view<float128_type>(data.data(), data.size());
+        data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -570,7 +570,7 @@ private:
                         std::error_code& ec) override
     {
         state_ = cbor_cursor_state::typed_array;
-        data_ = typed_array_view<float128_type>(data.data(), data.size());
+        data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }
@@ -581,7 +581,7 @@ private:
                         std::error_code& ec) override
     {
         state_ = cbor_cursor_state::typed_array;
-        data_ = typed_array_view<float128_type>(data.data(), data.size());
+        data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
     }

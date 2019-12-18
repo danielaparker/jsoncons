@@ -159,7 +159,7 @@ struct ser_traits<T,
         {
             JSONCONS_THROW(ser_error(conversion_errc::json_not_vector));
         }
-        result.reserve(j.size());
+        //result.reserve(j.size());
         for (const auto& item : j.array_range())
         {
             result.push_back(item.template as<value_type>());

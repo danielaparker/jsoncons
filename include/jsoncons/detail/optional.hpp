@@ -30,34 +30,44 @@ namespace detail
         {
         }
 
+        optional(const optional& other) noexcept
+            : valuep_(nullptr)
+        {
+            if (other)
+            {
+                valuep_ = ::new(&storage_)value_type(other.value());
+            }
+        }
+
+        optional(optional&& other) noexcept
+            : valuep_(nullptr)
+        {
+            std::swap(valuep_,other.valuep_);
+            std::swap(storage_,other.storage_);
+        }
+
         template <class U=T>
-        optional(const optional& other,
+        optional(const optional<U>& other,
                  typename std::enable_if<std::is_copy_constructible<U>::value>::type* = 0)
             : valuep_(nullptr)
         {
             if (other)
             {
-                valuep_ = ::new(&storage_)value_type(other);
+                valuep_ = ::new(&storage_)value_type(other.value());
             }
         }
 
-        optional( optional&& other ) noexcept
-            : valuep_(nullptr)
-        {
-            std::swap(valuep_,other.valuep_);
-        }
-
         template <class U = T>
-        constexpr optional( U&& value,
-                            typename std::enable_if<std::is_constructible<T, U&&>::value &&
-                            std::is_convertible<T, U&&>::value>::type * = 0) // (8)
+        constexpr optional(U&& value,
+                           typename std::enable_if<std::is_constructible<T, U&&>::value &&
+                           std::is_convertible<T, U&&>::value>::type * = 0) // (8)
             : valuep_(::new(&storage_)value_type(std::forward<U>(value)))
         {
         }
 
         template <class U = T>
-        explicit constexpr optional( U&& value,
-                                     typename std::enable_if<std::is_constructible<T, U&&>::value &&
+        explicit constexpr optional(U&& value,
+                                    typename std::enable_if<std::is_constructible<T, U&&>::value &&
                                                             !std::is_convertible<T, U&&>::value>::type* = 0) // (8)
             : valuep_(::new(&storage_)value_type(std::forward<U>(value)))
         {

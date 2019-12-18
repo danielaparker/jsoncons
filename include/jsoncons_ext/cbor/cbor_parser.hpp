@@ -535,7 +535,6 @@ public:
    
 };
 
-template <class Float128T = std::nullptr_t>
 class typed_array_view
 {
     typed_array_type type_;
@@ -551,11 +550,9 @@ class typed_array_view
         const int64_t* int64_data_;
         const float* float_data_;
         const double* double_data_;
-        const Float128T* float128_data_;
     } data_;
     std::size_t size_;
 public:
-    typedef Float128T float128_type;
 
     typed_array_view()
         : type_(), data_(), size_(0)
@@ -572,7 +569,8 @@ public:
         swap(*this,other);
     }
 
-    typed_array_view(const typed_array<float128_type>& other)
+    template <class Float128T>
+    typed_array_view(const typed_array<Float128T>& other)
         : type_(other.type_), data_(), size_(other.size())
     {
         switch (other.type_)
@@ -629,7 +627,6 @@ public:
             }
             case typed_array_type::float128_value:
             {
-                data_.float128_data_ = other.float128_data_;
                 break;
             }
             default:
@@ -701,12 +698,6 @@ public:
         : type_(typed_array_type::double_value), size_(size)
     {
         data_.double_data_ = data;
-    }
-
-    typed_array_view(const float128_type* data,size_t size)
-        : type_(typed_array_type::float128_value), size_(size)
-    {
-        data_.float128_data_ = data;
     }
 
     typed_array_view& operator=(const typed_array_view& other)
@@ -787,12 +778,6 @@ public:
     {
         JSONCONS_ASSERT(type_ == typed_array_type::double_value);
         return span<const double>(data_.double_data_, size_);
-    }
-
-    span<const float128_type> data(float128_array_arg_t) const
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::float128_value);
-        return span<const float128_type>(data_.float128_data_, size_);
     }
 
     friend void swap(typed_array_view& a, typed_array_view& b) noexcept
