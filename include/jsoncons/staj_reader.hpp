@@ -1241,12 +1241,14 @@ private:
     std::size_t index_;
 public:
     basic_staj_event_handler()
-        : filter_(accept), event_(staj_event_type::null_value)
+        : filter_(accept), event_(staj_event_type::null_value),
+          state_(), data_(), shape_(), index_(0)
     {
     }
 
     basic_staj_event_handler(std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter)
-        : filter_(filter), event_(staj_event_type::null_value)
+        : filter_(filter), event_(staj_event_type::null_value),
+          state_(), data_(), shape_(), index_(0)
     {
     }
 
@@ -1254,6 +1256,224 @@ public:
     {
         return event_;
     }
+
+    bool in_available() const
+    {
+        return state_ != staj_reader_state();
+    }
+
+    void send_available(std::error_code& ec)
+    {
+        switch (state_)
+        {
+            case staj_reader_state::typed_array:
+                advance_typed_array(ec);
+                break;
+            case staj_reader_state::multi_dim:
+            case staj_reader_state::shape:
+                advance_multi_dim(ec);
+                break;
+            default:
+                break;
+        }
+    }
+
+    bool is_typed_array() const
+    {
+        return data_.type() != typed_array_type();
+    }
+
+    staj_reader_state state() const
+    {
+        return state_;
+    }
+
+    void advance_typed_array(std::error_code& ec)
+    {
+        if (data_.type() != typed_array_type())
+        {
+            if (index_ < data_.size())
+            {
+                switch (data_.type())
+                {
+                    case typed_array_type::uint8_value:
+                    {
+                        this->uint64_value(data_.data(uint8_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        break;
+                    }
+                    case typed_array_type::uint16_value:
+                    {
+                        this->uint64_value(data_.data(uint16_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        break;
+                    }
+                    case typed_array_type::uint32_value:
+                    {
+                        this->uint64_value(data_.data(uint32_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        break;
+                    }
+                    case typed_array_type::uint64_value:
+                    {
+                        this->uint64_value(data_.data(uint64_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        break;
+                    }
+                    case typed_array_type::int8_value:
+                    {
+                        this->int64_value(data_.data(int8_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        break;
+                    }
+                    case typed_array_type::int16_value:
+                    {
+                        this->int64_value(data_.data(int16_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        break;
+                    }
+                    case typed_array_type::int32_value:
+                    {
+                        this->int64_value(data_.data(int32_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        break;
+                    }
+                    case typed_array_type::int64_value:
+                    {
+                        this->int64_value(data_.data(int64_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        break;
+                    }
+                    case typed_array_type::half_value:
+                    {
+                        this->half_value(data_.data(half_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        break;
+                    }
+                    case typed_array_type::float_value:
+                    {
+                        this->double_value(data_.data(float_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        break;
+                    }
+                    case typed_array_type::double_value:
+                    {
+                        this->double_value(data_.data(double_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        break;
+                    }
+                    case typed_array_type::float128_value:
+                    {
+                        break;
+                    }
+                    default:
+                        break;
+                }
+                ++index_;
+            }
+            else
+            {
+                this->end_array();
+                state_ = staj_reader_state();
+                data_ = typed_array_view();
+                index_ = 0;
+            }
+        }
+    }
+
+    void advance_multi_dim(std::error_code& ec)
+    {
+        if (shape_.size() != 0)
+        {
+            if (state_ == staj_reader_state::multi_dim)
+            {
+                this->begin_array(shape_.size(), semantic_tag::none, null_ser_context(), ec);
+                state_ = staj_reader_state::shape;
+            }
+            else if (index_ < shape_.size())
+            {
+                this->uint64_value(shape_[index_], semantic_tag::none, null_ser_context(), ec);
+                ++index_;
+            }
+            else
+            {
+                state_ = staj_reader_state();
+                this->end_array(null_ser_context(), ec);
+                shape_ = span<const size_t>();
+                index_ = 0;
+            }
+        }
+    }
+
+    bool dump(basic_json_content_handler<CharT>& handler, const ser_context& context, std::error_code& ec)
+    {
+        bool more = true;
+        if (data_.type() != typed_array_type())
+        {
+            more = handler.begin_array();
+            switch (data_.type())
+            {
+                case typed_array_type::uint8_value:
+                {
+                    more = handler.typed_array(data_.data(uint8_array_arg).last(data_.size() - index_));
+                    break;
+                }
+                case typed_array_type::uint16_value:
+                {
+                    more = handler.typed_array(data_.data(uint16_array_arg).last(data_.size() - index_));
+                    break;
+                }
+                case typed_array_type::uint32_value:
+                {
+                    more = handler.typed_array(data_.data(uint32_array_arg).last(data_.size() - index_));
+                    break;
+                }
+                case typed_array_type::uint64_value:
+                {
+                    more = handler.typed_array(data_.data(uint64_array_arg).last(data_.size() - index_));
+                    break;
+                }
+                case typed_array_type::int8_value:
+                {
+                    more = handler.typed_array(data_.data(int8_array_arg).last(data_.size() - index_));
+                    break;
+                }
+                case typed_array_type::int16_value:
+                {
+                    more = handler.typed_array(data_.data(int16_array_arg).last(data_.size() - index_));
+                    break;
+                }
+                case typed_array_type::int32_value:
+                {
+                    more = handler.typed_array(data_.data(int32_array_arg).last(data_.size() - index_));
+                    break;
+                }
+                case typed_array_type::int64_value:
+                {
+                    more = handler.typed_array(data_.data(int64_array_arg).last(data_.size() - index_));
+                    break;
+                }
+                case typed_array_type::float_value:
+                {
+                    more = handler.typed_array(data_.data(float_array_arg).last(data_.size() - index_));
+                    break;
+                }
+                case typed_array_type::double_value:
+                {
+                    more = handler.typed_array(data_.data(double_array_arg).last(data_.size() - index_));
+                    break;
+                }
+                //case typed_array_type::float128_value:
+                //{
+                    //more = handler.typed_array(data_.data(float128_array_arg).last(data_.size() - index_));
+                    //break;
+                //}
+                default:
+                    break;
+            }
+            ++index_;
+
+            more = handler.end_array();
+            state_ = staj_reader_state();
+            data_ = typed_array_view();
+            index_ = 0;
+        }
+        else
+        {
+            more = staj_to_saj_event(event(), handler, context, ec);        
+        }
+        return more;
+    }
+
 private:
     static constexpr bool accept(const basic_staj_event<CharT>&, const ser_context&) 
     {
@@ -1342,6 +1562,151 @@ private:
     {
         event_ = basic_staj_event<CharT>(value, tag);
         return !filter_(event_, context);
+    }
+
+    bool do_typed_array(const span<const uint8_t>& v, 
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code& ec) override
+    {
+        state_ = staj_reader_state::typed_array;
+        data_ = typed_array_view(v.data(), v.size());
+        index_ = 0;
+        return this->begin_array(tag, context, ec);
+    }
+
+    bool do_typed_array(const span<const uint16_t>& data, 
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code& ec) override
+    {
+        state_ = staj_reader_state::typed_array;
+        data_ = typed_array_view(data.data(), data.size());
+        index_ = 0;
+        return this->begin_array(tag, context, ec);
+    }
+
+    bool do_typed_array(const span<const uint32_t>& data, 
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code& ec) override
+    {
+        state_ = staj_reader_state::typed_array;
+        data_ = typed_array_view(data.data(), data.size());
+        index_ = 0;
+        return this->begin_array(tag, context, ec);
+    }
+
+    bool do_typed_array(const span<const uint64_t>& data, 
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code& ec) override
+    {
+        state_ = staj_reader_state::typed_array;
+        data_ = typed_array_view(data.data(), data.size());
+        index_ = 0;
+        return this->begin_array(tag, context, ec);
+    }
+
+    bool do_typed_array(const span<const int8_t>& data, 
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code& ec) override
+    {
+        state_ = staj_reader_state::typed_array;
+        data_ = typed_array_view(data.data(), data.size());
+        index_ = 0;
+        return this->begin_array(tag, context, ec);
+    }
+
+    bool do_typed_array(const span<const int16_t>& data, 
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code& ec) override
+    {
+        state_ = staj_reader_state::typed_array;
+        data_ = typed_array_view(data.data(), data.size());
+        index_ = 0;
+        return this->begin_array(tag, context, ec);
+    }
+
+    bool do_typed_array(const span<const int32_t>& data, 
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code& ec) override
+    {
+        state_ = staj_reader_state::typed_array;
+        data_ = typed_array_view(data.data(), data.size());
+        index_ = 0;
+        return this->begin_array(tag, context, ec);
+    }
+
+    bool do_typed_array(const span<const int64_t>& data, 
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code& ec) override
+    {
+        state_ = staj_reader_state::typed_array;
+        data_ = typed_array_view(data.data(), data.size());
+        index_ = 0;
+        return this->begin_array(tag, context, ec);
+    }
+
+    bool do_typed_array(half_arg_t, const span<const uint16_t>& data, 
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code& ec) override
+    {
+        state_ = staj_reader_state::typed_array;
+        data_ = typed_array_view(data.data(), data.size());
+        index_ = 0;
+        return this->begin_array(tag, context, ec);
+    }
+
+    bool do_typed_array(const span<const float>& data, 
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code& ec) override
+    {
+        state_ = staj_reader_state::typed_array;
+        data_ = typed_array_view(data.data(), data.size());
+        index_ = 0;
+        return this->begin_array(tag, context, ec);
+    }
+
+    bool do_typed_array(const span<const double>& data, 
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code& ec) override
+    {
+        state_ = staj_reader_state::typed_array;
+        data_ = typed_array_view(data.data(), data.size());
+        index_ = 0;
+        return this->begin_array(tag, context, ec);
+    }
+/*
+    bool do_typed_array(const span<const float128_type>&, 
+                        semantic_tag,
+                        const ser_context&,
+                        std::error_code&) override
+    {
+        return true;
+    }
+*/
+    bool do_begin_multi_dim(const span<const size_t>& shape,
+                            semantic_tag tag,
+                            const ser_context& context, 
+                            std::error_code& ec) override
+    {
+        state_ = staj_reader_state::multi_dim;
+        shape_ = shape;
+        return this->begin_array(2, tag, context, ec);
+    }
+
+    bool do_end_multi_dim(const ser_context& context,
+                          std::error_code& ec) override
+    {
+        return this->end_array(context, ec);
     }
 
     void do_flush() override

@@ -25,13 +25,6 @@
 namespace jsoncons { 
 namespace cbor {
 
-enum class cbor_cursor_state
-{
-    typed_array = 1,
-    multi_dim,
-    shape
-};
-
 class cbor_staj_event_handler : public cbor_content_handler
 {
     using super_type = cbor_content_handler;
@@ -42,7 +35,7 @@ private:
     std::function<bool(const basic_staj_event<char_type>&, const ser_context&)> filter_;
     basic_staj_event<char_type> event_;
 
-    cbor_cursor_state state_;
+    staj_reader_state state_;
     typed_array_view data_;
     span<const size_t> shape_;
     std::size_t index_;
@@ -66,18 +59,18 @@ public:
 
     bool in_available() const
     {
-        return state_ != cbor_cursor_state();
+        return state_ != staj_reader_state();
     }
 
     void send_available(std::error_code& ec)
     {
         switch (state_)
         {
-            case cbor_cursor_state::typed_array:
+            case staj_reader_state::typed_array:
                 advance_typed_array(ec);
                 break;
-            case cbor_cursor_state::multi_dim:
-            case cbor_cursor_state::shape:
+            case staj_reader_state::multi_dim:
+            case staj_reader_state::shape:
                 advance_multi_dim(ec);
                 break;
             default:
@@ -90,7 +83,7 @@ public:
         return data_.type() != typed_array_type();
     }
 
-    cbor_cursor_state state() const
+    staj_reader_state state() const
     {
         return state_;
     }
@@ -170,7 +163,7 @@ public:
             else
             {
                 this->end_array();
-                state_ = cbor_cursor_state();
+                state_ = staj_reader_state();
                 data_ = typed_array_view();
                 index_ = 0;
             }
@@ -181,10 +174,10 @@ public:
     {
         if (shape_.size() != 0)
         {
-            if (state_ == cbor_cursor_state::multi_dim)
+            if (state_ == staj_reader_state::multi_dim)
             {
                 this->begin_array(shape_.size(), semantic_tag::none, null_ser_context(), ec);
-                state_ = cbor_cursor_state::shape;
+                state_ = staj_reader_state::shape;
             }
             else if (index_ < shape_.size())
             {
@@ -193,7 +186,7 @@ public:
             }
             else
             {
-                state_ = cbor_cursor_state();
+                state_ = staj_reader_state();
                 this->end_array(null_ser_context(), ec);
                 shape_ = span<const size_t>();
                 index_ = 0;
@@ -276,7 +269,7 @@ public:
             else
             {
                 more = handler.end_array();
-                state_ = cbor_cursor_state();
+                state_ = staj_reader_state();
                 data_ = typed_array_view();
                 index_ = 0;
             }
@@ -353,7 +346,7 @@ public:
             ++index_;
             
             more = handler.end_array();
-            state_ = cbor_cursor_state();
+            state_ = staj_reader_state();
             data_ = typed_array_view();
             index_ = 0;
         }
@@ -468,7 +461,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = cbor_cursor_state::typed_array;
+        state_ = staj_reader_state::typed_array;
         data_ = typed_array_view(v.data(), v.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -479,7 +472,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = cbor_cursor_state::typed_array;
+        state_ = staj_reader_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -490,7 +483,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = cbor_cursor_state::typed_array;
+        state_ = staj_reader_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -501,7 +494,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = cbor_cursor_state::typed_array;
+        state_ = staj_reader_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -512,7 +505,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = cbor_cursor_state::typed_array;
+        state_ = staj_reader_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -523,7 +516,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = cbor_cursor_state::typed_array;
+        state_ = staj_reader_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -534,7 +527,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = cbor_cursor_state::typed_array;
+        state_ = staj_reader_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -545,7 +538,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = cbor_cursor_state::typed_array;
+        state_ = staj_reader_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -556,7 +549,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = cbor_cursor_state::typed_array;
+        state_ = staj_reader_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -567,7 +560,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = cbor_cursor_state::typed_array;
+        state_ = staj_reader_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -578,7 +571,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = cbor_cursor_state::typed_array;
+        state_ = staj_reader_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -597,7 +590,7 @@ private:
                             const ser_context& context, 
                             std::error_code& ec) override
     {
-        state_ = cbor_cursor_state::multi_dim;
+        state_ = staj_reader_state::multi_dim;
         shape_ = shape;
         return this->begin_array(2, tag, context, ec);
     }
