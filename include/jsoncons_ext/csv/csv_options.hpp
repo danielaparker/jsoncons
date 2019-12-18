@@ -519,7 +519,7 @@ public:
           comment_starter_('\0'),
           mapping_(),
           header_lines_(0),
-          max_lines_((std::numeric_limits<size_t>::max)())
+          max_lines_((std::numeric_limits<std::size_t>::max)())
     {}
 
     basic_csv_decode_options(const basic_csv_decode_options& other) = default;
@@ -754,7 +754,7 @@ public:
         return *this;
     }
 
-    basic_csv_options& header_lines(size_t value)
+    basic_csv_options& header_lines(std::size_t value)
     {
         this->header_lines_ = value;
         return *this;
@@ -900,7 +900,7 @@ public:
         return *this;
     }
 
-    basic_csv_options& max_lines(size_t value)
+    basic_csv_options& max_lines(std::size_t value)
     {
         this->max_lines_ = value;
         return *this;

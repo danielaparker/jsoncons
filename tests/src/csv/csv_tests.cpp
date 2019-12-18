@@ -960,7 +960,7 @@ TEST_CASE("serialize_tab_delimited_file")
 
     CHECK(employees1.size() == employees2.size());
 
-    for (size_t i = 0; i < employees1.size(); ++i)
+    for (std::size_t i = 0; i < employees1.size(); ++i)
     {
         CHECK(employees1[i]["dept"] == employees2[i]["dept"]);
         CHECK(employees1[i]["employee-name"] ==employees2[i]["employee-name"]);

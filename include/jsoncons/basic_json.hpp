@@ -1697,12 +1697,12 @@ public:
             return it->value();
         }
 
-        basic_json& evaluate(size_t index)
+        basic_json& evaluate(std::size_t index)
         {
             return evaluate().at(index);
         }
 
-        const basic_json& evaluate(size_t index) const
+        const basic_json& evaluate(std::size_t index) const
         {
             return evaluate().at(index);
         }
@@ -1802,18 +1802,18 @@ public:
             return evaluate().capacity();
         }
 
-        void reserve(size_t n)
+        void reserve(std::size_t n)
         {
             evaluate().reserve(n);
         }
 
-        void resize(size_t n)
+        void resize(std::size_t n)
         {
             evaluate().resize(n);
         }
 
         template <class T>
-        void resize(size_t n, T val)
+        void resize(std::size_t n, T val)
         {
             evaluate().resize(n,val);
         }
@@ -2052,12 +2052,12 @@ public:
             return !(evaluate() < rhs);
         }
 
-        basic_json& operator[](size_t i)
+        basic_json& operator[](std::size_t i)
         {
             return evaluate_with_default().at(i);
         }
 
-        const basic_json& operator[](size_t i) const
+        const basic_json& operator[](std::size_t i) const
         {
             return evaluate().at(i);
         }
@@ -2082,12 +2082,12 @@ public:
             return evaluate().at(name);
         }
 
-        const basic_json& at(size_t index)
+        const basic_json& at(std::size_t index)
         {
             return evaluate().at(index);
         }
 
-        const basic_json& at(size_t index) const
+        const basic_json& at(std::size_t index) const
         {
             return evaluate().at(index);
         }
@@ -2568,15 +2568,15 @@ public:
             evaluate().to_stream(os,options,pprint);
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use resize(size_t)")
-        void resize_array(size_t n)
+        JSONCONS_DEPRECATED_MSG("Instead, use resize(std::size_t)")
+        void resize_array(std::size_t n)
         {
             evaluate().resize_array(n);
         }
 
         template <class T>
-        JSONCONS_DEPRECATED_MSG("Instead, use resize(size_t, T)")
-        void resize_array(size_t n, T val)
+        JSONCONS_DEPRECATED_MSG("Instead, use resize(std::size_t, T)")
+        void resize_array(std::size_t n, T val)
         {
             evaluate().resize_array(n,val);
         }
@@ -2673,7 +2673,7 @@ public:
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use erase(const_object_iterator, const_object_iterator)")
-        void remove_range(size_t from_index, std::size_t to_index)
+        void remove_range(std::size_t from_index, std::size_t to_index)
         {
             evaluate().remove_range(from_index, to_index);
         }
@@ -2820,37 +2820,37 @@ public:
         return array(std::move(init),alloc);
     }
 
-    static basic_json make_array(size_t n, const Allocator& alloc = Allocator())
+    static basic_json make_array(std::size_t n, const Allocator& alloc = Allocator())
     {
         return array(n,alloc);
     }
 
     template <class T>
-    static basic_json make_array(size_t n, const T& val, const Allocator& alloc = Allocator())
+    static basic_json make_array(std::size_t n, const T& val, const Allocator& alloc = Allocator())
     {
         return basic_json::array(n, val,alloc);
     }
 
-    template <size_t dim>
-    static typename std::enable_if<dim==1,basic_json>::type make_array(size_t n)
+    template <std::size_t dim>
+    static typename std::enable_if<dim==1,basic_json>::type make_array(std::size_t n)
     {
         return array(n);
     }
 
-    template <size_t dim, class T>
-    static typename std::enable_if<dim==1,basic_json>::type make_array(size_t n, const T& val, const Allocator& alloc = Allocator())
+    template <std::size_t dim, class T>
+    static typename std::enable_if<dim==1,basic_json>::type make_array(std::size_t n, const T& val, const Allocator& alloc = Allocator())
     {
         return array(n,val,alloc);
     }
 
-    template <size_t dim, typename... Args>
-    static typename std::enable_if<(dim>1),basic_json>::type make_array(size_t n, Args... args)
+    template <std::size_t dim, typename... Args>
+    static typename std::enable_if<(dim>1),basic_json>::type make_array(std::size_t n, Args... args)
     {
         const size_t dim1 = dim - 1;
 
         basic_json val = make_array<dim1>(std::forward<Args>(args)...);
         val.resize(n);
-        for (size_t i = 0; i < n; ++i)
+        for (std::size_t i = 0; i < n; ++i)
         {
             val[i] = make_array<dim1>(std::forward<Args>(args)...);
         }
@@ -3169,12 +3169,12 @@ public:
         }
     }
 
-    basic_json& operator[](size_t i)
+    basic_json& operator[](std::size_t i)
     {
         return at(i);
     }
 
-    const basic_json& operator[](size_t i) const
+    const basic_json& operator[](std::size_t i) const
     {
         return at(i);
     }
@@ -3580,7 +3580,7 @@ public:
         var_ = variant(object(Allocator()), semantic_tag::none);
     }
 
-    void reserve(size_t n)
+    void reserve(std::size_t n)
     {
         switch (var_.storage())
         {
@@ -3603,7 +3603,7 @@ public:
         }
     }
 
-    void resize(size_t n)
+    void resize(std::size_t n)
     {
         switch (var_.storage())
         {
@@ -3616,7 +3616,7 @@ public:
     }
 
     template <class T>
-    void resize(size_t n, T val)
+    void resize(std::size_t n, T val)
     {
         switch (var_.storage())
         {
@@ -3951,7 +3951,7 @@ public:
         }
     }
 
-    basic_json& at(size_t i)
+    basic_json& at(std::size_t i)
     {
         switch (var_.storage())
         {
@@ -3968,7 +3968,7 @@ public:
         }
     }
 
-    const basic_json& at(size_t i) const
+    const basic_json& at(std::size_t i) const
     {
         switch (var_.storage())
         {
@@ -4789,13 +4789,13 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use insert(const_array_iterator, T&&)")
-    void add(size_t index, const basic_json& value)
+    void add(std::size_t index, const basic_json& value)
     {
         evaluate_with_default().add(index, value);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use insert(const_array_iterator, T&&)")
-    void add(size_t index, basic_json&& value)
+    void add(std::size_t index, basic_json&& value)
     {
         evaluate_with_default().add(index, std::forward<basic_json>(value));
     }
@@ -4828,15 +4828,15 @@ public:
         return insert_or_assign(hint, name, std::forward<T>(val));
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use resize(size_t)")
-    void resize_array(size_t n)
+    JSONCONS_DEPRECATED_MSG("Instead, use resize(std::size_t)")
+    void resize_array(std::size_t n)
     {
         resize(n);
     }
 
     template <class T>
-    JSONCONS_DEPRECATED_MSG("Instead, use resize(size_t, T)")
-    void resize_array(size_t n, T val)
+    JSONCONS_DEPRECATED_MSG("Instead, use resize(std::size_t, T)")
+    void resize_array(std::size_t n, T val)
     {
         resize(n,val);
     }
@@ -5052,7 +5052,7 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use erase(const_object_iterator, const_object_iterator)")
-    void remove_range(size_t from_index, std::size_t to_index)
+    void remove_range(std::size_t from_index, std::size_t to_index)
     {
         switch (var_.storage())
         {
@@ -5094,39 +5094,39 @@ public:
     {
         return make_array();
     }
-    template<size_t size>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(size_t)")
-    static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n)
+    template<std::size_t size>
+    JSONCONS_DEPRECATED_MSG("Instead, use make_array(std::size_t)")
+    static typename std::enable_if<size==1,basic_json>::type make_multi_array(std::size_t n)
     {
         return make_array(n);
     }
-    template<size_t size,typename T>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(size_t, T)")
-    static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n, T val)
+    template<std::size_t size,typename T>
+    JSONCONS_DEPRECATED_MSG("Instead, use make_array(std::size_t, T)")
+    static typename std::enable_if<size==1,basic_json>::type make_multi_array(std::size_t n, T val)
     {
         return make_array(n,val);
     }
-    template<size_t size>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(size_t, std::size_t)")
-    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, std::size_t n)
+    template<std::size_t size>
+    JSONCONS_DEPRECATED_MSG("Instead, use make_array(std::size_t, std::size_t)")
+    static typename std::enable_if<size==2,basic_json>::type make_multi_array(std::size_t m, std::size_t n)
     {
         return make_array<2>(m, n);
     }
-    template<size_t size,typename T>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(size_t, std::size_t, T)")
-    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, std::size_t n, T val)
+    template<std::size_t size,typename T>
+    JSONCONS_DEPRECATED_MSG("Instead, use make_array(std::size_t, std::size_t, T)")
+    static typename std::enable_if<size==2,basic_json>::type make_multi_array(std::size_t m, std::size_t n, T val)
     {
         return make_array<2>(m, n, val);
     }
-    template<size_t size>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(size_t, std::size_t, std::size_t)")
-    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, std::size_t n, std::size_t k)
+    template<std::size_t size>
+    JSONCONS_DEPRECATED_MSG("Instead, use make_array(std::size_t, std::size_t, std::size_t)")
+    static typename std::enable_if<size==3,basic_json>::type make_multi_array(std::size_t m, std::size_t n, std::size_t k)
     {
         return make_array<3>(m, n, k);
     }
-    template<size_t size,typename T>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(size_t, std::size_t, std::size_t, T)")
-    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, std::size_t n, std::size_t k, T val)
+    template<std::size_t size,typename T>
+    JSONCONS_DEPRECATED_MSG("Instead, use make_array(std::size_t, std::size_t, std::size_t, T)")
+    static typename std::enable_if<size==3,basic_json>::type make_multi_array(std::size_t m, std::size_t n, std::size_t k, T val)
     {
         return make_array<3>(m, n, k, val);
     }

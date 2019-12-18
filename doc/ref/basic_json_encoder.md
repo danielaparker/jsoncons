@@ -61,7 +61,7 @@ and uses the specified [json options](basic_json_options.md).
     bool begin_object(semantic_tag tag=semantic_tag::none,
                       const ser_context& context=null_ser_context()); 
 
-    bool begin_object(size_t length, 
+    bool begin_object(std::size_t length, 
                       semantic_tag tag=semantic_tag::none,
                       const ser_context& context=null_ser_context()); 
 
@@ -139,10 +139,10 @@ int main()
     json_options options;
     json_stream_encoder os(std::cout, options); 
     os.begin_array();
-    for (size_t i = 0; i < A.size1(); ++i)
+    for (std::size_t i = 0; i < A.size1(); ++i)
     {
         os.begin_array();
-        for (size_t j = 0; j < A.size2(); ++j)
+        for (std::size_t j = 0; j < A.size2(); ++j)
         {
             os.double_value(A(i, j));
         }

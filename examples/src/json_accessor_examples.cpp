@@ -93,7 +93,7 @@ void introspection_example()
 
     if (val.is_array())
     {
-        for (size_t i = 0; i < val.size(); ++i)
+        for (std::size_t i = 0; i < val.size(); ++i)
         {
             json& elem = val[i];
             std::cout << "Is element " << i << " an object? " << elem.is_object() << std::endl;

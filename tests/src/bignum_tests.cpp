@@ -81,7 +81,7 @@ TEST_CASE("test_negative_bignum")
     x.dump(signum, v);
 
     REQUIRE(v.size() == b.size());
-    for (size_t i = 0; i < v.size(); ++i)
+    for (std::size_t i = 0; i < v.size(); ++i)
     {
         REQUIRE(v[i] == b[i]);
     }
@@ -266,7 +266,7 @@ TEST_CASE("times 10")
         std::string expected("1234");
         bignum n(expected);
 
-        for (size_t i = 0; i < 31; ++i)
+        for (std::size_t i = 0; i < 31; ++i)
         {
             n *= (uint64_t)10;
             expected.push_back('0');
@@ -280,7 +280,7 @@ TEST_CASE("times 10")
     {
         std::string expected("1234");
         bignum n(expected);
-        for (size_t i = 0; i < 32; ++i)
+        for (std::size_t i = 0; i < 32; ++i)
         {
             n *= (uint64_t)10;
             expected.push_back('0');

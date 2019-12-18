@@ -84,7 +84,7 @@ struct uint128_holder
 class read_nbytes_failed : public std::invalid_argument, public virtual json_exception
 {
 public:
-    explicit read_nbytes_failed(size_t count) noexcept
+    explicit read_nbytes_failed(std::size_t count) noexcept
         : std::invalid_argument("")
     {
         buffer_.append("Failed attempting to read ");
@@ -104,7 +104,7 @@ private:
 
 namespace detail {
 
-static inline bool add_check_overflow(size_t v1, std::size_t v2, std::size_t *r)
+static inline bool add_check_overflow(std::size_t v1, std::size_t v2, std::size_t *r)
 {
 #if ((defined(__GNUC__) && (__GNUC__ >= 5)) && !defined(__INTEL_COMPILER)) || __has_builtin(__builtin_add_overflow)
     return __builtin_add_overflow(v1, v2, r);

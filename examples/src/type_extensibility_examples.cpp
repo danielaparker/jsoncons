@@ -146,7 +146,7 @@ struct json_type_traits<Json, own_vector>
     }
     static Json to_json(const own_vector& val){
         Json j;
-        for(size_t i=0;i<val.size();i+=2){
+        for(std::size_t i=0;i<val.size();i+=2){
             j[std::to_string(val[i])] = val[i + 1];
         }
         return j;

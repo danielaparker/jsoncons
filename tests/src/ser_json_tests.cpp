@@ -76,7 +76,7 @@ TEST_CASE("convert_vector_test")
     auto result = jsoncons::decode_json<std::vector<double>>(s);
 
     REQUIRE(v.size() == result.size());
-    for (size_t i = 0; i < result.size(); ++i)
+    for (std::size_t i = 0; i < result.size(); ++i)
     {
         CHECK(v[i] == result[i]);
     }
@@ -103,7 +103,7 @@ TEST_CASE("convert_array_test")
     jsoncons::encode_json(v,s);
     std::array<double, 4> result = jsoncons::decode_json<std::array<double,4>>(s);
     REQUIRE(result.size() == v.size());
-    for (size_t i = 0; i < result.size(); ++i)
+    for (std::size_t i = 0; i < result.size(); ++i)
     {
         CHECK(v[i] == result[i]);
     }

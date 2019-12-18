@@ -156,11 +156,11 @@ public:
         }
     }
 
-    void ignore(size_t count)
+    void ignore(std::size_t count)
     {
         JSONCONS_TRY
         {
-            for (size_t i = 0; i < count; ++i)
+            for (std::size_t i = 0; i < count; ++i)
             {
                 int c = sbuf_->sbumpc();
                 if (c == traits_type::eof())
@@ -203,12 +203,12 @@ public:
         JSONCONS_TRY
         {
             std::streamsize count = sbuf_->sgetn(p, length); // never negative
-            if (static_cast<size_t>(count) < length)
+            if (static_cast<std::size_t>(count) < length)
             {
                 is_->clear(is_->rdstate() | std::ios::eofbit);
             }
             position_ += length;
-            return static_cast<size_t>(count);
+            return static_cast<std::size_t>(count);
         }
         JSONCONS_CATCH(const std::exception&)     
         {
@@ -352,10 +352,10 @@ public:
         }
     }
 
-    void ignore(size_t count)
+    void ignore(std::size_t count)
     {
         std::size_t len;
-        if ((size_t)(input_end_ - input_ptr_) < count)
+        if ((std::size_t)(input_end_ - input_ptr_) < count)
         {
             len = input_end_ - input_ptr_;
             eof_ = true;
@@ -375,7 +375,7 @@ public:
     std::size_t read(value_type* p, std::size_t length)
     {
         std::size_t len;
-        if ((size_t)(input_end_ - input_ptr_) < length)
+        if ((std::size_t)(input_end_ - input_ptr_) < length)
         {
             len = input_end_ - input_ptr_;
             eof_ = true;
@@ -394,7 +394,7 @@ public:
     read(OutputIt d_first, std::size_t count)
     {
         std::size_t len;
-        if ((size_t)(input_end_ - input_ptr_) < count)
+        if ((std::size_t)(input_end_ - input_ptr_) < count)
         {
             len = input_end_ - input_ptr_;
             eof_ = true;
@@ -403,7 +403,7 @@ public:
         {
             len = count;
         }
-        for (size_t i = 0; i < len; ++i)
+        for (std::size_t i = 0; i < len; ++i)
         {
             *d_first++ = *input_ptr_++;
         }
@@ -518,11 +518,11 @@ public:
         }
     }
 
-    void ignore(size_t count)
+    void ignore(std::size_t count)
     {
         JSONCONS_TRY
         {
-            for (size_t i = 0; i < count; ++i)
+            for (std::size_t i = 0; i < count; ++i)
             {
                 int c = sbuf_->sbumpc();
                 if (c == traits_type::eof())
@@ -680,10 +680,10 @@ public:
         }
     }
 
-    void ignore(size_t count)
+    void ignore(std::size_t count)
     {
         std::size_t len;
-        if ((size_t)(input_end_ - input_ptr_) < count)
+        if ((std::size_t)(input_end_ - input_ptr_) < count)
         {
             len = input_end_ - input_ptr_;
             eof_ = true;
@@ -703,7 +703,7 @@ public:
     std::size_t read(value_type* p, std::size_t length)
     {
         std::size_t len;
-        if ((size_t)(input_end_ - input_ptr_) < length)
+        if ((std::size_t)(input_end_ - input_ptr_) < length)
         {
             len = input_end_ - input_ptr_;
             eof_ = true;
@@ -722,7 +722,7 @@ public:
     read(OutputIt d_first, std::size_t count)
     {
         std::size_t len;
-        if ((size_t)(input_end_ - input_ptr_) < count)
+        if ((std::size_t)(input_end_ - input_ptr_) < count)
         {
             len = input_end_ - input_ptr_;
             eof_ = true;
@@ -731,7 +731,7 @@ public:
         {
             len = count;
         }
-        for (size_t i = 0; i < len; ++i)
+        for (std::size_t i = 0; i < len; ++i)
         {
             *d_first++ = *input_ptr_++;
         }

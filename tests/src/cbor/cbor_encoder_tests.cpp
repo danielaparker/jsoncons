@@ -23,7 +23,7 @@ TEST_CASE("cbor encode multi dim array test")
     std::vector<uint8_t> v;
 
     cbor::cbor_bytes_encoder encoder(v);
-    std::vector<size_t> shape = { 2,3 };
+    std::vector<std::size_t> shape = { 2,3 };
     encoder.begin_multi_dim(shape);
     encoder.begin_array(6);
     encoder.uint64_value(2);

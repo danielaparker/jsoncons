@@ -724,7 +724,7 @@ public:
         return *this;
     }
 
-    basic_json_options& line_length_limit(size_t value)
+    basic_json_options& line_length_limit(std::size_t value)
     {
         this->line_length_limit_ = value;
         return *this;

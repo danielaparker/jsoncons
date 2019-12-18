@@ -5,9 +5,9 @@ basic_json& at(const string_view_type& name); // (1)
 
 const basic_json& at(const string_view_type& name) const; // (2)
 
-basic_json& at(size_t i); // (3)
+basic_json& at(std::size_t i); // (3)
 
-const basic_json& at(size_t i) const; // (4)
+const basic_json& at(std::size_t i) const; // (4)
 ```
 
 (1)-(2) return a reference to the value with the specifed name in a 

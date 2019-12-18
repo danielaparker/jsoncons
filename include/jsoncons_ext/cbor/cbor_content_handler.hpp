@@ -614,7 +614,7 @@ private:
         return to_handler_.begin_object(tag, context, ec);
     }
 
-    bool do_begin_object(size_t length, semantic_tag tag, const ser_context& context, std::error_code&) override
+    bool do_begin_object(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         return to_handler_.begin_object(length, tag, context);
     }
@@ -629,7 +629,7 @@ private:
         return to_handler_.begin_array(tag, context, ec);
     }
 
-    bool do_begin_array(size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+    bool do_begin_array(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         return to_handler_.begin_array(length, tag, context, ec);
     }

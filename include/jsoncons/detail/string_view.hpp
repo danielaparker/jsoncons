@@ -125,7 +125,7 @@ public:
         return data_[pos]; 
     }
 
-    const_reference at(size_t pos) const 
+    const_reference at(std::size_t pos) const 
     {
         if (pos >= length_)
         {

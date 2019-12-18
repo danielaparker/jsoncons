@@ -103,7 +103,7 @@ private:
         return false;
     }
 
-    bool do_begin_object(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool do_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(msgpack_container_type::object, length));
 
@@ -159,7 +159,7 @@ private:
         return false;
     }
 
-    bool do_begin_array(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool do_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(msgpack_container_type::array, length));
         if (length <= 15)

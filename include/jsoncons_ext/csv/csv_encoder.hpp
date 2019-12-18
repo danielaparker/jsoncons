@@ -97,7 +97,7 @@ private:
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> buffered_line_;
     string_type name_;
     std::size_t column_index_;
-    std::vector<size_t> row_counts_;
+    std::vector<std::size_t> row_counts_;
 
     // Noncopyable and nonmoveable
     basic_csv_encoder(const basic_csv_encoder&) = delete;
@@ -186,7 +186,7 @@ private:
             case stack_item_kind::object:
                 if (stack_[0].count_ == 0)
                 {
-                    for (size_t i = 0; i < strings_buffer_.size(); ++i)
+                    for (std::size_t i = 0; i < strings_buffer_.size(); ++i)
                     {
                         if (i > 0)
                         {
@@ -198,7 +198,7 @@ private:
                     result_.append(options_.line_delimiter().data(),
                                   options_.line_delimiter().length());
                 }
-                for (size_t i = 0; i < strings_buffer_.size(); ++i)
+                for (std::size_t i = 0; i < strings_buffer_.size(); ++i)
                 {
                     if (i > 0)
                     {
@@ -246,7 +246,7 @@ private:
                 stack_.emplace_back(stack_item_kind::row);
                 if (stack_[0].count_ == 0)
                 {
-                    for (size_t i = 0; i < strings_buffer_.size(); ++i)
+                    for (std::size_t i = 0; i < strings_buffer_.size(); ++i)
                     {
                         if (i > 0)
                         {
@@ -863,7 +863,7 @@ private:
             {
                 if (row_counts_.size() >= 3)
                 {
-                    for (size_t i = row_counts_.size()-2; i-- > 0;)
+                    for (std::size_t i = row_counts_.size()-2; i-- > 0;)
                     {
                         if (row_counts_[i] <= row_counts_.back())
                         {

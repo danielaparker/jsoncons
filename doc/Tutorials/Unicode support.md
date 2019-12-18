@@ -19,7 +19,7 @@ std::cout << "Input:    " << inputStr << std::endl;
 json arr = json::parse(inputStr);
 std::string str = arr[0].as<std::string>();
 std::cout << "Hex dump: [";
-for (size_t i = 0; i < str.size(); ++i)
+for (std::size_t i = 0; i < str.size(); ++i)
 {
     unsigned int val = static_cast<unsigned int>(str[i]);
     if (i != 0)
@@ -52,7 +52,7 @@ std::cout << "Input:    " << inputStr << std::endl;
 json arr = json::parse(inputStr);
 std::string s = arr[0].as<string>();
 std::cout << "Hex dump: [";
-for (size_t i = 0; i < s.size(); ++i)
+for (std::size_t i = 0; i < s.size(); ++i)
 {
     if (i != 0)
         std::cout << " ";
@@ -71,7 +71,7 @@ std::cout << "Output:   " << os.str() << std::endl;
 json arr2 = json::parse(outputStr);
 std::string s2 = arr2[0].as<string>();
 std::cout << "Hex dump: [";
-for (size_t i = 0; i < s2.size(); ++i)
+for (std::size_t i = 0; i < s2.size(); ++i)
 {
     if (i != 0)
         std::cout << " ";
@@ -154,7 +154,7 @@ wjson val = wjson::parse(is);
 wstring s = val[0].as<wstring>();
 std::cout << "length=" << s.length() << std::endl;
 std::cout << "Hex dump: [";
-for (size_t i = 0; i < s.size(); ++i)
+for (std::size_t i = 0; i < s.size(); ++i)
 {
     if (i != 0)
         std::cout << " ";

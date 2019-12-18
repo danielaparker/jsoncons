@@ -51,7 +51,7 @@ and uses the specified [csv options](basic_csv_options.md).
     bool begin_object(semantic_tag tag=semantic_tag::none,
                       const ser_context& context=null_ser_context()); // (1)
 
-    bool begin_object(size_t length, 
+    bool begin_object(std::size_t length, 
                       semantic_tag tag=semantic_tag::none, 
                       const ser_context& context = null_ser_context()); // (2)
 
@@ -60,7 +60,7 @@ and uses the specified [csv options](basic_csv_options.md).
     bool begin_array(semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context()); // (4)
 
-    bool begin_array(size_t length, 
+    bool begin_array(std::size_t length, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context()); // (5)
 
@@ -104,7 +104,7 @@ and uses the specified [csv options](basic_csv_options.md).
                       const ser_context& context,
                       std::error_code& ec); // (16)
 
-    bool begin_object(size_t length, 
+    bool begin_object(std::size_t length, 
                       semantic_tag tag, 
                       const ser_context& context,
                       std::error_code& ec); // (17)
@@ -116,7 +116,7 @@ and uses the specified [csv options](basic_csv_options.md).
                      const ser_context& context, 
                      std::error_code& ec); // (19)
 
-    bool begin_array(size_t length, 
+    bool begin_array(std::size_t length, 
                      semantic_tag tag, 
                      const ser_context& context, 
                      std::error_code& ec); // (20)

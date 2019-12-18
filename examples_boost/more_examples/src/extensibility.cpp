@@ -121,10 +121,10 @@ namespace jsoncons {
                 }
 
                 boost::numeric::ublas::matrix<T> A(m,n,T());
-                for (size_t i = 0; i < m; ++i)
+                for (std::size_t i = 0; i < m; ++i)
                 {
                     const auto& a = val[i];
-                    for (size_t j = 0; j < a.size(); ++j)
+                    for (std::size_t j = 0; j < a.size(); ++j)
                     {
                         A(i,j) = a[j].template as<T>();
                     }
@@ -142,9 +142,9 @@ namespace jsoncons {
                             allocator_type alloc = allocator_type())
         {
             Json a = Json::template make_array<2>(val.size1(), val.size2(), T());
-            for (size_t i = 0; i < val.size1(); ++i)
+            for (std::size_t i = 0; i < val.size1(); ++i)
             {
-                for (size_t j = 0; j < val.size1(); ++j)
+                for (std::size_t j = 0; j < val.size1(); ++j)
                 {
                     a[i][j] = val(i,j);
                 }

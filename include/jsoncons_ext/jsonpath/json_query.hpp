@@ -41,7 +41,7 @@ struct array_slice
     {
     }
 
-    array_slice(size_t start, bool is_start_positive, 
+    array_slice(std::size_t start, bool is_start_positive, 
                 std::size_t end, bool is_end_positive, bool is_end_defined,
                 std::size_t step, bool is_step_positive)
         : start_(start), is_start_positive(is_start_positive), 
@@ -50,12 +50,12 @@ struct array_slice
     {
     }
 
-    std::size_t get_start(size_t size) const
+    std::size_t get_start(std::size_t size) const
     {
         return is_start_positive ? start_ : size - start_;
     }
 
-    std::size_t get_end(size_t size) const
+    std::size_t get_end(std::size_t size) const
     {
         if (is_end_defined)
         {
@@ -116,7 +116,7 @@ namespace detail {
 template<class CharT>
 bool try_string_to_index(const CharT *s, std::size_t length, std::size_t* value, bool* positive)
 {
-    static const size_t max_value = (std::numeric_limits<size_t>::max)();
+    static const size_t max_value = (std::numeric_limits<std::size_t>::max)();
     static const size_t max_value_div_10 = max_value / 10;
 
     std::size_t start = 0;
@@ -135,7 +135,7 @@ bool try_string_to_index(const CharT *s, std::size_t length, std::size_t* value,
     }
     if (length > start)
     {
-        for (size_t i = start; i < length; ++i)
+        for (std::size_t i = start; i < length; ++i)
         {
             CharT c = s[i];
             switch (c)
@@ -346,9 +346,9 @@ class jsonpath_evaluator : public ser_context
                     node_set& nodes) override
         {
             auto index = result_.eval(val);
-            if (index.template is<size_t>())
+            if (index.template is<std::size_t>())
             {
-                std::size_t start = index.template as<size_t>();
+                std::size_t start = index.template as<std::size_t>();
                 if (val.is_array() && start < val.size())
                 {
                     nodes.emplace_back(PathCons()(path,start),std::addressof(val[start]));
@@ -385,7 +385,7 @@ class jsonpath_evaluator : public ser_context
             if (val.is_array())
             {
                 //std::cout << "from array \n";
-                for (size_t i = 0; i < val.size(); ++i)
+                for (std::size_t i = 0; i < val.size(); ++i)
                 {
                     if (result_.exists(val[i]))
                     {
@@ -495,7 +495,7 @@ class jsonpath_evaluator : public ser_context
             {
                 std::size_t start = slice_.get_start(val.size());
                 std::size_t end = slice_.get_end(val.size());
-                for (size_t j = start; j < end; j += slice_.step())
+                for (std::size_t j = start; j < end; j += slice_.step())
                 {
                     if (j < val.size())
                     {
@@ -549,7 +549,7 @@ public:
     {
     }
 
-    jsonpath_evaluator(size_t line, std::size_t column)
+    jsonpath_evaluator(std::size_t line, std::size_t column)
         : line_(line), column_(column),
           begin_input_(nullptr), end_input_(nullptr),
           p_(nullptr)
@@ -644,7 +644,7 @@ public:
     {
         if (stack_.size() > 0)
         {
-            for (size_t i = 0; i < stack_.back().size(); ++i)
+            for (std::size_t i = 0; i < stack_.back().size(); ++i)
             {
                 *(stack_.back()[i].val_ptr) = new_value;
             }
@@ -1498,7 +1498,7 @@ public:
                             break;
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                             slice.is_end_defined = true;
-                            slice.end_ = static_cast<size_t>(*p_-'0');
+                            slice.end_ = static_cast<std::size_t>(*p_-'0');
                             state_stack_.back().state = path_state::slice_end;
                             ++p_;
                             ++column_;
@@ -1530,7 +1530,7 @@ public:
                             break;
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                             slice.is_end_defined = true;
-                            slice.end_ = slice.end_*10 + static_cast<size_t>(*p_-'0');
+                            slice.end_ = slice.end_*10 + static_cast<std::size_t>(*p_-'0');
                             ++p_;
                             ++column_;
                             break;
@@ -1569,7 +1569,7 @@ public:
                     switch (*p_)
                     {
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                            slice.step_ = slice.step_*10 + static_cast<size_t>(*p_-'0');
+                            slice.step_ = slice.step_*10 + static_cast<std::size_t>(*p_-'0');
                             ++p_;
                             ++column_;
                             break;

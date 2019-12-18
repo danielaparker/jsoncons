@@ -80,7 +80,7 @@ void first_example_a()
     }
     json books = json::parse(is);
 
-    for (size_t i = 0; i < books.size(); ++i)
+    for (std::size_t i = 0; i < books.size(); ++i)
     {
         try
         {
@@ -108,7 +108,7 @@ void first_example_b()
     }
     json books = json::parse(is);
 
-    for (size_t i = 0; i < books.size(); ++i)
+    for (std::size_t i = 0; i < books.size(); ++i)
     {
         try
         {
@@ -180,7 +180,7 @@ void first_example_d()
     //options.floatfield(std::ios::fixed);
     options.precision(2);
 
-    for (size_t i = 0; i < books.size(); ++i)
+    for (std::size_t i = 0; i < books.size(); ++i)
     {
         try
         {

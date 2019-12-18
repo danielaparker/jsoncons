@@ -883,7 +883,7 @@ class basic_cbor_parser : public ser_context
     std::vector<uint64_t,tag_allocator_type> tags_; 
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     typed_array<Float128T,WorkAllocator> typed_array_;
-    std::vector<size_t> shape_;
+    std::vector<std::size_t> shape_;
     std::size_t index_;
 
 public:
@@ -1656,7 +1656,7 @@ private:
                 break;
         }
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::text_string);
-        auto func = [&](size_t length, std::error_code& ec)
+        auto func = [&](std::size_t length, std::error_code& ec)
         {
             s.reserve(s.size()+length);
             source_.read(std::back_inserter(s), length);
@@ -1685,7 +1685,7 @@ private:
         {
             return 0;
         }
-        std::size_t len = (size_t)u;
+        std::size_t len = (std::size_t)u;
         if (len != u)
         {
             ec = cbor_errc::number_too_large;
@@ -1713,7 +1713,7 @@ private:
                 break;
         }
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::byte_string);
-        auto func = [&](size_t length, std::error_code& ec)
+        auto func = [&](std::size_t length, std::error_code& ec)
         {
             v.reserve(v.size()+length);
             source_.read(std::back_inserter(v), length);
@@ -2410,7 +2410,7 @@ private:
 
                     std::size_t size = v.size();
                     typed_array_ = typed_array<Float128T,WorkAllocator>(uint8_array_arg,size,alloc_);
-                    for (size_t i = 0; p < last; ++p, ++i)
+                    for (std::size_t i = 0; p < last; ++p, ++i)
                     {
                         typed_array_.data(uint8_array_arg)[i] = *p;
                     }
@@ -2424,7 +2424,7 @@ private:
 
                     std::size_t size = v.size();
                     typed_array_ = typed_array<Float128T,WorkAllocator>(uint8_array_arg,size,alloc_);
-                    for (size_t i = 0; p < last; ++p, ++i)
+                    for (std::size_t i = 0; p < last; ++p, ++i)
                     {
                         typed_array_.data(uint8_array_arg)[i] = *p;
                     }
@@ -2446,7 +2446,7 @@ private:
 
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<Float128T,WorkAllocator>(uint16_array_arg,size,alloc_);
-                    for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                    for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
                         uint16_t val{ 0 };
@@ -2476,7 +2476,7 @@ private:
 
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<Float128T,WorkAllocator>(uint32_array_arg,size,alloc_);
-                    for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                    for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
                         uint32_t val{ 0 };
@@ -2506,7 +2506,7 @@ private:
 
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<Float128T,WorkAllocator>(uint64_array_arg,size,alloc_);
-                    for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                    for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
                         uint64_t val{ 0 };
@@ -2528,7 +2528,7 @@ private:
 
                     std::size_t size = v.size();
                     typed_array_ = typed_array<Float128T,WorkAllocator>(int8_array_arg,size,alloc_);
-                    for (size_t i = 0; p < last; ++p, ++i)
+                    for (std::size_t i = 0; p < last; ++p, ++i)
                     {
                         typed_array_.data(int8_array_arg)[i] = (int8_t)*p;
                     }
@@ -2550,7 +2550,7 @@ private:
 
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<Float128T,WorkAllocator>(int16_array_arg,size,alloc_);
-                    for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                    for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
                         int16_t val{ 0 };
@@ -2580,7 +2580,7 @@ private:
 
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<Float128T,WorkAllocator>(int32_array_arg,size,alloc_);
-                    for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                    for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
                         int32_t val{ 0 };
@@ -2610,7 +2610,7 @@ private:
 
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<Float128T,WorkAllocator>(int64_array_arg,size,alloc_);
-                    for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                    for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
                         int64_t val{ 0 };
@@ -2640,7 +2640,7 @@ private:
 
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<Float128T,WorkAllocator>(half_array_arg,size,alloc_);
-                    for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                    for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
                         uint16_t val{ 0 };
@@ -2670,7 +2670,7 @@ private:
 
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<Float128T,WorkAllocator>(float_array_arg,size,alloc_);
-                    for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                    for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
                         float val{ 0 };
@@ -2700,7 +2700,7 @@ private:
 
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<Float128T,WorkAllocator>(double_array_arg,size,alloc_);
-                    for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                    for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                     {
                         const uint8_t* endp = nullptr;
                         double val{ 0 };
@@ -2761,7 +2761,7 @@ private:
 
             std::size_t size = v.size()/bytes_per_elem;
             typed_array_ = typed_array<Float128T,WorkAllocator>(float128_array_arg,size,alloc_);
-            for (size_t i = 0; p < last; p += bytes_per_elem, ++i)
+            for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
             {
                 const uint8_t* endp = nullptr;
                 Float128T val{ 0 };
@@ -2852,7 +2852,7 @@ private:
                 {
                     return;
                 }
-                for (size_t i = 0; more_ && i < size; ++i)
+                for (std::size_t i = 0; more_ && i < size; ++i)
                 {
                     std::size_t dim = get_size(ec);
                     if (ec)

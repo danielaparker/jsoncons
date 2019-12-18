@@ -20,7 +20,7 @@ static void check_safe_dtoa(double x, const std::vector<std::string>& expected)
     REQUIRE(result);
 
     bool accept = false;
-    for (size_t i = 0; !accept && i < expected.size(); ++i)
+    for (std::size_t i = 0; !accept && i < expected.size(); ++i)
     {
         accept = s == expected[i];
     }
@@ -43,7 +43,7 @@ static void check_dtoa(double x, const std::vector<std::string>& expected)
     REQUIRE(result);
 
     bool accept = false;
-    for (size_t i = 0; !accept && i < expected.size(); ++i)
+    for (std::size_t i = 0; !accept && i < expected.size(); ++i)
     {
         accept = s == expected[i];
     }

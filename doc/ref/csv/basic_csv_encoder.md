@@ -52,7 +52,7 @@ and uses the specified [csv options](basic_csv_options.md).
     bool begin_object(semantic_tag tag=semantic_tag::none,
                       const ser_context& context=null_ser_context()); 
 
-    bool begin_object(size_t length, 
+    bool begin_object(std::size_t length, 
                       semantic_tag tag=semantic_tag::none,
                       const ser_context& context=null_ser_context()); 
 

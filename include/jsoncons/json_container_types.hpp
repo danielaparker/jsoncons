@@ -235,14 +235,14 @@ public:
     {
     }
 
-    explicit json_array(size_t n, 
+    explicit json_array(std::size_t n, 
                         const allocator_type& alloc = allocator_type())
         : allocator_holder<allocator_type>(alloc), 
           elements_(n,Json(),value_allocator_type(alloc))
     {
     }
 
-    explicit json_array(size_t n, 
+    explicit json_array(std::size_t n, 
                         const Json& value, 
                         const allocator_type& alloc = allocator_type())
         : allocator_holder<allocator_type>(alloc), 
@@ -301,22 +301,22 @@ public:
 
     void shrink_to_fit() 
     {
-        for (size_t i = 0; i < elements_.size(); ++i)
+        for (std::size_t i = 0; i < elements_.size(); ++i)
         {
             elements_[i].shrink_to_fit();
         }
         elements_.shrink_to_fit();
     }
 
-    void reserve(size_t n) {elements_.reserve(n);}
+    void reserve(std::size_t n) {elements_.reserve(n);}
 
-    void resize(size_t n) {elements_.resize(n);}
+    void resize(std::size_t n) {elements_.resize(n);}
 
-    void resize(size_t n, const Json& val) {elements_.resize(n,val);}
+    void resize(std::size_t n, const Json& val) {elements_.resize(n,val);}
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use erase(const_iterator, const_iterator)")
-    void remove_range(size_t from_index, std::size_t to_index) 
+    void remove_range(std::size_t from_index, std::size_t to_index) 
     {
         JSONCONS_ASSERT(from_index <= to_index);
         JSONCONS_ASSERT(to_index <= elements_.size());
@@ -344,9 +344,9 @@ public:
 #endif
     }
 
-    Json& operator[](size_t i) {return elements_[i];}
+    Json& operator[](std::size_t i) {return elements_[i];}
 
-    const Json& operator[](size_t i) const {return elements_[i];}
+    const Json& operator[](std::size_t i) const {return elements_[i];}
 
     // push_back
 
@@ -587,16 +587,16 @@ public:
 
     void shrink_to_fit() 
     {
-        for (size_t i = 0; i < members_.size(); ++i)
+        for (std::size_t i = 0; i < members_.size(); ++i)
         {
             members_[i].shrink_to_fit();
         }
         members_.shrink_to_fit();
     }
 
-    void reserve(size_t n) {members_.reserve(n);}
+    void reserve(std::size_t n) {members_.reserve(n);}
 
-    Json& at(size_t i) 
+    Json& at(std::size_t i) 
     {
         if (i >= members_.size())
         {
@@ -605,7 +605,7 @@ public:
         return members_[i].value();
     }
 
-    const Json& at(size_t i) const 
+    const Json& at(std::size_t i) const 
     {
         if (i >= members_.size())
         {
@@ -1125,8 +1125,8 @@ private:
     typedef typename Json::implementation_policy implementation_policy;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type> key_value_allocator_type;
     using key_value_container_type = typename implementation_policy::template sequence_container_type<key_value_type,key_value_allocator_type>;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<size_t> index_allocator_type;
-    using index_container_type = typename implementation_policy::template sequence_container_type<size_t,index_allocator_type>;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::size_t> index_allocator_type;
+    using index_container_type = typename implementation_policy::template sequence_container_type<std::size_t,index_allocator_type>;
 
     key_value_container_type members_;
     index_container_type index_;
@@ -1186,7 +1186,7 @@ public:
 
         build_index();
         auto last_unique = std::unique(index_.begin(), index_.end(),
-            [&](size_t a, std::size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
+            [&](std::size_t a, std::size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
 
         if (last_unique != index_.end())
         {
@@ -1225,7 +1225,7 @@ public:
 
         build_index();
         auto last_unique = std::unique(index_.begin(), index_.end(),
-            [&](size_t a, std::size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
+            [&](std::size_t a, std::size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
 
         if (last_unique != index_.end())
         {
@@ -1298,7 +1298,7 @@ public:
 
     void shrink_to_fit() 
     {
-        for (size_t i = 0; i < members_.size(); ++i)
+        for (std::size_t i = 0; i < members_.size(); ++i)
         {
             members_[i].shrink_to_fit();
         }
@@ -1306,9 +1306,9 @@ public:
         index_.shrink_to_fit();
     }
 
-    void reserve(size_t n) {members_.reserve(n);}
+    void reserve(std::size_t n) {members_.reserve(n);}
 
-    Json& at(size_t i) 
+    Json& at(std::size_t i) 
     {
         if (i >= members_.size())
         {
@@ -1317,7 +1317,7 @@ public:
         return members_[i].value();
     }
 
-    const Json& at(size_t i) const 
+    const Json& at(std::size_t i) const 
     {
         if (i >= members_.size())
         {
@@ -1329,7 +1329,7 @@ public:
     iterator find(const string_view_type& name) noexcept
     {
         auto it = std::lower_bound(index_.begin(),index_.end(), name, 
-                                    [&](size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
+                                    [&](std::size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
         if (it != index_.end() && members_.at(*it).key() == name)
         {
             return members_.begin() + *it;
@@ -1343,7 +1343,7 @@ public:
     const_iterator find(const string_view_type& name) const noexcept
     {
         auto it = std::lower_bound(index_.begin(),index_.end(), name, 
-                                    [&](size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
+                                    [&](std::size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
         if (it != index_.end() && members_.at(*it).key() == name)
         {
             return members_.begin() + *it;
@@ -1404,7 +1404,7 @@ public:
 
         build_index();
         auto last_unique = std::unique(index_.begin(), index_.end(),
-            [&](size_t a, std::size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
+            [&](std::size_t a, std::size_t b) { return !(members_.at(a).key().compare(members_.at(b).key())); });
 
         if (last_unique != index_.end())
         {
@@ -1777,17 +1777,17 @@ public:
     }
 private:
 
-    std::pair<size_t,bool> insert_index_entry(const string_view_type& key, std::size_t pos)
+    std::pair<std::size_t,bool> insert_index_entry(const string_view_type& key, std::size_t pos)
     {
         JSONCONS_ASSERT(pos <= index_.size());
 
         auto it = std::lower_bound(index_.begin(),index_.end(), key, 
-                                    [&](size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
+                                    [&](std::size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
 
         if (it == index_.end())
         {
             std::size_t count = index_.size() - pos;
-            for (size_t i = 0; count > 0 && i < index_.size(); ++i)
+            for (std::size_t i = 0; count > 0 && i < index_.size(); ++i)
             {
                 if (index_[i] >= pos)
                 {
@@ -1801,7 +1801,7 @@ private:
         else if (members_.at(*it).key() != key)
         {
             std::size_t count = index_.size() - pos;
-            for (size_t i = 0; count > 0 && i < index_.size(); ++i)
+            for (std::size_t i = 0; count > 0 && i < index_.size(); ++i)
             {
                 if (index_[i] >= pos)
                 {
@@ -1818,14 +1818,14 @@ private:
         }
     }
 
-    void erase_index_entries(size_t pos1, std::size_t pos2)
+    void erase_index_entries(std::size_t pos1, std::size_t pos2)
     {
         JSONCONS_ASSERT(pos1 <= pos2);
         JSONCONS_ASSERT(pos2 <= index_.size());
 
         const size_t offset = pos2 - pos1;
         const size_t n = index_.size() - offset;
-        for (size_t i = 0; i < index_.size(); ++i)
+        for (std::size_t i = 0; i < index_.size(); ++i)
         {
             if (offset == index_.size())
             {
@@ -1837,7 +1837,7 @@ private:
                 index_.erase(index_.begin()+i);
             }
         }
-        for (size_t i = 0; i < index_.size(); ++i)
+        for (std::size_t i = 0; i < index_.size(); ++i)
         {
             if (index_[i] >= pos2)
             {
@@ -1851,12 +1851,12 @@ private:
     {
         index_.clear();
         index_.reserve(members_.size());
-        for (size_t i = 0; i < members_.size(); ++i)
+        for (std::size_t i = 0; i < members_.size(); ++i)
         {
             index_.push_back(i);
         }
         std::stable_sort(index_.begin(),index_.end(),
-                         [&](size_t a, std::size_t b) -> bool {return members_.at(a).key().compare(members_.at(b).key()) < 0;});
+                         [&](std::size_t a, std::size_t b) -> bool {return members_.at(a).key().compare(members_.at(b).key()) < 0;});
     }
 
     json_object& operator=(const json_object&) = delete;

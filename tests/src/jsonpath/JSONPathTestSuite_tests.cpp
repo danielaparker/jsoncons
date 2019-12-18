@@ -61,7 +61,7 @@ TEST_CASE("JSONPath Test Suite")
                 {
                     s.append(buffer, sizeof(buffer));
                 }
-                s.append(buffer, (size_t)is.gcount());
+                s.append(buffer, (std::size_t)is.gcount());
                 query_dictionary[p.path().stem()] = s;
             }
             else if (p.path().extension() == ".json")

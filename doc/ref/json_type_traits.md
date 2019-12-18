@@ -916,7 +916,7 @@ struct json_type_traits<Json, own_vector>
     }
     static Json to_json(const own_vector& val){
 		Json j;
-		for(size_t i=0;i<val.size();i+=2){
+		for(std::size_t i=0;i<val.size();i+=2){
 			j[std::to_string(val[i])] = val[i + 1];
 		}
 		return j;
@@ -1000,10 +1000,10 @@ namespace jsoncons {
                 }
 
                 boost::numeric::ublas::matrix<T> A(m,n,T());
-                for (size_t i = 0; i < m; ++i)
+                for (std::size_t i = 0; i < m; ++i)
                 {
                     const auto& a = val[i];
-                    for (size_t j = 0; j < a.size(); ++j)
+                    for (std::size_t j = 0; j < a.size(); ++j)
                     {
                         A(i,j) = a[j].template as<T>();
                     }
@@ -1020,9 +1020,9 @@ namespace jsoncons {
         static Json to_json(const boost::numeric::ublas::matrix<T>& val)
         {
             Json a = Json::template make_array<2>(val.size1(), val.size2(), T());
-            for (size_t i = 0; i < val.size1(); ++i)
+            for (std::size_t i = 0; i < val.size1(); ++i)
             {
-                for (size_t j = 0; j < val.size1(); ++j)
+                for (std::size_t j = 0; j < val.size1(); ++j)
                 {
                     a[i][j] = val(i,j);
                 }
@@ -1054,9 +1054,9 @@ int main()
     matrix<double> B = a.as<matrix<double>>();
 
     std::cout << "(4) \n\n";
-    for (size_t i = 0; i < B.size1(); ++i)
+    for (std::size_t i = 0; i < B.size1(); ++i)
     {
-        for (size_t j = 0; j < B.size2(); ++j)
+        for (std::size_t j = 0; j < B.size2(); ++j)
         {
             if (j > 0)
             {

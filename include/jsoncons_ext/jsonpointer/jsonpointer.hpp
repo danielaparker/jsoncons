@@ -478,7 +478,7 @@ public:
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                auto result = jsoncons::detail::to_integer<size_t>(buffer_.data(), buffer_.length());
+                auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
                 if (result.ec != jsoncons::detail::to_integer_errc())
                 {
                     ec = jsonpointer_errc::invalid_index;
@@ -531,7 +531,7 @@ public:
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                auto result = jsoncons::detail::to_integer<size_t>(buffer_.data(), buffer_.length());
+                auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
                 if (result.ec != jsoncons::detail::to_integer_errc())
                 {
                     ec = jsonpointer_errc::invalid_index;
@@ -593,7 +593,7 @@ public:
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                auto result = jsoncons::detail::to_integer<size_t>(buffer_.data(), buffer_.length());
+                auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
                 if (result.ec != jsoncons::detail::to_integer_errc())
                 {
                     ec = jsonpointer_errc::invalid_index;
@@ -648,7 +648,7 @@ public:
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                auto result = jsoncons::detail::to_integer<size_t>(buffer_.data(), buffer_.length());
+                auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
                 if (result.ec != jsoncons::detail::to_integer_errc())
                 {
                     ec = jsonpointer_errc::invalid_index;
@@ -722,7 +722,7 @@ public:
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                auto result = jsoncons::detail::to_integer<size_t>(buffer.data(), buffer.length());
+                auto result = jsoncons::detail::to_integer<std::size_t>(buffer.data(), buffer.length());
                 if (result.ec != jsoncons::detail::to_integer_errc())
                 {
                     ec = jsonpointer_errc::invalid_index;

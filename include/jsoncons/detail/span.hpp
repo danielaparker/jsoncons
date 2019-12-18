@@ -55,14 +55,14 @@ namespace detail
 
         template <typename C>
         constexpr span(C& c,
-                       typename std::enable_if<!is_span<C>::value && !is_std_array<C>::value && is_compatible_element<C,element_type>::value && has_data_and_size<C>::value>::type* = 0)
+                       typename std::enable_if<!is_std_array<C>::value && is_compatible_element<C,element_type>::value && has_data_and_size<C>::value>::type* = 0)
             : data_(c.data()), size_(c.size())
         {
         }
 
         template <typename C>
         constexpr span(const C& c,
-                       typename std::enable_if<!is_span<C>::value && !is_std_array<C>::value && is_compatible_element<C,element_type>::value && has_data_and_size<C>::value>::type* = 0)
+                       typename std::enable_if<!is_std_array<C>::value && is_compatible_element<C,element_type>::value && has_data_and_size<C>::value>::type* = 0)
             : data_(c.data()), size_(c.size())
         {
         }

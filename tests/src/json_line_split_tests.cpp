@@ -19,11 +19,11 @@ bool are_equal(const std::string& s1, const std::string& s2)
 
     std::size_t len = std::min(len1,len2);
 
-    for (size_t i = 0; i < len; ++i)
+    for (std::size_t i = 0; i < len; ++i)
     {
         if (s1[i] != s2[i])
         {
-            for (size_t j = 0; j <= i; ++j)
+            for (std::size_t j = 0; j <= i; ++j)
             {
                 std::cout << s1[j];
             }

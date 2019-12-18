@@ -276,7 +276,7 @@ struct ser_traits<std::array<T,N>>
     {
         std::array<T, N> buff;
         JSONCONS_ASSERT(j.size() == N);
-        for (size_t i = 0; i < N; i++)
+        for (std::size_t i = 0; i < N; i++)
         {
             buff[i] = j[i].template as<T>();
         }
@@ -307,7 +307,7 @@ struct ser_traits<std::array<T,N>>
             return v;
         }
         reader.next(ec);
-        for (size_t i = 0; i < N && reader.current().event_type() != staj_event_type::end_array && !ec; ++i)
+        for (std::size_t i = 0; i < N && reader.current().event_type() != staj_event_type::end_array && !ec; ++i)
         {
             v[i] = ser_traits<value_type>::decode(reader, context_j, ec);
             reader.next(ec);

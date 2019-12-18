@@ -162,7 +162,7 @@ Constructs a new encoder that writes to the specified result.
     bool begin_object(semantic_tag tag=semantic_tag::none,
                       const ser_context& context=null_ser_context()); // (1)
 
-    bool begin_object(size_t length, 
+    bool begin_object(std::size_t length, 
                       semantic_tag tag=semantic_tag::none, 
                       const ser_context& context = null_ser_context()); // (2)
 
@@ -171,7 +171,7 @@ Constructs a new encoder that writes to the specified result.
     bool begin_array(semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context()); // (4)
 
-    bool begin_array(size_t length, 
+    bool begin_array(std::size_t length, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context()); // (5)
 
@@ -215,7 +215,7 @@ Constructs a new encoder that writes to the specified result.
                       const ser_context& context,
                       std::error_code& ec); // (16)
 
-    bool begin_object(size_t length, 
+    bool begin_object(std::size_t length, 
                       semantic_tag tag, 
                       const ser_context& context,
                       std::error_code& ec); // (17)
@@ -227,7 +227,7 @@ Constructs a new encoder that writes to the specified result.
                      const ser_context& context, 
                      std::error_code& ec); // (19)
 
-    bool begin_array(size_t length, 
+    bool begin_array(std::size_t length, 
                      semantic_tag tag, 
                      const ser_context& context, 
                      std::error_code& ec); // (20)
@@ -509,7 +509,7 @@ int main()
     std::vector<uint8_t> v;
 
     cbor::cbor_bytes_encoder encoder(v);
-    std::vector<size_t> shape = { 2,3 };
+    std::vector<std::size_t> shape = { 2,3 };
     encoder.begin_multi_dim(shape, semantic_tag::multi_dim_column_major);
     encoder.begin_array(6);
     encoder.uint64_value(2);

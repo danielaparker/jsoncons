@@ -28,7 +28,7 @@ void check_encode_cbor(const std::vector<uint8_t>& expected, const json& j)
         std::cout << j << "\n";
     }
     REQUIRE(result.size() == expected.size());
-    for (size_t i = 0; i < expected.size(); ++i)
+    for (std::size_t i = 0; i < expected.size(); ++i)
     {
         REQUIRE(result[i] == expected[i]);
     }

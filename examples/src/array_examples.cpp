@@ -48,7 +48,7 @@ void accessing_a_json_value_as_a_vector()
     std::string s = "{\"my-array\" : [1,2,3,4]}";
     json val = json::parse(s);
     std::vector<int> v = val["my-array"].as<std::vector<int>>();
-    for (size_t i = 0; i < v.size(); ++i)
+    for (std::size_t i = 0; i < v.size(); ++i)
     {
         if (i > 0)
         {
@@ -83,7 +83,7 @@ void construct_json_from_vector()
     std::cout << pretty_print(root) << std::endl;
 
     std::cout << "size=" << root["addresses"].size() << std::endl;
-    for (size_t i = 0; i < root["addresses"].size(); ++i)
+    for (std::size_t i = 0; i < root["addresses"].size(); ++i)
     {
         std::cout << root["addresses"][i] << std::endl;
     }
@@ -192,11 +192,11 @@ void make_3_dimensional_array()
     json a = json::make_array<3>(4,3,2,0);
 
     double val = 1.0;
-    for (size_t i = 0; i < a.size(); ++i)
+    for (std::size_t i = 0; i < a.size(); ++i)
     {
-        for (size_t j = 0; j < a[i].size(); ++j)
+        for (std::size_t j = 0; j < a[i].size(); ++j)
         {
-            for (size_t k = 0; k < a[i][j].size(); ++k)
+            for (std::size_t k = 0; k < a[i][j].size(); ++k)
             {
                 a[i][j][k] = val;
                 val += 1.0;

@@ -309,7 +309,7 @@ public:
         return buffer_length_;
     }
 
-    void buffer_length(size_t length)
+    void buffer_length(std::size_t length)
     {
         buffer_length_ = length;
         buffer_.reserve(buffer_length_);
@@ -470,8 +470,8 @@ public:
         return buffer_length_;
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use buffer_length(size_t)")
-    void buffer_capacity(size_t length)
+    JSONCONS_DEPRECATED_MSG("Instead, use buffer_length(std::size_t)")
+    void buffer_capacity(std::size_t length)
     {
         buffer_length_ = length;
         buffer_.reserve(buffer_length_);
@@ -483,7 +483,7 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth(int)")
-    void max_depth(size_t depth)
+    void max_depth(std::size_t depth)
     {
         parser_.max_nesting_depth(depth);
     }
@@ -496,7 +496,7 @@ private:
         buffer_.clear();
         buffer_.resize(buffer_length_);
         std::size_t count = source_.read(buffer_.data(), buffer_length_);
-        buffer_.resize(static_cast<size_t>(count));
+        buffer_.resize(static_cast<std::size_t>(count));
         if (buffer_.size() == 0)
         {
             eof_ = true;

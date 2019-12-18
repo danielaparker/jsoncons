@@ -215,7 +215,7 @@ public:
         return buffer_length_;
     }
 
-    void buffer_length(size_t length)
+    void buffer_length(std::size_t length)
     {
         buffer_length_ = length;
         buffer_.reserve(buffer_length_);
@@ -276,7 +276,7 @@ public:
         buffer_.clear();
         buffer_.resize(buffer_length_);
         std::size_t count = source_.read(buffer_.data(), buffer_length_);
-        buffer_.resize(static_cast<size_t>(count));
+        buffer_.resize(static_cast<std::size_t>(count));
         if (buffer_.size() == 0)
         {
             eof_ = true;

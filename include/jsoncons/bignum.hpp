@@ -199,7 +199,7 @@ public:
         if (n > 0)
         {
             basic_bignum<Allocator> v = 0;
-            for (size_t i = 0; i < n; i++)
+            for (std::size_t i = 0; i < n; i++)
             {
                 v = (v * 256) + (uint64_t)(str[i]);
             }
@@ -385,7 +385,7 @@ public:
 
         incr_length( (std::max)(y.length(), length()) + 1 );
 
-        for (size_t i = 0; i < length(); i++ )
+        for (std::size_t i = 0; i < length(); i++ )
         {
             if ( i >= y.length() && carry == 0 )
                 break;
@@ -412,7 +412,7 @@ public:
             return *this = -(y - *this);
         uint64_t borrow = 0;
         uint64_t d;
-        for (size_t i = 0; i < length(); i++ )
+        for (std::size_t i = 0; i < length(); i++ )
         {
             if ( i >= y.length() && borrow == 0 )
                 break;
@@ -497,7 +497,7 @@ public:
                 basic_bignum<Allocator> x = *this;
                 set_length( lenProd ); // Give *this length lenProd
 
-                for (size_t i = 0; i < lenProd; i++ )
+                for (std::size_t i = 0; i < lenProd; i++ )
                 {
                     sumLo = sumHi;
                     sumHi = carry;
@@ -542,11 +542,11 @@ public:
 
     basic_bignum& operator<<=( uint64_t k )
     {
-        std::size_t q = (size_t)(k / basic_type_bits);
+        std::size_t q = (std::size_t)(k / basic_type_bits);
         if ( q ) // Increase length_ by q:
         {
             incr_length(length() + q);
-            for (size_t i = length(); i-- > 0; )
+            for (std::size_t i = length(); i-- > 0; )
                 data_[i] = ( i < q ? 0 : data_[i - q]);
             k %= basic_type_bits;
         }
@@ -555,7 +555,7 @@ public:
             uint64_t k1 = basic_type_bits - k;
             uint64_t mask = (1 << k) - 1;
             incr_length( length() + 1 );
-            for (size_t i = length(); i-- > 0; )
+            for (std::size_t i = length(); i-- > 0; )
             {
                 data_[i] <<= k;
                 if ( i > 0 )
@@ -568,7 +568,7 @@ public:
 
     basic_bignum& operator>>=(uint64_t k)
     {
-        std::size_t q = (size_t)(k / basic_type_bits);
+        std::size_t q = (std::size_t)(k / basic_type_bits);
         if ( q >= length() )
         {
             set_length( 0 );
@@ -576,7 +576,7 @@ public:
         }
         if (q > 0)
         {
-            memmove( data_, data_+q, (size_t)((length() - q)*sizeof(uint64_t)) );
+            memmove( data_, data_+q, (std::size_t)((length() - q)*sizeof(uint64_t)) );
             set_length( length() - q );
             k %= basic_type_bits;
             if ( k == 0 )
@@ -586,10 +586,10 @@ public:
             }
         }
 
-        std::size_t n = (size_t)(length() - 1);
+        std::size_t n = (std::size_t)(length() - 1);
         int64_t k1 = basic_type_bits - k;
         uint64_t mask = (1 << k) - 1;
-        for (size_t i = 0; i <= n; i++)
+        for (std::size_t i = 0; i <= n; i++)
         {
             data_[i] >>= k;
             if ( i < n )
@@ -1141,7 +1141,7 @@ public:
             code = +1;
         else
         {
-            for (size_t i = length(); i-- > 0; )
+            for (std::size_t i = length(); i-- > 0; )
             {
                 if (data_[i] > y.data_[i])
                 {
@@ -1323,7 +1323,7 @@ private:
             uint64_t divisor = denom.data_[0], dHi = 0,
                      q1, r, q2, dividend;
             quot.set_length(length());
-            for (size_t i=length(); i-- > 0; )
+            for (std::size_t i=length(); i-- > 0; )
             {
                 dividend = (dHi << basic_type_halfBits) | (data_[i] >> basic_type_halfBits);
                 q1 = dividend/divisor;
@@ -1344,7 +1344,7 @@ private:
         std::size_t l = denom.length() - 1;
         std::size_t n = num.length() - 1;
         quot.set_length(n - l);
-        for (size_t i=quot.length(); i-- > 0; )
+        for (std::size_t i=quot.length(); i-- > 0; )
             quot.data_[i] = 0;
         rem = num;
         if ( rem.data_[n] >= denom.data_[l] )
@@ -1375,7 +1375,7 @@ private:
     uint64_t* end() { return data_ + length_; }
     const uint64_t* end() const { return data_ + length_; }
 
-    void set_length(size_t n)
+    void set_length(std::size_t n)
     {
        length_ = n;
        if ( length_ > capacity() )
@@ -1390,7 +1390,7 @@ private:
        }
     }
 
-    std::size_t round_up(size_t i) const // Find suitable new block size
+    std::size_t round_up(std::size_t i) const // Find suitable new block size
     {
         return (i/word_length + 1) * word_length;
     }
@@ -1539,7 +1539,7 @@ private:
         }
 
         basic_bignum<Allocator> v = 0;
-        for (size_t i = 0; i < length; i++)
+        for (std::size_t i = 0; i < length; i++)
         {
             CharT c = data[i];
             switch (c)
@@ -1580,7 +1580,7 @@ private:
         }
 
         basic_bignum<Allocator> v = 0;
-        for (size_t i = 0; i < length; i++)
+        for (std::size_t i = 0; i < length; i++)
         {
             CharT c = data[i];
             uint64_t d;

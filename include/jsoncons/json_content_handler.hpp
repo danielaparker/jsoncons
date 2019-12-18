@@ -46,7 +46,7 @@ public:
         return more;
     }
 
-    bool begin_object(size_t length, 
+    bool begin_object(std::size_t length, 
                       semantic_tag tag=semantic_tag::none, 
                       const ser_context& context = null_ser_context())
     {
@@ -82,7 +82,7 @@ public:
         return more;
     }
 
-    bool begin_array(size_t length, 
+    bool begin_array(std::size_t length, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context())
     {
@@ -234,7 +234,7 @@ public:
         return do_begin_object(tag, context, ec);
     }
 
-    bool begin_object(size_t length, 
+    bool begin_object(std::size_t length, 
                       semantic_tag tag, 
                       const ser_context& context,
                       std::error_code& ec)
@@ -252,7 +252,7 @@ public:
         return do_begin_array(tag, context, ec);
     }
 
-    bool begin_array(size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec)
+    bool begin_array(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec)
     {
         return do_begin_array(length, tag, context, ec);
     }
@@ -493,7 +493,7 @@ private:
                                  const ser_context& context, 
                                  std::error_code& ec) = 0;
 
-    virtual bool do_begin_object(size_t /*length*/, 
+    virtual bool do_begin_object(std::size_t /*length*/, 
                                  semantic_tag tag, 
                                  const ser_context& context, 
                                  std::error_code& ec)
@@ -508,7 +508,7 @@ private:
                                 const ser_context& context, 
                                 std::error_code& ec) = 0;
 
-    virtual bool do_begin_array(size_t /*length*/, 
+    virtual bool do_begin_array(std::size_t /*length*/, 
                                 semantic_tag tag, 
                                 const ser_context& context, 
                                 std::error_code& ec)

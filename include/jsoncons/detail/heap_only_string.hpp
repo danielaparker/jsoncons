@@ -112,7 +112,7 @@ public:
     };
     typedef typename std::aligned_storage<sizeof(string_storage), alignof(string_storage)>::type storage_type;
 
-    static size_t aligned_size(size_t n)
+    static size_t aligned_size(std::size_t n)
     {
         return sizeof(storage_type) + n;
     }

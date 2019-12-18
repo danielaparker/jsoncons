@@ -701,7 +701,7 @@ private:
                 int64_t val = jsoncons::detail::big_to_native<int64_t>(buf,buf+sizeof(buf),&endp);
                 if (val >= 0)
                 {
-                    length = (size_t)val;
+                    length = (std::size_t)val;
                     if (length != (uint64_t)val)
                     {
                         ec = ubjson_errc::number_too_large;

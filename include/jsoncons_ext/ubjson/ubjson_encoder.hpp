@@ -105,7 +105,7 @@ private:
         return true;
     }
 
-    bool do_begin_object(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool do_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(ubjson_container_type::object, length));
         result_.push_back(jsoncons::ubjson::detail::ubjson_format::start_object_marker);
@@ -148,7 +148,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool do_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(ubjson_container_type::array, length));
         result_.push_back(jsoncons::ubjson::detail::ubjson_format::start_array_marker);
@@ -244,14 +244,14 @@ private:
         return true;
     }
 
-    void put_length(size_t length)
+    void put_length(std::size_t length)
     {
         if (length <= (std::numeric_limits<uint8_t>::max)())
         {
             result_.push_back('U');
             jsoncons::detail::native_to_big(static_cast<uint8_t>(length), std::back_inserter(result_));
         }
-        else if (length <= (size_t)(std::numeric_limits<int16_t>::max)())
+        else if (length <= (std::size_t)(std::numeric_limits<int16_t>::max)())
         {
             result_.push_back('I');
             jsoncons::detail::native_to_big(static_cast<uint16_t>(length), std::back_inserter(result_));

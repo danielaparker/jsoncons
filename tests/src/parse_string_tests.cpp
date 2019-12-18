@@ -67,7 +67,7 @@ TEST_CASE("test_parse_small_string4")
 {
     std::string input = "\"Str\\\"ing\"";
 
-    for (size_t i = 2; i < input.length(); ++i)
+    for (std::size_t i = 2; i < input.length(); ++i)
     {
         std::istringstream is(input);
         json_decoder<json> decoder;
@@ -88,7 +88,7 @@ TEST_CASE("test_parse_big_string1")
 {
     std::string input = "\"Big Str\\\"ing\"";
 
-    for (size_t i = 2; i < input.length(); ++i)
+    for (std::size_t i = 2; i < input.length(); ++i)
     {
         std::istringstream is(input);
         json_decoder<json> decoder;
@@ -110,7 +110,7 @@ TEST_CASE("test_parse_big_string2")
 {
     std::string input = "\"Big\t Str\\\"ing\"";
 
-    //for (size_t i = 2; i < input.length(); ++i)
+    //for (std::size_t i = 2; i < input.length(); ++i)
     //{
         std::istringstream is(input);
         json_decoder<json> decoder;

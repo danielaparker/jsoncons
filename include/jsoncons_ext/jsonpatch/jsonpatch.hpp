@@ -113,7 +113,7 @@ namespace detail {
         if (source.is_array() && target.is_array())
         {
             std::size_t common = (std::min)(source.size(),target.size());
-            for (size_t i = 0; i < common; ++i)
+            for (std::size_t i = 0; i < common; ++i)
             {
                 std::basic_ostringstream<char_type> ss; 
                 ss << path << '/' << i;
@@ -121,7 +121,7 @@ namespace detail {
                 result.insert(result.array_range().end(),temp_diff.array_range().begin(),temp_diff.array_range().end());
             }
             // Element in source, not in target - remove
-            for (size_t i = target.size(); i < source.size(); ++i)
+            for (std::size_t i = target.size(); i < source.size(); ++i)
             {
                 std::basic_ostringstream<char_type> ss; 
                 ss << path << '/' << i;
@@ -132,7 +132,7 @@ namespace detail {
             }
             // Element in target, not in source - add, 
             // Fix contributed by Alexander rog13
-            for (size_t i = source.size(); i < target.size(); ++i)
+            for (std::size_t i = source.size(); i < target.size(); ++i)
             {
                 const auto& a = target[i];
                 std::basic_ostringstream<char_type> ss; 

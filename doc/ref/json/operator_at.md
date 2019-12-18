@@ -5,9 +5,9 @@ proxy_type operator[](const string_view_type& key); // (1)
 
 const_reference operator[](const string_view_type& key) const; // (2)
 
-reference operator[](size_t i); // (3)
+reference operator[](std::size_t i); // (3)
 
-const_reference operator[](size_t i) const; // (4)
+const_reference operator[](std::size_t i) const; // (4)
 ```
 
 (1) Returns a "reference-like" proxy object that can be used to access 

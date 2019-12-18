@@ -220,7 +220,7 @@ private:
         {
         }
 
-        void set_position(size_t pos)
+        void set_position(std::size_t pos)
         {
             data_pos_ = pos;
         }
@@ -973,10 +973,10 @@ private:
         column_ = indent_amount_;
     }
 
-    void new_line(size_t len)
+    void new_line(std::size_t len)
     {
         result_.append(options_.new_line_chars().data(),options_.new_line_chars().length());
-        for (size_t i = 0; i < len; ++i)
+        for (std::size_t i = 0; i < len; ++i)
         {
             result_.push_back(' ');
         }

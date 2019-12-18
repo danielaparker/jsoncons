@@ -65,7 +65,7 @@ TEST_CASE("jsonpath function tests")
         std::size_t expected = 4;
 
         REQUIRE(result.size() == 1);
-        CHECK(result[0].as<size_t>() == expected);
+        CHECK(result[0].as<std::size_t>() == expected);
     }
 #if 0
     SECTION("keys")

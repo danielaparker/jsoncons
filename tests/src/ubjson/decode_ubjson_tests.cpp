@@ -38,12 +38,12 @@ void check_decode_ubjson(const std::vector<uint8_t>& expected, const std::vector
         std::cout << std::hex << (int)expected[0] << " " << std::hex << (int)result[0] << std::endl;
     }
     REQUIRE(result.size() == expected.size());
-    for (size_t i = 0; i < expected.size(); ++i)
+    for (std::size_t i = 0; i < expected.size(); ++i)
     {
         if (expected[i] != result[i])
         {
             std::cout << "Different " << i << "\n"; 
-            for (size_t k = 0; k < expected.size(); ++k)
+            for (std::size_t k = 0; k < expected.size(); ++k)
             {
                 std::cout << std::hex << std::setprecision(2) << std::setw(2) 
                           << std::noshowbase << std::setfill('0') << static_cast<int>(result[k]);

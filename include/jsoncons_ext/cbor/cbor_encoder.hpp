@@ -124,7 +124,7 @@ private:
         return true;
     }
 
-    bool do_begin_object(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool do_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(cbor_container_type::object, length));
 
@@ -199,7 +199,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool do_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(cbor_container_type::array, length));
         if (length <= 0x17)
@@ -530,7 +530,7 @@ private:
         }
 
         write_tag(4);
-        more = do_begin_array((size_t)2, semantic_tag::none, context, ec);
+        more = do_begin_array((std::size_t)2, semantic_tag::none, context, ec);
         if (!more) {return more;}
         if (exponent.length() > 0)
         {
@@ -710,7 +710,7 @@ private:
         }
 
         write_tag(5);
-        more = do_begin_array((size_t)2, semantic_tag::none, context, ec);
+        more = do_begin_array((std::size_t)2, semantic_tag::none, context, ec);
         if (!more) return more;
 
         if (exponent.length() > 0)

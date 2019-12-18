@@ -370,7 +370,7 @@ convert(InputIt first, InputIt last, OutputIt target, conv_flags flags=conv_flag
     while (first != last) 
     {
         std::size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(*first)] + 1;
-        if (length > (size_t)(last - first))
+        if (length > (std::size_t)(last - first))
         {
             return convert_result<InputIt>{first, conv_errc::source_exhausted};
         }
@@ -892,8 +892,8 @@ validate(InputIt first, InputIt last) UNICONS_NOEXCEPT
     conv_errc  result = conv_errc();
     while (first != last) 
     {
-        std::size_t length = static_cast<size_t>(trailing_bytes_for_utf8[static_cast<uint8_t>(*first)]) + 1;
-        if (length > (size_t)(last - first))
+        std::size_t length = static_cast<std::size_t>(trailing_bytes_for_utf8[static_cast<uint8_t>(*first)]) + 1;
+        if (length > (std::size_t)(last - first))
         {
             return convert_result<InputIt>{first, conv_errc::source_exhausted};
         }
@@ -1116,7 +1116,7 @@ public:
         if (begin_ != last_)
         {
             std::size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(*begin_)] + 1;
-            if (length > (size_t)(last_ - begin_))
+            if (length > (std::size_t)(last_ - begin_))
             {
                 err_cd_ = conv_errc::source_exhausted;
             }

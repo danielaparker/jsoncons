@@ -115,15 +115,15 @@ Returns the allocator associated with the basic_json value.
     <td>Returns the size of the storage space currently allocated for a basic_json object or array</td> 
   </tr>
   <tr>
-    <td><a>void reserve(size_t n)</a></td>
+    <td><a>void reserve(std::size_t n)</a></td>
     <td>Increases the capacity of a basic_json object or array to allow at least `n` members or elements</td> 
   </tr>
   <tr>
-    <td><a>void resize(size_t n)</a></td>
+    <td><a>void resize(std::size_t n)</a></td>
     <td>Resizes a basic_json array so that it contains `n` elements</td> 
   </tr>
   <tr>
-    <td><a>void resize(size_t n, const basic_json& val)</a></td>
+    <td><a>void resize(std::size_t n, const basic_json& val)</a></td>
     <td>Resizes a basic_json array so that it contains `n` elements that are initialized to `val`</td> 
   </tr>
   <tr>

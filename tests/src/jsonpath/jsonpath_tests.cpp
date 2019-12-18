@@ -297,7 +297,7 @@ TEST_CASE("jsonpath store tests")
 
         json expected(json_array_arg);
         expected.push_back(bicycle["price"]);
-        for (size_t i = 0; i < book_list.size(); ++i)
+        for (std::size_t i = 0; i < book_list.size(); ++i)
         {
             expected.push_back(book_list[i]["price"]);
         }
@@ -368,7 +368,7 @@ TEST_CASE("jsonpath store tests")
         //std::cout << pretty_print(result) << std::endl;
         json books = book_list;
         json expected(json_array_arg);
-        for (size_t i = 0; i < books.size(); ++i)
+        for (std::size_t i = 0; i < books.size(); ++i)
         {
             double price = books[i]["price"].as<double>();
             if (price < 10)
@@ -388,7 +388,7 @@ TEST_CASE("jsonpath store tests")
         //std::cout << pretty_print(result) << std::endl;
         json books = book_list;
         json expected(json_array_arg);
-        for (size_t i = 0; i < books.size(); ++i)
+        for (std::size_t i = 0; i < books.size(); ++i)
         {
             double price = books[i]["price"].as<double>();
             if (10 > price)
@@ -408,7 +408,7 @@ TEST_CASE("jsonpath store tests")
         //std::cout << pretty_print(result) << std::endl;
         json books = book_list;
         json expected(json_array_arg);
-        for (size_t i = 0; i < books.size(); ++i)
+        for (std::size_t i = 0; i < books.size(); ++i)
         {
             double price = books[i]["price"].as<double>();
             (void)price;
@@ -430,7 +430,7 @@ TEST_CASE("jsonpath store tests")
         json books = book_list;
 
         json expected(json_array_arg);
-        for (size_t i = 0; i < books.size(); ++i)
+        for (std::size_t i = 0; i < books.size(); ++i)
         {
             double price = books[i]["price"].as<double>();
             if (price > 8 && price < 12)
@@ -449,7 +449,7 @@ TEST_CASE("jsonpath store tests")
         json book_list = store["store"]["book"];
 
         json books = book_list;
-        for (size_t i = 0; i < books.size(); ++i)
+        for (std::size_t i = 0; i < books.size(); ++i)
         {
             bool has_isbn = books[i].contains("isbn");
             if (has_isbn)
@@ -471,7 +471,7 @@ TEST_CASE("jsonpath store tests")
         json root2 = json::parse(empty_isbn);
 
         json books = book_list;
-        for (size_t i = 0; i < books.size(); ++i)
+        for (std::size_t i = 0; i < books.size(); ++i)
         {
             bool has_isbn = books[i].contains("isbn");
             if (has_isbn)
@@ -494,7 +494,7 @@ TEST_CASE("jsonpath store tests")
         json books = book_list;
 
         json expected(json_array_arg);
-        for (size_t i = 0; i < books.size(); ++i)
+        for (std::size_t i = 0; i < books.size(); ++i)
         {
             if (books[i].contains("isbn"))
             {
@@ -513,7 +513,7 @@ TEST_CASE("jsonpath store tests")
         //std::cout << pretty_print(result) << std::endl;
 
         CHECK(1 == result.size());
-        CHECK(store["store"]["book"].size() == result[0].as<size_t>());
+        CHECK(store["store"]["book"].size() == result[0].as<std::size_t>());
     }
      
     SECTION("test_jsonpath_book_category")
@@ -575,7 +575,7 @@ TEST_CASE("jsonpath store tests")
         json result = jsonpath::json_query(store,"$.store.book[?(@.price < 10)].author");
 
         json expected(json_array_arg);
-        for (size_t i = 0; i < book_list.size(); ++i)
+        for (std::size_t i = 0; i < book_list.size(); ++i)
         {
             json book = book_list[i];
             if (book["price"].as<double>() < 10)

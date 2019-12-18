@@ -54,7 +54,7 @@ private:
             return name_offset_;
         }
 
-        void member_offset(size_t offset) 
+        void member_offset(std::size_t offset) 
         {
             name_offset_ = offset;
         }

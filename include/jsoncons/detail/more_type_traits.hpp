@@ -22,16 +22,16 @@ namespace jsoncons
 {
 // static_max
 
-template <size_t arg1, std::size_t ... argn>
+template <std::size_t arg1, std::size_t ... argn>
 struct static_max;
 
-template <size_t arg>
+template <std::size_t arg>
 struct static_max<arg>
 {
     static const size_t value = arg;
 };
 
-template <size_t arg1, std::size_t arg2, std::size_t ... argn>
+template <std::size_t arg1, std::size_t arg2, std::size_t ... argn>
 struct static_max<arg1,arg2,argn ...>
 {
     static const size_t value = arg1 >= arg2 ? 

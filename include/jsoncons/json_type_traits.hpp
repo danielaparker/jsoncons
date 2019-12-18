@@ -457,7 +457,7 @@ struct json_type_traits<Json, T,
 namespace detail
 {
 
-template<size_t Pos, class Json, class Tuple>
+template<std::size_t Pos, class Json, class Tuple>
 struct json_tuple_helper
 {
     using element_type = typename std::tuple_element<Pos - 1, Tuple>::type;
@@ -652,7 +652,7 @@ struct json_type_traits<Json, std::valarray<T>>
         if (j.is_array())
         {
             std::valarray<T> v(j.size());
-            for (size_t i = 0; i < j.size(); ++i)
+            for (std::size_t i = 0; i < j.size(); ++i)
             {
                 v[i] = j[i].template as<T>();
             }

@@ -356,7 +356,7 @@ for (auto it = books.array_range().begin();
 ```
 or a traditional for loop
 ```c++
-for (size_t i = 0; i < books.size(); ++i)
+for (std::size_t i = 0; i < books.size(); ++i)
 {
     json& book = books[i];
     std::string author = book["author"].as<std::string>();

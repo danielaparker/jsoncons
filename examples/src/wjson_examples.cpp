@@ -32,7 +32,7 @@ void wjson_escape_u2()
     std::wstring s = val[0].as<std::wstring>();
     std::cout << "length=" << s.length() << std::endl;
     std::cout << "Hex dump: [";
-    for (size_t i = 0; i < s.size(); ++i)
+    for (std::size_t i = 0; i < s.size(); ++i)
     {
         if (i != 0)
             std::cout << " ";
@@ -62,7 +62,7 @@ void wjson_surrogate_pair()
     std::wstring s = val[0].as<std::wstring>();
     std::cout << "length=" << s.length() << std::endl;
     std::cout << "Hex dump: [";
-    for (size_t i = 0; i < s.size(); ++i)
+    for (std::size_t i = 0; i < s.size(); ++i)
     {
         if (i != 0)
             std::cout << " ";

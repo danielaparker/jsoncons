@@ -40,7 +40,7 @@ namespace jsoncons { namespace bson {
     {
         REQUIRE(v.size() == expected.size());
 
-        for (size_t i = 0; i < v.size(); ++i)
+        for (std::size_t i = 0; i < v.size(); ++i)
         {
             CHECK(v[i] == expected[i]);
         }

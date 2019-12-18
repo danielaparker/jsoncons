@@ -146,7 +146,7 @@ Escape the solidus ('/') character. The default is `false`.
     basic_json_options& new_line_chars(const string_type& value)
 Defaults to "\n"
 
-    basic_json_options& line_length_limit(size_t value)
+    basic_json_options& line_length_limit(std::size_t value)
 
     basic_json_options& object_object_line_splits(line_split_kind value)
 For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).

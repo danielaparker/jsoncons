@@ -78,7 +78,7 @@ void encode_mult_dim_array()
     std::vector<uint8_t> v;
 
     cbor::cbor_bytes_encoder encoder(v);
-    std::vector<size_t> shape = { 2,3 };
+    std::vector<std::size_t> shape = { 2,3 };
     encoder.begin_multi_dim(shape, semantic_tag::multi_dim_column_major);
     encoder.begin_array(6);
     encoder.uint64_value(2);

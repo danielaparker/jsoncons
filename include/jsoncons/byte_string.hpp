@@ -525,7 +525,7 @@ public:
         return *this;
     }
 
-    void reserve(size_t new_cap)
+    void reserve(std::size_t new_cap)
     {
         data_.reserve(new_cap);
     }

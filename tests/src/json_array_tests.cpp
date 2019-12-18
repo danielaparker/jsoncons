@@ -17,9 +17,9 @@ TEST_CASE("test_initializer_list_of_integers")
     json j(json_array_arg, {0,1,2,3});
     CHECK(j.is_array());
     CHECK(j.size() == 4);
-    for (size_t i = 0; i < j.size(); ++i)
+    for (std::size_t i = 0; i < j.size(); ++i)
     {
-        CHECK(i == j[i].as<size_t>());
+        CHECK(i == j[i].as<std::size_t>());
     }
 }
 
@@ -30,9 +30,9 @@ TEST_CASE("test_assignment_to_initializer_list")
     j = json(json_array_arg, {0,1,2,3});
     CHECK(j.is_array());
     CHECK(j.size() == 4);
-    for (size_t i = 0; i < j.size(); ++i)
+    for (std::size_t i = 0; i < j.size(); ++i)
     {
-        CHECK(i == j[i].as<size_t>());
+        CHECK(i == j[i].as<std::size_t>());
     }
 }
 

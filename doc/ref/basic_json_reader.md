@@ -149,7 +149,7 @@ Override (2) sets `ec` to a [json_errc](jsoncons::json_errc.md) if there are any
 
     std::size_t buffer_length() const
 
-    void buffer_length(size_t length)
+    void buffer_length(std::size_t length)
 
     std::size_t line() const
 

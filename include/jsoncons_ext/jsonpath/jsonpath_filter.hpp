@@ -299,7 +299,7 @@ public:
         : type_(type),precedence_level_(0),is_right_associative_(false),operand_ptr_(term_ptr)
     {
     }
-    token(size_t precedence_level, 
+    token(std::size_t precedence_level, 
           bool is_right_associative,
           unary_operator_type unary_operator)
         : type_(token_type::unary_operator), 
@@ -731,7 +731,7 @@ public:
         if (nodes_.size() > 0)
         {
             result = true;
-            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
             {
                 result = rhs.eq(nodes_[i]);
             }
@@ -745,7 +745,7 @@ public:
         if (nodes_.size() > 0)
         {
             result = true;
-            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
             {
                 result = nodes_[i] == rhs;
             }
@@ -759,7 +759,7 @@ public:
         if (nodes_.size() > 0)
         {
             result = true;
-            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
             {
                 result = rhs.ne(nodes_[i]);
             }
@@ -773,7 +773,7 @@ public:
         if (nodes_.size() > 0)
         {
             result = true;
-            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
             {
                 result = nodes_[i] != rhs;
             }
@@ -786,7 +786,7 @@ public:
         if (nodes_.size() > 0)
         {
             result = true;
-            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
             {
                 result = rhs.regex2(nodes_[i].as_string());
             }
@@ -799,7 +799,7 @@ public:
         if (nodes_.size() > 0)
         {
             result = true;
-            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
             {
                 result = rhs.ampamp(nodes_[i]);
             }
@@ -812,7 +812,7 @@ public:
         if (nodes_.size() > 0)
         {
             result = true;
-            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
             {
                 result = jsoncons::jsonpath::detail::ampamp(nodes_[i],rhs);
             }
@@ -825,7 +825,7 @@ public:
         if (nodes_.size() > 0)
         {
             result = true;
-            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
             {
                 result = rhs.pipepipe(nodes_[i]);
             }
@@ -838,7 +838,7 @@ public:
         if (nodes_.size() > 0)
         {
             result = true;
-            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
             {
                 result = jsoncons::jsonpath::detail::pipepipe(nodes_[i],rhs);
             }
@@ -852,7 +852,7 @@ public:
         if (nodes_.size() > 0)
         {
             result = true;
-            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
             {
                 result = jsoncons::jsonpath::detail::lt(nodes_[i],rhs);
             }
@@ -866,7 +866,7 @@ public:
         if (nodes_.size() > 0)
         {
             result = true;
-            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
             {
                 result = rhs.gt(nodes_[i]);
             }
@@ -880,7 +880,7 @@ public:
         if (nodes_.size() > 0)
         {
             result = true;
-            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
             {
                 result = jsoncons::jsonpath::detail::gt(nodes_[i],rhs);
             }
@@ -894,7 +894,7 @@ public:
         if (nodes_.size() > 0)
         {
             result = true;
-            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
             {
                 result = rhs.lt(nodes_[i]);
             }
@@ -1086,7 +1086,7 @@ public:
         : line_(1), column_(1)
     {
     }
-    jsonpath_filter_parser(size_t line, std::size_t column)
+    jsonpath_filter_parser(std::size_t line, std::size_t column)
         : line_(line), column_(column)
     {
     }

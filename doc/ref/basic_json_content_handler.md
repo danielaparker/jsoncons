@@ -29,7 +29,7 @@ Member type                         |Definition
     bool begin_object(semantic_tag tag=semantic_tag::none,
                       const ser_context& context=null_ser_context()); // (1)
 
-    bool begin_object(size_t length, 
+    bool begin_object(std::size_t length, 
                       semantic_tag tag=semantic_tag::none, 
                       const ser_context& context = null_ser_context()); // (2)
 
@@ -38,7 +38,7 @@ Member type                         |Definition
     bool begin_array(semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context()); // (4)
 
-    bool begin_array(size_t length, 
+    bool begin_array(std::size_t length, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context()); // (5)
 
@@ -82,7 +82,7 @@ Member type                         |Definition
                       const ser_context& context,
                       std::error_code& ec); // (16)
 
-    bool begin_object(size_t length, 
+    bool begin_object(std::size_t length, 
                       semantic_tag tag, 
                       const ser_context& context,
                       std::error_code& ec); // (17)
@@ -94,7 +94,7 @@ Member type                         |Definition
                      const ser_context& context, 
                      std::error_code& ec); // (19)
 
-    bool begin_array(size_t length, 
+    bool begin_array(std::size_t length, 
                      semantic_tag tag, 
                      const ser_context& context, 
                      std::error_code& ec); // (20)
@@ -216,7 +216,7 @@ Flushes whatever is buffered to the destination.
                                  const ser_context& context, 
                                  std::error_code& ec) = 0; // (1)
 
-    virtual bool do_begin_object(size_t length, 
+    virtual bool do_begin_object(std::size_t length, 
                                  semantic_tag tag, 
                                  const ser_context& context, 
                                  std::error_code& ec); // (2)
@@ -228,7 +228,7 @@ Flushes whatever is buffered to the destination.
                                 const ser_context& context, 
                                 std::error_code& ec) = 0; // (4)
 
-    virtual bool do_begin_array(size_t length, 
+    virtual bool do_begin_array(std::size_t length, 
                                 semantic_tag tag, 
                                 const ser_context& context, 
                                 std::error_code& ec); // (5)
