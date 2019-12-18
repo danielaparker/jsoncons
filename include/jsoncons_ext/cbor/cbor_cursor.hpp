@@ -32,7 +32,6 @@ enum class cbor_cursor_state
     shape
 };
 
-template <class Float128T>
 class cbor_staj_event_handler : public cbor_content_handler
 {
     using super_type = cbor_content_handler;
@@ -614,14 +613,14 @@ private:
     }
 };
 
-template<class Src=jsoncons::binary_stream_source,class Float128T = std::nullptr_t,class Allocator=std::allocator<char>>
+template<class Src=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
 class basic_cbor_cursor : public basic_staj_reader<char>, private virtual ser_context
 {
 public:
     typedef Allocator allocator_type;
 private:
     basic_cbor_parser<Src> parser_;
-    cbor_staj_event_handler<Float128T> event_handler_;
+    cbor_staj_event_handler event_handler_;
     bool eof_;
 
     // Noncopyable and nonmoveable
