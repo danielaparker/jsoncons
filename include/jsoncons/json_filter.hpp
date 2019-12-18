@@ -347,6 +347,109 @@ private:
         return to_handler_->null_value(tag, context, ec);
     }
 
+    bool do_typed_array(const span<const uint8_t>& v, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        return to_handler_->do_typed_array(v, tag, context, ec);
+    }
+
+    bool do_typed_array(const span<const uint16_t>& v, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        return to_handler_->do_typed_array(v, tag, context, ec);
+    }
+
+    bool do_typed_array(const span<const uint32_t>& v, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        return to_handler_->do_typed_array(v, tag, context, ec);
+    }
+
+    bool do_typed_array(const span<const uint64_t>& v, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        return to_handler_->do_typed_array(v, tag, context, ec);
+    }
+
+    bool do_typed_array(const span<const int8_t>& v, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        return to_handler_->do_typed_array(v, tag, context, ec);
+    }
+
+    bool do_typed_array(const span<const int16_t>& v, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        return to_handler_->do_typed_array(v, tag, context, ec);
+    }
+
+    bool do_typed_array(const span<const int32_t>& v, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        return to_handler_->do_typed_array(v, tag, context, ec);
+    }
+
+    bool do_typed_array(const span<const int64_t>& v, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        return to_handler_->do_typed_array(v, tag, context, ec);
+    }
+
+    bool do_typed_array(half_arg_t, 
+                        const span<const uint16_t>& v, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        return to_handler_->do_typed_array(half_arg, v, tag, context, ec);
+    }
+
+    bool do_typed_array(const span<const float>& v, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        return to_handler_->do_typed_array(v, tag, context, ec);
+    }
+
+    bool do_typed_array(const span<const double>& v, 
+                        semantic_tag tag,
+                        const ser_context& context, 
+                        std::error_code& ec) override
+    {
+        return to_handler_->do_typed_array(v, tag, context, ec);
+    }
+
+    bool do_begin_multi_dim(const span<const size_t>& shape,
+                            semantic_tag tag,
+                            const ser_context& context, 
+                            std::error_code& ec) override
+    {
+        return to_handler_->do_begin_multi_dim(shape, tag, context, ec);
+    }
+
+    bool do_end_multi_dim(const ser_context& context,
+                          std::error_code& ec) override
+    {
+        return to_handler_->do_end_multi_dim(context, ec);
+    }
+
 };
 
 template <class From,class To>
