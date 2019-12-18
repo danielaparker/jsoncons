@@ -14,6 +14,7 @@
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/config/binary_config.hpp>
 #include <jsoncons/tag_type.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons {
 
@@ -338,6 +339,57 @@ public:
         return do_double_value(value, tag, context, ec);
     }
 
+    template <class T>
+    bool typed_array(const span<T>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context())
+    {
+        std::error_code ec;
+        bool more = do_typed_array(data, tag, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool typed_array(half_arg_t, const span<const uint16_t>& s,
+        semantic_tag tag = semantic_tag::none,
+        const ser_context& context = null_ser_context())
+    {
+        std::error_code ec;
+        bool more = do_typed_array(half_arg, s, tag, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool begin_multi_dim(const span<const size_t>& shape,
+                         semantic_tag tag = semantic_tag::multi_dim_row_major,
+                         const ser_context& context=null_ser_context()) 
+    {
+        std::error_code ec;
+        bool more = do_begin_multi_dim(shape, tag, context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
+    bool end_multi_dim(const ser_context& context=null_ser_context()) 
+    {
+        std::error_code ec;
+        bool more = do_end_multi_dim(context, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+        }
+        return more;
+    }
+
     void flush()
     {
         do_flush();
@@ -567,6 +619,221 @@ private:
                                  semantic_tag tag,
                                  const ser_context& context,
                                  std::error_code& ec) = 0;
+
+    virtual bool do_typed_array(const span<const uint8_t>& s, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec)  
+    {
+        bool more = begin_array(s.size(), tag, context, ec);
+        for (auto p = s.begin(); more && p != s.end(); ++p)
+        {
+            more = uint64_value(*p, semantic_tag::none, context, ec);
+        }
+        if (more)
+        {
+            more = end_array(context, ec);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const span<const uint16_t>& s, 
+                                semantic_tag tag, 
+                                const ser_context& context, 
+                                std::error_code& ec)  
+    {
+        bool more = begin_array(s.size(), tag, context, ec);
+        for (auto p = s.begin(); more && p != s.end(); ++p)
+        {
+            more = uint64_value(*p, semantic_tag::none, context, ec);
+        }
+        if (more)
+        {
+            more = end_array(context, ec);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const span<const uint32_t>& s, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec) 
+    {
+        bool more = begin_array(s.size(), tag, context, ec);
+        for (auto p = s.begin(); more && p != s.end(); ++p)
+        {
+            more = uint64_value(*p, semantic_tag::none, context, ec);
+        }
+        if (more)
+        {
+            more = end_array(context, ec);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const span<const uint64_t>& s, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec) 
+    {
+        bool more = begin_array(s.size(), tag, context, ec);
+        for (auto p = s.begin(); more && p != s.end(); ++p)
+        {
+            more = uint64_value(*p,semantic_tag::none,context, ec);
+        }
+        if (more)
+        {
+            more = end_array(context, ec);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const span<const int8_t>& s, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec)  
+    {
+        bool more = begin_array(s.size(), tag,context, ec);
+        for (auto p = s.begin(); more && p != s.end(); ++p)
+        {
+            more = int64_value(*p,semantic_tag::none,context, ec);
+        }
+        if (more)
+        {
+            more = end_array(context, ec);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const span<const int16_t>& s, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec)  
+    {
+        bool more = begin_array(s.size(), tag,context, ec);
+        for (auto p = s.begin(); more && p != s.end(); ++p)
+        {
+            more = int64_value(*p,semantic_tag::none,context, ec);
+        }
+        if (more)
+        {
+            more = end_array(context, ec);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const span<const int32_t>& s, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec)  
+    {
+        bool more = begin_array(s.size(), tag,context, ec);
+        for (auto p = s.begin(); more && p != s.end(); ++p)
+        {
+            more = int64_value(*p,semantic_tag::none,context, ec);
+        }
+        if (more)
+        {
+            more = end_array(context, ec);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const span<const int64_t>& s, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec)  
+    {
+        bool more = begin_array(s.size(), tag,context, ec);
+        for (auto p = s.begin(); more && p != s.end(); ++p)
+        {
+            more = int64_value(*p,semantic_tag::none,context, ec);
+        }
+        if (more)
+        {
+            more = end_array(context, ec);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(half_arg_t, 
+                                const span<const uint16_t>& s, 
+                                semantic_tag tag, 
+                                const ser_context& context, 
+                                std::error_code& ec)  
+    {
+        bool more = begin_array(s.size(), tag, context, ec);
+        for (auto p = s.begin(); more && p != s.end(); ++p)
+        {
+            more = half_value(*p, semantic_tag::none, context, ec);
+        }
+        if (more)
+        {
+            more = end_array(context, ec);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const span<const float>& s, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec)  
+    {
+        bool more = begin_array(s.size(), tag,context, ec);
+        for (auto p = s.begin(); more && p != s.end(); ++p)
+        {
+            more = double_value(*p,semantic_tag::none,context, ec);
+        }
+        if (more)
+        {
+            more = end_array(context, ec);
+        }
+        return more;
+    }
+
+    virtual bool do_typed_array(const span<const double>& s, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec)  
+    {
+        bool more = begin_array(s.size(), tag,context, ec);
+        for (auto p = s.begin(); more && p != s.end(); ++p)
+        {
+            more = double_value(*p,semantic_tag::none,context, ec);
+        }
+        if (more)
+        {
+            more = end_array(context, ec);
+        }
+        return more;
+    }
+
+    virtual bool do_begin_multi_dim(const span<const size_t>& shape,
+                                    semantic_tag tag,
+                                    const ser_context& context, 
+                                    std::error_code& ec) 
+    {
+        bool more = do_begin_array(2, tag, context, ec);
+        if (more)
+        {
+            more = do_begin_array(shape.size(), tag, context, ec);
+            for (auto it = shape.begin(); more && it != shape.end(); ++it)
+            {
+                do_uint64_value(*it, semantic_tag::none, context, ec);
+            }
+            if (more)
+            {
+                more = do_end_array(context, ec);
+            }
+        }
+        return more;
+    }
+
+    virtual bool do_end_multi_dim(const ser_context& context,
+                                  std::error_code& ec) 
+    {
+        return do_end_array(context, ec);
+    }
 
     virtual void do_flush() = 0;
 

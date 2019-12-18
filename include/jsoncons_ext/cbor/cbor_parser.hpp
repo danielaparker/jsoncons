@@ -2806,9 +2806,9 @@ private:
         more_ = handler.begin_multi_dim(shape_, tag, *this, ec);
     }
 
-    void produce_end_multi_dim(basic_cbor_content_handler<Float128T>& handler, std::error_code&)
+    void produce_end_multi_dim(basic_cbor_content_handler<Float128T>& handler, std::error_code& ec)
     {
-        more_ = handler.end_multi_dim(*this);
+        more_ = handler.end_multi_dim(*this, ec);
         state_stack_.pop_back();
     }
 
