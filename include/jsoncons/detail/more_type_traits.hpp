@@ -232,10 +232,10 @@ struct is_constructible_from_const_pointer_and_size<T,
 
 // has_size_and_data
 
-template<class T, class Enable=void >
+template<class T, class Enable=void>
 struct has_data_and_size : std::false_type{};
 
-template< class C >
+template<class C>
 struct has_data_and_size
 <
     C, 
@@ -243,15 +243,28 @@ struct has_data_and_size
                             !std::is_void<decltype(std::declval<C>().data())>::value>::type
 > : std::true_type{};
 
-template<class C, class E, class Enable=void >
+// is_c_array
+
+template<class T>
+struct is_c_array : std::false_type {};
+
+template<class T>
+struct is_c_array<T[]> : std::true_type {};
+
+template<class T, std::size_t N>
+struct is_c_array<T[N]> : std::true_type {};
+
+// is_compatible_element
+
+template<class C, class E, class Enable=void>
 struct is_compatible_element : std::false_type {};
 
-template< class C, class E >
+template<class C, class E>
 struct is_compatible_element
 <
     C, E, 
-    typename std::enable_if<!std::is_void<decltype(std::declval<C>().data())>::value>::type >
-        : std::is_convertible< typename std::remove_pointer<decltype(std::declval<C>().data() )>::type(*)[], E(*)[] >
+    typename std::enable_if<!std::is_void<decltype(std::declval<C>().data())>::value>::type>
+        : std::is_convertible< typename std::remove_pointer<decltype(std::declval<C>().data() )>::type(*)[], E(*)[]>
 {};
 
 } // detail

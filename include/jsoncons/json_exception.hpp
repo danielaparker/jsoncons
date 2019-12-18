@@ -11,7 +11,7 @@
 #include <sstream> // std::ostringstream
 #include <system_error> // std::error_code
 #include <jsoncons/unicode_traits.hpp> // unicons::convert
-#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/config/compiler_support.hpp>
 
 namespace jsoncons {
 
