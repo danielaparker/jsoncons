@@ -19,7 +19,6 @@
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_options.hpp>
-#include <jsoncons_ext/cbor/cbor_content_handler.hpp>
 
 namespace jsoncons { namespace cbor {
 

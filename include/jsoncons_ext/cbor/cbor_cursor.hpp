@@ -21,13 +21,14 @@
 #include <jsoncons/staj_reader.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons_ext/cbor/cbor_parser.hpp>
+#include <jsoncons_ext/cbor/cbor_content_handler.hpp>
 
 namespace jsoncons { 
 namespace cbor {
 
-class cbor_staj_event_handler : public cbor_content_handler
+class cbor_staj_event_handler : public json_content_handler
 {
-    using super_type = cbor_content_handler;
+    using super_type = json_content_handler;
 public:
     using char_type = char;
     using string_view_type = typename super_type::string_view_type;
