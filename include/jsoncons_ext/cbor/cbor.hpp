@@ -22,62 +22,6 @@
 
 namespace jsoncons { namespace cbor {
 
-template <class T, class Enable = void>
-struct cbor_ser_traits
-{
-    template <class Json>
-    static T decode(basic_staj_reader<typename Json::char_type>& cursor, 
-                         const Json& context_j,
-                         std::error_code& ec)
-    {
-        return ser_traits<T>::decode(cursor, context_j, ec);
-    }
-
-    template <class Json>
-    static void encode(const T& val, 
-                          json_content_handler& encoder, 
-                          const Json& context_j,
-                          std::error_code& ec)
-    {
-        ser_traits<T>::encode(val, encoder, context_j, ec);
-    }
-};
-
-template <class T>
-struct cbor_ser_traits<T,
-    typename std::enable_if<jsoncons::detail::is_vector_like<T>::value && 
-                            (std::is_same<typename T::value_type,uint8_t>::value ||  
-                             std::is_same<typename T::value_type,uint16_t>::value ||
-                             std::is_same<typename T::value_type,uint32_t>::value ||
-                             std::is_same<typename T::value_type,uint64_t>::value ||
-                             std::is_same<typename T::value_type,int8_t>::value ||  
-                             std::is_same<typename T::value_type,int16_t>::value ||
-                             std::is_same<typename T::value_type,int32_t>::value ||
-                             std::is_same<typename T::value_type,int64_t>::value ||
-                             std::is_same<typename T::value_type,float_t>::value ||
-                             std::is_same<typename T::value_type,double_t>::value)
->::type>
-{
-    typedef typename T::value_type value_type;
-
-    template <class Json>
-    static T decode(basic_staj_reader<typename Json::char_type>& cursor, 
-                         const Json& context_j,
-                         std::error_code& ec)
-    {
-        return ser_traits<T>::decode(cursor, context_j, ec);
-    }
-
-    template <class Json>
-    static void encode(const T& val, 
-                          json_content_handler& encoder, 
-                          const Json&,
-                          std::error_code& ec)
-    {
-        encoder.typed_array(span<const value_type>(val), semantic_tag::none, null_ser_context(), ec);
-    }
-};
-
 // encode_cbor
 
 template<class T>
@@ -132,7 +76,7 @@ encode_cbor(const T& val,
             std::error_code& ec)
 {
     cbor_stream_encoder encoder(os, options);
-    cbor_ser_traits<T>::encode(val, encoder, json(), ec);
+    ser_traits<T>::encode(val, encoder, json(), ec);
 }
 
 template<class T>
@@ -140,7 +84,7 @@ typename std::enable_if<!is_basic_json_class<T>::value, void>::type
 encode_cbor(const T& val, std::vector<uint8_t>& v, const cbor_encode_options& options, std::error_code& ec)
 {
     cbor_bytes_encoder encoder(v, options);
-    cbor_ser_traits<T>::encode(val, encoder, json(), ec);
+    ser_traits<T>::encode(val, encoder, json(), ec);
 }
 
 template<class T>

@@ -22,6 +22,28 @@
 
 namespace jsoncons {
 
+// is_compatible_element
+
+template<class C, class Enable=void>
+struct is_typed_array : std::false_type {};
+
+template<class T>
+struct is_typed_array
+<
+    T, 
+    typename std::enable_if<jsoncons::detail::is_vector_like<T>::value && 
+                            (std::is_same<typename T::value_type,uint8_t>::value ||  
+                             std::is_same<typename T::value_type,uint16_t>::value ||
+                             std::is_same<typename T::value_type,uint32_t>::value ||
+                             std::is_same<typename T::value_type,uint64_t>::value ||
+                             std::is_same<typename T::value_type,int8_t>::value ||  
+                             std::is_same<typename T::value_type,int16_t>::value ||
+                             std::is_same<typename T::value_type,int32_t>::value ||
+                             std::is_same<typename T::value_type,int64_t>::value ||
+                             std::is_same<typename T::value_type,float_t>::value ||
+                             std::is_same<typename T::value_type,double_t>::value)>::type
+> : std::true_type{};
+
 template <class T>
 struct ser_traits_default;
 
@@ -127,7 +149,8 @@ private:
 template <class T>
 struct ser_traits<T,
     typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-             jsoncons::detail::is_vector_like<T>::value
+             jsoncons::detail::is_vector_like<T>::value &&
+             !is_typed_array<T>::value 
 >::type>
 {
     typedef typename T::value_type value_type;
@@ -243,6 +266,123 @@ struct ser_traits<T,
         }
         encoder.end_array();
         encoder.flush();
+    }
+};
+
+template <class T>
+struct ser_traits<T,
+    typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+             jsoncons::detail::is_vector_like<T>::value &&
+             is_typed_array<T>::value 
+>::type>
+{
+    typedef typename T::value_type value_type;
+
+    template <class Json>
+    static bool is(const Json& j)
+    {
+        bool result = j.is_array();
+        if (result)
+        {
+            for (const auto& item : j.array_range())
+            {
+                if (!item.template is<value_type>())
+                {
+                    result = false;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    template <class Json,class Ty = value_type>
+    static typename std::enable_if<!std::is_same<Ty,uint8_t>::value,T>::type
+    as(const Json& j)
+    {
+        T result;
+        if (!j.is_array())
+        {
+            JSONCONS_THROW(ser_error(conversion_errc::json_not_vector));
+        }
+        //result.reserve(j.size());
+        for (const auto& item : j.array_range())
+        {
+            result.push_back(item.template as<value_type>());
+        }
+
+        return result;
+    }
+
+    template <class Json,class Ty = value_type>
+    static typename std::enable_if<std::is_same<Ty,uint8_t>::value,T>::type
+    as(const Json& j)
+    {
+        if (j.is_array())
+        {
+            T result;
+            result.reserve(j.size());
+            for (const auto& item : j.array_range())
+            {
+                result.push_back(item.template as<value_type>());
+            }
+
+            return result;
+        }
+        else if (j.is_byte_string())
+        {
+            T v(j.as_byte_string_view().begin(),j.as_byte_string_view().end());
+            return v;
+        }
+        else
+        {
+            JSONCONS_THROW(ser_error(conversion_errc::json_not_vector));
+        }
+    }
+
+    template <class Json>
+    static Json to_json(const T& val, 
+                        const typename Json::allocator_type& alloc = typename Json::allocator_type())
+    {
+        Json j(json_array_arg, semantic_tag::none, alloc);
+        auto first = std::begin(val);
+        auto last = std::end(val);
+        std::size_t size = std::distance(first, last);
+        j.reserve(size);
+        for (auto it = first; it != last; ++it)
+        {
+            j.push_back(*it);
+        }
+        return j;
+    }
+
+    template <class Json>
+    static T decode(basic_staj_reader<typename Json::char_type>& reader, 
+                    const Json& context_j, 
+                    std::error_code& ec)
+    {
+        T v;
+
+        if (reader.current().event_type() != staj_event_type::begin_array)
+        {
+            return v;
+        }
+        reader.next(ec);
+        while (reader.current().event_type() != staj_event_type::end_array && !ec)
+        {
+            v.push_back(ser_traits<value_type>::decode(reader, context_j, ec));
+            reader.next(ec);
+        }
+        return v;
+    }
+
+    template <class Json>
+    static void encode(const T& val, 
+                          json_content_handler& encoder, 
+                          const Json&,
+                          std::error_code& ec)
+    {
+        encoder.typed_array(span<const value_type>(val), semantic_tag::none, null_ser_context(), ec);
     }
 };
 
