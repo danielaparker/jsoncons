@@ -26,9 +26,9 @@ namespace jsoncons { namespace cbor {
 enum class cbor_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template<class Result=jsoncons::binary_stream_result,class Float128T = std::nullptr_t>
-class basic_cbor_encoder final : public cbor_content_handler
+class basic_cbor_encoder final : public json_content_handler
 {
-    using super_type = cbor_content_handler;
+    using super_type = json_content_handler;
 
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
     enum class hexfloat_parse_state { start, expect_0, expect_x, integer, exp1, exp2, fraction1 };

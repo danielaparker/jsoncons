@@ -35,7 +35,7 @@ struct cbor_ser_traits
 
     template <class Json>
     static void encode(const T& val, 
-                          cbor_content_handler& encoder, 
+                          json_content_handler& encoder, 
                           const Json& context_j,
                           std::error_code& ec)
     {
@@ -70,7 +70,7 @@ struct cbor_ser_traits<T,
 
     template <class Json>
     static void encode(const T& val, 
-                          cbor_content_handler& encoder, 
+                          json_content_handler& encoder, 
                           const Json&,
                           std::error_code& ec)
     {
