@@ -16,7 +16,7 @@
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/json_traits.hpp>
 #include <jsoncons/staj_reader.hpp>
 #include <jsoncons/conversion_error.hpp>
 
@@ -50,36 +50,6 @@ struct ser_traits_default;
 template <class T, class Enable = void>
 struct ser_traits
 {
-    template <class Json>
-    static constexpr bool is_compatible()
-    {
-        return json_type_traits<Json,T>::is_compatible;
-    }
-
-    template <class Json>
-    static bool is(const Json& j)
-    {
-        return json_type_traits<Json,T>::is(j);
-    }
-
-    template <class Json>
-    static T as(const Json& j)
-    {
-        return json_type_traits<Json,T>::as(j);
-    }
-
-    template <class Json>
-    static Json to_json(const T& val)
-    {
-        return json_type_traits<Json,T>::to_json(val);
-    }
-
-    template <class Json>
-    static Json to_json(const T& val, const typename Json::allocator_type& alloc)
-    {
-        return json_type_traits<Json, T>::to_json(val, alloc);
-    }
-
     template <class Json>
     static T decode(basic_staj_reader<typename Json::char_type>& reader, 
                     const Json& context_j, 
@@ -128,7 +98,7 @@ private:
                        const Json& /*context_j*/, 
                        std::error_code& ec)
     {
-        auto j = ser_traits<T>::template to_json<Json>(val);
+        auto j = json_traits<T>::template to_json<Json>(val);
         j.dump(encoder, ec);
     }
     template <class Json>
@@ -138,7 +108,7 @@ private:
                        const Json& context_j, 
                        std::error_code& ec)
     {
-        auto j = ser_traits<T>::template to_json<Json>(val, context_j.get_allocator());
+        auto j = json_traits<T>::template to_json<Json>(val, context_j.get_allocator());
         j.dump(encoder, ec);
     }
 };
@@ -154,84 +124,6 @@ struct ser_traits<T,
 >::type>
 {
     typedef typename T::value_type value_type;
-
-    template <class Json>
-    static bool is(const Json& j)
-    {
-        bool result = j.is_array();
-        if (result)
-        {
-            for (const auto& item : j.array_range())
-            {
-                if (!item.template is<value_type>())
-                {
-                    result = false;
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-
-    template <class Json,class Ty = value_type>
-    static typename std::enable_if<!std::is_same<Ty,uint8_t>::value,T>::type
-    as(const Json& j)
-    {
-        T result;
-        if (!j.is_array())
-        {
-            JSONCONS_THROW(ser_error(conversion_errc::json_not_vector));
-        }
-        //result.reserve(j.size());
-        for (const auto& item : j.array_range())
-        {
-            result.push_back(item.template as<value_type>());
-        }
-
-        return result;
-    }
-
-    template <class Json,class Ty = value_type>
-    static typename std::enable_if<std::is_same<Ty,uint8_t>::value,T>::type
-    as(const Json& j)
-    {
-        if (j.is_array())
-        {
-            T result;
-            result.reserve(j.size());
-            for (const auto& item : j.array_range())
-            {
-                result.push_back(item.template as<value_type>());
-            }
-
-            return result;
-        }
-        else if (j.is_byte_string())
-        {
-            T v(j.as_byte_string_view().begin(),j.as_byte_string_view().end());
-            return v;
-        }
-        else
-        {
-            JSONCONS_THROW(ser_error(conversion_errc::json_not_vector));
-        }
-    }
-
-    template <class Json>
-    static Json to_json(const T& val, 
-                        const typename Json::allocator_type& alloc = typename Json::allocator_type())
-    {
-        Json j(json_array_arg, semantic_tag::none, alloc);
-        auto first = std::begin(val);
-        auto last = std::end(val);
-        std::size_t size = std::distance(first, last);
-        j.reserve(size);
-        for (auto it = first; it != last; ++it)
-        {
-            j.push_back(*it);
-        }
-        return j;
-    }
 
     template <class Json>
     static T decode(basic_staj_reader<typename Json::char_type>& reader, 
@@ -279,84 +171,6 @@ struct ser_traits<T,
     typedef typename T::value_type value_type;
 
     template <class Json>
-    static bool is(const Json& j)
-    {
-        bool result = j.is_array();
-        if (result)
-        {
-            for (const auto& item : j.array_range())
-            {
-                if (!item.template is<value_type>())
-                {
-                    result = false;
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-
-    template <class Json,class Ty = value_type>
-    static typename std::enable_if<!std::is_same<Ty,uint8_t>::value,T>::type
-    as(const Json& j)
-    {
-        T result;
-        if (!j.is_array())
-        {
-            JSONCONS_THROW(ser_error(conversion_errc::json_not_vector));
-        }
-        //result.reserve(j.size());
-        for (const auto& item : j.array_range())
-        {
-            result.push_back(item.template as<value_type>());
-        }
-
-        return result;
-    }
-
-    template <class Json,class Ty = value_type>
-    static typename std::enable_if<std::is_same<Ty,uint8_t>::value,T>::type
-    as(const Json& j)
-    {
-        if (j.is_array())
-        {
-            T result;
-            result.reserve(j.size());
-            for (const auto& item : j.array_range())
-            {
-                result.push_back(item.template as<value_type>());
-            }
-
-            return result;
-        }
-        else if (j.is_byte_string())
-        {
-            T v(j.as_byte_string_view().begin(),j.as_byte_string_view().end());
-            return v;
-        }
-        else
-        {
-            JSONCONS_THROW(ser_error(conversion_errc::json_not_vector));
-        }
-    }
-
-    template <class Json>
-    static Json to_json(const T& val, 
-                        const typename Json::allocator_type& alloc = typename Json::allocator_type())
-    {
-        Json j(json_array_arg, semantic_tag::none, alloc);
-        auto first = std::begin(val);
-        auto last = std::end(val);
-        std::size_t size = std::distance(first, last);
-        j.reserve(size);
-        for (auto it = first; it != last; ++it)
-        {
-            j.push_back(*it);
-        }
-        return j;
-    }
-
-    template <class Json>
     static T decode(basic_staj_reader<typename Json::char_type>& reader, 
                     const Json& context_j, 
                     std::error_code& ec)
@@ -392,48 +206,6 @@ template <class T, std::size_t N>
 struct ser_traits<std::array<T,N>>
 {
     typedef typename std::array<T,N>::value_type value_type;
-
-    template <class Json>
-    static bool is(const Json& j)
-    {
-        bool result = j.is_array() && j.size() == N;
-        if (result)
-        {
-            for (auto e : j.array_range())
-            {
-                if (!e.template is<value_type>())
-                {
-                    result = false;
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-
-    template <class Json>
-    static std::array<T,N> as(const Json& j)
-    {
-        std::array<T, N> buff;
-        JSONCONS_ASSERT(j.size() == N);
-        for (std::size_t i = 0; i < N; i++)
-        {
-            buff[i] = j[i].template as<T>();
-        }
-        return buff;
-    }
-
-    template <class Json>
-    static Json to_json(const std::array<T,N>& val, const typename Json::allocator_type& alloc = typename Json::allocator_type())
-    {
-        Json j(json_array_arg, semantic_tag::none, alloc);
-        j.reserve(N);
-        for (auto it = val.begin(); it != val.end(); ++it)
-        {
-            j.push_back(*it);
-        }
-        return j;
-    }
 
     template <class Json>
     static std::array<T, N> decode(basic_staj_reader<typename Json::char_type>& reader, 
@@ -483,40 +255,6 @@ struct ser_traits<T,
     typedef typename T::mapped_type mapped_type;
     typedef typename T::value_type value_type;
     typedef typename T::key_type key_type;
-
-    template <class Json>
-    static bool is(const Json& j)
-    {
-        bool result = j.is_object();
-        for (auto member : j.object_range())
-        {
-            if (!member.value().template is<mapped_type>())
-            {
-                result = false;
-            }
-        }
-        return result;
-    }
-
-    template <class Json>
-    static T as(const Json& j)
-    {
-        T result;
-        for (const auto& item : j.object_range())
-        {
-            result.emplace(key_type(item.key().data(),item.key().size()), item.value().template as<mapped_type>());
-        }
-
-        return result;
-    }
-
-    template <class Json>
-    static Json to_json(const T& val, const typename Json::allocator_type& alloc = typename Json::allocator_type())
-    {
-        Json j = Json(json_object_arg, val.begin(), val.end(), semantic_tag::none, alloc);
-        return j;
-    }
-
 
     template <class Json>
     static T decode(basic_staj_reader<typename Json::char_type>& reader, 

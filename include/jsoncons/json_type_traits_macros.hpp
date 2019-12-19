@@ -24,7 +24,7 @@
 #include <unordered_map> // std::unordered_map
 #include <utility>
 #include <valarray>
-#include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/json_traits.hpp>
 
 #if defined(_MSC_VER)
 #pragma warning( disable : 4127)
@@ -97,7 +97,7 @@
     template <class JSON,class T,class Enable> \
     friend struct jsoncons::json_type_traits; \
     template <class T,class Enable> \
-    friend struct jsoncons::ser_traits; 
+    friend struct jsoncons::json_traits; 
 
 #define JSONCONS_EXPAND_CALL2(Call, Expr, Id) JSONCONS_EXPAND(Call(Expr, Id))
 
@@ -181,7 +181,7 @@
 namespace jsoncons \
 { \
     template< JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams) > \
-    struct ser_traits<ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) > \
+    struct json_traits<ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) > \
     { \
         typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
@@ -229,12 +229,6 @@ namespace jsoncons \
             JSONCONS_VARIADIC_REP_N(JSONCONS_TO_JSON,L,,, __VA_ARGS__) \
             return ajson; \
         } \
-        template <class Json> \
-        static value_type decode(basic_staj_reader<typename Json::char_type>& reader, const Json& context_j, std::error_code& ec) \
-        { return ser_traits_default<value_type>::decode(reader, context_j, ec); } \
-        template <class Json> \
-        static void encode(const value_type& val, basic_json_content_handler<typename Json::char_type>& encoder, const Json& context_j, std::error_code& ec) \
-        { ser_traits_default<value_type>::encode(val, encoder, context_j, ec); } \
     private: \
         template <class Json, class U> \
         static void set_member(std::true_type, const Json&, const typename Json::string_view_type&, U&) \
@@ -301,7 +295,7 @@ namespace jsoncons \
 namespace jsoncons \
 { \
     template< JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams) > \
-    struct ser_traits<ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) > \
+    struct json_traits<ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) > \
     { \
         typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
@@ -328,12 +322,6 @@ namespace jsoncons \
             JSONCONS_VARIADIC_REP_N(JSONCONS_NAMED_TO_JSON,,,, __VA_ARGS__) \
             return ajson; \
         } \
-        template <class Json> \
-        static value_type decode(basic_staj_reader<typename Json::char_type>& reader, const Json& context_j, std::error_code& ec) \
-        { return ser_traits_default<value_type>::decode(reader, context_j, ec); } \
-        template <class Json> \
-        static void encode(const value_type& val, basic_json_content_handler<typename Json::char_type>& encoder, const Json& context_j, std::error_code& ec) \
-        { ser_traits_default<value_type>::encode(val, encoder, context_j, ec); } \
     private: \
         template <class J, class U> \
         static void set_member(std::true_type, const J&, const typename J::string_view_type&, U&) \
@@ -390,7 +378,7 @@ namespace jsoncons \
 namespace jsoncons \
 { \
     template< JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams) > \
-    struct ser_traits<ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) > \
+    struct json_traits<ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) > \
     { \
         typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
@@ -434,12 +422,6 @@ namespace jsoncons \
             JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_TO_JSON,L,,, __VA_ARGS__) \
             return ajson; \
         } \
-        template <class Json> \
-        static value_type decode(basic_staj_reader<typename Json::char_type>& reader, const Json& context_j, std::error_code& ec) \
-        { return ser_traits_default<value_type>::decode(reader, context_j, ec); } \
-        template <class Json> \
-        static void encode(const value_type& val, basic_json_content_handler<typename Json::char_type>& encoder, const Json& context_j, std::error_code& ec) \
-        { ser_traits_default<value_type>::encode(val, encoder, context_j, ec); } \
     }; \
 } \
   /**/
@@ -476,7 +458,7 @@ JSONCONS_GETTER_CTOR_TRAITS_DECL_BASE(NumTemplateParams, ValueType,NumMandatoryP
 namespace jsoncons \
 { \
     template< JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams) > \
-    struct ser_traits<ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) > \
+    struct json_traits<ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) > \
     { \
         typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
@@ -501,12 +483,6 @@ namespace jsoncons \
             JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_NAMED_TO_JSON,,,, __VA_ARGS__) \
             return ajson; \
         } \
-        template <class Json> \
-        static value_type decode(basic_staj_reader<typename Json::char_type>& reader, const Json& context_j, std::error_code& ec) \
-        { return ser_traits_default<value_type>::decode(reader, context_j, ec); } \
-        template <class Json> \
-        static void encode(const value_type& val, basic_json_content_handler<typename Json::char_type>& encoder, const Json& context_j, std::error_code& ec) \
-        { ser_traits_default<value_type>::encode(val, encoder, context_j, ec); } \
     }; \
 } \
   /**/
@@ -534,7 +510,7 @@ JSONCONS_GETTER_CTOR_NAMED_TRAITS_DECL_BASE(NumTemplateParams, ValueType,NumMand
 namespace jsoncons \
 { \
     template<> \
-    struct ser_traits<EnumType> \
+    struct json_traits<EnumType> \
     { \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
         typedef EnumType value_type; \
@@ -633,12 +609,6 @@ namespace jsoncons \
             } \
             return Json(it->second,alloc); \
         } \
-        template <class Json> \
-        static value_type decode(basic_staj_reader<typename Json::char_type>& reader, const Json& context_j, std::error_code& ec) \
-        { return ser_traits_default<value_type>::decode(reader, context_j, ec); } \
-        template <class Json> \
-        static void encode(const value_type& val, basic_json_content_handler<typename Json::char_type>& encoder, const Json& context_j, std::error_code& ec) \
-        { ser_traits_default<value_type>::encode(val, encoder, context_j, ec); } \
     }; \
 } \
     /**/
@@ -655,7 +625,7 @@ namespace jsoncons \
 namespace jsoncons \
 { \
     template<> \
-    struct ser_traits<EnumType> \
+    struct json_traits<EnumType> \
     { \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
         typedef EnumType value_type; \
@@ -747,12 +717,6 @@ namespace jsoncons \
             } \
             return Json(it->second,alloc); \
         } \
-        template <class Json> \
-        static value_type decode(basic_staj_reader<typename Json::char_type>& reader, const Json& context_j, std::error_code& ec) \
-        { return ser_traits_default<value_type>::decode(reader, context_j, ec); } \
-        template <class Json> \
-        static void encode(const value_type& val, basic_json_content_handler<typename Json::char_type>& encoder, const Json& context_j, std::error_code& ec) \
-        { ser_traits_default<value_type>::encode(val, encoder, context_j, ec); } \
     }; \
 } \
     /**/
@@ -855,7 +819,7 @@ namespace jsoncons \
 namespace jsoncons \
 { \
     template< JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams) > \
-    struct ser_traits<ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) > \
+    struct json_traits<ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) > \
     { \
         typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
@@ -882,12 +846,6 @@ namespace jsoncons \
             JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_SETTER_TO_JSON,,,, __VA_ARGS__) \
             return ajson; \
         } \
-        template <class Json> \
-        static value_type decode(basic_staj_reader<typename Json::char_type>& reader, const Json& context_j, std::error_code& ec) \
-        { return ser_traits_default<value_type>::decode(reader, context_j, ec); } \
-        template <class Json> \
-        static void encode(const value_type& val, basic_json_content_handler<typename Json::char_type>& encoder, const Json& context_j, std::error_code& ec) \
-        { ser_traits_default<value_type>::encode(val, encoder, context_j, ec); } \
     }; \
 } \
   /**/
