@@ -283,70 +283,67 @@ public:
         bool more = true;
         if (data_.type() != typed_array_type())
         {
-            more = handler.begin_array();
             switch (data_.type())
             {
                 case typed_array_type::uint8_value:
                 {
-                    more = handler.typed_array(data_.data(uint8_array_arg).last(data_.size() - index_));
+                    more = handler.typed_array(data_.data(uint8_array_arg));
                     break;
                 }
                 case typed_array_type::uint16_value:
                 {
-                    more = handler.typed_array(data_.data(uint16_array_arg).last(data_.size() - index_));
+                    more = handler.typed_array(data_.data(uint16_array_arg));
                     break;
                 }
                 case typed_array_type::uint32_value:
                 {
-                    more = handler.typed_array(data_.data(uint32_array_arg).last(data_.size() - index_));
+                    more = handler.typed_array(data_.data(uint32_array_arg));
                     break;
                 }
                 case typed_array_type::uint64_value:
                 {
-                    more = handler.typed_array(data_.data(uint64_array_arg).last(data_.size() - index_));
+                    more = handler.typed_array(data_.data(uint64_array_arg));
                     break;
                 }
                 case typed_array_type::int8_value:
                 {
-                    more = handler.typed_array(data_.data(int8_array_arg).last(data_.size() - index_));
+                    more = handler.typed_array(data_.data(int8_array_arg));
                     break;
                 }
                 case typed_array_type::int16_value:
                 {
-                    more = handler.typed_array(data_.data(int16_array_arg).last(data_.size() - index_));
+                    more = handler.typed_array(data_.data(int16_array_arg));
                     break;
                 }
                 case typed_array_type::int32_value:
                 {
-                    more = handler.typed_array(data_.data(int32_array_arg).last(data_.size() - index_));
+                    more = handler.typed_array(data_.data(int32_array_arg));
                     break;
                 }
                 case typed_array_type::int64_value:
                 {
-                    more = handler.typed_array(data_.data(int64_array_arg).last(data_.size() - index_));
+                    more = handler.typed_array(data_.data(int64_array_arg));
                     break;
                 }
                 case typed_array_type::float_value:
                 {
-                    more = handler.typed_array(data_.data(float_array_arg).last(data_.size() - index_));
+                    more = handler.typed_array(data_.data(float_array_arg));
                     break;
                 }
                 case typed_array_type::double_value:
                 {
-                    more = handler.typed_array(data_.data(double_array_arg).last(data_.size() - index_));
+                    more = handler.typed_array(data_.data(double_array_arg));
                     break;
                 }
                 //case typed_array_type::float128_value:
                 //{
-                    //more = handler.typed_array(data_.data(float128_array_arg).last(data_.size() - index_));
+                    //more = handler.typed_array(data_.data(float128_array_arg));
                     //break;
                 //}
                 default:
                     break;
             }
-            ++index_;
             
-            more = handler.end_array();
             state_ = staj_reader_state();
             data_ = typed_array_view();
             index_ = 0;
