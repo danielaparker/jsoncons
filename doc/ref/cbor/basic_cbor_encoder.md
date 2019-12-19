@@ -5,7 +5,7 @@ __`jsoncons_ext/cbor/cbor_encoder.hpp`__
 ```c++
 template<
     class Result,class Float128T = std::nullptr_t>
-> class basic_cbor_encoder final : public cbor_content_handler
+> class basic_cbor_encoder final : public json_content_handler
 ```
 
 `basic_cbor_encoder` is noncopyable
@@ -38,7 +38,7 @@ Constructs a new encoder that writes to the specified result.
     virtual ~basic_cbor_encoder()
 
 
-#### Inherited from [jsoncons::cbor::basic_cbor_content_handler](basic_cbor_content_handler.md)
+#### Inherited from [jsoncons::json_content_handler](../basic_json_content_handler.md)
 
     bool typed_array(const span<const uint8_t>& data, 
                      semantic_tag tag=semantic_tag::none,

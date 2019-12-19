@@ -14,8 +14,6 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 [cbor_options](cbor_options.md)
 
-[basic_cbor_content_handler](basic_cbor_content_handler.md)
-
 ### Tag handling and extensions
 
 All tags not explicitly mentioned below are ignored.

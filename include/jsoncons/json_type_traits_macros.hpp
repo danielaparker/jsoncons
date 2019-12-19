@@ -895,38 +895,42 @@ JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL_BASE(JSONCONS_GETTER_SETTER_NAMED_AS, N
 
 #define JSONCONS_POLYMORPHIC_TRAITS_DECL(BaseClass, ...)  \
 namespace jsoncons { \
-    template<class Json> \
-    struct json_type_traits<Json, std::shared_ptr<BaseClass>> { \
+    template <> \
+    struct json_traits<std::shared_ptr<BaseClass>> { \
+        template<class Json> \
         static bool is(const Json& ajson) noexcept { \
             if (!ajson.is_object()) return false; \
             JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_IS, BaseClass,,, __VA_ARGS__)\
             return false; \
         } \
-\
+        template<class Json> \
         static std::shared_ptr<BaseClass> as(const Json& ajson) { \
             if (!ajson.is_object()) return std::shared_ptr<BaseClass>(); \
             JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_AS_SHARED_PTR, BaseClass,,, __VA_ARGS__)\
             return std::shared_ptr<BaseClass>(); \
         } \
-\
+        template<class Json> \
         static Json to_json(const std::shared_ptr<BaseClass>& ptr) { \
             if (ptr.get() == nullptr) {return Json::null();} \
             JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_TO_JSON, BaseClass,,, __VA_ARGS__)\
             return Json::null(); \
         } \
     }; \
-    template<class Json> \
-    struct json_type_traits<Json, std::unique_ptr<BaseClass>> { \
+    template<> \
+    struct json_traits<std::unique_ptr<BaseClass>> { \
+        template<class Json> \
         static bool is(const Json& ajson) noexcept { \
             if (!ajson.is_object()) return false; \
             JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_IS, BaseClass,,, __VA_ARGS__)\
             return false; \
         } \
+        template<class Json> \
         static std::unique_ptr<BaseClass> as(const Json& ajson) { \
             if (!ajson.is_object()) return std::unique_ptr<BaseClass>(); \
             JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_AS_UNIQUE_PTR, BaseClass,,, __VA_ARGS__)\
             return std::unique_ptr<BaseClass>(); \
         } \
+        template<class Json> \
         static Json to_json(const std::unique_ptr<BaseClass>& ptr) { \
             if (ptr.get() == nullptr) {return Json::null();} \
             JSONCONS_VARIADIC_REP_N(JSONCONS_POLYMORPHIC_TO_JSON, BaseClass,,, __VA_ARGS__)\
