@@ -9,7 +9,7 @@
 
 #include <jsoncons/config/compiler_support.hpp>
 
-#if !defined(JSONCONS_HAS_STRING_VIEW)
+#if !defined(JSONCONS_HAS_STD_STRING_VIEW)
 #include <jsoncons/detail/string_view.hpp>
 namespace jsoncons {
 using jsoncons::detail::basic_string_view;

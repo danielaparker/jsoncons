@@ -2,6 +2,7 @@
 #define JSONCONS_DETAIL_SPAN_HPP
 
 #include <utility> // std::swap
+#include <memory> // std::addressof
 #include <type_traits> // std::enable_if, std::true_type, std::false_type
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/detail/more_type_traits.hpp>
@@ -61,6 +62,26 @@ namespace detail
         constexpr span(C& c,
                        typename std::enable_if<!is_span<C>::value && !is_std_array<C>::value && is_compatible_element<C,element_type>::value && has_data_and_size<C>::value>::type* = 0)
             : data_(c.data()), size_(c.size())
+        {
+        }
+
+        template <std::size_t N>
+        span(element_type (&arr)[N]) noexcept
+            : data_(std::addressof(arr[0])), size_(N)
+        {
+        }
+
+        template <std::size_t N>
+        constexpr span(std::array<value_type, N>& arr,
+                       typename std::enable_if<(N == dynamic_extent || N == extent)>::type* = 0) noexcept
+            : data_(arr.data()), size_(arr.size())
+        {
+        }
+
+        template <std::size_t N>
+        constexpr span(const std::array<value_type, N>& arr,
+                       typename std::enable_if<(N == dynamic_extent || N == extent)>::type* = 0) noexcept
+            : data_(arr.data()), size_(arr.size())
         {
         }
 

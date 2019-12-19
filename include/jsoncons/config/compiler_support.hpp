@@ -99,28 +99,50 @@
 #define JSONCONS_HAS_FOPEN_S
 #endif
 
-// Follows boost 1_68
-#if !defined(JSONCONS_HAS_STRING_VIEW)
+// Follows boost 1_71
+#if !defined(JSONCONS_HAS_STD_STRING_VIEW)
 #  if defined(__clang__)
 #   if (__cplusplus >= 201703)
 #    if __has_include(<string_view>)
-#     define JSONCONS_HAS_STRING_VIEW 1
+#     define JSONCONS_HAS_STD_STRING_VIEW 1
 #    endif // __has_include(<string_view>)
 #   endif // (__cplusplus >= 201703)
 #  endif // defined(__clang__)
 #  if defined(__GNUC__)
 #   if (__GNUC__ >= 7)
-#    if (__cplusplus >= 201703) || (defined(_HAS_CXX17) && _HAS_CXX17 == 1)
-#     define JSONCONS_HAS_STRING_VIEW 1
+#    if (__cplusplus >= 201703)
+#     define JSONCONS_HAS_STD_STRING_VIEW 1
 #    endif // (__cplusplus >= 201703)
 #   endif // (__GNUC__ >= 7)
 #  endif // defined(__GNUC__)
 #  if defined(_MSC_VER)
-#   if (_MSC_VER >= 1910 && defined(_HAS_CXX17) && (_HAS_CXX17 > 0))
-#    define JSONCONS_HAS_STRING_VIEW 1
-#   endif // (_MSC_VER >= 1910 && _HAS_CXX17)
+#   if (_MSC_VER >= 1910 && _MSVC_LANG >= 201703)
+#    define JSONCONS_HAS_STD_STRING_VIEW 1
+#   endif // (_MSC_VER >= 1910 && MSVC_LANG >= 201703)
 #  endif // defined(_MSC_VER)
-#endif // !defined(JSONCONS_HAS_STRING_VIEW)
+#endif // !defined(JSONCONS_HAS_STD_STRING_VIEW)
+
+#if !defined(JSONCONS_HAS_STD_OPTIONAL)
+#  if defined(__clang__)
+#   if (__cplusplus >= 201703)
+#    if __has_include(<string_view>)
+#     define JSONCONS_HAS_STD_OPTIONAL 1
+#    endif // __has_include(<string_view>)
+#   endif // (__cplusplus >= 201703)
+#  endif // defined(__clang__)
+#  if defined(__GNUC__)
+#   if (__GNUC__ >= 7)
+#    if (__cplusplus >= 201703)
+#     define JSONCONS_HAS_STD_OPTIONAL 1
+#    endif // (__cplusplus >= 201703)
+#   endif // (__GNUC__ >= 7)
+#  endif // defined(__GNUC__)
+#  if defined(_MSC_VER)
+#   if (_MSC_VER >= 1910 && _MSVC_LANG >= 201703)
+#    define JSONCONS_HAS_STD_OPTIONAL 1
+#   endif // (_MSC_VER >= 1910 && MSVC_LANG >= 201703)
+#  endif // defined(_MSC_VER)
+#endif // !defined(JSONCONS_HAS_STD_OPTIONAL)
 
  #define JSONCONS_STRING_LITERAL(name, ...) \
     template <class CharT> \

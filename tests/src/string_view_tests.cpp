@@ -4,7 +4,7 @@
 #include <jsoncons/json.hpp>
 #include <catch/catch.hpp>
 
-#if defined(JSONCONS_HAS_STRING_VIEW)
+#if defined(JSONCONS_HAS_STD_STRING_VIEW)
 
 #include <string_view>
 

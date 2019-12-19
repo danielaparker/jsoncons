@@ -30,5 +30,21 @@ TEST_CASE("span constructor tests")
         CHECK(s.size() == c.size());
         CHECK(s.data() == c.data());
     }
+    SECTION("span(C c[])")
+    {
+        double c[] = {1,2,3,4};
+
+        span<const double> s{ c };
+        CHECK(s.size() == 4);
+        CHECK(s.data() == c);
+    }
+    SECTION("span(std::array)")
+    {
+        std::array<double,4> c = {1,2,3,4};
+
+        span<std::array<double,4>> s{ c };
+        CHECK(s.size() == 4);
+        CHECK(s.data() == c);
+    }
 }
 
