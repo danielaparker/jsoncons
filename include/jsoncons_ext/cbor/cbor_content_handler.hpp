@@ -237,9 +237,9 @@ private:
     }
 };
 
-class cbor_to_json_content_handler_adaptor : public cbor_content_handler
+class cbor_to_json_content_handler_adaptor : public json_content_handler
 {
-    using super_type = cbor_content_handler;
+    using super_type = json_content_handler;
 public:
     using char_type = char;
     using string_view_type = typename super_type::string_view_type;
