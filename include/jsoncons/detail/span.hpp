@@ -72,15 +72,15 @@ namespace detail
         }
 
         template <std::size_t N>
-        constexpr span(std::array<value_type, N>& arr,
-                       typename std::enable_if<(N == dynamic_extent || N == extent)>::type* = 0) noexcept
+        span(std::array<value_type, N>& arr,
+             typename std::enable_if<(Extent == dynamic_extent || Extent == N)>::type* = 0) noexcept
             : data_(arr.data()), size_(arr.size())
         {
         }
 
         template <std::size_t N>
-        constexpr span(const std::array<value_type, N>& arr,
-                       typename std::enable_if<(N == dynamic_extent || N == extent)>::type* = 0) noexcept
+        span(const std::array<value_type, N>& arr,
+             typename std::enable_if<(Extent == dynamic_extent || Extent == N)>::type* = 0) noexcept
             : data_(arr.data()), size_(arr.size())
         {
         }

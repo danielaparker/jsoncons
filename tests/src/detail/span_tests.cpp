@@ -42,9 +42,9 @@ TEST_CASE("span constructor tests")
     {
         std::array<double,4> c = {1,2,3,4};
 
-        span<std::array<double,4>> s{ c };
+        span<double> s(c);
         CHECK(s.size() == 4);
-        CHECK(s.data() == c);
+        CHECK(s.data() == c.data());
     }
 }
 

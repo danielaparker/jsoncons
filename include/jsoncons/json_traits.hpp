@@ -25,6 +25,8 @@ namespace jsoncons {
 template <class T, class Enable = void>
 struct json_traits
 {
+    static constexpr bool is_undeclared = true;
+
     template <class Json>
     static constexpr bool is_compatible()
     {
@@ -56,6 +58,13 @@ struct json_traits
     }
 };
 
+template <class T, class Enable = void>
+struct is_json_traits_declared : std::true_type
+{};
+
+template <class T>
+struct is_json_traits_declared<T, typename std::enable_if<json_traits<T>::is_undeclared>::type> : std::false_type
+{};
 // specializations
 
 // vector like
