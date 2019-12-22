@@ -172,8 +172,8 @@ struct ser_traits<T,
 
     template <class Json>
     static T decode(basic_staj_reader<typename Json::char_type>& reader, 
-                    const Json& context_j, 
-                    std::error_code& ec)
+                    const Json&, 
+                    std::error_code&)
     {
         T v;
 

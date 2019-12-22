@@ -32,7 +32,7 @@ supplied or defaults.
 #include <cassert>
 #include <iostream>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/csv/csv_encoder.hpp>
+#include <jsoncons_ext/csv/csv.hpp>
 
 using namespace jsoncons;
 
@@ -104,7 +104,7 @@ customer_name,has_coupon,phone_number,zip_code,sales_tax_rate,total_amount
 #include <cassert>
 #include <iostream>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/csv/csv_encoder.hpp>
+#include <jsoncons_ext/csv/csv.hpp>
 
 using namespace jsoncons;
 
@@ -151,7 +151,7 @@ Output:
 #include <cassert>
 #include <iostream>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/csv/csv_encoder.hpp>
+#include <jsoncons_ext/csv/csv.hpp>
 
 using namespace jsoncons;
 

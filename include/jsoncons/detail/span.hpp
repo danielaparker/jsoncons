@@ -73,14 +73,14 @@ namespace detail
 
         template <std::size_t N>
         span(std::array<value_type, N>& arr,
-             typename std::enable_if<(Extent == dynamic_extent || Extent == N)>::type* = 0) noexcept
+             typename std::enable_if<(extent == dynamic_extent || extent == N)>::type* = 0) noexcept
             : data_(arr.data()), size_(arr.size())
         {
         }
 
         template <std::size_t N>
         span(const std::array<value_type, N>& arr,
-             typename std::enable_if<(Extent == dynamic_extent || Extent == N)>::type* = 0) noexcept
+             typename std::enable_if<(extent == dynamic_extent || extent == N)>::type* = 0) noexcept
             : data_(arr.data()), size_(arr.size())
         {
         }
