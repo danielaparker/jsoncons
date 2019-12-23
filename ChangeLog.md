@@ -1,3 +1,13 @@
+v0.142.0
+--------
+
+Defect fixes: 
+
+- Fixed csv documentation showing the wrong header file includes 
+- Fixed jsonpath issue [json_query() is reordering arrays](https://github.com/danielaparker/jsoncons/issues/200)
+- Fixed jsonpath issue with recursive descent reported in 
+[Alignment on JSONPath implementations across languages](https://github.com/danielaparker/jsoncons/issues/199)
+
 v0.141.0
 --------
 
