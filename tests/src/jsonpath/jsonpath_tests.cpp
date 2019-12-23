@@ -1859,7 +1859,7 @@ TEST_CASE("jsonpath object union test")
     }
 }
 #endif
-TEST_CASE("jsonpath test")
+TEST_CASE("jsonpath recursive descent test")
 {
     SECTION("test")
     {
