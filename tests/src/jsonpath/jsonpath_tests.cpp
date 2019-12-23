@@ -133,7 +133,7 @@ TEST_CASE("jsonpath store tests")
         CHECK(result1[0] == store);
         REQUIRE(result2.size() == 1);
         CHECK(result2[0] == store["store"]);
-        REQUIRE(result3.size() == 1);
+        REQUIRE(result3.size() == 27);
         CHECK(result3[0] == store["store"]);
 
         json result4 = jsonpath::json_query(store,"$ ");
@@ -144,7 +144,7 @@ TEST_CASE("jsonpath store tests")
         CHECK(result4[0] == store);
         REQUIRE(result5.size() == 1);
         CHECK(result5[0] == store["store"]);
-        REQUIRE(result6.size() == 1);
+        REQUIRE(result6.size() == 27);
         CHECK(result6[0] == store["store"]);
     }
 
@@ -676,7 +676,6 @@ TEST_CASE("jsonpath store tests")
         expected5.push_back("J. R. R. Tolkien");
         CHECK(result5 == expected5);
     }
-    #endif
 
     SECTION("test_jsonpath_everything")
     {
@@ -698,8 +697,25 @@ TEST_CASE("jsonpath store tests")
         json result = jsonpath::json_query(store,"$..*");
         //std::cout << result << std::endl;
      
-        json expected(json_array_arg);
-        expected.push_back(store["store"]);
+        //json expected(json_array_arg);
+        //expected.push_back(store["store"]);
+
+        json expected = json::parse(R"(
+[
+{"bicycle":{"color":"red","price":19.95},"book":[{"author":"Nigel Rees",
+"category":"reference","price":8.95,"title":"Sayings of the Century"},
+{"author":"Evelyn Waugh","category":"fiction","price":12.99,"title":"Sword of Honour"},{"author":"Herman Melville","category":"fiction","isbn":"0-553-21311-3","price":8.99,"title":"Moby Dick"},{"author":"J. R. R. Tolkien",
+"category":"fiction","isbn":"0-395-19395-8","price":22.99,"title":"The Lord of the Rings"}]},{"color":"red","price":19.95},[{"author":"Nigel Rees",
+"category":"reference","price":8.95,"title":"Sayings of the Century"},
+{"author":"Evelyn Waugh","category":"fiction","price":12.99,"title":"Sword of Honour"},{"author":"Herman Melville","category":"fiction","isbn":"0-553-21311-3","price":8.99,"title":"Moby Dick"},{"author":"J. R. R. Tolkien",
+"category":"fiction","isbn":"0-395-19395-8","price":22.99,"title":"The Lord of the Rings"}],"red",19.95,{"author":"Nigel Rees","category":"reference",
+"price":8.95,"title":"Sayings of the Century"},{"author":"Evelyn Waugh",
+"category":"fiction","price":12.99,"title":"Sword of Honour"},{"author":
+"Herman Melville","category":"fiction","isbn":"0-553-21311-3","price":8.99,
+"title":"Moby Dick"},{"author":"J. R. R. Tolkien","category":"fiction",
+"isbn":"0-395-19395-8","price":22.99,"title":"The Lord of the Rings"},"Nigel Rees","reference",8.95,"Sayings of the Century","Evelyn Waugh","fiction",12.99,"Sword of Honour","Herman Melville","fiction","0-553-21311-3",8.99,"Moby Dick","J. R. R. Tolkien","fiction","0-395-19395-8",22.99,"The Lord of the Rings"
+]
+)");
 
         CHECK(result == expected);
     }
@@ -1840,6 +1856,42 @@ TEST_CASE("jsonpath object union test")
         json result = jsonpath::json_query(root,path);
         //std::cout << result << "\n\n";
         CHECK(result == expected);
+    }
+}
+#endif
+TEST_CASE("jsonpath test")
+{
+    SECTION("test")
+    {
+        std::string input = R"(
+{"key": "value", "another key": {"complex": "string", "primitives": [0, 1]}}
+        )";
+
+        ojson root = ojson::parse(input);
+
+        ojson output = jsonpath::json_query(root,"$..*");
+
+        ojson expected = ojson::parse(R"(
+[
+   "value",
+   {
+      "complex" : "string",
+      "primitives" : [
+         0,
+         1
+      ]
+   },
+   "string",
+   [
+      0,
+      1
+   ],
+   0,
+   1
+]
+        )");
+
+        CHECK(output == expected); 
     }
 }
 
