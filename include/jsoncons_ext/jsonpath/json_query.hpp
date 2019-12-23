@@ -26,12 +26,12 @@ namespace jsoncons { namespace jsonpath {
 
 struct array_slice
 {
-    size_t start_;
+    std::size_t start_;
     bool is_start_positive;
-    size_t end_;
+    std::size_t end_;
     bool is_end_positive;
     bool is_end_defined;
-    size_t step_;
+    std::size_t step_;
     bool is_step_positive;
 
     array_slice()
@@ -41,21 +41,21 @@ struct array_slice
     {
     }
 
-    array_slice(size_t start, bool is_start_positive, 
-                size_t end, bool is_end_positive, bool is_end_defined,
-                size_t step, bool is_step_positive)
+    array_slice(std::size_t start, bool is_start_positive, 
+                std::size_t end, bool is_end_positive, bool is_end_defined,
+                std::size_t step, bool is_step_positive)
         : start_(start), is_start_positive(is_start_positive), 
           end_(end), is_end_positive(is_end_positive), is_end_defined(is_end_defined), 
           step_(step), is_step_positive(is_step_positive)
     {
     }
 
-    size_t get_start(size_t size) const
+    std::size_t get_start(std::size_t size) const
     {
         return is_start_positive ? start_ : size - start_;
     }
 
-    size_t get_end(size_t size) const
+    std::size_t get_end(std::size_t size) const
     {
         if (is_end_defined)
         {
@@ -67,7 +67,7 @@ struct array_slice
         }
     }
 
-    size_t step() const
+    std::size_t step() const
     {
         return step_;
     }
@@ -114,13 +114,13 @@ void json_replace(Json& root, const typename Json::string_view_type& path, T&& n
 namespace detail {
 
 template<class CharT>
-bool try_string_to_index(const CharT *s, size_t length, size_t* value, bool* positive)
+bool try_string_to_index(const CharT *s, std::size_t length, std::size_t* value, bool* positive)
 {
-    static const size_t max_value = (std::numeric_limits<size_t>::max)();
+    static const size_t max_value = (std::numeric_limits<std::size_t>::max)();
     static const size_t max_value_div_10 = max_value / 10;
 
-    size_t start = 0;
-    size_t n = 0;
+    std::size_t start = 0;
+    std::size_t n = 0;
     if (length > 0)
     {
         if (s[start] == '-')
@@ -135,14 +135,14 @@ bool try_string_to_index(const CharT *s, size_t length, size_t* value, bool* pos
     }
     if (length > start)
     {
-        for (size_t i = start; i < length; ++i)
+        for (std::size_t i = start; i < length; ++i)
         {
             CharT c = s[i];
             switch (c)
             {
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                 {
-                    size_t x = c - '0';
+                    std::size_t x = c - '0';
                     if (n > max_value_div_10)
                     {
                         return false;
@@ -346,9 +346,9 @@ class jsonpath_evaluator : public ser_context
                     node_set& nodes) override
         {
             auto index = result_.eval(val);
-            if (index.template is<size_t>())
+            if (index.template is<std::size_t>())
             {
-                size_t start = index.template as<size_t>();
+                std::size_t start = index.template as<std::size_t>();
                 if (val.is_array() && start < val.size())
                 {
                     nodes.emplace_back(PathCons()(path,start),std::addressof(val[start]));
@@ -385,7 +385,7 @@ class jsonpath_evaluator : public ser_context
             if (val.is_array())
             {
                 //std::cout << "from array \n";
-                for (size_t i = 0; i < val.size(); ++i)
+                for (std::size_t i = 0; i < val.size(); ++i)
                 {
                     if (result_.exists(val[i]))
                     {
@@ -426,10 +426,10 @@ class jsonpath_evaluator : public ser_context
             }
             else if (val.is_array())
             {
-                size_t pos = 0;
+                std::size_t pos = 0;
                 if (try_string_to_index(name_.data(), name_.size(), &pos, &is_start_positive))
                 {
-                    size_t index = is_start_positive ? pos : val.size() - pos;
+                    std::size_t index = is_start_positive ? pos : val.size() - pos;
                     if (index < val.size())
                     {
                         nodes.emplace_back(PathCons()(path,index),std::addressof(val[index]));
@@ -443,11 +443,11 @@ class jsonpath_evaluator : public ser_context
             }
             else if (val.is_string())
             {
-                size_t pos = 0;
+                std::size_t pos = 0;
                 string_view_type sv = val.as_string_view();
                 if (try_string_to_index(name_.data(), name_.size(), &pos, &is_start_positive))
                 {
-                    size_t index = is_start_positive ? pos : sv.size() - pos;
+                    std::size_t index = is_start_positive ? pos : sv.size() - pos;
                     auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), index);
                     if (sequence.length() > 0)
                     {
@@ -457,7 +457,7 @@ class jsonpath_evaluator : public ser_context
                 }
                 else if (name_ == length_literal<char_type>() && sv.size() > 0)
                 {
-                    size_t count = unicons::u32_length(sv.begin(),sv.end());
+                    std::size_t count = unicons::u32_length(sv.begin(),sv.end());
                     pointer ptr = evaluator.create_temp(count);
                     nodes.emplace_back(PathCons()(path, name_), ptr);
                 }
@@ -493,9 +493,9 @@ class jsonpath_evaluator : public ser_context
         {
             if (val.is_array())
             {
-                size_t start = slice_.get_start(val.size());
-                size_t end = slice_.get_end(val.size());
-                for (size_t j = start; j < end; j += slice_.step())
+                std::size_t start = slice_.get_start(val.size());
+                std::size_t end = slice_.get_end(val.size());
+                for (std::size_t j = start; j < end; j += slice_.step())
                 {
                     if (j < val.size())
                     {
@@ -509,10 +509,10 @@ class jsonpath_evaluator : public ser_context
         {
             if (val.is_array())
             {
-                size_t start = slice_.get_start(val.size());
-                size_t end = slice_.get_end(val.size());
+                std::size_t start = slice_.get_start(val.size());
+                std::size_t end = slice_.get_end(val.size());
 
-                size_t j = end + slice_.step() - 1;
+                std::size_t j = end + slice_.step() - 1;
                 while (j > (start+slice_.step()-1))
                 {
                     j -= slice_.step();
@@ -529,8 +529,8 @@ class jsonpath_evaluator : public ser_context
 
     node_set nodes_;
     std::vector<node_set> stack_;
-    size_t line_;
-    size_t column_;
+    std::size_t line_;
+    std::size_t column_;
     const char_type* begin_input_;
     const char_type* end_input_;
     const char_type* p_;
@@ -549,19 +549,19 @@ public:
     {
     }
 
-    jsonpath_evaluator(size_t line, size_t column)
+    jsonpath_evaluator(std::size_t line, std::size_t column)
         : line_(line), column_(column),
           begin_input_(nullptr), end_input_(nullptr),
           p_(nullptr)
     {
     }
 
-    size_t line() const
+    std::size_t line() const
     {
         return line_;
     }
 
-    size_t column() const
+    std::size_t column() const
     {
         return column_;
     }
@@ -644,7 +644,7 @@ public:
     {
         if (stack_.size() > 0)
         {
-            for (size_t i = 0; i < stack_.back().size(); ++i)
+            for (std::size_t i = 0; i < stack_.back().size(); ++i)
             {
                 *(stack_.back()[i].val_ptr) = new_value;
             }
@@ -675,7 +675,7 @@ public:
  
     void evaluate(reference root, 
                   const char_type* path, 
-                  size_t length,
+                  std::size_t length,
                   std::error_code& ec)
     {
         state_stack_.emplace_back(path_state::start);
@@ -1498,7 +1498,7 @@ public:
                             break;
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                             slice.is_end_defined = true;
-                            slice.end_ = static_cast<size_t>(*p_-'0');
+                            slice.end_ = static_cast<std::size_t>(*p_-'0');
                             state_stack_.back().state = path_state::slice_end;
                             ++p_;
                             ++column_;
@@ -1530,7 +1530,7 @@ public:
                             break;
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                             slice.is_end_defined = true;
-                            slice.end_ = slice.end_*10 + static_cast<size_t>(*p_-'0');
+                            slice.end_ = slice.end_*10 + static_cast<std::size_t>(*p_-'0');
                             ++p_;
                             ++column_;
                             break;
@@ -1569,7 +1569,7 @@ public:
                     switch (*p_)
                     {
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                            slice.step_ = slice.step_*10 + static_cast<size_t>(*p_-'0');
+                            slice.step_ = slice.step_*10 + static_cast<std::size_t>(*p_-'0');
                             ++p_;
                             ++column_;
                             break;
@@ -1681,22 +1681,42 @@ public:
         {
             const auto& path = node.path;
             pointer p = node.val_ptr;
+            end_all(path, *p);
+        }
+    } 
 
-            if (p->is_array())
+    void end_all(const string_type& path, reference val)
+    {
+        if (val.is_array())
+        {
+            for (auto it = val.array_range().begin(); it != val.array_range().end(); ++it)
             {
-                for (auto it = p->array_range().begin(); it != p->array_range().end(); ++it)
+                nodes_.emplace_back(PathCons()(path,it - val.array_range().begin()),std::addressof(*it));
+            }
+        }
+        else if (val.is_object())
+        {
+            for (auto it = val.object_range().begin(); it != val.object_range().end(); ++it)
+            {
+                nodes_.emplace_back(PathCons()(path,it->key()),std::addressof(it->value()));
+            }
+        }
+        if (state_stack_.back().is_recursive_descent)
+        {
+            if (val.is_array())
+            {
+                for (auto it = val.array_range().begin(); it != val.array_range().end(); ++it)
                 {
-                    nodes_.emplace_back(PathCons()(path,it - p->array_range().begin()),std::addressof(*it));
+                    end_all(PathCons()(path, it - val.array_range().begin()),*it);
                 }
             }
-            else if (p->is_object())
+            else if (val.is_object())
             {
-                for (auto it = p->object_range().begin(); it != p->object_range().end(); ++it)
+                for (auto it = val.object_range().begin(); it != val.object_range().end(); ++it)
                 {
-                    nodes_.emplace_back(PathCons()(path,it->key()),std::addressof(it->value()));
+                    end_all(PathCons()(path,it->key()),it->value());
                 }
             }
-
         }
     }
 
