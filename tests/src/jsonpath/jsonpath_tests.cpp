@@ -1859,6 +1859,61 @@ TEST_CASE("jsonpath object union test")
         CHECK(result == expected);
     }
 }
+ 
+TEST_CASE("jsonpath recursive descent test")
+{
+    SECTION("test")
+    {
+        std::string input = R"(
+{"key": "value", "another key": {"complex": "string", "primitives": [0, 1]}}
+        )";
+
+        ojson root = ojson::parse(input);
+
+        ojson output = jsonpath::json_query(root,"$..*");
+
+        ojson expected = ojson::parse(R"(
+[
+   "value",
+   {
+      "complex" : "string",
+      "primitives" : [
+         0,
+         1
+      ]
+   },
+   "string",
+   [
+      0,
+      1
+   ],
+   0,
+   1
+]
+        )");
+
+        CHECK(output == expected); 
+    }
+}
+
+TEST_CASE("jsonpath intersection tests")
+{
+    SECTION("test")
+    {
+        std::string input = R"(
+        [
+            {"Bid":"100","Ask":"200","Last":"300"},
+            {"Bid":"100","Last":"300"},
+            {"Bid":"110","Ask":"220"}
+        ]
+        )";
+
+        json root = json::parse(input);
+
+        json result = jsonpath::json_query(root,"$..[?(@.'Bid')][?(@.'Ask')]");
+        std::cout << "result: " << result << "\n";
+    }
+}
 
 TEST_CASE("jsonpath recursive descent test")
 {
