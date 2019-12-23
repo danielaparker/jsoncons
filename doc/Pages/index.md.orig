@@ -532,6 +532,10 @@ You can read the `CSV` file into a `json` value with the `decode_csv` function.
 #include <fstream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
+<<<<<<< HEAD
+=======
+#include <jsoncons_ext/csv/csv_encoder.hpp>
+>>>>>>> ca35166bf2f9aeb8894074b85fff12da649856c2
 
 using namespace jsoncons;
 
