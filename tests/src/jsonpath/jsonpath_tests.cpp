@@ -676,6 +676,7 @@ TEST_CASE("jsonpath store tests")
         expected5.push_back("J. R. R. Tolkien");
         CHECK(result5 == expected5);
     }
+    #endif
 
     SECTION("test_jsonpath_everything")
     {
