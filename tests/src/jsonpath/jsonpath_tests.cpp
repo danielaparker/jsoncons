@@ -1858,7 +1858,7 @@ TEST_CASE("jsonpath object union test")
         CHECK(result == expected);
     }
 }
-#endif
+
 TEST_CASE("jsonpath recursive descent test")
 {
     SECTION("test")
