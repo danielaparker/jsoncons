@@ -1681,22 +1681,42 @@ public:
         {
             const auto& path = node.path;
             pointer p = node.val_ptr;
+            end_all(path, *p);
+        }
+    }
 
-            if (p->is_array())
+    void end_all(const string_type& path, reference val)
+    {
+        if (val.is_array())
+        {
+            for (auto it = val.array_range().begin(); it != val.array_range().end(); ++it)
             {
-                for (auto it = p->array_range().begin(); it != p->array_range().end(); ++it)
+                nodes_.emplace_back(PathCons()(path,it - val.array_range().begin()),std::addressof(*it));
+            }
+        }
+        else if (val.is_object())
+        {
+            for (auto it = val.object_range().begin(); it != val.object_range().end(); ++it)
+            {
+                nodes_.emplace_back(PathCons()(path,it->key()),std::addressof(it->value()));
+            }
+        }
+        if (state_stack_.back().is_recursive_descent)
+        {
+            if (val.is_array())
+            {
+                for (auto it = val.array_range().begin(); it != val.array_range().end(); ++it)
                 {
-                    nodes_.emplace_back(PathCons()(path,it - p->array_range().begin()),std::addressof(*it));
+                    end_all(PathCons()(path, it - val.array_range().begin()),*it);
                 }
             }
-            else if (p->is_object())
+            else if (val.is_object())
             {
-                for (auto it = p->object_range().begin(); it != p->object_range().end(); ++it)
+                for (auto it = val.object_range().begin(); it != val.object_range().end(); ++it)
                 {
-                    nodes_.emplace_back(PathCons()(path,it->key()),std::addressof(it->value()));
+                    end_all(PathCons()(path,it->key()),it->value());
                 }
             }
-
         }
     }
 
