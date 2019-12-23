@@ -1,0 +1,27 @@
+[
+    // Tests from https://github.com/cburgmer/json-path-comparison
+    {
+        "annotation" : "jsonpath recursive descent with *",
+        "document" : "{\"key\": \"value\", \"another key\": {\"complex\": \"string\", \"primitives\": [0, 1]}}",
+        "selector" : "$..*",
+        "expected" : "[\"value\",{\"complex\" : \"string\",\"primitives\" : [0,1]},\"string\",[0,1],0,1]" 
+    },
+    {
+        "annotation" : "array index",
+        "document" : "[\"first\", \"second\", \"third\", \"forth\", \"fifth\"]",
+        "selector" : "$[2]",
+        "expected" : "[\"third\"]"
+    },
+    {
+        "annotation" : "Array index last",
+        "document" : "[\"first\", \"second\", \"third\"]",
+        "selector" : "$[-1]",
+        "expected" : "[\"third\"]"
+    },
+    {
+        "annotation" : "Array index slice start end step 0",
+        "document" : "[\"first\", \"second\", \"third\", \"forth\", \"fifth\"]",
+        "selector" : "$[0:3:0]",
+        "error" : "Expected slice step at line 1 and column 8"
+    }
+]
