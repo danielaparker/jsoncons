@@ -22,6 +22,8 @@ namespace jsoncons { namespace detail {
 
 enum class to_integer_errc : uint8_t {success=0,overflow,invalid_digit};
 
+enum class integer_chars_format : uint8_t {binary=1,octal,decimal,hex};
+
 template <class T>
 struct to_integer_result
 {
@@ -65,12 +67,12 @@ std::error_code make_error_code(to_integer_errc e)
 }
 
 template <class CharT>
-bool is_integer(const CharT* s, std::size_t length)
+integer_chars_format is_integer(const CharT* s, std::size_t length)
 {
     const CharT* end = s + length; 
     if (s == end)
     {
-        return false;
+        return integer_chars_format();
     }
     if (*s == '-')
     {
@@ -78,16 +80,16 @@ bool is_integer(const CharT* s, std::size_t length)
     }
     if (s == end)
     {
-        return false;
+        return integer_chars_format();
     }
     for (;s < end; ++s)
     {
         if (!(*s >= '0' && *s <= '9'))
         {
-            return false;
+            return integer_chars_format();
         }
     }
-    return true;
+    return integer_chars_format::decimal;
 }
 
 template <class CharT>

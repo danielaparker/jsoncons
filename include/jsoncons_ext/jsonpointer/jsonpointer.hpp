@@ -473,7 +473,7 @@ public:
             }
             else
             {
-                if (!jsoncons::detail::is_integer(buffer_.data(), buffer_.length()))
+                if (jsoncons::detail::is_integer(buffer_.data(), buffer_.length()) != jsoncons::detail::integer_chars_format::decimal)
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
@@ -526,7 +526,7 @@ public:
             }
             else
             {
-                if (!jsoncons::detail::is_integer(buffer_.data(), buffer_.length()))
+                if (jsoncons::detail::is_integer(buffer_.data(), buffer_.length()) != jsoncons::detail::integer_chars_format::decimal)
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
@@ -588,7 +588,7 @@ public:
             }
             else
             {
-                if (!jsoncons::detail::is_integer(buffer_.data(), buffer_.length()))
+                if (jsoncons::detail::is_integer(buffer_.data(), buffer_.length()) != jsoncons::detail::integer_chars_format::decimal)
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
@@ -643,7 +643,7 @@ public:
             }
             else
             {
-                if (!jsoncons::detail::is_integer(buffer_.data(), buffer_.length()))
+                if (jsoncons::detail::is_integer(buffer_.data(), buffer_.length()) != jsoncons::detail::integer_chars_format::decimal)
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
@@ -717,7 +717,7 @@ public:
             }
             else
             {
-                if (!jsoncons::detail::is_integer(buffer.data(), buffer.length()))
+                if (jsoncons::detail::is_integer(buffer.data(), buffer.length()) != jsoncons::detail::integer_chars_format::decimal)
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;

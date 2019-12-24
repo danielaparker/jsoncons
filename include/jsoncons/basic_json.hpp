@@ -1078,7 +1078,7 @@ public:
             {
                 case storage_type::short_string_value:
                 case storage_type::long_string_value:
-                    if (!jsoncons::detail::is_integer(as_string_view().data(), as_string_view().length()))
+                    if (jsoncons::detail::is_integer(as_string_view().data(), as_string_view().length()) != jsoncons::detail::integer_chars_format::decimal)
                     {
                         JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an integer"));
                     }
@@ -3466,7 +3466,7 @@ public:
         {
             case storage_type::short_string_value:
             case storage_type::long_string_value:
-                return jsoncons::detail::is_integer(as_string_view().data(), as_string_view().length());
+                return jsoncons::detail::is_integer(as_string_view().data(), as_string_view().length()) == jsoncons::detail::integer_chars_format::decimal;
             case storage_type::int64_value:
             case storage_type::uint64_value:
                 return true;

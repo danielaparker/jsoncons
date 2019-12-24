@@ -472,7 +472,7 @@ private:
         switch (event_type_)
         {
             case staj_event_type::string_value:
-                if (!jsoncons::detail::is_integer(value_.string_data_, length_))
+                if (jsoncons::detail::is_integer(value_.string_data_, length_) != jsoncons::detail::integer_chars_format::decimal)
                 {
                     JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a bignum"));
                 }
