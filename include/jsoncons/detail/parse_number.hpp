@@ -22,8 +22,6 @@ namespace jsoncons { namespace detail {
 
 enum class to_integer_errc : uint8_t {success=0,overflow,invalid_digit};
 
-enum class integer_chars_format : uint8_t {binary=1,octal,decimal,hex};
-
 template <class T>
 struct to_integer_result
 {
@@ -66,48 +64,105 @@ std::error_code make_error_code(to_integer_errc e)
     return std::error_code(static_cast<int>(e),to_integer_error_category());
 }
 
+enum class integer_chars_format : uint8_t {decimal=1,hex};
+enum class integer_chars_state {initial,minus,integer,decimal,hex};
+
 template <class CharT>
 integer_chars_format is_integer(const CharT* s, std::size_t length)
 {
-    const CharT* end = s + length; 
-    if (s == end)
-    {
-        return integer_chars_format();
-    }
-    if (*s == '-')
-    {
-        ++s;
-    }
-    if (s == end)
-    {
-        return integer_chars_format();
-    }
-    for (;s < end; ++s)
-    {
-        if (!(*s >= '0' && *s <= '9'))
-        {
-            return integer_chars_format();
-        }
-    }
-    return integer_chars_format::decimal;
-}
+    integer_chars_format format{};
+    integer_chars_state state = integer_chars_state::initial;
 
-template <class CharT>
-bool is_uinteger(const CharT* s, std::size_t length)
-{
     const CharT* end = s + length; 
-    if (s == end)
-    {
-        return false;
-    }
     for (;s < end; ++s)
     {
-        if (!(*s >= '0' && *s <= '9'))
+        switch(state)
         {
-            return false;
+            case integer_chars_state::initial:
+            {
+                switch(*s)
+                {
+                    case '0':
+                        state = integer_chars_state::integer; 
+                        break;
+                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                        format = integer_chars_format::decimal;
+                        state = integer_chars_state::decimal;
+                        break;
+                    case '-':
+                        state = integer_chars_state::minus;
+                        break;
+                    default:
+                        return integer_chars_format();
+                }
+                break;
+            }
+            case integer_chars_state::minus:
+            {
+                switch(*s)
+                {
+                    case '0':
+                        state = integer_chars_state::integer; 
+                        break;
+                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                        format = integer_chars_format::decimal;
+                        state = integer_chars_state::decimal;
+                        break;
+                    default:
+                        return integer_chars_format();
+                }
+                break;
+            }
+            case integer_chars_state::integer:
+            {
+                switch(*s)
+                {
+                    case 'x':case 'X':
+                    {
+                        format = integer_chars_format::hex;
+                        state = integer_chars_state::hex;
+                        break;
+                    }
+                    case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                    {
+                        format = integer_chars_format::decimal;
+                        state = integer_chars_state::decimal;
+                        break;
+                    }
+                    default:
+                        return integer_chars_format();
+                }
+                break;
+            }
+            case integer_chars_state::decimal:
+            {
+                switch(*s)
+                {
+                    case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                        break;
+                    default:
+                        return integer_chars_format();
+                }
+                break;
+            }
+            case integer_chars_state::hex:
+            {
+                switch(*s)
+                {
+                    case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                        break;
+                    case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+                        break;
+                    case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
+                        break;
+                    default:
+                        return integer_chars_format();
+                }
+                break;
+            }
         }
     }
-    return true;
+    return format;
 }
 
 // Precondition: s satisfies
