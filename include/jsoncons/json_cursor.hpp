@@ -15,7 +15,7 @@
 #include <ios>
 #include <istream> // std::basic_istream
 #include <jsoncons/byte_string.hpp>
-#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/utility.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_parser.hpp>

@@ -8,7 +8,7 @@
 #define JSONCONS_TAG_TYPE_HPP
 
 #include <ostream>
-#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/utility.hpp>
 
 namespace jsoncons {
 

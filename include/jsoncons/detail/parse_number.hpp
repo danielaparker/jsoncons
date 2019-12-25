@@ -15,7 +15,7 @@
 #include <limits> // std::numeric_limits
 #include <type_traits> // std::enable_if
 #include <exception>
-#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/utility.hpp>
 #include <cctype>
 
 namespace jsoncons { namespace detail {

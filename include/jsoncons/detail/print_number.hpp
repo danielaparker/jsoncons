@@ -13,7 +13,7 @@
 #include <locale>
 #include <limits> // std::numeric_limits
 #include <exception>
-#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/utility.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/detail/grisu3.hpp>
 #include <jsoncons/detail/parse_number.hpp>

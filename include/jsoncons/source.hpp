@@ -15,7 +15,7 @@
 #include <cstring> // std::memcpy
 #include <exception>
 #include <type_traits> // std::enable_if
-#include <jsoncons/config/jsoncons_config.hpp>
+#include <jsoncons/utility.hpp>
 #include <jsoncons/byte_string.hpp> // jsoncons::byte_traits
 
 namespace jsoncons { 
