@@ -16,7 +16,7 @@
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_encoder.hpp>
-#include <jsoncons/json_traits.hpp>
+#include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/staj_reader.hpp>
 #include <jsoncons/conversion_error.hpp>
 
@@ -98,7 +98,7 @@ private:
                        const Json& /*context_j*/, 
                        std::error_code& ec)
     {
-        auto j = json_traits<T>::template to_json<Json>(val);
+        auto j = json_type_traits<Json,T>::to_json(val);
         j.dump(encoder, ec);
     }
     template <class Json>
@@ -108,7 +108,7 @@ private:
                        const Json& context_j, 
                        std::error_code& ec)
     {
-        auto j = json_traits<T>::template to_json<Json>(val, context_j.get_allocator());
+        auto j = json_type_traits<Json,T>::to_json(val, context_j.get_allocator());
         j.dump(encoder, ec);
     }
 };
