@@ -139,7 +139,7 @@ to_integer(const CharT* s, std::size_t length)
     bool is_negative = false;
 
     const CharT* end = s + length; 
-    for (;s < end; ++s)
+    while (s < end)
     {
         switch(state)
         {
@@ -149,6 +149,7 @@ to_integer(const CharT* s, std::size_t length)
                 {
                     case '0':
                         state = integer_chars_state::integer; 
+                        ++s;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                         state = integer_chars_state::decimal;
@@ -156,6 +157,7 @@ to_integer(const CharT* s, std::size_t length)
                     case '-':
                         is_negative = true;
                         state = integer_chars_state::minus;
+                        ++s;
                         break;
                     default:
                         return to_integer_result<T>(to_integer_errc::invalid_digit);
@@ -168,6 +170,7 @@ to_integer(const CharT* s, std::size_t length)
                 {
                     case '0':
                         state = integer_chars_state::integer; 
+                        ++s;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                         state = integer_chars_state::decimal;
@@ -184,6 +187,7 @@ to_integer(const CharT* s, std::size_t length)
                     case 'x':case 'X':
                     {
                         state = integer_chars_state::hex;
+                        ++s;
                         break;
                     }
                     case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
@@ -340,7 +344,7 @@ to_integer(const CharT* s, std::size_t length)
     T n = 0;
 
     const CharT* end = s + length; 
-    for (;s < end; ++s)
+    while (s < end)
     {
         switch(state)
         {
@@ -350,6 +354,7 @@ to_integer(const CharT* s, std::size_t length)
                 {
                     case '0':
                         state = integer_chars_state::integer; 
+                        ++s;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                         state = integer_chars_state::decimal;
@@ -366,6 +371,7 @@ to_integer(const CharT* s, std::size_t length)
                     case 'x':case 'X':
                     {
                         state = integer_chars_state::hex;
+                        ++s;
                         break;
                     }
                     case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
