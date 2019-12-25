@@ -89,7 +89,7 @@ bool is_base10(const CharT* s, std::size_t length)
             {
                 switch(*s)
                 {
-                    case 0:case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                    case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                         state = integer_chars_state::decimal;
                         break;
                     case '-':
@@ -104,7 +104,7 @@ bool is_base10(const CharT* s, std::size_t length)
             {
                 switch(*s)
                 {
-                    case 0:case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                    case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                         state = integer_chars_state::decimal;
                         break;
                     default:
