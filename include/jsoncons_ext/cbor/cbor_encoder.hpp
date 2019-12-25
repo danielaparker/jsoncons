@@ -532,7 +532,7 @@ private:
         if (!more) {return more;}
         if (exponent.length() > 0)
         {
-            auto result = jsoncons::detail::to_integer<int64_t>(exponent.data(), exponent.length());
+            auto result = jsoncons::detail::integer_from_json<int64_t>(exponent.data(), exponent.length());
             if (result.ec != jsoncons::detail::to_integer_errc())
             {
                 ec = make_error_code(result.ec);
@@ -543,7 +543,7 @@ private:
         more = do_int64_value(scale, semantic_tag::none, context, ec);
         if (!more) {return more;}
 
-        auto result = jsoncons::detail::to_integer<int64_t>(s.data(),s.length());
+        auto result = jsoncons::detail::integer_from_json<int64_t>(s.data(),s.length());
         if (result.ec == jsoncons::detail::to_integer_errc())
         {
             more = do_int64_value(result.value, semantic_tag::none, context, ec);

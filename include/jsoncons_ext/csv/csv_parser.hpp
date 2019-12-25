@@ -1991,7 +1991,7 @@ private:
             {
                 if (is_negative)
                 {
-                    auto result = jsoncons::detail::to_integer<int64_t>(buffer_.data(), buffer_.length());
+                    auto result = jsoncons::detail::integer_from_json<int64_t>(buffer_.data(), buffer_.length());
                     if (result.ec == jsoncons::detail::to_integer_errc())
                     {
                         more_ = handler_->int64_value(result.value, semantic_tag::none, *this, ec);
@@ -2003,7 +2003,7 @@ private:
                 }
                 else
                 {
-                    auto result = jsoncons::detail::to_integer<uint64_t>(buffer_.data(), buffer_.length());
+                    auto result = jsoncons::detail::integer_from_json<uint64_t>(buffer_.data(), buffer_.length());
                     if (result.ec == jsoncons::detail::to_integer_errc())
                     {
                         more_ = handler_->uint64_value(result.value, semantic_tag::none, *this, ec);

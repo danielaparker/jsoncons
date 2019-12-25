@@ -363,7 +363,7 @@ private:
             case staj_event_type::name:
             case staj_event_type::string_value:
             {
-                auto result = jsoncons::detail::to_integer<int64_t>(value_.string_data_, length_);
+                auto result = jsoncons::detail::integer_from_json<int64_t>(value_.string_data_, length_);
                 if (result.ec != jsoncons::detail::to_integer_errc())
                 {
                     JSONCONS_THROW(json_runtime_error<std::runtime_error>(make_error_code(result.ec).message()));
@@ -397,7 +397,7 @@ private:
             case staj_event_type::name:
             case staj_event_type::string_value:
             {
-                auto result = jsoncons::detail::to_integer<uint64_t>(value_.string_data_, length_);
+                auto result = jsoncons::detail::integer_from_json<uint64_t>(value_.string_data_, length_);
                 if (result.ec != jsoncons::detail::to_integer_errc())
                 {
                     JSONCONS_THROW(json_runtime_error<std::runtime_error>(make_error_code(result.ec).message()));
@@ -472,7 +472,7 @@ private:
         switch (event_type_)
         {
             case staj_event_type::string_value:
-                if (jsoncons::detail::is_integer(value_.string_data_, length_) != jsoncons::detail::integer_chars_format::decimal)
+                if (!jsoncons::detail::is_base10(value_.string_data_, length_))
                 {
                     JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a bignum"));
                 }

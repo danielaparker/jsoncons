@@ -473,12 +473,12 @@ public:
             }
             else
             {
-                if (jsoncons::detail::is_integer(buffer_.data(), buffer_.length()) != jsoncons::detail::integer_chars_format::decimal)
+                if (!jsoncons::detail::is_base10(buffer_.data(), buffer_.length()))
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
+                auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer_.data(), buffer_.length());
                 if (result.ec != jsoncons::detail::to_integer_errc())
                 {
                     ec = jsonpointer_errc::invalid_index;
@@ -526,12 +526,12 @@ public:
             }
             else
             {
-                if (jsoncons::detail::is_integer(buffer_.data(), buffer_.length()) != jsoncons::detail::integer_chars_format::decimal)
+                if (!jsoncons::detail::is_base10(buffer_.data(), buffer_.length()))
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
+                auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer_.data(), buffer_.length());
                 if (result.ec != jsoncons::detail::to_integer_errc())
                 {
                     ec = jsonpointer_errc::invalid_index;
@@ -588,12 +588,12 @@ public:
             }
             else
             {
-                if (jsoncons::detail::is_integer(buffer_.data(), buffer_.length()) != jsoncons::detail::integer_chars_format::decimal)
+                if (!jsoncons::detail::is_base10(buffer_.data(), buffer_.length()))
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
+                auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer_.data(), buffer_.length());
                 if (result.ec != jsoncons::detail::to_integer_errc())
                 {
                     ec = jsonpointer_errc::invalid_index;
@@ -643,12 +643,12 @@ public:
             }
             else
             {
-                if (jsoncons::detail::is_integer(buffer_.data(), buffer_.length()) != jsoncons::detail::integer_chars_format::decimal)
+                if (!jsoncons::detail::is_base10(buffer_.data(), buffer_.length()))
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
+                auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer_.data(), buffer_.length());
                 if (result.ec != jsoncons::detail::to_integer_errc())
                 {
                     ec = jsonpointer_errc::invalid_index;
@@ -717,12 +717,12 @@ public:
             }
             else
             {
-                if (jsoncons::detail::is_integer(buffer.data(), buffer.length()) != jsoncons::detail::integer_chars_format::decimal)
+                if (!jsoncons::detail::is_base10(buffer.data(), buffer.length()))
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                auto result = jsoncons::detail::to_integer<std::size_t>(buffer.data(), buffer.length());
+                auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer.data(), buffer.length());
                 if (result.ec != jsoncons::detail::to_integer_errc())
                 {
                     ec = jsonpointer_errc::invalid_index;
