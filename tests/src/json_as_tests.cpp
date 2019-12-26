@@ -10,6 +10,35 @@
 #include <ctime>
 #include <map>
 
+TEST_CASE("json integer as string")
+{
+    SECTION("Test 1")
+    {
+        jsoncons::json j("0xabcdef");
+        CHECK(j.as<int32_t>() == 11259375);
+    }
+    SECTION("Test 2")
+    {
+        jsoncons::json j("0x0123456789");
+        CHECK(j.as<int64_t>() == 4886718345);
+    }
+    SECTION("Test 3")
+    {
+        jsoncons::json j("0XABCDEF");
+        CHECK(j.as<uint32_t>() == 11259375u);
+    }
+    SECTION("Test 4")
+    {
+        jsoncons::json j("0X0123456789");
+        CHECK(j.as<uint64_t>() == 4886718345);
+    }
+    SECTION("Test 5")
+    {
+        jsoncons::json j("0x0");
+        CHECK(j.as<int>() == 0);
+    }
+}
+
 TEST_CASE("json::is_object on proxy")
 {
     jsoncons::json root = jsoncons::json::parse(R"({"key":"value"})");

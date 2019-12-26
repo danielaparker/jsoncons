@@ -35,6 +35,11 @@ namespace jsoncons {
 
         virtual ~basic_json_content_handler() {}
 
+        void flush()
+        {
+            do_flush();
+        }
+
         bool begin_object(semantic_tag tag=semantic_tag::none,
                           const ser_context& context=null_ser_context())
         {
@@ -421,11 +426,6 @@ namespace jsoncons {
             return do_end_multi_dim(context, ec);
         }
 
-        void flush()
-        {
-            do_flush();
-        }
-
     #if !defined(JSONCONS_NO_DEPRECATED)
 
         JSONCONS_DEPRECATED_MSG("Instead, use const byte_string_view&, semantic_tag=semantic_tag::none, const ser_context&=null_ser_context()") 
@@ -572,6 +572,9 @@ namespace jsoncons {
 
     #endif
     private:
+
+        virtual void do_flush() = 0;
+
         virtual bool do_begin_object(semantic_tag tag, 
                                      const ser_context& context, 
                                      std::error_code& ec) = 0;
@@ -865,8 +868,6 @@ namespace jsoncons {
         {
             return do_end_array(context, ec);
         }
-
-        virtual void do_flush() = 0;
 
     };
 
