@@ -12,30 +12,45 @@
 
 TEST_CASE("json integer as string")
 {
-    SECTION("Test 1")
+    SECTION("0xabcdef")
     {
         jsoncons::json j("0xabcdef");
         CHECK(j.as<int32_t>() == 11259375);
     }
-    SECTION("Test 2")
+    SECTION("0x123456789")
     {
-        jsoncons::json j("0x0123456789");
+        jsoncons::json j("0x123456789");
         CHECK(j.as<int64_t>() == 4886718345);
     }
-    SECTION("Test 3")
+    SECTION("0XABCDEF")
     {
         jsoncons::json j("0XABCDEF");
         CHECK(j.as<uint32_t>() == 11259375u);
     }
-    SECTION("Test 4")
+    SECTION("0X123456789")
     {
-        jsoncons::json j("0X0123456789");
+        jsoncons::json j("0X123456789");
         CHECK(j.as<uint64_t>() == 4886718345);
     }
-    SECTION("Test 5")
+    SECTION("0x0")
     {
         jsoncons::json j("0x0");
         CHECK(j.as<int>() == 0);
+    }
+    SECTION("0777")
+    {
+        jsoncons::json j("0777");
+        CHECK(j.as<int>() == 511);
+    }
+    SECTION("0b1001")
+    {
+        jsoncons::json j("0b1001");
+        CHECK(j.as<int>() == 9);
+    }
+    SECTION("0B1001")
+    {
+        jsoncons::json j("0B1001");
+        CHECK(j.as<int>() == 9);
     }
 }
 
@@ -88,12 +103,12 @@ TEST_CASE("json::as<__int128>()")
     std::string s = "-18446744073709551617";
 
     jsoncons::detail::to_integer_result<__int128> result = jsoncons::detail::integer_from_json<__int128>(s.data(),s.size());
-    REQUIRE(result.ec == jsoncons::detail::to_integer_errc());
+    REQUIRE((result == true));
 
     jsoncons::json j(s);
 
     __int128 val = j.as<__int128>();
-    CHECK(result.value == val);
+    CHECK(result.value() == val);
 }
 
 TEST_CASE("json::as<unsigned __int128>()")
@@ -101,11 +116,11 @@ TEST_CASE("json::as<unsigned __int128>()")
     std::string s = "18446744073709551616";
 
     jsoncons::detail::to_integer_result<unsigned __int128> result = jsoncons::detail::integer_from_json<unsigned __int128>(s.data(),s.size());
-    REQUIRE(result.ec == jsoncons::detail::to_integer_errc());
+    REQUIRE((result == true));
 
     jsoncons::json j(s);
 
     unsigned __int128 val = j.as<unsigned __int128>();
-    CHECK(result.value == val);
+    CHECK(result.value() == val);
 }
 #endif

@@ -1992,9 +1992,9 @@ private:
                 if (is_negative)
                 {
                     auto result = jsoncons::detail::integer_from_json<int64_t>(buffer_.data(), buffer_.length());
-                    if (result.ec == jsoncons::detail::to_integer_errc())
+                    if (result)
                     {
-                        more_ = handler_->int64_value(result.value, semantic_tag::none, *this, ec);
+                        more_ = handler_->int64_value(result.value(), semantic_tag::none, *this, ec);
                     }
                     else // Must be overflow
                     {
@@ -2004,17 +2004,18 @@ private:
                 else
                 {
                     auto result = jsoncons::detail::integer_from_json<uint64_t>(buffer_.data(), buffer_.length());
-                    if (result.ec == jsoncons::detail::to_integer_errc())
+                    if (result)
                     {
-                        more_ = handler_->uint64_value(result.value, semantic_tag::none, *this, ec);
+                        more_ = handler_->uint64_value(result.value(), semantic_tag::none, *this, ec);
                     }
-                    else if (result.ec == jsoncons::detail::to_integer_errc::overflow)
+                    else if (result.error_code() == jsoncons::detail::to_integer_errc::overflow)
                     {
                         more_ = handler_->string_value(buffer_, semantic_tag::bigint, *this, ec);
                     }
                     else
                     {
-                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>(make_error_code(result.ec).message()));
+                        ec = result.error_code();
+                        return;
                     }
                 }
                 break;

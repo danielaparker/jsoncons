@@ -20,60 +20,92 @@
 
 namespace jsoncons { namespace detail {
 
-enum class to_integer_errc : uint8_t {success=0,overflow,invalid_digit};
+    enum class to_integer_errc : uint8_t {success=0,overflow,invalid_digit};
+
+    class to_integer_error_category_impl
+       : public std::error_category
+    {
+    public:
+        const char* name() const noexcept override
+        {
+            return "jsoncons/integer_from_json";
+        }
+        std::string message(int ev) const override
+        {
+            switch (static_cast<to_integer_errc>(ev))
+            {
+                case to_integer_errc::overflow:
+                    return "Integer overflow";
+                case to_integer_errc::invalid_digit:
+                    return "Invalid digit";
+                default:
+                    return "Unknown integer_from_json error";
+            }
+        }
+    };
+
+    inline
+    const std::error_category& to_integer_error_category()
+    {
+      static to_integer_error_category_impl instance;
+      return instance;
+    }
+
+    inline 
+    std::error_code make_error_code(to_integer_errc e)
+    {
+        return std::error_code(static_cast<int>(e),to_integer_error_category());
+    }
+
+} // namespace detail
+} // namespace jsoncons
+
+namespace std {
+    template<>
+    struct is_error_code_enum<jsoncons::detail::to_integer_errc> : public true_type
+    {
+    };
+}
+
+namespace jsoncons { namespace detail {
 
 template <class T>
-struct to_integer_result
+class to_integer_result
 {
-    to_integer_result(T value, to_integer_errc ec = to_integer_errc())
-        : value(value), ec(ec)
-    {
-    }
-    to_integer_result(to_integer_errc ec)
-        : value(), ec(ec)
-    {
-    }
-    T value;
+    T value_;
     to_integer_errc ec;
-};
-
-class to_integer_error_category_impl
-   : public std::error_category
-{
 public:
-    const char* name() const noexcept override
+    constexpr to_integer_result(T value_)
+        : value_(value_), ec(to_integer_errc::success)
     {
-        return "jsoncons/integer_from_json";
     }
-    std::string message(int ev) const override
+    constexpr to_integer_result(to_integer_errc ec)
+        : value_(), ec(ec)
     {
-        switch (static_cast<to_integer_errc>(ev))
-        {
-            case to_integer_errc::overflow:
-                return "Integer overflow";
-            case to_integer_errc::invalid_digit:
-                return "Invalid digit";
-            default:
-                return "Unknown integer_from_json error";
-        }
+    }
+
+    to_integer_result(const to_integer_result&) = default;
+
+    to_integer_result& operator=(const to_integer_result&) = default;
+
+    constexpr explicit operator bool() const noexcept
+    {
+        return ec == to_integer_errc::success;
+    }
+
+    T value() const
+    {
+        return value_;
+    }
+
+    std::error_code error_code() const
+    {
+        return make_error_code(ec);
     }
 };
-
-inline
-const std::error_category& to_integer_error_category()
-{
-  static to_integer_error_category_impl instance;
-  return instance;
-}
-
-inline 
-std::error_code make_error_code(to_integer_errc e)
-{
-    return std::error_code(static_cast<int>(e),to_integer_error_category());
-}
 
 enum class integer_chars_format : uint8_t {decimal=1,hex};
-enum class integer_chars_state {initial,minus,integer,decimal,hex};
+enum class integer_chars_state {initial,minus,integer,binary,octal,decimal,hex};
 
 template <class CharT>
 bool is_base10(const CharT* s, std::size_t length)
@@ -148,10 +180,10 @@ to_integer(const CharT* s, std::size_t length)
                 switch(*s)
                 {
                     case '0':
-                        state = integer_chars_state::integer; 
+                        state = integer_chars_state::integer; // Could be binary, octal, hex
                         ++s;
                         break;
-                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9': // Must be decimal
                         state = integer_chars_state::decimal;
                         break;
                     case '-':
@@ -168,11 +200,11 @@ to_integer(const CharT* s, std::size_t length)
             {
                 switch(*s)
                 {
-                    case '0':
+                    case '0': // Could be binary, octal, hex
                         state = integer_chars_state::integer; 
                         ++s;
                         break;
-                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9': // Must be decimal
                         state = integer_chars_state::decimal;
                         break;
                     default:
@@ -184,6 +216,12 @@ to_integer(const CharT* s, std::size_t length)
             {
                 switch(*s)
                 {
+                    case 'b':case 'B':
+                    {
+                        state = integer_chars_state::binary;
+                        ++s;
+                        break;
+                    }
                     case 'x':case 'X':
                     {
                         state = integer_chars_state::hex;
@@ -192,11 +230,135 @@ to_integer(const CharT* s, std::size_t length)
                     }
                     case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                     {
-                        state = integer_chars_state::decimal;
+                        state = integer_chars_state::octal;
                         break;
                     }
                     default:
                         return to_integer_result<T>(to_integer_errc::invalid_digit);
+                }
+                break;
+            }
+            case integer_chars_state::binary:
+            {
+                if (is_negative)
+                {
+                    static constexpr T min_value = (std::numeric_limits<T>::lowest)();
+                    static constexpr T min_value_div_2 = min_value / 2;
+                    for (; s < end; ++s)
+                    {
+                        T x = 0;
+                        switch(*s)
+                        {
+                            case '0':case '1':
+                                x = (T)*s - (T)('0');
+                                break;
+                            case ',':
+                                break;
+                            default:
+                                return to_integer_result<T>(to_integer_errc::invalid_digit);
+                        }
+                        if (n < min_value_div_2)
+                        {
+                            return to_integer_result<T>(to_integer_errc::overflow);
+                        }
+                        n = n * 2;
+                        if (n < min_value + x)
+                        {
+                            return to_integer_result<T>(to_integer_errc::overflow);
+                        }
+                        n -= x;
+                    }
+                }
+                else
+                {
+                    static constexpr T max_value = (std::numeric_limits<T>::max)();
+                    static constexpr T max_value_div_2 = max_value / 2;
+                    for (; s < end; ++s)
+                    {
+                        T x = 0;
+                        switch(*s)
+                        {
+                            case '0':case '1':
+                                x = static_cast<T>(*s) - static_cast<T>('0');
+                                break;
+                            case ',':
+                                break;
+                            default:
+                                return to_integer_result<T>(to_integer_errc::invalid_digit);
+                        }
+                        if (n > max_value_div_2)
+                        {
+                            return to_integer_result<T>(to_integer_errc::overflow);
+                        }
+                        n = n * 2;
+                        if (n > max_value - x)
+                        {
+                            return to_integer_result<T>(to_integer_errc::overflow);
+                        }
+                        n += x;
+                    }
+                }
+                break;
+            }
+            case integer_chars_state::octal:
+            {
+                if (is_negative)
+                {
+                    static constexpr T min_value = (std::numeric_limits<T>::lowest)();
+                    static constexpr T min_value_div_8 = min_value / 8;
+                    for (; s < end; ++s)
+                    {
+                        T x = 0;
+                        switch(*s)
+                        {
+                            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':
+                                x = (T)*s - (T)('0');
+                                break;
+                            case ',':
+                                break;
+                            default:
+                                return to_integer_result<T>(to_integer_errc::invalid_digit);
+                        }
+                        if (n < min_value_div_8)
+                        {
+                            return to_integer_result<T>(to_integer_errc::overflow);
+                        }
+                        n = n * 8;
+                        if (n < min_value + x)
+                        {
+                            return to_integer_result<T>(to_integer_errc::overflow);
+                        }
+                        n -= x;
+                    }
+                }
+                else
+                {
+                    static constexpr T max_value = (std::numeric_limits<T>::max)();
+                    static constexpr T max_value_div_8 = max_value / 8;
+                    for (; s < end; ++s)
+                    {
+                        T x = 0;
+                        switch(*s)
+                        {
+                            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':
+                                x = static_cast<T>(*s) - static_cast<T>('0');
+                                break;
+                            case ',':
+                                break;
+                            default:
+                                return to_integer_result<T>(to_integer_errc::invalid_digit);
+                        }
+                        if (n > max_value_div_8)
+                        {
+                            return to_integer_result<T>(to_integer_errc::overflow);
+                        }
+                        n = n * 8;
+                        if (n > max_value - x)
+                        {
+                            return to_integer_result<T>(to_integer_errc::overflow);
+                        }
+                        n += x;
+                    }
                 }
                 break;
             }
@@ -213,6 +375,8 @@ to_integer(const CharT* s, std::size_t length)
                         {
                             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                                 x = (T)*s - (T)('0');
+                                break;
+                            case ',':
                                 break;
                             default:
                                 return to_integer_result<T>(to_integer_errc::invalid_digit);
@@ -240,6 +404,8 @@ to_integer(const CharT* s, std::size_t length)
                         {
                             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                                 x = static_cast<T>(*s) - static_cast<T>('0');
+                                break;
+                            case ',':
                                 break;
                             default:
                                 return to_integer_result<T>(to_integer_errc::invalid_digit);
@@ -279,6 +445,8 @@ to_integer(const CharT* s, std::size_t length)
                             case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
                                 x = c - ('A' - 10);
                                 break;
+                            case ',':
+                                break;
                             default:
                                 return to_integer_result<T>(to_integer_errc::invalid_digit);
                         }
@@ -312,6 +480,8 @@ to_integer(const CharT* s, std::size_t length)
                                 break;
                             case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
                                 x = c - ('A' - 10);
+                                break;
+                            case ',':
                                 break;
                             default:
                                 return to_integer_result<T>(to_integer_errc::invalid_digit);
@@ -353,10 +523,10 @@ to_integer(const CharT* s, std::size_t length)
                 switch(*s)
                 {
                     case '0':
-                        state = integer_chars_state::integer; 
+                        state = integer_chars_state::integer; // Could be binary, octal, hex 
                         ++s;
                         break;
-                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9': // Must be decimal
                         state = integer_chars_state::decimal;
                         break;
                     default:
@@ -368,6 +538,12 @@ to_integer(const CharT* s, std::size_t length)
             {
                 switch(*s)
                 {
+                    case 'b':case 'B':
+                    {
+                        state = integer_chars_state::binary;
+                        ++s;
+                        break;
+                    }
                     case 'x':case 'X':
                     {
                         state = integer_chars_state::hex;
@@ -376,11 +552,67 @@ to_integer(const CharT* s, std::size_t length)
                     }
                     case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                     {
-                        state = integer_chars_state::decimal;
+                        state = integer_chars_state::octal;
                         break;
                     }
                     default:
                         return to_integer_result<T>(to_integer_errc::invalid_digit);
+                }
+                break;
+            }
+            case integer_chars_state::binary:
+            {
+                static constexpr T max_value = (std::numeric_limits<T>::max)();
+                static constexpr T max_value_div_2 = max_value / 2;
+                for (; s < end; ++s)
+                {
+                    T x = 0;
+                    switch(*s)
+                    {
+                        case '0':case '1':
+                            x = static_cast<T>(*s) - static_cast<T>('0');
+                            break;
+                        default:
+                            return to_integer_result<T>(to_integer_errc::invalid_digit);
+                    }
+                    if (n > max_value_div_2)
+                    {
+                        return to_integer_result<T>(to_integer_errc::overflow);
+                    }
+                    n = n * 2;
+                    if (n > max_value - x)
+                    {
+                        return to_integer_result<T>(to_integer_errc::overflow);
+                    }
+                    n += x;
+                }
+                break;
+            }
+            case integer_chars_state::octal:
+            {
+                static constexpr T max_value = (std::numeric_limits<T>::max)();
+                static constexpr T max_value_div_8 = max_value / 8;
+                for (; s < end; ++s)
+                {
+                    T x = 0;
+                    switch(*s)
+                    {
+                        case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':
+                            x = static_cast<T>(*s) - static_cast<T>('0');
+                            break;
+                        default:
+                            return to_integer_result<T>(to_integer_errc::invalid_digit);
+                    }
+                    if (n > max_value_div_8)
+                    {
+                        return to_integer_result<T>(to_integer_errc::overflow);
+                    }
+                    n = n * 8;
+                    if (n > max_value - x)
+                    {
+                        return to_integer_result<T>(to_integer_errc::overflow);
+                    }
+                    n += x;
                 }
                 break;
             }
@@ -469,8 +701,6 @@ integer_from_json(const CharT* s, std::size_t length)
     static_assert(std::numeric_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
 
-    to_integer_errc ec{};
-
     T n = 0;
     const CharT* end = s + length; 
     if (*s == '-')
@@ -483,14 +713,12 @@ integer_from_json(const CharT* s, std::size_t length)
             T x = (T)*s - (T)('0');
             if (n < min_value_div_10)
             {
-                ec = to_integer_errc::overflow;
-                break;
+                return to_integer_result<T>(to_integer_errc::overflow);
             }
             n = n * 10;
             if (n < min_value + x)
             {
-                ec = to_integer_errc::overflow;
-                break;
+                return to_integer_result<T>(to_integer_errc::overflow);
             }
 
             n -= x;
@@ -505,21 +733,19 @@ integer_from_json(const CharT* s, std::size_t length)
             T x = static_cast<T>(*s) - static_cast<T>('0');
             if (n > max_value_div_10)
             {
-                ec = to_integer_errc::overflow;
-                break;
+                return to_integer_result<T>(to_integer_errc::overflow);
             }
             n = n * 10;
             if (n > max_value - x)
             {
-                ec = to_integer_errc::overflow;
-                break;
+                return to_integer_result<T>(to_integer_errc::overflow);
             }
 
             n += x;
         }
     }
 
-    return to_integer_result<T>({n,ec});
+    return to_integer_result<T>(n);
 }
 
 // Precondition: s satisfies
@@ -536,8 +762,6 @@ integer_from_json(const CharT* s, std::size_t length)
     static_assert(std::numeric_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
 
-    to_integer_errc ec{};
-
     T n = 0;
     const CharT* end = s + length; 
     if (*s == '-')
@@ -550,14 +774,12 @@ integer_from_json(const CharT* s, std::size_t length)
             T x = (T)*s - (T)('0');
             if (n < min_value_div_10)
             {
-                ec = to_integer_errc::overflow;
-                break;
+                return to_integer_result<T>(to_integer_errc::overflow);
             }
             n = n * 10;
             if (n < min_value + x)
             {
-                ec = to_integer_errc::overflow;
-                break;
+                return to_integer_result<T>(to_integer_errc::overflow);
             }
 
             n -= x;
@@ -572,21 +794,19 @@ integer_from_json(const CharT* s, std::size_t length)
             T x = static_cast<T>(*s) - static_cast<T>('0');
             if (n > max_value_div_10)
             {
-                ec = to_integer_errc::overflow;
-                break;
+                return to_integer_result<T>(to_integer_errc::overflow);
             }
             n = n * 10;
             if (n > max_value - x)
             {
-                ec = to_integer_errc::overflow;
-                break;
+                return to_integer_result<T>(to_integer_errc::overflow);
             }
 
             n += x;
         }
     }
 
-    return to_integer_result<T>({n,ec});
+    return to_integer_result<T>(n);
 }
 
 // base16_to_integer
@@ -599,7 +819,6 @@ base16_to_integer(const CharT* s, std::size_t length)
     JSONCONS_ASSERT(length > 0);
 
     T n = 0;
-    to_integer_errc ec{};
     const CharT* end = s + length; 
     if (*s == '-')
     {
@@ -622,18 +841,16 @@ base16_to_integer(const CharT* s, std::size_t length)
                     x = c - ('A' - 10);
                     break;
                 default:
-                    JSONCONS_THROW(std::runtime_error("Invalid hex digit"));
+                    return to_integer_result<T>(to_integer_errc::invalid_digit);
             }
             if (n < min_value_div_16)
             {
-                ec = to_integer_errc::overflow;
-                break;
+                return to_integer_result<T>(to_integer_errc::overflow);
             }
             n = n * 16;
             if (n < min_value + x)
             {
-                ec = to_integer_errc::overflow;
-                break;
+                return to_integer_result<T>(to_integer_errc::overflow);
             }
             n -= x;
         }
@@ -658,25 +875,23 @@ base16_to_integer(const CharT* s, std::size_t length)
                     x = c - ('A' - 10);
                     break;
                 default:
-                    JSONCONS_THROW(std::runtime_error("Invalid hex digit"));
+                    return to_integer_result<T>(to_integer_errc::invalid_digit);
             }
             if (n > max_value_div_16)
             {
-                ec = to_integer_errc::overflow;
-                break;
+                return to_integer_result<T>(to_integer_errc::overflow);
             }
             n = n * 16;
             if (n > max_value - x)
             {
-                ec = to_integer_errc::overflow;
-                break;
+                return to_integer_result<T>(to_integer_errc::overflow);
             }
 
             n += x;
         }
     }
 
-    return to_integer_result<T>({ n,ec });
+    return to_integer_result<T>(n);
 }
 
 template <class T, class CharT>
@@ -687,7 +902,6 @@ base16_to_integer(const CharT* s, std::size_t length)
     JSONCONS_ASSERT(length > 0);
 
     T n = 0;
-    to_integer_errc ec{};
     const CharT* end = s + length; 
 
     static const T max_value = (std::numeric_limits<T>::max)();
@@ -708,24 +922,22 @@ base16_to_integer(const CharT* s, std::size_t length)
                 x = c - ('A' - 10);
                 break;
             default:
-                JSONCONS_THROW(std::runtime_error("Invalid hex digit"));
+                return to_integer_result<T>(to_integer_errc::invalid_digit);
         }
         if (n > max_value_div_16)
         {
-            ec = to_integer_errc::overflow;
-            break;
+            return to_integer_result<T>(to_integer_errc::overflow);
         }
         n = n * 16;
         if (n > max_value - x)
         {
-            ec = to_integer_errc::overflow;
-            break;
+            return to_integer_result<T>(to_integer_errc::overflow);
         }
 
         n += x;
     }
 
-    return to_integer_result<T>({ n,ec });
+    return to_integer_result<T>(n);
 }
 
 #if defined(JSONCONS_HAS_MSC__STRTOD_L)

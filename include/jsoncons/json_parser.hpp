@@ -2591,9 +2591,9 @@ private:
     void end_negative_value(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
         auto result = jsoncons::detail::integer_from_json<int64_t>(string_buffer_.data(), string_buffer_.length());
-        if (result.ec == jsoncons::detail::to_integer_errc())
+        if (result)
         {
-            more_ = handler.int64_value(result.value, semantic_tag::none, *this, ec);
+            more_ = handler.int64_value(result.value(), semantic_tag::none, *this, ec);
         }
         else // Must be overflow
         {
@@ -2605,9 +2605,9 @@ private:
     void end_positive_value(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
         auto result = jsoncons::detail::integer_from_json<uint64_t>(string_buffer_.data(), string_buffer_.length());
-        if (result.ec == jsoncons::detail::to_integer_errc())
+        if (result)
         {
-            more_ = handler.uint64_value(result.value, semantic_tag::none, *this, ec);
+            more_ = handler.uint64_value(result.value(), semantic_tag::none, *this, ec);
         }
         else // Must be overflow
         {

@@ -533,23 +533,23 @@ private:
         if (exponent.length() > 0)
         {
             auto result = jsoncons::detail::integer_from_json<int64_t>(exponent.data(), exponent.length());
-            if (result.ec != jsoncons::detail::to_integer_errc())
+            if (!result)
             {
-                ec = make_error_code(result.ec);
+                ec = result.error_code();
                 return false;
             }
-            scale += result.value;
+            scale += result.value();
         }
         more = do_int64_value(scale, semantic_tag::none, context, ec);
         if (!more) {return more;}
 
         auto result = jsoncons::detail::integer_from_json<int64_t>(s.data(),s.length());
-        if (result.ec == jsoncons::detail::to_integer_errc())
+        if (result)
         {
-            more = do_int64_value(result.value, semantic_tag::none, context, ec);
+            more = do_int64_value(result.value(), semantic_tag::none, context, ec);
             if (!more) {return more;}
         }
-        else if (result.ec == jsoncons::detail::to_integer_errc::overflow)
+        else if (result.error_code() == jsoncons::detail::to_integer_errc::overflow)
         {
             bignum n(s.data(), s.length());
             write_bignum(n);
@@ -557,7 +557,7 @@ private:
         }
         else
         {
-            ec = make_error_code(result.ec);
+            ec = result.error_code();
             return false;
         }
         more = do_end_array(context, ec);
@@ -714,22 +714,23 @@ private:
         if (exponent.length() > 0)
         {
             auto result = jsoncons::detail::base16_to_integer<int64_t>(exponent.data(), exponent.length());
-            if (result.ec != jsoncons::detail::to_integer_errc())
+            if (!result)
             {
-                JSONCONS_THROW(json_runtime_error<std::invalid_argument>(make_error_code(result.ec).message()));
+                ec = result.error_code();
+                return false;
             }
-            scale += result.value;
+            scale += result.value();
         }
         more = do_int64_value(scale, semantic_tag::none, context, ec);
         if (!more) return more;
 
         auto result = jsoncons::detail::base16_to_integer<int64_t>(s.data(),s.length());
-        if (result.ec == jsoncons::detail::to_integer_errc())
+        if (result)
         {
-            more = do_int64_value(result.value, semantic_tag::none, context, ec);
+            more = do_int64_value(result.value(), semantic_tag::none, context, ec);
             if (!more) return more;
         }
-        else if (result.ec == jsoncons::detail::to_integer_errc::overflow)
+        else if (result.error_code() == jsoncons::detail::to_integer_errc::overflow)
         {
             bignum n(s.data(), s.length(), 16);
             write_bignum(n);
@@ -737,7 +738,7 @@ private:
         }
         else
         {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>(make_error_code(result.ec).message()));
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>(result.error_code().message()));
         }
         return do_end_array(context, ec);
     }

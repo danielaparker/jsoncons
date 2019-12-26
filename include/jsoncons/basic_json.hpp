@@ -3689,11 +3689,11 @@ public:
             case storage_type::long_string_value:
             {
                 auto result = jsoncons::detail::to_integer<T>(as_string_view().data(), as_string_view().length());
-                if (result.ec != jsoncons::detail::to_integer_errc())
+                if (!result)
                 {
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>(make_error_code(result.ec).message()));
+                    JSONCONS_THROW(json_runtime_error<std::runtime_error>(result.error_code().message()));
                 }
-                return result.value;
+                return result.value();
             }
             case storage_type::half_value:
                 return static_cast<T>(var_.half_storage_cast().value());

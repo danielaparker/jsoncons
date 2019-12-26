@@ -479,12 +479,12 @@ public:
                     return;
                 }
                 auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer_.data(), buffer_.length());
-                if (result.ec != jsoncons::detail::to_integer_errc())
+                if (!result)
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                std::size_t index = result.value;
+                std::size_t index = result.value();
                 if (index > current_.back().get().size())
                 {
                     ec = jsonpointer_errc::index_exceeds_array_size;
@@ -532,12 +532,12 @@ public:
                     return;
                 }
                 auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer_.data(), buffer_.length());
-                if (result.ec != jsoncons::detail::to_integer_errc())
+                if (!result)
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                std::size_t index = result.value;
+                std::size_t index = result.value();
                 if (index > current_.back().get().size())
                 {
                     ec = jsonpointer_errc::index_exceeds_array_size;
@@ -594,12 +594,12 @@ public:
                     return;
                 }
                 auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer_.data(), buffer_.length());
-                if (result.ec != jsoncons::detail::to_integer_errc())
+                if (!result)
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                std::size_t index = result.value;
+                std::size_t index = result.value();
                 if (index >= current_.back().get().size())
                 {
                     ec = jsonpointer_errc::index_exceeds_array_size;
@@ -649,12 +649,12 @@ public:
                     return;
                 }
                 auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer_.data(), buffer_.length());
-                if (result.ec != jsoncons::detail::to_integer_errc())
+                if (!result)
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                std::size_t index = result.value;
+                std::size_t index = result.value();
                 if (index >= current_.back().get().size())
                 {
                     ec = jsonpointer_errc::index_exceeds_array_size;
@@ -723,12 +723,12 @@ public:
                     return;
                 }
                 auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer.data(), buffer.length());
-                if (result.ec != jsoncons::detail::to_integer_errc())
+                if (!result)
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                std::size_t index = result.value;
+                std::size_t index = result.value();
                 if (index >= current.back().get().size())
                 {
                     ec = jsonpointer_errc::index_exceeds_array_size;
