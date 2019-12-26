@@ -14,7 +14,10 @@ Changes:
 - The `cbor_content_handler` public member functions `typed_array()` and private virtual functions 
 `do_typed_array()` have been moved to `basic_json_content_handler`. The `do_typed_array()`
 private virtual functions have been given default implementations. `cbor_content_handler`
-has been deprecated. 
+has been deprecated.
+ 
+- Replaced Martin Moene's span-lite with simpler implementation until `std::span` is available
+(primarily for typed array interface)  
 
 v0.142.0
 --------
