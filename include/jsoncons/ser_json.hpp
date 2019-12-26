@@ -155,12 +155,12 @@ encode_json(const T& val,
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s, options);
+        basic_json_encoder<CharT,jsoncons::string_destination<std::basic_string<CharT>>> encoder(s, options);
         val.dump(encoder);
     }
     else
     {
-        basic_json_compressed_encoder<CharT, jsoncons::string_result<std::basic_string<CharT>>> encoder(s, options);
+        basic_json_compressed_encoder<CharT, jsoncons::string_destination<std::basic_string<CharT>>> encoder(s, options);
         val.dump(encoder);
     }
 }
@@ -174,12 +174,12 @@ encode_json(const T& val,
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s, options);
+        basic_json_encoder<CharT,jsoncons::string_destination<std::basic_string<CharT>>> encoder(s, options);
         encode_json(val, encoder);
     }
     else
     {
-        basic_json_compressed_encoder<CharT, jsoncons::string_result<std::basic_string<CharT>>> encoder(s, options);
+        basic_json_compressed_encoder<CharT, jsoncons::string_destination<std::basic_string<CharT>>> encoder(s, options);
         encode_json(val, encoder);
     }
 }
@@ -255,12 +255,12 @@ encode_json(const T& val,
 { 
     if (line_indent == indenting::indent)
     {
-        basic_json_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s, options);
+        basic_json_encoder<CharT,jsoncons::string_destination<std::basic_string<CharT>>> encoder(s, options);
         encode_json(val, encoder, context_j);
     }
     else
     {
-        basic_json_compressed_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s, options);
+        basic_json_compressed_encoder<CharT,jsoncons::string_destination<std::basic_string<CharT>>> encoder(s, options);
         encode_json(val, encoder, context_j);
     }
 }
@@ -366,12 +366,12 @@ void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context
 { 
     if (line_indent == indenting::indent)
     {
-        basic_json_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s, options);
+        basic_json_encoder<CharT,jsoncons::string_destination<std::basic_string<CharT>>> encoder(s, options);
         encode_json(context_j, val, encoder);
     }
     else
     {
-        basic_json_compressed_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s, options);
+        basic_json_compressed_encoder<CharT,jsoncons::string_destination<std::basic_string<CharT>>> encoder(s, options);
         encode_json(context_j, val, encoder);
     }
 }
@@ -385,12 +385,12 @@ void encode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context
 { 
     if (line_indent == indenting::indent)
     {
-        basic_json_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s, basic_json_encode_options<CharT>());
+        basic_json_encoder<CharT,jsoncons::string_destination<std::basic_string<CharT>>> encoder(s, basic_json_encode_options<CharT>());
         encode_json(context_j, val, encoder);
     }
     else
     {
-        basic_json_compressed_encoder<CharT,jsoncons::string_result<std::basic_string<CharT>>> encoder(s, basic_json_encode_options<CharT>());
+        basic_json_compressed_encoder<CharT,jsoncons::string_destination<std::basic_string<CharT>>> encoder(s, basic_json_encode_options<CharT>());
         encode_json(context_j, val, encoder);
     }
 }

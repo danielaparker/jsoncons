@@ -4,7 +4,7 @@ __`jsoncons_ext/cbor/cbor_encoder.hpp`__
 
 ```c++
 template<
-    class Result,class Float128T = std::nullptr_t>
+    class Destination>
 > class basic_cbor_encoder final : public json_content_handler
 ```
 
@@ -12,26 +12,26 @@ template<
 
 ![basic_cbor_encoder](./diagrams/cbor_encoder.png)
 
-Four specializations for common result types are defined:
+Four specializations for common destination types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-cbor_stream_encoder            |basic_cbor_encoder<jsoncons::binary_stream_result>
-cbor_bytes_encoder     |basic_cbor_encoder<jsoncons::binary_buffer_result>
+cbor_stream_encoder            |basic_cbor_encoder<jsoncons::bin_stream_destination>
+cbor_bytes_encoder     |basic_cbor_encoder<jsoncons::bytes_destination>
 
 #### Member types
 
 Type                       |Definition
 ---------------------------|------------------------------
 char_type                  |char
-result_type                |Result
+destination_type                |Destination
 float128_type              |Float128T
 string_view_type           |
 
 #### Constructors
 
-    explicit basic_cbor_encoder(result_type result)
-Constructs a new encoder that writes to the specified result.
+    explicit basic_cbor_encoder(destination_type dest)
+Constructs a new encoder that writes to the specified destination.
 
 #### Destructor
 

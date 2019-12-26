@@ -413,7 +413,7 @@ public:
 
 // binary sources
 
-class binary_stream_source 
+class bin_stream_source 
 {
 public:
     typedef uint8_t value_type;
@@ -425,31 +425,31 @@ private:
     std::size_t position_;
 
     // Noncopyable 
-    binary_stream_source(const binary_stream_source&) = delete;
-    binary_stream_source& operator=(const binary_stream_source&) = delete;
+    bin_stream_source(const bin_stream_source&) = delete;
+    bin_stream_source& operator=(const bin_stream_source&) = delete;
 public:
-    binary_stream_source()
+    bin_stream_source()
         : is_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0)
     {
     }
 
-    binary_stream_source(std::istream& is)
+    bin_stream_source(std::istream& is)
         : is_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0)
     {
     }
 
-    binary_stream_source(binary_stream_source&& other) noexcept
+    bin_stream_source(bin_stream_source&& other) noexcept
     {
         std::swap(is_,other.is_);
         std::swap(sbuf_,other.sbuf_);
         std::swap(position_,other.position_);
     }
 
-    ~binary_stream_source()
+    ~bin_stream_source()
     {
     }
 
-    binary_stream_source& operator=(binary_stream_source&& other) noexcept
+    bin_stream_source& operator=(bin_stream_source&& other) noexcept
     {
         std::swap(is_,other.is_);
         std::swap(sbuf_,other.sbuf_);

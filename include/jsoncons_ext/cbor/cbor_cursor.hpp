@@ -25,7 +25,7 @@
 namespace jsoncons { 
 namespace cbor {
 
-template<class Src=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
+template<class Src=jsoncons::bin_stream_source,class Allocator=std::allocator<char>>
 class basic_cbor_cursor : public basic_staj_reader<char>, private virtual ser_context
 {
 public:
@@ -207,7 +207,7 @@ public:
 private:
 };
 
-typedef basic_cbor_cursor<jsoncons::binary_stream_source> cbor_stream_cursor;
+typedef basic_cbor_cursor<jsoncons::bin_stream_source> cbor_stream_cursor;
 typedef basic_cbor_cursor<jsoncons::bytes_source> cbor_bytes_cursor;
 
 } // namespace cbor

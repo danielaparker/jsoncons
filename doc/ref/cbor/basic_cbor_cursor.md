@@ -4,7 +4,7 @@ __`jsoncons_ext/cbor/cbor_cursor.hpp`__
 
 ```c++
 template<
-    class Src=jsoncons::binary_stream_source,
+    class Src=jsoncons::bin_stream_source,
     class Allocator=std::allocator<char>>
 class basic_cbor_cursor;
 ```
@@ -19,7 +19,7 @@ Typedefs for common sources are provided:
 
 Type                |Definition
 --------------------|------------------------------
-cbor_stream_cursor  |basic_cbor_cursor<jsoncons::binary_stream_source>
+cbor_stream_cursor  |basic_cbor_cursor<jsoncons::bin_stream_source>
 cbor_bytes_cursor   |basic_cbor_cursor<jsoncons::bytes_source>
 
 ### Implemented interfaces

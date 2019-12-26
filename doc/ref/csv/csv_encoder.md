@@ -5,7 +5,7 @@ __`jsoncons_ext/csv/csv.hpp`__
 ```c++
 template<
     class CharT,
-    class Result
+    class Destination
     class Allocator=std::allocator<CharT>=std::allocator<CharT>>
 > class basic_csv_encoder : public jsoncons::basic_json_content_handler<CharT>
 ```
@@ -18,27 +18,27 @@ Four specializations for common character types and result types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-csv_stream_encoder            |basic_csv_encoder<char,jsoncons::stream_result<char>>
-csv_string_encoder     |basic_csv_encoder<char,jsoncons::string_result<std::string>>
-wcsv_stream_encoder           |basic_csv_encoder<wchar_t,jsoncons::stream_result<wchar_t>>
-wcsv_string_encoder    |basic_csv_encoder<wchar_t,jsoncons::string_result<std::wstring>>
+csv_stream_encoder         |basic_csv_encoder<char,jsoncons::stream_destination<char>>
+csv_string_encoder         |basic_csv_encoder<char,jsoncons::string_destination<std::string>>
+wcsv_stream_encoder        |basic_csv_encoder<wchar_t,jsoncons::stream_destination<wchar_t>>
+wcsv_string_encoder        |basic_csv_encoder<wchar_t,jsoncons::string_destination<std::wstring>>
 
 #### Member types
 
 Type                       |Definition
 ---------------------------|------------------------------
 char_type                  |CharT
-result_type                |Result
+destination_type           |Destination
 string_view_type           |
 
 #### Constructors
 
-    explicit basic_csv_encoder(result_type result)
-Constructs a new csv encoder that is associated with the output adaptor `result`.
+    explicit basic_csv_encoder(destination_type dest)
+Constructs a new csv encoder that is associated with the destination `dest`.
 
-    basic_csv_encoder(result_type result, 
-                         const basic_csv_options<CharT>& options)
-Constructs a new csv encoder that is associated with the output adaptor `result` 
+    basic_csv_encoder(destination_type dest, 
+                      const basic_csv_options<CharT>& options)
+Constructs a new csv encoder that is associated with the destination `dest` 
 and uses the specified [csv options](basic_csv_options.md). 
 
 #### Destructor

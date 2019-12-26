@@ -25,7 +25,7 @@
 namespace jsoncons { 
 namespace bson {
 
-template<class Src=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
+template<class Src=jsoncons::bin_stream_source,class Allocator=std::allocator<char>>
 class basic_bson_cursor : public basic_staj_reader<char>, private virtual ser_context
 {
 public:
@@ -191,7 +191,7 @@ public:
 private:
 };
 
-typedef basic_bson_cursor<jsoncons::binary_stream_source> bson_stream_cursor;
+typedef basic_bson_cursor<jsoncons::bin_stream_source> bson_stream_cursor;
 typedef basic_bson_cursor<jsoncons::bytes_source> bson_bytes_cursor;
 
 } // namespace bson

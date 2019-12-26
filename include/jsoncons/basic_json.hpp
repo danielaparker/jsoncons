@@ -3271,12 +3271,12 @@ public:
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         if (line_indent == indenting::indent)
         {
-            basic_json_encoder<char_type,jsoncons::string_result<string_type>> encoder(s, options);
+            basic_json_encoder<char_type,jsoncons::string_destination<string_type>> encoder(s, options);
             dump(encoder, ec);
         }
         else
         {
-            basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s, options);
+            basic_json_compressed_encoder<char_type,jsoncons::string_destination<string_type>> encoder(s, options);
             dump(encoder, ec);
         }
     }
@@ -3289,12 +3289,12 @@ public:
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         if (line_indent == indenting::indent)
         {
-            basic_json_encoder<char_type,jsoncons::string_result<string_type>> encoder(s);
+            basic_json_encoder<char_type,jsoncons::string_destination<string_type>> encoder(s);
             dump(encoder, ec);
         }
         else
         {
-            basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s);
+            basic_json_compressed_encoder<char_type,jsoncons::string_destination<string_type>> encoder(s);
             dump(encoder, ec);
         }
     }
@@ -3348,7 +3348,7 @@ public:
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         string_type s(alloc);
-        basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s);
+        basic_json_compressed_encoder<char_type,jsoncons::string_destination<string_type>> encoder(s);
         dump(encoder);
         return s;
     }
@@ -3359,7 +3359,7 @@ public:
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         string_type s(alloc);
-        basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s,options);
+        basic_json_compressed_encoder<char_type,jsoncons::string_destination<string_type>> encoder(s,options);
         dump(encoder);
         return s;
     }
@@ -3853,7 +3853,7 @@ public:
                 else
 #endif
                 {
-                    basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s,options);
+                    basic_json_compressed_encoder<char_type,jsoncons::string_destination<string_type>> encoder(s,options);
                     dump(encoder);
                 }
                 return s;
@@ -3861,7 +3861,7 @@ public:
             default:
             {
                 string_type s(alloc);
-                basic_json_compressed_encoder<char_type,jsoncons::string_result<string_type>> encoder(s,options);
+                basic_json_compressed_encoder<char_type,jsoncons::string_destination<string_type>> encoder(s,options);
                 dump(encoder);
                 return s;
             }

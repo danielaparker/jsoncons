@@ -15,21 +15,21 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_config.hpp>
-#include <jsoncons/result.hpp>
+#include <jsoncons/destination.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/bson/bson_detail.hpp>
 #include <jsoncons_ext/bson/bson_error.hpp>
 
 namespace jsoncons { namespace bson {
 
-template<class Result=jsoncons::binary_stream_result>
+template<class Destination=jsoncons::bin_stream_destination>
 class basic_bson_encoder final : public basic_json_content_handler<char>
 {
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
     typedef char char_type;
     using typename basic_json_content_handler<char>::string_view_type;
-    typedef Result result_type;
+    typedef Destination destination_type;
 
 private:
     struct stack_item
@@ -74,14 +74,14 @@ private:
 
     std::vector<stack_item> stack_;
     std::vector<uint8_t> buffer_;
-    result_type result_;
+    destination_type result_;
 
     // Noncopyable and nonmoveable
     basic_bson_encoder(const basic_bson_encoder&) = delete;
     basic_bson_encoder& operator=(const basic_bson_encoder&) = delete;
 public:
-    explicit basic_bson_encoder(result_type result)
-       : result_(std::move(result))
+    explicit basic_bson_encoder(destination_type dest)
+       : result_(std::move(dest))
     {
     }
 
@@ -208,8 +208,8 @@ private:
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
         std::size_t string_offset = buffer_.size();
 
-        auto result = unicons::validate(sv.begin(), sv.end());
-        if (result.ec != unicons::conv_errc())
+        auto dest = unicons::validate(sv.begin(), sv.end());
+        if (dest.ec != unicons::conv_errc())
         {
             ec = bson_errc::invalid_utf8_text_string;
             return false;
@@ -334,12 +334,12 @@ private:
     }
 };
 
-typedef basic_bson_encoder<jsoncons::binary_stream_result> bson_stream_encoder;
-typedef basic_bson_encoder<jsoncons::bytes_result> bson_bytes_encoder;
+typedef basic_bson_encoder<jsoncons::bin_stream_destination> bson_stream_encoder;
+typedef basic_bson_encoder<jsoncons::bytes_destination> bson_bytes_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-template<class Result=jsoncons::binary_stream_result>
-using basic_bson_serializer = basic_bson_encoder<Result>; 
+template<class Destination=jsoncons::bin_stream_destination>
+using basic_bson_serializer = basic_bson_encoder<Destination>; 
 
 JSONCONS_DEPRECATED_MSG("Instead, use bson_stream_encoder") typedef bson_stream_encoder bson_encoder;
 JSONCONS_DEPRECATED_MSG("Instead, use bson_stream_encoder") typedef bson_stream_encoder bson_serializer;

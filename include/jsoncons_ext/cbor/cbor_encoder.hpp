@@ -15,7 +15,7 @@
 #include <jsoncons/json_exception.hpp> // jsoncons::ser_error
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_config.hpp>
-#include <jsoncons/result.hpp>
+#include <jsoncons/destination.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_options.hpp>
@@ -24,7 +24,7 @@ namespace jsoncons { namespace cbor {
 
 enum class cbor_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
-template<class Result=jsoncons::binary_stream_result,class Float128T = std::nullptr_t>
+template<class Destination=jsoncons::bin_stream_destination,class Float128T = std::nullptr_t>
 class basic_cbor_encoder final : public json_content_handler
 {
     using super_type = json_content_handler;
@@ -33,7 +33,7 @@ class basic_cbor_encoder final : public json_content_handler
     enum class hexfloat_parse_state { start, expect_0, expect_x, integer, exp1, exp2, fraction1 };
 
 public:
-    typedef Result result_type;
+    typedef Destination destination_type;
     using typename super_type::char_type;
     using typename super_type::string_view_type;
 
@@ -71,7 +71,7 @@ private:
 
     };
     std::vector<stack_item> stack_;
-    Result result_;
+    Destination result_;
     const cbor_encode_options options_;
 
     // Noncopyable and nonmoveable
@@ -82,12 +82,12 @@ private:
     std::map<byte_string,size_t> bytestringref_map_;
     std::size_t next_stringref_ = 0;
 public:
-    explicit basic_cbor_encoder(result_type result)
-       : result_(std::move(result)), options_(cbor_encode_options())
+    explicit basic_cbor_encoder(destination_type dest)
+       : result_(std::move(dest)), options_(cbor_encode_options())
     {
     }
-    basic_cbor_encoder(result_type result, const cbor_encode_options& options)
-       : result_(std::move(result)), options_(options)
+    basic_cbor_encoder(destination_type dest, const cbor_encode_options& options)
+       : result_(std::move(dest)), options_(options)
     {
         if (options.pack_strings())
         {
@@ -287,8 +287,8 @@ private:
 
     void write_string(const string_view& sv)
     {
-        auto result = unicons::validate(sv.begin(), sv.end());
-        if (result.ec != unicons::conv_errc())
+        auto dest = unicons::validate(sv.begin(), sv.end());
+        if (dest.ec != unicons::conv_errc())
         {
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Illegal unicode"));
         }
@@ -532,24 +532,24 @@ private:
         if (!more) {return more;}
         if (exponent.length() > 0)
         {
-            auto result = jsoncons::detail::integer_from_json<int64_t>(exponent.data(), exponent.length());
-            if (!result)
+            auto dest = jsoncons::detail::integer_from_json<int64_t>(exponent.data(), exponent.length());
+            if (!dest)
             {
-                ec = result.error_code();
+                ec = dest.error_code();
                 return false;
             }
-            scale += result.value();
+            scale += dest.value();
         }
         more = do_int64_value(scale, semantic_tag::none, context, ec);
         if (!more) {return more;}
 
-        auto result = jsoncons::detail::integer_from_json<int64_t>(s.data(),s.length());
-        if (result)
+        auto dest = jsoncons::detail::integer_from_json<int64_t>(s.data(),s.length());
+        if (dest)
         {
-            more = do_int64_value(result.value(), semantic_tag::none, context, ec);
+            more = do_int64_value(dest.value(), semantic_tag::none, context, ec);
             if (!more) {return more;}
         }
-        else if (result.error_code() == jsoncons::detail::to_integer_errc::overflow)
+        else if (dest.error_code() == jsoncons::detail::to_integer_errc::overflow)
         {
             bignum n(s.data(), s.length());
             write_bignum(n);
@@ -557,7 +557,7 @@ private:
         }
         else
         {
-            ec = result.error_code();
+            ec = dest.error_code();
             return false;
         }
         more = do_end_array(context, ec);
@@ -713,24 +713,24 @@ private:
 
         if (exponent.length() > 0)
         {
-            auto result = jsoncons::detail::base16_to_integer<int64_t>(exponent.data(), exponent.length());
-            if (!result)
+            auto dest = jsoncons::detail::base16_to_integer<int64_t>(exponent.data(), exponent.length());
+            if (!dest)
             {
-                ec = result.error_code();
+                ec = dest.error_code();
                 return false;
             }
-            scale += result.value();
+            scale += dest.value();
         }
         more = do_int64_value(scale, semantic_tag::none, context, ec);
         if (!more) return more;
 
-        auto result = jsoncons::detail::base16_to_integer<int64_t>(s.data(),s.length());
-        if (result)
+        auto dest = jsoncons::detail::base16_to_integer<int64_t>(s.data(),s.length());
+        if (dest)
         {
-            more = do_int64_value(result.value(), semantic_tag::none, context, ec);
+            more = do_int64_value(dest.value(), semantic_tag::none, context, ec);
             if (!more) return more;
         }
-        else if (result.error_code() == jsoncons::detail::to_integer_errc::overflow)
+        else if (dest.error_code() == jsoncons::detail::to_integer_errc::overflow)
         {
             bignum n(s.data(), s.length(), 16);
             write_bignum(n);
@@ -738,7 +738,7 @@ private:
         }
         else
         {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>(result.error_code().message()));
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>(dest.error_code().message()));
         }
         return do_end_array(context, ec);
     }
@@ -1609,14 +1609,14 @@ private:
     }
 };
 
-typedef basic_cbor_encoder<jsoncons::binary_stream_result> cbor_stream_encoder;
-typedef basic_cbor_encoder<jsoncons::bytes_result> cbor_bytes_encoder;
+typedef basic_cbor_encoder<jsoncons::bin_stream_destination> cbor_stream_encoder;
+typedef basic_cbor_encoder<jsoncons::bytes_destination> cbor_bytes_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use cbor_bytes_encoder") typedef cbor_bytes_encoder cbor_bytes_serializer;
 
-template<class Result=jsoncons::binary_stream_result>
-using basic_cbor_serializer = basic_cbor_encoder<Result>; 
+template<class Destination=jsoncons::bin_stream_destination>
+using basic_cbor_serializer = basic_cbor_encoder<Destination>; 
 
 JSONCONS_DEPRECATED_MSG("Instead, use cbor_stream_encoder") typedef cbor_stream_encoder cbor_encoder;
 JSONCONS_DEPRECATED_MSG("Instead, use cbor_stream_encoder") typedef cbor_stream_encoder cbor_serializer;

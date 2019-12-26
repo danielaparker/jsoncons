@@ -4,7 +4,7 @@ __`jsoncons_ext/msgpack/msgpack_encoder.hpp`__
 
 ```c++
 template<
-    class Result>
+    class Destination>
 > class basic_msgpack_encoder : public jsoncons::json_content_handler
 ```
 
@@ -17,21 +17,21 @@ Four specializations for common character types and result types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-msgpack_stream_encoder            |basic_msgpack_encoder<jsoncons::binary_stream_result>
-bson_bytes_encoder     |basic_msgpack_encoder<jsoncons::binary_buffer_result>
+msgpack_stream_encoder            |basic_msgpack_encoder<jsoncons::bin_stream_destination>
+bson_bytes_encoder     |basic_msgpack_encoder<jsoncons::bytes_destination>
 
 #### Member types
 
 Type                       |Definition
 ---------------------------|------------------------------
 char_type                  |char
-result_type                |Result
+destination_type                |Destination
 string_view_type           |
 
 #### Constructors
 
-    explicit basic_msgpack_encoder(result_type result)
-Constructs a new encoder that writes to the specified result.
+    explicit basic_msgpack_encoder(destination_type dest)
+Constructs a new encoder that writes to the specified destination.
 
 #### Destructor
 

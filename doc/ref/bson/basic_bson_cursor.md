@@ -4,7 +4,7 @@ __`jsoncons_ext/bson/bson_cursor.hpp`__
 
 ```c++
 template<
-    class Src=jsoncons::binary_stream_source,
+    class Src=jsoncons::bin_stream_source,
     class Allocator=std::allocator<char>>
 class basic_bson_cursor;
 ```
@@ -19,7 +19,7 @@ Typedefs for common sources are provided:
 
 Type                |Definition
 --------------------|------------------------------
-bson_stream_cursor  |basic_bson_cursor<jsoncons::binary_stream_source>
+bson_stream_cursor  |basic_bson_cursor<jsoncons::bin_stream_source>
 bson_bytes_cursor   |basic_bson_cursor<jsoncons::bytes_source>
 
 ### Implemented interfaces

@@ -21,14 +21,14 @@
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/result.hpp>
+#include <jsoncons/destination.hpp>
 #include <jsoncons/detail/print_number.hpp>
 
 namespace jsoncons { namespace detail {
-template <class CharT, class Result>
+template <class CharT, class Destination>
 size_t escape_string(const CharT* s, std::size_t length,
                      bool escape_all_non_ascii, bool escape_solidus,
-                     Result& result)
+                     Destination& dest)
 {
     std::size_t count = 0;
     const CharT* begin = s;
@@ -39,45 +39,45 @@ size_t escape_string(const CharT* s, std::size_t length,
         switch (c)
         {
             case '\\':
-                result.push_back('\\');
-                result.push_back('\\');
+                dest.push_back('\\');
+                dest.push_back('\\');
                 count += 2;
                 break;
             case '"':
-                result.push_back('\\');
-                result.push_back('\"');
+                dest.push_back('\\');
+                dest.push_back('\"');
                 count += 2;
                 break;
             case '\b':
-                result.push_back('\\');
-                result.push_back('b');
+                dest.push_back('\\');
+                dest.push_back('b');
                 count += 2;
                 break;
             case '\f':
-                result.push_back('\\');
-                result.push_back('f');
+                dest.push_back('\\');
+                dest.push_back('f');
                 count += 2;
                 break;
             case '\n':
-                result.push_back('\\');
-                result.push_back('n');
+                dest.push_back('\\');
+                dest.push_back('n');
                 count += 2;
                 break;
             case '\r':
-                result.push_back('\\');
-                result.push_back('r');
+                dest.push_back('\\');
+                dest.push_back('r');
                 count += 2;
                 break;
             case '\t':
-                result.push_back('\\');
-                result.push_back('t');
+                dest.push_back('\\');
+                dest.push_back('t');
                 count += 2;
                 break;
             default:
                 if (escape_solidus && c == '/')
                 {
-                    result.push_back('\\');
-                    result.push_back('/');
+                    dest.push_back('\\');
+                    dest.push_back('/');
                     count += 2;
                 }
                 else if (is_control_character(c) || escape_all_non_ascii)
@@ -98,40 +98,40 @@ size_t escape_string(const CharT* s, std::size_t length,
                             uint32_t first = (cp >> 10) + 0xD800;
                             uint32_t second = ((cp & 0x03FF) + 0xDC00);
 
-                            result.push_back('\\');
-                            result.push_back('u');
-                            result.push_back(to_hex_character(first >> 12 & 0x000F));
-                            result.push_back(to_hex_character(first >> 8 & 0x000F));
-                            result.push_back(to_hex_character(first >> 4 & 0x000F));
-                            result.push_back(to_hex_character(first & 0x000F));
-                            result.push_back('\\');
-                            result.push_back('u');
-                            result.push_back(to_hex_character(second >> 12 & 0x000F));
-                            result.push_back(to_hex_character(second >> 8 & 0x000F));
-                            result.push_back(to_hex_character(second >> 4 & 0x000F));
-                            result.push_back(to_hex_character(second & 0x000F));
+                            dest.push_back('\\');
+                            dest.push_back('u');
+                            dest.push_back(to_hex_character(first >> 12 & 0x000F));
+                            dest.push_back(to_hex_character(first >> 8 & 0x000F));
+                            dest.push_back(to_hex_character(first >> 4 & 0x000F));
+                            dest.push_back(to_hex_character(first & 0x000F));
+                            dest.push_back('\\');
+                            dest.push_back('u');
+                            dest.push_back(to_hex_character(second >> 12 & 0x000F));
+                            dest.push_back(to_hex_character(second >> 8 & 0x000F));
+                            dest.push_back(to_hex_character(second >> 4 & 0x000F));
+                            dest.push_back(to_hex_character(second & 0x000F));
                             count += 12;
                         }
                         else
                         {
-                            result.push_back('\\');
-                            result.push_back('u');
-                            result.push_back(to_hex_character(cp >> 12 & 0x000F));
-                            result.push_back(to_hex_character(cp >> 8 & 0x000F));
-                            result.push_back(to_hex_character(cp >> 4 & 0x000F));
-                            result.push_back(to_hex_character(cp & 0x000F));
+                            dest.push_back('\\');
+                            dest.push_back('u');
+                            dest.push_back(to_hex_character(cp >> 12 & 0x000F));
+                            dest.push_back(to_hex_character(cp >> 8 & 0x000F));
+                            dest.push_back(to_hex_character(cp >> 4 & 0x000F));
+                            dest.push_back(to_hex_character(cp & 0x000F));
                             count += 6;
                         }
                     }
                     else
                     {
-                        result.push_back(c);
+                        dest.push_back(c);
                         ++count;
                     }
                 }
                 else
                 {
-                    result.push_back(c);
+                    dest.push_back(c);
                     ++count;
                 }
                 break;
@@ -145,13 +145,13 @@ byte_string_chars_format resolve_byte_string_chars_format(byte_string_chars_form
                                                           byte_string_chars_format format2,
                                                           byte_string_chars_format default_format = byte_string_chars_format::base64url)
 {
-    byte_string_chars_format result;
+    byte_string_chars_format dest;
     switch (format1)
     {
         case byte_string_chars_format::base16:
         case byte_string_chars_format::base64:
         case byte_string_chars_format::base64url:
-            result = format1;
+            dest = format1;
             break;
         default:
             switch (format2)
@@ -159,24 +159,24 @@ byte_string_chars_format resolve_byte_string_chars_format(byte_string_chars_form
                 case byte_string_chars_format::base64url:
                 case byte_string_chars_format::base64:
                 case byte_string_chars_format::base16:
-                    result = format2;
+                    dest = format2;
                     break;
                 default: // base64url
                 {
-                    result = default_format;
+                    dest = default_format;
                     break;
                 }
             }
             break;
     }
-    return result;
+    return dest;
 }
 
 }}
 
 namespace jsoncons {
 
-template<class CharT,class Result=jsoncons::stream_result<CharT>>
+template<class CharT,class Destination=jsoncons::stream_destination<CharT>>
 class basic_json_encoder final : public basic_json_content_handler<CharT>
 {
     static const std::array<CharT, 4>& null_k()
@@ -197,7 +197,7 @@ class basic_json_encoder final : public basic_json_content_handler<CharT>
 public:
     typedef CharT char_type;
     using typename basic_json_content_handler<CharT>::string_view_type;
-    typedef Result result_type;
+    typedef Destination destination_type;
     typedef typename basic_json_encode_options<CharT>::string_type string_type;
 
 private:
@@ -291,7 +291,7 @@ private:
 
     jsoncons::detail::print_double fp_;
 
-    Result result_;
+    Destination result_;
 
     std::vector<encoding_context> stack_;
     int indent_amount_;
@@ -307,16 +307,16 @@ private:
     basic_json_encoder(const basic_json_encoder&) = delete;
     basic_json_encoder& operator=(const basic_json_encoder&) = delete;
 public:
-    basic_json_encoder(result_type result)
-        : basic_json_encoder(std::move(result), basic_json_encode_options<CharT>())
+    basic_json_encoder(destination_type dest)
+        : basic_json_encoder(std::move(dest), basic_json_encode_options<CharT>())
     {
     }
 
-    basic_json_encoder(result_type result, 
+    basic_json_encoder(destination_type dest, 
                        const basic_json_encode_options<CharT>& options)
        : options_(options),
          fp_(options.float_format(), options.precision()),
-         result_(std::move(result)), 
+         result_(std::move(dest)), 
          indent_amount_(0), 
          column_(0)
     {
@@ -990,7 +990,7 @@ private:
     }
 };
 
-template<class CharT,class Result=jsoncons::stream_result<CharT>>
+template<class CharT,class Destination=jsoncons::stream_destination<CharT>>
 class basic_json_compressed_encoder final : public basic_json_content_handler<CharT>
 {
     static const std::array<CharT, 4>& null_k()
@@ -1011,7 +1011,7 @@ class basic_json_compressed_encoder final : public basic_json_content_handler<Ch
 public:
     typedef CharT char_type;
     using typename basic_json_content_handler<CharT>::string_view_type;
-    typedef Result result_type;
+    typedef Destination destination_type;
     typedef typename basic_json_encode_options<CharT>::string_type string_type;
 
 private:
@@ -1047,22 +1047,22 @@ private:
 
     std::vector<encoding_context> stack_;
     jsoncons::detail::print_double fp_;
-    Result result_;
+    Destination result_;
 
     // Noncopyable and nonmoveable
     basic_json_compressed_encoder(const basic_json_compressed_encoder&) = delete;
     basic_json_compressed_encoder& operator=(const basic_json_compressed_encoder&) = delete;
 public:
-    basic_json_compressed_encoder(result_type result)
-        : basic_json_compressed_encoder(std::move(result), basic_json_encode_options<CharT>())
+    basic_json_compressed_encoder(destination_type dest)
+        : basic_json_compressed_encoder(std::move(dest), basic_json_encode_options<CharT>())
     {
     }
 
-    basic_json_compressed_encoder(result_type result, 
+    basic_json_compressed_encoder(destination_type dest, 
                                      const basic_json_encode_options<CharT>& options)
        : options_(options),
          fp_(options.float_format(), options.precision()),
-         result_(std::move(result))
+         result_(std::move(dest))
     {
     }
 
@@ -1437,39 +1437,39 @@ private:
     }
 };
 
-typedef basic_json_encoder<char,jsoncons::stream_result<char>> json_stream_encoder;
-typedef basic_json_encoder<wchar_t,jsoncons::stream_result<wchar_t>> wjson_stream_encoder;
-typedef basic_json_compressed_encoder<char,jsoncons::stream_result<char>> json_compressed_stream_encoder;
-typedef basic_json_compressed_encoder<wchar_t,jsoncons::stream_result<wchar_t>> wjson_compressed_stream_encoder;
+typedef basic_json_encoder<char,jsoncons::stream_destination<char>> json_stream_encoder;
+typedef basic_json_encoder<wchar_t,jsoncons::stream_destination<wchar_t>> wjson_stream_encoder;
+typedef basic_json_compressed_encoder<char,jsoncons::stream_destination<char>> json_compressed_stream_encoder;
+typedef basic_json_compressed_encoder<wchar_t,jsoncons::stream_destination<wchar_t>> wjson_compressed_stream_encoder;
 
-typedef basic_json_encoder<char,jsoncons::string_result<std::string>> json_string_encoder;
-typedef basic_json_encoder<wchar_t,jsoncons::string_result<std::wstring>> wjson_string_encoder;
-typedef basic_json_compressed_encoder<char,jsoncons::string_result<std::string>> json_compressed_string_encoder;
-typedef basic_json_compressed_encoder<wchar_t,jsoncons::string_result<std::wstring>> wjson_compressed_string_encoder;
+typedef basic_json_encoder<char,jsoncons::string_destination<std::string>> json_string_encoder;
+typedef basic_json_encoder<wchar_t,jsoncons::string_destination<std::wstring>> wjson_string_encoder;
+typedef basic_json_compressed_encoder<char,jsoncons::string_destination<std::string>> json_compressed_string_encoder;
+typedef basic_json_compressed_encoder<wchar_t,jsoncons::string_destination<std::wstring>> wjson_compressed_string_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-template<class CharT,class Result=jsoncons::stream_result<CharT>>
-using basic_json_serializer = basic_json_encoder<CharT,Result>; 
+template<class CharT,class Destination=jsoncons::stream_destination<CharT>>
+using basic_json_serializer = basic_json_encoder<CharT,Destination>; 
 
-template<class CharT,class Result=jsoncons::stream_result<CharT>>
-using basic_json_compressed_serializer = basic_json_compressed_encoder<CharT,Result>; 
+template<class CharT,class Destination=jsoncons::stream_destination<CharT>>
+using basic_json_compressed_serializer = basic_json_compressed_encoder<CharT,Destination>; 
 
 JSONCONS_DEPRECATED_MSG("Instead, use json_stream_encoder") typedef json_stream_encoder json_encoder;
 JSONCONS_DEPRECATED_MSG("Instead, use wjson_stream_encoder") typedef wjson_stream_encoder wjson_encoder;
 JSONCONS_DEPRECATED_MSG("Instead, use json_compressed_stream_encoder") typedef json_compressed_stream_encoder json_compressed_encoder;
 JSONCONS_DEPRECATED_MSG("Instead, use wjson_compressed_stream_encoder") typedef wjson_compressed_stream_encoder wjson_compressed_encoder;
 
-JSONCONS_DEPRECATED_MSG("Instead, use json_stream_encoder") typedef basic_json_encoder<char,jsoncons::stream_result<char>> json_serializer;
-JSONCONS_DEPRECATED_MSG("Instead, use wjson_stream_encoder") typedef basic_json_encoder<wchar_t,jsoncons::stream_result<wchar_t>> wjson_serializer;
+JSONCONS_DEPRECATED_MSG("Instead, use json_stream_encoder") typedef basic_json_encoder<char,jsoncons::stream_destination<char>> json_serializer;
+JSONCONS_DEPRECATED_MSG("Instead, use wjson_stream_encoder") typedef basic_json_encoder<wchar_t,jsoncons::stream_destination<wchar_t>> wjson_serializer;
 
-JSONCONS_DEPRECATED_MSG("Instead, use json_compressed_stream_encoder")  typedef basic_json_compressed_encoder<char,jsoncons::stream_result<char>> json_compressed_serializer;
-JSONCONS_DEPRECATED_MSG("Instead, use wjson_compressed_stream_encoder") typedef basic_json_compressed_encoder<wchar_t,jsoncons::stream_result<wchar_t>> wjson_compressed_serializer;
+JSONCONS_DEPRECATED_MSG("Instead, use json_compressed_stream_encoder")  typedef basic_json_compressed_encoder<char,jsoncons::stream_destination<char>> json_compressed_serializer;
+JSONCONS_DEPRECATED_MSG("Instead, use wjson_compressed_stream_encoder") typedef basic_json_compressed_encoder<wchar_t,jsoncons::stream_destination<wchar_t>> wjson_compressed_serializer;
 
-JSONCONS_DEPRECATED_MSG("Instead, use json_string_encoder")  typedef basic_json_encoder<char,jsoncons::string_result<std::string>> json_string_serializer;
-JSONCONS_DEPRECATED_MSG("Instead, use wjson_string_encoder") typedef basic_json_encoder<wchar_t,jsoncons::string_result<std::wstring>> wjson_string_serializer;
+JSONCONS_DEPRECATED_MSG("Instead, use json_string_encoder")  typedef basic_json_encoder<char,jsoncons::string_destination<std::string>> json_string_serializer;
+JSONCONS_DEPRECATED_MSG("Instead, use wjson_string_encoder") typedef basic_json_encoder<wchar_t,jsoncons::string_destination<std::wstring>> wjson_string_serializer;
 
-JSONCONS_DEPRECATED_MSG("Instead, use json_compressed_string_encoder")  typedef basic_json_compressed_encoder<char,jsoncons::string_result<std::string>> json_compressed_string_serializer;
-JSONCONS_DEPRECATED_MSG("Instead, use wjson_compressed_string_encoder") typedef basic_json_compressed_encoder<wchar_t,jsoncons::string_result<std::wstring>> wjson_compressed_string_serializer;
+JSONCONS_DEPRECATED_MSG("Instead, use json_compressed_string_encoder")  typedef basic_json_compressed_encoder<char,jsoncons::string_destination<std::string>> json_compressed_string_serializer;
+JSONCONS_DEPRECATED_MSG("Instead, use wjson_compressed_string_encoder") typedef basic_json_compressed_encoder<wchar_t,jsoncons::string_destination<std::wstring>> wjson_compressed_string_serializer;
 #endif
 
 }

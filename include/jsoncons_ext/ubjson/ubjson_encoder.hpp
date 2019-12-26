@@ -15,7 +15,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_config.hpp>
-#include <jsoncons/result.hpp>
+#include <jsoncons/destination.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/ubjson/ubjson_detail.hpp>
 #include <jsoncons_ext/ubjson/ubjson_error.hpp>
@@ -24,14 +24,14 @@ namespace jsoncons { namespace ubjson {
 
 enum class ubjson_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
-template<class Result=jsoncons::binary_stream_result>
+template<class Destination=jsoncons::bin_stream_destination>
 class basic_ubjson_encoder final : public basic_json_content_handler<char>
 {
 
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
     using typename basic_json_content_handler<char>::string_view_type;
-    typedef Result result_type;
+    typedef Destination destination_type;
 
 private:
     struct stack_item
@@ -67,14 +67,14 @@ private:
 
     };
     std::vector<stack_item> stack_;
-    Result result_;
+    Destination result_;
 
     // Noncopyable and nonmoveable
     basic_ubjson_encoder(const basic_ubjson_encoder&) = delete;
     basic_ubjson_encoder& operator=(const basic_ubjson_encoder&) = delete;
 public:
-    basic_ubjson_encoder(result_type result)
-       : result_(std::move(result))
+    basic_ubjson_encoder(destination_type dest)
+       : result_(std::move(dest))
     {
     }
 
@@ -185,8 +185,8 @@ private:
 
     bool do_name(const string_view_type& name, const ser_context&, std::error_code& ec) override
     {
-        auto result = unicons::validate(name.begin(), name.end());
-        if (result.ec != unicons::conv_errc())
+        auto dest = unicons::validate(name.begin(), name.end());
+        if (dest.ec != unicons::conv_errc())
         {
             ec = ubjson_errc::invalid_utf8_text_string;
             return false;
@@ -226,8 +226,8 @@ private:
             }
         }
 
-        auto result = unicons::validate(sv.begin(), sv.end());
-        if (result.ec != unicons::conv_errc())
+        auto dest = unicons::validate(sv.begin(), sv.end());
+        if (dest.ec != unicons::conv_errc())
         {
             ec = ubjson_errc::invalid_utf8_text_string;
             return false;
@@ -428,12 +428,12 @@ private:
     }
 };
 
-typedef basic_ubjson_encoder<jsoncons::binary_stream_result> ubjson_stream_encoder;
-typedef basic_ubjson_encoder<jsoncons::bytes_result> ubjson_bytes_encoder;
+typedef basic_ubjson_encoder<jsoncons::bin_stream_destination> ubjson_stream_encoder;
+typedef basic_ubjson_encoder<jsoncons::bytes_destination> ubjson_bytes_encoder;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-template<class Result=jsoncons::binary_stream_result>
-using basic_ubjson_serializer = basic_ubjson_encoder<Result>; 
+template<class Destination=jsoncons::bin_stream_destination>
+using basic_ubjson_serializer = basic_ubjson_encoder<Destination>; 
 
 JSONCONS_DEPRECATED_MSG("Instead, use ubjson_stream_encoder") typedef ubjson_stream_encoder ubjson_encoder;
 JSONCONS_DEPRECATED_MSG("Instead, use ubjson_stream_encoder") typedef ubjson_stream_encoder ubjson_serializer;

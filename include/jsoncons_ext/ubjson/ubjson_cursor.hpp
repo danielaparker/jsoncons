@@ -25,7 +25,7 @@
 namespace jsoncons { 
 namespace ubjson {
 
-template<class Src=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
+template<class Src=jsoncons::bin_stream_source,class Allocator=std::allocator<char>>
 class basic_ubjson_cursor : public basic_staj_reader<char>, private virtual ser_context
 {
 public:
@@ -192,7 +192,7 @@ public:
 private:
 };
 
-typedef basic_ubjson_cursor<jsoncons::binary_stream_source> ubjson_stream_cursor;
+typedef basic_ubjson_cursor<jsoncons::bin_stream_source> ubjson_stream_cursor;
 typedef basic_ubjson_cursor<jsoncons::bytes_source> ubjson_bytes_cursor;
 
 } // namespace ubjson
