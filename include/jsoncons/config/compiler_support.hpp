@@ -122,6 +122,26 @@
 #  endif // defined(_MSC_VER)
 #endif // !defined(JSONCONS_HAS_STD_STRING_VIEW)
 
+// Follows boost
+#if !defined(JSONCONS_HAS_FLOAT128)
+#  if defined(__clang__)
+#if (defined(linux) || defined(__linux) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)) && !defined(_CRAYC)
+#if (__clang_major__ >= 4) && defined(__has_include)
+#if __has_include(<quadmath.h>)
+#  define JSONCONS_HAS_FLOAT128
+#endif
+#endif
+#endif
+#endif
+#endif
+#if !defined(JSONCONS_HAS_FLOAT128)
+#if defined(__GNUC__)
+#if defined(_GLIBCXX_USE_FLOAT128) && !defined(__STRICT_ANSI__) && !defined(__CUDACC__)
+# define JSONCONS_HAS_FLOAT128
+#endif
+#endif
+#endif
+
 #if !defined(JSONCONS_HAS_STD_OPTIONAL)
 #  if defined(__clang__)
 #   if (__cplusplus >= 201703)
