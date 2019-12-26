@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_TYPE_TRAITS_MACROS_HPP
-#define JSONCONS_JSON_TYPE_TRAITS_MACROS_HPP
+#ifndef JSONCONS_JSON_TRAITS_MACROS_HPP
+#define JSONCONS_JSON_TRAITS_MACROS_HPP
 
 #include <algorithm> // std::swap
 #include <array>
