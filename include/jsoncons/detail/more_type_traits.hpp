@@ -39,48 +39,6 @@ struct static_max<arg1,arg2,argn ...>
         static_max<arg2,argn...>::value; 
 };
 
-// type_wrapper
-
-template <class T>
-struct type_wrapper
-{
-    typedef T* pointer_type;
-    typedef const T* const_pointer_type;
-    typedef T value_type;
-    typedef T& reference;
-    typedef const T& const_reference;
-};
-
-template <class T>
-struct type_wrapper<const T>
-{
-    typedef T* pointer_type;
-    typedef const T* const_pointer_type;
-    typedef T value_type;
-    typedef T& reference;
-    typedef const T& const_reference;
-};
-
-template <class T>
-struct type_wrapper<T&>
-{
-    typedef T* pointer_type;
-    typedef const T* const_pointer_type;
-    typedef T value_type;
-    typedef T& reference;
-    typedef const T& const_reference;
-};
-
-template <class T>
-struct type_wrapper<const T&>
-{
-    typedef T* pointer_type;
-    typedef const T* const_pointer_type;
-    typedef T value_type;
-    typedef T& reference;
-    typedef const T& const_reference;
-};
-
 inline
 char to_hex_character(uint8_t c)
 {

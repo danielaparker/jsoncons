@@ -297,7 +297,7 @@ private:
 }
 
 template<class Json>
-struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::const_pointer_type>
+struct json_type_traits<Json, const typename std::decay<typename Json::char_type>::type*>
 {
     typedef typename Json::char_type char_type;
     typedef typename Json::allocator_type allocator_type;
@@ -318,7 +318,7 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::c
 };
 
 template<class Json>
-struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::pointer_type>
+struct json_type_traits<Json, typename std::decay<typename Json::char_type>::type*>
 {
     typedef typename Json::char_type char_type;
     typedef typename Json::allocator_type allocator_type;
