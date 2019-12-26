@@ -26,321 +26,509 @@ Member type                         |Definition
 
 #### Public event producer interface
 
+    void flush(); // (1)
+
     bool begin_object(semantic_tag tag=semantic_tag::none,
-                      const ser_context& context=null_ser_context()); // (1)
+                      const ser_context& context=null_ser_context()); // (2)
 
     bool begin_object(std::size_t length, 
                       semantic_tag tag=semantic_tag::none, 
-                      const ser_context& context = null_ser_context()); // (2)
+                      const ser_context& context = null_ser_context()); // (3)
 
-    bool end_object(const ser_context& context = null_ser_context()); // (3)
+    bool end_object(const ser_context& context = null_ser_context()); // (4)
 
     bool begin_array(semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context()); // (4)
+                     const ser_context& context=null_ser_context()); // (5)
 
     bool begin_array(std::size_t length, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context()); // (5)
+                     const ser_context& context=null_ser_context()); // (6)
 
-    bool end_array(const ser_context& context=null_ser_context()); // (6)
+    bool end_array(const ser_context& context=null_ser_context()); // (7)
 
     bool name(const string_view_type& name, 
-              const ser_context& context=null_ser_context()); // (7)
+              const ser_context& context=null_ser_context()); // (8)
 
     bool null_value(semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context()); // (8) 
+                    const ser_context& context=null_ser_context()); // (9) 
 
     bool bool_value(bool value, 
                     semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context()); // (9) 
+                    const ser_context& context=null_ser_context()); // (10) 
 
     bool string_value(const string_view_type& value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context()); // (10) 
+                      const ser_context& context=null_ser_context()); // (11) 
 
     bool byte_string_value(const byte_string_view& b, 
                            semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context()); // (11)
+                           const ser_context& context=null_ser_context()); // (12)
 
     bool uint64_value(uint64_t value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context()); // (12)
+                      const ser_context& context=null_ser_context()); // (13)
 
     bool int64_value(int64_t value, 
                      semantic_tag tag = semantic_tag::none, 
-                     const ser_context& context=null_ser_context()); // (13)
+                     const ser_context& context=null_ser_context()); // (14)
 
     bool half_value(uint16_t value, 
                     semantic_tag tag = semantic_tag::none, 
-                    const ser_context& context=null_ser_context()); // (14)
+                    const ser_context& context=null_ser_context()); // (15)
 
     bool double_value(double value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context()); // (15)
+                      const ser_context& context=null_ser_context()); // (16)
 
     bool begin_object(semantic_tag tag,
                       const ser_context& context,
-                      std::error_code& ec); // (16)
+                      std::error_code& ec); // (17)
 
     bool begin_object(std::size_t length, 
                       semantic_tag tag, 
                       const ser_context& context,
-                      std::error_code& ec); // (17)
+                      std::error_code& ec); // (18)
 
     bool end_object(const ser_context& context, 
-                    std::error_code& ec); // (18)
+                    std::error_code& ec); // (19)
 
     bool begin_array(semantic_tag tag, 
                      const ser_context& context, 
-                     std::error_code& ec); // (19)
+                     std::error_code& ec); // (20)
 
     bool begin_array(std::size_t length, 
                      semantic_tag tag, 
                      const ser_context& context, 
-                     std::error_code& ec); // (20)
+                     std::error_code& ec); // (21)
 
     bool end_array(const ser_context& context, 
-                   std::error_code& ec); // (21)
+                   std::error_code& ec); // (22)
 
     bool name(const string_view_type& name, 
               const ser_context& context, 
-              std::error_code& ec); // (22)
+              std::error_code& ec); // (23)
 
     bool null_value(semantic_tag tag,
                     const ser_context& context,
-                    std::error_code& ec); // (23) 
+                    std::error_code& ec); // (24) 
 
     bool bool_value(bool value, 
                     semantic_tag tag,
                     const ser_context& context,
-                    std::error_code& ec); // (24) 
+                    std::error_code& ec); // (25) 
 
     bool string_value(const string_view_type& value, 
                       semantic_tag tag, 
                       const ser_context& context,
-                      std::error_code& ec); // (25) 
+                      std::error_code& ec); // (26) 
 
     bool byte_string_value(const byte_string_view& b, 
                            semantic_tag tag, 
                            const ser_context& context,
-                           std::error_code& ec); // (26)
+                           std::error_code& ec); // (27)
 
     bool uint64_value(uint64_t value, 
                       semantic_tag tag, 
                       const ser_context& context,
-                      std::error_code& ec); // (27)
+                      std::error_code& ec); // (28)
 
     bool int64_value(int64_t value, 
                      semantic_tag tag, 
                      const ser_context& context,
-                     std::error_code& ec); // (28)
+                     std::error_code& ec); // (29)
 
     bool half_value(uint16_t value, 
                     semantic_tag tag, 
                     const ser_context& context,
-                    std::error_code& ec); // (29)
+                    std::error_code& ec); // (30)
 
     bool double_value(double value, 
                       semantic_tag tag, 
                       const ser_context& context,
-                      std::error_code& ec); // (30)
+                      std::error_code& ec); // (31)
 
-(1) Indicates the begining of an object of indefinite length.
+   bool typed_array(const span<const uint8_t>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context()); // (32)
+
+    bool typed_array(const span<const uint16_t>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context()); // (33)
+
+    bool typed_array(const span<const uint32_t>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context()); // (34)
+
+    bool typed_array(const span<const uint64_t>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context()); // (35)
+
+    bool typed_array(const span<const int8_t>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context()); // (36)
+
+    bool typed_array(const span<const int16_t>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context()); // (37)
+
+    bool typed_array(const span<const int32_t>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context()); // (38)
+
+    bool typed_array(const span<const int64_t>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context()); // (39)
+
+    bool typed_array(half_arg_t, const span<const uint16_t>& data,
+                     semantic_tag tag = semantic_tag::none,
+                     const ser_context& context = null_ser_context()); // (40)
+
+    bool typed_array(const span<const float>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context()); // (41)
+
+    bool typed_array(const span<const double>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context()); // (42)
+
+    bool typed_array(const span<const float128_type>& data, 
+                     semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=null_ser_context()); // (43)
+
+    bool begin_multi_dim(const span<const size_t>& shape,
+                         semantic_tag tag,
+                         const ser_context& context); // (44) 
+
+    bool end_multi_dim(const ser_context& context=null_ser_context()); // (45) 
+
+    bool typed_array(const span<const uint8_t>& v, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec); // (46)
+
+    bool typed_array(const span<const uint16_t>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec); // (47)
+
+    bool typed_array(const span<const uint32_t>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec); // (48)
+
+    bool typed_array(const span<const uint64_t>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec); // (49)
+
+    bool typed_array(const span<const int8_t>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec); // (50)
+
+    bool typed_array(const span<const int16_t>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec); // (51)
+
+    bool typed_array(const span<const int32_t>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec); // (52)
+
+    bool typed_array(const span<const int64_t>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec); // (53)
+
+    bool typed_array(half_arg_t arg, const span<const uint16_t>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec); // (54)
+
+    bool typed_array(const span<const float>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec); // (55)
+
+    bool typed_array(const span<const double>& data, 
+                     semantic_tag tag,
+                     const ser_context& context, 
+                     std::error_code& ec); // (56)
+
+    bool begin_multi_dim(const span<const size_t>& shape,
+                         semantic_tag tag,
+                         const ser_context& context, 
+                         std::error_code& ec); // (57)
+
+    bool end_multi_dim(const ser_context& context,
+                       std::error_code& ec); // (58) 
+
+(1) Flushes whatever is buffered to the destination.
+
+(2) Indicates the begining of an object of indefinite length.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(2) Indicates the begining of an object of known length. 
+(3) Indicates the begining of an object of known length. 
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(3) Indicates the end of an object.
+(4) Indicates the end of an object.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(4) Indicates the beginning of an indefinite length array. 
+(5) Indicates the beginning of an indefinite length array. 
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(5) Indicates the beginning of an array of known length. 
+(6) Indicates the beginning of an array of known length. 
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(6) Indicates the end of an array.
+(7) Indicates the end of an array.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(7) Writes the name part of an object name-value pair.
+(8) Writes the name part of an object name-value pair.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(8) Writes a null value. 
+(9) Writes a null value. 
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(9) Writes a boolean value.
+(10) Writes a boolean value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(10) Writes a text string value.
+(11) Writes a text string value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(11) Writes a byte string value.
+(12) Writes a byte string value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(12) Writes a non-negative integer value.
+(13) Writes a non-negative integer value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(13) Writes a signed integer value.
+(14) Writes a signed integer value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(14) Writes a half precision floating point value.
+(15) Writes a half precision floating point value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(15) Writes a double precision floating point value.
+(16) Writes a double precision floating point value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(16)-(30) Same as (1)-(15), except sets `ec` and returns `false` on parse errors.
-
-    void flush()
-Flushes whatever is buffered to the destination.
+(17)-(31) Same as (2)-(16), except sets `ec` and returns `false` on parse errors.
 
 #### Private event consumer interface
 
+    virtual void do_flush() = 0; // (1)
+
     virtual bool do_begin_object(semantic_tag tag, 
                                  const ser_context& context, 
-                                 std::error_code& ec) = 0; // (1)
+                                 std::error_code& ec) = 0; // (2)
 
     virtual bool do_begin_object(std::size_t length, 
                                  semantic_tag tag, 
                                  const ser_context& context, 
-                                 std::error_code& ec); // (2)
+                                 std::error_code& ec); // (3)
 
     virtual bool do_end_object(const ser_context& context, 
-                               std::error_code& ec) = 0; // (3)
+                               std::error_code& ec) = 0; // (4)
 
     virtual bool do_begin_array(semantic_tag tag, 
                                 const ser_context& context, 
-                                std::error_code& ec) = 0; // (4)
+                                std::error_code& ec) = 0; // (5)
 
     virtual bool do_begin_array(std::size_t length, 
                                 semantic_tag tag, 
                                 const ser_context& context, 
-                                std::error_code& ec); // (5)
+                                std::error_code& ec); // (6)
 
     virtual bool do_end_array(const ser_context& context, 
-                              std::error_code& ec) = 0; // (6)
+                              std::error_code& ec) = 0; // (7)
 
     virtual bool do_name(const string_view_type& name, 
                          const ser_context& context, 
-                         std::error_code&) = 0; // (7)
+                         std::error_code&) = 0; // (8)
 
     virtual bool do_null_value(semantic_tag tag, 
                                const ser_context& context, 
-                               std::error_code& ec) = 0; // (8)
+                               std::error_code& ec) = 0; // (9)
 
     virtual bool do_bool_value(bool value, 
                                semantic_tag tag, 
                                const ser_context& context, 
-                               std::error_code&) = 0; // (9)
+                               std::error_code&) = 0; // (10)
 
     virtual bool do_string_value(const string_view_type& value, 
                                  semantic_tag tag, 
                                  const ser_context& context, 
-                                 std::error_code& ec) = 0; // (10)
+                                 std::error_code& ec) = 0; // (11)
 
     virtual bool do_byte_string_value(const byte_string_view& value, 
                                       semantic_tag tag, 
                                       const ser_context& context,
-                                      std::error_code& ec) = 0; // (11)
+                                      std::error_code& ec) = 0; // (12)
 
     virtual bool do_uint64_value(uint64_t value, 
                                  semantic_tag tag, 
                                  const ser_context& context,
-                                 std::error_code& ec) = 0; // (12)
+                                 std::error_code& ec) = 0; // (13)
 
     virtual bool do_int64_value(int64_t value, 
                                 semantic_tag tag,
                                 const ser_context& context,
-                                std::error_code& ec) = 0; // (13)
+                                std::error_code& ec) = 0; // (14)
 
     virtual bool do_half_value(uint16_t value, 
                                semantic_tag tag,
                                const ser_context& context,
-                               std::error_code& ec) = 0; // (14)
+                               std::error_code& ec) = 0; // (15)
 
     virtual bool do_double_value(double value, 
                                  semantic_tag tag,
                                  const ser_context& context,
-                                 std::error_code& ec) = 0; // (15)
+                                 std::error_code& ec) = 0; // (16)
 
-(1) Handles the beginning of an object of indefinite length.
+    virtual bool do_typed_array(const span<const uint8_t>& data, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec) = 0; // (17)
+
+    virtual bool do_typed_array(const span<const uint16_t>& data, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec) = 0; // (18)
+
+    virtual bool do_typed_array(const span<const uint32_t>& data, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec) = 0; // (19)
+
+    virtual bool do_typed_array(const span<const uint64_t>& data, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec) = 0; // (20)
+
+    virtual bool do_typed_array(const span<const int8_t>& data, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec) = 0; // (21)
+
+    virtual bool do_typed_array(const span<const int16_t>& data, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec) = 0; // (22)
+
+    virtual bool do_typed_array(const span<const int32_t>& data, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec) = 0; // (23)
+
+    virtual bool do_typed_array(const span<const int64_t>& data, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec) = 0; // (24)
+
+    virtual bool do_typed_array(half_arg_t, 
+                                const span<const uint16_t>& data, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec) = 0; // (25)
+
+    virtual bool do_typed_array(const span<const float>& data, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec) = 0; // (26)
+
+    virtual bool do_typed_array(const span<const double>& data, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec) = 0; // (27)
+
+    virtual bool do_typed_array(const span<const float128_type>& data, 
+                                semantic_tag tag,
+                                const ser_context& context, 
+                                std::error_code& ec) = 0; // (28)
+
+    virtual bool do_begin_multi_dim(const span<const size_t>& shape,
+                                    semantic_tag tag,
+                                    const ser_context& context, 
+                                    std::error_code& ec) = 0; // (29)
+
+    virtual bool do_end_multi_dim(const ser_context& context,
+                                  std::error_code& ec) = 0; // (30)
+
+(1) Allows producers of json events to flush any buffered data.
+
+(2) Handles the beginning of an object of indefinite length.
 Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
+Sets `ec` and returns `false` on parse errors. 
 
-(2) Handles the beginning of an object of known length.
+(3) Handles the beginning of an object of known length.
 Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
+Sets `ec` and returns `false` on parse errors. 
 
-(3) Handles the end of an object.
+(4) Handles the end of an object.
 Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
+Sets `ec` and returns `false` on parse errors. 
 
-(4) Handles the beginning of an array of indefinite length.
+(5) Handles the beginning of an array of indefinite length.
 Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
+Sets `ec` and returns `false` on parse errors. 
 
-(5) Handles the beginning of an array of known length.
+(6) Handles the beginning of an array of known length.
 Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
+Sets `ec` and returns `false` on parse errors. 
 
-(6) Handles the end of an array.
+(7) Handles the end of an array.
 Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
+Sets `ec` and returns `false` on parse errors. 
 
-(7) Handles the name part of an object name-value pair.
+(8) Handles the name part of an object name-value pair.
 Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
+Sets `ec` and returns `false` on parse errors. 
 
-(8) Handles a null value.
+(9) Handles a null value.
 Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
+Sets `ec` and returns `false` on parse errors. 
 
-(9) Handles a boolean value. 
+(10) Handles a boolean value. 
 Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
+Sets `ec` and returns `false` on parse errors. 
 
-(10) Handles a string value.
+(11) Handles a string value.
 Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
+Sets `ec` and returns `false` on parse errors. 
 
-(11) Handles a byte string value.
+(12) Handles a byte string value.
 Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
+Sets `ec` and returns `false` on parse errors. 
 
-(12) Handles a non-negative integer value.
+(13) Handles a non-negative integer value.
 Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
+Sets `ec` and returns `false` on parse errors. 
 
-(13) Handles a signed integer value.
+(14) Handles a signed integer value.
 Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
+Sets `ec` and returns `false` on parse errors. 
 
-(14) Handles a half precision floating point value. 
+(15) Handles a half precision floating point value. 
 Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
+Sets `ec` and returns `false` on parse errors. 
 
-(15) Handles a double precision floating point value. 
+(16) Handles a double precision floating point value. 
 Returns `true` if the producer should generate more events, `false` otherwise.
-Throws a [ser_error](ser_error.md) on parse errors. 
-
-    virtual void do_flush() = 0;
-Allows producers of json events to flush any buffered data.
+Sets `ec` and returns `false` on parse errors. 
 
 #### Parameters
 
