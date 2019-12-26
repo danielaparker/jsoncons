@@ -99,6 +99,8 @@ If exceptions are disabled or if the compile time macro `JSONCONS_NO_EXCEPTIONS`
 
 - [Performance benchmarks with text and doubles](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance_fp.md)
 
+[JSONPath Comparison](https://cburgmer.github.io/json-path-comparison/) shows how jsoncons JsonPath compares with other implementations
+
 ## Examples
 
 [Working with JSON data](#E1)  

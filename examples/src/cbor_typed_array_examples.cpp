@@ -212,7 +212,7 @@ void cursor_example_multi_dim_column_major_classical_cbor_array()
     }
 }
 
-struct my_cbor_content_handler : public cbor::default_json_content_handler
+struct my_cbor_content_handler : public default_json_content_handler
 {
     std::vector<double> v;
 private:
