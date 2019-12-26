@@ -15,9 +15,6 @@
 #include <jsoncons/config/binary_config.hpp>
 #include <jsoncons/tag_type.hpp>
 #include <jsoncons/utility.hpp>
-#ifdef JSONCONS_HAS_FLOAT128
-#include <quadmath.h>
-#endif
 
 namespace jsoncons {
 
