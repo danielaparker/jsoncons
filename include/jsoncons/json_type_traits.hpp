@@ -559,7 +559,7 @@ struct json_type_traits<Json, T,
 {
     typedef typename T::mapped_type mapped_type;
     typedef typename T::value_type value_type;
-    typedef typename T::value_type key_type;
+    typedef typename T::key_type key_type;
     typedef typename Json::allocator_type allocator_type;
 
     static bool is(const Json& j) noexcept

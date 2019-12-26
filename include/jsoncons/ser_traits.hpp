@@ -134,6 +134,7 @@ struct ser_traits<T,
 
         if (reader.current().event_type() != staj_event_type::begin_array)
         {
+            ec = conversion_errc::json_not_vector;
             return v;
         }
         reader.next(ec);
@@ -179,6 +180,7 @@ struct ser_traits<T,
 
         if (reader.current().event_type() != staj_event_type::begin_array)
         {
+            ec = conversion_errc::json_not_vector;
             return v;
         }
         reader.next(ec);
@@ -216,7 +218,7 @@ struct ser_traits<std::array<T,N>>
         v.fill(T{});
         if (reader.current().event_type() != staj_event_type::begin_array)
         {
-            return v;
+            ec = conversion_errc::json_not_vector;
         }
         reader.next(ec);
         for (std::size_t i = 0; i < N && reader.current().event_type() != staj_event_type::end_array && !ec; ++i)
@@ -264,6 +266,7 @@ struct ser_traits<T,
         T val;
         if (reader.current().event_type() != staj_event_type::begin_object)
         {
+            ec = conversion_errc::json_not_map;
             return val;
         }
         reader.next(ec);
