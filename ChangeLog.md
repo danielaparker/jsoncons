@@ -1,3 +1,21 @@
+master
+------
+
+Enhancements:
+
+- `j.as<int>()`, `j.as<uint64_t>()` etc. supported for binary, octal and hex string values,
+in addition to decimal string values. 
+
+Changes:
+
+- The tag type `bstr_arg_t` has been renamed to `byte_string_arg_t`, and the constant 
+`bstr_arg` to `byte_string_arg`.
+
+- The `cbor_content_handler` public member functions `typed_array()` and private virtual functions 
+`do_typed_array()` have been moved to `basic_json_content_handler`. The `do_typed_array()`
+private virtual functions have been given default implementations. `cbor_content_handler`
+has been deprecated. 
+
 v0.142.0
 --------
 
