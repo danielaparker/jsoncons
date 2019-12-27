@@ -106,7 +106,7 @@ Output:
 (2) "Sayings of the Century"
 ```
 
-#### Using addresses with jsonpointer::get 
+#### Using jsonpointer::json_ptr with jsonpointer::get 
 
 ```c++
 #include <jsoncons/json.hpp>
