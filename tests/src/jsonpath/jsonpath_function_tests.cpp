@@ -70,7 +70,7 @@ TEST_CASE("jsonpath function tests")
 
     SECTION("keys")
     {
-        json result = json_query(store,"keys($.store.book[0])[*]");
+        json result = jsonpath::json_query(store,"keys($.store.book[0])[*]");
 
         json expected = json::parse("[\"author\",\"category\",\"price\",\"title\"]");
 
@@ -79,21 +79,21 @@ TEST_CASE("jsonpath function tests")
     }
     SECTION("sum")
     {
-        json result = json_query(store,"sum($.store.book[*].price)");
+        json result = jsonpath::json_query(store,"sum($.store.book[*].price)");
         double expected = 53.92;
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<double>() == Approx(expected).epsilon(0.000001));
     }
     SECTION("sum in filter")
     {
-        json result = json_query(store,"$.store.book[?(@.price > sum($.store.book[*].price) / count($.store.book[*]))].title");
+        json result = jsonpath::json_query(store,"$.store.book[?(@.price > sum($.store.book[*].price) / count($.store.book[*]))].title");
         std::string expected = "The Lord of the Rings";
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<std::string>() == expected);
     }
     SECTION("avg")
     {
-        json result = json_query(store,"avg($.store.book[*].price)");
+        json result = jsonpath::json_query(store,"avg($.store.book[*].price)");
 
         double expected = 13.48;
 
@@ -102,7 +102,7 @@ TEST_CASE("jsonpath function tests")
     }
     SECTION("avg in filter")
     {
-        json result = json_query(store,"$.store.book[?(@.price > avg($.store.book[*].price))].title");
+        json result = jsonpath::json_query(store,"$.store.book[?(@.price > avg($.store.book[*].price))].title");
         std::string expected = "The Lord of the Rings";
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<std::string>() == expected);
@@ -110,7 +110,7 @@ TEST_CASE("jsonpath function tests")
 
     SECTION("prod")
     {
-        json result = json_query(store,"prod($.store.book[*].price)");
+        json result = jsonpath::json_query(store,"prod($.store.book[*].price)");
 
         double expected = 24028.731766049998;
 
@@ -120,7 +120,7 @@ TEST_CASE("jsonpath function tests")
 
     SECTION("min")
     {
-        json result = json_query(store,"min($.store.book[*].price)");
+        json result = jsonpath::json_query(store,"min($.store.book[*].price)");
 
         double expected = 8.95;
 
@@ -130,7 +130,7 @@ TEST_CASE("jsonpath function tests")
 
     SECTION("max")
     {
-        json result = json_query(store,"max($.store.book[*].price)");
+        json result = jsonpath::json_query(store,"max($.store.book[*].price)");
 
         double expected = 22.99;
 
@@ -146,7 +146,7 @@ TEST_CASE("jsonpath function tests")
     ["Sayings of the Century","Sword of Honour","Moby Dick"]
         )");
 
-        json result = json_query(store,path);
+        json result = jsonpath::json_query(store,path);
 
         CHECK(result == expected);
     }
@@ -155,7 +155,7 @@ TEST_CASE("jsonpath function tests")
     SECTION("tokenize")
     {
         json j("The cat sat on the mat");
-        json result = json_query(j,"tokenize($,'\\\\s+')[*]");
+        json result = jsonpath::json_query(j,"tokenize($,'\\\\s+')[*]");
 
         json expected = json::parse("[\"The\",\"cat\",\"sat\",\"on\",\"the\",\"mat\"]");
 
@@ -164,13 +164,13 @@ TEST_CASE("jsonpath function tests")
     SECTION("tokenize in filter")
     {
         json j = json::parse("[\"The cat sat on the mat\",\"The cat on the mat\"]");
-        json result = json_query(j,"$[?(tokenize(@,'\\\\s+')[2]=='sat')]");
+        json result = jsonpath::json_query(j,"$[?(tokenize(@,'\\\\s+')[2]=='sat')]");
 
         CHECK(result[0] == j[0]);
     }
     SECTION("tokenize in filter 2")
     {
-        json result = json_query(store,"$.store.book[?(tokenize(@.author,'\\\\s+')[1] == 'Waugh')].title");
+        json result = jsonpath::json_query(store,"$.store.book[?(tokenize(@.author,'\\\\s+')[1] == 'Waugh')].title");
         std::string expected = "Sword of Honour";
         REQUIRE(result.size() == 1);
         CHECK(result[0].as<std::string>() == expected);
