@@ -581,7 +581,7 @@ namespace jsoncons \
 #define JSONCONS_ENUM_TRAITS_DECL(EnumType, ...)  \
     JSONCONS_ENUM_TRAITS_DECL_BASE(char,,EnumType,__VA_ARGS__) \
     JSONCONS_ENUM_TRAITS_DECL_BASE(wchar_t,L,EnumType,__VA_ARGS__) \
-    template <> struct is_json_type_traits_declared<EnumType> : public std::true_type {}; \
+    namespace jsoncons { template <> struct is_json_type_traits_declared<EnumType> : public std::true_type {}; } \
   /**/
 
 #define JSONCONS_NAMED_ENUM_PAIR(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_NAMED_ENUM_PAIR_ Seq),
