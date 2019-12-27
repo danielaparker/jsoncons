@@ -643,7 +643,7 @@ struct json_type_traits<Json, T,
         for (const auto& item : val.object_range())
         {
             auto r = jsoncons::detail::to_integer<key_type>(item.key().data(),item.key().size());
-            result.emplace(r.value(), item.value().as<mapped_type>());
+            result.emplace(r.value(), item.value().template as<mapped_type>());
         }
 
         return result;
