@@ -608,7 +608,7 @@ struct json_type_traits<Json, std::array<E, N>>
 {
     typedef typename Json::allocator_type allocator_type;
 
-    typedef E element_type;
+    typedef E value_type;
 
     static bool is(const Json& j) noexcept
     {
@@ -617,7 +617,7 @@ struct json_type_traits<Json, std::array<E, N>>
         {
             for (auto e : j.array_range())
             {
-                if (!e.template is<element_type>())
+                if (!e.template is<value_type>())
                 {
                     result = false;
                     break;
