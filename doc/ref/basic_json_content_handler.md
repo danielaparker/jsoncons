@@ -392,7 +392,7 @@ Throws a [ser_error](ser_error.md) on parse errors.
     virtual bool do_half_value(uint16_t value, 
                                semantic_tag tag,
                                const ser_context& context,
-                               std::error_code& ec) = 0; // (15)
+                               std::error_code& ec); // (15)
 
     virtual bool do_double_value(double value, 
                                  semantic_tag tag,
@@ -402,71 +402,71 @@ Throws a [ser_error](ser_error.md) on parse errors.
     virtual bool do_typed_array(const span<const uint8_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
-                                std::error_code& ec) = 0; // (17)
+                                std::error_code& ec); // (17)
 
     virtual bool do_typed_array(const span<const uint16_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
-                                std::error_code& ec) = 0; // (18)
+                                std::error_code& ec); // (18)
 
     virtual bool do_typed_array(const span<const uint32_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
-                                std::error_code& ec) = 0; // (19)
+                                std::error_code& ec); // (19)
 
     virtual bool do_typed_array(const span<const uint64_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
-                                std::error_code& ec) = 0; // (20)
+                                std::error_code& ec); // (20)
 
     virtual bool do_typed_array(const span<const int8_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
-                                std::error_code& ec) = 0; // (21)
+                                std::error_code& ec); // (21)
 
     virtual bool do_typed_array(const span<const int16_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
-                                std::error_code& ec) = 0; // (22)
+                                std::error_code& ec); // (22)
 
     virtual bool do_typed_array(const span<const int32_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
-                                std::error_code& ec) = 0; // (23)
+                                std::error_code& ec); // (23)
 
     virtual bool do_typed_array(const span<const int64_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
-                                std::error_code& ec) = 0; // (24)
+                                std::error_code& ec); // (24)
 
     virtual bool do_typed_array(half_arg_t, 
                                 const span<const uint16_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
-                                std::error_code& ec) = 0; // (25)
+                                std::error_code& ec); // (25)
 
     virtual bool do_typed_array(const span<const float>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
-                                std::error_code& ec) = 0; // (26)
+                                std::error_code& ec); // (26)
 
     virtual bool do_typed_array(const span<const double>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
-                                std::error_code& ec) = 0; // (27)
+                                std::error_code& ec); // (27)
 
     virtual bool do_typed_array(const span<const float128_type>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
-                                std::error_code& ec) = 0; // (28)
+                                std::error_code& ec); // (28)
 
     virtual bool do_begin_multi_dim(const span<const size_t>& shape,
                                     semantic_tag tag,
                                     const ser_context& context, 
-                                    std::error_code& ec) = 0; // (29)
+                                    std::error_code& ec); // (29)
 
     virtual bool do_end_multi_dim(const ser_context& context,
-                                  std::error_code& ec) = 0; // (30)
+                                  std::error_code& ec); // (30)
 
 (1) Allows producers of json events to flush any buffered data.
 
