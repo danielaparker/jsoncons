@@ -307,6 +307,69 @@ struct ser_traits<T,
     }
 };
 
+template <class T>
+struct ser_traits<T,
+    typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+                            jsoncons::detail::is_map_like<T>::value &&
+                            std::is_integral<typename T::key_type>::value
+>::type>
+{
+    typedef typename T::mapped_type mapped_type;
+    typedef typename T::value_type value_type;
+    typedef typename T::key_type key_type;
+
+    template <class Json>
+    static T decode(basic_staj_reader<typename Json::char_type>& reader, 
+                    const Json& context_j, 
+                    std::error_code& ec)
+    {
+        T val;
+        if (reader.current().event_type() != staj_event_type::begin_object)
+        {
+            ec = conversion_errc::json_not_map;
+            return val;
+        }
+        reader.next(ec);
+
+        while (reader.current().event_type() != staj_event_type::end_object && !ec)
+        {
+            JSONCONS_ASSERT(reader.current().event_type() == staj_event_type::name);
+            auto s = reader.current().template get<basic_string_view<typename Json::char_type>>();
+            auto key = jsoncons::detail::to_integer<key_type>(s.data(), s.size()); 
+            reader.next(ec);
+            val.emplace(key.value(),ser_traits<mapped_type>::decode(reader, context_j, ec));
+            reader.next(ec);
+        }
+        return val;
+    }
+
+    template <class Json>
+    static void encode(const T& val, 
+                          basic_json_content_handler<typename Json::char_type>& encoder, 
+                          const Json& context_j, 
+                          std::error_code& ec)
+    {
+        encoder.begin_object(val.size(), semantic_tag::none, null_ser_context(), ec);
+        if (ec)
+        {
+            return;
+        }
+        for (auto it = std::begin(val); it != std::end(val); ++it)
+        {
+            std::basic_string<typename Json::char_type> s;
+            jsoncons::detail::print_integer(it->first,s);
+            encoder.name(s);
+            ser_traits<mapped_type>::encode(it->second, encoder, context_j, ec);
+        }
+        encoder.end_object(null_ser_context(), ec);
+        if (ec)
+        {
+            return;
+        }
+        encoder.flush();
+    }
+};
+
 }
 
 #endif

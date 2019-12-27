@@ -384,3 +384,32 @@ TEST_CASE("own_vector json_type_traits")
     json j2 = v;
     CHECK(j2 == j);
 }
+
+TEST_CASE("map with integer key")
+{
+    SECTION("test 1")
+    {
+        std::map<uint32_t, int> val{ {1,1,},{2,2} };
+
+        json j{ val };
+        CHECK(j.is<std::map<uint32_t, int>>());
+        CHECK(j.is<std::map<uint64_t, int>>());
+        CHECK_FALSE(!j.is<std::map<std::string, int>>());
+
+        REQUIRE(j.is_object());
+        REQUIRE(j.size() == 2);
+        CHECK(j["1"] == 1);
+        CHECK(j["2"] == 2);
+
+        std::map<uint64_t, int> other = j.as<std::map<uint64_t, int>>();
+        REQUIRE(other.size() == 2);
+        CHECK(other[1] == 1);
+        CHECK(other[2] == 2);
+
+        json other_j{ other };
+        REQUIRE(other_j.is_object());
+        REQUIRE(other_j.size() == 2);
+        CHECK(other_j["1"] == 1);
+        CHECK(other_j["2"] == 2);
+    }
+}

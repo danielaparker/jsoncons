@@ -153,3 +153,16 @@ TEST_CASE("convert_tuple_test")
 }
 #endif
 
+TEST_CASE("encode/decode map with integer key")
+{
+    std::map<int,double> m = {{1,1},{2,2}};
+
+    std::string s;
+    jsoncons::encode_json(m,s);
+    auto result = jsoncons::decode_json<std::map<int,double>>(s);
+
+    REQUIRE(result.size() == m.size());
+    CHECK(m[1] == result[1]);
+    CHECK(m[2] == result[2]);
+}
+

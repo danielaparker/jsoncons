@@ -87,16 +87,24 @@ struct json_type_traits
 
 namespace detail {
 
-    // is_incompatible
+    // is_json_type_traits_unspecialized
     template<class Json, class T, class Enable = void>
-    struct is_incompatible : std::false_type {};
+    struct is_json_type_traits_unspecialized : std::false_type {};
 
-
-    // is_incompatible
+    // is_json_type_traits_unspecialized
     template<class Json, class T>
-    struct is_incompatible<Json,T,
+    struct is_json_type_traits_unspecialized<Json,T,
         typename std::enable_if<!std::integral_constant<bool, json_type_traits<Json, T>::is_compatible>::value>::type
     > : std::true_type {};
+
+    // is_json_type_traits_specialized
+    template<class Json, class T, class Enable=void>
+    struct is_json_type_traits_specialized : std::false_type {};
+
+    template<class Json, class T>
+    struct is_json_type_traits_specialized<Json,T, 
+        typename std::enable_if<!is_json_type_traits_unspecialized<Json,T>::value
+    >::type> : std::true_type {};
 
     // is_compatible_string_type
     template<class Json, class T, class Enable=void>
@@ -106,7 +114,7 @@ namespace detail {
     struct is_compatible_string_type<Json,T, 
         typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
         jsoncons::detail::is_string_like<T>::value && 
-        !is_incompatible<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
+        !is_json_type_traits_unspecialized<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
     >::type> : std::true_type {};
 
     // is_compatible_string_view_type
@@ -117,7 +125,7 @@ namespace detail {
     struct is_compatible_string_view_type<Json,T, 
         typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
         jsoncons::detail::is_string_view_like<T>::value && 
-        !is_incompatible<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
+        !is_json_type_traits_unspecialized<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
     >::type> : std::true_type {};
 
     // is_compatible_array_type
@@ -128,7 +136,7 @@ namespace detail {
     struct is_compatible_array_type<Json,T, 
         typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
         jsoncons::detail::is_vector_like<T>::value && 
-        !is_incompatible<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
+        !is_json_type_traits_unspecialized<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
     >::type> : std::true_type {};
 
     // is_compatible_object_type
@@ -138,7 +146,7 @@ namespace detail {
     template<class Json, class T>
     struct is_compatible_object_type<Json,T, 
                            typename std::enable_if<
-        !is_incompatible<Json,typename T::mapped_type>::value
+        !is_json_type_traits_unspecialized<Json,typename T::mapped_type>::value
     >::type> : std::true_type {};
 
 } // namespace detail
@@ -471,7 +479,7 @@ struct json_type_traits<Json, T,
 
     static Json to_json(const T& val)
     {
-        Json j = typename Json::array();
+        Json j(json_array_arg);
         auto first = std::begin(val);
         auto last = std::end(val);
         size_t size = std::distance(first,last);
@@ -485,7 +493,7 @@ struct json_type_traits<Json, T,
 
     static Json to_json(const T& val, const allocator_type& alloc)
     {
-        Json j = typename Json::array(alloc);
+        Json j(json_array_arg, alloc);
         auto first = std::begin(val);
         auto last = std::end(val);
         size_t size = std::distance(first, last);
@@ -554,7 +562,9 @@ struct json_type_traits<Json, T,
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<!is_json_type_traits_declared<T>::value && jsoncons::detail::is_compatible_object_type<Json,T>::value>::type
+                        typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+                                                jsoncons::detail::is_constructible_from_const_pointer_and_size<typename T::key_type>::value &&
+                                                jsoncons::detail::is_json_type_traits_specialized<Json,typename T::mapped_type>::value>::type
 >
 {
     typedef typename T::mapped_type mapped_type;
@@ -592,13 +602,75 @@ struct json_type_traits<Json, T,
 
     static Json to_json(const T& val)
     {
-        Json j = typename Json::object(val.begin(), val.end());
+        Json j(json_object_arg, val.begin(), val.end());
         return j;
     }
 
     static Json to_json(const T& val, const allocator_type& alloc)
     {
-        Json j = typename Json::object(val.begin(), val.end(), alloc);
+        Json j(json_object_arg, val.begin(), val.end(), alloc);
+        return j;
+    }
+};
+
+template <class Json, typename T>
+struct json_type_traits<Json, T, 
+                        typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+                                                std::is_integral<typename T::key_type>::value &&
+                                                jsoncons::detail::is_json_type_traits_specialized<Json,typename T::mapped_type>::value>::type
+>
+{
+    typedef typename T::mapped_type mapped_type;
+    typedef typename T::value_type value_type;
+    typedef typename T::key_type key_type;
+    typedef typename Json::allocator_type allocator_type;
+
+    static bool is(const Json& val) noexcept {
+        if (!val.is_object())
+            return false;
+        for (const auto& item : val.object_range())
+        {
+            if (!jsoncons::detail::to_integer<key_type>(item.key().data(),item.key().size()))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static T as(const Json& val) {
+        T result;
+        for (const auto& item : val.object_range())
+        {
+            auto r = jsoncons::detail::to_integer<key_type>(item.key().data(),item.key().size());
+            result.emplace(r.value(), item.value().as<mapped_type>());
+        }
+
+        return result;
+    }
+
+    static Json to_json(const T& val) {
+        Json j;
+        j.reserve(val.size());
+        for (const auto& item : val)
+        {
+            typename Json::key_type key;
+            jsoncons::detail::print_integer(item.first,key);
+            j.try_emplace(key, item.second);
+        }
+        return j;
+    }
+
+    static Json to_json(const T& val, const allocator_type& alloc)
+    {
+        Json j;
+        j.reserve(val.size());
+        for (const auto& item : val)
+        {
+            typename Json::key_type key{alloc};
+            jsoncons::detail::print_integer(item.first,key);
+            j.try_emplace(key, item.second, alloc);
+        }
         return j;
     }
 };
@@ -640,7 +712,7 @@ struct json_type_traits<Json, std::array<E, N>>
 
     static Json to_json(const std::array<E, N>& val)
     {
-        Json j = typename Json::array();
+        Json j(json_array_arg);
         j.reserve(N);
         for (auto it = val.begin(); it != val.end(); ++it)
         {
@@ -652,7 +724,7 @@ struct json_type_traits<Json, std::array<E, N>>
     static Json to_json(const std::array<E, N>& val, 
                         const allocator_type& alloc)
     {
-        Json j = typename Json::array(alloc);
+        Json j(json_array_arg, alloc);
         j.reserve(N);
         for (auto it = val.begin(); it != val.end(); ++it)
         {
@@ -758,7 +830,7 @@ public:
     
     static Json to_json(const std::pair<T1,T2>& val)
     {
-        return typename Json::array{val.first,val.second};
+        return Json(json_array_arg, { val.first, val.second });
     }
 };
 
@@ -874,7 +946,7 @@ struct json_type_traits<Json, std::valarray<T>>
     
     static Json to_json(const std::valarray<T>& val)
     {
-        Json j = typename Json::array();
+        Json j(json_array_arg);
         auto first = std::begin(val);
         auto last = std::end(val);
         size_t size = std::distance(first,last);
@@ -888,7 +960,7 @@ struct json_type_traits<Json, std::valarray<T>>
 
     static Json to_json(const std::valarray<T>& val, const allocator_type& alloc)
     {
-        Json j = typename Json::array(alloc);
+        Json j(json_array_arg, alloc);
         auto first = std::begin(val);
         auto last = std::end(val);
         size_t size = std::distance(first,last);
