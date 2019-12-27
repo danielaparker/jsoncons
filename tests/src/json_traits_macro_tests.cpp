@@ -409,6 +409,10 @@ JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advance
 JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
 JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::hiking_reputation, application, reputons)
 
+void test_is_json_type_traits_declared(std::true_type)
+{
+}
+
 TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS_DECL tests")
 {
     std::string an_author = "Haruki Murakami"; 
@@ -416,6 +420,9 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS_DECL tests")
     double a_price = 25.17;
 
     ns::book1a book{an_author, a_title, a_price};
+
+    CHECK(jsoncons::is_json_type_traits_declared<ns::book1a>::value);
+    test_is_json_type_traits_declared(jsoncons::is_json_type_traits_declared<ns::book1a>());
 
     SECTION("book1a")
     {
