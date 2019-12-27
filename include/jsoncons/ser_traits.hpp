@@ -273,7 +273,11 @@ struct ser_traits<T,
 
         while (reader.current().event_type() != staj_event_type::end_object && !ec)
         {
-            JSONCONS_ASSERT(reader.current().event_type() == staj_event_type::name);
+            if (reader.current().event_type() != staj_event_type::name)
+            {
+                ec = json_errc::expected_name;
+                return val;
+            }
             auto key = reader.current(). template get<key_type>();
             reader.next(ec);
             val.emplace(std::move(key),ser_traits<mapped_type>::decode(reader, context_j, ec));
@@ -333,7 +337,11 @@ struct ser_traits<T,
 
         while (reader.current().event_type() != staj_event_type::end_object && !ec)
         {
-            JSONCONS_ASSERT(reader.current().event_type() == staj_event_type::name);
+            if (reader.current().event_type() != staj_event_type::name)
+            {
+                ec = json_errc::expected_name;
+                return val;
+            }
             auto s = reader.current().template get<basic_string_view<typename Json::char_type>>();
             auto key = jsoncons::detail::to_integer<key_type>(s.data(), s.size()); 
             reader.next(ec);

@@ -940,7 +940,7 @@ struct json_type_traits<Json, std::valarray<T>>
         }
         else
         {
-            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Attempt to cast json non-array to array"));
+            JSONCONS_THROW(ser_error(conversion_errc::json_not_array));
         }
     }
     
