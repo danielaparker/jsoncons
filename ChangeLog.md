@@ -4,7 +4,13 @@ master
 Enhancements:
 
 - `j.as<int>()`, `j.as<uint64_t>()` etc. supported for binary, octal and hex string values,
-in addition to decimal string values. 
+in addition to decimal string values.
+ 
+- Includes `json_type_traits` specialization for integer keyed maps, with conversion 
+to/from string keys in `basic_json`. 
+
+- The convenience json traits macros now generate a `jsoncons::is_json_type_traits_declared<T>`
+specialization in addition to a `jsoncons::json_type_traits<Json,T>` specialization.
 
 Changes:
 
