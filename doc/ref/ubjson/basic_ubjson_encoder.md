@@ -4,7 +4,7 @@ __`jsoncons_ext/ubjson/ubjson_encoder.hpp`__
 
 ```c++
 template<
-    class Destination>
+    class Sink>
 > class basic_ubjson_encoder : public jsoncons::json_content_handler
 ```
 
@@ -16,20 +16,20 @@ Four specializations for common character types and result types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-ubjson_stream_encoder            |basic_ubjson_encoder<jsoncons::bin_stream_destination>
-ubjson_bytes_encoder     |basic_ubjson_encoder<jsoncons::bytes_destination>
+ubjson_stream_encoder            |basic_ubjson_encoder<jsoncons::binary_stream_sink>
+ubjson_bytes_encoder     |basic_ubjson_encoder<jsoncons::bytes_sink>
 
 #### Member types
 
 Type                       |Definition
 ---------------------------|------------------------------
 char_type                  |char
-destination_type                |Destination
+sink_type                |Sink
 string_view_type           |
 
 #### Constructors
 
-    explicit basic_ubjson_encoder(destination_type dest)
+    explicit basic_ubjson_encoder(sink_type sink)
 Constructs a new encoder that writes to the specified destination.
 
 #### Destructor

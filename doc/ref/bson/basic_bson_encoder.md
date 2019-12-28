@@ -4,7 +4,7 @@ __`jsoncons_ext/bson/bson_encoder.hpp`__
 
 ```c++
 template<
-    class Destination>
+    class Sink>
 > class basic_bson_encoder : public jsoncons::json_content_handler
 ```
 
@@ -12,24 +12,24 @@ template<
 
 ![basic_bson_encoder](./diagrams/bson_encoder.png)
 
-Two specializations for common destination types are defined:
+Two specializations for common sink types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-bson_stream_encoder        |basic_bson_encoder<jsoncons::bin_stream_destination>
-bson_bytes_encoder     |basic_bson_encoder<jsoncons::bytes_destination>
+bson_stream_encoder        |basic_bson_encoder<jsoncons::binary_stream_sink>
+bson_bytes_encoder         |basic_bson_encoder<jsoncons::bytes_sink>
 
 #### Member types
 
 Type                       |Definition
 ---------------------------|------------------------------
 char_type                  |char
-destination_type                |Destination
+sink_type                  |Sink
 string_view_type           |
 
 #### Constructors
 
-    explicit basic_bson_encoder(destination_type dest)
+    explicit basic_bson_encoder(sink_type sink)
 Constructs a new encoder that writes to the specified destination.
 
 #### Destructor

@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DESTINATION_HPP
-#define JSONCONS_DESTINATION_HPP
+#ifndef JSONCONS_SINK_HPP
+#define JSONCONS_SINK_HPP
 
 #include <stdexcept>
 #include <string>
@@ -20,10 +20,10 @@
 
 namespace jsoncons { 
 
-// stream_destination
+// stream_sink
 
 template <class CharT>
-class stream_destination
+class stream_sink
 {
 public:
     typedef CharT value_type;
@@ -39,27 +39,27 @@ private:
     CharT* p_;
 
     // Noncopyable
-    stream_destination(const stream_destination&) = delete;
-    stream_destination& operator=(const stream_destination&) = delete;
+    stream_sink(const stream_sink&) = delete;
+    stream_sink& operator=(const stream_sink&) = delete;
 
 public:
-    stream_destination(stream_destination&&) = default;
+    stream_sink(stream_sink&&) = default;
 
-    stream_destination(std::basic_ostream<CharT>& os)
+    stream_sink(std::basic_ostream<CharT>& os)
         : os_(std::addressof(os)), buffer_(default_buffer_length), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
     {
     }
-    stream_destination(std::basic_ostream<CharT>& os, std::size_t buflen)
+    stream_sink(std::basic_ostream<CharT>& os, std::size_t buflen)
     : os_(std::addressof(os)), buffer_(buflen), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
     {
     }
-    ~stream_destination()
+    ~stream_sink()
     {
         os_->write(begin_buffer_, buffer_length());
         os_->flush();
     }
 
-    stream_destination& operator=(stream_destination&&) = default;
+    stream_sink& operator=(stream_sink&&) = default;
 
     void flush()
     {
@@ -105,9 +105,9 @@ private:
     }
 };
 
-// bin_stream_destination
+// binary_stream_sink
 
-class bin_stream_destination
+class binary_stream_sink
 {
 public:
     typedef uint8_t value_type;
@@ -122,13 +122,13 @@ private:
     uint8_t* p_;
 
     // Noncopyable
-    bin_stream_destination(const bin_stream_destination&) = delete;
-    bin_stream_destination& operator=(const bin_stream_destination&) = delete;
+    binary_stream_sink(const binary_stream_sink&) = delete;
+    binary_stream_sink& operator=(const binary_stream_sink&) = delete;
 
 public:
-    bin_stream_destination(bin_stream_destination&&) = default;
+    binary_stream_sink(binary_stream_sink&&) = default;
 
-    bin_stream_destination(std::basic_ostream<char>& os)
+    binary_stream_sink(std::basic_ostream<char>& os)
         : os_(std::addressof(os)), 
           buffer_(default_buffer_length), 
           begin_buffer_(buffer_.data()), 
@@ -136,7 +136,7 @@ public:
           p_(begin_buffer_)
     {
     }
-    bin_stream_destination(std::basic_ostream<char>& os, std::size_t buflen)
+    binary_stream_sink(std::basic_ostream<char>& os, std::size_t buflen)
         : os_(std::addressof(os)), 
           buffer_(buflen), 
           begin_buffer_(buffer_.data()), 
@@ -144,13 +144,13 @@ public:
           p_(begin_buffer_)
     {
     }
-    ~bin_stream_destination()
+    ~binary_stream_sink()
     {
         os_->write((char*)begin_buffer_, buffer_length());
         os_->flush();
     }
 
-    bin_stream_destination& operator=(bin_stream_destination&&) = default;
+    binary_stream_sink& operator=(binary_stream_sink&&) = default;
 
     void flush()
     {
@@ -195,10 +195,10 @@ private:
     }
 };
 
-// string_destination
+// string_sink
 
 template <class StringT>
-class string_destination 
+class string_sink 
 {
 public:
     typedef typename StringT::value_type value_type;
@@ -207,21 +207,21 @@ private:
     output_type* s_;
 
     // Noncopyable
-    string_destination(const string_destination&) = delete;
-    string_destination& operator=(const string_destination&) = delete;
+    string_sink(const string_sink&) = delete;
+    string_sink& operator=(const string_sink&) = delete;
 public:
-    string_destination(string_destination&& val)
+    string_sink(string_sink&& val)
         : s_(nullptr)
     {
         std::swap(s_,val.s_);
     }
 
-    string_destination(output_type& s)
+    string_sink(output_type& s)
         : s_(std::addressof(s))
     {
     }
 
-    string_destination& operator=(string_destination&& val)
+    string_sink& operator=(string_sink&& val)
     {
         std::swap(s_, val.s_);
     }
@@ -241,9 +241,9 @@ public:
     }
 };
 
-// bytes_destination
+// bytes_sink
 
-class bytes_destination 
+class bytes_sink 
 {
 public:
     typedef uint8_t value_type;
@@ -252,17 +252,17 @@ private:
     output_type& s_;
 
     // Noncopyable
-    bytes_destination(const bytes_destination&) = delete;
-    bytes_destination& operator=(const bytes_destination&) = delete;
+    bytes_sink(const bytes_sink&) = delete;
+    bytes_sink& operator=(const bytes_sink&) = delete;
 public:
-    bytes_destination(bytes_destination&&) = default;
+    bytes_sink(bytes_sink&&) = default;
 
-    bytes_destination(output_type& s)
+    bytes_sink(output_type& s)
         : s_(s)
     {
     }
 
-    bytes_destination& operator=(bytes_destination&&) = default;
+    bytes_sink& operator=(bytes_sink&&) = default;
 
     void flush()
     {

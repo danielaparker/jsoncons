@@ -5,12 +5,12 @@ __`jsoncons/json_encoder.hpp`__
 ```c++
 template<
     class CharT,
-    class Destination>
+    class Sink>
 > basic_json_encoder : public jsoncons::basic_json_content_handler<CharT>
 
 template<
     class CharT,
-    class Destination>
+    class Sink>
 > basic_json_compressed_encoder : public jsoncons::basic_json_content_handler<CharT>
 ```
 
@@ -18,36 +18,36 @@ template<
 
 ![basic_json_encoder](./diagrams/json_encoder.png)
 
-Four specializations for common character types and destination types are defined
+Four specializations for common character types and sink types are defined
 for both the pretty print and compressed serializers:
 
 Type                       |Definition
 ---------------------------|------------------------------
-json_stream_encoder            |basic_json_encoder<char,jsoncons::stream_destination<char>>
-json_string_encoder     |basic_json_encoder<char,jsoncons::string_destination<std::string>>
-wjson_stream_encoder           |basic_json_encoder<wchar_t,jsoncons::stream_destination<wchar_t>>
-wjson_string_encoder    |basic_json_encoder<wchar_t,jsoncons::string_destination<std::wstring>>
-json_compressed_stream_encoder            |basic_json_compressed_encoder<char,jsoncons::stream_destination<char>>
-json_compressed_string_encoder     |basic_json_compressed_encoder<char,jsoncons::string_destination<std::string>>
-wjson_compressed_stream_encoder           |basic_json_compressed_encoder<wchar_t,jsoncons::stream_destination<wchar_t>>
-wjson_compressed_string_encoder    |basic_json_compressed_encoder<wchar_t,jsoncons::string_destination<std::wstring>>
+json_stream_encoder            |basic_json_encoder<char,jsoncons::stream_sink<char>>
+json_string_encoder     |basic_json_encoder<char,jsoncons::string_sink<std::string>>
+wjson_stream_encoder           |basic_json_encoder<wchar_t,jsoncons::stream_sink<wchar_t>>
+wjson_string_encoder    |basic_json_encoder<wchar_t,jsoncons::string_sink<std::wstring>>
+json_compressed_stream_encoder            |basic_json_compressed_encoder<char,jsoncons::stream_sink<char>>
+json_compressed_string_encoder     |basic_json_compressed_encoder<char,jsoncons::string_sink<std::string>>
+wjson_compressed_stream_encoder           |basic_json_compressed_encoder<wchar_t,jsoncons::stream_sink<wchar_t>>
+wjson_compressed_string_encoder    |basic_json_compressed_encoder<wchar_t,jsoncons::string_sink<std::wstring>>
 
 #### Member types
 
 Type                       |Definition
 ---------------------------|------------------------------
 char_type                  |CharT
-destination_type           |Destination
+sink_type           |Sink
 string_view_type           |
 
 #### Constructors
 
-    explicit basic_json_encoder(destination_type dest)
-Constructs a new encoder that is associated with the destination `dest`.
+    explicit basic_json_encoder(sink_type sink)
+Constructs a new encoder that is associated with the destination `sink`.
 
-    basic_json_encoder(destination_type dest, 
+    basic_json_encoder(sink_type sink, 
                           const basic_json_options<CharT>& options)
-Constructs a new encoder that is associated with the destination `dest` 
+Constructs a new encoder that is associated with the destination `sink` 
 and uses the specified [json options](basic_json_options.md). 
 
 #### Destructor

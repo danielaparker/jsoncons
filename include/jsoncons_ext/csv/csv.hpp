@@ -76,7 +76,7 @@ typename std::enable_if<is_basic_json_class<T>::value,void>::type
 encode_csv(const T& j, std::basic_string<CharT>& s, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
 {
     typedef CharT char_type;
-    basic_csv_encoder<char_type,jsoncons::string_destination<std::basic_string<char_type>>> encoder(s,options);
+    basic_csv_encoder<char_type,jsoncons::string_sink<std::basic_string<char_type>>> encoder(s,options);
     j.dump(encoder);
 }
 
@@ -85,7 +85,7 @@ typename std::enable_if<!is_basic_json_class<T>::value,void>::type
 encode_csv(const T& val, std::basic_string<CharT>& s, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
 {
     typedef CharT char_type;
-    basic_csv_encoder<char_type,jsoncons::string_destination<std::basic_string<char_type>>> encoder(s,options);
+    basic_csv_encoder<char_type,jsoncons::string_sink<std::basic_string<char_type>>> encoder(s,options);
     std::error_code ec;
     ser_traits<T>::encode(val, encoder, json(), ec);
     if (ec)
@@ -99,7 +99,7 @@ typename std::enable_if<is_basic_json_class<T>::value,void>::type
 encode_csv(const T& j, std::basic_ostream<CharT>& os, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
 {
     typedef CharT char_type;
-    basic_csv_encoder<char_type,jsoncons::stream_destination<char_type>> encoder(os,options);
+    basic_csv_encoder<char_type,jsoncons::stream_sink<char_type>> encoder(os,options);
     j.dump(encoder);
 }
 
@@ -108,7 +108,7 @@ typename std::enable_if<!is_basic_json_class<T>::value,void>::type
 encode_csv(const T& val, std::basic_ostream<CharT>& os, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
 {
     typedef CharT char_type;
-    basic_csv_encoder<char_type,jsoncons::stream_destination<char_type>> encoder(os,options);
+    basic_csv_encoder<char_type,jsoncons::stream_sink<char_type>> encoder(os,options);
     std::error_code ec;
     ser_traits<T>::encode(val, encoder, json(), ec);
     if (ec)

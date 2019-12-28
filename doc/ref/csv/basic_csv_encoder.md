@@ -5,7 +5,7 @@ __`jsoncons_ext/csv/csv_encoder.hpp__
 ```c++
 template<
     class CharT,
-    class Destination,
+    class Sink,
     class Allocator=std::allocator<CharT>=std::allocator<CharT>>
 > class basic_csv_encoder : public jsoncons::basic_json_content_handler<CharT>
 ```
@@ -18,27 +18,27 @@ Four specializations for common character types and result types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-csv_stream_encoder            |basic_csv_encoder<char,jsoncons::stream_destination<char>>
-csv_string_encoder     |basic_csv_encoder<char,jsoncons::string_destination<std::string>>
-wcsv_stream_encoder           |basic_csv_encoder<wchar_t,jsoncons::stream_destination<wchar_t>>
-wcsv_string_encoder    |basic_csv_encoder<wchar_t,jsoncons::string_destination<std::wstring>>
+csv_stream_encoder            |basic_csv_encoder<char,jsoncons::stream_sink<char>>
+csv_string_encoder     |basic_csv_encoder<char,jsoncons::string_sink<std::string>>
+wcsv_stream_encoder           |basic_csv_encoder<wchar_t,jsoncons::stream_sink<wchar_t>>
+wcsv_string_encoder    |basic_csv_encoder<wchar_t,jsoncons::string_sink<std::wstring>>
 
 #### Member types
 
 Type                       |Definition
 ---------------------------|------------------------------
 char_type                  |CharT
-destination_type                |Destination
+sink_type                |Sink
 string_view_type           |
 
 #### Constructors
 
-    explicit basic_csv_encoder(destination_type dest)
-Constructs a new csv encoder that is associated with the destination `dest`.
+    explicit basic_csv_encoder(sink_type sink)
+Constructs a new csv encoder that is associated with the destination `sink`.
 
-    basic_csv_encoder(destination_type dest, 
+    basic_csv_encoder(sink_type sink, 
                          const basic_csv_options<CharT>& options)
-Constructs a new csv encoder that is associated with the destination `dest` 
+Constructs a new csv encoder that is associated with the destination `sink` 
 and uses the specified [csv options](basic_csv_options.md). 
 
 #### Destructor

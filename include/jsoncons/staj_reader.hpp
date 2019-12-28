@@ -20,7 +20,7 @@
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/ser_context.hpp>
-#include <jsoncons/destination.hpp>
+#include <jsoncons/sink.hpp>
 #include <jsoncons/detail/print_number.hpp>
 
 namespace jsoncons {
@@ -222,48 +222,48 @@ public:
             break;
         case staj_event_type::int64_value:
         {
-            jsoncons::string_destination<T> dest(s);
-            jsoncons::detail::print_integer(value_.int64_value_, dest);
+            jsoncons::string_sink<T> sink(s);
+            jsoncons::detail::print_integer(value_.int64_value_, sink);
             break;
         }
         case staj_event_type::uint64_value:
         {
-            jsoncons::string_destination<T> dest(s);
-            jsoncons::detail::print_uinteger(value_.uint64_value_, dest);
+            jsoncons::string_sink<T> sink(s);
+            jsoncons::detail::print_uinteger(value_.uint64_value_, sink);
             break;
         }
         case staj_event_type::half_value:
         {
-            jsoncons::string_destination<T> dest(s);
+            jsoncons::string_sink<T> sink(s);
             jsoncons::detail::print_double f{float_chars_format::general,0};
             double x = jsoncons::detail::decode_half(value_.half_value_);
-            f(x, dest);
+            f(x, sink);
             break;
         }
         case staj_event_type::double_value:
         {
-            jsoncons::string_destination<T> dest(s);
+            jsoncons::string_sink<T> sink(s);
             jsoncons::detail::print_double f{float_chars_format::general,0};
-            f(value_.double_value_, dest);
+            f(value_.double_value_, sink);
             break;
         }
         case staj_event_type::bool_value:
         {
-            jsoncons::string_destination<T> dest(s);
+            jsoncons::string_sink<T> sink(s);
             if (value_.bool_value_)
             {
-                dest.append(true_literal<CharT>().data(),true_literal<CharT>().size());
+                sink.append(true_literal<CharT>().data(),true_literal<CharT>().size());
             }
             else
             {
-                dest.append(false_literal<CharT>().data(),false_literal<CharT>().size());
+                sink.append(false_literal<CharT>().data(),false_literal<CharT>().size());
             }
             break;
         }
         case staj_event_type::null_value:
         {
-            jsoncons::string_destination<T> dest(s);
-            dest.append(null_literal<CharT>().data(),null_literal<CharT>().size());
+            jsoncons::string_sink<T> sink(s);
+            sink.append(null_literal<CharT>().data(),null_literal<CharT>().size());
             break;
         }
         default:
@@ -363,12 +363,12 @@ private:
             case staj_event_type::name:
             case staj_event_type::string_value:
             {
-                auto dest = jsoncons::detail::integer_from_json<int64_t>(value_.string_data_, length_);
-                if (!dest)
+                auto sink = jsoncons::detail::integer_from_json<int64_t>(value_.string_data_, length_);
+                if (!sink)
                 {
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>(dest.error_code().message()));
+                    JSONCONS_THROW(json_runtime_error<std::runtime_error>(sink.error_code().message()));
                 }
-                value = dest.value();
+                value = sink.value();
                 break;
             }
             case staj_event_type::double_value:
@@ -397,12 +397,12 @@ private:
             case staj_event_type::name:
             case staj_event_type::string_value:
             {
-                auto dest = jsoncons::detail::integer_from_json<uint64_t>(value_.string_data_, length_);
-                if (!dest)
+                auto sink = jsoncons::detail::integer_from_json<uint64_t>(value_.string_data_, length_);
+                if (!sink)
                 {
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>(dest.error_code().message()));
+                    JSONCONS_THROW(json_runtime_error<std::runtime_error>(sink.error_code().message()));
                 }
-                value = dest.value();
+                value = sink.value();
                 break;
             }
             case staj_event_type::double_value:

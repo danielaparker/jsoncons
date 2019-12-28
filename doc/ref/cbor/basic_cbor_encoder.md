@@ -4,7 +4,7 @@ __`jsoncons_ext/cbor/cbor_encoder.hpp`__
 
 ```c++
 template<
-    class Destination>
+    class Sink>
 > class basic_cbor_encoder final : public json_content_handler
 ```
 
@@ -12,25 +12,25 @@ template<
 
 ![basic_cbor_encoder](./diagrams/cbor_encoder.png)
 
-Four specializations for common destination types are defined:
+Four specializations for common sink types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-cbor_stream_encoder            |basic_cbor_encoder<jsoncons::bin_stream_destination>
-cbor_bytes_encoder     |basic_cbor_encoder<jsoncons::bytes_destination>
+cbor_stream_encoder            |basic_cbor_encoder<jsoncons::binary_stream_sink>
+cbor_bytes_encoder     |basic_cbor_encoder<jsoncons::bytes_sink>
 
 #### Member types
 
 Type                       |Definition
 ---------------------------|------------------------------
 char_type                  |char
-destination_type                |Destination
+sink_type                |Sink
 float128_type              |Float128T
 string_view_type           |
 
 #### Constructors
 
-    explicit basic_cbor_encoder(destination_type dest)
+    explicit basic_cbor_encoder(sink_type sink)
 Constructs a new encoder that writes to the specified destination.
 
 #### Destructor
