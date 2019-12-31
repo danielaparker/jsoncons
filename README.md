@@ -6,7 +6,7 @@ to work with the data in a number of ways:
 
 - As a variant-like data structure, [basic_json](doc/ref/basic_json.md) 
 
-- As a strongly typed C++ data structure
+- As a strongly typed C++ data structure that implements jsoncons traits, [json_type_traits](doc/ref/json_type_traits.md)
 
 - As a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
   in the XML world.
@@ -143,7 +143,7 @@ jsoncons allows you to work with the data in a number of ways:
 
 - As a variant-like data structure, [basic_json](doc/ref/basic_json.md) 
 
-- As a strongly typed C++ data structure
+- As a strongly typed C++ data structure that implements jsoncons traits, [json_type_traits](doc/ref/json_type_traits.md)
 
 - As a stream of parse events
 
@@ -480,7 +480,7 @@ jsoncons allows you to work with the CBOR data similarly to JSON data:
 
 - As a variant-like data structure, [basic_json](doc/ref/basic_json.md) 
 
-- As a strongly typed C++ data structure
+- As a strongly typed C++ data structure that implements jsoncons traits, [json_type_traits](doc/ref/json_type_traits.md)
 
 - As a stream of parse events
 

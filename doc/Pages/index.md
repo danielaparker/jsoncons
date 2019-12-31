@@ -27,9 +27,9 @@ jsoncons is a C++, header-only library for constructing [JSON](http://www.json.o
 data formats such as [CBOR](http://cbor.io/). For each supported data format, it enables you
 to work with the data in a number of ways:
 
-- As a variant-like data structure, [basic_json](doc/ref/basic_json.md) 
+- As a variant-like data structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json.md) 
 
-- As a strongly typed C++ data structure
+- As a strongly typed C++ data structure that implements jsoncons traits, [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md)
 
 - As a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
   in the XML world.
@@ -70,7 +70,7 @@ jsoncons allows you to work with the data in a number of ways:
 
 - As a variant-like data structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json.md) 
 
-- As a strongly typed C++ data structure
+- As a strongly typed C++ data structure that implements jsoncons traits
 
 - As a stream of parse events
 
