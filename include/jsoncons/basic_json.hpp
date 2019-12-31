@@ -1772,6 +1772,11 @@ public:
             return evaluate().tag();
         }
 
+        json_type type() const
+        {
+            return evaluate().type();
+        }
+
         std::size_t count(const string_view_type& name) const
         {
             return evaluate().count(name);
