@@ -12,6 +12,8 @@ to/from string keys in `basic_json`.
 - The convenience json traits macros now generate a `jsoncons::is_json_type_traits_declared<T>`
 specialization in addition to a `jsoncons::json_type_traits<Json,T>` specialization.
 
+- New `basic_json` member function `json_type type()`
+
 Changes:
 
 - The tag type `bstr_arg_t` has been renamed to `byte_string_arg_t`, and the constant 
