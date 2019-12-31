@@ -110,11 +110,11 @@ public:
         heap_only_string<CharT,Allocator> data;
         char_type c[1];
     };
-    typedef typename std::aligned_storage<sizeof(string_storage), alignof(string_storage)>::type storage_type;
+    typedef typename std::aligned_storage<sizeof(string_storage), alignof(string_storage)>::type storage_kind;
 
     static size_t aligned_size(std::size_t n)
     {
-        return sizeof(storage_type) + n;
+        return sizeof(storage_kind) + n;
     }
 public:
     static string_pointer create(const char_type* s, std::size_t length)

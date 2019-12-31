@@ -159,6 +159,9 @@ Returns the allocator associated with the basic_json value.
 
     semantic_tag tag() const
 Returns the [semantic_tag](semantic_tag.md) associated with this value
+
+    json_type type() const
+Returns the [json type](json_type.md) associated with this value
  
     object_iterator find(const string_view_type& name)
     const_object_iterator find(const string_view_type& name) const

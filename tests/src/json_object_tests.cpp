@@ -663,9 +663,9 @@ TEST_CASE("test_is")
     obj["field2"] = -10;
     obj["field3"] = 10U;
 
-    CHECK(obj["field1"].storage() == jsoncons::storage_type::int64_value);
-    CHECK(obj["field2"].storage() == jsoncons::storage_type::int64_value);
-    CHECK(obj["field3"].storage() == jsoncons::storage_type::uint64_value);
+    CHECK(obj["field1"].storage() == jsoncons::storage_kind::int64_value);
+    CHECK(obj["field2"].storage() == jsoncons::storage_kind::int64_value);
+    CHECK(obj["field3"].storage() == jsoncons::storage_kind::uint64_value);
 
     CHECK_FALSE(obj["field1"].is<std::string>());
     CHECK(obj["field1"].is<short>());
@@ -703,7 +703,7 @@ TEST_CASE("test_is2")
 {
     json obj = json::parse("{\"field1\":10}");
 
-    CHECK(obj["field1"].storage() == jsoncons::storage_type::uint64_value);
+    CHECK(obj["field1"].storage() == jsoncons::storage_kind::uint64_value);
 
     CHECK_FALSE(obj["field1"].is<std::string>());
     CHECK(obj["field1"].is<int>());

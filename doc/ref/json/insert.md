@@ -22,8 +22,8 @@ void insert(InputIt first, InputIt last); // (3)
 (3) Inserts elements from range `[first, last)` into a json object. 
     If multiple elements in the range have the same key, the first element in the range is inserted.
     The function template parameter `InputIt` represents an input
-    iterator type that iterates over elements of type `key_value<string_type,json_type>`,
-    or alternatively over elements of type `std::pair<T1,T2>` where `T1` is convertible to `string_type` and `T2` is convertible to `json_type`. 
+    iterator type that iterates over elements of type `key_value_type`,
+    or alternatively over elements of type `std::pair<T1,T2>` where `T1` is convertible to `key_type` and `T2` is convertible to `basic_json`. 
 
 ### See also
 
