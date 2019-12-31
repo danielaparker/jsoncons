@@ -2100,6 +2100,11 @@ public:
             return evaluate().at(name);
         }
 
+        const basic_json& at_or_null(const string_view_type& name) const
+        {
+            return evaluate().at_or_null(name);
+        }
+
         const basic_json& at(std::size_t index)
         {
             return evaluate().at(index);
@@ -2118,11 +2123,6 @@ public:
         const_object_iterator find(const string_view_type& name) const
         {
             return evaluate().find(name);
-        }
-
-        const basic_json& get_with_default(const string_view_type& name) const
-        {
-            return evaluate().get_with_default(name);
         }
 
         template <class T>
@@ -2371,6 +2371,12 @@ public:
             return os;
         }
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+        JSONCONS_DEPRECATED_MSG("Instead, use at_or_null(const string_view_type&)")
+        const basic_json& get_with_default(const string_view_type& name) const
+        {
+            return evaluate().at_or_null(name);
+        }
 
         JSONCONS_DEPRECATED_MSG("Instead, use tag()")
         semantic_tag get_semantic_tag() const
@@ -2678,7 +2684,7 @@ public:
             return evaluate().get(name,std::forward<T>(default_val));
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use get_with_default(const string_view_type&)")
+        JSONCONS_DEPRECATED_MSG("Instead, use at_or_null(const string_view_type&)")
         const basic_json& get(const string_view_type& name) const
         {
             return evaluate().get(name);
@@ -4033,7 +4039,7 @@ public:
         }
     }
 
-    const basic_json& get_with_default(const string_view_type& name) const
+    const basic_json& at_or_null(const string_view_type& name) const
     {
         switch (var_.storage())
         {
@@ -4551,6 +4557,9 @@ public:
             case storage_kind::empty_object_value:
             case storage_kind::object_value:
                 return json_type::object_value;
+            default:
+                JSONCONS_UNREACHABLE();
+                break;
         }
     }
 
@@ -4580,6 +4589,12 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+    JSONCONS_DEPRECATED_MSG("Instead, use at_or_null(const string_view_type&)")
+    const basic_json& get_with_default(const string_view_type& name) const
+    {
+        return at_or_null(name);
+    }
 
     JSONCONS_DEPRECATED_MSG("Instead, use parse(const string_view_type&)")
     static basic_json parse(const char_type* s, std::size_t length)
@@ -4965,7 +4980,7 @@ public:
         }
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use get_with_default(const string_view_type&)")
+    JSONCONS_DEPRECATED_MSG("Instead, use at_or_null(const string_view_type&)")
     const basic_json& get(const string_view_type& name) const
     {
         static const basic_json a_null = null_type();

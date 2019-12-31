@@ -152,7 +152,7 @@ Returns the allocator associated with the basic_json value.
     <td>Access or insert specified element.</td> 
   </tr>
   <tr>
-    <td><a href="json/at.md">at</a></td>
+    <td><a href="json/at.md">at,at_or_null</a></td>
     <td>Access specified element.</td> 
   </tr>
 </table>
@@ -167,10 +167,6 @@ Returns the [json type](json_type.md) associated with this value
     const_object_iterator find(const string_view_type& name) const
 Returns an object iterator to a member whose name compares equal to `name`. If there is no such member, returns `object_range.end()`.
 Throws `std::runtime_error` if not an object.  
-
-    const basic_json& get_with_default(const string_view_type& name) const
-If `name` matches the name of a member in the basic_json object, returns the member value converted to the default's data type, otherwise returns `null`.
-Throws `std::runtime_error` if not an object or null value.
 
     template <class T>
     T get_with_default(const string_view_type& name, 

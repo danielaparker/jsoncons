@@ -276,31 +276,31 @@ TEST_CASE("get_with_default test")
 
     SECTION("1 arg")
     {
-        const json& j = a.get_with_default("key1");
+        const json& j = a.at_or_null("key1");
         CHECK(j.as<std::string>() == std::string("value1"));
     }
 
     SECTION("1 arg proxy")
     {
-        const json& j = a["key2"].get_with_default("key3");
+        const json& j = a["key2"].at_or_null("key3");
         CHECK(j.as<std::string>() == std::string("value3"));
     }
 
     SECTION("1 arg default")
     {
-        const json& j = a.get_with_default("key4");
+        const json& j = a.at_or_null("key4");
         CHECK(j.is_null());
     }
 
     SECTION("1 arg proxy default")
     {
-        const json& j = a["key2"].get_with_default("key4");
+        const json& j = a["key2"].at_or_null("key4");
         CHECK(j.is_null());
     }
 
     SECTION("1 arg null")
     {
-        const json& j = json::null().get_with_default("key1");
+        const json& j = json::null().at_or_null("key1");
         CHECK(j.is_null());
     }
 
