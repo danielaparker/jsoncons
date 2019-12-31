@@ -136,6 +136,8 @@ enum class token_type
     rparen
 };
 
+enum class term_type {value,regex,path};
+
 template <class Json>
 class term
 {
@@ -146,6 +148,8 @@ public:
     virtual ~term() {}
 
     virtual void initialize(const Json&) = 0;
+
+    virtual term_type type() const = 0;
 
     virtual bool accept_single_node() const
     {
@@ -159,122 +163,15 @@ public:
     {
         JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
-    virtual bool eq_term(const term&) const 
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual bool eq(const Json&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual bool ne_term(const term&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual bool ne(const Json&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual bool regex_term(const term&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual bool regex2(const string_type&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual bool ampamp_term(const term&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual bool ampamp(const Json&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual bool pipepipe_term(const term&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual bool pipepipe(const Json&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual bool lt_term(const term&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual bool lt(const Json&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual bool gt_term(const term&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual bool gt(const Json&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-
-    virtual Json minus_term(const term&) const 
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual Json minus(const Json&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-
-    virtual Json left_minus(const Json&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
 
     virtual Json unary_minus() const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual Json plus_term(const term&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual Json plus(const Json&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual Json mult_term(const term&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual Json mult(const Json&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-
-    virtual Json div_term(const term&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-    virtual Json div(const Json&) const
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
-
-    virtual Json left_div(const Json&) const
     {
         JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
 };
 
 template <class Json>
-struct operator_properties
-{
-    typedef std::function<Json(const term<Json>&, const term<Json>&)> operator_type;
-
-    std::size_t precedence_level;
-    bool is_right_associative;
-    operator_type op;
-};
+struct operator_properties;
 
 template <class Json>
 class token
@@ -391,18 +288,6 @@ public:
 };
 
 template <class Json>
-bool ampamp(const Json& lhs, const Json& rhs)
-{
-    return lhs.as_bool() && rhs.as_bool();
-}
-
-template <class Json>
-bool pipepipe(const Json& lhs, const Json& rhs)
-{
-    return lhs.as_bool() || rhs.as_bool();
-}
-
-template <class Json>
 bool lt(const Json& lhs, const Json& rhs)
 {
     bool result = false;
@@ -426,9 +311,26 @@ bool lt(const Json& lhs, const Json& rhs)
 }
 
 template <class Json>
-bool gt(const Json& lhs, const Json& rhs)
+bool lte(const Json& lhs, const Json& rhs)
 {
-    return lt(rhs,lhs);
+    bool result = false;
+    if (lhs.template is<int64_t>() && rhs.template is<int64_t>())
+    {
+        result = lhs.template as<int64_t>() <= rhs.template as<int64_t>();
+    }
+    else if (lhs.template is<uint64_t>() && rhs.template is<uint64_t>())
+    {
+        result = lhs.template as<uint64_t>() <= rhs.template as<uint64_t>();
+    }
+    else if (lhs.is_number() && rhs.is_number())
+    {
+        result = lhs.as_double() <= rhs.as_double();
+    }
+    else if (lhs.is_string() && rhs.is_string())
+    {
+        result = lhs.as_string_view() <= rhs.as_string_view();
+    }
+    return result;
 }
 
 template <class Json>
@@ -540,6 +442,8 @@ public:
     {
     }
 
+    term_type type() const override {return term_type::value;}
+
     bool accept_single_node() const override
     {
         return value_.as_bool();
@@ -550,118 +454,19 @@ public:
         return value_;
     }
 
+    const Json& value() const
+    {
+        return value_;
+    }
+
     bool exclaim() const override
     {
         return !value_.as_bool();
     }
 
-    bool eq_term(const term<Json>& rhs) const override
-    {
-        return rhs.eq(value_);
-    }
-
-    bool eq(const Json& rhs) const override
-    {
-        return value_ == rhs;
-    }
-
-    bool ne_term(const term<Json>& rhs) const override
-    {
-        return rhs.ne(value_);
-    }
-    bool ne(const Json& rhs) const override
-    {
-        return value_ != rhs;
-    }
-    bool regex_term(const term<Json>& rhs) const override
-    {
-        return rhs.regex2(value_.as_string());
-    }
-    bool ampamp_term(const term<Json>& rhs) const override
-    {
-        return rhs.ampamp(value_);
-    }
-    bool ampamp(const Json& rhs) const override
-    {
-        return jsoncons::jsonpath::detail::ampamp(value_,rhs);
-    }
-    bool pipepipe_term(const term<Json>& rhs) const override
-    {
-        return rhs.pipepipe(value_);
-    }
-    bool pipepipe(const Json& rhs) const override
-    {
-        return jsoncons::jsonpath::detail::pipepipe(value_,rhs);
-    }
-
-    bool lt_term(const term<Json>& rhs) const override
-    {
-        return rhs.gt(value_);
-    }
-    bool lt(const Json& rhs) const override
-    {
-        return jsoncons::jsonpath::detail::lt(value_,rhs);
-    }
-
-    bool gt_term(const term<Json>& rhs) const override
-    {
-        return rhs.lt(value_);
-    }
-    bool gt(const Json& rhs) const override
-    {
-        return jsoncons::jsonpath::detail::gt(value_,rhs);
-    }
-
-    Json minus_term(const term<Json>& rhs) const override
-    {
-        return rhs.left_minus(value_);
-    }
-    Json minus(const Json& rhs) const override
-    {
-        return jsoncons::jsonpath::detail::minus(value_,rhs);
-    }
-
-    Json left_minus(const Json& lhs) const override
-    {
-        return jsoncons::jsonpath::detail::minus(lhs,value_);
-    }
-
     Json unary_minus() const override
     {
         return jsoncons::jsonpath::detail::unary_minus(value_);
-    }
-
-    Json plus_term(const term<Json>& rhs) const override
-    {
-        return rhs.plus(value_);
-    }
-
-    Json plus(const Json& rhs) const override
-    {
-        return jsoncons::jsonpath::detail::plus(value_,rhs);
-    }
-    Json mult_term(const term<Json>& rhs) const override
-    {
-        return rhs.mult(value_);
-    }
-
-    Json mult(const Json& rhs) const override
-    {
-        return jsoncons::jsonpath::detail::mult(value_,rhs);
-    }
-
-    Json div_term(const term<Json>& rhs) const override
-    {
-        return rhs.left_div(value_);
-    }
-    Json div(const Json& rhs) const override
-    {
-        return jsoncons::jsonpath::detail::div(value_,rhs);
-    }
-
-    Json left_div(const Json& lhs) const override
-    {
-        return jsoncons::jsonpath::detail::div(lhs,value_);
     }
 };
 
@@ -681,7 +486,9 @@ public:
     {
     }
 
-    bool regex2(const string_type& subject) const override
+    term_type type() const override {return term_type::regex;}
+
+    bool evaluate(const string_type& subject) const
     {
         return std::regex_match(subject, pattern_);
     }
@@ -710,6 +517,14 @@ public:
         nodes_ = evaluator.get_values();
     }
 
+    term_type type() const override {return term_type::path;}
+
+
+    const Json& result() const
+    {
+        return nodes_;
+    }
+
     bool accept_single_node() const override
     {
         return nodes_.size() != 0;
@@ -725,243 +540,628 @@ public:
         return nodes_.size() == 0;
     }
 
-    bool eq_term(const term<Json>& rhs) const override
-    {
-        bool result = false;
-        if (nodes_.size() > 0)
-        {
-            result = true;
-            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
-            {
-                result = rhs.eq(nodes_[i]);
-            }
-        }
-        return result;
-    }
-
-    bool eq(const Json& rhs) const override
-    {
-        bool result = false;
-        if (nodes_.size() > 0)
-        {
-            result = true;
-            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
-            {
-                result = nodes_[i] == rhs;
-            }
-        }
-        return result;
-    }
-
-    bool ne_term(const term<Json>& rhs) const override
-    {
-        bool result = false;
-        if (nodes_.size() > 0)
-        {
-            result = true;
-            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
-            {
-                result = rhs.ne(nodes_[i]);
-            }
-        }
-        return result;
-
-    }
-    bool ne(const Json& rhs) const override
-    {
-        bool result = false;
-        if (nodes_.size() > 0)
-        {
-            result = true;
-            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
-            {
-                result = nodes_[i] != rhs;
-            }
-        }
-        return result;
-    }
-    bool regex_term(const term<Json>& rhs) const override
-    {
-        bool result = false;
-        if (nodes_.size() > 0)
-        {
-            result = true;
-            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
-            {
-                result = rhs.regex2(nodes_[i].as_string());
-            }
-        }
-        return result;
-    }
-    bool ampamp_term(const term<Json>& rhs) const override
-    {
-        bool result = false;
-        if (nodes_.size() > 0)
-        {
-            result = true;
-            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
-            {
-                result = rhs.ampamp(nodes_[i]);
-            }
-        }
-        return result;
-    }
-    bool ampamp(const Json& rhs) const override
-    {
-        bool result = false;
-        if (nodes_.size() > 0)
-        {
-            result = true;
-            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
-            {
-                result = jsoncons::jsonpath::detail::ampamp(nodes_[i],rhs);
-            }
-        }
-        return result;
-    }
-    bool pipepipe_term(const term<Json>& rhs) const override
-    {
-        bool result = false;
-        if (nodes_.size() > 0)
-        {
-            result = true;
-            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
-            {
-                result = rhs.pipepipe(nodes_[i]);
-            }
-        }
-        return result;
-    }
-    bool pipepipe(const Json& rhs) const override
-    {
-        bool result = false;
-        if (nodes_.size() > 0)
-        {
-            result = true;
-            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
-            {
-                result = jsoncons::jsonpath::detail::pipepipe(nodes_[i],rhs);
-            }
-        }
-        return result;
-    }
-
-    bool lt(const Json& rhs) const override
-    {
-        bool result = false;
-        if (nodes_.size() > 0)
-        {
-            result = true;
-            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
-            {
-                result = jsoncons::jsonpath::detail::lt(nodes_[i],rhs);
-            }
-        }
-        return result;
-    }
-
-    bool lt_term(const term<Json>& rhs) const override
-    {
-        bool result = false;
-        if (nodes_.size() > 0)
-        {
-            result = true;
-            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
-            {
-                result = rhs.gt(nodes_[i]);
-            }
-        }
-        return result;
-    }
-
-    bool gt(const Json& rhs) const override
-    {
-        bool result = false;
-        if (nodes_.size() > 0)
-        {
-            result = true;
-            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
-            {
-                result = jsoncons::jsonpath::detail::gt(nodes_[i],rhs);
-            }
-        }
-        return result;
-    }
-
-    bool gt_term(const term<Json>& rhs) const override
-    {
-        bool result = false;
-        if (nodes_.size() > 0)
-        {
-            result = true;
-            for (std::size_t i = 0; result && i < nodes_.size(); ++i)
-            {
-                result = rhs.lt(nodes_[i]);
-            }
-        }
-        return result;
-    }
-
-    Json minus_term(const term<Json>& rhs) const override
-    {
-        static auto a_null = Json(jsoncons::null_type());
-        return nodes_.size() == 1 ? rhs.left_minus(nodes_[0]) : a_null;
-    }
-    Json minus(const Json& rhs) const override
-    {
-        return nodes_.size() == 1 ? jsoncons::jsonpath::detail::minus(nodes_[0],rhs) : Json(jsoncons::null_type());
-    }
-
-    Json left_minus(const Json& lhs) const override
-    {
-        static auto a_null = Json(jsoncons::null_type());
-        return nodes_.size() == 1 ? jsoncons::jsonpath::detail::minus(lhs,nodes_[0]) : a_null;
-    }
-
     Json unary_minus() const override
     {
         return nodes_.size() == 1 ? jsoncons::jsonpath::detail::unary_minus(nodes_[0]) : Json::null();
     }
+};
 
-    Json plus_term(const term<Json>& rhs) const override
+template <class Json>
+struct cmp_plus
+{
+    Json operator()(const value_term<Json>& lhs, const value_term<Json>& rhs)
     {
-        static auto a_null = Json(jsoncons::null_type());
-        return nodes_.size() == 1 ? rhs.plus(nodes_[0]) : a_null;
-    }
-    Json plus(const Json& rhs) const override
-    {
-        static auto a_null = Json(jsoncons::null_type());
-        return nodes_.size() == 1 ? jsoncons::jsonpath::detail::plus(nodes_[0],rhs) : a_null;
+        return plus(lhs.value(), rhs.value());
     }
 
-    Json mult_term(const term<Json>& rhs) const override
+    Json operator()(const value_term<Json>& lhs, const path_term<Json>& rhs)
     {
-        static auto a_null = Json(jsoncons::null_type());
-        return nodes_.size() == 1 ? rhs.mult(nodes_[0]) : a_null;
-    }
-    Json mult(const Json& rhs) const override
-    {
-        static auto a_null = Json(jsoncons::null_type());
-        return nodes_.size() == 1 ? jsoncons::jsonpath::detail::mult(nodes_[0],rhs) : a_null;
+        if (rhs.result().size() != 1)
+        {
+            return false;
+        }
+        return (*this)(lhs.value(),rhs.result()[0]);
     }
 
-    Json div_term(const term<Json>& rhs) const override
+    Json operator()(const path_term<Json>& lhs, const path_term<Json>& rhs)
     {
-        static auto a_null = Json(jsoncons::null_type());
-        return nodes_.size() == 1 ? rhs.left_div(nodes_[0]) : a_null;
-    }
-    Json div(const Json& rhs) const override
-    {
-        static auto a_null = Json(jsoncons::null_type());
-        return nodes_.size() == 1 ? jsoncons::jsonpath::detail::div(nodes_[0],rhs) : a_null;
+        if (lhs.result().size() != rhs.result().size() && lhs.result().size() != 1)
+        {
+            return Json(jsoncons::null_type());
+        }
+        return (*this)(lhs.result()[0],rhs.result()[0]);
     }
 
-    Json left_div(const Json& lhs) const override
+    Json operator()(const path_term<Json>& lhs, const value_term<Json>& rhs)
     {
-        static auto a_null = Json(jsoncons::null_type());
-        return nodes_.size() == 1 ? jsoncons::jsonpath::detail::div(lhs, nodes_[0]) : a_null;
+        return (*this)(rhs, lhs);
+    }
+
+    bool operator()(const value_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+
+    bool operator()(const path_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
 };
+
+template <class Json>
+struct cmp_minus
+{
+    Json operator()(const value_term<Json>& lhs, const value_term<Json>& rhs)
+    {
+        return minus(lhs.value(), rhs.value());
+    }
+
+    Json operator()(const path_term<Json>& lhs, const path_term<Json>& rhs)
+    {
+        if (lhs.result().size() != rhs.result().size() && lhs.result().size() != 1)
+        {
+            return Json(jsoncons::null_type());
+        }
+        return jsoncons::jsonpath::detail::minus(lhs.result()[0],rhs.result()[0]);
+    }
+
+    Json operator()(const value_term<Json>& lhs, const path_term<Json>& rhs)
+    {
+        if (rhs.result().size() != 1)
+        {
+            return false;
+        }
+        return jsoncons::jsonpath::detail::minus(lhs.value(),rhs.result()[0]);
+    }
+
+    Json operator()(const path_term<Json>& lhs, const value_term<Json>& rhs)
+    {
+        if (lhs.result().size() != 1)
+        {
+            return false;
+        }
+        return jsoncons::jsonpath::detail::minus(lhs.result()[0],rhs.value());
+    }
+
+    bool operator()(const value_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+
+    bool operator()(const path_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+};
+
+template <class Json>
+struct cmp_mult
+{
+    Json operator()(const value_term<Json>& lhs, const value_term<Json>& rhs)
+    {
+        return mult(lhs.value(), rhs.value());
+    }
+
+    Json operator()(const path_term<Json>& lhs, const path_term<Json>& rhs)
+    {
+        if (lhs.result().size() != rhs.result().size() && lhs.result().size() != 1)
+        {
+            return Json(jsoncons::null_type());
+        }
+        return jsoncons::jsonpath::detail::mult(lhs.result()[0],rhs.result()[0]);
+    }
+
+    Json operator()(const value_term<Json>& lhs, const path_term<Json>& rhs)
+    {
+        if (rhs.result().size() != 1)
+        {
+            return false;
+        }
+        return jsoncons::jsonpath::detail::mult(lhs.value(),rhs.result()[0]);
+    }
+
+    Json operator()(const path_term<Json>& lhs, const value_term<Json>& rhs)
+    {
+        return (*this)(rhs, lhs);
+    }
+
+    bool operator()(const value_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+
+    bool operator()(const path_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+};
+
+template <class Json>
+struct cmp_div
+{
+    Json operator()(const value_term<Json>& lhs, const value_term<Json>& rhs)
+    {
+        return div(lhs.value(), rhs.value());
+    }
+
+    Json operator()(const path_term<Json>& lhs, const path_term<Json>& rhs)
+    {
+        if (lhs.result().size() != rhs.result().size() && lhs.result().size() != 1)
+        {
+            return Json(jsoncons::null_type());
+        }
+        return jsoncons::jsonpath::detail::div(lhs.result()[0],rhs.result()[0]);
+    }
+
+    Json operator()(const value_term<Json>& lhs, const path_term<Json>& rhs)
+    {
+        if (rhs.result().size() != 1)
+        {
+            return false;
+        }
+        return jsoncons::jsonpath::detail::div(lhs.value(),rhs.result()[0]);
+    }
+
+    Json operator()(const path_term<Json>& lhs, const value_term<Json>& rhs)
+    {
+        if (lhs.result().size() != 1)
+        {
+            return false;
+        }
+        return jsoncons::jsonpath::detail::div(lhs.result()[0],rhs.value());
+    }
+
+    bool operator()(const value_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+
+    bool operator()(const path_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+};
+
+template <class Json>
+struct cmp_eq
+{
+    bool operator()(const value_term<Json>& lhs, const value_term<Json>& rhs)
+    {
+        return lhs.value() == rhs.value();
+    }
+
+    bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs)
+    {
+        if (lhs.result().size() != rhs.result().size())
+        {
+            return false;
+        }
+        for (size_t i = 0; i < lhs.result().size(); ++i)
+        {
+            if (lhs.result()[i] != rhs.result()[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs)
+    {
+        if (rhs.result().size() != 1)
+        {
+            return false;
+        }
+        return lhs.value() == rhs.result()[0];
+    }
+
+    bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs)
+    {
+        return (*this)(rhs, lhs);
+    }
+
+    bool operator()(const value_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+
+    bool operator()(const path_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+};
+
+template <class Json>
+struct cmp_ne
+{
+    cmp_eq<Json> eq;
+    cmp_ne()
+        : eq{}
+    {
+    }
+
+    bool operator()(const value_term<Json>& lhs, const value_term<Json>& rhs) 
+    {
+        return !eq(lhs, rhs);
+    }
+
+    bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) 
+    {
+        return !eq(lhs, rhs);
+    }
+
+    bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) 
+    {
+        return !eq(lhs, rhs);
+    }
+
+    bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs)
+    {
+        return !eq(lhs, rhs);
+    }
+
+    bool operator()(const value_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+
+    bool operator()(const path_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+};
+
+template <class Json>
+struct cmp_pipepipe
+{
+    bool operator()(const value_term<Json>& lhs, const value_term<Json>& rhs)
+    {
+        return lhs.value().as_bool() || rhs.value().as_bool();
+    }
+
+    bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs)
+    {
+        if (lhs.result().size() != rhs.result().size())
+        {
+            return false;
+        }
+        for (size_t i = 0; i < lhs.result().size(); ++i)
+        {
+            if (!(*this)(lhs.result()[i], rhs.result()[i]))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs)
+    {
+        if (rhs.result().size() != 1)
+        {
+            return false;
+        }
+        return (*this)(lhs.value(),rhs.result()[0]);
+    }
+
+    bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs)
+    {
+        return (*this)(rhs, lhs);
+    }
+
+    bool operator()(const value_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+
+    bool operator()(const path_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+};
+
+template <class Json>
+struct cmp_ampamp
+{
+    bool operator()(const value_term<Json>& lhs, const value_term<Json>& rhs)
+    {
+        return lhs.value().as_bool() && rhs.value().as_bool();
+    }
+
+    bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs)
+    {
+        if (lhs.result().size() != rhs.result().size())
+        {
+            return false;
+        }
+        for (size_t i = 0; i < lhs.result().size(); ++i)
+        {
+            if (!(*this)(lhs.result()[i], rhs.result()[i]))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs)
+    {
+        if (rhs.result().size() != 1)
+        {
+            return false;
+        }
+        return (*this)(lhs.value(),rhs.result()[0]);
+    }
+
+    bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs)
+    {
+        return (*this)(rhs, lhs);
+    }
+
+    bool operator()(const value_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+
+    bool operator()(const path_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+};
+
+template <class Json>
+struct cmp_lt
+{
+    cmp_eq<Json> eq;
+
+    cmp_lt()
+        : eq{}
+    {
+    }
+
+    bool operator()(const value_term<Json>& lhs, const value_term<Json>& rhs)
+    {
+        bool result = false;
+        if (lhs.value().template is<int64_t>() && rhs.value().template is<int64_t>())
+        {
+            result = lhs.value().template as<int64_t>() < rhs.value().template as<int64_t>();
+        }
+        else if (lhs.value().template is<uint64_t>() && rhs.value().template is<uint64_t>())
+        {
+            result = lhs.value().template as<uint64_t>() < rhs.value().template as<uint64_t>();
+        }
+        else if (lhs.value().is_number() && rhs.value().is_number())
+        {
+            result = lhs.value().as_double() < rhs.value().as_double();
+        }
+        else if (lhs.value().is_string() && rhs.value().is_string())
+        {
+            result = lhs.value().as_string_view() < rhs.value().as_string_view();
+        }
+        return result;
+    }
+
+    bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs)
+    {
+        if (lhs.result().size() == 0)
+        {
+            return true;
+        }
+        if (rhs.result().size() == 0)
+        {
+            return false;
+        }
+        bool result = true;
+        size_t min_len = lhs.result().size() < rhs.result().size() ? lhs.result().size() : rhs.result().size();
+        for (std::size_t i = 0; result && i < min_len; ++i)
+        {
+            result = (*this)(lhs.result()[i],rhs.result()[i]);
+        }
+        return result;
+    }
+
+    bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs)
+    {
+        return !((*this)(rhs, lhs) || eq(rhs,lhs));
+    }
+
+    bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs)
+    {
+        if (lhs.result().size() == 0)
+         {
+            return true;
+        }
+        bool result = jsoncons::jsonpath::detail::lt(lhs.result()[0], rhs.value());
+        return result;
+    }
+
+    bool operator()(const value_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+
+    bool operator()(const path_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+};
+
+template <class Json>
+struct cmp_lte
+{
+    cmp_lt<Json> lt;
+
+    cmp_lte()
+        : lt{}
+    {
+    }
+
+    bool operator()(const value_term<Json>& lhs, const value_term<Json>& rhs)
+    {
+        bool result = false;
+        if (lhs.value().template is<int64_t>() && rhs.value().template is<int64_t>())
+        {
+            result = lhs.value().template as<int64_t>() <= rhs.value().template as<int64_t>();
+        }
+        else if (lhs.value().template is<uint64_t>() && rhs.value().template is<uint64_t>())
+        {
+            result = lhs.value().template as<uint64_t>() <= rhs.value().template as<uint64_t>();
+        }
+        else if (lhs.value().is_number() && rhs.value().is_number())
+        {
+            result = lhs.value().as_double() <= rhs.value().as_double();
+        }
+        else if (lhs.value().is_string() && rhs.value().is_string())
+        {
+            result = lhs.value().as_string_view() <= rhs.value().as_string_view();
+        }
+        return result;
+    }
+
+    bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs)
+    {
+        if (lhs.result().size() == 0)
+        {
+            return true;
+        }
+        if (rhs.result().size() == 0)
+        {
+            return false;
+        }
+        bool result = true;
+        size_t min_len = lhs.result().size() < rhs.result().size() ? lhs.result().size() : rhs.result().size();
+        for (std::size_t i = 0; result && i < min_len; ++i)
+        {
+            result = (*this)(lhs.result()[i],rhs.result()[i]);
+        }
+        return result;
+    }
+
+    bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs)
+    {
+        return !lt(rhs, lhs);
+    }
+
+    bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs)
+    {
+        if (lhs.result().size() == 0)
+         {
+            return true;
+        }
+        bool result = (*this)(lhs.result()[0], rhs.value());
+        return result;
+    }
+
+    bool operator()(const value_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+
+    bool operator()(const path_term<Json>&, const regex_term<Json>&)
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+};
+
+template <class Json>
+struct cmp_regex
+{
+    bool operator()(const value_term<Json>&, const value_term<Json>&) 
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+    bool operator()(const value_term<Json>&, const path_term<Json>&) 
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+    bool operator()(const path_term<Json>&, const value_term<Json>&) 
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+    bool operator()(const path_term<Json>&, const path_term<Json>&) 
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+    }
+    bool operator()(const value_term<Json>& lhs, const regex_term<Json>& rhs)
+    {
+        return rhs.evaluate(lhs.value().as_string()); 
+    }
+
+    bool operator()(const path_term<Json>& lhs, const regex_term<Json>& rhs)
+    {
+        if (lhs.result().empty())
+            return false;
+        for (const auto& val : lhs.result().array_range())
+        {
+            if (!rhs.evaluate(val.as_string()))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+};
+
+
+template <typename Visitor,typename Json>
+Json visit(Visitor vis, const term<Json>& v, const term<Json>& w)
+{
+    switch(v.type())
+    {
+        case term_type::value:
+        {
+            const auto& t1 = static_cast<const value_term<Json>&>(v);
+            switch(w.type())
+            {
+                case term_type::value:
+                {
+                    const auto& t2 = static_cast<const value_term<Json>&>(w);
+                    return vis(t1, t2);
+                }
+                case term_type::path:
+                {
+                    const auto& t2 = static_cast<const path_term<Json>&>(w);
+                    return vis(t1, t2);
+                }
+                case term_type::regex:
+                {
+                    const auto& t2 = static_cast<const regex_term<Json>&>(w);
+                    return vis(t1, t2);
+                }
+            }
+            break;
+        }
+        case term_type::path:
+        {
+            const auto& t1 = static_cast<const path_term<Json>&>(v);
+            switch(w.type())
+            {
+                case term_type::value:
+                {
+                    const auto& t2 = static_cast<const value_term<Json>&>(w);
+                    return vis(t1, t2);
+                }
+                case term_type::path:
+                {
+                    const auto& t2 = static_cast<const path_term<Json>&>(w);
+                    return vis(t1, t2);
+                }
+                case term_type::regex:
+                {
+                    const auto& t2 = static_cast<const regex_term<Json>&>(w);
+                    return vis(t1, t2);
+                }
+            }
+            break;
+        }
+        case term_type::regex:
+        {
+            JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+        }
+    }
+
+    return false;
+}
 
 template <class Json>
 token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
@@ -1031,6 +1231,17 @@ public:
 };
 
 template <class Json>
+struct operator_properties
+{
+    typedef std::function<Json(const term<Json>&, const term<Json>&)> operator_type;
+
+    std::size_t precedence_level;
+    bool is_right_associative;
+    operator_type op;
+};
+
+
+template <class Json>
 class jsonpath_filter_parser
 {
     typedef typename Json::char_type char_type;
@@ -1053,19 +1264,19 @@ class jsonpath_filter_parser
 
         const binary_operator_map operators =
         {
-            {eqtilde_literal<char_type>(),{2,false,[](const term<Json>& a, const term<Json>& b) -> Json {return Json(a.regex_term(b)); }}},
-            {star_literal<char_type>(),{3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return a.mult_term(b); }}},
-            {forwardslash_literal<char_type>(),{3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return a.div_term(b); }}},
-            {plus_literal<char_type>(),{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return a.plus_term(b); }}},
-            {minus_literal<char_type>(),{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return a.minus_term(b); }}},
-            {lt_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return Json(a.lt_term(b)); }}},
-            {lte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return Json(a.lt_term(b) || a.eq_term(b)); }}},
-            {gt_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return Json(a.gt_term(b)); }}},
-            {gte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return Json(a.gt_term(b) || a.eq_term(b)); }}},
-            {eq_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return Json(a.eq_term(b)); }}},
-            {ne_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return Json(a.ne_term(b)); }}},
-            {ampamp_literal<char_type>(),{7,false,[](const term<Json>& a, const term<Json>& b) -> Json {return Json(a.ampamp_term(b)); }}},
-            {pipepipe_literal<char_type>(),{8,false,[](const term<Json>& a, const term<Json>& b) -> Json {return Json(a.pipepipe_term(b)); }}}
+            {eqtilde_literal<char_type>(),{2,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_regex<Json>(),a,b); }}},
+            {star_literal<char_type>(),{3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_mult<Json>(),a,b); }}},
+            {forwardslash_literal<char_type>(),{3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_div<Json>(),a,b); }}},
+            {plus_literal<char_type>(),{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_plus<Json>(),a,b); }}},
+            {minus_literal<char_type>(),{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_minus<Json>(),a,b); }}},
+            {lt_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lt<Json>(),a,b); }}},
+            {lte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lte<Json>(),a,b); }}},
+            {gt_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lt<Json>(),b,a); }}},
+            {gte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lte<Json>(),b,a); }}},
+            {eq_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_eq<Json>(),a,b); }}},
+            {ne_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_ne<Json>(),a,b); }}},
+            {ampamp_literal<char_type>(),{7,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_ampamp<Json>(),a,b); }}},
+            {pipepipe_literal<char_type>(),{8,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_pipepipe<Json>(),a,b); }}}
         };
 
     public:

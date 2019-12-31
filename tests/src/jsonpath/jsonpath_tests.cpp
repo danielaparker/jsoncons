@@ -123,7 +123,6 @@ TEST_CASE("jsonpath store tests")
     }
     )");
 
-
     SECTION("Absolute path")
     {
         json result1 = jsonpath::json_query(store,"$");
@@ -840,7 +839,6 @@ TEST_CASE("jsonpath store tests")
 
         CHECK(result == expected);
     }
-
 }
 
 // store tests
