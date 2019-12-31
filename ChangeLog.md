@@ -16,6 +16,11 @@ specialization in addition to a `jsoncons::json_type_traits<Json,T>` specializat
 
 Changes:
 
+- The basic_json `get_with_default(name)` function that returned a json null if not found
+has been deprecated and renamed to `at_or_null(name)`. Rationale: it has more in
+common with `at(name)` (both return a const reference) than with
+`get_with_default(name,default_value)` (which returns a value).  
+
 - The tag type `bstr_arg_t` has been renamed to `byte_string_arg_t`, and the constant 
 `bstr_arg` to `byte_string_arg`.
 

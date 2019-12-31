@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include <jsoncons/json.hpp>
+#include <assert.h>
 
 using namespace jsoncons;
 
@@ -76,13 +77,34 @@ void container_example1()
     json j_umap1(umap1);
     std::cout << j_umap1 << std::endl;
 
-    std::cout << std::endl;
+    std::cout << "\n\n";
+}
+
+void map_with_integer_key_example()
+{
+    std::map<short, std::string> m{ {1,"foo",},{2,"baz"} };
+
+    json j{m};
+
+    std::cout << "(1)\n";
+    std::cout << pretty_print(j) << "\n\n";
+
+    assert((j.is<std::map<uint64_t, std::string>>()));
+    auto other = j.as<std::map<uint64_t, std::string>>();
+
+    std::cout << "(2)\n";
+    for (const auto& item : other)
+    {
+        std::cout << item.first << " | " << item.second << "\n";
+    }
+    std::cout << "\n\n";
 }
 
 void container_examples()
 {
     std::cout << "\nContainer examples\n\n";
     container_example1();
+    map_with_integer_key_example();
     std::cout << std::endl;
 }
 

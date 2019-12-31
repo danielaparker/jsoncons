@@ -251,14 +251,15 @@ These macro declarations must be placed at global scope, outside any namespace b
 
 [Convert from and to standard library sequence containers](#A1)  
 [Convert from and to standard library associative containers](#A2)  
-[Convert from and to std::tuple](#A3)  
-[Extend json_type_traits to support `boost::gregorian` dates.](#A4)  
-[Specialize json_type_traits to support a book class.](#A5)  
-[Using JSONCONS_N_MEMBER_TRAITS_DECL to generate the json_type_traits](#A6)  
-[Serialize a polymorphic type based on the presence of members](#A7)  
-[Ensuring type selection is possible](#A8)  
-[Specialize json_type_traits for a container type that the jsoncons library also supports](#A9)  
-[Convert JSON to/from boost matrix](#A10)
+[Convert from and to std::map with integer key](#A3)  
+[Convert from and to std::tuple](#A4)  
+[Extend json_type_traits to support `boost::gregorian` dates.](#A5)  
+[Specialize json_type_traits to support a book class.](#A6)  
+[Using JSONCONS_N_MEMBER_TRAITS_DECL to generate the json_type_traits](#A7)  
+[Serialize a polymorphic type based on the presence of members](#A8)  
+[Ensuring type selection is possible](#A9)  
+[Specialize json_type_traits for a container type that the jsoncons library also supports](#A10)  
+[Convert JSON to/from boost matrix](#A11)
 
 <div id="A1"/> 
 
@@ -280,10 +281,10 @@ Output:
 #### Convert from and to standard library associative containers
 
 ```c++
-    std::map<std::string,int> m{{"one",1},{"two",2},{"three",3}};
-    json j(m);
-    std::cout << j << std::endl;
-    std::unordered_map<std::string,int> um = j.as<std::unordered_map<std::string,int>>();
+std::map<std::string,int> m{{"one",1},{"two",2},{"three",3}};
+json j(m);
+std::cout << j << std::endl;
+std::unordered_map<std::string,int> um = j.as<std::unordered_map<std::string,int>>();
 ```
 Output:
 ```
@@ -291,6 +292,42 @@ Output:
 ```
 
 <div id="A3"/> 
+
+#### Convert from and to std::map with integer key
+
+```c++
+std::map<short, std::string> m{ {1,"foo",},{2,"baz"} };
+
+json j{m};
+
+std::cout << "(1)\n";
+std::cout << pretty_print(j) << "\n\n";
+
+assert((j.is<std::map<uint64_t, std::string>>()));
+auto other = j.as<std::map<uint64_t, std::string>>();
+
+std::cout << "(2)\n";
+for (const auto& item : other)
+{
+    std::cout << item.first << " | " << item.second << "\n";
+}
+std::cout << "\n\n";
+```
+Output:
+
+```c++
+(1)
+{
+    "1": "foo",
+    "2": "baz"
+}
+
+(2)
+1 | foo
+2 | baz
+```
+
+<div id="A4"/> 
 
 #### Convert from and to std::tuple
 
@@ -305,7 +342,7 @@ Output:
 [false,1,"foo"]
 ```
 
-<div id="A4"/> 
+<div id="A5"/> 
 
 #### Extend json_type_traits to support `boost::gregorian` dates.
 
@@ -387,7 +424,7 @@ Observation dates:
 2014-Feb-28
 ```
 
-<div id="A5"/> 
+<div id="A6"/> 
 
 #### Specialize json_type_traits to support a book class.
 
@@ -613,7 +650,7 @@ Output:
 }
 ```
 
-<div id="A7"/> 
+<div id="A8"/> 
 
 #### Serialize a polymorphic type based on the presence of members
 
@@ -800,7 +837,7 @@ Jane Doe, 30250
 ]
 ```
 
-<div id="A8"/>
+<div id="A9"/>
 
 #### Ensuring type selection is possible
 
@@ -945,7 +982,7 @@ Output:
 {"1":2,"3":4}
 ```
 
-<div id="A10"/>
+<div id="A11"/>
 
 #### Convert JSON to/from boost matrix
 

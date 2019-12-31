@@ -265,7 +265,7 @@ TEST_CASE("test_empty_object_assignment")
     CHECK(c.is_object());
 }
 
-TEST_CASE("get_with_default test")
+TEST_CASE("at_or_null test")
 {
     json a = json::parse(R"(
     {
@@ -303,6 +303,16 @@ TEST_CASE("get_with_default test")
         const json& j = json::null().at_or_null("key1");
         CHECK(j.is_null());
     }
+}
+
+TEST_CASE("get_with_default test")
+{
+    json a = json::parse(R"(
+    {
+        "key1" : "value1",
+        "key2" : {"key3" : "value3"}
+    }
+    )");
 
     SECTION("2 arg")
     {

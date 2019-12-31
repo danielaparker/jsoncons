@@ -29,3 +29,23 @@ basic_json array. If not an array, an exception of type
 bounds of the array, an exception of type `std::out_of_range`
 is thrown.  
 
+### Examples
+
+#### Returning a value or null
+
+```c++
+#include <jsoncons/json.hpp>
+
+int main()
+{
+    json j(json_object_arg, {{"author","Evelyn Waugh"},{"title","Sword of Honour"}});
+
+    std::cout << j.at_or_null("author").as<std::string>() << "\n";
+    std::cout << j.at_or_null("category").as<std::string>() << "\n";
+}
+```
+Output:
+```
+Evelyn Waugh
+null
+```

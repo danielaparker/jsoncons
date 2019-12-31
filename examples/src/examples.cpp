@@ -125,6 +125,15 @@ void first_example_b()
     }
 }
 
+void at_or_null_example()
+{
+    json j(json_object_arg, {{"author","Evelyn Waugh"},{"title","Sword of Honour"}});
+
+    std::cout << j.at_or_null("author").as<std::string>() << "\n";
+    std::cout << j.at_or_null("category").as<std::string>() << "\n";
+
+}
+
 void first_example_c()
 {
     const json books = json::parse(R"(
@@ -374,7 +383,6 @@ int main()
         second_example_a();
 
         array_examples();
-        container_examples();
 
         wjson_examples();
 
@@ -437,6 +445,10 @@ int main()
         byte_string_examples();
 
         json_constructor_examples();
+
+        container_examples();
+
+        at_or_null_example();
     }
     catch (const std::exception& e)
     {
