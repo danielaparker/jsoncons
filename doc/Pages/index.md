@@ -597,13 +597,13 @@ There are a few things to note about the effect of the parameter settings.
 The `pretty_print` function applies stylistic formatting to JSON text. For example
 
 ```c++
-    json val;
+json j;
 
-    val["verts"] = json(json_array_arg, {1, 2, 3});
-    val["normals"] = json(json_array_arg, {1, 0, 1});
-    val["uvs"] = json(json_array_arg, {0, 0, 1, 1});
+j["verts"] = json(json_array_arg, {1, 2, 3});
+j["normals"] = json(json_array_arg, {1, 0, 1});
+j["uvs"] = json(json_array_arg, {0, 0, 1, 1});
 
-    std::cout << pretty_print(val) << std::endl;
+std::cout << pretty_print(j) << std::endl;
 ```
 produces
 

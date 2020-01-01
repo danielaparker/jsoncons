@@ -249,24 +249,24 @@ Output:
 #### Object-array block formatting
 
 ```c++
-    json val;
+json j;
 
-    val["verts"] = json(json_array_arg, {1, 2, 3});
-    val["normals"] = json(json_array_arg, {1, 0, 1});
-    val["uvs"] = json(json_array_arg, {0, 0, 1, 1});
+j["verts"] = json(json_array_arg, {1, 2, 3});
+j["normals"] = json(json_array_arg, {1, 0, 1});
+j["uvs"] = json(json_array_arg, {0, 0, 1, 1});
 
-    std::cout << "Default (same line)" << std::endl;
-    std::cout << pretty_print(val) << std::endl;
+std::cout << "Default (same line)" << std::endl;
+std::cout << pretty_print(j) << std::endl;
 
-    std::cout << "New line" << std::endl;
-    json_options options1;
-    format1.object_array_line_splits(line_split_kind::new_line);
-    std::cout << pretty_print(val,options1) << std::endl;
+std::cout << "New line" << std::endl;
+json_options options1;
+format1.object_array_line_splits(line_split_kind::new_line);
+std::cout << pretty_print(j,options1) << std::endl;
 
-    std::cout << "Multi line" << std::endl;
-    json_options options2;
-    format2.object_array_line_splits(line_split_kind::multi_line);
-    std::cout << pretty_print(val,options2) << std::endl;
+std::cout << "Multi line" << std::endl;
+json_options options2;
+format2.object_array_line_splits(line_split_kind::multi_line);
+std::cout << pretty_print(j,options2) << std::endl;
 ```
 
 Output:
@@ -321,9 +321,9 @@ Multi line
 #### Array-array block formatting
 
 ```c++
-    json val;
-    val["data"]["id"] = json(json_array_arg, {0,1,2,3,4,5,6,7});
-    val["data"]["item"] = json(json_array_arg, {json(json_array_arg, {2}),
+    json j;
+    j["data"]["id"] = json(json_array_arg, {0,1,2,3,4,5,6,7});
+    j["data"]["item"] = json(json_array_arg, {json(json_array_arg, {2}),
                                       json(json_array_arg, {4,5,2,3}),
                                       json(json_array_arg, {4}),
                                       json(json_array_arg, {4,5,2,3}),
@@ -333,17 +333,17 @@ Multi line
                                       json(json_array_arg, {4,3})});
 
     std::cout << "Default (new line)" << std::endl;
-    std::cout << pretty_print(val) << std::endl;
+    std::cout << pretty_print(j) << std::endl;
 
     std::cout << "Same line" << std::endl;
     json_options options1;
     format1.array_array_line_splits(line_split_kind::same_line);
-    std::cout << pretty_print(val, options1) << std::endl;
+    std::cout << pretty_print(j, options1) << std::endl;
 
     std::cout << "Multi line" << std::endl;
     json_options options2;
     format2.array_array_line_splits(line_split_kind::multi_line);
-    std::cout << pretty_print(val, options2) << std::endl;
+    std::cout << pretty_print(j, options2) << std::endl;
 ```
 
 Output:

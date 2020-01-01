@@ -40,27 +40,29 @@ Returns an error code for this exception
 
 ### Example
 
-    #include <jsoncons/json.hpp>
+```c++
+#include <jsoncons/json.hpp>
 
-    using jsoncons::json;
+using jsoncons::json;
 
-    int main()
+int main()
+{
+    string s = "[1,2,3,4,]";
+    try 
     {
-        string s = "[1,2,3,4,]";
-        try 
-        {
-            jsoncons::json val = jsoncons::json::parse(s);
-        } 
-        catch(const jsoncons::ser_error& e) 
-        {
-            std::cout << "Caught ser_error with category " 
-                      << e.code().category().name() 
-                              << ", code " << e.code().value() 
-                      << " and message " << e.what() << std::endl;
-        }
+        jsoncons::json j = jsoncons::json::parse(s);
+    } 
+    catch(const jsoncons::ser_error& e) 
+    {
+        std::cout << "Caught ser_error with category " 
+                  << e.code().category().name() 
+                  << ", code " << e.code().value() 
+                  << " and message " << e.what() << std::endl;
     }
-
+}
+```
 
 Output:
-
-    Caught ser_error with category json_input, code 1 and message Unexpected value separator ',' at line 1 and column 10
+```
+Caught ser_error with category json_input, code 1 and message Unexpected value separator ',' at line 1 and column 10
+```
