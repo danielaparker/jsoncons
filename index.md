@@ -27,9 +27,9 @@ jsoncons is a C++, header-only library for constructing [JSON](http://www.json.o
 data formats such as [CBOR](http://cbor.io/). For each supported data format, it enables you
 to work with the data in a number of ways:
 
-- As a variant-like data structure, [basic_json](doc/ref/basic_json.md) 
+- As a variant-like data structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json.md) 
 
-- As a strongly typed C++ data structure
+- As a strongly typed C++ data structure that implements [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md)
 
 - As a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
   in the XML world.
@@ -70,7 +70,7 @@ jsoncons allows you to work with the data in a number of ways:
 
 - As a variant-like data structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json.md) 
 
-- As a strongly typed C++ data structure
+- As a strongly typed C++ data structure that implements [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md)
 
 - As a stream of parse events
 
@@ -356,7 +356,7 @@ for (auto it = books.array_range().begin();
 ```
 or a traditional for loop
 ```c++
-for (size_t i = 0; i < books.size(); ++i)
+for (std::size_t i = 0; i < books.size(); ++i)
 {
     json& book = books[i];
     std::string author = book["author"].as<std::string>();
@@ -402,15 +402,13 @@ Note that the third book, Cutter's Way, is missing a price.
 
 You have a choice of object member accessors:
 
-- `book["price"]` will throw `std::out_of_range` if there is no price
-- `book.get_with_default("price",std::string("n/a"))` will return the price converted to the
-   default's data type, `std::string`, or `"n/a"` if there is no price.
+- `book["price"]` will throw `std::out_of_range` if there is no price.
+- `book.at("price")` will throw `std::out_of_range` if there is no price.
+- `book.at_or_null("price")` will return a null json value if there is no price.
+- `book.get_value_or<std::string>("price","n/a")` will return the price as `std::string` if available, otherwise 
+`"n/a"`.
 
-So if you want to show "n/a" for the missing price, you can use this accessor
-```c++
-std::string price = book.get_with_default("price","n/a");
-```
-Or you can check if book has a member "price" with the method `contains`, and output accordingly,
+Or, you can check if book has a member "price" with the member function `contains`, 
 ```c++
 if (book.contains("price"))
 {
@@ -531,8 +529,7 @@ You can read the `CSV` file into a `json` value with the `decode_csv` function.
 ```c++
 #include <fstream>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/csv/csv_reader.hpp>
-#include <jsoncons_ext/csv/csv_encoder.hpp>
+#include <jsoncons_ext/csv/csv.hpp>
 
 using namespace jsoncons;
 
@@ -600,13 +597,13 @@ There are a few things to note about the effect of the parameter settings.
 The `pretty_print` function applies stylistic formatting to JSON text. For example
 
 ```c++
-    json val;
+json j;
 
-    val["verts"] = json(json_array_arg, {1, 2, 3});
-    val["normals"] = json(json_array_arg, {1, 0, 1});
-    val["uvs"] = json(json_array_arg, {0, 0, 1, 1});
+j["verts"] = json(json_array_arg, {1, 2, 3});
+j["normals"] = json(json_array_arg, {1, 0, 1});
+j["uvs"] = json(json_array_arg, {0, 0, 1, 1});
 
-    std::cout << pretty_print(val) << std::endl;
+std::cout << pretty_print(j) << std::endl;
 ```
 produces
 
@@ -675,7 +672,7 @@ You can rename object member names with the built in filter [rename_object_membe
 ```c++
 #include <sstream>
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_content_filter.hpp>
+#include <jsoncons/json_filter.hpp>
 
 using namespace jsoncons;
 
@@ -709,7 +706,7 @@ Output:
 (1) {"first":1,"second":2,"third":3,"fourth":4}
 (2) {"first":1,"second":2,"third":3,"fourth":4}
 ```
-Or define and use your own filters. See [basic_json_content_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json_content_filter.md) for details.
+Or define and use your own filters. See [basic_json_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json_filter.md) for details.
 <div id="A8"/>
 ### JSONPath
 
@@ -857,12 +854,12 @@ jsoncons supports wide character strings and streams with `wjson` and `wjson_rea
 ```c++
 using jsoncons::wjson;
 
-wjson root;
-root[L"field1"] = L"test";
-root[L"field2"] = 3.9;
-root[L"field3"] = true;
+wjson j;
+j[L"field1"] = L"test";
+j[L"field2"] = 3.9;
+j[L"field3"] = true;
 
-std::wcout << root << L"\n";
+std::wcout << j << L"\n";
 ```
 which prints
 ```c++
