@@ -14,36 +14,26 @@ to/from string keys in `basic_json`.
 
 - New `basic_json` member function `json_type type()`
 
-- New `basic_json` member functions for getting a value if available, 
-or a null or default value if not: 
-
-    const basic_json& at_or_null(const string_view_type& name) const; 
+- New `basic_json` member function `get_value_or` that gets a value as type `T` if available, 
+or a default value if not: 
 
     template <class T,class U>
-    T get_value_or(const string_view_type& name, U&& v) const; 
+    T get_value_or(const string_view_type& name, U&& default_value) const; 
 
-`at_or_null` is a rename of 
-
-    const basic_json& get_with_default(const string_view_type& name) const
-
-`get_value_or` is a preferred replacement for
+`get_value_or` is a preferred alternative to
 
     template<class T>
-    T get_with_default(const string_view_type& name, const T& default_val) const
-
-Example:
-
-    json j(json_object_arg, {{"author","Evelyn Waugh"},{"title","Sword of Honour"}});
-
-    std::cout << j.at_or_null("category").as<std::string>() << "\n";        // Output is null
-    std::cout << j.get_value_or<std::string>("category","fiction") << "\n"; // Output is fiction
+    T get_with_default(const string_view_type& name, const T& default_value) const
 
 Note that `get_value_or` requires that the first template parameter `T` be specified explicitly (unlike `get_with_default`)
 
 Changes:
 
-- The functions `get_with_default` have been deprecated and replaced with `at_or_null`
-and `get_value_or`.
+- The basic_json `get_with_default(name)` function, which returned a const reference 
+to the value if available and to a json null constant if not,
+has been deprecated and renamed to `at_or_null(name)`. Rationale: `get_with_default(name)` has more in
+common with `at(name)` (both return a const reference) than with
+`get_with_default(name,default_value)` (which returns a value).  
 
 - The tag type `bstr_arg_t` has been renamed to `byte_string_arg_t`, and the constant 
 `bstr_arg` to `byte_string_arg`.

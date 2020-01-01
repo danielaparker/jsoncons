@@ -21,7 +21,7 @@ workaround for gcc 4.8 regex issues.
 
 - [Milan Burda](https://github.com/miniak) for fix for clang build error
 
-- [Peter Tissen](https://github.com/Bigpet), for reporting and suggesting a fix for get(name,default_val)
+- [Peter Tissen](https://github.com/Bigpet), for reporting and suggesting a fix for get(name,default_value)
 
 - [Tom Bass](https://github.com/tbass) for assistance with clang build errors
 

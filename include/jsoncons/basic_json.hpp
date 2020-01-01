@@ -2368,21 +2368,20 @@ public:
             o.dump(os);
             return os;
         }
-#if !defined(JSONCONS_NO_DEPRECATED)
 
         template <class T>
-        JSONCONS_DEPRECATED_MSG("Instead, use get_value_or<T>(name, default_val)")
-        T get_with_default(const string_view_type& name, const T& default_val) const
+        T get_with_default(const string_view_type& name, const T& default_value) const
         {
-            return evaluate().template get_with_default<T>(name,default_val);
+            return evaluate().template get_with_default<T>(name,default_value);
         }
 
         template <class T = std::basic_string<char_type>>
-        JSONCONS_DEPRECATED_MSG("Instead, use get_value_or<std::string>(name, default_val)")
-        T get_with_default(const string_view_type& name, const char_type* default_val) const
+        T get_with_default(const string_view_type& name, const char_type* default_value) const
         {
-            return evaluate().template get_with_default<T>(name,default_val);
+            return evaluate().template get_with_default<T>(name,default_value);
         }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
 
         const basic_json& get_with_default(const string_view_type& name) const
         {
@@ -2690,9 +2689,9 @@ public:
 
         template <class T>
         JSONCONS_DEPRECATED_MSG("Instead, use get_with_default(const string_view_type&, T&&)")
-        basic_json get(const string_view_type& name, T&& default_val) const
+        basic_json get(const string_view_type& name, T&& default_value) const
         {
-            return evaluate().get(name,std::forward<T>(default_val));
+            return evaluate().get(name,std::forward<T>(default_value));
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use at_or_null(const string_view_type&)")
@@ -4574,18 +4573,15 @@ public:
         }
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
     template<class T>
-    JSONCONS_DEPRECATED_MSG("Instead, use get_value_or<T>(name,default_val)")
-    T get_with_default(const string_view_type& name, const T& default_val) const
+    T get_with_default(const string_view_type& name, const T& default_value) const
     {
         switch (var_.storage())
         {
         case storage_kind::null_value:
         case storage_kind::empty_object_value:
             {
-                return default_val;
+                return default_value;
             }
         case storage_kind::object_value:
             {
@@ -4596,7 +4592,7 @@ public:
                 }
                 else
                 {
-                    return default_val;
+                    return default_value;
                 }
             }
         default:
@@ -4607,15 +4603,14 @@ public:
     }
 
     template<class T = std::basic_string<char_type>>
-    JSONCONS_DEPRECATED_MSG("Instead, use get_value_or<std::string>(name, default_val)")
-    T get_with_default(const string_view_type& name, const char_type* default_val) const
+    T get_with_default(const string_view_type& name, const char_type* default_value) const
     {
         switch (var_.storage())
         {
         case storage_kind::null_value:
         case storage_kind::empty_object_value:
             {
-                return T(default_val);
+                return T(default_value);
             }
         case storage_kind::object_value:
             {
@@ -4626,7 +4621,7 @@ public:
                 }
                 else
                 {
-                    return T(default_val);
+                    return T(default_value);
                 }
             }
         default:
@@ -4635,6 +4630,8 @@ public:
             }
         }
     }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
 
     JSONCONS_DEPRECATED_MSG("Instead, use at_or_null(const string_view_type&)")
     const basic_json& get_with_default(const string_view_type& name) const
@@ -4999,13 +4996,13 @@ public:
 
     template<class T>
     JSONCONS_DEPRECATED_MSG("Instead, use get_with_default(const string_view_type&, T&&)")
-    basic_json get(const string_view_type& name, T&& default_val) const
+    basic_json get(const string_view_type& name, T&& default_value) const
     {
         switch (var_.storage())
         {
         case storage_kind::empty_object_value:
             {
-                return basic_json(std::forward<T>(default_val));
+                return basic_json(std::forward<T>(default_value));
             }
         case storage_kind::object_value:
             {
@@ -5016,7 +5013,7 @@ public:
                 }
                 else
                 {
-                    return basic_json(std::forward<T>(default_val));
+                    return basic_json(std::forward<T>(default_value));
                 }
             }
         default:
