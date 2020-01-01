@@ -18,19 +18,19 @@ accessing and the key does not exist, `noexcept` accessors return a
 default value, e.g. the `is_xxx` functions return `false`, other 
 accessors throw.
 If assigning, inserts or updates with the new value. 
-Throws `std::runtime_error` if not an object. 
+Throws `std::domain_error` if not an object. 
 If read, throws `std::out_of_range` if the object does not have a 
 member with the specified key.  
 
 (2) If `key` matches the key of a member in the basic_json object, returns a reference to the basic_json object, otherwise throws.
-Throws `std::runtime_error` if not an object.
+Throws `std::domain_error` if not an object.
 Throws `std::out_of_range` if the object does not have a member with the specified key.  
 
 (3) Returns a reference to the value at index i in a `basic_json` object or array.
-Throws `std::runtime_error` if not an object or array.
+Throws `std::domain_error` if not an object or array.
 
 (4) Returns a `const_reference` to the value at index i in a `basic_json` object or array.
-Throws `std::runtime_error` if not an object or array.
+Throws `std::domain_error` if not an object or array.
 
 #### Notes
 

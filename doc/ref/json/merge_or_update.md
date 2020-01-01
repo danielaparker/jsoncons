@@ -26,7 +26,7 @@ None
 
 #### Exceptions
 
-Throws `std::runtime_error` if source or *this are not json objects.
+Throws `std::domain_error` if source or *this are not json objects.
 
 ### Examples
 

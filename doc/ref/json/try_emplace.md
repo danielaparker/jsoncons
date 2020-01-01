@@ -34,7 +34,7 @@ or the already existing value.
 
 #### Exceptions
 
-Throws `std::runtime_error` if not a json object.
+Throws `std::domain_error` if not a json object.
 
 ### Example
 

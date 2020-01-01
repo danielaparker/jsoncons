@@ -13,17 +13,17 @@ void erase(const string_view_type& name); // (5)
 ```
 
 (1) Remove an element from an array at the specified position.
-Throws `std::runtime_error` if not an array.
+Throws `std::domain_error` if not an array.
 
 (2) Remove the elements from an array in the range '[first,last)'.
-Throws `std::runtime_error` if not an array.
+Throws `std::domain_error` if not an array.
 
 (3) Remove a member from an object at the specified position.
-Throws `std::runtime_error` if not an object.
+Throws `std::domain_error` if not an object.
     
 (4) Remove the members from an object in the range '[first,last)'.
-Throws `std::runtime_error` if not an object.
+Throws `std::domain_error` if not an object.
 
 (5) Remove a member with the specified name from an object
-Throws `std::runtime_error` if not an object.
+Throws `std::domain_error` if not an object.
 

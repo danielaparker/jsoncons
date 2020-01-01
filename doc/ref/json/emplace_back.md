@@ -15,7 +15,7 @@ A reference to the emplaced json value.
 
 #### Exceptions
 
-Throws `std::runtime_error` if not a json array.
+Throws `std::domain_error` if not a json array.
 
 ### Example
 
