@@ -966,7 +966,7 @@ TEST_CASE("serialize_tab_delimited_file")
         CHECK(employees1[i]["employee-name"] ==employees2[i]["employee-name"]);
         CHECK(employees1[i]["employee-no"] ==employees2[i]["employee-no"]);
         CHECK(employees1[i]["salary"] == employees2[i]["salary"]);
-        CHECK(employees1[i].get_with_default("note","") == employees2[i].get_with_default("note",""));
+        CHECK(employees1[i].get_value_or<std::string>("note","") == employees2[i].get_value_or<std::string>("note",""));
     }
 }
 

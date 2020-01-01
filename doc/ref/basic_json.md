@@ -153,7 +153,11 @@ Returns the allocator associated with the basic_json value.
   </tr>
   <tr>
     <td><a href="json/at.md">at<br>at_or_null</a></td>
-    <td>Access specified element.</td> 
+    <td>Return the specified value.</td> 
+  </tr>
+  <tr>
+    <td><a href="json/get_value_or.md">get_value_or</a></td>
+    <td>Return the specified value if available, otherwise a default value.</td> 
   </tr>
 </table>
 

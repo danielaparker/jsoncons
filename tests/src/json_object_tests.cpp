@@ -305,7 +305,7 @@ TEST_CASE("at_or_null test")
     }
 }
 
-TEST_CASE("get_with_default test")
+TEST_CASE("get_value_or test")
 {
     json a = json::parse(R"(
     {
@@ -318,7 +318,7 @@ TEST_CASE("get_with_default test")
     {
         std::string s1 = a.at("key1").as<std::string>();
         std::string s1a = a.at("key1").as<std::string>();
-        std::string s2 = a.get_with_default("key4","null");
+        std::string s2 = a.get_value_or<std::string>("key4","null");
         REQUIRE_THROWS_AS(a.at("key4"), std::out_of_range);
 
         CHECK(s1 == std::string("value1"));
@@ -329,7 +329,7 @@ TEST_CASE("get_with_default test")
 
     SECTION("2 arg null")
     {
-        std::string s2 = json::null().get_with_default("key4","null");
+        std::string s2 = json::null().get_value_or<std::string>("key4","null");
         CHECK(s2 == std::string("null"));
     }
 }
@@ -343,8 +343,8 @@ TEST_CASE("test_proxy_get")
 
     std::string s1 = a["object1"].at("key1").as<std::string>();
     std::string s1a = a["object1"].at("key1").as<std::string>();
-    std::string s2 = a["object1"].get_with_default("key2",json::null()).as<std::string>();
-    CHECK(a["object1"].get_with_default("key2", json::null()).is_null());
+    std::string s2 = a["object1"].get_value_or<json>("key2",json::null()).as<std::string>();
+    CHECK(a["object1"].get_value_or<json>("key2", json::null()).is_null());
     //std::cout << s2 << std::endl;
     REQUIRE_THROWS_AS(a["object1"].at("key2").as<std::string>(), std::out_of_range);
 
@@ -353,7 +353,7 @@ TEST_CASE("test_proxy_get")
     CHECK(std::string("null") == s2);
 }
 
-TEST_CASE("test_proxy_get_with_default")
+TEST_CASE("test proxy get_value_or")
 {
     json a;
 
@@ -361,14 +361,14 @@ TEST_CASE("test_proxy_get_with_default")
     a["object1"]["field1"] = "3.7";
     a["object1"]["field2"] = 1.5;
 
-    std::string s1 = a["object1"].get_with_default("field1","default");
-    std::string s2 = a["object1"].get_with_default("field2","1.0");
-    std::string s3 = a["object1"].get_with_default("field3","1.0");
-    std::string s4 = a["object1"].get_with_default<std::string>("field2","1.0");
-    std::string s5 = a["object1"].get_with_default<std::string>("field3","1.0");
-    double d1 = a["object1"].get_with_default("field1",1.0);
-    double d2 = a["object1"].get_with_default("field2",1.0);
-    double d3 = a["object1"].get_with_default("field3",1.0);
+    std::string s1 = a["object1"].get_value_or<std::string>("field1","default");
+    std::string s2 = a["object1"].get_value_or<std::string>("field2","1.0");
+    std::string s3 = a["object1"].get_value_or<std::string>("field3","1.0");
+    std::string s4 = a["object1"].get_value_or<std::string>("field2","1.0");
+    std::string s5 = a["object1"].get_value_or<std::string>("field3","1.0");
+    double d1 = a["object1"].get_value_or<double> ("field1",1.0);
+    double d2 = a["object1"].get_value_or<double> ("field2",1.0);
+    double d3 = a["object1"].get_value_or<double> ("field3",1.0);
 
     CHECK(std::string("3.7") == s1);
     CHECK(std::string("1.5") == s2);
@@ -561,7 +561,7 @@ TEST_CASE("test_get_with_string_default")
     json example;
 
     std::string s("too long string for short string");
-    std::string result = example.get_with_default("test", s);
+    std::string result = example.get_value_or<std::string>("test", s);
     CHECK(s == result);
 }
 
@@ -808,8 +808,8 @@ TEST_CASE("test_object_get_defaults")
     CHECK(x1 == 1.0);
     CHECK(x2 == 20.0);
 
-    std::string s1 = obj.get_with_default("field3", "Montreal");
-    std::string s2 = obj.get_with_default("field4", "San Francisco");
+    std::string s1 = obj.get_value_or<std::string> ("field3", "Montreal");
+    std::string s2 = obj.get_value_or<std::string> ("field4", "San Francisco");
 
     CHECK(s1 =="Toronto");
     CHECK(s2 == "San Francisco");

@@ -106,7 +106,7 @@ void basics_wjson_example1()
         // book has member "author"
     }
 
-    std::wstring s = book.get_with_default(L"author", L"author unknown");
+    auto s = book.get_value_or<std::wstring>(L"author", L"author unknown");
     // Returns author if found, otherwise "author unknown"
 
     try

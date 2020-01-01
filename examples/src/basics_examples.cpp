@@ -107,7 +107,7 @@ void basics_json_example1()
         // book has member "author"
     }
 
-    std::string s = book.get_with_default("author", "author unknown");
+    std::string s = book.get_value_or<std::string>("author", "author unknown");
     // Returns author if found, otherwise "author unknown"
 
     try

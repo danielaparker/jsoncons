@@ -1991,9 +1991,9 @@ Output:
 ```c++
 json j(json_object_arg, {{"price", "25.17"}});
 
-double price = j.get_with_default("price", 25.00); // returns 25.17
+double price = j.get_value_or<double>("price", 25.00); // returns 25.17
 
-double sale_price = j.get_with_default("sale_price", 22.0); // returns 22.0
+double sale_price = j.get_value_or<double>("sale_price", 22.0); // returns 22.0
 ```
 
 <div id="E5"/>
