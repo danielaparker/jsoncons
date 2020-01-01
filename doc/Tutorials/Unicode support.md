@@ -134,11 +134,11 @@ Instead you need to use the non standard Microsoft extension
 ```c++
 using jsoncons::wjson;
 
-wjson root;
-root[L"field1"] = L"test";
-root[L"field2"] = 3.9;
-root[L"field3"] = true;
-std::wcout << root << L"\n";
+wjson j;
+j[L"field1"] = L"test";
+j[L"field2"] = 3.9;
+j[L"field3"] = true;
+std::wcout << j << L"\n";
 ```
 Output:
 ```

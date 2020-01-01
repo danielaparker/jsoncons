@@ -854,12 +854,12 @@ jsoncons supports wide character strings and streams with `wjson` and `wjson_rea
 ```c++
 using jsoncons::wjson;
 
-wjson root;
-root[L"field1"] = L"test";
-root[L"field2"] = 3.9;
-root[L"field3"] = true;
+wjson j;
+j[L"field1"] = L"test";
+j[L"field2"] = 3.9;
+j[L"field3"] = true;
 
-std::wcout << root << L"\n";
+std::wcout << j << L"\n";
 ```
 which prints
 ```c++

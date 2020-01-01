@@ -27,8 +27,8 @@ void read_mulitple_json_objects()
         reader.read_next();
         if (!reader.eof())
         {
-            json val = decoder.get_result();
-            std::cout << val << std::endl;
+            json j = decoder.get_result();
+            std::cout << j << std::endl;
         }
     }
 }
