@@ -2126,23 +2126,13 @@ public:
         }
 
         template <class T,class U>
-        T get_value_or(const string_view_type& name, U&& v) const &
+        T get_value_or(const string_view_type& name, U&& default_value) const
         {
             static_assert(std::is_copy_constructible<T>::value,
                           "get_value_or: T must be copy constructible");
             static_assert(std::is_convertible<U&&, T>::value,
                           "get_value_or: U must be convertible to T");
-            return evaluate().template get_value_or<T,U>(name,std::forward<U>(v));
-        }
-
-        template <class T,class U>
-        T get_value_or(const string_view_type& name, U&& v) const &&
-        {
-            static_assert(std::is_move_constructible<T>::value,
-                          "get_value_or: T must be move constructible");
-            static_assert(std::is_convertible<U&&, T>::value,
-                          "get_value_or: U must be convertible to T");
-            return evaluate().template get_value_or<T,U>(name,std::forward<U>(v));
+            return evaluate().template get_value_or<T,U>(name,std::forward<U>(default_value));
         }
 
         void shrink_to_fit()
@@ -4089,7 +4079,7 @@ public:
     }
 
     template <class T,class U>
-    T get_value_or(const string_view_type& name, U&& v) const &
+    T get_value_or(const string_view_type& name, U&& default_value) const
     {
         static_assert(std::is_copy_constructible<T>::value,
                       "get_value_or: T must be copy constructible");
@@ -4100,7 +4090,7 @@ public:
         case storage_kind::null_value:
         case storage_kind::empty_object_value:
             {
-                return static_cast<T>(std::forward<U>(v));
+                return static_cast<T>(std::forward<U>(default_value));
             }
         case storage_kind::object_value:
             {
@@ -4111,43 +4101,10 @@ public:
                 }
                 else
                 {
-                    return static_cast<T>(std::forward<U>(v));
+                    return static_cast<T>(std::forward<U>(default_value));
                 }
             }
         default:
-            {
-                JSONCONS_THROW(not_an_object(name.data(),name.length()));
-            }
-        }
-    }
-
-    template <class T,class U>
-    T get_value_or(const string_view_type& name, U&& v) const &&
-    {
-        static_assert(std::is_move_constructible<T>::value,
-                      "get_value_or: T must be move constructible");
-        static_assert(std::is_convertible<U&&, T>::value,
-                      "get_value_or: U must be convertible to T");
-        switch (var_.storage())
-        {
-            case storage_kind::null_value:
-            case storage_kind::empty_object_value:
-            {
-                return static_cast<T>(std::forward<U>(v));
-            }
-            case storage_kind::object_value:
-            {
-                const_object_iterator it = object_value().find(name);
-                if (it != object_range().end())
-                {
-                    return it->value().template as<T>();
-                }
-                else
-                {
-                    return static_cast<T>(std::forward<U>(v));
-                }
-            }
-            default:
             {
                 JSONCONS_THROW(not_an_object(name.data(),name.length()));
             }

@@ -154,6 +154,26 @@ namespace detail
             }
             return *valuep_;
         }
+
+        template <typename U>
+        constexpr T value_or(U&& default_value) const & 
+        {
+            static_assert(std::is_copy_constructible<T>::value,
+                          "get_value_or: T must be copy constructible");
+            static_assert(std::is_convertible<U&&, T>::value,
+                          "get_value_or: U must be convertible to T");
+            return bool(*this) ? **this : static_cast<T>(std::forward<U>(default_value));
+        }
+
+        template <typename U>
+        T value_or(U&& default_value) && 
+        {
+            static_assert(std::is_move_constructible<T>::value,
+                          "get_value_or: T must be move constructible");
+            static_assert(std::is_convertible<U&&, T>::value,
+                          "get_value_or: U must be convertible to T");
+            return bool(*this) ? std::move(**this) : static_cast<T>(std::forward<U>(default_value))
+        }
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif  // _MSC_VER

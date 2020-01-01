@@ -20,10 +20,7 @@ or a null or default value if not:
     const basic_json& at_or_null(const string_view_type& name) const; 
 
     template <class T,class U>
-    T get_value_or(const string_view_type& name, U&& v) const &; 
-
-    template <class T,class U>
-    T get_value_or(const string_view_type& name, U&& v) const &&;
+    T get_value_or(const string_view_type& name, U&& v) const; 
 
 `at_or_null` is a rename of 
 
