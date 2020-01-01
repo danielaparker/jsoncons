@@ -6,28 +6,16 @@ Selects a `json` value.
 
 ```c++
 template<class J>
-typename std::enable_if<is_accessible_by_reference<J>::value,J&>::type
-get(J& root, const typename J::string_view_type& path); // (1)
+J& get(J& root, const typename J::string_view_type& path); // (1)
 
 template<class J>
-typename std::enable_if<is_accessible_by_reference<J>::value,const J&>::type
-get(const J& root, const typename J::string_view_type& path); // (2)
+const J& get(const J& root, const typename J::string_view_type& path); // (2)
 
 template<class J>
-typename std::enable_if<!is_accessible_by_reference<J>::value,J>::type
-get(const J& root, const typename J::string_view_type& path); // (3)
+J& get(J& root, const typename J::string_view_type& path, std::error_code& ec); // (3)
 
 template<class J>
-typename std::enable_if<is_accessible_by_reference<J>::value,J&>::type
-get(J& root, const typename J::string_view_type& path, std::error_code& ec); // (4)
-
-template<class J>
-typename std::enable_if<is_accessible_by_reference<J>::value,const J&>::type
-get(const J& root, const typename J::string_view_type& path, std::error_code& ec); // (5)
-
-template<class J>
-typename std::enable_if<!is_accessible_by_reference<J>::value,J>::type
-get(const J& root, const typename J::string_view_type& path, std::error_code& ec); // (6)
+const J& get(const J& root, const typename J::string_view_type& path, std::error_code& ec); // (4)
 ```
 
 #### Return value
@@ -59,14 +47,10 @@ get(const J& root, const typename J::string_view_type& path, std::error_code& ec
 (1) Throws a [jsonpointer_error](jsonpointer_error.md) if get fails.
 
 (2) Throws a [jsonpointer_error](jsonpointer_error.md) if get fails.
-
-(3) Throws a [jsonpointer_error](jsonpointer_error.md) if get fails.
+ 
+(3) Sets the `std::error_code&` to the [jsonpointer_error_category](jsonpointer_errc.md) if get fails. 
  
 (4) Sets the `std::error_code&` to the [jsonpointer_error_category](jsonpointer_errc.md) if get fails. 
- 
-(5) Sets the `std::error_code&` to the [jsonpointer_error_category](jsonpointer_errc.md) if get fails. 
- 
-(6) Sets the `std::error_code&` to the [jsonpointer_error_category](jsonpointer_errc.md) if get fails. 
 
 #### Requirements
 
@@ -84,7 +68,7 @@ name              |type                  |notes
 
 and given 
 
-- a value `index` of type `size_t`
+- a value `index` of type `std::size_t`
 - a value `key` of type `string_view_type` 
 - an rvalue expression `j` of type `J`
 
@@ -94,8 +78,8 @@ expression     |return type                |effects
 ---------------|---------------------------|---------------
 is_array()     |`bool`                     |
 is_object()    |`bool`                     |
-size()         |`size_t`                   |
-contains(key)   |`bool`                     |
+size()         |`std::size_t`              |
+contains(key)  |`bool`                     |
 at(index)      |`reference` or `value_type`|
 at(key)        |`reference` or `value_type`|
 
