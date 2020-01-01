@@ -2125,18 +2125,6 @@ public:
             return evaluate().find(name);
         }
 
-        template <class T>
-        T get_with_default(const string_view_type& name, const T& default_val) const
-        {
-            return evaluate().template get_with_default<T>(name,default_val);
-        }
-
-        template <class T = std::basic_string<char_type>>
-        T get_with_default(const string_view_type& name, const char_type* default_val) const
-        {
-            return evaluate().template get_with_default<T>(name,default_val);
-        }
-
         template <class T,class U>
         T get_value_or(const string_view_type& name, U&& v) const &
         {
@@ -2392,7 +2380,20 @@ public:
         }
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-        JSONCONS_DEPRECATED_MSG("Instead, use at_or_null(const string_view_type&)")
+        template <class T>
+        JSONCONS_DEPRECATED_MSG("Instead, use get_value_or<T>(name, default_val)")
+        T get_with_default(const string_view_type& name, const T& default_val) const
+        {
+            return evaluate().template get_with_default<T>(name,default_val);
+        }
+
+        template <class T = std::basic_string<char_type>>
+        JSONCONS_DEPRECATED_MSG("Instead, use get_value_or<std::string>(name, default_val)")
+        T get_with_default(const string_view_type& name, const char_type* default_val) const
+        {
+            return evaluate().template get_with_default<T>(name,default_val);
+        }
+
         const basic_json& get_with_default(const string_view_type& name) const
         {
             return evaluate().at_or_null(name);
@@ -4087,35 +4088,6 @@ public:
         }
     }
 
-    template<class T>
-    T get_with_default(const string_view_type& name, const T& default_val) const
-    {
-        switch (var_.storage())
-        {
-        case storage_kind::null_value:
-        case storage_kind::empty_object_value:
-            {
-                return default_val;
-            }
-        case storage_kind::object_value:
-            {
-                const_object_iterator it = object_value().find(name);
-                if (it != object_range().end())
-                {
-                    return it->value().template as<T>();
-                }
-                else
-                {
-                    return default_val;
-                }
-            }
-        default:
-            {
-                JSONCONS_THROW(not_an_object(name.data(),name.length()));
-            }
-        }
-    }
-
     template <class T,class U>
     T get_value_or(const string_view_type& name, U&& v) const &
     {
@@ -4176,35 +4148,6 @@ public:
                 }
             }
             default:
-            {
-                JSONCONS_THROW(not_an_object(name.data(),name.length()));
-            }
-        }
-    }
-
-    template<class T = std::basic_string<char_type>>
-    T get_with_default(const string_view_type& name, const char_type* default_val) const
-    {
-        switch (var_.storage())
-        {
-        case storage_kind::null_value:
-        case storage_kind::empty_object_value:
-            {
-                return T(default_val);
-            }
-        case storage_kind::object_value:
-            {
-                const_object_iterator it = object_value().find(name);
-                if (it != object_range().end())
-                {
-                    return it->value().template as<T>();
-                }
-                else
-                {
-                    return T(default_val);
-                }
-            }
-        default:
             {
                 JSONCONS_THROW(not_an_object(name.data(),name.length()));
             }
@@ -4675,6 +4618,66 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+    template<class T>
+    JSONCONS_DEPRECATED_MSG("Instead, use get_value_or<T>(name,default_val)")
+    T get_with_default(const string_view_type& name, const T& default_val) const
+    {
+        switch (var_.storage())
+        {
+        case storage_kind::null_value:
+        case storage_kind::empty_object_value:
+            {
+                return default_val;
+            }
+        case storage_kind::object_value:
+            {
+                const_object_iterator it = object_value().find(name);
+                if (it != object_range().end())
+                {
+                    return it->value().template as<T>();
+                }
+                else
+                {
+                    return default_val;
+                }
+            }
+        default:
+            {
+                JSONCONS_THROW(not_an_object(name.data(),name.length()));
+            }
+        }
+    }
+
+    template<class T = std::basic_string<char_type>>
+    JSONCONS_DEPRECATED_MSG("Instead, use get_value_or<std::string>(name, default_val)")
+    T get_with_default(const string_view_type& name, const char_type* default_val) const
+    {
+        switch (var_.storage())
+        {
+        case storage_kind::null_value:
+        case storage_kind::empty_object_value:
+            {
+                return T(default_val);
+            }
+        case storage_kind::object_value:
+            {
+                const_object_iterator it = object_value().find(name);
+                if (it != object_range().end())
+                {
+                    return it->value().template as<T>();
+                }
+                else
+                {
+                    return T(default_val);
+                }
+            }
+        default:
+            {
+                JSONCONS_THROW(not_an_object(name.data(),name.length()));
+            }
+        }
+    }
 
     JSONCONS_DEPRECATED_MSG("Instead, use at_or_null(const string_view_type&)")
     const basic_json& get_with_default(const string_view_type& name) const

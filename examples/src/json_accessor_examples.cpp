@@ -124,20 +124,12 @@ void operator_at_examples()
     std::cout << pretty_print(export_settings) << "\n\n";
 }
 
-void at_or_null_example()
+void return_value_null_or_default_example()
 {
     json j(json_object_arg, {{"author","Evelyn Waugh"},{"title","Sword of Honour"}});
 
-    std::cout << j.at_or_null("author").as<std::string>() << "\n";
-    std::cout << j.at_or_null("category").as<std::string>() << "\n";
-}
-
-void get_value_or_example()
-{
-    json j(json_object_arg, {{"author","Evelyn Waugh"},{"title","Sword of Honour"}});
-
-    std::cout << "(1) " << j["author"].as<std::string>() << "\n";
-    std::cout << "(2) " << j.at("title").as<std::string>() << "\n";
+    std::cout << "(1) " << j.at_or_null("author").as<std::string>() << "\n";
+    std::cout << "(2) " << j.at_or_null("title").as<std::string>() << "\n";
     std::cout << "(3) " << j.at_or_null("category").as<std::string>() << "\n";
     std::cout << "(4) " << j.get_value_or<std::string>("category","fiction") << "\n";
 }
@@ -154,9 +146,7 @@ void json_accessor_examples()
 
     operator_at_examples();
 
-    at_or_null_example();
-
-    get_value_or_example();
+    return_value_null_or_default_example();
 }
 
 

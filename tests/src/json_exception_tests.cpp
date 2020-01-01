@@ -60,7 +60,7 @@ TEST_CASE("test_array_add")
 {
     json b;
     b["key1"] = "value1";
-    REQUIRE_THROWS_AS(b.push_back(0), std::runtime_error);
+    REQUIRE_THROWS_AS(b.push_back(0), std::domain_error);
 }
 
 TEST_CASE("test_object_index")
