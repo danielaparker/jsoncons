@@ -149,7 +149,7 @@ jsoncons allows you to work with the CBOR data similarly to JSON data:
 
 - As a variant-like data structure, [basic_json](../basic_json.md) 
 
-- As a strongly typed C++ data structure that implements jsoncons traits, [json_type_traits](../json_type_traits.md) 
+- As a strongly typed C++ data structure that implements [json_type_traits](../json_type_traits.md) 
 
 - As a stream of parse events
 

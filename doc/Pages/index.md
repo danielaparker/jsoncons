@@ -29,7 +29,7 @@ to work with the data in a number of ways:
 
 - As a variant-like data structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements jsoncons traits, [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md)
+- As a strongly typed C++ data structure that implements [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md)
 
 - As a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
   in the XML world.
@@ -70,7 +70,7 @@ jsoncons allows you to work with the data in a number of ways:
 
 - As a variant-like data structure, [basic_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/basic_json.md) 
 
-- As a strongly typed C++ data structure that implements jsoncons traits
+- As a strongly typed C++ data structure that implements [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md)
 
 - As a stream of parse events
 
@@ -402,15 +402,13 @@ Note that the third book, Cutter's Way, is missing a price.
 
 You have a choice of object member accessors:
 
-- `book["price"]` will throw `std::out_of_range` if there is no price
-- `book.get_with_default("price",std::string("n/a"))` will return the price converted to the
-   default's data type, `std::string`, or `"n/a"` if there is no price.
+- `book["price"]` will throw `std::out_of_range` if there is no price.
+- `book.at("price")` will throw `std::out_of_range` if there is no price.
+- `book.at_or_null("price")` will return a null json value if there is no price.
+- `book.get_value_or<std::string>("price","n/a")` will return the price as `std::string` if available, otherwise 
+`"n/a"`.
 
-So if you want to show "n/a" for the missing price, you can use this accessor
-```c++
-std::string price = book.get_with_default("price","n/a");
-```
-Or you can check if book has a member "price" with the method `contains`, and output accordingly,
+Or, you can check if book has a member "price" with the member function `contains`, 
 ```c++
 if (book.contains("price"))
 {
