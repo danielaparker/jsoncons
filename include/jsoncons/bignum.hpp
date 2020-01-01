@@ -20,7 +20,7 @@
 #include <memory> // std::allocator
 #include <initializer_list> // std::initializer_list
 #include <type_traits> // std::enable_if
-#include <jsoncons/utility.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons {
 

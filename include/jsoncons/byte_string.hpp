@@ -18,7 +18,7 @@
 #include <iomanip> // std::setw
 #include <initializer_list>
 #include <utility> // std::move
-#include <jsoncons/utility.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
 
 namespace jsoncons {

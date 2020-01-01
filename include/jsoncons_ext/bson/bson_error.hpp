@@ -8,7 +8,7 @@
 #define JSONCONS_BSON_BSON_ERROR_HPP
 
 #include <system_error>
-#include <jsoncons/utility.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { namespace bson {
 

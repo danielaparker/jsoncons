@@ -8,7 +8,7 @@
 #define JSONCONS_CBOR_CBOR_ERROR_HPP
 
 #include <system_error>
-#include <jsoncons/utility.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp> // jsoncons::ser_error
 
 namespace jsoncons { namespace cbor {

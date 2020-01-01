@@ -14,7 +14,7 @@
 #include <functional>
 #include <iterator> // std::iterator_traits, std::input_iterator_tag
 #include <jsoncons/bignum.hpp>
-#include <jsoncons/utility.hpp> // JSONCONS_EXPAND, JSONCONS_QUOTE
+#include <jsoncons/config/jsoncons_config.hpp> // JSONCONS_EXPAND, JSONCONS_QUOTE
 #include <jsoncons/detail/more_type_traits.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <limits> // std::numeric_limits

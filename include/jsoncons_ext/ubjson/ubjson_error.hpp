@@ -8,7 +8,7 @@
 #define JSONCONS_UBJSON_UBJSON_ERROR_HPP
 
 #include <system_error>
-#include <jsoncons/utility.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { namespace ubjson {
 
