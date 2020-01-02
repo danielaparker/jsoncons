@@ -18,7 +18,7 @@
 #include <fstream>
 
 using namespace jsoncons;
-
+#if 0
 TEST_CASE("jsonpath name tests")
 {
     ojson example = ojson::parse(R"(
@@ -1877,7 +1877,7 @@ TEST_CASE("jsonpath intersection tests")
         std::cout << "result: " << result << "\n";
     }
 }
-
+#endif
 TEST_CASE("jsonpath-tests")
 {
     std::string fpath = "./input/jsonpath/jsonpath-tests.json";
@@ -1887,8 +1887,8 @@ TEST_CASE("jsonpath-tests")
     json tests = json::parse(is);
     for (const auto& test : tests.array_range())
     {
-        std::string input = test["document"].as<std::string>();
-        std::string path = test["selector"].as<std::string>();
+        std::string input = test["input"].as<std::string>();
+        std::string path = test["path"].as<std::string>();
         if (test.contains("expected"))
         {
             std::string expected = test["expected"].as<std::string>();
@@ -1898,7 +1898,11 @@ TEST_CASE("jsonpath-tests")
             ojson expected_result = ojson::parse(expected);
             if (result != expected_result)
             {
-                std::cerr << test["annotation"] << "\n";
+                std::cout << "\n" << test["annotation"] << "\n";
+                std::cout << root << "\n";
+                std::cout << path << "\n\n";
+                std::cout << "actual: " << result << "\n\n";
+                std::cout << "expected: " << expected << "\n\n";
             }
             CHECK(result == expected_result);
         }

@@ -37,8 +37,8 @@ void json_cursor_examples();
 void data_model_examples();
 void staj_iterator_examples();
 void bson_examples();
-void json_type_traits_macros_examples();
-void json_type_traits_macros_named_examples();
+void json_traits_macros_examples();
+void json_traits_macros_named_examples();
 void run_cbor_typed_array_examples();
 void byte_string_examples();
 void json_constructor_examples();
@@ -423,13 +423,9 @@ int main()
 
         json_reader_examples();
 
-        json_type_traits_macros_named_examples();
-
         run_csv_examples();
 
         run_cbor_typed_array_examples();
-
-        json_type_traits_macros_examples();
 
         byte_string_examples();
 
@@ -438,6 +434,10 @@ int main()
         container_examples();
 
         json_accessor_examples();
+
+        json_traits_macros_examples();
+
+        json_traits_macros_named_examples();
     }
     catch (const std::exception& e)
     {

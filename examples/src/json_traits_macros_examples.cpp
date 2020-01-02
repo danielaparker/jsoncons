@@ -322,7 +322,7 @@ void foo_bar_baz_example()
     }
 }
 
-void json_type_traits_macros_examples()
+void json_traits_macros_examples()
 {
     std::cout << "\njson_type_traits macro examples\n\n";
 

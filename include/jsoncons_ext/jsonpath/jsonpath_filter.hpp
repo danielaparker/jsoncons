@@ -444,6 +444,7 @@ struct cmp_plus
         }
         return result;
     }
+
     Json operator()(const value_term<Json>& lhs, const value_term<Json>& rhs) const
     {
         return plus(lhs.value(), rhs.value());
@@ -458,18 +459,22 @@ struct cmp_plus
         return (*this)(lhs.value(),rhs.result()[0]);
     }
 
-    Json operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
-    {
-        if (lhs.result().size() != rhs.result().size() && lhs.result().size() != 1)
-        {
-            return Json(jsoncons::null_type());
-        }
-        return (*this)(lhs.result()[0],rhs.result()[0]);
-    }
-
     Json operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
     {
+        if (lhs.result().size() != 1)
+        {
+            return false;
+        }
         return (*this)(rhs, lhs);
+    }
+
+    Json operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
+    {
+        if (lhs.result().empty() || rhs.result().empty())
+        {
+            return Json::null();
+        }
+        return (*this)(lhs.result()[0],rhs.result()[0]);
     }
 
     bool operator()(const value_term<Json>&, const regex_term<Json>&) const
@@ -509,15 +514,6 @@ struct cmp_mult
         return mult(lhs.value(), rhs.value());
     }
 
-    Json operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
-    {
-        if (lhs.result().size() != rhs.result().size() && lhs.result().size() != 1)
-        {
-            return Json(jsoncons::null_type());
-        }
-        return mult(lhs.result()[0],rhs.result()[0]);
-    }
-
     Json operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
     {
         if (rhs.result().size() != 1)
@@ -529,7 +525,20 @@ struct cmp_mult
 
     Json operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
     {
+        if (lhs.result().size() != 1)
+        {
+            return false;
+        }
         return (*this)(rhs, lhs);
+    }
+
+    Json operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
+    {
+        if (lhs.result().empty() || rhs.result().empty())
+        {
+            return Json::null();
+        }
+        return mult(lhs.result()[0],rhs.result()[0]);
     }
 
     bool operator()(const value_term<Json>&, const regex_term<Json>&) const
@@ -569,15 +578,6 @@ struct cmp_div
         return div(lhs.value(), rhs.value());
     }
 
-    Json operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
-    {
-        if (lhs.result().size() != rhs.result().size() && lhs.result().size() != 1)
-        {
-            return Json(jsoncons::null_type());
-        }
-        return div(lhs.result()[0],rhs.result()[0]);
-    }
-
     Json operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
     {
         if (rhs.result().size() != 1)
@@ -594,6 +594,15 @@ struct cmp_div
             return false;
         }
         return div(lhs.result()[0],rhs.value());
+    }
+
+    Json operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
+    {
+        if (lhs.result().empty() || rhs.result().empty())
+        {
+            return Json::null();
+        }
+        return div(lhs.result()[0],rhs.result()[0]);
     }
 
     bool operator()(const value_term<Json>&, const regex_term<Json>&) const
@@ -615,8 +624,35 @@ struct cmp_eq
         return lhs.value() == rhs.value();
     }
 
+    bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
+    {
+        if (rhs.result().size() != 1)
+        {
+            return false;
+        }
+        return lhs.value() == rhs.result()[0];
+    }
+
+    bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
+    {
+        if (lhs.result().size() != 1)
+        {
+            return false;
+        }
+        return (*this)(rhs, lhs);
+    }
+
     bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
     {
+        if (lhs.result().empty())
+        {
+            return !rhs.result().empty();
+        }
+        if (rhs.result().empty())
+        {
+            return false;
+        }
+
         if (lhs.result().size() != rhs.result().size())
         {
             return false;
@@ -629,20 +665,6 @@ struct cmp_eq
             }
         }
         return true;
-    }
-
-    bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
-    {
-        if (rhs.result().size() != 1)
-        {
-            return false;
-        }
-        return lhs.value() == rhs.result()[0];
-    }
-
-    bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
-    {
-        return (*this)(rhs, lhs);
     }
 
     bool operator()(const value_term<Json>&, const regex_term<Json>&) const
@@ -670,18 +692,34 @@ struct cmp_ne
         return !eq(lhs, rhs);
     }
 
-    bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const 
-    {
-        return !eq(lhs, rhs);
-    }
-
     bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const 
     {
+        if (rhs.result().size() != 1)
+        {
+            return false;
+        }
         return !eq(lhs, rhs);
     }
 
     bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
     {
+        if (lhs.result().size() != 1)
+        {
+            return false;
+        }
+        return !eq(lhs, rhs);
+    }
+
+    bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const 
+    {
+        if (lhs.result().empty())
+        {
+            return !rhs.result().empty();
+        }
+        if (rhs.result().empty())
+        {
+            return false;
+        }
         return !eq(lhs, rhs);
     }
 
@@ -704,8 +742,34 @@ struct cmp_pipepipe
         return lhs.value().as_bool() || rhs.value().as_bool();
     }
 
+    bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
+    {
+        if (rhs.result().size() != 1)
+        {
+            return false;
+        }
+        return (*this)(lhs.value(),rhs.result()[0]);
+    }
+
+    bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
+    {
+        if (lhs.result().size() != 1)
+        {
+            return false;
+        }
+        return (*this)(rhs, lhs);
+    }
+
     bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
     {
+        if (lhs.result().empty())
+        {
+            return !rhs.result().empty();
+        }
+        if (rhs.result().empty())
+        {
+            return false;
+        }
         if (lhs.result().size() != rhs.result().size())
         {
             return false;
@@ -718,20 +782,6 @@ struct cmp_pipepipe
             }
         }
         return true;
-    }
-
-    bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
-    {
-        if (rhs.result().size() != 1)
-        {
-            return false;
-        }
-        return (*this)(lhs.value(),rhs.result()[0]);
-    }
-
-    bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
-    {
-        return (*this)(rhs, lhs);
     }
 
     bool operator()(const value_term<Json>&, const regex_term<Json>&) const
@@ -753,8 +803,34 @@ struct cmp_ampamp
         return lhs.value().as_bool() && rhs.value().as_bool();
     }
 
+    bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
+    {
+        if (rhs.result().size() != 1)
+        {
+            return false;
+        }
+        return (*this)(lhs.value(),rhs.result()[0]);
+    }
+
+    bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
+    {
+        if (lhs.result().size() != 1)
+        {
+            return false;
+        }
+        return (*this)(rhs, lhs);
+    }
+
     bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
     {
+        if (lhs.result().empty())
+        {
+            return !rhs.result().empty();
+        }
+        if (rhs.result().empty())
+        {
+            return false;
+        }
         if (lhs.result().size() != rhs.result().size())
         {
             return false;
@@ -767,20 +843,6 @@ struct cmp_ampamp
             }
         }
         return true;
-    }
-
-    bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
-    {
-        if (rhs.result().size() != 1)
-        {
-            return false;
-        }
-        return (*this)(lhs.value(),rhs.result()[0]);
-    }
-
-    bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
-    {
-        return (*this)(rhs, lhs);
     }
 
     bool operator()(const value_term<Json>&, const regex_term<Json>&) const
@@ -848,13 +910,32 @@ struct cmp_lt
         return result;
     }
 
+    bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
+    {
+        if (rhs.result().size() != 1)
+        {
+            return false;
+        }
+        return !((*this)(rhs, lhs) || eq(rhs,lhs));
+    }
+
+    bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
+    {
+        if (lhs.result().size() != 1)
+         {
+            return false;
+        }
+        bool result = lt(lhs.result()[0], rhs.value());
+        return result;
+    }
+
     bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
     {
-        if (lhs.result().size() == 0)
+        if (lhs.result().empty())
         {
-            return true;
+            return !rhs.result().empty();
         }
-        if (rhs.result().size() == 0)
+        if (rhs.result().empty())
         {
             return false;
         }
@@ -864,21 +945,6 @@ struct cmp_lt
         {
             result = (*this)(lhs.result()[i],rhs.result()[i]);
         }
-        return result;
-    }
-
-    bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
-    {
-        return !((*this)(rhs, lhs) || eq(rhs,lhs));
-    }
-
-    bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
-    {
-        if (lhs.result().size() == 0)
-         {
-            return true;
-        }
-        bool result = lt(lhs.result()[0], rhs.value());
         return result;
     }
 
@@ -925,6 +991,25 @@ struct cmp_lte
         return result;
     }
 
+    bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
+    {
+        if (rhs.result().size() != 1)
+        {
+            return false;
+        }
+        return !lt(rhs, lhs);
+    }
+
+    bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
+    {
+        if (lhs.result().size() != 1)
+         {
+            return false;
+        }
+        bool result = (*this)(lhs.result()[0], rhs.value());
+        return result;
+    }
+
     bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
     {
         if (lhs.result().size() == 0)
@@ -941,21 +1026,6 @@ struct cmp_lte
         {
             result = (*this)(lhs.result()[i],rhs.result()[i]);
         }
-        return result;
-    }
-
-    bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
-    {
-        return !lt(rhs, lhs);
-    }
-
-    bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
-    {
-        if (lhs.result().size() == 0)
-         {
-            return true;
-        }
-        bool result = (*this)(lhs.result()[0], rhs.value());
         return result;
     }
 
@@ -1003,15 +1073,6 @@ struct cmp_minus
         return minus(lhs.value(), rhs.value());
     }
 
-    Json operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
-    {
-        if (lhs.result().size() != rhs.result().size() && lhs.result().size() != 1)
-        {
-            return Json(jsoncons::null_type());
-        }
-        return minus(lhs.result()[0],rhs.result()[0]);
-    }
-
     Json operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
     {
         if (rhs.result().size() != 1)
@@ -1028,6 +1089,15 @@ struct cmp_minus
             return false;
         }
         return minus(lhs.result()[0],rhs.value());
+    }
+
+    Json operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
+    {
+        if (lhs.result().empty() || rhs.result().empty())
+        {
+            return Json::null();
+        }
+        return minus(lhs.result()[0],rhs.result()[0]);
     }
 
     bool operator()(const value_term<Json>&, const regex_term<Json>&) const
@@ -1048,10 +1118,6 @@ struct cmp_regex
     {
         JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
-    bool operator()(const value_term<Json>&, const path_term<Json>&) const 
-    {
-        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-    }
     bool operator()(const path_term<Json>&, const value_term<Json>&) const 
     {
         JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
@@ -1063,6 +1129,10 @@ struct cmp_regex
     bool operator()(const value_term<Json>& lhs, const regex_term<Json>& rhs) const
     {
         return rhs.evaluate(lhs.value().as_string()); 
+    }
+    bool operator()(const value_term<Json>&, const path_term<Json>&) const 
+    {
+        JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
 
     bool operator()(const path_term<Json>& lhs, const regex_term<Json>& rhs) const
@@ -1233,8 +1303,6 @@ class jsonpath_filter_parser
 
     std::size_t line_;
     std::size_t column_;
-
-    static const operator_properties<Json> op_properties_[];
 
     class binary_operator_table
     {
@@ -2118,24 +2186,6 @@ public:
 
         return jsonpath_filter_expr<Json>(output_stack_);
     }
-};
-
-template <class Json>
-const operator_properties<Json> jsonpath_filter_parser<Json>::op_properties_[] =
-{
-    {2,false,[](const term<Json>& a, const term<Json>& b) -> Json {return Json(a.regex_term(b));}},
-    {3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return a.mult_term(b);}},
-    {3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return a.div_term(b);}},
-    {4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return a.plus_term(b);}},
-    {4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return a.minus_term(b);}},
-    {5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return Json(a.lt_term(b));}},
-    {5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return Json(a.lt_term(b) || a.eq_term(b));}},
-    {5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return Json(a.gt_term(b));}},
-    {5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return Json(a.gt_term(b) || a.eq_term(b));}},
-    {6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return Json(a.eq_term(b)); }},
-    {6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return Json(a.ne_term(b)); }},
-    {7,false,[](const term<Json>& a, const term<Json>& b) -> Json {return Json(a.ampamp_term(b));}},
-    {8,false,[](const term<Json>& a, const term<Json>& b) -> Json {return Json(a.pipepipe_term(b));}}
 };
 
 }}}

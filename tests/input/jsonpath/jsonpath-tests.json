@@ -1,27 +1,134 @@
 [
-    // Tests from https://github.com/cburgmer/json-path-comparison
+    // < Comparison operator
     {
+        "annotation" : "Filter empty set less than value",
+        "input" : "[{\"some\": \"value\"}]",
+        "path" : "$[?(@.key<42)]",
+        "expected" : "[]"
+    },
+    {
+        "annotation" : "Filter value less than empty set",
+        "input" : "[{\"some\": \"value\"}]",
+        "path" : "$[?(42 < @.key)]",
+        "expected" : "[]"
+    },
+    {
+        "annotation" : "Filter empty set less than empty set",
+        "input" : "[{\"some\": \"value\"}]",
+        "path" : "$[?(@.other < @.key)]",
+        "expected" : "[]"
+    },
+    {
+        "annotation" : "Filter non-empty set less than non-empty set",
+        "input" : "[{\"key1\": 0,\"key2\": 20}, {\"key1\": 10,\"key2\": 9}]",
+        "path" : "$[?(@.key1 < @.key2)]",
+        "expected" : "[{\"key1\": 0,\"key2\": 20}]"
+    },
+    // > Comparison operator
+    {
+        "annotation" : "Filter empty set greater than value",
+        "input" : "[{\"some\": \"value\"}]",
+        "path" : "$[?(@.key>42)]",
+        "expected" : "[]"
+    },
+    {
+        "annotation" : "Filter value greater than empty set",
+        "input" : "[{\"some\": \"value\"}]",
+        "path" : "$[?(42 > @.key)]",
+        "expected" : "[]"
+    },
+    {
+        "annotation" : "Filter empty set greater than empty set",
+        "input" : "[{\"some\": \"value\"}]",
+        "path" : "$[?(@.other > @.key)]",
+        "expected" : "[]"
+    },
+    {
+        "annotation" : "Filter non-empty set greater than non-empty set",
+        "input" : "[{\"key1\": 0,\"key2\": 20}, {\"key1\": 10,\"key2\": 9}]",
+        "path" : "$[?(@.key1 > @.key2)]",
+        "expected" : "[{\"key1\": 10,\"key2\": 9}]"
+    },
+    // <= Comparison operator
+    {
+        "annotation" : "Filter empty set less than or equal value",
+        "input" : "[{\"some\": \"value\"}]",
+        "path" : "$[?(@.key<=42)]",
+        "expected" : "[]"
+    },
+    {
+        "annotation" : "Filter value less than or equal empty set",
+        "input" : "[{\"some\": \"value\"}]",
+        "path" : "$[?(42 <= @.key)]",
+        "expected" : "[]"
+    },
+    {
+        "annotation" : "Filter empty set less than or equal empty set",
+        "input" : "[{\"some\": \"value\"}]",
+        "path" : "$[?(@.other <= @.key)]",
+        "expected" : "[{\"some\": \"value\"}]"
+    },
+    {
+        "annotation" : "Filter non-empty set less than or equal non-empty set",
+        "input" : "[{\"key1\": 0,\"key2\": 20}, {\"key1\": 10,\"key2\": 9}]",
+        "path" : "$[?(@.key1 <= @.key2)]",
+        "expected" : "[{\"key1\": 0,\"key2\": 20}]"
+    },
+    // >= Comparison operator
+    {
+        "annotation" : "Filter empty set greater than or equal value",
+        "input" : "[{\"some\": \"value\"}]",
+        "path" : "$[?(@.key>=42)]",
+        "expected" : "[]"
+    },
+    {
+        "annotation" : "Filter value greater than or equal empty set",
+        "input" : "[{\"some\": \"value\"}]",
+        "path" : "$[?(42 >= @.key)]",
+        "expected" : "[]"
+    },
+    {
+        "annotation" : "Filter empty set greater than or equal empty set",
+        "input" : "[{\"some\": \"value\"}]",
+        "path" : "$[?(@.other >= @.key)]",
+        "expected" : "[{\"some\": \"value\"}]"
+    },
+    {
+        "annotation" : "Filter non-empty set greater than or equal non-empty set",
+        "input" : "[{\"key1\": 0,\"key2\": 20}, {\"key1\": 10,\"key2\": 9}]",
+        "path" : "$[?(@.key1 >= @.key2)]",
+        "expected" : "[{\"key1\": 10,\"key2\": 9}]"
+    },
+
+    // Tests from https://github.com/cburgmer/json-path-comparison
+    /*{
         "annotation" : "jsonpath recursive descent with *",
-        "document" : "{\"key\": \"value\", \"another key\": {\"complex\": \"string\", \"primitives\": [0, 1]}}",
-        "selector" : "$..*",
+        "input" : "{\"key\": \"value\", \"another key\": {\"complex\": \"string\", \"primitives\": [0, 1]}}",
+        "path" : "$..*",
         "expected" : "[\"value\",{\"complex\" : \"string\",\"primitives\" : [0,1]},\"string\",[0,1],0,1]" 
     },
     {
         "annotation" : "array index",
-        "document" : "[\"first\", \"second\", \"third\", \"forth\", \"fifth\"]",
-        "selector" : "$[2]",
+        "input" : "[\"first\", \"second\", \"third\", \"forth\", \"fifth\"]",
+        "path" : "$[2]",
         "expected" : "[\"third\"]"
     },
     {
         "annotation" : "Array index last",
-        "document" : "[\"first\", \"second\", \"third\"]",
-        "selector" : "$[-1]",
+        "input" : "[\"first\", \"second\", \"third\"]",
+        "path" : "$[-1]",
         "expected" : "[\"third\"]"
     },
     {
         "annotation" : "Array index slice start end step 0",
-        "document" : "[\"first\", \"second\", \"third\", \"forth\", \"fifth\"]",
-        "selector" : "$[0:3:0]",
+        "input" : "[\"first\", \"second\", \"third\", \"forth\", \"fifth\"]",
+        "path" : "$[0:3:0]",
         "error" : "Expected slice step at line 1 and column 8"
+    },*/
+    {
+        "annotation" : "Filter less than",
+        "input" : "[{\"key\": 0}, {\"key\": 42}, {\"key\": -1}, {\"key\": 41}, {\"key\": 43}, {\"key\": 42.0001}, {\"key\": 41.9999}, {\"key\": 100}, {\"some\": \"value\"}]",
+        "path" : "$[?(@.key<42)]",
+        "expected" : "[{\"key\": 0}, {\"key\": -1}, {\"key\": 41}, {\"key\": 41.9999}]"
     }
 ]

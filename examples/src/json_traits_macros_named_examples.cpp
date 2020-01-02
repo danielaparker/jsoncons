@@ -199,7 +199,7 @@ static void json_type_traits_book_examples()
     std::cout << "\n\n";
 }
 
-void json_type_traits_macros_named_examples()
+void json_traits_macros_named_examples()
 {
     std::cout << "\njson_type_traits macro named examples\n\n";
 
