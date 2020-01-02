@@ -18,7 +18,7 @@
 #include <fstream>
 
 using namespace jsoncons;
-#if 0
+
 TEST_CASE("jsonpath name tests")
 {
     ojson example = ojson::parse(R"(
@@ -1877,7 +1877,7 @@ TEST_CASE("jsonpath intersection tests")
         std::cout << "result: " << result << "\n";
     }
 }
-#endif
+
 TEST_CASE("jsonpath-tests")
 {
     std::string fpath = "./input/jsonpath/jsonpath-tests.json";

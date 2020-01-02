@@ -890,24 +890,7 @@ struct cmp_lt
 
     bool operator()(const value_term<Json>& lhs, const value_term<Json>& rhs) const
     {
-        bool result = false;
-        if (lhs.value().template is<int64_t>() && rhs.value().template is<int64_t>())
-        {
-            result = lhs.value().template as<int64_t>() < rhs.value().template as<int64_t>();
-        }
-        else if (lhs.value().template is<uint64_t>() && rhs.value().template is<uint64_t>())
-        {
-            result = lhs.value().template as<uint64_t>() < rhs.value().template as<uint64_t>();
-        }
-        else if (lhs.value().is_number() && rhs.value().is_number())
-        {
-            result = lhs.value().as_double() < rhs.value().as_double();
-        }
-        else if (lhs.value().is_string() && rhs.value().is_string())
-        {
-            result = lhs.value().as_string_view() < rhs.value().as_string_view();
-        }
-        return result;
+        return lhs.value() < rhs.value();
     }
 
     bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
@@ -945,7 +928,7 @@ struct cmp_lt
         {
             result = (*this)(lhs.result()[i],rhs.result()[i]);
         }
-        return result;
+        return result ? min_len == lhs.result().size() : false;
     }
 
     bool operator()(const value_term<Json>&, const regex_term<Json>&) const
@@ -971,24 +954,7 @@ struct cmp_lte
 
     bool operator()(const value_term<Json>& lhs, const value_term<Json>& rhs) const
     {
-        bool result = false;
-        if (lhs.value().template is<int64_t>() && rhs.value().template is<int64_t>())
-        {
-            result = lhs.value().template as<int64_t>() <= rhs.value().template as<int64_t>();
-        }
-        else if (lhs.value().template is<uint64_t>() && rhs.value().template is<uint64_t>())
-        {
-            result = lhs.value().template as<uint64_t>() <= rhs.value().template as<uint64_t>();
-        }
-        else if (lhs.value().is_number() && rhs.value().is_number())
-        {
-            result = lhs.value().as_double() <= rhs.value().as_double();
-        }
-        else if (lhs.value().is_string() && rhs.value().is_string())
-        {
-            result = lhs.value().as_string_view() <= rhs.value().as_string_view();
-        }
-        return result;
+        return lhs.value() <= rhs.value();
     }
 
     bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
@@ -1012,11 +978,11 @@ struct cmp_lte
 
     bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
     {
-        if (lhs.result().size() == 0)
+        if (lhs.result().empty())
         {
             return true;
         }
-        if (rhs.result().size() == 0)
+        if (rhs.result().empty())
         {
             return false;
         }
@@ -1026,7 +992,7 @@ struct cmp_lte
         {
             result = (*this)(lhs.result()[i],rhs.result()[i]);
         }
-        return result;
+        return result ? min_len == lhs.result().size() : false;
     }
 
     bool operator()(const value_term<Json>&, const regex_term<Json>&) const

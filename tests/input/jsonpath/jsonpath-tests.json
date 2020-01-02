@@ -1,5 +1,25 @@
 [
-    // < Comparison operator
+    // + operator
+    {
+        "annotation" : "set plus value",
+        "input" : "[{\"key1\": 100,\"key2\": 100},{\"key1\": 105,\"key2\": 200}]",
+        "path" : "$[?((@.key1 + 110) == 210)]",
+        "expected" : "[{\"key1\": 100,\"key2\": 100}]"
+    },
+    {
+        "annotation" : "value plus set",
+        "input" : "[{\"key1\": 100,\"key2\": 100},{\"key1\": 105,\"key2\": 200}]",
+        "path" : "$[?((110 + @.key1) == 210)]",
+        "expected" : "[{\"key1\": 100,\"key2\": 100}]"
+    },
+    {
+        "annotation" : "set plus set",
+        "input" : "[{\"key1\": 100,\"key2\": 100},{\"key1\": 105,\"key2\": 200}]",
+        "path" : "$[?((@.key1 + @.key2) == 200)]",
+        "expected" : "[{\"key1\": 100,\"key2\": 100}]"
+    },
+
+    // < operator
     {
         "annotation" : "Filter empty set less than value",
         "input" : "[{\"some\": \"value\"}]",
@@ -24,7 +44,7 @@
         "path" : "$[?(@.key1 < @.key2)]",
         "expected" : "[{\"key1\": 0,\"key2\": 20}]"
     },
-    // > Comparison operator
+    // > operator
     {
         "annotation" : "Filter empty set greater than value",
         "input" : "[{\"some\": \"value\"}]",
@@ -49,7 +69,7 @@
         "path" : "$[?(@.key1 > @.key2)]",
         "expected" : "[{\"key1\": 10,\"key2\": 9}]"
     },
-    // <= Comparison operator
+    // <= operator
     {
         "annotation" : "Filter empty set less than or equal value",
         "input" : "[{\"some\": \"value\"}]",
@@ -74,7 +94,7 @@
         "path" : "$[?(@.key1 <= @.key2)]",
         "expected" : "[{\"key1\": 0,\"key2\": 20}]"
     },
-    // >= Comparison operator
+    // >= operator
     {
         "annotation" : "Filter empty set greater than or equal value",
         "input" : "[{\"some\": \"value\"}]",
