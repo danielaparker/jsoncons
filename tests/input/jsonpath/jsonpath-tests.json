@@ -121,7 +121,7 @@
     },
 
     // Tests from https://github.com/cburgmer/json-path-comparison
-    /*{
+    {
         "annotation" : "jsonpath recursive descent with *",
         "input" : "{\"key\": \"value\", \"another key\": {\"complex\": \"string\", \"primitives\": [0, 1]}}",
         "path" : "$..*",
@@ -144,11 +144,41 @@
         "input" : "[\"first\", \"second\", \"third\", \"forth\", \"fifth\"]",
         "path" : "$[0:3:0]",
         "error" : "Expected slice step at line 1 and column 8"
-    },*/
+    },
     {
         "annotation" : "Filter less than",
         "input" : "[{\"key\": 0}, {\"key\": 42}, {\"key\": -1}, {\"key\": 41}, {\"key\": 43}, {\"key\": 42.0001}, {\"key\": 41.9999}, {\"key\": 100}, {\"some\": \"value\"}]",
         "path" : "$[?(@.key<42)]",
         "expected" : "[{\"key\": 0}, {\"key\": -1}, {\"key\": 41}, {\"key\": 41.9999}]"
+    },
+    {
+        "annotation" : "Wildcard bracket notation on null value array",
+        "input" : "[40,null,42]",
+        "path" : "$[*]",
+        "expected" : "[40,null,42]"
+    },
+    {
+        "annotation" : "Wildcard bracket notation on object",
+        "input" : "{\"some\": \"string\",\"int\": 42,\"object\": {\"key\": \"value\"},\"array\": [0, 1]}",
+        "path" : "$[*]",
+        "expected" : "[\"string\",42,{\"key\": \"value\"},[0,1]]"
+    },
+    {
+        "annotation" : "Wildcard bracket notation with key on nested objects",
+        "input" : "[{\"bar\": [{\"baz\": \"hello\"}]}]",
+        "path" : "$[*].bar[*].baz",
+        "expected" : "[\"hello\"]"
+    },
+    {
+        "annotation" : "Wildcard dot notation on array",
+        "input" : "[\"string\",42,{\"key\": \"value\"},[0, 1]]",
+        "path" : "$.*",
+        "expected" : "[\"string\",42,{\"key\": \"value\"},[0,1]]"
+    },
+    {
+        "annotation" : "Wildcard dot notation on object",
+        "input" : "{\"some\": \"string\",\"int\": 42,\"object\": {\"key\": \"value\"},\"array\": [0, 1]}",
+        "path" : "$.*",
+        "expected" : "[\"string\",42,{\"key\": \"value\"},[0,1]]"
     }
 ]
