@@ -1,6 +1,10 @@
 v0.143.1
 --------
 
+Bug fix:
+
+- v0.143.1 fixs a bug in the jsonpath filter < comparison operator that was introduced in v0.143.0 
+
 Enhancements:
 
 - `j.as<int>()`, `j.as<uint64_t>()` etc. supported for binary, octal and hex string values,
