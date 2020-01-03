@@ -30,16 +30,6 @@ class Baz : public Foo
 
 enum class BookCategory {fiction,biography};
 
-std::ostream& operator<<(std::ostream& os, BookCategory c)
-{
-    switch(c)
-    {
-        case BookCategory::fiction: os << "fiction"; break;
-        case BookCategory::biography: os << "biography"; break;
-    }
-    return os;
-}
-
 // #1 Class with public member data and default constructor   
 struct Book1
 {
@@ -224,8 +214,12 @@ static void json_type_traits_book_examples()
     auto books1 = decode_json<std::vector<ns::Book1>>(input);
     for (const auto& item : books1)
     {
-        std::cout << item.category << ", " 
-                  << item.author << ", " 
+        switch(item.category)
+        {
+            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
+            case ns::BookCategory::biography: std::cout << "biography, "; break;
+        }
+        std::cout << item.author << ", " 
                   << item.title << ", " 
                   << item.price << "\n";
     }
@@ -237,8 +231,12 @@ static void json_type_traits_book_examples()
     auto books2 = decode_json<std::vector<ns::Book2>>(input);
     for (const auto& item : books2)
     {
-        std::cout << item.get_category() << ", " 
-                  << item.get_author() << ", " 
+        switch(item.get_category())
+        {
+            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
+            case ns::BookCategory::biography: std::cout << "biography, "; break;
+        }
+        std::cout << item.get_author() << ", " 
                   << item.get_title() << ", " 
                   << item.get_price() << "\n";
     }
@@ -250,8 +248,12 @@ static void json_type_traits_book_examples()
     auto books3 = decode_json<std::vector<ns::Book3>>(input);
     for (const auto& item : books3)
     {
-        std::cout << item.category() << ", " 
-                  << item.author() << ", " 
+        switch(item.category())
+        {
+            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
+            case ns::BookCategory::biography: std::cout << "biography, "; break;
+        }
+        std::cout << item.author() << ", " 
                   << item.title() << ", " 
                   << item.price() << "\n";
     }

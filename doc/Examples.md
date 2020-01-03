@@ -504,16 +504,6 @@ namespace ns {
 
 enum class BookCategory {fiction,biography};
 
-std::ostream& operator<<(std::ostream& os, BookCategory c)
-{
-    switch(c)
-    {
-        case BookCategory::fiction: os << "fiction"; break;
-        case BookCategory::biography: os << "biography"; break;
-    }
-    return os;
-}
-
 // #1 Class with public member data and default constructor   
 struct Book1
 {
@@ -607,8 +597,12 @@ int main()
     auto books1 = decode_json<std::vector<ns::Book1>>(input);
     for (const auto& item : books1)
     {
-        std::cout << item.category << ", " 
-                  << item.author << ", " 
+        switch(item.category)
+        {
+            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
+            case ns::BookCategory::biography: std::cout << "biography, "; break;
+        }
+        std::cout << item.author << ", " 
                   << item.title << ", " 
                   << item.price << "\n";
     }
@@ -620,8 +614,12 @@ int main()
     auto books2 = decode_json<std::vector<ns::Book2>>(input);
     for (const auto& item : books2)
     {
-        std::cout << item.get_category() << ", " 
-                  << item.get_author() << ", " 
+        switch(item.get_category())
+        {
+            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
+            case ns::BookCategory::biography: std::cout << "biography, "; break;
+        }
+        std::cout << item.get_author() << ", " 
                   << item.get_title() << ", " 
                   << item.get_price() << "\n";
     }
@@ -633,8 +631,12 @@ int main()
     auto books3 = decode_json<std::vector<ns::Book3>>(input);
     for (const auto& item : books3)
     {
-        std::cout << item.category() << ", " 
-                  << item.author() << ", " 
+        switch(item.category())
+        {
+            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
+            case ns::BookCategory::biography: std::cout << "biography, "; break;
+        }
+        std::cout << item.author() << ", " 
                   << item.title() << ", " 
                   << item.price() << "\n";
     }
@@ -678,16 +680,6 @@ The output for (2), (3) and (4) is the same.
 namespace ns {
 
 enum class BookCategory {fiction,biography};
-
-std::ostream& operator<<(std::ostream& os, BookCategory c)
-{
-    switch(c)
-    {
-        case BookCategory::fiction: os << "fiction"; break;
-        case BookCategory::biography: os << "biography"; break;
-    }
-    return os;
-}
 
 // #1 Class with public member data and default constructor   
 struct Book1
@@ -816,8 +808,12 @@ int main()
     auto books1 = decode_json<std::vector<ns::Book1>>(input);
     for (const auto& item : books1)
     {
-        std::cout << item.category << ", " 
-                  << item.author << ", " 
+        switch(item.category)
+        {
+            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
+            case ns::BookCategory::biography: std::cout << "biography, "; break;
+        }
+        std::cout << item.author << ", " 
                   << item.title << ", " 
                   << item.price << "\n";
     }
@@ -829,8 +825,12 @@ int main()
     auto books2 = decode_json<std::vector<ns::Book2>>(input);
     for (const auto& item : books2)
     {
-        std::cout << item.category() << ", " 
-                  << item.author() << ", " 
+        switch(item.category())
+        {
+            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
+            case ns::BookCategory::biography: std::cout << "biography, "; break;
+        }
+        std::cout << item.author() << ", " 
                   << item.title() << ", " 
                   << item.price() << "\n";
     }
@@ -842,8 +842,12 @@ int main()
     auto books3 = decode_json<std::vector<ns::Book3>>(input);
     for (const auto& item : books3)
     {
-        std::cout << item.category() << ", " 
-                  << item.author() << ", " 
+        switch(item.category)
+        {
+            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
+            case ns::BookCategory::biography: std::cout << "biography, "; break;
+        }
+        std::cout << item.author() << ", " 
                   << item.title() << ", " 
                   << item.price() << "\n";
     }
@@ -855,8 +859,12 @@ int main()
     auto books4 = decode_json<std::vector<ns::Book4>>(input);
     for (const auto& item : books4)
     {
-        std::cout << item.getCategory() << ", " 
-                  << item.getAuthor() << ", " 
+        switch(item.getCategory())
+        {
+            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
+            case ns::BookCategory::biography: std::cout << "biography, "; break;
+        }
+        std::cout << item.getAuthor() << ", " 
                   << item.getTitle() << ", " 
                   << item.getPrice() << "\n";
     }
