@@ -27,40 +27,30 @@ namespace jsoncons { namespace jmespath {
 
 struct array_slice
 {
-    std::size_t start_;
-    bool is_start_positive;
-    std::size_t end_;
-    bool is_end_positive;
-    bool is_end_defined;
-    std::size_t step_;
-    bool is_step_positive;
+    int64_t start_;
+    optional<int64_t> end_;
+    int64_t step_;
 
     array_slice()
-        : start_(0), is_start_positive(true), 
-          end_(0), is_end_positive(true), is_end_defined(false), 
-          step_(1), is_step_positive(true)
+        : start_(0), end_(), step_(1)
     {
     }
 
-    array_slice(std::size_t start, bool is_start_positive, 
-                std::size_t end, bool is_end_positive, bool is_end_defined,
-                std::size_t step, bool is_step_positive)
-        : start_(start), is_start_positive(is_start_positive), 
-          end_(end), is_end_positive(is_end_positive), is_end_defined(is_end_defined), 
-          step_(step), is_step_positive(is_step_positive)
+    array_slice(int64_t start, optional<int64_t> end, int64_t step) 
+        : start_(start), end_(end), step_(step)
     {
     }
 
     std::size_t get_start(std::size_t size) const
     {
-        return is_start_positive ? start_ : size - start_;
+        return start_ >= 0 ? static_cast<std::size_t>(start_) : static_cast<std::size_t>(static_cast<int64_t>(size) - start_);
     }
 
     std::size_t get_end(std::size_t size) const
     {
-        if (is_end_defined)
+        if (end_)
         {
-            return is_end_positive ? end_ : size - end_;
+            return end_.value() >= 0 ? static_cast<std::size_t>(end_.value()) : static_cast<std::size_t>(static_cast<int64_t>(size) - end_.value());
         }
         else
         {
@@ -70,7 +60,7 @@ struct array_slice
 
     std::size_t step() const
     {
-        return step_;
+        return static_cast<std::size_t>(step_); // Allow negative
     }
 
     array_slice(const array_slice&) = default;
@@ -524,67 +514,74 @@ class jmespath_evaluator : public ser_context
             return null;
         }
     };
-#if 0
+
     class array_slice_selector final : public selector_base
     {
     private:
         array_slice slice_;
+        Json a_; 
     public:
         array_slice_selector(const array_slice& slice)
-            : slice_(slice) 
+            : slice_(slice), a_(json_array_arg) 
         {
         }
 
-        void select(jmespath_evaluator&,
-                    const string_type& path, reference val,
-                    node_set& nodes) override
+        reference select(jmespath_evaluator& evaluator,
+                         const string_type& path, 
+                         reference val) override
         {
-            if (slice_.is_step_positive)
+            static Json null{null_type()};
+
+            if (val.is_array())
             {
-                end_array_slice1(path, val, nodes);
+                if (slice_.is_step_positive)
+                {
+                    return end_array_slice1(path, val);
+                }
+                else
+                {
+                    return end_array_slice2(path, val);
+                }
             }
             else
             {
-                end_array_slice2(path, val, nodes);
+                return null;
             }
         }
 
-        void end_array_slice1(const string_type& path, reference val, node_set& nodes)
+        reference end_array_slice1(const string_type& path, reference val)
         {
-            if (val.is_array())
+            std::size_t start = slice_.get_start(val.size());
+            std::size_t end = slice_.get_end(val.size());
+
+            for (std::size_t j = start; j < end; j += slice_.step())
             {
-                std::size_t start = slice_.get_start(val.size());
-                std::size_t end = slice_.get_end(val.size());
-                for (std::size_t j = start; j < end; j += slice_.step())
+                if (j < val.size())
                 {
-                    if (j < val.size())
-                    {
-                        nodes.emplace_back(PathCons()(path,j),std::addressof(val[j]));
-                    }
+                    a_.emplace_back(val[j]);
                 }
             }
+            return a_; 
         }
 
         void end_array_slice2(const string_type& path, reference val, node_set& nodes)
         {
-            if (val.is_array())
-            {
-                std::size_t start = slice_.get_start(val.size());
-                std::size_t end = slice_.get_end(val.size());
+            std::size_t start = slice_.get_start(val.size());
+            std::size_t end = slice_.get_end(val.size());
 
-                std::size_t j = end + slice_.step() - 1;
-                while (j > (start+slice_.step()-1))
+            std::size_t j = end + slice_.step() - 1;
+            while (j > (start+slice_.step()-1))
+            {
+                j -= slice_.step();
+                if (j < val.size())
                 {
-                    j -= slice_.step();
-                    if (j < val.size())
-                    {
-                        nodes.emplace_back(PathCons()(path,j),std::addressof(val[j]));
-                    }
+                    a_.emplace_back(val[j]);
                 }
             }
+            return a_; 
         }
     };
-#endif
+
     function_table<Json,pointer> functions_;
 
     node_set nodes_;
@@ -737,7 +734,7 @@ public:
                             advance_past_space_character();
                             break;
                         case '\"':
-                            state_stack_.emplace_back(path_state::identifier, state_stack_.back());
+                            state_stack_.back().state = path_state::identifier;
                             state_stack_.emplace_back(path_state::quoted_string, state_stack_.back());
                             ++p_;
                             ++column_;
@@ -745,6 +742,47 @@ public:
                         case '[':
                             state_stack_.emplace_back(path_state::index_expression, state_stack_.back());
                             state_stack_.emplace_back(path_state::number, state_stack_.back());
+                            ++p_;
+                            ++column_;
+                            break;
+                        case '.':
+                            ++p_;
+                            ++column_;
+                            break;
+                        default:
+                            if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
+                            {
+                                state_stack_.emplace_back(path_state::identifier, state_stack_.back());
+                                state_stack_.emplace_back(path_state::unquoted_string, state_stack_.back());
+                                buffer.push_back(*p_);
+                                ++p_;
+                                ++column_;
+                            }
+                            else
+                            {
+                                ec = jmespath_errc::expected_identifier;
+                                return result;
+                            }
+                            break;
+                    };
+                    break;
+                }
+                case path_state::sub_expression: 
+                {
+                    switch (*p_)
+                    {
+                        case ' ':case '\t':case '\r':case '\n':
+                            advance_past_space_character();
+                            break;
+                        case '\"':
+                            state_stack_.back().state = path_state::identifier;
+                            state_stack_.emplace_back(path_state::quoted_string, state_stack_.back());
+                            ++p_;
+                            ++column_;
+                            break;
+                        case '.':
+                            selector_stack_.back()->add_selector(make_unique_ptr<identifier_selector>(buffer));
+                            buffer.clear();
                             ++p_;
                             ++column_;
                             break;
