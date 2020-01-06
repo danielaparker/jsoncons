@@ -737,7 +737,6 @@ public:
                             advance_past_space_character();
                             break;
                         case '\"':
-                            //state_stack_.emplace_back(path_state::expression, state_stack_.back());
                             state_stack_.emplace_back(path_state::identifier, state_stack_.back());
                             state_stack_.emplace_back(path_state::quoted_string, state_stack_.back());
                             ++p_;
@@ -752,7 +751,6 @@ public:
                         default:
                             if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                             {
-                                //state_stack_.emplace_back(path_state::expression, state_stack_.back());
                                 state_stack_.emplace_back(path_state::identifier, state_stack_.back());
                                 state_stack_.emplace_back(path_state::unquoted_string, state_stack_.back());
                                 buffer.push_back(*p_);
@@ -786,12 +784,27 @@ public:
                             ++p_;
                             ++column_;
                             break;
+                        case '[':
+                            selector_stack_.back()->add_selector(make_unique_ptr<identifier_selector>(buffer));
+                            state_stack_.pop_back(); // unquoted_string
+                            state_stack_.pop_back(); // identifier
+                            buffer.clear();
+                            state_stack_.emplace_back(path_state::index_expression, state_stack_.back());
+                            state_stack_.emplace_back(path_state::number, state_stack_.back());
+                            ++p_;
+                            ++column_;
+                            break;
                         default:
                             if ((*p_ >= '0' && *p_ <= '9') || (*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                             {
                                 buffer.push_back(*p_);
                                 ++p_;
                                 ++column_;
+                            }
+                            else
+                            {
+                                ec = jmespath_errc::expected_A_Za_Z_;
+                                return result;
                             }
                             break;
                     };
