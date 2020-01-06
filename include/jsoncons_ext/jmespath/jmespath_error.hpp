@@ -85,6 +85,7 @@ enum class jmespath_errc
 {
     success = 0,
     expected_identifier,
+    expected_index,
 
     expected_root,
     expected_current_node,
@@ -129,6 +130,9 @@ public:
         {
             case jmespath_errc::expected_identifier:
                 return "Expected identifier";
+            case jmespath_errc::expected_index:
+                return "Expected index";
+
             case jmespath_errc::expected_root:
                 return "Expected $";
             case jmespath_errc::expected_current_node:

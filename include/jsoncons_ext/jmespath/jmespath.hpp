@@ -94,13 +94,11 @@ Json select(const Json& root, const typename Json::string_view_type& path, resul
     {
         jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
         return evaluator.evaluate(root, path);
-        //return evaluator.get_values();
     }
     else
     {
         jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
         return evaluator.evaluate(root, path);
-        //return evaluator.get_normalized_paths();
     }
 }
 
@@ -180,6 +178,8 @@ enum class path_state
     quoted_string,
     unquoted_string,
     sub_expression,
+    index_expression,
+    number,
 
     dot_or_left_bracket,
     name_or_left_bracket,
@@ -513,6 +513,69 @@ class jmespath_evaluator : public ser_context
             return null;
         }
     };
+
+    class index_selector final : public selector_base
+    {
+    private:
+        string_type identifier_;
+    public:
+        index_selector(const string_view_type& name)
+            : identifier_(name)
+        {
+        }
+
+        void add_selector(std::unique_ptr<selector_base>&& selector) 
+        {
+            // Error
+        }
+
+        reference select(jmespath_evaluator& evaluator,
+                         const string_type& path, 
+                         reference val) override
+        {
+            static Json null{null_type()};
+
+            bool is_start_positive = true;
+            if (val.is_array())
+            {
+                std::size_t pos = 0;
+                if (try_string_to_index(identifier_.data(), identifier_.size(), &pos, &is_start_positive))
+                {
+                    std::size_t index = is_start_positive ? pos : val.size() - pos;
+                    if (index < val.size())
+                    {
+                        return val.at(index);
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+            /* else if (val.is_string())
+            {
+                std::size_t pos = 0;
+                string_view_type sv = val.as_string_view();
+                if (try_string_to_index(identifier_.data(), identifier_.size(), &pos, &is_start_positive))
+                {
+                    std::size_t index = is_start_positive ? pos : sv.size() - pos;
+                    auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), index);
+                    if (sequence.length() > 0)
+                    {
+                        pointer ptr = evaluator.create_temp(sequence.begin(),sequence.length());
+                        nodes.emplace_back(PathCons()(path, index), ptr);
+                    }
+                }
+                else if (identifier_ == length_literal<char_type>() && sv.size() > 0)
+                {
+                    std::size_t count = unicons::u32_length(sv.begin(),sv.end());
+                    pointer ptr = evaluator.create_temp(count);
+                    nodes.emplace_back(PathCons()(path, identifier_), ptr);
+                }
+            }*/
+            return null;
+        }
+    };
 #if 0
     class array_slice_selector final : public selector_base
     {
@@ -577,7 +640,6 @@ class jmespath_evaluator : public ser_context
     function_table<Json,pointer> functions_;
 
     node_set nodes_;
-    std::vector<node_set> stack_;
     std::size_t line_;
     std::size_t column_;
     const char_type* begin_input_;
@@ -617,36 +679,7 @@ public:
         return column_;
     }
 
-    Json get_values() const
-    {
-        Json result = typename Json::array();
-
-        if (stack_.size() > 0)
-        {
-            result.reserve(stack_.back().size());
-            for (const auto& p : stack_.back())
-            {
-                result.push_back(*(p.val_ptr));
-            }
-        }
-        return result;
-    }
-
-    std::vector<pointer> get_pointers() const
-    {
-        std::vector<pointer> result;
-
-        if (stack_.size() > 0)
-        {
-            result.reserve(stack_.back().size());
-            for (const auto& p : stack_.back())
-            {
-                result.push_back(p.val_ptr);
-            }
-        }
-        return result;
-    }
-
+#if 0
     void call_function(const string_type& function_name, std::error_code& ec)
     {
         auto f = functions_.get(function_name, ec);
@@ -665,15 +698,6 @@ public:
         pointer ptr = create_temp(std::move(result));
         v.emplace_back(s,ptr);
         stack_.push_back(v);
-    }
-
-    template <typename... Args>
-    pointer create_temp(Args&& ... args)
-    {
-        auto temp = make_unique_ptr<Json>(std::forward<Args>(args)...);
-        pointer ptr = temp.get();
-        temp_json_values_.emplace_back(std::move(temp));
-        return ptr;
     }
 
     Json get_normalized_paths() const
@@ -700,6 +724,15 @@ public:
                 *(stack_.back()[i].val_ptr) = new_value;
             }
         }
+    }
+#endif
+    template <typename... Args>
+    pointer create_temp(Args&& ... args)
+    {
+        auto temp = make_unique_ptr<Json>(std::forward<Args>(args)...);
+        pointer ptr = temp.get();
+        temp_json_values_.emplace_back(std::move(temp));
+        return ptr;
     }
 
     reference evaluate(reference root, const string_view_type& path)
@@ -741,11 +774,6 @@ public:
         end_input_ = path + length;
         p_ = begin_input_;
 
-        string_type s = {'$'};
-        node_set v;
-        v.emplace_back(std::move(s),std::addressof(root));
-        stack_.push_back(v);
-
         array_slice slice;
 
         selector_stack_.push_back(make_unique_ptr<sub_expression_selector>());
@@ -764,6 +792,12 @@ public:
                             //state_stack_.emplace_back(path_state::expression, state_stack_.back());
                             state_stack_.emplace_back(path_state::identifier, state_stack_.back());
                             state_stack_.emplace_back(path_state::quoted_string, state_stack_.back());
+                            ++p_;
+                            ++column_;
+                            break;
+                        case '[':
+                            state_stack_.emplace_back(path_state::index_expression, state_stack_.back());
+                            state_stack_.emplace_back(path_state::number, state_stack_.back());
                             ++p_;
                             ++column_;
                             break;
@@ -814,8 +848,34 @@ public:
                             break;
                     };
                     break;
-                case path_state::sub_expression:
-                    break; 
+                case path_state::number:
+                    switch(*p_)
+                    {
+                        case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                            buffer.push_back(*p_);
+                            ++p_;
+                            ++column_;
+                            break;
+                        default:
+                            state_stack_.pop_back(); // index_expression
+                            break;
+                    }
+                    break;
+                case path_state::index_expression:
+                    switch(*p_)
+                    {
+                        case ']':
+                            state_stack_.pop_back(); // index_expression
+                            selector_stack_.back()->add_selector(make_unique_ptr<index_selector>(buffer));
+                            buffer.clear();
+                            ++p_;
+                            ++column_;
+                            break;
+                        default:
+                            ec = jmespath_errc::expected_index;
+                            return result;
+                    }
+                    break;
 #if 0
                 case path_state::dot:
                     switch (*p_)
