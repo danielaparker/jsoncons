@@ -679,7 +679,6 @@ class Employee
 {
     std::string firstName_;
     std::string lastName_;
-    std::string socialSecurityNumber_;
 public:
     Employee(const std::string& firstName, const std::string& lastName)
         : firstName_(firstName), lastName_(lastName)
