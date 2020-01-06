@@ -1,14 +1,26 @@
 [
     {
-        "annotation" : "select a value with an identifier",
+        "annotation" : "Select a value with an identifier",
         "input" : "{\"a\": \"foo\", \"b\": \"bar\", \"c\": \"baz\"}",
         "expression" : "a",
         "expected" : "\"foo\""
     },
     {
-        "annotation" : "select nested values in json object with subexpression",
+        "annotation" : "Select nested values in json object with subexpression",
         "input" : "{\"a\": {\"b\": {\"c\": {\"d\": \"value\"}}}}",
         "expression" : "a.b.c.d",
         "expected" : "\"value\""
+    },
+    {
+        "annotation" : "Select nested values in json object with subexpression, key does not exist",
+        "input" : "{\"a\": {\"b\": {\"c\": {\"d\": \"value\"}}}}",
+        "expression" : "b.c.d.e",
+        "expected" : "null"
+    },
+    {
+        "annotation" : "Index expression",
+        "input" : "[\"a\", \"b\", \"c\", \"d\", \"e\", \"f\"]",
+        "expression" : "[1]",
+        "expected" : "\"b\""
     }
 ]

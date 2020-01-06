@@ -1888,7 +1888,7 @@ TEST_CASE("jsonpath-tests")
     for (const auto& test : tests.array_range())
     {
         std::string input = test["input"].as<std::string>();
-        std::string path = test["expression"].as<std::string>();
+        std::string path = test["path"].as<std::string>();
         if (test.contains("expected"))
         {
             std::string expected = test["expected"].as<std::string>();
