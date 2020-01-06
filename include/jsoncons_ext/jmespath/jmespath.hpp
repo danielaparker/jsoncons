@@ -1,11 +1,11 @@
-// Copyright 2013 Daniel Parkerpath_single_quoted
+// Copyright 2020 Daniel Parkerpath_single_quoted
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPATH_JSON_QUERY_HPP
-#define JSONCONS_JSONPATH_JSON_QUERY_HPP
+#ifndef JSONCONS_JMESPATH_JMESPATH_HPP
+#define JSONCONS_JMESPATH_JMESPATH_HPP
 
 #include <array> // std::array
 #include <string>
@@ -17,12 +17,13 @@
 #include <regex>
 #include <set> // std::set
 #include <iterator> // std::make_move_iterator
+#include <functional> // <functional>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpath/jsonpath_filter.hpp>
-#include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
-#include <jsoncons_ext/jsonpath/jsonpath_function.hpp>
+#include <jsoncons_ext/jmespath/jmespath_filter.hpp>
+#include <jsoncons_ext/jmespath/jmespath_error.hpp>
+#include <jsoncons_ext/jmespath/jmespath_function.hpp>
 
-namespace jsoncons { namespace jsonpath {
+namespace jsoncons { namespace jmespath {
 
 struct array_slice
 {
@@ -87,26 +88,26 @@ std::unique_ptr<T> make_unique_ptr(Args&&... args)
 enum class result_type {value,path};
 
 template<class Json>
-Json json_query(const Json& root, const typename Json::string_view_type& path, result_type result_t = result_type::value)
+Json select(const Json& root, const typename Json::string_view_type& path, result_type result_t = result_type::value)
 {
     if (result_t == result_type::value)
     {
-        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
-        evaluator.evaluate(root, path);
-        return evaluator.get_values();
+        jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
+        return evaluator.evaluate(root, path);
+        //return evaluator.get_values();
     }
     else
     {
-        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
-        evaluator.evaluate(root, path);
-        return evaluator.get_normalized_paths();
+        jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
+        return evaluator.evaluate(root, path);
+        //return evaluator.get_normalized_paths();
     }
 }
 
 template<class Json, class T>
 void json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
 {
-    jsoncons::jsonpath::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
+    jsoncons::jmespath::detail::jmespath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
     evaluator.evaluate(root, path);
     evaluator.replace(std::forward<T>(new_value));
 }
@@ -173,6 +174,13 @@ bool try_string_to_index(const CharT *s, std::size_t length, std::size_t* value,
 enum class path_state 
 {
     start,
+    expression,
+
+    identifier,
+    quoted_string,
+    unquoted_string,
+    sub_expression,
+
     dot_or_left_bracket,
     name_or_left_bracket,
     name,
@@ -238,7 +246,7 @@ JSONCONS_STRING_LITERAL(length, 'l', 'e', 'n', 'g', 't', 'h')
 template<class Json,
          class JsonReference,
          class PathCons>
-class jsonpath_evaluator : public ser_context
+class jmespath_evaluator : public ser_context
 {
     typedef typename Json::char_type char_type;
     typedef typename Json::char_traits_type char_traits_type;
@@ -295,15 +303,19 @@ class jsonpath_evaluator : public ser_context
         virtual ~selector_base()
         {
         }
-        virtual void select(jsonpath_evaluator& evaluator,
-                            const string_type& path, reference val, node_set& nodes) = 0;
 
-        virtual bool is_filter() const
-        {
-            return false;
-        }
+        virtual void add_selector(std::unique_ptr<selector_base>&&) = 0;
+
+        virtual reference select(jmespath_evaluator& evaluator,
+                                 const string_type& path, 
+                                 reference val) = 0;
+
+        //virtual bool is_filter() const
+        //{
+        //    return false;
+        //}
     };
-
+#if 0
     class path_selector final : public selector_base
     {
     private:
@@ -314,12 +326,12 @@ class jsonpath_evaluator : public ser_context
         {
         }
 
-        void select(jsonpath_evaluator&,
+        void select(jmespath_evaluator&,
                     const string_type& path, reference val, 
                     node_set& nodes) override
         {
             std::error_code ec;
-            jsonpath_evaluator<Json,JsonReference,PathCons> e;
+            jmespath_evaluator<Json,JsonReference,PathCons> e;
             e.evaluate(val, path_, ec);
             if (!ec)
             {
@@ -334,14 +346,14 @@ class jsonpath_evaluator : public ser_context
     class expr_selector final : public selector_base
     {
     private:
-         jsonpath_filter_expr<Json> result_;
+         jmespath_filter_expr<Json> result_;
     public:
-        expr_selector(const jsonpath_filter_expr<Json>& result)
+        expr_selector(const jmespath_filter_expr<Json>& result)
             : result_(result)
         {
         }
 
-        void select(jsonpath_evaluator& evaluator,
+        void select(jmespath_evaluator& evaluator,
                     const string_type& path, reference val, 
                     node_set& nodes) override
         {
@@ -356,7 +368,7 @@ class jsonpath_evaluator : public ser_context
             }
             else if (index.is_string())
             {
-                name_selector selector(index.as_string_view());
+                identifier_selector selector(index.as_string_view());
                 selector.select(evaluator, path, val, nodes);
             }
         }
@@ -365,9 +377,9 @@ class jsonpath_evaluator : public ser_context
     class filter_selector final : public selector_base
     {
     private:
-         jsonpath_filter_expr<Json> result_;
+         jmespath_filter_expr<Json> result_;
     public:
-        filter_selector(const jsonpath_filter_expr<Json>& result)
+        filter_selector(const jmespath_filter_expr<Json>& result)
             : result_(result)
         {
         }
@@ -377,7 +389,7 @@ class jsonpath_evaluator : public ser_context
             return true;
         }
 
-        void select(jsonpath_evaluator&,
+        void select(jmespath_evaluator&,
                     const string_type& path, reference val, 
                     node_set& nodes) override
         {
@@ -403,31 +415,67 @@ class jsonpath_evaluator : public ser_context
             }
         }
     };
-
-    class name_selector final : public selector_base
+#endif
+    class sub_expression_selector final : public selector_base
     {
-    private:
-        string_type name_;
     public:
-        name_selector(const string_view_type& name)
-            : name_(name)
+        std::vector<std::unique_ptr<selector_base>> selectors_;
+
+        sub_expression_selector()
         {
         }
 
-        void select(jsonpath_evaluator& evaluator,
-                    const string_type& path, reference val,
-                    node_set& nodes) override
+        void add_selector(std::unique_ptr<selector_base>&& selector) 
         {
+            selectors_.emplace_back(std::move(selector));
+        }
+
+        reference select(jmespath_evaluator& evaluator,
+                         const string_type& path, 
+                         reference val) override
+        {
+            std::vector<pointer> refs;
+            refs.push_back(std::addressof(val));
+
+            for (auto& selector : selectors_)
+            {
+                refs.push_back(std::addressof(selector->select(evaluator,path,*(refs.back()))));
+            }
+            return *(refs.back());
+        }
+    };
+
+    class identifier_selector final : public selector_base
+    {
+    private:
+        string_type identifier_;
+    public:
+        identifier_selector(const string_view_type& name)
+            : identifier_(name)
+        {
+        }
+
+        void add_selector(std::unique_ptr<selector_base>&& selector) 
+        {
+            // Error
+        }
+
+        reference select(jmespath_evaluator& evaluator,
+                         const string_type& path, 
+                         reference val) override
+        {
+            static Json null{null_type()};
+
             bool is_start_positive = true;
 
-            if (val.is_object() && val.contains(name_))
+            if (val.is_object() && val.contains(identifier_))
             {
-                nodes.emplace_back(PathCons()(path,name_),std::addressof(val.at(name_)));
+                return val.at(identifier_);
             }
-            else if (val.is_array())
+            /* else if (val.is_array())
             {
                 std::size_t pos = 0;
-                if (try_string_to_index(name_.data(), name_.size(), &pos, &is_start_positive))
+                if (try_string_to_index(identifier_.data(), identifier_.size(), &pos, &is_start_positive))
                 {
                     std::size_t index = is_start_positive ? pos : val.size() - pos;
                     if (index < val.size())
@@ -435,17 +483,17 @@ class jsonpath_evaluator : public ser_context
                         nodes.emplace_back(PathCons()(path,index),std::addressof(val[index]));
                     }
                 }
-                else if (name_ == length_literal<char_type>() && val.size() > 0)
+                else if (identifier_ == length_literal<char_type>() && val.size() > 0)
                 {
                     pointer ptr = evaluator.create_temp(val.size());
-                    nodes.emplace_back(PathCons()(path, name_), ptr);
+                    nodes.emplace_back(PathCons()(path, identifier_), ptr);
                 }
             }
             else if (val.is_string())
             {
                 std::size_t pos = 0;
                 string_view_type sv = val.as_string_view();
-                if (try_string_to_index(name_.data(), name_.size(), &pos, &is_start_positive))
+                if (try_string_to_index(identifier_.data(), identifier_.size(), &pos, &is_start_positive))
                 {
                     std::size_t index = is_start_positive ? pos : sv.size() - pos;
                     auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), index);
@@ -455,16 +503,17 @@ class jsonpath_evaluator : public ser_context
                         nodes.emplace_back(PathCons()(path, index), ptr);
                     }
                 }
-                else if (name_ == length_literal<char_type>() && sv.size() > 0)
+                else if (identifier_ == length_literal<char_type>() && sv.size() > 0)
                 {
                     std::size_t count = unicons::u32_length(sv.begin(),sv.end());
                     pointer ptr = evaluator.create_temp(count);
-                    nodes.emplace_back(PathCons()(path, name_), ptr);
+                    nodes.emplace_back(PathCons()(path, identifier_), ptr);
                 }
-            }
+            }*/
+            return null;
         }
     };
-
+#if 0
     class array_slice_selector final : public selector_base
     {
     private:
@@ -475,7 +524,7 @@ class jsonpath_evaluator : public ser_context
         {
         }
 
-        void select(jsonpath_evaluator&,
+        void select(jmespath_evaluator&,
                     const string_type& path, reference val,
                     node_set& nodes) override
         {
@@ -524,7 +573,7 @@ class jsonpath_evaluator : public ser_context
             }
         }
     };
-
+#endif
     function_table<Json,pointer> functions_;
 
     node_set nodes_;
@@ -534,7 +583,9 @@ class jsonpath_evaluator : public ser_context
     const char_type* begin_input_;
     const char_type* end_input_;
     const char_type* p_;
-    std::vector<std::unique_ptr<selector_base>> selectors_;
+    std::vector<std::unique_ptr<selector_base>> selector_stack_;
+    std::vector<std::size_t> sub_expression_indices_;
+
     std::vector<std::unique_ptr<Json>> temp_json_values_;
 
     typedef std::vector<pointer> argument_type;
@@ -542,14 +593,14 @@ class jsonpath_evaluator : public ser_context
     std::vector<state_item> state_stack_;
 
 public:
-    jsonpath_evaluator()
+    jmespath_evaluator()
         : line_(1), column_(1),
           begin_input_(nullptr), end_input_(nullptr),
           p_(nullptr)
     {
     }
 
-    jsonpath_evaluator(std::size_t line, std::size_t column)
+    jmespath_evaluator(std::size_t line, std::size_t column)
         : line_(line), column_(column),
           begin_input_(nullptr), end_input_(nullptr),
           p_(nullptr)
@@ -651,33 +702,36 @@ public:
         }
     }
 
-    void evaluate(reference root, const string_view_type& path)
+    reference evaluate(reference root, const string_view_type& path)
     {
         std::error_code ec;
-        evaluate(root, path.data(), path.length(), ec);
+        reference j = evaluate(root, path.data(), path.length(), ec);
         if (ec)
         {
-            JSONCONS_THROW(jsonpath_error(ec, line_, column_));
+            JSONCONS_THROW(jmespath_error(ec, line_, column_));
         }
+        return j;
     }
 
-    void evaluate(reference root, const string_view_type& path, std::error_code& ec)
+    reference evaluate(reference root, const string_view_type& path, std::error_code& ec)
     {
         JSONCONS_TRY
         {
-            evaluate(root, path.data(), path.length(), ec);
+            return evaluate(root, path.data(), path.length(), ec);
         }
         JSONCONS_CATCH(...)
         {
-            ec = jsonpath_errc::unidentified_error;
+            ec = jmespath_errc::unidentified_error;
         }
     }
  
-    void evaluate(reference root, 
-                  const char_type* path, 
-                  std::size_t length,
-                  std::error_code& ec)
+    reference evaluate(reference root, 
+                       const char_type* path, 
+                       std::size_t length,
+                       std::error_code& ec)
     {
+        static Json result{null_type()};
+
         state_stack_.emplace_back(path_state::start);
 
         string_type function_name;
@@ -694,6 +748,7 @@ public:
 
         array_slice slice;
 
+        selector_stack_.push_back(make_unique_ptr<sub_expression_selector>());
         while (p_ < end_input_)
         {
             switch (state_stack_.back().state)
@@ -705,331 +760,63 @@ public:
                         case ' ':case '\t':case '\r':case '\n':
                             advance_past_space_character();
                             break;
-                        case '$':
-                        {
-                            state_stack_.emplace_back(path_state::dot_or_left_bracket, state_stack_.back());
+                        case '\"':
+                            //state_stack_.emplace_back(path_state::expression, state_stack_.back());
+                            state_stack_.emplace_back(path_state::identifier, state_stack_.back());
+                            state_stack_.emplace_back(path_state::quoted_string, state_stack_.back());
                             ++p_;
                             ++column_;
                             break;
-                        }
                         default:
-                        {
-                            switch (*p_)
+                            if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                             {
-                                case '.':
-                                case '[':
-                                    ec = jsonpath_errc::expected_root;
-                                    return;
-                                default: // might be function, validate name later
-                                    state_stack_.emplace_back(path_state::dot_or_left_bracket, state_stack_.back());
-                                    state_stack_.emplace_back(path_state::path_or_function_name, state_stack_.back());
-                                    break;
+                                //state_stack_.emplace_back(path_state::expression, state_stack_.back());
+                                state_stack_.emplace_back(path_state::identifier, state_stack_.back());
+                                state_stack_.emplace_back(path_state::unquoted_string, state_stack_.back());
+                                buffer.push_back(*p_);
+                                ++p_;
+                                ++column_;
+                            }
+                            else
+                            {
+                                ec = jmespath_errc::expected_identifier;
+                                return result;
                             }
                             break;
-                        }
-
-                        return;
                     };
                     break;
                 }
-                case path_state::path_or_function_name:
+                case path_state::unquoted_string: 
                     switch (*p_)
                     {
                         case ' ':case '\t':case '\r':case '\n':
-                        {
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                            apply_selectors();
+                            selector_stack_.back()->add_selector(make_unique_ptr<identifier_selector>(buffer));
                             buffer.clear();
-                            state_stack_.pop_back();
+                            state_stack_.pop_back(); // unquoted_string
+                            state_stack_.pop_back(); // identifier
                             advance_past_space_character();
                             break;
-                        }
-                        case '(':
-                            state_stack_.back().state = path_state::arg_or_right_paren;
-                            function_name = std::move(buffer);
-                            buffer.clear();
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '[':
-                        {
-                            if (buffer.size() > 0)
-                            {
-                                selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                                apply_selectors();
-                                buffer.clear();
-                            }
-                            slice.start_ = 0;
-
-                            state_stack_.back().state = path_state::wildcard_or_rpath_or_slice_or_filter;
-                            ++p_;
-                            ++column_;
-                            break;
-                        }
                         case '.':
-                        {
-                            if (buffer.size() > 0)
-                            {
-                                selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                                apply_selectors();
-                                buffer.clear();
-                            }
-                            state_stack_.back().state = path_state::dot;
-                            ++p_;
-                            ++column_;
-                            break;
-                        }
-                        case '*':
-                        {
-                            end_all();
-                            transfer_nodes();
-                            state_stack_.back().state = path_state::dot;
-                            ++p_;
-                            ++column_;
-                            break;
-                        }
-                        case '\'':
-                        {
+                            selector_stack_.back()->add_selector(make_unique_ptr<identifier_selector>(buffer));
+                            state_stack_.pop_back(); // unquoted_string
+                            state_stack_.pop_back(); // identifier
                             buffer.clear();
-                            state_stack_.back().state = path_state::single_quoted_name;
                             ++p_;
                             ++column_;
-                            break;
-                        }
-                        case '\"':
-                        {
-                            buffer.clear();
-                            state_stack_.back().state = path_state::double_quoted_name;
-                            ++p_;
-                            ++column_;
-                            break;
-                        }
-                        default:
-                            buffer.push_back(*p_);
-                            ++p_;
-                            ++column_;
-                            break;
-                    }
-                    break;
-                case path_state::arg_or_right_paren:
-                    switch (*p_)
-                    {
-                        case ' ':case '\t':case '\r':case '\n':
-                            advance_past_space_character();
-                            break;
-                        case '$':
-                            buffer.clear();
-                            buffer.push_back(*p_);
-                            state_stack_.emplace_back(path_state::path_argument, state_stack_.back());
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '\'':
-                            buffer.clear();
-                            buffer.push_back('\"');
-                            state_stack_.back().state = path_state::more_args_or_right_paren;
-                            state_stack_.emplace_back(path_state::single_quoted_arg, state_stack_.back());
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '\"':
-                            buffer.clear();
-                            buffer.push_back('\"');
-                            state_stack_.back().state = path_state::more_args_or_right_paren;
-                            state_stack_.emplace_back(path_state::double_quoted_arg, state_stack_.back());
-                            ++p_;
-                            ++column_;
-                            break;
-                        case ')':
-                        {
-                            jsonpath_evaluator<Json,JsonReference,PathCons> evaluator;
-                            evaluator.evaluate(root, buffer, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            function_stack_.push_back(evaluator.get_pointers());
-
-                            call_function(function_name, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            state_stack_.pop_back();
-                            ++p_;
-                            ++column_;
-                            break;
-                        }
-                        default:
-                            buffer.clear();
-                            state_stack_.back().state = path_state::more_args_or_right_paren;
-                            state_stack_.emplace_back(path_state::unquoted_arg, state_stack_.back());
-                            ++p_;
-                            ++column_;
-                            break;
-                    }
-                    break;
-                case path_state::path_argument:
-                    switch (*p_)
-                    {
-                        case ',':
-                        {
-                            jsonpath_evaluator<Json, JsonReference, PathCons> evaluator;
-                            evaluator.evaluate(root, buffer, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            function_stack_.push_back(evaluator.get_pointers());
-                            state_stack_.pop_back();
-                            ++p_;
-                            ++column_;
-                            break;
-                        }
-                        case ')':
-                        {
-                            state_stack_.pop_back();
-                            break;
-                        }
-                        default:
-                            buffer.push_back(*p_); // path_argument
-                            ++p_;
-                            ++column_;
-                            break;
-                    }
-                    break;
-                case path_state::unquoted_arg:
-                    switch (*p_)
-                    {
-                        case ',':
-                            JSONCONS_TRY
-                            {
-                                auto val = Json::parse(buffer);
-                                auto temp = create_temp(val);
-                                function_stack_.push_back(std::vector<pointer>{temp});
-                            }
-                            JSONCONS_CATCH(const ser_error&)     
-                            {
-                                ec = jsonpath_errc::argument_parse_error;
-                                return;
-                            }
-                            buffer.clear();
-                            //state_ = path_state::arg_or_right_paren;
-                            state_stack_.pop_back();
-                            break;
-                        case ')':
-                        {
-                            JSONCONS_TRY
-                            {
-                                auto val = Json::parse(buffer);
-                                auto temp = create_temp(val);
-                                function_stack_.push_back(std::vector<pointer>{temp});
-                            }
-                            JSONCONS_CATCH(const ser_error&)     
-                            {
-                                ec = jsonpath_errc::argument_parse_error;
-                                return;
-                            }
-                            call_function(function_name, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            state_stack_.pop_back();
-                            break;
-                        }
-                        default:
-                            buffer.push_back(*p_);
-                            break;
-                    }
-                    ++p_;
-                    ++column_;
-                    break;
-                case path_state::single_quoted_arg:
-                    switch (*p_)
-                    {
-                        case '\'':
-                            buffer.push_back('\"');
-                            state_stack_.pop_back();
-                            break;
-                        case '\"':
-                            buffer.push_back('\\');
-                            buffer.push_back('\"');
-                            state_stack_.pop_back();
                             break;
                         default:
-                            buffer.push_back(*p_);
+                            if ((*p_ >= '0' && *p_ <= '9') || (*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
+                            {
+                                buffer.push_back(*p_);
+                                ++p_;
+                                ++column_;
+                            }
                             break;
-                    }
-                    ++p_;
-                    ++column_;
+                    };
                     break;
-                case path_state::double_quoted_arg:
-                    switch (*p_)
-                    {
-                        case '\"':
-                            buffer.push_back('\"');
-                            state_stack_.pop_back();
-                            break;
-                        default:
-                            buffer.push_back(*p_);
-                            break;
-                    }
-                    ++p_;
-                    ++column_;
-                    break;
-                case path_state::more_args_or_right_paren:
-                    switch (*p_)
-                    {
-                        case ' ':case '\t':case '\r':case '\n':
-                            advance_past_space_character();
-                            break;
-                        case ',':
-                            JSONCONS_TRY
-                            {
-                                auto val = Json::parse(buffer);
-                                auto temp = create_temp(val);
-                                function_stack_.push_back(std::vector<pointer>{temp});
-                            }
-                            JSONCONS_CATCH(const ser_error&)     
-                            {
-                                ec = jsonpath_errc::argument_parse_error;
-                                return;
-                            }
-                            buffer.clear();
-                            //state_ = path_state::arg_or_right_paren;
-                            state_stack_.pop_back();
-                            ++p_;
-                            ++column_;
-                            break;
-                        case ')':
-                        {
-                            JSONCONS_TRY
-                            {
-                                auto val = Json::parse(buffer);
-                                auto temp = create_temp(val);
-                                function_stack_.push_back(std::vector<pointer>{temp});
-                            }
-                            JSONCONS_CATCH(const ser_error&)     
-                            {
-                                ec = jsonpath_errc::argument_parse_error;
-                                return;
-                            }
-                            call_function(function_name, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            state_stack_.pop_back();
-                            ++p_;
-                            ++column_;
-                            break;
-                        }
-                        default:
-                            ec = jsonpath_errc::invalid_filter_unsupported_operator;
-                            return;
-                    }
-                    break;
+                case path_state::sub_expression:
+                    break; 
+#if 0
                 case path_state::dot:
                     switch (*p_)
                     {
@@ -1086,7 +873,7 @@ public:
                             break;
                         case '[': 
                         case '.':
-                            ec = jsonpath_errc::expected_name;
+                            ec = jmespath_errc::expected_name;
                             return;
                         default:
                             buffer.clear();
@@ -1111,7 +898,7 @@ public:
                             ++column_;
                             break;
                         default:
-                            ec = jsonpath_errc::expected_separator;
+                            ec = jmespath_errc::expected_separator;
                             return;
                     };
                     break;
@@ -1139,20 +926,20 @@ public:
                             advance_past_space_character();
                             break;
                         case '[':
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            selector_stack_.push_back(make_unique_ptr<identifier_selector>(buffer));
                             apply_selectors();
                             buffer.clear();
                             slice.start_ = 0;
                             state_stack_.pop_back();
                             break;
                         case '.':
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            selector_stack_.push_back(make_unique_ptr<identifier_selector>(buffer));
                             apply_selectors();
                             buffer.clear();
                             state_stack_.pop_back();
                             break;
                         default:
-                            ec = jsonpath_errc::expected_name;
+                            ec = jmespath_errc::expected_name;
                             return;
                     };
                     break;
@@ -1160,7 +947,7 @@ public:
                     switch (*p_)
                     {
                         case '\'':
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            selector_stack_.push_back(make_unique_ptr<identifier_selector>(buffer));
                             apply_selectors();
                             buffer.clear();
                             state_stack_.pop_back();
@@ -1174,7 +961,7 @@ public:
                             }
                             else
                             {
-                                ec = jsonpath_errc::unexpected_end_of_input;
+                                ec = jmespath_errc::unexpected_end_of_input;
                                 return;
                             }
                             break;
@@ -1189,7 +976,7 @@ public:
                     switch (*p_)
                     {
                         case '\"':
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            selector_stack_.push_back(make_unique_ptr<identifier_selector>(buffer));
                             apply_selectors();
                             buffer.clear();
                             state_stack_.pop_back();
@@ -1203,7 +990,7 @@ public:
                             }
                             else
                             {
-                                ec = jsonpath_errc::unexpected_end_of_input;
+                                ec = jmespath_errc::unexpected_end_of_input;
                                 return;
                             }
                             break;
@@ -1233,7 +1020,7 @@ public:
                             ++column_;
                             break;
                         default:
-                            ec = jsonpath_errc::expected_right_bracket;
+                            ec = jmespath_errc::expected_right_bracket;
                             return;
                     }
                     break;
@@ -1245,21 +1032,21 @@ public:
                             break;
                         case '(':
                         {
-                            jsonpath_filter_parser<Json> parser(line_,column_);
+                            jmespath_filter_parser<Json> parser(line_,column_);
                             auto result = parser.parse(root, p_,end_input_,&p_);
                             line_ = parser.line();
                             column_ = parser.column();
-                            selectors_.push_back(make_unique_ptr<expr_selector>(result));
+                            selector_stack_.push_back(make_unique_ptr<expr_selector>(result));
                             state_stack_.back().state = path_state::comma_or_right_bracket;
                             break;
                         }
                         case '?':
                         {
-                            jsonpath_filter_parser<Json> parser(line_,column_);
+                            jmespath_filter_parser<Json> parser(line_,column_);
                             auto result = parser.parse(root,p_,end_input_,&p_);
                             line_ = parser.line();
                             column_ = parser.column();
-                            selectors_.push_back(make_unique_ptr<filter_selector>(result));
+                            selector_stack_.push_back(make_unique_ptr<filter_selector>(result));
                             state_stack_.back().state = path_state::comma_or_right_bracket;
                             break;                   
                         }
@@ -1306,7 +1093,7 @@ public:
                         case ':':
                             if (!try_string_to_index(buffer.data(), buffer.size(), &slice.start_, &slice.is_start_positive))
                             {
-                                ec = jsonpath_errc::expected_slice_start;
+                                ec = jmespath_errc::expected_slice_start;
                                 return;
                             }
                             state_stack_.back().state = path_state::slice_end_or_end_step;
@@ -1348,13 +1135,13 @@ public:
                         case ']': 
                             if (!buffer.empty())
                             {
-                                selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                                selector_stack_.push_back(make_unique_ptr<identifier_selector>(buffer));
                                 buffer.clear();
                             }
                             state_stack_.pop_back();
                             break;
                         default:
-                            ec = jsonpath_errc::expected_right_bracket;
+                            ec = jmespath_errc::expected_right_bracket;
                             return;
                     }
                     break;
@@ -1384,7 +1171,7 @@ public:
                             state_stack_.pop_back();
                             break;
                         default:
-                            ec = jsonpath_errc::expected_right_bracket;
+                            ec = jmespath_errc::expected_right_bracket;
                             return;
                     }
                     break;
@@ -1407,7 +1194,7 @@ public:
                         case ']': 
                             if (!buffer.empty())
                             {
-                                selectors_.push_back(make_unique_ptr<path_selector>(buffer));
+                                selector_stack_.push_back(make_unique_ptr<path_selector>(buffer));
                                 buffer.clear();
                             }
                             state_stack_.pop_back();
@@ -1435,7 +1222,7 @@ public:
                             }
                             else
                             {
-                                ec = jsonpath_errc::unexpected_end_of_input;
+                                ec = jmespath_errc::unexpected_end_of_input;
                                 return;
                             }
                             break;
@@ -1462,7 +1249,7 @@ public:
                             }
                             else
                             {
-                                ec = jsonpath_errc::unexpected_end_of_input;
+                                ec = jmespath_errc::unexpected_end_of_input;
                                 return;
                             }
                             break;
@@ -1511,11 +1298,11 @@ public:
                             break;
                         case ',':
                         case ']':
-                            selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
+                            selector_stack_.push_back(make_unique_ptr<array_slice_selector>(slice));
                             state_stack_.pop_back();
                             break;
                         default:
-                            ec = jsonpath_errc::expected_minus_or_digit_or_colon_or_comma_or_right_bracket;
+                            ec = jmespath_errc::expected_minus_or_digit_or_colon_or_comma_or_right_bracket;
                             return;
                     }
                     break;
@@ -1538,14 +1325,14 @@ public:
                         case ']':
                             if (!slice.is_end_defined)
                             {
-                                ec = jsonpath_errc::expected_slice_end;
+                                ec = jmespath_errc::expected_slice_end;
                                 return;
                             }
-                            selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
+                            selector_stack_.push_back(make_unique_ptr<array_slice_selector>(slice));
                             state_stack_.pop_back();
                             break;
                         default:
-                            ec = jsonpath_errc::expected_digit_or_colon_or_comma_or_right_bracket;
+                            ec = jmespath_errc::expected_digit_or_colon_or_comma_or_right_bracket;
                             return;
                     }
                     break;
@@ -1577,14 +1364,14 @@ public:
                         case ']':
                             if (slice.step_ == 0)
                             {
-                                ec = jsonpath_errc::expected_slice_step;
+                                ec = jmespath_errc::expected_slice_step;
                                 return;
                             }
-                            selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
+                            selector_stack_.push_back(make_unique_ptr<array_slice_selector>(slice));
                             state_stack_.pop_back();
                             break;
                         default:
-                            ec = jsonpath_errc::expected_minus_or_digit_or_comma_or_right_bracket;
+                            ec = jmespath_errc::expected_minus_or_digit_or_comma_or_right_bracket;
                             return;
                     }
                     break;
@@ -1603,7 +1390,7 @@ public:
                             }
                             else
                             {
-                                ec = jsonpath_errc::unexpected_end_of_input;
+                                ec = jmespath_errc::unexpected_end_of_input;
                                 return;
                             }
                             break;
@@ -1629,7 +1416,7 @@ public:
                             }
                             else
                             {
-                                ec = jsonpath_errc::unexpected_end_of_input;
+                                ec = jmespath_errc::unexpected_end_of_input;
                                 return;
                             }
                             break;
@@ -1644,37 +1431,41 @@ public:
                     ++p_;
                     ++column_;
                     break;
+#endif
             }
         }
 
+        std::cout << "stack size: " << state_stack_.size() << "\n";
         switch (state_stack_.back().state)
         {
-            case path_state::unquoted_name: 
-            case path_state::unquoted_name2: 
+            case path_state::unquoted_string: 
             {
-                selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                apply_selectors();
+                selector_stack_.back()->add_selector(make_unique_ptr<identifier_selector>(buffer));
                 buffer.clear();
                 state_stack_.pop_back(); // unquoted_name
+                state_stack_.pop_back(); // identifier
                 break;
             }
             default:
                 break;
         }
 
-        if (state_stack_.size() > 2)
+        if (state_stack_.size() > 1)
         {
-            ec = jsonpath_errc::unexpected_end_of_input;
-            return;
+            ec = jmespath_errc::unexpected_end_of_input;
+            return result;
         }
 
-        JSONCONS_ASSERT(state_stack_.size() == 2);
-        state_stack_.pop_back(); 
+        //state_stack_.pop_back(); 
 
+        JSONCONS_ASSERT(state_stack_.size() == 1);
         JSONCONS_ASSERT(state_stack_.back().state == path_state::start);
         state_stack_.pop_back();
-    }
 
+        reference r = selector_stack_[0]->select(*this, string_type(), root); 
+        return r;
+    }
+#if 0
     void end_all()
     {
         for (const auto& node : stack_.back())
@@ -1683,11 +1474,7 @@ public:
             pointer p = node.val_ptr;
             end_all(path, *p);
         }
-<<<<<<< HEAD
     }
-=======
-    } 
->>>>>>> ca35166bf2f9aeb8894074b85fff12da649856c2
 
     void end_all(const string_type& path, reference val)
     {
@@ -1739,7 +1526,8 @@ public:
             }
             selectors_.clear();
         }
-        transfer_nodes();
+        stack_.push_back(std::move(nodes_));
+        //transfer_nodes();
     }
 
     void apply_selector(const string_type& path, reference val, selector_base& selector, bool process)
@@ -1809,7 +1597,7 @@ public:
         state_stack_.back().is_recursive_descent = false;
         state_stack_.back().is_union = false;
     }
-
+#endif
     void advance_past_space_character()
     {
         switch (*p_)
