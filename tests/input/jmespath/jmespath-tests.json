@@ -22,5 +22,17 @@
         "input" : "[\"a\", \"b\", \"c\", \"d\", \"e\", \"f\"]",
         "expression" : "[1]",
         "expected" : "\"b\""
+    },
+    {
+        "annotation" : "Index expression larger than list",
+        "input" : "[\"a\", \"b\", \"c\", \"d\", \"e\", \"f\"]",
+        "expression" : "[6]",
+        "expected" : "null"
+    },
+    {
+        "annotation" : "Negative index",
+        "input" : "[\"a\", \"b\", \"c\", \"d\", \"e\", \"f\"]",
+        "expression" : "[-2]",
+        "expected" : "\"e\""
     }
 ]

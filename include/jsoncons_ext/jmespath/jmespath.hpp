@@ -111,63 +111,6 @@ void json_replace(Json& root, const typename Json::string_view_type& path, T&& n
 }
 
 namespace detail {
-
-template<class CharT>
-bool try_string_to_index(const CharT *s, std::size_t length, std::size_t* value, bool* positive)
-{
-    static const size_t max_value = (std::numeric_limits<std::size_t>::max)();
-    static const size_t max_value_div_10 = max_value / 10;
-
-    std::size_t start = 0;
-    std::size_t n = 0;
-    if (length > 0)
-    {
-        if (s[start] == '-')
-        {
-            *positive = false;
-            ++start;
-        }
-        else
-        {
-            *positive = true;
-        }
-    }
-    if (length > start)
-    {
-        for (std::size_t i = start; i < length; ++i)
-        {
-            CharT c = s[i];
-            switch (c)
-            {
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                {
-                    std::size_t x = c - '0';
-                    if (n > max_value_div_10)
-                    {
-                        return false;
-                    }
-                    n = n * 10;
-                    if (n > max_value - x)
-                    {
-                        return false;
-                    }
-
-                    n += x;
-                    break;
-                }
-                default:
-                    return false;
-                    break;
-            }
-        }
-        *value = n;
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
  
 enum class path_state 
 {
@@ -180,6 +123,7 @@ enum class path_state
     sub_expression,
     index_expression,
     number,
+    digit,
 
     dot_or_left_bracket,
     name_or_left_bracket,
@@ -466,8 +410,6 @@ class jmespath_evaluator : public ser_context
         {
             static Json null{null_type()};
 
-            bool is_start_positive = true;
-
             if (val.is_object() && val.contains(identifier_))
             {
                 return val.at(identifier_);
@@ -535,21 +477,27 @@ class jmespath_evaluator : public ser_context
         {
             static Json null{null_type()};
 
-            bool is_start_positive = true;
             if (val.is_array())
             {
-                std::size_t pos = 0;
-                if (try_string_to_index(identifier_.data(), identifier_.size(), &pos, &is_start_positive))
+                int64_t slen = static_cast<int64_t>(val.size());
+                auto result = jsoncons::detail::to_integer<int64_t>(identifier_.data(), identifier_.size());
+                if (!result)
                 {
-                    std::size_t index = is_start_positive ? pos : val.size() - pos;
-                    if (index < val.size())
-                    {
-                        return val.at(index);
-                    }
-                    else
-                    {
-                        return null;
-                    }
+                    return null;
+                }
+                else if (result.value() >= 0 && result.value() < slen)
+                {
+                    std::size_t index = static_cast<std::size_t>(result.value());
+                    return val.at(index);
+                }
+                else if (result.value() < 0 && (slen+result.value()) < slen)
+                {
+                    std::size_t index = static_cast<std::size_t>(slen + result.value());
+                    return val.at(index);
+                }
+                else
+                {
+                    return null;
                 }
             }
             /* else if (val.is_string())
@@ -849,6 +797,20 @@ public:
                     };
                     break;
                 case path_state::number:
+                    switch(*p_)
+                    {
+                        case '-':
+                            buffer.push_back(*p_);
+                            state_stack_.back().state = path_state::digit;
+                            ++p_;
+                            ++column_;
+                            break;
+                        default:
+                            state_stack_.back().state = path_state::digit;
+                            break;
+                    }
+                    break;
+                case path_state::digit:
                     switch(*p_)
                     {
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
