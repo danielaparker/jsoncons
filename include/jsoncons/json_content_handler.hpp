@@ -875,11 +875,13 @@ namespace jsoncons {
     class basic_default_json_content_handler : public basic_json_content_handler<CharT>
     {
         bool parse_more_;
+        std::error_code ec_;
     public:
         using typename basic_json_content_handler<CharT>::string_view_type;
 
-        basic_default_json_content_handler(bool accept_more = true)
-            : parse_more_(accept_more)
+        basic_default_json_content_handler(bool accept_more = true,
+                                           std::error_code ec = std::error_code())
+            : parse_more_(accept_more), ec_(ec)
         {
         }
     private:
@@ -887,75 +889,123 @@ namespace jsoncons {
         {
         }
 
-        bool do_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+        bool do_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
         {
+            if (ec_)
+            {
+                ec = ec_;
+            }
             return parse_more_;
         }
 
-        bool do_end_object(const ser_context&, std::error_code&) override
+        bool do_end_object(const ser_context&, std::error_code& ec) override
         {
+            if (ec_)
+            {
+                ec = ec_;
+            }
             return parse_more_;
         }
 
-        bool do_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+        bool do_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
         {
+            if (ec_)
+            {
+                ec = ec_;
+            }
             return parse_more_;
         }
 
-        bool do_end_array(const ser_context&, std::error_code&) override
+        bool do_end_array(const ser_context&, std::error_code& ec) override
         {
+            if (ec_)
+            {
+                ec = ec_;
+            }
             return parse_more_;
         }
 
-        bool do_name(const string_view_type&, const ser_context&, std::error_code&) override
+        bool do_name(const string_view_type&, const ser_context&, std::error_code& ec) override
         {
+            if (ec_)
+            {
+                ec = ec_;
+            }
             return parse_more_;
         }
 
-        bool do_null_value(semantic_tag, const ser_context&, std::error_code&) override
+        bool do_null_value(semantic_tag, const ser_context&, std::error_code& ec) override
         {
+            if (ec_)
+            {
+                ec = ec_;
+            }
             return parse_more_;
         }
 
-        bool do_string_value(const string_view_type&, semantic_tag, const ser_context&, std::error_code&) override
+        bool do_string_value(const string_view_type&, semantic_tag, const ser_context&, std::error_code& ec) override
         {
+            if (ec_)
+            {
+                ec = ec_;
+            }
             return parse_more_;
         }
 
         bool do_byte_string_value(const byte_string_view&,
                                   semantic_tag, 
                                   const ser_context&,
-                                  std::error_code&) override
+                                  std::error_code& ec) override
         {
+            if (ec_)
+            {
+                ec = ec_;
+            }
             return parse_more_;
         }
 
         bool do_int64_value(int64_t, 
                             semantic_tag, 
                             const ser_context&,
-                            std::error_code&) override
+                            std::error_code& ec) override
         {
+            if (ec_)
+            {
+                ec = ec_;
+            }
             return parse_more_;
         }
 
         bool do_uint64_value(uint64_t, 
                              semantic_tag, 
                              const ser_context&,
-                             std::error_code&) override
+                             std::error_code& ec) override
         {
+            if (ec_)
+            {
+                ec = ec_;
+            }
             return parse_more_;
         }
 
         bool do_double_value(double, 
                              semantic_tag,
                              const ser_context&,
-                             std::error_code&) override
+                             std::error_code& ec) override
         {
+            if (ec_)
+            {
+                ec = ec_;
+            }
             return parse_more_;
         }
 
-        bool do_bool_value(bool, semantic_tag, const ser_context&, std::error_code&) override
+        bool do_bool_value(bool, semantic_tag, const ser_context&, std::error_code& ec) override
         {
+            if (ec_)
+            {
+                ec = ec_;
+            }
             return parse_more_;
         }
     };

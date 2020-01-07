@@ -201,6 +201,18 @@ struct has_data_and_size
                             !std::is_void<decltype(std::declval<C>().data())>::value>::type
 > : std::true_type{};
 
+// has_reserve
+
+template<class T, class Enable=void>
+struct has_reserve : std::false_type{};
+
+template<class C>
+struct has_reserve
+<
+    C, 
+    typename std::enable_if<!std::is_void<decltype(std::declval<C>().reserve(0))>::value>::type
+> : std::true_type{};
+
 // is_c_array
 
 template<class T>
