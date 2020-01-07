@@ -512,7 +512,7 @@ struct json_type_traits<Json, T,
         v.reserve(size);
     }
 
-    static void do_reserve_(std::false_type, T& v, size_t)
+    static void do_reserve_(std::false_type, T&, size_t)
     {
     }
 };
