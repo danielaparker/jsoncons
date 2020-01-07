@@ -163,6 +163,77 @@ struct ser_traits<T,
 };
 
 template <class T>
+struct typed_array_content_handler : public default_json_content_handler
+{
+    T& v_;
+public:
+    typedef typename T::value_type value_type;
+
+    typed_array_content_handler(T& v)
+        : default_json_content_handler(false), v_(v)
+    {
+    }
+private:
+    bool do_begin_array(semantic_tag, 
+                        const ser_context&, 
+                        std::error_code&) override
+    {
+        return true;
+    }
+
+    bool do_begin_array(std::size_t size, 
+                        semantic_tag, 
+                        const ser_context&, 
+                        std::error_code&) override
+    {
+        v_.reserve(size);
+        return true;
+    }
+
+    bool do_end_array(const ser_context&, 
+                      std::error_code&) override
+    {
+        return false;
+    }
+
+    bool do_uint64_value(uint64_t value, 
+                         semantic_tag, 
+                         const ser_context&,
+                         std::error_code&) override
+    {
+        v_.push_back(static_cast<value_type>(value));
+        return true;
+    }
+
+    bool do_int64_value(int64_t value, 
+                        semantic_tag,
+                        const ser_context&,
+                        std::error_code&) override
+    {
+        v_.push_back(static_cast<value_type>(value));
+        return true;
+    }
+
+    bool do_double_value(double value, 
+                         semantic_tag,
+                         const ser_context&,
+                         std::error_code&) override
+    {
+        v_.push_back(static_cast<value_type>(value));
+        return true;
+    }
+
+    bool do_typed_array(const span<const value_type>& data,  
+                        semantic_tag,
+                        const ser_context&,
+                        std::error_code&) override
+    {
+        v_ = std::vector<value_type>(data.begin(),data.end());
+        return false;
+    }
+};
+
+template <class T>
 struct ser_traits<T,
     typename std::enable_if<!is_json_type_traits_declared<T>::value && 
              jsoncons::detail::is_vector_like<T>::value &&
@@ -173,7 +244,7 @@ struct ser_traits<T,
 
     template <class Json>
     static T decode(basic_staj_reader<typename Json::char_type>& reader, 
-                    const Json& context_j, 
+                    const Json&, 
                     std::error_code& ec)
     {
         T v;
@@ -183,12 +254,16 @@ struct ser_traits<T,
             ec = conversion_errc::json_not_vector;
             return v;
         }
-        reader.next(ec);
+
+        typed_array_content_handler<T> handler(v);
+        reader.read(handler, ec);
+
+        /* reader.next(ec);
         while (reader.current().event_type() != staj_event_type::end_array && !ec)
         {
             v.push_back(ser_traits<value_type>::decode(reader, context_j, ec));
             reader.next(ec);
-        }
+        }*/
         return v;
     }
 
