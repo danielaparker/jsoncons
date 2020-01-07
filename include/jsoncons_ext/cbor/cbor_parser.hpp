@@ -82,7 +82,7 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Src,class Float128T = std::nullptr_t,class WorkAllocator=std::allocator<char>>
+template <class Src,class WorkAllocator=std::allocator<char>>
 class basic_cbor_parser : public ser_context
 {
     typedef char char_type;
@@ -748,7 +748,7 @@ private:
             {
                 text_buffer_.clear();
                 json_string_encoder encoder(text_buffer_);
-                basic_cbor_parser<Src,Float128T> reader(std::move(source_));
+                basic_cbor_parser<Src> reader(std::move(source_));
 
                 reader.parse(encoder, ec);
                 source_ = std::move(reader.source_);
@@ -1842,15 +1842,6 @@ private:
                     more_ = handler.typed_array(typed_array_.data(double_array_arg), semantic_tag::none, *this, ec);
                     break;
                 }
-
-                case 0x53:
-                case 0x57:
-                {
-                    const uint8_t tag = (uint8_t)tags_.back();
-                    handle_float128(handler,v,tag,ec);
-                    break;
-                }
-
                 default:
                     more_ = handler.byte_string_value(v, semantic_tag::none, *this, ec);
                     break;
@@ -1860,51 +1851,6 @@ private:
         else
         {
             more_ = handler.byte_string_value(v, semantic_tag::none, *this, ec);
-        }
-    }
-
-    template <class Float128T_ = Float128T>
-    typename std::enable_if<std::is_same<Float128T_,std::nullptr_t>::value,void>::type
-    handle_float128(json_content_handler& handler, const byte_string_view&, const uint8_t, std::error_code& ec)
-    {
-        more_ = handler.begin_array(semantic_tag::none, *this, ec);
-        more_ = handler.end_array(*this);
-    }
-
-    template <class Float128T_ = Float128T>
-    typename std::enable_if<!std::is_same<Float128T_,std::nullptr_t>::value,void>::type
-    handle_float128(json_content_handler& handler, const byte_string_view& v, const uint8_t tag, std::error_code& ec)
-    {
-        const uint8_t e = (tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift; 
-        const uint8_t f = (tag & detail::cbor_array_tags_f_mask) >> detail::cbor_array_tags_f_shift; 
-        const uint8_t ll = (tag & detail::cbor_array_tags_ll_mask) >> detail::cbor_array_tags_ll_shift; 
-
-        const size_t bytes_per_elem = std::size_t(1) << (f + ll);
-        if (bytes_per_elem == sizeof(Float128T))
-        {
-
-            const uint8_t* p = v.data();
-            const uint8_t* last = v.data() + v.size();
-
-            std::size_t size = v.size()/bytes_per_elem;
-            typed_array_ = typed_array<WorkAllocator>(float128_array_arg,size,alloc_);
-            for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-            {
-                const uint8_t* endp = nullptr;
-                Float128T val{ 0 };
-                switch (e)
-                {
-                    case 0: val = jsoncons::detail::big_to_native<Float128T>(p,p+bytes_per_elem,&endp);
-                        //std::cout << "big_to_native: " << val << "\n";
-                        break;
-                    case 1: val = jsoncons::detail::little_to_native<Float128T>(p,p+bytes_per_elem,&endp);
-                        //std::cout << "little_to_native: " << val << "\n";
-                        break;
-                    default: break;
-                }
-                typed_array_.data(float128_array_arg)[i] = val;
-            }
-            more_ = handler.typed_array(typed_array_.data(float128_array_arg), semantic_tag::none, *this, ec);
         }
     }
 

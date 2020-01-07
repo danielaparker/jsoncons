@@ -528,7 +528,7 @@ constexpr float128_array_arg_t float128_array_arg = float128_array_arg_t();
 
 enum typed_array_type {uint8_value=1,uint16_value,uint32_value,uint64_value,
                       int8_value,int16_value,int32_value,int64_value, 
-                      half_value, float_value,double_value,float128_value};
+                      half_value, float_value,double_value};
 
 template <class Allocator=std::allocator<char>>
 class typed_array
@@ -637,10 +637,6 @@ public:
                 data_.double_data_ = alloc.allocate(size_);
                 break;
             }
-            case typed_array_type::float128_value:
-            {
-                break;
-            }
             default:
                 break;
         }
@@ -734,65 +730,61 @@ public:
             case typed_array_type::uint8_value:
             {
                 uint8_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.uint8_data_, 1);
+                alloc.deallocate(data_.uint8_data_, size_);
                 break;
             }
             case typed_array_type::uint16_value:
             {
                 uint16_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.uint16_data_, 1);
+                alloc.deallocate(data_.uint16_data_, size_);
                 break;
             }
             case typed_array_type::uint32_value:
             {
                 uint32_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.uint32_data_, 1);
+                alloc.deallocate(data_.uint32_data_, size_);
                 break;
             }
             case typed_array_type::uint64_value:
             {
                 uint64_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.uint64_data_, 1);
+                alloc.deallocate(data_.uint64_data_, size_);
                 break;
             }
             case typed_array_type::int8_value:
             {
                 int8_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.int8_data_, 1);
+                alloc.deallocate(data_.int8_data_, size_);
                 break;
             }
             case typed_array_type::int16_value:
             {
                 int16_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.int16_data_, 1);
+                alloc.deallocate(data_.int16_data_, size_);
                 break;
             }
             case typed_array_type::int32_value:
             {
                 int32_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.int32_data_, 1);
+                alloc.deallocate(data_.int32_data_, size_);
                 break;
             }
             case typed_array_type::int64_value:
             {
                 int64_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.int64_data_, 1);
+                alloc.deallocate(data_.int64_data_, size_);
                 break;
             }
             case typed_array_type::float_value:
             {
                 float_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.float_data_, 1);
+                alloc.deallocate(data_.float_data_, size_);
                 break;
             }
             case typed_array_type::double_value:
             {
                 double_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.double_data_, 1);
-                break;
-            }
-            case typed_array_type::float128_value:
-            {
+                alloc.deallocate(data_.double_data_, size_);
                 break;
             }
             default:
@@ -804,8 +796,20 @@ public:
 
     typed_array& operator=(const typed_array& other)
     {
-        typed_array temp(other);
-        swap(*this,temp);
+        if (this != &other)
+        {
+            typed_array temp(other);
+            swap(*this,temp);
+        }
+        return *this;
+    }
+
+    typed_array& operator=(typed_array&& other)
+    {
+        if (this != &other)
+        {
+            swap(*this,other);
+        }
         return *this;
     }
 
@@ -949,19 +953,6 @@ public:
         JSONCONS_ASSERT(type_ == typed_array_type::double_value);
         return span<const double>(data_.double_data_, size_);
     }
-/*
-    span<float128_type> data(float128_array_arg_t)
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::float128_value);
-        return span<float128_type>(data_.float128_data_, size_);
-    }
-
-    span<const float128_type> data(float128_array_arg_t) const
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::float128_value);
-        return span<const float128_type>(data_.float128_data_, size_);
-    }
-*/
     friend void swap(typed_array& a, typed_array& b) noexcept
     {
         std::swap(a.data_,b.data_);
@@ -1059,10 +1050,6 @@ public:
             case typed_array_type::double_value:
             {
                 data_.double_data_ = other.data(double_array_arg).data();
-                break;
-            }
-            case typed_array_type::float128_value:
-            {
                 break;
             }
             default:
@@ -1351,10 +1338,6 @@ public:
                         this->double_value(data_.data(double_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
                         break;
                     }
-                    case typed_array_type::float128_value:
-                    {
-                        break;
-                    }
                     default:
                         break;
                 }
@@ -1458,10 +1441,6 @@ public:
                                 more = handler.double_value(data_.data(double_array_arg)[index_]);
                                 break;
                             }
-                            case typed_array_type::float128_value:
-                            {
-                                break;
-                            }
                             default:
                                 break;
                         }
@@ -1530,11 +1509,6 @@ public:
                         more = handler.typed_array(data_.data(double_array_arg));
                         break;
                     }
-                    //case typed_array_type::float128_value:
-                    //{
-                        //more = handler.typed_array(data_.data(float128_array_arg));
-                        //break;
-                    //}
                     default:
                         break;
                 }

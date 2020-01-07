@@ -24,8 +24,7 @@ cbor_bytes_encoder     |basic_cbor_encoder<jsoncons::bytes_sink>
 Type                       |Definition
 ---------------------------|------------------------------
 char_type                  |char
-sink_type                |Sink
-float128_type              |Float128T
+sink_type                  |Sink
 string_view_type           |
 
 #### Constructors
