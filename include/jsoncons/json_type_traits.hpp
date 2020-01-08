@@ -439,6 +439,7 @@ struct json_type_traits<Json, T,
         if (j.is_array())
         {
             T result;
+            do_reserve_(typename std::integral_constant<bool, jsoncons::detail::has_reserve<T>::value>::type(),result,j.size());
             for (const auto& item : j.array_range())
             {
                 result.push_back(item.template as<value_type>());
@@ -459,6 +460,7 @@ struct json_type_traits<Json, T,
         if (j.is_array())
         {
             T result;
+            do_reserve_(typename std::integral_constant<bool, jsoncons::detail::has_reserve<T>::value>::type(),result,j.size());
             for (const auto& item : j.array_range())
             {
                 result.push_back(item.template as<value_type>());
@@ -503,6 +505,15 @@ struct json_type_traits<Json, T,
             j.push_back(*it);
         }
         return j;
+    }
+
+    static void do_reserve_(std::true_type, T& v, size_t size)
+    {
+        v.reserve(size);
+    }
+
+    static void do_reserve_(std::false_type, T&, size_t)
+    {
     }
 };
 

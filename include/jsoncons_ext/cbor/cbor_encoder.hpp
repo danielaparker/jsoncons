@@ -24,7 +24,7 @@ namespace jsoncons { namespace cbor {
 
 enum class cbor_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
-template<class Sink=jsoncons::binary_stream_sink,class Float128T = std::nullptr_t>
+template<class Sink=jsoncons::binary_stream_sink>
 class basic_cbor_encoder final : public json_content_handler
 {
     using super_type = json_content_handler;

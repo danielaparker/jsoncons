@@ -163,6 +163,113 @@ struct ser_traits<T,
 };
 
 template <class T>
+struct typed_array_content_handler : public default_json_content_handler
+{
+    T& v_;
+    int level_;
+public:
+    typedef typename T::value_type value_type;
+
+    typed_array_content_handler(T& v)
+        : default_json_content_handler(false,conversion_errc::json_not_vector), v_(v), level_(0)
+    {
+    }
+private:
+    bool do_begin_array(semantic_tag, 
+                        const ser_context&, 
+                        std::error_code& ec) override
+    {      
+        if (++level_ != 1)
+        {
+            ec = conversion_errc::json_not_vector;
+            return false;
+        }
+        return true;
+    }
+
+    bool do_begin_array(std::size_t size, 
+                        semantic_tag, 
+                        const ser_context&, 
+                        std::error_code& ec) override
+    {
+        if (++level_ != 1)
+        {
+            ec = conversion_errc::json_not_vector;
+            return false;
+        }
+        v_.reserve(size);
+        return true;
+    }
+
+    bool do_end_array(const ser_context&, 
+                      std::error_code& ec) override
+    {
+        if (level_ != 1)
+        {
+            ec = conversion_errc::json_not_vector;
+            return false;
+        }
+        return false;
+    }
+
+    bool do_uint64_value(uint64_t value, 
+                         semantic_tag, 
+                         const ser_context&,
+                         std::error_code&) override
+    {
+        v_.push_back(static_cast<value_type>(value));
+        return true;
+    }
+
+    bool do_int64_value(int64_t value, 
+                        semantic_tag,
+                        const ser_context&,
+                        std::error_code&) override
+    {
+        v_.push_back(static_cast<value_type>(value));
+        return true;
+    }
+
+    bool do_half_value(uint16_t value, 
+                       semantic_tag,
+                       const ser_context&,
+                       std::error_code&) override
+    {
+        return do_half_value_(typename std::integral_constant<bool, std::is_integral<value_type>::value>::type(), value);
+    }
+
+    bool do_half_value_(std::true_type, uint16_t value)
+    {
+        v_.push_back(static_cast<value_type>(value));
+        return true;
+    }
+
+    bool do_half_value_(std::false_type, uint16_t value)
+    {
+        v_.push_back(static_cast<value_type>(jsoncons::detail::decode_half(value)));
+        return true;
+    }
+
+    bool do_double_value(double value, 
+                         semantic_tag,
+                         const ser_context&,
+                         std::error_code&) override
+    {
+        v_.push_back(static_cast<value_type>(value));
+        return true;
+    }
+
+    bool do_typed_array(const span<const value_type>& data,  
+                        semantic_tag,
+                        const ser_context&,
+                        std::error_code&) override
+    {
+        v_ = std::vector<value_type>(data.begin(),data.end());
+        return false;
+    }
+};
+
+template <class T>
 struct ser_traits<T,
     typename std::enable_if<!is_json_type_traits_declared<T>::value && 
              jsoncons::detail::is_vector_like<T>::value &&
@@ -173,7 +280,7 @@ struct ser_traits<T,
 
     template <class Json>
     static T decode(basic_staj_reader<typename Json::char_type>& reader, 
-                    const Json& context_j, 
+                    const Json&, 
                     std::error_code& ec)
     {
         T v;
@@ -183,12 +290,9 @@ struct ser_traits<T,
             ec = conversion_errc::json_not_vector;
             return v;
         }
-        reader.next(ec);
-        while (reader.current().event_type() != staj_event_type::end_array && !ec)
-        {
-            v.push_back(ser_traits<value_type>::decode(reader, context_j, ec));
-            reader.next(ec);
-        }
+
+        typed_array_content_handler<T> handler(v);
+        reader.read(handler, ec);
         return v;
     }
 
