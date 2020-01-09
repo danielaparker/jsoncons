@@ -840,23 +840,49 @@ private:
                 break;
         }
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::byte_string);
-        auto func = [&](std::size_t length, std::error_code& ec)
+
+        switch(info)
         {
-            v.reserve(v.size()+length);
-            source_.read(std::back_inserter(v), length);
-            if (source_.eof())
+            case jsoncons::cbor::detail::additional_info::indefinite_length:
             {
-                ec = cbor_errc::unexpected_eof;
-                more_ = false;
-                return;
+                auto func = [&](std::size_t length, std::error_code& ec)
+                {
+                    size_t offset = v.size();
+                    v.resize(v.size()+length);
+                    source_.read(v.data()+offset, length);
+                    if (source_.eof())
+                    {
+                        ec = cbor_errc::unexpected_eof;
+                        more_ = false;
+                        return;
+                    }
+                };
+                iterate_string_chunks( func, ec);
+                break;
             }
-        };
-        iterate_string_chunks( func, ec);
-        if (state_stack_.back().stringref_map && 
-            info != jsoncons::cbor::detail::additional_info::indefinite_length &&
-            v.size() >= jsoncons::cbor::detail::min_length_for_stringref(state_stack_.back().stringref_map->size()))
-        {
-            state_stack_.back().stringref_map->emplace_back(v);
+            default:
+            {
+                std::size_t length = get_size(ec);
+                if (ec)
+                {
+                    more_ = false;
+                    return v;
+                }
+                v.resize(length);
+                source_.read(v.data(), length);
+                if (source_.eof())
+                {
+                    ec = cbor_errc::unexpected_eof;
+                    more_ = false;
+                    return v;
+                }
+                if (state_stack_.back().stringref_map &&
+                    v.size() >= jsoncons::cbor::detail::min_length_for_stringref(state_stack_.back().stringref_map->size()))
+                {
+                    state_stack_.back().stringref_map->emplace_back(v);
+                }
+                break;
+            }
         }
         return v;
     }
