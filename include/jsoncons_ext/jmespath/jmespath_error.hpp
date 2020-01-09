@@ -87,10 +87,11 @@ enum class jmespath_errc
     expected_identifier,
     expected_index,
     expected_A_Za_Z_,
+    expected_right_bracket,
+    invalid_number,
 
     expected_root,
     expected_current_node,
-    expected_right_bracket,
     expected_name,
     expected_separator,
     invalid_filter,

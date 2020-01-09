@@ -91,7 +91,7 @@ namespace detail
                 }
                 if (other)
                 {
-                    valuep_ = ::new(&storage_)value_type(other);
+                    valuep_ = ::new(&storage_)value_type(other.value());
                 }
             }
             return *this;
