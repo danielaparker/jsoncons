@@ -1,3 +1,14 @@
+v0.143.2
+--------
+
+Bug fix:
+
+- Fixed bug in destructor of `typed_array` class
+
+Enhancement:
+
+- Improved performance of decoding CBOR typed arrays
+
 v0.143.1
 --------
 
