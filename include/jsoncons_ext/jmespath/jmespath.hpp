@@ -49,11 +49,12 @@ struct array_slice
         if (end_)
         {
             auto len = end_.value() >= 0 ? end_.value() : (static_cast<int64_t>(size) - end_.value());
-            return len <= size ? len : size;
+            return len <= static_cast<int64_t>(size) ? len : static_cast<int64_t>(size);
         }
         else
         {
-            return size;
+            std::cout << "END: " << end_.value() << "\n";
+            return static_cast<int64_t>(size);
         }
     }
 
@@ -279,7 +280,7 @@ class jmespath_evaluator : public ser_context
         {
         }
 
-        void add_selector(std::unique_ptr<selector_base>&& selector) override
+        void add_selector(std::unique_ptr<selector_base>&&) override
         {
             // Error
         }
@@ -344,7 +345,7 @@ class jmespath_evaluator : public ser_context
         {
         }
 
-        void add_selector(std::unique_ptr<selector_base>&& selector) 
+        void add_selector(std::unique_ptr<selector_base>&&) 
         {
             // Error
         }
@@ -412,7 +413,7 @@ class jmespath_evaluator : public ser_context
         {
         }
 
-        void add_selector(std::unique_ptr<selector_base>&& selector) override
+        void add_selector(std::unique_ptr<selector_base>&&) override
         {
             // Error
         }

@@ -77,6 +77,7 @@ namespace detail
             if (valuep_)
             {
                 valuep_->~T();
+                valuep_ = nullptr;
             }
         }
 
@@ -107,7 +108,7 @@ namespace detail
         }
 
         template< class U = T >
-        optional& operator=( U&& value )
+        optional& operator=(U&& value)
         {
             if (valuep_)
             {
