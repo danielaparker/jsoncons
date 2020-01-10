@@ -59,7 +59,8 @@ namespace detail
 
         template <class U = T>
         optional(U&& value,
-             typename std::enable_if<std::is_constructible<T, U&&>::value &&
+             typename std::enable_if<!std::is_same<optional<T>, typename std::decay<U>::type>::value &&
+                                    std::is_constructible<T, U&&>::value &&
                                     std::is_convertible<U&&,T>::value>::type * = 0) // (8)
             : valuep_(nullptr)
         {
@@ -68,7 +69,8 @@ namespace detail
 
         template <class U = T>
         explicit optional(U&& value,
-                      typename std::enable_if<std::is_constructible<T, U&&>::value &&
+                      typename std::enable_if<!std::is_same<optional<T>, typename std::decay<U>::type>::value &&
+                                              std::is_constructible<T, U&&>::value &&
                                               !std::is_convertible<U&&,T>::value>::type* = 0) // (8)
             : valuep_(nullptr)
         {
