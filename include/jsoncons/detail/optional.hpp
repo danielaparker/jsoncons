@@ -58,23 +58,20 @@ namespace detail
         }
 
         template <class U = T>
-        /*constexpr */optional(U&& value,
-                           typename std::enable_if<std::is_constructible<T, U&&>::value &&
-                                                  std::is_convertible<U&&,T>::value>::type * = 0) // (8)
-            : valuep_(::new(&storage_)value_type(std::forward<U>(value)))
+        optional(U&& value,
+             typename std::enable_if<std::is_constructible<T, U&&>::value &&
+                                    std::is_convertible<U&&,T>::value>::type * = 0) // (8)
+            : valuep_(nullptr)
         {
-            //std::cout << "VALUE1 " << value << "\n";
-            //valuep_ = ::new(&storage_)value_type(std::forward<U>(value));
-            //std::cout << *valuep_ << "\n"; 
+            valuep_ = ::new(&storage_)value_type(std::forward<U>(value));
         }
 
         template <class U = T>
-        explicit /*constexpr*/ optional(U&& value,
-                                    typename std::enable_if<std::is_constructible<T, U&&>::value &&
-                                                            !std::is_convertible<U&&,T>::value>::type* = 0) // (8)
+        explicit optional(U&& value,
+                      typename std::enable_if<std::is_constructible<T, U&&>::value &&
+                                              !std::is_convertible<U&&,T>::value>::type* = 0) // (8)
             : valuep_(nullptr)
         {
-            std::cout << "VALUE2 " << value << "\n";
             valuep_ = ::new(&storage_)value_type(std::forward<U>(value));
         }
         ~optional()
