@@ -611,7 +611,6 @@ class jmespath_evaluator : public ser_context
     const char_type* begin_input_;
     const char_type* end_input_;
     const char_type* p_;
-    std::vector<std::unique_ptr<selector_base>> selector_stack_;
     std::vector<std::size_t> sub_expression_indices_;
 
     std::vector<std::unique_ptr<Json>> temp_json_values_;
@@ -619,12 +618,13 @@ class jmespath_evaluator : public ser_context
     typedef std::vector<pointer> argument_type;
     std::vector<argument_type> function_stack_;
     std::vector<state_item> state_stack_;
+    std::unique_ptr<selector_base> selector_;
 
 public:
     jmespath_evaluator()
         : line_(1), column_(1),
           begin_input_(nullptr), end_input_(nullptr),
-          p_(nullptr)
+          p_(nullptr), selector_(make_unique_ptr<sub_expression_selector>())
     {
     }
 
@@ -742,8 +742,6 @@ public:
 
         array_slice slice;
 
-        selector_stack_.push_back(make_unique_ptr<sub_expression_selector>());
-
         while (p_ < end_input_)
         {
             switch (state_stack_.back().state)
@@ -826,13 +824,13 @@ public:
                     switch (*p_)
                     {
                         case ' ':case '\t':case '\r':case '\n':
-                            selector_stack_.back()->add_selector(make_unique_ptr<identifier_selector>(buffer));
+                            selector_->add_selector(make_unique_ptr<identifier_selector>(buffer));
                             buffer.clear();
                             state_stack_.pop_back(); // unquoted_string
                             advance_past_space_character();
                             break;
                         case '.':
-                            selector_stack_.back()->add_selector(make_unique_ptr<identifier_selector>(buffer));
+                            selector_->add_selector(make_unique_ptr<identifier_selector>(buffer));
                             state_stack_.pop_back(); // unquoted_string
                             state_stack_.back().state = path_state::expression1;
                             buffer.clear();
@@ -840,7 +838,7 @@ public:
                             ++column_;
                             break;
                         case '[':
-                            selector_stack_.back()->add_selector(make_unique_ptr<identifier_selector>(buffer));
+                            selector_->add_selector(make_unique_ptr<identifier_selector>(buffer));
                             state_stack_.pop_back(); // unquoted_string
                             buffer.clear();
                             state_stack_.back().state = path_state::index_expression;
@@ -913,7 +911,7 @@ public:
                     switch(*p_)
                     {
                         case ']':
-                            selector_stack_.back()->add_selector(make_unique_ptr<index_selector>(buffer));
+                            selector_->add_selector(make_unique_ptr<index_selector>(buffer));
                             buffer.clear();
                             state_stack_.pop_back(); // bracket_specifier
                             ++p_;
@@ -958,7 +956,7 @@ public:
                     switch(*p_)
                     {
                         case ']':
-                            selector_stack_.back()->add_selector(make_unique_ptr<slice_selector>(slice));
+                            selector_->add_selector(make_unique_ptr<slice_selector>(slice));
                             buffer.clear();
                             slice = array_slice();
                             state_stack_.pop_back(); // bracket_specifier2
@@ -993,7 +991,7 @@ public:
                     switch(*p_)
                     {
                         case ']':
-                            selector_stack_.back()->add_selector(make_unique_ptr<slice_selector>(slice));
+                            selector_->add_selector(make_unique_ptr<slice_selector>(slice));
                             buffer.clear();
                             slice = array_slice();
                             state_stack_.pop_back(); // bracket_specifier2
@@ -1630,7 +1628,7 @@ public:
         {
             case path_state::unquoted_string: 
             {
-                selector_stack_.back()->add_selector(make_unique_ptr<identifier_selector>(buffer));
+                selector_->add_selector(make_unique_ptr<identifier_selector>(buffer));
                 buffer.clear();
                 state_stack_.pop_back(); // unquoted_name
                 break;
@@ -1645,15 +1643,13 @@ public:
             return result;
         }
 
-        //state_stack_.pop_back(); 
-
         JSONCONS_ASSERT(state_stack_.size() == 1);
         JSONCONS_ASSERT(state_stack_.back().state == path_state::identifier ||
                         state_stack_.back().state == path_state::expression1 ||
                         state_stack_.back().state == path_state::index_expression);
         state_stack_.pop_back();
 
-        reference r = selector_stack_[0]->select(*this, string_type(), root); 
+        reference r = selector_->select(*this, string_type(), root); 
         return r;
     }
 #if 0
