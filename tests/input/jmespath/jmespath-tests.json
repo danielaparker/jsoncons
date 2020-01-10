@@ -82,11 +82,17 @@
         "input" : "{\"people\": [{\"first\": \"James\", \"last\": \"d\"},{\"first\": \"Jacob\", \"last\": \"e\"},{\"first\": \"Jayden\", \"last\": \"f\"},{\"missing\": \"different\"}],\"foo\": {\"bar\": \"baz\"}}",
         "expression" : "people[*].first",
         "expected" : "[\"James\",\"Jacob\",\"Jayden\"]"
-    },*/
+    },
     {
         "annotation" : "Slice Projection",
         "input" : "{\"people\": [{\"first\": \"James\", \"last\": \"d\"},{\"first\": \"Jacob\", \"last\": \"e\"},{\"first\": \"Jayden\", \"last\": \"f\"},{\"missing\": \"different\"}],\"foo\": {\"bar\": \"baz\"}}",
         "expression" : "people[:2].first",
         "expected" : "[\"James\",\"Jacob\"]"
+    },*/
+    {
+        "annotation" : "Object Projection",
+        "input" : "{\"ops\": {\"functionA\": {\"numArgs\": 2},\"functionB\": {\"numArgs\": 3},\"functionC\": {\"variadic\": true}}}",
+        "expression" : "ops.*.numArgs",
+        "expected" : "[2,3]"
     }
 ]

@@ -178,8 +178,6 @@ struct state_item
     state_item& operator=(const state_item&) = default;
 };
 
-JSONCONS_STRING_LITERAL(length, 'l', 'e', 'n', 'g', 't', 'h')
-
 template<class Json,
          class JsonReference>
 class jmespath_evaluator : public ser_context
@@ -353,27 +351,6 @@ class jmespath_evaluator : public ser_context
                     return null;
                 }
             }
-            /* else if (val.is_string())
-            {
-                std::size_t pos = 0;
-                string_view_type sv = val.as_string_view();
-                if (try_string_to_index(identifier_.data(), identifier_.size(), &pos, &is_start_positive))
-                {
-                    std::size_t index = is_start_positive ? pos : sv.size() - pos;
-                    auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), index);
-                    if (sequence.length() > 0)
-                    {
-                        pointer ptr = evaluator.create_temp(sequence.begin(),sequence.length());
-                        nodes.emplace_back(PathCons()(path, index), ptr);
-                    }
-                }
-                else if (identifier_ == length_literal<char_type>() && sv.size() > 0)
-                {
-                    std::size_t count = unicons::u32_length(sv.begin(),sv.end());
-                    pointer ptr = evaluator.create_temp(count);
-                    nodes.emplace_back(PathCons()(path, identifier_), ptr);
-                }
-            }*/
             return null;
         }
     };
