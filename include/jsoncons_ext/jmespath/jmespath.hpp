@@ -41,16 +41,17 @@ struct array_slice
     {
     }
 
-    std::size_t get_start(std::size_t size) const
+    int64_t get_start(std::size_t size) const
     {
-        return start_ >= 0 ? static_cast<std::size_t>(start_) : static_cast<std::size_t>(static_cast<int64_t>(size) - start_);
+        return start_ >= 0 ? start_ : (static_cast<int64_t>(size) - start_);
     }
 
-    std::size_t get_end(std::size_t size) const
+    int64_t get_end(std::size_t size) const
     {
         if (end_)
         {
-            return end_.value() >= 0 ? static_cast<std::size_t>(end_.value()) : static_cast<std::size_t>(static_cast<int64_t>(size) - end_.value());
+            auto len = end_.value() >= 0 ? end_.value() : (static_cast<int64_t>(size) - end_.value());
+            return len <= size ? len : size;
         }
         else
         {
@@ -58,9 +59,9 @@ struct array_slice
         }
     }
 
-    std::size_t step() const
+    int64_t step() const
     {
-        return static_cast<std::size_t>(step_); // Allow negative
+        return step_; // Allow negative
     }
 
     array_slice(const array_slice&) = default;
@@ -110,7 +111,7 @@ enum class path_state
     identifier,
     quoted_string,
     unquoted_string,
-    sub_expression,
+    expression1,
     index_expression,
     number,
     digit,
@@ -154,23 +155,14 @@ enum class path_state
 struct state_item
 {
     path_state state;
-    bool is_recursive_descent;
-    bool is_union;
 
     state_item()
-        : state(path_state::start), is_recursive_descent(false), is_union(false)
+        : state(path_state::start)
     {
     }
 
     explicit state_item(path_state state)
-        : state(state), is_recursive_descent(false), is_union(false)
-    {
-    }
-
-    state_item(path_state state, const state_item& parent)
-        : state(state), 
-          is_recursive_descent(parent.is_recursive_descent), 
-          is_union(parent.is_union)
+        : state(state)
     {
     }
 
@@ -542,13 +534,24 @@ class jmespath_evaluator : public ser_context
 
             if (val.is_array())
             {
-                if (slice_.step() >= 0)
+                auto start = slice_.get_start(val.size());
+                auto end = slice_.get_end(val.size());
+                auto step = slice_.step();
+                if (step >= 0)
                 {
-                    return end_array_slice1(path, val);
+                    for (int64_t j = start; j < end; j += step)
+                    {
+                        a_.emplace_back(val[static_cast<std::size_t>(j)]);
+                    }
+                    return a_; 
                 }
                 else
                 {
-                    return end_array_slice2(path, val);
+                    for (int64_t j = end-1; j >= start; j += step)
+                    {
+                        a_.emplace_back(val[static_cast<std::size_t>(j)]);
+                    }
+                    return a_; 
                 }
             }
             else
@@ -559,17 +562,6 @@ class jmespath_evaluator : public ser_context
 
         reference end_array_slice1(const string_type& path, reference val)
         {
-            std::size_t start = slice_.get_start(val.size());
-            std::size_t end = slice_.get_end(val.size());
-
-            for (std::size_t j = start; j < end; j += slice_.step())
-            {
-                if (j < val.size())
-                {
-                    a_.emplace_back(val[j]);
-                }
-            }
-            return a_; 
         }
 
         reference end_array_slice2(const string_type& path, reference val)
@@ -736,37 +728,7 @@ public:
             {
                 case path_state::start: 
                 {
-                    switch (*p_)
-                    {
-                        case '\"':
-                            state_stack_.back().state = path_state::identifier;
-                            state_stack_.emplace_back(path_state::quoted_string, state_stack_.back());
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '[':
-                            state_stack_.back().state = path_state::index_expression;
-                            state_stack_.emplace_back(path_state::bracket_specifier, state_stack_.back());
-                            state_stack_.emplace_back(path_state::number, state_stack_.back());
-                            ++p_;
-                            ++column_;
-                            break;
-                        default:
-                            if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
-                            {
-                                state_stack_.back().state = path_state::identifier;
-                                state_stack_.emplace_back(path_state::unquoted_string, state_stack_.back());
-                                buffer.push_back(*p_);
-                                ++p_;
-                                ++column_;
-                            }
-                            else
-                            {
-                                ec = jmespath_errc::expected_identifier;
-                                return result;
-                            }
-                            break;
-                    };
+                    state_stack_.back().state = path_state::expression1;
                     break;
                 }
                 case path_state::identifier: 
@@ -774,8 +736,9 @@ public:
                     switch (*p_)
                     {
                         case '[':
-                            state_stack_.emplace_back(path_state::index_expression, state_stack_.back());
-                            state_stack_.emplace_back(path_state::number, state_stack_.back());
+                            state_stack_.back().state = path_state::index_expression;
+                            state_stack_.emplace_back(path_state::bracket_specifier);
+                            state_stack_.emplace_back(path_state::number);
                             ++p_;
                             ++column_;
                             break;
@@ -787,7 +750,7 @@ public:
                             if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                             {
                                 state_stack_.back().state = path_state::identifier;
-                                state_stack_.emplace_back(path_state::unquoted_string, state_stack_.back());
+                                state_stack_.emplace_back(path_state::unquoted_string);
                                 buffer.push_back(*p_);
                                 ++p_;
                                 ++column_;
@@ -801,7 +764,7 @@ public:
                     };
                     break;
                 }
-                case path_state::sub_expression: 
+                case path_state::expression1: 
                 {
                     switch (*p_)
                     {
@@ -809,14 +772,21 @@ public:
                             advance_past_space_character();
                             break;
                         case '\"':
-                            state_stack_.emplace_back(path_state::quoted_string, state_stack_.back());
+                            state_stack_.emplace_back(path_state::quoted_string);
+                            ++p_;
+                            ++column_;
+                            break;
+                        case '[':
+                            state_stack_.back().state = path_state::index_expression;
+                            state_stack_.emplace_back(path_state::bracket_specifier);
+                            state_stack_.emplace_back(path_state::number);
                             ++p_;
                             ++column_;
                             break;
                         default:
                             if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                             {
-                                state_stack_.emplace_back(path_state::unquoted_string, state_stack_.back());
+                                state_stack_.emplace_back(path_state::unquoted_string);
                                 buffer.push_back(*p_);
                                 ++p_;
                                 ++column_;
@@ -842,7 +812,7 @@ public:
                         case '.':
                             selector_stack_.back()->add_selector(make_unique_ptr<identifier_selector>(buffer));
                             state_stack_.pop_back(); // unquoted_string
-                            state_stack_.back().state = path_state::sub_expression;
+                            state_stack_.back().state = path_state::expression1;
                             buffer.clear();
                             ++p_;
                             ++column_;
@@ -852,7 +822,8 @@ public:
                             state_stack_.pop_back(); // unquoted_string
                             buffer.clear();
                             state_stack_.back().state = path_state::index_expression;
-                            state_stack_.emplace_back(path_state::number, state_stack_.back());
+                            state_stack_.emplace_back(path_state::bracket_specifier);
+                            state_stack_.emplace_back(path_state::number);
                             ++p_;
                             ++column_;
                             break;
@@ -899,8 +870,22 @@ public:
                     }
                     break;
                 case path_state::index_expression:
-                    ec = jmespath_errc::expected_index;
-                    return result;
+                    switch(*p_)
+                    {
+                        case '.':
+                            ++p_;
+                            ++column_;
+                            state_stack_.back().state = path_state::expression1;
+                            break;
+                        case '[':
+                            //++p_;
+                            //++column_;
+                            state_stack_.back().state = path_state::expression1;
+                            break;
+                        default:
+                            ec = jmespath_errc::expected_index;
+                            return result;
+                    }
                     break;
                 case path_state::bracket_specifier:
                     switch(*p_)
@@ -922,7 +907,7 @@ public:
                             }
                             slice.start_ = r.value();
                             state_stack_.back().state = path_state::bracket_specifier2;
-                            state_stack_.emplace_back(path_state::number, state_stack_.back());
+                            state_stack_.emplace_back(path_state::number);
                             ++p_;
                             ++column_;
                             break;
@@ -956,7 +941,7 @@ public:
                             break;
                         case ':':
                             state_stack_.back().state = path_state::bracket_specifier3;
-                            state_stack_.emplace_back(path_state::number, state_stack_.back());
+                            state_stack_.emplace_back(path_state::number);
                             ++p_;
                             ++column_;
                             break;
@@ -1066,12 +1051,12 @@ public:
                             advance_past_space_character();
                             break;
                         case '.':
-                            state_stack_.emplace_back(path_state::dot, state_stack_.back());
+                            state_stack_.emplace_back(path_state::dot);
                             ++p_;
                             ++column_;
                             break;
                         case '[':
-                            state_stack_.emplace_back(path_state::wildcard_or_rpath_or_slice_or_filter, state_stack_.back());
+                            state_stack_.emplace_back(path_state::wildcard_or_rpath_or_slice_or_filter);
                             ++p_;
                             ++column_;
                             break;
@@ -1232,25 +1217,25 @@ public:
                             slice = array_slice();
                             buffer.clear();
                             state_stack_.back().state = path_state::comma_or_right_bracket;
-                            state_stack_.emplace_back(path_state::slice_end_or_end_step, state_stack_.back());
+                            state_stack_.emplace_back(path_state::slice_end_or_end_step);
                             ++p_;
                             ++column_;
                             break;
                         case '*':
                             state_stack_.back().state = path_state::comma_or_right_bracket;
-                            state_stack_.emplace_back(path_state::bracketed_wildcard_or_path, state_stack_.back());
+                            state_stack_.emplace_back(path_state::bracketed_wildcard_or_path);
                             ++p_;
                             ++column_;
                             break;
                         case '\'':
                             state_stack_.back().state = path_state::comma_or_right_bracket;
-                            state_stack_.emplace_back(path_state::bracketed_single_quoted_name, state_stack_.back());
+                            state_stack_.emplace_back(path_state::bracketed_single_quoted_name);
                             ++p_;
                             ++column_;
                             break;
                         case '\"':
                             state_stack_.back().state = path_state::comma_or_right_bracket;
-                            state_stack_.emplace_back(path_state::bracketed_double_quoted_name, state_stack_.back());
+                            state_stack_.emplace_back(path_state::bracketed_double_quoted_name);
                             ++p_;
                             ++column_;
                             break;
@@ -1259,7 +1244,7 @@ public:
                             buffer.clear();
                             buffer.push_back(*p_);
                             state_stack_.back().state = path_state::comma_or_right_bracket;
-                            state_stack_.emplace_back(path_state::bracketed_unquoted_name, state_stack_.back());
+                            state_stack_.emplace_back(path_state::bracketed_unquoted_name);
                             ++p_;
                             ++column_;
                             break;
@@ -1358,13 +1343,13 @@ public:
                     {
                         case '\'':
                             buffer.push_back(*p_);
-                            state_stack_.emplace_back(path_state::path_single_quoted, state_stack_.back());
+                            state_stack_.emplace_back(path_state::path_single_quoted);
                             ++p_;
                             ++column_;
                             break;
                         case '\"':
                             buffer.push_back(*p_);
-                            state_stack_.emplace_back(path_state::path_double_quoted, state_stack_.back());
+                            state_stack_.emplace_back(path_state::path_double_quoted);
                             ++p_;
                             ++column_;
                             break;
@@ -1637,7 +1622,7 @@ public:
 
         JSONCONS_ASSERT(state_stack_.size() == 1);
         JSONCONS_ASSERT(state_stack_.back().state == path_state::identifier ||
-                        state_stack_.back().state == path_state::sub_expression ||
+                        state_stack_.back().state == path_state::expression1 ||
                         state_stack_.back().state == path_state::index_expression);
         state_stack_.pop_back();
 
