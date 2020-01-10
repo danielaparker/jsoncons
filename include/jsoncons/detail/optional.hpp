@@ -58,7 +58,7 @@ namespace detail
         }
 
         template <class U = T>
-        constexpr optional(U&& value,
+        /*constexpr */optional(U&& value,
                            typename std::enable_if<std::is_constructible<T, U&&>::value &&
                            std::is_convertible<T, U&&>::value>::type * = 0) // (8)
             : valuep_(::new(&storage_)value_type(std::forward<U>(value)))
@@ -66,7 +66,7 @@ namespace detail
         }
 
         template <class U = T>
-        explicit constexpr optional(U&& value,
+        explicit /*constexpr*/ optional(U&& value,
                                     typename std::enable_if<std::is_constructible<T, U&&>::value &&
                                                             !std::is_convertible<T, U&&>::value>::type* = 0) // (8)
             : valuep_(::new(&storage_)value_type(std::forward<U>(value)))
