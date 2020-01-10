@@ -42,8 +42,10 @@ namespace detail
         optional(optional&& other) noexcept
             : valuep_(nullptr)
         {
-            std::swap(valuep_,other.valuep_);
-            std::swap(storage_,other.storage_);
+            if (other)
+            {
+                valuep_ = ::new(&storage_)value_type(other.value());
+            }
         }
 
         template <class U=T>
@@ -102,32 +104,6 @@ namespace detail
             return *this;
         }
 
-        optional& operator=( optional&& other ) noexcept
-        {
-            if (this != &other)
-            {
-                std::swap(valuep_, other.valuep_);
-            }
-            return *this;
-        }
-
-        template< class U = T >
-        optional& operator=(U&& value)
-        {
-            if (valuep_)
-            {
-                valuep_->~T();
-                valuep_ = nullptr;
-            }
-            valuep_ = ::new(&storage_)value_type(value);
-            return *this;
-        }
-
-        void swap( optional& other ) noexcept
-        {
-            std::swap(valuep_,other.valuep_);
-        }
-
         constexpr explicit operator bool() const noexcept
         {
             return valuep_ != nullptr;
@@ -142,7 +118,7 @@ namespace detail
 #pragma warning(disable : 4702)
 #endif // _MSC_VER
 
-        T& value() &
+        T& value()
         {
             if (valuep_ == nullptr)
             {
@@ -151,7 +127,7 @@ namespace detail
             return *valuep_;
         }
 
-        constexpr const T& value() const &
+        constexpr const T& value() const 
         {
             if (valuep_ == nullptr)
             {

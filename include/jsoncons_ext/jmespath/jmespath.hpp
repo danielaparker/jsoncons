@@ -34,10 +34,17 @@ struct array_slice
     {
     }
 
-    array_slice(int64_t start, optional<int64_t> end, int64_t step) 
+    array_slice(int64_t start, const optional<int64_t>& end, int64_t step) 
         : start_(start), end_(end), step_(step)
     {
     }
+
+    array_slice(const array_slice& other)
+        : start_(other.start_), end_(other.end_), step_(other.step_)
+    {
+    }
+
+    array_slice& operator=(const array_slice&) = default;
 
     int64_t get_start(std::size_t size) const
     {
@@ -49,7 +56,6 @@ struct array_slice
         if (end_)
         {
             auto len = end_.value() >= 0 ? end_.value() : (static_cast<int64_t>(size) - end_.value());
-            std::cout << "END: " << end_.value() << ", len: " << len << ", size: " << size << "\n";
             return len <= static_cast<int64_t>(size) ? len : static_cast<int64_t>(size);
         }
         else
@@ -62,10 +68,6 @@ struct array_slice
     {
         return step_; // Allow negative
     }
-
-    array_slice(const array_slice&) = default;
-
-    array_slice& operator=(const array_slice&) = default;
 };
 
 // work around for std::make_unique not being available until C++14
@@ -274,9 +276,10 @@ class jmespath_evaluator : public ser_context
     {
     private:
         string_type identifier_;
+        Json aresult_;
     public:
         identifier_selector(const string_view_type& name)
-            : identifier_(name)
+            : identifier_(name), aresult_(json_array_arg)
         {
         }
 
@@ -293,44 +296,17 @@ class jmespath_evaluator : public ser_context
             {
                 return val.at(identifier_);
             }
-            /* else if (val.is_array())
+            else if (val.is_array())
             {
-                std::size_t pos = 0;
-                if (try_string_to_index(identifier_.data(), identifier_.size(), &pos, &is_start_positive))
+                for (const auto& item : val.array_range())
                 {
-                    std::size_t index = is_start_positive ? pos : val.size() - pos;
-                    if (index < val.size())
+                    if (item.is_object() && item.contains(identifier_))
                     {
-                        nodes.emplace_back(PathCons()(path,index),std::addressof(val[index]));
+                        aresult_.push_back(item.at(identifier_));
                     }
                 }
-                else if (identifier_ == length_literal<char_type>() && val.size() > 0)
-                {
-                    pointer ptr = evaluator.create_temp(val.size());
-                    nodes.emplace_back(PathCons()(path, identifier_), ptr);
-                }
+                return aresult_;
             }
-            else if (val.is_string())
-            {
-                std::size_t pos = 0;
-                string_view_type sv = val.as_string_view();
-                if (try_string_to_index(identifier_.data(), identifier_.size(), &pos, &is_start_positive))
-                {
-                    std::size_t index = is_start_positive ? pos : sv.size() - pos;
-                    auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), index);
-                    if (sequence.length() > 0)
-                    {
-                        pointer ptr = evaluator.create_temp(sequence.begin(),sequence.length());
-                        nodes.emplace_back(PathCons()(path, index), ptr);
-                    }
-                }
-                else if (identifier_ == length_literal<char_type>() && sv.size() > 0)
-                {
-                    std::size_t count = unicons::u32_length(sv.begin(),sv.end());
-                    pointer ptr = evaluator.create_temp(count);
-                    nodes.emplace_back(PathCons()(path, identifier_), ptr);
-                }
-            }*/
             return null;
         }
     };
@@ -742,7 +718,6 @@ public:
                             return result;
                         }
                         slice.end_ = optional<int64_t>(r.value());
-                        std::cout << "r.value(): " << r.value() << ", slice.end_: " << slice.end_.value() << "\n";
                     }
                     switch(*p_)
                     {
