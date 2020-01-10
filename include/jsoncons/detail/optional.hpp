@@ -63,6 +63,7 @@ namespace detail
                            std::is_convertible<T, U&&>::value>::type * = 0) // (8)
             : valuep_(nullptr)
         {
+            std::cout << "VALUE1 " << value << "\n";
             valuep_ = ::new(&storage_)value_type(std::forward<U>(value));
         }
 
@@ -72,6 +73,7 @@ namespace detail
                                                             !std::is_convertible<T, U&&>::value>::type* = 0) // (8)
             : valuep_(nullptr)
         {
+            std::cout << "VALUE2 " << value << "\n";
             valuep_ = ::new(&storage_)value_type(std::forward<U>(value));
         }
         ~optional()
