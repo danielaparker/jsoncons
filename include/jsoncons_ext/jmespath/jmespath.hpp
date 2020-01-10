@@ -559,27 +559,6 @@ class jmespath_evaluator : public ser_context
                 return null;
             }
         }
-
-        reference end_array_slice1(const string_type& path, reference val)
-        {
-        }
-
-        reference end_array_slice2(const string_type& path, reference val)
-        {
-            std::size_t start = slice_.get_start(val.size());
-            std::size_t end = slice_.get_end(val.size());
-
-            std::size_t j = end + slice_.step() - 1;
-            while (j > (start+slice_.step()-1))
-            {
-                j -= slice_.step();
-                if (j < val.size())
-                {
-                    a_.emplace_back(val[j]);
-                }
-            }
-            return a_; 
-        }
     };
 
     function_table<Json,pointer> functions_;
@@ -899,13 +878,17 @@ public:
                             break;
                         case ':':
                         {
-                            auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
-                            if (!r)
+                            if (!buffer.empty())
                             {
-                                ec = jmespath_errc::invalid_number;
-                                return result;
+                                auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
+                                if (!r)
+                                {
+                                    ec = jmespath_errc::invalid_number;
+                                    return result;
+                                }
+                                slice.start_ = r.value();
+                                buffer.clear();
                             }
-                            slice.start_ = r.value();
                             state_stack_.back().state = path_state::bracket_specifier2;
                             state_stack_.emplace_back(path_state::number);
                             ++p_;
@@ -962,6 +945,7 @@ public:
                             return result;
                         }
                         slice.step_ = r.value();
+                        buffer.clear();
                     }
                     switch(*p_)
                     {
