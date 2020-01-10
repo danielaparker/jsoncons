@@ -63,6 +63,7 @@ namespace detail
                            std::is_convertible<T, U&&>::value>::type * = 0) // (8)
             : valuep_(::new(&storage_)value_type(std::forward<U>(value)))
         {
+            std::cout << "constexpr optional(U&& value) 1\n";
         }
 
         template <class U = T>
@@ -71,6 +72,7 @@ namespace detail
                                                             !std::is_convertible<T, U&&>::value>::type* = 0) // (8)
             : valuep_(::new(&storage_)value_type(std::forward<U>(value)))
         {
+            std::cout << "constexpr optional(U&& value) 2\n";
         }
         ~optional()
         {

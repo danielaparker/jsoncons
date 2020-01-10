@@ -742,6 +742,7 @@ public:
                             return result;
                         }
                         slice.end_ = optional<int64_t>(r.value());
+                        std::cout << "r.value(): " << r.value() << ", slice.end_: " << slice.end_.value() << "\n";
                     }
                     switch(*p_)
                     {
