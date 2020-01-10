@@ -1,5 +1,5 @@
 [
-    {
+    /*{
         "annotation" : "Select a value with an identifier",
         "input" : "{\"a\": \"foo\", \"b\": \"bar\", \"c\": \"baz\"}",
         "expression" : "a",
@@ -76,5 +76,11 @@
         "input" : "[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]",
         "expression" : "[::-1]",
         "expected" : "[9,8,7,6,5,4,3,2,1,0]"
+    },*/
+    {
+        "annotation" : "List Projection",
+        "input" : "{\"people\": [{\"first\": \"James\", \"last\": \"d\"},{\"first\": \"Jacob\", \"last\": \"e\"},{\"first\": \"Jayden\", \"last\": \"f\"},{\"missing\": \"different\"}],\"foo\": {\"bar\": \"baz\"}}",
+        "expression" : "people[*].first",
+        "expected" : "[\"James\",\"Jacob\",\"Jayden\"]"
     }
 ]

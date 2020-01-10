@@ -118,6 +118,7 @@ enum class path_state
     bracket_specifier,
     bracket_specifier2,
     bracket_specifier3,
+    bracket_specifier4,
 
     dot_or_left_bracket,
     name_or_left_bracket,
@@ -185,47 +186,6 @@ class jmespath_evaluator : public ser_context
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
     typedef typename Json::const_pointer const_pointer;
 
-    struct node_type
-    {
-        string_type path;
-        pointer val_ptr;
-
-        node_type() = default;
-        node_type(const string_type& p, const pointer& valp)
-            : path(p),val_ptr(valp)
-        {
-        }
-
-        node_type(string_type&& p, pointer&& valp) noexcept
-            : path(std::move(p)),val_ptr(valp)
-        {
-        }
-        node_type(const node_type&) = default;
-
-        node_type(node_type&& other) noexcept
-            : path(std::move(other.path)), val_ptr(other.val_ptr)
-        {
-
-        }
-        node_type& operator=(const node_type&) = default;
-
-        node_type& operator=(node_type&& other) noexcept
-        {
-            path.swap(other.path);
-            val_ptr = other.val_ptr;
-        }
-
-    };
-    typedef std::vector<node_type> node_set;
-
-    struct node_less
-    {
-        bool operator()(const node_type& a, const node_type& b) const
-        {
-            return *(a.val_ptr) < *(b.val_ptr);
-        }
-    };
-
     class selector_base
     {
     public:
@@ -238,11 +198,6 @@ class jmespath_evaluator : public ser_context
         virtual reference select(jmespath_evaluator& evaluator,
                                  const string_type& path, 
                                  reference val) = 0;
-
-        //virtual bool is_filter() const
-        //{
-        //    return false;
-        //}
     };
 #if 0
     class path_selector final : public selector_base
@@ -382,6 +337,7 @@ class jmespath_evaluator : public ser_context
         Json result_;
 
         list_projection_selector(std::unique_ptr<selector_base>&& lhs_selector)
+           : result_(json_array_arg)
         {
             lhs_selector_ = std::move(lhs_selector);
         }
@@ -396,7 +352,7 @@ class jmespath_evaluator : public ser_context
                          reference val) override
         {
             static Json null{null_type()};
-            auto j = lhs_selector_.select(evaluator,path,val);
+            auto j = lhs_selector_->select(evaluator,path,val);
             if (!j.is_array())
             {
                 return null;
@@ -405,12 +361,15 @@ class jmespath_evaluator : public ser_context
             for (reference item : j.array_range())
             {
                 std::vector<pointer> refs;
-                refs.push_back(std::addressof(val));
+                refs.push_back(std::addressof(item));
                 for (auto& selector : rhs_selectors_)
                 {
                     refs.push_back(std::addressof(selector->select(evaluator,path,*(refs.back()))));
                 }
-                result_.push_back(*(refs.back()));
+                if (!refs.back()->is_null())
+                {
+                    result_.push_back(*(refs.back()));
+                }
             }
             return result_;
         }
@@ -605,7 +564,6 @@ class jmespath_evaluator : public ser_context
 
     function_table<Json,pointer> functions_;
 
-    node_set nodes_;
     std::size_t line_;
     std::size_t column_;
     const char_type* begin_input_;
@@ -936,6 +894,12 @@ public:
                             ++column_;
                             break;
                         }
+                        case '*':
+                            selector_ = make_unique_ptr<list_projection_selector>(std::move(selector_));
+                            state_stack_.back().state = path_state::bracket_specifier4;
+                            ++p_;
+                            ++column_;
+                            break;
                         default:
                             ec = jmespath_errc::expected_right_bracket;
                             return result;
@@ -994,7 +958,22 @@ public:
                             selector_->add_selector(make_unique_ptr<slice_selector>(slice));
                             buffer.clear();
                             slice = array_slice();
-                            state_stack_.pop_back(); // bracket_specifier2
+                            state_stack_.pop_back(); // bracket_specifier3
+                            ++p_;
+                            ++column_;
+                            break;
+                        default:
+                            ec = jmespath_errc::expected_right_bracket;
+                            return result;
+                    }
+                    break;
+                }
+                case path_state::bracket_specifier4:
+                {
+                    switch(*p_)
+                    {
+                        case ']':
+                            state_stack_.pop_back(); // bracket_specifier4
                             ++p_;
                             ++column_;
                             break;
@@ -1698,92 +1677,6 @@ public:
         }
     }
 
-    void apply_selectors()
-    {
-        //std::cout << "apply_selectors count: " << selectors_.size() << "\n";
-        if (selectors_.size() > 0)
-        {
-            for (auto& node : stack_.back())
-            {
-                //std::cout << "apply selector to:\n" << pretty_print(*(node.val_ptr)) << "\n";
-                for (auto& selector : selectors_)
-                {
-                    apply_selector(node.path, *(node.val_ptr), *selector, true);
-                }
-            }
-            selectors_.clear();
-        }
-        stack_.push_back(std::move(nodes_));
-        //transfer_nodes();
-    }
-
-    void apply_selector(const string_type& path, reference val, selector_base& selector, bool process)
-    {
-        if (process)
-        {
-            selector.select(*this, path, val, nodes_);
-        }
-        //std::cout << "*it: " << val << "\n";
-        //std::cout << "apply_selectors 1 done\n";
-        if (state_stack_.back().is_recursive_descent)
-        {
-            //std::cout << "is_recursive_descent\n";
-            if (val.is_object())
-            {
-                //std::cout << "is_object\n";
-                for (auto& nvp : val.object_range())
-                {
-                    if (nvp.value().is_array() || nvp.value().is_object())
-                    {                        
-                        apply_selector(PathCons()(path,nvp.key()), nvp.value(), selector, true);
-                    } 
-                }
-            }
-            else if (val.is_array())
-            {
-                //std::cout << "is_array\n";
-                auto first = val.array_range().begin();
-                auto last = val.array_range().end();
-                for (auto it = first; it != last; ++it)
-                {
-                    if (it->is_array())
-                    {
-                        apply_selector(PathCons()(path,it - first), *it,selector, true);
-                        //std::cout << "*it: " << *it << "\n";
-                    }
-                    else if (it->is_object())
-                    {
-                        apply_selector(PathCons()(path,it - first), *it, selector, !selector.is_filter());
-                    }
-                }
-            }
-        }
-    }
-
-    void transfer_nodes()
-    {
-        if (state_stack_.back().is_union)
-        {
-            std::set<node_type, node_less> index;
-            std::vector<node_type> temp;
-            for (const auto& node : nodes_)
-            {
-                if (index.count(node) == 0)
-                {
-                    temp.emplace_back(node);
-                    index.emplace(node);
-                }
-            }
-            stack_.emplace_back(std::move(temp));
-        }
-        else
-        {
-            stack_.push_back(std::move(nodes_));
-        }
-        nodes_.clear();
-        state_stack_.back().is_recursive_descent = false;
-        state_stack_.back().is_union = false;
-    }
 #endif
     void advance_past_space_character()
     {
