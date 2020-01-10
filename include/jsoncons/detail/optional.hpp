@@ -61,11 +61,11 @@ namespace detail
         /*constexpr */optional(U&& value,
                            typename std::enable_if<std::is_constructible<T, U&&>::value &&
                                                   std::is_convertible<U&&,T>::value>::type * = 0) // (8)
-            : valuep_(nullptr)
+            : valuep_(::new(&storage_)value_type(std::forward<U>(value)))
         {
-            std::cout << "VALUE1 " << value << "\n";
-            valuep_ = ::new(&storage_)value_type(std::forward<U>(value));
-            std::cout << *valuep_ << "\n"; 
+            //std::cout << "VALUE1 " << value << "\n";
+            //valuep_ = ::new(&storage_)value_type(std::forward<U>(value));
+            //std::cout << *valuep_ << "\n"; 
         }
 
         template <class U = T>
