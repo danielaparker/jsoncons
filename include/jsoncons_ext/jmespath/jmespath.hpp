@@ -374,6 +374,48 @@ class jmespath_evaluator : public ser_context
         }
     };
 
+    class list_projection_selector final : public selector_base
+    {
+    public:
+        std::unique_ptr<selector_base> lhs_selector_;
+        std::vector<std::unique_ptr<selector_base>> rhs_selectors_;
+        Json result_;
+
+        list_projection_selector(std::unique_ptr<selector_base>&& lhs_selector)
+        {
+            lhs_selector_ = std::move(lhs_selector);
+        }
+
+        void add_selector(std::unique_ptr<selector_base>&& rhs_selectors) 
+        {
+            rhs_selectors_.emplace_back(std::move(rhs_selectors));
+        }
+
+        reference select(jmespath_evaluator& evaluator,
+                         const string_type& path, 
+                         reference val) override
+        {
+            static Json null{null_type()};
+            auto j = lhs_selector_.select(evaluator,path,val);
+            if (!j.is_array())
+            {
+                return null;
+            }
+
+            for (reference item : j.array_range())
+            {
+                std::vector<pointer> refs;
+                refs.push_back(std::addressof(val));
+                for (auto& selector : rhs_selectors_)
+                {
+                    refs.push_back(std::addressof(selector->select(evaluator,path,*(refs.back()))));
+                }
+                result_.push_back(*(refs.back()));
+            }
+            return result_;
+        }
+    };
+
     class identifier_selector final : public selector_base
     {
     private:
@@ -701,6 +743,7 @@ public:
         array_slice slice;
 
         selector_stack_.push_back(make_unique_ptr<sub_expression_selector>());
+
         while (p_ < end_input_)
         {
             switch (state_stack_.back().state)
