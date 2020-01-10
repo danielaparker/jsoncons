@@ -49,11 +49,11 @@ struct array_slice
         if (end_)
         {
             auto len = end_.value() >= 0 ? end_.value() : (static_cast<int64_t>(size) - end_.value());
+            std::cout << "END: " << end_.value() << ", len: " << len << ", size: " << size << "\n";
             return len <= static_cast<int64_t>(size) ? len : static_cast<int64_t>(size);
         }
         else
         {
-            std::cout << "END: " << end_.value() << "\n";
             return static_cast<int64_t>(size);
         }
     }
