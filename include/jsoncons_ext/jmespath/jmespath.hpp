@@ -318,14 +318,12 @@ class jmespath_evaluator : public ser_context
                          const string_type& path, 
                          reference val) override
         {
-            std::vector<pointer> refs;
-            refs.push_back(std::addressof(val));
-
+            pointer ptr = std::addressof(val);
             for (auto& selector : selectors_)
             {
-                refs.push_back(std::addressof(selector->select(evaluator,path,*(refs.back()))));
+                ptr = std::addressof(selector->select(evaluator,path,*ptr));
             }
-            return *(refs.back());
+            return *ptr;
         }
     };
 
@@ -360,15 +358,14 @@ class jmespath_evaluator : public ser_context
 
             for (reference item : j.array_range())
             {
-                std::vector<pointer> refs;
-                refs.push_back(std::addressof(item));
+                pointer ptr = std::addressof(item);
                 for (auto& selector : rhs_selectors_)
                 {
-                    refs.push_back(std::addressof(selector->select(evaluator,path,*(refs.back()))));
+                    ptr = std::addressof(selector->select(evaluator,path,*ptr));
                 }
-                if (!refs.back()->is_null())
+                if (!ptr->is_null())
                 {
-                    result_.push_back(*(refs.back()));
+                    result_.push_back(*ptr);
                 }
             }
             return result_;
