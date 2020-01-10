@@ -19,9 +19,7 @@
 #include <iterator> // std::make_move_iterator
 #include <functional> // <functional>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jmespath/jmespath_filter.hpp>
 #include <jsoncons_ext/jmespath/jmespath_error.hpp>
-#include <jsoncons_ext/jmespath/jmespath_function.hpp>
 
 namespace jsoncons { namespace jmespath {
 
@@ -78,17 +76,23 @@ std::unique_ptr<T> make_unique_ptr(Args&&... args)
 
 enum class result_type {value,path};
 
+namespace detail {
+template <class Json,
+    class JsonReference>
+    class jmespath_evaluator;
+}
+
 template<class Json>
 Json select(const Json& root, const typename Json::string_view_type& path, result_type result_t = result_type::value)
 {
     if (result_t == result_type::value)
     {
-        jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
+        jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
         return evaluator.evaluate(root, path);
     }
     else
     {
-        jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
+        jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
         return evaluator.evaluate(root, path);
     }
 }
@@ -96,7 +100,7 @@ Json select(const Json& root, const typename Json::string_view_type& path, resul
 template<class Json, class T>
 void json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
 {
-    jsoncons::jmespath::detail::jmespath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
+    jsoncons::jmespath::detail::jmespath_evaluator<Json,Json&> evaluator;
     evaluator.evaluate(root, path);
     evaluator.replace(std::forward<T>(new_value));
 }
@@ -174,8 +178,7 @@ struct state_item
 JSONCONS_STRING_LITERAL(length, 'l', 'e', 'n', 'g', 't', 'h')
 
 template<class Json,
-         class JsonReference,
-         class PathCons>
+         class JsonReference>
 class jmespath_evaluator : public ser_context
 {
     typedef typename Json::char_type char_type;
@@ -447,19 +450,12 @@ class jmespath_evaluator : public ser_context
         }
     };
 
-    function_table<Json,pointer> functions_;
-
     std::size_t line_;
     std::size_t column_;
     const char_type* begin_input_;
     const char_type* end_input_;
     const char_type* p_;
-    std::vector<std::size_t> sub_expression_indices_;
 
-    std::vector<std::unique_ptr<Json>> temp_json_values_;
-
-    typedef std::vector<pointer> argument_type;
-    std::vector<argument_type> function_stack_;
     std::vector<state_item> state_stack_;
     std::unique_ptr<selector_base> selector_;
 
@@ -486,62 +482,6 @@ public:
     std::size_t column() const
     {
         return column_;
-    }
-
-#if 0
-    void call_function(const string_type& function_name, std::error_code& ec)
-    {
-        auto f = functions_.get(function_name, ec);
-        if (ec)
-        {
-            return;
-        }
-        auto result = f(function_stack_, ec);
-        if (ec)
-        {
-            return;
-        }
-
-        string_type s = {'$'};
-        node_set v;
-        pointer ptr = create_temp(std::move(result));
-        v.emplace_back(s,ptr);
-        stack_.push_back(v);
-    }
-
-    Json get_normalized_paths() const
-    {
-        Json result = typename Json::array();
-        if (stack_.size() > 0)
-        {
-            result.reserve(stack_.back().size());
-            for (const auto& p : stack_.back())
-            {
-                result.push_back(p.path);
-            }
-        }
-        return result;
-    }
-
-    template <class T>
-    void replace(T&& new_value)
-    {
-        if (stack_.size() > 0)
-        {
-            for (std::size_t i = 0; i < stack_.back().size(); ++i)
-            {
-                *(stack_.back()[i].val_ptr) = new_value;
-            }
-        }
-    }
-#endif
-    template <typename... Args>
-    pointer create_temp(Args&& ... args)
-    {
-        auto temp = make_unique_ptr<Json>(std::forward<Args>(args)...);
-        pointer ptr = temp.get();
-        temp_json_values_.emplace_back(std::move(temp));
-        return ptr;
     }
 
     reference evaluate(reference root, const string_view_type& path)
