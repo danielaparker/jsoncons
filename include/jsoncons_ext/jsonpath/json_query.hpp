@@ -112,63 +112,6 @@ void json_replace(Json& root, const typename Json::string_view_type& path, T&& n
 }
 
 namespace detail {
-
-template<class CharT>
-bool try_string_to_index(const CharT *s, std::size_t length, std::size_t* value, bool* positive)
-{
-    static const size_t max_value = (std::numeric_limits<std::size_t>::max)();
-    static const size_t max_value_div_10 = max_value / 10;
-
-    std::size_t start = 0;
-    std::size_t n = 0;
-    if (length > 0)
-    {
-        if (s[start] == '-')
-        {
-            *positive = false;
-            ++start;
-        }
-        else
-        {
-            *positive = true;
-        }
-    }
-    if (length > start)
-    {
-        for (std::size_t i = start; i < length; ++i)
-        {
-            CharT c = s[i];
-            switch (c)
-            {
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                {
-                    std::size_t x = c - '0';
-                    if (n > max_value_div_10)
-                    {
-                        return false;
-                    }
-                    n = n * 10;
-                    if (n > max_value - x)
-                    {
-                        return false;
-                    }
-
-                    n += x;
-                    break;
-                }
-                default:
-                    return false;
-                    break;
-            }
-        }
-        *value = n;
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
  
 enum class path_state 
 {
@@ -447,7 +390,8 @@ class jsonpath_evaluator : public ser_context
                 auto r = jsoncons::detail::to_integer<int64_t>(name_.data(), name_.size());
                 if (r)
                 {
-                    std::size_t index = (r.value() >= 0) ? static_cast<std::size_t>(r.value()) : static_cast<std::size_t>(static_cast<int64_t>(sv.size()) + r.value());
+                    std::size_t index = (r.value() >= 0) ? static_cast<std::size_t>(r.value()) : 
+                                                           static_cast<std::size_t>(static_cast<int64_t>(sv.size()) + r.value());
                     auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), index);
                     if (sequence.length() > 0)
                     {
@@ -455,18 +399,6 @@ class jsonpath_evaluator : public ser_context
                         nodes.emplace_back(PathCons()(path, index), ptr);
                     }
                 }
-                /* std::size_t pos = 0;
-                string_view_type sv = val.as_string_view();
-                if (try_string_to_index(name_.data(), name_.size(), &pos, &is_start_positive))
-                {
-                    std::size_t index = is_start_positive ? pos : sv.size() - pos;
-                    auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), index);
-                    if (sequence.length() > 0)
-                    {
-                        pointer ptr = evaluator.create_temp(sequence.begin(),sequence.length());
-                        nodes.emplace_back(PathCons()(path, index), ptr);
-                    }
-                }*/
                 else if (name_ == length_literal<char_type>() && sv.size() > 0)
                 {
                     std::size_t count = unicons::u32_length(sv.begin(),sv.end());
@@ -1316,15 +1248,20 @@ public:
                     switch (*p_)
                     {
                         case ':':
-                            if (!try_string_to_index(buffer.data(), buffer.size(), &slice.start_, &slice.is_start_positive))
+                        {
+                            auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
+                            if (!r)
                             {
                                 ec = jsonpath_errc::expected_slice_start;
                                 return;
                             }
+                            slice.is_start_positive = (r.value() >= 0) ? true : false;
+                            slice.start_ = (r.value() >= 0) ? static_cast<std::size_t>(r.value()) : static_cast<std::size_t>(-r.value());
                             state_stack_.back().state = path_state::slice_end_or_end_step;
                             ++p_;
                             ++column_;
                             break;
+                        }
                         case '.':
                         case '[':
                         case ',': 
