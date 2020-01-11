@@ -418,7 +418,7 @@ class jsonpath_evaluator : public ser_context
                     const string_type& path, reference val,
                     node_set& nodes) override
         {
-            bool is_start_positive = true;
+            //bool is_start_positive = true;
 
             if (val.is_object() && val.contains(name_))
             {
@@ -435,15 +435,6 @@ class jsonpath_evaluator : public ser_context
                         nodes.emplace_back(PathCons()(path,index),std::addressof(val[index]));
                     }
                 }
-                /* std::size_t pos = 0;
-                if (try_string_to_index(name_.data(), name_.size(), &pos, &is_start_positive))
-                {
-                    std::size_t index = is_start_positive ? pos : val.size() - pos;
-                    if (index < val.size())
-                    {
-                        nodes.emplace_back(PathCons()(path,index),std::addressof(val[index]));
-                    }
-                }*/
                 else if (name_ == length_literal<char_type>() && val.size() > 0)
                 {
                     pointer ptr = evaluator.create_temp(val.size());
@@ -452,7 +443,19 @@ class jsonpath_evaluator : public ser_context
             }
             else if (val.is_string())
             {
-                std::size_t pos = 0;
+                string_view_type sv = val.as_string_view();
+                auto r = jsoncons::detail::to_integer<int64_t>(name_.data(), name_.size());
+                if (r)
+                {
+                    std::size_t index = (r.value() >= 0) ? static_cast<std::size_t>(r.value()) : static_cast<std::size_t>(static_cast<int64_t>(sv.size()) + r.value());
+                    auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), index);
+                    if (sequence.length() > 0)
+                    {
+                        pointer ptr = evaluator.create_temp(sequence.begin(),sequence.length());
+                        nodes.emplace_back(PathCons()(path, index), ptr);
+                    }
+                }
+                /* std::size_t pos = 0;
                 string_view_type sv = val.as_string_view();
                 if (try_string_to_index(name_.data(), name_.size(), &pos, &is_start_positive))
                 {
@@ -463,7 +466,7 @@ class jsonpath_evaluator : public ser_context
                         pointer ptr = evaluator.create_temp(sequence.begin(),sequence.length());
                         nodes.emplace_back(PathCons()(path, index), ptr);
                     }
-                }
+                }*/
                 else if (name_ == length_literal<char_type>() && sv.size() > 0)
                 {
                     std::size_t count = unicons::u32_length(sv.begin(),sv.end());
