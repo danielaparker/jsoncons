@@ -94,11 +94,23 @@
         "input" : "{\"ops\": {\"functionA\": {\"numArgs\": 2},\"functionB\": {\"numArgs\": 3},\"functionC\": {\"variadic\": true}}}",
         "expression" : "ops.*.numArgs",
         "expected" : "[2,3]"
-    },*/
+    },
     {
         "annotation" : "Flatten Projection",
         "input" : "{\"reservations\": [{\"instances\": [{\"state\": \"running\"},{\"state\": \"stopped\"}]},{\"instances\": [{\"state\": \"terminated\"},{\"state\": \"runnning\"}]}]}",
         "expression" : "reservations[*].instances[*].state",
+        "expected" : "[[\"running\",\"stopped\"],[\"terminated\",\"runnning\"]]"
+    }
+    {
+        "annotation" : "Flatten Projection",
+        "input" : "{\"reservations\": [{\"instances\": [{\"state\": \"running\"},{\"state\": \"stopped\"}]},{\"instances\": [{\"state\": \"terminated\"},{\"state\": \"runnning\"}]}]}",
+        "expression" : "reservations[].instances[].state",
+        "expected" : "[[\"running\",\"stopped\"],[\"terminated\",\"runnning\"]]"
+    },*/
+    {
+        "annotation" : "Flatten Projection",
+        "input" : "{\"reservations\": [{\"instances\": [{\"state\": \"running\"},{\"state\": \"stopped\"}]},{\"instances\": [{\"state\": \"terminated\"},{\"state\": \"runnning\"}]}]}",
+        "expression" : "reservations[].instances[].state",
         "expected" : "[[\"running\",\"stopped\"],[\"terminated\",\"runnning\"]]"
     }
 ]
