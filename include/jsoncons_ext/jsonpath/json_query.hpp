@@ -426,7 +426,16 @@ class jsonpath_evaluator : public ser_context
             }
             else if (val.is_array())
             {
-                std::size_t pos = 0;
+                auto r = jsoncons::detail::to_integer<int64_t>(name_.data(), name_.size());
+                if (r)
+                {
+                    std::size_t index = (r.value() >= 0) ? static_cast<std::size_t>(r.value()) : static_cast<std::size_t>(static_cast<int64_t>(val.size()) + r.value());
+                    if (index < val.size())
+                    {
+                        nodes.emplace_back(PathCons()(path,index),std::addressof(val[index]));
+                    }
+                }
+                /* std::size_t pos = 0;
                 if (try_string_to_index(name_.data(), name_.size(), &pos, &is_start_positive))
                 {
                     std::size_t index = is_start_positive ? pos : val.size() - pos;
@@ -434,7 +443,7 @@ class jsonpath_evaluator : public ser_context
                     {
                         nodes.emplace_back(PathCons()(path,index),std::addressof(val[index]));
                     }
-                }
+                }*/
                 else if (name_ == length_literal<char_type>() && val.size() > 0)
                 {
                     pointer ptr = evaluator.create_temp(val.size());
