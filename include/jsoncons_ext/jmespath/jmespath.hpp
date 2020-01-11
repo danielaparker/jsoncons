@@ -23,28 +23,28 @@
 
 namespace jsoncons { namespace jmespath {
 
-struct array_slice
+struct slice
 {
     int64_t start_;
     optional<int64_t> end_;
     int64_t step_;
 
-    array_slice()
+    slice()
         : start_(0), end_(), step_(1)
     {
     }
 
-    array_slice(int64_t start, const optional<int64_t>& end, int64_t step) 
+    slice(int64_t start, const optional<int64_t>& end, int64_t step) 
         : start_(start), end_(end), step_(step)
     {
     }
 
-    array_slice(const array_slice& other)
+    slice(const slice& other)
         : start_(other.start_), end_(other.end_), step_(other.step_)
     {
     }
 
-    array_slice& operator=(const array_slice&) = default;
+    slice& operator=(const slice&) = default;
 
     int64_t get_start(std::size_t size) const
     {
@@ -469,10 +469,10 @@ class jmespath_evaluator : public ser_context
     class slice_selector final : public selector_base
     {
     private:
-        array_slice slice_;
+        slice slice_;
     public:
-        slice_selector(const array_slice& slice)
-            : slice_(slice)
+        slice_selector(const slice& list_slice)
+            : slice_(list_slice)
         {
         }
 
@@ -590,7 +590,7 @@ public:
         end_input_ = path + length;
         p_ = begin_input_;
 
-        array_slice slice;
+        slice list_slice;
 
         while (p_ < end_input_)
         {
@@ -796,7 +796,7 @@ public:
                                     ec = jmespath_errc::invalid_number;
                                     return result;
                                 }
-                                slice.start_ = r.value();
+                                list_slice.start_ = r.value();
                                 buffer.clear();
                             }
                             state_stack_.back().state = path_state::bracket_specifier2;
@@ -826,14 +826,14 @@ public:
                             ec = jmespath_errc::invalid_number;
                             return result;
                         }
-                        slice.end_ = optional<int64_t>(r.value());
+                        list_slice.end_ = optional<int64_t>(r.value());
                     }
                     switch(*p_)
                     {
                         case ']':
-                            selector_->add_selector(make_unique_ptr<slice_selector>(slice));
+                            selector_->add_selector(make_unique_ptr<slice_selector>(list_slice));
                             buffer.clear();
-                            slice = array_slice();
+                            list_slice = slice();
                             state_stack_.pop_back(); // bracket_specifier2
                             ++p_;
                             ++column_;
@@ -860,15 +860,15 @@ public:
                             ec = jmespath_errc::invalid_number;
                             return result;
                         }
-                        slice.step_ = r.value();
+                        list_slice.step_ = r.value();
                         buffer.clear();
                     }
                     switch(*p_)
                     {
                         case ']':
-                            selector_->add_selector(make_unique_ptr<slice_selector>(slice));
+                            selector_->add_selector(make_unique_ptr<slice_selector>(list_slice));
                             buffer.clear();
-                            slice = array_slice();
+                            list_slice = slice();
                             state_stack_.pop_back(); // bracket_specifier3
                             ++p_;
                             ++column_;
