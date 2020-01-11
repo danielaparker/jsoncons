@@ -1,5 +1,5 @@
 [
-    /*{
+    {
         "annotation" : "Select a value with an identifier",
         "input" : "{\"a\": \"foo\", \"b\": \"bar\", \"c\": \"baz\"}",
         "expression" : "a",
@@ -96,23 +96,17 @@
         "expected" : "[2,3]"
     },
     {
-        "annotation" : "Flatten Projection",
+        "annotation" : "More than one List Projection",
         "input" : "{\"reservations\": [{\"instances\": [{\"state\": \"running\"},{\"state\": \"stopped\"}]},{\"instances\": [{\"state\": \"terminated\"},{\"state\": \"runnning\"}]}]}",
         "expression" : "reservations[*].instances[*].state",
         "expected" : "[[\"running\",\"stopped\"],[\"terminated\",\"runnning\"]]"
-    }
-    {
-        "annotation" : "Flatten Projection using [*]",
-        "input" : "{\"reservations\": [{\"instances\": [{\"state\": \"running\"},{\"state\": \"stopped\"}]},{\"instances\": [{\"state\": \"terminated\"},{\"state\": \"runnning\"}]}]}",
-        "expression" : "reservations[].instances[].state",
-        "expected" : "[[\"running\",\"stopped\"],[\"terminated\",\"runnning\"]]"
-    }
+    },
     {
         "annotation" : "Flatten Projection using []",
         "input" : "{\"reservations\": [{\"instances\": [{\"state\": \"running\"},{\"state\": \"stopped\"}]},{\"instances\": [{\"state\": \"terminated\"},{\"state\": \"runnning\"}]}]}",
         "expression" : "reservations[].instances[].state",
-        "expected" : "[[\"running\",\"stopped\"],[\"terminated\",\"runnning\"]]"
-    },*/
+        "expected" : "[\"running\",\"stopped\",\"terminated\",\"runnning\"]"
+    },
     {
         "annotation" : "Flatten Projection using [] to flatten a list",
         "input" : "[[0, 1],2,[3],4,[5, [6, 7]]]",

@@ -428,16 +428,16 @@ class jmespath_evaluator : public ser_context
     class index_selector final : public selector_base
     {
     private:
-        string_type identifier_;
+        int64_t index_;
     public:
-        index_selector(const string_view_type& name)
-            : identifier_(name)
+        index_selector(int64_t index)
+            : index_(index)
         {
         }
 
         void add_selector(std::unique_ptr<selector_base>&&) 
         {
-            // Error
+            // noop
         }
 
         reference select(reference val, temp_storage&) override
@@ -447,19 +447,14 @@ class jmespath_evaluator : public ser_context
             if (val.is_array())
             {
                 int64_t slen = static_cast<int64_t>(val.size());
-                auto result = jsoncons::detail::to_integer<int64_t>(identifier_.data(), identifier_.size());
-                if (!result)
+                if (index_ >= 0 && index_ < slen)
                 {
-                    return null;
-                }
-                else if (result.value() >= 0 && result.value() < slen)
-                {
-                    std::size_t index = static_cast<std::size_t>(result.value());
+                    std::size_t index = static_cast<std::size_t>(index_);
                     return val.at(index);
                 }
-                else if (result.value() < 0 && (slen+result.value()) < slen)
+                else if (index_ < 0 && (slen+index_) < slen)
                 {
-                    std::size_t index = static_cast<std::size_t>(slen + result.value());
+                    std::size_t index = static_cast<std::size_t>(slen + index_);
                     return val.at(index);
                 }
                 else
@@ -778,7 +773,13 @@ public:
                             }
                             else
                             {
-                                selector_->add_selector(make_unique_ptr<index_selector>(buffer));
+                                auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
+                                if (!r)
+                                {
+                                    ec = jmespath_errc::invalid_number;
+                                    return result;
+                                }
+                                selector_->add_selector(make_unique_ptr<index_selector>(r.value()));
                                 buffer.clear();
                             }
                             state_stack_.pop_back(); // bracket_specifier
