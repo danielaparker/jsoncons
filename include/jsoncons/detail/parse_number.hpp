@@ -503,7 +503,8 @@ to_integer(const CharT* s, std::size_t length)
             }
         }
     }
-    return to_integer_result<T>(n);
+    return (state == integer_chars_state::initial || state == integer_chars_state::minus) ? to_integer_result<T>(to_integer_errc::invalid_digit) : 
+                                                                                            to_integer_result<T>(n);
 }
 
 template <class T, class CharT>
