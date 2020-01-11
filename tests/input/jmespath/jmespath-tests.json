@@ -102,15 +102,21 @@
         "expected" : "[[\"running\",\"stopped\"],[\"terminated\",\"runnning\"]]"
     }
     {
-        "annotation" : "Flatten Projection",
+        "annotation" : "Flatten Projection using [*]",
+        "input" : "{\"reservations\": [{\"instances\": [{\"state\": \"running\"},{\"state\": \"stopped\"}]},{\"instances\": [{\"state\": \"terminated\"},{\"state\": \"runnning\"}]}]}",
+        "expression" : "reservations[].instances[].state",
+        "expected" : "[[\"running\",\"stopped\"],[\"terminated\",\"runnning\"]]"
+    }
+    {
+        "annotation" : "Flatten Projection using []",
         "input" : "{\"reservations\": [{\"instances\": [{\"state\": \"running\"},{\"state\": \"stopped\"}]},{\"instances\": [{\"state\": \"terminated\"},{\"state\": \"runnning\"}]}]}",
         "expression" : "reservations[].instances[].state",
         "expected" : "[[\"running\",\"stopped\"],[\"terminated\",\"runnning\"]]"
     },*/
     {
-        "annotation" : "Flatten Projection",
-        "input" : "{\"reservations\": [{\"instances\": [{\"state\": \"running\"},{\"state\": \"stopped\"}]},{\"instances\": [{\"state\": \"terminated\"},{\"state\": \"runnning\"}]}]}",
-        "expression" : "reservations[].instances[].state",
-        "expected" : "[[\"running\",\"stopped\"],[\"terminated\",\"runnning\"]]"
+        "annotation" : "Flatten Projection using [] to flatten a list",
+        "input" : "[[0, 1],2,[3],4,[5, [6, 7]]]",
+        "expression" : "[]",
+        "expected" : "[0,1,2,3,4,5,[6,7]]"
     }
 ]

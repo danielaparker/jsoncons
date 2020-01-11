@@ -285,6 +285,65 @@ class jmespath_evaluator : public ser_context
         }
     };
 
+    class flatten_selector final : public selector_base
+    {
+    public:
+        std::unique_ptr<selector_base> lhs_selector_;
+        std::vector<std::unique_ptr<selector_base>> rhs_selectors_;
+
+        flatten_selector(std::unique_ptr<selector_base>&& lhs_selector)
+        {
+            lhs_selector_ = std::move(lhs_selector);
+        }
+
+        void add_selector(std::unique_ptr<selector_base>&& rhs_selectors) 
+        {
+            rhs_selectors_.emplace_back(std::move(rhs_selectors));
+        }
+
+        reference select(reference val, temp_storage& make_temp) override
+        {
+            static Json null{null_type()};
+            auto j = lhs_selector_->select(val, make_temp);
+            if (!j.is_array())
+            {
+                return null;
+            }
+
+            auto currentp = make_temp(json_array_arg);
+            for (reference item : j.array_range())
+            {
+                if (item.is_array())
+                {
+                    for (reference item_of_item : item.array_range())
+                    {
+                        currentp->push_back(item_of_item);
+                    }
+                }
+                else
+                {
+                    currentp->push_back(item);
+                }
+            }
+
+            auto resultp = make_temp(json_array_arg);
+            for (reference item : currentp->array_range())
+            {
+                pointer ptr = std::addressof(item);
+
+                for (auto& selector : rhs_selectors_)
+                {
+                    ptr = std::addressof(selector->select(*ptr, make_temp));
+                }
+                if (!ptr->is_null())
+                {
+                    resultp->push_back(*ptr);
+                }
+            }
+            return *resultp;
+        }
+    };
+
     class object_projection_selector final : public selector_base
     {
     public:
@@ -547,39 +606,6 @@ public:
                     state_stack_.back().state = path_state::expression1;
                     break;
                 }
-                case path_state::identifier: 
-                {
-                    switch (*p_)
-                    {
-                        case '[':
-                            state_stack_.back().state = path_state::index_expression;
-                            state_stack_.emplace_back(path_state::bracket_specifier);
-                            state_stack_.emplace_back(path_state::number);
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '.':
-                            ++p_;
-                            ++column_;
-                            break;
-                        default:
-                            if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
-                            {
-                                state_stack_.back().state = path_state::identifier;
-                                state_stack_.emplace_back(path_state::unquoted_string);
-                                buffer.push_back(*p_);
-                                ++p_;
-                                ++column_;
-                            }
-                            else
-                            {
-                                ec = jmespath_errc::expected_identifier;
-                                return result;
-                            }
-                            break;
-                    };
-                    break;
-                }
                 case path_state::expression1: 
                 {
                     switch (*p_)
@@ -608,6 +634,39 @@ public:
                         default:
                             if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                             {
+                                state_stack_.emplace_back(path_state::unquoted_string);
+                                buffer.push_back(*p_);
+                                ++p_;
+                                ++column_;
+                            }
+                            else
+                            {
+                                ec = jmespath_errc::expected_identifier;
+                                return result;
+                            }
+                            break;
+                    };
+                    break;
+                }
+                case path_state::identifier: 
+                {
+                    switch (*p_)
+                    {
+                        case '[':
+                            state_stack_.back().state = path_state::index_expression;
+                            state_stack_.emplace_back(path_state::bracket_specifier);
+                            state_stack_.emplace_back(path_state::number);
+                            ++p_;
+                            ++column_;
+                            break;
+                        case '.':
+                            ++p_;
+                            ++column_;
+                            break;
+                        default:
+                            if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
+                            {
+                                state_stack_.back().state = path_state::identifier;
                                 state_stack_.emplace_back(path_state::unquoted_string);
                                 buffer.push_back(*p_);
                                 ++p_;
@@ -715,7 +774,7 @@ public:
                         case ']':
                             if (buffer.empty())
                             {
-                                selector_ = make_unique_ptr<list_projection_selector>(std::move(selector_));
+                                selector_ = make_unique_ptr<flatten_selector>(std::move(selector_));
                             }
                             else
                             {
