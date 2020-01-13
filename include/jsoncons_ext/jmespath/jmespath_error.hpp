@@ -89,6 +89,7 @@ enum class jmespath_errc
     expected_A_Za_Z_,
     expected_right_bracket,
     invalid_number,
+    expected_comparator,
 
     expected_root,
     expected_current_node,
@@ -136,6 +137,12 @@ public:
                 return "Expected index";
             case jmespath_errc::expected_A_Za_Z_:
                 return "Expected A-Z, a-z, or _";
+            case jmespath_errc::invalid_number:
+                return "Invalid number";
+            case jmespath_errc::expected_comparator:
+                return "Expected <, <=, ==, >=, > or !=";
+
+
             case jmespath_errc::expected_root:
                 return "Expected $";
             case jmespath_errc::expected_current_node:
