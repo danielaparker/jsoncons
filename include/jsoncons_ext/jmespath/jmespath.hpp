@@ -718,7 +718,10 @@ public:
                 case path_state::number_or_expression:
                     switch(*p_)
                     {
-                        case '?':case '*':case ']':case ':':case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                        case '?':case '*':case ']':case ':':
+                            state_stack_.pop_back();
+                            break;
+                        case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                             state_stack_.back() = path_state::number; 
                             break;
                         default:
