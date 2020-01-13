@@ -124,7 +124,6 @@ enum class path_state
     expression3,
     index_expression1,
     number,
-    number_or_expression,
     digit,
     bracket_specifier9,
     bracket_specifier,
@@ -716,21 +715,6 @@ public:
                     state_stack_.back() = path_state::expression1;
                     break;
                 }
-                case path_state::number_or_expression:
-                    switch(*p_)
-                    {
-                        case '?':case '*':case ']':case ':':
-                            state_stack_.pop_back();
-                            break;
-                        case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                            state_stack_.back() = path_state::number; 
-                            break;
-                        default:
-                            state_stack_.back() = path_state::expression3; 
-                            selector_stack_.emplace_back(make_unique_ptr<multiselect_list_selector>());
-                            break;
-                    }
-                    break;
                 case path_state::expression1: 
                 {
                     switch (*p_)
@@ -926,7 +910,7 @@ public:
                             break;
                         case ':':
                             state_stack_.back() = path_state::bracket_specifier2;
-                            state_stack_.emplace_back(path_state::number_or_expression);
+                            state_stack_.emplace_back(path_state::number);
                             ++p_;
                             ++column_;
                             break;
@@ -981,7 +965,7 @@ public:
                                 buffer.clear();
                             }
                             state_stack_.back() = path_state::bracket_specifier2;
-                            state_stack_.emplace_back(path_state::number_or_expression);
+                            state_stack_.emplace_back(path_state::number);
                             ++p_;
                             ++column_;
                             break;
@@ -1015,7 +999,7 @@ public:
                             break;
                         case ':':
                             state_stack_.back() = path_state::bracket_specifier3;
-                            state_stack_.emplace_back(path_state::number_or_expression);
+                            state_stack_.emplace_back(path_state::number);
                             ++p_;
                             ++column_;
                             break;
@@ -1093,8 +1077,7 @@ public:
                             break;
                         case '[':
                             state_stack_.back() = path_state::comparator;
-                            state_stack_.emplace_back(path_state::bracket_specifier9);
-                            state_stack_.emplace_back(path_state::number_or_expression);
+                            state_stack_.emplace_back(path_state::bracket_specifier);
                             ++p_;
                             ++column_;
                             break;
@@ -1148,8 +1131,7 @@ public:
                             break;
                         case '[':
                             state_stack_.back() = path_state::expect_right_bracket;
-                            state_stack_.emplace_back(path_state::bracket_specifier9);
-                            state_stack_.emplace_back(path_state::number_or_expression);
+                            state_stack_.emplace_back(path_state::bracket_specifier);
                             ++p_;
                             ++column_;
                             break;
