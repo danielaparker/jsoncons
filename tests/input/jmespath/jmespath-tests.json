@@ -131,6 +131,6 @@
         "input" : "{\"people\": [{\"name\": \"a\",\"state\": {\"name\": \"up\"}},{\"name\": \"b\",\"state\": {\"name\": \"down\"}},{\"name\": \"c\",\"state\": {\"name\": \"up\"}}]}",
         "expression" : "people[].[name,state.name]",
         "expected" : "[[\"a\",\"up\"],[\"b\",\"down\"],[\"c\",\"up\"]]"
-    }
-    */
+    }*/
+    
 ]
