@@ -126,6 +126,7 @@ enum class path_state
     number,
     number_or_expression,
     digit,
+    bracket_specifier9,
     bracket_specifier,
     bracket_specifier2,
     bracket_specifier3,
@@ -750,9 +751,7 @@ public:
                             ++column_;
                             break;
                         case '[':
-                            state_stack_.back() = path_state::index_expression;
                             state_stack_.emplace_back(path_state::bracket_specifier);
-                            state_stack_.emplace_back(path_state::number_or_expression);
                             ++p_;
                             ++column_;
                             break;
@@ -902,10 +901,55 @@ public:
                             return result;
                     }
                     break;
+
                 case path_state::bracket_specifier:
                     switch(*p_)
                     {
+                        case '*':
+                            selector_stack_.back() = make_unique_ptr<list_projection_selector>(std::move(selector_stack_.back()));
+                            state_stack_.pop_back(); // bracket_specifier
+                            state_stack_.back() = path_state::index_expression;
+                            state_stack_.emplace_back(path_state::bracket_specifier4);
+                            ++p_;
+                            ++column_;
+                            break;
                         case ']':
+                            selector_stack_.back() = make_unique_ptr<flatten_selector>(std::move(selector_stack_.back()));
+                            state_stack_.pop_back(); // bracket_specifier
+                            state_stack_.back() = path_state::index_expression;
+                            ++p_;
+                            ++column_;
+                            break;
+                        case '?':
+                            selector_stack_.emplace_back(make_unique_ptr<sub_expression_selector>());
+                            state_stack_.pop_back(); // bracket_specifier
+                            state_stack_.back() = path_state::index_expression;
+                            state_stack_.emplace_back(path_state::expression2);
+                            ++p_;
+                            ++column_;
+                            break;
+                        case ':':
+                            state_stack_.pop_back(); // bracket_specifier
+                            state_stack_.back() = path_state::index_expression;
+                            state_stack_.emplace_back(path_state::bracket_specifier2);
+                            state_stack_.emplace_back(path_state::number_or_expression);
+                            ++p_;
+                            ++column_;
+                            break;
+                        default:
+                            state_stack_.pop_back();
+                            state_stack_.back() = path_state::index_expression;
+                            state_stack_.emplace_back(path_state::bracket_specifier9);
+                            state_stack_.emplace_back(path_state::number_or_expression);
+                            break;
+                    }
+                    break;
+
+                case path_state::bracket_specifier9:
+                    switch(*p_)
+                    {
+                        case ']':
+                        {
                             if (buffer.empty())
                             {
                                 selector_stack_.back() = make_unique_ptr<flatten_selector>(std::move(selector_stack_.back()));
@@ -925,6 +969,7 @@ public:
                             ++p_;
                             ++column_;
                             break;
+                        }
                         case ':':
                         {
                             if (!buffer.empty())
@@ -944,18 +989,6 @@ public:
                             ++column_;
                             break;
                         }
-                        case '*':
-                            selector_stack_.back() = make_unique_ptr<list_projection_selector>(std::move(selector_stack_.back()));
-                            state_stack_.back() = path_state::bracket_specifier4;
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '?':
-                            state_stack_.back() = path_state::expression2;
-                            selector_stack_.emplace_back(make_unique_ptr<sub_expression_selector>());
-                            ++p_;
-                            ++column_;
-                            break;
                         default:
                             ec = jmespath_errc::expected_right_bracket;
                             return result;
@@ -1063,7 +1096,7 @@ public:
                             break;
                         case '[':
                             state_stack_.back() = path_state::comparator;
-                            state_stack_.emplace_back(path_state::bracket_specifier);
+                            state_stack_.emplace_back(path_state::bracket_specifier9);
                             state_stack_.emplace_back(path_state::number_or_expression);
                             ++p_;
                             ++column_;
@@ -1118,7 +1151,7 @@ public:
                             break;
                         case '[':
                             state_stack_.back() = path_state::expect_right_bracket;
-                            state_stack_.emplace_back(path_state::bracket_specifier);
+                            state_stack_.emplace_back(path_state::bracket_specifier9);
                             state_stack_.emplace_back(path_state::number_or_expression);
                             ++p_;
                             ++column_;
@@ -1255,7 +1288,7 @@ public:
                             ++column_;
                             break;
                         default:
-                            ec = jmespath_errc::expected_right_bracket;
+                            ec = jmespath_errc::expected_dot;
                             return result;
                     }
                     break;

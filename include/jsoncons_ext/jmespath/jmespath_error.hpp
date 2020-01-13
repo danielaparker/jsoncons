@@ -88,6 +88,7 @@ enum class jmespath_errc
     expected_index,
     expected_A_Za_Z_,
     expected_right_bracket,
+    expected_dot,
     invalid_number,
     expected_comparator,
 
@@ -149,6 +150,8 @@ public:
                 return "Expected @";
             case jmespath_errc::expected_right_bracket:
                 return "Expected ]";
+            case jmespath_errc::expected_dot:
+                return "Expected \".\"";
             case jmespath_errc::expected_name:
                 return "Expected a name following a dot";
             case jmespath_errc::expected_slice_start:
