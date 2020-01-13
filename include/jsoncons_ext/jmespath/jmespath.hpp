@@ -122,7 +122,7 @@ enum class path_state
     expression1,
     expression2,
     expression3,
-    index_expression,
+    index_expression1,
     number,
     number_or_expression,
     digit,
@@ -751,7 +751,7 @@ public:
                             ++column_;
                             break;
                         case '[':
-                            state_stack_.back() = path_state::index_expression;
+                            state_stack_.back() = path_state::index_expression1;
                             state_stack_.emplace_back(path_state::bracket_specifier);
                             ++p_;
                             ++column_;
@@ -886,7 +886,7 @@ public:
                             break;
                     }
                     break;
-                case path_state::index_expression:
+                case path_state::index_expression1:
                     switch(*p_)
                     {
                         case '.':
@@ -908,8 +908,7 @@ public:
                     {
                         case '*':
                             selector_stack_.back() = make_unique_ptr<list_projection_selector>(std::move(selector_stack_.back()));
-                            state_stack_.pop_back(); // bracket_specifier
-                            state_stack_.emplace_back(path_state::bracket_specifier4);
+                            state_stack_.back() = path_state::bracket_specifier4;
                             ++p_;
                             ++column_;
                             break;
@@ -921,22 +920,24 @@ public:
                             break;
                         case '?':
                             selector_stack_.emplace_back(make_unique_ptr<sub_expression_selector>());
-                            state_stack_.pop_back(); // bracket_specifier
-                            state_stack_.emplace_back(path_state::expression2);
+                            state_stack_.back() = path_state::expression2;
                             ++p_;
                             ++column_;
                             break;
                         case ':':
-                            state_stack_.pop_back(); // bracket_specifier
-                            state_stack_.emplace_back(path_state::bracket_specifier2);
+                            state_stack_.back() = path_state::bracket_specifier2;
                             state_stack_.emplace_back(path_state::number_or_expression);
                             ++p_;
                             ++column_;
                             break;
+                        case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                            state_stack_.back() = path_state::bracket_specifier9;
+                            state_stack_.emplace_back(path_state::number);
+                            break;
                         default:
-                            state_stack_.pop_back();
-                            state_stack_.emplace_back(path_state::bracket_specifier9);
-                            state_stack_.emplace_back(path_state::number_or_expression);
+                            selector_stack_.emplace_back(make_unique_ptr<multiselect_list_selector>());
+                            state_stack_.back() = path_state::bracket_specifier9;
+                            state_stack_.emplace_back(path_state::expression3);
                             break;
                     }
                     break;
@@ -1343,7 +1344,7 @@ public:
 
         JSONCONS_ASSERT(state_stack_.size() == 1);
         JSONCONS_ASSERT(state_stack_.back() == path_state::expression1 ||
-                        state_stack_.back() == path_state::index_expression);
+                        state_stack_.back() == path_state::index_expression1);
         state_stack_.pop_back();
 
         reference r = selector_stack_.back()->select(root, temp_factory_); 
