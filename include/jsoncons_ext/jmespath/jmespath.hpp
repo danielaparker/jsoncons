@@ -926,8 +926,7 @@ public:
                             break;
                         default:
                             selector_stack_.emplace_back(make_unique_ptr<multiselect_list_selector>());
-                            state_stack_.back() = path_state::bracket_specifier9;
-                            state_stack_.emplace_back(path_state::expression3);
+                            state_stack_.back() = path_state::expression3;
                             break;
                     }
                     break;
