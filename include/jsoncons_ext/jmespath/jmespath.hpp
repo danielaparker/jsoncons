@@ -751,6 +751,7 @@ public:
                             ++column_;
                             break;
                         case '[':
+                            state_stack_.back() = path_state::index_expression;
                             state_stack_.emplace_back(path_state::bracket_specifier);
                             ++p_;
                             ++column_;
@@ -908,7 +909,6 @@ public:
                         case '*':
                             selector_stack_.back() = make_unique_ptr<list_projection_selector>(std::move(selector_stack_.back()));
                             state_stack_.pop_back(); // bracket_specifier
-                            state_stack_.back() = path_state::index_expression;
                             state_stack_.emplace_back(path_state::bracket_specifier4);
                             ++p_;
                             ++column_;
@@ -916,21 +916,18 @@ public:
                         case ']':
                             selector_stack_.back() = make_unique_ptr<flatten_selector>(std::move(selector_stack_.back()));
                             state_stack_.pop_back(); // bracket_specifier
-                            state_stack_.back() = path_state::index_expression;
                             ++p_;
                             ++column_;
                             break;
                         case '?':
                             selector_stack_.emplace_back(make_unique_ptr<sub_expression_selector>());
                             state_stack_.pop_back(); // bracket_specifier
-                            state_stack_.back() = path_state::index_expression;
                             state_stack_.emplace_back(path_state::expression2);
                             ++p_;
                             ++column_;
                             break;
                         case ':':
                             state_stack_.pop_back(); // bracket_specifier
-                            state_stack_.back() = path_state::index_expression;
                             state_stack_.emplace_back(path_state::bracket_specifier2);
                             state_stack_.emplace_back(path_state::number_or_expression);
                             ++p_;
@@ -938,7 +935,6 @@ public:
                             break;
                         default:
                             state_stack_.pop_back();
-                            state_stack_.back() = path_state::index_expression;
                             state_stack_.emplace_back(path_state::bracket_specifier9);
                             state_stack_.emplace_back(path_state::number_or_expression);
                             break;
