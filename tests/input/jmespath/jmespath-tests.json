@@ -118,8 +118,8 @@
         "input" : "{\"machines\": [{\"name\": \"a\", \"state\": \"running\"},{\"name\": \"b\", \"state\": \"stopped\"},{\"name\": \"b\", \"state\": \"running\"}]}",
         "expression" : "machines[?state=='running'].name",
         "expected" : "[\"a\",\"b\"]"
-    }/*,
-    {
+    }
+    /*,{
         "annotation" : "Flatten Projection using [] to flatten a list",
         "input" : "{\"people\": [{\"first\": \"James\", \"last\": \"d\"},{\"first\": \"Jacob\", \"last\": \"e\"},{\"first\": \"Jayden\", \"last\": \"f\"},{\"missing\": \"different\"}],\"foo\": {\"bar\": \"baz\"}}",
         "expression" : "people[*].first | [0]",

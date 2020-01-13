@@ -122,6 +122,7 @@ enum class path_state
     expression1,
     expression2,
     expression3,
+    identifier_expression1,
     index_expression1,
     number,
     digit,
@@ -749,6 +750,7 @@ public:
                         default:
                             if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                             {
+                                state_stack_.back() = path_state::identifier_expression1;
                                 state_stack_.emplace_back(path_state::unquoted_string);
                                 buffer.push_back(*p_);
                                 ++p_;
@@ -771,18 +773,6 @@ public:
                             buffer.clear();
                             state_stack_.pop_back(); // unquoted_string
                             advance_past_space_character();
-                            break;
-                        case '.':
-                            selector_stack_.back()->add_selector(make_unique_ptr<identifier_selector>(buffer));
-                            state_stack_.pop_back(); // unquoted_string
-                            buffer.clear();
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '[':
-                            selector_stack_.back()->add_selector(make_unique_ptr<identifier_selector>(buffer));
-                            state_stack_.pop_back(); // unquoted_string
-                            buffer.clear();
                             break;
                         default:
                             if ((*p_ >= '0' && *p_ <= '9') || (*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
@@ -871,6 +861,22 @@ public:
                     }
                     break;
                 case path_state::index_expression1:
+                    switch(*p_)
+                    {
+                        case '.':
+                            ++p_;
+                            ++column_;
+                            state_stack_.back() = path_state::expression1;
+                            break;
+                        case '[':
+                            state_stack_.back() = path_state::expression1;
+                            break;
+                        default:
+                            ec = jmespath_errc::expected_index;
+                            return result;
+                    }
+                    break;
+                case path_state::identifier_expression1:
                     switch(*p_)
                     {
                         case '.':
@@ -1281,6 +1287,11 @@ public:
                             ++p_;
                             ++column_;
                             break;
+                        case '.':
+                            state_stack_.back() = path_state::expression3; 
+                            ++p_;
+                            ++column_;
+                            break;
                         case ']':
                         {
                             state_stack_.pop_back();
@@ -1326,7 +1337,8 @@ public:
 
         JSONCONS_ASSERT(state_stack_.size() == 1);
         JSONCONS_ASSERT(state_stack_.back() == path_state::expression1 ||
-                        state_stack_.back() == path_state::index_expression1);
+                        state_stack_.back() == path_state::index_expression1 ||
+                        state_stack_.back() == path_state::identifier_expression1);
         state_stack_.pop_back();
 
         reference r = selector_stack_.back()->select(root, temp_factory_); 
