@@ -624,12 +624,13 @@ class jmespath_evaluator : public ser_context
             auto resultp = make_temp(json_array_arg);
             for (reference item : val.array_range())
             {
+                resultp->emplace_back(json_array_arg);
                 for (auto& selector : selectors_)
                 {
                     auto ptr = std::addressof(selector->select(item, make_temp));
                     if (!ptr->is_null())
                     {
-                        resultp->push_back(*ptr);
+                        resultp->at(resultp->size()-1).push_back(*ptr);
                     }
                 }
             }
@@ -644,6 +645,7 @@ class jmespath_evaluator : public ser_context
     const char_type* p_;
 
     std::vector<path_state> state_stack_;
+    std::vector<std::size_t> bracket_stack_;
     std::vector<std::unique_ptr<selector_base>> selector_stack_;
     temp_storage temp_factory_;
 
@@ -909,6 +911,7 @@ public:
                             ++column_;
                             break;
                         case '?':
+                            bracket_stack_.push_back(selector_stack_.size());
                             selector_stack_.emplace_back(make_unique_ptr<sub_expression_selector>());
                             state_stack_.back() = path_state::expression2;
                             ++p_;
@@ -925,6 +928,7 @@ public:
                             state_stack_.emplace_back(path_state::number);
                             break;
                         default:
+                            bracket_stack_.push_back(selector_stack_.size());
                             selector_stack_.emplace_back(make_unique_ptr<multiselect_list_selector>());
                             state_stack_.back() = path_state::expression3;
                             break;
@@ -1282,6 +1286,7 @@ public:
                     switch(*p_)
                     {
                         case ',':
+                            selector_stack_.emplace_back(make_unique_ptr<sub_expression_selector>());
                             state_stack_.back() = path_state::expression3; 
                             ++p_;
                             ++column_;
@@ -1295,13 +1300,19 @@ public:
                         {
                             state_stack_.pop_back();
 
-                            auto tmp = std::move(selector_stack_.back());
-                            selector_stack_.pop_back();
+                            size_t pos = bracket_stack_.back();
+                            bracket_stack_.pop_back();
+                            auto p = std::move(selector_stack_[pos]);
+                            for (size_t i = pos+1; i < selector_stack_.size(); ++i)
+                            {
+                                p->add_selector(std::move(selector_stack_[i]));
+                            }
+                            selector_stack_.erase(selector_stack_.begin()+pos, selector_stack_.end());
 
-                            auto p = make_unique_ptr<sub_expression_selector>();
-                            p->add_selector(std::move(selector_stack_.back()));
-                            p->add_selector(std::move(tmp));
-                            selector_stack_.back() = std::move(p);
+                            auto q = make_unique_ptr<sub_expression_selector>();
+                            q->add_selector(std::move(selector_stack_.back()));
+                            q->add_selector(std::move(p));
+                            selector_stack_.back() = std::move(q);
                             ++p_;
                             ++column_;
                             break;
