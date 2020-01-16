@@ -118,20 +118,27 @@
         "input" : "{\"machines\": [{\"name\": \"a\", \"state\": \"running\"},{\"name\": \"b\", \"state\": \"stopped\"},{\"name\": \"b\", \"state\": \"running\"}]}",
         "expression" : "machines[?state=='running'].name",
         "expected" : "[\"a\",\"b\"]"
-    },
+    }/*,
     
-    /*{
+    {
         "annotation" : "Flatten Projection using [] to flatten a list",
         "input" : "{\"people\": [{\"first\": \"James\", \"last\": \"d\"},{\"first\": \"Jacob\", \"last\": \"e\"},{\"first\": \"Jayden\", \"last\": \"f\"},{\"missing\": \"different\"}],\"foo\": {\"bar\": \"baz\"}}",
         "expression" : "people[*].first | [0]",
         "expected" : "James"
-    },*/
+    },
     
     {
         "annotation" : "Multiselect List",
         "input" : "{\"people\": [{\"name\": \"a\",\"state\": {\"name\": \"up\"}},{\"name\": \"b\",\"state\": {\"name\": \"down\"}},{\"name\": \"c\",\"state\": {\"name\": \"up\"}}]}",
         "expression" : "people[].[name,state.name]",
         "expected" : "[[\"a\",\"up\"],[\"b\",\"down\"],[\"c\",\"up\"]]"
-    }
+    },
+    
+    {
+        "annotation" : "Multi select hash",
+        "input" : "{\"people\": [{\"name\": \"a\",\"state\": {\"name\": \"up\"}},{\"name\": \"b\",\"state\": {\"name\": \"down\"}},{\"name\": \"c\",\"state\": {\"name\": \"up\"}}]}",
+        "expression" : "people[].people[].{Name: name, State: state.name}",
+        "expected" : "[{\"Name\": \"a\",\"State\": \"up\"},{\"Name\": \"b\",\"State\": \"down\"},{\"Name\": \"c\",\"State\": \"up\"}]"
+    }*/
     
 ]
