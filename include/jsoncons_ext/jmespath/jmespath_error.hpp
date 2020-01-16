@@ -88,9 +88,12 @@ enum class jmespath_errc
     expected_index,
     expected_A_Za_Z_,
     expected_right_bracket,
+    expected_right_brace,
+    expected_colon,
     expected_dot,
     invalid_number,
     expected_comparator,
+    expected_key,
 
     expected_root,
     expected_current_node,
@@ -142,14 +145,20 @@ public:
                 return "Invalid number";
             case jmespath_errc::expected_comparator:
                 return "Expected <, <=, ==, >=, > or !=";
+            case jmespath_errc::expected_key:
+                return "Expected key";
+            case jmespath_errc::expected_right_bracket:
+                return "Expected ]";
+            case jmespath_errc::expected_right_brace:
+                return "Expected }";
+            case jmespath_errc::expected_colon:
+                return "Expected :";
 
 
             case jmespath_errc::expected_root:
                 return "Expected $";
             case jmespath_errc::expected_current_node:
                 return "Expected @";
-            case jmespath_errc::expected_right_bracket:
-                return "Expected ]";
             case jmespath_errc::expected_dot:
                 return "Expected \".\"";
             case jmespath_errc::expected_name:
