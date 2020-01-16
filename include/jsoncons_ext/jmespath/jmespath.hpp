@@ -667,47 +667,6 @@ class jmespath_evaluator : public ser_context
         }
     };
 
-    class multi_select_hash_selector final : public selector_base
-    {
-    public:
-        std::vector<string_type> names_;
-        std::vector<std::unique_ptr<selector_base>> selectors_;
-
-        multi_select_hash_selector(std::vector<string_type>&& names,
-                                   std::vector<std::unique_ptr<selector_base>>&& selectors)
-            : names_(std::move(names)), selectors_(std::move(selectors))
-        {
-        }
-
-        void add_selector(std::unique_ptr<selector_base>&&) 
-        {
-        }
-
-        reference select(reference val, temp_storage& make_temp) override
-        {
-            static Json null{null_type()};
-            if (!val.is_array())
-            {
-                return null;
-            }
-
-            auto resultp = make_temp(json_array_arg);
-            for (reference item : val.array_range())
-            {
-                resultp->emplace_back(json_object_arg);
-                for (size_t i = 0; i < selectors_.size(); ++i)
-                {
-                    auto ptr = std::addressof(selectors_[i]->select(item, make_temp));
-                    if (!ptr->is_null())
-                    {
-                        resultp->at(resultp->size()-1).try_emplace(names_[i],*ptr);
-                    }
-                }
-            }
-            return *resultp;
-        }
-    };
-
     struct key_selector
     {
         string_type key;
@@ -727,6 +686,45 @@ class jmespath_evaluator : public ser_context
         key_selector& operator=(const key_selector&) = delete;
         key_selector(key_selector&&) = default;
         key_selector& operator=(key_selector&&) = default;
+    };
+
+    class multi_select_hash_selector final : public selector_base
+    {
+    public:
+        std::vector<key_selector> key_selectors_;
+
+        multi_select_hash_selector(std::vector<key_selector>&& key_selectors)
+            : key_selectors_(std::move(key_selectors))
+        {
+        }
+
+        void add_selector(std::unique_ptr<selector_base>&&) 
+        {
+        }
+
+        reference select(reference val, temp_storage& make_temp) override
+        {
+            static Json null{null_type()};
+            if (!val.is_array())
+            {
+                return null;
+            }
+
+            auto resultp = make_temp(json_array_arg);
+            for (reference item : val.array_range())
+            {
+                resultp->emplace_back(json_object_arg);
+                for (auto& key_selector : key_selectors_)
+                {
+                    auto ptr = std::addressof(key_selector.selector->select(item, make_temp));
+                    if (!ptr->is_null())
+                    {
+                        resultp->at(resultp->size()-1).try_emplace(key_selector.key,*ptr);
+                    }
+                }
+            }
+            return *resultp;
+        }
     };
 
     std::size_t line_;
@@ -799,7 +797,6 @@ public:
         p_ = begin_input_;
 
         slice a_slice;
-        std::vector<string_type> keys;
 
         while (p_ < end_input_)
         {
@@ -870,7 +867,7 @@ public:
                     break;
                 }
                 case path_state::key_expr:
-                    keys.emplace_back(std::move(buffer));
+                    selector_stack_.back().key = std::move(buffer);
                     buffer.clear(); 
                     state_stack_.pop_back(); 
                     break;
@@ -1573,19 +1570,18 @@ public:
 
                             size_t pos = bracket_stack_.back();
                             bracket_stack_.pop_back();
-                            std::vector<std::unique_ptr<selector_base>> selectors;
-                            selectors.reserve(selector_stack_.size());
+                            std::vector<key_selector> key_selectors;
+                            key_selectors.reserve(selector_stack_.size()-pos);
                             for (size_t i = pos; i < selector_stack_.size(); ++i)
                             {
-                                selectors.emplace_back(std::move(selector_stack_[i].selector));
+                                key_selectors.emplace_back(std::move(selector_stack_[i]));
                             }
                             selector_stack_.erase(selector_stack_.begin()+pos, selector_stack_.end());
 
                             auto q = make_unique_ptr<sub_expression_selector>();
                             q->add_selector(std::move(selector_stack_.back().selector));
-                            q->add_selector(make_unique_ptr<multi_select_hash_selector>(std::move(keys),std::move(selectors)));
+                            q->add_selector(make_unique_ptr<multi_select_hash_selector>(std::move(key_selectors)));
                             selector_stack_.back() = key_selector(std::move(q));
-                            keys.clear();
                             ++p_;
                             ++column_;
                             break;
