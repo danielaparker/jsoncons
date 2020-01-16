@@ -708,6 +708,27 @@ class jmespath_evaluator : public ser_context
         }
     };
 
+    struct key_selector
+    {
+        string_type key;
+        std::unique_ptr<selector_base> selector;
+
+        key_selector(string_type&& key)
+            : key(std::move(key))
+        {
+        }
+
+        key_selector(std::unique_ptr<selector_base>&& selector)
+            : selector(std::move(selector))
+        {
+        }
+
+        key_selector(const key_selector&) = delete;
+        key_selector& operator=(const key_selector&) = delete;
+        key_selector(key_selector&&) = default;
+        key_selector& operator=(key_selector&&) = default;
+    };
+
     std::size_t line_;
     std::size_t column_;
     const char_type* begin_input_;
@@ -716,7 +737,7 @@ class jmespath_evaluator : public ser_context
 
     std::vector<path_state> state_stack_;
     std::vector<std::size_t> bracket_stack_;
-    std::vector<std::unique_ptr<selector_base>> selector_stack_;
+    std::vector<key_selector> selector_stack_;
     temp_storage temp_factory_;
 
 public:
@@ -824,7 +845,7 @@ public:
                             ++column_;
                             break;
                         case '*':
-                            selector_stack_.back() = make_unique_ptr<object_projection_selector>(std::move(selector_stack_.back()));
+                            selector_stack_.back() = key_selector(make_unique_ptr<object_projection_selector>(std::move(selector_stack_.back().selector)));
                             state_stack_.emplace_back(path_state::expect_dot);
                             ++p_;
                             ++column_;
@@ -854,7 +875,7 @@ public:
                     state_stack_.pop_back(); 
                     break;
                 case path_state::val_expr:
-                    selector_stack_.back()->add_selector(make_unique_ptr<identifier_selector>(buffer));
+                    selector_stack_.back().selector->add_selector(make_unique_ptr<identifier_selector>(buffer));
                     buffer.clear();
                     state_stack_.pop_back(); 
                     break;
@@ -884,7 +905,7 @@ public:
                     {
                         case '\'':
                         {
-                            selector_stack_.back()->add_selector(make_unique_ptr<json_value_selector>(Json(buffer)));
+                            selector_stack_.back().selector->add_selector(make_unique_ptr<json_value_selector>(Json(buffer)));
                             buffer.clear();
                             state_stack_.pop_back(); // raw_string
                             ++p_;
@@ -908,7 +929,7 @@ public:
                         case '\'':
                         {
                             auto j = Json::parse(buffer);
-                            selector_stack_.back()->add_selector(make_unique_ptr<json_value_selector>(std::move(j)));
+                            selector_stack_.back().selector->add_selector(make_unique_ptr<json_value_selector>(std::move(j)));
                             buffer.clear();
                             state_stack_.pop_back(); // raw_string
                             break;
@@ -971,13 +992,13 @@ public:
                     switch(*p_)
                     {
                         case '*':
-                            selector_stack_.back() = make_unique_ptr<list_projection_selector>(std::move(selector_stack_.back()));
+                            selector_stack_.back() = key_selector(make_unique_ptr<list_projection_selector>(std::move(selector_stack_.back().selector)));
                             state_stack_.back() = path_state::bracket_specifier4;
                             ++p_;
                             ++column_;
                             break;
                         case ']':
-                            selector_stack_.back() = make_unique_ptr<flatten_selector>(std::move(selector_stack_.back()));
+                            selector_stack_.back() = key_selector(make_unique_ptr<flatten_selector>(std::move(selector_stack_.back().selector)));
                             state_stack_.pop_back(); // bracket_specifier
                             ++p_;
                             ++column_;
@@ -1031,7 +1052,7 @@ public:
                         {
                             if (buffer.empty())
                             {
-                                selector_stack_.back() = make_unique_ptr<flatten_selector>(std::move(selector_stack_.back()));
+                                selector_stack_.back() = key_selector(make_unique_ptr<flatten_selector>(std::move(selector_stack_.back().selector)));
                             }
                             else
                             {
@@ -1041,7 +1062,7 @@ public:
                                     ec = jmespath_errc::invalid_number;
                                     return result;
                                 }
-                                selector_stack_.back()->add_selector(make_unique_ptr<index_selector>(r.value()));
+                                selector_stack_.back().selector->add_selector(make_unique_ptr<index_selector>(r.value()));
                                 buffer.clear();
                             }
                             state_stack_.pop_back(); // bracket_specifier
@@ -1088,7 +1109,7 @@ public:
                     switch(*p_)
                     {
                         case ']':
-                            selector_stack_.back()->add_selector(make_unique_ptr<slice_selector>(a_slice));
+                            selector_stack_.back().selector->add_selector(make_unique_ptr<slice_selector>(a_slice));
                             buffer.clear();
                             a_slice = slice();
                             state_stack_.pop_back(); // bracket_specifier2
@@ -1123,7 +1144,7 @@ public:
                     switch(*p_)
                     {
                         case ']':
-                            selector_stack_.back()->add_selector(make_unique_ptr<slice_selector>(a_slice));
+                            selector_stack_.back().selector->add_selector(make_unique_ptr<slice_selector>(a_slice));
                             buffer.clear();
                             a_slice = slice();
                             state_stack_.pop_back(); // bracket_specifier3
@@ -1190,7 +1211,7 @@ public:
                             break;
                         case '*':
                             state_stack_.back() = path_state::comparator;
-                            selector_stack_.back() = make_unique_ptr<object_projection_selector>(std::move(selector_stack_.back()));
+                            selector_stack_.back() = key_selector(make_unique_ptr<object_projection_selector>(std::move(selector_stack_.back().selector)));
                             state_stack_.emplace_back(path_state::expect_dot);
                             ++p_;
                             ++column_;
@@ -1253,7 +1274,7 @@ public:
                             break;
                         case '*':
                             state_stack_.back() = path_state::expect_right_bracket;
-                            selector_stack_.back() = make_unique_ptr<object_projection_selector>(std::move(selector_stack_.back()));
+                            selector_stack_.back() = key_selector(make_unique_ptr<object_projection_selector>(std::move(selector_stack_.back().selector)));
                             state_stack_.emplace_back(path_state::expect_dot);
                             ++p_;
                             ++column_;
@@ -1354,7 +1375,7 @@ public:
                             break;
                         case '*':
                             state_stack_.back() = path_state::expect_right_brace;
-                            selector_stack_.back() = make_unique_ptr<object_projection_selector>(std::move(selector_stack_.back()));
+                            selector_stack_.back() = key_selector(make_unique_ptr<object_projection_selector>(std::move(selector_stack_.back().selector)));
                             state_stack_.emplace_back(path_state::expect_dot);
                             ++p_;
                             ++column_;
@@ -1413,13 +1434,13 @@ public:
                     switch(*p_)
                     {
                         case '=':
-                            selector_stack_.back() = make_unique_ptr<filter_selector<cmp_lte>>(std::move(selector_stack_.back()));
+                            selector_stack_.back() = key_selector(make_unique_ptr<filter_selector<cmp_lte>>(std::move(selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expression3;
                             ++p_;
                             ++column_;
                             break;
                         default:
-                            selector_stack_.back() = make_unique_ptr<filter_selector<cmp_lt>>(std::move(selector_stack_.back()));
+                            selector_stack_.back() = key_selector(make_unique_ptr<filter_selector<cmp_lt>>(std::move(selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expression3;
                             break;
                     }
@@ -1430,7 +1451,7 @@ public:
                     switch(*p_)
                     {
                         case '=':
-                            selector_stack_.back() = make_unique_ptr<filter_selector<cmp_eq>>(std::move(selector_stack_.back()));
+                            selector_stack_.back() = key_selector(make_unique_ptr<filter_selector<cmp_eq>>(std::move(selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expression3;
                             ++p_;
                             ++column_;
@@ -1446,13 +1467,13 @@ public:
                     switch(*p_)
                     {
                         case '=':
-                            selector_stack_.back() = make_unique_ptr<filter_selector<cmp_gte>>(std::move(selector_stack_.back()));
+                            selector_stack_.back() = key_selector(make_unique_ptr<filter_selector<cmp_gte>>(std::move(selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expression3;
                             ++p_;
                             ++column_;
                             break;
                         default:
-                            selector_stack_.back() = make_unique_ptr<filter_selector<cmp_gt>>(std::move(selector_stack_.back()));
+                            selector_stack_.back() = key_selector(make_unique_ptr<filter_selector<cmp_gt>>(std::move(selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expression3;
                             break;
                     }
@@ -1463,7 +1484,7 @@ public:
                     switch(*p_)
                     {
                         case '=':
-                            selector_stack_.back() = make_unique_ptr<filter_selector<cmp_ne>>(std::move(selector_stack_.back()));
+                            selector_stack_.back() = key_selector(make_unique_ptr<filter_selector<cmp_ne>>(std::move(selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expression3;
                             ++p_;
                             ++column_;
@@ -1494,7 +1515,7 @@ public:
                     switch(*p_)
                     {
                         case ',':
-                            selector_stack_.emplace_back(make_unique_ptr<sub_expression_selector>());
+                            selector_stack_.emplace_back(key_selector(make_unique_ptr<sub_expression_selector>()));
                             state_stack_.back() = path_state::expression3; 
                             ++p_;
                             ++column_;
@@ -1513,14 +1534,14 @@ public:
                             auto p = std::move(selector_stack_[pos]);
                             for (size_t i = pos+1; i < selector_stack_.size(); ++i)
                             {
-                                p->add_selector(std::move(selector_stack_[i]));
+                                p.selector->add_selector(std::move(selector_stack_[i].selector));
                             }
                             selector_stack_.erase(selector_stack_.begin()+pos, selector_stack_.end());
 
                             auto q = make_unique_ptr<sub_expression_selector>();
-                            q->add_selector(std::move(selector_stack_.back()));
-                            q->add_selector(std::move(p));
-                            selector_stack_.back() = std::move(q);
+                            q->add_selector(std::move(selector_stack_.back().selector));
+                            q->add_selector(std::move(p.selector));
+                            selector_stack_.back() = key_selector(std::move(q));
                             ++p_;
                             ++column_;
                             break;
@@ -1556,14 +1577,14 @@ public:
                             selectors.reserve(selector_stack_.size());
                             for (size_t i = pos; i < selector_stack_.size(); ++i)
                             {
-                                selectors.emplace_back(std::move(selector_stack_[i]));
+                                selectors.emplace_back(std::move(selector_stack_[i].selector));
                             }
                             selector_stack_.erase(selector_stack_.begin()+pos, selector_stack_.end());
 
                             auto q = make_unique_ptr<sub_expression_selector>();
-                            q->add_selector(std::move(selector_stack_.back()));
+                            q->add_selector(std::move(selector_stack_.back().selector));
                             q->add_selector(make_unique_ptr<multi_select_hash_selector>(std::move(keys),std::move(selectors)));
-                            selector_stack_.back() = std::move(q);
+                            selector_stack_.back() = key_selector(std::move(q));
                             keys.clear();
                             ++p_;
                             ++column_;
@@ -1601,7 +1622,7 @@ public:
         {
             case path_state::unquoted_string: 
             {
-                selector_stack_.back()->add_selector(make_unique_ptr<identifier_selector>(buffer));
+                selector_stack_.back().selector->add_selector(make_unique_ptr<identifier_selector>(buffer));
                 buffer.clear();
                 state_stack_.pop_back(); // unquoted_name
                 state_stack_.pop_back(); // val_expr
@@ -1622,7 +1643,7 @@ public:
                         state_stack_.back() == path_state::sub_expression1);
         state_stack_.pop_back();
 
-        reference r = selector_stack_.back()->select(root, temp_factory_); 
+        reference r = selector_stack_.back().selector->select(root, temp_factory_); 
         return r;
     }
 
