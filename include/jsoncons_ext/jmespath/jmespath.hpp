@@ -86,7 +86,7 @@ template <class Json,
 }
 
 template<class Json>
-Json select(const Json& root, const typename Json::string_view_type& path, result_type result_t = result_type::value)
+Json search(const Json& root, const typename Json::string_view_type& path, result_type result_t = result_type::value)
 {
     if (result_t == result_type::value)
     {
@@ -113,7 +113,6 @@ namespace detail {
 enum class path_state 
 {
     start,
-    expression,
 
     quoted_string,
     raw_string,
@@ -139,7 +138,6 @@ enum class path_state
     expect_right_bracket,
     expect_right_brace,
     expect_colon,
-    comparator_expression,
     comparator,
     cmp_lt_or_lte,
     cmp_eq,
@@ -849,6 +847,7 @@ public:
                             advance_past_space_character();
                             break;
                         case '\"':
+                            state_stack_.emplace_back(path_state::val_expr);
                             state_stack_.emplace_back(path_state::quoted_string);
                             ++p_;
                             ++column_;
@@ -910,6 +909,34 @@ public:
                     buffer.clear();
                     state_stack_.pop_back(); 
                     break;
+
+                case path_state::quoted_string: 
+                    switch (*p_)
+                    {
+                        case '\"':
+                            state_stack_.pop_back(); // quoted_string
+                            break;
+                        case '\\':
+                            if (p_+1 < end_input_)
+                            {
+                                ++p_;
+                                ++column_;
+                                buffer.push_back(*p_);
+                            }
+                            else
+                            {
+                                ec = jmespath_errc::unexpected_end_of_input;
+                                return result;
+                            }
+                            break;
+                        default:
+                            buffer.push_back(*p_);
+                            break;
+                    };
+                    ++p_;
+                    ++column_;
+                    break;
+
                 case path_state::unquoted_string: 
                     switch (*p_)
                     {
@@ -1225,6 +1252,7 @@ public:
                             break;
                         case '\"':
                             state_stack_.back() = path_state::comparator;
+                            state_stack_.emplace_back(path_state::val_expr);
                             state_stack_.emplace_back(path_state::quoted_string);
                             ++p_;
                             ++column_;
@@ -1288,6 +1316,7 @@ public:
                             break;
                         case '\"':
                             state_stack_.back() = path_state::expect_right_bracket;
+                            state_stack_.emplace_back(path_state::val_expr);
                             state_stack_.emplace_back(path_state::quoted_string);
                             ++p_;
                             ++column_;
@@ -1351,6 +1380,7 @@ public:
                             break;
                         case '\"':
                             state_stack_.back() = path_state::expect_colon;
+                            state_stack_.emplace_back(path_state::key_expr);
                             state_stack_.emplace_back(path_state::quoted_string);
                             ++p_;
                             ++column_;
@@ -1389,6 +1419,7 @@ public:
                             break;
                         case '\"':
                             state_stack_.back() = path_state::expect_right_brace;
+                            state_stack_.emplace_back(path_state::val_expr);
                             state_stack_.emplace_back(path_state::quoted_string);
                             ++p_;
                             ++column_;
@@ -1673,18 +1704,15 @@ public:
             
         }
 
-        switch (state_stack_.back())
+        if (state_stack_.size() >= 3 && state_stack_.back() == path_state::unquoted_string)
         {
-            case path_state::unquoted_string: 
+            state_stack_.pop_back(); // unquoted_string
+            if (state_stack_.back() == path_state::val_expr)
             {
                 key_selector_stack_.back().selector->add_selector(make_unique_ptr<identifier_selector>(buffer));
                 buffer.clear();
-                state_stack_.pop_back(); // unquoted_name
                 state_stack_.pop_back(); // val_expr
-                break;
             }
-            default:
-                break;
         }
 
         if (state_stack_.size() > 1)

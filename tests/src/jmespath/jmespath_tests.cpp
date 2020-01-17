@@ -1,4 +1,4 @@
-// Copyright 2013 Daniel Parker
+// Copyright 2020 Daniel Parker
 // Distributed under Boost license
 
 #if defined(_MSC_VER)
@@ -35,7 +35,7 @@ TEST_CASE("jmespath-tests")
             std::string expected = test["expected"].as<std::string>();
 
             ojson root = ojson::parse(input);
-            ojson result = jmespath::select(root, path);
+            ojson result = jmespath::search(root, path);
             ojson expected_result = ojson::parse(expected);
             if (result != expected_result)
             {
@@ -51,7 +51,7 @@ TEST_CASE("jmespath-tests")
         {
             std::string error = test["error"].as<std::string>();
             ojson root = ojson::parse(input);
-            REQUIRE_THROWS_WITH(jmespath::select(root, path), error);
+            REQUIRE_THROWS_WITH(jmespath::search(root, path), error);
         }
     }
 }
