@@ -143,7 +143,7 @@
     {
         "annotation" : "Multi select hash",
         "input" : "{\"people\": [{\"age\": 20,\"other\": \"foo\",\"name\": \"Bob\"},{\"age\": 25,\"other\": \"bar\",\"name\": \"Fred\"},{\"age\": 30,\"other\": \"baz\",\"name\": \"George\"}]}",
-        "expression" : "people[?age > `20`].[name, age] ",
+        "expression" : "people[?age > `20`].[name, age]",
         "expected" : "[[\"Fred\",25],[\"George\",30]]"
     }
 ]
