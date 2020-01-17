@@ -254,7 +254,7 @@ class jmespath_evaluator : public ser_context
         reference select(reference val, temp_storage& make_temp) override
         {
             static Json null{null_type()};
-            auto j = lhs_selector_->select(val, make_temp);
+            reference j = lhs_selector_->select(val, make_temp);
             if (!j.is_array())
             {
                 return null;
@@ -284,8 +284,8 @@ class jmespath_evaluator : public ser_context
         std::vector<std::unique_ptr<selector_base>> rhs_selectors_;
 
         pipe_selector(std::unique_ptr<selector_base>&& lhs_selector)
+            : lhs_selector_(std::move(lhs_selector))
         {
-            lhs_selector_ = std::move(lhs_selector);
         }
 
         void add_selector(std::unique_ptr<selector_base>&& rhs_selectors) 
@@ -296,7 +296,7 @@ class jmespath_evaluator : public ser_context
         reference select(reference val, temp_storage& make_temp) override
         {
             static Json null{null_type()};
-            auto lhs = lhs_selector_->select(val, make_temp);
+            reference lhs = lhs_selector_->select(val, make_temp);
             if (!lhs.is_array())
             {
                 return null;
@@ -330,7 +330,7 @@ class jmespath_evaluator : public ser_context
         reference select(reference val, temp_storage& make_temp) override
         {
             static Json null{null_type()};
-            auto j = lhs_selector_->select(val, make_temp);
+            reference j = lhs_selector_->select(val, make_temp);
             if (!j.is_array())
             {
                 return null;
@@ -389,7 +389,7 @@ class jmespath_evaluator : public ser_context
         reference select(reference val, temp_storage& make_temp) override
         {
             static Json null{null_type()};
-            auto j = lhs_selector_->select(val, make_temp);
+            reference j = lhs_selector_->select(val, make_temp);
             if (!j.is_object())
             {
                 return null;
@@ -642,7 +642,7 @@ class jmespath_evaluator : public ser_context
                 auto resultp = make_temp(json_array_arg);
                 for (auto& item : val.array_range())
                 {
-                    auto lhs = lhs_selector_->select(item, make_temp);
+                    reference lhs = lhs_selector_->select(item, make_temp);
 
                     pointer rhsp = std::addressof(item);
                     for (auto& selector : rhs_selectors_)
@@ -1013,11 +1013,13 @@ public:
                             state_stack_.back() = path_state::expression1;
                             break;
                         case '|':
+                        {
                             ++p_;
                             ++column_;
                             key_selector_stack_.back() = key_selector(make_unique_ptr<pipe_selector>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expression1;
                             break;
+                        }
                         case '[':
                         case '{':
                             state_stack_.back() = path_state::expression1;
