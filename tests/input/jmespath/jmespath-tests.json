@@ -1,5 +1,6 @@
 [
-    {
+    // From tutorial
+    /*{
         "annotation" : "Select a value with an identifier",
         "input" : "{\"a\": \"foo\", \"b\": \"bar\", \"c\": \"baz\"}",
         "expression" : "a",
@@ -136,5 +137,13 @@
         "input" : "{\"people\": [{\"name\": \"a\",\"state\": {\"name\": \"up\"}},{\"name\": \"b\",\"state\": {\"name\": \"down\"}},{\"name\": \"c\",\"state\": {\"name\": \"up\"}}]}",
         "expression" : "people[].{Name: name, State: state.name}",
         "expected" : "[{\"Name\": \"a\",\"State\": \"up\"},{\"Name\": \"b\",\"State\": \"down\"},{\"Name\": \"c\",\"State\": \"up\"}]"
+    },*/
+    // From examples
+    // Filters and Multiselect Lists
+    {
+        "annotation" : "Multi select hash",
+        "input" : "{\"people\": [{\"age\": 20,\"other\": \"foo\",\"name\": \"Bob\"},{\"age\": 25,\"other\": \"bar\",\"name\": \"Fred\"},{\"age\": 30,\"other\": \"baz\",\"name\": \"George\"}]}",
+        "expression" : "people[?age > `20`].[name, age] ",
+        "expected" : "[[\"Fred\",25],[\"George\",30]]"
     }
 ]

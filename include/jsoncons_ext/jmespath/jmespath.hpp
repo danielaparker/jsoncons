@@ -957,12 +957,14 @@ public:
                 case path_state::json_value: 
                     switch (*p_)
                     {
-                        case '\'':
+                        case '`':
                         {
                             auto j = Json::parse(buffer);
                             key_selector_stack_.back().selector->add_selector(make_unique_ptr<json_value_selector>(std::move(j)));
                             buffer.clear();
-                            state_stack_.pop_back(); // raw_string
+                            state_stack_.pop_back(); // json_value
+                            ++p_;
+                            ++column_;
                             break;
                         }
                         case '\\':
@@ -1147,12 +1149,12 @@ public:
                             return result;
                         }
                         a_slice.end_ = optional<int64_t>(r.value());
+                        buffer.clear();
                     }
                     switch(*p_)
                     {
                         case ']':
                             key_selector_stack_.back().selector->add_selector(make_unique_ptr<slice_selector>(a_slice));
-                            buffer.clear();
                             a_slice = slice();
                             state_stack_.pop_back(); // bracket_specifier2
                             ++p_;
@@ -1541,6 +1543,9 @@ public:
                 {
                     switch(*p_)
                     {
+                        case ' ':case '\t':case '\r':case '\n':
+                            advance_past_space_character();
+                            break;
                         case '.':
                             state_stack_.pop_back(); // expect_dot
                             ++p_;
@@ -1556,6 +1561,9 @@ public:
                 {
                     switch(*p_)
                     {
+                        case ' ':case '\t':case '\r':case '\n':
+                            advance_past_space_character();
+                            break;
                         case ',':
                             key_selector_stack_.emplace_back(key_selector(make_unique_ptr<sub_expression_selector>()));
                             state_stack_.back() = path_state::expression3; 
@@ -1598,6 +1606,9 @@ public:
                 {
                     switch(*p_)
                     {
+                        case ' ':case '\t':case '\r':case '\n':
+                            advance_past_space_character();
+                            break;
                         case ',':
                             key_selector_stack_.emplace_back(make_unique_ptr<sub_expression_selector>());
                             state_stack_.back() = path_state::key_val_expr; 
