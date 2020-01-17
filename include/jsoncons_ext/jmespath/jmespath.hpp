@@ -1615,6 +1615,9 @@ public:
                             ++p_;
                             ++column_;
                             break;
+                        case '[':
+                            state_stack_.back() = path_state::expression4;
+                            break;
                         case '.':
                             state_stack_.back() = path_state::expression4; 
                             ++p_;
