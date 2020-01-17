@@ -40,9 +40,9 @@ TEST_CASE("jmespath-tests")
             if (result != expected_result)
             {
                 std::cout << "\n" << test["annotation"] << "\n";
-                std::cout << root << "\n";
+                std::cout << "input\n" << pretty_print(root) << "\n";
                 std::cout << path << "\n\n";
-                std::cout << "actual: " << result << "\n\n";
+                std::cout << "actual\n: " << pretty_print(result) << "\n\n";
                 std::cout << "expected: " << expected << "\n\n";
             }
             CHECK(result == expected_result);

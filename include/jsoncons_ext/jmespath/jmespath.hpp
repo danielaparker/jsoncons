@@ -1601,11 +1601,22 @@ public:
                             ++p_;
                             ++column_;
                             break;
+                        case '[':
+                            state_stack_.back() = path_state::expression3;
+                            break;
                         case '.':
                             state_stack_.back() = path_state::expression3; 
                             ++p_;
                             ++column_;
                             break;
+                        case '|':
+                        {
+                            ++p_;
+                            ++column_;
+                            key_selector_stack_.back() = key_selector(make_unique_ptr<pipe_selector>(std::move(key_selector_stack_.back().selector)));
+                            state_stack_.back() = path_state::expression3;
+                            break;
+                        }
                         case ']':
                         {
                             state_stack_.pop_back();
