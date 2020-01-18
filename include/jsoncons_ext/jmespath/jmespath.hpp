@@ -1081,6 +1081,8 @@ public:
                             state_stack_.emplace_back(path_state::number);
                             break;
                         default:
+                            key_selector_stack_.back() = key_selector(make_unique_ptr<list_projection_selector>(std::move(key_selector_stack_.back().selector)));
+
                             structure_offset_stack_.push_back(key_selector_stack_.size());
                             key_selector_stack_.emplace_back(make_unique_ptr<sub_expression_selector>());
                             state_stack_.back() = path_state::multi_select_list_expr;
@@ -1098,6 +1100,8 @@ public:
                         case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                             break;
                         default:
+                            key_selector_stack_.back() = key_selector(make_unique_ptr<list_projection_selector>(std::move(key_selector_stack_.back().selector)));
+
                             structure_offset_stack_.push_back(key_selector_stack_.size());
                             key_selector_stack_.emplace_back(make_unique_ptr<sub_expression_selector>());
                             state_stack_.back() = path_state::key_val_expr;
@@ -1716,10 +1720,7 @@ public:
                                 selectors.emplace_back(std::move(key_selector_stack_[i].selector));
                             }
                             key_selector_stack_.erase(key_selector_stack_.begin()+pos, key_selector_stack_.end());
-
-                            auto q = make_unique_ptr<list_projection_selector>(std::move(key_selector_stack_.back().selector));
-                            q->add_selector(make_unique_ptr<multi_select_list_selector>(std::move(selectors)));
-                            key_selector_stack_.back() = key_selector(std::move(q));
+                            key_selector_stack_.back().selector->add_selector(make_unique_ptr<multi_select_list_selector>(std::move(selectors)));
 
                             ++p_;
                             ++column_;
@@ -1766,10 +1767,8 @@ public:
                                 key_selectors.emplace_back(std::move(key_selector_stack_[i]));
                             }
                             key_selector_stack_.erase(key_selector_stack_.begin()+pos, key_selector_stack_.end());
+                            key_selector_stack_.back().selector->add_selector(make_unique_ptr<multi_select_hash_selector>(std::move(key_selectors)));
 
-                            auto q = make_unique_ptr<list_projection_selector>(std::move(key_selector_stack_.back().selector));
-                            q->add_selector(make_unique_ptr<multi_select_hash_selector>(std::move(key_selectors)));
-                            key_selector_stack_.back() = key_selector(std::move(q));
                             ++p_;
                             ++column_;
                             break;
