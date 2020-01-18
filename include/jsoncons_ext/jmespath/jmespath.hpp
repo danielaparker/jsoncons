@@ -1535,6 +1535,11 @@ public:
                 {
                     switch(*p_)
                     {
+                        case '.': 
+                            ++p_;
+                            ++column_;
+                            state_stack_.back() = path_state::cmp_lhs_expr;
+                            break;
                         case '<':
                             state_stack_.back() = path_state::cmp_lt_or_lte;
                             ++p_;
