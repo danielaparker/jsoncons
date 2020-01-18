@@ -1,6 +1,6 @@
 [
     // From tutorial
-    {
+    /*{
         "annotation" : "Select a value with an identifier",
         "input" : "{\"a\": \"foo\", \"b\": \"bar\", \"c\": \"baz\"}",
         "expression" : "a",
@@ -158,21 +158,11 @@
         "input" : "{\"people\": [{\"age\": 20,\"tags\": [\"a\", \"b\", \"c\"],\"name\": \"Bob\"},{\"age\": 25,\"tags\": [\"d\", \"e\", \"f\"],\"name\": \"Fred\"},{\"age\": 30,\"tags\": [\"g\", \"h\", \"i\"],\"name\": \"George\"}]}",
         "expression" : "people[*].{name: name, tags: tags[0]}",
         "expected" : "[{\"name\": \"Bob\",\"tags\": \"a\"},{\"name\": \"Fred\",\"tags\": \"d\"},{\"name\": \"George\",\"tags\": \"g\"}]"
-    }/*
+    },*/
     {
         "annotation" : "Working with Nested Data",
         "input" : "{\"reservations\": [{\"instances\": [{\"type\": \"small\",\"state\": {\"name\": \"running\"},\"tags\": [{\"Key\": \"Name\",\"Values\": [\"Web\"]},{\"Key\": \"version\",\"Values\": [\"1\"]}]},{\"type\": \"large\",\"state\": {\"name\": \"stopped\"},\"tags\": [{\"Key\": \"Name\",\"Values\": [\"Web\"]},{\"Key\": \"version\",\"Values\": [\"1\"]}]}]}, {\"instances\": [{\"type\": \"medium\",\"state\": {\"name\": \"terminated\"},\"tags\": [{\"Key\": \"Name\",\"Values\": [\"Web\"]},{\"Key\": \"version\",\"Values\": [\"1\"]}]},{\"type\": \"xlarge\",\"state\": {\"name\": \"running\"},\"tags\": [{\"Key\": \"Name\",\"Values\": [\"DB\"]},{\"Key\": \"version\",\"Values\": [\"1\"]}]}]}]}",
-        "expression" : 
-//"reservations[].instances[].[tags[?Key=='Name'].Values[] | [0], type, state.name]",
-"reservations[].instances[]",
+        "expression" : "reservations[].instances[].[tags[?Key=='Name'].Values[] | [0], type, state.name]",
         "expected" : "[[\"Web\",\"small\",\"running\"],[\"Web\",\"large\",\"stopped\"],[\"Web\",\"medium\",\"terminated\"],[\"DB\",\"xlarge\",\"running\"]]"
-    },
-    {
-        "annotation" : "Working with Nested Data",
-        "input" : "[{\"type\":\"small\",\"state\":{\"name\":\"running\"},\"tags\":[{\"Key\":\"Name\",\"Values\":[\"Web\"]},{\"Key\":\"version\",\"Values\":[\"1\"]}]},{\"type\":\"large\",\"state\":{\"name\":\"stopped\"},\"tags\":[{\"Key\":\"Name\",\"Values\":[\"Web\"]},{\"Key\":\"version\",\"Values\":[\"1\"]}]},{\"type\":\"medium\",\"state\":{\"name\":\"terminated\"},\"tags\":[{\"Key\":\"Name\",\"Values\":[\"Web\"]},{\"Key\":\"version\",\"Values\":[\"1\"]}]},{\"type\":\"xlarge\",\"state\":{\"name\":\"running\"},\"tags\":[{\"Key\":\"Name\",\"Values\":[\"DB\"]},{\"Key\":\"version\",\"Values\":[\"1\"]}]}]",
-        "expression" : 
-//"reservations[].instances[].[tags[?Key=='Name'].Values[] | [0], type, state.name]",
-"[tags]",
-        "expected" : "[[\"Web\",\"small\",\"running\"],[\"Web\",\"large\",\"stopped\"],[\"Web\",\"medium\",\"terminated\"],[\"DB\",\"xlarge\",\"running\"]]"
-    }*/
+    }
 ]
