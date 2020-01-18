@@ -121,9 +121,10 @@ enum class path_state
     val_expr,
     unquoted_string,
     expression1,
-    expression2,
-    expression3,
-    expression4,
+    cmp_lhs_expr,
+    cmp_rhs_expr,
+    multi_select_list_expr,
+    multi_select_hash_expr,
     key_val_expr,
     sub_expression1,
     number,
@@ -136,6 +137,7 @@ enum class path_state
     bracket_specifier4,
     expect_dot,
     expect_right_bracket,
+    expect_right_bracket4,
     expect_right_brace,
     expect_colon,
     comparator,
@@ -193,7 +195,7 @@ class jmespath_evaluator : public ser_context
         {
         }
 
-        void add_selector(std::unique_ptr<selector_base>&& selector) 
+        void add_selector(std::unique_ptr<selector_base>&& selector) override 
         {
             selectors_.emplace_back(std::move(selector));
         }
@@ -221,7 +223,7 @@ class jmespath_evaluator : public ser_context
         {
         }
 
-        void add_selector(std::unique_ptr<selector_base>&& selector) 
+        void add_selector(std::unique_ptr<selector_base>&& selector) override 
         {
         }
 
@@ -244,7 +246,7 @@ class jmespath_evaluator : public ser_context
             lhs_selector_ = std::move(lhs_selector);
         }
 
-        void add_selector(std::unique_ptr<selector_base>&& rhs_selectors) 
+        void add_selector(std::unique_ptr<selector_base>&& rhs_selectors) override 
         {
             rhs_selectors_.emplace_back(std::move(rhs_selectors));
         }
@@ -286,7 +288,7 @@ class jmespath_evaluator : public ser_context
         {
         }
 
-        void add_selector(std::unique_ptr<selector_base>&& rhs_selectors) 
+        void add_selector(std::unique_ptr<selector_base>&& rhs_selectors) override 
         {
             rhs_selectors_.emplace_back(std::move(rhs_selectors));
         }
@@ -320,7 +322,7 @@ class jmespath_evaluator : public ser_context
             lhs_selector_ = std::move(lhs_selector);
         }
 
-        void add_selector(std::unique_ptr<selector_base>&& rhs_selectors) 
+        void add_selector(std::unique_ptr<selector_base>&& rhs_selectors) override 
         {
             rhs_selectors_.emplace_back(std::move(rhs_selectors));
         }
@@ -379,7 +381,7 @@ class jmespath_evaluator : public ser_context
             lhs_selector_ = std::move(lhs_selector);
         }
 
-        void add_selector(std::unique_ptr<selector_base>&& rhs_selectors) 
+        void add_selector(std::unique_ptr<selector_base>&& rhs_selectors) override 
         {
             rhs_selectors_.emplace_back(std::move(rhs_selectors));
         }
@@ -484,7 +486,7 @@ class jmespath_evaluator : public ser_context
         {
         }
 
-        void add_selector(std::unique_ptr<selector_base>&&) 
+        void add_selector(std::unique_ptr<selector_base>&&) override 
         {
             // noop
         }
@@ -626,7 +628,7 @@ class jmespath_evaluator : public ser_context
             lhs_selector_ = std::move(lhs_selector);
         }
 
-        void add_selector(std::unique_ptr<selector_base>&& rhs_selectors) 
+        void add_selector(std::unique_ptr<selector_base>&& rhs_selectors) override 
         {
             rhs_selectors_.emplace_back(std::move(rhs_selectors));
         }
@@ -660,67 +662,36 @@ class jmespath_evaluator : public ser_context
         }
     };
 
-    class multi_select_list_selector2 final : public selector_base
+    class multi_select_list_selector final : public selector_base
     {
     public:
         std::vector<std::unique_ptr<selector_base>> selectors_;
 
-        multi_select_list_selector2(std::vector<std::unique_ptr<selector_base>>&& selectors)
+        multi_select_list_selector(std::vector<std::unique_ptr<selector_base>>&& selectors)
             : selectors_(std::move(selectors))
         {
         }
 
-        void add_selector(std::unique_ptr<selector_base>&&) 
+        void add_selector(std::unique_ptr<selector_base>&&) override
         {
         }
 
         reference select(reference val, temp_storage& make_temp) override
         {
             static Json null{null_type()};
-            if (!val.is_array())
+
+            if (!val.is_object())
             {
                 return null;
             }
 
             auto resultp = make_temp(json_array_arg);
-            for (reference item : val.array_range())
-            {
-                resultp->emplace_back(json_array_arg);
-                for (auto& selector : selectors_)
-                {
-                    auto ptr = std::addressof(selector->select(item, make_temp));
-                    if (!ptr->is_null())
-                    {
-                        resultp->at(resultp->size()-1).push_back(*ptr);
-                    }
-                }
-            }
-            return *resultp;
-        }
-    };
-
-    class multi_select_list_selector final : public selector_base
-    {
-    public:
-        std::vector<std::unique_ptr<selector_base>> selectors_;
-
-        multi_select_list_selector()
-        {
-        }
-
-        void add_selector(std::unique_ptr<selector_base>&& selector) 
-        {
-            selectors_.emplace_back(std::move(selector));
-        }
-
-        reference select(reference val, temp_storage& make_temp) override
-        {
-            pointer ptr = std::addressof(val);
+            resultp->reserve(selectors_.size());
             for (auto& selector : selectors_)
             {
-                ptr = std::addressof(selector->select(*ptr, make_temp));
+                resultp->push_back(selector->select(val, make_temp));
             }
-            return *ptr;
+            return *resultp;
         }
     };
 
@@ -755,7 +726,7 @@ class jmespath_evaluator : public ser_context
         {
         }
 
-        void add_selector(std::unique_ptr<selector_base>&&) 
+        void add_selector(std::unique_ptr<selector_base>&&) override 
         {
         }
 
@@ -1102,7 +1073,7 @@ public:
                         case '?':
                             structure_offset_stack_.push_back(key_selector_stack_.size());
                             key_selector_stack_.emplace_back(make_unique_ptr<sub_expression_selector>());
-                            state_stack_.back() = path_state::expression2;
+                            state_stack_.back() = path_state::cmp_lhs_expr;
                             ++p_;
                             ++column_;
                             break;
@@ -1118,8 +1089,8 @@ public:
                             break;
                         default:
                             structure_offset_stack_.push_back(key_selector_stack_.size());
-                            key_selector_stack_.emplace_back(make_unique_ptr<multi_select_list_selector>());
-                            state_stack_.back() = path_state::expression3;
+                            key_selector_stack_.emplace_back(make_unique_ptr<sub_expression_selector>());
+                            state_stack_.back() = path_state::multi_select_list_expr;
                             break;
                     }
                     break;
@@ -1268,7 +1239,7 @@ public:
                     }
                     break;
                 }
-                case path_state::expression2: 
+                case path_state::cmp_lhs_expr: 
                 {
                     switch (*p_)
                     {
@@ -1332,7 +1303,7 @@ public:
                     };
                     break;
                 }
-                case path_state::expression3: 
+                case path_state::cmp_rhs_expr: 
                 {
                     switch (*p_)
                     {
@@ -1396,6 +1367,70 @@ public:
                     };
                     break;
                 }
+                case path_state::multi_select_list_expr: 
+                {
+                    switch (*p_)
+                    {
+                        case ' ':case '\t':case '\r':case '\n':
+                            advance_past_space_character();
+                            break;
+                        case '\"':
+                            state_stack_.back() = path_state::expect_right_bracket4;
+                            state_stack_.emplace_back(path_state::val_expr);
+                            state_stack_.emplace_back(path_state::quoted_string);
+                            ++p_;
+                            ++column_;
+                            break;
+                        case '\'':
+                            state_stack_.back() = path_state::expect_right_bracket4;
+                            state_stack_.emplace_back(path_state::raw_string);
+                            ++p_;
+                            ++column_;
+                            break;
+                        case '`':
+                            state_stack_.back() = path_state::expect_right_bracket4;
+                            state_stack_.emplace_back(path_state::json_value);
+                            ++p_;
+                            ++column_;
+                            break;
+                        case '[':
+                            state_stack_.back() = path_state::expect_right_bracket4;
+                            state_stack_.emplace_back(path_state::bracket_specifier);
+                            ++p_;
+                            ++column_;
+                            break;
+                        case '{':
+                            state_stack_.back() = path_state::expect_right_bracket4;
+                            state_stack_.emplace_back(path_state::multi_select_hash);
+                            ++p_;
+                            ++column_;
+                            break;
+                        case '*':
+                            state_stack_.back() = path_state::expect_right_bracket4;
+                            key_selector_stack_.back() = key_selector(make_unique_ptr<object_projection_selector>(std::move(key_selector_stack_.back().selector)));
+                            state_stack_.emplace_back(path_state::expect_dot);
+                            ++p_;
+                            ++column_;
+                            break;
+                        default:
+                            if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
+                            {
+                                state_stack_.back() = path_state::expect_right_bracket4;
+                                state_stack_.emplace_back(path_state::val_expr);
+                                state_stack_.emplace_back(path_state::unquoted_string);
+                                buffer.push_back(*p_);
+                                ++p_;
+                                ++column_;
+                            }
+                            else
+                            {
+                                ec = jmespath_errc::expected_identifier;
+                                return result;
+                            }
+                            break;
+                    };
+                    break;
+                }
                 case path_state::key_val_expr: 
                 {
                     switch (*p_)
@@ -1435,7 +1470,7 @@ public:
                     };
                     break;
                 }
-                case path_state::expression4: 
+                case path_state::multi_select_hash_expr: 
                 {
                     switch (*p_)
                     {
@@ -1535,13 +1570,13 @@ public:
                     {
                         case '=':
                             key_selector_stack_.back() = key_selector(make_unique_ptr<filter_selector<cmp_lte>>(std::move(key_selector_stack_.back().selector)));
-                            state_stack_.back() = path_state::expression3;
+                            state_stack_.back() = path_state::cmp_rhs_expr;
                             ++p_;
                             ++column_;
                             break;
                         default:
                             key_selector_stack_.back() = key_selector(make_unique_ptr<filter_selector<cmp_lt>>(std::move(key_selector_stack_.back().selector)));
-                            state_stack_.back() = path_state::expression3;
+                            state_stack_.back() = path_state::cmp_rhs_expr;
                             break;
                     }
                     break;
@@ -1552,7 +1587,7 @@ public:
                     {
                         case '=':
                             key_selector_stack_.back() = key_selector(make_unique_ptr<filter_selector<cmp_eq>>(std::move(key_selector_stack_.back().selector)));
-                            state_stack_.back() = path_state::expression3;
+                            state_stack_.back() = path_state::cmp_rhs_expr;
                             ++p_;
                             ++column_;
                             break;
@@ -1568,13 +1603,13 @@ public:
                     {
                         case '=':
                             key_selector_stack_.back() = key_selector(make_unique_ptr<filter_selector<cmp_gte>>(std::move(key_selector_stack_.back().selector)));
-                            state_stack_.back() = path_state::expression3;
+                            state_stack_.back() = path_state::cmp_rhs_expr;
                             ++p_;
                             ++column_;
                             break;
                         default:
                             key_selector_stack_.back() = key_selector(make_unique_ptr<filter_selector<cmp_gt>>(std::move(key_selector_stack_.back().selector)));
-                            state_stack_.back() = path_state::expression3;
+                            state_stack_.back() = path_state::cmp_rhs_expr;
                             break;
                     }
                     break;
@@ -1585,7 +1620,7 @@ public:
                     {
                         case '=':
                             key_selector_stack_.back() = key_selector(make_unique_ptr<filter_selector<cmp_ne>>(std::move(key_selector_stack_.back().selector)));
-                            state_stack_.back() = path_state::expression3;
+                            state_stack_.back() = path_state::cmp_rhs_expr;
                             ++p_;
                             ++column_;
                             break;
@@ -1620,17 +1655,49 @@ public:
                         case ' ':case '\t':case '\r':case '\n':
                             advance_past_space_character();
                             break;
+                        case ']':
+                        {
+                            state_stack_.pop_back();
+                            size_t pos = structure_offset_stack_.back();
+                            structure_offset_stack_.pop_back();
+                            auto p = std::move(key_selector_stack_[pos]);
+                            for (size_t i = pos+1; i < key_selector_stack_.size(); ++i)
+                            {
+                                p.selector->add_selector(std::move(key_selector_stack_[i].selector));
+                            }
+                            key_selector_stack_.erase(key_selector_stack_.begin()+pos, key_selector_stack_.end());
+
+                            auto q = make_unique_ptr<sub_expression_selector>();
+                            q->add_selector(std::move(key_selector_stack_.back().selector));
+                            q->add_selector(std::move(p.selector));
+                            key_selector_stack_.back() = key_selector(std::move(q));                            ++p_;
+                            ++column_;
+                            break;
+                        }
+                        default:
+                            ec = jmespath_errc::expected_right_bracket;
+                            return result;
+                    }
+                    break;
+                }
+                case path_state::expect_right_bracket4:
+                {
+                    switch(*p_)
+                    {
+                        case ' ':case '\t':case '\r':case '\n':
+                            advance_past_space_character();
+                            break;
                         case ',':
-                            key_selector_stack_.emplace_back(key_selector(make_unique_ptr<multi_select_list_selector>()));
-                            state_stack_.back() = path_state::expression3; 
+                            key_selector_stack_.emplace_back(key_selector(make_unique_ptr<sub_expression_selector>()));
+                            state_stack_.back() = path_state::multi_select_list_expr; 
                             ++p_;
                             ++column_;
                             break;
                         case '[':
-                            state_stack_.back() = path_state::expression3;
+                            state_stack_.back() = path_state::multi_select_list_expr;
                             break;
                         case '.':
-                            state_stack_.back() = path_state::expression3; 
+                            state_stack_.back() = path_state::multi_select_list_expr; 
                             ++p_;
                             ++column_;
                             break;
@@ -1639,7 +1706,7 @@ public:
                             ++p_;
                             ++column_;
                             key_selector_stack_.back() = key_selector(make_unique_ptr<pipe_selector>(std::move(key_selector_stack_.back().selector)));
-                            state_stack_.back() = path_state::expression3;
+                            state_stack_.back() = path_state::multi_select_list_expr;
                             break;
                         }
                         case ']':
@@ -1657,9 +1724,9 @@ public:
                             }
                             key_selector_stack_.erase(key_selector_stack_.begin()+pos, key_selector_stack_.end());
 
-                            auto q = make_unique_ptr<sub_expression_selector>();
-                            q->add_selector(std::move(key_selector_stack_.back().selector));
-                            q->add_selector(make_unique_ptr<multi_select_list_selector2>(std::move(selectors)));
+                            auto q = make_unique_ptr<list_projection_selector>(std::move(key_selector_stack_.back().selector));
+                            q->add_selector(make_unique_ptr<multi_select_list_selector>(std::move(selectors)));
+
                             key_selector_stack_.back() = key_selector(std::move(q));
 
                             ++p_;
@@ -1686,10 +1753,10 @@ public:
                             ++column_;
                             break;
                         case '[':
-                            state_stack_.back() = path_state::expression4;
+                            state_stack_.back() = path_state::multi_select_hash_expr;
                             break;
                         case '.':
-                            state_stack_.back() = path_state::expression4; 
+                            state_stack_.back() = path_state::multi_select_hash_expr; 
                             ++p_;
                             ++column_;
                             break;
@@ -1729,7 +1796,7 @@ public:
                             advance_past_space_character();
                             break;
                         case ':':
-                            state_stack_.back() = path_state::expression4;
+                            state_stack_.back() = path_state::multi_select_hash_expr;
                             ++p_;
                             ++column_;
                             break;
