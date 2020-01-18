@@ -1,6 +1,6 @@
 [
     // From tutorial
-    {
+    /*{
         "annotation" : "Select a value with an identifier",
         "input" : "{\"a\": \"foo\", \"b\": \"bar\", \"c\": \"baz\"}",
         "expression" : "a",
@@ -125,13 +125,13 @@
         "input" : "{\"people\": [{\"first\": \"James\", \"last\": \"d\"},{\"first\": \"Jacob\", \"last\": \"e\"},{\"first\": \"Jayden\", \"last\": \"f\"},{\"missing\": \"different\"}],\"foo\": {\"bar\": \"baz\"}}",
         "expression" : "people[*].first | [0]",
         "expected" : "\"James\""
-    },
+    },*/
     {
         "annotation" : "Multiselect List",
         "input" : "{\"people\": [{\"name\": \"a\",\"state\": {\"name\": \"up\"}},{\"name\": \"b\",\"state\": {\"name\": \"down\"}},{\"name\": \"c\",\"state\": {\"name\": \"up\"}}]}",
         "expression" : "people[].[name,state.name]",
         "expected" : "[[\"a\",\"up\"],[\"b\",\"down\"],[\"c\",\"up\"]]"
-    },
+    }/*,
     {
         "annotation" : "Multi select hash",
         "input" : "{\"people\": [{\"name\": \"a\",\"state\": {\"name\": \"up\"}},{\"name\": \"b\",\"state\": {\"name\": \"down\"}},{\"name\": \"c\",\"state\": {\"name\": \"up\"}}]}",
@@ -158,7 +158,7 @@
         "input" : "{\"people\": [{\"age\": 20,\"tags\": [\"a\", \"b\", \"c\"],\"name\": \"Bob\"},{\"age\": 25,\"tags\": [\"d\", \"e\", \"f\"],\"name\": \"Fred\"},{\"age\": 30,\"tags\": [\"g\", \"h\", \"i\"],\"name\": \"George\"}]}",
         "expression" : "people[*].{name: name, tags: tags[0]}",
         "expected" : "[{\"name\": \"Bob\",\"tags\": \"a\"},{\"name\": \"Fred\",\"tags\": \"d\"},{\"name\": \"George\",\"tags\": \"g\"}]"
-    }/*
+    }*//*
     {
         "annotation" : "Working with Nested Data",
         "input" : "{\"reservations\": [{\"instances\": [{\"type\": \"small\",\"state\": {\"name\": \"running\"},\"tags\": [{\"Key\": \"Name\",\"Values\": [\"Web\"]},{\"Key\": \"version\",\"Values\": [\"1\"]}]},{\"type\": \"large\",\"state\": {\"name\": \"stopped\"},\"tags\": [{\"Key\": \"Name\",\"Values\": [\"Web\"]},{\"Key\": \"version\",\"Values\": [\"1\"]}]}]}, {\"instances\": [{\"type\": \"medium\",\"state\": {\"name\": \"terminated\"},\"tags\": [{\"Key\": \"Name\",\"Values\": [\"Web\"]},{\"Key\": \"version\",\"Values\": [\"1\"]}]},{\"type\": \"xlarge\",\"state\": {\"name\": \"running\"},\"tags\": [{\"Key\": \"Name\",\"Values\": [\"DB\"]},{\"Key\": \"version\",\"Values\": [\"1\"]}]}]}]}",

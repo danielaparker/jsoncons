@@ -660,18 +660,18 @@ class jmespath_evaluator : public ser_context
         }
     };
 
-    class multi_select_list_selector final : public selector_base
+    class multi_select_list_selector2 final : public selector_base
     {
     public:
         std::vector<std::unique_ptr<selector_base>> selectors_;
 
-        multi_select_list_selector()
+        multi_select_list_selector2(std::vector<std::unique_ptr<selector_base>>&& selectors)
+            : selectors_(std::move(selectors))
         {
         }
 
-        void add_selector(std::unique_ptr<selector_base>&& rhs_selectors) 
+        void add_selector(std::unique_ptr<selector_base>&&) 
         {
-            selectors_.emplace_back(std::move(rhs_selectors));
         }
 
         reference select(reference val, temp_storage& make_temp) override
@@ -696,6 +696,31 @@ class jmespath_evaluator : public ser_context
                 }
             }
             return *resultp;
+        }
+    };
+
+    class multi_select_list_selector final : public selector_base
+    {
+    public:
+        std::vector<std::unique_ptr<selector_base>> selectors_;
+
+        multi_select_list_selector()
+        {
+        }
+
+        void add_selector(std::unique_ptr<selector_base>&& selector) 
+        {
+            selectors_.emplace_back(std::move(selector));
+        }
+
+        reference select(reference val, temp_storage& make_temp) override
+        {
+            pointer ptr = std::addressof(val);
+            for (auto& selector : selectors_)
+            {
+                ptr = std::addressof(selector->select(*ptr, make_temp));
+            }
+            return *ptr;
         }
     };
 
@@ -1596,7 +1621,7 @@ public:
                             advance_past_space_character();
                             break;
                         case ',':
-                            key_selector_stack_.emplace_back(key_selector(make_unique_ptr<sub_expression_selector>()));
+                            key_selector_stack_.emplace_back(key_selector(make_unique_ptr<multi_select_list_selector>()));
                             state_stack_.back() = path_state::expression3; 
                             ++p_;
                             ++column_;
@@ -1623,17 +1648,20 @@ public:
 
                             size_t pos = structure_offset_stack_.back();
                             structure_offset_stack_.pop_back();
-                            auto p = std::move(key_selector_stack_[pos]);
-                            for (size_t i = pos+1; i < key_selector_stack_.size(); ++i)
+
+                            std::vector<std::unique_ptr<selector_base>> selectors;
+                            selectors.reserve(key_selector_stack_.size()-pos);
+                            for (size_t i = pos; i < key_selector_stack_.size(); ++i)
                             {
-                                p.selector->add_selector(std::move(key_selector_stack_[i].selector));
+                                selectors.emplace_back(std::move(key_selector_stack_[i].selector));
                             }
                             key_selector_stack_.erase(key_selector_stack_.begin()+pos, key_selector_stack_.end());
 
                             auto q = make_unique_ptr<sub_expression_selector>();
                             q->add_selector(std::move(key_selector_stack_.back().selector));
-                            q->add_selector(std::move(p.selector));
+                            q->add_selector(make_unique_ptr<multi_select_list_selector2>(std::move(selectors)));
                             key_selector_stack_.back() = key_selector(std::move(q));
+
                             ++p_;
                             ++column_;
                             break;
