@@ -733,23 +733,16 @@ class jmespath_evaluator : public ser_context
         reference select(reference val, temp_storage& make_temp) override
         {
             static Json null{null_type()};
-            if (!val.is_array())
+            if (!val.is_object())
             {
                 return null;
             }
 
-            auto resultp = make_temp(json_array_arg);
-            for (reference item : val.array_range())
+            auto resultp = make_temp(json_object_arg);
+            resultp->reserve(key_selectors_.size());
+            for (auto& key_selector : key_selectors_)
             {
-                resultp->emplace_back(json_object_arg);
-                for (auto& key_selector : key_selectors_)
-                {
-                    auto ptr = std::addressof(key_selector.selector->select(item, make_temp));
-                    if (!ptr->is_null())
-                    {
-                        resultp->at(resultp->size()-1).try_emplace(key_selector.key,*ptr);
-                    }
-                }
+                resultp->try_emplace(key_selector.key,key_selector.selector->select(val, make_temp));
             }
             return *resultp;
         }
@@ -1726,7 +1719,6 @@ public:
 
                             auto q = make_unique_ptr<list_projection_selector>(std::move(key_selector_stack_.back().selector));
                             q->add_selector(make_unique_ptr<multi_select_list_selector>(std::move(selectors)));
-
                             key_selector_stack_.back() = key_selector(std::move(q));
 
                             ++p_;
@@ -1753,6 +1745,7 @@ public:
                             ++column_;
                             break;
                         case '[':
+                        case '{':
                             state_stack_.back() = path_state::multi_select_hash_expr;
                             break;
                         case '.':
@@ -1774,8 +1767,7 @@ public:
                             }
                             key_selector_stack_.erase(key_selector_stack_.begin()+pos, key_selector_stack_.end());
 
-                            auto q = make_unique_ptr<sub_expression_selector>();
-                            q->add_selector(std::move(key_selector_stack_.back().selector));
+                            auto q = make_unique_ptr<list_projection_selector>(std::move(key_selector_stack_.back().selector));
                             q->add_selector(make_unique_ptr<multi_select_hash_selector>(std::move(key_selectors)));
                             key_selector_stack_.back() = key_selector(std::move(q));
                             ++p_;
