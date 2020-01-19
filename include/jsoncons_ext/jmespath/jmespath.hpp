@@ -119,6 +119,7 @@ enum class path_state
     json_value,
     key_expr,
     val_expr,
+    identifier_or_function_expr,
     unquoted_string,
     expression1,
     cmp_lhs_expr,
@@ -873,7 +874,7 @@ public:
                             if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                             {
                                 state_stack_.back() = path_state::sub_expression1;
-                                state_stack_.emplace_back(path_state::val_expr);
+                                state_stack_.emplace_back(path_state::identifier_or_function_expr);
                                 state_stack_.emplace_back(path_state::unquoted_string);
                                 buffer.push_back(*p_);
                                 ++p_;
@@ -894,6 +895,11 @@ public:
                     state_stack_.pop_back(); 
                     break;
                 case path_state::val_expr:
+                    key_selector_stack_.back().selector->add_selector(make_unique_ptr<identifier_selector>(buffer));
+                    buffer.clear();
+                    state_stack_.pop_back(); 
+                    break;
+                case path_state::identifier_or_function_expr:
                     key_selector_stack_.back().selector->add_selector(make_unique_ptr<identifier_selector>(buffer));
                     buffer.clear();
                     state_stack_.pop_back(); 
