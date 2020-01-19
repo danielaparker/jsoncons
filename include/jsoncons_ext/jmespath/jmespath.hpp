@@ -1815,7 +1815,7 @@ public:
         if (state_stack_.size() >= 3 && state_stack_.back() == path_state::unquoted_string)
         {
             state_stack_.pop_back(); // unquoted_string
-            if (state_stack_.back() == path_state::val_expr)
+            if (state_stack_.back() == path_state::val_expr || state_stack_.back() == path_state::identifier_or_function_expr)
             {
                 key_selector_stack_.back().selector->add_selector(make_unique_ptr<identifier_selector>(buffer));
                 buffer.clear();
