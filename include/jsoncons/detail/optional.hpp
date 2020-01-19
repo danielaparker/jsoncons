@@ -43,10 +43,6 @@ namespace detail
             {
                 construct(std::move(other.value_));
             }
-            else
-            {
-                has_value_ = false;
-            }
        }
 
         template <class U>
