@@ -93,15 +93,6 @@ namespace detail
             destroy();
         }
 
-        void destroy() noexcept 
-        {
-            if (has_value_) 
-            {
-                value_.~T();
-                has_value_ = false;
-            }
-        }
-
         optional& operator=( const optional& other ) = default;
 
         optional& operator=(optional&& other ) = default;
@@ -236,6 +227,15 @@ namespace detail
         {
             ::new (static_cast<void*>(&this->value_)) T(std::forward<Args>(args)...);
             has_value_ = true;
+        }
+
+        void destroy() noexcept 
+        {
+            if (has_value_) 
+            {
+                value_.~T();
+                has_value_ = false;
+            }
         }
 
         template <typename U>
