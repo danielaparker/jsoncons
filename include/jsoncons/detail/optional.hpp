@@ -34,9 +34,9 @@ namespace detail
         {
         }
 
-        optional(const optional& other) noexcept = default;
+        optional(const optional& other) = default;
 
-        optional(optional&& other) noexcept = default;
+        optional(optional&& other) = default;
 
         template <class U>
         optional(const optional<U>& other,
@@ -163,20 +163,16 @@ namespace detail
 
         T& value() &
         {
-            if (!has_value())
-            {
-                JSONCONS_THROW(std::runtime_error("Bad optional access"));
-            }
-            return get();
+            return static_cast<bool>(*this)
+                       ? get()
+                       : JSONCONS_THROW(std::runtime_error("Bad optional access")), get();
         }
 
         constexpr const T& value() const &
         {
-            if (!has_value())
-            {
-                JSONCONS_THROW(std::runtime_error("Bad optional access"));
-            }
-            return get();
+            return static_cast<bool>(*this)
+                       ? get()
+                       : JSONCONS_THROW(std::runtime_error("Bad optional access")), get();
         }
 
         template <typename U>
