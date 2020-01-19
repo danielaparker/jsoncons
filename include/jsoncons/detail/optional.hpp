@@ -102,7 +102,8 @@ namespace detail
         template <typename U=T>
         typename std::enable_if<!std::is_same<optional<T>, typename std::decay<U>::type>::value &&
                                 std::is_constructible<T, U>::value &&
-                                std::is_assignable<T&, U>::value,
+                                std::is_assignable<T&, U>::value &&
+                                !std::conjunction<std::is_scalar<T>,std::is_same<T, typename std::decay<U>::type>>::value,
             optional&>::type
         operator=(U&& v)
         {
