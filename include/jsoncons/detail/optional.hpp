@@ -10,6 +10,7 @@
 #include <new> // placement new
 #include <memory>
 #include <utility> // std::swap
+#include <type_traits>
 #include <jsoncons/config/compiler_support.hpp>
 
 namespace jsoncons 
@@ -22,40 +23,44 @@ namespace detail
     public:
         typedef T value_type;
     private:
-        typename std::aligned_storage<sizeof(value_type), alignof(value_type)>::type storage_;
-        value_type* valuep_;
+        bool has_value_;
+        union {
+            char dummy_;
+            typename std::remove_const<T>::type value_;
+        };
     public:
         constexpr optional() noexcept
-            : valuep_(nullptr)
+            : has_value_(false), dummy_{}
         {
         }
 
-        optional(const optional& other) noexcept
-            : valuep_(nullptr)
-        {
-            if (other)
-            {
-                valuep_ = ::new(&storage_)value_type(other.value());
-            }
-        }
+        optional(const optional& other) noexcept = default;
 
-        optional(optional&& other) noexcept
-            : valuep_(nullptr)
-        {
-            if (other)
-            {
-                valuep_ = ::new(&storage_)value_type(other.value());
-            }
-        }
+        optional(optional&& other) noexcept = default;
 
-        template <class U=T>
+        template <class U>
         optional(const optional<U>& other,
-                 typename std::enable_if<std::is_copy_constructible<U>::value>::type* = 0)
-            : valuep_(nullptr)
+                 typename std::enable_if<!std::is_same<T,U>::value &&
+                                         std::is_constructible<T, const U&>::value &&
+                                         std::is_convertible<const U&,T>::value &&
+                                         std::is_copy_constructible<U>::value>::type* = 0)
         {
             if (other)
             {
-                valuep_ = ::new(&storage_)value_type(other.value());
+                construct(*other);
+            }
+        }
+
+        template <class U>
+        explicit optional(const optional<U>& other,
+                          typename std::enable_if<!std::is_same<T,U>::value &&
+                                                  std::is_constructible<T, const U&>::value &&
+                                                  !std::is_convertible<const U&,T>::value &&
+                                                  std::is_copy_constructible<U>::value>::type* = 0)
+        {
+            if (other)
+            {
+                construct(*other);
             }
         }
 
@@ -64,9 +69,8 @@ namespace detail
              typename std::enable_if<!std::is_same<optional<T>, typename std::decay<U>::type>::value &&
                                     std::is_constructible<T, U&&>::value &&
                                     std::is_convertible<U&&,T>::value>::type * = 0) // (8)
-            : valuep_(nullptr)
+            : has_value_(true), value_(std::forward<U>(value))
         {
-            valuep_ = ::new(&storage_)value_type(std::forward<U>(value));
         }
 
         template <class U = T>
@@ -74,43 +78,81 @@ namespace detail
                       typename std::enable_if<!std::is_same<optional<T>, typename std::decay<U>::type>::value &&
                                               std::is_constructible<T, U&&>::value &&
                                               !std::is_convertible<U&&,T>::value>::type* = 0) // (8)
-            : valuep_(nullptr)
+            : has_value_(true), value_(std::forward<U>(value))
         {
-            valuep_ = ::new(&storage_)value_type(std::forward<U>(value));
         }
         ~optional()
         {
-            if (valuep_)
+            destroy();
+        }
+
+        void destroy() noexcept 
+        {
+            if (has_value_) 
             {
-                valuep_->~T();
-                valuep_ = nullptr;
+                value_.~T();
+                has_value_ = false;
             }
         }
 
-        optional& operator=( const optional& other )
+        optional& operator=( const optional& other ) = default;
+
+        optional& operator=(optional&& other ) = default;
+
+        template <typename U=T>
+        typename std::enable_if<!std::is_same<optional<T>, typename std::decay<U>::type>::value &&
+                                std::is_constructible<T, U>::value &&
+                                std::is_assignable<T&, U>::value,
+            optional&>::type
+        operator=(U&& v)
         {
-            if (this != &other)
+            assign(std::forward<U>(v));
+            return *this;
+        }
+
+        template <typename U>
+        typename std::enable_if<!std::is_same<optional<T>, U>::value &&
+                                std::is_constructible<T, const U&>::value &&
+                                std::is_assignable<T&, const U&>::value,
+            optional&>::type
+        operator=(const optional<U>& other)
+        {
+            if (other) 
             {
-                if (valuep_)
-                {
-                    valuep_->~T();
-                    valuep_ = nullptr;
-                }
-                if (other)
-                {
-                    valuep_ = ::new(&storage_)value_type(other.value());
-                }
+                assign(*other);
+            } 
+            else 
+            {
+                destroy();
+            }
+            return *this;
+        }
+
+        template <typename U>
+        typename std::enable_if<!std::is_same<optional<T>, U>::value &&
+                                std::is_constructible<T, U>::value &&
+                                std::is_assignable<T&, U>::value,
+            optional&>::type
+        operator=(optional<U>&& other)
+        {
+            if (other) 
+            {
+                assign(std::move(*other));
+            } 
+            else 
+            {
+                destroy();
             }
             return *this;
         }
 
         constexpr explicit operator bool() const noexcept
         {
-            return valuep_ != nullptr;
+            return has_value_;
         }
         constexpr bool has_value() const noexcept
         {
-            return valuep_ != nullptr;
+            return has_value_;
         }
 
 #ifdef _MSC_VER
@@ -118,22 +160,22 @@ namespace detail
 #pragma warning(disable : 4702)
 #endif // _MSC_VER
 
-        T& value()
+        T& value() &
         {
-            if (valuep_ == nullptr)
+            if (!has_value())
             {
                 JSONCONS_THROW(std::runtime_error("Bad optional access"));
             }
-            return *valuep_;
+            return get();
         }
 
-        constexpr const T& value() const 
+        constexpr const T& value() const &
         {
-            if (valuep_ == nullptr)
+            if (!has_value())
             {
                 JSONCONS_THROW(std::runtime_error("Bad optional access"));
             }
-            return *valuep_;
+            return get();
         }
 
         template <typename U>
@@ -143,7 +185,9 @@ namespace detail
                           "get_value_or: T must be copy constructible");
             static_assert(std::is_convertible<U&&, T>::value,
                           "get_value_or: U must be convertible to T");
-            return bool(*this) ? **this : static_cast<T>(std::forward<U>(default_value));
+            return static_cast<bool>(*this)
+                       ? **this
+                       : static_cast<T>(std::forward<U>(default_value));
         }
 
         template <typename U>
@@ -153,7 +197,8 @@ namespace detail
                           "get_value_or: T must be move constructible");
             static_assert(std::is_convertible<U&&, T>::value,
                           "get_value_or: U must be convertible to T");
-            return bool(*this) ? std::move(**this) : static_cast<T>(std::forward<U>(default_value));
+            return static_cast<bool>(*this) ? std::move(**this)
+                                            : static_cast<T>(std::forward<U>(default_value));
         }
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -161,12 +206,12 @@ namespace detail
 
         const T* operator->() const
         {
-            return valuep_;
+            return std::addressof(this->value_);
         }
 
         T* operator->()
         {
-            return valuep_;
+            return std::addressof(this->value_);
         }
 
         constexpr const T& operator*() const&
@@ -177,6 +222,29 @@ namespace detail
         T& operator*() &
         {
             return value();
+        }
+    private:
+        constexpr const T& get() const { return this->value_; }
+        T& get() { return this->value_; }
+
+        template <typename... Args>
+        void construct(Args&&... args) 
+        {
+            ::new (static_cast<void*>(&this->dummy_)) T(std::forward<Args>(args)...);
+            has_value_ = true;
+        }
+
+        template <typename U>
+        void assign(U&& u) 
+        {
+            if (has_value_) 
+            {
+                value_ = std::forward<U>(u);
+            } 
+            else 
+            {
+                construct(std::forward<U>(u));
+            }
         }
     };
 } // namespace detail
