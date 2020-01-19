@@ -26,7 +26,7 @@ namespace detail
         bool has_value_;
         union {
             char dummy_;
-            typename std::remove_const<T>::type value_;
+            T value_;
         };
     public:
         constexpr optional() noexcept
