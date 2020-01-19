@@ -36,7 +36,18 @@ namespace detail
 
         optional(const optional& other) = default;
 
-        optional(optional&& other) = default;
+        optional(optional&& other,
+                 typename std::enable_if<std::is_move_constructible<T>::value>::type* = 0)
+       {
+            if (other)
+            {
+                construct(std::move(other.value_));
+            }
+            else
+            {
+                has_value_ = false;
+            }
+       }
 
         template <class U>
         optional(const optional<U>& other,
