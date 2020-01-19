@@ -234,7 +234,7 @@ namespace detail
         template <typename... Args>
         void construct(Args&&... args) 
         {
-            ::new (static_cast<void*>(&this->dummy_)) T(std::forward<Args>(args)...);
+            ::new (static_cast<void*>(&this->value_)) T(std::forward<Args>(args)...);
             has_value_ = true;
         }
 
