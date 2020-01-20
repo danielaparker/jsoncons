@@ -175,46 +175,6 @@ class jmespath_evaluator : public ser_context
         }
     };
 
-    // function
-
-    static reference sort_by(jmespath_context& context,
-                             const std::vector<pointer>& args,
-                             std::error_code& ec)
-    {
-        static Json null{ null_type() };
-
-        if (args.size() != 2)
-        {
-            ec = jmespath_errc::invalid_argument;
-            return null;
-        }
-        if (!(args[0]->is_array() && args[1]->is_string()))
-        {
-            ec = jmespath_errc::invalid_argument;
-            return null;
-        }
-        auto key = args.at(1)->as_string_view();
-        auto v = context.new_instance(*args[0]);
-        std::sort((v->array_range()).begin(), (v->array_range()).end(),
-            [&key, &ec](reference lhs, reference rhs) -> bool
-        {
-            if (!(lhs.contains(key) && rhs.contains(key)))
-            {
-                ec = jmespath_errc::invalid_argument;
-                return false;
-            }
-            return lhs.at(key) < rhs.at(key);
-        });
-        return *v;
-    }
-
-    typedef std::function<reference(jmespath_context& context, const std::vector<pointer>&, std::error_code&)> function_type;
-
-    std::unordered_map<string_type,function_type> functions =
-    {
-        {string_type("sort_by"),sort_by}
-    };
-
     // selector
 
     class selector_base
@@ -229,11 +189,54 @@ class jmespath_evaluator : public ser_context
         virtual reference select(jmespath_context&, reference val) = 0;
     };
 
+    // function
+
+    static reference sort_by(jmespath_context& context,
+                             reference val,
+                             const std::vector<std::unique_ptr<selector_base>>& selectors,
+                             std::error_code& ec)
+    {
+        static Json null{ null_type() };
+
+        if (selectors.size() != 2)
+        {
+            ec = jmespath_errc::invalid_argument;
+            return null;
+        }
+
+        reference u = selectors[0]->select(context, val);
+
+        if (!u.is_array())
+        {
+            ec = jmespath_errc::invalid_argument;
+            return null;
+        }
+        auto& key_selector = selectors[1];
+
+        auto v = context.new_instance(u);
+        std::sort((v->array_range()).begin(), (v->array_range()).end(),
+            [&context,&key_selector,&ec](reference lhs, reference rhs) -> bool
+        {
+            reference key1 = key_selector->select(context,lhs);
+            reference key2 = key_selector->select(context,rhs);
+
+            return key1 < key2;
+        });
+        return *v;
+    }
+
+    typedef std::function<reference(jmespath_context& context, reference, const std::vector<std::unique_ptr<selector_base>>&, std::error_code&)> function_type;
+
+    std::unordered_map<string_type,function_type> functions_ =
+    {
+        {string_type("sort_by"),sort_by}
+    };
+
     class function_selector : public selector_base
     {
         function_type& f_;
         std::vector<std::unique_ptr<selector_base>> selectors_;
-
+    public:
         function_selector(function_type& f)
             : f_(f)
         {
@@ -246,14 +249,8 @@ class jmespath_evaluator : public ser_context
 
         reference select(jmespath_context& context, reference val) override
         {
-            std::vector<pointer> args;
-            args.reserve(selectors_.size());
-            for (auto& selector : selectors_)
-            {
-                args.push_back(std::addressof(selector->select(context, val)));
-            }
             std::error_code ec;
-            return f_(context, args, ec);
+            return f_(context, val, selectors_, ec);
         }
     };
 
@@ -881,7 +878,6 @@ public:
 
         state_stack_.emplace_back(path_state::start);
 
-        string_type function_name;
         string_type buffer;
  
         begin_input_ = path;
@@ -949,7 +945,7 @@ public:
                             if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                             {
                                 state_stack_.pop_back();
-                                state_stack_.emplace_back(path_state::val_expr);
+                                state_stack_.emplace_back(path_state::identifier_or_function_expr);
                                 state_stack_.emplace_back(path_state::unquoted_string);
                                 buffer.push_back(*p_);
                                 ++p_;
@@ -978,78 +974,65 @@ public:
                     switch(*p_)
                     {
                         case '(':
-                            state_stack_.back() = path_state::arg_or_right_paren;
-                            function_name = std::move(buffer);
-                            buffer.clear();
-                            ++p_;
-                            ++column_;
-                            break;
-                        default:
-                            key_selector_stack_.back().selector->add_selector(make_unique_ptr<identifier_selector>(buffer));
-                            buffer.clear();
-                            state_stack_.pop_back(); 
-                            break;
-                    }
-                    break;
-                /* case path_state::arg_or_right_paren:
-                    switch (*p_)
-                    {
-                        case ' ':case '\t':case '\r':case '\n':
-                            advance_past_space_character();
-                            break;
-                        case '$':
-                            buffer.clear();
-                            buffer.push_back(*p_);
-                            state_stack_.emplace_back(path_state::path_argument, state_stack_.back());
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '\'':
-                            buffer.clear();
-                            buffer.push_back('\"');
-                            state_stack_.back().state = path_state::more_args_or_right_paren;
-                            state_stack_.emplace_back(path_state::single_quoted_arg, state_stack_.back());
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '\"':
-                            buffer.clear();
-                            buffer.push_back('\"');
-                            state_stack_.back().state = path_state::more_args_or_right_paren;
-                            state_stack_.emplace_back(path_state::double_quoted_arg, state_stack_.back());
-                            ++p_;
-                            ++column_;
-                            break;
-                        case ')':
                         {
-                            jsonpath_evaluator<Json,JsonReference,PathCons> evaluator;
-                            evaluator.evaluate(root, buffer, ec);
-                            if (ec)
+                            auto it = functions_.find(buffer);
+                            buffer.clear();
+                            if (it == functions_.end())
                             {
-                                return;
+                                ec = jmespath_errc::function_name_not_found;
+                                return result;
                             }
-                            function_stack_.push_back(evaluator.get_pointers());
-
-                            call_function(function_name, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            state_stack_.pop_back();
+                            key_selector_stack_.back() = key_selector(make_unique_ptr<function_selector>(it->second));
+                            structure_offset_stack_.push_back(key_selector_stack_.size());
+                            key_selector_stack_.emplace_back(make_unique_ptr<sub_expression_selector>());
+                            state_stack_.back() = path_state::arg_or_right_paren;
+                            state_stack_.emplace_back(path_state::expression);
                             ++p_;
                             ++column_;
                             break;
                         }
                         default:
+                        {
+                            key_selector_stack_.back().selector->add_selector(make_unique_ptr<identifier_selector>(buffer));
                             buffer.clear();
-                            state_stack_.back().state = path_state::more_args_or_right_paren;
-                            state_stack_.emplace_back(path_state::unquoted_arg, state_stack_.back());
+                            state_stack_.pop_back(); 
+                            break;
+                        }
+                    }
+                    break;
+
+                case path_state::arg_or_right_paren:
+                    switch (*p_)
+                    {
+                        case ' ':case '\t':case '\r':case '\n':
+                            advance_past_space_character();
+                            break;
+                        case ',':
+                            key_selector_stack_.emplace_back(key_selector(make_unique_ptr<sub_expression_selector>()));
+                            state_stack_.emplace_back(path_state::expression);
                             ++p_;
                             ++column_;
                             break;
+                        case ')':
+                        {
+                            size_t pos = structure_offset_stack_.back();
+                            structure_offset_stack_.pop_back();
+                            auto& selector = key_selector_stack_[pos-1].selector;
+                            for (size_t i = pos; i < key_selector_stack_.size(); ++i)
+                            {
+                                selector->add_selector(std::move(key_selector_stack_[i].selector));
+                            }
+                            key_selector_stack_.erase(key_selector_stack_.begin()+pos, key_selector_stack_.end());
+                            state_stack_.pop_back(); 
+                            ++p_;
+                            ++column_;
+                            break;
+                        }
+                        default:
+                            break;
                     }
                     break;
-*/
+
                 case path_state::quoted_string: 
                     switch (*p_)
                     {
