@@ -28,30 +28,37 @@ TEST_CASE("jmespath-tests")
     json tests = json::parse(is);
     for (const auto& test : tests.array_range())
     {
-        std::string input = test["input"].as<std::string>();
-        std::string path = test["expression"].as<std::string>();
-        if (test.contains("expected"))
-        {
-            std::string expected = test["expected"].as<std::string>();
+        std::string input = test["given"].as<std::string>();
 
-            ojson root = ojson::parse(input);
-            ojson result = jmespath::search(root, path);
-            ojson expected_result = ojson::parse(expected);
-            if (result != expected_result)
-            {
-                std::cout << "\n" << test["annotation"] << "\n";
-                std::cout << "input\n" << pretty_print(root) << "\n";
-                std::cout << path << "\n\n";
-                std::cout << "actual\n: " << pretty_print(result) << "\n\n";
-                std::cout << "expected: " << expected << "\n\n";
-            }
-            CHECK(result == expected_result);
-        }
-        else
+        for (const auto& item : test["cases"].array_range())
         {
-            std::string error = test["error"].as<std::string>();
-            ojson root = ojson::parse(input);
-            REQUIRE_THROWS_WITH(jmespath::search(root, path), error);
+            std::string path = item["expression"].as<std::string>();
+            if (item.contains("result"))
+            {
+                std::string expected = item["result"].as<std::string>();
+
+                ojson root = ojson::parse(input);
+                ojson result = jmespath::search(root, path);
+                ojson expected_result = ojson::parse(expected);
+                if (result != expected_result)
+                {
+                    if (item.contains("annotation"))
+                    {
+                        std::cout << "\n" << item["annotation"] << "\n";
+                    }
+                    std::cout << "input\n" << pretty_print(root) << "\n";
+                    std::cout << path << "\n\n";
+                    std::cout << "actual\n: " << pretty_print(result) << "\n\n";
+                    std::cout << "expected: " << expected << "\n\n";
+                }
+                CHECK(result == expected_result);
+            }
+            else
+            {
+                std::string error = item["error"].as<std::string>();
+                ojson root = ojson::parse(input);
+                REQUIRE_THROWS_WITH(jmespath::search(root, path), error);
+            }
         }
     }
 }
