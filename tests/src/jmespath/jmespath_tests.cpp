@@ -19,47 +19,70 @@
 
 using namespace jsoncons;
 
-TEST_CASE("jmespath-tests")
+void jmespath_tests(const std::string& fpath)
 {
-    std::string fpath = "./input/jmespath/jmespath-tests.json";
     std::fstream is(fpath);
     REQUIRE(is);
 
     json tests = json::parse(is);
     for (const auto& test : tests.array_range())
     {
-        std::string input = test["given"].as<std::string>();
+        const json& root = test["given"];
 
         for (const auto& item : test["cases"].array_range())
         {
             std::string path = item["expression"].as<std::string>();
             if (item.contains("result"))
             {
-                std::string expected = item["result"].as<std::string>();
+                const json& expected = item["result"];
 
-                ojson root = ojson::parse(input);
-                ojson result = jmespath::search(root, path);
-                ojson expected_result = ojson::parse(expected);
-                if (result != expected_result)
+                std::error_code ec;
+                try
                 {
+                    json result = jmespath::search(root, path, ec);
+                    if (result != expected)
+                    {
+                        if (item.contains("annotation"))
+                        {
+                            std::cout << "\n" << item["annotation"] << "\n";
+                        }
+                        std::cout << "input\n" << pretty_print(root) << "\n";
+                        std::cout << path << "\n\n";
+                        std::cout << "actual\n: " << pretty_print(result) << "\n\n";
+                        std::cout << "expected: " << pretty_print(expected) << "\n\n";
+                    }
+                    CHECK(result == expected);
+                }
+                catch (const std::exception& e)
+                {
+                    std::cout << e.what() << "\n";
                     if (item.contains("annotation"))
                     {
                         std::cout << "\n" << item["annotation"] << "\n";
                     }
                     std::cout << "input\n" << pretty_print(root) << "\n";
-                    std::cout << path << "\n\n";
-                    std::cout << "actual\n: " << pretty_print(result) << "\n\n";
+                    std::cout << "expression\n" << path << "\n";
                     std::cout << "expected: " << expected << "\n\n";
                 }
-                CHECK(result == expected_result);
             }
             else
             {
                 std::string error = item["error"].as<std::string>();
-                ojson root = ojson::parse(input);
-                REQUIRE_THROWS_WITH(jmespath::search(root, path), error);
+                //REQUIRE_THROWS_WITH(jmespath::search(root, path), error);
             }
         }
+    }
+}
+
+TEST_CASE("jmespath-tests")
+{
+    SECTION("Examples and tutorials")
+    {
+        jmespath_tests("./input/jmespath/examples/jmespath-tests.json");
+    }
+    SECTION("basics")
+    {
+        //jmespath_tests("./input/jmespath/compliance-tests/basic.json");
     }
 }
 

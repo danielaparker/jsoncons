@@ -80,8 +80,6 @@ std::unique_ptr<T> make_unique_ptr(Args&&... args)
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
-enum class result_type {value,path};
-
 namespace detail {
 template <class Json,
     class JsonReference>
@@ -89,26 +87,17 @@ template <class Json,
 }
 
 template<class Json>
-Json search(const Json& root, const typename Json::string_view_type& path, result_type result_t = result_type::value)
+Json search(const Json& root, const typename Json::string_view_type& path)
 {
-    if (result_t == result_type::value)
-    {
-        jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
-        return evaluator.evaluate(root, path);
-    }
-    else
-    {
-        jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
-        return evaluator.evaluate(root, path);
-    }
+    jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
+    return evaluator.evaluate(root, path);
 }
 
-template<class Json, class T>
-void json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
+template<class Json>
+Json search(const Json& root, const typename Json::string_view_type& path, std::error_code& ec)
 {
-    jsoncons::jmespath::detail::jmespath_evaluator<Json,Json&> evaluator;
-    evaluator.evaluate(root, path);
-    evaluator.replace(std::forward<T>(new_value));
+    jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
+    return evaluator.evaluate(root, path, ec);
 }
 
 namespace detail {
@@ -923,14 +912,7 @@ public:
 
     reference evaluate(reference root, const string_view_type& path, std::error_code& ec)
     {
-        JSONCONS_TRY
-        {
-            return evaluate(root, path.data(), path.length(), ec);
-        }
-        JSONCONS_CATCH(...)
-        {
-            ec = jmespath_errc::unidentified_error;
-        }
+        return evaluate(root, path.data(), path.length(), ec);
     }
  
     reference evaluate(reference root, 
