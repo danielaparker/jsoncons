@@ -96,31 +96,8 @@ enum class jmespath_errc
     expected_key,
     invalid_argument,
     function_name_not_found,
-
-    invalid_function_name,
-    expected_root,
-    expected_current_node,
-    expected_name,
-    expected_separator,
-    invalid_filter,
-    invalid_filter_expected_slash,
-    invalid_filter_unbalanced_paren,
-    invalid_filter_unsupported_operator,
-    invalid_filter_expected_right_brace,
-    invalid_filter_expected_primary,
-    expected_slice_start,
-    expected_slice_end,
-    expected_slice_step,
-    expected_left_bracket_token,
-    expected_minus_or_digit_or_colon_or_comma_or_right_bracket,
-    expected_digit_or_colon_or_comma_or_right_bracket,
-    expected_minus_or_digit_or_comma_or_right_bracket,
-    expected_digit_or_comma_or_right_bracket,
-    unexpected_operator,
-    parse_error_in_filter,
-    argument_parse_error,
-    unidentified_error,
-    unexpected_end_of_input
+    invalid_type,
+    unexpected_end_of_input 
 };
 
 class jmespath_error_category_impl
@@ -141,70 +118,26 @@ public:
                 return "Expected index";
             case jmespath_errc::expected_A_Za_Z_:
                 return "Expected A-Z, a-z, or _";
-            case jmespath_errc::invalid_number:
-                return "Invalid number";
-            case jmespath_errc::expected_comparator:
-                return "Expected <, <=, ==, >=, > or !=";
-            case jmespath_errc::expected_key:
-                return "Expected key";
             case jmespath_errc::expected_right_bracket:
                 return "Expected ]";
             case jmespath_errc::expected_right_brace:
                 return "Expected }";
             case jmespath_errc::expected_colon:
                 return "Expected :";
-
-
-            case jmespath_errc::expected_root:
-                return "Expected $";
-            case jmespath_errc::expected_current_node:
-                return "Expected @";
             case jmespath_errc::expected_dot:
                 return "Expected \".\"";
-            case jmespath_errc::expected_name:
-                return "Expected a name following a dot";
-            case jmespath_errc::expected_slice_start:
-                return "Expected slice start";
-            case jmespath_errc::expected_slice_end:
-                return "Expected slice end";
-            case jmespath_errc::expected_slice_step:
-                return "Expected slice step";
-            case jmespath_errc::expected_separator:
-                return "Expected dot or left bracket separator";
-            case jmespath_errc::invalid_filter:
-                return "Invalid path filter";
-            case jmespath_errc::invalid_filter_expected_slash:
-                return "Invalid path filter, expected '/'";
-            case jmespath_errc::invalid_filter_unbalanced_paren:
-                return "Invalid path filter, unbalanced parenthesis";
-            case jmespath_errc::invalid_filter_unsupported_operator:
-                return "Unsupported operator";
-            case jmespath_errc::invalid_filter_expected_right_brace:
-                return "Invalid path filter, expected right brace }";
-            case jmespath_errc::invalid_filter_expected_primary:
-                return "Invalid path filter, expected primary expression.";
-            case jmespath_errc::expected_left_bracket_token:
-                return "Expected ?,',\",0-9,*";
-            case jmespath_errc::expected_minus_or_digit_or_colon_or_comma_or_right_bracket:
-                return "Expected - or 0-9 or : or , or ]";
-            case jmespath_errc::expected_minus_or_digit_or_comma_or_right_bracket:
-                return "Expected - or 0-9 or , or ]";
-            case jmespath_errc::expected_digit_or_comma_or_right_bracket:
-                return "Expected - or 0-9 or , or ]";
-            case jmespath_errc::expected_digit_or_colon_or_comma_or_right_bracket:
-                return "Expected 0-9 or : or , or ]";
-            case jmespath_errc::invalid_function_name:
-                return "Invalid function name";
+            case jmespath_errc::invalid_number:
+                return "Invalid number";
+            case jmespath_errc::expected_comparator:
+                return "Expected <, <=, ==, >=, > or !=";
+            case jmespath_errc::expected_key:
+                return "Expected key";
             case jmespath_errc::invalid_argument:
                 return "Invalid argument type";
             case jmespath_errc::function_name_not_found:
                 return "Function name not found";
-            case jmespath_errc::parse_error_in_filter:
-                return "Could not parse JSON expression in a JSONPath filter";
-            case jmespath_errc::argument_parse_error:
-                return "Could not parse JSON expression passed to JSONPath function";
-            case jmespath_errc::unidentified_error:
-                return "Unidentified error";
+            case jmespath_errc::invalid_type:
+                return "Invalid type";
             case jmespath_errc::unexpected_end_of_input:
                 return "Unexpected end of jmespath input";
             default:
