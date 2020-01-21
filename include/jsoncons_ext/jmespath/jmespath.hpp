@@ -179,7 +179,23 @@ class jmespath_evaluator : public ser_context
 
     class selector_base
     {
+        bool expression_type_;
     public:
+        selector_base()
+            : expression_type_(false)
+        {
+        }
+
+        bool expression_type() const
+        {
+            return expression_type_;
+        }
+
+        void expression_type(bool value)
+        {
+            expression_type_ = value;
+        }
+
         virtual ~selector_base()
         {
         }
@@ -1059,6 +1075,7 @@ public:
                             ++column_;
                             break;
                         case '&':
+                            key_selector_stack_.back().selector->expression_type(true);
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
                             ++column_;
