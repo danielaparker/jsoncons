@@ -1,3 +1,10 @@
+master
+------
+
+Bug fix:
+
+Fixed issue [json with preserve_order_policy does not preserve order of elements #210](https://github.com/danielaparker/jsoncons/issues/210)
+
 v0.143.2
 --------
 

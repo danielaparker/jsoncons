@@ -60,11 +60,9 @@ public:
     {
     }
 
-    template <class T>
-    key_value(key_type&& name, 
-                   T&& val, 
-                   const allocator_type& alloc)
-        : key_(std::forward<key_type>(name)), value_(std::forward<T>(val), alloc)
+    template <typename... Args>
+    key_value(key_type&& name,  Args&& ... args)
+        : key_(std::forward<key_type>(name)), value_(std::forward<Args>(args)...)
     {
     }
 

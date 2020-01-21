@@ -1705,9 +1705,13 @@ public:
             auto it = val.find(key_);
             if (it == val.object_range().end())
             {
-                it = val.insert_or_assign(val.object_range().begin(),key_,object(val.object_value().get_allocator()));            
+                auto r = val.try_emplace(key_, json_object_arg, semantic_tag::none, val.object_value().get_allocator());
+                return r.first->value();
             }
-            return it->value();
+            else
+            {
+                return it->value();
+            }
         }
 
         basic_json& evaluate(std::size_t index)
