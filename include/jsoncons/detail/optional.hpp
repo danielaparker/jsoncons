@@ -95,7 +95,18 @@ namespace detail
 
         optional& operator=( const optional& other ) = default;
 
-        optional& operator=(optional&& other ) = default;
+        optional& operator=(optional&& other )
+        {
+            if (other)
+            {
+                assign(std::move(*other));
+            }
+            else
+            {
+                reset();
+            }
+            return *this;
+        }
 
         template <typename U=T>
         typename std::enable_if<!std::is_same<optional<T>, typename std::decay<U>::type>::value &&
@@ -218,6 +229,32 @@ namespace detail
         {
             return value();
         }
+
+        void reset() noexcept
+        {
+            destroy();
+        }
+
+        void swap(optional& other) noexcept(std::is_nothrow_move_constructible<T>::value /*&&
+                                            std::is_nothrow_swappable<T>::value*/)
+        {
+            const bool contains_a_value = has_value();
+            if (contains_a_value == other.has_value())
+            {
+                if (contains_a_value)
+                {
+                    using std::swap;
+                    swap(**this, *other);
+                }
+            }
+            else
+            {
+                optional& source = contains_a_value ? *this : other;
+                optional& target = contains_a_value ? other : *this;
+                target = optional<T>(*source);
+                source.reset();
+            }
+        }
     private:
         constexpr const T& get() const { return this->value_; }
         T& get() { return this->value_; }
@@ -251,6 +288,13 @@ namespace detail
             }
         }
     };
+
+    template <typename T>
+    typename std::enable_if<std::is_nothrow_move_constructible<T>::value,void>::type
+    swap(optional<T>& lhs, optional<T>& rhs) noexcept
+    {
+        lhs.swap(rhs);
+    }
 } // namespace detail
 } // namespace jsoncons
 
