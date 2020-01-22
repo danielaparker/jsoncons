@@ -1,6 +1,6 @@
 [
     // From jmespath.org tutorial
-    {
+    /*{
         "given" : {"a": "foo", "b": "bar", "c": "baz"},
         "cases" : [
             {
@@ -159,7 +159,7 @@
                 "result" : [2,3]
             }
         ]
-    },
+    },*/
     {
         "given" : {"reservations": [{"instances": [{"state": "running"},{"state": "stopped"}]},{"instances": [{"state": "terminated"},{"state": "runnning"}]}]},
         "cases" : [ 
@@ -169,7 +169,7 @@
                 "result" : [["running","stopped"],["terminated","runnning"]]
             }
         ]
-    },
+    }/*,
     {
         "given" : {"reservations": [{"instances": [{"state": "running"},{"state": "stopped"}]},{"instances": [{"state": "terminated"},{"state": "runnning"}]}]},
         "cases" : [ 
@@ -292,5 +292,5 @@
                 "result" : [{"Key": "logs/baz","Size": 329},{"Key": "logs/aa","Size": 308},{"Key": "logs/qux","Size": 297},{"Key": "logs/bar","Size": 604},{"Key": "logs/foo","Size": 647},{"Key": "logs/bb","Size": 303}]
             }
         ]
-    }
+    }*/
 ]
