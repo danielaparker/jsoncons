@@ -64,3 +64,69 @@ TEST_CASE("optional constructor tests")
     }
 }
 
+TEST_CASE("optional swap tests")
+{
+    SECTION("with value and with value")
+    {
+        optional<std::vector<double>> a(std::vector<double>{1.0,2.0,3.0,4.0});
+        optional<std::vector<double>> b(std::vector<double>{5.0,6.0,7.0,8.0});
+
+        swap(a,b);
+        CHECK(a.has_value());
+        CHECK(b.has_value());
+        CHECK(a.value()[0] == 5.0);
+        CHECK(a.value()[1] == 6.0);
+        CHECK(a.value()[2] == 7.0);
+        CHECK(a.value()[3] == 8.0);
+        CHECK(b.value()[0] == 1.0);
+        CHECK(b.value()[1] == 2.0);
+        CHECK(b.value()[2] == 3.0);
+        CHECK(b.value()[3] == 4.0);
+    }
+    SECTION("with value and without value")
+    {
+        optional<std::vector<double>> a(std::vector<double>{1.0, 2.0, 3.0, 4.0});
+        optional<std::vector<double>> b;
+
+        swap(a, b);
+        CHECK_FALSE(a.has_value());
+        CHECK(b.has_value());
+        CHECK(b.value()[0] == 1.0);
+        CHECK(b.value()[1] == 2.0);
+        CHECK(b.value()[2] == 3.0);
+        CHECK(b.value()[3] == 4.0);
+    }
+    SECTION("without value and without value")
+    {
+        optional<std::vector<double>> a;
+        optional<std::vector<double>> b;
+
+        swap(a, b);
+        CHECK_FALSE(a.has_value());
+        CHECK_FALSE(b.has_value());
+    }
+}
+
+TEST_CASE("optional&& assignment tests")
+{
+    SECTION("with value from with value")
+    {
+        optional<std::vector<double>> a(std::vector<double>{1.0,2.0,3.0,4.0});
+        optional<std::vector<double>> b(std::vector<double>{5.0,6.0,7.0,8.0});
+
+        a = std::move(b);
+        CHECK(a.has_value());
+        CHECK(a.value()[0] == 5.0);
+        CHECK(a.value()[1] == 6.0);
+        CHECK(a.value()[2] == 7.0);
+        CHECK(a.value()[3] == 8.0);
+    }
+    SECTION("with value from no value")
+    {
+        optional<std::vector<double>> a(std::vector<double>{1.0,2.0,3.0,4.0});
+        optional<std::vector<double>> b;
+
+        a = std::move(b);
+        CHECK_FALSE(a.has_value());
+    }
+}
