@@ -82,7 +82,7 @@ TEST_CASE("jmespath-tests")
     }
     SECTION("basics")
     {
-        //jmespath_tests("./input/jmespath/compliance-tests/basic.json");
+        jmespath_tests("./input/jmespath/compliance-tests/basic.json");
     }
 }
 

@@ -565,7 +565,7 @@ class jmespath_evaluator : public ser_context
             {
                 return val.at(identifier_);
             }
-            else if (val.is_array())
+            /*else if (val.is_array())
             {
                 auto resultp = context.create_new(json_array_arg);
                 for (const auto& item : val.array_range())
@@ -576,7 +576,7 @@ class jmespath_evaluator : public ser_context
                     }
                 }
                 return *resultp;
-            }
+            }*/
             return Json::null();
         }
     };

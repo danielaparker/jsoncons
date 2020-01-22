@@ -1,19 +1,19 @@
-[{
+[/*{
     "given":
         {"foo": {"bar": {"baz": "correct"}}},
      "cases": [
-         /*{
+         {
             "expression": "foo",
             "result": {"bar": {"baz": "correct"}}
          },
          {
             "expression": "foo.bar",
             "result": {"baz": "correct"}
-         },*/
+         },
          {
             "expression": "foo.bar.baz",
             "result": "correct"
-         }/*,
+         },
          {
             "expression": "foo\n.\nbar\n.baz",
             "result": "correct"
@@ -37,9 +37,9 @@
          {
             "expression": "bad.morebad.morebad",
             "result": null
-         }*/
+         }
      ]
-}/*,
+},
 {
     "given":
         {"foo": {"bar": ["one", "two", "three"]}},
@@ -53,14 +53,14 @@
             "result": ["one", "two", "three"]
          }
     ]
-},
+},*/
 {
     "given": ["one", "two", "three"],
     "cases": [
         {
             "expression": "one",
             "result": null
-        },
+        }/*,
         {
             "expression": "two",
             "result": null
@@ -72,9 +72,9 @@
         {
             "expression": "one.two",
             "result": null
-        }
+        }*/
     ]
-},
+}/*,
 {
     "given":
         {"foo": {"1": ["one", "two", "three"], "-1": "bar"}},
