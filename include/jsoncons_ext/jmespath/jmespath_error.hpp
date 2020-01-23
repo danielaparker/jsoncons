@@ -17,7 +17,7 @@ class jmespath_error : public std::system_error, public virtual json_exception
     std::string buffer_;
     std::size_t line_number_;
     std::size_t column_number_;
-public:
+public: 
     jmespath_error(std::error_code ec)
         : std::system_error(ec), line_number_(0), column_number_(0)
     {
