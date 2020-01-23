@@ -310,14 +310,14 @@ class jmespath_evaluator : public ser_context
         reference select(jmespath_context& context, reference val, std::error_code& ec) override
         {
             static Json null{null_type()};
-            reference j = lhs_selector_->select(context, val, ec);
-            if (!j.is_array())
+            reference lhs = lhs_selector_->select(context, val, ec);
+            if (!lhs.is_array())
             {
                 return null;
             }
 
             auto resultp = context.new_instance(json_array_arg);
-            for (reference item : j.array_range())
+            for (reference item : lhs.array_range())
             {
                 pointer ptr = std::addressof(item);
                 for (auto& selector : rhs_selectors_)
@@ -386,14 +386,14 @@ class jmespath_evaluator : public ser_context
         reference select(jmespath_context& context, reference val, std::error_code& ec) override
         {
             static Json null{null_type()};
-            reference j = lhs_selector_->select(context, val, ec);
-            if (!j.is_array())
+            reference lhs = lhs_selector_->select(context, val, ec);
+            if (!lhs.is_array())
             {
                 return null;
             }
 
             auto currentp = context.new_instance(json_array_arg);
-            for (reference item : j.array_range())
+            for (reference item : lhs.array_range())
             {
                 if (item.is_array())
                 {
@@ -445,14 +445,14 @@ class jmespath_evaluator : public ser_context
         reference select(jmespath_context& context, reference val, std::error_code& ec) override
         {
             static Json null{null_type()};
-            reference j = lhs_selector_->select(context, val, ec);
-            if (!j.is_object())
+            reference lhs = lhs_selector_->select(context, val, ec);
+            if (!lhs.is_object())
             {
                 return null;
             }
 
             auto resultp = context.new_instance(json_array_arg);
-            for (auto& item : j.object_range())
+            for (auto& item : lhs.object_range())
             {
                 pointer ptr = std::addressof(item.value());
                 for (auto& selector : rhs_selectors_)
