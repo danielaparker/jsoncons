@@ -80,8 +80,6 @@ std::unique_ptr<T> make_unique_ptr(Args&&... args)
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
-enum class result_type {value,path};
-
 namespace detail {
 template <class Json,
     class JsonReference>
@@ -89,26 +87,17 @@ template <class Json,
 }
 
 template<class Json>
-Json search(const Json& root, const typename Json::string_view_type& path, result_type result_t = result_type::value)
+Json search(const Json& root, const typename Json::string_view_type& path)
 {
-    if (result_t == result_type::value)
-    {
-        jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
-        return evaluator.evaluate(root, path);
-    }
-    else
-    {
-        jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
-        return evaluator.evaluate(root, path);
-    }
+    jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
+    return evaluator.evaluate(root, path);
 }
 
-template<class Json, class T>
-void json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
+template<class Json>
+Json search(const Json& root, const typename Json::string_view_type& path, std::error_code& ec)
 {
-    jsoncons::jmespath::detail::jmespath_evaluator<Json,Json&> evaluator;
-    evaluator.evaluate(root, path);
-    evaluator.replace(std::forward<T>(new_value));
+    jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
+    return evaluator.evaluate(root, path, ec);
 }
 
 namespace detail {
@@ -186,7 +175,7 @@ class jmespath_evaluator : public ser_context
 
         virtual void add_selector(std::unique_ptr<selector_base>&&) = 0;
 
-        virtual reference select(jmespath_context&, reference val) = 0;
+        virtual reference select(jmespath_context&, reference val, std::error_code& ec) = 0;
     };
 
     // function
@@ -204,7 +193,7 @@ class jmespath_evaluator : public ser_context
             return null;
         }
 
-        reference u = selectors[0]->select(context, val);
+        reference u = selectors[0]->select(context, val, ec);
 
         if (!u.is_array())
         {
@@ -217,8 +206,8 @@ class jmespath_evaluator : public ser_context
         std::sort((v->array_range()).begin(), (v->array_range()).end(),
             [&context,&key_selector,&ec](reference lhs, reference rhs) -> bool
         {
-            reference key1 = key_selector->select(context,lhs);
-            reference key2 = key_selector->select(context,rhs);
+            reference key1 = key_selector->select(context, lhs, ec);
+            reference key2 = key_selector->select(context, rhs, ec);
 
             return key1 < key2;
         });
@@ -247,9 +236,8 @@ class jmespath_evaluator : public ser_context
             selectors_.emplace_back(std::move(selector));
         }
 
-        reference select(jmespath_context& context, reference val) override
+        reference select(jmespath_context& context, reference val, std::error_code& ec) override
         {
-            std::error_code ec;
             return f_(context, val, selectors_, ec);
         }
     };
@@ -268,12 +256,12 @@ class jmespath_evaluator : public ser_context
             selectors_.emplace_back(std::move(selector));
         }
 
-        reference select(jmespath_context& context, reference val)                       override
+        reference select(jmespath_context& context, reference val, std::error_code& ec) override
         {
             pointer ptr = std::addressof(val);
             for (auto& selector : selectors_)
             {
-                ptr = std::addressof(selector->select(context, *ptr)        );
+                ptr = std::addressof(selector->select(context, *ptr, ec)        );
             }
             return *ptr;
         }
@@ -295,10 +283,10 @@ class jmespath_evaluator : public ser_context
         {
         }
 
-        reference select(jmespath_context& context, reference val)                       override
+        reference select(jmespath_context& context, reference val, std::error_code& ec) override
         {
             auto key_valuep = context.new_instance(json_object_arg);
-            key_valuep->try_emplace(name_,selector_->select(context, val)        );
+            key_valuep->try_emplace(name_,selector_->select(context, val, ec)        );
             return *key_valuep;
         }
     };
@@ -319,10 +307,10 @@ class jmespath_evaluator : public ser_context
             rhs_selectors_.emplace_back(std::move(rhs_selectors));
         }
 
-        reference select(jmespath_context& context, reference val)                       override
+        reference select(jmespath_context& context, reference val, std::error_code& ec) override
         {
             static Json null{null_type()};
-            reference j = lhs_selector_->select(context, val)        ;
+            reference j = lhs_selector_->select(context, val, ec);
             if (!j.is_array())
             {
                 return null;
@@ -334,7 +322,7 @@ class jmespath_evaluator : public ser_context
                 pointer ptr = std::addressof(item);
                 for (auto& selector : rhs_selectors_)
                 {
-                    ptr = std::addressof(selector->select(context, *ptr)        );
+                    ptr = std::addressof(selector->select(context, *ptr, ec)        );
                 }
                 if (!ptr->is_null())
                 {
@@ -361,10 +349,10 @@ class jmespath_evaluator : public ser_context
             rhs_selectors_.emplace_back(std::move(rhs_selectors));
         }
 
-        reference select(jmespath_context& context, reference val)                       override
+        reference select(jmespath_context& context, reference val, std::error_code& ec) override
         {
             static Json null{null_type()};
-            reference lhs = lhs_selector_->select(context, val)        ;
+            reference lhs = lhs_selector_->select(context, val, ec);
             if (!lhs.is_array())
             {
                 return null;
@@ -373,7 +361,7 @@ class jmespath_evaluator : public ser_context
             pointer ptr = std::addressof(lhs);
             for (auto& selector : rhs_selectors_)
             {
-                ptr = std::addressof(selector->select(context, *ptr)        );
+                ptr = std::addressof(selector->select(context, *ptr, ec)        );
             }
             return *ptr;
         }
@@ -395,10 +383,10 @@ class jmespath_evaluator : public ser_context
             rhs_selectors_.emplace_back(std::move(rhs_selectors));
         }
 
-        reference select(jmespath_context& context, reference val)                       override
+        reference select(jmespath_context& context, reference val, std::error_code& ec) override
         {
             static Json null{null_type()};
-            reference j = lhs_selector_->select(context, val)        ;
+            reference j = lhs_selector_->select(context, val, ec);
             if (!j.is_array())
             {
                 return null;
@@ -427,7 +415,7 @@ class jmespath_evaluator : public ser_context
 
                 for (auto& selector : rhs_selectors_)
                 {
-                    ptr = std::addressof(selector->select(context, *ptr)        );
+                    ptr = std::addressof(selector->select(context, *ptr, ec)        );
                 }
                 if (!ptr->is_null())
                 {
@@ -454,10 +442,10 @@ class jmespath_evaluator : public ser_context
             rhs_selectors_.emplace_back(std::move(rhs_selectors));
         }
 
-        reference select(jmespath_context& context, reference val)                       override
+        reference select(jmespath_context& context, reference val, std::error_code& ec) override
         {
             static Json null{null_type()};
-            reference j = lhs_selector_->select(context, val)        ;
+            reference j = lhs_selector_->select(context, val, ec);
             if (!j.is_object())
             {
                 return null;
@@ -469,7 +457,7 @@ class jmespath_evaluator : public ser_context
                 pointer ptr = std::addressof(item.value());
                 for (auto& selector : rhs_selectors_)
                 {
-                    ptr = std::addressof(selector->select(context, *ptr)        );
+                    ptr = std::addressof(selector->select(context, *ptr, ec)        );
                 }
                 if (!ptr->is_null())
                 {
@@ -495,7 +483,7 @@ class jmespath_evaluator : public ser_context
             // Error
         }
 
-        reference select(jmespath_context& context, reference val)                       override
+        reference select(jmespath_context& context, reference val, std::error_code&) override
         {
             static Json null{null_type()};
 
@@ -538,7 +526,7 @@ class jmespath_evaluator : public ser_context
             // noop
         }
 
-        reference select(jmespath_context&, reference)             override
+        reference select(jmespath_context&, reference, std::error_code&)             override
         {
             return j_;
         }
@@ -559,7 +547,7 @@ class jmespath_evaluator : public ser_context
             // noop
         }
 
-        reference select(jmespath_context&, reference val) override
+        reference select(jmespath_context&, reference val, std::error_code&) override
         {
             static Json null{null_type()};
 
@@ -600,7 +588,7 @@ class jmespath_evaluator : public ser_context
             // Error
         }
 
-        reference select(jmespath_context& context, reference val)                       override
+        reference select(jmespath_context& context, reference val, std::error_code&) override
         {
             static Json null{null_type()};
 
@@ -701,7 +689,7 @@ class jmespath_evaluator : public ser_context
             rhs_selectors_.emplace_back(std::move(rhs_selectors));
         }
 
-        reference select(jmespath_context& context, reference val)                       override
+        reference select(jmespath_context& context, reference val, std::error_code& ec) override
         {
             static Json null{null_type()};
 
@@ -710,12 +698,12 @@ class jmespath_evaluator : public ser_context
                 auto resultp = context.new_instance(json_array_arg);
                 for (auto& item : val.array_range())
                 {
-                    reference lhs = lhs_selector_->select(context, item)        ;
+                    reference lhs = lhs_selector_->select(context, item, ec);
 
                     pointer rhsp = std::addressof(item);
                     for (auto& selector : rhs_selectors_)
                     {
-                        rhsp = std::addressof(selector->select(context, *rhsp)        );
+                        rhsp = std::addressof(selector->select(context, *rhsp, ec)        );
                     }
                     auto r = cmp_(lhs,*rhsp);
                     if (r && r.value())
@@ -744,7 +732,7 @@ class jmespath_evaluator : public ser_context
         {
         }
 
-        reference select(jmespath_context& context, reference val)                       override
+        reference select(jmespath_context& context, reference val, std::error_code& ec) override
         {
             static Json null{null_type()};
 
@@ -757,7 +745,7 @@ class jmespath_evaluator : public ser_context
             resultp->reserve(selectors_.size());
             for (auto& selector : selectors_)
             {
-                resultp->push_back(selector->select(context, val)        );
+                resultp->push_back(selector->select(context, val, ec)        );
             }
             return *resultp;
         }
@@ -798,7 +786,7 @@ class jmespath_evaluator : public ser_context
         {
         }
 
-        reference select(jmespath_context& context, reference val)                       override
+        reference select(jmespath_context& context, reference val, std::error_code& ec) override
         {
             static Json null{null_type()};
             if (!val.is_object())
@@ -810,7 +798,7 @@ class jmespath_evaluator : public ser_context
             resultp->reserve(key_selectors_.size());
             for (auto& key_selector : key_selectors_)
             {
-                resultp->try_emplace(key_selector.key,key_selector.selector->select(context, val)        );
+                resultp->try_emplace(key_selector.key,key_selector.selector->select(context, val, ec)        );
             }
             return *resultp;
         }
@@ -1722,7 +1710,7 @@ public:
                         state_stack_.back() == path_state::sub_expression);
         state_stack_.pop_back();
 
-        reference r = key_selector_stack_.back().selector->select(temp_factory_, root);
+        reference r = key_selector_stack_.back().selector->select(temp_factory_, root, ec);
         return r;
     }
 
