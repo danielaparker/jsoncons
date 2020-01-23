@@ -39,7 +39,7 @@ void jmespath_tests(const std::string& fpath)
                 std::error_code ec;
                 try
                 {
-                    json result = jmespath::search(root, path, ec);
+                    json result = jmespath::search(root, path);
                     if (result != expected)
                     {
                         if (item.contains("annotation"))
