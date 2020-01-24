@@ -115,7 +115,7 @@ Output:
 ```c++
 std::vector<uint8_t> u = {'H','e','l','l','o'};
 
-jsoncons::json j(jsoncons::byte_string_arg, u, jsoncons::semantic_tag::base64);
+json j(byte_string_arg, u, semantic_tag::base64);
 
 auto bytes = j.as<std::vector<uint8_t>>();
 std::cout << "(1) ";
@@ -125,20 +125,22 @@ for (auto b : bytes)
 }
 std::cout << "\n\n";
 
-auto s = j.as<std::string>();
+std::string s;
+encode_json(j, s); 
 std::cout << "(2) " << s << "\n\n";
 
-jsoncons::json sj(s);
-auto v = sj.as<std::vector<uint8_t>>(jsoncons::byte_string_arg,
-                                     jsoncons::semantic_tag::base64);
+auto sj = decode_json<json>(s); // tag information is lost
+
+// provide hint
+auto v = sj.as<std::vector<uint8_t>>(byte_string_arg,
+                                     semantic_tag::base64);
 
 assert(v == u);
 ```
 Output:
 ```
-
 (1) Hello
 
-(2) SGVsbG8
+(2) "SGVsbG8="
 ```
 

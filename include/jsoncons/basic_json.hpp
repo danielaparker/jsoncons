@@ -3893,7 +3893,7 @@ public:
 
     template <class SAllocator=std::allocator<char_type>>
     std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_encode_options<char_type>& options,
-                          const SAllocator& alloc) const 
+                                                                       const SAllocator& alloc) const 
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         switch (var_.storage())
