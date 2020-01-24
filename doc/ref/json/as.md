@@ -2,22 +2,25 @@
 
 ```c++
 template <class T, class... Args>
-T as(Args&&... args) const; // (1)
+T as() const; // (1)
 
-bool as_bool() const; // (2)
+template <class T, class... Args>
+T as(byte_string_arg_t, semantic_tag hint) const; // (2)
+
+bool as_bool() const; // (3)
 
 template <class T>
-T as_integer() const; // (3)
+T as_integer() const; // (4)
 
-double as_double() const; // (4)
+double as_double() const; // (5)
 
-string_view_type as_string_view() const; // (5)
+string_view_type as_string_view() const; // (6)
 
-std::string as_string() const; // (6)
+std::string as_string() const; // (7)
 
-byte_string as_byte_string() const; // (7)
+byte_string as_byte_string() const; // (8)
 
-bignum as_bignum() const; // (8)
+bignum as_bignum() const; // (9)
 ```
 
 (1) Generic get `as` type `T`. Attempts to convert the json value to the template value type using [json_type_traits](../json_type_traits.md).
@@ -31,15 +34,18 @@ If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceCont
     as<X<std::string,T>>()
 If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), `as<X<std::string,T>>()` returns the `json` value as an `X<std::string,T>` if the `json` value is an object and if each member value is convertible to type `T`, otherwise throws.
 
-(2) Same as `as<bool>()`.  
+(2) Get as byte string. This overload only participates in overload resolution if `uint8_t` is convertible to `T::value_type`.
+If the json type is a string, converts string according to its `semantic_tag`, or if there is none, uses `hint`.
+
+(3) Same as `as<bool>()`.  
 Returns `true` if value is `bool` and `true`, or if value is integral and non-zero, or if value is floating point and non-zero, or if value is string and parsed value evaluates as `true`. 
 Returns `false` if value is `bool` and `false`, or if value is integral and zero, or if value is floating point and zero, or if value is string and parsed value evaluates as `false`. 
 Otherwise throws `std::runtime_exception`
 
-(3) Same as `as<T>()` for integral type T.  
+(4) Same as `as<T>()` for integral type T.  
 Returns integer value if value is integral, performs cast if value has double type, returns 1 or 0 if value has bool type, attempts conversion if value is string, otherwise throws.
 
-(4) Same as `as<double>()`.  
+(5) Same as `as<double>()`.  
 Returns value cast to double if value is integral, returns `NaN` if value is `null`, attempts conversion if value is string, otherwise throws.
 
 ### Examples
@@ -105,15 +111,34 @@ Output:
 1,2,3,4
 ```
 
-#### Accessing a `json` byte string as a [byte_string](../byte_string.md)
+#### Accessing a `json` byte string as a byte string
 ```c++
-json j(byte_string{'H','e','l','l','o'});
-byte_string bytes = j.as<byte_string>();
+std::vector<uint8_t> u = {'H','e','l','l','o'};
 
-std::cout << bytes << std::endl;
+jsoncons::json j(jsoncons::byte_string_arg, u, jsoncons::semantic_tag::base64);
+
+auto bytes = j.as<std::vector<uint8_t>>();
+std::cout << "(1) ";
+for (auto b : bytes)
+{
+    std::cout << (char)b;
+}
+std::cout << "\n\n";
+
+auto s = j.as<std::string>();
+std::cout << "(2) " << s << "\n\n";
+
+jsoncons::json sj(s);
+auto v = sj.as<std::vector<uint8_t>>(jsoncons::byte_string_arg,
+                                     jsoncons::semantic_tag::base64);
+
+assert(v == u);
 ```
 Output:
 ```
-48 65 6c 6c 6f
+
+(1) Hello
+
+(2) SGVsbG8
 ```
 

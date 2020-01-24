@@ -34,7 +34,13 @@ namespace detail
         {
         }
 
-        optional(const optional& other) = default;
+        optional(const optional& other)
+        {
+            if (other)
+            {
+                construct(*other);
+            }
+        }
 
         optional(optional&& other,
                  typename std::enable_if<std::is_move_constructible<T>::value>::type* = 0)

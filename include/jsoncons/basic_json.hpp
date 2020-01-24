@@ -2017,6 +2017,14 @@ public:
         {
             return evaluate().template as<T>();
         }
+
+        template<class T>
+        typename std::enable_if<std::is_convertible<uint8_t,typename T::value_type>::value,T>::type
+        as(byte_string_arg_t, semantic_tag hint) const
+        {
+            return evaluate().template as<T>(byte_string_arg, hint);
+        }
+
         bool as_bool() const
         {
             return evaluate().as_bool();
@@ -3676,6 +3684,78 @@ public:
             JSONCONS_THROW(ser_error(ec));
         }
         return val;
+    }
+
+    template<class T>
+    typename std::enable_if<std::is_convertible<uint8_t,typename T::value_type>::value,T>::type
+    as(byte_string_arg_t, semantic_tag hint) const
+    {
+        switch (storage())
+        {
+            case storage_kind::short_string_value:
+            case storage_kind::string_value:
+            {
+                switch (tag())
+                {
+                    case semantic_tag::base16:
+                    {
+                        T bytes;
+                        auto s = as_string_view();
+                        decode_base16(s.begin(), s.end(), bytes);
+                        return bytes;
+                    }
+                    case semantic_tag::base64:
+                    {
+                        T bytes;
+                        auto s = as_string_view();
+                        decode_base64(s.begin(), s.end(), bytes);
+                        return bytes;
+                    }
+                    case semantic_tag::base64url:
+                    {
+                        T bytes;
+                        auto s = as_string_view();
+                        decode_base64url(s.begin(), s.end(), bytes);
+                        return bytes;
+                    }
+                    default:
+                    {
+                        switch (hint)
+                        {
+                            case semantic_tag::base16:
+                            {
+                                T bytes;
+                                auto s = as_string_view();
+                                decode_base16(s.begin(), s.end(), bytes);
+                                return bytes;
+                            }
+                            case semantic_tag::base64:
+                            {
+                                T bytes;
+                                auto s = as_string_view();
+                                decode_base64(s.begin(), s.end(), bytes);
+                                return bytes;
+                            }
+                            case semantic_tag::base64url:
+                            {
+                                T bytes;
+                                auto s = as_string_view();
+                                decode_base64url(s.begin(), s.end(), bytes);
+                                return bytes;
+                            }
+                            default:
+                                JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a byte string"));
+                        }
+                    }
+                    break;
+                }
+                break;
+            }
+            case storage_kind::byte_string_value:
+                return T(as_byte_string_view().begin(), as_byte_string_view().end());
+            default:
+                JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a byte string"));
+        }
     }
 
     bool as_bool() const 

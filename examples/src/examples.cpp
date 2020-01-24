@@ -411,8 +411,6 @@ int main()
 
         json_cursor_examples();
 
-        json_accessor_examples();
-
         run_ubjson_examples();
 
         run_cbor_examples();
@@ -438,6 +436,8 @@ int main()
         json_traits_macros_examples();
 
         json_traits_macros_named_examples();
+
+        json_accessor_examples();
     }
     catch (const std::exception& e)
     {
