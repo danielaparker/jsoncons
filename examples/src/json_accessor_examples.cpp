@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <cassert>
 #include <jsoncons/json.hpp>
 #include <fstream>
 
@@ -63,19 +64,26 @@ void byte_string_from_initializer_list()
 
 void byte_string_from_char_array()
 {
-    json j(byte_string{'H','e','l','l','o'});
-    byte_string bytes = j.as<byte_string>();
+    std::vector<uint8_t> u = {'H','e','l','l','o'};
 
-    std::cout << "(1) "<< bytes << "\n\n";
+    jsoncons::json j(jsoncons::byte_string_arg, u, jsoncons::semantic_tag::base64);
 
-    std::cout << "(2) ";
+    auto bytes = j.as<std::vector<uint8_t>>();
+    std::cout << "(1) ";
     for (auto b : bytes)
     {
         std::cout << (char)b;
     }
     std::cout << "\n\n";
 
-    std::cout << "(3) " << j << std::endl;
+    auto s = j.as<std::string>();
+    std::cout << "(2) " << s << "\n\n";
+
+    jsoncons::json sj(s);
+    auto v = sj.as<std::vector<uint8_t>>(jsoncons::byte_string_arg,
+                                         jsoncons::semantic_tag::base64);
+
+    assert(v == u);
 }
 
 void introspection_example()
@@ -140,13 +148,14 @@ void json_accessor_examples()
 
     introspection_example();
 
-    byte_string_from_char_array();
-
     byte_string_from_initializer_list();
 
     operator_at_examples();
 
     return_value_null_or_default_example();
+
+    std::cout << "\n";
+    byte_string_from_char_array();
 }
 
 

@@ -34,7 +34,23 @@ namespace detail
         {
         }
 
-        optional(const optional& other) = default;
+        optional(const optional& other)
+        {
+            if (other)
+            {
+                construct(*other);
+            }
+        }
+
+        template <class T2=T>
+        optional(const optional& other,
+        typename std::enable_if<std::is_copy_constructible<T2>::value>::type* = 0)
+        {
+            if (other)
+            {
+                construct(*other);
+            }
+        }
 
         optional(optional&& other,
                  typename std::enable_if<std::is_move_constructible<T>::value>::type* = 0)

@@ -1,9 +1,17 @@
 master
 ------
 
-Bug fix:
+Bug fixes:
 
 Fixed issue [json with preserve_order_policy does not preserve order of elements #210](https://github.com/danielaparker/jsoncons/issues/210)
+
+Implemented feature requests:
+
+- [208](https://github.com/danielaparker/jsoncons/issues/208) Added member function to `basic_json`
+```
+template <class T>
+T as(byte_string_arg_t, semantic_tag hint) const; 
+```
 
 v0.143.2
 --------
