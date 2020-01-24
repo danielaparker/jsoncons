@@ -5,6 +5,14 @@ Bug fix:
 
 Fixed issue [json with preserve_order_policy does not preserve order of elements #210](https://github.com/danielaparker/jsoncons/issues/210)
 
+Enhancement:
+
+- Added member function to `basic_json` re [byte string feature request](https://github.com/danielaparker/jsoncons/issues/208)
+```
+template <class T>
+T as(byte_string_arg_t, semantic_tag hint) const; 
+```
+
 v0.143.2
 --------
 

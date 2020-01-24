@@ -1,10 +1,10 @@
 ### jsoncons::basic_json::as
 
 ```c++
-template <class T, class... Args>
+template <class T>
 T as() const; // (1)
 
-template <class T, class... Args>
+template <class T>
 T as(byte_string_arg_t, semantic_tag hint) const; // (2)
 
 bool as_bool() const; // (3)
