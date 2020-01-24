@@ -126,10 +126,10 @@ for (auto b : bytes)
 std::cout << "\n\n";
 
 std::string s;
-encode_json(j, s); 
+encode_json(j, s); // tag information is lost 
 std::cout << "(2) " << s << "\n\n";
 
-auto sj = decode_json<json>(s); // tag information is lost
+auto sj = decode_json<json>(s);
 
 // provide hint
 auto v = sj.as<std::vector<uint8_t>>(byte_string_arg,
