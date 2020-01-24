@@ -78,7 +78,7 @@ TEST_CASE("jmespath-tests")
 {
     SECTION("Examples and tutorials")
     {
-        jmespath_tests("./input/jmespath/examples/jmespath-tests.json");
+        //jmespath_tests("./input/jmespath/examples/jmespath-tests.json");
     }
     SECTION("basics")
     {
@@ -88,7 +88,7 @@ TEST_CASE("jmespath-tests")
 
 using jmespath::detail::jmespath_evaluator;
 
-/*
+
 TEST_CASE("jmespath expressions")
 {
     std::string input = R"(
@@ -98,54 +98,53 @@ TEST_CASE("jmespath expressions")
     json root = json::parse(input);
     jmespath_evaluator<json,const json&>::jmespath_context context;
     std::error_code ec;
-
+/*
     SECTION("reservations[*].instances[*].state")
     {
-        jmespath_evaluator<json,const json&>::identifier_selector reservations("reservations");
-        auto& result = reservations.select(context, root, ec);
-        std::cout << pretty_print(result) << "\n";
+        auto reservations = std::make_unique<jmespath_evaluator<json,const json&>::identifier_selector>("reservations");
+        auto instances = std::make_unique<jmespath_evaluator<json,const json&>::identifier_selector>("instances");
+        auto state = std::make_unique<jmespath_evaluator<json, const json&>::identifier_selector>("state");
 
-        jmespath_evaluator<json, const json&>::expression_selector expr{};
-        expr.add_selector(std::make_unique<jmespath_evaluator<json, const json&>::identifier_selector>(reservations));
+        auto expr = std::make_unique<jmespath_evaluator<json, const json&>::expression_selector>();
+        expr->add_selector(std::move(reservations));
 
-        jmespath_evaluator<json, const json&>::list_projection proj1{};
-        jmespath_evaluator<json, const json&>::identifier_selector instances("instances");
-        proj1.add_selector(std::make_unique<jmespath_evaluator<json, const json&>::identifier_selector>(instances));
-        jmespath_evaluator<json, const json&>::list_projection proj2{};
-        jmespath_evaluator<json, const json&>::identifier_selector state("state");
-        proj2.add_selector(std::make_unique<jmespath_evaluator<json, const json&>::identifier_selector>(state));
-        proj1.add_selector(std::make_unique<jmespath_evaluator<json, const json&>::list_projection>(std::move(proj2)));
-        expr.add_selector(std::make_unique<jmespath_evaluator<json, const json&>::list_projection>(std::move(proj1)));
-        auto& result3 = expr.select(context, root, ec);
+        auto expr2 = std::make_unique<jmespath_evaluator<json, const json&>::list_projection>(std::move(expr)); 
+        expr2->add_selector(std::move(instances));
+
+        auto expr3 = std::make_unique<jmespath_evaluator<json, const json&>::list_projection>(std::move(expr2));
+        expr3->add_selector(std::move(state));
+
+        std::cout << "\n" << expr3->to_string() << "\n";
+
+        auto& result3 = expr3->evaluate(context, root, ec);
         std::cout << pretty_print(result3) << "\n";
     }
-    SECTION("reservations[*].instances[*].state 2")
+*/
+    SECTION("reservations[].instances[].state2")
     {
-        std::vector<std::unique_ptr<jmespath_evaluator<json, const json&>::selector_base>> expr_stack;
-        std::vector<size_t> offset_stack;
+        auto reservations = std::make_unique<jmespath_evaluator<json,const json&>::identifier_selector>("reservations");
+        auto instances = std::make_unique<jmespath_evaluator<json,const json&>::identifier_selector>("instances");
+        auto state = std::make_unique<jmespath_evaluator<json, const json&>::identifier_selector>("state");
 
-        offset_stack.push_back(expr_stack.size()); // 0
-        expr_stack.push_back(std::make_unique<jmespath_evaluator<json, const json&>::expression_selector>());
-        expr_stack.push_back(std::make_unique<jmespath_evaluator<json, const json&>::identifier_selector>("reservations"));
-        offset_stack.push_back(expr_stack.size()); // 2
-        expr_stack.push_back(std::make_unique<jmespath_evaluator<json, const json&>::list_projection>());
-        expr_stack.push_back(std::make_unique<jmespath_evaluator<json, const json&>::identifier_selector>("instances"));
-        offset_stack.push_back(expr_stack.size()); // 5
-        expr_stack.push_back(std::make_unique<jmespath_evaluator<json, const json&>::list_projection>());
-        expr_stack.push_back(std::make_unique<jmespath_evaluator<json, const json&>::identifier_selector>("state"));
+        auto sub_expr1 = std::make_unique<jmespath_evaluator<json, const json&>::sub_expression>(std::move(reservations));
+        auto lp_instances = std::make_unique<jmespath_evaluator<json, const json&>::flatten_projection>();
 
-        while (!offset_stack.empty())
-        {
-            const size_t pos = offset_stack.back();
-            for (size_t i = pos + 1; i < expr_stack.size(); ++i)
-            {
-                expr_stack[pos]->add_selector(std::move(expr_stack[i]));
-            }
-            expr_stack.erase(expr_stack.begin()+pos+1,expr_stack.end());
-            offset_stack.pop_back();
-        }
-        auto& result = expr_stack[0]->select(context, root, ec);
-        std::cout << pretty_print(result) << "\n";
+        // list projection lp_state must receive as input [[{"state": "running"},{"state": "stopped"}],[{"state": "terminated"},{"state": "runnning"}]]
+        auto lp_state = std::make_unique<jmespath_evaluator<json, const json&>::flatten_projection>();
+        lp_state->add_selector(std::move(state));
+
+        auto sub_expr2 = std::make_unique<jmespath_evaluator<json, const json&>::sub_expression>(std::move(instances));
+        sub_expr2->add_selector(std::move(lp_state));
+
+        lp_instances->add_selector(std::move(sub_expr2));
+
+
+        sub_expr1->add_selector(std::move(lp_instances));
+
+        std::cout << "\n" << sub_expr1->to_string() << "\n\n";
+
+        auto& result1 = sub_expr1->evaluate(context, root, ec);
+        std::cout << pretty_print(result1) << "\n";
     }
 }
-*/
+
