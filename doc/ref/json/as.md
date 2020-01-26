@@ -19,8 +19,6 @@ string_view_type as_string_view() const; // (6)
 std::string as_string() const; // (7)
 
 byte_string as_byte_string() const; // (8)
-
-bignum as_bignum() const; // (9)
 ```
 
 (1) Generic get `as` type `T`. Attempts to convert the json value to the template value type using [json_type_traits](../json_type_traits.md).
@@ -72,8 +70,7 @@ std::cout << "(5) " << j["k3"].as<uint32_t>() << '\n';
 std::cout << "(6) " << j["k4"].as<int32_t>() << '\n';
 std::cout << "(7) " << j["k4"].as<double>() << '\n';
 std::cout << std::boolalpha << "(8) " << j["k5"].as<int>() << '\n';
-std::cout << std::boolalpha << "(9) " << j["k5"].as<bool>() << '\n';
-std::cout << "(10) " << j["k6"].as<double>() << '\n';
+std::cout << "(9) " << j["k6"].as<double>() << '\n';
 
 ```
 Output:
@@ -86,9 +83,8 @@ Output:
 (5) 4294967286
 (6) 10
 (7) 10.5
-(8) 1
-(9) true
-(10) 10.5
+(8) true
+(9) 10.5
 ```
 
 #### Accessing a `json` array value as a `std::vector`
