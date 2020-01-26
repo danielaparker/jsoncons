@@ -1391,7 +1391,8 @@ public:
         }
 
         template <class Alloc = allocator_type>
-        typename std::enable_if<std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value,void>::type
+        typename std::enable_if<std::is_standard_layout<typename std::allocator_traits<Alloc>::pointer>::value ||
+                                std::is_trivial<typename std::allocator_traits<Alloc>::pointer>::value,void>::type
         swap(variant& other) noexcept
         {
             if (this ==&other)
@@ -1403,7 +1404,8 @@ public:
         }
 
         template <class Alloc = allocator_type>
-        typename std::enable_if<!std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value, void>::type
+        typename std::enable_if<!(std::is_standard_layout<typename std::allocator_traits<Alloc>::pointer>::value ||
+                                  std::is_trivial<typename std::allocator_traits<Alloc>::pointer>::value), void>::type
         swap(variant& other) noexcept
         {
             if (this ==&other)
@@ -3876,13 +3878,60 @@ public:
     template <class SAllocator=std::allocator<char_type>>
     std::basic_string<char_type,char_traits_type,SAllocator> as_string() const 
     {
-        return as_string(basic_json_encode_options<char_type>(),SAllocator());
+        return as_string(SAllocator());
     }
 
     template <class SAllocator=std::allocator<char_type>>
     std::basic_string<char_type,char_traits_type,SAllocator> as_string(const SAllocator& alloc) const 
     {
-        return as_string(basic_json_encode_options<char_type>(),alloc);
+        typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
+        switch (var_.storage())
+        {
+            case storage_kind::short_string_value:
+            case storage_kind::string_value:
+            {
+                return string_type(as_string_view().data(),as_string_view().length(),alloc);
+            }
+            case storage_kind::byte_string_value:
+            {
+                string_type s(alloc);
+                switch (tag())
+                {
+                    case semantic_tag::base64:
+                        encode_base64(var_.byte_string_storage_cast().begin(), 
+                                      var_.byte_string_storage_cast().end(),
+                                      s);
+                        break;
+                    case semantic_tag::base16:
+                        encode_base16(var_.byte_string_storage_cast().begin(), 
+                                      var_.byte_string_storage_cast().end(),
+                                      s);
+                        break;
+                    default:
+                        encode_base64url(var_.byte_string_storage_cast().begin(), 
+                                         var_.byte_string_storage_cast().end(),
+                                         s);
+                        break;
+                }
+                return s;
+            }
+            case storage_kind::array_value:
+            {
+                string_type s(alloc);
+                {
+                    basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
+                    dump(encoder);
+                }
+                return s;
+            }
+            default:
+            {
+                string_type s(alloc);
+                basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
+                dump(encoder);
+                return s;
+            }
+        }
     }
 
     template <class SAllocator=std::allocator<char_type>>
@@ -3932,44 +3981,6 @@ public:
             case storage_kind::array_value:
             {
                 string_type s(alloc);
-#if !defined(JSONCONS_NO_DEPRECATED)
-                if (tag() == semantic_tag::bigfloat)
-                {
-                    JSONCONS_ASSERT(size() == 2);
-                    int64_t exp = at(0).template as_integer<int64_t>();
-                    string_type mantissa = at(1).as_string();
-                    bignum n(mantissa);
-                    int64_t new_exp = 0;
-                    bignum five(5);
-                    if (exp > 0)
-                    {
-                        new_exp = static_cast<int64_t>(std::floor(exp*std::log(2)/std::log(10)));
-                        bignum five_power = power(five,(unsigned)new_exp);
-                        uint64_t binShift = exp - new_exp;
-                        n = ((n) << (unsigned)binShift)/five_power;
-                    }
-                    else
-                    {
-                        new_exp = static_cast<int64_t>(std::ceil(-exp*std::log(2)/std::log(10)));
-                        bignum five_power = power(five,(unsigned)new_exp);
-                        uint64_t binShift = -exp - new_exp;
-                        n = (n*five_power) >> (unsigned)binShift;
-                    }
-
-                    std::string str;
-                    n.dump(str);
-                    if (str[0] == '-')
-                    {
-                        s.push_back('-');
-                        jsoncons::detail::prettify_string(str.c_str()+1, str.size()-1, -(int)new_exp, -4, 17, s);
-                    }
-                    else
-                    {
-                        jsoncons::detail::prettify_string(str.c_str(), str.size(), -(int)new_exp, -4, 17, s);
-                    }
-                }
-                else
-#endif
                 {
                     basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s,options);
                     dump(encoder);

@@ -75,11 +75,11 @@ TEST_CASE("json::as<jsoncons::string_view>()")
 TEST_CASE("as with byte_string_arg hint)")
 {
     std::vector<uint8_t> v = {'H','e','l','l','o'};
-    jsoncons::json j(jsoncons::byte_string_arg, v, jsoncons::semantic_tag::base64url);
+    jsoncons::json j(jsoncons::byte_string_arg, v, jsoncons::semantic_tag::base64);
     jsoncons::json sj(j.as<std::string>());
 
     auto u = sj.as<std::vector<uint8_t>>(jsoncons::byte_string_arg,
-                                         jsoncons::semantic_tag::base64url);
+                                         jsoncons::semantic_tag::base64);
 
     CHECK(u == v);
 }
