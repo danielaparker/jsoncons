@@ -83,6 +83,17 @@ Output:
 1,2,3,4
 ```
 
+#### Use string_view to access the actual memory that's being used to hold a string
+
+You can use `j.as<jsoncons::string_view>()`, e.g.
+```c++
+json j = json::parse("\"Hello World\"");
+auto sv = j.as<jsoncons::string_view>();
+```
+`jsoncons::string_view` supports the member functions of `std::string_view`, including `data()` and `size()`. 
+
+If your compiler supports `std::string_view`, you can also use `j.as<std::string_view>()`.
+
 #### Accessing a `json` byte string as a byte string
 ```c++
 std::vector<uint8_t> u = {'H','e','l','l','o'};
