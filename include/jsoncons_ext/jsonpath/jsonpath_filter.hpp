@@ -398,7 +398,7 @@ public:
     }
     token(const binary_operator_properties<Json>& properties)
         : type_(token_type::binary_operator), 
-          binary_op_properties_{properties}
+          binary_op_properties_(properties)
     {
     }
 
