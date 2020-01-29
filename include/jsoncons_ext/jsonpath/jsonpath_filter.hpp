@@ -142,6 +142,21 @@ enum class token_type
 enum class term_type {value,regex,path};
 
 template <class Json>
+Json unary_minus(const Json& lhs)
+{
+    Json result = Json::null();
+    if (lhs.is_int64())
+    {
+        result = -lhs.template as<int64_t>();
+    }
+    else if (lhs.is_double())
+    {
+        result = -lhs.as_double();
+    }
+    return result;
+}
+
+template <class Json>
 class term
 {
 public:
@@ -678,21 +693,6 @@ private:
         }
     }
 };
-
-template <class Json>
-Json unary_minus(const Json& lhs)
-{
-    Json result = Json::null();
-    if (lhs.is_int64())
-    {
-        result = -lhs.template as<int64_t>();
-    }
-    else if (lhs.is_double())
-    {
-        result = -lhs.as_double();
-    }
-    return result;
-}
 
 template <class Json>
 struct cmp_plus
