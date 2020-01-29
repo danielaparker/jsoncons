@@ -166,19 +166,19 @@ using namespace jsoncons;
 
 int main()
 {
-    std::map<std::string,std::tuple<std::string,std::string,double>> employees = 
-    { 
+    std::map<std::string, std::tuple<std::string, std::string, double>> employees =
+    {
         {"John Smith",{"Hourly","Software Engineer",10000}},
         {"Jane Doe",{"Commission","Sales",20000}}
     };
 
-    json_encoder encoder(std::cout, jsoncons::indenting::indent); 
+    json_stream_encoder encoder(std::cout);
 
-    encoder.begin_object();       
-    encoder.write_name("Employees");       
+    encoder.begin_object();
+    encoder.name("Employees");
     encode_json(employees, encoder);
-    encoder.end_object();       
-    encoder.flush();       
+    encoder.end_object();
+    encoder.flush();
 }
 ```
 Output:
