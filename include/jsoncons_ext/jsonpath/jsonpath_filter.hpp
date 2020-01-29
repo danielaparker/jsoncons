@@ -1495,8 +1495,8 @@ public:
     {
     }
 
-    jsonpath_filter_expr(const std::vector<token<Json>>& tokens)
-        : tokens_(tokens)
+    jsonpath_filter_expr(std::vector<token<Json>>&& tokens)
+        : tokens_(std::move(tokens))
     {
     }
 
@@ -2408,7 +2408,7 @@ public:
         }
         *end_ptr = p;
 
-        return jsonpath_filter_expr<Json>(output_stack_);
+        return jsonpath_filter_expr<Json>(std::move(output_stack_));
     }
 };
 
