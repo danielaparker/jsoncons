@@ -1450,12 +1450,13 @@ Json visit(Visitor vis, const term<Json>& v, const term<Json>& w)
 template <class Json>
 token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
 {
-    for (auto it= tokens.begin(); it != tokens.end(); ++it)
+    for (auto it = tokens.begin(); it != tokens.end(); ++it)
     {
         it->initialize(context);
     }
     std::vector<token<Json>> stack;
-    for (auto t : tokens)
+    stack.reserve(tokens.size());
+    for (auto& t : tokens)
     {
         if (t.is_operand())
         {
@@ -1463,15 +1464,15 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
         }
         else if (t.is_unary_operator())
         {
-            auto rhs = stack.back();
+            auto rhs = std::move(stack.back());
             stack.pop_back();
             stack.push_back(token<Json>(value_term<Json>(t(rhs.operand()))));
         }
         else if (t.is_binary_operator())
         {
-            auto rhs = stack.back();
+            auto rhs = std::move(stack.back());
             stack.pop_back();
-            auto lhs = stack.back();
+            auto lhs = std::move(stack.back());
             stack.pop_back();
             stack.push_back(token<Json>(value_term<Json>(t(lhs.operand(), rhs.operand()))));
         }
@@ -1594,24 +1595,24 @@ public:
         return state;
     }
 
-    void push_token(token<Json> token)
+    void push_token(token<Json>&& token)
     {
         switch (token.type())
         {
             case token_type::value:
             case token_type::path:
             case token_type::regex:
-                output_stack_.push_back(token);
+                output_stack_.push_back(std::move(token));
                 break;
             case token_type::lparen:
-                operator_stack_.push_back(token);
+                operator_stack_.push_back(std::move(token));
                 break;
             case token_type::rparen:
                 {
                     auto it = operator_stack_.rbegin();
                     while (it != operator_stack_.rend() && !it->is_lparen())
                     {
-                        output_stack_.push_back(*it);
+                        output_stack_.push_back(std::move(*it));
                         ++it;
                     }
                     if (it == operator_stack_.rend())
@@ -1627,12 +1628,12 @@ public:
             {
                 if (operator_stack_.empty() || operator_stack_.back().is_lparen())
                 {
-                    operator_stack_.push_back(token);
+                    operator_stack_.push_back(std::move(token));
                 }
                 else if (token.precedence_level() < operator_stack_.back().precedence_level()
                          || (token.precedence_level() == operator_stack_.back().precedence_level() && token.is_right_associative()))
                 {
-                    operator_stack_.push_back(token);
+                    operator_stack_.push_back(std::move(token));
                 }
                 else
                 {
@@ -1641,12 +1642,12 @@ public:
                            && (token.precedence_level() > it->precedence_level()
                          || (token.precedence_level() == it->precedence_level() && token.is_right_associative())))
                     {
-                        output_stack_.push_back(*it);
+                        output_stack_.push_back(std::move(*it));
                         ++it;
                     }
 
                     operator_stack_.erase(it.base(),operator_stack_.end());
-                    operator_stack_.push_back(token);
+                    operator_stack_.push_back(std::move(token));
                 }
                 break;
             }
