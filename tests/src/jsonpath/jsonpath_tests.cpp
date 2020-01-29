@@ -839,6 +839,7 @@ TEST_CASE("jsonpath store tests")
 
         CHECK(result == expected);
     }
+
 }
 
 // store tests
