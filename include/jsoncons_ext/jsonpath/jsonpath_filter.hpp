@@ -195,7 +195,7 @@ public:
     {
         JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
-    virtual bool exclaim() const
+    virtual bool unary_not() const
     {
         JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
     }
@@ -248,7 +248,7 @@ public:
         return value_;
     }
 
-    bool exclaim() const override
+    bool unary_not() const override
     {
         return !value_.as_bool();
     }
@@ -335,7 +335,7 @@ public:
         return nodes_.size() == 1 ? nodes_[0] : nodes_;
     }
 
-    bool exclaim() const override
+    bool unary_not() const override
     {
         return nodes_.size() == 0;
     }
@@ -2130,7 +2130,7 @@ public:
                         break;
                     case '!':
                     {
-                        std::function<Json(const term<Json>&)> f = [](const term<Json>& b) {return Json(b.exclaim());};
+                        std::function<Json(const term<Json>&)> f = [](const term<Json>& a) {return Json(a.unary_not());};
                         push_token(token<Json>(1, true, f));
                         ++p;
                         ++column_;
@@ -2138,7 +2138,7 @@ public:
                     }
                     case '-':
                     {
-                        std::function<Json(const term<Json>&)> f = [](const term<Json>& b) {return b.unary_minus();};
+                        std::function<Json(const term<Json>&)> f = [](const term<Json>& a) {return a.unary_minus();};
                         push_token(token<Json>(1, true, f));
                         ++p;
                         ++column_;
