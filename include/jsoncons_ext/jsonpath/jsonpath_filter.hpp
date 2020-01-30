@@ -1541,9 +1541,6 @@ class jsonpath_filter_parser
     std::vector<filter_state> state_stack_;
     std::vector<filter_path_mode> path_mode_stack_;
 
-    std::size_t line_;
-    std::size_t column_;
-
     class binary_operator_table
     {
         typedef std::map<string_type,binary_operator_properties<Json>> binary_operator_map;
@@ -1576,7 +1573,12 @@ class jsonpath_filter_parser
         }
     };
 
+    unary_operator_properties<Json> unary_not_properties_;
+    unary_operator_properties<Json> unary_minus_properties_;
     binary_operator_table binary_operators_;
+
+    std::size_t line_;
+    std::size_t column_;
 
 public:
     jsonpath_filter_parser()
@@ -1584,7 +1586,9 @@ public:
     {
     }
     jsonpath_filter_parser(std::size_t line, std::size_t column)
-        : line_(line), column_(column)
+        : unary_not_properties_{ 1,true, unary_not_op },
+          unary_minus_properties_{ 1,true, unary_minus_op },
+          line_(line), column_(column)
     {
     }
 
@@ -2128,14 +2132,14 @@ public:
                         break;
                     case '!':
                     {
-                        push_token(token<Json>(unary_operator_properties<Json>{1, true, unary_not_op}));
+                        push_token(token<Json>(unary_not_properties_));
                         ++p;
                         ++column_;
                         break;
                     }
                     case '-':
                     {
-                        push_token(token<Json>(unary_operator_properties<Json>{1, true, unary_minus_op}));
+                        push_token(token<Json>(unary_minus_properties_));
                         ++p;
                         ++column_;
                         break;
