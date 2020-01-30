@@ -14,6 +14,7 @@ namespace jsoncons {
 
 struct null_type
 {
+    explicit null_type() = default; 
 };
 
 struct half_arg_t

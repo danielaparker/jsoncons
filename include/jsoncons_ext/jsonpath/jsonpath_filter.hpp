@@ -139,6 +139,18 @@ enum class token_type
     rparen
 };
 
+struct lparen_arg_t
+{
+    explicit lparen_arg_t() = default; 
+};
+constexpr lparen_arg_t lparen_arg{};
+
+struct rparen_arg_t
+{
+    explicit rparen_arg_t() = default; 
+};
+constexpr rparen_arg_t rparen_arg{};
+
 enum class term_type {value,regex,path};
 
 template <class Json>
@@ -371,10 +383,16 @@ private:
 
 public:
 
-    token(token_type type)
-        : type_(type)
+    token(lparen_arg_t)
+        : type_(token_type::lparen)
     {
     }
+
+    token(rparen_arg_t)
+        : type_(token_type::rparen)
+    {
+    }
+
     token(value_term<Json>&& term)
         : type_(token_type::value), value_term_(std::move(term))
     {
@@ -1564,7 +1582,7 @@ class jsonpath_filter_parser
 
 public:
     jsonpath_filter_parser()
-        : line_(1), column_(1)
+        : jsonpath_filter_parser(1,1)
     {
     }
     jsonpath_filter_parser(std::size_t line, std::size_t column)
@@ -1690,11 +1708,11 @@ public:
                         case '(':
                             state = filter_state::expect_path_or_value_or_unary_op;
                             ++depth;
-                            push_token(token<Json>(token_type::lparen));
+                            push_token(token<Json>(lparen_arg));
                             break;
                         case ')':
                             state = filter_state::expect_path_or_value_or_unary_op;
-                            push_token(token<Json>(token_type::rparen));
+                            push_token(token<Json>(rparen_arg));
                             if (--depth == 0)
                             {
                                 state = filter_state::done;
@@ -1994,7 +2012,7 @@ public:
                                 buffer.clear();
                                 buffer_line = buffer_column = 1;
                             }
-                            push_token(token<Json>(token_type::rparen));
+                            push_token(token<Json>(rparen_arg));
                             if (--depth == 0)
                             {
                                 state = filter_state::done;
@@ -2148,12 +2166,12 @@ public:
                         break;
                     case '(':
                         ++depth;
-                        push_token(token<Json>(token_type::lparen));
+                        push_token(token<Json>(lparen_arg));
                         ++p;
                         ++column_;
                         break;
                     case ')':
-                        push_token(token<Json>(token_type::rparen));
+                        push_token(token<Json>(rparen_arg));
                         if (--depth == 0)
                         {
                             state = filter_state::done;
@@ -2187,7 +2205,7 @@ public:
                         ++column_;
                         break;
                     case ')':
-                        push_token(token<Json>(token_type::rparen));
+                        push_token(token<Json>(rparen_arg));
                         if (--depth == 0)
                         {
                             state = filter_state::done;
@@ -2234,7 +2252,7 @@ public:
                     case ' ':case '\t':
                         break;
                     case ')':
-                        push_token(token<Json>(token_type::rparen));
+                        push_token(token<Json>(rparen_arg));
                         if (--depth == 0)
                         {
                             state = filter_state::done;
@@ -2307,7 +2325,7 @@ public:
                                 {
                                     push_token(token<Json>(value_term<Json>(std::move(result[0]))));
                                 }
-                                push_token(token<Json>(token_type::rparen));
+                                push_token(token<Json>(rparen_arg));
                             }
                             else
                             {
@@ -2318,7 +2336,7 @@ public:
                         else
                         {
                             push_token(token<Json>(path_term<Json>(buffer, buffer_line, buffer_column)));
-                            push_token(token<Json>(token_type::rparen));
+                            push_token(token<Json>(rparen_arg));
                         }
                         buffer.clear();
                         buffer_line = buffer_column = 1;
