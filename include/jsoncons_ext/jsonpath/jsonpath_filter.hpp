@@ -405,15 +405,13 @@ public:
         : type_(token_type::regex), regex_term_(std::move(term))
     {
     }
-    token(std::size_t precedence_level, 
-          bool is_right_associative,
-          typename unary_operator_properties<Json>::operator_type unary_operator)
+
+    token(const unary_operator_properties<Json>& properties)
         : type_(token_type::unary_operator), 
-          unary_op_properties_{precedence_level, 
-                               is_right_associative,
-                               unary_operator}
+          unary_op_properties_(properties)
     {
     }
+
     token(const binary_operator_properties<Json>& properties)
         : type_(token_type::binary_operator), 
           binary_op_properties_(properties)
@@ -2130,14 +2128,14 @@ public:
                         break;
                     case '!':
                     {
-                        push_token(token<Json>(1, true, unary_not_op));
+                        push_token(token<Json>(unary_operator_properties<Json>{1, true, unary_not_op}));
                         ++p;
                         ++column_;
                         break;
                     }
                     case '-':
                     {
-                        push_token(token<Json>(1, true, unary_minus_op));
+                        push_token(token<Json>(unary_operator_properties<Json>{1, true, unary_minus_op}));
                         ++p;
                         ++column_;
                         break;
