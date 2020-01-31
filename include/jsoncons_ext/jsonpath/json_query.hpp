@@ -77,13 +77,6 @@ struct array_slice
     array_slice& operator=(const array_slice&) = default;
 };
 
-// work around for std::make_unique not being available until C++14
-template<typename T, typename... Args>
-std::unique_ptr<T> make_unique_ptr(Args&&... args)
-{
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
 enum class result_type {value,path};
 
 template<class Json>
@@ -563,7 +556,7 @@ public:
     template <typename... Args>
     pointer create_temp(Args&& ... args)
     {
-        auto temp = make_unique_ptr<Json>(std::forward<Args>(args)...);
+        auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
         pointer ptr = temp.get();
         temp_json_values_.emplace_back(std::move(temp));
         return ptr;
@@ -681,7 +674,7 @@ public:
                     {
                         case ' ':case '\t':case '\r':case '\n':
                         {
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
                             apply_selectors();
                             buffer.clear();
                             state_stack_.pop_back();
@@ -699,7 +692,7 @@ public:
                         {
                             if (buffer.size() > 0)
                             {
-                                selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                                selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
                                 apply_selectors();
                                 buffer.clear();
                             }
@@ -714,7 +707,7 @@ public:
                         {
                             if (buffer.size() > 0)
                             {
-                                selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                                selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
                                 apply_selectors();
                                 buffer.clear();
                             }
@@ -1083,14 +1076,14 @@ public:
                             advance_past_space_character();
                             break;
                         case '[':
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
                             apply_selectors();
                             buffer.clear();
                             slice.start_ = 0;
                             state_stack_.pop_back();
                             break;
                         case '.':
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
                             apply_selectors();
                             buffer.clear();
                             state_stack_.pop_back();
@@ -1104,7 +1097,7 @@ public:
                     switch (*p_)
                     {
                         case '\'':
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
                             apply_selectors();
                             buffer.clear();
                             state_stack_.pop_back();
@@ -1133,7 +1126,7 @@ public:
                     switch (*p_)
                     {
                         case '\"':
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                            selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
                             apply_selectors();
                             buffer.clear();
                             state_stack_.pop_back();
@@ -1193,7 +1186,7 @@ public:
                             auto result = parser.parse(root, p_,end_input_,&p_);
                             line_ = parser.line();
                             column_ = parser.column();
-                            selectors_.push_back(make_unique_ptr<expr_selector>(result));
+                            selectors_.push_back(jsoncons::make_unique<expr_selector>(result));
                             state_stack_.back().state = path_state::comma_or_right_bracket;
                             break;
                         }
@@ -1203,7 +1196,7 @@ public:
                             auto result = parser.parse(root,p_,end_input_,&p_);
                             line_ = parser.line();
                             column_ = parser.column();
-                            selectors_.push_back(make_unique_ptr<filter_selector>(result));
+                            selectors_.push_back(jsoncons::make_unique<filter_selector>(result));
                             state_stack_.back().state = path_state::comma_or_right_bracket;
                             break;                   
                         }
@@ -1297,7 +1290,7 @@ public:
                         case ']': 
                             if (!buffer.empty())
                             {
-                                selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                                selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
                                 buffer.clear();
                             }
                             state_stack_.pop_back();
@@ -1356,7 +1349,7 @@ public:
                         case ']': 
                             if (!buffer.empty())
                             {
-                                selectors_.push_back(make_unique_ptr<path_selector>(buffer));
+                                selectors_.push_back(jsoncons::make_unique<path_selector>(buffer));
                                 buffer.clear();
                             }
                             state_stack_.pop_back();
@@ -1460,7 +1453,7 @@ public:
                             break;
                         case ',':
                         case ']':
-                            selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
+                            selectors_.push_back(jsoncons::make_unique<array_slice_selector>(slice));
                             state_stack_.pop_back();
                             break;
                         default:
@@ -1490,7 +1483,7 @@ public:
                                 ec = jsonpath_errc::expected_slice_end;
                                 return;
                             }
-                            selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
+                            selectors_.push_back(jsoncons::make_unique<array_slice_selector>(slice));
                             state_stack_.pop_back();
                             break;
                         default:
@@ -1529,7 +1522,7 @@ public:
                                 ec = jsonpath_errc::expected_slice_step;
                                 return;
                             }
-                            selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
+                            selectors_.push_back(jsoncons::make_unique<array_slice_selector>(slice));
                             state_stack_.pop_back();
                             break;
                         default:
@@ -1601,7 +1594,7 @@ public:
             case path_state::unquoted_name: 
             case path_state::unquoted_name2: 
             {
-                selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
                 apply_selectors();
                 buffer.clear();
                 state_stack_.pop_back(); // unquoted_name
