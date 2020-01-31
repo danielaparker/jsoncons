@@ -204,11 +204,11 @@ template<> inline char32_t const* name##_literal<char32_t>() { return JSONCONS_Q
          #if __clang_major__ >= 6  && _cplusplus >= 201103L // Xcode 6
             #define JSONCONS_HAS_MAKE_UNIQUE
          #endif
-      #elif ((__clang_major__*100 +__clang_minor__) >= 340) && _cplusplus >= 201103L
+      #elif ((__clang_major__*100 +__clang_minor__) >= 340) && _cplusplus > 201103L
          #define JSONCONS_HAS_MAKE_UNIQUE
       #endif
    #elif defined(__GNUC__)
-      #if (__GNUC__ * 100 + __GNUC_MINOR__) >= 409 && __cplusplus >= 201103L
+      #if (__GNUC__ * 100 + __GNUC_MINOR__) >= 409 && __cplusplus > 201103L
          #define JSONCONS_HAS_MAKE_UNIQUE
       #endif
    #elif defined(_MSC_VER)
