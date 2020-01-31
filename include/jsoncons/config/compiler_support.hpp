@@ -165,8 +165,6 @@ template<> inline wchar_t const* name##_literal<wchar_t>() { return JSONCONS_QUO
 template<> inline char16_t const* name##_literal<char16_t>() { return JSONCONS_QUOTE(u,name); } \
 template<> inline char32_t const* name##_literal<char32_t>() { return JSONCONS_QUOTE(U,name); }
 
-#endif
-
 #if (!defined(JSONCONS_NO_EXCEPTIONS))
 // Check if exceptions are disabled.
 #if defined( __cpp_exceptions) && __cpp_exceptions == 0
@@ -206,8 +204,9 @@ template<> inline char32_t const* name##_literal<char32_t>() { return JSONCONS_Q
          #if __clang_major__ >= 6 // Xcode 6
             #define JSONCONS_HAS_MAKE_UNIQUE
          #endif
-      #else ((__clang_major__*100 +__clang_minor__) >= 340) 
+      #elif ((__clang_major__*100 +__clang_minor__) >= 340) 
          #define JSONCONS_HAS_MAKE_UNIQUE
+      #endif
    #elif defined(__GNUC__)
       #if (__GNUC__ * 100 + __GNUC_MINOR__) >= 409 && __cplusplus > 201103L
          #define JSONCONS_HAS_MAKE_UNIQUE
