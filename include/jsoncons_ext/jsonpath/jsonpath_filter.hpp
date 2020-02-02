@@ -23,6 +23,12 @@ namespace jsoncons { namespace jsonpath { namespace detail {
 
 template <class Json>
 class term;
+template <class Json>
+class value_term;
+template <class Json>
+class path_term;
+template <class Json>
+class regex_term;
 
 template <class Json>
 struct unary_operator_properties
@@ -44,13 +50,112 @@ struct binary_operator_properties
     operator_type op;
 };
 
+enum class term_type {value,regex,path};
+
+template <typename Visitor,typename Json>
+Json visit(Visitor vis, const term<Json>& v, const term<Json>& w)
+{
+    switch(v.type())
+    {
+        case term_type::value:
+        {
+            const auto& t1 = static_cast<const value_term<Json>&>(v);
+            switch(w.type())
+            {
+                case term_type::value:
+                {
+                    const auto& t2 = static_cast<const value_term<Json>&>(w);
+                    return vis(t1, t2);
+                }
+                case term_type::path:
+                {
+                    const auto& t2 = static_cast<const path_term<Json>&>(w);
+                    return vis(t1, t2);
+                }
+                case term_type::regex:
+                {
+                    const auto& t2 = static_cast<const regex_term<Json>&>(w);
+                    return vis(t1, t2);
+                }
+            }
+            break;
+        }
+        case term_type::path:
+        {
+            const auto& t1 = static_cast<const path_term<Json>&>(v);
+            switch(w.type())
+            {
+                case term_type::value:
+                {
+                    const auto& t2 = static_cast<const value_term<Json>&>(w);
+                    return vis(t1, t2);
+                }
+                case term_type::path:
+                {
+                    const auto& t2 = static_cast<const path_term<Json>&>(w);
+                    return vis(t1, t2);
+                }
+                case term_type::regex:
+                {
+                    const auto& t2 = static_cast<const regex_term<Json>&>(w);
+                    return vis(t1, t2);
+                }
+            }
+            break;
+        }
+        case term_type::regex:
+        {
+            JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
+        }
+    }
+
+    return false;
+}
+
 template <class Json>
 struct jsonpath_resources
 {
+    typedef typename Json::char_type char_type;
+    typedef std::basic_string<char_type> string_type;
+
+    class binary_operator_table
+    {
+        typedef std::map<string_type,binary_operator_properties<Json>> binary_operator_map;
+
+        const binary_operator_map operators =
+        {
+            {eqtilde_literal<char_type>(),{2,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_regex<Json>(),a,b); }}},
+            {star_literal<char_type>(),{3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_mult<Json>(),a,b); }}},
+            {forwardslash_literal<char_type>(),{3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_div<Json>(),a,b); }}},
+            {plus_literal<char_type>(),{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_plus<Json>(),a,b); }}},
+            {minus_literal<char_type>(),{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_minus<Json>(),a,b); }}},
+            {lt_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lt<Json>(),a,b); }}},
+            {lte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lte<Json>(),a,b); }}},
+            {gt_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lt<Json>(),b,a); }}},
+            {gte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lte<Json>(),b,a); }}},
+            {eq_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_eq<Json>(),a,b); }}},
+            {ne_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_ne<Json>(),a,b); }}},
+            {ampamp_literal<char_type>(),{7,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_ampamp<Json>(),a,b); }}},
+            {pipepipe_literal<char_type>(),{8,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_pipepipe<Json>(),a,b); }}}
+        };
+
+    public:
+        typename binary_operator_map::const_iterator find(const string_type& key) const
+        {
+            return operators.find(key);
+        }
+        typename binary_operator_map::const_iterator end() const
+        {
+            return operators.end();
+        }
+    };
+
     std::vector<std::unique_ptr<Json>> temp_json_values_;
 
     unary_operator_properties<Json> unary_not_properties;
     unary_operator_properties<Json> unary_minus_properties;
+
+    binary_operator_table binary_operators_;
 
     jsonpath_resources()
         : unary_not_properties{ 1,true, unary_not_op },
@@ -207,8 +312,6 @@ struct rparen_arg_t
     explicit rparen_arg_t() = default; 
 };
 constexpr rparen_arg_t rparen_arg{};
-
-enum class term_type {value,regex,path};
 
 template <class Json>
 Json unary_minus(const Json& lhs)
@@ -1436,67 +1539,6 @@ struct cmp_regex
     }
 };
 
-
-template <typename Visitor,typename Json>
-Json visit(Visitor vis, const term<Json>& v, const term<Json>& w)
-{
-    switch(v.type())
-    {
-        case term_type::value:
-        {
-            const auto& t1 = static_cast<const value_term<Json>&>(v);
-            switch(w.type())
-            {
-                case term_type::value:
-                {
-                    const auto& t2 = static_cast<const value_term<Json>&>(w);
-                    return vis(t1, t2);
-                }
-                case term_type::path:
-                {
-                    const auto& t2 = static_cast<const path_term<Json>&>(w);
-                    return vis(t1, t2);
-                }
-                case term_type::regex:
-                {
-                    const auto& t2 = static_cast<const regex_term<Json>&>(w);
-                    return vis(t1, t2);
-                }
-            }
-            break;
-        }
-        case term_type::path:
-        {
-            const auto& t1 = static_cast<const path_term<Json>&>(v);
-            switch(w.type())
-            {
-                case term_type::value:
-                {
-                    const auto& t2 = static_cast<const value_term<Json>&>(w);
-                    return vis(t1, t2);
-                }
-                case term_type::path:
-                {
-                    const auto& t2 = static_cast<const path_term<Json>&>(w);
-                    return vis(t1, t2);
-                }
-                case term_type::regex:
-                {
-                    const auto& t2 = static_cast<const regex_term<Json>&>(w);
-                    return vis(t1, t2);
-                }
-            }
-            break;
-        }
-        case term_type::regex:
-        {
-            JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
-        }
-    }
-
-    return false;
-}
-
 template <class Json>
 token<Json> evaluate(jsonpath_resources<Json>& resources, const Json& context, std::vector<token<Json>>& tokens)
 {
@@ -1574,40 +1616,6 @@ class jsonpath_filter_parser
     std::vector<token<Json>> operator_stack_;
     std::vector<filter_state> state_stack_;
     std::vector<filter_path_mode> path_mode_stack_;
-
-    class binary_operator_table
-    {
-        typedef std::map<string_type,binary_operator_properties<Json>> binary_operator_map;
-
-        const binary_operator_map operators =
-        {
-            {eqtilde_literal<char_type>(),{2,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_regex<Json>(),a,b); }}},
-            {star_literal<char_type>(),{3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_mult<Json>(),a,b); }}},
-            {forwardslash_literal<char_type>(),{3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_div<Json>(),a,b); }}},
-            {plus_literal<char_type>(),{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_plus<Json>(),a,b); }}},
-            {minus_literal<char_type>(),{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_minus<Json>(),a,b); }}},
-            {lt_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lt<Json>(),a,b); }}},
-            {lte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lte<Json>(),a,b); }}},
-            {gt_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lt<Json>(),b,a); }}},
-            {gte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lte<Json>(),b,a); }}},
-            {eq_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_eq<Json>(),a,b); }}},
-            {ne_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_ne<Json>(),a,b); }}},
-            {ampamp_literal<char_type>(),{7,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_ampamp<Json>(),a,b); }}},
-            {pipepipe_literal<char_type>(),{8,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_pipepipe<Json>(),a,b); }}}
-        };
-
-    public:
-        typename binary_operator_map::const_iterator find(const string_type& key) const
-        {
-            return operators.find(key);
-        }
-        typename binary_operator_map::const_iterator end() const
-        {
-            return operators.end();
-        }
-    };
-
-    binary_operator_table binary_operators_;
 
     std::size_t line_;
     std::size_t column_;
@@ -1925,8 +1933,8 @@ public:
                         buffer.push_back(*p);
                         ++p;
                         ++column_;
-                        auto it = binary_operators_.find(buffer);
-                        if (it == binary_operators_.end())
+                        auto it = resources.binary_operators_.find(buffer);
+                        if (it == resources.binary_operators_.end())
                         {
                             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_));
                         }
@@ -1943,8 +1951,8 @@ public:
                         buffer.push_back(*p);
                         ++p;
                         ++column_;
-                        auto it = binary_operators_.find(buffer);
-                        if (it == binary_operators_.end())
+                        auto it = resources.binary_operators_.find(buffer);
+                        if (it == resources.binary_operators_.end())
                         {
                             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_));
                         }
@@ -1956,8 +1964,8 @@ public:
                     }
                     default:
                     {
-                        auto it = binary_operators_.find(buffer);
-                        if (it == binary_operators_.end())
+                        auto it = resources.binary_operators_.find(buffer);
+                        if (it == resources.binary_operators_.end())
                         {
                             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_));
                         }
