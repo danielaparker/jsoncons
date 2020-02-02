@@ -163,6 +163,12 @@ struct jsonpath_resources
     {
     }
 
+    const binary_operator_properties<Json>* get_binary_operator_properties(const string_type& id) const
+    {
+        auto it = binary_operators_.find(id);
+        return it == binary_operators_.end()  ? nullptr : &(it->second);
+    }
+
     template <typename... Args>
     Json* create_temp(Args&& ... args)
     {
@@ -1930,14 +1936,14 @@ public:
                         buffer.push_back(*p);
                         ++p;
                         ++column_;
-                        auto it = resources.binary_operators_.find(buffer);
-                        if (it == resources.binary_operators_.end())
+                        auto properties = resources.get_binary_operator_properties(buffer);
+                        if (properties == nullptr)
                         {
                             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_));
                         }
                         buffer.clear();
                         buffer_line = buffer_column = 1;
-                        push_token(token<Json>(&(it->second)));
+                        push_token(token<Json>(properties));
                         state = filter_state::expect_regex;
                         break;
                     }
@@ -1948,27 +1954,27 @@ public:
                         buffer.push_back(*p);
                         ++p;
                         ++column_;
-                        auto it = resources.binary_operators_.find(buffer);
-                        if (it == resources.binary_operators_.end())
+                        auto properties = resources.get_binary_operator_properties(buffer);
+                        if (properties == nullptr)
                         {
                             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_));
                         }
                         buffer.clear();
                         buffer_line = buffer_column = 1;
-                        push_token(token<Json>(&(it->second)));
+                        push_token(token<Json>(properties));
                         state = filter_state::expect_path_or_value_or_unary_op;
                         break;
                     }
                     default:
                     {
-                        auto it = resources.binary_operators_.find(buffer);
-                        if (it == resources.binary_operators_.end())
+                        auto properties = resources.get_binary_operator_properties(buffer);
+                        if (properties == nullptr)
                         {
                             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_));
                         }
                         buffer.clear();
                         buffer_line = buffer_column = 1;
-                        push_token(token<Json>(&(it->second)));
+                        push_token(token<Json>(properties));
                         state = filter_state::expect_path_or_value_or_unary_op;
                         break;
                     }
