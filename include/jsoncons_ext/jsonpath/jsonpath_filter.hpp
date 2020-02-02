@@ -515,7 +515,7 @@ private:
     union
     {
         const unary_operator_properties<Json>* unary_op_properties_;
-        binary_operator_properties<Json> binary_op_properties_;
+        const binary_operator_properties<Json>* binary_op_properties_;
         value_term<Json> value_term_;
         path_term<Json> path_term_;
         regex_term<Json> regex_term_;
@@ -552,7 +552,7 @@ public:
     {
     }
 
-    token(const binary_operator_properties<Json>& properties)
+    token(const binary_operator_properties<Json>* properties)
         : type_(token_type::binary_operator), 
           binary_op_properties_(properties)
     {
@@ -632,7 +632,7 @@ public:
                         unary_op_properties_ = other.unary_op_properties_;
                         break;
                     case token_type::binary_operator:
-                        binary_op_properties_ = std::move(other.binary_op_properties_);
+                        binary_op_properties_ = other.binary_op_properties_;
                         break;
                     default:
                         break;
@@ -669,7 +669,7 @@ public:
         switch(type_)
         {
             case token_type::binary_operator:
-                return binary_op_properties_.op(a,b);
+                return binary_op_properties_->op(a,b);
             default:
                 JSONCONS_UNREACHABLE();
                 break;
@@ -721,7 +721,7 @@ public:
             case token_type::unary_operator:
                 return unary_op_properties_->precedence_level;
             case token_type::binary_operator:
-                return binary_op_properties_.precedence_level;
+                return binary_op_properties_->precedence_level;
             default:
                 return 0;
         }
@@ -734,7 +734,7 @@ public:
             case token_type::unary_operator:
                 return unary_op_properties_->is_right_associative;
             case token_type::binary_operator:
-                return binary_op_properties_.is_right_associative;
+                return binary_op_properties_->is_right_associative;
             default:
                 return false;
         }
@@ -793,7 +793,7 @@ private:
             this->unary_op_properties_ = other.unary_op_properties_;
             break;
         case token_type::binary_operator:
-            ::new(static_cast<void*>(&this->binary_op_properties_))binary_operator_properties<Json>(other.binary_op_properties_);
+            this->binary_op_properties_ = other.binary_op_properties_;
             break;
         default:
             break;
@@ -818,7 +818,7 @@ private:
             this->unary_op_properties_ = other.unary_op_properties_;
             break;
         case token_type::binary_operator:
-            ::new(static_cast<void*>(&this->binary_op_properties_))binary_operator_properties<Json>(std::move(other.binary_op_properties_));
+            this->binary_op_properties_ = other.binary_op_properties_;
             break;
         default:
             break;
@@ -837,9 +837,6 @@ private:
                 break;
             case token_type::regex:
                 regex_term_.~regex_term();
-                break;
-            case token_type::binary_operator:
-                binary_op_properties_.~binary_operator_properties();
                 break;
             default:
                 break;
@@ -1940,7 +1937,7 @@ public:
                         }
                         buffer.clear();
                         buffer_line = buffer_column = 1;
-                        push_token(token<Json>(it->second));
+                        push_token(token<Json>(&(it->second)));
                         state = filter_state::expect_regex;
                         break;
                     }
@@ -1958,7 +1955,7 @@ public:
                         }
                         buffer.clear();
                         buffer_line = buffer_column = 1;
-                        push_token(token<Json>(it->second));
+                        push_token(token<Json>(&(it->second)));
                         state = filter_state::expect_path_or_value_or_unary_op;
                         break;
                     }
@@ -1971,7 +1968,7 @@ public:
                         }
                         buffer.clear();
                         buffer_line = buffer_column = 1;
-                        push_token(token<Json>(it->second));
+                        push_token(token<Json>(&(it->second)));
                         state = filter_state::expect_path_or_value_or_unary_op;
                         break;
                     }
