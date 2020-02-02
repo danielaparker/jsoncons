@@ -824,38 +824,6 @@ struct jsonpath_resources
     typedef typename Json::char_type char_type;
     typedef std::basic_string<char_type> string_type;
 
-    class binary_operator_table
-    {
-        typedef std::map<string_type,binary_operator_properties<Json>> binary_operator_map;
-
-        const binary_operator_map operators =
-        {
-            {eqtilde_literal<char_type>(),{2,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_regex<Json>(),a,b); }}},
-            {star_literal<char_type>(),{3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_mult<Json>(),a,b); }}},
-            {forwardslash_literal<char_type>(),{3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_div<Json>(),a,b); }}},
-            {plus_literal<char_type>(),{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_plus<Json>(),a,b); }}},
-            {minus_literal<char_type>(),{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_minus<Json>(),a,b); }}},
-            {lt_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lt<Json>(),a,b); }}},
-            {lte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lte<Json>(),a,b); }}},
-            {gt_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lt<Json>(),b,a); }}},
-            {gte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lte<Json>(),b,a); }}},
-            {eq_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_eq<Json>(),a,b); }}},
-            {ne_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_ne<Json>(),a,b); }}},
-            {ampamp_literal<char_type>(),{7,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_ampamp<Json>(),a,b); }}},
-            {pipepipe_literal<char_type>(),{8,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_pipepipe<Json>(),a,b); }}}
-        };
-
-    public:
-        typename binary_operator_map::const_iterator find(const string_type& key) const
-        {
-            return operators.find(key);
-        }
-        typename binary_operator_map::const_iterator end() const
-        {
-            return operators.end();
-        }
-    };
-
     std::vector<std::unique_ptr<Json>> temp_json_values_;
 
     unary_operator_properties<Json> not_properties;
@@ -867,16 +835,13 @@ struct jsonpath_resources
     binary_operator_properties<Json> div_properties;
     binary_operator_properties<Json> plus_properties;
     binary_operator_properties<Json> minus_properties;
-
-    binary_operator_table binary_operators_;
-
-    //{eqtilde_literal<char_type>(),{2,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_regex<Json>(),a,b); }}},
-    //{lte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lte<Json>(),a,b); }}},
-    //{gte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lte<Json>(),b,a); }}},
-    //{eq_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_eq<Json>(),a,b); }}},
-    //{ne_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_ne<Json>(),a,b); }}},
-    //{ampamp_literal<char_type>(),{7,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_ampamp<Json>(),a,b); }}},
-    //{pipepipe_literal<char_type>(),{8,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_pipepipe<Json>(),a,b); }}}
+    binary_operator_properties<Json> lte_properties;
+    binary_operator_properties<Json> gte_properties;
+    binary_operator_properties<Json> ne_properties;
+    binary_operator_properties<Json> eq_properties;
+    binary_operator_properties<Json> eqtilde_properties;
+    binary_operator_properties<Json> ampamp_properties;
+    binary_operator_properties<Json> pipepipe_properties;
 
     jsonpath_resources()
         : not_properties{ 1,true, unary_not_op },
@@ -886,15 +851,16 @@ struct jsonpath_resources
           mult_properties{3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_mult<Json>(),a,b); }},
           div_properties{3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_div<Json>(),a,b); }},
           plus_properties{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_plus<Json>(),a,b); }},
-          minus_properties{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_minus<Json>(),a,b); }}
+          minus_properties{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_minus<Json>(),a,b); }},
+          lte_properties{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lte<Json>(),a,b); }},
+          gte_properties{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lte<Json>(),b,a); }},
+          ne_properties{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_ne<Json>(),a,b); }},
+          eq_properties{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_eq<Json>(),a,b); }},
+          eqtilde_properties{2,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_regex<Json>(),a,b); }},
+          ampamp_properties{7,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_ampamp<Json>(),a,b); }},
+          pipepipe_properties{8,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_pipepipe<Json>(),a,b); }}
     {
     }
-
-    //const binary_operator_properties<Json>* get_binary_operator_properties(const string_type& id) const
-    //{
-    //    auto it = binary_operators_.find(id);
-    //    return it == binary_operators_.end()  ? nullptr : &(it->second);
-    //}
 
     const binary_operator_properties<Json>* get_binary_operator_properties(const string_type& id) const
     {
@@ -929,15 +895,25 @@ struct jsonpath_resources
                 switch (c1)
                 {
                     case '<':
+                        return c2 == '=' ? &lte_properties : nullptr;
                     case '>':
+                        return c2 == '=' ? &gte_properties : nullptr;
                     case '!':
+                        return c2 == '=' ? &ne_properties : nullptr;
                     case '=':
+                        switch(c2)
+                        {
+                            case '=':
+                                return &eq_properties;
+                            case '~':
+                                return &eqtilde_properties;
+                            default:
+                                return nullptr;
+                        }
                     case '&':
+                        return c2 == '&' ? &ampamp_properties : nullptr;
                     case '|':
-                    {
-                        auto it = binary_operators_.find(id);
-                        return it == binary_operators_.end() ? nullptr : &(it->second);
-                    }
+                        return c2 == '|' ? &pipepipe_properties : nullptr;
                     default:
                         return nullptr;
                 }
