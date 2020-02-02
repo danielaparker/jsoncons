@@ -858,21 +858,94 @@ struct jsonpath_resources
 
     std::vector<std::unique_ptr<Json>> temp_json_values_;
 
-    unary_operator_properties<Json> unary_not_properties;
+    unary_operator_properties<Json> not_properties;
     unary_operator_properties<Json> unary_minus_properties;
+
+    binary_operator_properties<Json> lt_properties;
+    binary_operator_properties<Json> gt_properties;
+    binary_operator_properties<Json> mult_properties;
+    binary_operator_properties<Json> div_properties;
+    binary_operator_properties<Json> plus_properties;
+    binary_operator_properties<Json> minus_properties;
 
     binary_operator_table binary_operators_;
 
+    //{eqtilde_literal<char_type>(),{2,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_regex<Json>(),a,b); }}},
+    //{lte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lte<Json>(),a,b); }}},
+    //{gte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lte<Json>(),b,a); }}},
+    //{eq_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_eq<Json>(),a,b); }}},
+    //{ne_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_ne<Json>(),a,b); }}},
+    //{ampamp_literal<char_type>(),{7,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_ampamp<Json>(),a,b); }}},
+    //{pipepipe_literal<char_type>(),{8,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_pipepipe<Json>(),a,b); }}}
+
     jsonpath_resources()
-        : unary_not_properties{ 1,true, unary_not_op },
-          unary_minus_properties{ 1,true, unary_minus_op }
+        : not_properties{ 1,true, unary_not_op },
+          unary_minus_properties{ 1,true, unary_minus_op },
+          lt_properties{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lt<Json>(),a,b); }},
+          gt_properties{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lt<Json>(),b,a); }},
+          mult_properties{3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_mult<Json>(),a,b); }},
+          div_properties{3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_div<Json>(),a,b); }},
+          plus_properties{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_plus<Json>(),a,b); }},
+          minus_properties{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_minus<Json>(),a,b); }}
     {
     }
 
+    //const binary_operator_properties<Json>* get_binary_operator_properties(const string_type& id) const
+    //{
+    //    auto it = binary_operators_.find(id);
+    //    return it == binary_operators_.end()  ? nullptr : &(it->second);
+    //}
+
     const binary_operator_properties<Json>* get_binary_operator_properties(const string_type& id) const
     {
-        auto it = binary_operators_.find(id);
-        return it == binary_operators_.end()  ? nullptr : &(it->second);
+        switch(id.size())
+        {
+            case 1:
+            {
+                char_type c1 = id[0];
+                switch (c1)
+                {
+                    case '<':
+                        return &lt_properties;
+                    case '>':
+                        return &gt_properties;
+                    case '+':
+                        return &plus_properties;
+                    case '-':
+                        return &minus_properties;
+                    case '*':
+                        return &mult_properties;
+                    case '/':
+                        return &div_properties;
+                    default:
+                        return nullptr;
+                }
+                break;
+            }
+            case 2:
+            {
+                char_type c1 = id[0];
+                char_type c2 = id[1];
+                switch (c1)
+                {
+                    case '<':
+                    case '>':
+                    case '!':
+                    case '=':
+                    case '&':
+                    case '|':
+                    {
+                        auto it = binary_operators_.find(id);
+                        return it == binary_operators_.end() ? nullptr : &(it->second);
+                    }
+                    default:
+                        return nullptr;
+                }
+                break;
+            }
+            default:
+                return nullptr;
+        }
     }
 
     template <typename... Args>
@@ -2173,7 +2246,7 @@ public:
                         break;
                     case '!':
                     {
-                        push_token(token<Json>(&(resources.unary_not_properties)));
+                        push_token(token<Json>(&(resources.not_properties)));
                         ++p;
                         ++column_;
                         break;
