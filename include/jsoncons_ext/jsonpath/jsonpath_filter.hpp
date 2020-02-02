@@ -21,6 +21,45 @@
 
 namespace jsoncons { namespace jsonpath { namespace detail {
 
+template <class Json>
+class term;
+
+template <class Json>
+struct unary_operator_properties
+{
+    typedef std::function<Json(const term<Json>&)> operator_type;
+
+    std::size_t precedence_level;
+    bool is_right_associative;
+    operator_type op;
+};
+
+template <class Json>
+struct binary_operator_properties
+{
+    typedef std::function<Json(const term<Json>&, const term<Json>&)> operator_type;
+
+    std::size_t precedence_level;
+    bool is_right_associative;
+    operator_type op;
+};
+
+template <class Json>
+struct jsonpath_resources
+{
+    std::vector<std::unique_ptr<Json>> temp_json_values_;
+
+    template <typename... Args>
+    Json* create_temp(Args&& ... args)
+    {
+        auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
+        Json* ptr = temp.get();
+        temp_json_values_.emplace_back(std::move(temp));
+        return ptr;
+    }
+
+};
+
 JSONCONS_STRING_LITERAL(eqtilde,'=','~')
 JSONCONS_STRING_LITERAL(star,'*')
 JSONCONS_STRING_LITERAL(forwardslash,'/')
@@ -183,7 +222,7 @@ public:
     term& operator=(const term&) = default;
     term& operator=(term&&) = default;
 
-    virtual void initialize(const Json&) = 0;
+    virtual void initialize(jsonpath_resources<Json>& resources, const Json&) = 0;
 
     virtual term_type type() const = 0;
 
@@ -227,7 +266,7 @@ public:
     value_term& operator=(const value_term&) = default;
     value_term& operator=(value_term&&) = default;
 
-    void initialize(const Json&) override
+    void initialize(jsonpath_resources<Json>&, const Json&) override
     {
     }
 
@@ -277,7 +316,7 @@ public:
     regex_term& operator=(const regex_term&) = default;
     regex_term& operator=(regex_term&&) = default;
 
-    void initialize(const Json&) override
+    void initialize(jsonpath_resources<Json>&, const Json&) override
     {
     }
 
@@ -310,10 +349,10 @@ public:
     path_term& operator=(const path_term&) = default;
     path_term& operator=(path_term&&) = default;
 
-    void initialize(const Json& current_node) override
+    void initialize(jsonpath_resources<Json>& resources, const Json& current_node) override
     {
         jsonpath_evaluator<Json,const Json&,VoidPathConstructor<Json>> evaluator(line_,column_);
-        evaluator.evaluate(current_node, path_);
+        evaluator.evaluate(resources, current_node, path_);
         nodes_ = evaluator.get_values();
     }
 
@@ -344,26 +383,6 @@ public:
     {
         return nodes_.size() == 1 ? jsoncons::jsonpath::detail::unary_minus(nodes_[0]) : Json::null();
     }
-};
-
-template <class Json>
-struct unary_operator_properties
-{
-    typedef std::function<Json(const term<Json>&)> operator_type;
-
-    std::size_t precedence_level;
-    bool is_right_associative;
-    operator_type op;
-};
-
-template <class Json>
-struct binary_operator_properties
-{
-    typedef std::function<Json(const term<Json>&, const term<Json>&)> operator_type;
-
-    std::size_t precedence_level;
-    bool is_right_associative;
-    operator_type op;
 };
 
 template <class Json>
@@ -615,18 +634,18 @@ public:
         }
     }
 
-    void initialize(const Json& current_node)
+    void initialize(jsonpath_resources<Json>& resources, const Json& current_node)
     {
         switch(type_)
         {
             case token_type::value:
-                value_term_.initialize(current_node);
+                value_term_.initialize(resources, current_node);
                 break;
             case token_type::path:
-                path_term_.initialize(current_node);
+                path_term_.initialize(resources, current_node);
                 break;
             case token_type::regex:
-                regex_term_.initialize(current_node);
+                regex_term_.initialize(resources, current_node);
                 break;
             default:
                 break;
@@ -1464,11 +1483,11 @@ Json visit(Visitor vis, const term<Json>& v, const term<Json>& w)
 }
 
 template <class Json>
-token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
+token<Json> evaluate(jsonpath_resources<Json>& resources, const Json& context, std::vector<token<Json>>& tokens)
 {
     for (auto it = tokens.begin(); it != tokens.end(); ++it)
     {
-        it->initialize(context);
+        it->initialize(resources, context);
     }
     std::vector<token<Json>> stack;
     stack.reserve(tokens.size());
@@ -1516,15 +1535,15 @@ public:
     {
     }
 
-    Json eval(const Json& current_node)
+    Json eval(jsonpath_resources<Json>& resources, const Json& current_node)
     {
-        auto t = evaluate(current_node, tokens_);
+        auto t = evaluate(resources, current_node, tokens_);
         return t.operand().get_single_node();
     }
 
-    bool exists(const Json& current_node)
+    bool exists(jsonpath_resources<Json>& resources, const Json& current_node)
     {
-        auto t = evaluate(current_node,tokens_);
+        auto t = evaluate(resources, current_node,tokens_);
         return t.operand().accept_single_node();
     }
 };
@@ -1676,7 +1695,7 @@ public:
         }
     }
 
-    jsonpath_filter_expr<Json> parse(const Json& root, const char_type* p, const char_type* end_expr, const char_type** end_ptr)
+    jsonpath_filter_expr<Json> parse(jsonpath_resources<Json>& resources, const Json& root, const char_type* p, const char_type* end_expr, const char_type** end_ptr)
     {
         output_stack_.clear();
         operator_stack_.clear();
@@ -2288,7 +2307,7 @@ public:
                                 if (path_mode_stack_[0] == filter_path_mode::root_path)
                                 {
                                     jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator(buffer_line,buffer_column);
-                                    evaluator.evaluate(root, buffer);
+                                    evaluator.evaluate(resources, root, buffer);
                                     auto result = evaluator.get_values();
                                     if (result.size() > 0)
                                     {
@@ -2319,7 +2338,7 @@ public:
                             if (path_mode_stack_[0] == filter_path_mode::root_path)
                             {
                                 jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator(buffer_line,buffer_column);
-                                evaluator.evaluate(root, buffer);
+                                evaluator.evaluate(resources, root, buffer);
                                 auto result = evaluator.get_values();
                                 if (result.size() > 0)
                                 {
