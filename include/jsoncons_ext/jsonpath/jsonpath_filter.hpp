@@ -49,6 +49,15 @@ struct jsonpath_resources
 {
     std::vector<std::unique_ptr<Json>> temp_json_values_;
 
+    unary_operator_properties<Json> unary_not_properties;
+    unary_operator_properties<Json> unary_minus_properties;
+
+    jsonpath_resources()
+        : unary_not_properties{ 1,true, unary_not_op },
+          unary_minus_properties{ 1,true, unary_minus_op }
+    {
+    }
+
     template <typename... Args>
     Json* create_temp(Args&& ... args)
     {
@@ -57,7 +66,16 @@ struct jsonpath_resources
         temp_json_values_.emplace_back(std::move(temp));
         return ptr;
     }
+private:
+    static Json unary_not_op(const term<Json>& a)
+    {
+        return a.unary_not();
+    }
 
+    static Json unary_minus_op(const term<Json>& a)
+    {
+        return a.unary_minus();
+    }
 };
 
 JSONCONS_STRING_LITERAL(eqtilde,'=','~')
@@ -393,7 +411,7 @@ private:
 
     union
     {
-        unary_operator_properties<Json> unary_op_properties_;
+        const unary_operator_properties<Json>* unary_op_properties_;
         binary_operator_properties<Json> binary_op_properties_;
         value_term<Json> value_term_;
         path_term<Json> path_term_;
@@ -425,7 +443,7 @@ public:
     {
     }
 
-    token(const unary_operator_properties<Json>& properties)
+    token(const unary_operator_properties<Json>* properties)
         : type_(token_type::unary_operator), 
           unary_op_properties_(properties)
     {
@@ -508,7 +526,7 @@ public:
                         regex_term_ = std::move(other.regex_term_);
                         break;
                     case token_type::unary_operator:
-                        unary_op_properties_ = std::move(other.unary_op_properties_);
+                        unary_op_properties_ = other.unary_op_properties_;
                         break;
                     case token_type::binary_operator:
                         binary_op_properties_ = std::move(other.binary_op_properties_);
@@ -536,7 +554,7 @@ public:
         switch(type_)
         {
             case token_type::unary_operator:
-                return unary_op_properties_.op(a);
+                return unary_op_properties_->op(a);
             default:
                 JSONCONS_UNREACHABLE();
                 break;
@@ -598,7 +616,7 @@ public:
         switch(type_)
         {
             case token_type::unary_operator:
-                return unary_op_properties_.precedence_level;
+                return unary_op_properties_->precedence_level;
             case token_type::binary_operator:
                 return binary_op_properties_.precedence_level;
             default:
@@ -611,7 +629,7 @@ public:
         switch(type_)
         {
             case token_type::unary_operator:
-                return unary_op_properties_.is_right_associative;
+                return unary_op_properties_->is_right_associative;
             case token_type::binary_operator:
                 return binary_op_properties_.is_right_associative;
             default:
@@ -669,7 +687,7 @@ private:
             ::new(static_cast<void*>(&this->regex_term_))regex_term<Json>(other.regex_term_);
             break;
         case token_type::unary_operator:
-            ::new(static_cast<void*>(&this->unary_op_properties_))unary_operator_properties<Json>(other.unary_op_properties_);
+            this->unary_op_properties_ = other.unary_op_properties_;
             break;
         case token_type::binary_operator:
             ::new(static_cast<void*>(&this->binary_op_properties_))binary_operator_properties<Json>(other.binary_op_properties_);
@@ -694,7 +712,7 @@ private:
             ::new(static_cast<void*>(&this->regex_term_))regex_term<Json>(std::move(other.regex_term_));
             break;
         case token_type::unary_operator:
-            ::new(static_cast<void*>(&this->unary_op_properties_))unary_operator_properties<Json>(std::move(other.unary_op_properties_));
+            this->unary_op_properties_ = other.unary_op_properties_;
             break;
         case token_type::binary_operator:
             ::new(static_cast<void*>(&this->binary_op_properties_))binary_operator_properties<Json>(std::move(other.binary_op_properties_));
@@ -716,9 +734,6 @@ private:
                 break;
             case token_type::regex:
                 regex_term_.~regex_term();
-                break;
-            case token_type::unary_operator:
-                unary_op_properties_.~unary_operator_properties();
                 break;
             case token_type::binary_operator:
                 binary_op_properties_.~binary_operator_properties();
@@ -1592,8 +1607,6 @@ class jsonpath_filter_parser
         }
     };
 
-    unary_operator_properties<Json> unary_not_properties_;
-    unary_operator_properties<Json> unary_minus_properties_;
     binary_operator_table binary_operators_;
 
     std::size_t line_;
@@ -1605,9 +1618,7 @@ public:
     {
     }
     jsonpath_filter_parser(std::size_t line, std::size_t column)
-        : unary_not_properties_{ 1,true, unary_not_op },
-          unary_minus_properties_{ 1,true, unary_minus_op },
-          line_(line), column_(column)
+        : line_(line), column_(column)
     {
     }
 
@@ -2151,14 +2162,14 @@ public:
                         break;
                     case '!':
                     {
-                        push_token(token<Json>(unary_not_properties_));
+                        push_token(token<Json>(&(resources.unary_not_properties)));
                         ++p;
                         ++column_;
                         break;
                     }
                     case '-':
                     {
-                        push_token(token<Json>(unary_minus_properties_));
+                        push_token(token<Json>(&(resources.unary_minus_properties)));
                         ++p;
                         ++column_;
                         break;
