@@ -1666,8 +1666,6 @@ class jsonpath_filter_parser
 
     std::vector<token<Json>> output_stack_;
     std::vector<token<Json>> operator_stack_;
-    std::vector<filter_state> state_stack_;
-    std::vector<filter_path_mode> path_mode_stack_;
 
     std::size_t line_;
     std::size_t column_;
@@ -1690,19 +1688,6 @@ public:
     std::size_t column() const
     {
         return column_;
-    }
-
-    void push_state(filter_state state)
-    {
-        state_stack_.push_back(state);
-    }
-
-    filter_state pop_state()
-    {
-        JSONCONS_ASSERT(!state_stack_.empty())
-        filter_state state = state_stack_.back();
-        state_stack_.pop_back();
-        return state;
     }
 
     void push_token(token<Json>&& token)
@@ -1766,11 +1751,16 @@ public:
         }
     }
 
-    jsonpath_filter_expr<Json> parse(jsonpath_resources<Json>& resources, const Json& root, const char_type* p, const char_type* end_expr, const char_type** end_ptr)
+    jsonpath_filter_expr<Json> parse(jsonpath_resources<Json>& resources, 
+                                     const Json& root, 
+                                     const char_type* p, 
+                                     const char_type* end_expr, 
+                                     const char_type** end_ptr)
     {
         output_stack_.clear();
         operator_stack_.clear();
-        state_stack_.clear();
+        std::vector<filter_state> state_stack;
+        std::vector<filter_path_mode> path_mode_stack;
 
         string_type buffer;
         std::size_t buffer_line = 1;
@@ -1835,12 +1825,12 @@ public:
                             break;
                         case '$':
                             buffer.push_back(*p);
-                            path_mode_stack_.back() = filter_path_mode::root_path;
+                            path_mode_stack.back() = filter_path_mode::root_path;
                             state = filter_state::path_argument;
                             break;
                         case '@':
                             buffer.push_back('$');
-                            path_mode_stack_.back() = filter_path_mode::current_path;
+                            path_mode_stack.back() = filter_path_mode::current_path;
                             state = filter_state::path_argument;
                             break;
                         // Maybe error from here down
@@ -2053,7 +2043,7 @@ public:
                         case '(':
                         {
                             buffer.push_back(*p);
-                            path_mode_stack_.push_back(filter_path_mode::path);
+                            path_mode_stack.push_back(filter_path_mode::path);
                             state = filter_state::expect_arg;
                             ++p;
                             ++column_;
@@ -2373,9 +2363,9 @@ public:
                     case '*':
                     case '/':
                         {
-                            if (!path_mode_stack_.empty())
+                            if (!path_mode_stack.empty())
                             {
-                                if (path_mode_stack_[0] == filter_path_mode::root_path)
+                                if (path_mode_stack[0] == filter_path_mode::root_path)
                                 {
                                     jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator(buffer_line,buffer_column);
                                     evaluator.evaluate(resources, root, buffer);
@@ -2389,7 +2379,7 @@ public:
                                 {
                                     push_token(token<Json>(path_term<Json>(buffer, buffer_line, buffer_column)));
                                 }
-                                path_mode_stack_.pop_back();
+                                path_mode_stack.pop_back();
                             }
                             else
                             {
@@ -2404,9 +2394,9 @@ public:
                         }
                         break;
                     case ')':
-                        if (!path_mode_stack_.empty())
+                        if (!path_mode_stack.empty())
                         {
-                            if (path_mode_stack_[0] == filter_path_mode::root_path)
+                            if (path_mode_stack[0] == filter_path_mode::root_path)
                             {
                                 jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator(buffer_line,buffer_column);
                                 evaluator.evaluate(resources, root, buffer);
@@ -2421,7 +2411,7 @@ public:
                             {
                                 push_token(token<Json>(path_term<Json>(buffer, buffer_line, buffer_column)));
                             }
-                            path_mode_stack_.pop_back();
+                            path_mode_stack.pop_back();
                         }
                         else
                         {
