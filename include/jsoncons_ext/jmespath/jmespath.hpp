@@ -73,13 +73,6 @@ struct slice
     }
 };
 
-// work around for std::make_unique not being available until C++14
-template<typename T, typename... Args>
-std::unique_ptr<T> make_unique_ptr(Args&&... args)
-{
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
 namespace detail {
 template <class Json,
     class JsonReference>
@@ -157,7 +150,7 @@ public:
         template <typename... Args>
         Json* create_new(Args&& ... args)
         {
-            auto temp = make_unique_ptr<Json>(std::forward<Args>(args)...);
+            auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
             Json* ptr = temp.get();
             temp_storage_.emplace_back(std::move(temp));
             return ptr;
@@ -1220,10 +1213,10 @@ public:
           begin_input_(nullptr), end_input_(nullptr),
           p_(nullptr)
     {
-        key_selector_stack_.emplace_back(make_unique_ptr<expression_selector>());
+        key_selector_stack_.emplace_back(jsoncons::make_unique<expression_selector>());
 
         offset_stack_.push_back(output_stack_.size());
-        output_stack_.emplace_back(make_unique_ptr<expression_selector>());
+        output_stack_.emplace_back(jsoncons::make_unique<expression_selector>());
     }
 
     std::size_t line() const
@@ -1316,9 +1309,9 @@ public:
                             ++column_;
                             break;
                         case '*':
-                            key_selector_stack_.back() = key_selector(make_unique_ptr<object_projection_selector>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<object_projection_selector>(std::move(key_selector_stack_.back().selector)));
                             offset_stack_.push_back(output_stack_.size());
-                            output_stack_.emplace_back(make_unique_ptr<object_projection>());
+                            output_stack_.emplace_back(jsoncons::make_unique<object_projection>());
                             state_stack_.emplace_back(path_state::expect_dot);
                             ++p_;
                             ++column_;
@@ -1347,8 +1340,8 @@ public:
                     state_stack_.pop_back(); 
                     break;
                 case path_state::val_expr:
-                    key_selector_stack_.back().selector->add_selector(make_unique_ptr<identifier_selector>(buffer));
-                    output_stack_.emplace_back(key_selector(make_unique_ptr<identifier_selector>(buffer)));
+                    key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<identifier_selector>(buffer));
+                    output_stack_.emplace_back(key_selector(jsoncons::make_unique<identifier_selector>(buffer)));
                     buffer.clear();
                     state_stack_.pop_back(); 
                     break;
@@ -1364,9 +1357,9 @@ public:
                                 ec = jmespath_errc::function_name_not_found;
                                 return Json::null();
                             }
-                            key_selector_stack_.back() = key_selector(make_unique_ptr<function_selector>(it->second));
+                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<function_selector>(it->second));
                             structure_offset_stack_.push_back(key_selector_stack_.size());
-                            key_selector_stack_.emplace_back(make_unique_ptr<expression_selector>());
+                            key_selector_stack_.emplace_back(jsoncons::make_unique<expression_selector>());
                             state_stack_.back() = path_state::arg_or_right_paren;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
@@ -1375,8 +1368,8 @@ public:
                         }
                         default:
                         {
-                            key_selector_stack_.back().selector->add_selector(make_unique_ptr<identifier_selector>(buffer));
-                            output_stack_.emplace_back(key_selector(make_unique_ptr<identifier_selector>(buffer)));
+                            key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<identifier_selector>(buffer));
+                            output_stack_.emplace_back(key_selector(jsoncons::make_unique<identifier_selector>(buffer)));
                             buffer.clear();
                             state_stack_.pop_back(); 
                             break;
@@ -1391,7 +1384,7 @@ public:
                             advance_past_space_character();
                             break;
                         case ',':
-                            key_selector_stack_.emplace_back(key_selector(make_unique_ptr<expression_selector>()));
+                            key_selector_stack_.emplace_back(key_selector(jsoncons::make_unique<expression_selector>()));
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
                             ++column_;
@@ -1478,7 +1471,7 @@ public:
                     {
                         case '\'':
                         {
-                            key_selector_stack_.back().selector->add_selector(make_unique_ptr<json_value_selector>(Json(buffer)));
+                            key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<json_value_selector>(Json(buffer)));
                             buffer.clear();
                             state_stack_.pop_back(); // raw_string
                             ++p_;
@@ -1502,7 +1495,7 @@ public:
                         case '`':
                         {
                             auto j = Json::parse(buffer);
-                            key_selector_stack_.back().selector->add_selector(make_unique_ptr<json_value_selector>(std::move(j)));
+                            key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<json_value_selector>(std::move(j)));
                             buffer.clear();
                             state_stack_.pop_back(); // json_value
                             ++p_;
@@ -1560,7 +1553,7 @@ public:
                         {
                             ++p_;
                             ++column_;
-                            key_selector_stack_.back() = key_selector(make_unique_ptr<pipe_selector>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<pipe_selector>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.emplace_back(path_state::expression);
                             break;
                         }
@@ -1580,21 +1573,21 @@ public:
                         case '*':
                             state_stack_.back() = path_state::bracket_specifier4;
                             offset_stack_.push_back(output_stack_.size());
-                            output_stack_.emplace_back(make_unique_ptr<list_projection>());
+                            output_stack_.emplace_back(jsoncons::make_unique<list_projection>());
                             ++p_;
                             ++column_;
                             break;
                         case ']':
-                            key_selector_stack_.back() = key_selector(make_unique_ptr<flatten_selector>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<flatten_selector>(std::move(key_selector_stack_.back().selector)));
                             offset_stack_.push_back(output_stack_.size());
-                            output_stack_.emplace_back(make_unique_ptr<flatten_projection>());
+                            output_stack_.emplace_back(jsoncons::make_unique<flatten_projection>());
                             state_stack_.pop_back(); // bracket_specifier
                             ++p_;
                             ++column_;
                             break;
                         case '?':
                             structure_offset_stack_.push_back(key_selector_stack_.size());
-                            key_selector_stack_.emplace_back(make_unique_ptr<expression_selector>());
+                            key_selector_stack_.emplace_back(jsoncons::make_unique<expression_selector>());
                             state_stack_.back() = path_state::comparator;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
@@ -1611,9 +1604,9 @@ public:
                             state_stack_.emplace_back(path_state::number);
                             break;
                         default:
-                            key_selector_stack_.back() = key_selector(make_unique_ptr<list_projection_selector>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<list_projection_selector>(std::move(key_selector_stack_.back().selector)));
                             structure_offset_stack_.push_back(key_selector_stack_.size());
-                            key_selector_stack_.emplace_back(make_unique_ptr<expression_selector>());
+                            key_selector_stack_.emplace_back(jsoncons::make_unique<expression_selector>());
                             state_stack_.back() = path_state::expect_right_bracket4;
                             state_stack_.emplace_back(path_state::expression);
                             break;
@@ -1630,10 +1623,10 @@ public:
                         case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                             break;
                         default:
-                            key_selector_stack_.back() = key_selector(make_unique_ptr<list_projection_selector>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<list_projection_selector>(std::move(key_selector_stack_.back().selector)));
 
                             structure_offset_stack_.push_back(key_selector_stack_.size());
-                            key_selector_stack_.emplace_back(make_unique_ptr<expression_selector>());
+                            key_selector_stack_.emplace_back(jsoncons::make_unique<expression_selector>());
                             state_stack_.back() = path_state::key_val_expr;
                             break;
                     }
@@ -1646,7 +1639,7 @@ public:
                         {
                             if (buffer.empty())
                             {
-                                key_selector_stack_.back() = key_selector(make_unique_ptr<flatten_selector>(std::move(key_selector_stack_.back().selector)));
+                                key_selector_stack_.back() = key_selector(jsoncons::make_unique<flatten_selector>(std::move(key_selector_stack_.back().selector)));
                             }
                             else
                             {
@@ -1656,8 +1649,8 @@ public:
                                     ec = jmespath_errc::invalid_number;
                                     return Json::null();
                                 }
-                                key_selector_stack_.back().selector->add_selector(make_unique_ptr<index_selector>(r.value()));
-                                output_stack_.emplace_back(key_selector(make_unique_ptr<index_selector>(r.value())));
+                                key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<index_selector>(r.value()));
+                                output_stack_.emplace_back(key_selector(jsoncons::make_unique<index_selector>(r.value())));
                                 buffer.clear();
                             }
                             state_stack_.pop_back(); // bracket_specifier
@@ -1705,9 +1698,9 @@ public:
                     switch(*p_)
                     {
                         case ']':
-                            key_selector_stack_.back() = key_selector(make_unique_ptr<slice_selector>(std::move(key_selector_stack_.back().selector), a_slice));
+                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<slice_selector>(std::move(key_selector_stack_.back().selector), a_slice));
                             offset_stack_.push_back(output_stack_.size());
-                            output_stack_.emplace_back(make_unique_ptr<slice_projection>(a_slice));
+                            output_stack_.emplace_back(jsoncons::make_unique<slice_projection>(a_slice));
                             a_slice = slice();
                             state_stack_.pop_back(); // bracket_specifier2
                             ++p_;
@@ -1741,9 +1734,9 @@ public:
                     switch(*p_)
                     {
                         case ']':
-                            key_selector_stack_.back() = key_selector(make_unique_ptr<slice_selector>(std::move(key_selector_stack_.back().selector), a_slice));
+                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<slice_selector>(std::move(key_selector_stack_.back().selector), a_slice));
                             offset_stack_.push_back(output_stack_.size());
-                            output_stack_.emplace_back(make_unique_ptr<slice_projection>(a_slice));
+                            output_stack_.emplace_back(jsoncons::make_unique<slice_projection>(a_slice));
                             buffer.clear();
                             a_slice = slice();
                             state_stack_.pop_back(); // bracket_specifier3
@@ -1865,14 +1858,14 @@ public:
                     switch(*p_)
                     {
                         case '=':
-                            key_selector_stack_.back() = key_selector(make_unique_ptr<filter_selector<cmp_lte>>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<filter_selector<cmp_lte>>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expect_right_bracket;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
                             ++column_;
                             break;
                         default:
-                            key_selector_stack_.back() = key_selector(make_unique_ptr<filter_selector<cmp_lt>>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<filter_selector<cmp_lt>>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expect_right_bracket;
                             state_stack_.emplace_back(path_state::expression);
                             break;
@@ -1884,7 +1877,7 @@ public:
                     switch(*p_)
                     {
                         case '=':
-                            key_selector_stack_.back() = key_selector(make_unique_ptr<filter_selector<cmp_eq>>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<filter_selector<cmp_eq>>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expect_right_bracket;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
@@ -1901,14 +1894,14 @@ public:
                     switch(*p_)
                     {
                         case '=':
-                            key_selector_stack_.back() = key_selector(make_unique_ptr<filter_selector<cmp_gte>>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<filter_selector<cmp_gte>>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expect_right_bracket;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
                             ++column_;
                             break;
                         default:
-                            key_selector_stack_.back() = key_selector(make_unique_ptr<filter_selector<cmp_gt>>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<filter_selector<cmp_gt>>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expect_right_bracket;
                             state_stack_.emplace_back(path_state::expression);
                             break;
@@ -1920,7 +1913,7 @@ public:
                     switch(*p_)
                     {
                         case '=':
-                            key_selector_stack_.back() = key_selector(make_unique_ptr<filter_selector<cmp_ne>>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<filter_selector<cmp_ne>>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expect_right_bracket;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
@@ -1969,7 +1962,7 @@ public:
                             }
                             key_selector_stack_.erase(key_selector_stack_.begin()+pos, key_selector_stack_.end());
 
-                            auto q = make_unique_ptr<expression_selector>();
+                            auto q = jsoncons::make_unique<expression_selector>();
                             q->add_selector(std::move(key_selector_stack_.back().selector));
                             q->add_selector(std::move(p.selector));
                             key_selector_stack_.back() = key_selector(std::move(q)); 
@@ -1991,7 +1984,7 @@ public:
                             advance_past_space_character();
                             break;
                         case ',':
-                            key_selector_stack_.emplace_back(key_selector(make_unique_ptr<expression_selector>()));
+                            key_selector_stack_.emplace_back(key_selector(jsoncons::make_unique<expression_selector>()));
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
                             ++column_;
@@ -2008,7 +2001,7 @@ public:
                         {
                             ++p_;
                             ++column_;
-                            key_selector_stack_.back() = key_selector(make_unique_ptr<pipe_selector>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<pipe_selector>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.emplace_back(path_state::expression);
                             break;
                         }
@@ -2026,7 +2019,7 @@ public:
                                 selectors.emplace_back(std::move(key_selector_stack_[i].selector));
                             }
                             key_selector_stack_.erase(key_selector_stack_.begin()+pos, key_selector_stack_.end());
-                            key_selector_stack_.back().selector->add_selector(make_unique_ptr<multi_select_list_selector>(std::move(selectors)));
+                            key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<multi_select_list_selector>(std::move(selectors)));
 
                             ++p_;
                             ++column_;
@@ -2046,7 +2039,7 @@ public:
                             advance_past_space_character();
                             break;
                         case ',':
-                            key_selector_stack_.emplace_back(make_unique_ptr<expression_selector>());
+                            key_selector_stack_.emplace_back(jsoncons::make_unique<expression_selector>());
                             state_stack_.back() = path_state::key_val_expr; 
                             ++p_;
                             ++column_;
@@ -2073,7 +2066,7 @@ public:
                                 key_selectors.emplace_back(std::move(key_selector_stack_[i]));
                             }
                             key_selector_stack_.erase(key_selector_stack_.begin()+pos, key_selector_stack_.end());
-                            key_selector_stack_.back().selector->add_selector(make_unique_ptr<multi_select_hash_selector>(std::move(key_selectors)));
+                            key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<multi_select_hash_selector>(std::move(key_selectors)));
 
                             ++p_;
                             ++column_;
@@ -2113,8 +2106,8 @@ public:
             state_stack_.pop_back(); // unquoted_string
             if (state_stack_.back() == path_state::val_expr || state_stack_.back() == path_state::identifier_or_function_expr)
             {
-                key_selector_stack_.back().selector->add_selector(make_unique_ptr<identifier_selector>(buffer));
-                output_stack_.emplace_back(key_selector(make_unique_ptr<identifier_selector>(buffer)));
+                key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<identifier_selector>(buffer));
+                output_stack_.emplace_back(key_selector(jsoncons::make_unique<identifier_selector>(buffer)));
                 buffer.clear();
                 state_stack_.pop_back(); // val_expr
             }
@@ -2131,7 +2124,9 @@ public:
                         state_stack_.back() == path_state::sub_expression);
         state_stack_.pop_back();
 
-        //reference r = key_selector_stack_.back().selector->evaluate(context_, root, ec);
+        reference r = key_selector_stack_.back().selector->evaluate(context_, root, ec);
+        return r;
+/*
         while (!offset_stack_.empty())
         {
             const size_t pos = offset_stack_.back();
@@ -2144,6 +2139,7 @@ public:
         }
         std::cout << "\n" << output_stack_[0].selector->to_string() << "\n";
         return output_stack_[0].selector->evaluate(context_, root, ec);
+*/
     }
 
     void advance_past_space_character()

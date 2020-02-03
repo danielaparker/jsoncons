@@ -159,7 +159,7 @@
                 "result" : [2,3]
             }
         ]
-    },
+    },*/
     {
         "given" : {"reservations": [{"instances": [{"state": "running"},{"state": "stopped"}]},{"instances": [{"state": "terminated"},{"state": "runnning"}]}]},
         "cases" : [ 
@@ -169,7 +169,7 @@
                 "result" : [["running","stopped"],["terminated","runnning"]]
             }
         ]
-    },*/
+    },
     {
         "given" : {"reservations": [{"instances": [{"state": "running"},{"state": "stopped"}]},{"instances": [{"state": "terminated"},{"state": "runnning"}]}]},
         "cases" : [ 
