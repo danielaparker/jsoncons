@@ -6,21 +6,6 @@ T as() const; // (1)
 
 template <class T>
 T as(byte_string_arg_t, semantic_tag hint) const; // (2)
-
-bool as_bool() const; // (3)
-
-template <class T>
-T as_integer() const; // (4)
-
-double as_double() const; // (5)
-
-string_view_type as_string_view() const; // (6)
-
-std::string as_string() const; // (7)
-
-byte_string as_byte_string() const; // (8)
-
-bignum as_bignum() const; // (9)
 ```
 
 (1) Generic get `as` type `T`. Attempts to convert the json value to the template value type using [json_type_traits](../json_type_traits.md).
@@ -34,19 +19,8 @@ If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceCont
     as<X<std::string,T>>()
 If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), `as<X<std::string,T>>()` returns the `json` value as an `X<std::string,T>` if the `json` value is an object and if each member value is convertible to type `T`, otherwise throws.
 
-(2) Get as byte string. This overload only participates in overload resolution if `uint8_t` is convertible to `T::value_type`.
+(2) Get as byte string with hint. This overload only participates in overload resolution if `uint8_t` is convertible to `T::value_type`.
 If the json type is a string, converts string according to its `semantic_tag`, or if there is none, uses `hint`.
-
-(3) Same as `as<bool>()`.  
-Returns `true` if value is `bool` and `true`, or if value is integral and non-zero, or if value is floating point and non-zero, or if value is string and parsed value evaluates as `true`. 
-Returns `false` if value is `bool` and `false`, or if value is integral and zero, or if value is floating point and zero, or if value is string and parsed value evaluates as `false`. 
-Otherwise throws `std::runtime_exception`
-
-(4) Same as `as<T>()` for integral type T.  
-Returns integer value if value is integral, performs cast if value has double type, returns 1 or 0 if value has bool type, attempts conversion if value is string, otherwise throws.
-
-(5) Same as `as<double>()`.  
-Returns value cast to double if value is integral, returns `NaN` if value is `null`, attempts conversion if value is string, otherwise throws.
 
 ### Examples
 
@@ -72,8 +46,7 @@ std::cout << "(5) " << j["k3"].as<uint32_t>() << '\n';
 std::cout << "(6) " << j["k4"].as<int32_t>() << '\n';
 std::cout << "(7) " << j["k4"].as<double>() << '\n';
 std::cout << std::boolalpha << "(8) " << j["k5"].as<int>() << '\n';
-std::cout << std::boolalpha << "(9) " << j["k5"].as<bool>() << '\n';
-std::cout << "(10) " << j["k6"].as<double>() << '\n';
+std::cout << "(9) " << j["k6"].as<double>() << '\n';
 
 ```
 Output:
@@ -86,9 +59,8 @@ Output:
 (5) 4294967286
 (6) 10
 (7) 10.5
-(8) 1
-(9) true
-(10) 10.5
+(8) true
+(9) 10.5
 ```
 
 #### Accessing a `json` array value as a `std::vector`
@@ -111,11 +83,22 @@ Output:
 1,2,3,4
 ```
 
+#### Use string_view to access the actual memory that's being used to hold a string
+
+You can use `j.as<jsoncons::string_view>()`, e.g.
+```c++
+json j = json::parse("\"Hello World\"");
+auto sv = j.as<jsoncons::string_view>();
+```
+`jsoncons::string_view` supports the member functions of `std::string_view`, including `data()` and `size()`. 
+
+If your compiler supports `std::string_view`, you can also use `j.as<std::string_view>()`.
+
 #### Accessing a `json` byte string as a byte string
 ```c++
 std::vector<uint8_t> u = {'H','e','l','l','o'};
 
-jsoncons::json j(jsoncons::byte_string_arg, u, jsoncons::semantic_tag::base64);
+json j(byte_string_arg, u, semantic_tag::base64);
 
 auto bytes = j.as<std::vector<uint8_t>>();
 std::cout << "(1) ";
@@ -125,20 +108,22 @@ for (auto b : bytes)
 }
 std::cout << "\n\n";
 
-auto s = j.as<std::string>();
+std::string s;
+encode_json(j, s); // tag information is lost 
 std::cout << "(2) " << s << "\n\n";
 
-jsoncons::json sj(s);
-auto v = sj.as<std::vector<uint8_t>>(jsoncons::byte_string_arg,
-                                     jsoncons::semantic_tag::base64);
+auto sj = decode_json<json>(s);
+
+// provide hint
+auto v = sj.as<std::vector<uint8_t>>(byte_string_arg,
+                                     semantic_tag::base64);
 
 assert(v == u);
 ```
 Output:
 ```
-
 (1) Hello
 
-(2) SGVsbG8
+(2) "SGVsbG8="
 ```
 

@@ -154,7 +154,7 @@ Output:
 }
 ```
     
-#### Contain JSON output in an object
+#### Contain JSON output in an object (prettified output)
 
 ```c++
 #include <iostream>
@@ -166,19 +166,19 @@ using namespace jsoncons;
 
 int main()
 {
-    std::map<std::string,std::tuple<std::string,std::string,double>> employees = 
-    { 
+    std::map<std::string, std::tuple<std::string, std::string, double>> employees =
+    {
         {"John Smith",{"Hourly","Software Engineer",10000}},
         {"Jane Doe",{"Commission","Sales",20000}}
     };
 
-    json_encoder encoder(std::cout, jsoncons::indenting::indent); 
+    json_stream_encoder encoder(std::cout);
 
-    encoder.begin_object();       
-    encoder.write_name("Employees");       
+    encoder.begin_object();
+    encoder.name("Employees");
     encode_json(employees, encoder);
-    encoder.end_object();       
-    encoder.flush();       
+    encoder.end_object();
+    encoder.flush();
 }
 ```
 Output:
@@ -190,9 +190,42 @@ Output:
     }
 }
 ```
+    
+#### Contain JSON output in an object (compressed output)
+
+```c++
+#include <iostream>
+#include <map>
+#include <tuple>
+#include <jsoncons/json.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    std::map<std::string, std::tuple<std::string, std::string, double>> employees =
+    {
+        {"John Smith",{"Hourly","Software Engineer",10000}},
+        {"Jane Doe",{"Commission","Sales",20000}}
+    };
+
+    json_compressed_stream_encoder encoder(std::cout);
+
+    encoder.begin_object();
+    encoder.name("Employees");
+    encode_json(employees, encoder);
+    encoder.end_object();
+    encoder.flush();
+}
+```
+Output:
+```json
+{"Employees":{"Jane Doe":["Commission","Sales",20000.0],"John Smith":["Hourly","Software Engineer",10000.0]}}
+```
 
 ### See also
 
+- [basic_json_encoder](basic_json_encoder.md)  
 - [decode_json](decode_json.md)
 
 

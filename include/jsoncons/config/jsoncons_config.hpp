@@ -47,6 +47,62 @@ using jsoncons::detail::optional;
 namespace jsoncons {
 using std::optional;
 }
-#endif
+#endif // !defined(JSONCONS_HAS_OPTIONAL)
 
-#endif
+#if !defined(JSONCONS_HAS_MAKE_UNIQUE)
+
+#include <cstddef>
+#include <memory>
+#include <type_traits>
+#include <utility>
+
+namespace jsoncons {
+
+    template<class T> 
+    struct unique_if 
+    {
+        typedef std::unique_ptr<T> value_is_not_array;
+    };
+
+    template<class T> 
+    struct unique_if<T[]> 
+    {
+        typedef std::unique_ptr<T[]> value_is_array_of_unknown_bound;
+    };
+
+    template<class T, size_t N> 
+    struct unique_if<T[N]> {
+        typedef void value_is_array_of_known_bound;
+    };
+
+    template<class T, class... Args>
+    typename unique_if<T>::value_is_not_array
+    make_unique(Args&&... args) 
+    {
+        return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+    }
+
+    template<class T>
+    typename unique_if<T>::value_is_array_of_unknown_bound
+    make_unique(size_t n) 
+    {
+        typedef typename std::remove_extent<T>::type U;
+        return std::unique_ptr<T>(new U[n]());
+    }
+
+    template<class T, class... Args>
+    typename unique_if<T>::value_is_array_of_known_bound
+    make_unique(Args&&...) = delete;
+}
+
+#else
+
+#include <memory>
+namespace jsoncons 
+{
+    using std::make_unique;
+}
+
+#endif // !defined(JSONCONS_HAS_MAKE_UNIQUE)
+
+#endif // JSONCONS_CONFIG_JSONCONS_CONFIG_HPP

@@ -656,7 +656,7 @@ private:
         member_name_ = name;
         if (member_name_ != "name")
         {
-            this->to_handler().write_name(name, context);
+            this->to_handler().name(name, context);
         }
         return true;
     }
@@ -669,12 +669,12 @@ private:
         {
             std::size_t end_first = val.find_first_of(" \t");
             std::size_t start_last = val.find_first_not_of(" \t", end_first);
-            this->to_handler().write_name("first-name", context);
+            this->to_handler().name("first-name", context);
             string_view_type first = val.substr(0, end_first);
             this->to_handler().value(first, context);
             if (start_last != string_view_type::npos)
             {
-                this->to_handler().write_name("last-name", context);
+                this->to_handler().name("last-name", context);
                 string_view_type last = val.substr(start_last);
                 this->to_handler().value(last, context);
             }
@@ -696,7 +696,7 @@ private:
 Configure a [rename_object_member_filter](rename_object_member_filter.md) to emit json events to a [basic_json_encoder](basic_json_encoder.md). 
 ```c++
 std::ofstream os("output/new-address-book.json");
-json_encoder encoder(os, jsoncons::indenting::indent);
+json_stream_encoder encoder(os);
 name_fix_up_filter filter(encoder);
 ```
 Parse the input and send the json events into the filter ...

@@ -77,13 +77,6 @@ struct array_slice
     array_slice& operator=(const array_slice&) = default;
 };
 
-// work around for std::make_unique not being available until C++14
-template<typename T, typename... Args>
-std::unique_ptr<T> make_unique_ptr(Args&&... args)
-{
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
 enum class result_type {value,path};
 
 template<class Json>
@@ -92,13 +85,15 @@ Json json_query(const Json& root, const typename Json::string_view_type& path, r
     if (result_t == result_type::value)
     {
         jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
-        evaluator.evaluate(root, path);
+        jsoncons::jsonpath::detail::jsonpath_resources<Json> resources;
+        evaluator.evaluate(resources, root, path);
         return evaluator.get_values();
     }
     else
     {
         jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
-        evaluator.evaluate(root, path);
+        jsoncons::jsonpath::detail::jsonpath_resources<Json> resources;
+        evaluator.evaluate(resources, root, path);
         return evaluator.get_normalized_paths();
     }
 }
@@ -107,7 +102,8 @@ template<class Json, class T>
 void json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
 {
     jsoncons::jsonpath::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
-    evaluator.evaluate(root, path);
+    jsoncons::jsonpath::detail::jsonpath_resources<Json> resources;
+    evaluator.evaluate(resources, root, path);
     evaluator.replace(std::forward<T>(new_value));
 }
 
@@ -238,7 +234,7 @@ class jsonpath_evaluator : public ser_context
         virtual ~selector_base()
         {
         }
-        virtual void select(jsonpath_evaluator& evaluator,
+        virtual void select(jsonpath_resources<Json>& resources,
                             const string_type& path, reference val, node_set& nodes) = 0;
 
         virtual bool is_filter() const
@@ -257,13 +253,13 @@ class jsonpath_evaluator : public ser_context
         {
         }
 
-        void select(jsonpath_evaluator&,
+        void select(jsonpath_resources<Json>& resources,
                     const string_type& path, reference val, 
                     node_set& nodes) override
         {
             std::error_code ec;
             jsonpath_evaluator<Json,JsonReference,PathCons> e;
-            e.evaluate(val, path_, ec);
+            e.evaluate(resources, val, path_, ec);
             if (!ec)
             {
                 for (auto ptr : e.get_pointers())
@@ -284,11 +280,11 @@ class jsonpath_evaluator : public ser_context
         {
         }
 
-        void select(jsonpath_evaluator& evaluator,
+        void select(jsonpath_resources<Json>& resources,
                     const string_type& path, reference val, 
                     node_set& nodes) override
         {
-            auto index = result_.eval(val);
+            auto index = result_.eval(resources, val);
             if (index.template is<std::size_t>())
             {
                 std::size_t start = index.template as<std::size_t>();
@@ -300,7 +296,7 @@ class jsonpath_evaluator : public ser_context
             else if (index.is_string())
             {
                 name_selector selector(index.as_string_view());
-                selector.select(evaluator, path, val, nodes);
+                selector.select(resources, path, val, nodes);
             }
         }
     };
@@ -320,7 +316,7 @@ class jsonpath_evaluator : public ser_context
             return true;
         }
 
-        void select(jsonpath_evaluator&,
+        void select(jsonpath_resources<Json>& resources,
                     const string_type& path, reference val, 
                     node_set& nodes) override
         {
@@ -330,7 +326,7 @@ class jsonpath_evaluator : public ser_context
                 //std::cout << "from array \n";
                 for (std::size_t i = 0; i < val.size(); ++i)
                 {
-                    if (result_.exists(val[i]))
+                    if (result_.exists(resources, val[i]))
                     {
                         nodes.emplace_back(PathCons()(path,i),std::addressof(val[i]));
                     }
@@ -339,7 +335,7 @@ class jsonpath_evaluator : public ser_context
             else if (val.is_object())
             {
                 //std::cout << "from object \n";
-                if (result_.exists(val))
+                if (result_.exists(resources, val))
                 {
                     nodes.emplace_back(path, std::addressof(val));
                 }
@@ -357,7 +353,7 @@ class jsonpath_evaluator : public ser_context
         {
         }
 
-        void select(jsonpath_evaluator& evaluator,
+        void select(jsonpath_resources<Json>& resources,
                     const string_type& path, reference val,
                     node_set& nodes) override
         {
@@ -380,7 +376,7 @@ class jsonpath_evaluator : public ser_context
                 }
                 else if (name_ == length_literal<char_type>() && val.size() > 0)
                 {
-                    pointer ptr = evaluator.create_temp(val.size());
+                    pointer ptr = resources.create_temp(val.size());
                     nodes.emplace_back(PathCons()(path, name_), ptr);
                 }
             }
@@ -395,14 +391,14 @@ class jsonpath_evaluator : public ser_context
                     auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), index);
                     if (sequence.length() > 0)
                     {
-                        pointer ptr = evaluator.create_temp(sequence.begin(),sequence.length());
+                        pointer ptr = resources.create_temp(sequence.begin(),sequence.length());
                         nodes.emplace_back(PathCons()(path, index), ptr);
                     }
                 }
                 else if (name_ == length_literal<char_type>() && sv.size() > 0)
                 {
                     std::size_t count = unicons::u32_length(sv.begin(),sv.end());
-                    pointer ptr = evaluator.create_temp(count);
+                    pointer ptr = resources.create_temp(count);
                     nodes.emplace_back(PathCons()(path, name_), ptr);
                 }
             }
@@ -419,7 +415,7 @@ class jsonpath_evaluator : public ser_context
         {
         }
 
-        void select(jsonpath_evaluator&,
+        void select(jsonpath_resources<Json>&,
                     const string_type& path, reference val,
                     node_set& nodes) override
         {
@@ -540,7 +536,7 @@ public:
         return result;
     }
 
-    void call_function(const string_type& function_name, std::error_code& ec)
+    void call_function(jsonpath_resources<Json>& resources, const string_type& function_name, std::error_code& ec)
     {
         auto f = functions_.get(function_name, ec);
         if (ec)
@@ -555,18 +551,9 @@ public:
 
         string_type s = {'$'};
         node_set v;
-        pointer ptr = create_temp(std::move(result));
+        pointer ptr = resources.create_temp(std::move(result));
         v.emplace_back(s,ptr);
         stack_.push_back(v);
-    }
-
-    template <typename... Args>
-    pointer create_temp(Args&& ... args)
-    {
-        auto temp = make_unique_ptr<Json>(std::forward<Args>(args)...);
-        pointer ptr = temp.get();
-        temp_json_values_.emplace_back(std::move(temp));
-        return ptr;
     }
 
     Json get_normalized_paths() const
@@ -595,21 +582,21 @@ public:
         }
     }
 
-    void evaluate(reference root, const string_view_type& path)
+    void evaluate(jsonpath_resources<Json>& resources, reference root, const string_view_type& path)
     {
         std::error_code ec;
-        evaluate(root, path.data(), path.length(), ec);
+        evaluate(resources, root, path.data(), path.length(), ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpath_error(ec, line_, column_));
         }
     }
 
-    void evaluate(reference root, const string_view_type& path, std::error_code& ec)
+    void evaluate(jsonpath_resources<Json>& resources, reference root, const string_view_type& path, std::error_code& ec)
     {
         JSONCONS_TRY
         {
-            evaluate(root, path.data(), path.length(), ec);
+            evaluate(resources, root, path.data(), path.length(), ec);
         }
         JSONCONS_CATCH(...)
         {
@@ -617,7 +604,8 @@ public:
         }
     }
  
-    void evaluate(reference root, 
+    void evaluate(jsonpath_resources<Json>& resources,
+                  reference root, 
                   const char_type* path, 
                   std::size_t length,
                   std::error_code& ec)
@@ -681,8 +669,8 @@ public:
                     {
                         case ' ':case '\t':case '\r':case '\n':
                         {
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                            apply_selectors();
+                            selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
+                            apply_selectors(resources);
                             buffer.clear();
                             state_stack_.pop_back();
                             advance_past_space_character();
@@ -699,8 +687,8 @@ public:
                         {
                             if (buffer.size() > 0)
                             {
-                                selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                                apply_selectors();
+                                selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
+                                apply_selectors(resources);
                                 buffer.clear();
                             }
                             slice.start_ = 0;
@@ -714,8 +702,8 @@ public:
                         {
                             if (buffer.size() > 0)
                             {
-                                selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                                apply_selectors();
+                                selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
+                                apply_selectors(resources);
                                 buffer.clear();
                             }
                             state_stack_.back().state = path_state::dot;
@@ -787,14 +775,14 @@ public:
                         case ')':
                         {
                             jsonpath_evaluator<Json,JsonReference,PathCons> evaluator;
-                            evaluator.evaluate(root, buffer, ec);
+                            evaluator.evaluate(resources, root, buffer, ec);
                             if (ec)
                             {
                                 return;
                             }
                             function_stack_.push_back(evaluator.get_pointers());
 
-                            call_function(function_name, ec);
+                            call_function(resources, function_name, ec);
                             if (ec)
                             {
                                 return;
@@ -819,7 +807,7 @@ public:
                         case ',':
                         {
                             jsonpath_evaluator<Json, JsonReference, PathCons> evaluator;
-                            evaluator.evaluate(root, buffer, ec);
+                            evaluator.evaluate(resources, root, buffer, ec);
                             if (ec)
                             {
                                 return;
@@ -849,7 +837,7 @@ public:
                             JSONCONS_TRY
                             {
                                 auto val = Json::parse(buffer);
-                                auto temp = create_temp(val);
+                                auto temp = resources.create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
                             JSONCONS_CATCH(const ser_error&)     
@@ -866,7 +854,7 @@ public:
                             JSONCONS_TRY
                             {
                                 auto val = Json::parse(buffer);
-                                auto temp = create_temp(val);
+                                auto temp = resources.create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
                             JSONCONS_CATCH(const ser_error&)     
@@ -874,7 +862,7 @@ public:
                                 ec = jsonpath_errc::argument_parse_error;
                                 return;
                             }
-                            call_function(function_name, ec);
+                            call_function(resources, function_name, ec);
                             if (ec)
                             {
                                 return;
@@ -932,7 +920,7 @@ public:
                             JSONCONS_TRY
                             {
                                 auto val = Json::parse(buffer);
-                                auto temp = create_temp(val);
+                                auto temp = resources.create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
                             JSONCONS_CATCH(const ser_error&)     
@@ -951,7 +939,7 @@ public:
                             JSONCONS_TRY
                             {
                                 auto val = Json::parse(buffer);
-                                auto temp = create_temp(val);
+                                auto temp = resources.create_temp(val);
                                 function_stack_.push_back(std::vector<pointer>{temp});
                             }
                             JSONCONS_CATCH(const ser_error&)     
@@ -959,7 +947,7 @@ public:
                                 ec = jsonpath_errc::argument_parse_error;
                                 return;
                             }
-                            call_function(function_name, ec);
+                            call_function(resources, function_name, ec);
                             if (ec)
                             {
                                 return;
@@ -1083,15 +1071,15 @@ public:
                             advance_past_space_character();
                             break;
                         case '[':
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                            apply_selectors();
+                            selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
+                            apply_selectors(resources);
                             buffer.clear();
                             slice.start_ = 0;
                             state_stack_.pop_back();
                             break;
                         case '.':
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                            apply_selectors();
+                            selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
+                            apply_selectors(resources);
                             buffer.clear();
                             state_stack_.pop_back();
                             break;
@@ -1104,8 +1092,8 @@ public:
                     switch (*p_)
                     {
                         case '\'':
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                            apply_selectors();
+                            selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
+                            apply_selectors(resources);
                             buffer.clear();
                             state_stack_.pop_back();
                             break;
@@ -1133,8 +1121,8 @@ public:
                     switch (*p_)
                     {
                         case '\"':
-                            selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                            apply_selectors();
+                            selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
+                            apply_selectors(resources);
                             buffer.clear();
                             state_stack_.pop_back();
                             break;
@@ -1171,7 +1159,7 @@ public:
                             ++column_;
                             break;
                         case ']':
-                            apply_selectors();
+                            apply_selectors(resources);
                             state_stack_.pop_back();
                             ++p_;
                             ++column_;
@@ -1190,20 +1178,20 @@ public:
                         case '(':
                         {
                             jsonpath_filter_parser<Json> parser(line_,column_);
-                            auto result = parser.parse(root, p_,end_input_,&p_);
+                            auto result = parser.parse(resources, root, p_,end_input_,&p_);
                             line_ = parser.line();
                             column_ = parser.column();
-                            selectors_.push_back(make_unique_ptr<expr_selector>(result));
+                            selectors_.push_back(jsoncons::make_unique<expr_selector>(result));
                             state_stack_.back().state = path_state::comma_or_right_bracket;
                             break;
                         }
                         case '?':
                         {
                             jsonpath_filter_parser<Json> parser(line_,column_);
-                            auto result = parser.parse(root,p_,end_input_,&p_);
+                            auto result = parser.parse(resources,root,p_,end_input_,&p_);
                             line_ = parser.line();
                             column_ = parser.column();
-                            selectors_.push_back(make_unique_ptr<filter_selector>(result));
+                            selectors_.push_back(jsoncons::make_unique<filter_selector>(result));
                             state_stack_.back().state = path_state::comma_or_right_bracket;
                             break;                   
                         }
@@ -1297,7 +1285,7 @@ public:
                         case ']': 
                             if (!buffer.empty())
                             {
-                                selectors_.push_back(make_unique_ptr<name_selector>(buffer));
+                                selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
                                 buffer.clear();
                             }
                             state_stack_.pop_back();
@@ -1356,7 +1344,7 @@ public:
                         case ']': 
                             if (!buffer.empty())
                             {
-                                selectors_.push_back(make_unique_ptr<path_selector>(buffer));
+                                selectors_.push_back(jsoncons::make_unique<path_selector>(buffer));
                                 buffer.clear();
                             }
                             state_stack_.pop_back();
@@ -1460,7 +1448,7 @@ public:
                             break;
                         case ',':
                         case ']':
-                            selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
+                            selectors_.push_back(jsoncons::make_unique<array_slice_selector>(slice));
                             state_stack_.pop_back();
                             break;
                         default:
@@ -1490,7 +1478,7 @@ public:
                                 ec = jsonpath_errc::expected_slice_end;
                                 return;
                             }
-                            selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
+                            selectors_.push_back(jsoncons::make_unique<array_slice_selector>(slice));
                             state_stack_.pop_back();
                             break;
                         default:
@@ -1529,7 +1517,7 @@ public:
                                 ec = jsonpath_errc::expected_slice_step;
                                 return;
                             }
-                            selectors_.push_back(make_unique_ptr<array_slice_selector>(slice));
+                            selectors_.push_back(jsoncons::make_unique<array_slice_selector>(slice));
                             state_stack_.pop_back();
                             break;
                         default:
@@ -1601,8 +1589,8 @@ public:
             case path_state::unquoted_name: 
             case path_state::unquoted_name2: 
             {
-                selectors_.push_back(make_unique_ptr<name_selector>(buffer));
-                apply_selectors();
+                selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
+                apply_selectors(resources);
                 buffer.clear();
                 state_stack_.pop_back(); // unquoted_name
                 break;
@@ -1669,7 +1657,7 @@ public:
         }
     }
 
-    void apply_selectors()
+    void apply_selectors(jsonpath_resources<Json>& resources)
     {
         //std::cout << "apply_selectors count: " << selectors_.size() << "\n";
         if (selectors_.size() > 0)
@@ -1679,7 +1667,7 @@ public:
                 //std::cout << "apply selector to:\n" << pretty_print(*(node.val_ptr)) << "\n";
                 for (auto& selector : selectors_)
                 {
-                    apply_selector(node.path, *(node.val_ptr), *selector, true);
+                    apply_selector(resources, node.path, *(node.val_ptr), *selector, true);
                 }
             }
             selectors_.clear();
@@ -1687,11 +1675,15 @@ public:
         transfer_nodes();
     }
 
-    void apply_selector(const string_type& path, reference val, selector_base& selector, bool process)
+    void apply_selector(jsonpath_resources<Json>& resources,
+                        const string_type& path, 
+                        reference val, 
+                        selector_base& selector, 
+                        bool process)
     {
         if (process)
         {
-            selector.select(*this, path, val, nodes_);
+            selector.select(resources, path, val, nodes_);
         }
         //std::cout << "*it: " << val << "\n";
         //std::cout << "apply_selectors 1 done\n";
@@ -1705,7 +1697,7 @@ public:
                 {
                     if (nvp.value().is_array() || nvp.value().is_object())
                     {                        
-                        apply_selector(PathCons()(path,nvp.key()), nvp.value(), selector, true);
+                        apply_selector(resources, PathCons()(path,nvp.key()), nvp.value(), selector, true);
                     } 
                 }
             }
@@ -1718,12 +1710,12 @@ public:
                 {
                     if (it->is_array())
                     {
-                        apply_selector(PathCons()(path,it - first), *it,selector, true);
+                        apply_selector(resources, PathCons()(path,it - first), *it,selector, true);
                         //std::cout << "*it: " << *it << "\n";
                     }
                     else if (it->is_object())
                     {
-                        apply_selector(PathCons()(path,it - first), *it, selector, !selector.is_filter());
+                        apply_selector(resources, PathCons()(path,it - first), *it, selector, !selector.is_filter());
                     }
                 }
             }
