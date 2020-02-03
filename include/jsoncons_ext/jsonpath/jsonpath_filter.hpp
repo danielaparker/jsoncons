@@ -2518,16 +2518,6 @@ public:
 
         return jsonpath_filter_expr<Json>(std::move(output_stack_));
     }
-private:
-    static Json unary_not_op(const term<Json>& a)
-    {
-        return a.unary_not();
-    }
-
-    static Json unary_minus_op(const term<Json>& a)
-    {
-        return a.unary_minus();
-    }
 };
 
 }}}
