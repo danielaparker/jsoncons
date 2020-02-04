@@ -804,20 +804,6 @@ Json visit(Visitor vis, const term<Json>& v, const term<Json>& w)
     return false;
 }
 
-JSONCONS_STRING_LITERAL(eqtilde,'=','~')
-JSONCONS_STRING_LITERAL(star,'*')
-JSONCONS_STRING_LITERAL(forwardslash,'/')
-JSONCONS_STRING_LITERAL(plus,'+')
-JSONCONS_STRING_LITERAL(minus,'-')
-JSONCONS_STRING_LITERAL(lt,'<')
-JSONCONS_STRING_LITERAL(lte,'<','=')
-JSONCONS_STRING_LITERAL(gt,'>')
-JSONCONS_STRING_LITERAL(gte,'>','=')
-JSONCONS_STRING_LITERAL(eq,'=','=')
-JSONCONS_STRING_LITERAL(ne,'!', '=')
-JSONCONS_STRING_LITERAL(ampamp,'&','&')
-JSONCONS_STRING_LITERAL(pipepipe,'|','|')
-
 template <class Json>
 struct jsonpath_resources
 {
