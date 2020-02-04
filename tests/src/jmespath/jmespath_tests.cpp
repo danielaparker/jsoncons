@@ -98,7 +98,7 @@ TEST_CASE("jmespath expressions")
     json root = json::parse(input);
     jmespath_evaluator<json,const json&>::jmespath_context context;
     std::error_code ec;
-/*
+
     SECTION("reservations[*].instances[*].state")
     {
         auto reservations = jsoncons::make_unique<jmespath_evaluator<json,const json&>::identifier_selector>("reservations");
@@ -108,10 +108,10 @@ TEST_CASE("jmespath expressions")
         auto expr = jsoncons::make_unique<jmespath_evaluator<json, const json&>::expression_selector>();
         expr->add_selector(std::move(reservations));
 
-        auto expr2 = jsoncons::make_unique<jmespath_evaluator<json, const json&>::list_projection>(std::move(expr)); 
+        auto expr2 = jsoncons::make_unique<jmespath_evaluator<json, const json&>::list_projection_selector>(std::move(expr)); 
         expr2->add_selector(std::move(instances));
 
-        auto expr3 = jsoncons::make_unique<jmespath_evaluator<json, const json&>::list_projection>(std::move(expr2));
+        auto expr3 = jsoncons::make_unique<jmespath_evaluator<json, const json&>::list_projection_selector>(std::move(expr2));
         expr3->add_selector(std::move(state));
 
         std::cout << "\n" << expr3->to_string() << "\n";
@@ -119,7 +119,7 @@ TEST_CASE("jmespath expressions")
         auto& result3 = expr3->evaluate(context, root, ec);
         std::cout << pretty_print(result3) << "\n";
     }
-*/
+
     SECTION("reservations[].instances[].state2")
     {
         auto reservations = jsoncons::make_unique<jmespath_evaluator<json,const json&>::identifier_selector>("reservations");
