@@ -783,16 +783,16 @@ private:
                 break;
         }
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::text_string);
-        auto func = [&](std::size_t length, std::error_code& ec)
+        auto func = [&s](Src& source, std::size_t length, std::error_code& ec) -> bool
         {
             s.reserve(s.size()+length);
-            source_.read(std::back_inserter(s), length);
-            if (source_.eof())
+            source.read(std::back_inserter(s), length);
+            if (source.eof())
             {
                 ec = cbor_errc::unexpected_eof;
-                more_ = false;
-                return;
+                return false;
             }
+            return true;
         };
         iterate_string_chunks( func, ec);
         if (state_stack_.back().stringref_map && 
@@ -845,17 +845,17 @@ private:
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length:
             {
-                auto func = [&](std::size_t length, std::error_code& ec)
+                auto func = [&v](Src& source, std::size_t length, std::error_code& ec) -> bool
                 {
                     size_t offset = v.size();
                     v.resize(v.size()+length);
-                    source_.read(v.data()+offset, length);
-                    if (source_.eof())
+                    source.read(v.data()+offset, length);
+                    if (source.eof())
                     {
                         ec = cbor_errc::unexpected_eof;
-                        more_ = false;
-                        return;
+                        return false;
                     }
+                    return true;
                 };
                 iterate_string_chunks( func, ec);
                 break;
@@ -888,7 +888,7 @@ private:
     }
 
     template <class Function>
-    void iterate_string_chunks(Function func, std::error_code& ec)
+    void iterate_string_chunks(Function& func, std::error_code& ec)
     {
         int c = source_.peek();
         if (c == Src::traits_type::eof())
@@ -939,7 +939,7 @@ private:
                 {
                     return;
                 }
-                func(length, ec);
+                more_ = func(source_, length, ec);
                 if (ec)
                 {
                     return;
