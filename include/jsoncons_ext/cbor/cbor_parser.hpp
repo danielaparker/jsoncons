@@ -60,7 +60,7 @@ struct mapped_string
     mapped_string& operator=(mapped_string&&) = default;
 };
 
-typedef std::vector<mapped_string> stringref_map_type;
+typedef std::vector<mapped_string> stringref_map;
 
 struct parse_state 
 {
@@ -88,6 +88,7 @@ class basic_cbor_parser : public ser_context
     typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
     typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<uint64_t> tag_allocator_type;
     typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
+    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<stringref_map> stringref_map_allocator_type;
 
     typedef std::basic_string<char_type,char_traits_type,char_allocator_type> string_type;
 
@@ -109,7 +110,7 @@ class basic_cbor_parser : public ser_context
     typed_array<WorkAllocator> typed_array_;
     std::vector<std::size_t> shape_;
     std::size_t index_;
-    std::vector<stringref_map_type> stringref_map_stack_;
+    std::vector<stringref_map,stringref_map_allocator_type> stringref_map_stack_;
 
 public:
     template <class Source>
@@ -124,7 +125,8 @@ public:
          item_tag_(0),
          state_stack_(alloc),
          typed_array_(alloc),
-         index_(0)
+         index_(0),
+         stringref_map_stack_(alloc)
     {
         state_stack_.emplace_back(parse_mode::root,0);
     }
@@ -344,7 +346,7 @@ private:
                 {
                     return;
                 }
-                if (other_tags_[stringref_tag])
+                if (!stringref_map_stack_.empty() && other_tags_[stringref_tag])
                 {
                     other_tags_[stringref_tag] = false;
                     if (val >= stringref_map_stack_.back().size())
@@ -353,7 +355,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    stringref_map_type::size_type index = (stringref_map_type::size_type)val;
+                    stringref_map::size_type index = (stringref_map::size_type)val;
                     if (index != val)
                     {
                         ec = cbor_errc::number_too_large;
@@ -564,7 +566,7 @@ private:
         bool pop_stringref_map_stack = false;
         if (other_tags_[stringref_namespace_tag])
         {
-            stringref_map_stack_.push_back(stringref_map_type());
+            stringref_map_stack_.emplace_back(alloc_);
             other_tags_[stringref_namespace_tag] = false;
             pop_stringref_map_stack = true;
         }
@@ -606,7 +608,7 @@ private:
         bool pop_stringref_map_stack = false;
         if (other_tags_[stringref_namespace_tag])
         {
-            stringref_map_stack_.push_back(stringref_map_type());
+            stringref_map_stack_.emplace_back(alloc_);
             other_tags_[stringref_namespace_tag] = false;
             pop_stringref_map_stack = true;
         }
@@ -695,7 +697,7 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
-                if (other_tags_[stringref_tag])
+                if (!stringref_map_stack_.empty() && other_tags_[stringref_tag])
                 {
                     other_tags_[stringref_tag] = false;
                     uint64_t ref = get_uint64_value(ec);
@@ -710,7 +712,7 @@ private:
                         return;
                     }
 
-                    stringref_map_type::size_type index = (stringref_map_type::size_type)ref;
+                    stringref_map::size_type index = (stringref_map::size_type)ref;
                     if (index != ref)
                     {
                         ec = cbor_errc::number_too_large;
