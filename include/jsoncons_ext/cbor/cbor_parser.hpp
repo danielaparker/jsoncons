@@ -98,6 +98,7 @@ class basic_cbor_parser : public ser_context
 
     enum {stringref_tag, // 25
           stringref_namespace_tag, // 256
+          item_tag,
           num_of_tags};
 
     std::bitset<num_of_tags> other_tags_;
@@ -108,7 +109,7 @@ class basic_cbor_parser : public ser_context
     bool done_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
     std::vector<uint8_t,byte_allocator_type> bytes_buffer_;
-    std::vector<uint64_t,tag_allocator_type> tags_; 
+    uint64_t item_tag_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     typed_array<WorkAllocator> typed_array_;
     std::vector<std::size_t> shape_;
@@ -124,7 +125,7 @@ public:
          done_(false),
          text_buffer_(alloc),
          bytes_buffer_(alloc),
-         tags_(alloc),
+         item_tag_(0),
          state_stack_(alloc),
          typed_array_(alloc),
          index_(0)
@@ -392,13 +393,13 @@ private:
                 else
                 {
                     semantic_tag tag = semantic_tag::none;
-                    if (!tags_.empty())
+                    if (other_tags_[item_tag])
                     {
-                        if (tags_.back() == 1)
+                        if (item_tag_ == 1)
                         {
                             tag = semantic_tag::timestamp;
                         }
-                        tags_.clear();
+                        other_tags_[item_tag] = false;
                     }
                     more_ = handler.uint64_value(val, tag, *this);
                 }
@@ -412,13 +413,13 @@ private:
                     return;
                 }
                 semantic_tag tag = semantic_tag::none;
-                if (!tags_.empty())
+                if (other_tags_[item_tag])
                 {
-                    if (tags_.back() == 1)
+                    if (item_tag_ == 1)
                     {
                         tag = semantic_tag::timestamp;
                     }
-                    tags_.clear();
+                    other_tags_[item_tag] = false;
                 }
                 more_ = handler.int64_value(val, tag, *this);
                 break;
@@ -497,13 +498,13 @@ private:
                             return;
                         }
                         semantic_tag tag = semantic_tag::none;
-                        if (!tags_.empty())
+                        if (other_tags_[item_tag])
                         {
-                            if (tags_.back() == 1)
+                            if (item_tag_ == 1)
                             {
                                 tag = semantic_tag::timestamp;
                             }
-                            tags_.clear();
+                            other_tags_[item_tag] = false;
                         }
                         more_ = handler.double_value(val, tag, *this);
                         break;
@@ -512,9 +513,9 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::array:
             {
-                if (!tags_.empty())
+                if (other_tags_[item_tag])
                 {
-                    switch (tags_.back())
+                    switch (item_tag_)
                     {
                         case 0x04:
                             text_buffer_ = get_array_as_decimal_string(ec);
@@ -523,7 +524,6 @@ private:
                                 return;
                             }
                             more_ = handler.string_value(text_buffer_, semantic_tag::bigdec);
-                            tags_.pop_back();
                             break;
                         case 0x05:
                             text_buffer_ = get_array_as_hexfloat_string(ec);
@@ -532,7 +532,6 @@ private:
                                 return;
                             }
                             more_ = handler.string_value(text_buffer_, semantic_tag::bigfloat);
-                            tags_.pop_back();
                             break;
                         case 40: // row major storage
                             produce_begin_multi_dim(handler, semantic_tag::multi_dim_row_major, ec);
@@ -544,6 +543,7 @@ private:
                             produce_begin_array(handler, info, ec);
                             break;
                     }
+                    other_tags_[item_tag] = false;
                 }
                 else
                 {
@@ -559,7 +559,7 @@ private:
             default:
                 break;
         }
-        tags_.clear();
+        other_tags_[item_tag] = false;
     }
 
     void produce_begin_array(json_content_handler& handler, uint8_t info, std::error_code& ec)
@@ -730,7 +730,7 @@ private:
                             JSONCONS_UNREACHABLE();
                             break;
                     }
-                    //tags_.pop_back();
+                    //other_tags_[item_tag] = false;
                     break;
                 }
             }
@@ -1514,7 +1514,8 @@ private:
                 case 0x55:
                 case 0x52:
                 case 0x56:
-                    tags_.push_back(val);
+                    other_tags_[item_tag] = true;
+                    item_tag_ = val;
                     break;
                 default:
                     break;
@@ -1533,9 +1534,9 @@ private:
     void handle_string(json_content_handler& handler, const basic_string_view<char>& v, std::error_code&)
     {
         semantic_tag tag = semantic_tag::none;
-        if (!tags_.empty())
+        if (other_tags_[item_tag])
         {
-            switch (tags_.back())
+            switch (item_tag_)
             {
                 case 0:
                     tag = semantic_tag::datetime;
@@ -1552,7 +1553,7 @@ private:
                 default:
                     break;
             }
-            tags_.clear();
+            other_tags_[item_tag] = false;
         }
         more_ = handler.string_value(v, tag, *this);
     }
@@ -1572,9 +1573,9 @@ private:
 
     void handle_byte_string(json_content_handler& handler, const byte_string_view& v, std::error_code& ec)
     {
-        if (!tags_.empty())
+        if (other_tags_[item_tag])
         {
-            switch (tags_.back())
+            switch (item_tag_)
             {
                 case 0x2:
                 {
@@ -1638,7 +1639,7 @@ private:
                 case 0x41:
                 case 0x45:
                 {
-                    const uint8_t tag = (uint8_t)tags_.back();
+                    const uint8_t tag = (uint8_t)item_tag_;
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
@@ -1671,7 +1672,7 @@ private:
                 case 0x42:
                 case 0x46:
                 {
-                    const uint8_t tag = (uint8_t)tags_.back();
+                    const uint8_t tag = (uint8_t)item_tag_;
                     jsoncons::detail::endian e = get_typed_array_endianness(tag);
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
@@ -1703,7 +1704,7 @@ private:
                 case 0x43:
                 case 0x47:
                 {
-                    const uint8_t tag = (uint8_t)tags_.back();
+                    const uint8_t tag = (uint8_t)item_tag_;
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
@@ -1750,7 +1751,7 @@ private:
                 case 0x49:
                 case 0x4d:
                 {
-                    const uint8_t tag = (uint8_t)tags_.back();
+                    const uint8_t tag = (uint8_t)item_tag_;
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
@@ -1783,7 +1784,7 @@ private:
                 case 0x4a:
                 case 0x4e:
                 {
-                    const uint8_t tag = (uint8_t)tags_.back();
+                    const uint8_t tag = (uint8_t)item_tag_;
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
@@ -1816,7 +1817,7 @@ private:
                 case 0x4b:
                 case 0x4f:
                 {
-                    const uint8_t tag = (uint8_t)tags_.back();
+                    const uint8_t tag = (uint8_t)item_tag_;
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
@@ -1849,7 +1850,7 @@ private:
                 case 0x50:
                 case 0x54:
                 {
-                    const uint8_t tag = (uint8_t)tags_.back();
+                    const uint8_t tag = (uint8_t)item_tag_;
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
@@ -1882,7 +1883,7 @@ private:
                 case 0x51:
                 case 0x55:
                 {
-                    const uint8_t tag = (uint8_t)tags_.back();
+                    const uint8_t tag = (uint8_t)item_tag_;
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
@@ -1915,7 +1916,7 @@ private:
                 case 0x52:
                 case 0x56:
                 {
-                    const uint8_t tag = (uint8_t)tags_.back();
+                    const uint8_t tag = (uint8_t)item_tag_;
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
@@ -1949,7 +1950,7 @@ private:
                     more_ = handler.byte_string_value(v, semantic_tag::none, *this, ec);
                     break;
             }
-            tags_.clear();
+            other_tags_[item_tag] = false;
         }
         else
         {
