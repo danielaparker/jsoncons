@@ -61,6 +61,9 @@ class jsonpatch_error_category_impl
    : public std::error_category
 {
 public:
+    constexpr jsonpatch_error_category_impl() noexcept
+    {}
+
     const char* name() const noexcept override
     {
         return "jsoncons/jsonpatch";
@@ -89,11 +92,11 @@ public:
     }
 };
 
-inline
-const std::error_category& jsonpatch_error_category()
+inline 
+const std::error_category& jsonpatch_error_category() noexcept
 {
-  static jsonpatch_error_category_impl instance;
-  return instance;
+    jsonpatch_error_category_impl instance;
+    return instance;
 }
 
 inline 
