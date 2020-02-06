@@ -11,6 +11,7 @@
 #include <vector>
 #include <memory>
 #include <utility> // std::move
+#include <bitset> // std::bitset
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_content_handler.hpp>
@@ -94,6 +95,12 @@ class basic_cbor_parser : public ser_context
     typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
 
     typedef std::basic_string<char_type,char_traits_type,char_allocator_type> string_type;
+
+    enum {stringref_tag, // 25
+          stringref_namespace_tag, // 256
+          num_of_tags};
+
+    std::bitset<num_of_tags> other_tags_;
 
     work_allocator_type alloc_;
     Src source_;
@@ -340,9 +347,9 @@ private:
                 {
                     return;
                 }
-                if (state_stack_.back().stringref_map && !tags_.empty() && tags_.back() == 25)
+                if (other_tags_[stringref_tag])
                 {
-                    tags_.pop_back();
+                    other_tags_[stringref_tag] = false;
                     if (val >= state_stack_.back().stringref_map->size())
                     {
                         ec = cbor_errc::stringref_too_large;
@@ -559,21 +566,11 @@ private:
     {
         semantic_tag tag = semantic_tag::none;
         auto stringref_map = state_stack_.back().stringref_map;
-        for (auto t : tags_)
+        if (other_tags_[stringref_namespace_tag])
         {
-            switch (t)
-            {
-                case 0x05:
-                    tag = semantic_tag::bigfloat;
-                    break;
-                case 0x100: // 256 (stringref-namespace)
-                    stringref_map = std::make_shared<stringref_map_type>();
-                    break;
-                default:
-                    break;
-            }
+            stringref_map = std::make_shared<stringref_map_type>();
+            other_tags_[stringref_namespace_tag] = false;
         }
-        tags_.clear();
         switch (info)
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length:
@@ -606,18 +603,11 @@ private:
     void produce_begin_map(json_content_handler& handler, uint8_t info, std::error_code& ec)
     {
         auto stringref_map = state_stack_.back().stringref_map;
-        for (auto t : tags_)
+        if (other_tags_[stringref_namespace_tag])
         {
-            switch (t)
-            {
-                case 0x100: // 256 (stringref-namespace)
-                    stringref_map = std::make_shared<stringref_map_type>();
-                    break;
-                default:
-                    break;
-            }
+            stringref_map = std::make_shared<stringref_map_type>();
+            other_tags_[stringref_namespace_tag] = false;
         }
-        tags_.clear();
         switch (info)
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length: 
@@ -699,8 +689,9 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
-                if (state_stack_.back().stringref_map && !tags_.empty() && tags_.back() == 25)
+                if (other_tags_[stringref_tag])
                 {
+                    other_tags_[stringref_tag] = false;
                     uint64_t ref = get_uint64_value(ec);
                     if (ec)
                     {
@@ -739,7 +730,7 @@ private:
                             JSONCONS_UNREACHABLE();
                             break;
                     }
-                    tags_.pop_back();
+                    //tags_.pop_back();
                     break;
                 }
             }
@@ -1479,8 +1470,19 @@ private:
             if (ec)
             {
                 return;
-            } 
-            tags_.push_back(val);
+            }
+            switch(val)
+            {
+                case 25:
+                    other_tags_[stringref_tag] = true;
+                    break;
+                case 256:
+                    other_tags_[stringref_namespace_tag] = true;
+                    break;
+                default:
+                    tags_.push_back(val);
+                    break;
+            }
             c = source_.peek();
             if (c == Src::traits_type::eof())
             {
