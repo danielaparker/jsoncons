@@ -67,15 +67,10 @@ struct parse_state
     parse_mode mode; 
     std::size_t length;
     std::size_t index;
-    std::shared_ptr<stringref_map_type> stringref_map; 
+    bool pop_stringref_map_stack;
 
-    parse_state(parse_mode mode, std::size_t length)
-        : mode(mode), length(length), index(0)
-    {
-    }
-
-    parse_state(parse_mode mode, std::size_t length, std::shared_ptr<stringref_map_type> stringref_map)
-        : mode(mode), length(length), index(0), stringref_map(stringref_map)
+    parse_state(parse_mode mode, std::size_t length, bool pop_stringref_map_stack = false)
+        : mode(mode), length(length), index(0), pop_stringref_map_stack(pop_stringref_map_stack)
     {
     }
 
@@ -114,6 +109,7 @@ class basic_cbor_parser : public ser_context
     typed_array<WorkAllocator> typed_array_;
     std::vector<std::size_t> shape_;
     std::size_t index_;
+    std::vector<stringref_map_type> stringref_map_stack_;
 
 public:
     template <class Source>
@@ -351,7 +347,7 @@ private:
                 if (other_tags_[stringref_tag])
                 {
                     other_tags_[stringref_tag] = false;
-                    if (val >= state_stack_.back().stringref_map->size())
+                    if (val >= stringref_map_stack_.back().size())
                     {
                         ec = cbor_errc::stringref_too_large;
                         more_ = false;
@@ -364,7 +360,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    auto& str = state_stack_.back().stringref_map->at(index);
+                    auto& str = stringref_map_stack_.back().at(index);
                     switch (str.type)
                     {
                         case jsoncons::cbor::detail::cbor_major_type::text_string:
@@ -565,17 +561,18 @@ private:
     void produce_begin_array(json_content_handler& handler, uint8_t info, std::error_code& ec)
     {
         semantic_tag tag = semantic_tag::none;
-        auto stringref_map = state_stack_.back().stringref_map;
+        bool pop_stringref_map_stack = false;
         if (other_tags_[stringref_namespace_tag])
         {
-            stringref_map = std::make_shared<stringref_map_type>();
+            stringref_map_stack_.push_back(stringref_map_type());
             other_tags_[stringref_namespace_tag] = false;
+            pop_stringref_map_stack = true;
         }
         switch (info)
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length:
             {
-                state_stack_.emplace_back(parse_mode::indefinite_array,0,stringref_map);
+                state_stack_.emplace_back(parse_mode::indefinite_array,0,pop_stringref_map_stack);
                 more_ = handler.begin_array(tag, *this);
                 source_.ignore(1);
                 break;
@@ -587,7 +584,7 @@ private:
                 {
                     return;
                 }
-                state_stack_.emplace_back(parse_mode::array,len,stringref_map);
+                state_stack_.emplace_back(parse_mode::array,len,pop_stringref_map_stack);
                 more_ = handler.begin_array(len, tag, *this);
                 break;
             }
@@ -597,22 +594,27 @@ private:
     void produce_end_array(json_content_handler& handler, std::error_code&)
     {
         more_ = handler.end_array(*this);
+        if (state_stack_.back().pop_stringref_map_stack)
+        {
+            stringref_map_stack_.pop_back();
+        }
         state_stack_.pop_back();
     }
 
     void produce_begin_map(json_content_handler& handler, uint8_t info, std::error_code& ec)
     {
-        auto stringref_map = state_stack_.back().stringref_map;
+        bool pop_stringref_map_stack = false;
         if (other_tags_[stringref_namespace_tag])
         {
-            stringref_map = std::make_shared<stringref_map_type>();
+            stringref_map_stack_.push_back(stringref_map_type());
             other_tags_[stringref_namespace_tag] = false;
+            pop_stringref_map_stack = true;
         }
         switch (info)
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length: 
             {
-                state_stack_.emplace_back(parse_mode::indefinite_map_key,0,stringref_map);
+                state_stack_.emplace_back(parse_mode::indefinite_map_key,0,pop_stringref_map_stack);
                 more_ = handler.begin_object(semantic_tag::none, *this, ec);
                 source_.ignore(1);
                 break;
@@ -624,7 +626,7 @@ private:
                 {
                     return;
                 }
-                state_stack_.emplace_back(parse_mode::map_key,len,stringref_map);
+                state_stack_.emplace_back(parse_mode::map_key,len,pop_stringref_map_stack);
                 more_ = handler.begin_object(len, semantic_tag::none, *this, ec);
                 break;
             }
@@ -634,6 +636,10 @@ private:
     void produce_end_map(json_content_handler& handler, std::error_code&)
     {
         more_ = handler.end_object(*this);
+        if (state_stack_.back().pop_stringref_map_stack)
+        {
+            stringref_map_stack_.pop_back();
+        }
         state_stack_.pop_back();
     }
 
@@ -697,7 +703,7 @@ private:
                     {
                         return;
                     }
-                    if (ref >= state_stack_.back().stringref_map->size())
+                    if (ref >= stringref_map_stack_.back().size())
                     {
                         ec = cbor_errc::stringref_too_large;
                         more_ = false;
@@ -711,7 +717,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    auto& val = state_stack_.back().stringref_map->at(index);
+                    auto& val = stringref_map_stack_.back().at(index);
                     switch (val.type)
                     {
                         case jsoncons::cbor::detail::cbor_major_type::text_string:
@@ -786,11 +792,11 @@ private:
             return true;
         };
         iterate_string_chunks( func, ec);
-        if (state_stack_.back().stringref_map && 
+        if (!stringref_map_stack_.empty() && 
             info != jsoncons::cbor::detail::additional_info::indefinite_length &&
-            s.length() >= jsoncons::cbor::detail::min_length_for_stringref(state_stack_.back().stringref_map->size()))
+            s.length() >= jsoncons::cbor::detail::min_length_for_stringref(stringref_map_stack_.back().size()))
         {
-            state_stack_.back().stringref_map->emplace_back(s);
+            stringref_map_stack_.back().emplace_back(s);
         }
         
         return s;
@@ -867,10 +873,10 @@ private:
                     more_ = false;
                     return v;
                 }
-                if (state_stack_.back().stringref_map &&
-                    v.size() >= jsoncons::cbor::detail::min_length_for_stringref(state_stack_.back().stringref_map->size()))
+                if (!stringref_map_stack_.empty() &&
+                    v.size() >= jsoncons::cbor::detail::min_length_for_stringref(stringref_map_stack_.back().size()))
                 {
-                    state_stack_.back().stringref_map->emplace_back(v);
+                    stringref_map_stack_.back().emplace_back(v);
                 }
                 break;
             }
