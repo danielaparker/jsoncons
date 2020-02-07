@@ -376,9 +376,9 @@ private:
                         }
                         case jsoncons::cbor::detail::cbor_major_type::byte_string:
                         {
-                            auto read = [&str](std::error_code&) -> std::vector<uint8_t>
+                            auto read = [&str](std::vector<uint8_t>& v, std::error_code&)
                             {
-                                return str.bytes;
+                                v = str.bytes;
                             };
                             write_byte_string(read, handler, ec);
                             if (ec)
@@ -428,9 +428,9 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::byte_string:
             {
-                auto read = [this](std::error_code& ec) -> std::vector<uint8_t>
+                auto read = [this](std::vector<uint8_t>& v, std::error_code& ec) 
                 {
-                    return this->get_byte_string(ec);
+                    this->get_byte_string(v, ec);
                 };
                 write_byte_string(read, handler, ec);
                 if (ec)
@@ -688,8 +688,8 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::byte_string:
             {
-                bytes_buffer_ = get_byte_string(ec);
-                if (ec)
+                more_ = get_byte_string(bytes_buffer_, ec);
+                if (!more_)
                 {
                     return;
                 }
@@ -823,10 +823,10 @@ private:
         return len;
     }
 
-    std::vector<uint8_t> get_byte_string(std::error_code& ec)
+    bool get_byte_string(std::vector<uint8_t>& v, std::error_code& ec)
     {
-        std::vector<uint8_t> v;
-
+        bool more = true;
+        v.clear();
         jsoncons::cbor::detail::cbor_major_type major_type;
         uint8_t info;
         int c = source_.peek();
@@ -834,8 +834,8 @@ private:
         {
             case Src::traits_type::eof():
                 ec = cbor_errc::unexpected_eof;
-                more_ = false;
-                return v;
+                more = false;
+                return more;
             default:
                 major_type = get_major_type((uint8_t)c);
                 info = get_additional_information_value((uint8_t)c);
@@ -867,16 +867,16 @@ private:
                 std::size_t length = get_size(ec);
                 if (ec)
                 {
-                    more_ = false;
-                    return v;
+                    more = false;
+                    return more;
                 }
                 v.resize(length);
                 source_.read(v.data(), length);
                 if (source_.eof())
                 {
                     ec = cbor_errc::unexpected_eof;
-                    more_ = false;
-                    return v;
+                    more = false;
+                    return more;
                 }
                 if (!stringref_map_stack_.empty() &&
                     v.size() >= jsoncons::cbor::detail::min_length_for_stringref(stringref_map_stack_.back().size()))
@@ -886,7 +886,7 @@ private:
                 break;
             }
         }
-        return v;
+        return more;
     }
 
     template <class Function>
@@ -1268,9 +1268,11 @@ private:
 
                 if (get_major_type((uint8_t)c) == jsoncons::cbor::detail::cbor_major_type::byte_string)
                 {
-                    std::vector<uint8_t> v = get_byte_string(ec);
+                    std::vector<uint8_t> v;
+                    get_byte_string(v, ec);
                     if (ec)
                     {
+                        more_ = false;
                         return s;
                     }
                     if (tag == 2)
@@ -1406,7 +1408,8 @@ private:
 
                 if (get_major_type((uint8_t)c) == jsoncons::cbor::detail::cbor_major_type::byte_string)
                 {
-                    std::vector<uint8_t> v = get_byte_string(ec);
+                    std::vector<uint8_t> v; 
+                    more_ = get_byte_string(v, ec);
                     if (ec)
                     {
                         return s;
@@ -1591,9 +1594,11 @@ private:
             {
                 case 0x2:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     bignum n(1, v.data(), v.size());
@@ -1604,9 +1609,11 @@ private:
                 }
                 case 0x3:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     bignum n(-1, v.data(), v.size());
@@ -1617,9 +1624,10 @@ private:
                 }
                 case 0x15:
                 {
-                    bytes_buffer_ = read(ec);
+                    read(bytes_buffer_,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     more_ = handler.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), semantic_tag::base64url, *this);
@@ -1627,9 +1635,10 @@ private:
                 }
                 case 0x16:
                 {
-                    bytes_buffer_ = read(ec);
+                    read(bytes_buffer_,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     more_ = handler.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), semantic_tag::base64, *this);
@@ -1637,9 +1646,10 @@ private:
                 }
                 case 0x17:
                 {
-                    bytes_buffer_ = read(ec);
+                    read(bytes_buffer_,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     more_ = handler.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), semantic_tag::base16, *this);
@@ -1647,9 +1657,11 @@ private:
                 }
                 case 0x40:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t* p = v.data();
@@ -1666,9 +1678,11 @@ private:
                 }
                 case 0x44:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t* p = v.data();
@@ -1686,9 +1700,11 @@ private:
                 case 0x41:
                 case 0x45:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
@@ -1724,9 +1740,11 @@ private:
                 case 0x42:
                 case 0x46:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
@@ -1761,9 +1779,11 @@ private:
                 case 0x43:
                 case 0x47:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
@@ -1798,9 +1818,11 @@ private:
                 }
                 case 0x48:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t* p = v.data();
@@ -1818,9 +1840,11 @@ private:
                 case 0x49:
                 case 0x4d:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
@@ -1856,9 +1880,11 @@ private:
                 case 0x4a:
                 case 0x4e:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
@@ -1894,9 +1920,11 @@ private:
                 case 0x4b:
                 case 0x4f:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
@@ -1932,9 +1960,11 @@ private:
                 case 0x50:
                 case 0x54:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
@@ -1970,9 +2000,11 @@ private:
                 case 0x51:
                 case 0x55:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
@@ -2008,9 +2040,11 @@ private:
                 case 0x52:
                 case 0x56:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
@@ -2045,9 +2079,10 @@ private:
                 }
                 default:
                 {
-                    bytes_buffer_ = read(ec);
+                    read(bytes_buffer_,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     more_ = handler.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), semantic_tag::none, *this, ec);
@@ -2058,7 +2093,7 @@ private:
         }
         else
         {
-            bytes_buffer_ = read(ec);
+            read(bytes_buffer_,ec);
             if (ec)
             {
                 return;
