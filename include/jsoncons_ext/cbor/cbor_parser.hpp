@@ -112,6 +112,41 @@ class basic_cbor_parser : public ser_context
     std::size_t index_;
     std::vector<stringref_map,stringref_map_allocator_type> stringref_map_stack_;
 
+    struct read_byte_string_from_buffer
+    {
+        byte_string_view bytes;
+
+        read_byte_string_from_buffer(const byte_string_view& b)
+            : bytes(b)
+        {
+        }
+        template <class Container>
+        void operator()(Container& c, std::error_code&)
+        {
+            c.clear();
+            c.reserve(bytes.size());
+            for (auto b : bytes)
+            {
+                c.push_back(b);
+            }
+        }
+    };
+
+    struct read_byte_string_from_source
+    {
+        basic_cbor_parser<Src,WorkAllocator>* source;
+
+        read_byte_string_from_source(basic_cbor_parser<Src,WorkAllocator>* source)
+            : source(source)
+        {
+        }
+        template <class Container>
+        void operator()(Container& c, std::error_code& ec)
+        {
+            source->get_byte_string(c,ec);
+        }
+    };
+
 public:
     template <class Source>
     basic_cbor_parser(Source&& source,
@@ -376,10 +411,11 @@ private:
                         }
                         case jsoncons::cbor::detail::cbor_major_type::byte_string:
                         {
-                            auto read = [&str](std::vector<uint8_t>& v, std::error_code&)
-                            {
-                                v = str.bytes;
-                            };
+                            //auto read = [&str](std::vector<uint8_t>& v, std::error_code&)
+                            //{
+                            //    v = str.bytes;
+                            //};
+                            read_byte_string_from_buffer read(byte_string_view(str.bytes.data(), str.bytes.size()));
                             write_byte_string(read, handler, ec);
                             if (ec)
                             {
@@ -428,10 +464,11 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::byte_string:
             {
-                auto read = [this](std::vector<uint8_t>& v, std::error_code& ec) 
-                {
-                    this->get_byte_string(v, ec);
-                };
+                //auto read = [this](std::vector<uint8_t>& v, std::error_code& ec) 
+                //{
+                //    this->get_byte_string(v, ec);
+                //};
+                read_byte_string_from_source read(this);
                 write_byte_string(read, handler, ec);
                 if (ec)
                 {
