@@ -376,11 +376,11 @@ private:
                         }
                         case jsoncons::cbor::detail::cbor_major_type::byte_string:
                         {
-                            auto getter = [&str](std::error_code&) -> std::vector<uint8_t>
+                            auto read = [&str](std::error_code&) -> std::vector<uint8_t>
                             {
                                 return str.bytes;
                             };
-                            handle_byte_string(getter, handler, ec);
+                            write_byte_string(read, handler, ec);
                             if (ec)
                             {
                                 return;
@@ -428,11 +428,11 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::byte_string:
             {
-                auto getter = [this](std::error_code& ec) -> std::vector<uint8_t>
+                auto read = [this](std::error_code& ec) -> std::vector<uint8_t>
                 {
                     return this->get_byte_string(ec);
                 };
-                handle_byte_string(getter, handler, ec);
+                write_byte_string(read, handler, ec);
                 if (ec)
                 {
                     return;
@@ -1582,8 +1582,8 @@ private:
         return std::size_t(1) << (f + ll); 
     }
 
-    template <typename Getter>
-    void handle_byte_string(Getter getter, json_content_handler& handler, std::error_code& ec)
+    template <typename Read>
+    void write_byte_string(Read read, json_content_handler& handler, std::error_code& ec)
     {
         if (other_tags_[item_tag])
         {
@@ -1591,7 +1591,7 @@ private:
             {
                 case 0x2:
                 {
-                    std::vector<uint8_t> v = getter(ec);
+                    std::vector<uint8_t> v = read(ec);
                     if (ec)
                     {
                         return;
@@ -1604,7 +1604,7 @@ private:
                 }
                 case 0x3:
                 {
-                    std::vector<uint8_t> v = getter(ec);
+                    std::vector<uint8_t> v = read(ec);
                     if (ec)
                     {
                         return;
@@ -1617,7 +1617,7 @@ private:
                 }
                 case 0x15:
                 {
-                    bytes_buffer_ = getter(ec);
+                    bytes_buffer_ = read(ec);
                     if (ec)
                     {
                         return;
@@ -1627,7 +1627,7 @@ private:
                 }
                 case 0x16:
                 {
-                    bytes_buffer_ = getter(ec);
+                    bytes_buffer_ = read(ec);
                     if (ec)
                     {
                         return;
@@ -1637,7 +1637,7 @@ private:
                 }
                 case 0x17:
                 {
-                    bytes_buffer_ = getter(ec);
+                    bytes_buffer_ = read(ec);
                     if (ec)
                     {
                         return;
@@ -1647,7 +1647,7 @@ private:
                 }
                 case 0x40:
                 {
-                    std::vector<uint8_t> v = getter(ec);
+                    std::vector<uint8_t> v = read(ec);
                     if (ec)
                     {
                         return;
@@ -1666,7 +1666,7 @@ private:
                 }
                 case 0x44:
                 {
-                    std::vector<uint8_t> v = getter(ec);
+                    std::vector<uint8_t> v = read(ec);
                     if (ec)
                     {
                         return;
@@ -1686,7 +1686,7 @@ private:
                 case 0x41:
                 case 0x45:
                 {
-                    std::vector<uint8_t> v = getter(ec);
+                    std::vector<uint8_t> v = read(ec);
                     if (ec)
                     {
                         return;
@@ -1724,7 +1724,7 @@ private:
                 case 0x42:
                 case 0x46:
                 {
-                    std::vector<uint8_t> v = getter(ec);
+                    std::vector<uint8_t> v = read(ec);
                     if (ec)
                     {
                         return;
@@ -1761,7 +1761,7 @@ private:
                 case 0x43:
                 case 0x47:
                 {
-                    std::vector<uint8_t> v = getter(ec);
+                    std::vector<uint8_t> v = read(ec);
                     if (ec)
                     {
                         return;
@@ -1798,7 +1798,7 @@ private:
                 }
                 case 0x48:
                 {
-                    std::vector<uint8_t> v = getter(ec);
+                    std::vector<uint8_t> v = read(ec);
                     if (ec)
                     {
                         return;
@@ -1818,7 +1818,7 @@ private:
                 case 0x49:
                 case 0x4d:
                 {
-                    std::vector<uint8_t> v = getter(ec);
+                    std::vector<uint8_t> v = read(ec);
                     if (ec)
                     {
                         return;
@@ -1856,7 +1856,7 @@ private:
                 case 0x4a:
                 case 0x4e:
                 {
-                    std::vector<uint8_t> v = getter(ec);
+                    std::vector<uint8_t> v = read(ec);
                     if (ec)
                     {
                         return;
@@ -1894,7 +1894,7 @@ private:
                 case 0x4b:
                 case 0x4f:
                 {
-                    std::vector<uint8_t> v = getter(ec);
+                    std::vector<uint8_t> v = read(ec);
                     if (ec)
                     {
                         return;
@@ -1932,7 +1932,7 @@ private:
                 case 0x50:
                 case 0x54:
                 {
-                    std::vector<uint8_t> v = getter(ec);
+                    std::vector<uint8_t> v = read(ec);
                     if (ec)
                     {
                         return;
@@ -1970,7 +1970,7 @@ private:
                 case 0x51:
                 case 0x55:
                 {
-                    std::vector<uint8_t> v = getter(ec);
+                    std::vector<uint8_t> v = read(ec);
                     if (ec)
                     {
                         return;
@@ -2008,7 +2008,7 @@ private:
                 case 0x52:
                 case 0x56:
                 {
-                    std::vector<uint8_t> v = getter(ec);
+                    std::vector<uint8_t> v = read(ec);
                     if (ec)
                     {
                         return;
@@ -2045,7 +2045,7 @@ private:
                 }
                 default:
                 {
-                    bytes_buffer_ = getter(ec);
+                    bytes_buffer_ = read(ec);
                     if (ec)
                     {
                         return;
@@ -2058,7 +2058,7 @@ private:
         }
         else
         {
-            bytes_buffer_ = getter(ec);
+            bytes_buffer_ = read(ec);
             if (ec)
             {
                 return;
