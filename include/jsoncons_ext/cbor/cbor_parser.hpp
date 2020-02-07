@@ -376,7 +376,11 @@ private:
                         }
                         case jsoncons::cbor::detail::cbor_major_type::byte_string:
                         {
-                            handle_byte_string(handler, byte_string_view(str.bytes.data(),str.bytes.size()), ec);
+                            auto getter = [&str](std::error_code&) -> std::vector<uint8_t>
+                            {
+                                return str.bytes;
+                            };
+                            handle_byte_string(getter, handler, ec);
                             if (ec)
                             {
                                 return;
@@ -424,12 +428,11 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::byte_string:
             {
-                bytes_buffer_ = get_byte_string(ec);
-                if (ec)
+                auto getter = [this](std::error_code& ec) -> std::vector<uint8_t>
                 {
-                    return;
-                }
-                handle_byte_string(handler, byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), ec);
+                    return this->get_byte_string(ec);
+                };
+                handle_byte_string(getter, handler, ec);
                 if (ec)
                 {
                     return;
@@ -1579,7 +1582,8 @@ private:
         return std::size_t(1) << (f + ll); 
     }
 
-    void handle_byte_string(json_content_handler& handler, const byte_string_view& v, std::error_code& ec)
+    template <typename Getter>
+    void handle_byte_string(Getter getter, json_content_handler& handler, std::error_code& ec)
     {
         if (other_tags_[item_tag])
         {
@@ -1587,6 +1591,11 @@ private:
             {
                 case 0x2:
                 {
+                    std::vector<uint8_t> v = getter(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
                     bignum n(1, v.data(), v.size());
                     text_buffer_.clear();
                     n.dump(text_buffer_);
@@ -1595,6 +1604,11 @@ private:
                 }
                 case 0x3:
                 {
+                    std::vector<uint8_t> v = getter(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
                     bignum n(-1, v.data(), v.size());
                     text_buffer_.clear();
                     n.dump(text_buffer_);
@@ -1603,21 +1617,41 @@ private:
                 }
                 case 0x15:
                 {
-                    more_ = handler.byte_string_value(v, semantic_tag::base64url, *this);
+                    bytes_buffer_ = getter(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                    more_ = handler.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), semantic_tag::base64url, *this);
                     break;
                 }
                 case 0x16:
                 {
-                    more_ = handler.byte_string_value(v, semantic_tag::base64, *this);
+                    bytes_buffer_ = getter(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                    more_ = handler.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), semantic_tag::base64, *this);
                     break;
                 }
                 case 0x17:
                 {
-                    more_ = handler.byte_string_value(v, semantic_tag::base16, *this);
+                    bytes_buffer_ = getter(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                    more_ = handler.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), semantic_tag::base16, *this);
                     break;
                 }
                 case 0x40:
                 {
+                    std::vector<uint8_t> v = getter(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
                     const uint8_t* p = v.data();
                     const uint8_t* last = v.data() + v.size();
 
@@ -1632,6 +1666,11 @@ private:
                 }
                 case 0x44:
                 {
+                    std::vector<uint8_t> v = getter(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
                     const uint8_t* p = v.data();
                     const uint8_t* last = v.data() + v.size();
 
@@ -1647,6 +1686,11 @@ private:
                 case 0x41:
                 case 0x45:
                 {
+                    std::vector<uint8_t> v = getter(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
                     const uint8_t tag = (uint8_t)item_tag_;
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
@@ -1680,6 +1724,11 @@ private:
                 case 0x42:
                 case 0x46:
                 {
+                    std::vector<uint8_t> v = getter(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
                     const uint8_t tag = (uint8_t)item_tag_;
                     jsoncons::detail::endian e = get_typed_array_endianness(tag);
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
@@ -1712,6 +1761,11 @@ private:
                 case 0x43:
                 case 0x47:
                 {
+                    std::vector<uint8_t> v = getter(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
                     const uint8_t tag = (uint8_t)item_tag_;
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
@@ -1744,6 +1798,11 @@ private:
                 }
                 case 0x48:
                 {
+                    std::vector<uint8_t> v = getter(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
                     const uint8_t* p = v.data();
                     const uint8_t* last = v.data() + v.size();
 
@@ -1759,6 +1818,11 @@ private:
                 case 0x49:
                 case 0x4d:
                 {
+                    std::vector<uint8_t> v = getter(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
                     const uint8_t tag = (uint8_t)item_tag_;
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
@@ -1792,6 +1856,11 @@ private:
                 case 0x4a:
                 case 0x4e:
                 {
+                    std::vector<uint8_t> v = getter(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
                     const uint8_t tag = (uint8_t)item_tag_;
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
@@ -1825,6 +1894,11 @@ private:
                 case 0x4b:
                 case 0x4f:
                 {
+                    std::vector<uint8_t> v = getter(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
                     const uint8_t tag = (uint8_t)item_tag_;
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
@@ -1858,6 +1932,11 @@ private:
                 case 0x50:
                 case 0x54:
                 {
+                    std::vector<uint8_t> v = getter(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
                     const uint8_t tag = (uint8_t)item_tag_;
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
@@ -1891,6 +1970,11 @@ private:
                 case 0x51:
                 case 0x55:
                 {
+                    std::vector<uint8_t> v = getter(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
                     const uint8_t tag = (uint8_t)item_tag_;
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
@@ -1924,6 +2008,11 @@ private:
                 case 0x52:
                 case 0x56:
                 {
+                    std::vector<uint8_t> v = getter(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
                     const uint8_t tag = (uint8_t)item_tag_;
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
@@ -1955,14 +2044,26 @@ private:
                     break;
                 }
                 default:
-                    more_ = handler.byte_string_value(v, semantic_tag::none, *this, ec);
+                {
+                    bytes_buffer_ = getter(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                    more_ = handler.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), semantic_tag::none, *this, ec);
                     break;
+                }
             }
             other_tags_[item_tag] = false;
         }
         else
         {
-            more_ = handler.byte_string_value(v, semantic_tag::none, *this, ec);
+            bytes_buffer_ = getter(ec);
+            if (ec)
+            {
+                return;
+            }
+            more_ = handler.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), semantic_tag::none, *this, ec);
         }
     }
 
