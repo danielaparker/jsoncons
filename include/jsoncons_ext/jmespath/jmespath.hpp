@@ -639,7 +639,8 @@ public:
                 s.append("\n");
             }
             return s;
-        }    };
+        }    
+    };
 
     class flatten_projection final : public selector_base
     {
