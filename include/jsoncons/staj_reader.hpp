@@ -867,7 +867,7 @@ public:
     span<const uint64_t> data(uint64_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::uint64_value);
-         span<const uint64_t>(data_.uint64_data_, size_);
+        return span<const uint64_t>(data_.uint64_data_, size_);
     }
 
     span<int8_t> data(int8_array_arg_t)
