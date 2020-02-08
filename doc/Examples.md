@@ -370,7 +370,7 @@ for (; !cursor.done(); cursor.next())
             std::cout << event.event_type() << ": " << event.get<double>() << "\n";
             break;
         default:
-            std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";;
+            std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
             break;
     }
 }
@@ -476,7 +476,7 @@ for (; !cursor.done(); cursor.next())
             std::cout << event.get<jsoncons::string_view>() << "\n";
             break;
         default:
-            std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";;
+            std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
             break;
     }
 }
