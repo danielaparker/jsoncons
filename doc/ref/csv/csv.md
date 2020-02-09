@@ -244,7 +244,7 @@ int main()
                 std::cout << event.event_type() << ": " << event.get<double>() << "\n";
                 break;
             default:
-                std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";;
+                std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
                 break;
         }
     }

@@ -201,7 +201,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
                     std::cout << event.event_type() << ": " << event.get<double>() << "\n";
                     break;
                 default:
-                    std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";;
+                    std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
                     break;
             }
         }*/
@@ -318,7 +318,7 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
                     std::cout << event.event_type() << ": " << event.get<double>() << "\n";
                     break;
                 default:
-                    std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";;
+                    std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
                     break;
             }
         }
@@ -451,7 +451,7 @@ NY,LON,TOR;LON
                     std::cout << event.event_type() << ": " << event.get<double>() << "\n";
                     break;
                 default:
-                    std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";;
+                    std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
                     break;
             }
         } 
