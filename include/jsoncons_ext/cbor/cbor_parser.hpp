@@ -1748,27 +1748,15 @@ private:
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
-
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(uint16_array_arg,size,alloc_);
 
-                    const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    std::memcpy(reinterpret_cast<char*>(typed_array_.data(uint16_array_arg).data()),v.data(),v.size());
+                    if (e != jsoncons::detail::endian::native)
                     {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                        for (std::size_t i = 0; i < size; ++i)
                         {
-                            uint16_t val = jsoncons::detail::big_to_native<uint16_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(uint16_array_arg)[i] = val;
-                        }
-                    }
-                    else if (e == jsoncons::detail::endian::little)
-                    {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-                        {
-                            uint16_t val = jsoncons::detail::little_to_native<uint16_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(uint16_array_arg)[i] = val;
+                            typed_array_.data(uint16_array_arg)[i] = jsoncons::detail::byte_swap<uint16_t>(typed_array_.data(uint16_array_arg)[i]);
                         }
                     }
                     more_ = handler.typed_array(typed_array_.data(uint16_array_arg), semantic_tag::none, *this, ec);
@@ -1788,26 +1776,14 @@ private:
                     jsoncons::detail::endian e = get_typed_array_endianness(tag);
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
-
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(uint32_array_arg,size,alloc_);
-                    const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    std::memcpy(reinterpret_cast<char*>(typed_array_.data(uint32_array_arg).data()),v.data(),v.size());
+                    if (e != jsoncons::detail::endian::native)
                     {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                        for (std::size_t i = 0; i < size; ++i)
                         {
-                            uint32_t val = jsoncons::detail::big_to_native<uint32_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(uint32_array_arg)[i] = val;
-                        }
-                    }
-                    else if (e == jsoncons::detail::endian::little)
-                    {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-                        {
-                            uint32_t val = jsoncons::detail::little_to_native<uint32_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(uint32_array_arg)[i] = val;
+                            typed_array_.data(uint32_array_arg)[i] = jsoncons::detail::byte_swap<uint32_t>(typed_array_.data(uint32_array_arg)[i]);
                         }
                     }
                     more_ = handler.typed_array(typed_array_.data(uint32_array_arg), semantic_tag::none, *this, ec);
@@ -1827,27 +1803,15 @@ private:
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
-
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(uint64_array_arg,size,alloc_);
 
-                    const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    std::memcpy(reinterpret_cast<char*>(typed_array_.data(uint64_array_arg).data()),v.data(),v.size());
+                    if (e != jsoncons::detail::endian::native)
                     {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                        for (std::size_t i = 0; i < size; ++i)
                         {
-                            uint64_t val = jsoncons::detail::big_to_native<uint64_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(uint64_array_arg)[i] = val;
-                        }
-                    }
-                    else if (e == jsoncons::detail::endian::little)
-                    {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-                        {
-                            uint64_t val = jsoncons::detail::little_to_native<uint64_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(uint64_array_arg)[i] = val;
+                            typed_array_.data(uint64_array_arg)[i] = jsoncons::detail::byte_swap<uint64_t>(typed_array_.data(uint64_array_arg)[i]);
                         }
                     }
                     more_ = handler.typed_array(typed_array_.data(uint64_array_arg), semantic_tag::none, *this, ec);
@@ -1888,27 +1852,15 @@ private:
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
-
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(int16_array_arg,size,alloc_);
 
-                    const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    std::memcpy(reinterpret_cast<char*>(typed_array_.data(int16_array_arg).data()),v.data(),v.size());
+                    if (e != jsoncons::detail::endian::native)
                     {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                        for (std::size_t i = 0; i < size; ++i)
                         {
-                            int16_t val = jsoncons::detail::big_to_native<int16_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(int16_array_arg)[i] = val;
-                        }
-                    }
-                    else if (e == jsoncons::detail::endian::little)
-                    {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-                        {
-                            int16_t val = jsoncons::detail::little_to_native<int16_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(int16_array_arg)[i] = val;
+                            typed_array_.data(int16_array_arg)[i] = jsoncons::detail::byte_swap<int16_t>(typed_array_.data(int16_array_arg)[i]);
                         }
                     }
                     more_ = handler.typed_array(typed_array_.data(int16_array_arg), semantic_tag::none, *this, ec);
@@ -1928,27 +1880,15 @@ private:
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
-
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(int32_array_arg,size,alloc_);
 
-                    const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    std::memcpy(reinterpret_cast<char*>(typed_array_.data(int32_array_arg).data()),v.data(),v.size());
+                    if (e != jsoncons::detail::endian::native)
                     {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                        for (std::size_t i = 0; i < size; ++i)
                         {
-                            int32_t val = jsoncons::detail::big_to_native<int32_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(int32_array_arg)[i] = val;
-                        }
-                    }
-                    else if (e == jsoncons::detail::endian::little)
-                    {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-                        {
-                            int32_t val = jsoncons::detail::little_to_native<int32_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(int32_array_arg)[i] = val;
+                            typed_array_.data(int32_array_arg)[i] = jsoncons::detail::byte_swap<int32_t>(typed_array_.data(int32_array_arg)[i]);
                         }
                     }
                     more_ = handler.typed_array(typed_array_.data(int32_array_arg), semantic_tag::none, *this, ec);
@@ -1968,27 +1908,15 @@ private:
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
-
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(int64_array_arg,size,alloc_);
 
-                    const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    std::memcpy(reinterpret_cast<char*>(typed_array_.data(int64_array_arg).data()),v.data(),v.size());
+                    if (e != jsoncons::detail::endian::native)
                     {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                        for (std::size_t i = 0; i < size; ++i)
                         {
-                            int64_t val = jsoncons::detail::big_to_native<int64_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(int64_array_arg)[i] = val;
-                        }
-                    }
-                    else if (e == jsoncons::detail::endian::little)
-                    {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-                        {
-                            int64_t val = jsoncons::detail::little_to_native<int64_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(int64_array_arg)[i] = val;
+                            typed_array_.data(int64_array_arg)[i] = jsoncons::detail::byte_swap<int64_t>(typed_array_.data(int64_array_arg)[i]);
                         }
                     }
                     more_ = handler.typed_array(typed_array_.data(int64_array_arg), semantic_tag::none, *this, ec);
@@ -2008,27 +1936,15 @@ private:
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
-
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(half_array_arg,size,alloc_);
 
-                    const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    std::memcpy(reinterpret_cast<char*>(typed_array_.data(half_array_arg).data()),v.data(),v.size());
+                    if (e != jsoncons::detail::endian::native)
                     {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                        for (std::size_t i = 0; i < size; ++i)
                         {
-                            uint16_t val = jsoncons::detail::big_to_native<uint16_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(half_array_arg)[i] = val;
-                        }
-                    }
-                    else if (e == jsoncons::detail::endian::little)
-                    {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-                        {
-                            uint16_t val = jsoncons::detail::little_to_native<uint16_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(half_array_arg)[i] = val;
+                            typed_array_.data(half_array_arg)[i] = jsoncons::detail::byte_swap<uint16_t>(typed_array_.data(half_array_arg)[i]);
                         }
                     }
                     more_ = handler.typed_array(half_arg, typed_array_.data(half_array_arg), semantic_tag::none, *this, ec);
@@ -2048,27 +1964,15 @@ private:
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
-
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(float_array_arg,size,alloc_);
 
-                    const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    std::memcpy(reinterpret_cast<char*>(typed_array_.data(float_array_arg).data()),v.data(),v.size());
+                    if (e != jsoncons::detail::endian::native)
                     {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                        for (std::size_t i = 0; i < size; ++i)
                         {
-                            float val = jsoncons::detail::big_to_native<float>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(float_array_arg)[i] = val;
-                        }
-                    }
-                    else if (e == jsoncons::detail::endian::little)
-                    {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-                        {
-                            float val = jsoncons::detail::little_to_native<float>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(float_array_arg)[i] = val;
+                            typed_array_.data(float_array_arg)[i] = jsoncons::detail::byte_swap<float>(typed_array_.data(float_array_arg)[i]);
                         }
                     }
                     more_ = handler.typed_array(typed_array_.data(float_array_arg), semantic_tag::none, *this, ec);
@@ -2088,27 +1992,15 @@ private:
                     jsoncons::detail::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
-
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(double_array_arg,size,alloc_);
 
-                    const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    std::memcpy(reinterpret_cast<char*>(typed_array_.data(double_array_arg).data()),v.data(),v.size());
+                    if (e != jsoncons::detail::endian::native)
                     {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                        for (std::size_t i = 0; i < size; ++i)
                         {
-                            double val = jsoncons::detail::big_to_native<double>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(double_array_arg)[i] = val;
-                        }
-                    }
-                    else if (e == jsoncons::detail::endian::little)
-                    {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-                        {
-                            double val = jsoncons::detail::little_to_native<double>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(double_array_arg)[i] = val;
+                            typed_array_.data(double_array_arg)[i] = jsoncons::detail::byte_swap<double>(typed_array_.data(double_array_arg)[i]);
                         }
                     }
                     more_ = handler.typed_array(typed_array_.data(double_array_arg), semantic_tag::none, *this, ec);
