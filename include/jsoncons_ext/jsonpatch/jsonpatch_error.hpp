@@ -90,23 +90,13 @@ namespace jsoncons { namespace jsonpatch {
         {
         }
 
-        jsonpatch_error(const std::error_code& ec, const std::string& what_arg)
-            : std::system_error(ec, what_arg)
-        {
-        }
-
-        jsonpatch_error(const std::error_code& ec, const char* what_arg)
-            : std::system_error(ec, what_arg)
-        {
-        }
-
         jsonpatch_error(const jsonpatch_error& other) = default;
 
         jsonpatch_error(jsonpatch_error&& other) = default;
 
         const char* what() const noexcept override
         {
-            return std::system_error::what();
+            return this->code().message().c_str();
         }
 
         jsonpatch_error& operator=(const jsonpatch_error& e) = default;
