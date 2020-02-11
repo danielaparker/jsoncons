@@ -149,7 +149,7 @@ TEST_CASE("cbor typed array tests")
         cbor::cbor_options options;
         options.enable_typed_arrays(true);
         cbor::encode_cbor(u, v, options);
-        check_native(std::integral_constant<bool,jsoncons::detail::endian::native == jsoncons::detail::endian::big>(),
+        check_native(std::integral_constant<bool,jsoncons::endian::native == jsoncons::endian::big>(),
                      input, v);
     }
     SECTION("Tag 66 (uint32, big endian)")
@@ -176,7 +176,7 @@ TEST_CASE("cbor typed array tests")
         cbor::cbor_options options;
         options.enable_typed_arrays(true);
         cbor::encode_cbor(u, v, options);
-        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(),
+        check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(),
             input, v);
     }
 
@@ -204,7 +204,7 @@ TEST_CASE("cbor typed array tests")
         cbor::cbor_options options;
         options.enable_typed_arrays(true);
         cbor::encode_cbor(u, v, options);
-        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(),
+        check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(),
             input, v);
     }
 
@@ -272,7 +272,7 @@ TEST_CASE("cbor typed array tests")
         cbor::cbor_options options;
         options.enable_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
-        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(),
+        check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
     }
 
@@ -311,7 +311,7 @@ TEST_CASE("cbor typed array tests")
         cbor::cbor_options options;
         options.enable_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
-        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(),
+        check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
     }
     SECTION("Tag 71 (uint64,little endian)")
@@ -343,7 +343,7 @@ TEST_CASE("cbor typed array tests")
         cbor::cbor_options options;
         options.enable_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
-        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(),
+        check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
     }
     SECTION("Tag 72 (int8)")
@@ -369,7 +369,7 @@ TEST_CASE("cbor typed array tests")
         cbor::cbor_options options;
         options.enable_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
-        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(),
+        check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
     }
     SECTION("Tag 73 (int16, big endian)")
@@ -413,7 +413,7 @@ TEST_CASE("cbor typed array tests")
         cbor::cbor_options options;
         options.enable_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
-        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(),
+        check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(),
             input, buf);
     }
 
@@ -452,7 +452,7 @@ TEST_CASE("cbor typed array tests")
         cbor::cbor_options options;
         options.enable_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
-        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(),
+        check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(),
             input, buf);
     }
     SECTION("Tag 75 (int64,big endian)")
@@ -484,7 +484,7 @@ TEST_CASE("cbor typed array tests")
         cbor::cbor_options options;
         options.enable_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
-        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(),
+        check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(),
             input, buf);
     }
     SECTION("Tag 77 (int16, little endian)")
@@ -528,7 +528,7 @@ TEST_CASE("cbor typed array tests")
         cbor::cbor_options options;
         options.enable_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
-        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(),
+        check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
     }
     SECTION("Tags 78 (int32, little endian)")
@@ -566,7 +566,7 @@ TEST_CASE("cbor typed array tests")
         cbor::cbor_options options;
         options.enable_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
-        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(),
+        check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
     }
 
@@ -599,7 +599,7 @@ TEST_CASE("cbor typed array tests")
         cbor::cbor_options options;
         options.enable_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
-        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(),
+        check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
     }
 
@@ -648,7 +648,7 @@ TEST_CASE("cbor typed array tests")
         cbor::cbor_options options;
         options.enable_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
-        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(),
+        check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(),
             input, buf);
     }
 
@@ -672,7 +672,7 @@ TEST_CASE("cbor typed array tests")
         cbor::cbor_options options;
         options.enable_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
-        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(),
+        check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(),
             input, buf);
     }
 
@@ -743,7 +743,7 @@ TEST_CASE("cbor typed array tests")
         cbor::cbor_options options;
         options.enable_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
-        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(),
+        check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
     }
     SECTION("Tag 86, float64, little endian")
@@ -772,7 +772,7 @@ TEST_CASE("cbor typed array tests")
         cbor::cbor_options options;
         options.enable_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
-        check_native(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::little>(),
+        check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
     }
 

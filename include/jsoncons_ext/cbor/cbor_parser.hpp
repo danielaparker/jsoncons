@@ -16,7 +16,7 @@
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/staj_reader.hpp> // typed_array
-#include <jsoncons/config/binary_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
@@ -1609,9 +1609,9 @@ private:
         more_ = handler.string_value(v, tag, *this);
     }
 
-    static jsoncons::detail::endian get_typed_array_endianness(const uint8_t tag)
+    static jsoncons::endian get_typed_array_endianness(const uint8_t tag)
     {
-        return ((tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift) == 0 ? jsoncons::detail::endian::big : jsoncons::detail::endian::little; 
+        return ((tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift) == 0 ? jsoncons::endian::big : jsoncons::endian::little; 
     }
 
     static std::size_t get_typed_array_bytes_per_element(const uint8_t tag)
@@ -1745,7 +1745,7 @@ private:
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
                     std::size_t size = v.size()/bytes_per_elem;
@@ -1773,7 +1773,7 @@ private:
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag);
+                    jsoncons::endian e = get_typed_array_endianness(tag);
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
                     std::size_t size = v.size()/bytes_per_elem;
@@ -1800,7 +1800,7 @@ private:
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
                     std::size_t size = v.size()/bytes_per_elem;
@@ -1849,7 +1849,7 @@ private:
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
                     std::size_t size = v.size()/bytes_per_elem;
@@ -1877,7 +1877,7 @@ private:
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
                     std::size_t size = v.size()/bytes_per_elem;
@@ -1905,7 +1905,7 @@ private:
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
                     std::size_t size = v.size()/bytes_per_elem;
@@ -1933,7 +1933,7 @@ private:
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
                     std::size_t size = v.size()/bytes_per_elem;
@@ -1961,7 +1961,7 @@ private:
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
                     std::size_t size = v.size()/bytes_per_elem;
@@ -1989,7 +1989,7 @@ private:
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
                     std::size_t size = v.size()/bytes_per_elem;

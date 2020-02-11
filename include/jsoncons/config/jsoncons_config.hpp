@@ -8,6 +8,7 @@
 #define JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 
 #include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/config/binary_config.hpp>
 
 #if !defined(JSONCONS_HAS_STD_STRING_VIEW)
 #include <jsoncons/detail/string_view.hpp>
@@ -48,6 +49,19 @@ namespace jsoncons {
 using std::optional;
 }
 #endif // !defined(JSONCONS_HAS_OPTIONAL)
+
+#if !defined(JSONCONS_HAS_ENDIAN)
+#include <jsoncons/detail/endian.hpp>
+namespace jsoncons {
+using jsoncons::detail::endian;
+}
+#else
+#include <bit>
+namespace jsoncons 
+{
+    using std::endian;
+}
+#endif
 
 #if !defined(JSONCONS_HAS_MAKE_UNIQUE)
 
@@ -93,7 +107,7 @@ namespace jsoncons {
     template<class T, class... Args>
     typename unique_if<T>::value_is_array_of_known_bound
     make_unique(Args&&...) = delete;
-}
+} // jsoncons
 
 #else
 
@@ -105,4 +119,130 @@ namespace jsoncons
 
 #endif // !defined(JSONCONS_HAS_MAKE_UNIQUE)
 
+namespace jsoncons {
+namespace detail {
+
+    // native_to_big
+
+    template<typename T, class OutputIt, class Endian=endian>
+    typename std::enable_if<Endian::native == Endian::big,void>::type
+    native_to_big(T val, OutputIt d_first)
+    {
+        uint8_t buf[sizeof(T)];
+        std::memcpy(buf, &val, sizeof(T));
+        for (auto item : buf)
+        {
+            *d_first++ = item;
+        }
+    }
+
+    template<typename T, class OutputIt, class Endian=endian>
+    typename std::enable_if<Endian::native == Endian::little,void>::type
+    native_to_big(T val, OutputIt d_first)
+    {
+        T val2 = byte_swap(val);
+        uint8_t buf[sizeof(T)];
+        std::memcpy(buf, &val2, sizeof(T));
+        for (auto item : buf)
+        {
+            *d_first++ = item;
+        }
+    }
+
+    // native_to_little
+
+    template<typename T, class OutputIt, class Endian = endian>
+    typename std::enable_if<Endian::native == Endian::little,void>::type
+    native_to_little(T val, OutputIt d_first)
+    {
+        uint8_t buf[sizeof(T)];
+        std::memcpy(buf, &val, sizeof(T));
+        for (auto item : buf)
+        {
+            *d_first++ = item;
+        }
+    }
+
+    template<typename T, class OutputIt, class Endian=endian>
+    typename std::enable_if<Endian::native == Endian::big, void>::type
+    native_to_little(T val, OutputIt d_first)
+    {
+        T val2 = byte_swap(val);
+        uint8_t buf[sizeof(T)];
+        std::memcpy(buf, &val2, sizeof(T));
+        for (auto item : buf)
+        {
+            *d_first++ = item;
+        }
+    }
+
+    // big_to_native
+
+    template<class T,class Endian=endian>
+    typename std::enable_if<Endian::native == Endian::big,T>::type
+    big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+    {
+        if (first + sizeof(T) > last)
+        {
+            *endp = first;
+            return 0;
+        }
+        *endp = first + sizeof(T);
+        T val;
+        std::memcpy(&val,first,sizeof(T));
+        return val;
+    }
+
+    template<class T,class Endian=endian>
+    typename std::enable_if<Endian::native == Endian::little,T>::type
+    big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+    {
+        if (first + sizeof(T) > last)
+        {
+            *endp = first;
+            return 0;
+        }
+        *endp = first + sizeof(T);
+        T val;
+        std::memcpy(&val,first,sizeof(T));
+        return byte_swap(val);
+    }
+
+    // little_to_native
+
+    template<class T,class Endian=endian>
+    typename std::enable_if<Endian::native == Endian::little,T>::type
+    little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+    {
+        if (first + sizeof(T) > last)
+        {
+            *endp = first;
+            return 0;
+        }
+        *endp = first + sizeof(T);
+        T val;
+        std::memcpy(&val,first,sizeof(T));
+        return val;
+    }
+
+    template<class T,class Endian=endian>
+    typename std::enable_if<Endian::native == Endian::big,T>::type
+    little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+    {
+        if (first + sizeof(T) > last)
+        {
+            *endp = first;
+            return 0;
+        }
+        *endp = first + sizeof(T);
+        T val;
+        std::memcpy(&val,first,sizeof(T));
+        return byte_swap(val);
+    }
+
+} // detail
+} // jsoncons
+
 #endif // JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
+
+
