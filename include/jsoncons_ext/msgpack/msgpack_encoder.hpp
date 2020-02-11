@@ -14,7 +14,7 @@
 #include <utility> // std::move
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/config/binary_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/msgpack/msgpack_detail.hpp>

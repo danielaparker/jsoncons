@@ -14,7 +14,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/config/binary_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/bson/bson_detail.hpp>
 #include <jsoncons_ext/bson/bson_error.hpp>
 

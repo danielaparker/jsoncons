@@ -16,7 +16,7 @@
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/staj_reader.hpp> // typed_array
-#include <jsoncons/config/binary_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
@@ -1569,9 +1569,9 @@ private:
         more_ = handler.string_value(v, tag, *this);
     }
 
-    static jsoncons::detail::endian get_typed_array_endianness(const uint8_t tag)
+    static jsoncons::endian get_typed_array_endianness(const uint8_t tag)
     {
-        return ((tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift) == 0 ? jsoncons::detail::endian::big : jsoncons::detail::endian::little; 
+        return ((tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift) == 0 ? jsoncons::endian::big : jsoncons::endian::little; 
     }
 
     static std::size_t get_typed_array_bytes_per_element(const uint8_t tag)
@@ -1692,7 +1692,7 @@ private:
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
                     const uint8_t* p = v.data();
@@ -1702,7 +1702,7 @@ private:
                     typed_array_ = typed_array<WorkAllocator>(uint16_array_arg,size,alloc_);
 
                     const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    if (e == jsoncons::endian::big)
                     {
                         for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
@@ -1710,7 +1710,7 @@ private:
                             typed_array_.data(uint16_array_arg)[i] = val;
                         }
                     }
-                    else if (e == jsoncons::detail::endian::little)
+                    else if (e == jsoncons::endian::little)
                     {
                         for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
@@ -1730,7 +1730,7 @@ private:
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag);
+                    jsoncons::endian e = get_typed_array_endianness(tag);
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
                     const uint8_t* p = v.data();
@@ -1739,7 +1739,7 @@ private:
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(uint32_array_arg,size,alloc_);
                     const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    if (e == jsoncons::endian::big)
                     {
                         for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
@@ -1747,7 +1747,7 @@ private:
                             typed_array_.data(uint32_array_arg)[i] = val;
                         }
                     }
-                    else if (e == jsoncons::detail::endian::little)
+                    else if (e == jsoncons::endian::little)
                     {
                         for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
@@ -1767,7 +1767,7 @@ private:
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
                     const uint8_t* p = v.data();
@@ -1777,7 +1777,7 @@ private:
                     typed_array_ = typed_array<WorkAllocator>(uint64_array_arg,size,alloc_);
 
                     const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    if (e == jsoncons::endian::big)
                     {
                         for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
@@ -1785,7 +1785,7 @@ private:
                             typed_array_.data(uint64_array_arg)[i] = val;
                         }
                     }
-                    else if (e == jsoncons::detail::endian::little)
+                    else if (e == jsoncons::endian::little)
                     {
                         for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
@@ -1824,7 +1824,7 @@ private:
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
                     const uint8_t* p = v.data();
@@ -1834,7 +1834,7 @@ private:
                     typed_array_ = typed_array<WorkAllocator>(int16_array_arg,size,alloc_);
 
                     const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    if (e == jsoncons::endian::big)
                     {
                         for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
@@ -1842,7 +1842,7 @@ private:
                             typed_array_.data(int16_array_arg)[i] = val;
                         }
                     }
-                    else if (e == jsoncons::detail::endian::little)
+                    else if (e == jsoncons::endian::little)
                     {
                         for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
@@ -1862,7 +1862,7 @@ private:
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
                     const uint8_t* p = v.data();
@@ -1872,7 +1872,7 @@ private:
                     typed_array_ = typed_array<WorkAllocator>(int32_array_arg,size,alloc_);
 
                     const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    if (e == jsoncons::endian::big)
                     {
                         for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
@@ -1880,7 +1880,7 @@ private:
                             typed_array_.data(int32_array_arg)[i] = val;
                         }
                     }
-                    else if (e == jsoncons::detail::endian::little)
+                    else if (e == jsoncons::endian::little)
                     {
                         for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
@@ -1900,7 +1900,7 @@ private:
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
                     const uint8_t* p = v.data();
@@ -1910,7 +1910,7 @@ private:
                     typed_array_ = typed_array<WorkAllocator>(int64_array_arg,size,alloc_);
 
                     const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    if (e == jsoncons::endian::big)
                     {
                         for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
@@ -1918,7 +1918,7 @@ private:
                             typed_array_.data(int64_array_arg)[i] = val;
                         }
                     }
-                    else if (e == jsoncons::detail::endian::little)
+                    else if (e == jsoncons::endian::little)
                     {
                         for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
@@ -1938,7 +1938,7 @@ private:
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
                     const uint8_t* p = v.data();
@@ -1948,7 +1948,7 @@ private:
                     typed_array_ = typed_array<WorkAllocator>(half_array_arg,size,alloc_);
 
                     const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    if (e == jsoncons::endian::big)
                     {
                         for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
@@ -1956,7 +1956,7 @@ private:
                             typed_array_.data(half_array_arg)[i] = val;
                         }
                     }
-                    else if (e == jsoncons::detail::endian::little)
+                    else if (e == jsoncons::endian::little)
                     {
                         for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
@@ -1976,7 +1976,7 @@ private:
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
                     const uint8_t* p = v.data();
@@ -1986,7 +1986,7 @@ private:
                     typed_array_ = typed_array<WorkAllocator>(float_array_arg,size,alloc_);
 
                     const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    if (e == jsoncons::endian::big)
                     {
                         for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
@@ -1994,7 +1994,7 @@ private:
                             typed_array_.data(float_array_arg)[i] = val;
                         }
                     }
-                    else if (e == jsoncons::detail::endian::little)
+                    else if (e == jsoncons::endian::little)
                     {
                         for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
@@ -2014,7 +2014,7 @@ private:
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
 
                     const uint8_t* p = v.data();
@@ -2024,7 +2024,7 @@ private:
                     typed_array_ = typed_array<WorkAllocator>(double_array_arg,size,alloc_);
 
                     const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    if (e == jsoncons::endian::big)
                     {
                         for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
@@ -2032,7 +2032,7 @@ private:
                             typed_array_.data(double_array_arg)[i] = val;
                         }
                     }
-                    else if (e == jsoncons::detail::endian::little)
+                    else if (e == jsoncons::endian::little)
                     {
                         for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
                         {
