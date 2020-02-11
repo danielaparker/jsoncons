@@ -14,7 +14,7 @@
 #include <limits> // std::numeric_limits
 #include <memory>
 #include <utility> // std::move
-#include <jsoncons/config/binary_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/bignum.hpp>

@@ -12,7 +12,7 @@
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/json_options.hpp>
-#include <jsoncons/config/binary_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/tag_type.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 

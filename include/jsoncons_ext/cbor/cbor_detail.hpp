@@ -15,7 +15,7 @@
 #include <utility> // std::move
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/config/binary_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 
 // 0x00..0x17 (0..23)
 #define JSONCONS_CBOR_0x00_0x17 \

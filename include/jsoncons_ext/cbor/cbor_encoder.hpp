@@ -14,7 +14,7 @@
 #include <utility> // std::move
 #include <jsoncons/json_exception.hpp> // jsoncons::ser_error
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/config/binary_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
@@ -1150,7 +1150,7 @@ private:
     {
         if (options_.enable_typed_arrays())
         {
-            write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
+            write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   uint16_t(), 
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint16_t));
@@ -1180,7 +1180,7 @@ private:
     {
         if (options_.enable_typed_arrays())
         {
-            write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
+            write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   uint32_t(), 
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint32_t));
@@ -1210,7 +1210,7 @@ private:
     {
         if (options_.enable_typed_arrays())
         {
-            write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
+            write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   uint64_t(), 
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint64_t));
@@ -1268,7 +1268,7 @@ private:
     {
         if (options_.enable_typed_arrays())
         {
-            write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
+            write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   int16_t(), 
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(int16_t));
@@ -1298,7 +1298,7 @@ private:
     {
         if (options_.enable_typed_arrays())
         {
-            write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
+            write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   int32_t(), 
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(int32_t));
@@ -1328,7 +1328,7 @@ private:
     {
         if (options_.enable_typed_arrays())
         {
-            write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
+            write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   int64_t(), 
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(int64_t));
@@ -1358,7 +1358,7 @@ private:
     {
         if (options_.enable_typed_arrays())
         {
-            write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
+            write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   half_arg, 
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint16_t));
@@ -1388,7 +1388,7 @@ private:
     {
         if (options_.enable_typed_arrays())
         {
-            write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
+            write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   float(), 
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(float));
@@ -1418,7 +1418,7 @@ private:
     {
         if (options_.enable_typed_arrays())
         {
-            write_typed_array_tag(std::integral_constant<bool, jsoncons::detail::endian::native == jsoncons::detail::endian::big>(), 
+            write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   double(), 
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(double));

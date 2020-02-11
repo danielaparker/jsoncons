@@ -16,7 +16,7 @@
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/staj_reader.hpp> // typed_array
-#include <jsoncons/config/binary_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
@@ -111,6 +111,41 @@ class basic_cbor_parser : public ser_context
     std::vector<std::size_t> shape_;
     std::size_t index_;
     std::vector<stringref_map,stringref_map_allocator_type> stringref_map_stack_;
+
+    struct read_byte_string_from_buffer
+    {
+        byte_string_view bytes;
+
+        read_byte_string_from_buffer(const byte_string_view& b)
+            : bytes(b)
+        {
+        }
+        template <class Container>
+        void operator()(Container& c, std::error_code&)
+        {
+            c.clear();
+            c.reserve(bytes.size());
+            for (auto b : bytes)
+            {
+                c.push_back(b);
+            }
+        }
+    };
+
+    struct read_byte_string_from_source
+    {
+        basic_cbor_parser<Src,WorkAllocator>* source;
+
+        read_byte_string_from_source(basic_cbor_parser<Src,WorkAllocator>* source)
+            : source(source)
+        {
+        }
+        template <class Container>
+        void operator()(Container& c, std::error_code& ec)
+        {
+            source->get_byte_string(c,ec);
+        }
+    };
 
 public:
     template <class Source>
@@ -376,10 +411,11 @@ private:
                         }
                         case jsoncons::cbor::detail::cbor_major_type::byte_string:
                         {
-                            auto read = [&str](std::error_code&) -> std::vector<uint8_t>
-                            {
-                                return str.bytes;
-                            };
+                            //auto read = [&str](std::vector<uint8_t>& v, std::error_code&)
+                            //{
+                            //    v = str.bytes;
+                            //};
+                            read_byte_string_from_buffer read(byte_string_view(str.bytes.data(), str.bytes.size()));
                             write_byte_string(read, handler, ec);
                             if (ec)
                             {
@@ -428,10 +464,11 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::byte_string:
             {
-                auto read = [this](std::error_code& ec) -> std::vector<uint8_t>
-                {
-                    return this->get_byte_string(ec);
-                };
+                //auto read = [this](std::vector<uint8_t>& v, std::error_code& ec) 
+                //{
+                //    this->get_byte_string(v, ec);
+                //};
+                read_byte_string_from_source read(this);
                 write_byte_string(read, handler, ec);
                 if (ec)
                 {
@@ -688,8 +725,8 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::byte_string:
             {
-                bytes_buffer_ = get_byte_string(ec);
-                if (ec)
+                more_ = get_byte_string(bytes_buffer_, ec);
+                if (!more_)
                 {
                     return;
                 }
@@ -823,10 +860,10 @@ private:
         return len;
     }
 
-    std::vector<uint8_t> get_byte_string(std::error_code& ec)
+    bool get_byte_string(std::vector<uint8_t>& v, std::error_code& ec)
     {
-        std::vector<uint8_t> v;
-
+        bool more = true;
+        v.clear();
         jsoncons::cbor::detail::cbor_major_type major_type;
         uint8_t info;
         int c = source_.peek();
@@ -834,8 +871,8 @@ private:
         {
             case Src::traits_type::eof():
                 ec = cbor_errc::unexpected_eof;
-                more_ = false;
-                return v;
+                more = false;
+                return more;
             default:
                 major_type = get_major_type((uint8_t)c);
                 info = get_additional_information_value((uint8_t)c);
@@ -867,16 +904,16 @@ private:
                 std::size_t length = get_size(ec);
                 if (ec)
                 {
-                    more_ = false;
-                    return v;
+                    more = false;
+                    return more;
                 }
                 v.resize(length);
                 source_.read(v.data(), length);
                 if (source_.eof())
                 {
                     ec = cbor_errc::unexpected_eof;
-                    more_ = false;
-                    return v;
+                    more = false;
+                    return more;
                 }
                 if (!stringref_map_stack_.empty() &&
                     v.size() >= jsoncons::cbor::detail::min_length_for_stringref(stringref_map_stack_.back().size()))
@@ -886,7 +923,7 @@ private:
                 break;
             }
         }
-        return v;
+        return more;
     }
 
     template <class Function>
@@ -1268,9 +1305,11 @@ private:
 
                 if (get_major_type((uint8_t)c) == jsoncons::cbor::detail::cbor_major_type::byte_string)
                 {
-                    std::vector<uint8_t> v = get_byte_string(ec);
+                    std::vector<uint8_t> v;
+                    get_byte_string(v, ec);
                     if (ec)
                     {
+                        more_ = false;
                         return s;
                     }
                     if (tag == 2)
@@ -1406,7 +1445,8 @@ private:
 
                 if (get_major_type((uint8_t)c) == jsoncons::cbor::detail::cbor_major_type::byte_string)
                 {
-                    std::vector<uint8_t> v = get_byte_string(ec);
+                    std::vector<uint8_t> v; 
+                    more_ = get_byte_string(v, ec);
                     if (ec)
                     {
                         return s;
@@ -1569,9 +1609,9 @@ private:
         more_ = handler.string_value(v, tag, *this);
     }
 
-    static jsoncons::detail::endian get_typed_array_endianness(const uint8_t tag)
+    static jsoncons::endian get_typed_array_endianness(const uint8_t tag)
     {
-        return ((tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift) == 0 ? jsoncons::detail::endian::big : jsoncons::detail::endian::little; 
+        return ((tag & detail::cbor_array_tags_e_mask) >> detail::cbor_array_tags_e_shift) == 0 ? jsoncons::endian::big : jsoncons::endian::little; 
     }
 
     static std::size_t get_typed_array_bytes_per_element(const uint8_t tag)
@@ -1591,9 +1631,11 @@ private:
             {
                 case 0x2:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     bignum n(1, v.data(), v.size());
@@ -1604,9 +1646,11 @@ private:
                 }
                 case 0x3:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     bignum n(-1, v.data(), v.size());
@@ -1617,9 +1661,10 @@ private:
                 }
                 case 0x15:
                 {
-                    bytes_buffer_ = read(ec);
+                    read(bytes_buffer_,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     more_ = handler.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), semantic_tag::base64url, *this);
@@ -1627,9 +1672,10 @@ private:
                 }
                 case 0x16:
                 {
-                    bytes_buffer_ = read(ec);
+                    read(bytes_buffer_,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     more_ = handler.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), semantic_tag::base64, *this);
@@ -1637,9 +1683,10 @@ private:
                 }
                 case 0x17:
                 {
-                    bytes_buffer_ = read(ec);
+                    read(bytes_buffer_,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     more_ = handler.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), semantic_tag::base16, *this);
@@ -1647,9 +1694,11 @@ private:
                 }
                 case 0x40:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t* p = v.data();
@@ -1666,9 +1715,11 @@ private:
                 }
                 case 0x44:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t* p = v.data();
@@ -1686,36 +1737,26 @@ private:
                 case 0x41:
                 case 0x45:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
-
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(uint16_array_arg,size,alloc_);
 
-                    const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    std::memcpy(reinterpret_cast<char*>(typed_array_.data(uint16_array_arg).data()),v.data(),v.size());
+                    if (e != jsoncons::detail::endian::native)
                     {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                        for (std::size_t i = 0; i < size; ++i)
                         {
-                            uint16_t val = jsoncons::detail::big_to_native<uint16_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(uint16_array_arg)[i] = val;
-                        }
-                    }
-                    else if (e == jsoncons::detail::endian::little)
-                    {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-                        {
-                            uint16_t val = jsoncons::detail::little_to_native<uint16_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(uint16_array_arg)[i] = val;
+                            typed_array_.data(uint16_array_arg)[i] = jsoncons::detail::byte_swap<uint16_t>(typed_array_.data(uint16_array_arg)[i]);
                         }
                     }
                     more_ = handler.typed_array(typed_array_.data(uint16_array_arg), semantic_tag::none, *this, ec);
@@ -1724,35 +1765,25 @@ private:
                 case 0x42:
                 case 0x46:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag);
+                    jsoncons::endian e = get_typed_array_endianness(tag);
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
-
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(uint32_array_arg,size,alloc_);
-                    const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    std::memcpy(reinterpret_cast<char*>(typed_array_.data(uint32_array_arg).data()),v.data(),v.size());
+                    if (e != jsoncons::detail::endian::native)
                     {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                        for (std::size_t i = 0; i < size; ++i)
                         {
-                            uint32_t val = jsoncons::detail::big_to_native<uint32_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(uint32_array_arg)[i] = val;
-                        }
-                    }
-                    else if (e == jsoncons::detail::endian::little)
-                    {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-                        {
-                            uint32_t val = jsoncons::detail::little_to_native<uint32_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(uint32_array_arg)[i] = val;
+                            typed_array_.data(uint32_array_arg)[i] = jsoncons::detail::byte_swap<uint32_t>(typed_array_.data(uint32_array_arg)[i]);
                         }
                     }
                     more_ = handler.typed_array(typed_array_.data(uint32_array_arg), semantic_tag::none, *this, ec);
@@ -1761,36 +1792,26 @@ private:
                 case 0x43:
                 case 0x47:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
-
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(uint64_array_arg,size,alloc_);
 
-                    const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    std::memcpy(reinterpret_cast<char*>(typed_array_.data(uint64_array_arg).data()),v.data(),v.size());
+                    if (e != jsoncons::detail::endian::native)
                     {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                        for (std::size_t i = 0; i < size; ++i)
                         {
-                            uint64_t val = jsoncons::detail::big_to_native<uint64_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(uint64_array_arg)[i] = val;
-                        }
-                    }
-                    else if (e == jsoncons::detail::endian::little)
-                    {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-                        {
-                            uint64_t val = jsoncons::detail::little_to_native<uint64_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(uint64_array_arg)[i] = val;
+                            typed_array_.data(uint64_array_arg)[i] = jsoncons::detail::byte_swap<uint64_t>(typed_array_.data(uint64_array_arg)[i]);
                         }
                     }
                     more_ = handler.typed_array(typed_array_.data(uint64_array_arg), semantic_tag::none, *this, ec);
@@ -1798,9 +1819,11 @@ private:
                 }
                 case 0x48:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t* p = v.data();
@@ -1818,36 +1841,26 @@ private:
                 case 0x49:
                 case 0x4d:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
-
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(int16_array_arg,size,alloc_);
 
-                    const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    std::memcpy(reinterpret_cast<char*>(typed_array_.data(int16_array_arg).data()),v.data(),v.size());
+                    if (e != jsoncons::detail::endian::native)
                     {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                        for (std::size_t i = 0; i < size; ++i)
                         {
-                            int16_t val = jsoncons::detail::big_to_native<int16_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(int16_array_arg)[i] = val;
-                        }
-                    }
-                    else if (e == jsoncons::detail::endian::little)
-                    {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-                        {
-                            int16_t val = jsoncons::detail::little_to_native<int16_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(int16_array_arg)[i] = val;
+                            typed_array_.data(int16_array_arg)[i] = jsoncons::detail::byte_swap<int16_t>(typed_array_.data(int16_array_arg)[i]);
                         }
                     }
                     more_ = handler.typed_array(typed_array_.data(int16_array_arg), semantic_tag::none, *this, ec);
@@ -1856,36 +1869,26 @@ private:
                 case 0x4a:
                 case 0x4e:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
-
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(int32_array_arg,size,alloc_);
 
-                    const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    std::memcpy(reinterpret_cast<char*>(typed_array_.data(int32_array_arg).data()),v.data(),v.size());
+                    if (e != jsoncons::detail::endian::native)
                     {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                        for (std::size_t i = 0; i < size; ++i)
                         {
-                            int32_t val = jsoncons::detail::big_to_native<int32_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(int32_array_arg)[i] = val;
-                        }
-                    }
-                    else if (e == jsoncons::detail::endian::little)
-                    {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-                        {
-                            int32_t val = jsoncons::detail::little_to_native<int32_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(int32_array_arg)[i] = val;
+                            typed_array_.data(int32_array_arg)[i] = jsoncons::detail::byte_swap<int32_t>(typed_array_.data(int32_array_arg)[i]);
                         }
                     }
                     more_ = handler.typed_array(typed_array_.data(int32_array_arg), semantic_tag::none, *this, ec);
@@ -1894,36 +1897,26 @@ private:
                 case 0x4b:
                 case 0x4f:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
-
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(int64_array_arg,size,alloc_);
 
-                    const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    std::memcpy(reinterpret_cast<char*>(typed_array_.data(int64_array_arg).data()),v.data(),v.size());
+                    if (e != jsoncons::detail::endian::native)
                     {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                        for (std::size_t i = 0; i < size; ++i)
                         {
-                            int64_t val = jsoncons::detail::big_to_native<int64_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(int64_array_arg)[i] = val;
-                        }
-                    }
-                    else if (e == jsoncons::detail::endian::little)
-                    {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-                        {
-                            int64_t val = jsoncons::detail::little_to_native<int64_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(int64_array_arg)[i] = val;
+                            typed_array_.data(int64_array_arg)[i] = jsoncons::detail::byte_swap<int64_t>(typed_array_.data(int64_array_arg)[i]);
                         }
                     }
                     more_ = handler.typed_array(typed_array_.data(int64_array_arg), semantic_tag::none, *this, ec);
@@ -1932,36 +1925,26 @@ private:
                 case 0x50:
                 case 0x54:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
-
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(half_array_arg,size,alloc_);
 
-                    const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    std::memcpy(reinterpret_cast<char*>(typed_array_.data(half_array_arg).data()),v.data(),v.size());
+                    if (e != jsoncons::detail::endian::native)
                     {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                        for (std::size_t i = 0; i < size; ++i)
                         {
-                            uint16_t val = jsoncons::detail::big_to_native<uint16_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(half_array_arg)[i] = val;
-                        }
-                    }
-                    else if (e == jsoncons::detail::endian::little)
-                    {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-                        {
-                            uint16_t val = jsoncons::detail::little_to_native<uint16_t>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(half_array_arg)[i] = val;
+                            typed_array_.data(half_array_arg)[i] = jsoncons::detail::byte_swap<uint16_t>(typed_array_.data(half_array_arg)[i]);
                         }
                     }
                     more_ = handler.typed_array(half_arg, typed_array_.data(half_array_arg), semantic_tag::none, *this, ec);
@@ -1970,36 +1953,26 @@ private:
                 case 0x51:
                 case 0x55:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
-
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(float_array_arg,size,alloc_);
 
-                    const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    std::memcpy(reinterpret_cast<char*>(typed_array_.data(float_array_arg).data()),v.data(),v.size());
+                    if (e != jsoncons::detail::endian::native)
                     {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                        for (std::size_t i = 0; i < size; ++i)
                         {
-                            float val = jsoncons::detail::big_to_native<float>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(float_array_arg)[i] = val;
-                        }
-                    }
-                    else if (e == jsoncons::detail::endian::little)
-                    {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-                        {
-                            float val = jsoncons::detail::little_to_native<float>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(float_array_arg)[i] = val;
+                            typed_array_.data(float_array_arg)[i] = jsoncons::detail::byte_swap<float>(typed_array_.data(float_array_arg)[i]);
                         }
                     }
                     more_ = handler.typed_array(typed_array_.data(float_array_arg), semantic_tag::none, *this, ec);
@@ -2008,36 +1981,26 @@ private:
                 case 0x52:
                 case 0x56:
                 {
-                    std::vector<uint8_t> v = read(ec);
+                    std::vector<uint8_t> v;
+                    read(v,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     const uint8_t tag = (uint8_t)item_tag_;
-                    jsoncons::detail::endian e = get_typed_array_endianness(tag); 
+                    jsoncons::endian e = get_typed_array_endianness(tag); 
                     const size_t bytes_per_elem = get_typed_array_bytes_per_element(tag);
-
-                    const uint8_t* p = v.data();
-                    const uint8_t* last = v.data() + v.size();
 
                     std::size_t size = v.size()/bytes_per_elem;
                     typed_array_ = typed_array<WorkAllocator>(double_array_arg,size,alloc_);
 
-                    const uint8_t* endp = nullptr;
-                    if (e == jsoncons::detail::endian::big)
+                    std::memcpy(reinterpret_cast<char*>(typed_array_.data(double_array_arg).data()),v.data(),v.size());
+                    if (e != jsoncons::detail::endian::native)
                     {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
+                        for (std::size_t i = 0; i < size; ++i)
                         {
-                            double val = jsoncons::detail::big_to_native<double>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(double_array_arg)[i] = val;
-                        }
-                    }
-                    else if (e == jsoncons::detail::endian::little)
-                    {
-                        for (std::size_t i = 0; p < last; p += bytes_per_elem, ++i)
-                        {
-                            double val = jsoncons::detail::little_to_native<double>(p,p+bytes_per_elem,&endp);
-                            typed_array_.data(double_array_arg)[i] = val;
+                            typed_array_.data(double_array_arg)[i] = jsoncons::detail::byte_swap<double>(typed_array_.data(double_array_arg)[i]);
                         }
                     }
                     more_ = handler.typed_array(typed_array_.data(double_array_arg), semantic_tag::none, *this, ec);
@@ -2045,9 +2008,10 @@ private:
                 }
                 default:
                 {
-                    bytes_buffer_ = read(ec);
+                    read(bytes_buffer_,ec);
                     if (ec)
                     {
+                        more_ = false;
                         return;
                     }
                     more_ = handler.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), semantic_tag::none, *this, ec);
@@ -2058,7 +2022,7 @@ private:
         }
         else
         {
-            bytes_buffer_ = read(ec);
+            read(bytes_buffer_,ec);
             if (ec)
             {
                 return;
