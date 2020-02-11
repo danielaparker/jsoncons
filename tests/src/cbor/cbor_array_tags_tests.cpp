@@ -735,6 +735,9 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[1].as<float>() == (std::numeric_limits<float>::max)());
 
         auto u = cbor::decode_cbor<std::vector<float>>(input);
+        REQUIRE(u.size() == 2);
+        CHECK(u[0] == std::numeric_limits<float>::lowest());
+        CHECK(u[1] == (std::numeric_limits<float>::max)());
 
         std::vector<uint8_t> buf;
         cbor::cbor_options options;
@@ -761,6 +764,9 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[1].as<double>() == (std::numeric_limits<double>::max)());
 
         auto u = cbor::decode_cbor<std::vector<double>>(input);
+        REQUIRE(u.size() == 2);
+        CHECK(u[0] == std::numeric_limits<double>::lowest());
+        CHECK(u[1] == (std::numeric_limits<double>::max)());
 
         std::vector<uint8_t> buf;
         cbor::cbor_options options;
