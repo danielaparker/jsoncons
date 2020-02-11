@@ -116,7 +116,7 @@ TEST_CASE("jmespath expressions")
 
         std::cout << "\n" << expr3->to_string() << "\n";
 
-        auto& result3 = expr3->evaluate(context, root, ec);
+        auto& result3 = expr3->select(context, root, ec);
         std::cout << pretty_print(result3) << "\n";
     }
 
@@ -143,7 +143,7 @@ TEST_CASE("jmespath expressions")
 
         std::cout << "\n" << sub_expr1->to_string() << "\n\n";
 
-        auto& result1 = sub_expr1->evaluate(context, root, ec);
+        auto& result1 = sub_expr1->select(context, root, ec);
         std::cout << pretty_print(result1) << "\n";
     }
 }
