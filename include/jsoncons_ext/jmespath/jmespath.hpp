@@ -184,19 +184,15 @@ public:
 
         virtual void add_selector(std::unique_ptr<selector_base>&&) = 0;
 
-        virtual reference begin_select(jmespath_context&, 
-                                       reference val,
-                                       std::error_code& ec) 
+        virtual void begin_select(jmespath_context&, reference, std::error_code&) 
         {
         }
 
         virtual reference select(jmespath_context&, 
                                  reference val,
-                                 std::error_code& ec) = 0;
+                                 std::error_code&) = 0;
 
-        virtual reference end_select(jmespath_context&, 
-                                     reference val,
-                                     std::error_code& ec) 
+        virtual void end_select(jmespath_context&, reference, std::error_code&) 
         {
         }
 
