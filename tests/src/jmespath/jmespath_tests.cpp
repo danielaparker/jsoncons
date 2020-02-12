@@ -88,7 +88,7 @@ TEST_CASE("jmespath-tests")
 
 using jmespath::detail::jmespath_evaluator;
 
-
+#if 0
 TEST_CASE("jmespath expressions")
 {
     std::string input = R"(
@@ -147,4 +147,4 @@ TEST_CASE("jmespath expressions")
         std::cout << pretty_print(result1) << "\n";
     }
 }
-
+#endif

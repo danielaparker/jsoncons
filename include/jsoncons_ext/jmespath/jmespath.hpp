@@ -141,16 +141,16 @@ class jmespath_evaluator : public ser_context
     typedef JsonReference reference;
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
     typedef typename Json::const_pointer const_pointer;
-public:
+
     class jmespath_context
     {
         std::vector<std::unique_ptr<Json>> temp_storage_;
     public:
 
         template <typename... Args>
-        Json* create_new(Args&& ... args)
+        Json* new_instance(Args&& ... args)
         {
-            auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
+            auto temp = make_unique<Json>(std::forward<Args>(args)...);
             Json* ptr = temp.get();
             temp_storage_.emplace_back(std::move(temp));
             return ptr;
@@ -161,89 +161,14 @@ public:
 
     class selector_base
     {
-        bool expression_type_;
     public:
-        selector_base()
-            : expression_type_(false)
-        {
-        }
-
-        bool expression_type() const
-        {
-            return expression_type_;
-        }
-
-        void expression_type(bool value)
-        {
-            expression_type_ = value;
-        }
-
         virtual ~selector_base()
         {
         }
 
         virtual void add_selector(std::unique_ptr<selector_base>&&) = 0;
 
-        virtual void begin_select(jmespath_context&, reference, std::error_code&) 
-        {
-        }
-
-        virtual reference select(jmespath_context&, 
-                                 reference val,
-                                 std::error_code&) = 0;
-
-        virtual void end_select(jmespath_context&, reference, std::error_code&) 
-        {
-        }
-
-        virtual string_type to_string() const
-        {
-            return string_type("to_string not implemented");
-        }
-    };
-
-    class sub_expression final : public selector_base
-    {
-    public:
-        std::unique_ptr<selector_base> lhs_selector_;
-        std::vector<std::unique_ptr<selector_base>> selectors_;
-
-        sub_expression(std::unique_ptr<selector_base>&& selector)
-            : lhs_selector_(std::move(selector))
-        {
-        }
-
-        void add_selector(std::unique_ptr<selector_base>&& selector) override 
-        {
-            selectors_.emplace_back(std::move(selector));
-        }
-
-        reference select(jmespath_context& context, reference val, std::error_code& ec) override
-        {
-            reference lhs = lhs_selector_->select(context, val, ec);
-
-            pointer ptr = std::addressof(lhs);
-            for (auto& selector : selectors_)
-            {
-                ptr = std::addressof(selector->select(context, *ptr, ec));
-            }
-            return *ptr;
-        }
-
-        string_type to_string() const override
-        {
-            string_type s("sub_expression\n");
-            s.append("lhs\n");
-            s.append(lhs_selector_->to_string());
-            s.append("rhs\n");
-            for (auto& selector : selectors_)
-            {
-                s.append("    ");
-                s.append(selector->to_string());
-                s.append("\n");
-            }
-            return s;
-        }
+        virtual reference evaluate(jmespath_context&, reference val, std::error_code& ec) = 0;
     };
 
     // function
@@ -253,89 +178,29 @@ public:
                              const std::vector<std::unique_ptr<selector_base>>& selectors,
                              std::error_code& ec)
     {
+        static Json null{ null_type() };
+
         if (selectors.size() != 2)
         {
             ec = jmespath_errc::invalid_argument;
-            return Json::null();
+            return null;
         }
 
-        reference u = selectors[0]->select(context, val, ec);
+        reference u = selectors[0]->evaluate(context, val, ec);
 
         if (!u.is_array())
         {
             ec = jmespath_errc::invalid_argument;
-            return Json::null();
+            return null;
         }
         auto& key_selector = selectors[1];
 
-        auto v = context.create_new(u);
+        auto v = context.new_instance(u);
         std::sort((v->array_range()).begin(), (v->array_range()).end(),
             [&context,&key_selector,&ec](reference lhs, reference rhs) -> bool
         {
-            reference key1 = key_selector->select(context, lhs, ec);
-            reference key2 = key_selector->select(context, rhs, ec);
-
-            return key1 < key2;
-        });
-        return *v;
-    }
-
-    static reference abs(jmespath_context& context,
-                         reference val,
-                         const std::vector<std::unique_ptr<selector_base>>& selectors,
-                         std::error_code& ec)
-    {
-        if (selectors.size() != 1)
-        {
-            ec = jmespath_errc::invalid_argument;
-            return Json::null();
-        }
-
-        reference u = selectors[0]->select(context, val, ec);
-
-        switch(u.type())
-        {
-            case json_type::int64_value:
-                if (u.as<int64_t>() >= 0)
-                {
-                    return u;
-                }
-                else
-                {
-                    return *(context.create_new(-u.as<int64_t>()));
-                }
-            case json_type::uint64_value:
-                return u;
-            case json_type::half_value:
-            case json_type::double_value:
-                if (u.as<double>() >= 0)
-                {
-                    return u;
-                }
-                else
-                {
-                    return *(context.create_new(-u.as<double>()));
-                }
-            default:
-                ec = jmespath_errc::invalid_type;
-                return Json::null();
-        }
-        if (u.is<uint64_t>() || u.as<double>() >= 0)
-        {
-            return u;
-        }
-        else if (u.is<int>())
-        {
-        }
-
-        auto& key_selector = selectors[1];
-
-        auto v = context.create_new(u);
-        std::sort((v->array_range()).begin(), (v->array_range()).end(),
-            [&context,&key_selector,&ec](reference lhs, reference rhs) -> bool
-        {
-            reference key1 = key_selector->select(context, lhs, ec);
-            reference key2 = key_selector->select(context, rhs, ec);
+            reference key1 = key_selector->evaluate(context, lhs, ec);
+            reference key2 = key_selector->evaluate(context, rhs, ec);
 
             return key1 < key2;
         });
@@ -364,20 +229,18 @@ public:
             selectors_.emplace_back(std::move(selector));
         }
 
-        reference select(jmespath_context& context, 
-                         reference val,
-                         std::error_code& ec) override
+        reference evaluate(jmespath_context& context, reference val, std::error_code& ec) override
         {
             return f_(context, val, selectors_, ec);
         }
     };
 
-    class expression_selector final : public selector_base
+    class sub_expression final : public selector_base
     {
     public:
         std::vector<std::unique_ptr<selector_base>> selectors_;
 
-        expression_selector()
+        sub_expression()
         {
         }
 
@@ -386,28 +249,14 @@ public:
             selectors_.emplace_back(std::move(selector));
         }
 
-        reference select(jmespath_context& context, reference val, std::error_code& ec) override
+        reference evaluate(jmespath_context& context, reference val, std::error_code& ec) override
         {
             pointer ptr = std::addressof(val);
             for (auto& selector : selectors_)
             {
-                ptr = std::addressof(selector->select(context, *ptr, ec));
+                ptr = std::addressof(selector->evaluate(context, *ptr, ec)        );
             }
             return *ptr;
-        }
-
-        string_type to_string() const override
-        {
-            string_type s("expression_selector ");
-            s.append(std::to_string(selectors_.size()));
-            s.append("\n");
-            for (auto& selector : selectors_)
-            {
-                s.append("    ");
-                s.append(selector->to_string());
-                s.append("\n");
-            }
-            return s;
         }
     };
 
@@ -427,21 +276,21 @@ public:
         {
         }
 
-        reference select(jmespath_context& context, reference val, std::error_code& ec) override
+        reference evaluate(jmespath_context& context, reference val, std::error_code& ec) override
         {
-            auto key_valuep = context.create_new(json_object_arg);
-            key_valuep->try_emplace(name_,selector_->select(context, val, ec));
+            auto key_valuep = context.new_instance(json_object_arg);
+            key_valuep->try_emplace(name_,selector_->evaluate(context, val, ec)        );
             return *key_valuep;
         }
     };
 
-    class list_projection_selector final : public selector_base
+    class list_projection final : public selector_base
     {
     public:
         std::unique_ptr<selector_base> lhs_selector_;
         std::vector<std::unique_ptr<selector_base>> rhs_selectors_;
 
-        list_projection_selector(std::unique_ptr<selector_base>&& lhs_selector)
+        list_projection(std::unique_ptr<selector_base>&& lhs_selector)
         {
             lhs_selector_ = std::move(lhs_selector);
         }
@@ -451,23 +300,22 @@ public:
             rhs_selectors_.emplace_back(std::move(rhs_selectors));
         }
 
-        reference select(jmespath_context& context, reference val, std::error_code& ec) override
+        reference evaluate(jmespath_context& context, reference val, std::error_code& ec) override
         {
-            reference lhs = lhs_selector_->select(context, val, ec)        ;
+            static Json null{null_type()};
+            reference lhs = lhs_selector_->evaluate(context, val, ec);
             if (!lhs.is_array())
             {
-                return Json::null();
+                return null;
             }
-            std::cout << "list_projection_selector lhs:\n";
-            std::cout << pretty_print(lhs) << "\n";
 
-            auto resultp = context.create_new(json_array_arg);
+            auto resultp = context.new_instance(json_array_arg);
             for (reference item : lhs.array_range())
             {
                 pointer ptr = std::addressof(item);
                 for (auto& selector : rhs_selectors_)
                 {
-                    ptr = std::addressof(selector->select(context, *ptr, ec));
+                    ptr = std::addressof(selector->evaluate(context, *ptr, ec)        );
                 }
                 if (!ptr->is_null())
                 {
@@ -475,72 +323,6 @@ public:
                 }
             }
             return *resultp;
-        }
-
-        string_type to_string() const override
-        {
-            string_type s("list_projection_selector\n");
-            s.append("lhs\n");
-            s.append(lhs_selector_->to_string());
-            s.append("rhs\n");
-            for (auto& selector : rhs_selectors_)
-            {
-                s.append("    ");
-                s.append(selector->to_string());
-                s.append("\n");
-            }
-            return s;
-        }
-    };
-
-    class list_projection final : public selector_base
-    {
-    public:
-        std::vector<std::unique_ptr<selector_base>> rhs_selectors_;
-
-        list_projection()
-        {
-        }
-
-        void add_selector(std::unique_ptr<selector_base>&& selector) override 
-        {
-            rhs_selectors_.emplace_back(std::move(selector));
-        }
-
-        reference select(jmespath_context& context, reference val, std::error_code& ec) override
-        {
-            if (!val.is_array())
-            {
-                return Json::null();
-            }
-
-            auto resultp = context.create_new(json_array_arg);
-            for (reference item : val.array_range())
-            {
-                pointer ptr = std::addressof(item);
-                for (auto& selector : rhs_selectors_)
-                {
-                    ptr = std::addressof(selector->select(context, *ptr, ec));
-                }
-                if (!ptr->is_null())
-                {
-                    resultp->push_back(*ptr);
-                }
-            }
-            return *resultp;
-        }
-
-        string_type to_string() const override
-        {
-            string_type s("list_projection2\n");
-            s.append("rhs\n");
-            for (auto& selector : rhs_selectors_)
-            {
-                s.append("    ");
-                s.append(selector->to_string());
-                s.append("\n");
-            }
-            return s;
         }
     };
 
@@ -560,32 +342,33 @@ public:
             rhs_selectors_.emplace_back(std::move(rhs_selectors));
         }
 
-        reference select(jmespath_context& context, reference val, std::error_code& ec) override
+        reference evaluate(jmespath_context& context, reference val, std::error_code& ec) override
         {
-            reference lhs = lhs_selector_->select(context, val, ec)        ;
+            static Json null{null_type()};
+            reference lhs = lhs_selector_->evaluate(context, val, ec);
             if (!lhs.is_array())
             {
-                return Json::null();
+                return null;
             }
 
             pointer ptr = std::addressof(lhs);
             for (auto& selector : rhs_selectors_)
             {
-                ptr = std::addressof(selector->select(context, *ptr, ec));
+                ptr = std::addressof(selector->evaluate(context, *ptr, ec)        );
             }
             return *ptr;
         }
     };
 
-    class flatten_selector final : public selector_base
+    class flatten_projection final : public selector_base
     {
     public:
         std::unique_ptr<selector_base> lhs_selector_;
         std::vector<std::unique_ptr<selector_base>> rhs_selectors_;
 
-        flatten_selector(std::unique_ptr<selector_base>&& lhs_selector)
-            : lhs_selector_(std::move(lhs_selector)) 
+        flatten_projection(std::unique_ptr<selector_base>&& lhs_selector)
         {
+            lhs_selector_ = std::move(lhs_selector);
         }
 
         void add_selector(std::unique_ptr<selector_base>&& rhs_selectors) override 
@@ -593,15 +376,16 @@ public:
             rhs_selectors_.emplace_back(std::move(rhs_selectors));
         }
 
-        reference select(jmespath_context& context, reference val, std::error_code& ec) override
+        reference evaluate(jmespath_context& context, reference val, std::error_code& ec) override
         {
-            reference lhs = lhs_selector_->select(context, val, ec)        ;
+            static Json null{null_type()};
+            reference lhs = lhs_selector_->evaluate(context, val, ec);
             if (!lhs.is_array())
             {
-                return Json::null();
+                return null;
             }
 
-            auto currentp = context.create_new(json_array_arg);
+            auto currentp = context.new_instance(json_array_arg);
             for (reference item : lhs.array_range())
             {
                 if (item.is_array())
@@ -617,142 +401,14 @@ public:
                 }
             }
 
-            auto resultp = context.create_new(json_array_arg);
+            auto resultp = context.new_instance(json_array_arg);
             for (reference item : currentp->array_range())
             {
                 pointer ptr = std::addressof(item);
 
                 for (auto& selector : rhs_selectors_)
                 {
-                    ptr = std::addressof(selector->select(context, *ptr, ec));
-                }
-                if (!ptr->is_null())
-                {
-                    resultp->push_back(*ptr);
-                }
-            }
-            return *resultp;
-        }
-
-        string_type to_string() const override
-        {
-            string_type s("flatten_selector\n");
-            s.append("lhs\n");
-            s.append(lhs_selector_->to_string());
-            s.append("rhs\n");
-            for (auto& selector : rhs_selectors_)
-            {
-                s.append("    ");
-                s.append(selector->to_string());
-                s.append("\n");
-            }
-            return s;
-        }    
-    };
-
-    class flatten_projection final : public selector_base
-    {
-    public:
-        std::vector<std::unique_ptr<selector_base>> rhs_selectors_;
-
-        flatten_projection()
-        {
-        }
-
-        void add_selector(std::unique_ptr<selector_base>&& rhs_selectors) override 
-        {
-            rhs_selectors_.emplace_back(std::move(rhs_selectors));
-        }
-
-        reference select(jmespath_context& context, reference val, std::error_code& ec) override
-        {
-            if (!val.is_array())
-            {
-                return Json::null();
-            }
-
-            std::cout << "flatten projection 1 " << pretty_print(val) << "\n";
-
-            auto currentp = context.create_new(json_array_arg);
-            for (reference item : val.array_range())
-            {
-                if (item.is_array())
-                {
-                    for (reference item_of_item : item.array_range())
-                    {
-                        currentp->push_back(item_of_item);
-                    }
-                }
-                else
-                {
-                    currentp->push_back(item);
-                }
-            }
-
-            std::cout << "flatten projection 2: " << pretty_print(*currentp) << "\n";
-
-            auto resultp = context.create_new(json_array_arg);
-            for (reference item : currentp->array_range())
-            {
-                pointer ptr = std::addressof(item);
-                for (auto& selector : rhs_selectors_)
-                {
-                    ptr = std::addressof(selector->select(context, *ptr, ec));
-                }
-                if (!ptr->is_null())
-                {
-                    resultp->push_back(*ptr);
-                }
-            }
-
-            std::cout << "flatten result: " << pretty_print(*resultp) << "\n";
-            return *resultp;
-        }
-
-        string_type to_string() const override
-        {
-            string_type s("flatten_projection\n");
-            for (auto& selector : rhs_selectors_)
-            {
-                s.append("    ");
-                s.append(selector->to_string());
-                s.append("\n");
-            }
-            return s;
-        }
-    };
-
-    class object_projection_selector final : public selector_base
-    {
-    public:
-        std::unique_ptr<selector_base> lhs_selector_;
-        std::vector<std::unique_ptr<selector_base>> rhs_selectors_;
-
-        object_projection_selector(std::unique_ptr<selector_base>&& lhs_selector)
-        {
-            lhs_selector_ = std::move(lhs_selector);
-        }
-
-        void add_selector(std::unique_ptr<selector_base>&& selector) override 
-        {
-            rhs_selectors_.emplace_back(std::move(selector));
-        }
-
-        reference select(jmespath_context& context, reference val, std::error_code& ec) override
-        {
-            reference j = lhs_selector_->select(context, val, ec);
-            if (!j.is_object())
-            {
-                return Json::null();
-            }
-
-            auto resultp = context.create_new(json_array_arg);
-            for (auto& item : j.object_range())
-            {
-                pointer ptr = std::addressof(item.value());
-                for (auto& selector : rhs_selectors_)
-                {
-                    ptr = std::addressof(selector->select(context, *ptr, ec));
+                    ptr = std::addressof(selector->evaluate(context, *ptr, ec)        );
                 }
                 if (!ptr->is_null())
                 {
@@ -766,31 +422,35 @@ public:
     class object_projection final : public selector_base
     {
     public:
+        std::unique_ptr<selector_base> lhs_selector_;
         std::vector<std::unique_ptr<selector_base>> rhs_selectors_;
 
-        object_projection()
+        object_projection(std::unique_ptr<selector_base>&& lhs_selector)
         {
+            lhs_selector_ = std::move(lhs_selector);
         }
 
-        void add_selector(std::unique_ptr<selector_base>&& selector) override 
+        void add_selector(std::unique_ptr<selector_base>&& rhs_selectors) override 
         {
-            rhs_selectors_.emplace_back(std::move(selector));
+            rhs_selectors_.emplace_back(std::move(rhs_selectors));
         }
 
-        reference select(jmespath_context& context, reference val, std::error_code& ec) override
+        reference evaluate(jmespath_context& context, reference val, std::error_code& ec) override
         {
-            if (!val.is_object())
+            static Json null{null_type()};
+            reference lhs = lhs_selector_->evaluate(context, val, ec);
+            if (!lhs.is_object())
             {
-                return Json::null();
+                return null;
             }
 
-            auto resultp = context.create_new(json_array_arg);
-            for (auto& item : val.object_range())
+            auto resultp = context.new_instance(json_array_arg);
+            for (auto& item : lhs.object_range())
             {
                 pointer ptr = std::addressof(item.value());
                 for (auto& selector : rhs_selectors_)
                 {
-                    ptr = std::addressof(selector->select(context, *ptr, ec));
+                    ptr = std::addressof(selector->evaluate(context, *ptr, ec)        );
                 }
                 if (!ptr->is_null())
                 {
@@ -816,24 +476,27 @@ public:
             // Error
         }
 
-        reference select(jmespath_context&, reference val, std::error_code&) override
+        reference evaluate(jmespath_context& context, reference val, std::error_code&) override
         {
+            static Json null{null_type()};
+
             if (val.is_object() && val.contains(identifier_))
             {
                 return val.at(identifier_);
             }
-            else
+            else if (val.is_array())
             {
-                return Json::null();
+                auto resultp = context.new_instance(json_array_arg);
+                for (const auto& item : val.array_range())
+                {
+                    if (item.is_object() && item.contains(identifier_))
+                    {
+                        resultp->push_back(item.at(identifier_));
+                    }
+                }
+                return *resultp;
             }
-        }
-
-        string_type to_string() const override
-        {
-            string_type s("identifier ");
-            s.append(identifier_);
-            s.append("\n");
-            return s;
+            return null;
         }
     };
 
@@ -856,7 +519,7 @@ public:
             // noop
         }
 
-        reference select(jmespath_context&, reference, std::error_code&) override
+        reference evaluate(jmespath_context&, reference, std::error_code&)             override
         {
             return j_;
         }
@@ -877,8 +540,10 @@ public:
             // noop
         }
 
-        reference select(jmespath_context&, reference val, std::error_code&) override
+        reference evaluate(jmespath_context&, reference val, std::error_code&) override
         {
+            static Json null{null_type()};
+
             if (val.is_array())
             {
                 int64_t slen = static_cast<int64_t>(val.size());
@@ -894,74 +559,10 @@ public:
                 }
                 else
                 {
-                    return Json::null();
+                    return null;
                 }
             }
-            return Json::null();
-        }
-    };
-
-    class slice_selector final : public selector_base
-    {
-    private:
-        std::unique_ptr<selector_base> lhs_selector_;
-        slice slice_;
-        std::vector<std::unique_ptr<selector_base>> rhs_selectors_;
-    public:
-        slice_selector(std::unique_ptr<selector_base>&& lhs_selector, const slice& a_slice)
-            : lhs_selector_(std::move(lhs_selector)), slice_(a_slice)
-        {
-        }
-
-        void add_selector(std::unique_ptr<selector_base>&& selector) override
-        {
-            rhs_selectors_.emplace_back(std::move(selector));
-        }
-
-        reference select(jmespath_context& context, reference val, std::error_code& ec) override
-        {
-            reference lhs = lhs_selector_->select(context, val, ec)        ;
-            if (!lhs.is_array())
-            {
-                return Json::null();
-            }
-
-            auto resultp = context.create_new(json_array_arg);
-
-            auto start = slice_.get_start(lhs.size());
-            auto end = slice_.get_end(lhs.size());
-            auto step = slice_.step();
-            if (step >= 0)
-            {
-                for (int64_t j = start; j < end; j += step)
-                {
-                    pointer ptr = std::addressof(lhs[static_cast<std::size_t>(j)]);
-                    for (auto& selector : rhs_selectors_)
-                    {
-                        ptr = std::addressof(selector->select(context, *ptr, ec));
-                    }
-                    if (!ptr->is_null())
-                    {
-                        resultp->push_back(*ptr);
-                    }
-                }
-            }
-            else
-            {
-                for (int64_t j = end-1; j >= start; j += step)
-                {
-                    pointer ptr = std::addressof(lhs[static_cast<std::size_t>(j)]);
-                    for (auto& selector : rhs_selectors_)
-                    {
-                        ptr = std::addressof(selector->select(context, *ptr, ec));
-                    }
-                    if (!ptr->is_null())
-                    {
-                        resultp->push_back(*ptr);
-                    }
-                }
-            }
-            return *resultp; 
+            return null;
         }
     };
 
@@ -969,61 +570,49 @@ public:
     {
     private:
         slice slice_;
-        std::vector<std::unique_ptr<selector_base>> rhs_selectors_;
     public:
         slice_projection(const slice& a_slice)
             : slice_(a_slice)
         {
         }
 
-        void add_selector(std::unique_ptr<selector_base>&& selector) override
+        void add_selector(std::unique_ptr<selector_base>&&) override
         {
-            rhs_selectors_.emplace_back(std::move(selector));
+            // Error
         }
 
-        reference select(jmespath_context& context, reference val, std::error_code& ec) override
+        reference evaluate(jmespath_context& context, reference val, std::error_code&) override
         {
-            if (!val.is_array())
-            {
-                return Json::null();
-            }
+            static Json null{null_type()};
 
-            auto resultp = context.create_new(json_array_arg);
-
-            auto start = slice_.get_start(val.size());
-            auto end = slice_.get_end(val.size());
-            auto step = slice_.step();
-            if (step >= 0)
+            if (val.is_array())
             {
-                for (int64_t j = start; j < end; j += step)
+                auto resultp = context.new_instance(json_array_arg);
+
+                auto start = slice_.get_start(val.size());
+                auto end = slice_.get_end(val.size());
+                auto step = slice_.step();
+                if (step >= 0)
                 {
-                    pointer ptr = std::addressof(val[static_cast<std::size_t>(j)]);
-                    for (auto& selector : rhs_selectors_)
+                    for (int64_t j = start; j < end; j += step)
                     {
-                        ptr = std::addressof(selector->select(context, *ptr, ec));
+                        resultp->emplace_back(val[static_cast<std::size_t>(j)]);
                     }
-                    if (!ptr->is_null())
+                    return *resultp; 
+                }
+                else
+                {
+                    for (int64_t j = end-1; j >= start; j += step)
                     {
-                        resultp->push_back(*ptr);
+                        resultp->emplace_back(val[static_cast<std::size_t>(j)]);
                     }
+                    return *resultp; 
                 }
             }
             else
             {
-                for (int64_t j = end-1; j >= start; j += step)
-                {
-                    pointer ptr = std::addressof(val[static_cast<std::size_t>(j)]);
-                    for (auto& selector : rhs_selectors_)
-                    {
-                        ptr = std::addressof(selector->select(context, *ptr, ec));
-                    }
-                    if (!ptr->is_null())
-                    {
-                        resultp->push_back(*ptr);
-                    }
-                }
+                return null;
             }
-            return *resultp; 
         }
     };
 
@@ -1093,19 +682,21 @@ public:
             rhs_selectors_.emplace_back(std::move(rhs_selectors));
         }
 
-        reference select(jmespath_context& context, reference val, std::error_code& ec) override
+        reference evaluate(jmespath_context& context, reference val, std::error_code& ec) override
         {
+            static Json null{null_type()};
+
             if (val.is_array())
             {
-                auto resultp = context.create_new(json_array_arg);
+                auto resultp = context.new_instance(json_array_arg);
                 for (auto& item : val.array_range())
                 {
-                    reference lhs = lhs_selector_->select(context, item, ec);
+                    reference lhs = lhs_selector_->evaluate(context, item, ec);
 
                     pointer rhsp = std::addressof(item);
                     for (auto& selector : rhs_selectors_)
                     {
-                        rhsp = std::addressof(selector->select(context, *rhsp, ec));
+                        rhsp = std::addressof(selector->evaluate(context, *rhsp, ec)        );
                     }
                     auto r = cmp_(lhs,*rhsp);
                     if (r && r.value())
@@ -1116,16 +707,16 @@ public:
                 return *resultp;
             }
 
-            return Json::null();
+            return null;
         }
     };
 
-    class multi_select_list_selector final : public selector_base
+    class multi_select_list final : public selector_base
     {
     public:
         std::vector<std::unique_ptr<selector_base>> selectors_;
 
-        multi_select_list_selector(std::vector<std::unique_ptr<selector_base>>&& selectors)
+        multi_select_list(std::vector<std::unique_ptr<selector_base>>&& selectors)
             : selectors_(std::move(selectors))
         {
         }
@@ -1134,18 +725,20 @@ public:
         {
         }
 
-        reference select(jmespath_context& context, reference val, std::error_code& ec) override
+        reference evaluate(jmespath_context& context, reference val, std::error_code& ec) override
         {
+            static Json null{null_type()};
+
             if (!val.is_object())
             {
-                return Json::null();
+                return null;
             }
 
-            auto resultp = context.create_new(json_array_arg);
+            auto resultp = context.new_instance(json_array_arg);
             resultp->reserve(selectors_.size());
             for (auto& selector : selectors_)
             {
-                resultp->push_back(selector->select(context, val, ec));
+                resultp->push_back(selector->evaluate(context, val, ec)        );
             }
             return *resultp;
         }
@@ -1172,12 +765,12 @@ public:
         key_selector& operator=(key_selector&&) = default;
     };
 
-    class multi_select_hash_selector final : public selector_base
+    class multi_select_hash final : public selector_base
     {
     public:
         std::vector<key_selector> key_selectors_;
 
-        multi_select_hash_selector(std::vector<key_selector>&& key_selectors)
+        multi_select_hash(std::vector<key_selector>&& key_selectors)
             : key_selectors_(std::move(key_selectors))
         {
         }
@@ -1186,18 +779,19 @@ public:
         {
         }
 
-        reference select(jmespath_context& context, reference val, std::error_code& ec) override
+        reference evaluate(jmespath_context& context, reference val, std::error_code& ec) override
         {
+            static Json null{null_type()};
             if (!val.is_object())
             {
-                return Json::null();
+                return null;
             }
 
-            auto resultp = context.create_new(json_object_arg);
+            auto resultp = context.new_instance(json_object_arg);
             resultp->reserve(key_selectors_.size());
             for (auto& key_selector : key_selectors_)
             {
-                resultp->try_emplace(key_selector.key,key_selector.selector->select(context, val, ec));
+                resultp->try_emplace(key_selector.key,key_selector.selector->evaluate(context, val, ec)        );
             }
             return *resultp;
         }
@@ -1212,9 +806,7 @@ public:
     std::vector<path_state> state_stack_;
     std::vector<std::size_t> structure_offset_stack_;
     std::vector<key_selector> key_selector_stack_;
-    std::vector<key_selector> output_stack_;
-    std::vector<std::size_t> offset_stack_;
-    jmespath_context context_;
+    jmespath_context temp_factory_;
 
 public:
     jmespath_evaluator()
@@ -1222,10 +814,7 @@ public:
           begin_input_(nullptr), end_input_(nullptr),
           p_(nullptr)
     {
-        key_selector_stack_.emplace_back(jsoncons::make_unique<expression_selector>());
-
-        offset_stack_.push_back(output_stack_.size());
-        output_stack_.emplace_back(jsoncons::make_unique<expression_selector>());
+        key_selector_stack_.emplace_back(make_unique<sub_expression>());
     }
 
     std::size_t line() const
@@ -1251,7 +840,14 @@ public:
 
     reference evaluate(reference root, const string_view_type& path, std::error_code& ec)
     {
-        return evaluate(root, path.data(), path.length(), ec);
+        JSONCONS_TRY
+        {
+            return evaluate(root, path.data(), path.length(), ec);
+        }
+        JSONCONS_CATCH(...)
+        {
+            ec = jmespath_errc::unidentified_error;
+        }
     }
  
     reference evaluate(reference root, 
@@ -1259,6 +855,8 @@ public:
                        std::size_t length,
                        std::error_code& ec)
     {
+        static Json result{null_type()};
+
         state_stack_.emplace_back(path_state::start);
 
         string_type buffer;
@@ -1318,9 +916,8 @@ public:
                             ++column_;
                             break;
                         case '*':
-                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<object_projection_selector>(std::move(key_selector_stack_.back().selector)));
-                            offset_stack_.push_back(output_stack_.size());
-                            output_stack_.emplace_back(jsoncons::make_unique<object_projection>());
+                            //state_stack_.pop_back();
+                            key_selector_stack_.back() = key_selector(make_unique<object_projection>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.emplace_back(path_state::expect_dot);
                             ++p_;
                             ++column_;
@@ -1337,7 +934,8 @@ public:
                             }
                             else
                             {
-                                state_stack_.pop_back();
+                                ec = jmespath_errc::expected_identifier;
+                                return result;
                             }
                             break;
                     };
@@ -1349,8 +947,7 @@ public:
                     state_stack_.pop_back(); 
                     break;
                 case path_state::val_expr:
-                    key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<identifier_selector>(buffer));
-                    output_stack_.emplace_back(key_selector(jsoncons::make_unique<identifier_selector>(buffer)));
+                    key_selector_stack_.back().selector->add_selector(make_unique<identifier_selector>(buffer));
                     buffer.clear();
                     state_stack_.pop_back(); 
                     break;
@@ -1364,11 +961,11 @@ public:
                             if (it == functions_.end())
                             {
                                 ec = jmespath_errc::function_name_not_found;
-                                return Json::null();
+                                return result;
                             }
-                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<function_selector>(it->second));
+                            key_selector_stack_.back() = key_selector(make_unique<function_selector>(it->second));
                             structure_offset_stack_.push_back(key_selector_stack_.size());
-                            key_selector_stack_.emplace_back(jsoncons::make_unique<expression_selector>());
+                            key_selector_stack_.emplace_back(make_unique<sub_expression>());
                             state_stack_.back() = path_state::arg_or_right_paren;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
@@ -1377,8 +974,7 @@ public:
                         }
                         default:
                         {
-                            key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<identifier_selector>(buffer));
-                            output_stack_.emplace_back(key_selector(jsoncons::make_unique<identifier_selector>(buffer)));
+                            key_selector_stack_.back().selector->add_selector(make_unique<identifier_selector>(buffer));
                             buffer.clear();
                             state_stack_.pop_back(); 
                             break;
@@ -1393,13 +989,7 @@ public:
                             advance_past_space_character();
                             break;
                         case ',':
-                            key_selector_stack_.emplace_back(key_selector(jsoncons::make_unique<expression_selector>()));
-                            state_stack_.emplace_back(path_state::expression);
-                            ++p_;
-                            ++column_;
-                            break;
-                        case '&':
-                            key_selector_stack_.back().selector->expression_type(true);
+                            key_selector_stack_.emplace_back(key_selector(make_unique<sub_expression>()));
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
                             ++column_;
@@ -1420,10 +1010,7 @@ public:
                             break;
                         }
                         default:
-                        {
-                            ec = jmespath_errc::invalid_argument;
-                            return Json::null();
-                        }
+                            break;
                     }
                     break;
 
@@ -1443,7 +1030,7 @@ public:
                             else
                             {
                                 ec = jmespath_errc::unexpected_end_of_input;
-                                return Json::null();
+                                return result;
                             }
                             break;
                         default:
@@ -1480,7 +1067,7 @@ public:
                     {
                         case '\'':
                         {
-                            key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<json_value_selector>(Json(buffer)));
+                            key_selector_stack_.back().selector->add_selector(make_unique<json_value_selector>(Json(buffer)));
                             buffer.clear();
                             state_stack_.pop_back(); // raw_string
                             ++p_;
@@ -1504,7 +1091,7 @@ public:
                         case '`':
                         {
                             auto j = Json::parse(buffer);
-                            key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<json_value_selector>(std::move(j)));
+                            key_selector_stack_.back().selector->add_selector(make_unique<json_value_selector>(std::move(j)));
                             buffer.clear();
                             state_stack_.pop_back(); // json_value
                             ++p_;
@@ -1562,7 +1149,7 @@ public:
                         {
                             ++p_;
                             ++column_;
-                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<pipe_selector>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(make_unique<pipe_selector>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.emplace_back(path_state::expression);
                             break;
                         }
@@ -1572,7 +1159,7 @@ public:
                             break;
                         default:
                             ec = jmespath_errc::expected_index;
-                            return Json::null();
+                            return result;
                     }
                     break;
 
@@ -1580,23 +1167,20 @@ public:
                     switch(*p_)
                     {
                         case '*':
+                            key_selector_stack_.back() = key_selector(make_unique<list_projection>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.back() = path_state::bracket_specifier4;
-                            offset_stack_.push_back(output_stack_.size());
-                            output_stack_.emplace_back(jsoncons::make_unique<list_projection>());
                             ++p_;
                             ++column_;
                             break;
                         case ']':
-                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<flatten_selector>(std::move(key_selector_stack_.back().selector)));
-                            offset_stack_.push_back(output_stack_.size());
-                            output_stack_.emplace_back(jsoncons::make_unique<flatten_projection>());
+                            key_selector_stack_.back() = key_selector(make_unique<flatten_projection>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.pop_back(); // bracket_specifier
                             ++p_;
                             ++column_;
                             break;
                         case '?':
                             structure_offset_stack_.push_back(key_selector_stack_.size());
-                            key_selector_stack_.emplace_back(jsoncons::make_unique<expression_selector>());
+                            key_selector_stack_.emplace_back(make_unique<sub_expression>());
                             state_stack_.back() = path_state::comparator;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
@@ -1613,9 +1197,10 @@ public:
                             state_stack_.emplace_back(path_state::number);
                             break;
                         default:
-                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<list_projection_selector>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(make_unique<list_projection>(std::move(key_selector_stack_.back().selector)));
+
                             structure_offset_stack_.push_back(key_selector_stack_.size());
-                            key_selector_stack_.emplace_back(jsoncons::make_unique<expression_selector>());
+                            key_selector_stack_.emplace_back(make_unique<sub_expression>());
                             state_stack_.back() = path_state::expect_right_bracket4;
                             state_stack_.emplace_back(path_state::expression);
                             break;
@@ -1632,10 +1217,10 @@ public:
                         case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                             break;
                         default:
-                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<list_projection_selector>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(make_unique<list_projection>(std::move(key_selector_stack_.back().selector)));
 
                             structure_offset_stack_.push_back(key_selector_stack_.size());
-                            key_selector_stack_.emplace_back(jsoncons::make_unique<expression_selector>());
+                            key_selector_stack_.emplace_back(make_unique<sub_expression>());
                             state_stack_.back() = path_state::key_val_expr;
                             break;
                     }
@@ -1648,7 +1233,7 @@ public:
                         {
                             if (buffer.empty())
                             {
-                                key_selector_stack_.back() = key_selector(jsoncons::make_unique<flatten_selector>(std::move(key_selector_stack_.back().selector)));
+                                key_selector_stack_.back() = key_selector(make_unique<flatten_projection>(std::move(key_selector_stack_.back().selector)));
                             }
                             else
                             {
@@ -1656,10 +1241,9 @@ public:
                                 if (!r)
                                 {
                                     ec = jmespath_errc::invalid_number;
-                                    return Json::null();
+                                    return result;
                                 }
-                                key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<index_selector>(r.value()));
-                                output_stack_.emplace_back(key_selector(jsoncons::make_unique<index_selector>(r.value())));
+                                key_selector_stack_.back().selector->add_selector(make_unique<index_selector>(r.value()));
                                 buffer.clear();
                             }
                             state_stack_.pop_back(); // bracket_specifier
@@ -1675,7 +1259,7 @@ public:
                                 if (!r)
                                 {
                                     ec = jmespath_errc::invalid_number;
-                                    return Json::null();
+                                    return result;
                                 }
                                 a_slice.start_ = r.value();
                                 buffer.clear();
@@ -1688,7 +1272,7 @@ public:
                         }
                         default:
                             ec = jmespath_errc::expected_right_bracket;
-                            return Json::null();
+                            return result;
                     }
                     break;
                 case path_state::bracket_specifier2:
@@ -1699,7 +1283,7 @@ public:
                         if (!r)
                         {
                             ec = jmespath_errc::invalid_number;
-                            return Json::null();
+                            return result;
                         }
                         a_slice.end_ = optional<int64_t>(r.value());
                         buffer.clear();
@@ -1707,9 +1291,7 @@ public:
                     switch(*p_)
                     {
                         case ']':
-                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<slice_selector>(std::move(key_selector_stack_.back().selector), a_slice));
-                            offset_stack_.push_back(output_stack_.size());
-                            output_stack_.emplace_back(jsoncons::make_unique<slice_projection>(a_slice));
+                            key_selector_stack_.back().selector->add_selector(make_unique<slice_projection>(a_slice));
                             a_slice = slice();
                             state_stack_.pop_back(); // bracket_specifier2
                             ++p_;
@@ -1723,7 +1305,7 @@ public:
                             break;
                         default:
                             ec = jmespath_errc::expected_right_bracket;
-                            return Json::null();
+                            return result;
                     }
                     break;
                 }
@@ -1735,7 +1317,7 @@ public:
                         if (!r)
                         {
                             ec = jmespath_errc::invalid_number;
-                            return Json::null();
+                            return result;
                         }
                         a_slice.step_ = r.value();
                         buffer.clear();
@@ -1743,9 +1325,7 @@ public:
                     switch(*p_)
                     {
                         case ']':
-                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<slice_selector>(std::move(key_selector_stack_.back().selector), a_slice));
-                            offset_stack_.push_back(output_stack_.size());
-                            output_stack_.emplace_back(jsoncons::make_unique<slice_projection>(a_slice));
+                            key_selector_stack_.back().selector->add_selector(make_unique<slice_projection>(a_slice));
                             buffer.clear();
                             a_slice = slice();
                             state_stack_.pop_back(); // bracket_specifier3
@@ -1754,7 +1334,7 @@ public:
                             break;
                         default:
                             ec = jmespath_errc::expected_right_bracket;
-                            return Json::null();
+                            return result;
                     }
                     break;
                 }
@@ -1763,28 +1343,13 @@ public:
                     switch(*p_)
                     {
                         case ']':
-                        {
                             state_stack_.pop_back(); // bracket_specifier4
-
-                            if (!structure_offset_stack_.empty())
-                            {
-                                size_t pos = structure_offset_stack_.back();
-                                structure_offset_stack_.pop_back();
-                                auto p = std::move(key_selector_stack_[pos].selector);
-                                for (size_t i = pos + 1; i < key_selector_stack_.size(); ++i)
-                                {
-                                    p->add_selector(std::move(key_selector_stack_[i].selector));
-                                }
-                                key_selector_stack_.erase(key_selector_stack_.begin() + pos, key_selector_stack_.end());
-                                key_selector_stack_.back().selector->add_selector(std::move(p));
-                            }
                             ++p_;
                             ++column_;
                             break;
-                        }
                         default:
                             ec = jmespath_errc::expected_right_bracket;
-                            return Json::null();
+                            return result;
                     }
                     break;
                 }
@@ -1821,7 +1386,7 @@ public:
                             else
                             {
                                 ec = jmespath_errc::expected_key;
-                                return Json::null();
+                                return result;
                             }
                             break;
                     };
@@ -1834,6 +1399,7 @@ public:
                         case '.': 
                             ++p_;
                             ++column_;
+                            state_stack_.back() = path_state::comparator;
                             state_stack_.emplace_back(path_state::expression);
                             break;
                         case '<':
@@ -1858,7 +1424,7 @@ public:
                             break;
                         default:
                             ec = jmespath_errc::expected_comparator;
-                            return Json::null();
+                            return result;
                     }
                     break;
                 }
@@ -1867,14 +1433,14 @@ public:
                     switch(*p_)
                     {
                         case '=':
-                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<filter_selector<cmp_lte>>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(make_unique<filter_selector<cmp_lte>>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expect_right_bracket;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
                             ++column_;
                             break;
                         default:
-                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<filter_selector<cmp_lt>>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(make_unique<filter_selector<cmp_lt>>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expect_right_bracket;
                             state_stack_.emplace_back(path_state::expression);
                             break;
@@ -1886,7 +1452,7 @@ public:
                     switch(*p_)
                     {
                         case '=':
-                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<filter_selector<cmp_eq>>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(make_unique<filter_selector<cmp_eq>>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expect_right_bracket;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
@@ -1894,7 +1460,7 @@ public:
                             break;
                         default:
                             ec = jmespath_errc::expected_comparator;
-                            return Json::null();
+                            return result;
                     }
                     break;
                 }
@@ -1903,14 +1469,14 @@ public:
                     switch(*p_)
                     {
                         case '=':
-                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<filter_selector<cmp_gte>>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(make_unique<filter_selector<cmp_gte>>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expect_right_bracket;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
                             ++column_;
                             break;
                         default:
-                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<filter_selector<cmp_gt>>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(make_unique<filter_selector<cmp_gt>>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expect_right_bracket;
                             state_stack_.emplace_back(path_state::expression);
                             break;
@@ -1922,7 +1488,7 @@ public:
                     switch(*p_)
                     {
                         case '=':
-                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<filter_selector<cmp_ne>>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(make_unique<filter_selector<cmp_ne>>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.back() = path_state::expect_right_bracket;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
@@ -1930,7 +1496,7 @@ public:
                             break;
                         default:
                             ec = jmespath_errc::expected_comparator;
-                            return Json::null();
+                            return result;
                     }
                     break;
                 }
@@ -1948,7 +1514,7 @@ public:
                             break;
                         default:
                             ec = jmespath_errc::expected_dot;
-                            return Json::null();
+                            return result;
                     }
                     break;
                 }
@@ -1971,17 +1537,16 @@ public:
                             }
                             key_selector_stack_.erase(key_selector_stack_.begin()+pos, key_selector_stack_.end());
 
-                            auto q = jsoncons::make_unique<expression_selector>();
+                            auto q = make_unique<sub_expression>();
                             q->add_selector(std::move(key_selector_stack_.back().selector));
                             q->add_selector(std::move(p.selector));
-                            key_selector_stack_.back() = key_selector(std::move(q)); 
-                            ++p_;
+                            key_selector_stack_.back() = key_selector(std::move(q));                            ++p_;
                             ++column_;
                             break;
                         }
                         default:
                             ec = jmespath_errc::expected_right_bracket;
-                            return Json::null();
+                            return result;
                     }
                     break;
                 }
@@ -1993,15 +1558,18 @@ public:
                             advance_past_space_character();
                             break;
                         case ',':
-                            key_selector_stack_.emplace_back(key_selector(jsoncons::make_unique<expression_selector>()));
+                            key_selector_stack_.emplace_back(key_selector(make_unique<sub_expression>()));
+                            state_stack_.back() = path_state::expect_right_bracket4;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
                             ++column_;
                             break;
                         case '[':
+                            state_stack_.back() = path_state::expect_right_bracket4;
                             state_stack_.emplace_back(path_state::expression);
                             break;
                         case '.':
+                            state_stack_.back() = path_state::expect_right_bracket4;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
                             ++column_;
@@ -2010,7 +1578,8 @@ public:
                         {
                             ++p_;
                             ++column_;
-                            key_selector_stack_.back() = key_selector(jsoncons::make_unique<pipe_selector>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.back() = key_selector(make_unique<pipe_selector>(std::move(key_selector_stack_.back().selector)));
+                            state_stack_.back() = path_state::expect_right_bracket4;
                             state_stack_.emplace_back(path_state::expression);
                             break;
                         }
@@ -2028,7 +1597,7 @@ public:
                                 selectors.emplace_back(std::move(key_selector_stack_[i].selector));
                             }
                             key_selector_stack_.erase(key_selector_stack_.begin()+pos, key_selector_stack_.end());
-                            key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<multi_select_list_selector>(std::move(selectors)));
+                            key_selector_stack_.back().selector->add_selector(make_unique<multi_select_list>(std::move(selectors)));
 
                             ++p_;
                             ++column_;
@@ -2036,7 +1605,7 @@ public:
                         }
                         default:
                             ec = jmespath_errc::expected_right_bracket;
-                            return Json::null();
+                            return result;
                     }
                     break;
                 }
@@ -2048,16 +1617,18 @@ public:
                             advance_past_space_character();
                             break;
                         case ',':
-                            key_selector_stack_.emplace_back(jsoncons::make_unique<expression_selector>());
+                            key_selector_stack_.emplace_back(make_unique<sub_expression>());
                             state_stack_.back() = path_state::key_val_expr; 
                             ++p_;
                             ++column_;
                             break;
                         case '[':
                         case '{':
+                            state_stack_.back() = path_state::expect_right_brace;
                             state_stack_.emplace_back(path_state::expression);
                             break;
                         case '.':
+                            state_stack_.back() = path_state::expect_right_brace;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
                             ++column_;
@@ -2075,7 +1646,7 @@ public:
                                 key_selectors.emplace_back(std::move(key_selector_stack_[i]));
                             }
                             key_selector_stack_.erase(key_selector_stack_.begin()+pos, key_selector_stack_.end());
-                            key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<multi_select_hash_selector>(std::move(key_selectors)));
+                            key_selector_stack_.back().selector->add_selector(make_unique<multi_select_hash>(std::move(key_selectors)));
 
                             ++p_;
                             ++column_;
@@ -2083,7 +1654,7 @@ public:
                         }
                         default:
                             ec = jmespath_errc::expected_right_brace;
-                            return Json::null();
+                            return result;
                     }
                     break;
                 }
@@ -2102,7 +1673,7 @@ public:
                             break;
                         default:
                             ec = jmespath_errc::expected_colon;
-                            return Json::null();
+                            return result;
                     }
                     break;
                 }
@@ -2115,8 +1686,7 @@ public:
             state_stack_.pop_back(); // unquoted_string
             if (state_stack_.back() == path_state::val_expr || state_stack_.back() == path_state::identifier_or_function_expr)
             {
-                key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<identifier_selector>(buffer));
-                output_stack_.emplace_back(key_selector(jsoncons::make_unique<identifier_selector>(buffer)));
+                key_selector_stack_.back().selector->add_selector(make_unique<identifier_selector>(buffer));
                 buffer.clear();
                 state_stack_.pop_back(); // val_expr
             }
@@ -2125,7 +1695,7 @@ public:
         if (state_stack_.size() > 1)
         {
             ec = jmespath_errc::unexpected_end_of_input;
-            return Json::null();
+            return result;
         }
 
         JSONCONS_ASSERT(state_stack_.size() == 1);
@@ -2133,22 +1703,8 @@ public:
                         state_stack_.back() == path_state::sub_expression);
         state_stack_.pop_back();
 
-        reference r = key_selector_stack_.back().selector->select(context_, root, ec);
+        reference r = key_selector_stack_.back().selector->evaluate(temp_factory_, root, ec);
         return r;
-/*
-        while (!offset_stack_.empty())
-        {
-            const size_t pos = offset_stack_.back();
-            for (size_t i = pos + 1; i < output_stack_.size(); ++i)
-            {
-                output_stack_[pos].selector->add_selector(std::move(output_stack_[i].selector));
-            }
-            output_stack_.erase(output_stack_.begin()+pos+1,output_stack_.end());
-            offset_stack_.pop_back();
-        }
-        std::cout << "\n" << output_stack_[0].selector->to_string() << "\n";
-        return output_stack_[0].selector->select(context_, root, ec);
-*/
     }
 
     void advance_past_space_character()
