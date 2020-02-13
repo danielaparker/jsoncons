@@ -2913,7 +2913,7 @@ public:
 
     variant var_;
 
-    basic_json(semantic_tag tag = semantic_tag::none) 
+    constexpr basic_json(semantic_tag tag = semantic_tag::none) 
         : var_(tag)
     {
     }
@@ -3092,12 +3092,12 @@ public:
     {
     }
 
-    basic_json(null_type val, semantic_tag tag)
+    constexpr basic_json(null_type val, semantic_tag tag)
         : var_(val, tag)
     {
     }
 
-    basic_json(bool val, semantic_tag tag)
+    constexpr basic_json(bool val, semantic_tag tag)
         : var_(val, tag)
     {
     }
