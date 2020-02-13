@@ -109,7 +109,7 @@ enum class path_state
     unquoted_string,
     expression,
     key_val_expr,
-    sub_expression,
+    compound_expression,
     number,
     digit,
     bracket_specifier9,
@@ -233,12 +233,12 @@ class jmespath_evaluator : public ser_context
         }
     };
 
-    class sub_expression final : public selector_base
+    class compound_expression final : public selector_base
     {
     public:
         std::vector<std::unique_ptr<selector_base>> selectors_;
 
-        sub_expression()
+        compound_expression()
         {
         }
 
@@ -472,6 +472,7 @@ class jmespath_evaluator : public ser_context
 
         reference select(jmespath_context&, reference val, std::error_code&) override
         {
+            std::cout << "identifier val: " << pretty_print(val) << "\n";
             if (val.is_object() && val.contains(identifier_))
             {
                 return val.at(identifier_);
@@ -663,43 +664,39 @@ class jmespath_evaluator : public ser_context
     {
     public:
         std::unique_ptr<selector_base> lhs_selector_;
-        std::vector<std::unique_ptr<selector_base>> rhs_selectors_;
+        compound_expression rhs_selector_;
         Comparator cmp_;
 
         filter_selector(std::unique_ptr<selector_base>&& lhs_selector)
+            : lhs_selector_(std::move(lhs_selector))
         {
-            lhs_selector_ = std::move(lhs_selector);
         }
 
-        void add_selector(std::unique_ptr<selector_base>&& rhs_selectors) override 
+        void add_selector(std::unique_ptr<selector_base>&& selector) override 
         {
-            rhs_selectors_.emplace_back(std::move(rhs_selectors));
+            rhs_selector_.add_selector(std::move(selector));
         }
 
         reference select(jmespath_context& context, reference val, std::error_code& ec) override
         {
-            if (val.is_array())
+            std::cout << "filter val: " << pretty_print(val) << "\n";
+            if (!val.is_array())
             {
-                auto resultp = context.new_instance(json_array_arg);
-                for (auto& item : val.array_range())
-                {
-                    reference lhs = lhs_selector_->select(context, item, ec);
-
-                    pointer rhsp = std::addressof(item);
-                    for (auto& selector : rhs_selectors_)
-                    {
-                        rhsp = std::addressof(selector->select(context, *rhsp, ec)        );
-                    }
-                    auto r = cmp_(lhs,*rhsp);
-                    if (r && r.value())
-                    {
-                        resultp->emplace_back(item);
-                    }
-                }
-                return *resultp;
+                return Json::null();
             }
-
-            return Json::null();
+            auto resultp = context.new_instance(json_array_arg);
+            for (auto& item : val.array_range())
+            {
+                reference lhs = lhs_selector_->select(context, item, ec);
+                reference rhs = rhs_selector_.select(context, item, ec);
+                auto r = cmp_(lhs,rhs);
+                if (r && r.value())
+                {
+                    resultp->emplace_back(item);
+                }
+            }
+            std::cout << "filter result: " << pretty_print(*resultp) << "\n";
+            return *resultp;
         }
     };
 
@@ -803,7 +800,7 @@ public:
           begin_input_(nullptr), end_input_(nullptr),
           p_(nullptr)
     {
-        key_selector_stack_.emplace_back(make_unique<sub_expression>());
+        key_selector_stack_.emplace_back(make_unique<compound_expression>());
     }
 
     std::size_t line() const
@@ -860,7 +857,7 @@ public:
             {
                 case path_state::start: 
                 {
-                    state_stack_.back() = path_state::sub_expression;
+                    state_stack_.back() = path_state::compound_expression;
                     state_stack_.emplace_back(path_state::expression);
                     break;
                 }
@@ -952,7 +949,7 @@ public:
                             }
                             key_selector_stack_.back() = key_selector(make_unique<function_selector>(it->second));
                             structure_offset_stack_.push_back(key_selector_stack_.size());
-                            key_selector_stack_.emplace_back(make_unique<sub_expression>());
+                            key_selector_stack_.emplace_back(make_unique<compound_expression>());
                             state_stack_.back() = path_state::arg_or_right_paren;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
@@ -976,7 +973,7 @@ public:
                             advance_past_space_character();
                             break;
                         case ',':
-                            key_selector_stack_.emplace_back(key_selector(make_unique<sub_expression>()));
+                            key_selector_stack_.emplace_back(key_selector(make_unique<compound_expression>()));
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
                             ++column_;
@@ -1121,7 +1118,7 @@ public:
                             break;
                     }
                     break;
-                case path_state::sub_expression:
+                case path_state::compound_expression:
                     switch(*p_)
                     {
                         case ' ':case '\t':case '\r':case '\n':
@@ -1167,7 +1164,7 @@ public:
                             break;
                         case '?':
                             structure_offset_stack_.push_back(key_selector_stack_.size());
-                            key_selector_stack_.emplace_back(make_unique<sub_expression>());
+                            key_selector_stack_.emplace_back(make_unique<compound_expression>());
                             state_stack_.back() = path_state::comparator;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
@@ -1187,7 +1184,7 @@ public:
                             key_selector_stack_.back() = key_selector(make_unique<list_projection>(std::move(key_selector_stack_.back().selector)));
 
                             structure_offset_stack_.push_back(key_selector_stack_.size());
-                            key_selector_stack_.emplace_back(make_unique<sub_expression>());
+                            key_selector_stack_.emplace_back(make_unique<compound_expression>());
                             state_stack_.back() = path_state::expect_right_bracket4;
                             state_stack_.emplace_back(path_state::expression);
                             break;
@@ -1207,7 +1204,7 @@ public:
                             key_selector_stack_.back() = key_selector(make_unique<list_projection>(std::move(key_selector_stack_.back().selector)));
 
                             structure_offset_stack_.push_back(key_selector_stack_.size());
-                            key_selector_stack_.emplace_back(make_unique<sub_expression>());
+                            key_selector_stack_.emplace_back(make_unique<compound_expression>());
                             state_stack_.back() = path_state::key_val_expr;
                             break;
                     }
@@ -1525,7 +1522,7 @@ public:
                             }
                             key_selector_stack_.erase(key_selector_stack_.begin()+pos, key_selector_stack_.end());
 
-                            auto q = make_unique<sub_expression>();
+                            auto q = make_unique<compound_expression>();
                             q->add_selector(std::move(key_selector_stack_.back().selector));
                             q->add_selector(std::move(p.selector));
                             key_selector_stack_.back() = key_selector(std::move(q));                            ++p_;
@@ -1546,7 +1543,7 @@ public:
                             advance_past_space_character();
                             break;
                         case ',':
-                            key_selector_stack_.emplace_back(key_selector(make_unique<sub_expression>()));
+                            key_selector_stack_.emplace_back(key_selector(make_unique<compound_expression>()));
                             state_stack_.back() = path_state::expect_right_bracket4;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
@@ -1605,7 +1602,7 @@ public:
                             advance_past_space_character();
                             break;
                         case ',':
-                            key_selector_stack_.emplace_back(make_unique<sub_expression>());
+                            key_selector_stack_.emplace_back(make_unique<compound_expression>());
                             state_stack_.back() = path_state::key_val_expr; 
                             ++p_;
                             ++column_;
@@ -1688,7 +1685,7 @@ public:
 
         JSONCONS_ASSERT(state_stack_.size() == 1);
         JSONCONS_ASSERT(state_stack_.back() == path_state::expression ||
-                        state_stack_.back() == path_state::sub_expression);
+                        state_stack_.back() == path_state::compound_expression);
         state_stack_.pop_back();
 
         reference r = key_selector_stack_.back().selector->select(temp_factory_, root, ec);
