@@ -119,7 +119,7 @@ enum class path_state
     bracket_specifier3,
     bracket_specifier4,
     expect_dot,
-    expect_right_bracket,
+    expect_filter_right_bracket,
     expect_right_bracket4,
     expect_right_brace,
     expect_colon,
@@ -472,7 +472,6 @@ class jmespath_evaluator : public ser_context
 
         reference select(jmespath_context&, reference val, std::error_code&) override
         {
-            std::cout << "identifier val: " << pretty_print(val) << "\n";
             if (val.is_object() && val.contains(identifier_))
             {
                 return val.at(identifier_);
@@ -659,15 +658,65 @@ class jmespath_evaluator : public ser_context
         }
     };
 
+    class filter_expression final : public selector_base
+    {
+    public:
+        std::unique_ptr<selector_base> lhs_selector_;
+        std::unique_ptr<selector_base> cmp_selector_;
+        compound_expression rhs_selector_;
+
+        filter_expression(std::unique_ptr<selector_base>&& lhs_selector,
+                          std::unique_ptr<selector_base>&& cmp_selector)
+            : lhs_selector_(std::move(lhs_selector)),
+              cmp_selector_(std::move(cmp_selector))
+        {
+        }
+
+        void add_selector(std::unique_ptr<selector_base>&& selector) override 
+        {
+            rhs_selector_.add_selector(std::move(selector));
+        }
+
+        reference select(jmespath_context& context, reference val, std::error_code& ec) override
+        {
+            reference lhs = lhs_selector_->select(context, val, ec);
+            if (!lhs.is_array())
+            {
+                return Json::null();
+            }
+
+            auto tempp = context.new_instance(json_array_arg);
+            for (auto& item : lhs.array_range())
+            {
+                reference x = cmp_selector_->select(context, item, ec);
+                if (x.as<bool>())
+                {
+                    tempp->emplace_back(item);
+                }
+            }
+
+            auto resultp = context.new_instance(json_array_arg);
+            for (auto& item : tempp->array_range())
+            {
+                reference v = rhs_selector_.select(context, item, ec);
+                if (!v.is_null())
+                {
+                    resultp->emplace_back(v);
+                }
+            }
+            return *resultp;
+        }
+    };
+
     template <typename Comparator>
-    class filter_selector final : public selector_base
+    class comparator_selector final : public selector_base
     {
     public:
         std::unique_ptr<selector_base> lhs_selector_;
         compound_expression rhs_selector_;
         Comparator cmp_;
 
-        filter_selector(std::unique_ptr<selector_base>&& lhs_selector)
+        comparator_selector(std::unique_ptr<selector_base>&& lhs_selector)
             : lhs_selector_(std::move(lhs_selector))
         {
         }
@@ -679,24 +728,21 @@ class jmespath_evaluator : public ser_context
 
         reference select(jmespath_context& context, reference val, std::error_code& ec) override
         {
-            std::cout << "filter val: " << pretty_print(val) << "\n";
-            if (!val.is_array())
+            static const Json t(true, semantic_tag::none);
+            static const Json f(false, semantic_tag::none);
+
+            reference lhs = lhs_selector_->select(context, val, ec);
+            if (ec)
             {
                 return Json::null();
             }
-            auto resultp = context.new_instance(json_array_arg);
-            for (auto& item : val.array_range())
+            reference rhs = rhs_selector_.select(context, val, ec);
+            if (ec)
             {
-                reference lhs = lhs_selector_->select(context, item, ec);
-                reference rhs = rhs_selector_.select(context, item, ec);
-                auto r = cmp_(lhs,rhs);
-                if (r && r.value())
-                {
-                    resultp->emplace_back(item);
-                }
+                return Json::null();
             }
-            std::cout << "filter result: " << pretty_print(*resultp) << "\n";
-            return *resultp;
+            auto r = cmp_(lhs,rhs);
+            return (r && r.value()) ? t : f;
         }
     };
 
@@ -1418,15 +1464,15 @@ public:
                     switch(*p_)
                     {
                         case '=':
-                            key_selector_stack_.back() = key_selector(make_unique<filter_selector<cmp_lte>>(std::move(key_selector_stack_.back().selector)));
-                            state_stack_.back() = path_state::expect_right_bracket;
+                            key_selector_stack_.back() = key_selector(make_unique<comparator_selector<cmp_lte>>(std::move(key_selector_stack_.back().selector)));
+                            state_stack_.back() = path_state::expect_filter_right_bracket;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
                             ++column_;
                             break;
                         default:
-                            key_selector_stack_.back() = key_selector(make_unique<filter_selector<cmp_lt>>(std::move(key_selector_stack_.back().selector)));
-                            state_stack_.back() = path_state::expect_right_bracket;
+                            key_selector_stack_.back() = key_selector(make_unique<comparator_selector<cmp_lt>>(std::move(key_selector_stack_.back().selector)));
+                            state_stack_.back() = path_state::expect_filter_right_bracket;
                             state_stack_.emplace_back(path_state::expression);
                             break;
                     }
@@ -1437,8 +1483,8 @@ public:
                     switch(*p_)
                     {
                         case '=':
-                            key_selector_stack_.back() = key_selector(make_unique<filter_selector<cmp_eq>>(std::move(key_selector_stack_.back().selector)));
-                            state_stack_.back() = path_state::expect_right_bracket;
+                            key_selector_stack_.back() = key_selector(make_unique<comparator_selector<cmp_eq>>(std::move(key_selector_stack_.back().selector)));
+                            state_stack_.back() = path_state::expect_filter_right_bracket;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
                             ++column_;
@@ -1454,15 +1500,15 @@ public:
                     switch(*p_)
                     {
                         case '=':
-                            key_selector_stack_.back() = key_selector(make_unique<filter_selector<cmp_gte>>(std::move(key_selector_stack_.back().selector)));
-                            state_stack_.back() = path_state::expect_right_bracket;
+                            key_selector_stack_.back() = key_selector(make_unique<comparator_selector<cmp_gte>>(std::move(key_selector_stack_.back().selector)));
+                            state_stack_.back() = path_state::expect_filter_right_bracket;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
                             ++column_;
                             break;
                         default:
-                            key_selector_stack_.back() = key_selector(make_unique<filter_selector<cmp_gt>>(std::move(key_selector_stack_.back().selector)));
-                            state_stack_.back() = path_state::expect_right_bracket;
+                            key_selector_stack_.back() = key_selector(make_unique<comparator_selector<cmp_gt>>(std::move(key_selector_stack_.back().selector)));
+                            state_stack_.back() = path_state::expect_filter_right_bracket;
                             state_stack_.emplace_back(path_state::expression);
                             break;
                     }
@@ -1473,8 +1519,8 @@ public:
                     switch(*p_)
                     {
                         case '=':
-                            key_selector_stack_.back() = key_selector(make_unique<filter_selector<cmp_ne>>(std::move(key_selector_stack_.back().selector)));
-                            state_stack_.back() = path_state::expect_right_bracket;
+                            key_selector_stack_.back() = key_selector(make_unique<comparator_selector<cmp_ne>>(std::move(key_selector_stack_.back().selector)));
+                            state_stack_.back() = path_state::expect_filter_right_bracket;
                             state_stack_.emplace_back(path_state::expression);
                             ++p_;
                             ++column_;
@@ -1503,7 +1549,7 @@ public:
                     }
                     break;
                 }
-                case path_state::expect_right_bracket:
+                case path_state::expect_filter_right_bracket:
                 {
                     switch(*p_)
                     {
@@ -1522,10 +1568,10 @@ public:
                             }
                             key_selector_stack_.erase(key_selector_stack_.begin()+pos, key_selector_stack_.end());
 
-                            auto q = make_unique<compound_expression>();
-                            q->add_selector(std::move(key_selector_stack_.back().selector));
-                            q->add_selector(std::move(p.selector));
-                            key_selector_stack_.back() = key_selector(std::move(q));                            ++p_;
+                            auto q = make_unique<filter_expression>(std::move(key_selector_stack_.back().selector), 
+                                                                    std::move(p.selector));
+                            key_selector_stack_.back() = key_selector(std::move(q));                            
+                            ++p_;
                             ++column_;
                             break;
                         }
