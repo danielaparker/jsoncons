@@ -1045,7 +1045,10 @@ public:
                         case '\"':
                             ++p_;
                             ++column_;
-                            JSONCONS_FALLTHROUGH
+                            key_selector_stack_.back().selector->add_selector(make_unique<identifier_selector>(buffer));
+                            buffer.clear();
+                            state_stack_.pop_back(); 
+                            break;
                         default:
                             key_selector_stack_.back().selector->add_selector(make_unique<identifier_selector>(buffer));
                             buffer.clear();
