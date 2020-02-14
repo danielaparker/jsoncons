@@ -158,10 +158,25 @@ class jmespath_evaluator : public ser_context
     };
 
     // selector
-
-    class selector_base
+class selector_base
     {
+        bool expression_type_;
     public:
+        selector_base()
+            : expression_type_(false)
+        {
+        }
+
+        bool expression_type() const
+        {
+            return expression_type_;
+        }
+
+        void expression_type(bool value)
+        {
+            expression_type_ = value;
+        }
+
         virtual ~selector_base()
         {
         }
@@ -169,6 +184,11 @@ class jmespath_evaluator : public ser_context
         virtual void add_selector(std::unique_ptr<selector_base>&&) = 0;
 
         virtual reference select(jmespath_context&, reference val, std::error_code& ec) = 0;
+
+        virtual string_type to_string() const
+        {
+            return string_type("to_string not implemented");
+        }
     };
 
     // function
@@ -990,6 +1010,11 @@ public:
                             ++p_;
                             ++column_;
                             break;
+                        case '&':
+                            key_selector_stack_.back().selector->expression_type(true);
+                            ++p_;
+                            ++column_;
+                            break;                        
                         default:
                             if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                             {
