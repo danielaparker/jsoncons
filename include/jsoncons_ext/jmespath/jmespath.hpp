@@ -323,6 +323,44 @@ class jmespath_evaluator : public ser_context
         }
     };
 
+    class list_projection2 final : public selector_base
+    {
+    public:
+        compound_expression rhs_selector_;
+
+        list_projection2()
+        {
+        }
+
+        void add_selector(std::unique_ptr<selector_base>&& selector) override 
+        {
+            rhs_selector_.add_selector(std::move(selector));
+        }
+
+        reference select(jmespath_context& context, reference val, std::error_code& ec) override
+        {
+            if (!val.is_array())
+            {
+                return Json::null();
+            }
+
+            auto resultp = context.new_instance(json_array_arg);
+            for (reference item : val.array_range())
+            {
+                reference j = rhs_selector_.select(context, item, ec);
+                if (ec)
+                {
+                    return Json::null();
+                }
+                if (!j.is_null())
+                {
+                    resultp->push_back(j);
+                }
+            }
+            return *resultp;
+        }
+    };
+
     class pipe_selector final : public selector_base
     {
     public:
@@ -1197,7 +1235,8 @@ public:
                     switch(*p_)
                     {
                         case '*':
-                            key_selector_stack_.back() = key_selector(make_unique<list_projection>(std::move(key_selector_stack_.back().selector)));
+                            //key_selector_stack_.back() = key_selector(make_unique<list_projection>(std::move(key_selector_stack_.back().selector)));
+                            key_selector_stack_.emplace_back(make_unique<list_projection2>());
                             state_stack_.back() = path_state::bracket_specifier4;
                             ++p_;
                             ++column_;
@@ -1723,11 +1762,11 @@ public:
             }
         }
 
-        if (state_stack_.size() > 1)
+        for (size_t i = key_selector_stack_.size(); --i > 0;)
         {
-            ec = jmespath_errc::unexpected_end_of_input;
-            return Json::null();
+            key_selector_stack_[i-1].selector->add_selector(std::move(key_selector_stack_[i].selector));
         }
+        key_selector_stack_.erase(key_selector_stack_.begin()+1,key_selector_stack_.end());
 
         JSONCONS_ASSERT(state_stack_.size() == 1);
         JSONCONS_ASSERT(state_stack_.back() == path_state::expression ||
