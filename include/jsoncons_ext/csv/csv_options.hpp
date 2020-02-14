@@ -19,10 +19,10 @@
 namespace jsoncons { namespace csv {
 
 namespace detail {
-    JSONCONS_STRING_LITERAL(string,'s','t','r','i','n','g')
-    JSONCONS_STRING_LITERAL(integer,'i','n','t','e','g','e','r')
-    JSONCONS_STRING_LITERAL(float,'f','l','o','a','t')
-    JSONCONS_STRING_LITERAL(boolean,'b','o','o','l','e','a','n')
+    JSONCONS_STRING_LITERAL(string_literal,'s','t','r','i','n','g')
+    JSONCONS_STRING_LITERAL(integer_literal,'i','n','t','e','g','e','r')
+    JSONCONS_STRING_LITERAL(float_literal,'f','l','o','a','t')
+    JSONCONS_STRING_LITERAL(boolean_literal,'b','o','o','l','e','a','n')
 }
 
 enum class csv_column_type : uint8_t 
