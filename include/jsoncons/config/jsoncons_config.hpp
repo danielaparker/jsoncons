@@ -256,13 +256,6 @@ namespace detail {
 #define JSONCONS_ARRAY_OF_CHAR(CharT, name, ...) \
     static constexpr CharT name[] = { __VA_ARGS__,0};
 
-#define JSONCONS_DEFINE_LITERAL( name ) \
-template<class CharT> CharT const* name##_literal(); \
-template<> inline char const * name##_literal<char>() { return JSONCONS_QUOTE(,name); } \
-template<> inline wchar_t const* name##_literal<wchar_t>() { return JSONCONS_QUOTE(L,name); } \
-template<> inline char16_t const* name##_literal<char16_t>() { return JSONCONS_QUOTE(u,name); } \
-template<> inline char32_t const* name##_literal<char32_t>() { return JSONCONS_QUOTE(U,name); }
-
 #endif // JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 
 
