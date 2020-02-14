@@ -1,4 +1,4 @@
-[/*{
+[{
     "given":
         {"foo": {"bar": {"baz": "correct"}}},
      "cases": [
@@ -53,14 +53,14 @@
             "result": ["one", "two", "three"]
          }
     ]
-},*/
+},
 {
     "given": ["one", "two", "three"],
     "cases": [
         {
             "expression": "one",
             "result": null
-        }/*,
+        },
         {
             "expression": "two",
             "result": null
@@ -72,9 +72,9 @@
         {
             "expression": "one.two",
             "result": null
-        }*/
+        }
     ]
-}/*,
+},
 {
     "given":
         {"foo": {"1": ["one", "two", "three"], "-1": "bar"}},
@@ -92,5 +92,5 @@
             "result": "bar"
          }
     ]
-}*/
+}
 ]

@@ -1015,9 +1015,18 @@ public:
                     state_stack_.pop_back(); 
                     break;
                 case path_state::val_expr:
-                    key_selector_stack_.back().selector->add_selector(make_unique<identifier_selector>(buffer));
-                    buffer.clear();
-                    state_stack_.pop_back(); 
+                    switch(*p_)
+                    {
+                        case '\"':
+                            ++p_;
+                            ++column_;
+                            JSONCONS_FALLTHROUGH
+                        default:
+                            key_selector_stack_.back().selector->add_selector(make_unique<identifier_selector>(buffer));
+                            buffer.clear();
+                            state_stack_.pop_back(); 
+                            break;
+                    }
                     break;
                 case path_state::identifier_or_function_expr:
                     switch(*p_)
@@ -1100,13 +1109,15 @@ public:
                                 ec = jmespath_errc::unexpected_end_of_input;
                                 return Json::null();
                             }
+                            ++p_;
+                            ++column_;
                             break;
                         default:
                             buffer.push_back(*p_);
+                            ++p_;
+                            ++column_;
                             break;
                     };
-                    ++p_;
-                    ++column_;
                     break;
 
                 case path_state::unquoted_string: 
@@ -1286,6 +1297,7 @@ public:
                             break;
                         default:
                             key_selector_stack_.back() = key_selector(make_unique<list_projection>(std::move(key_selector_stack_.back().selector)));
+
                             structure_offset_stack_.push_back(key_selector_stack_.size());
                             key_selector_stack_.emplace_back(make_unique<compound_expression>());
                             state_stack_.back() = path_state::key_val_expr;
