@@ -51,7 +51,7 @@ namespace detail {
             : data_(data), length_(Traits::length(data))
         {
         }
-        basic_string_view(const basic_string_view& other) = default;
+        constexpr basic_string_view(const basic_string_view& other) noexcept = default;
 
         template <class Allocator>
         basic_string_view(const std::basic_string<CharT,Traits,Allocator>& s)
