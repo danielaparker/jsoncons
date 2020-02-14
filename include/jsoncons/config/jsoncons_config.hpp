@@ -243,6 +243,19 @@ namespace detail {
 } // detail
 } // jsoncons
 
+#define JSONCONS_EXPAND(X) X    
+#define JSONCONS_QUOTE(Prefix, A) JSONCONS_EXPAND(Prefix ## #A)
+
+#define JSONCONS_STRING_LITERAL(name, ...) \
+   template <class CharT> \
+   jsoncons::basic_string_view<CharT> name() {\
+       static constexpr CharT s[] = { __VA_ARGS__};\
+       return jsoncons::basic_string_view<CharT>(s, sizeof(s) / sizeof(CharT));\
+   }
+
+#define JSONCONS_ARRAY_OF_CHAR(CharT, name, ...) \
+    static constexpr CharT name[] = { __VA_ARGS__,0};
+
 #endif // JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 
 

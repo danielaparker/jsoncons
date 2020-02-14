@@ -10,20 +10,21 @@
 #include <string> // std::basic_string
 #include <vector> // std::vector
 #include <unordered_map> // std::unordered_map
+#include <map>
 #include <limits> // std::numeric_limits
 #include <utility> // std::move
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 
 namespace jsoncons { namespace jsonpath {
 
-JSONCONS_STRING_LITERAL(keys,'k','e','y','s')
-JSONCONS_STRING_LITERAL(avg,'a','v','g')
-JSONCONS_STRING_LITERAL(max,'m','a','x')
-JSONCONS_STRING_LITERAL(min,'m','i','n')
-JSONCONS_STRING_LITERAL(sum,'s','u','m')
-JSONCONS_STRING_LITERAL(prod,'p','r','o','d')
-JSONCONS_STRING_LITERAL(count,'c','o','u','n','t')
-JSONCONS_STRING_LITERAL(tokenize,'t','o','k','e','n','i','z','e')
+JSONCONS_STRING_LITERAL(keys_literal,'k','e','y','s')
+JSONCONS_STRING_LITERAL(avg_literal,'a','v','g')
+JSONCONS_STRING_LITERAL(max_literal,'m','a','x')
+JSONCONS_STRING_LITERAL(min_literal,'m','i','n')
+JSONCONS_STRING_LITERAL(sum_literal,'s','u','m')
+JSONCONS_STRING_LITERAL(prod_literal,'p','r','o','d')
+JSONCONS_STRING_LITERAL(count_literal,'c','o','u','n','t')
+JSONCONS_STRING_LITERAL(tokenize_literal,'t','o','k','e','n','i','z','e')
 
 template <class Json, class JsonPointer>
 class function_table
@@ -36,7 +37,7 @@ public:
     typedef JsonPointer pointer;
     typedef std::vector<pointer> argument_type;
     typedef std::function<Json(const std::vector<argument_type>&, std::error_code&)> function_type;
-    typedef std::unordered_map<string_type,function_type> function_dictionary;
+    typedef std::map<jsoncons::basic_string_view<char_type>,function_type> function_dictionary;
 private:
     const function_dictionary functions_ =
     {

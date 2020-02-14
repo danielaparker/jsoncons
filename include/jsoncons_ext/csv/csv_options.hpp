@@ -11,6 +11,7 @@
 #include <vector>
 #include <utility> // std::pair
 #include <unordered_map> // std::unordered_map
+#include <map>
 #include <limits> // std::numeric_limits
 #include <cwchar>
 #include <jsoncons/json_options.hpp>
@@ -18,10 +19,10 @@
 namespace jsoncons { namespace csv {
 
 namespace detail {
-    JSONCONS_STRING_LITERAL(string,'s','t','r','i','n','g')
-    JSONCONS_STRING_LITERAL(integer,'i','n','t','e','g','e','r')
-    JSONCONS_STRING_LITERAL(float,'f','l','o','a','t')
-    JSONCONS_STRING_LITERAL(boolean,'b','o','o','l','e','a','n')
+    JSONCONS_STRING_LITERAL(string_literal,'s','t','r','i','n','g')
+    JSONCONS_STRING_LITERAL(integer_literal,'i','n','t','e','g','e','r')
+    JSONCONS_STRING_LITERAL(float_literal,'f','l','o','a','t')
+    JSONCONS_STRING_LITERAL(boolean_literal,'b','o','o','l','e','a','n')
 }
 
 enum class csv_column_type : uint8_t 
@@ -126,7 +127,7 @@ void parse_column_types(const std::basic_string<CharT>& types,
                         Container& column_types)
 {
     using char_type = CharT;
-    const std::unordered_map<std::basic_string<CharT>,csv_column_type, std::hash<std::basic_string<CharT>>,std::equal_to<std::basic_string<CharT>>> type_dictionary =
+    const std::map<jsoncons::basic_string_view<CharT>,csv_column_type> type_dictionary =
     {
 
         {detail::string_literal<char_type>(),csv_column_type::string_t},

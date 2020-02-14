@@ -130,9 +130,9 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_event_
     return os;
 }
 
-JSONCONS_STRING_LITERAL(null,'n','u','l','l')
-JSONCONS_STRING_LITERAL(true,'t','r','u','e')
-JSONCONS_STRING_LITERAL(false,'f','a','l','s','e')
+JSONCONS_STRING_LITERAL(null_literal,'n','u','l','l')
+JSONCONS_STRING_LITERAL(true_literal,'t','r','u','e')
+JSONCONS_STRING_LITERAL(false_literal,'f','a','l','s','e')
 
 template<class CharT>
 class basic_staj_event

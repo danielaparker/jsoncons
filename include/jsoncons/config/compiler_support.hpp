@@ -144,27 +144,6 @@
 #  endif // defined(_MSC_VER)
 #endif // !defined(JSONCONS_HAS_STD_OPTIONAL)
 
- #define JSONCONS_STRING_LITERAL(name, ...) \
-    template <class CharT> \
-    const std::basic_string<CharT>& name##_literal() {\
-        static constexpr CharT s[] = { __VA_ARGS__};\
-        static const std::basic_string<CharT> sv(s, sizeof(s) / sizeof(CharT));\
-        return sv;\
-    }
- 
-#define JSONCONS_ARRAY_OF_CHAR(CharT, name, ...) \
-    static constexpr CharT name[] = { __VA_ARGS__,0};
-
-#define JSONCONS_EXPAND(X) X    
-#define JSONCONS_QUOTE(Prefix, A) JSONCONS_EXPAND(Prefix ## #A)
-
-#define JSONCONS_DEFINE_LITERAL( name ) \
-template<class CharT> CharT const* name##_literal(); \
-template<> inline char const * name##_literal<char>() { return JSONCONS_QUOTE(,name); } \
-template<> inline wchar_t const* name##_literal<wchar_t>() { return JSONCONS_QUOTE(L,name); } \
-template<> inline char16_t const* name##_literal<char16_t>() { return JSONCONS_QUOTE(u,name); } \
-template<> inline char32_t const* name##_literal<char32_t>() { return JSONCONS_QUOTE(U,name); }
-
 #if (!defined(JSONCONS_NO_EXCEPTIONS))
 // Check if exceptions are disabled.
 #if defined( __cpp_exceptions) && __cpp_exceptions == 0

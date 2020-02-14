@@ -172,7 +172,7 @@ struct state_item
     state_item& operator=(const state_item&) = default;
 };
 
-JSONCONS_STRING_LITERAL(length, 'l', 'e', 'n', 'g', 't', 'h')
+JSONCONS_STRING_LITERAL(length_literal, 'l', 'e', 'n', 'g', 't', 'h')
 
 template<class Json,
          class JsonReference,

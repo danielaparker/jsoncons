@@ -1,7 +1,7 @@
 ### `jsoncons::basic_json::basic_json`
 
 ```c++
-basic_json(); // (1)
+constexpr basic_json(); // (1)
 
 basic_json(const basic_json& other); // (2)
 
@@ -15,15 +15,15 @@ template <class T>
 basic_json(const T& val); // (6)
 
 template <class Unsigned>
-basic_json(Unsigned val, semantic_tag tag); // (7)
+constexpr basic_json(Unsigned val, semantic_tag tag); // (7)
 
 template <class Signed>
-basic_json(Signed val, semantic_tag tag); // (8)
+constexpr basic_json(Signed val, semantic_tag tag); // (8)
 
-basic_json(half_arg_t, uint16_t value, 
-           semantic_tag tag = semantic_tag::none); // (9)
+constexpr basic_json(half_arg_t, uint16_t value, 
+                     semantic_tag tag = semantic_tag::none); // (9)
 
-basic_json(double val, semantic_tag tag); // (10)
+constexpr basic_json(double val, semantic_tag tag); // (10)
 
 explicit basic_json(json_object_arg_t, 
                     semantic_tag tag = semantic_tag::none, 

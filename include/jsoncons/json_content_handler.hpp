@@ -14,7 +14,6 @@
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/tag_type.hpp>
-#include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons {
 
