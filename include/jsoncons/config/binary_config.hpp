@@ -13,7 +13,6 @@
 #include <cstring> // std::memcpy
 #include <memory>
 #include <type_traits> // std::enable_if
-#include <jsoncons/json_exception.hpp>
 
 // The definitions below follow the definitions in compiler_support_p.h, https://github.com/01org/tinycbor
 // MIT license
@@ -51,27 +50,6 @@ namespace detail {
     {
         uint64_t lo;
         uint64_t hi;
-    };
-
-    class read_nbytes_failed : public std::invalid_argument, public virtual json_exception
-    {
-    public:
-        explicit read_nbytes_failed(std::size_t count) noexcept
-            : std::invalid_argument("")
-        {
-            buffer_.append("Failed attempting to read ");
-            buffer_.append(std::to_string(count));
-            buffer_.append(" bytes from vector");
-        }
-        ~read_nbytes_failed() noexcept
-        {
-        }
-        const char* what() const noexcept override
-        {
-            return buffer_.c_str();
-        }
-    private:
-        std::string buffer_;
     };
 
     namespace detail {

@@ -11,6 +11,7 @@
 #include <vector>
 #include <utility> // std::pair
 #include <unordered_map> // std::unordered_map
+#include <map>
 #include <limits> // std::numeric_limits
 #include <cwchar>
 #include <jsoncons/json_options.hpp>
@@ -126,7 +127,7 @@ void parse_column_types(const std::basic_string<CharT>& types,
                         Container& column_types)
 {
     using char_type = CharT;
-    const std::unordered_map<std::basic_string<CharT>,csv_column_type, std::hash<std::basic_string<CharT>>,std::equal_to<std::basic_string<CharT>>> type_dictionary =
+    const std::map<jsoncons::basic_string_view<CharT>,csv_column_type> type_dictionary =
     {
 
         {detail::string_literal<char_type>(),csv_column_type::string_t},

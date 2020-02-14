@@ -10,6 +10,7 @@
 #include <string> // std::basic_string
 #include <vector> // std::vector
 #include <unordered_map> // std::unordered_map
+#include <map>
 #include <limits> // std::numeric_limits
 #include <utility> // std::move
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
@@ -36,7 +37,7 @@ public:
     typedef JsonPointer pointer;
     typedef std::vector<pointer> argument_type;
     typedef std::function<Json(const std::vector<argument_type>&, std::error_code&)> function_type;
-    typedef std::unordered_map<string_type,function_type> function_dictionary;
+    typedef std::map<jsoncons::basic_string_view<char_type>,function_type> function_dictionary;
 private:
     const function_dictionary functions_ =
     {
