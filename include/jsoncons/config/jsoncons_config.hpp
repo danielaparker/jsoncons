@@ -248,10 +248,9 @@ namespace detail {
 
 #define JSONCONS_STRING_LITERAL(name, ...) \
    template <class CharT> \
-   const jsoncons::basic_string_view<CharT>& name() {\
+   jsoncons::basic_string_view<CharT> name() {\
        static constexpr CharT s[] = { __VA_ARGS__};\
-       static const jsoncons::basic_string_view<CharT> sv(s, sizeof(s) / sizeof(CharT));\
-       return sv;\
+       return jsoncons::basic_string_view<CharT> sv(s, sizeof(s) / sizeof(CharT));\
    }
 
 #define JSONCONS_ARRAY_OF_CHAR(CharT, name, ...) \
