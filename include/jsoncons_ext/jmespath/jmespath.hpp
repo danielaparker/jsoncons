@@ -1235,7 +1235,6 @@ public:
                     switch(*p_)
                     {
                         case '*':
-                            //key_selector_stack_.back() = key_selector(make_unique<list_projection>(std::move(key_selector_stack_.back().selector)));
                             key_selector_stack_.emplace_back(make_unique<list_projection2>());
                             state_stack_.back() = path_state::bracket_specifier4;
                             ++p_;
@@ -1287,7 +1286,6 @@ public:
                             break;
                         default:
                             key_selector_stack_.back() = key_selector(make_unique<list_projection>(std::move(key_selector_stack_.back().selector)));
-
                             structure_offset_stack_.push_back(key_selector_stack_.size());
                             key_selector_stack_.emplace_back(make_unique<compound_expression>());
                             state_stack_.back() = path_state::key_val_expr;
