@@ -727,7 +727,7 @@ class jmespath_evaluator : public ser_context
             for (auto& item : lhs.array_range())
             {
                 reference x = cmp_selector_->select(context, item, ec);
-                if (x.as<bool>())
+                if (x.template as<bool>())
                 {
                     tempp->emplace_back(item);
                 }
@@ -916,7 +916,7 @@ public:
         }
         JSONCONS_CATCH(...)
         {
-            ec = jmespath_errc::unidentified_error;
+            ec = jmespath_errc::unknown_error;
         }
     }
  

@@ -97,7 +97,8 @@ enum class jmespath_errc
     invalid_argument,
     function_name_not_found,
     invalid_type,
-    unexpected_end_of_input 
+    unexpected_end_of_input,
+    unknown_error 
 };
 
 class jmespath_error_category_impl
@@ -140,6 +141,7 @@ public:
                 return "Invalid type";
             case jmespath_errc::unexpected_end_of_input:
                 return "Unexpected end of jmespath input";
+            case jmespath_errc::unknown_error:
             default:
                 return "Unknown jmespath parser error";
         }
