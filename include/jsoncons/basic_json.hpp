@@ -760,7 +760,7 @@ public:
         {
             ::new(&data_)byte_string_storage(tag, bytes.data(), bytes.size(), alloc);
         }
-
+/*
         variant(const basic_bignum<byte_allocator_type>& n) : data_{}
         {
             std::basic_string<char_type> s;
@@ -790,6 +790,7 @@ public:
                 ::new(&data_)long_string_storage(semantic_tag::bigint, s.data(), s.length(), char_allocator_type(alloc));
             }
         }
+*/
         variant(const object& val, semantic_tag tag) : data_{}
         {
             ::new(&data_)object_storage(val, tag);
@@ -1083,7 +1084,7 @@ public:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a byte string"));
             }
         }
-
+/*
         template <class UserAllocator=std::allocator<uint8_t>>
         basic_bignum<UserAllocator> as_bignum() const
         {
@@ -1110,7 +1111,7 @@ public:
                     JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bignum"));
             }
         }
-
+*/
         bool operator==(const variant& rhs) const
         {
             if (this ==&rhs)
@@ -1977,12 +1978,12 @@ public:
         {
             return evaluate().as_byte_string_view();
         }
-
+/*
         basic_bignum<byte_allocator_type> as_bignum() const 
         {
             return evaluate().as_bignum();
         }
-
+*/
         template <class SAllocator=std::allocator<char_type>>
         std::basic_string<char_type,char_traits_type,SAllocator> as_string() const 
         {
@@ -3126,7 +3127,7 @@ public:
         : var_(byte_string_arg, bytes, tag, alloc)
     {
     }
-
+/*
     explicit basic_json(const basic_bignum<byte_allocator_type>& bytes)
         : var_(bytes)
     {
@@ -3136,6 +3137,7 @@ public:
     : var_(bytes, byte_allocator_type(alloc))
     {
     }
+*/
 
     ~basic_json()
     {
@@ -3507,7 +3509,7 @@ public:
     {
         return is_byte_string();
     }
-
+/*
     bool is_bignum() const
     {
         switch (storage())
@@ -3522,7 +3524,7 @@ public:
                 return false;
         }
     }
-
+*/
     bool is_bool() const noexcept
     {
         return var_.storage() == storage_kind::bool_value;
@@ -3764,7 +3766,7 @@ public:
     {
         switch (var_.storage())
         {
-            case storage_kind::short_string_value:
+            /*case storage_kind::short_string_value:
             case storage_kind::long_string_value:
                 if (var_.tag() == semantic_tag::bigint)
                 {
@@ -3780,13 +3782,13 @@ public:
                 {
                     JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bool"));
                 }
-                break;
+                break;*/
             case storage_kind::bool_value:
                 return var_.bool_storage_cast().value();
-            case storage_kind::half_value:
+            /* case storage_kind::half_value:
                 return var_.half_storage_cast().value() != 0.0;
             case storage_kind::double_value:
-                return var_.double_storage_cast().value() != 0.0;
+                return var_.double_storage_cast().value() != 0.0;*/
             case storage_kind::int64_value:
                 return var_.int64_storage_cast().value() != 0;
             case storage_kind::uint64_value:
@@ -3870,11 +3872,12 @@ public:
         return var_.template as_byte_string<BAllocator>();
     }
 
+/*
     basic_bignum<byte_allocator_type> as_bignum() const
     {
         return var_.as_bignum();
     }
-
+*/
     template <class SAllocator=std::allocator<char_type>>
     std::basic_string<char_type,char_traits_type,SAllocator> as_string() const 
     {
