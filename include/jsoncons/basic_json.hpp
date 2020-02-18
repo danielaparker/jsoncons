@@ -100,7 +100,7 @@ enum class storage_kind : uint8_t
     half_value = 0x04,
     double_value = 0x05,
     short_string_value = 0x06,
-    string_value = 0x07,
+    long_string_value = 0x07,
     byte_string_value = 0x08,
     array_value = 0x09,
     empty_object_value = 0x0a,
@@ -322,11 +322,11 @@ public:
 
         class short_string_storage final : public storage_base
         {
-            static const size_t capacity = 14/sizeof(char_type);
+            static constexpr size_t capacity = (2*sizeof(uint64_t) - sizeof(storage_base))/sizeof(char_type);
             uint8_t length_;
             char_type data_[capacity];
         public:
-            static constexpr size_t max_length = (14 / sizeof(char_type)) - 1;
+            static constexpr size_t max_length = capacity - sizeof(char_type);
 
             short_string_storage(semantic_tag tag, const char_type* p, uint8_t length)
                 : storage_base(storage_kind::short_string_value, tag), length_(length)
@@ -368,7 +368,7 @@ public:
         public:
 
             long_string_storage(semantic_tag tag, const char_type* data, std::size_t length, const Allocator& a)
-                : storage_base(storage_kind::string_value, tag)
+                : storage_base(storage_kind::long_string_value, tag)
             {
                 ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(data,length,a);
             }
@@ -682,8 +682,8 @@ public:
         };
 
     private:
-        static const size_t data_size = static_max<sizeof(uint64_storage),sizeof(half_storage),sizeof(double_storage),sizeof(short_string_storage), sizeof(long_string_storage), sizeof(array_storage), sizeof(object_storage)>::value;
-        static const size_t data_align = static_max<alignof(uint64_storage),alignof(half_storage),alignof(double_storage),alignof(short_string_storage),alignof(long_string_storage),alignof(array_storage),alignof(object_storage)>::value;
+        static constexpr size_t data_size = static_max<sizeof(uint64_storage),sizeof(half_storage),sizeof(double_storage),sizeof(short_string_storage), sizeof(long_string_storage), sizeof(array_storage), sizeof(object_storage)>::value;
+        static constexpr size_t data_align = static_max<alignof(uint64_storage),alignof(half_storage),alignof(double_storage),alignof(short_string_storage),alignof(long_string_storage),alignof(array_storage),alignof(object_storage)>::value;
 
         typedef typename std::aligned_storage<data_size,data_align>::type data_t;
 
@@ -837,7 +837,7 @@ public:
         {
             switch (storage())
             {
-                case storage_kind::string_value:
+                case storage_kind::long_string_value:
                     reinterpret_cast<long_string_storage*>(&data_)->~long_string_storage();
                     break;
                 case storage_kind::byte_string_value:
@@ -885,7 +885,7 @@ public:
                     case storage_kind::short_string_value:
                         ::new(&data_)short_string_storage(val.short_string_storage_cast());
                         break;
-                    case storage_kind::string_value:
+                    case storage_kind::long_string_value:
                         ::new(&data_)long_string_storage(val.string_storage_cast());
                         break;
                     case storage_kind::byte_string_value:
@@ -1023,7 +1023,7 @@ public:
             {
                 case storage_kind::short_string_value:
                     return string_view_type(short_string_storage_cast().data(),short_string_storage_cast().length());
-                case storage_kind::string_value:
+                case storage_kind::long_string_value:
                     return string_view_type(string_storage_cast().data(),string_storage_cast().length());
                 default:
                     JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a string"));
@@ -1036,7 +1036,7 @@ public:
             switch (storage())
             {
                 case storage_kind::short_string_value:
-                case storage_kind::string_value:
+                case storage_kind::long_string_value:
                 {
                     switch (tag())
                     {
@@ -1090,7 +1090,7 @@ public:
             switch (storage())
             {
                 case storage_kind::short_string_value:
-                case storage_kind::string_value:
+                case storage_kind::long_string_value:
                     if (!jsoncons::detail::is_base10(as_string_view().data(), as_string_view().length()))
                     {
                         JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an integer"));
@@ -1203,18 +1203,18 @@ public:
                     {
                         case storage_kind::short_string_value:
                             return as_string_view() == rhs.as_string_view();
-                        case storage_kind::string_value:
+                        case storage_kind::long_string_value:
                             return as_string_view() == rhs.as_string_view();
                         default:
                             return false;
                     }
                     break;
-                case storage_kind::string_value:
+                case storage_kind::long_string_value:
                     switch (rhs.storage())
                     {
                         case storage_kind::short_string_value:
                             return as_string_view() == rhs.as_string_view();
-                        case storage_kind::string_value:
+                        case storage_kind::long_string_value:
                             return as_string_view() == rhs.as_string_view();
                         default:
                             return false;
@@ -1336,18 +1336,18 @@ public:
                     {
                         case storage_kind::short_string_value:
                             return as_string_view() < rhs.as_string_view();
-                        case storage_kind::string_value:
+                        case storage_kind::long_string_value:
                             return as_string_view() < rhs.as_string_view();
                         default:
                             return (int)storage() < (int)rhs.storage();
                     }
                     break;
-                case storage_kind::string_value:
+                case storage_kind::long_string_value:
                     switch (rhs.storage())
                     {
                         case storage_kind::short_string_value:
                             return as_string_view() < rhs.as_string_view();
-                        case storage_kind::string_value:
+                        case storage_kind::long_string_value:
                             return as_string_view() < rhs.as_string_view();
                         default:
                             return (int)storage() < (int)rhs.storage();
@@ -1440,7 +1440,7 @@ public:
                 case storage_kind::short_string_value:
                     ::new(&(other.data_))short_string_storage(short_string_storage_cast());
                     break;
-                case storage_kind::string_value:
+                case storage_kind::long_string_value:
                     ::new((&other.data_))long_string_storage(std::move(string_storage_cast()));
                     break;
                 case storage_kind::byte_string_value:
@@ -1458,7 +1458,7 @@ public:
             }
             switch (temp.storage())
             {
-                case storage_kind::string_value:
+                case storage_kind::long_string_value:
                     ::new(&data_)long_string_storage(std::move(temp.string_storage_cast()));
                     break;
                 case storage_kind::byte_string_value:
@@ -1505,7 +1505,7 @@ public:
                 case storage_kind::short_string_value:
                     ::new(&data_)short_string_storage(val.short_string_storage_cast());
                     break;
-                case storage_kind::string_value:
+                case storage_kind::long_string_value:
                     ::new(&data_)long_string_storage(val.string_storage_cast());
                     break;
                 case storage_kind::byte_string_value:
@@ -1536,7 +1536,7 @@ public:
             case storage_kind::short_string_value:
                 Init_(val);
                 break;
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
                 ::new(&data_)long_string_storage(val.string_storage_cast(),a);
                 break;
             case storage_kind::byte_string_value:
@@ -1567,7 +1567,7 @@ public:
                 case storage_kind::short_string_value:
                     Init_(val);
                     break;
-                case storage_kind::string_value:
+                case storage_kind::long_string_value:
                 {
                     ::new(&data_)long_string_storage(std::move(val.string_storage_cast()));
                     ::new((&val.data_))null_storage();
@@ -1616,7 +1616,7 @@ public:
                 case storage_kind::short_string_value:
                     Init_(std::forward<variant>(val));
                     break;
-                case storage_kind::string_value:
+                case storage_kind::long_string_value:
                 {
                     if (a == val.string_storage_cast().get_allocator())
                     {
@@ -3421,7 +3421,7 @@ public:
     {
         switch (var_.storage())
         {
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
             {
                 return var_.string_storage_cast().get_allocator();
             }
@@ -3490,7 +3490,7 @@ public:
 
     bool is_string() const noexcept
     {
-        return (var_.storage() == storage_kind::string_value) || (var_.storage() == storage_kind::short_string_value);
+        return (var_.storage() == storage_kind::long_string_value) || (var_.storage() == storage_kind::short_string_value);
     }
 
     bool is_string_view() const noexcept
@@ -3513,7 +3513,7 @@ public:
         switch (storage())
         {
             case storage_kind::short_string_value:
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
                 return jsoncons::detail::is_base10(as_string_view().data(), as_string_view().length());
             case storage_kind::int64_value:
             case storage_kind::uint64_value:
@@ -3568,7 +3568,7 @@ public:
             case storage_kind::double_value:
                 return true;
             case storage_kind::short_string_value:
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
                 return var_.tag() == semantic_tag::bigint ||
                        var_.tag() == semantic_tag::bigdec ||
                        var_.tag() == semantic_tag::bigfloat;
@@ -3586,7 +3586,7 @@ public:
                 break;
             case storage_kind::short_string_value:
                 return var_.short_string_storage_cast().length() == 0;
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
                 return var_.string_storage_cast().length() == 0;
             case storage_kind::array_value:
                 return array_value().size() == 0;
@@ -3695,7 +3695,7 @@ public:
         switch (storage())
         {
             case storage_kind::short_string_value:
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
             {
                 switch (tag())
                 {
@@ -3765,7 +3765,7 @@ public:
         switch (var_.storage())
         {
             case storage_kind::short_string_value:
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
                 if (var_.tag() == semantic_tag::bigint)
                 {
                     return static_cast<bool>(var_.as_bignum());
@@ -3806,7 +3806,7 @@ public:
         switch (var_.storage())
         {
             case storage_kind::short_string_value:
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
             {
                 auto result = jsoncons::detail::to_integer<T>(as_string_view().data(), as_string_view().length());
                 if (!result)
@@ -3835,7 +3835,7 @@ public:
         switch (var_.storage())
         {
             case storage_kind::short_string_value:
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
             {
                 jsoncons::detail::string_to_double to_double;
                 // to_double() throws std::invalid_argument if conversion fails
@@ -3888,7 +3888,7 @@ public:
         switch (var_.storage())
         {
             case storage_kind::short_string_value:
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
             {
                 return string_type(as_string_view().data(),as_string_view().length(),alloc);
             }
@@ -3948,7 +3948,7 @@ public:
         switch (var_.storage())
         {
             case storage_kind::short_string_value:
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
             {
                 return string_type(as_string_view().data(),as_string_view().length(),alloc);
             }
@@ -4003,7 +4003,7 @@ public:
         {
         case storage_kind::short_string_value:
             return var_.short_string_storage_cast().c_str();
-        case storage_kind::string_value:
+        case storage_kind::long_string_value:
             return var_.string_storage_cast().c_str();
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a cstring"));
@@ -4628,7 +4628,7 @@ public:
             case storage_kind::double_value:
                 return json_type::double_value;
             case storage_kind::short_string_value:
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
                 return json_type::string_value;
             case storage_kind::byte_string_value:
                 return json_type::byte_string_value;
@@ -5473,7 +5473,7 @@ private:
         switch (var_.storage())
         {
             case storage_kind::short_string_value:
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
                 handler.string_value(as_string_view(), var_.tag(), context, ec);
                 break;
             case storage_kind::byte_string_value:
