@@ -923,11 +923,11 @@ public:
                 return basic_bignum<Allocator>(j.as_string_view().data(), j.as_string_view().length());
             case json_type::half_value:
             case json_type::double_value:
-                return basic_bignum<Allocator>(j.as<double>());
+                return basic_bignum<Allocator>(j.template as<double>());
             case json_type::int64_value:
-                return basic_bignum<Allocator>(j.as<int64_t>());
+                return basic_bignum<Allocator>(j.template as<int64_t>());
             case json_type::uint64_value:
-                return basic_bignum<Allocator>(j.as<uint64_t>());
+                return basic_bignum<Allocator>(j.template as<uint64_t>());
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bignum"));
         }
