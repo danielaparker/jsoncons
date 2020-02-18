@@ -199,7 +199,7 @@ TEST_CASE("test_uinteger_overflow")
 
     json j2 =  json::parse(s2);
     CHECK_FALSE(j2.is_uint64());
-    CHECK(j2.is_bignum());
+    CHECK(j2.is<jsoncons::bignum>());
     CHECK(s2 == j2.as<std::string>());
 }
 TEST_CASE("test_negative_integer_overflow")
@@ -230,7 +230,7 @@ TEST_CASE("test_positive_integer_overflow")
 
     json j2 =  json::parse(s2);
     CHECK_FALSE(j2.is_int64());
-    CHECK(j2.is_bignum());
+    CHECK(j2.is<jsoncons::bignum>());
     CHECK(s2 == j2.as<std::string>());
 }
 

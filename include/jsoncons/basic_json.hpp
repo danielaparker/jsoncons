@@ -3497,7 +3497,7 @@ public:
     {
         return is_byte_string();
     }
-/*
+
     bool is_bignum() const
     {
         switch (storage())
@@ -3512,7 +3512,7 @@ public:
                 return false;
         }
     }
-*/
+
     bool is_bool() const noexcept
     {
         return var_.storage() == storage_kind::bool_value;
