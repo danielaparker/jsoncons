@@ -22,7 +22,9 @@
 #include <type_traits> // std::enable_if
 #include <istream> // std::basic_istream
 #include <jsoncons/json_fwd.hpp>
+#include <jsoncons/json_type.hpp>
 #include <jsoncons/config/version.hpp>
+#include <jsoncons/json_type.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/pretty_print.hpp>
 #include <jsoncons/json_container_types.hpp>
@@ -75,20 +77,6 @@ public:
     {
         return last_;
     }
-};
-
-enum class json_type : uint8_t 
-{
-    null_value,
-    bool_value,
-    int64_value,
-    uint64_value,
-    half_value,
-    double_value,
-    string_value,
-    byte_string_value,
-    array_value,
-    object_value
 };
 
 enum class storage_kind : uint8_t 
