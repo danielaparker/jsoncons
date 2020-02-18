@@ -18,7 +18,7 @@ TEST_CASE("test_variant")
     json::variant var3("Small string", 12, semantic_tag::none);
     CHECK(storage_kind::short_string_value == var3.storage());
     json::variant var4("Too long to fit in small string", 31, semantic_tag::none);
-    CHECK(storage_kind::string_value == var4.storage());
+    CHECK(storage_kind::long_string_value == var4.storage());
     json::variant var5(true, semantic_tag::none);
     CHECK(storage_kind::bool_value == var5.storage());
     json::variant var6(semantic_tag::none);
@@ -58,7 +58,7 @@ TEST_CASE("test_move_constructor")
     json::variant var7(val7.data(), val7.length(), semantic_tag::none);
     json::variant var8(std::move(var7));
     //CHECK(storage_kind::null_value == var7.storage());
-    CHECK(storage_kind::string_value == var8.storage());
+    CHECK(storage_kind::long_string_value == var8.storage());
     CHECK(val7 == var8.string_storage_cast().data());
     CHECK(val7.length() == var8.string_storage_cast().length());
 
@@ -81,7 +81,7 @@ TEST_CASE("test_move_constructor")
     json::variant var13(val13.data(), val13.length(), semantic_tag::none);
     json::variant var14(std::move(var13));
     //CHECK(storage_kind::null_value == var13.storage());
-    CHECK(storage_kind::string_value == var14.storage());
+    CHECK(storage_kind::long_string_value == var14.storage());
     CHECK(val13 == var14.string_storage_cast().data());
 
     json::object val15 = { {"first",1},{"second",2} };
@@ -139,8 +139,8 @@ TEST_CASE("test_copy_constructor")
     std::string val13 = "Too long for small string";
     json::variant var13(val13.data(), val13.length(), semantic_tag::none);
     json::variant var14(var13);
-    CHECK(storage_kind::string_value == var13.storage());
-    CHECK(storage_kind::string_value == var14.storage());
+    CHECK(storage_kind::long_string_value == var13.storage());
+    CHECK(storage_kind::long_string_value == var14.storage());
     CHECK(var14.string_storage_cast().data() == val13);
 
     json::object val15 = { {"first",1},{"second",2} };
