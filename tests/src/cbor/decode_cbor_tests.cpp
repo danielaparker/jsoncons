@@ -520,7 +520,7 @@ TEST_CASE("cbor conversion tests")
     it2++;
     CHECK(it2->as_byte_string() == byte_string{'P','u','s','s'});
     it2++;
-    CHECK(bool(it2->as_bignum() == bignum{"-18446744073709551617"}));
+    CHECK(bool(it2->as<bignum>() == bignum{"-18446744073709551617"}));
     it2++;
     CHECK(bool(it2->as_string() == std::string{"273.15"}));
     it2++;
