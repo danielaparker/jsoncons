@@ -913,21 +913,20 @@ public:
     
     static basic_bignum<Allocator> as(const Json& j)
     {
-        switch (j.storage())
+        switch (j.type())
         {
-            case storage_kind::short_string_value:
-            case storage_kind::long_string_value:
+            case json_type::string_value:
                 if (!jsoncons::detail::is_base10(j.as_string_view().data(), j.as_string_view().length()))
                 {
                     JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bignum"));
                 }
                 return basic_bignum<Allocator>(j.as_string_view().data(), j.as_string_view().length());
-            case storage_kind::half_value:
-            case storage_kind::double_value:
+            case json_type::half_value:
+            case json_type::double_value:
                 return basic_bignum<Allocator>(j.as<double>());
-            case storage_kind::int64_value:
+            case json_type::int64_value:
                 return basic_bignum<Allocator>(j.as<int64_t>());
-            case storage_kind::uint64_value:
+            case json_type::uint64_value:
                 return basic_bignum<Allocator>(j.as<uint64_t>());
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bignum"));
