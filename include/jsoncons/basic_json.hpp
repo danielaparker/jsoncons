@@ -326,7 +326,7 @@ public:
             uint8_t length_;
             char_type data_[capacity];
         public:
-            static constexpr size_t max_length = capacity - sizeof(char_type);
+            static constexpr size_t max_length = capacity - 1;
 
             short_string_storage(semantic_tag tag, const char_type* p, uint8_t length)
                 : storage_base(storage_kind::short_string_value, tag), length_(length)
