@@ -679,46 +679,46 @@ public:
     public:
         variant(semantic_tag tag) : data_{}
         {
-            ::new(&data_)empty_object_storage(tag);
+            construct_var<empty_object_storage>(tag);
         }
 
         explicit variant(null_type, semantic_tag tag) : data_{}
         {
-            ::new(&data_)null_storage(tag);
+            construct_var<null_storage>(tag);
         }
 
         explicit variant(bool val, semantic_tag tag) : data_{}
         {
-            ::new(&data_)bool_storage(val,tag);
+            construct_var<bool_storage>(val,tag);
         }
         explicit variant(int64_t val, semantic_tag tag) : data_{}
         {
-            ::new(&data_)int64_storage(val, tag);
+            construct_var<int64_storage>(val, tag);
         }
         explicit variant(uint64_t val, semantic_tag tag) : data_{}
         {
-            ::new(&data_)uint64_storage(val, tag);
+            construct_var<uint64_storage>(val, tag);
         }
 
         variant(half_arg_t, uint16_t val, semantic_tag tag) : data_{}
         {
-            ::new(&data_)half_storage(val, tag);
+            construct_var<half_storage>(val, tag);
         }
 
         variant(double val, semantic_tag tag) : data_{}
         {
-            ::new(&data_)double_storage(val, tag);
+            construct_var<double_storage>(val, tag);
         }
 
         variant(const char_type* s, std::size_t length, semantic_tag tag)
         {
             if (length <= short_string_storage::max_length)
             {
-                ::new(&data_)short_string_storage(tag, s, static_cast<uint8_t>(length));
+                construct_var<short_string_storage>(tag, s, static_cast<uint8_t>(length));
             }
             else
             {
-                ::new(&data_)long_string_storage(tag, s, length, char_allocator_type());
+                construct_var<long_string_storage>(tag, s, length, char_allocator_type());
             }
         }
 
@@ -726,44 +726,44 @@ public:
         {
             if (length <= short_string_storage::max_length)
             {
-                ::new(&data_)short_string_storage(tag, s, static_cast<uint8_t>(length));
+                construct_var<short_string_storage>(tag, s, static_cast<uint8_t>(length));
             }
             else
             {
-                ::new(&data_)long_string_storage(tag, s, length, char_allocator_type(alloc));
+                construct_var<long_string_storage>(tag, s, length, char_allocator_type(alloc));
             }
         }
 
         variant(const byte_string_view& bytes, semantic_tag tag) : data_{}
         {
-            ::new(&data_)byte_string_storage(tag, bytes.data(), bytes.size(), byte_allocator_type());
+            construct_var<byte_string_storage>(tag, bytes.data(), bytes.size(), byte_allocator_type());
         }
 
         variant(const byte_string_view& bytes, semantic_tag tag, const Allocator& alloc) : data_{}
         {
-            ::new(&data_)byte_string_storage(tag, bytes.data(), bytes.size(), alloc);
+            construct_var<byte_string_storage>(tag, bytes.data(), bytes.size(), alloc);
         }
 
         variant(byte_string_arg_t, const span<const uint8_t>& bytes, semantic_tag tag, const Allocator& alloc) : data_{}
         {
-            ::new(&data_)byte_string_storage(tag, bytes.data(), bytes.size(), alloc);
+            construct_var<byte_string_storage>(tag, bytes.data(), bytes.size(), alloc);
         }
 
         variant(const object& val, semantic_tag tag) : data_{}
         {
-            ::new(&data_)object_storage(val, tag);
+            construct_var<object_storage>(val, tag);
         }
         variant(const object& val, semantic_tag tag, const Allocator& alloc) : data_{}
         {
-            ::new(&data_)object_storage(val, tag, alloc);
+            construct_var<object_storage>(val, tag, alloc);
         }
         variant(const array& val, semantic_tag tag) : data_{}
         {
-            ::new(&data_)array_storage(val, tag);
+            construct_var<array_storage>(val, tag);
         }
         variant(const array& val, semantic_tag tag, const Allocator& alloc) : data_{}
         {
-            ::new(&data_)array_storage(val, tag, alloc);
+            construct_var<array_storage>(val, tag, alloc);
         }
 
         variant(const variant& val)
@@ -1409,40 +1409,40 @@ public:
             switch (val.storage())
             {
                 case storage_kind::null_value:
-                    ::new(&data_)null_storage(val.cast<null_storage>());
+                    construct_var<null_storage>(val.cast<null_storage>());
                     break;
                 case storage_kind::empty_object_value:
-                    ::new(&data_)empty_object_storage(val.cast<empty_object_storage>());
+                    construct_var<empty_object_storage>(val.cast<empty_object_storage>());
                     break;
                 case storage_kind::bool_value:
-                    ::new(&data_)bool_storage(val.cast<bool_storage>());
+                    construct_var<bool_storage>(val.cast<bool_storage>());
                     break;
                 case storage_kind::int64_value:
-                    ::new(&data_)int64_storage(val.cast<int64_storage>());
+                    construct_var<int64_storage>(val.cast<int64_storage>());
                     break;
                 case storage_kind::uint64_value:
-                    ::new(&data_)uint64_storage(val.cast<uint64_storage>());
+                    construct_var<uint64_storage>(val.cast<uint64_storage>());
                     break;
                 case storage_kind::half_value:
-                    ::new(&data_)half_storage(val.cast<half_storage>());
+                    construct_var<half_storage>(val.cast<half_storage>());
                     break;
                 case storage_kind::double_value:
-                    ::new(&data_)double_storage(val.cast<double_storage>());
+                    construct_var<double_storage>(val.cast<double_storage>());
                     break;
                 case storage_kind::short_string_value:
-                    ::new(&data_)short_string_storage(val.cast<short_string_storage>());
+                    construct_var<short_string_storage>(val.cast<short_string_storage>());
                     break;
                 case storage_kind::long_string_value:
-                    ::new(&data_)long_string_storage(val.cast<long_string_storage>());
+                    construct_var<long_string_storage>(val.cast<long_string_storage>());
                     break;
                 case storage_kind::byte_string_value:
-                    ::new(&data_)byte_string_storage(val.cast<byte_string_storage>());
+                    construct_var<byte_string_storage>(val.cast<byte_string_storage>());
                     break;
                 case storage_kind::object_value:
-                    ::new(&data_)object_storage(val.cast<object_storage>());
+                    construct_var<object_storage>(val.cast<object_storage>());
                     break;
                 case storage_kind::array_value:
-                    ::new(&data_)array_storage(val.cast<array_storage>());
+                    construct_var<array_storage>(val.cast<array_storage>());
                     break;
                 default:
                     break;
@@ -1464,16 +1464,16 @@ public:
                 Init_(val);
                 break;
             case storage_kind::long_string_value:
-                ::new(&data_)long_string_storage(val.cast<long_string_storage>(),a);
+                construct_var<long_string_storage>(val.cast<long_string_storage>(),a);
                 break;
             case storage_kind::byte_string_value:
-                ::new(&data_)byte_string_storage(val.cast<byte_string_storage>(),a);
+                construct_var<byte_string_storage>(val.cast<byte_string_storage>(),a);
                 break;
             case storage_kind::array_value:
-                ::new(&data_)array_storage(val.cast<array_storage>(),a);
+                construct_var<array_storage>(val.cast<array_storage>(),a);
                 break;
             case storage_kind::object_value:
-                ::new(&data_)object_storage(val.cast<object_storage>(),a);
+                construct_var<object_storage>(val.cast<object_storage>(),a);
                 break;
             default:
                 break;
