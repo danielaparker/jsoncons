@@ -748,37 +748,7 @@ public:
         {
             ::new(&data_)byte_string_storage(tag, bytes.data(), bytes.size(), alloc);
         }
-/*
-        variant(const basic_bignum<byte_allocator_type>& n) : data_{}
-        {
-            std::basic_string<char_type> s;
-            n.dump(s);
 
-            if (s.length() <= short_string_storage::max_length)
-            {
-                ::new(&data_)short_string_storage(semantic_tag::bigint, s.data(), static_cast<uint8_t>(s.length()));
-            }
-            else
-            {
-                ::new(&data_)long_string_storage(semantic_tag::bigint, s.data(), s.length(), char_allocator_type());
-            }
-        }
-
-        variant(const basic_bignum<byte_allocator_type>& n, const Allocator& alloc) : data_{}
-        {
-            std::basic_string<char_type> s;
-            n.dump(s);
-
-            if (s.length() <= short_string_storage::max_length)
-            {
-                ::new(&data_)short_string_storage(semantic_tag::bigint, s.data(), static_cast<uint8_t>(s.length()));
-            }
-            else
-            {
-                ::new(&data_)long_string_storage(semantic_tag::bigint, s.data(), s.length(), char_allocator_type(alloc));
-            }
-        }
-*/
         variant(const object& val, semantic_tag tag) : data_{}
         {
             ::new(&data_)object_storage(val, tag);
@@ -911,6 +881,18 @@ public:
         semantic_tag tag() const
         {
             return reinterpret_cast<const storage_base*>(&data_)->tag();
+        }
+
+        template <class VariantType, class... Args>
+        void construct_var(Args&&... args)
+        {
+            new (&cast<VariantType>()) VariantType(std::forward<Args>(args)...);
+        }
+
+        template <class VariantType>
+        void destroy_var()
+        {
+            cast<VariantType>().~VariantType();
         }
 
         template <class T>
@@ -1433,7 +1415,68 @@ public:
                     break;
             }
         }
+        template <class TypeA, class TypeB>
+        void swap_a_b(variant& other)
+        {
+            TypeA& curA = cast<TypeA>();
+            TypeB& curB = other.cast<TypeB>();
+            TypeB tmpB(std::move(curB));
+            other.construct_var<TypeA>(std::move(curA));
+            construct_var<TypeB>(std::move(tmpB));
+        }
 
+        template <class TypeA>
+        void swap_a(variant& other)
+        {
+            switch (other.storage())
+            {
+                case storage_kind::null_value         : swap_a_b<TypeA, null_storage>(other); break;
+                case storage_kind::empty_object_value : swap_a_b<TypeA, empty_object_storage>(other); break;
+                case storage_kind::bool_value         : swap_a_b<TypeA, bool_storage>(other); break;
+                case storage_kind::int64_value      : swap_a_b<TypeA, int64_storage>(other); break;
+                case storage_kind::uint64_value     : swap_a_b<TypeA, uint64_storage>(other); break;
+                case storage_kind::half_value       : swap_a_b<TypeA, half_storage>(other); break;
+                case storage_kind::double_value       : swap_a_b<TypeA, double_storage>(other); break;
+                case storage_kind::short_string_value : swap_a_b<TypeA, short_string_storage>(other); break;
+                case storage_kind::long_string_value       : swap_a_b<TypeA, long_string_storage>(other); break;
+                case storage_kind::byte_string_value  : swap_a_b<TypeA, byte_string_storage>(other); break;
+                case storage_kind::array_value        : swap_a_b<TypeA, array_storage>(other); break;
+                case storage_kind::object_value       : swap_a_b<TypeA, object_storage>(other); break;
+                default:
+                    JSONCONS_UNREACHABLE();
+                    break;
+            }
+        }
+    public:
+
+        void swap(variant& other) noexcept
+        {
+            if (this == &other)
+            {
+                return;
+            }
+
+            switch (storage())
+            {
+                case storage_kind::null_value: swap_a<null_storage>(other); break;
+                case storage_kind::empty_object_value : swap_a<empty_object_storage>(other); break;
+                case storage_kind::bool_value: swap_a<bool_storage>(other); break;
+                case storage_kind::int64_value: swap_a<int64_storage>(other); break;
+                case storage_kind::uint64_value: swap_a<uint64_storage>(other); break;
+                case storage_kind::half_value: swap_a<half_storage>(other); break;
+                case storage_kind::double_value: swap_a<double_storage>(other); break;
+                case storage_kind::short_string_value: swap_a<short_string_storage>(other); break;
+                case storage_kind::long_string_value: swap_a<long_string_storage>(other); break;
+                case storage_kind::byte_string_value: swap_a<byte_string_storage>(other); break;
+                case storage_kind::array_value: swap_a<array_storage>(other); break;
+                case storage_kind::object_value: swap_a<object_storage>(other); break;
+                default:
+                    JSONCONS_UNREACHABLE();
+                    break;
+            }
+        }
+
+/*
         template <class Alloc = allocator_type>
         typename std::enable_if<std::is_standard_layout<typename std::allocator_traits<Alloc>::pointer>::value ||
                                 std::is_trivial<typename std::allocator_traits<Alloc>::pointer>::value,void>::type
@@ -1519,6 +1562,7 @@ public:
                     break;
             }
         }
+ */
     private:
 
         void Init_(const variant& val)
