@@ -797,16 +797,16 @@ public:
             switch (storage())
             {
                 case storage_kind::long_string_value:
-                    reinterpret_cast<long_string_storage*>(&data_)->~long_string_storage();
+                    destroy_var<long_string_storage>();
                     break;
                 case storage_kind::byte_string_value:
-                    reinterpret_cast<byte_string_storage*>(&data_)->~byte_string_storage();
+                    destroy_var<byte_string_storage>();
                     break;
                 case storage_kind::array_value:
-                    reinterpret_cast<array_storage*>(&data_)->~array_storage();
+                    destroy_var<array_storage>();
                     break;
                 case storage_kind::object_value:
-                    reinterpret_cast<object_storage*>(&data_)->~object_storage();
+                    destroy_var<object_storage>();
                     break;
                 default:
                     break;
@@ -846,6 +846,12 @@ public:
         void construct_var(Args&&... args)
         {
             ::new (&cast<VariantType>()) VariantType(std::forward<Args>(args)...);
+        }
+
+        template <class VariantType>
+        void destroy_var()
+        {
+            reinterpret_cast<VariantType*>(&data_)->~VariantType();
         }
 
         template <class T>
