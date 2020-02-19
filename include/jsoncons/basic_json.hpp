@@ -1145,9 +1145,9 @@ public:
                 case storage_kind::double_value:
                     return basic_bignum<UserAllocator>(cast<double_storage>().value());
                 case storage_kind::int64_value:
-                    return basic_bignum<UserAllocator>(var_.template cast<int64_storage>().value());
+                    return basic_bignum<UserAllocator>(cast<int64_storage>().value());
                 case storage_kind::uint64_value:
-                    return basic_bignum<UserAllocator>(var_.template cast<uint64_storage>().value());
+                    return basic_bignum<UserAllocator>(cast<uint64_storage>().value());
                 case storage_kind::bool_value:
                     return basic_bignum<UserAllocator>(cast<bool_storage>().value() ? 1 : 0);
                 default:
@@ -1340,11 +1340,11 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::int64_value:
-                            return var_.template cast<int64_storage>().value() < rhs.var_.template cast<int64_storage>().value();
+                            return cast<int64_storage>().value() < rhs.cast<int64_storage>().value();
                         case storage_kind::uint64_value:
-                            return var_.template cast<int64_storage>().value() >= 0 ? static_cast<uint64_t>(var_.template cast<int64_storage>().value()) < rhs.var_.template cast<uint64_storage>().value() : true;
+                            return cast<int64_storage>().value() >= 0 ? static_cast<uint64_t>(cast<int64_storage>().value()) < rhs.cast<uint64_storage>().value() : true;
                         case storage_kind::double_value:
-                            return static_cast<double>(var_.template cast<int64_storage>().value()) < rhs.cast<double_storage>().value();
+                            return static_cast<double>(cast<int64_storage>().value()) < rhs.cast<double_storage>().value();
                         default:
                             return (int)storage() < (int)rhs.storage();
                     }
@@ -1353,11 +1353,11 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::int64_value:
-                            return rhs.var_.template cast<int64_storage>().value() >= 0 ? var_.template cast<uint64_storage>().value() < static_cast<uint64_t>(rhs.var_.template cast<int64_storage>().value()) : true;
+                            return rhs.cast<int64_storage>().value() >= 0 ? cast<uint64_storage>().value() < static_cast<uint64_t>(rhs.cast<int64_storage>().value()) : true;
                         case storage_kind::uint64_value:
-                            return var_.template cast<uint64_storage>().value() < rhs.var_.template cast<uint64_storage>().value();
+                            return cast<uint64_storage>().value() < rhs.cast<uint64_storage>().value();
                         case storage_kind::double_value:
-                            return static_cast<double>(var_.template cast<uint64_storage>().value()) < rhs.cast<double_storage>().value();
+                            return static_cast<double>(cast<uint64_storage>().value()) < rhs.cast<double_storage>().value();
                         default:
                             return (int)storage() < (int)rhs.storage();
                     }
@@ -1366,9 +1366,9 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::int64_value:
-                            return cast<double_storage>().value() < static_cast<double>(rhs.var_.template cast<int64_storage>().value());
+                            return cast<double_storage>().value() < static_cast<double>(rhs.cast<int64_storage>().value());
                         case storage_kind::uint64_value:
-                            return cast<double_storage>().value() < static_cast<double>(rhs.var_.template cast<uint64_storage>().value());
+                            return cast<double_storage>().value() < static_cast<double>(rhs.cast<uint64_storage>().value());
                         case storage_kind::double_value:
                             return cast<double_storage>().value() < rhs.cast<double_storage>().value();
                         default:
@@ -1470,10 +1470,10 @@ public:
                     ::new(&(other.data_))bool_storage(cast<bool_storage>());
                     break;
                 case storage_kind::int64_value:
-                    ::new(&(other.data_))int64_storage(var_.template cast<int64_storage>());
+                    ::new(&(other.data_))int64_storage(cast<int64_storage>());
                     break;
                 case storage_kind::uint64_value:
-                    ::new(&(other.data_))uint64_storage(var_.template cast<uint64_storage>());
+                    ::new(&(other.data_))uint64_storage(cast<uint64_storage>());
                     break;
                 case storage_kind::half_value:
                     ::new(&(other.data_))half_storage(cast<half_storage>());
