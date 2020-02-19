@@ -886,7 +886,7 @@ public:
         template <class VariantType, class... Args>
         void construct_var(Args&&... args)
         {
-            new (&cast<VariantType>()) VariantType(std::forward<Args>(args)...);
+            ::new (&cast<VariantType>()) VariantType(std::forward<Args>(args)...);
         }
 
         template <class VariantType>
