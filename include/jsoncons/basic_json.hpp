@@ -815,51 +815,10 @@ public:
 
         variant& operator=(const variant& val)
         {
-            if (this !=&val)
+            if (this != &val)
             {
                 Destroy_();
-                switch (val.storage())
-                {
-                    case storage_kind::null_value:
-                        ::new(&data_)null_storage(val.cast<null_storage>());
-                        break;
-                    case storage_kind::empty_object_value:
-                        ::new(&data_)empty_object_storage(val.cast<empty_object_storage>());
-                        break;
-                    case storage_kind::bool_value:
-                        ::new(&data_)bool_storage(val.cast<bool_storage>());
-                        break;
-                    case storage_kind::int64_value:
-                        ::new(&data_)int64_storage(val.cast<int64_storage>());
-                        break;
-                    case storage_kind::uint64_value:
-                        ::new(&data_)uint64_storage(val.cast<uint64_storage>());
-                        break;
-                    case storage_kind::half_value:
-                        ::new(&data_)half_storage(val.cast<half_storage>());
-                        break;
-                    case storage_kind::double_value:
-                        ::new(&data_)double_storage(val.cast<double_storage>());
-                        break;
-                    case storage_kind::short_string_value:
-                        ::new(&data_)short_string_storage(val.cast<short_string_storage>());
-                        break;
-                    case storage_kind::long_string_value:
-                        ::new(&data_)long_string_storage(val.cast<long_string_storage>());
-                        break;
-                    case storage_kind::byte_string_value:
-                        ::new(&data_)byte_string_storage(val.cast<byte_string_storage>());
-                        break;
-                    case storage_kind::array_value:
-                        ::new(&data_)array_storage(val.cast<array_storage>());
-                        break;
-                    case storage_kind::object_value:
-                        ::new(&data_)object_storage(val.cast<object_storage>());
-                        break;
-                    default:
-                        JSONCONS_UNREACHABLE();
-                        break;
-                }
+                Init_(val);
             }
             return *this;
         }
@@ -887,12 +846,6 @@ public:
         void construct_var(Args&&... args)
         {
             ::new (&cast<VariantType>()) VariantType(std::forward<Args>(args)...);
-        }
-
-        template <class VariantType>
-        void destroy_var()
-        {
-            cast<VariantType>().~VariantType();
         }
 
         template <class T>
@@ -1109,34 +1062,7 @@ public:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a byte string"));
             }
         }
-/*
-        template <class UserAllocator=std::allocator<uint8_t>>
-        basic_bignum<UserAllocator> as_bignum() const
-        {
-            switch (storage())
-            {
-                case storage_kind::short_string_value:
-                case storage_kind::long_string_value:
-                    if (!jsoncons::detail::is_base10(as_string_view().data(), as_string_view().length()))
-                    {
-                        JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an integer"));
-                    }
-                    return basic_bignum<UserAllocator>(as_string_view().data(), as_string_view().length());
-                case storage_kind::half_value:
-                    return basic_bignum<UserAllocator>(jsoncons::detail::decode_half(cast<half_storage>().value()));
-                case storage_kind::double_value:
-                    return basic_bignum<UserAllocator>(cast<double_storage>().value());
-                case storage_kind::int64_value:
-                    return basic_bignum<UserAllocator>(cast<int64_storage>().value());
-                case storage_kind::uint64_value:
-                    return basic_bignum<UserAllocator>(cast<uint64_storage>().value());
-                case storage_kind::bool_value:
-                    return basic_bignum<UserAllocator>(cast<bool_storage>().value() ? 1 : 0);
-                default:
-                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bignum"));
-            }
-        }
-*/
+
         bool operator==(const variant& rhs) const
         {
             if (this ==&rhs)
@@ -1476,93 +1402,6 @@ public:
             }
         }
 
-/*
-        template <class Alloc = allocator_type>
-        typename std::enable_if<std::is_standard_layout<typename std::allocator_traits<Alloc>::pointer>::value ||
-                                std::is_trivial<typename std::allocator_traits<Alloc>::pointer>::value,void>::type
-        swap(variant& other) noexcept
-        {
-            if (this ==&other)
-            {
-                return;
-            }
-
-            std::swap(data_,other.data_);
-        }
-
-        template <class Alloc = allocator_type>
-        typename std::enable_if<!(std::is_standard_layout<typename std::allocator_traits<Alloc>::pointer>::value ||
-                                  std::is_trivial<typename std::allocator_traits<Alloc>::pointer>::value), void>::type
-        swap(variant& other) noexcept
-        {
-            if (this ==&other)
-            {
-                return;
-            }
-
-            variant temp(other);
-            switch (storage())
-            {
-                case storage_kind::null_value:
-                    ::new(&(other.data_))null_storage(cast<null_storage>());
-                    break;
-                case storage_kind::empty_object_value:
-                    ::new(&(other.data_))empty_object_storage(cast<empty_object_storage>());
-                    break;
-                case storage_kind::bool_value:
-                    ::new(&(other.data_))bool_storage(cast<bool_storage>());
-                    break;
-                case storage_kind::int64_value:
-                    ::new(&(other.data_))int64_storage(cast<int64_storage>());
-                    break;
-                case storage_kind::uint64_value:
-                    ::new(&(other.data_))uint64_storage(cast<uint64_storage>());
-                    break;
-                case storage_kind::half_value:
-                    ::new(&(other.data_))half_storage(cast<half_storage>());
-                    break;
-                case storage_kind::double_value:
-                    ::new(&(other.data_))double_storage(cast<double_storage>());
-                    break;
-                case storage_kind::short_string_value:
-                    ::new(&(other.data_))short_string_storage(cast<short_string_storage>());
-                    break;
-                case storage_kind::long_string_value:
-                    ::new((&other.data_))long_string_storage(std::move(cast<long_string_storage>()));
-                    break;
-                case storage_kind::byte_string_value:
-                    ::new((&other.data_))byte_string_storage(std::move(cast<byte_string_storage>()));
-                    break;
-                case storage_kind::array_value:
-                    ::new(&(other.data_))array_storage(std::move(cast<array_storage>()));
-                    break;
-                case storage_kind::object_value:
-                    ::new(&(other.data_))object_storage(std::move(cast<object_storage>()));
-                    break;
-                default:
-                    JSONCONS_UNREACHABLE();
-                    break;
-            }
-            switch (temp.storage())
-            {
-                case storage_kind::long_string_value:
-                    ::new(&data_)long_string_storage(std::move(temp.cast<long_string_storage>()));
-                    break;
-                case storage_kind::byte_string_value:
-                    ::new(&data_)byte_string_storage(std::move(temp.cast<byte_string_storage>()));
-                    break;
-                case storage_kind::array_value:
-                    ::new((&(data_)))array_storage(std::move(temp.cast<array_storage>()));
-                    break;
-                case storage_kind::object_value:
-                    ::new((&(data_)))object_storage(std::move(temp.cast<object_storage>()));
-                    break;
-                default:
-                    std::swap(data_,temp.data_);
-                    break;
-            }
-        }
- */
     private:
 
         void Init_(const variant& val)
@@ -1656,27 +1495,12 @@ public:
                     Init_(val);
                     break;
                 case storage_kind::long_string_value:
-                {
-                    ::new(&data_)long_string_storage(std::move(val.cast<long_string_storage>()));
-                    ::new((&val.data_))null_storage();
-                    break;
-                }
                 case storage_kind::byte_string_value:
-                {
-                    ::new(&data_)byte_string_storage(std::move(val.cast<byte_string_storage>()));
-                    ::new((&val.data_))null_storage();
-                    break;
-                }
                 case storage_kind::array_value:
-                {
-                    ::new(&data_)array_storage(std::move(val.cast<array_storage>()));
-                    ::new((&val.data_))null_storage();
-                    break;
-                }
                 case storage_kind::object_value:
                 {
-                    ::new(&data_)object_storage(std::move(val.cast<object_storage>()));
-                    ::new((&val.data_))null_storage();
+                    construct_var<null_storage>();
+                    swap(val);
                     break;
                 }
                 default:
@@ -2065,12 +1889,7 @@ public:
         {
             return evaluate().as_byte_string_view();
         }
-/*
-        basic_bignum<byte_allocator_type> as_bignum() const 
-        {
-            return evaluate().as_bignum();
-        }
-*/
+
         template <class SAllocator=std::allocator<char_type>>
         std::basic_string<char_type,char_traits_type,SAllocator> as_string() const 
         {
@@ -3214,17 +3033,6 @@ public:
         : var_(byte_string_arg, bytes, tag, alloc)
     {
     }
-/*
-    explicit basic_json(const basic_bignum<byte_allocator_type>& bytes)
-        : var_(bytes)
-    {
-    }
-
-    explicit basic_json(const basic_bignum<byte_allocator_type>& bytes, const Allocator& alloc)
-    : var_(bytes, byte_allocator_type(alloc))
-    {
-    }
-*/
 
     ~basic_json()
     {
@@ -3853,29 +3661,8 @@ public:
     {
         switch (var_.storage())
         {
-            /*case storage_kind::short_string_value:
-            case storage_kind::long_string_value:
-                if (var_.tag() == semantic_tag::bigint)
-                {
-                    return static_cast<bool>(var_.as_bignum());
-                }
-
-                JSONCONS_TRY
-                {
-                    basic_json j = basic_json::parse(as_string_view());
-                    return j.as_bool();
-                }
-                JSONCONS_CATCH(...)
-                {
-                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bool"));
-                }
-                break;*/
             case storage_kind::bool_value:
                 return var_.template cast<typename variant::bool_storage>().value();
-            /* case storage_kind::half_value:
-                return var_.template cast<typename variant::half_storage>().value() != 0.0;
-            case storage_kind::double_value:
-                return var_.template cast<typename variant::double_storage>().value() != 0.0;*/
             case storage_kind::int64_value:
                 return var_.template cast<typename variant::int64_storage>().value() != 0;
             case storage_kind::uint64_value:
@@ -3959,12 +3746,6 @@ public:
         return var_.template as_byte_string<BAllocator>();
     }
 
-/*
-    basic_bignum<byte_allocator_type> as_bignum() const
-    {
-        return var_.as_bignum();
-    }
-*/
     template <class SAllocator=std::allocator<char_type>>
     std::basic_string<char_type,char_traits_type,SAllocator> as_string() const 
     {
