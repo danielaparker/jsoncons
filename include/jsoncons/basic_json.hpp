@@ -3468,19 +3468,19 @@ public:
         {
             case storage_kind::long_string_value:
             {
-                return var_.template cast<variant::long_string_storage>().get_allocator();
+                return var_.template cast<typename variant::long_string_storage>().get_allocator();
             }
             case storage_kind::byte_string_value:
             {
-                return var_.template cast<variant::byte_string_storage>().get_allocator();
+                return var_.template cast<typename variant::byte_string_storage>().get_allocator();
             }
             case storage_kind::array_value:
             {
-                return var_.template cast<variant::array_storage>().get_allocator();
+                return var_.template cast<typename variant::array_storage>().get_allocator();
             }
             case storage_kind::object_value:
             {
-                return var_.template cast<variant::object_storage>().get_allocator();
+                return var_.template cast<typename variant::object_storage>().get_allocator();
             }
             default:
                 return allocator_type();
@@ -3627,12 +3627,12 @@ public:
         switch (var_.storage())
         {
             case storage_kind::byte_string_value:
-                return var_.template cast<variant::byte_string_storage>().length() == 0;
+                return var_.template cast<typename variant::byte_string_storage>().length() == 0;
                 break;
             case storage_kind::short_string_value:
-                return var_.template cast<variant::short_string_storage>().length() == 0;
+                return var_.template cast<typename variant::short_string_storage>().length() == 0;
             case storage_kind::long_string_value:
-                return var_.template cast<variant::long_string_storage>().length() == 0;
+                return var_.template cast<typename variant::long_string_storage>().length() == 0;
             case storage_kind::array_value:
                 return array_value().size() == 0;
             case storage_kind::empty_object_value:
@@ -3827,15 +3827,15 @@ public:
                 }
                 break;*/
             case storage_kind::bool_value:
-                return var_.template cast<variant::bool_storage>().value();
+                return var_.template cast<typename variant::bool_storage>().value();
             /* case storage_kind::half_value:
-                return var_.template cast<variant::half_storage>().value() != 0.0;
+                return var_.template cast<typename variant::half_storage>().value() != 0.0;
             case storage_kind::double_value:
-                return var_.template cast<variant::double_storage>().value() != 0.0;*/
+                return var_.template cast<typename variant::double_storage>().value() != 0.0;*/
             case storage_kind::int64_value:
-                return var_.template cast<variant::int64_storage>().value() != 0;
+                return var_.template cast<typename variant::int64_storage>().value() != 0;
             case storage_kind::uint64_value:
-                return var_.template cast<variant::uint64_storage>().value() != 0;
+                return var_.template cast<typename variant::uint64_storage>().value() != 0;
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bool"));
         }
@@ -3861,15 +3861,15 @@ public:
                 return result.value();
             }
             case storage_kind::half_value:
-                return static_cast<T>(var_.template cast<variant::half_storage>().value());
+                return static_cast<T>(var_.template cast<typename variant::half_storage>().value());
             case storage_kind::double_value:
-                return static_cast<T>(var_.template cast<variant::double_storage>().value());
+                return static_cast<T>(var_.template cast<typename variant::double_storage>().value());
             case storage_kind::int64_value:
-                return static_cast<T>(var_.template cast<variant::int64_storage>().value());
+                return static_cast<T>(var_.template cast<typename variant::int64_storage>().value());
             case storage_kind::uint64_value:
-                return static_cast<T>(var_.template cast<variant::uint64_storage>().value());
+                return static_cast<T>(var_.template cast<typename variant::uint64_storage>().value());
             case storage_kind::bool_value:
-                return static_cast<T>(var_.template cast<variant::bool_storage>().value() ? 1 : 0);
+                return static_cast<T>(var_.template cast<typename variant::bool_storage>().value() ? 1 : 0);
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an integer"));
         }
@@ -3887,13 +3887,13 @@ public:
                 return to_double(as_cstring(), as_string_view().length());
             }
             case storage_kind::half_value:
-                return jsoncons::detail::decode_half(var_.template cast<variant::half_storage>().value());
+                return jsoncons::detail::decode_half(var_.template cast<typename variant::half_storage>().value());
             case storage_kind::double_value:
-                return var_.template cast<variant::double_storage>().value();
+                return var_.template cast<typename variant::double_storage>().value();
             case storage_kind::int64_value:
-                return static_cast<double>(var_.template cast<variant::int64_storage>().value());
+                return static_cast<double>(var_.template cast<typename variant::int64_storage>().value());
             case storage_kind::uint64_value:
-                return static_cast<double>(var_.template cast<variant::uint64_storage>().value());
+                return static_cast<double>(var_.template cast<typename variant::uint64_storage>().value());
             default:
                 JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
         }
@@ -3944,18 +3944,18 @@ public:
                 switch (tag())
                 {
                     case semantic_tag::base64:
-                        encode_base64(var_.template cast<variant::byte_string_storage>().begin(), 
-                                      var_.template cast<variant::byte_string_storage>().end(),
+                        encode_base64(var_.template cast<typename variant::byte_string_storage>().begin(), 
+                                      var_.template cast<typename variant::byte_string_storage>().end(),
                                       s);
                         break;
                     case semantic_tag::base16:
-                        encode_base16(var_.template cast<variant::byte_string_storage>().begin(), 
-                                      var_.template cast<variant::byte_string_storage>().end(),
+                        encode_base16(var_.template cast<typename variant::byte_string_storage>().begin(), 
+                                      var_.template cast<typename variant::byte_string_storage>().end(),
                                       s);
                         break;
                     default:
-                        encode_base64url(var_.template cast<variant::byte_string_storage>().begin(), 
-                                         var_.template cast<variant::byte_string_storage>().end(),
+                        encode_base64url(var_.template cast<typename variant::byte_string_storage>().begin(), 
+                                         var_.template cast<typename variant::byte_string_storage>().end(),
                                          s);
                         break;
                 }
@@ -4007,18 +4007,18 @@ public:
                 switch (format)
                 {
                     case byte_string_chars_format::base64:
-                        encode_base64(var_.template cast<variant::byte_string_storage>().begin(), 
-                                      var_.template cast<variant::byte_string_storage>().end(),
+                        encode_base64(var_.template cast<typename variant::byte_string_storage>().begin(), 
+                                      var_.template cast<typename variant::byte_string_storage>().end(),
                                       s);
                         break;
                     case byte_string_chars_format::base16:
-                        encode_base16(var_.template cast<variant::byte_string_storage>().begin(), 
-                                      var_.template cast<variant::byte_string_storage>().end(),
+                        encode_base16(var_.template cast<typename variant::byte_string_storage>().begin(), 
+                                      var_.template cast<typename variant::byte_string_storage>().end(),
                                       s);
                         break;
                     default:
-                        encode_base64url(var_.template cast<variant::byte_string_storage>().begin(), 
-                                         var_.template cast<variant::byte_string_storage>().end(),
+                        encode_base64url(var_.template cast<typename variant::byte_string_storage>().begin(), 
+                                         var_.template cast<typename variant::byte_string_storage>().end(),
                                          s);
                         break;
                 }
@@ -4048,9 +4048,9 @@ public:
         switch (var_.storage())
         {
         case storage_kind::short_string_value:
-            return var_.template cast<variant::short_string_storage>().c_str();
+            return var_.template cast<typename variant::short_string_storage>().c_str();
         case storage_kind::long_string_value:
-            return var_.template cast<variant::long_string_storage>().c_str();
+            return var_.template cast<typename variant::long_string_storage>().c_str();
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a cstring"));
         }
@@ -5215,13 +5215,13 @@ public:
         switch (var_.storage())
         {
         case storage_kind::double_value:
-            return static_cast<int>(var_.template cast<variant::double_storage>().value());
+            return static_cast<int>(var_.template cast<typename variant::double_storage>().value());
         case storage_kind::int64_value:
-            return static_cast<int>(var_.template cast<variant::int64_storage>().value());
+            return static_cast<int>(var_.template cast<typename variant::int64_storage>().value());
         case storage_kind::uint64_value:
-            return static_cast<int>(var_.template cast<variant::uint64_storage>().value());
+            return static_cast<int>(var_.template cast<typename variant::uint64_storage>().value());
         case storage_kind::bool_value:
-            return var_.template cast<variant::bool_storage>().value() ? 1 : 0;
+            return var_.template cast<typename variant::bool_storage>().value() ? 1 : 0;
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an int"));
         }
@@ -5233,13 +5233,13 @@ public:
         switch (var_.storage())
         {
         case storage_kind::double_value:
-            return static_cast<unsigned int>(var_.template cast<variant::double_storage>().value());
+            return static_cast<unsigned int>(var_.template cast<typename variant::double_storage>().value());
         case storage_kind::int64_value:
-            return static_cast<unsigned int>(var_.template cast<variant::int64_storage>().value());
+            return static_cast<unsigned int>(var_.template cast<typename variant::int64_storage>().value());
         case storage_kind::uint64_value:
-            return static_cast<unsigned int>(var_.template cast<variant::uint64_storage>().value());
+            return static_cast<unsigned int>(var_.template cast<typename variant::uint64_storage>().value());
         case storage_kind::bool_value:
-            return var_.template cast<variant::bool_storage>().value() ? 1 : 0;
+            return var_.template cast<typename variant::bool_storage>().value() ? 1 : 0;
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an unsigned int"));
         }
@@ -5251,13 +5251,13 @@ public:
         switch (var_.storage())
         {
         case storage_kind::double_value:
-            return static_cast<long>(var_.template cast<variant::double_storage>().value());
+            return static_cast<long>(var_.template cast<typename variant::double_storage>().value());
         case storage_kind::int64_value:
-            return static_cast<long>(var_.template cast<variant::int64_storage>().value());
+            return static_cast<long>(var_.template cast<typename variant::int64_storage>().value());
         case storage_kind::uint64_value:
-            return static_cast<long>(var_.template cast<variant::uint64_storage>().value());
+            return static_cast<long>(var_.template cast<typename variant::uint64_storage>().value());
         case storage_kind::bool_value:
-            return var_.template cast<variant::bool_storage>().value() ? 1 : 0;
+            return var_.template cast<typename variant::bool_storage>().value() ? 1 : 0;
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a long"));
         }
@@ -5269,13 +5269,13 @@ public:
         switch (var_.storage())
         {
         case storage_kind::double_value:
-            return static_cast<unsigned long>(var_.template cast<variant::double_storage>().value());
+            return static_cast<unsigned long>(var_.template cast<typename variant::double_storage>().value());
         case storage_kind::int64_value:
-            return static_cast<unsigned long>(var_.template cast<variant::int64_storage>().value());
+            return static_cast<unsigned long>(var_.template cast<typename variant::int64_storage>().value());
         case storage_kind::uint64_value:
-            return static_cast<unsigned long>(var_.template cast<variant::uint64_storage>().value());
+            return static_cast<unsigned long>(var_.template cast<typename variant::uint64_storage>().value());
         case storage_kind::bool_value:
-            return var_.template cast<variant::bool_storage>().value() ? 1 : 0;
+            return var_.template cast<typename variant::bool_storage>().value() ? 1 : 0;
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an unsigned long"));
         }
@@ -5462,7 +5462,7 @@ public:
         switch (var_.storage())
         {
         case storage_kind::array_value:
-            return var_.template cast<variant::array_storage>().value();
+            return var_.template cast<typename variant::array_storage>().value();
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Bad array cast"));
             break;
@@ -5474,7 +5474,7 @@ public:
         switch (var_.storage())
         {
         case storage_kind::array_value:
-            return var_.template cast<variant::array_storage>().value();
+            return var_.template cast<typename variant::array_storage>().value();
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Bad array cast"));
             break;
@@ -5489,7 +5489,7 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_kind::object_value:
-            return var_.template cast<variant::object_storage>().value();
+            return var_.template cast<typename variant::object_storage>().value();
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Bad object cast"));
             break;
@@ -5504,7 +5504,7 @@ public:
             const_cast<basic_json*>(this)->create_object_implicitly(); // HERE
             JSONCONS_FALLTHROUGH;
         case storage_kind::object_value:
-            return var_.template cast<variant::object_storage>().value();
+            return var_.template cast<typename variant::object_storage>().value();
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Bad object cast"));
             break;
@@ -5523,24 +5523,24 @@ private:
                 handler.string_value(as_string_view(), var_.tag(), context, ec);
                 break;
             case storage_kind::byte_string_value:
-                handler.byte_string_value(var_.template cast<variant::byte_string_storage>().data(), var_.template cast<variant::byte_string_storage>().length(), 
+                handler.byte_string_value(var_.template cast<typename variant::byte_string_storage>().data(), var_.template cast<typename variant::byte_string_storage>().length(), 
                                           var_.tag(), context, ec);
                 break;
             case storage_kind::half_value:
-                handler.half_value(var_.template cast<variant::half_storage>().value(), var_.tag(), context, ec);
+                handler.half_value(var_.template cast<typename variant::half_storage>().value(), var_.tag(), context, ec);
                 break;
             case storage_kind::double_value:
-                handler.double_value(var_.template cast<variant::double_storage>().value(), 
+                handler.double_value(var_.template cast<typename variant::double_storage>().value(), 
                                      var_.tag(), context, ec);
                 break;
             case storage_kind::int64_value:
-                handler.int64_value(var_.template cast<variant::int64_storage>().value(), var_.tag(), context, ec);
+                handler.int64_value(var_.template cast<typename variant::int64_storage>().value(), var_.tag(), context, ec);
                 break;
             case storage_kind::uint64_value:
-                handler.uint64_value(var_.template cast<variant::uint64_storage>().value(), var_.tag(), context, ec);
+                handler.uint64_value(var_.template cast<typename variant::uint64_storage>().value(), var_.tag(), context, ec);
                 break;
             case storage_kind::bool_value:
-                handler.bool_value(var_.template cast<variant::bool_storage>().value(), var_.tag(), context, ec);
+                handler.bool_value(var_.template cast<typename variant::bool_storage>().value(), var_.tag(), context, ec);
                 break;
             case storage_kind::null_value:
                 handler.null_value(var_.tag(), context, ec);
