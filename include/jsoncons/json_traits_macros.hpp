@@ -172,7 +172,7 @@
 #define JSONCONS_ALL_AS_LAST(Prefix,P2,P3, Member, Count) set_member(std::is_const<decltype(aval.Member)>(),ajson,JSONCONS_QUOTE(Prefix, Member),aval.Member);
 
 #define JSONCONS_TO_JSON(Prefix, P2, P3, Member, Count) JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Count)
-#define JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Count) ajson.try_emplace(JSONCONS_QUOTE(Prefix, Member), aval.Member);
+#define JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Count) set_json_member(JSONCONS_QUOTE(Prefix, Member), aval.Member, ajson);
 
 #define JSONCONS_MEMBER_TRAITS_DECL_BASE(As,CharT,Prefix,NumTemplateParams,ValueType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons \
@@ -213,6 +213,16 @@ namespace jsoncons \
         static void set_member(std::false_type, const Json& j, const string_view_type& name, U& val) \
         { \
             val = j.at(name).template as<U>(); \
+        } \
+        template <class U> \
+        static void set_json_member(const string_view_type& name, const jsoncons::optional<U>& val, Json& j) \
+        { \
+            if (val) set_json_member(name, val, j); \
+        } \
+        template <class U> \
+        static void set_json_member(const string_view_type& name, const U& val, Json& j) \
+        { \
+            j.try_emplace(name, val); \
         } \
     }; \
 } \

@@ -73,6 +73,13 @@ namespace json_type_traits_macro_tests
         double price;
         std::string isbn;
     };
+    struct book1c
+    {
+        std::string author;
+        std::string title;
+        double price;
+        jsoncons::optional<std::string> isbn;
+    };
 
     class book2a
     {
@@ -391,6 +398,8 @@ namespace ns = json_type_traits_macro_tests;
 JSONCONS_ENUM_TRAITS_DECL(ns::float_format, scientific, fixed, hex, general)
 JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::book1a,author,title,price)
 JSONCONS_N_MEMBER_TRAITS_DECL(ns::book1b,3,author,title,price,isbn)
+JSONCONS_N_MEMBER_TRAITS_DECL(ns::book1c,3,author,title,price,isbn)
+
 JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::book2a, author, title, price)
 JSONCONS_N_GETTER_CTOR_TRAITS_DECL(ns::book2b, 2, author, title, price, isbn)
 JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL(1,ns::MyStruct,typeContent,someString)
@@ -448,6 +457,45 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS_DECL tests")
         CHECK(val.author == book.author);
         CHECK(val.title == book.title);
         CHECK(val.price == Approx(book.price).epsilon(0.001));
+    }
+}
+
+TEST_CASE("JSONCONS_N_MEMBER_TRAITS_DECL with optional tests")
+{
+    std::string an_author = "Haruki Murakami"; 
+    std::string a_title = "Kafka on the Shore";
+    double a_price = 25.17;
+
+    ns::book1c book{an_author, a_title, a_price};
+
+    CHECK(jsoncons::is_json_type_traits_declared<ns::book1c>::value);
+
+    SECTION("book1c")
+    {
+        std::string s;
+
+        encode_json(book, s);
+
+        json j = decode_json<json>(s);
+
+        REQUIRE(j.is<ns::book1a>() == true);
+        REQUIRE(j.is<ns::book1b>() == true); // isbn is optional
+
+        CHECK(j["author"].as<std::string>() == an_author);
+        CHECK(j["title"].as<std::string>() == a_title);
+        CHECK(j["price"].as<double>() == Approx(a_price).epsilon(0.001));
+        CHECK_FALSE(j.contains("isbn"));
+
+        json j2(book);
+
+        CHECK(j == j2);
+
+        auto val = j.as<ns::book1c>();
+
+        CHECK(val.author == book.author);
+        CHECK(val.title == book.title);
+        CHECK(val.price == Approx(book.price).epsilon(0.001));
+        CHECK_FALSE(val.isbn.has_value());
     }
 }
 

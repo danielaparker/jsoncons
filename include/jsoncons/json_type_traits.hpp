@@ -869,6 +869,26 @@ public:
     }
 };
 
+template<class Json, class U>
+struct json_type_traits<Json, jsoncons::optional<U>>
+{
+public:
+    static bool is(const Json& j) noexcept
+    {
+        return true;
+    }
+    
+    static jsoncons::optional<U> as(const Json& j)
+    { 
+        return j.is_null() ? jsoncons::optional<U>() : jsoncons::optional<U>(j.template as<U>());
+    }
+    
+    static Json to_json(const jsoncons::optional<U>& val)
+    {
+        return val.has_value() ? Json::null() : Json(val.value());
+    }
+};
+
 template<class Json>
 struct json_type_traits<Json, byte_string_view>
 {

@@ -35,6 +35,7 @@ namespace detail
         }
 
         optional(const optional& other)
+            : has_value_(false)
         {
             if (other)
             {
@@ -45,6 +46,7 @@ namespace detail
         template <class T2=T>
         optional(const optional& other,
         typename std::enable_if<std::is_copy_constructible<T2>::value>::type* = 0)
+            : has_value_(false)
         {
             if (other)
             {
@@ -54,6 +56,7 @@ namespace detail
 
         optional(optional&& other,
                  typename std::enable_if<std::is_move_constructible<T>::value>::type* = 0)
+            : has_value_(false)
        {
             if (other)
             {
@@ -67,6 +70,7 @@ namespace detail
                                          std::is_constructible<T, const U&>::value &&
                                          std::is_convertible<const U&,T>::value &&
                                          std::is_copy_constructible<U>::value>::type* = 0)
+            : has_value_(false)
         {
             if (other)
             {
@@ -80,6 +84,7 @@ namespace detail
                                                   std::is_constructible<T, const U&>::value &&
                                                   !std::is_convertible<const U&,T>::value &&
                                                   std::is_copy_constructible<U>::value>::type* = 0)
+            : has_value_(false)
         {
             if (other)
             {
