@@ -466,7 +466,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS_DECL with optional tests")
     std::string a_title = "Kafka on the Shore";
     double a_price = 25.17;
 
-    ns::book1c book{an_author, a_title, a_price};
+    ns::book1c book{an_author, a_title, a_price, jsoncons::optional<std::string>{}};
 
     CHECK(jsoncons::is_json_type_traits_declared<ns::book1c>::value);
 
