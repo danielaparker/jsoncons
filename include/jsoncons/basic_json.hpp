@@ -1114,7 +1114,7 @@ public:
                         case storage_kind::uint64_value:
                             return cast<int64_storage>().value() >= 0 ? static_cast<uint64_t>(cast<int64_storage>().value()) == rhs.cast<uint64_storage>().value() : false;
                         case storage_kind::half_value:
-                            return cast<int64_storage>().value() == static_cast<int64_t>(rhs.cast<half_storage>().value());
+                            return static_cast<double>(cast<int64_storage>().value()) == jsoncons::detail::decode_half(rhs.cast<half_storage>().value());
                         case storage_kind::double_value:
                             return static_cast<double>(cast<int64_storage>().value()) == rhs.cast<double_storage>().value();
                         default:
@@ -1129,7 +1129,7 @@ public:
                         case storage_kind::uint64_value:
                             return cast<uint64_storage>().value() == rhs.cast<uint64_storage>().value();
                         case storage_kind::half_value:
-                            return cast<uint64_storage>().value() == static_cast<uint64_t>(rhs.cast<half_storage>().value());
+                            return static_cast<double>(cast<uint64_storage>().value()) == jsoncons::detail::decode_half(rhs.cast<half_storage>().value());
                         case storage_kind::double_value:
                             return static_cast<double>(cast<uint64_storage>().value()) == rhs.cast<double_storage>().value();
                         default:
