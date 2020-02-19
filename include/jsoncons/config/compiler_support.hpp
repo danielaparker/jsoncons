@@ -177,25 +177,25 @@
     #define JSONCONS_CATCH(exception) if(false)
 #endif
 
-#if !defined(JSONCONS_HAS_MAKE_UNIQUE)
+#if !defined(JSONCONS_HAS_STD_MAKE_UNIQUE)
    #if defined(__clang__)
       #if defined(__APPLE__)
          #if __clang_major__ >= 6  && _cplusplus >= 201103L // Xcode 6
-            #define JSONCONS_HAS_MAKE_UNIQUE
+            #define JSONCONS_HAS_STD_MAKE_UNIQUE
          #endif
       #elif ((__clang_major__*100 +__clang_minor__) >= 340) && _cplusplus > 201103L
-         #define JSONCONS_HAS_MAKE_UNIQUE
+         #define JSONCONS_HAS_STD_MAKE_UNIQUE
       #endif
    #elif defined(__GNUC__)
       #if (__GNUC__ * 100 + __GNUC_MINOR__) >= 409 && __cplusplus > 201103L
-         #define JSONCONS_HAS_MAKE_UNIQUE
+         #define JSONCONS_HAS_STD_MAKE_UNIQUE
       #endif
    #elif defined(_MSC_VER)
       #if _MSC_VER >= 1800 
-         #define JSONCONS_HAS_MAKE_UNIQUE
+         #define JSONCONS_HAS_STD_MAKE_UNIQUE
       #endif
    #endif
-#endif // !defined(JSONCONS_HAS_MAKE_UNIQUE)
+#endif // !defined(JSONCONS_HAS_STD_MAKE_UNIQUE)
 
 #endif // JSONCONS_COMPILER_SUPPORT_HPP
 
