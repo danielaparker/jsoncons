@@ -283,9 +283,9 @@ namespace jsoncons \
 #define JSONCONS_ALL_NAMED_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_ALL_NAMED_AS_ Seq)
 #define JSONCONS_ALL_NAMED_AS_(Member, Name) set_member(std::is_const<decltype(aval.Member)>(),ajson,Name,aval.Member);
 
-#define JSONCONS_NAMED_TO_JSON_JSON(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_NAMED_TO_JSON_ Seq)
-#define JSONCONS_NAMED_TO_JSON_JSON_LAST(P1, P2, P3, Seq, Count)  if ((num_params-Count) < num_mandatory_params2 JSONCONS_EXPAND(JSONCONS_NAMED_TO_JSON_ Seq))
-#define JSONCONS_NAMED_TO_JSON_(Member, Name) {ajson.try_emplace(Name, aval.Member);} else {set_json_member(JSONCONS_QUOTE(Prefix, Member), aval.Member, ajson);}
+#define JSONCONS_NAMED_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_NAMED_TO_JSON_LAST(P1, P2, P3, Seq, Count)
+#define JSONCONS_NAMED_TO_JSON_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2 JSONCONS_EXPAND(JSONCONS_NAMED_TO_JSON_ Seq)
+#define JSONCONS_NAMED_TO_JSON_(Member, Name) ) {ajson.try_emplace(Name, aval.Member);} else {set_json_member(JSONCONS_QUOTE(Prefix, Member), aval.Member, ajson);}
 
 #define JSONCONS_ALL_NAMED_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_ALL_NAMED_TO_JSON_ Seq)
 #define JSONCONS_ALL_NAMED_TO_JSON_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_ALL_NAMED_TO_JSON_ Seq)
@@ -827,7 +827,7 @@ namespace jsoncons \
 #define JSONCONS_GETTER_SETTER_NAMED_TO_JSON_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_GETTER_SETTER_NAMED_TO_JSON_ Seq)
 #define JSONCONS_GETTER_SETTER_NAMED_TO_JSON_(Getter, Setter, Name) ajson.try_emplace(Name, aval.Getter() );
 
-#define JSONCONS_ALL_GETTER_SETTER_NAMED_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_ALL_GETTER_SETTER_NAMED_TO_JSON_ Seq)
+#define JSONCONS_ALL_GETTER_SETTER_NAMED_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_ALL_GETTER_SETTER_NAMED_TO_JSON_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_GETTER_SETTER_NAMED_TO_JSON_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_ALL_GETTER_SETTER_NAMED_TO_JSON_ Seq)
 #define JSONCONS_ALL_GETTER_SETTER_NAMED_TO_JSON_(Getter, Setter, Name) ajson.try_emplace(Name, aval.Getter() );
  
