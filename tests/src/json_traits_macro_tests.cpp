@@ -395,26 +395,26 @@ namespace json_type_traits_macro_tests
  
 namespace ns = json_type_traits_macro_tests;
 
-JSONCONS_ENUM_TRAITS_DECL(ns::float_format, scientific, fixed, hex, general)
+JSONCONS_ENUM_TRAITS(ns::float_format, scientific, fixed, hex, general)
 JSONCONS_ALL_MEMBER_TRAITS(ns::book1a,author,title,price)
 JSONCONS_N_MEMBER_TRAITS(ns::book1b,3,author,title,price,isbn)
 JSONCONS_N_MEMBER_TRAITS(ns::book1c,3,author,title,price,isbn)
 
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::book2a, author, title, price)
-JSONCONS_N_GETTER_CTOR_TRAITS_DECL(ns::book2b, 2, author, title, price, isbn)
+JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::book2a, author, title, price)
+JSONCONS_N_GETTER_CTOR_TRAITS(ns::book2b, 2, author, title, price, isbn)
 JSONCONS_TPL_ALL_MEMBER_TRAITS(1,ns::MyStruct,typeContent,someString)
 JSONCONS_TPL_ALL_MEMBER_TRAITS(1,ns::MyStruct2,typeContent,someString)
-JSONCONS_TPL_ALL_GETTER_CTOR_TRAITS_DECL(1,ns::MyStruct3,typeContent,someString)
+JSONCONS_TPL_ALL_GETTER_CTOR_TRAITS(1,ns::MyStruct3,typeContent,someString)
 JSONCONS_TPL_ALL_MEMBER_TRAITS(2,ns::TemplatedStruct,aT1,aT2)
 
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, firstName, lastName, wage, hours)
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
-JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
+JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::HourlyEmployee, firstName, lastName, wage, hours)
+JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::CommissionedEmployee, firstName, lastName, baseSalary, commission, sales)
+JSONCONS_POLYMORPHIC_TRAITS(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
 
-JSONCONS_ALL_GETTER_SETTER_TRAITS_DECL(ns::book3a, get, set, Author, Title, Price)
-JSONCONS_N_GETTER_SETTER_TRAITS_DECL(ns::book3b, get, set, 2, Author, Title, Price, Isbn)
+JSONCONS_ALL_GETTER_SETTER_TRAITS(ns::book3a, get, set, Author, Title, Price)
+JSONCONS_N_GETTER_SETTER_TRAITS(ns::book3b, get, set, 2, Author, Title, Price, Isbn)
 
-JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
+JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
 JSONCONS_ALL_MEMBER_TRAITS(ns::hiking_reputon, rater, assertion, rated, rating)
 JSONCONS_ALL_MEMBER_TRAITS(ns::hiking_reputation, application, reputons)
 
@@ -499,7 +499,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
     }
 }
 
-TEST_CASE("JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_ALL_GETTER_CTOR_TRAITS tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
@@ -541,7 +541,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_N_GETTER_CTOR_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_N_GETTER_CTOR_TRAITS tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
@@ -661,7 +661,7 @@ TEST_CASE("JSONCONS_TPL_ALL_MEMBER_TRAITS tests")
     }
 }
 
-TEST_CASE("JSONCONS_TPL_ALL_GETTER_CTOR_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_TPL_ALL_GETTER_CTOR_TRAITS tests")
 {
     SECTION("MyStruct<std::pair<int,int>>")
     {
@@ -682,7 +682,7 @@ TEST_CASE("JSONCONS_TPL_ALL_GETTER_CTOR_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_ENUM_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_ENUM_TRAITS tests")
 {
     SECTION("float_format default")
     {
@@ -726,7 +726,7 @@ TEST_CASE("JSONCONS_ENUM_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS tests")
 {
     std::string input = R"(
 [
@@ -803,7 +803,7 @@ TEST_CASE("JSONCONS_POLYMORPHIC_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_N_GETTER_SETTER_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_N_GETTER_SETTER_TRAITS tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
@@ -862,7 +862,7 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_TRAITS_DECL tests")
     }
 }
 
-TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS_DECL tests")
+TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";

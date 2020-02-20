@@ -72,7 +72,7 @@ and a proposal for aggregation functions that work outside a filter.
 - [patternoia](https://github.com/patternoia) for fixing the installation script
 to include copying the jsoncons_ext directory into the installation place
 
-- [mikewallis](https://github.com/mikewallis) for removing redundant macro continuation character in JSONCONS_TYPE_TRAITS_DECL
+- [mikewallis](https://github.com/mikewallis) for removing redundant macro continuation character in JSONCONS_TYPE_TRAITS
 
 - [KonstantinPlotnikov](https://github.com/KonstantinPlotnikov) for fixing GCC 9.2 warning: ‘class jsoncons::json_exception’ 
 has virtual functions and accessible non-virtual destructor
