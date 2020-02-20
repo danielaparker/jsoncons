@@ -176,16 +176,16 @@ namespace ns = json_type_traits_macros_examples_ns;
 // Declare the traits at global scope
 JSONCONS_ENUM_TRAITS_DECL(ns::BookCategory,fiction,biography)
 
-JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::Book1,category,author,title,price)
-JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::Book2,category,author,title,price)
+JSONCONS_ALL_MEMBER_TRAITS(ns::Book1,category,author,title,price)
+JSONCONS_ALL_MEMBER_TRAITS(ns::Book2,category,author,title,price)
 JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::Book3,category,author,title,price)
 
 JSONCONS_N_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, 3, firstName, lastName, wage, hours)
 JSONCONS_N_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, 4, firstName, lastName, baseSalary, commission, sales)
 JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
 
-JSONCONS_N_MEMBER_TRAITS_DECL(ns::Bar,1,bar)
-JSONCONS_N_MEMBER_TRAITS_DECL(ns::Baz,1,baz)
+JSONCONS_N_MEMBER_TRAITS(ns::Bar,1,bar)
+JSONCONS_N_MEMBER_TRAITS(ns::Baz,1,baz)
 JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Foo, ns::Bar, ns::Baz)
 
 using namespace jsoncons;

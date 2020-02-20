@@ -568,8 +568,8 @@ public:
 // Declare the traits at global scope
 JSONCONS_ENUM_TRAITS_DECL(ns::BookCategory,fiction,biography)
 
-JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::Book1,category,author,title,price)
-JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::Book2,category,author,title,price)
+JSONCONS_ALL_MEMBER_TRAITS(ns::Book1,category,author,title,price)
+JSONCONS_ALL_MEMBER_TRAITS(ns::Book2,category,author,title,price)
 JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::Book3,category,author,title,price)
 
 using namespace jsoncons; // for convenience
@@ -927,7 +927,7 @@ namespace ns {
 } // namespace ns
 
 // Declare the traits. Specify the number of template parameters and which data members need to be serialized.
-JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
+JSONCONS_TPL_ALL_MEMBER_TRAITS(2,ns::TemplatedStruct,aT1,aT2)
 
 using namespace jsoncons; // for convenience
 
@@ -1010,7 +1010,7 @@ To save typing and enhance readability, the jsoncons library defines macros,
 so you could also write
 
 ```c++
-JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::book, author, title, price)
+JSONCONS_ALL_MEMBER_TRAITS(ns::book, author, title, price)
 ```
 
 which expands to the code above.
@@ -1075,9 +1075,9 @@ Charles Bukowski, Pulp, 22.48
 
 #### Mapping to C++ data structures with and without defaults allowed
 
-The macros `JSONCONS_N_MEMBER_TRAITS_DECL` and `JSONCONS_ALL_MEMBER_TRAITS_DECL` both generate
-the code to specialize `json_type_traits` from member data. The difference is that `JSONCONS_N_MEMBER_TRAITS_DECL`
-does not require all member names to be present in the JSON data, while `JSONCONS_ALL_MEMBER_TRAITS_DECL` does.
+The macros `JSONCONS_N_MEMBER_TRAITS` and `JSONCONS_ALL_MEMBER_TRAITS` both generate
+the code to specialize `json_type_traits` from member data. The difference is that `JSONCONS_N_MEMBER_TRAITS`
+does not require all member names to be present in the JSON data, while `JSONCONS_ALL_MEMBER_TRAITS` does.
 
 ```c++
 #include <iostream>
@@ -1109,7 +1109,7 @@ namespace ns {
 } // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized, and how many are mandatory.
-JSONCONS_N_MEMBER_TRAITS_DECL(ns::Person, 2, name, surname, ssn, age)
+JSONCONS_N_MEMBER_TRAITS(ns::Person, 2, name, surname, ssn, age)
 
 int main()
 {
@@ -1141,7 +1141,7 @@ Output:
 
 If all members of the JSON data must be present, use
 ```
-JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
+JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name, surname, ssn, age)
 ```
 instead. This will cause an exception to be thrown with the message
 ```
@@ -1460,8 +1460,8 @@ example above, the type selection strategy is based
 on the presence of members in the derived classes. If
 derived classes cannot be distinguished in this way, 
 you can introduce extra members. The convenience
-macros `JSONCONS_N_MEMBER_TRAITS_DECL`, `JSONCONS_ALL_MEMBER_TRAITS_DECL`,
-`JSONCONS_TPL_N_MEMBER_TRAITS_DECL`, `JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL`,
+macros `JSONCONS_N_MEMBER_TRAITS`, `JSONCONS_ALL_MEMBER_TRAITS`,
+`JSONCONS_TPL_N_MEMBER_TRAITS`, `JSONCONS_TPL_ALL_MEMBER_TRAITS`,
 `JSONCONS_N_MEMBER_TRAITS_NAMED_DECL`, `JSONCONS_ALL_MEMBER_TRAITS_NAMED_DECL`,
 `JSONCONS_TPL_N_MEMBER_TRAITS_NAMED_DECL`, and `JSONCONS_TPL_ALL_MEMBER_TRAITS_NAMED_DECL`
 allow you to have `const` or `static const` data members that are serialized and that 
@@ -1490,8 +1490,8 @@ class Baz : public Foo
 
 } // ns
 
-JSONCONS_N_MEMBER_TRAITS_DECL(ns::Bar,1,bar)
-JSONCONS_N_MEMBER_TRAITS_DECL(ns::Baz,1,baz)
+JSONCONS_N_MEMBER_TRAITS(ns::Bar,1,bar)
+JSONCONS_N_MEMBER_TRAITS(ns::Baz,1,baz)
 JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Foo, ns::Bar, ns::Baz)
 
 int main()
