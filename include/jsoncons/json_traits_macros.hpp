@@ -172,8 +172,8 @@ namespace jsoncons
 
 #define JSONCONS_GENERATE_NAME_STR(Prefix, P2, P3, Member, Count) JSONCONS_GENERATE_NAME_STR_LAST(Prefix, P2, P3, Member, Count) 
 #define JSONCONS_GENERATE_NAME_STR_LAST(Prefix, P2, P3, Member, Count) \
-    static inline basic_string_view<char> Member ## _str(char) {return JSONCONS_QUOTE(,Member);} \
-    static inline basic_string_view<wchar_t> Member ## _str(wchar_t) {return JSONCONS_QUOTE(L,Member);} \
+    static inline const char* Member ## _str(char) {return JSONCONS_QUOTE(,Member);} \
+    static inline const wchar_t* Member ## _str(wchar_t) {return JSONCONS_QUOTE(L,Member);} \
     /**/
 
 #define JSONCONS_IS(Prefix, P2, P3, Member, Count) JSONCONS_IS_LAST(Prefix, P2, P3, Member, Count)
@@ -505,8 +505,8 @@ JSONCONS_GETTER_CTOR_NAMED_TRAITS_BASE(NumTemplateParams, ValueType,NumMandatory
     namespace jsoncons { template <> struct is_json_type_traits_declared<ValueType> : public std::true_type {}; } \
   /**/
 
-#define JSONCONS_ENUM_PAIR(Prefix, P2, P3, Member, Count) {value_type::Member, JSONCONS_QUOTE(Prefix,Member)},
-#define JSONCONS_ENUM_PAIR_LAST(Prefix, P2, P3, Member, Count) {value_type::Member, JSONCONS_QUOTE(Prefix,Member)}
+#define JSONCONS_ENUM_PAIR(Prefix, P2, P3, Member, Count) JSONCONS_ENUM_PAIR_LAST(Prefix, P2, P3, Member, Count),
+#define JSONCONS_ENUM_PAIR_LAST(Prefix, P2, P3, Member, Count) {value_type::Member, json_traits_macros_names<char_type,char_type,value_type>::Member##_str(char_type{})}
 
 #define JSONCONS_ENUM_TRAITS_BASE(CharT,Prefix,EnumType, ...)  \
 namespace jsoncons \
@@ -624,7 +624,6 @@ namespace jsoncons \
     template<typename Json> \
     struct json_type_traits<Json, EnumType> \
     { \
-        typedef typename Json::char_type char_type; \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
         typedef EnumType value_type; \
         typedef std::basic_string<char_type> string_type; \
