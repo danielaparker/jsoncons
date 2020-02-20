@@ -828,8 +828,8 @@ namespace jsoncons \
 #define JSONCONS_GETTER_SETTER_NAMED_TO_JSON_(Getter, Setter, Name) ajson.try_emplace(Name, aval.Getter() );
 
 #define JSONCONS_ALL_GETTER_SETTER_NAMED_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_ALL_GETTER_SETTER_NAMED_TO_JSON_LAST(P1, P2, P3, Seq, Count)
-#define JSONCONS_ALL_GETTER_SETTER_NAMED_TO_JSON_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_ALL_GETTER_SETTER_NAMED_TO_JSON_ Seq)
-#define JSONCONS_ALL_GETTER_SETTER_NAMED_TO_JSON_(Getter, Setter, Name) ajson.try_emplace(Name, aval.Getter() );
+#define JSONCONS_ALL_GETTER_SETTER_NAMED_TO_JSON_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_EXPAND(JSONCONS_ALL_GETTER_SETTER_NAMED_TO_JSON_ Seq)
+#define JSONCONS_ALL_GETTER_SETTER_NAMED_TO_JSON_(Getter, Setter, Name) ajson.try_emplace(Name, aval.Getter()); else {set_json_member(Name, aval.Getter(), ajson);}
  
 #define JSONCONS_GETTER_SETTER_NAMED_TRAITS_DECL_BASE(AsT,ToJ, NumTemplateParams, ValueType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons \
