@@ -197,7 +197,7 @@ namespace jsoncons \
     template <class ChT JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_traits_macro_names<ChT,ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        JSONCONS_VARIADIC_REP_N(JSONCONS_GENERATE_NAME_STR, Prefix,,, __VA_ARGS__)\
+        JSONCONS_VARIADIC_REP_N(JSONCONS_GENERATE_NAME_STR, ,,, __VA_ARGS__)\
     }; \
     template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
@@ -212,19 +212,19 @@ namespace jsoncons \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
-            JSONCONS_VARIADIC_REP_N(JSONCONS_IS, Prefix,,, __VA_ARGS__)\
+            JSONCONS_VARIADIC_REP_N(JSONCONS_IS, ,,, __VA_ARGS__)\
             return true; \
         } \
         static value_type as(const Json& ajson) \
         { \
             value_type aval{}; \
-            JSONCONS_VARIADIC_REP_N(AsT, Prefix,,, __VA_ARGS__) \
+            JSONCONS_VARIADIC_REP_N(AsT, ,,, __VA_ARGS__) \
             return aval; \
         } \
         static Json to_json(const value_type& aval, allocator_type alloc=allocator_type()) \
         { \
             Json ajson(json_object_arg, semantic_tag::none, alloc); \
-            JSONCONS_VARIADIC_REP_N(ToJ, Prefix,,, __VA_ARGS__) \
+            JSONCONS_VARIADIC_REP_N(ToJ, ,,, __VA_ARGS__) \
             return ajson; \
         } \
     private: \
@@ -382,7 +382,7 @@ namespace jsoncons \
     template <class ChT JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_traits_macro_names<ChT,ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        JSONCONS_VARIADIC_REP_N(JSONCONS_GENERATE_NAME_STR, Prefix,,, __VA_ARGS__)\
+        JSONCONS_VARIADIC_REP_N(JSONCONS_GENERATE_NAME_STR, ,,, __VA_ARGS__)\
     }; \
     template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
@@ -396,17 +396,17 @@ namespace jsoncons \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
-            JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_IS, Prefix,,, __VA_ARGS__)\
+            JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_IS, ,,, __VA_ARGS__)\
             return true; \
         } \
         static value_type as(const Json& ajson) \
         { \
-            return value_type ( JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_AS, Prefix,,, __VA_ARGS__) ); \
+            return value_type ( JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_AS, ,,, __VA_ARGS__) ); \
         } \
         static Json to_json(const value_type& aval, allocator_type alloc=allocator_type()) \
         { \
             Json ajson(json_object_arg, semantic_tag::none, alloc); \
-            JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_TO_JSON, Prefix,,, __VA_ARGS__) \
+            JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_CTOR_TO_JSON, ,,, __VA_ARGS__) \
             return ajson; \
         } \
     }; \
@@ -506,7 +506,7 @@ namespace jsoncons \
     template <class ChT> \
     struct json_traits_macro_names<ChT,EnumType> \
     { \
-        JSONCONS_VARIADIC_REP_N(JSONCONS_GENERATE_NAME_STR, Prefix,,, __VA_ARGS__)\
+        JSONCONS_VARIADIC_REP_N(JSONCONS_GENERATE_NAME_STR, ,,, __VA_ARGS__)\
     }; \
     template<typename Json> \
     struct json_type_traits<Json, EnumType> \
@@ -522,7 +522,7 @@ namespace jsoncons \
         static std::pair<const mapped_type*,const mapped_type*> get_values() \
         { \
             static const mapped_type v[] = { \
-                JSONCONS_VARIADIC_REP_N(JSONCONS_ENUM_PAIR, Prefix,,, __VA_ARGS__)\
+                JSONCONS_VARIADIC_REP_N(JSONCONS_ENUM_PAIR, ,,, __VA_ARGS__)\
             };\
             return std::make_pair(v,v+JSONCONS_NARGS(__VA_ARGS__)); \
         } \
@@ -727,7 +727,7 @@ namespace jsoncons \
     template <class ChT JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_traits_macro_names<ChT,ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        JSONCONS_VARIADIC_REP_N(JSONCONS_GENERATE_NAME_STR, Prefix,,, __VA_ARGS__)\
+        JSONCONS_VARIADIC_REP_N(JSONCONS_GENERATE_NAME_STR, ,,, __VA_ARGS__)\
     }; \
     template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
@@ -742,19 +742,19 @@ namespace jsoncons \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
-            JSONCONS_VARIADIC_REP_N(JSONCONS_IS, Prefix,GetPrefix,SetPrefix, __VA_ARGS__)\
+            JSONCONS_VARIADIC_REP_N(JSONCONS_IS, ,GetPrefix,SetPrefix, __VA_ARGS__)\
             return true; \
         } \
         static value_type as(const Json& ajson) \
         { \
             value_type aval{}; \
-            JSONCONS_VARIADIC_REP_N(AsT, Prefix,GetPrefix,SetPrefix, __VA_ARGS__) \
+            JSONCONS_VARIADIC_REP_N(AsT, ,GetPrefix,SetPrefix, __VA_ARGS__) \
             return aval; \
         } \
         static Json to_json(const value_type& aval, allocator_type alloc=allocator_type()) \
         { \
             Json ajson(json_object_arg, semantic_tag::none, alloc); \
-            JSONCONS_VARIADIC_REP_N(ToJ, Prefix,GetPrefix,SetPrefix, __VA_ARGS__) \
+            JSONCONS_VARIADIC_REP_N(ToJ, ,GetPrefix,SetPrefix, __VA_ARGS__) \
             return ajson; \
         } \
         template <class U> \
