@@ -22,14 +22,15 @@
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
 [Serialize with the C++ member names of the class](#G1)  
-[Serialize with the provided names using the `_NAMED_` macros](#G2)  
-[Serialize a templated class with the `_TPL_` macros](#G3)  
-[Specialize json_type_traits explicitly](#G4)  
-[Mapping to C++ data structures with and without defaults allowed](#G5)  
-[An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_GETTER_CTOR_TRAITS](#G6)  
-[Serialize a polymorphic type based on the presence of members](#G7)  
-[Ensuring type selection is possible](#G8)  
-[Convert JSON numbers to/from boost multiprecision numbers](#G9)
+[Serialize with provided names using the `_NAMED_` macros](#G2)  
+[Serialize std::optional values](#G3)  
+[Serialize a templated class with the `_TPL_` macros](#G4)  
+[Specialize json_type_traits explicitly](#G5)  
+[Mapping to C++ data structures with and without defaults allowed](#G6)  
+[An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_GETTER_CTOR_TRAITS](#G7)  
+[Serialize a polymorphic type based on the presence of members](#G8)  
+[Ensuring type selection is possible](#G9)  
+[Convert JSON numbers to/from boost multiprecision numbers](#G10)
 
 ### Construct
 
@@ -672,7 +673,7 @@ The output for (2), (3) and (4) is the same.
 
 <div id="G2"/>
 
-#### Serialize with the provided names using the `_NAMED_` macros
+#### Serialize with provided names using the `_NAMED_` macros
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -900,6 +901,93 @@ The output for (2), (3) and (4) is the same.
 
 <div id="G3"/>
 
+#### Serialize std::optional values
+
+This example assumes C++17 language support for `std::optional`.
+Lacking that, you can use `jsoncons::optional`.
+
+```c++
+#include <jsoncons/json.hpp>
+
+namespace ns
+{
+    class MetaDataReplyTest 
+    {
+    public:
+        MetaDataReplyTest()
+            : description()
+        {
+        }
+        const std::string& GetStatus() const 
+        {
+            return status;
+        }
+        const std::string& GetPayload() const 
+        {
+            return payload;
+        }
+        const std::optional<std::string>& GetDescription() const 
+        {
+            return description;
+        }
+    private:
+        JSONCONS_TYPE_TRAITS_FRIEND;
+        std::string status;
+        std::string payload;
+        std::optional<std::string> description;
+    };
+}
+
+JSONCONS_N_MEMBER_TRAITS(ns::MetaDataReplyTest, 2, status, payload, description)
+
+using namespace jsoncons;
+
+int main()
+{
+    std::string input1 = R"({
+      "status": "OK",
+      "payload": "Modified",
+      "description": "TEST"
+    })";
+    std::string input2 = R"({
+      "status": "OK",
+      "payload": "Modified"
+    })";
+
+    auto val1 = decode_json<ns::MetaDataReplyTest>(input1);
+    auto val2 = decode_json<ns::MetaDataReplyTest>(input2);
+
+    std::string output1;
+    std::string output2;
+
+    encode_json(val2,output2,indenting::indent);
+    encode_json(val1,output1,indenting::indent);
+
+    std::cout << "(1)\n";
+    std::cout << output1 << "\n\n";
+
+    std::cout << "(2)\n";
+    std::cout << output2 << "\n\n";
+}
+```
+Output:
+```
+(1)
+{
+    "description": "TEST",
+    "payload": "Modified",
+    "status": "OK"
+}
+
+(2)
+{
+    "payload": "Modified",
+    "status": "OK"
+}
+```
+
+<div id="G4"/>
+
 #### Serialize a templated class with the `_TPL_` macros
 
 ```c++
@@ -945,7 +1033,7 @@ int main()
 }
 ```
 
-<div id="G4"/>
+<div id="G5"/>
 
 #### Specialize json_type_traits explicitly
 
@@ -1071,7 +1159,7 @@ Charles Bukowski, Pulp, 22.48
 ]
 ```
 
-<div id="G5"/>
+<div id="G6"/>
 
 #### Mapping to C++ data structures with and without defaults allowed
 
@@ -1148,7 +1236,7 @@ instead. This will cause an exception to be thrown with the message
 Key 'ssn' not found
 ```
 
-<div id="G6"/>
+<div id="G7"/>
 
 #### An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_GETTER_CTOR_TRAITS
 
@@ -1264,7 +1352,7 @@ Output:
 }
 ```
 
-<div id="G7"/>
+<div id="G8"/>
 
 #### Serialize a polymorphic type based on the presence of members
 
@@ -1450,7 +1538,7 @@ Jane Doe, 30250
 ]
 ```
 
-<div id="G8"/>
+<div id="G9"/>
 
 #### Ensuring type selection is possible
 
@@ -1531,7 +1619,7 @@ A bar
 A baz
 ```
 
-<div id="G9"/>
+<div id="G10"/>
 
 #### Convert JSON numbers to/from boost multiprecision numbers
 
