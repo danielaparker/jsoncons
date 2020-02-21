@@ -261,6 +261,64 @@ namespace json_type_traits_macro_tests
         }
     };
 
+    class book3c
+    {
+        std::string author_;
+        std::string title_;
+        double price_;
+        jsoncons::optional<std::string> isbn_;
+    public:
+        book3c()
+            : author_(), title_(), price_(), isbn_()
+        {
+        }
+
+        book3c(const book3c&) = default;
+        book3c(book3c&&) = default;
+        book3c& operator=(const book3c&) = default;
+        book3c& operator=(book3c&&) = default;
+
+        const std::string& getAuthor() const
+        {
+            return author_;
+        }
+
+        void setAuthor(const std::string& value)
+        {
+            author_ = value;
+        }
+
+        const std::string& getTitle() const
+        {
+            return title_;
+        }
+
+        void setTitle(const std::string& value)
+        {
+            title_ = value;
+        }
+
+        double getPrice() const
+        {
+            return price_;
+        }
+
+        void setPrice(double value)
+        {
+            price_ = value;
+        }
+
+        const jsoncons::optional<std::string>& getIsbn() const
+        {
+            return isbn_;
+        }
+
+        void setIsbn(const jsoncons::optional<std::string>& value)
+        {
+            isbn_ = value;
+        }
+    };
+
     enum class float_format {scientific = 1,fixed = 2,hex = 4,general = fixed | scientific};
 
     class Employee
@@ -413,6 +471,7 @@ JSONCONS_POLYMORPHIC_TRAITS(ns::Employee, ns::HourlyEmployee, ns::CommissionedEm
 
 JSONCONS_ALL_GETTER_SETTER_TRAITS(ns::book3a, get, set, Author, Title, Price)
 JSONCONS_N_GETTER_SETTER_TRAITS(ns::book3b, get, set, 2, Author, Title, Price, Isbn)
+JSONCONS_N_GETTER_SETTER_TRAITS(ns::book3c, get, set, 2, Author, Title, Price, Isbn)
 
 JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
 JSONCONS_ALL_MEMBER_TRAITS(ns::hiking_reputon, rater, assertion, rated, rating)
@@ -925,6 +984,49 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS tests")
         CHECK(book.getTitle() == a_title);
         CHECK(book.getPrice() == double());
         CHECK(book.getIsbn() == std::string());
+    }
+}
+
+TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS optional tests")
+{
+    std::string an_author = "Haruki Murakami"; 
+    std::string a_title = "Kafka on the Shore";
+    double a_price = 25.17;
+    std::string an_isbn = "1400079276";
+
+    SECTION("book3c no isbn")
+    {
+        ns::book3c book;
+        book.setAuthor(an_author);
+        book.setTitle(a_title);
+        book.setPrice(a_price);
+
+        std::string input;
+        encode_json(book,input);
+        
+        auto b1 = decode_json<ns::book3c>(input);
+        CHECK(b1.getAuthor() == an_author);
+        CHECK(b1.getTitle() == a_title);
+        CHECK(b1.getPrice() == a_price);
+        CHECK_FALSE(b1.getIsbn().has_value());
+    }
+
+    SECTION("book3c has isbn")
+    {
+        ns::book3c book;
+        book.setAuthor(an_author);
+        book.setTitle(a_title);
+        book.setPrice(a_price);
+        book.setIsbn(an_isbn);
+
+        std::string input;
+        encode_json(book,input);
+
+        auto b1 = decode_json<ns::book3c>(input);
+        CHECK(b1.getAuthor() == an_author);
+        CHECK(b1.getTitle() == a_title);
+        CHECK(b1.getPrice() == a_price);
+        CHECK(b1.getIsbn() == an_isbn);
     }
 }
 

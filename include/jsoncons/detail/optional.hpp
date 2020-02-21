@@ -34,15 +34,6 @@ namespace detail
         {
         }
 
-        optional(const optional& other)
-            : has_value_(false)
-        {
-            if (other)
-            {
-                construct(*other);
-            }
-        }
-
         template <class T2=T>
         optional(const optional& other,
         typename std::enable_if<std::is_copy_constructible<T2>::value>::type* = 0)
@@ -114,7 +105,18 @@ namespace detail
             destroy();
         }
 
-        optional& operator=( const optional& other ) = default;
+        optional& operator=(const optional& other)
+        {
+            if (other)
+            {
+                assign(*other);
+            }
+            else
+            {
+                reset();
+            }
+            return *this;
+        }
 
         optional& operator=(optional&& other )
         {
@@ -316,6 +318,93 @@ namespace detail
     {
         lhs.swap(rhs);
     }
+
+    template <class T1, class T2>
+    constexpr bool operator==(const optional<T1>& lhs, const optional<T2>& rhs) {
+        const bool lhs_has_value = lhs.has_value();
+        return lhs_has_value == rhs.has_value() && (!lhs_has_value || *lhs == *rhs);
+    }
+
+    template <class T1, class T2>
+    constexpr bool operator!=(const optional<T1>& lhs, const optional<T2>& rhs) {
+        const bool lhs_has_value = lhs.has_value();
+        return lhs_has_value != rhs.has_value() || (lhs_has_value && *lhs != *rhs);
+    }
+
+    template <class T1, class T2>
+    constexpr bool operator<(const optional<T1>& lhs, const optional<T2>& rhs) {
+        return rhs.has_value() && (!lhs.has_value() || *lhs < *rhs);
+    }
+
+    template <class T1, class T2>
+    constexpr bool operator>(const optional<T1>& lhs, const optional<T2>& rhs) {
+        return lhs.has_value() && (!rhs.has_value() || *lhs > *rhs);
+    }
+
+    template <class T1, class T2>
+    constexpr bool operator<=(const optional<T1>& lhs, const optional<T2>& rhs) {
+        return !lhs.has_value() || (rhs.has_value() && *lhs <= *rhs);
+    }
+
+    template <class T1, class T2>
+    constexpr bool operator>=(const optional<T1>& lhs, const optional<T2>& rhs) {
+        return !rhs.has_value() || (lhs.has_value() && *lhs >= *rhs);
+    }
+
+    template <class T1, class T2>
+    constexpr bool operator==(const optional<T1>& lhs, const T2& rhs) {
+        return lhs ? *lhs == rhs : false;
+    }
+    template <class T1, class T2>
+    constexpr bool operator==(const T1& lhs, const optional<T2>& rhs) {
+        return rhs ? lhs == *rhs : false;
+    }
+
+    template <class T1, class T2>
+    constexpr bool operator!=(const optional<T1>& lhs, const T2& rhs) {
+        return lhs ? *lhs != rhs : true;
+    }
+    template <class T1, class T2>
+    constexpr bool operator!=(const T1& lhs, const optional<T2>& rhs) {
+        return rhs ? lhs != *rhs : true;
+    }
+
+    template <class T1, class T2>
+    constexpr bool operator<(const optional<T1>& lhs, const T2& rhs) {
+        return lhs ? *lhs < rhs : true;
+    }
+    template <class T1, class T2>
+    constexpr bool operator<(const T1& lhs, const optional<T2>& rhs) {
+        return rhs ? lhs < *rhs : false;
+    }
+
+    template <class T1, class T2>
+    constexpr bool operator<=(const optional<T1>& lhs, const T2& rhs) {
+        return lhs ? *lhs <= rhs : true;
+    }
+    template <class T1, class T2>
+    constexpr bool operator<=(const T1& lhs, const optional<T2>& rhs) {
+        return rhs ? lhs <= *rhs : false;
+    }
+
+    template <class T1, class T2>
+    constexpr bool operator>(const optional<T1>& lhs, const T2& rhs) {
+        return lhs ? *lhs > rhs : false;
+    }
+    template <class T1, class T2>
+    constexpr bool operator>(const T1& lhs, const optional<T2>& rhs) {
+        return rhs ? lhs > *rhs : true;
+    }
+
+    template <class T1, class T2>
+    constexpr bool operator>=(const optional<T1>& lhs, const T2& rhs) {
+        return lhs ? *lhs >= rhs : false;
+    }
+    template <class T1, class T2>
+    constexpr bool operator>=(const T1& lhs, const optional<T2>& rhs) {
+        return rhs ? lhs >= *rhs : true;
+    }
+
 } // namespace detail
 } // namespace jsoncons
 
