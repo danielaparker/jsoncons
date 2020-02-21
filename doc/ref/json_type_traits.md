@@ -66,108 +66,107 @@ for a user-defined class.
 
 ```c++
 JSONCONS_N_MEMBER_TRAITS(class_name,num_mandatory,
-                              member_name0,member_name1,...) // (1)
+                         member_name0,member_name1,...) // (1)
 
 JSONCONS_ALL_MEMBER_TRAITS(class_name,
-                                member_name0,member_name1,...) // (2)
+                           member_name0,member_name1,...) // (2)
 
 JSONCONS_TPL_N_MEMBER_TRAITS(num_template_params,
-                                  class_name,num_mandatory,
-                                  member_name0,member_name1,...) // (3)  
+                             class_name,num_mandatory,
+                             member_name0,member_name1,...) // (3)  
 
 JSONCONS_TPL_ALL_MEMBER_TRAITS(num_template_params,
-                                    class_name,
-                                    member_name0,member_name1,...) // (4)
+                               class_name,
+                               member_name0,member_name1,...) // (4)
 
 JSONCONS_N_MEMBER_NAMED_TRAITS(class_name,num_mandatory,
-                                    (member_name0,"name0"),
-                                    (member_name1,"name1")...) // (5)
+                               (member_name0,"name0"),
+                               (member_name1,"name1")...) // (5)
 
 JSONCONS_ALL_MEMBER_NAMED_TRAITS(class_name,
-                                      (member_name0,"name0"),
-                                      (member_name1,"name1")...) // (6)
+                                 (member_name0,"name0"),
+                                 (member_name1,"name1")...) // (6)
 
 JSONCONS_TPL_N_MEMBER_NAMED_TRAITS(num_template_params,
-                                        class_name,num_mandatory,
-                                        (member_name0,"name0"),
-                                        (member_name1,"name1")...) // (7)
+                                   class_name,num_mandatory,
+                                   (member_name0,"name0"),
+                                   (member_name1,"name1")...) // (7)
 
 JSONCONS_TPL_ALL_MEMBER_NAMED_TRAITS(num_template_params,
-                                          class_name,
-                                          (member_name0,"name0"),
-                                          (member_name1,"name1")...) // (8)
+                                     class_name,
+                                     (member_name0,"name0"),
+                                     (member_name1,"name1")...) // (8)
 
-JSONCONS_ENUM_TRAITS(enum_name,
-                          identifier0,identifier1,...) // (9)
+JSONCONS_ENUM_TRAITS(enum_name,identifier0,identifier1,...) // (9)
 
 JSONCONS_ENUM_NAMED_TRAITS(enum_name,
-                                (identifier0,"name0"),
-                                (identifier1,"name1")...) // (10)
+                           (identifier0,"name0"),
+                           (identifier1,"name1")...) // (10)
 
 JSONCONS_N_GETTER_CTOR_TRAITS(class_name,num_mandatory,
-                                   getter_name0,
-                                   getter_name1,...) // (11)
+                              getter_name0,
+                              getter_name1,...) // (11)
 
 JSONCONS_ALL_GETTER_CTOR_TRAITS(class_name,
-                                     getter_name0,getter_name1,...) // (12)
+                                getter_name0,getter_name1,...) // (12)
 
 JSONCONS_TPL_N_GETTER_CTOR_TRAITS(num_template_params,
-                                       class_name,num_mandatory,
-                                       getter_name0,getter_name1,...) // (13)
+                                  class_name,num_mandatory,
+                                  getter_name0,getter_name1,...) // (13)
 
 JSONCONS_TPL_ALL_GETTER_CTOR_TRAITS(num_template_params,
-                                         class_name,
-                                         getter_name0,getter_name1,...) // (14)
+                                    class_name,
+                                    getter_name0,getter_name1,...) // (14)
 
 JSONCONS_N_GETTER_CTOR_NAMED_TRAITS(class_name,num_mandatory,
-                                         (getter_name0,"name0"),
-                                         (getter_name1,"name1")...) // (15)
+                                    (getter_name0,"name0"),
+                                    (getter_name1,"name1")...) // (15)
 
 JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS(class_name,
-                                          (getter_name0,"name0"),
-                                          (getter_name1,"name1")...) // (16)
+                                      (getter_name0,"name0"),
+                                      (getter_name1,"name1")...) // (16)
 
 JSONCONS_TPL_N_GETTER_CTOR_NAMED_TRAITS(num_template_params,
-                                             class_name,num_mandatory,
-                                             (getter_name0,"name0"),
-                                             (getter_name1,"name1")...) // (17)
+                                        class_name,num_mandatory,
+                                        (getter_name0,"name0"),
+                                        (getter_name1,"name1")...) // (17)
 
 JSONCONS_TPL_ALL_GETTER_CTOR_NAMED_TRAITS(num_template_params,
-                                               class_name,
-                                               (getter_name0,"name0"),
-                                               (getter_name1,"name1")...) // (18)
+                                          class_name,
+                                          (getter_name0,"name0"),
+                                          (getter_name1,"name1")...) // (18)
 
 JSONCONS_N_GETTER_SETTER_TRAITS(class_name,get_prefix,set_prefix,num_mandatory,
-                                     property_name0,property_name1,...) // (19)
+                                property_name0,property_name1,...) // (19)
 
 JSONCONS_ALL_GETTER_SETTER_TRAITS(class_name,get_prefix,set_prefix,
-                                       property_name0,property_name1,...) // (20)
+                                  property_name0,property_name1,...) // (20)
 
 JSONCONS_TPL_N_GETTER_SETTER_TRAITS(num_template_params,
-                                        class_name,get_prefix,set_prefix,num_mandatory,
-                                        property_name0,property_name1,...) // (21)  
+                                    class_name,get_prefix,set_prefix,num_mandatory,
+                                    property_name0,property_name1,...) // (21)  
 
 JSONCONS_TPL_ALL_GETTER_SETTER_TRAITS(num_template_params,
-                                           class_name,get_prefix,set_prefix,
-                                           property_name0,property_name1,...) // (22)
+                                      class_name,get_prefix,set_prefix,
+                                      property_name0,property_name1,...) // (22)
 
 JSONCONS_N_GETTER_SETTER_NAMED_TRAITS(class_name,num_mandatory,
-                                           (getter_name0,setter_name0,"name0"),
-                                           (getter_name1,setter_name1,"name1")...) // (23)
+                                      (getter_name0,setter_name0,"name0"),
+                                      (getter_name1,setter_name1,"name1")...) // (23)
 
 JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS(class_name,
-                                             (getter_name0,setter_name0,"name0"),
-                                             (getter_name1,setter_name1,"name1")...) // (24)
+                                        (getter_name0,setter_name0,"name0"),
+                                        (getter_name1,setter_name1,"name1")...) // (24)
 
 JSONCONS_TPL_N_GETTER_SETTER_NAMED_TRAITS(num_template_params,
-                                               class_name,num_mandatory,
-                                               (getter_name0,setter_name0,"name0"),
-                                               (getter_name1,setter_name1,"name1")...) // (25)
+                                          class_name,num_mandatory,
+                                          (getter_name0,setter_name0,"name0"),
+                                          (getter_name1,setter_name1,"name1")...) // (25)
 
 JSONCONS_TPL_ALL_GETTER_SETTER_NAMED_TRAITS(num_template_params,
-                                                 class_name,
-                                                 (getter_name0,setter_name0,"name0"),
-                                                 (getter_name1,setter_name1,"name1")...) // (26)
+                                            class_name,
+                                            (getter_name0,setter_name0,"name0"),
+                                            (getter_name1,setter_name1,"name1")...) // (26)
 
 JSONCONS_POLYMORPHIC_TRAITS(base_class_name,derived_class_name0,derived_class_name1,...) // (27)
 ```
