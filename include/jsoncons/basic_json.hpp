@@ -683,8 +683,8 @@ public:
         };
 
     private:
-        static constexpr size_t data_size = static_max<sizeof(uint64_storage),sizeof(half_storage),sizeof(double_storage),sizeof(short_string_storage), sizeof(long_string_storage), sizeof(array_storage), sizeof(object_storage)>::value;
-        static constexpr size_t data_align = static_max<alignof(uint64_storage),alignof(half_storage),alignof(double_storage),alignof(short_string_storage),alignof(long_string_storage),alignof(array_storage),alignof(object_storage)>::value;
+        static constexpr size_t data_size = static_max<sizeof(null_storage),sizeof(empty_object_storage),sizeof(bool_storage),sizeof(int64_storage),sizeof(uint64_storage),sizeof(half_storage),sizeof(double_storage),sizeof(short_string_storage), sizeof(long_string_storage), sizeof(array_storage), sizeof(object_storage)>::value;
+        static constexpr size_t data_align = static_max<alignof(null_storage),alignof(empty_object_storage),alignof(bool_storage),alignof(int64_storage),alignof(uint64_storage),alignof(half_storage),alignof(double_storage),alignof(short_string_storage),alignof(long_string_storage),alignof(array_storage),alignof(object_storage)>::value;
 
         typedef typename std::aligned_storage<data_size,data_align>::type data_t;
 
