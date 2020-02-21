@@ -524,13 +524,13 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
     double a_price = 25.17;
+    std::string an_isbn = "1400079276";
 
-    ns::book1c book{an_author, a_title, a_price, jsoncons::optional<std::string>{}};
-
-    CHECK(jsoncons::is_json_type_traits_declared<ns::book1c>::value);
-
-    SECTION("book1c")
+    SECTION("book1c no isbn")
     {
+        ns::book1c book{an_author, a_title, a_price, jsoncons::optional<std::string>{}};
+
+        CHECK(jsoncons::is_json_type_traits_declared<ns::book1c>::value);
         std::string s;
 
         encode_json(book, s);
@@ -555,6 +555,39 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
         CHECK(val.title == book.title);
         CHECK(val.price == Approx(book.price).epsilon(0.001));
         CHECK_FALSE(val.isbn.has_value());
+    }
+
+    SECTION("book1c has isbn")
+    {
+        ns::book1c book{an_author, a_title, a_price, an_isbn};
+
+        CHECK(jsoncons::is_json_type_traits_declared<ns::book1c>::value);
+        std::string s;
+
+        encode_json(book, s);
+
+        json j = decode_json<json>(s);
+
+        REQUIRE(j.is<ns::book1a>() == true);
+        REQUIRE(j.is<ns::book1b>() == true); 
+
+        CHECK(j["author"].as<std::string>() == an_author);
+        CHECK(j["title"].as<std::string>() == a_title);
+        CHECK(j["price"].as<double>() == Approx(a_price).epsilon(0.001));
+        REQUIRE(j.contains("isbn"));
+        CHECK(j["isbn"].as<std::string>() == an_isbn);
+
+        json j2(book);
+
+        CHECK(j == j2);
+
+        auto val = j.as<ns::book1c>();
+
+        CHECK(val.author == book.author);
+        CHECK(val.title == book.title);
+        CHECK(val.price == Approx(book.price).epsilon(0.00001));
+        CHECK(val.isbn.has_value());
+        CHECK(val.isbn == an_isbn);
     }
 }
 
@@ -1025,7 +1058,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_TRAITS optional tests")
         auto b1 = decode_json<ns::book3c>(input);
         CHECK(b1.getAuthor() == an_author);
         CHECK(b1.getTitle() == a_title);
-        CHECK(b1.getPrice() == a_price);
+        CHECK(b1.getPrice() == Approx(a_price).epsilon(0.00001));
         CHECK(b1.getIsbn() == an_isbn);
     }
 }

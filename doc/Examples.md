@@ -907,6 +907,7 @@ This example assumes C++17 language support for `std::optional`.
 Lacking that, you can use `jsoncons::optional`.
 
 ```c++
+#include <cassert>
 #include <jsoncons/json.hpp>
 
 namespace ns
@@ -955,7 +956,15 @@ int main()
     })";
 
     auto val1 = decode_json<ns::MetaDataReplyTest>(input1);
+    assert(val1.GetStatus() == "OK");
+    assert(val1.GetPayload() == "Modified");
+    assert(val1.GetDescription());
+    assert(val1.GetDescription() == "TEST");
+
     auto val2 = decode_json<ns::MetaDataReplyTest>(input2);
+    assert(val2.GetStatus() == "OK");
+    assert(val2.GetPayload() == "Modified");
+    assert(!val2.GetDescription());
 
     std::string output1;
     std::string output2;
