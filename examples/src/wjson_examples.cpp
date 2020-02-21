@@ -21,6 +21,7 @@ void wjson_object()
     std::wcout << j << L"\n";
 }
 
+#if 0
 void wjson_escape_u2()
 {
 #ifdef _MSC_VER
@@ -50,6 +51,7 @@ void wjson_escape_u2()
     os << pretty_print(val,options) << L"\n";
 #endif
 }
+#endif
 
 void wjson_surrogate_pair()
 {
@@ -77,7 +79,7 @@ void wjson_examples()
 {
     std::cout << "\nwjson examples\n\n";
     wjson_object();
-    wjson_escape_u2();
+    //wjson_escape_u2();
     wjson_surrogate_pair();
     std::cout << std::endl;
 }

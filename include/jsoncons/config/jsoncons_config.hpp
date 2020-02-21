@@ -26,7 +26,7 @@ using std::wstring_view;
 }
 #endif
 
-#if !defined(JSONCONS_HAS_SPAN)
+#if !defined(JSONCONS_HAS_STD_SPAN)
 #include <jsoncons/detail/span.hpp>
 namespace jsoncons {
 using jsoncons::detail::span;
@@ -38,7 +38,7 @@ using std::span;
 }
 #endif
 
-#if !defined(JSONCONS_HAS_OPTIONAL)
+#if !defined(JSONCONS_HAS_STD_OPTIONAL)
 #include <jsoncons/detail/optional.hpp>
 namespace jsoncons {
 using jsoncons::detail::optional;
@@ -50,7 +50,7 @@ using std::optional;
 }
 #endif // !defined(JSONCONS_HAS_OPTIONAL)
 
-#if !defined(JSONCONS_HAS_ENDIAN)
+#if !defined(JSONCONS_HAS_STD_ENDIAN)
 #include <jsoncons/detail/endian.hpp>
 namespace jsoncons {
 using jsoncons::detail::endian;
@@ -63,7 +63,7 @@ namespace jsoncons
 }
 #endif
 
-#if !defined(JSONCONS_HAS_MAKE_UNIQUE)
+#if !defined(JSONCONS_HAS_STD_MAKE_UNIQUE)
 
 #include <cstddef>
 #include <memory>
@@ -117,7 +117,7 @@ namespace jsoncons
     using std::make_unique;
 }
 
-#endif // !defined(JSONCONS_HAS_MAKE_UNIQUE)
+#endif // !defined(JSONCONS_HAS_STD_MAKE_UNIQUE)
 
 namespace jsoncons {
 namespace detail {

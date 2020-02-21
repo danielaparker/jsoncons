@@ -260,9 +260,9 @@ namespace ns {
 
 // Declare the traits. Specify which data members need to be serialized.
 
-JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputation, application, reputons)
+JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
+JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputon, rater, assertion, rated, rating)
+JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputation, application, reputons)
 
 int main()
 {
@@ -300,13 +300,13 @@ Marilyn C, 0.9
     ]
 }
 ```
-This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS_DECL`
-and `JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL` to specialize the 
+This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS`
+and `JSONCONS_ALL_GETTER_CTOR_TRAITS` to specialize the 
 [json_type_traits](doc/ref/json_type_traits.md) for the enum type
 `ns::hiking_experience` and the classes `ns::hiking_reputon` and 
 `ns::hiking_reputation`.
-The macro `JSONCONS_ENUM_TRAITS_DECL` generates the code from
-the enum values, and the macro `JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL` 
+The macro `JSONCONS_ENUM_TRAITS` generates the code from
+the enum values, and the macro `JSONCONS_ALL_GETTER_CTOR_TRAITS` 
 generates the code from the getter functions and a constructor. 
 These macro declarations must be placed outside any namespace blocks.
 
@@ -955,13 +955,15 @@ On UNIX:
 
 ## Acknowledgements
 
+A big thanks to the comp.lang.c++ community for help with implementation details, especially to Martin Bonner and Öö Tiib. 
+
 The jsoncons platform dependent binary configuration draws on to the excellent MIT licensed [tinycbor](https://github.com/intel/tinycbor).
 
-A big thanks to Milo Yip, author of [RapidJSON](http://rapidjson.org/), for raising the quality of JSON libraries across the board, by publishing [the benchmarks](https://github.com/miloyip/nativejson-benchmark), and contacting this project (among others) to share the results.
+Thanks to Milo Yip, author of [RapidJSON](http://rapidjson.org/), for raising the quality of JSON libraries across the board, by publishing [the benchmarks](https://github.com/miloyip/nativejson-benchmark), and contacting this project (among others) to share the results.
 
 The jsoncons implementation of the Grisu3 algorithm for printing floating-point numbers follows Florian Loitsch's MIT licensed [grisu3_59_56 implementation](http://florian.loitsch.com/publications), with minor modifications. 
 
-The macro `JSONCONS_ALL_MEMBER_TRAITS_DECL` was inspired by Martin York's [ThorsSerializer](https://github.com/Loki-Astari/ThorsSerializer)
+The macro `JSONCONS_ALL_MEMBER_TRAITS` was inspired by Martin York's [ThorsSerializer](https://github.com/Loki-Astari/ThorsSerializer)
 
 Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.md)
  

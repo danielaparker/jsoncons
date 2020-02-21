@@ -22,7 +22,9 @@
 #include <type_traits> // std::enable_if
 #include <istream> // std::basic_istream
 #include <jsoncons/json_fwd.hpp>
+#include <jsoncons/json_type.hpp>
 #include <jsoncons/config/version.hpp>
+#include <jsoncons/json_type.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/pretty_print.hpp>
 #include <jsoncons/json_container_types.hpp>
@@ -77,20 +79,6 @@ public:
     }
 };
 
-enum class json_type : uint8_t 
-{
-    null_value,
-    bool_value,
-    int64_value,
-    uint64_value,
-    half_value,
-    double_value,
-    string_value,
-    byte_string_value,
-    array_value,
-    object_value
-};
-
 enum class storage_kind : uint8_t 
 {
     null_value = 0x00,
@@ -100,7 +88,7 @@ enum class storage_kind : uint8_t
     half_value = 0x04,
     double_value = 0x05,
     short_string_value = 0x06,
-    string_value = 0x07,
+    long_string_value = 0x07,
     byte_string_value = 0x08,
     array_value = 0x09,
     empty_object_value = 0x0a,
@@ -157,72 +145,64 @@ public:
 
     struct variant
     {
-        class storage_base
-        {
-            static constexpr uint8_t major_type_shift = 0x04;
-            static constexpr uint8_t additional_information_mask = (1U << 4) - 1;
+        static constexpr uint8_t major_type_shift = 0x04;
+        static constexpr uint8_t additional_information_mask = (1U << 4) - 1;
 
+        static constexpr uint8_t from_storage_and_tag(storage_kind storage, semantic_tag tag)
+        {
+            return (static_cast<uint8_t>(storage) << major_type_shift) | static_cast<uint8_t>(tag);
+        }
+
+        static storage_kind to_storage(uint8_t ext_type) 
+        {
+            uint8_t value = ext_type >> major_type_shift;
+            return static_cast<storage_kind>(value);
+        }
+
+        static semantic_tag to_tag(uint8_t ext_type)
+        {
+            uint8_t value = ext_type & additional_information_mask;
+            return static_cast<semantic_tag>(value);
+        }
+
+        class null_storage final
+        {
             uint8_t ext_type_;
         public:
-            storage_base(uint8_t type)
-                : ext_type_(type)
-            {}
-
-            storage_base(storage_kind storage, semantic_tag semantic_type)
-                : ext_type_((static_cast<uint8_t>(storage) << major_type_shift) | static_cast<uint8_t>(semantic_type))
-            {}
-
-            uint8_t ext_type() const 
-            {
-                return ext_type_;
-            }
-
-            storage_kind storage() const 
-            {
-                uint8_t value = ext_type_ >> major_type_shift;
-                return static_cast<storage_kind>(value);
-            }
-
-            semantic_tag tag() const 
-            {
-                uint8_t value = ext_type_ & additional_information_mask;
-                return static_cast<semantic_tag>(value);
-            }
-        };
-
-        class null_storage final : public storage_base
-        {
-        public:
             null_storage()
-                : storage_base(storage_kind::null_value, semantic_tag::none)
+                : ext_type_(from_storage_and_tag(storage_kind::null_value, semantic_tag::none))
             {
             }
             null_storage(semantic_tag tag)
-                : storage_base(storage_kind::null_value, tag)
+                : ext_type_(from_storage_and_tag(storage_kind::null_value, tag))
             {
             }
         };
 
-        class empty_object_storage final : public storage_base
+        class empty_object_storage final
         {
+            uint8_t ext_type_;
         public:
             empty_object_storage(semantic_tag tag)
-                : storage_base(storage_kind::empty_object_value, tag)
+                : ext_type_(from_storage_and_tag(storage_kind::empty_object_value, tag))
             {
             }
         };  
 
-        class bool_storage final : public storage_base
+        class bool_storage final
         {
+            uint8_t ext_type_;
             bool val_;
         public:
             bool_storage(bool val, semantic_tag tag)
-                : storage_base(storage_kind::bool_value, tag),val_(val)
+                : ext_type_(from_storage_and_tag(storage_kind::bool_value, tag)),
+                  val_(val)
             {
             }
 
             bool_storage(const bool_storage& val)
-                : storage_base(val.ext_type()),val_(val.val_)
+                : ext_type_(val.ext_type_),
+                  val_(val.val_)
             {
             }
 
@@ -233,18 +213,21 @@ public:
 
         };
 
-        class int64_storage final : public storage_base
+        class int64_storage final
         {
+            uint8_t ext_type_;
             int64_t val_;
         public:
             int64_storage(int64_t val, 
                        semantic_tag tag = semantic_tag::none)
-                : storage_base(storage_kind::int64_value, tag),val_(val)
+                : ext_type_(from_storage_and_tag(storage_kind::int64_value, tag)),
+                  val_(val)
             {
             }
 
             int64_storage(const int64_storage& val)
-                : storage_base(val.ext_type()),val_(val.val_)
+                : ext_type_(val.ext_type_),
+                  val_(val.val_)
             {
             }
 
@@ -254,18 +237,21 @@ public:
             }
         };
 
-        class uint64_storage final : public storage_base
+        class uint64_storage final
         {
+            uint8_t ext_type_;
             uint64_t val_;
         public:
             uint64_storage(uint64_t val, 
                         semantic_tag tag = semantic_tag::none)
-                : storage_base(storage_kind::uint64_value, tag),val_(val)
+                : ext_type_(from_storage_and_tag(storage_kind::uint64_value, tag)),
+                  val_(val)
             {
             }
 
             uint64_storage(const uint64_storage& val)
-                : storage_base(val.ext_type()),val_(val.val_)
+                : ext_type_(val.ext_type_),
+                  val_(val.val_)
             {
             }
 
@@ -275,18 +261,19 @@ public:
             }
         };
 
-        class half_storage final : public storage_base
+        class half_storage final
         {
+            uint8_t ext_type_;
             uint16_t val_;
         public:
             half_storage(uint16_t val, semantic_tag tag = semantic_tag::none)
-                : storage_base(storage_kind::half_value, tag), 
+                : ext_type_(from_storage_and_tag(storage_kind::half_value, tag)), 
                   val_(val)
             {
             }
 
             half_storage(const half_storage& val)
-                : storage_base(val.ext_type()),
+                : ext_type_(val.ext_type_),
                   val_(val.val_)
             {
             }
@@ -297,19 +284,20 @@ public:
             }
         };
 
-        class double_storage final : public storage_base
+        class double_storage final
         {
+            uint8_t ext_type_;
             double val_;
         public:
             double_storage(double val, 
                         semantic_tag tag = semantic_tag::none)
-                : storage_base(storage_kind::double_value, tag), 
+                : ext_type_(from_storage_and_tag(storage_kind::double_value, tag)), 
                   val_(val)
             {
             }
 
             double_storage(const double_storage& val)
-                : storage_base(val.ext_type()),
+                : ext_type_(val.ext_type_),
                   val_(val.val_)
             {
             }
@@ -320,16 +308,18 @@ public:
             }
         };
 
-        class short_string_storage final : public storage_base
+        class short_string_storage final
         {
-            static const size_t capacity = 14/sizeof(char_type);
+            static constexpr size_t capacity = (2*sizeof(uint64_t) - 2*sizeof(uint8_t))/sizeof(char_type);
+            uint8_t ext_type_;
             uint8_t length_;
             char_type data_[capacity];
         public:
-            static constexpr size_t max_length = (14 / sizeof(char_type)) - 1;
+            static constexpr size_t max_length = capacity - 1;
 
             short_string_storage(semantic_tag tag, const char_type* p, uint8_t length)
-                : storage_base(storage_kind::short_string_value, tag), length_(length)
+                : ext_type_(from_storage_and_tag(storage_kind::short_string_value, tag)), 
+                  length_(length)
             {
                 JSONCONS_ASSERT(length <= max_length);
                 std::memcpy(data_,p,length*sizeof(char_type));
@@ -337,7 +327,8 @@ public:
             }
 
             short_string_storage(const short_string_storage& val)
-                : storage_base(val.ext_type()), length_(val.length_)
+                : ext_type_(val.ext_type_), 
+                  length_(val.length_)
             {
                 std::memcpy(data_,val.data_,val.length_*sizeof(char_type));
                 data_[length_] = 0;
@@ -360,33 +351,35 @@ public:
         };
 
         // long_string_storage
-        class long_string_storage final : public storage_base
+        class long_string_storage final
         {
             typedef typename jsoncons::detail::heap_only_string_factory<char_type, Allocator>::string_pointer pointer;
 
+            uint8_t ext_type_;
             pointer ptr_;
         public:
 
             long_string_storage(semantic_tag tag, const char_type* data, std::size_t length, const Allocator& a)
-                : storage_base(storage_kind::string_value, tag)
+                : ext_type_(from_storage_and_tag(storage_kind::long_string_value, tag))
             {
                 ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(data,length,a);
             }
 
             long_string_storage(const long_string_storage& val)
-                : storage_base(val.ext_type())
+                : ext_type_(val.ext_type_)
             {
                 ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),val.get_allocator());
             }
 
             long_string_storage(long_string_storage&& val) noexcept
-                : storage_base(val.ext_type()), ptr_(nullptr)
+                : ext_type_(val.ext_type_), 
+                  ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
             long_string_storage(const long_string_storage& val, const Allocator& a)
-                : storage_base(val.ext_type())
+                : ext_type_(val.ext_type_)
             {
                 ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),a);
             }
@@ -426,11 +419,12 @@ public:
         };
 
         // byte_string_storage
-        class byte_string_storage final : public storage_base
+        class byte_string_storage final
         {
             typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<byte_string_storage_type> byte_allocator_type;
             typedef typename std::allocator_traits<byte_allocator_type>::pointer pointer;
 
+            uint8_t ext_type_;
             pointer ptr_;
 
             template <typename... Args>
@@ -452,25 +446,26 @@ public:
             byte_string_storage(semantic_tag semantic_type, 
                              const uint8_t* data, std::size_t length, 
                              const Allocator& a)
-                : storage_base(storage_kind::byte_string_value, semantic_type)
+                : ext_type_(from_storage_and_tag(storage_kind::byte_string_value, semantic_type))
             {
                 create(byte_allocator_type(a), data, data+length, a);
             }
 
             byte_string_storage(const byte_string_storage& val)
-                : storage_base(val.ext_type())
+                : ext_type_(val.ext_type_)
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             byte_string_storage(byte_string_storage&& val) noexcept
-                : storage_base(val.ext_type()), ptr_(nullptr)
+                : ext_type_(val.ext_type_), 
+                  ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
             byte_string_storage(const byte_string_storage& val, const Allocator& a)
-                : storage_base(val.ext_type())
+                : ext_type_(val.ext_type_)
             { 
                 create(byte_allocator_type(a), *(val.ptr_), a);
             }
@@ -517,10 +512,12 @@ public:
         };
 
         // array_storage
-        class array_storage final : public storage_base
+        class array_storage final
         {
             typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
             typedef typename std::allocator_traits<array_allocator>::pointer pointer;
+
+            uint8_t ext_type_;
             pointer ptr_;
 
             template <typename... Args>
@@ -539,31 +536,32 @@ public:
             }
         public:
             array_storage(const array& val, semantic_tag tag)
-                : storage_base(storage_kind::array_value, tag)
+                : ext_type_(from_storage_and_tag(storage_kind::array_value, tag))
             {
                 create(val.get_allocator(), val);
             }
 
             array_storage(const array& val, semantic_tag tag, const Allocator& a)
-                : storage_base(storage_kind::array_value, tag)
+                : ext_type_(from_storage_and_tag(storage_kind::array_value, tag))
             {
                 create(array_allocator(a), val, a);
             }
 
             array_storage(const array_storage& val)
-                : storage_base(val.ext_type())
+                : ext_type_(val.ext_type_)
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             array_storage(array_storage&& val) noexcept
-                : storage_base(val.ext_type()), ptr_(nullptr)
+                : ext_type_(val.ext_type_), 
+                  ptr_(nullptr)
             {
                 std::swap(val.ptr_, ptr_);
             }
 
             array_storage(const array_storage& val, const Allocator& a)
-                : storage_base(val.ext_type())
+                : ext_type_(val.ext_type_)
             {
                 create(array_allocator(a), *(val.ptr_), a);
             }
@@ -599,10 +597,12 @@ public:
         };
 
         // object_storage
-        class object_storage final : public storage_base
+        class object_storage final
         {
             typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
             typedef typename std::allocator_traits<object_allocator>::pointer pointer;
+
+            uint8_t ext_type_;
             pointer ptr_;
 
             template <typename... Args>
@@ -621,31 +621,32 @@ public:
             }
         public:
             explicit object_storage(const object& val, semantic_tag tag)
-                : storage_base(storage_kind::object_value, tag)
+                : ext_type_(from_storage_and_tag(storage_kind::object_value, tag))
             {
                 create(val.get_allocator(), val);
             }
 
             explicit object_storage(const object& val, semantic_tag tag, const Allocator& a)
-                : storage_base(storage_kind::object_value, tag)
+                : ext_type_(from_storage_and_tag(storage_kind::object_value, tag))
             {
                 create(object_allocator(a), val, a);
             }
 
             explicit object_storage(const object_storage& val)
-                : storage_base(val.ext_type())
+                : ext_type_(val.ext_type_)
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             explicit object_storage(object_storage&& val) noexcept
-                : storage_base(val.ext_type()), ptr_(nullptr)
+                : ext_type_(val.ext_type_), 
+                  ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
             explicit object_storage(const object_storage& val, const Allocator& a)
-                : storage_base(val.ext_type())
+                : ext_type_(val.ext_type_)
             {
                 create(object_allocator(a), *(val.ptr_), a);
             }
@@ -682,8 +683,8 @@ public:
         };
 
     private:
-        static const size_t data_size = static_max<sizeof(uint64_storage),sizeof(half_storage),sizeof(double_storage),sizeof(short_string_storage), sizeof(long_string_storage), sizeof(array_storage), sizeof(object_storage)>::value;
-        static const size_t data_align = static_max<alignof(uint64_storage),alignof(half_storage),alignof(double_storage),alignof(short_string_storage),alignof(long_string_storage),alignof(array_storage),alignof(object_storage)>::value;
+        static constexpr size_t data_size = static_max<sizeof(null_storage),sizeof(empty_object_storage),sizeof(bool_storage),sizeof(int64_storage),sizeof(uint64_storage),sizeof(half_storage),sizeof(double_storage),sizeof(short_string_storage), sizeof(long_string_storage), sizeof(array_storage), sizeof(object_storage)>::value;
+        static constexpr size_t data_align = static_max<alignof(null_storage),alignof(empty_object_storage),alignof(bool_storage),alignof(int64_storage),alignof(uint64_storage),alignof(half_storage),alignof(double_storage),alignof(short_string_storage),alignof(long_string_storage),alignof(array_storage),alignof(object_storage)>::value;
 
         typedef typename std::aligned_storage<data_size,data_align>::type data_t;
 
@@ -691,46 +692,46 @@ public:
     public:
         variant(semantic_tag tag) : data_{}
         {
-            ::new(&data_)empty_object_storage(tag);
+            construct_var<empty_object_storage>(tag);
         }
 
         explicit variant(null_type, semantic_tag tag) : data_{}
         {
-            ::new(&data_)null_storage(tag);
+            construct_var<null_storage>(tag);
         }
 
         explicit variant(bool val, semantic_tag tag) : data_{}
         {
-            ::new(&data_)bool_storage(val,tag);
+            construct_var<bool_storage>(val,tag);
         }
         explicit variant(int64_t val, semantic_tag tag) : data_{}
         {
-            ::new(&data_)int64_storage(val, tag);
+            construct_var<int64_storage>(val, tag);
         }
         explicit variant(uint64_t val, semantic_tag tag) : data_{}
         {
-            ::new(&data_)uint64_storage(val, tag);
+            construct_var<uint64_storage>(val, tag);
         }
 
         variant(half_arg_t, uint16_t val, semantic_tag tag) : data_{}
         {
-            ::new(&data_)half_storage(val, tag);
+            construct_var<half_storage>(val, tag);
         }
 
         variant(double val, semantic_tag tag) : data_{}
         {
-            ::new(&data_)double_storage(val, tag);
+            construct_var<double_storage>(val, tag);
         }
 
         variant(const char_type* s, std::size_t length, semantic_tag tag)
         {
             if (length <= short_string_storage::max_length)
             {
-                ::new(&data_)short_string_storage(tag, s, static_cast<uint8_t>(length));
+                construct_var<short_string_storage>(tag, s, static_cast<uint8_t>(length));
             }
             else
             {
-                ::new(&data_)long_string_storage(tag, s, length, char_allocator_type());
+                construct_var<long_string_storage>(tag, s, length, char_allocator_type());
             }
         }
 
@@ -738,73 +739,44 @@ public:
         {
             if (length <= short_string_storage::max_length)
             {
-                ::new(&data_)short_string_storage(tag, s, static_cast<uint8_t>(length));
+                construct_var<short_string_storage>(tag, s, static_cast<uint8_t>(length));
             }
             else
             {
-                ::new(&data_)long_string_storage(tag, s, length, char_allocator_type(alloc));
+                construct_var<long_string_storage>(tag, s, length, char_allocator_type(alloc));
             }
         }
 
         variant(const byte_string_view& bytes, semantic_tag tag) : data_{}
         {
-            ::new(&data_)byte_string_storage(tag, bytes.data(), bytes.size(), byte_allocator_type());
+            construct_var<byte_string_storage>(tag, bytes.data(), bytes.size(), byte_allocator_type());
         }
 
         variant(const byte_string_view& bytes, semantic_tag tag, const Allocator& alloc) : data_{}
         {
-            ::new(&data_)byte_string_storage(tag, bytes.data(), bytes.size(), alloc);
+            construct_var<byte_string_storage>(tag, bytes.data(), bytes.size(), alloc);
         }
 
         variant(byte_string_arg_t, const span<const uint8_t>& bytes, semantic_tag tag, const Allocator& alloc) : data_{}
         {
-            ::new(&data_)byte_string_storage(tag, bytes.data(), bytes.size(), alloc);
+            construct_var<byte_string_storage>(tag, bytes.data(), bytes.size(), alloc);
         }
 
-        variant(const basic_bignum<byte_allocator_type>& n) : data_{}
-        {
-            std::basic_string<char_type> s;
-            n.dump(s);
-
-            if (s.length() <= short_string_storage::max_length)
-            {
-                ::new(&data_)short_string_storage(semantic_tag::bigint, s.data(), static_cast<uint8_t>(s.length()));
-            }
-            else
-            {
-                ::new(&data_)long_string_storage(semantic_tag::bigint, s.data(), s.length(), char_allocator_type());
-            }
-        }
-
-        variant(const basic_bignum<byte_allocator_type>& n, const Allocator& alloc) : data_{}
-        {
-            std::basic_string<char_type> s;
-            n.dump(s);
-
-            if (s.length() <= short_string_storage::max_length)
-            {
-                ::new(&data_)short_string_storage(semantic_tag::bigint, s.data(), static_cast<uint8_t>(s.length()));
-            }
-            else
-            {
-                ::new(&data_)long_string_storage(semantic_tag::bigint, s.data(), s.length(), char_allocator_type(alloc));
-            }
-        }
         variant(const object& val, semantic_tag tag) : data_{}
         {
-            ::new(&data_)object_storage(val, tag);
+            construct_var<object_storage>(val, tag);
         }
         variant(const object& val, semantic_tag tag, const Allocator& alloc) : data_{}
         {
-            ::new(&data_)object_storage(val, tag, alloc);
+            construct_var<object_storage>(val, tag, alloc);
         }
         variant(const array& val, semantic_tag tag) : data_{}
         {
-            ::new(&data_)array_storage(val, tag);
+            construct_var<array_storage>(val, tag);
         }
         variant(const array& val, semantic_tag tag, const Allocator& alloc) : data_{}
         {
-            ::new(&data_)array_storage(val, tag, alloc);
+            construct_var<array_storage>(val, tag, alloc);
         }
 
         variant(const variant& val)
@@ -837,17 +809,17 @@ public:
         {
             switch (storage())
             {
-                case storage_kind::string_value:
-                    reinterpret_cast<long_string_storage*>(&data_)->~long_string_storage();
+                case storage_kind::long_string_value:
+                    destroy_var<long_string_storage>();
                     break;
                 case storage_kind::byte_string_value:
-                    reinterpret_cast<byte_string_storage*>(&data_)->~byte_string_storage();
+                    destroy_var<byte_string_storage>();
                     break;
                 case storage_kind::array_value:
-                    reinterpret_cast<array_storage*>(&data_)->~array_storage();
+                    destroy_var<array_storage>();
                     break;
                 case storage_kind::object_value:
-                    reinterpret_cast<object_storage*>(&data_)->~object_storage();
+                    destroy_var<object_storage>();
                     break;
                 default:
                     break;
@@ -856,51 +828,10 @@ public:
 
         variant& operator=(const variant& val)
         {
-            if (this !=&val)
+            if (this != &val)
             {
                 Destroy_();
-                switch (val.storage())
-                {
-                    case storage_kind::null_value:
-                        ::new(&data_)null_storage(val.null_storage_cast());
-                        break;
-                    case storage_kind::empty_object_value:
-                        ::new(&data_)empty_object_storage(val.empty_object_storage_cast());
-                        break;
-                    case storage_kind::bool_value:
-                        ::new(&data_)bool_storage(val.bool_storage_cast());
-                        break;
-                    case storage_kind::int64_value:
-                        ::new(&data_)int64_storage(val.int64_storage_cast());
-                        break;
-                    case storage_kind::uint64_value:
-                        ::new(&data_)uint64_storage(val.uint64_storage_cast());
-                        break;
-                    case storage_kind::half_value:
-                        ::new(&data_)half_storage(val.half_storage_cast());
-                        break;
-                    case storage_kind::double_value:
-                        ::new(&data_)double_storage(val.double_storage_cast());
-                        break;
-                    case storage_kind::short_string_value:
-                        ::new(&data_)short_string_storage(val.short_string_storage_cast());
-                        break;
-                    case storage_kind::string_value:
-                        ::new(&data_)long_string_storage(val.string_storage_cast());
-                        break;
-                    case storage_kind::byte_string_value:
-                        ::new(&data_)byte_string_storage(val.byte_string_storage_cast());
-                        break;
-                    case storage_kind::array_value:
-                        ::new(&data_)array_storage(val.array_storage_cast());
-                        break;
-                    case storage_kind::object_value:
-                        ::new(&data_)object_storage(val.object_storage_cast());
-                        break;
-                    default:
-                        JSONCONS_UNREACHABLE();
-                        break;
-                }
+                Init_(val);
             }
             return *this;
         }
@@ -916,90 +847,157 @@ public:
 
         storage_kind storage() const
         {
-            return reinterpret_cast<const storage_base*>(&data_)->storage();
+            return to_storage(*reinterpret_cast<const uint8_t*>(&data_));
         }
 
         semantic_tag tag() const
         {
-            return reinterpret_cast<const storage_base*>(&data_)->tag();
+            return to_tag(*reinterpret_cast<const uint8_t*>(&data_));
         }
 
-        const null_storage& null_storage_cast() const
+        template <class VariantType, class... Args>
+        void construct_var(Args&&... args)
+        {
+            ::new (&cast<VariantType>()) VariantType(std::forward<Args>(args)...);
+        }
+
+        template <class VariantType>
+        void destroy_var()
+        {
+            reinterpret_cast<VariantType*>(&data_)->~VariantType();
+        }
+
+        template <class T>
+        struct identity { using type = T*; };
+
+        template <class T> 
+        T& cast()
+        {
+            return cast(identity<T>());
+        }
+
+        template <class T> 
+        const T& cast() const
+        {
+            return cast(identity<T>());
+        }
+
+        null_storage& cast(identity<null_storage>) 
+        {
+            return *reinterpret_cast<null_storage*>(&data_);
+        }
+
+        const null_storage& cast(identity<null_storage>) const
         {
             return *reinterpret_cast<const null_storage*>(&data_);
         }
 
-        const empty_object_storage& empty_object_storage_cast() const
+        empty_object_storage& cast(identity<empty_object_storage>) 
+        {
+            return *reinterpret_cast<empty_object_storage*>(&data_);
+        }
+
+        const empty_object_storage& cast(identity<empty_object_storage>) const
         {
             return *reinterpret_cast<const empty_object_storage*>(&data_);
         }
 
-        const bool_storage& bool_storage_cast() const
+        bool_storage& cast(identity<bool_storage>) 
+        {
+            return *reinterpret_cast<bool_storage*>(&data_);
+        }
+
+        const bool_storage& cast(identity<bool_storage>) const
         {
             return *reinterpret_cast<const bool_storage*>(&data_);
         }
 
-        const int64_storage& int64_storage_cast() const
+        int64_storage& cast(identity<int64_storage>) 
+        {
+            return *reinterpret_cast<int64_storage*>(&data_);
+        }
+
+        const int64_storage& cast(identity<int64_storage>) const
         {
             return *reinterpret_cast<const int64_storage*>(&data_);
         }
 
-        const uint64_storage& uint64_storage_cast() const
+        uint64_storage& cast(identity<uint64_storage>) 
+        {
+            return *reinterpret_cast<uint64_storage*>(&data_);
+        }
+
+        const uint64_storage& cast(identity<uint64_storage>) const
         {
             return *reinterpret_cast<const uint64_storage*>(&data_);
         }
 
-        const half_storage& half_storage_cast() const
+        half_storage& cast(identity<half_storage>)
+        {
+            return *reinterpret_cast<half_storage*>(&data_);
+        }
+
+        const half_storage& cast(identity<half_storage>) const
         {
             return *reinterpret_cast<const half_storage*>(&data_);
         }
 
-        const double_storage& double_storage_cast() const
+        double_storage& cast(identity<double_storage>) 
+        {
+            return *reinterpret_cast<double_storage*>(&data_);
+        }
+
+        const double_storage& cast(identity<double_storage>) const
         {
             return *reinterpret_cast<const double_storage*>(&data_);
         }
 
-        const short_string_storage& short_string_storage_cast() const
+        short_string_storage& cast(identity<short_string_storage>)
+        {
+            return *reinterpret_cast<short_string_storage*>(&data_);
+        }
+
+        const short_string_storage& cast(identity<short_string_storage>) const
         {
             return *reinterpret_cast<const short_string_storage*>(&data_);
         }
 
-        long_string_storage& string_storage_cast()
+        long_string_storage& cast(identity<long_string_storage>)
         {
             return *reinterpret_cast<long_string_storage*>(&data_);
         }
 
-        const long_string_storage& string_storage_cast() const
+        const long_string_storage& cast(identity<long_string_storage>) const
         {
             return *reinterpret_cast<const long_string_storage*>(&data_);
         }
 
-        byte_string_storage& byte_string_storage_cast()
+        byte_string_storage& cast(identity<byte_string_storage>)
         {
             return *reinterpret_cast<byte_string_storage*>(&data_);
         }
 
-        const byte_string_storage& byte_string_storage_cast() const
+        const byte_string_storage& cast(identity<byte_string_storage>) const
         {
             return *reinterpret_cast<const byte_string_storage*>(&data_);
         }
 
-        object_storage& object_storage_cast()
+        object_storage& cast(identity<object_storage>)
         {
             return *reinterpret_cast<object_storage*>(&data_);
         }
 
-        const object_storage& object_storage_cast() const
+        const object_storage& cast(identity<object_storage>) const
         {
             return *reinterpret_cast<const object_storage*>(&data_);
         }
 
-        array_storage& array_storage_cast()
+        array_storage& cast(identity<array_storage>)
         {
             return *reinterpret_cast<array_storage*>(&data_);
         }
 
-        const array_storage& array_storage_cast() const
+        const array_storage& cast(identity<array_storage>) const
         {
             return *reinterpret_cast<const array_storage*>(&data_);
         }
@@ -1009,9 +1007,9 @@ public:
             switch (storage())
             {
                 case storage_kind::array_value:
-                    return array_storage_cast().value().size();
+                    return cast<array_storage>().value().size();
                 case storage_kind::object_value:
-                    return object_storage_cast().value().size();
+                    return cast<object_storage>().value().size();
                 default:
                     return 0;
             }
@@ -1022,9 +1020,9 @@ public:
             switch (storage())
             {
                 case storage_kind::short_string_value:
-                    return string_view_type(short_string_storage_cast().data(),short_string_storage_cast().length());
-                case storage_kind::string_value:
-                    return string_view_type(string_storage_cast().data(),string_storage_cast().length());
+                    return string_view_type(cast<short_string_storage>().data(),cast<short_string_storage>().length());
+                case storage_kind::long_string_value:
+                    return string_view_type(cast<long_string_storage>().data(),cast<long_string_storage>().length());
                 default:
                     JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a string"));
             }
@@ -1036,7 +1034,7 @@ public:
             switch (storage())
             {
                 case storage_kind::short_string_value:
-                case storage_kind::string_value:
+                case storage_kind::long_string_value:
                 {
                     switch (tag())
                     {
@@ -1067,7 +1065,7 @@ public:
                     break;
                 }
                 case storage_kind::byte_string_value:
-                    return basic_byte_string<BAllocator>(byte_string_storage_cast().data(),byte_string_storage_cast().length());
+                    return basic_byte_string<BAllocator>(cast<byte_string_storage>().data(),cast<byte_string_storage>().length());
                 default:
                     JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a byte string"));
             }
@@ -1078,36 +1076,9 @@ public:
             switch (storage())
             {
             case storage_kind::byte_string_value:
-                return byte_string_view(byte_string_storage_cast().data(),byte_string_storage_cast().length());
+                return byte_string_view(cast<byte_string_storage>().data(),cast<byte_string_storage>().length());
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a byte string"));
-            }
-        }
-
-        template <class UserAllocator=std::allocator<uint8_t>>
-        basic_bignum<UserAllocator> as_bignum() const
-        {
-            switch (storage())
-            {
-                case storage_kind::short_string_value:
-                case storage_kind::string_value:
-                    if (!jsoncons::detail::is_base10(as_string_view().data(), as_string_view().length()))
-                    {
-                        JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an integer"));
-                    }
-                    return basic_bignum<UserAllocator>(as_string_view().data(), as_string_view().length());
-                case storage_kind::half_value:
-                    return basic_bignum<UserAllocator>(jsoncons::detail::decode_half(half_storage_cast().value()));
-                case storage_kind::double_value:
-                    return basic_bignum<UserAllocator>(double_storage_cast().value());
-                case storage_kind::int64_value:
-                    return basic_bignum<UserAllocator>(int64_storage_cast().value());
-                case storage_kind::uint64_value:
-                    return basic_bignum<UserAllocator>(uint64_storage_cast().value());
-                case storage_kind::bool_value:
-                    return basic_bignum<UserAllocator>(bool_storage_cast().value() ? 1 : 0);
-                default:
-                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bignum"));
             }
         }
 
@@ -1143,7 +1114,7 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::bool_value:
-                            return bool_storage_cast().value() == rhs.bool_storage_cast().value();
+                            return cast<bool_storage>().value() == rhs.cast<bool_storage>().value();
                         default:
                             return false;
                     }
@@ -1152,11 +1123,13 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::int64_value:
-                            return int64_storage_cast().value() == rhs.int64_storage_cast().value();
+                            return cast<int64_storage>().value() == rhs.cast<int64_storage>().value();
                         case storage_kind::uint64_value:
-                            return int64_storage_cast().value() >= 0 ? static_cast<uint64_t>(int64_storage_cast().value()) == rhs.uint64_storage_cast().value() : false;
+                            return cast<int64_storage>().value() >= 0 ? static_cast<uint64_t>(cast<int64_storage>().value()) == rhs.cast<uint64_storage>().value() : false;
+                        case storage_kind::half_value:
+                            return static_cast<double>(cast<int64_storage>().value()) == jsoncons::detail::decode_half(rhs.cast<half_storage>().value());
                         case storage_kind::double_value:
-                            return static_cast<double>(int64_storage_cast().value()) == rhs.double_storage_cast().value();
+                            return static_cast<double>(cast<int64_storage>().value()) == rhs.cast<double_storage>().value();
                         default:
                             return false;
                     }
@@ -1165,11 +1138,13 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::int64_value:
-                            return rhs.int64_storage_cast().value() >= 0 ? uint64_storage_cast().value() == static_cast<uint64_t>(rhs.int64_storage_cast().value()) : false;
+                            return rhs.cast<int64_storage>().value() >= 0 ? cast<uint64_storage>().value() == static_cast<uint64_t>(rhs.cast<int64_storage>().value()) : false;
                         case storage_kind::uint64_value:
-                            return uint64_storage_cast().value() == rhs.uint64_storage_cast().value();
+                            return cast<uint64_storage>().value() == rhs.cast<uint64_storage>().value();
+                        case storage_kind::half_value:
+                            return static_cast<double>(cast<uint64_storage>().value()) == jsoncons::detail::decode_half(rhs.cast<half_storage>().value());
                         case storage_kind::double_value:
-                            return static_cast<double>(uint64_storage_cast().value()) == rhs.double_storage_cast().value();
+                            return static_cast<double>(cast<uint64_storage>().value()) == rhs.cast<double_storage>().value();
                         default:
                             return false;
                     }
@@ -1178,22 +1153,22 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::half_value:
-                            return half_storage_cast().value() == rhs.half_storage_cast().value();
+                            return cast<half_storage>().value() == rhs.cast<half_storage>().value();
                         default:
-                            return variant(jsoncons::detail::decode_half(half_storage_cast().value()),semantic_tag::none) == rhs;
+                            return variant(jsoncons::detail::decode_half(cast<half_storage>().value()),semantic_tag::none) == rhs;
                     }
                     break;
                 case storage_kind::double_value:
                     switch (rhs.storage())
                     {
                         case storage_kind::int64_value:
-                            return double_storage_cast().value() == static_cast<double>(rhs.int64_storage_cast().value());
+                            return cast<double_storage>().value() == static_cast<double>(rhs.cast<int64_storage>().value());
                         case storage_kind::uint64_value:
-                            return double_storage_cast().value() == static_cast<double>(rhs.uint64_storage_cast().value());
+                            return cast<double_storage>().value() == static_cast<double>(rhs.cast<uint64_storage>().value());
                         case storage_kind::half_value:
-                            return double_storage_cast().value() == jsoncons::detail::decode_half(rhs.half_storage_cast().value());
+                            return cast<double_storage>().value() == jsoncons::detail::decode_half(rhs.cast<half_storage>().value());
                         case storage_kind::double_value:
-                            return double_storage_cast().value() == rhs.double_storage_cast().value();
+                            return cast<double_storage>().value() == rhs.cast<double_storage>().value();
                         default:
                             return false;
                     }
@@ -1203,18 +1178,18 @@ public:
                     {
                         case storage_kind::short_string_value:
                             return as_string_view() == rhs.as_string_view();
-                        case storage_kind::string_value:
+                        case storage_kind::long_string_value:
                             return as_string_view() == rhs.as_string_view();
                         default:
                             return false;
                     }
                     break;
-                case storage_kind::string_value:
+                case storage_kind::long_string_value:
                     switch (rhs.storage())
                     {
                         case storage_kind::short_string_value:
                             return as_string_view() == rhs.as_string_view();
-                        case storage_kind::string_value:
+                        case storage_kind::long_string_value:
                             return as_string_view() == rhs.as_string_view();
                         default:
                             return false;
@@ -1235,7 +1210,7 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::array_value:
-                            return array_storage_cast().value() == rhs.array_storage_cast().value();
+                            return cast<array_storage>().value() == rhs.cast<array_storage>().value();
                         default:
                             return false;
                     }
@@ -1246,7 +1221,7 @@ public:
                         case storage_kind::empty_object_value:
                             return size() == 0;
                         case storage_kind::object_value:
-                            return object_storage_cast().value() == rhs.object_storage_cast().value();
+                            return cast<object_storage>().value() == rhs.cast<object_storage>().value();
                         default:
                             return false;
                     }
@@ -1287,7 +1262,7 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::bool_value:
-                            return bool_storage_cast().value() < rhs.bool_storage_cast().value();
+                            return cast<bool_storage>().value() < rhs.cast<bool_storage>().value();
                         default:
                             return (int)storage() < (int)rhs.storage();
                     }
@@ -1296,11 +1271,11 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::int64_value:
-                            return int64_storage_cast().value() < rhs.int64_storage_cast().value();
+                            return cast<int64_storage>().value() < rhs.cast<int64_storage>().value();
                         case storage_kind::uint64_value:
-                            return int64_storage_cast().value() >= 0 ? static_cast<uint64_t>(int64_storage_cast().value()) < rhs.uint64_storage_cast().value() : true;
+                            return cast<int64_storage>().value() >= 0 ? static_cast<uint64_t>(cast<int64_storage>().value()) < rhs.cast<uint64_storage>().value() : true;
                         case storage_kind::double_value:
-                            return static_cast<double>(int64_storage_cast().value()) < rhs.double_storage_cast().value();
+                            return static_cast<double>(cast<int64_storage>().value()) < rhs.cast<double_storage>().value();
                         default:
                             return (int)storage() < (int)rhs.storage();
                     }
@@ -1309,11 +1284,11 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::int64_value:
-                            return rhs.int64_storage_cast().value() >= 0 ? uint64_storage_cast().value() < static_cast<uint64_t>(rhs.int64_storage_cast().value()) : true;
+                            return rhs.cast<int64_storage>().value() >= 0 ? cast<uint64_storage>().value() < static_cast<uint64_t>(rhs.cast<int64_storage>().value()) : true;
                         case storage_kind::uint64_value:
-                            return uint64_storage_cast().value() < rhs.uint64_storage_cast().value();
+                            return cast<uint64_storage>().value() < rhs.cast<uint64_storage>().value();
                         case storage_kind::double_value:
-                            return static_cast<double>(uint64_storage_cast().value()) < rhs.double_storage_cast().value();
+                            return static_cast<double>(cast<uint64_storage>().value()) < rhs.cast<double_storage>().value();
                         default:
                             return (int)storage() < (int)rhs.storage();
                     }
@@ -1322,11 +1297,11 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::int64_value:
-                            return double_storage_cast().value() < static_cast<double>(rhs.int64_storage_cast().value());
+                            return cast<double_storage>().value() < static_cast<double>(rhs.cast<int64_storage>().value());
                         case storage_kind::uint64_value:
-                            return double_storage_cast().value() < static_cast<double>(rhs.uint64_storage_cast().value());
+                            return cast<double_storage>().value() < static_cast<double>(rhs.cast<uint64_storage>().value());
                         case storage_kind::double_value:
-                            return double_storage_cast().value() < rhs.double_storage_cast().value();
+                            return cast<double_storage>().value() < rhs.cast<double_storage>().value();
                         default:
                             return (int)storage() < (int)rhs.storage();
                     }
@@ -1336,18 +1311,18 @@ public:
                     {
                         case storage_kind::short_string_value:
                             return as_string_view() < rhs.as_string_view();
-                        case storage_kind::string_value:
+                        case storage_kind::long_string_value:
                             return as_string_view() < rhs.as_string_view();
                         default:
                             return (int)storage() < (int)rhs.storage();
                     }
                     break;
-                case storage_kind::string_value:
+                case storage_kind::long_string_value:
                     switch (rhs.storage())
                     {
                         case storage_kind::short_string_value:
                             return as_string_view() < rhs.as_string_view();
-                        case storage_kind::string_value:
+                        case storage_kind::long_string_value:
                             return as_string_view() < rhs.as_string_view();
                         default:
                             return (int)storage() < (int)rhs.storage();
@@ -1368,7 +1343,7 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::array_value:
-                            return array_storage_cast().value() < rhs.array_storage_cast().value();
+                            return cast<array_storage>().value() < rhs.cast<array_storage>().value();
                         default:
                             return (int)storage() < (int)rhs.storage();
                     }
@@ -1379,7 +1354,7 @@ public:
                         case storage_kind::empty_object_value:
                             return false;
                         case storage_kind::object_value:
-                            return object_storage_cast().value() < rhs.object_storage_cast().value();
+                            return cast<object_storage>().value() < rhs.cast<object_storage>().value();
                         default:
                             return (int)storage() < (int)rhs.storage();
                     }
@@ -1389,92 +1364,67 @@ public:
                     break;
             }
         }
-
-        template <class Alloc = allocator_type>
-        typename std::enable_if<std::is_standard_layout<typename std::allocator_traits<Alloc>::pointer>::value ||
-                                std::is_trivial<typename std::allocator_traits<Alloc>::pointer>::value,void>::type
-        swap(variant& other) noexcept
+        template <class TypeA, class TypeB>
+        void swap_a_b(variant& other)
         {
-            if (this ==&other)
-            {
-                return;
-            }
-
-            std::swap(data_,other.data_);
+            TypeA& curA = cast<TypeA>();
+            TypeB& curB = other.cast<TypeB>();
+            TypeB tmpB(std::move(curB));
+            other.construct_var<TypeA>(std::move(curA));
+            construct_var<TypeB>(std::move(tmpB));
         }
 
-        template <class Alloc = allocator_type>
-        typename std::enable_if<!(std::is_standard_layout<typename std::allocator_traits<Alloc>::pointer>::value ||
-                                  std::is_trivial<typename std::allocator_traits<Alloc>::pointer>::value), void>::type
-        swap(variant& other) noexcept
+        template <class TypeA>
+        void swap_a(variant& other)
         {
-            if (this ==&other)
+            switch (other.storage())
             {
-                return;
-            }
-
-            variant temp(other);
-            switch (storage())
-            {
-                case storage_kind::null_value:
-                    ::new(&(other.data_))null_storage(null_storage_cast());
-                    break;
-                case storage_kind::empty_object_value:
-                    ::new(&(other.data_))empty_object_storage(empty_object_storage_cast());
-                    break;
-                case storage_kind::bool_value:
-                    ::new(&(other.data_))bool_storage(bool_storage_cast());
-                    break;
-                case storage_kind::int64_value:
-                    ::new(&(other.data_))int64_storage(int64_storage_cast());
-                    break;
-                case storage_kind::uint64_value:
-                    ::new(&(other.data_))uint64_storage(uint64_storage_cast());
-                    break;
-                case storage_kind::half_value:
-                    ::new(&(other.data_))half_storage(half_storage_cast());
-                    break;
-                case storage_kind::double_value:
-                    ::new(&(other.data_))double_storage(double_storage_cast());
-                    break;
-                case storage_kind::short_string_value:
-                    ::new(&(other.data_))short_string_storage(short_string_storage_cast());
-                    break;
-                case storage_kind::string_value:
-                    ::new((&other.data_))long_string_storage(std::move(string_storage_cast()));
-                    break;
-                case storage_kind::byte_string_value:
-                    ::new((&other.data_))byte_string_storage(std::move(byte_string_storage_cast()));
-                    break;
-                case storage_kind::array_value:
-                    ::new(&(other.data_))array_storage(std::move(array_storage_cast()));
-                    break;
-                case storage_kind::object_value:
-                    ::new(&(other.data_))object_storage(std::move(object_storage_cast()));
-                    break;
+                case storage_kind::null_value         : swap_a_b<TypeA, null_storage>(other); break;
+                case storage_kind::empty_object_value : swap_a_b<TypeA, empty_object_storage>(other); break;
+                case storage_kind::bool_value         : swap_a_b<TypeA, bool_storage>(other); break;
+                case storage_kind::int64_value      : swap_a_b<TypeA, int64_storage>(other); break;
+                case storage_kind::uint64_value     : swap_a_b<TypeA, uint64_storage>(other); break;
+                case storage_kind::half_value       : swap_a_b<TypeA, half_storage>(other); break;
+                case storage_kind::double_value       : swap_a_b<TypeA, double_storage>(other); break;
+                case storage_kind::short_string_value : swap_a_b<TypeA, short_string_storage>(other); break;
+                case storage_kind::long_string_value       : swap_a_b<TypeA, long_string_storage>(other); break;
+                case storage_kind::byte_string_value  : swap_a_b<TypeA, byte_string_storage>(other); break;
+                case storage_kind::array_value        : swap_a_b<TypeA, array_storage>(other); break;
+                case storage_kind::object_value       : swap_a_b<TypeA, object_storage>(other); break;
                 default:
                     JSONCONS_UNREACHABLE();
                     break;
             }
-            switch (temp.storage())
+        }
+    public:
+
+        void swap(variant& other) noexcept
+        {
+            if (this == &other)
             {
-                case storage_kind::string_value:
-                    ::new(&data_)long_string_storage(std::move(temp.string_storage_cast()));
-                    break;
-                case storage_kind::byte_string_value:
-                    ::new(&data_)byte_string_storage(std::move(temp.byte_string_storage_cast()));
-                    break;
-                case storage_kind::array_value:
-                    ::new((&(data_)))array_storage(std::move(temp.array_storage_cast()));
-                    break;
-                case storage_kind::object_value:
-                    ::new((&(data_)))object_storage(std::move(temp.object_storage_cast()));
-                    break;
+                return;
+            }
+
+            switch (storage())
+            {
+                case storage_kind::null_value: swap_a<null_storage>(other); break;
+                case storage_kind::empty_object_value : swap_a<empty_object_storage>(other); break;
+                case storage_kind::bool_value: swap_a<bool_storage>(other); break;
+                case storage_kind::int64_value: swap_a<int64_storage>(other); break;
+                case storage_kind::uint64_value: swap_a<uint64_storage>(other); break;
+                case storage_kind::half_value: swap_a<half_storage>(other); break;
+                case storage_kind::double_value: swap_a<double_storage>(other); break;
+                case storage_kind::short_string_value: swap_a<short_string_storage>(other); break;
+                case storage_kind::long_string_value: swap_a<long_string_storage>(other); break;
+                case storage_kind::byte_string_value: swap_a<byte_string_storage>(other); break;
+                case storage_kind::array_value: swap_a<array_storage>(other); break;
+                case storage_kind::object_value: swap_a<object_storage>(other); break;
                 default:
-                    std::swap(data_,temp.data_);
+                    JSONCONS_UNREACHABLE();
                     break;
             }
         }
+
     private:
 
         void Init_(const variant& val)
@@ -1482,40 +1432,40 @@ public:
             switch (val.storage())
             {
                 case storage_kind::null_value:
-                    ::new(&data_)null_storage(val.null_storage_cast());
+                    construct_var<null_storage>(val.cast<null_storage>());
                     break;
                 case storage_kind::empty_object_value:
-                    ::new(&data_)empty_object_storage(val.empty_object_storage_cast());
+                    construct_var<empty_object_storage>(val.cast<empty_object_storage>());
                     break;
                 case storage_kind::bool_value:
-                    ::new(&data_)bool_storage(val.bool_storage_cast());
+                    construct_var<bool_storage>(val.cast<bool_storage>());
                     break;
                 case storage_kind::int64_value:
-                    ::new(&data_)int64_storage(val.int64_storage_cast());
+                    construct_var<int64_storage>(val.cast<int64_storage>());
                     break;
                 case storage_kind::uint64_value:
-                    ::new(&data_)uint64_storage(val.uint64_storage_cast());
+                    construct_var<uint64_storage>(val.cast<uint64_storage>());
                     break;
                 case storage_kind::half_value:
-                    ::new(&data_)half_storage(val.half_storage_cast());
+                    construct_var<half_storage>(val.cast<half_storage>());
                     break;
                 case storage_kind::double_value:
-                    ::new(&data_)double_storage(val.double_storage_cast());
+                    construct_var<double_storage>(val.cast<double_storage>());
                     break;
                 case storage_kind::short_string_value:
-                    ::new(&data_)short_string_storage(val.short_string_storage_cast());
+                    construct_var<short_string_storage>(val.cast<short_string_storage>());
                     break;
-                case storage_kind::string_value:
-                    ::new(&data_)long_string_storage(val.string_storage_cast());
+                case storage_kind::long_string_value:
+                    construct_var<long_string_storage>(val.cast<long_string_storage>());
                     break;
                 case storage_kind::byte_string_value:
-                    ::new(&data_)byte_string_storage(val.byte_string_storage_cast());
+                    construct_var<byte_string_storage>(val.cast<byte_string_storage>());
                     break;
                 case storage_kind::object_value:
-                    ::new(&data_)object_storage(val.object_storage_cast());
+                    construct_var<object_storage>(val.cast<object_storage>());
                     break;
                 case storage_kind::array_value:
-                    ::new(&data_)array_storage(val.array_storage_cast());
+                    construct_var<array_storage>(val.cast<array_storage>());
                     break;
                 default:
                     break;
@@ -1536,17 +1486,17 @@ public:
             case storage_kind::short_string_value:
                 Init_(val);
                 break;
-            case storage_kind::string_value:
-                ::new(&data_)long_string_storage(val.string_storage_cast(),a);
+            case storage_kind::long_string_value:
+                construct_var<long_string_storage>(val.cast<long_string_storage>(),a);
                 break;
             case storage_kind::byte_string_value:
-                ::new(&data_)byte_string_storage(val.byte_string_storage_cast(),a);
+                construct_var<byte_string_storage>(val.cast<byte_string_storage>(),a);
                 break;
             case storage_kind::array_value:
-                ::new(&data_)array_storage(val.array_storage_cast(),a);
+                construct_var<array_storage>(val.cast<array_storage>(),a);
                 break;
             case storage_kind::object_value:
-                ::new(&data_)object_storage(val.object_storage_cast(),a);
+                construct_var<object_storage>(val.cast<object_storage>(),a);
                 break;
             default:
                 break;
@@ -1567,28 +1517,13 @@ public:
                 case storage_kind::short_string_value:
                     Init_(val);
                     break;
-                case storage_kind::string_value:
-                {
-                    ::new(&data_)long_string_storage(std::move(val.string_storage_cast()));
-                    ::new((&val.data_))null_storage();
-                    break;
-                }
+                case storage_kind::long_string_value:
                 case storage_kind::byte_string_value:
-                {
-                    ::new(&data_)byte_string_storage(std::move(val.byte_string_storage_cast()));
-                    ::new((&val.data_))null_storage();
-                    break;
-                }
                 case storage_kind::array_value:
-                {
-                    ::new(&data_)array_storage(std::move(val.array_storage_cast()));
-                    ::new((&val.data_))null_storage();
-                    break;
-                }
                 case storage_kind::object_value:
                 {
-                    ::new(&data_)object_storage(std::move(val.object_storage_cast()));
-                    ::new((&val.data_))null_storage();
+                    construct_var<null_storage>();
+                    swap(val);
                     break;
                 }
                 default:
@@ -1616,9 +1551,9 @@ public:
                 case storage_kind::short_string_value:
                     Init_(std::forward<variant>(val));
                     break;
-                case storage_kind::string_value:
+                case storage_kind::long_string_value:
                 {
-                    if (a == val.string_storage_cast().get_allocator())
+                    if (a == val.cast<long_string_storage>().get_allocator())
                     {
                         Init_rv_(std::forward<variant>(val), a, std::true_type());
                     }
@@ -1630,7 +1565,7 @@ public:
                 }
                 case storage_kind::byte_string_value:
                 {
-                    if (a == val.byte_string_storage_cast().get_allocator())
+                    if (a == val.cast<byte_string_storage>().get_allocator())
                     {
                         Init_rv_(std::forward<variant>(val), a, std::true_type());
                     }
@@ -1642,7 +1577,7 @@ public:
                 }
                 case storage_kind::object_value:
                 {
-                    if (a == val.object_storage_cast().get_allocator())
+                    if (a == val.cast<object_storage>().get_allocator())
                     {
                         Init_rv_(std::forward<variant>(val), a, std::true_type());
                     }
@@ -1654,7 +1589,7 @@ public:
                 }
                 case storage_kind::array_value:
                 {
-                    if (a == val.array_storage_cast().get_allocator())
+                    if (a == val.cast<array_storage>().get_allocator())
                     {
                         Init_rv_(std::forward<variant>(val), a, std::true_type());
                     }
@@ -1976,11 +1911,6 @@ public:
         byte_string_view as_byte_string_view() const 
         {
             return evaluate().as_byte_string_view();
-        }
-
-        basic_bignum<byte_allocator_type> as_bignum() const 
-        {
-            return evaluate().as_bignum();
         }
 
         template <class SAllocator=std::allocator<char_type>>
@@ -3127,16 +3057,6 @@ public:
     {
     }
 
-    explicit basic_json(const basic_bignum<byte_allocator_type>& bytes)
-        : var_(bytes)
-    {
-    }
-
-    explicit basic_json(const basic_bignum<byte_allocator_type>& bytes, const Allocator& alloc)
-    : var_(bytes, byte_allocator_type(alloc))
-    {
-    }
-
     ~basic_json()
     {
     }
@@ -3421,21 +3341,21 @@ public:
     {
         switch (var_.storage())
         {
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
             {
-                return var_.string_storage_cast().get_allocator();
+                return var_.template cast<typename variant::long_string_storage>().get_allocator();
             }
             case storage_kind::byte_string_value:
             {
-                return var_.byte_string_storage_cast().get_allocator();
+                return var_.template cast<typename variant::byte_string_storage>().get_allocator();
             }
             case storage_kind::array_value:
             {
-                return var_.array_storage_cast().get_allocator();
+                return var_.template cast<typename variant::array_storage>().get_allocator();
             }
             case storage_kind::object_value:
             {
-                return var_.object_storage_cast().get_allocator();
+                return var_.template cast<typename variant::object_storage>().get_allocator();
             }
             default:
                 return allocator_type();
@@ -3490,7 +3410,7 @@ public:
 
     bool is_string() const noexcept
     {
-        return (var_.storage() == storage_kind::string_value) || (var_.storage() == storage_kind::short_string_value);
+        return (var_.storage() == storage_kind::long_string_value) || (var_.storage() == storage_kind::short_string_value);
     }
 
     bool is_string_view() const noexcept
@@ -3513,7 +3433,7 @@ public:
         switch (storage())
         {
             case storage_kind::short_string_value:
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
                 return jsoncons::detail::is_base10(as_string_view().data(), as_string_view().length());
             case storage_kind::int64_value:
             case storage_kind::uint64_value:
@@ -3568,7 +3488,7 @@ public:
             case storage_kind::double_value:
                 return true;
             case storage_kind::short_string_value:
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
                 return var_.tag() == semantic_tag::bigint ||
                        var_.tag() == semantic_tag::bigdec ||
                        var_.tag() == semantic_tag::bigfloat;
@@ -3582,12 +3502,12 @@ public:
         switch (var_.storage())
         {
             case storage_kind::byte_string_value:
-                return var_.byte_string_storage_cast().length() == 0;
+                return var_.template cast<typename variant::byte_string_storage>().length() == 0;
                 break;
             case storage_kind::short_string_value:
-                return var_.short_string_storage_cast().length() == 0;
-            case storage_kind::string_value:
-                return var_.string_storage_cast().length() == 0;
+                return var_.template cast<typename variant::short_string_storage>().length() == 0;
+            case storage_kind::long_string_value:
+                return var_.template cast<typename variant::long_string_storage>().length() == 0;
             case storage_kind::array_value:
                 return array_value().size() == 0;
             case storage_kind::empty_object_value:
@@ -3695,7 +3615,7 @@ public:
         switch (storage())
         {
             case storage_kind::short_string_value:
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
             {
                 switch (tag())
                 {
@@ -3764,33 +3684,12 @@ public:
     {
         switch (var_.storage())
         {
-            case storage_kind::short_string_value:
-            case storage_kind::string_value:
-                if (var_.tag() == semantic_tag::bigint)
-                {
-                    return static_cast<bool>(var_.as_bignum());
-                }
-
-                JSONCONS_TRY
-                {
-                    basic_json j = basic_json::parse(as_string_view());
-                    return j.as_bool();
-                }
-                JSONCONS_CATCH(...)
-                {
-                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bool"));
-                }
-                break;
             case storage_kind::bool_value:
-                return var_.bool_storage_cast().value();
-            case storage_kind::half_value:
-                return var_.half_storage_cast().value() != 0.0;
-            case storage_kind::double_value:
-                return var_.double_storage_cast().value() != 0.0;
+                return var_.template cast<typename variant::bool_storage>().value();
             case storage_kind::int64_value:
-                return var_.int64_storage_cast().value() != 0;
+                return var_.template cast<typename variant::int64_storage>().value() != 0;
             case storage_kind::uint64_value:
-                return var_.uint64_storage_cast().value() != 0;
+                return var_.template cast<typename variant::uint64_storage>().value() != 0;
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bool"));
         }
@@ -3806,7 +3705,7 @@ public:
         switch (var_.storage())
         {
             case storage_kind::short_string_value:
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
             {
                 auto result = jsoncons::detail::to_integer<T>(as_string_view().data(), as_string_view().length());
                 if (!result)
@@ -3816,15 +3715,15 @@ public:
                 return result.value();
             }
             case storage_kind::half_value:
-                return static_cast<T>(var_.half_storage_cast().value());
+                return static_cast<T>(var_.template cast<typename variant::half_storage>().value());
             case storage_kind::double_value:
-                return static_cast<T>(var_.double_storage_cast().value());
+                return static_cast<T>(var_.template cast<typename variant::double_storage>().value());
             case storage_kind::int64_value:
-                return static_cast<T>(var_.int64_storage_cast().value());
+                return static_cast<T>(var_.template cast<typename variant::int64_storage>().value());
             case storage_kind::uint64_value:
-                return static_cast<T>(var_.uint64_storage_cast().value());
+                return static_cast<T>(var_.template cast<typename variant::uint64_storage>().value());
             case storage_kind::bool_value:
-                return static_cast<T>(var_.bool_storage_cast().value() ? 1 : 0);
+                return static_cast<T>(var_.template cast<typename variant::bool_storage>().value() ? 1 : 0);
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an integer"));
         }
@@ -3835,20 +3734,20 @@ public:
         switch (var_.storage())
         {
             case storage_kind::short_string_value:
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
             {
                 jsoncons::detail::string_to_double to_double;
                 // to_double() throws std::invalid_argument if conversion fails
                 return to_double(as_cstring(), as_string_view().length());
             }
             case storage_kind::half_value:
-                return jsoncons::detail::decode_half(var_.half_storage_cast().value());
+                return jsoncons::detail::decode_half(var_.template cast<typename variant::half_storage>().value());
             case storage_kind::double_value:
-                return var_.double_storage_cast().value();
+                return var_.template cast<typename variant::double_storage>().value();
             case storage_kind::int64_value:
-                return static_cast<double>(var_.int64_storage_cast().value());
+                return static_cast<double>(var_.template cast<typename variant::int64_storage>().value());
             case storage_kind::uint64_value:
-                return static_cast<double>(var_.uint64_storage_cast().value());
+                return static_cast<double>(var_.template cast<typename variant::uint64_storage>().value());
             default:
                 JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
         }
@@ -3870,11 +3769,6 @@ public:
         return var_.template as_byte_string<BAllocator>();
     }
 
-    basic_bignum<byte_allocator_type> as_bignum() const
-    {
-        return var_.as_bignum();
-    }
-
     template <class SAllocator=std::allocator<char_type>>
     std::basic_string<char_type,char_traits_type,SAllocator> as_string() const 
     {
@@ -3888,7 +3782,7 @@ public:
         switch (var_.storage())
         {
             case storage_kind::short_string_value:
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
             {
                 return string_type(as_string_view().data(),as_string_view().length(),alloc);
             }
@@ -3898,18 +3792,18 @@ public:
                 switch (tag())
                 {
                     case semantic_tag::base64:
-                        encode_base64(var_.byte_string_storage_cast().begin(), 
-                                      var_.byte_string_storage_cast().end(),
+                        encode_base64(var_.template cast<typename variant::byte_string_storage>().begin(), 
+                                      var_.template cast<typename variant::byte_string_storage>().end(),
                                       s);
                         break;
                     case semantic_tag::base16:
-                        encode_base16(var_.byte_string_storage_cast().begin(), 
-                                      var_.byte_string_storage_cast().end(),
+                        encode_base16(var_.template cast<typename variant::byte_string_storage>().begin(), 
+                                      var_.template cast<typename variant::byte_string_storage>().end(),
                                       s);
                         break;
                     default:
-                        encode_base64url(var_.byte_string_storage_cast().begin(), 
-                                         var_.byte_string_storage_cast().end(),
+                        encode_base64url(var_.template cast<typename variant::byte_string_storage>().begin(), 
+                                         var_.template cast<typename variant::byte_string_storage>().end(),
                                          s);
                         break;
                 }
@@ -3934,77 +3828,14 @@ public:
         }
     }
 
-    template <class SAllocator=std::allocator<char_type>>
-    std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_encode_options<char_type>& options) const 
-    {
-        return as_string(options,SAllocator());
-    }
-
-    template <class SAllocator=std::allocator<char_type>>
-    std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_encode_options<char_type>& options,
-                                                                       const SAllocator& alloc) const 
-    {
-        typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
-        switch (var_.storage())
-        {
-            case storage_kind::short_string_value:
-            case storage_kind::string_value:
-            {
-                return string_type(as_string_view().data(),as_string_view().length(),alloc);
-            }
-            case storage_kind::byte_string_value:
-            {
-                string_type s(alloc);
-                byte_string_chars_format format = jsoncons::detail::resolve_byte_string_chars_format(options.byte_string_format(), 
-                                                                                           byte_string_chars_format::none, 
-                                                                                           byte_string_chars_format::base64url);
-                switch (format)
-                {
-                    case byte_string_chars_format::base64:
-                        encode_base64(var_.byte_string_storage_cast().begin(), 
-                                      var_.byte_string_storage_cast().end(),
-                                      s);
-                        break;
-                    case byte_string_chars_format::base16:
-                        encode_base16(var_.byte_string_storage_cast().begin(), 
-                                      var_.byte_string_storage_cast().end(),
-                                      s);
-                        break;
-                    default:
-                        encode_base64url(var_.byte_string_storage_cast().begin(), 
-                                         var_.byte_string_storage_cast().end(),
-                                         s);
-                        break;
-                }
-                return s;
-            }
-            case storage_kind::array_value:
-            {
-                string_type s(alloc);
-                {
-                    basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s,options);
-                    dump(encoder);
-                }
-                return s;
-            }
-            default:
-            {
-                string_type s(alloc);
-                basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s,options);
-                dump(encoder);
-                return s;
-            }
-        }
-    }
-
     const char_type* as_cstring() const
     {
         switch (var_.storage())
         {
         case storage_kind::short_string_value:
-            return var_.short_string_storage_cast().c_str();
-        case storage_kind::string_value:
-            return var_.string_storage_cast().c_str();
+            return var_.template cast<typename variant::short_string_storage>().c_str();
+        case storage_kind::long_string_value:
+            return var_.template cast<typename variant::long_string_storage>().c_str();
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a cstring"));
         }
@@ -4628,7 +4459,7 @@ public:
             case storage_kind::double_value:
                 return json_type::double_value;
             case storage_kind::short_string_value:
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
                 return json_type::string_value;
             case storage_kind::byte_string_value:
                 return json_type::byte_string_value;
@@ -5169,13 +5000,13 @@ public:
         switch (var_.storage())
         {
         case storage_kind::double_value:
-            return static_cast<int>(var_.double_storage_cast().value());
+            return static_cast<int>(var_.template cast<typename variant::double_storage>().value());
         case storage_kind::int64_value:
-            return static_cast<int>(var_.int64_storage_cast().value());
+            return static_cast<int>(var_.template cast<typename variant::int64_storage>().value());
         case storage_kind::uint64_value:
-            return static_cast<int>(var_.uint64_storage_cast().value());
+            return static_cast<int>(var_.template cast<typename variant::uint64_storage>().value());
         case storage_kind::bool_value:
-            return var_.bool_storage_cast().value() ? 1 : 0;
+            return var_.template cast<typename variant::bool_storage>().value() ? 1 : 0;
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an int"));
         }
@@ -5187,13 +5018,13 @@ public:
         switch (var_.storage())
         {
         case storage_kind::double_value:
-            return static_cast<unsigned int>(var_.double_storage_cast().value());
+            return static_cast<unsigned int>(var_.template cast<typename variant::double_storage>().value());
         case storage_kind::int64_value:
-            return static_cast<unsigned int>(var_.int64_storage_cast().value());
+            return static_cast<unsigned int>(var_.template cast<typename variant::int64_storage>().value());
         case storage_kind::uint64_value:
-            return static_cast<unsigned int>(var_.uint64_storage_cast().value());
+            return static_cast<unsigned int>(var_.template cast<typename variant::uint64_storage>().value());
         case storage_kind::bool_value:
-            return var_.bool_storage_cast().value() ? 1 : 0;
+            return var_.template cast<typename variant::bool_storage>().value() ? 1 : 0;
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an unsigned int"));
         }
@@ -5205,13 +5036,13 @@ public:
         switch (var_.storage())
         {
         case storage_kind::double_value:
-            return static_cast<long>(var_.double_storage_cast().value());
+            return static_cast<long>(var_.template cast<typename variant::double_storage>().value());
         case storage_kind::int64_value:
-            return static_cast<long>(var_.int64_storage_cast().value());
+            return static_cast<long>(var_.template cast<typename variant::int64_storage>().value());
         case storage_kind::uint64_value:
-            return static_cast<long>(var_.uint64_storage_cast().value());
+            return static_cast<long>(var_.template cast<typename variant::uint64_storage>().value());
         case storage_kind::bool_value:
-            return var_.bool_storage_cast().value() ? 1 : 0;
+            return var_.template cast<typename variant::bool_storage>().value() ? 1 : 0;
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a long"));
         }
@@ -5223,13 +5054,13 @@ public:
         switch (var_.storage())
         {
         case storage_kind::double_value:
-            return static_cast<unsigned long>(var_.double_storage_cast().value());
+            return static_cast<unsigned long>(var_.template cast<typename variant::double_storage>().value());
         case storage_kind::int64_value:
-            return static_cast<unsigned long>(var_.int64_storage_cast().value());
+            return static_cast<unsigned long>(var_.template cast<typename variant::int64_storage>().value());
         case storage_kind::uint64_value:
-            return static_cast<unsigned long>(var_.uint64_storage_cast().value());
+            return static_cast<unsigned long>(var_.template cast<typename variant::uint64_storage>().value());
         case storage_kind::bool_value:
-            return var_.bool_storage_cast().value() ? 1 : 0;
+            return var_.template cast<typename variant::bool_storage>().value() ? 1 : 0;
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an unsigned long"));
         }
@@ -5416,7 +5247,7 @@ public:
         switch (var_.storage())
         {
         case storage_kind::array_value:
-            return var_.array_storage_cast().value();
+            return var_.template cast<typename variant::array_storage>().value();
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Bad array cast"));
             break;
@@ -5428,7 +5259,7 @@ public:
         switch (var_.storage())
         {
         case storage_kind::array_value:
-            return var_.array_storage_cast().value();
+            return var_.template cast<typename variant::array_storage>().value();
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Bad array cast"));
             break;
@@ -5443,7 +5274,7 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_kind::object_value:
-            return var_.object_storage_cast().value();
+            return var_.template cast<typename variant::object_storage>().value();
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Bad object cast"));
             break;
@@ -5458,7 +5289,7 @@ public:
             const_cast<basic_json*>(this)->create_object_implicitly(); // HERE
             JSONCONS_FALLTHROUGH;
         case storage_kind::object_value:
-            return var_.object_storage_cast().value();
+            return var_.template cast<typename variant::object_storage>().value();
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Bad object cast"));
             break;
@@ -5473,28 +5304,28 @@ private:
         switch (var_.storage())
         {
             case storage_kind::short_string_value:
-            case storage_kind::string_value:
+            case storage_kind::long_string_value:
                 handler.string_value(as_string_view(), var_.tag(), context, ec);
                 break;
             case storage_kind::byte_string_value:
-                handler.byte_string_value(var_.byte_string_storage_cast().data(), var_.byte_string_storage_cast().length(), 
+                handler.byte_string_value(var_.template cast<typename variant::byte_string_storage>().data(), var_.template cast<typename variant::byte_string_storage>().length(), 
                                           var_.tag(), context, ec);
                 break;
             case storage_kind::half_value:
-                handler.half_value(var_.half_storage_cast().value(), var_.tag(), context, ec);
+                handler.half_value(var_.template cast<typename variant::half_storage>().value(), var_.tag(), context, ec);
                 break;
             case storage_kind::double_value:
-                handler.double_value(var_.double_storage_cast().value(), 
+                handler.double_value(var_.template cast<typename variant::double_storage>().value(), 
                                      var_.tag(), context, ec);
                 break;
             case storage_kind::int64_value:
-                handler.int64_value(var_.int64_storage_cast().value(), var_.tag(), context, ec);
+                handler.int64_value(var_.template cast<typename variant::int64_storage>().value(), var_.tag(), context, ec);
                 break;
             case storage_kind::uint64_value:
-                handler.uint64_value(var_.uint64_storage_cast().value(), var_.tag(), context, ec);
+                handler.uint64_value(var_.template cast<typename variant::uint64_storage>().value(), var_.tag(), context, ec);
                 break;
             case storage_kind::bool_value:
-                handler.bool_value(var_.bool_storage_cast().value(), var_.tag(), context, ec);
+                handler.bool_value(var_.template cast<typename variant::bool_storage>().value(), var_.tag(), context, ec);
                 break;
             case storage_kind::null_value:
                 handler.null_value(var_.tag(), context, ec);

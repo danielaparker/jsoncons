@@ -22,14 +22,15 @@
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
 [Serialize with the C++ member names of the class](#G1)  
-[Serialize with the provided names using the `_NAMED_` macros](#G2)  
-[Serialize a templated class with the `_TPL_` macros](#G3)  
-[Specialize json_type_traits explicitly](#G4)  
-[Mapping to C++ data structures with and without defaults allowed](#G5)  
-[An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL](#G6)  
-[Serialize a polymorphic type based on the presence of members](#G7)  
-[Ensuring type selection is possible](#G8)  
-[Convert JSON numbers to/from boost multiprecision numbers](#G9)
+[Serialize with provided names using the `_NAMED_` macros](#G2)  
+[Serialize non-mandatory std::optional values using the convenience macros](#G3)  
+[Serialize a templated class with the `_TPL_` macros](#G4)  
+[Specialize json_type_traits explicitly](#G5)  
+[Mapping to C++ data structures with and without defaults allowed](#G6)  
+[An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_GETTER_CTOR_TRAITS](#G7)  
+[Serialize a polymorphic type based on the presence of members](#G8)  
+[Ensuring type selection is possible](#G9)  
+[Convert JSON numbers to/from boost multiprecision numbers](#G10)
 
 ### Construct
 
@@ -566,11 +567,11 @@ public:
 } // namespace ns
 
 // Declare the traits at global scope
-JSONCONS_ENUM_TRAITS_DECL(ns::BookCategory,fiction,biography)
+JSONCONS_ENUM_TRAITS(ns::BookCategory,fiction,biography)
 
-JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::Book1,category,author,title,price)
-JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::Book2,category,author,title,price)
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::Book3,category,author,title,price)
+JSONCONS_ALL_MEMBER_TRAITS(ns::Book1,category,author,title,price)
+JSONCONS_ALL_MEMBER_TRAITS(ns::Book2,category,author,title,price)
+JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::Book3,category,author,title,price)
 
 using namespace jsoncons; // for convenience
 
@@ -672,7 +673,7 @@ The output for (2), (3) and (4) is the same.
 
 <div id="G2"/>
 
-#### Serialize with the provided names using the `_NAMED_` macros
+#### Serialize with provided names using the `_NAMED_` macros
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -770,15 +771,15 @@ public:
 } // namespace ns
 
 // Declare the traits at global scope
-JSONCONS_ENUM_NAMED_TRAITS_DECL(ns::BookCategory,(fiction,"Fiction"),(biography,"Biography"))
+JSONCONS_ENUM_NAMED_TRAITS(ns::BookCategory,(fiction,"Fiction"),(biography,"Biography"))
 
-JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL(ns::Book1,(category,"Category"),(author,"Author"),
+JSONCONS_ALL_MEMBER_NAMED_TRAITS(ns::Book1,(category,"Category"),(author,"Author"),
                                                    (title,"Title"),(price,"Price"))
-JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL(ns::Book2,(category_,"Category"),(author_,"Author"),
+JSONCONS_ALL_MEMBER_NAMED_TRAITS(ns::Book2,(category_,"Category"),(author_,"Author"),
                                                    (title_,"Title"),(price_,"Price"))
-JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS_DECL(ns::Book3,(category,"Category"),(author,"Author"),
+JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS(ns::Book3,(category,"Category"),(author,"Author"),
                                                  (title,"Title"),(price,"Price"))
-JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS_DECL(ns::Book4,(getCategory,setCategory,"Category"),
+JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS(ns::Book4,(getCategory,setCategory,"Category"),
                                                           (getAuthor,setAuthor,"Author"),
                                                           (getTitle,setTitle,"Title"),
                                                           (getPrice,setPrice,"Price"))
@@ -900,6 +901,102 @@ The output for (2), (3) and (4) is the same.
 
 <div id="G3"/>
 
+#### Serialize non-mandatory std::optional values using the convenience macros
+
+This example assumes C++17 language support for `std::optional`.
+Lacking that, you can use `jsoncons::optional`.
+
+```c++
+#include <cassert>
+#include <jsoncons/json.hpp>
+
+namespace ns
+{
+    class MetaDataReplyTest 
+    {
+    public:
+        MetaDataReplyTest()
+            : description()
+        {
+        }
+        const std::string& GetStatus() const 
+        {
+            return status;
+        }
+        const std::string& GetPayload() const 
+        {
+            return payload;
+        }
+        const std::optional<std::string>& GetDescription() const 
+        {
+            return description;
+        }
+    private:
+        JSONCONS_TYPE_TRAITS_FRIEND;
+        std::string status;
+        std::string payload;
+        std::optional<std::string> description;
+    };
+}
+
+JSONCONS_N_MEMBER_TRAITS(ns::MetaDataReplyTest, 2, status, payload, description)
+
+using namespace jsoncons;
+
+int main()
+{
+    std::string input1 = R"({
+      "status": "OK",
+      "payload": "Modified",
+      "description": "TEST"
+    })";
+    std::string input2 = R"({
+      "status": "OK",
+      "payload": "Modified"
+    })";
+
+    auto val1 = decode_json<ns::MetaDataReplyTest>(input1);
+    assert(val1.GetStatus() == "OK");
+    assert(val1.GetPayload() == "Modified");
+    assert(val1.GetDescription());
+    assert(val1.GetDescription() == "TEST");
+
+    auto val2 = decode_json<ns::MetaDataReplyTest>(input2);
+    assert(val2.GetStatus() == "OK");
+    assert(val2.GetPayload() == "Modified");
+    assert(!val2.GetDescription());
+
+    std::string output1;
+    std::string output2;
+
+    encode_json(val2,output2,indenting::indent);
+    encode_json(val1,output1,indenting::indent);
+
+    std::cout << "(1)\n";
+    std::cout << output1 << "\n\n";
+
+    std::cout << "(2)\n";
+    std::cout << output2 << "\n\n";
+}
+```
+Output:
+```
+(1)
+{
+    "description": "TEST",
+    "payload": "Modified",
+    "status": "OK"
+}
+
+(2)
+{
+    "payload": "Modified",
+    "status": "OK"
+}
+```
+
+<div id="G4"/>
+
 #### Serialize a templated class with the `_TPL_` macros
 
 ```c++
@@ -927,7 +1024,7 @@ namespace ns {
 } // namespace ns
 
 // Declare the traits. Specify the number of template parameters and which data members need to be serialized.
-JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
+JSONCONS_TPL_ALL_MEMBER_TRAITS(2,ns::TemplatedStruct,aT1,aT2)
 
 using namespace jsoncons; // for convenience
 
@@ -945,7 +1042,7 @@ int main()
 }
 ```
 
-<div id="G4"/>
+<div id="G5"/>
 
 #### Specialize json_type_traits explicitly
 
@@ -1010,7 +1107,7 @@ To save typing and enhance readability, the jsoncons library defines macros,
 so you could also write
 
 ```c++
-JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::book, author, title, price)
+JSONCONS_ALL_MEMBER_TRAITS(ns::book, author, title, price)
 ```
 
 which expands to the code above.
@@ -1071,13 +1168,13 @@ Charles Bukowski, Pulp, 22.48
 ]
 ```
 
-<div id="G5"/>
+<div id="G6"/>
 
 #### Mapping to C++ data structures with and without defaults allowed
 
-The macros `JSONCONS_N_MEMBER_TRAITS_DECL` and `JSONCONS_ALL_MEMBER_TRAITS_DECL` both generate
-the code to specialize `json_type_traits` from member data. The difference is that `JSONCONS_N_MEMBER_TRAITS_DECL`
-does not require all member names to be present in the JSON data, while `JSONCONS_ALL_MEMBER_TRAITS_DECL` does.
+The macros `JSONCONS_N_MEMBER_TRAITS` and `JSONCONS_ALL_MEMBER_TRAITS` both generate
+the code to specialize `json_type_traits` from member data. The difference is that `JSONCONS_N_MEMBER_TRAITS`
+does not require all member names to be present in the JSON data, while `JSONCONS_ALL_MEMBER_TRAITS` does.
 
 ```c++
 #include <iostream>
@@ -1109,7 +1206,7 @@ namespace ns {
 } // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized, and how many are mandatory.
-JSONCONS_N_MEMBER_TRAITS_DECL(ns::Person, 2, name, surname, ssn, age)
+JSONCONS_N_MEMBER_TRAITS(ns::Person, 2, name, surname, ssn, age)
 
 int main()
 {
@@ -1141,24 +1238,24 @@ Output:
 
 If all members of the JSON data must be present, use
 ```
-JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
+JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name, surname, ssn, age)
 ```
 instead. This will cause an exception to be thrown with the message
 ```
 Key 'ssn' not found
 ```
 
-<div id="G6"/>
+<div id="G7"/>
 
-#### An example using JSONCONS_ENUM_TRAITS_DECL and JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL
+#### An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_GETTER_CTOR_TRAITS
 
-This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS_DECL`
-and `JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL` to specialize the 
+This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS`
+and `JSONCONS_ALL_GETTER_CTOR_TRAITS` to specialize the 
 [json_type_traits](doc/ref/json_type_traits.md) for the enum type
 `ns::hiking_experience` and the classes `ns::hiking_reputon` and 
 `ns::hiking_reputation`.
-The macro `JSONCONS_ENUM_TRAITS_DECL` generates the code from
-the enum values, and the macro `JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL` 
+The macro `JSONCONS_ENUM_TRAITS` generates the code from
+the enum values, and the macro `JSONCONS_ALL_GETTER_CTOR_TRAITS` 
 generates the code from the getter functions and a constructor. 
 These macro declarations must be placed outside any namespace blocks.
 
@@ -1230,9 +1327,9 @@ namespace ns {
 } // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputation, application, reputons)
+JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
+JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputon, rater, assertion, rated, rating)
+JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputation, application, reputons)
 
 using namespace jsoncons; // for convenience
 
@@ -1264,13 +1361,13 @@ Output:
 }
 ```
 
-<div id="G7"/>
+<div id="G8"/>
 
 #### Serialize a polymorphic type based on the presence of members
 
-This example uses the convenience macro `JSONCONS_N_GETTER_CTOR_TRAITS_DECL`
+This example uses the convenience macro `JSONCONS_N_GETTER_CTOR_TRAITS`
 to generate the `json_type_traits` boilerplate for the `HourlyEmployee` and `CommissionedEmployee` 
-derived classes, and `JSONCONS_POLYMORPHIC_TRAITS_DECL` to generate the `json_type_traits` boilerplate
+derived classes, and `JSONCONS_POLYMORPHIC_TRAITS` to generate the `json_type_traits` boilerplate
 for `std::shared_ptr<Employee>` and `std::unique_ptr<Employee>`. The type selection strategy is based
 on the presence of mandatory members, in particular, to the `firstName`, `lastName`, and `wage` members of an
 `HourlyEmployee`, and to the `firstName`, `lastName`, `baseSalary`, and `commission` members of a `CommissionedEmployee`.
@@ -1369,9 +1466,9 @@ public:
 
 } // ns
 
-JSONCONS_N_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, 3, firstName, lastName, wage, hours)
-JSONCONS_N_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, 4, firstName, lastName, baseSalary, commission, sales)
-JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
+JSONCONS_N_GETTER_CTOR_TRAITS(ns::HourlyEmployee, 3, firstName, lastName, wage, hours)
+JSONCONS_N_GETTER_CTOR_TRAITS(ns::CommissionedEmployee, 4, firstName, lastName, baseSalary, commission, sales)
+JSONCONS_POLYMORPHIC_TRAITS(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
 
 int main()
 {
@@ -1450,7 +1547,7 @@ Jane Doe, 30250
 ]
 ```
 
-<div id="G8"/>
+<div id="G9"/>
 
 #### Ensuring type selection is possible
 
@@ -1460,10 +1557,10 @@ example above, the type selection strategy is based
 on the presence of members in the derived classes. If
 derived classes cannot be distinguished in this way, 
 you can introduce extra members. The convenience
-macros `JSONCONS_N_MEMBER_TRAITS_DECL`, `JSONCONS_ALL_MEMBER_TRAITS_DECL`,
-`JSONCONS_TPL_N_MEMBER_TRAITS_DECL`, `JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL`,
-`JSONCONS_N_MEMBER_TRAITS_NAMED_DECL`, `JSONCONS_ALL_MEMBER_TRAITS_NAMED_DECL`,
-`JSONCONS_TPL_N_MEMBER_TRAITS_NAMED_DECL`, and `JSONCONS_TPL_ALL_MEMBER_TRAITS_NAMED_DECL`
+macros `JSONCONS_N_MEMBER_TRAITS`, `JSONCONS_ALL_MEMBER_TRAITS`,
+`JSONCONS_TPL_N_MEMBER_TRAITS`, `JSONCONS_TPL_ALL_MEMBER_TRAITS`,
+`JSONCONS_N_MEMBER_TRAITS_NAMED`, `JSONCONS_ALL_MEMBER_TRAITS_NAMED`,
+`JSONCONS_TPL_N_MEMBER_TRAITS_NAMED`, and `JSONCONS_TPL_ALL_MEMBER_TRAITS_NAMED`
 allow you to have `const` or `static const` data members that are serialized and that 
 particpate in the type selection strategy during deserialization. 
 
@@ -1490,9 +1587,9 @@ class Baz : public Foo
 
 } // ns
 
-JSONCONS_N_MEMBER_TRAITS_DECL(ns::Bar,1,bar)
-JSONCONS_N_MEMBER_TRAITS_DECL(ns::Baz,1,baz)
-JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Foo, ns::Bar, ns::Baz)
+JSONCONS_N_MEMBER_TRAITS(ns::Bar,1,bar)
+JSONCONS_N_MEMBER_TRAITS(ns::Baz,1,baz)
+JSONCONS_POLYMORPHIC_TRAITS(ns::Foo, ns::Bar, ns::Baz)
 
 int main()
 {
@@ -1531,7 +1628,7 @@ A bar
 A baz
 ```
 
-<div id="G9"/>
+<div id="G10"/>
 
 #### Convert JSON numbers to/from boost multiprecision numbers
 

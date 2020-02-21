@@ -433,11 +433,11 @@ int main()
 
         json_accessor_examples();
 
-        json_traits_macros_examples();
-
         json_traits_macros_named_examples();
 
         json_accessor_examples();
+
+        json_traits_macros_examples();
     }
     catch (const std::exception& e)
     {

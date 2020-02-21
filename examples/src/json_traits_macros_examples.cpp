@@ -10,185 +10,255 @@
 
 namespace json_type_traits_macros_examples_ns {
 
-class Foo
-{
-public:
-    virtual ~Foo() = default;
-};
-
-class Bar : public Foo
-{
-    static const bool bar = true;
-    JSONCONS_TYPE_TRAITS_FRIEND
-};
-
-class Baz : public Foo 
-{
-    static const bool baz = true;
-    JSONCONS_TYPE_TRAITS_FRIEND
-};
-
-enum class BookCategory {fiction,biography};
-
-// #1 Class with public member data and default constructor   
-struct Book1
-{
-    BookCategory category;
-    std::string author;
-    std::string title;
-    double price;
-};
-
-// #2 Class with private member data and default constructor   
-class Book2
-{
-    BookCategory category;
-    std::string author;
-    std::string title;
-    double price;
-    Book2() = default;
-
-    JSONCONS_TYPE_TRAITS_FRIEND
-public:
-    BookCategory get_category() const {return category;}
-
-    const std::string& get_author() const {return author;}
-
-    const std::string& get_title() const{return title;}
-
-    double get_price() const{return price;}
-};
-
-// #3 Class with getters and initializing constructor
-class Book3
-{
-    BookCategory category_;
-    std::string author_;
-    std::string title_;
-    double price_;
-public:
-    Book3(BookCategory category,
-          const std::string& author,
-          const std::string& title,
-          double price)
-        : category_(category), author_(author), title_(title), price_(price)
+    class Foo
     {
-    }
+    public:
+        virtual ~Foo() = default;
+    };
 
-    Book3(const Book3&) = default;
-    Book3(Book3&&) = default;
-    Book3& operator=(const Book3&) = default;
-    Book3& operator=(Book3&&) = default;
-
-    BookCategory category() const {return category_;}
-
-    const std::string& author() const{return author_;}
-
-    const std::string& title() const{return title_;}
-
-    double price() const{return price_;}
-};
-
-class Employee
-{
-    std::string firstName_;
-    std::string lastName_;
-public:
-    Employee(const std::string& firstName, const std::string& lastName)
-        : firstName_(firstName), lastName_(lastName)
+    class Bar : public Foo
     {
-    }
-    virtual ~Employee() = default;
+        static const bool bar = true;
+        JSONCONS_TYPE_TRAITS_FRIEND
+    };
 
-    virtual double calculatePay() const = 0;
-
-    const std::string& firstName() const {return firstName_;}
-    const std::string& lastName() const {return lastName_;}
-};
-
-class HourlyEmployee : public Employee
-{
-    double wage_;
-    unsigned hours_;
-public:
-    HourlyEmployee(const std::string& firstName, const std::string& lastName, 
-                   double wage, unsigned hours)
-        : Employee(firstName, lastName), 
-          wage_(wage), hours_(hours)
+    class Baz : public Foo 
     {
-    }
-    HourlyEmployee(const HourlyEmployee&) = default;
-    HourlyEmployee(HourlyEmployee&&) = default;
-    HourlyEmployee& operator=(const HourlyEmployee&) = default;
-    HourlyEmployee& operator=(HourlyEmployee&&) = default;
+        static const bool baz = true;
+        JSONCONS_TYPE_TRAITS_FRIEND
+    };
 
-    double wage() const {return wage_;}
+    enum class BookCategory {fiction,biography};
 
-    unsigned hours() const {return hours_;}
-
-    double calculatePay() const override
+    // #1 Class with public member data and default constructor   
+    struct Book1
     {
-        return wage_*hours_;
-    }
-};
+        BookCategory category;
+        std::string author;
+        std::string title;
+        double price;
+    };
 
-class CommissionedEmployee : public Employee
-{
-    double baseSalary_;
-    double commission_;
-    unsigned sales_;
-public:
-    CommissionedEmployee(const std::string& firstName, const std::string& lastName, 
-                         double baseSalary, double commission, unsigned sales)
-        : Employee(firstName, lastName), 
-          baseSalary_(baseSalary), commission_(commission), sales_(sales)
+    // #2 Class with private member data and default constructor   
+    class Book2
     {
-    }
-    CommissionedEmployee(const CommissionedEmployee&) = default;
-    CommissionedEmployee(CommissionedEmployee&&) = default;
-    CommissionedEmployee& operator=(const CommissionedEmployee&) = default;
-    CommissionedEmployee& operator=(CommissionedEmployee&&) = default;
+        BookCategory category;
+        std::string author;
+        std::string title;
+        double price;
+        Book2() = default;
 
-    double baseSalary() const
-    {
-        return baseSalary_;
-    }
+        JSONCONS_TYPE_TRAITS_FRIEND
+    public:
+        BookCategory get_category() const {return category;}
 
-    double commission() const
-    {
-        return commission_;
-    }
+        const std::string& get_author() const {return author;}
 
-    unsigned sales() const
-    {
-        return sales_;
-    }
+        const std::string& get_title() const{return title;}
 
-    double calculatePay() const override
+        double get_price() const{return price;}
+    };
+
+    // #3 Class with getters and initializing constructor
+    class Book3
     {
-        return baseSalary_ + commission_*sales_;
-    }
-};
-}
+        BookCategory category_;
+        std::string author_;
+        std::string title_;
+        double price_;
+    public:
+        Book3(BookCategory category,
+              const std::string& author,
+              const std::string& title,
+              double price)
+            : category_(category), author_(author), title_(title), price_(price)
+        {
+        }
+
+        Book3(const Book3&) = default;
+        Book3(Book3&&) = default;
+        Book3& operator=(const Book3&) = default;
+        Book3& operator=(Book3&&) = default;
+
+        BookCategory category() const {return category_;}
+
+        const std::string& author() const{return author_;}
+
+        const std::string& title() const{return title_;}
+
+        double price() const{return price_;}
+    };
+
+    class Employee
+    {
+        std::string firstName_;
+        std::string lastName_;
+    public:
+        Employee(const std::string& firstName, const std::string& lastName)
+            : firstName_(firstName), lastName_(lastName)
+        {
+        }
+        virtual ~Employee() = default;
+
+        virtual double calculatePay() const = 0;
+
+        const std::string& firstName() const {return firstName_;}
+        const std::string& lastName() const {return lastName_;}
+    };
+
+    class HourlyEmployee : public Employee
+    {
+        double wage_;
+        unsigned hours_;
+    public:
+        HourlyEmployee(const std::string& firstName, const std::string& lastName, 
+                       double wage, unsigned hours)
+            : Employee(firstName, lastName), 
+              wage_(wage), hours_(hours)
+        {
+        }
+        HourlyEmployee(const HourlyEmployee&) = default;
+        HourlyEmployee(HourlyEmployee&&) = default;
+        HourlyEmployee& operator=(const HourlyEmployee&) = default;
+        HourlyEmployee& operator=(HourlyEmployee&&) = default;
+
+        double wage() const {return wage_;}
+
+        unsigned hours() const {return hours_;}
+
+        double calculatePay() const override
+        {
+            return wage_*hours_;
+        }
+    };
+
+    class CommissionedEmployee : public Employee
+    {
+        double baseSalary_;
+        double commission_;
+        unsigned sales_;
+    public:
+        CommissionedEmployee(const std::string& firstName, const std::string& lastName, 
+                             double baseSalary, double commission, unsigned sales)
+            : Employee(firstName, lastName), 
+              baseSalary_(baseSalary), commission_(commission), sales_(sales)
+        {
+        }
+        CommissionedEmployee(const CommissionedEmployee&) = default;
+        CommissionedEmployee(CommissionedEmployee&&) = default;
+        CommissionedEmployee& operator=(const CommissionedEmployee&) = default;
+        CommissionedEmployee& operator=(CommissionedEmployee&&) = default;
+
+        double baseSalary() const
+        {
+            return baseSalary_;
+        }
+
+        double commission() const
+        {
+            return commission_;
+        }
+
+        unsigned sales() const
+        {
+            return sales_;
+        }
+
+        double calculatePay() const override
+        {
+            return baseSalary_ + commission_*sales_;
+        }
+    };
+#if defined(JSONCONS_HAS_STD_OPTIONAL)
+    class MetaDataReplyTest 
+    {
+    public:
+        MetaDataReplyTest()
+            : description()
+        {
+        }
+        const std::string& GetStatus() const 
+        {
+            return status;
+        }
+        const std::string& GetPayload() const 
+        {
+            return payload;
+        }
+        const std::optional<std::string>& GetDescription() const 
+        {
+            return description;
+        }
+    private:
+        JSONCONS_TYPE_TRAITS_FRIEND;
+        std::string status;
+        std::string payload;
+        std::optional<std::string> description;
+    };
+#endif
+
+} // json_type_traits_macros_examples_ns
 
 namespace ns = json_type_traits_macros_examples_ns;
 
 // Declare the traits at global scope
-JSONCONS_ENUM_TRAITS_DECL(ns::BookCategory,fiction,biography)
+JSONCONS_ENUM_TRAITS(ns::BookCategory,fiction,biography)
 
-JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::Book1,category,author,title,price)
-JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::Book2,category,author,title,price)
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::Book3,category,author,title,price)
+JSONCONS_ALL_MEMBER_TRAITS(ns::Book1,category,author,title,price)
+JSONCONS_ALL_MEMBER_TRAITS(ns::Book2,category,author,title,price)
+JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::Book3,category,author,title,price)
 
-JSONCONS_N_GETTER_CTOR_TRAITS_DECL(ns::HourlyEmployee, 3, firstName, lastName, wage, hours)
-JSONCONS_N_GETTER_CTOR_TRAITS_DECL(ns::CommissionedEmployee, 4, firstName, lastName, baseSalary, commission, sales)
-JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
+JSONCONS_N_GETTER_CTOR_TRAITS(ns::HourlyEmployee, 3, firstName, lastName, wage, hours)
+JSONCONS_N_GETTER_CTOR_TRAITS(ns::CommissionedEmployee, 4, firstName, lastName, baseSalary, commission, sales)
+JSONCONS_POLYMORPHIC_TRAITS(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
 
-JSONCONS_N_MEMBER_TRAITS_DECL(ns::Bar,1,bar)
-JSONCONS_N_MEMBER_TRAITS_DECL(ns::Baz,1,baz)
-JSONCONS_POLYMORPHIC_TRAITS_DECL(ns::Foo, ns::Bar, ns::Baz)
+JSONCONS_N_MEMBER_TRAITS(ns::Bar,1,bar)
+JSONCONS_N_MEMBER_TRAITS(ns::Baz,1,baz)
+JSONCONS_POLYMORPHIC_TRAITS(ns::Foo, ns::Bar, ns::Baz)
+
+#if defined(JSONCONS_HAS_STD_OPTIONAL)
+JSONCONS_N_MEMBER_TRAITS(ns::MetaDataReplyTest, 2, status, payload, description)
+#endif
 
 using namespace jsoncons;
+
+#if defined(JSONCONS_HAS_STD_OPTIONAL)
+static void json_type_traits_optional_examples()
+{
+    std::string input1 = R"({
+      "status": "OK",
+      "payload": "Modified",
+      "description": "TEST"
+    })";
+    std::string input2 = R"({
+      "status": "OK",
+      "payload": "Modified"
+    })";
+
+    auto val1 = decode_json<ns::MetaDataReplyTest>(input1);
+    assert(val1.GetStatus() == "OK");
+    assert(val1.GetPayload() == "Modified");
+    assert(val1.GetDescription());
+    assert(val1.GetDescription() == "TEST");
+
+    auto val2 = decode_json<ns::MetaDataReplyTest>(input2);
+    assert(val2.GetStatus() == "OK");
+    assert(val2.GetPayload() == "Modified");
+    assert(!val2.GetDescription());
+
+    std::string output1;
+    std::string output2;
+
+    encode_json(val2,output2,indenting::indent);
+    encode_json(val1,output1,indenting::indent);
+
+    std::cout << "(1)\n";
+    std::cout << output1 << "\n\n";
+
+    std::cout << "(2)\n";
+    std::cout << output2 << "\n\n";
+}
+#endif
 
 static void json_type_traits_book_examples()
 {
@@ -332,6 +402,10 @@ void json_traits_macros_examples()
     json_type_traits_book_examples();
     employee_polymorphic_example();
     foo_bar_baz_example();
+
+#if defined(JSONCONS_HAS_STD_OPTIONAL)
+    json_type_traits_optional_examples();
+#endif
 
     std::cout << std::endl;
 }

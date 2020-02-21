@@ -186,18 +186,18 @@ namespace jsoncons {
 } // namespace jsoncons
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_ALL_MEMBER_NAMED_TRAITS_DECL(ns::bond, (principal,"notional"), (maturity,"maturityDate"), (coupon,"couponRate"), (period,"frequency"))
+JSONCONS_ALL_MEMBER_NAMED_TRAITS(ns::bond, (principal,"notional"), (maturity,"maturityDate"), (coupon,"couponRate"), (period,"frequency"))
 
-JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputation, application, reputons)
+JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
+JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputon, rater, assertion, rated, rating)
+JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputation, application, reputons)
 
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::fixing, index_id, observation_date, rate)
-JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::employee, employeeNo, name, title)
+JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::fixing, index_id, observation_date, rate)
+JSONCONS_ALL_MEMBER_TRAITS(ns::employee, employeeNo, name, title)
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_ALL_MEMBER_TRAITS_DECL(ns::Person, name, surname, ssn, age)
+JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name, surname, ssn, age)
 
-JSONCONS_TPL_ALL_MEMBER_TRAITS_DECL(2,ns::TemplatedStruct,aT1,aT2)
+JSONCONS_TPL_ALL_MEMBER_TRAITS(2,ns::TemplatedStruct,aT1,aT2)
 
 #endif

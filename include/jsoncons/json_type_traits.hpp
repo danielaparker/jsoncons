@@ -18,6 +18,7 @@
 #include <limits> // std::numeric_limits
 #include <type_traits> // std::enable_if
 #include <iterator> // std::iterator_traits, std::input_iterator_tag
+#include <jsoncons/json_type.hpp>
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/detail/more_type_traits.hpp>
@@ -868,6 +869,27 @@ public:
     }
 };
 
+template<class Json, class T>
+struct json_type_traits<Json, jsoncons::optional<T>,
+                        typename std::enable_if<!is_json_type_traits_declared<jsoncons::optional<T>>::value>::type>
+{
+public:
+    static bool is(const Json& j) noexcept
+    {
+        return true;
+    }
+    
+    static jsoncons::optional<T> as(const Json& j)
+    { 
+        return j.is_null() ? jsoncons::optional<T>() : jsoncons::optional<T>(j.template as<T>());
+    }
+    
+    static Json to_json(const jsoncons::optional<T>& val)
+    {
+        return val.has_value() ? Json::null() : Json(val.value());
+    }
+};
+
 template<class Json>
 struct json_type_traits<Json, byte_string_view>
 {
@@ -898,12 +920,38 @@ struct json_type_traits<Json, basic_bignum<Allocator>>
 public:
     static bool is(const Json& j) noexcept
     {
-        return j.is_bignum();
+        switch (j.type())
+        {
+            case json_type::string_value:
+                return jsoncons::detail::is_base10(j.as_string_view().data(), j.as_string_view().length());
+            case json_type::int64_value:
+            case json_type::uint64_value:
+                return true;
+            default:
+                return false;
+        }
     }
     
     static basic_bignum<Allocator> as(const Json& j)
     {
-        return j.as_bignum();
+        switch (j.type())
+        {
+            case json_type::string_value:
+                if (!jsoncons::detail::is_base10(j.as_string_view().data(), j.as_string_view().length()))
+                {
+                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bignum"));
+                }
+                return basic_bignum<Allocator>(j.as_string_view().data(), j.as_string_view().length());
+            case json_type::half_value:
+            case json_type::double_value:
+                return basic_bignum<Allocator>(j.template as<double>());
+            case json_type::int64_value:
+                return basic_bignum<Allocator>(j.template as<int64_t>());
+            case json_type::uint64_value:
+                return basic_bignum<Allocator>(j.template as<uint64_t>());
+            default:
+                JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bignum"));
+        }
     }
     
     static Json to_json(const basic_bignum<Allocator>& val)
