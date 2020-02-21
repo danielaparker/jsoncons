@@ -3828,69 +3828,6 @@ public:
         }
     }
 
-    template <class SAllocator=std::allocator<char_type>>
-    std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_encode_options<char_type>& options) const 
-    {
-        return as_string(options,SAllocator());
-    }
-
-    template <class SAllocator=std::allocator<char_type>>
-    std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_encode_options<char_type>& options,
-                                                                       const SAllocator& alloc) const 
-    {
-        typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
-        switch (var_.storage())
-        {
-            case storage_kind::short_string_value:
-            case storage_kind::long_string_value:
-            {
-                return string_type(as_string_view().data(),as_string_view().length(),alloc);
-            }
-            case storage_kind::byte_string_value:
-            {
-                string_type s(alloc);
-                byte_string_chars_format format = jsoncons::detail::resolve_byte_string_chars_format(options.byte_string_format(), 
-                                                                                           byte_string_chars_format::none, 
-                                                                                           byte_string_chars_format::base64url);
-                switch (format)
-                {
-                    case byte_string_chars_format::base64:
-                        encode_base64(var_.template cast<typename variant::byte_string_storage>().begin(), 
-                                      var_.template cast<typename variant::byte_string_storage>().end(),
-                                      s);
-                        break;
-                    case byte_string_chars_format::base16:
-                        encode_base16(var_.template cast<typename variant::byte_string_storage>().begin(), 
-                                      var_.template cast<typename variant::byte_string_storage>().end(),
-                                      s);
-                        break;
-                    default:
-                        encode_base64url(var_.template cast<typename variant::byte_string_storage>().begin(), 
-                                         var_.template cast<typename variant::byte_string_storage>().end(),
-                                         s);
-                        break;
-                }
-                return s;
-            }
-            case storage_kind::array_value:
-            {
-                string_type s(alloc);
-                {
-                    basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s,options);
-                    dump(encoder);
-                }
-                return s;
-            }
-            default:
-            {
-                string_type s(alloc);
-                basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s,options);
-                dump(encoder);
-                return s;
-            }
-        }
-    }
-
     const char_type* as_cstring() const
     {
         switch (var_.storage())

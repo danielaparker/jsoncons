@@ -1,3 +1,26 @@
+v0.145.0
+--------
+
+Bug fixes:
+
+- Fixed [compiler warning with clang](https://github.com/danielaparker/jsoncons/issues/214)
+ 
+- Fixed [Missing return in typed_array](https://github.com/danielaparker/jsoncons/issues/213) 
+
+Name changes:
+
+- The `json_type_traits` convenience macro names ending in `_DECL` have been shortened 
+  by dropping the `_DECL` suffix, e.g. the old name `JSONCONS_N_MEMBER_TRAITS_DECL` is now
+  `JSONCONS_N_MEMBER_TRAITS`. The old names are still supported.
+
+Enhancements:
+
+- Includes `json_type_traits` specialization for `std::optional` if C++ 17. `nullopt` values
+are mapped to JSON null values. 
+
+- When encoding to JSON, the `json_type_traits` convenience macros will exlude altogether a non-mandatory 
+`nullopt` value from the JSON output.
+
 v0.144.0
 --------
 

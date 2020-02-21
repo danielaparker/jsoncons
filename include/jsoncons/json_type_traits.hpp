@@ -870,7 +870,8 @@ public:
 };
 
 template<class Json, class U>
-struct json_type_traits<Json, jsoncons::optional<U>>
+struct json_type_traits<Json, jsoncons::optional<U>,
+                        typename std::enable_if<!is_json_type_traits_declared<jsoncons::optional<U>>::value>::type>
 {
 public:
     static bool is(const Json& j) noexcept
