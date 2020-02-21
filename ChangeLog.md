@@ -19,7 +19,7 @@ Enhancements:
 are mapped to JSON null values. 
 
 - When encoding to JSON, the `json_type_traits` convenience macros will exlude altogether a non-mandatory 
-`nullopt` value from the JSON output.
+`std::optional` `nullopt` value from the JSON output.
 
 v0.144.0
 --------
