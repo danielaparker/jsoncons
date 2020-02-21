@@ -320,88 +320,107 @@ namespace detail
     }
 
     template <class T1, class T2>
-    constexpr bool operator==(const optional<T1>& lhs, const optional<T2>& rhs) {
+    constexpr bool operator==(const optional<T1>& lhs, const optional<T2>& rhs) 
+    {
         const bool lhs_has_value = lhs.has_value();
         return lhs_has_value == rhs.has_value() && (!lhs_has_value || *lhs == *rhs);
     }
 
     template <class T1, class T2>
-    constexpr bool operator!=(const optional<T1>& lhs, const optional<T2>& rhs) {
+    constexpr bool operator!=(const optional<T1>& lhs, const optional<T2>& rhs) 
+    {
         const bool lhs_has_value = lhs.has_value();
         return lhs_has_value != rhs.has_value() || (lhs_has_value && *lhs != *rhs);
     }
 
     template <class T1, class T2>
-    constexpr bool operator<(const optional<T1>& lhs, const optional<T2>& rhs) {
+    constexpr bool operator<(const optional<T1>& lhs, const optional<T2>& rhs) 
+    {
         return rhs.has_value() && (!lhs.has_value() || *lhs < *rhs);
     }
 
     template <class T1, class T2>
-    constexpr bool operator>(const optional<T1>& lhs, const optional<T2>& rhs) {
+    constexpr bool operator>(const optional<T1>& lhs, const optional<T2>& rhs) 
+    {
         return lhs.has_value() && (!rhs.has_value() || *lhs > *rhs);
     }
 
     template <class T1, class T2>
-    constexpr bool operator<=(const optional<T1>& lhs, const optional<T2>& rhs) {
+    constexpr bool operator<=(const optional<T1>& lhs, const optional<T2>& rhs) 
+    {
         return !lhs.has_value() || (rhs.has_value() && *lhs <= *rhs);
     }
 
     template <class T1, class T2>
-    constexpr bool operator>=(const optional<T1>& lhs, const optional<T2>& rhs) {
+    constexpr bool operator>=(const optional<T1>& lhs, const optional<T2>& rhs) 
+    {
         return !rhs.has_value() || (lhs.has_value() && *lhs >= *rhs);
     }
 
     template <class T1, class T2>
-    constexpr bool operator==(const optional<T1>& lhs, const T2& rhs) {
+    constexpr bool operator==(const optional<T1>& lhs, const T2& rhs) 
+    {
         return lhs ? *lhs == rhs : false;
     }
     template <class T1, class T2>
-    constexpr bool operator==(const T1& lhs, const optional<T2>& rhs) {
+    constexpr bool operator==(const T1& lhs, const optional<T2>& rhs) 
+    {
         return rhs ? lhs == *rhs : false;
     }
 
     template <class T1, class T2>
-    constexpr bool operator!=(const optional<T1>& lhs, const T2& rhs) {
+    constexpr bool operator!=(const optional<T1>& lhs, const T2& rhs) 
+    {
         return lhs ? *lhs != rhs : true;
     }
     template <class T1, class T2>
-    constexpr bool operator!=(const T1& lhs, const optional<T2>& rhs) {
+    constexpr bool operator!=(const T1& lhs, const optional<T2>& rhs) 
+    {
         return rhs ? lhs != *rhs : true;
     }
 
     template <class T1, class T2>
-    constexpr bool operator<(const optional<T1>& lhs, const T2& rhs) {
+    constexpr bool operator<(const optional<T1>& lhs, const T2& rhs) 
+    {
         return lhs ? *lhs < rhs : true;
     }
     template <class T1, class T2>
-    constexpr bool operator<(const T1& lhs, const optional<T2>& rhs) {
+    constexpr bool operator<(const T1& lhs, const optional<T2>& rhs) 
+    {
         return rhs ? lhs < *rhs : false;
     }
 
     template <class T1, class T2>
-    constexpr bool operator<=(const optional<T1>& lhs, const T2& rhs) {
+    constexpr bool operator<=(const optional<T1>& lhs, const T2& rhs) 
+    {
         return lhs ? *lhs <= rhs : true;
     }
     template <class T1, class T2>
-    constexpr bool operator<=(const T1& lhs, const optional<T2>& rhs) {
+    constexpr bool operator<=(const T1& lhs, const optional<T2>& rhs) 
+    {
         return rhs ? lhs <= *rhs : false;
     }
 
     template <class T1, class T2>
-    constexpr bool operator>(const optional<T1>& lhs, const T2& rhs) {
+    constexpr bool operator>(const optional<T1>& lhs, const T2& rhs) 
+    {
         return lhs ? *lhs > rhs : false;
     }
+
     template <class T1, class T2>
-    constexpr bool operator>(const T1& lhs, const optional<T2>& rhs) {
+    constexpr bool operator>(const T1& lhs, const optional<T2>& rhs) 
+    {
         return rhs ? lhs > *rhs : true;
     }
 
     template <class T1, class T2>
-    constexpr bool operator>=(const optional<T1>& lhs, const T2& rhs) {
+    constexpr bool operator>=(const optional<T1>& lhs, const T2& rhs) 
+    {
         return lhs ? *lhs >= rhs : false;
     }
     template <class T1, class T2>
-    constexpr bool operator>=(const T1& lhs, const optional<T2>& rhs) {
+    constexpr bool operator>=(const T1& lhs, const optional<T2>& rhs) 
+    {
         return rhs ? lhs >= *rhs : true;
     }
 
