@@ -23,7 +23,7 @@
 
 [Serialize with the C++ member names of the class](#G1)  
 [Serialize with provided names using the `_NAMED_` macros](#G2)  
-[Serialize std::optional values](#G3)  
+[Serialize non-mandatory std::optional values using the convenience macros](#G3)  
 [Serialize a templated class with the `_TPL_` macros](#G4)  
 [Specialize json_type_traits explicitly](#G5)  
 [Mapping to C++ data structures with and without defaults allowed](#G6)  
@@ -901,7 +901,7 @@ The output for (2), (3) and (4) is the same.
 
 <div id="G3"/>
 
-#### Serialize std::optional values
+#### Serialize non-mandatory std::optional values using the convenience macros
 
 This example assumes C++17 language support for `std::optional`.
 Lacking that, you can use `jsoncons::optional`.
