@@ -869,9 +869,9 @@ public:
     }
 };
 
-template<class Json, class U>
-struct json_type_traits<Json, jsoncons::optional<U>,
-                        typename std::enable_if<!is_json_type_traits_declared<jsoncons::optional<U>>::value>::type>
+template<class Json, class T>
+struct json_type_traits<Json, jsoncons::optional<T>,
+                        typename std::enable_if<!is_json_type_traits_declared<jsoncons::optional<T>>::value>::type>
 {
 public:
     static bool is(const Json& j) noexcept
@@ -879,12 +879,12 @@ public:
         return true;
     }
     
-    static jsoncons::optional<U> as(const Json& j)
+    static jsoncons::optional<T> as(const Json& j)
     { 
-        return j.is_null() ? jsoncons::optional<U>() : jsoncons::optional<U>(j.template as<U>());
+        return j.is_null() ? jsoncons::optional<T>() : jsoncons::optional<T>(j.template as<T>());
     }
     
-    static Json to_json(const jsoncons::optional<U>& val)
+    static Json to_json(const jsoncons::optional<T>& val)
     {
         return val.has_value() ? Json::null() : Json(val.value());
     }
