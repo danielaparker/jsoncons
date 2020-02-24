@@ -351,7 +351,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag, const ser_context&, std::error_code&) override
+    bool do_null(semantic_tag, const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)
@@ -400,7 +400,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code&) override
+    bool do_string(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)
@@ -449,7 +449,7 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const byte_string_view& b, 
+    bool do_byte_string(const byte_string_view& b, 
                               semantic_tag tag, 
                               const ser_context& context,
                               std::error_code& ec) override
@@ -478,19 +478,19 @@ private:
             case byte_string_chars_format::base16:
             {
                 encode_base16(b.begin(),b.end(),s);
-                do_string_value(s, semantic_tag::none, context, ec);
+                do_string(s, semantic_tag::none, context, ec);
                 break;
             }
             case byte_string_chars_format::base64:
             {
                 encode_base64(b.begin(),b.end(),s);
-                do_string_value(s, semantic_tag::none, context, ec);
+                do_string(s, semantic_tag::none, context, ec);
                 break;
             }
             case byte_string_chars_format::base64url:
             {
                 encode_base64url(b.begin(),b.end(),s);
-                do_string_value(s, semantic_tag::none, context, ec);
+                do_string(s, semantic_tag::none, context, ec);
                 break;
             }
             default:
@@ -502,7 +502,7 @@ private:
         return true;
     }
 
-    bool do_double_value(double val, 
+    bool do_double(double val, 
                          semantic_tag, 
                          const ser_context& context,
                          std::error_code& ec) override
@@ -554,7 +554,7 @@ private:
         return true;
     }
 
-    bool do_int64_value(int64_t val, 
+    bool do_int64(int64_t val, 
                         semantic_tag, 
                         const ser_context&,
                         std::error_code&) override
@@ -606,7 +606,7 @@ private:
         return true;
     }
 
-    bool do_uint64_value(uint64_t val, 
+    bool do_uint64(uint64_t val, 
                          semantic_tag, 
                          const ser_context&,
                          std::error_code&) override
@@ -658,7 +658,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool val, semantic_tag, const ser_context&, std::error_code&) override
+    bool do_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)
@@ -750,7 +750,7 @@ private:
                 }
                 else if (options_.enable_nan_to_str())
                 {
-                    do_string_value(options_.nan_to_str(), semantic_tag::none, context, ec);
+                    do_string(options_.nan_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -765,7 +765,7 @@ private:
                 }
                 else if (options_.enable_inf_to_str())
                 {
-                    do_string_value(options_.inf_to_str(), semantic_tag::none, context, ec);
+                    do_string(options_.inf_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -780,7 +780,7 @@ private:
                 }
                 else if (options_.enable_neginf_to_str())
                 {
-                    do_string_value(options_.neginf_to_str(), semantic_tag::none, context, ec);
+                    do_string(options_.neginf_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {

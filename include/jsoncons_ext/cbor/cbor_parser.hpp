@@ -411,10 +411,6 @@ private:
                         }
                         case jsoncons::cbor::detail::cbor_major_type::byte_string:
                         {
-                            //auto read = [&str](std::vector<uint8_t>& v, std::error_code&)
-                            //{
-                            //    v = str.bytes;
-                            //};
                             read_byte_string_from_buffer read(byte_string_view(str.bytes.data(), str.bytes.size()));
                             write_byte_string(read, handler, ec);
                             if (ec)
@@ -464,10 +460,6 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::byte_string:
             {
-                //auto read = [this](std::vector<uint8_t>& v, std::error_code& ec) 
-                //{
-                //    this->get_byte_string(v, ec);
-                //};
                 read_byte_string_from_source read(this);
                 write_byte_string(read, handler, ec);
                 if (ec)

@@ -270,7 +270,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag tag, const ser_context&, std::error_code&) override
+    bool do_null(semantic_tag tag, const ser_context&, std::error_code&) override
     {
         if (tag == semantic_tag::undefined)
         {
@@ -540,13 +540,13 @@ private:
             }
             scale += sink.value();
         }
-        more = do_int64_value(scale, semantic_tag::none, context, ec);
+        more = do_int64(scale, semantic_tag::none, context, ec);
         if (!more) {return more;}
 
         auto sink = jsoncons::detail::integer_from_json<int64_t>(s.data(),s.length());
         if (sink)
         {
-            more = do_int64_value(sink.value(), semantic_tag::none, context, ec);
+            more = do_int64(sink.value(), semantic_tag::none, context, ec);
             if (!more) {return more;}
         }
         else if (sink.error_code() == jsoncons::detail::to_integer_errc::overflow)
@@ -721,13 +721,13 @@ private:
             }
             scale += sink.value();
         }
-        more = do_int64_value(scale, semantic_tag::none, context, ec);
+        more = do_int64(scale, semantic_tag::none, context, ec);
         if (!more) return more;
 
         auto sink = jsoncons::detail::base16_to_integer<int64_t>(s.data(),s.length());
         if (sink)
         {
-            more = do_int64_value(sink.value(), semantic_tag::none, context, ec);
+            more = do_int64(sink.value(), semantic_tag::none, context, ec);
             if (!more) return more;
         }
         else if (sink.error_code() == jsoncons::detail::to_integer_errc::overflow)
@@ -743,7 +743,7 @@ private:
         return do_end_array(context, ec);
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+    bool do_string(const string_view_type& sv, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         switch (tag)
         {
@@ -801,7 +801,7 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const byte_string_view& b, 
+    bool do_byte_string(const byte_string_view& b, 
                               semantic_tag tag, 
                               const ser_context&,
                               std::error_code&) override
@@ -902,7 +902,7 @@ private:
         }
     }
 
-    bool do_double_value(double val, 
+    bool do_double(double val, 
                          semantic_tag tag,
                          const ser_context&,
                          std::error_code&) override
@@ -932,7 +932,7 @@ private:
         return true;
     }
 
-    bool do_int64_value(int64_t value, 
+    bool do_int64(int64_t value, 
                         semantic_tag tag, 
                         const ser_context&,
                         std::error_code&) override
@@ -1017,7 +1017,7 @@ private:
         return true;
     }
 
-    bool do_uint64_value(uint64_t value, 
+    bool do_uint64(uint64_t value, 
                          semantic_tag tag, 
                          const ser_context&,
                          std::error_code&) override
@@ -1094,7 +1094,7 @@ private:
         }
     }
 
-    bool do_bool_value(bool value, semantic_tag, const ser_context&, std::error_code&) override
+    bool do_bool(bool value, semantic_tag, const ser_context&, std::error_code&) override
     {
         if (value)
         {
@@ -1467,7 +1467,7 @@ private:
         more = do_begin_array(shape.size(), semantic_tag::none, context, ec);
         for (auto it = shape.begin(); more && it != shape.end(); ++it)
         {
-            more = do_uint64_value(*it, semantic_tag::none, context, ec);
+            more = do_uint64(*it, semantic_tag::none, context, ec);
         }
         if (more)
         {

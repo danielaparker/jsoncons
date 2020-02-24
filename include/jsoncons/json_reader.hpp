@@ -90,7 +90,7 @@ private:
         return other_handler_.name(target, context, ec);
     }
 
-    bool do_string_value(const string_view_type& value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+    bool do_string(const string_view_type& value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         std::basic_string<CharT> target;
         auto result = unicons::convert(
@@ -104,7 +104,7 @@ private:
         return other_handler_.string_value(target, tag, context, ec);
     }
 
-    bool do_int64_value(int64_t value, 
+    bool do_int64(int64_t value, 
                         semantic_tag tag, 
                         const ser_context& context,
                         std::error_code& ec) override
@@ -112,7 +112,7 @@ private:
         return other_handler_.int64_value(value, tag, context, ec);
     }
 
-    bool do_uint64_value(uint64_t value, 
+    bool do_uint64(uint64_t value, 
                          semantic_tag tag, 
                          const ser_context& context,
                          std::error_code& ec) override
@@ -120,7 +120,7 @@ private:
         return other_handler_.uint64_value(value, tag, context, ec);
     }
 
-    bool do_half_value(uint16_t value, 
+    bool do_half(uint16_t value, 
                        semantic_tag tag,
                        const ser_context& context,
                        std::error_code& ec) override
@@ -128,7 +128,7 @@ private:
         return other_handler_.half_value(value, tag, context, ec);
     }
 
-    bool do_double_value(double value, 
+    bool do_double(double value, 
                          semantic_tag tag,
                          const ser_context& context,
                          std::error_code& ec) override
@@ -136,12 +136,12 @@ private:
         return other_handler_.double_value(value, tag, context, ec);
     }
 
-    bool do_bool_value(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+    bool do_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         return other_handler_.bool_value(value, tag, context, ec);
     }
 
-    bool do_null_value(semantic_tag tag, const ser_context& context, std::error_code& ec) override
+    bool do_null(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         return other_handler_.null_value(tag, context, ec);
     }

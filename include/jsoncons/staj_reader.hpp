@@ -1560,25 +1560,25 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_null_value(semantic_tag tag, const ser_context& context, std::error_code&) override
+    bool do_null(semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::null_value, tag);
         return !filter_(event_, context);
     }
 
-    bool do_bool_value(bool value, semantic_tag tag, const ser_context& context, std::error_code&) override
+    bool do_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
         return !filter_(event_, context);
     }
 
-    bool do_string_value(const string_view_type& s, semantic_tag tag, const ser_context& context, std::error_code&) override
+    bool do_string(const string_view_type& s, semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(s, staj_event_type::string_value, tag);
         return !filter_(event_, context);
     }
 
-    bool do_byte_string_value(const byte_string_view& s, 
+    bool do_byte_string(const byte_string_view& s, 
                               semantic_tag tag,
                               const ser_context& context,
                               std::error_code&) override
@@ -1587,7 +1587,7 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_int64_value(int64_t value, 
+    bool do_int64(int64_t value, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code&) override
@@ -1596,7 +1596,7 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_uint64_value(uint64_t value, 
+    bool do_uint64(uint64_t value, 
                          semantic_tag tag, 
                          const ser_context& context,
                          std::error_code&) override
@@ -1605,7 +1605,7 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_double_value(double value, 
+    bool do_double(double value, 
                          semantic_tag tag, 
                          const ser_context& context,
                          std::error_code&) override

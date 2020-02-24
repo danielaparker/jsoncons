@@ -212,7 +212,7 @@ private:
         return false;
     }
 
-    bool do_uint64_value(uint64_t value, 
+    bool do_uint64(uint64_t value, 
                          semantic_tag, 
                          const ser_context&,
                          std::error_code&) override
@@ -221,7 +221,7 @@ private:
         return true;
     }
 
-    bool do_int64_value(int64_t value, 
+    bool do_int64(int64_t value, 
                         semantic_tag,
                         const ser_context&,
                         std::error_code&) override
@@ -230,27 +230,27 @@ private:
         return true;
     }
 
-    bool do_half_value(uint16_t value, 
+    bool do_half(uint16_t value, 
                        semantic_tag,
                        const ser_context&,
                        std::error_code&) override
     {
-        return do_half_value_(typename std::integral_constant<bool, std::is_integral<value_type>::value>::type(), value);
+        return do_half_(typename std::integral_constant<bool, std::is_integral<value_type>::value>::type(), value);
     }
 
-    bool do_half_value_(std::true_type, uint16_t value)
+    bool do_half_(std::true_type, uint16_t value)
     {
         v_.push_back(static_cast<value_type>(value));
         return true;
     }
 
-    bool do_half_value_(std::false_type, uint16_t value)
+    bool do_half_(std::false_type, uint16_t value)
     {
         v_.push_back(static_cast<value_type>(jsoncons::detail::decode_half(value)));
         return true;
     }
 
-    bool do_double_value(double value, 
+    bool do_double(double value, 
                          semantic_tag,
                          const ser_context&,
                          std::error_code&) override

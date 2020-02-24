@@ -215,7 +215,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
+    bool do_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         switch (structure_stack_.back().type_)
         {
@@ -231,7 +231,7 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const byte_string_view& b, 
+    bool do_byte_string(const byte_string_view& b, 
                               semantic_tag tag, 
                               const ser_context&,
                               std::error_code&) override
@@ -250,7 +250,7 @@ private:
         return true;
     }
 
-    bool do_int64_value(int64_t value, 
+    bool do_int64(int64_t value, 
                         semantic_tag tag, 
                         const ser_context&,
                         std::error_code&) override
@@ -269,7 +269,7 @@ private:
         return true;
     }
 
-    bool do_uint64_value(uint64_t value, 
+    bool do_uint64(uint64_t value, 
                          semantic_tag tag, 
                          const ser_context&,
                          std::error_code&) override
@@ -288,7 +288,7 @@ private:
         return true;
     }
 
-    bool do_half_value(uint16_t value, 
+    bool do_half(uint16_t value, 
                        semantic_tag tag,   
                        const ser_context&,
                        std::error_code&) override
@@ -307,7 +307,7 @@ private:
         return true;
     }
 
-    bool do_double_value(double value, 
+    bool do_double(double value, 
                          semantic_tag tag,   
                          const ser_context&,
                          std::error_code&) override
@@ -326,7 +326,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool value, semantic_tag tag, const ser_context&, std::error_code&) override
+    bool do_bool(bool value, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         switch (structure_stack_.back().type_)
         {
@@ -342,7 +342,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag tag, const ser_context&, std::error_code&) override
+    bool do_null(semantic_tag tag, const ser_context&, std::error_code&) override
     {
         switch (structure_stack_.back().type_)
         {

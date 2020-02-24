@@ -30,7 +30,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& s, 
+    bool do_string(const string_view_type& s, 
                          semantic_tag tag,
                          const ser_context& context,
                          std::error_code&) override
