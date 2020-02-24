@@ -20,26 +20,26 @@ namespace detail
     template <typename T>
     class optional;
 
-    template <typename T, typename U>
+    template <typename T1, typename T2>
     struct is_constructible_or_convertible_from_optional
         : std::integral_constant<
-              bool, std::is_constructible<T, optional<U>&>::value ||
-                    std::is_constructible<T, optional<U>&&>::value ||
-                    std::is_constructible<T, const optional<U>&>::value ||
-                    std::is_constructible<T, const optional<U>&&>::value ||
-                    std::is_convertible<optional<U>&, T>::value ||
-                    std::is_convertible<optional<U>&&, T>::value ||
-                    std::is_convertible<const optional<U>&, T>::value ||
-                    std::is_convertible<const optional<U>&&, T>::value> {};
+              bool, std::is_constructible<T1, optional<T2>&>::value ||
+                    std::is_constructible<T1, optional<T2>&&>::value ||
+                    std::is_constructible<T1, const optional<T2>&>::value ||
+                    std::is_constructible<T1, const optional<T2>&&>::value ||
+                    std::is_convertible<optional<T2>&, T1>::value ||
+                    std::is_convertible<optional<T2>&&, T1>::value ||
+                    std::is_convertible<const optional<T2>&, T1>::value ||
+                    std::is_convertible<const optional<T2>&&, T1>::value> {};
 
-    template <typename T, typename U>
+    template <typename T1, typename T2>
     struct is_constructible_convertible_or_assignable_from_optional
         : std::integral_constant<
-              bool, is_constructible_or_convertible_from_optional<T, U>::value ||
-                    std::is_assignable<T&, optional<U>&>::value ||
-                    std::is_assignable<T&, optional<U>&&>::value ||
-                    std::is_assignable<T&, const optional<U>&>::value ||
-                    std::is_assignable<T&, const optional<U>&&>::value> {};
+              bool, is_constructible_or_convertible_from_optional<T1, T2>::value ||
+                    std::is_assignable<T1&, optional<T2>&>::value ||
+                    std::is_assignable<T1&, optional<T2>&&>::value ||
+                    std::is_assignable<T1&, const optional<T2>&>::value ||
+                    std::is_assignable<T1&, const optional<T2>&&>::value> {};
 
     template <typename T>
     class optional
@@ -58,6 +58,7 @@ namespace detail
         {
         }
         
+        // copy constructors
         optional(const optional<T>& other)
             : has_value_(false)
         {
@@ -67,6 +68,7 @@ namespace detail
             }
         }
 
+        // converting
         template <class U,
                   typename std::enable_if<!std::is_same<T,U>::value &&
                                           std::is_constructible<T, const U&>::value &&
@@ -97,6 +99,7 @@ namespace detail
             }
         }
 
+        // move constructors
         template <class T2 = T>
         optional(optional<T>&& other,
                  typename std::enable_if<std::is_move_constructible<typename std::decay<T2>::type>::value>::type* = 0)
@@ -108,21 +111,47 @@ namespace detail
             }
        }
 
-        template <class U = T>
-        optional(U&& value,
-             typename std::enable_if<std::is_constructible<T, U&&>::value &&
+        // converting 
+        template <class U>
+        optional(optional<U>&& value,
+             typename std::enable_if<!std::is_same<T,U>::value &&
+                                     std::is_constructible<T, U&&>::value &&
+                                     !is_constructible_or_convertible_from_optional<T,U>::value &&
                                      std::is_convertible<U&&,T>::value,int>::type = 0) // (8)
             : has_value_(true), value_(std::forward<U>(value))
         {
         }
 
-        template <class U = T>
-        explicit optional(U&& value,
-                         typename std::enable_if<std::is_constructible<T, U&&>::value &&
-                                                !std::is_convertible<U&&,T>::value,int>::type = 0) // (8)
+        template <class U>
+        explicit optional(optional<U>&& value,
+                         typename std::enable_if<!std::is_same<T,U>::value &&
+                                                 std::is_constructible<T, U&&>::value &&
+                                                 !is_constructible_or_convertible_from_optional<T,U>::value &&
+                                                 !std::is_convertible<U&&,T>::value,int>::type = 0) // (8)
             : has_value_(true), value_(std::forward<U>(value))
         {
         }
+
+
+        // value constructors
+        template <class T2 = T>
+        optional(T&& value,
+             typename std::enable_if<!std::is_same<optional<T>,typename std::decay<T2>::type>::value &&
+                                     std::is_constructible<T, T2&&>::value &&
+                                     std::is_convertible<T2&&,T>::value,int>::type = 0) // (8)
+            : has_value_(true), value_(std::forward<T2>(value))
+        {
+        }
+
+        template <class T2=T>
+        explicit optional(T2&& value,
+                         typename std::enable_if<!std::is_same<optional<T>,typename std::decay<T2>::type>::value &&
+                                                 std::is_constructible<T, T2&&>::value &&
+                                                 !std::is_convertible<T2&&,T>::value,int>::type = 0) // (8)
+            : has_value_(true), value_(std::forward<T2>(value))
+        {
+        }
+
         ~optional()
         {
             destroy();
@@ -154,21 +183,10 @@ namespace detail
             return *this;
         }
 
-        template <typename U=T>
-        typename std::enable_if<!std::is_same<optional<T>, typename std::decay<U>::type>::value &&
-                                std::is_constructible<T, U>::value &&
-                                std::is_assignable<T&, U>::value &&
-                                !(std::is_scalar<T>::value && std::is_same<T, typename std::decay<U>::type>::value),
-            optional&>::type
-        operator=(U&& v)
-        {
-            assign(std::forward<U>(v));
-            return *this;
-        }
-
         template <typename U>
         typename std::enable_if<!std::is_same<optional<T>, U>::value &&
                                 std::is_constructible<T, const U&>::value &&
+                               !is_constructible_or_convertible_or_assignable_from_optional<T,U>::value &&
                                 std::is_assignable<T&, const U&>::value,
             optional&>::type
         operator=(const optional<U>& other)
@@ -187,6 +205,7 @@ namespace detail
         template <typename U>
         typename std::enable_if<!std::is_same<optional<T>, U>::value &&
                                 std::is_constructible<T, U>::value &&
+                                !is_constructible_or_convertible_or_assignable_from_optional<T,U>::value &&
                                 std::is_assignable<T&, U>::value,
             optional&>::type
         operator=(optional<U>&& other)
@@ -199,6 +218,19 @@ namespace detail
             {
                 destroy();
             }
+            return *this;
+        }
+
+        // value assignment
+        template <typename T2=T>
+        typename std::enable_if<!std::is_same<optional<T>, typename std::decay<T2>::type>::value &&
+                                std::is_constructible<T, T2>::value &&
+                                std::is_assignable<T&, T2>::value &&
+                                !(std::is_scalar<T>::value && std::is_same<T, typename std::decay<T2>::type>::value),
+            optional&>::type
+        operator=(T2&& v)
+        {
+            assign(std::forward<T2>(v));
             return *this;
         }
 
