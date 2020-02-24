@@ -1816,7 +1816,7 @@ public:
     virtual void read(basic_json_content_handler<CharT>& handler) = 0;
 
     virtual void read(basic_json_content_handler<CharT>& handler,
-                        std::error_code& ec) = 0;
+                      std::error_code& ec) = 0;
 
     virtual void next() = 0;
 
