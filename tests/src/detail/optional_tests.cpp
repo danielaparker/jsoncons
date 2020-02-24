@@ -42,7 +42,7 @@ TEST_CASE("optional constructor tests")
     SECTION("optional<T>(json)")
     {
         json j = json::parse(input);
-        optional<json> x(j);
+        optional<json> x{j};
         CHECK(x.has_value());
         bool b(x);
         CHECK(b);
@@ -66,7 +66,7 @@ TEST_CASE("optional constructor tests")
     SECTION("optional<T>(int64_t) from const")
     {
         const int64_t val = 10;
-        optional<int64_t> x(val);
+        optional<int64_t> x{val};
         CHECK(x.has_value());
         bool b(x);
         CHECK(b);
