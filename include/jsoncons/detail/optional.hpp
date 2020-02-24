@@ -134,20 +134,20 @@ namespace detail
 
 
         // value constructors
-        template <class T2 = T>
-        optional(T&& value,
+        template <class T2>
+        optional(T2&& value,
              typename std::enable_if<!std::is_same<optional<T>,typename std::decay<T2>::type>::value &&
-                                     std::is_constructible<T, T2&&>::value &&
-                                     std::is_convertible<T2&&,T>::value,int>::type = 0) // (8)
+                                     std::is_constructible<T, T2>::value &&
+                                     std::is_convertible<T2,T>::value,int>::type = 0) // (8)
             : has_value_(true), value_(std::forward<T2>(value))
         {
         }
 
-        template <class T2=T>
+        template <class T2>
         explicit optional(T2&& value,
                          typename std::enable_if<!std::is_same<optional<T>,typename std::decay<T2>::type>::value &&
-                                                 std::is_constructible<T, T2&&>::value &&
-                                                 !std::is_convertible<T2&&,T>::value,int>::type = 0) // (8)
+                                                 std::is_constructible<T, T2>::value &&
+                                                 !std::is_convertible<T2,T>::value,int>::type = 0) // (8)
             : has_value_(true), value_(std::forward<T2>(value))
         {
         }
@@ -222,7 +222,7 @@ namespace detail
         }
 
         // value assignment
-        template <typename T2=T>
+        template <typename T2>
         typename std::enable_if<!std::is_same<optional<T>, typename std::decay<T2>::type>::value &&
                                 std::is_constructible<T, T2>::value &&
                                 std::is_assignable<T&, T2>::value &&
