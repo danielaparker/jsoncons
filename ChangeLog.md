@@ -1,3 +1,10 @@
+v0.145.1
+--------
+
+Bug fixes:
+
+- Fixed issue with jsoncons::optional
+
 v0.145.0
 --------
 
