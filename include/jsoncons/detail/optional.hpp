@@ -186,7 +186,7 @@ namespace detail
         template <typename U>
         typename std::enable_if<!std::is_same<optional<T>, U>::value &&
                                 std::is_constructible<T, const U&>::value &&
-                               !is_constructible_or_convertible_or_assignable_from_optional<T,U>::value &&
+                               !is_constructible_convertible_or_assignable_from_optional<T,U>::value &&
                                 std::is_assignable<T&, const U&>::value,
             optional&>::type
         operator=(const optional<U>& other)
@@ -205,7 +205,7 @@ namespace detail
         template <typename U>
         typename std::enable_if<!std::is_same<optional<T>, U>::value &&
                                 std::is_constructible<T, U>::value &&
-                                !is_constructible_or_convertible_or_assignable_from_optional<T,U>::value &&
+                                !is_constructible_convertible_or_assignable_from_optional<T,U>::value &&
                                 std::is_assignable<T&, U>::value,
             optional&>::type
         operator=(optional<U>&& other)
