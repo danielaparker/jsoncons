@@ -165,6 +165,12 @@ public:
             return static_cast<semantic_tag>(value);
         }
 
+        class common_storage final
+        {
+        public:
+            uint8_t ext_type_;
+        };
+
         class null_storage final
         {
         public:
@@ -707,18 +713,19 @@ public:
     private:
         union 
         {
-            null_storage null_storage_;
-            bool_storage bool_storage_;
-            int64_storage int64_storage_;
-            uint64_storage uint64_storage_;
-            half_storage half_storage_;
-            double_storage double_storage_;
-            short_string_storage short_string_storage_;
-            long_string_storage long_string_storage_;
-            byte_string_storage byte_string_storage_;
-            array_storage array_storage_;
-            object_storage object_storage_;
-            empty_object_storage empty_object_storage_;
+            common_storage common_stor_;
+            null_storage null_stor_;
+            bool_storage bool_stor_;
+            int64_storage int64_stor_;
+            uint64_storage uint64_stor_;
+            half_storage half_stor_;
+            double_storage double_stor_;
+            short_string_storage short_string_stor_;
+            long_string_storage long_string_stor_;
+            byte_string_storage byte_string_stor_;
+            array_storage array_stor_;
+            object_storage object_stor_;
+            empty_object_storage empty_object_stor_;
         };
     public:
         variant(semantic_tag tag)
@@ -878,12 +885,12 @@ public:
 
         storage_kind storage() const
         {
-            return to_storage(null_storage_.ext_type_);
+            return to_storage(common_stor_.ext_type_);
         }
 
         semantic_tag tag() const
         {
-            return to_tag(null_storage_.ext_type_);
+            return to_tag(common_stor_.ext_type_);
         }
 
         template <class VariantType, class... Args>
@@ -915,122 +922,122 @@ public:
 
         null_storage& cast(identity<null_storage>) 
         {
-            return null_storage_;
+            return null_stor_;
         }
 
         const null_storage& cast(identity<null_storage>) const
         {
-            return null_storage_;
+            return null_stor_;
         }
 
         empty_object_storage& cast(identity<empty_object_storage>) 
         {
-            return empty_object_storage_;
+            return empty_object_stor_;
         }
 
         const empty_object_storage& cast(identity<empty_object_storage>) const
         {
-            return empty_object_storage_;
+            return empty_object_stor_;
         }
 
         bool_storage& cast(identity<bool_storage>) 
         {
-            return bool_storage_;
+            return bool_stor_;
         }
 
         const bool_storage& cast(identity<bool_storage>) const
         {
-            return bool_storage_;
+            return bool_stor_;
         }
 
         int64_storage& cast(identity<int64_storage>) 
         {
-            return int64_storage_;
+            return int64_stor_;
         }
 
         const int64_storage& cast(identity<int64_storage>) const
         {
-            return int64_storage_;
+            return int64_stor_;
         }
 
         uint64_storage& cast(identity<uint64_storage>) 
         {
-            return uint64_storage_;
+            return uint64_stor_;
         }
 
         const uint64_storage& cast(identity<uint64_storage>) const
         {
-            return uint64_storage_;
+            return uint64_stor_;
         }
 
         half_storage& cast(identity<half_storage>)
         {
-            return half_storage_;
+            return half_stor_;
         }
 
         const half_storage& cast(identity<half_storage>) const
         {
-            return half_storage_;
+            return half_stor_;
         }
 
         double_storage& cast(identity<double_storage>) 
         {
-            return double_storage_;
+            return double_stor_;
         }
 
         const double_storage& cast(identity<double_storage>) const
         {
-            return double_storage_;
+            return double_stor_;
         }
 
         short_string_storage& cast(identity<short_string_storage>)
         {
-            return short_string_storage_;
+            return short_string_stor_;
         }
 
         const short_string_storage& cast(identity<short_string_storage>) const
         {
-            return short_string_storage_;
+            return short_string_stor_;
         }
 
         long_string_storage& cast(identity<long_string_storage>)
         {
-            return long_string_storage_;
+            return long_string_stor_;
         }
 
         const long_string_storage& cast(identity<long_string_storage>) const
         {
-            return long_string_storage_;
+            return long_string_stor_;
         }
 
         byte_string_storage& cast(identity<byte_string_storage>)
         {
-            return byte_string_storage_;
+            return byte_string_stor_;
         }
 
         const byte_string_storage& cast(identity<byte_string_storage>) const
         {
-            return byte_string_storage_;
+            return byte_string_stor_;
         }
 
         object_storage& cast(identity<object_storage>)
         {
-            return object_storage_;
+            return object_stor_;
         }
 
         const object_storage& cast(identity<object_storage>) const
         {
-            return object_storage_;
+            return object_stor_;
         }
 
         array_storage& cast(identity<array_storage>)
         {
-            return array_storage_;
+            return array_stor_;
         }
 
         const array_storage& cast(identity<array_storage>) const
         {
-            return array_storage_;
+            return array_stor_;
         }
 
         std::size_t size() const
@@ -5217,7 +5224,7 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use storage()")
-    storage_kind get_storage_type() const
+    storage_kind get_stor_type() const
     {
         return var_.storage();
     }
