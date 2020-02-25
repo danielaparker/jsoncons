@@ -1,3 +1,10 @@
+v0.145.2
+--------
+
+Defect fixes:
+
+- Fixed issue with `json_type_traits` specialization for optional 
+
 v0.145.1
 --------
 

@@ -886,7 +886,7 @@ public:
     
     static Json to_json(const jsoncons::optional<T>& val)
     {
-        return val.has_value() ? Json::null() : Json(val.value());
+        return val.has_value() ? Json(val.value()) : Json::null();
     }
 };
 
