@@ -147,7 +147,7 @@ Member type                         |Definition
                       const ser_context& context,
                       std::error_code& ec); // (31)
 
-   bool typed_array(const span<const uint8_t>& data, 
+    bool typed_array(const span<const uint8_t>& data, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=null_ser_context()); // (32)
 
