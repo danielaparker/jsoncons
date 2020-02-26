@@ -953,7 +953,7 @@ public:
         end_input_ = path + length;
         p_ = begin_input_;
 
-        slice a_slice;
+        slice a_slice{};
 
         while (p_ < end_input_)
         {
@@ -1399,7 +1399,7 @@ public:
                     {
                         case ']':
                             key_selector_stack_.back() = key_selector(make_unique<slice_projection>(std::move(key_selector_stack_.back().selector),a_slice));
-                            a_slice = slice();
+                            a_slice = slice{};
                             state_stack_.pop_back(); // bracket_specifier2
                             ++p_;
                             ++column_;
@@ -1435,7 +1435,7 @@ public:
                             key_selector_stack_.back() = key_selector(make_unique<slice_projection>(std::move(key_selector_stack_.back().selector),a_slice));
                             //key_selector_stack_.back().selector->add_selector(make_unique<slice_projection>(a_slice));
                             buffer.clear();
-                            a_slice = slice();
+                            a_slice = slice{};
                             state_stack_.pop_back(); // bracket_specifier3
                             ++p_;
                             ++column_;
