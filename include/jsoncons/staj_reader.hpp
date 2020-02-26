@@ -1115,7 +1115,7 @@ private:
     bool do_half(uint16_t value, 
                  semantic_tag tag,
                  const ser_context& context,
-                 std::error_code& ec) override
+                 std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(half_arg, value, tag);
         return !filter_(event_, context);
