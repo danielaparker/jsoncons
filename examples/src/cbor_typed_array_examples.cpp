@@ -12,7 +12,7 @@
 
 using namespace jsoncons;
 
-namespace cbor_typed_array_examples {
+namespace {
 
 void decode_float64_big_endian_array()
 {
@@ -71,6 +71,43 @@ void decode_mult_dim_row_major()
 
     std::cout << j.tag() << "\n";
     std::cout << pretty_print(j) << "\n";
+}
+
+void encode_decode_large_typed_array()
+{
+    std::ios_base::fmtflags f( std::cout.flags() );
+
+    std::vector<float> x(15000000);
+    for (size_t i = 0; i < x.size(); ++i)
+    {
+        x[i] = static_cast<float>(i);
+    }
+    cbor::cbor_options options;
+    options.enable_typed_arrays(true);
+
+    std::vector<uint8_t> buf;
+    cbor::encode_cbor(x, buf, options);
+
+    std::cout << "first 19 bytes:\n\n";
+    for (size_t i = 0; i < 19; ++i) 
+    {
+        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
+                  << std::noshowbase << std::setfill('0') << static_cast<int>(buf[i]) << ' ';
+    }
+    std::cout << "\n\n";
+/*
+    0xd8,0x55 -- Tag 85 (float32 little endian Typed Array)
+    0x5a - byte string (four-byte uint32_t for n, and then  n bytes follow)
+      03 93 87 00 -- 60000000
+        00 00 00 00 -- 0.0f
+        00 00 80 3f -- 1.0f
+        00 00 00 40 -- 2.0f
+*/
+    auto y = cbor::decode_cbor<std::vector<float>>(buf);
+
+    assert(y == x);
+
+    std::cout.flags( f );
 }
 
 void encode_mult_dim_array()
@@ -261,18 +298,19 @@ void read_to_cbor_content_handler()
     std::cout << "\n";
 }
 
-} // cbor_typed_array_examples
+} // annonymous
 
 void run_cbor_typed_array_examples()
 {
     std::cout << "\ncbor typed array examples\n\n";
-    cbor_typed_array_examples::decode_float64_big_endian_array();
-    cbor_typed_array_examples::decode_mult_dim_row_major();
-    cbor_typed_array_examples::encode_mult_dim_array();
-    cbor_typed_array_examples::encode_half_array();
-    cbor_typed_array_examples::cursor_example_multi_dim_row_major_typed_array();
-    cbor_typed_array_examples::cursor_example_multi_dim_column_major_classical_cbor_array();
-    cbor_typed_array_examples::read_to_cbor_content_handler();
+    decode_float64_big_endian_array();
+    decode_mult_dim_row_major();
+    encode_mult_dim_array();
+    encode_half_array();
+    cursor_example_multi_dim_row_major_typed_array();
+    cursor_example_multi_dim_column_major_classical_cbor_array();
+    read_to_cbor_content_handler();
+    encode_decode_large_typed_array();
 
     std::cout << "\n\n";
 }

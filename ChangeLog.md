@@ -1,3 +1,25 @@
+master
+------
+
+Changes:
+
+- The name `basic_rename_object_member_filter` has been deprecated and renamed to 
+`basic_rename_object_key_filter` 
+
+v0.145.2
+--------
+
+Defect fixes:
+
+- Fixed issue with `json_type_traits` specialization for optional 
+
+v0.145.1
+--------
+
+Bug fixes:
+
+- Fixed issue with jsoncons::optional
+
 v0.145.0
 --------
 

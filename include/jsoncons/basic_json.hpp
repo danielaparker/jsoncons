@@ -165,10 +165,17 @@ public:
             return static_cast<semantic_tag>(value);
         }
 
+        class common_storage final
+        {
+        public:
+            uint8_t ext_type_;
+        };
+
         class null_storage final
         {
-            uint8_t ext_type_;
         public:
+            uint8_t ext_type_;
+
             null_storage()
                 : ext_type_(from_storage_and_tag(storage_kind::null_value, semantic_tag::none))
             {
@@ -181,8 +188,9 @@ public:
 
         class empty_object_storage final
         {
-            uint8_t ext_type_;
         public:
+            uint8_t ext_type_;
+
             empty_object_storage(semantic_tag tag)
                 : ext_type_(from_storage_and_tag(storage_kind::empty_object_value, tag))
             {
@@ -191,7 +199,9 @@ public:
 
         class bool_storage final
         {
+        public:
             uint8_t ext_type_;
+        private:
             bool val_;
         public:
             bool_storage(bool val, semantic_tag tag)
@@ -215,7 +225,9 @@ public:
 
         class int64_storage final
         {
+        public:
             uint8_t ext_type_;
+        private:
             int64_t val_;
         public:
             int64_storage(int64_t val, 
@@ -239,7 +251,9 @@ public:
 
         class uint64_storage final
         {
+        public:
             uint8_t ext_type_;
+        private:
             uint64_t val_;
         public:
             uint64_storage(uint64_t val, 
@@ -263,7 +277,9 @@ public:
 
         class half_storage final
         {
+        public:
             uint8_t ext_type_;
+        private:
             uint16_t val_;
         public:
             half_storage(uint16_t val, semantic_tag tag = semantic_tag::none)
@@ -286,7 +302,9 @@ public:
 
         class double_storage final
         {
+        public:
             uint8_t ext_type_;
+        private:
             double val_;
         public:
             double_storage(double val, 
@@ -310,8 +328,10 @@ public:
 
         class short_string_storage final
         {
-            static constexpr size_t capacity = (2*sizeof(uint64_t) - 2*sizeof(uint8_t))/sizeof(char_type);
+        public:
             uint8_t ext_type_;
+        private:
+            static constexpr size_t capacity = (2*sizeof(uint64_t) - 2*sizeof(uint8_t))/sizeof(char_type);
             uint8_t length_;
             char_type data_[capacity];
         public:
@@ -353,9 +373,11 @@ public:
         // long_string_storage
         class long_string_storage final
         {
+        public:
+            uint8_t ext_type_;
+        private:
             typedef typename jsoncons::detail::heap_only_string_factory<char_type, Allocator>::string_pointer pointer;
 
-            uint8_t ext_type_;
             pointer ptr_;
         public:
 
@@ -421,10 +443,12 @@ public:
         // byte_string_storage
         class byte_string_storage final
         {
+        public:
+            uint8_t ext_type_;
+        private:
             typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<byte_string_storage_type> byte_allocator_type;
             typedef typename std::allocator_traits<byte_allocator_type>::pointer pointer;
 
-            uint8_t ext_type_;
             pointer ptr_;
 
             template <typename... Args>
@@ -514,10 +538,12 @@ public:
         // array_storage
         class array_storage final
         {
+        public:
+            uint8_t ext_type_;
+        private:
             typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
             typedef typename std::allocator_traits<array_allocator>::pointer pointer;
 
-            uint8_t ext_type_;
             pointer ptr_;
 
             template <typename... Args>
@@ -599,10 +625,12 @@ public:
         // object_storage
         class object_storage final
         {
+        public:
+            uint8_t ext_type_;
+        private:
             typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
             typedef typename std::allocator_traits<object_allocator>::pointer pointer;
 
-            uint8_t ext_type_;
             pointer ptr_;
 
             template <typename... Args>
@@ -683,42 +711,52 @@ public:
         };
 
     private:
-        static constexpr size_t data_size = static_max<sizeof(null_storage),sizeof(empty_object_storage),sizeof(bool_storage),sizeof(int64_storage),sizeof(uint64_storage),sizeof(half_storage),sizeof(double_storage),sizeof(short_string_storage), sizeof(long_string_storage), sizeof(array_storage), sizeof(object_storage)>::value;
-        static constexpr size_t data_align = static_max<alignof(null_storage),alignof(empty_object_storage),alignof(bool_storage),alignof(int64_storage),alignof(uint64_storage),alignof(half_storage),alignof(double_storage),alignof(short_string_storage),alignof(long_string_storage),alignof(array_storage),alignof(object_storage)>::value;
-
-        typedef typename std::aligned_storage<data_size,data_align>::type data_t;
-
-        data_t data_;
+        union 
+        {
+            common_storage common_stor_;
+            null_storage null_stor_;
+            bool_storage bool_stor_;
+            int64_storage int64_stor_;
+            uint64_storage uint64_stor_;
+            half_storage half_stor_;
+            double_storage double_stor_;
+            short_string_storage short_string_stor_;
+            long_string_storage long_string_stor_;
+            byte_string_storage byte_string_stor_;
+            array_storage array_stor_;
+            object_storage object_stor_;
+            empty_object_storage empty_object_stor_;
+        };
     public:
-        variant(semantic_tag tag) : data_{}
+        variant(semantic_tag tag)
         {
             construct_var<empty_object_storage>(tag);
         }
 
-        explicit variant(null_type, semantic_tag tag) : data_{}
+        explicit variant(null_type, semantic_tag tag)
         {
             construct_var<null_storage>(tag);
         }
 
-        explicit variant(bool val, semantic_tag tag) : data_{}
+        explicit variant(bool val, semantic_tag tag)
         {
             construct_var<bool_storage>(val,tag);
         }
-        explicit variant(int64_t val, semantic_tag tag) : data_{}
+        explicit variant(int64_t val, semantic_tag tag)
         {
             construct_var<int64_storage>(val, tag);
         }
-        explicit variant(uint64_t val, semantic_tag tag) : data_{}
+        explicit variant(uint64_t val, semantic_tag tag)
         {
             construct_var<uint64_storage>(val, tag);
         }
 
-        variant(half_arg_t, uint16_t val, semantic_tag tag) : data_{}
+        variant(half_arg_t, uint16_t val, semantic_tag tag)
         {
             construct_var<half_storage>(val, tag);
         }
 
-        variant(double val, semantic_tag tag) : data_{}
+        variant(double val, semantic_tag tag)
         {
             construct_var<double_storage>(val, tag);
         }
@@ -735,7 +773,7 @@ public:
             }
         }
 
-        variant(const char_type* s, std::size_t length, semantic_tag tag, const Allocator& alloc) : data_{}
+        variant(const char_type* s, std::size_t length, semantic_tag tag, const Allocator& alloc)
         {
             if (length <= short_string_storage::max_length)
             {
@@ -747,34 +785,34 @@ public:
             }
         }
 
-        variant(const byte_string_view& bytes, semantic_tag tag) : data_{}
+        variant(const byte_string_view& bytes, semantic_tag tag)
         {
             construct_var<byte_string_storage>(tag, bytes.data(), bytes.size(), byte_allocator_type());
         }
 
-        variant(const byte_string_view& bytes, semantic_tag tag, const Allocator& alloc) : data_{}
+        variant(const byte_string_view& bytes, semantic_tag tag, const Allocator& alloc)
         {
             construct_var<byte_string_storage>(tag, bytes.data(), bytes.size(), alloc);
         }
 
-        variant(byte_string_arg_t, const span<const uint8_t>& bytes, semantic_tag tag, const Allocator& alloc) : data_{}
+        variant(byte_string_arg_t, const span<const uint8_t>& bytes, semantic_tag tag, const Allocator& alloc)
         {
             construct_var<byte_string_storage>(tag, bytes.data(), bytes.size(), alloc);
         }
 
-        variant(const object& val, semantic_tag tag) : data_{}
+        variant(const object& val, semantic_tag tag)
         {
             construct_var<object_storage>(val, tag);
         }
-        variant(const object& val, semantic_tag tag, const Allocator& alloc) : data_{}
+        variant(const object& val, semantic_tag tag, const Allocator& alloc)
         {
             construct_var<object_storage>(val, tag, alloc);
         }
-        variant(const array& val, semantic_tag tag) : data_{}
+        variant(const array& val, semantic_tag tag)
         {
             construct_var<array_storage>(val, tag);
         }
-        variant(const array& val, semantic_tag tag, const Allocator& alloc) : data_{}
+        variant(const array& val, semantic_tag tag, const Allocator& alloc)
         {
             construct_var<array_storage>(val, tag, alloc);
         }
@@ -847,12 +885,12 @@ public:
 
         storage_kind storage() const
         {
-            return to_storage(*reinterpret_cast<const uint8_t*>(&data_));
+            return to_storage(common_stor_.ext_type_);
         }
 
         semantic_tag tag() const
         {
-            return to_tag(*reinterpret_cast<const uint8_t*>(&data_));
+            return to_tag(common_stor_.ext_type_);
         }
 
         template <class VariantType, class... Args>
@@ -861,10 +899,10 @@ public:
             ::new (&cast<VariantType>()) VariantType(std::forward<Args>(args)...);
         }
 
-        template <class VariantType>
+        template <class T>
         void destroy_var()
         {
-            reinterpret_cast<VariantType*>(&data_)->~VariantType();
+            cast<T>().~T();
         }
 
         template <class T>
@@ -884,122 +922,122 @@ public:
 
         null_storage& cast(identity<null_storage>) 
         {
-            return *reinterpret_cast<null_storage*>(&data_);
+            return null_stor_;
         }
 
         const null_storage& cast(identity<null_storage>) const
         {
-            return *reinterpret_cast<const null_storage*>(&data_);
+            return null_stor_;
         }
 
         empty_object_storage& cast(identity<empty_object_storage>) 
         {
-            return *reinterpret_cast<empty_object_storage*>(&data_);
+            return empty_object_stor_;
         }
 
         const empty_object_storage& cast(identity<empty_object_storage>) const
         {
-            return *reinterpret_cast<const empty_object_storage*>(&data_);
+            return empty_object_stor_;
         }
 
         bool_storage& cast(identity<bool_storage>) 
         {
-            return *reinterpret_cast<bool_storage*>(&data_);
+            return bool_stor_;
         }
 
         const bool_storage& cast(identity<bool_storage>) const
         {
-            return *reinterpret_cast<const bool_storage*>(&data_);
+            return bool_stor_;
         }
 
         int64_storage& cast(identity<int64_storage>) 
         {
-            return *reinterpret_cast<int64_storage*>(&data_);
+            return int64_stor_;
         }
 
         const int64_storage& cast(identity<int64_storage>) const
         {
-            return *reinterpret_cast<const int64_storage*>(&data_);
+            return int64_stor_;
         }
 
         uint64_storage& cast(identity<uint64_storage>) 
         {
-            return *reinterpret_cast<uint64_storage*>(&data_);
+            return uint64_stor_;
         }
 
         const uint64_storage& cast(identity<uint64_storage>) const
         {
-            return *reinterpret_cast<const uint64_storage*>(&data_);
+            return uint64_stor_;
         }
 
         half_storage& cast(identity<half_storage>)
         {
-            return *reinterpret_cast<half_storage*>(&data_);
+            return half_stor_;
         }
 
         const half_storage& cast(identity<half_storage>) const
         {
-            return *reinterpret_cast<const half_storage*>(&data_);
+            return half_stor_;
         }
 
         double_storage& cast(identity<double_storage>) 
         {
-            return *reinterpret_cast<double_storage*>(&data_);
+            return double_stor_;
         }
 
         const double_storage& cast(identity<double_storage>) const
         {
-            return *reinterpret_cast<const double_storage*>(&data_);
+            return double_stor_;
         }
 
         short_string_storage& cast(identity<short_string_storage>)
         {
-            return *reinterpret_cast<short_string_storage*>(&data_);
+            return short_string_stor_;
         }
 
         const short_string_storage& cast(identity<short_string_storage>) const
         {
-            return *reinterpret_cast<const short_string_storage*>(&data_);
+            return short_string_stor_;
         }
 
         long_string_storage& cast(identity<long_string_storage>)
         {
-            return *reinterpret_cast<long_string_storage*>(&data_);
+            return long_string_stor_;
         }
 
         const long_string_storage& cast(identity<long_string_storage>) const
         {
-            return *reinterpret_cast<const long_string_storage*>(&data_);
+            return long_string_stor_;
         }
 
         byte_string_storage& cast(identity<byte_string_storage>)
         {
-            return *reinterpret_cast<byte_string_storage*>(&data_);
+            return byte_string_stor_;
         }
 
         const byte_string_storage& cast(identity<byte_string_storage>) const
         {
-            return *reinterpret_cast<const byte_string_storage*>(&data_);
+            return byte_string_stor_;
         }
 
         object_storage& cast(identity<object_storage>)
         {
-            return *reinterpret_cast<object_storage*>(&data_);
+            return object_stor_;
         }
 
         const object_storage& cast(identity<object_storage>) const
         {
-            return *reinterpret_cast<const object_storage*>(&data_);
+            return object_stor_;
         }
 
         array_storage& cast(identity<array_storage>)
         {
-            return *reinterpret_cast<array_storage*>(&data_);
+            return array_stor_;
         }
 
         const array_storage& cast(identity<array_storage>) const
         {
-            return *reinterpret_cast<const array_storage*>(&data_);
+            return array_stor_;
         }
 
         std::size_t size() const
@@ -5186,7 +5224,7 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use storage()")
-    storage_kind get_storage_type() const
+    storage_kind get_stor_type() const
     {
         return var_.storage();
     }

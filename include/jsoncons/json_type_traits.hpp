@@ -876,7 +876,7 @@ struct json_type_traits<Json, jsoncons::optional<T>,
 public:
     static bool is(const Json& j) noexcept
     {
-        return true;
+        return j.is_null() || j.template is<T>();
     }
     
     static jsoncons::optional<T> as(const Json& j)
@@ -886,7 +886,7 @@ public:
     
     static Json to_json(const jsoncons::optional<T>& val)
     {
-        return val.has_value() ? Json::null() : Json(val.value());
+        return val.has_value() ? Json(val.value()) : Json::null();
     }
 };
 

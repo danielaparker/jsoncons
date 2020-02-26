@@ -530,439 +530,6 @@ enum typed_array_type {uint8_value=1,uint16_value,uint32_value,uint64_value,
                       int8_value,int16_value,int32_value,int64_value, 
                       half_value, float_value,double_value};
 
-template <class Allocator=std::allocator<char>>
-class typed_array
-{
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint8_t> uint8_allocator_type;
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint16_t> uint16_allocator_type;
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint32_t> uint32_allocator_type;
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint64_t> uint64_allocator_type;
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<int8_t> int8_allocator_type;
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<int16_t> int16_allocator_type;
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<int32_t> int32_allocator_type;
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<int64_t> int64_allocator_type;
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<float> float_allocator_type;
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<double> double_allocator_type;
-
-    Allocator alloc_;
-    typed_array_type type_;
-    union 
-    {
-        uint8_t* uint8_data_;
-        uint16_t* uint16_data_;
-        uint32_t* uint32_data_;
-        uint64_t* uint64_data_;
-        int8_t* int8_data_;
-        int16_t* int16_data_;
-        int32_t* int32_data_;
-        int64_t* int64_data_;
-        float* float_data_;
-        double* double_data_;
-    } data_;
-    std::size_t size_;
-public:
-    typed_array(const Allocator& alloc)
-        : alloc_(alloc), type_(), data_(), size_(0)
-    {
-    }
-
-    typed_array(const typed_array& other)
-        : alloc_(other.alloc_), type_(other.type_), data_(), size_(other.size())
-    {
-        switch (other.type_)
-        {
-            case typed_array_type::uint8_value:
-            {
-                uint8_allocator_type alloc{ alloc_ };
-                data_.uint8_data_ = alloc.allocate(size_);
-                break;
-            }
-            case typed_array_type::uint16_value:
-            {
-                uint16_allocator_type alloc{ alloc_ };
-                data_.uint16_data_ = alloc.allocate(size_);
-                break;
-            }
-            case typed_array_type::uint32_value:
-            {
-                uint32_allocator_type alloc{ alloc_ };
-                data_.uint32_data_ = alloc.allocate(size_);
-                break;
-            }
-            case typed_array_type::uint64_value:
-            {
-                uint64_allocator_type alloc{ alloc_ };
-                data_.uint64_data_ = alloc.allocate(size_);
-                break;
-            }
-            case typed_array_type::int8_value:
-            {
-                int8_allocator_type alloc{ alloc_ };
-                data_.int8_data_ = alloc.allocate(size_);
-                break;
-            }
-            case typed_array_type::int16_value:
-            {
-                int16_allocator_type alloc{ alloc_ };
-                data_.int16_data_ = alloc.allocate(size_);
-                break;
-            }
-            case typed_array_type::int32_value:
-            {
-                int32_allocator_type alloc{ alloc_ };
-                data_.int32_data_ = alloc.allocate(size_);
-                break;
-            }
-            case typed_array_type::int64_value:
-            {
-                int64_allocator_type alloc{ alloc_ };
-                data_.int64_data_ = alloc.allocate(size_);
-                break;
-            }
-            case typed_array_type::half_value:
-            {
-                uint16_allocator_type alloc{ alloc_ };
-                data_.uint16_data_ = alloc.allocate(size_);
-                break;
-            }
-            case typed_array_type::float_value:
-            {
-                float_allocator_type alloc{ alloc_ };
-                data_.float_data_ = alloc.allocate(size_);
-                break;
-            }
-            case typed_array_type::double_value:
-            {
-                double_allocator_type alloc{alloc_};
-                data_.double_data_ = alloc.allocate(size_);
-                break;
-            }
-            default:
-                break;
-        }
-    }
-
-    typed_array(typed_array&& other)
-    {
-        swap(*this,other);
-    }
-    typed_array(uint8_array_arg_t,size_t size, const Allocator& allocator)
-        : alloc_(allocator), type_(typed_array_type::uint8_value), size_(size)
-    {
-        uint8_allocator_type alloc(alloc_);
-        data_.uint8_data_ = alloc.allocate(size);
-    }
-
-    typed_array(uint16_array_arg_t,size_t size, const Allocator& allocator)
-        : alloc_(allocator), type_(typed_array_type::uint16_value), size_(size)
-    {
-        uint16_allocator_type alloc(alloc_);
-        data_.uint16_data_ = alloc.allocate(size);
-    }
-
-    typed_array(uint32_array_arg_t,size_t size, const Allocator& allocator)
-        : alloc_(allocator), type_(typed_array_type::uint32_value), size_(size)
-    {
-        uint32_allocator_type alloc(alloc_);
-        data_.uint32_data_ = alloc.allocate(size);
-    }
-
-    typed_array(uint64_array_arg_t,size_t size, const Allocator& allocator)
-        : alloc_(allocator), type_(typed_array_type::uint64_value), size_(size)
-    {
-        uint64_allocator_type alloc(alloc_);
-        data_.uint64_data_ = alloc.allocate(size);
-    }
-
-    typed_array(int8_array_arg_t,size_t size, const Allocator& allocator)
-        : alloc_(allocator), type_(typed_array_type::int8_value), size_(size)
-    {
-        int8_allocator_type alloc(alloc_);
-        data_.int8_data_ = alloc.allocate(size);
-    }
-
-    typed_array(int16_array_arg_t,size_t size, const Allocator& allocator)
-        : alloc_(allocator), type_(typed_array_type::int16_value), size_(size)
-    {
-        int16_allocator_type alloc(alloc_);
-        data_.int16_data_ = alloc.allocate(size);
-    }
-
-    typed_array(int32_array_arg_t,size_t size, const Allocator& allocator)
-        : alloc_(allocator), type_(typed_array_type::int32_value), size_(size)
-    {
-        int32_allocator_type alloc(alloc_);
-        data_.int32_data_ = alloc.allocate(size);
-    }
-
-    typed_array(int64_array_arg_t,size_t size, const Allocator& allocator)
-        : alloc_(allocator), type_(typed_array_type::int64_value), size_(size)
-    {
-        int64_allocator_type alloc(alloc_);
-        data_.int64_data_ = alloc.allocate(size);
-    }
-
-    typed_array(half_array_arg_t, std::size_t size, const Allocator& allocator)
-        : alloc_(allocator), type_(typed_array_type::half_value), size_(size)
-    {
-        uint16_allocator_type alloc(alloc_);
-        data_.uint16_data_ = alloc.allocate(size);
-    }
-
-    typed_array(float_array_arg_t,size_t size, const Allocator& allocator)
-        : alloc_(allocator), type_(typed_array_type::float_value), size_(size)
-    {
-        float_allocator_type alloc(alloc_);
-        data_.float_data_ = alloc.allocate(size);
-    }
-
-    typed_array(double_array_arg_t,size_t size, const Allocator& allocator)
-        : alloc_(allocator), type_(typed_array_type::double_value), size_(size)
-    {
-        double_allocator_type alloc(alloc_);
-        data_.double_data_ = alloc.allocate(size);
-    }
-
-    ~typed_array()
-    {
-        switch (type_)
-        {
-            case typed_array_type::uint8_value:
-            {
-                uint8_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.uint8_data_, size_);
-                break;
-            }
-            case typed_array_type::uint16_value:
-            {
-                uint16_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.uint16_data_, size_);
-                break;
-            }
-            case typed_array_type::uint32_value:
-            {
-                uint32_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.uint32_data_, size_);
-                break;
-            }
-            case typed_array_type::uint64_value:
-            {
-                uint64_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.uint64_data_, size_);
-                break;
-            }
-            case typed_array_type::int8_value:
-            {
-                int8_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.int8_data_, size_);
-                break;
-            }
-            case typed_array_type::int16_value:
-            {
-                int16_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.int16_data_, size_);
-                break;
-            }
-            case typed_array_type::int32_value:
-            {
-                int32_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.int32_data_, size_);
-                break;
-            }
-            case typed_array_type::int64_value:
-            {
-                int64_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.int64_data_, size_);
-                break;
-            }
-            case typed_array_type::float_value:
-            {
-                float_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.float_data_, size_);
-                break;
-            }
-            case typed_array_type::double_value:
-            {
-                double_allocator_type alloc(alloc_);
-                alloc.deallocate(data_.double_data_, size_);
-                break;
-            }
-            default:
-                break;
-        }
-        type_ = typed_array_type();
-        size_ = 0;
-    }
-
-    typed_array& operator=(const typed_array& other)
-    {
-        if (this != &other)
-        {
-            typed_array temp(other);
-            swap(*this,temp);
-        }
-        return *this;
-    }
-
-    typed_array& operator=(typed_array&& other)
-    {
-        if (this != &other)
-        {
-            swap(*this,other);
-        }
-        return *this;
-    }
-
-    typed_array_type type() const
-    {
-        return type_;
-    }
-
-    std::size_t size() const
-    {
-        return size_;
-    }
-
-    span<uint8_t> data(uint8_array_arg_t)
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::uint8_value);
-        return span<uint8_t>(data_.uint8_data_, size_);
-    }
-
-    span<const uint8_t> data(uint8_array_arg_t) const
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::uint8_value);
-        return span<const uint8_t>(data_.uint8_data_, size_);
-    }
-    span<uint16_t> data(uint16_array_arg_t)
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::uint16_value);
-        return span<uint16_t>(data_.uint16_data_, size_);
-    }
-
-    span<const uint16_t> data(uint16_array_arg_t) const
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::uint16_value);
-        return span<const uint16_t>(data_.uint16_data_, size_);
-    }
-
-    span<uint32_t> data(uint32_array_arg_t)
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::uint32_value);
-        return span<uint32_t>(data_.uint32_data_, size_);
-    }
-
-    span<const uint32_t> data(uint32_array_arg_t) const
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::uint32_value);
-        return span<const uint32_t>(data_.uint32_data_, size_);
-    }
-
-    span<uint64_t> data(uint64_array_arg_t)
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::uint64_value);
-        return span<uint64_t>(data_.uint64_data_, size_);
-    }
-
-    span<const uint64_t> data(uint64_array_arg_t) const
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::uint64_value);
-        return span<const uint64_t>(data_.uint64_data_, size_);
-    }
-
-    span<int8_t> data(int8_array_arg_t)
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::int8_value);
-        return span<int8_t>(data_.int8_data_, size_);
-    }
-
-    span<const int8_t> data(int8_array_arg_t) const
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::int8_value);
-        return span<const int8_t>(data_.int8_data_, size_);
-    }
-
-    span<int16_t> data(int16_array_arg_t)
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::int16_value);
-        return span<int16_t>(data_.int16_data_, size_);
-    }
-
-    span<const int16_t> data(int16_array_arg_t) const
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::int16_value);
-        return span<const int16_t>(data_.int16_data_, size_);
-    }
-
-    span<int32_t> data(int32_array_arg_t)
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::int32_value);
-        return span<int32_t>(data_.int32_data_, size_);
-    }
-
-    span<const int32_t> data(int32_array_arg_t) const
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::int32_value);
-        return span<const int32_t>(data_.int32_data_, size_);
-    }
-
-    span<int64_t> data(int64_array_arg_t)
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::int64_value);
-        return span<int64_t>(data_.int64_data_, size_);
-    }
-
-    span<const int64_t> data(int64_array_arg_t) const
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::int64_value);
-        return span<const int64_t>(data_.int64_data_, size_);
-    }
-
-    span<uint16_t> data(half_array_arg_t)
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::half_value);
-        return span<uint16_t>(data_.uint16_data_, size_);
-    }
-
-    span<const uint16_t> data(half_array_arg_t) const
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::half_value);
-        return span<const uint16_t>(data_.uint16_data_, size_);
-    }
-
-    span<float> data(float_array_arg_t)
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::float_value);
-        return span<float>(data_.float_data_, size_);
-    }
-
-    span<const float> data(float_array_arg_t) const
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::float_value);
-        return span<const float>(data_.float_data_, size_);
-    }
-
-    span<double> data(double_array_arg_t)
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::double_value);
-        return span<double>(data_.double_data_, size_);
-    }
-
-    span<const double> data(double_array_arg_t) const
-    {
-        JSONCONS_ASSERT(type_ == typed_array_type::double_value);
-        return span<const double>(data_.double_data_, size_);
-    }
-    friend void swap(typed_array& a, typed_array& b) noexcept
-    {
-        std::swap(a.data_,b.data_);
-        std::swap(a.alloc_,b.alloc_);
-        std::swap(a.type_,b.type_);
-        std::swap(a.size_,b.size_);
-    }
-   
-};
-
 class typed_array_view
 {
     typed_array_type type_;
@@ -995,66 +562,6 @@ public:
     typed_array_view(typed_array_view&& other)
     {
         swap(*this,other);
-    }
-
-    typed_array_view(const typed_array<>& other)
-        : type_(other.type()), data_(), size_(other.size())
-    {
-        switch (other.type())
-        {
-            case typed_array_type::uint8_value:
-            {
-                data_.uint8_data_ = other.data(uint8_array_arg).data();
-                break;
-            }
-            case typed_array_type::uint16_value:
-            {
-                data_.uint16_data_ = other.data(uint16_array_arg).data();
-                break;
-            }
-            case typed_array_type::uint32_value:
-            {
-                data_.uint32_data_ = other.data(uint32_array_arg).data();
-                break;
-            }
-            case typed_array_type::uint64_value:
-            {
-                data_.uint64_data_ = other.data(uint64_array_arg).data();
-                break;
-            }
-            case typed_array_type::int8_value:
-            {
-                data_.int8_data_ = other.data(int8_array_arg).data();
-                break;
-            }
-            case typed_array_type::int16_value:
-            {
-                data_.int16_data_ = other.data(int16_array_arg).data();
-                break;
-            }
-            case typed_array_type::int32_value:
-            {
-                data_.int32_data_ = other.data(int32_array_arg).data();
-                break;
-            }
-            case typed_array_type::int64_value:
-            {
-                data_.int64_data_ = other.data(int64_array_arg).data();
-                break;
-            }
-            case typed_array_type::float_value:
-            {
-                data_.float_data_ = other.data(float_array_arg).data();
-                break;
-            }
-            case typed_array_type::double_value:
-            {
-                data_.double_data_ = other.data(double_array_arg).data();
-                break;
-            }
-            default:
-                break;
-        }
     }
 
     typed_array_view(const uint8_t* data,size_t size)
@@ -1560,43 +1067,34 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_null_value(semantic_tag tag, const ser_context& context, std::error_code&) override
+    bool do_null(semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::null_value, tag);
         return !filter_(event_, context);
     }
 
-    bool do_bool_value(bool value, semantic_tag tag, const ser_context& context, std::error_code&) override
+    bool do_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
         return !filter_(event_, context);
     }
 
-    bool do_string_value(const string_view_type& s, semantic_tag tag, const ser_context& context, std::error_code&) override
+    bool do_string(const string_view_type& s, semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(s, staj_event_type::string_value, tag);
         return !filter_(event_, context);
     }
 
-    bool do_byte_string_value(const byte_string_view& s, 
-                              semantic_tag tag,
-                              const ser_context& context,
-                              std::error_code&) override
+    bool do_byte_string(const byte_string_view& s, 
+                        semantic_tag tag,
+                        const ser_context& context,
+                        std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(s, staj_event_type::byte_string_value, tag);
         return !filter_(event_, context);
     }
 
-    bool do_int64_value(int64_t value, 
-                        semantic_tag tag,
-                        const ser_context& context,
-                        std::error_code&) override
-    {
-        event_ = basic_staj_event<CharT>(value, tag);
-        return !filter_(event_, context);
-    }
-
-    bool do_uint64_value(uint64_t value, 
+    bool do_uint64(uint64_t value, 
                          semantic_tag tag, 
                          const ser_context& context,
                          std::error_code&) override
@@ -1605,10 +1103,28 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_double_value(double value, 
-                         semantic_tag tag, 
-                         const ser_context& context,
-                         std::error_code&) override
+    bool do_int64(int64_t value, 
+                  semantic_tag tag,
+                  const ser_context& context,
+                  std::error_code&) override
+    {
+        event_ = basic_staj_event<CharT>(value, tag);
+        return !filter_(event_, context);
+    }
+
+    bool do_half(uint16_t value, 
+                 semantic_tag tag,
+                 const ser_context& context,
+                 std::error_code&) override
+    {
+        event_ = basic_staj_event<CharT>(half_arg, value, tag);
+        return !filter_(event_, context);
+    }
+
+    bool do_double(double value, 
+                   semantic_tag tag, 
+                   const ser_context& context,
+                   std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
         return !filter_(event_, context);
@@ -1816,7 +1332,7 @@ public:
     virtual void read(basic_json_content_handler<CharT>& handler) = 0;
 
     virtual void read(basic_json_content_handler<CharT>& handler,
-                        std::error_code& ec) = 0;
+                      std::error_code& ec) = 0;
 
     virtual void next() = 0;
 

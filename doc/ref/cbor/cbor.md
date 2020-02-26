@@ -104,6 +104,13 @@ CBOR data item|CBOR tag                                         | jsoncons data 
 
 ## Examples
 
+[Working with CBOR data](#A1)  
+[Encode and decode of a large typed array](#A2)  
+[CBOR and basic_json](#A3)  
+[Query CBOR with JSONPath](#A4)  
+
+<div id="A1"/> 
+
 ### Working with CBOR data
 
 For the examples below you need to include some header files and initialize a buffer of CBOR data:
@@ -357,6 +364,59 @@ string_value: 0x3p-1 (bigfloat)
 string_value: 1.23456789012345678901234567890 (bigdec)
 ```
 
+<div id="A2"/> 
+
+### Encode and decode of a large typed array
+
+```c++
+#include <jsoncons_ext/cbor/cbor.hpp>
+#include <iomanip>
+#include <cassert>
+
+using namespace jsoncons;
+
+int main()
+{
+    std::vector<float> x(15000000); 
+    for (size_t i = 0; i < x.size(); ++i)
+    {
+        x[i] = static_cast<float>(i);
+    }
+    cbor::cbor_options options;
+    options.enable_typed_arrays(true);
+
+    std::vector<uint8_t> buf;
+    cbor::encode_cbor(x, buf, options);
+
+    std::cout << "first 19 bytes:\n\n";
+    for (size_t i = 0; i < 19; ++i) 
+    {
+        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
+                  << std::noshowbase << std::setfill('0') << static_cast<int>(buf[i]) << ' ';
+    }
+    std::cout << "\n\n";
+/*
+    0xd8,0x55 -- Tag 85 (float32 little endian Typed Array)
+    0x5a - byte string (four-byte uint32_t for n, and then  n bytes follow)
+      03 93 87 00 -- 60000000
+        00 00 00 00 -- 0.0f
+        00 00 80 3f -- 1.0f
+        00 00 00 40 -- 2.0f
+*/
+    auto y = cbor::decode_cbor<std::vector<float>>(buf);
+
+    assert(y == x);
+}
+```
+Output:
+```
+first 19 bytes:
+
+d8 55 5a 03 93 87 00 00 00 00 00 00 00 80 3f 00 00 00 40
+```
+
+<div id="A3"/> 
+
 ### CBOR and basic_json
 
 ```c++
@@ -433,6 +493,8 @@ Marilyn C, 0.9
 
 (3) Marilyn C
 ```
+
+<div id="A4"/> 
 
 ### Query CBOR with JSONPath
 ```c++

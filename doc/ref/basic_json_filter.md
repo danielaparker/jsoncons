@@ -377,44 +377,44 @@ Throws a [ser_error](ser_error.md) on parse errors.
                          const ser_context& context, 
                          std::error_code&) = 0; // (8)
 
-    virtual bool do_null_value(semantic_tag tag, 
-                               const ser_context& context, 
-                               std::error_code& ec) = 0; // (9)
+    virtual bool do_null(semantic_tag tag, 
+                         const ser_context& context, 
+                         std::error_code& ec) = 0; // (9)
 
-    virtual bool do_bool_value(bool value, 
-                               semantic_tag tag, 
-                               const ser_context& context, 
-                               std::error_code&) = 0; // (10)
+    virtual bool do_bool(bool value, 
+                         semantic_tag tag, 
+                         const ser_context& context, 
+                         std::error_code&) = 0; // (10)
 
-    virtual bool do_string_value(const string_view_type& value, 
-                                 semantic_tag tag, 
-                                 const ser_context& context, 
-                                 std::error_code& ec) = 0; // (11)
+    virtual bool do_string(const string_view_type& value, 
+                           semantic_tag tag, 
+                           const ser_context& context, 
+                           std::error_code& ec) = 0; // (11)
 
-    virtual bool do_byte_string_value(const byte_string_view& value, 
-                                      semantic_tag tag, 
-                                      const ser_context& context,
-                                      std::error_code& ec) = 0; // (12)
-
-    virtual bool do_uint64_value(uint64_t value, 
-                                 semantic_tag tag, 
-                                 const ser_context& context,
-                                 std::error_code& ec) = 0; // (13)
-
-    virtual bool do_int64_value(int64_t value, 
-                                semantic_tag tag,
+    virtual bool do_byte_string(const byte_string_view& value, 
+                                semantic_tag tag, 
                                 const ser_context& context,
-                                std::error_code& ec) = 0; // (14)
+                                std::error_code& ec) = 0; // (12)
 
-    virtual bool do_half_value(uint16_t value, 
-                               semantic_tag tag,
-                               const ser_context& context,
-                               std::error_code& ec) = 0; // (15)
+    virtual bool do_uint64(uint64_t value, 
+                           semantic_tag tag, 
+                           const ser_context& context,
+                           std::error_code& ec) = 0; // (13)
 
-    virtual bool do_double_value(double value, 
-                                 semantic_tag tag,
-                                 const ser_context& context,
-                                 std::error_code& ec) = 0; // (16)
+    virtual bool do_int64(int64_t value, 
+                          semantic_tag tag,
+                          const ser_context& context,
+                          std::error_code& ec) = 0; // (14)
+
+    virtual bool do_half(uint16_t value, 
+                         semantic_tag tag,
+                         const ser_context& context,
+                         std::error_code& ec) = 0; // (15)
+
+    virtual bool do_double(double value, 
+                           semantic_tag tag,
+                           const ser_context& context,
+                           std::error_code& ec) = 0; // (16)
 
     virtual bool do_typed_array(const span<const uint8_t>& data, 
                                 semantic_tag tag,
@@ -567,7 +567,7 @@ The overloads that take a `std::error_code&` parameter set it to the error code 
 
 ### Examples
 
-#### Rename object member names with the built in filter [rename_object_member_filter](rename_object_member_filter.md)
+#### Rename object member names with the built in filter [rename_object_key_filter](rename_object_key_filter.md)
 
 ```c++
 #include <sstream>
@@ -583,8 +583,8 @@ int main()
     json_stream_encoder encoder(std::cout);
 
     // Filters can be chained
-    rename_object_member_filter filter2("fifth", "fourth", encoder);
-    rename_object_member_filter filter1("fourth", "third", filter2);
+    rename_object_key_filter filter2("fifth", "fourth", encoder);
+    rename_object_key_filter filter1("fourth", "third", filter2);
 
     // A filter can be passed to any function that takes
     // a json_content_handler ...
@@ -661,7 +661,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& s, 
+    bool do_string(const string_view_type& s, 
                          const ser_context& context,
                          std::error_code&) override
     {
@@ -693,7 +693,7 @@ private:
     }
 };
 ```
-Configure a [rename_object_member_filter](rename_object_member_filter.md) to emit json events to a [basic_json_encoder](basic_json_encoder.md). 
+Configure a [rename_object_key_filter](rename_object_key_filter.md) to emit json events to a [basic_json_encoder](basic_json_encoder.md). 
 ```c++
 std::ofstream os("output/new-address-book.json");
 json_stream_encoder encoder(os);

@@ -179,13 +179,13 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag, const ser_context&, std::error_code&) override
+    bool do_null(semantic_tag, const ser_context&, std::error_code&) override
     {
         before_value(jsoncons::bson::detail::bson_format::null_cd);
         return true;
     }
 
-    bool do_bool_value(bool val, semantic_tag, const ser_context&, std::error_code&) override
+    bool do_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
     {
         before_value(jsoncons::bson::detail::bson_format::bool_cd);
         if (val)
@@ -200,7 +200,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code& ec) override
+    bool do_string(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code& ec) override
     {
         before_value(jsoncons::bson::detail::bson_format::string_cd);
 
@@ -225,7 +225,7 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const byte_string_view& b, 
+    bool do_byte_string(const byte_string_view& b, 
                               semantic_tag, 
                               const ser_context&,
                               std::error_code&) override
@@ -246,7 +246,7 @@ private:
         return true;
     }
 
-    bool do_int64_value(int64_t val, 
+    bool do_int64(int64_t val, 
                         semantic_tag tag, 
                         const ser_context&,
                         std::error_code&) override
@@ -276,7 +276,7 @@ private:
         return true;
     }
 
-    bool do_uint64_value(uint64_t val, 
+    bool do_uint64(uint64_t val, 
                          semantic_tag tag, 
                          const ser_context&,
                          std::error_code&) override
@@ -306,7 +306,7 @@ private:
         return true;
     }
 
-    bool do_double_value(double val, 
+    bool do_double(double val, 
                          semantic_tag,
                          const ser_context&,
                          std::error_code&) override

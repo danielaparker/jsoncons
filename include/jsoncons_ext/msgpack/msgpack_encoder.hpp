@@ -208,7 +208,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag, const ser_context&, std::error_code&) override
+    bool do_null(semantic_tag, const ser_context&, std::error_code&) override
     {
         // nil
         jsoncons::detail::native_to_big(static_cast<uint8_t>(jsoncons::msgpack::detail::msgpack_format ::nil_cd), std::back_inserter(result_));
@@ -216,7 +216,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code&) override
+    bool do_string(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code&) override
     {
         write_string_value(sv);
         end_value();
@@ -262,7 +262,7 @@ private:
         }
     }
 
-    bool do_byte_string_value(const byte_string_view& b, 
+    bool do_byte_string(const byte_string_view& b, 
                               semantic_tag, 
                               const ser_context&,
                               std::error_code&) override
@@ -297,7 +297,7 @@ private:
         return true;
     }
 
-    bool do_double_value(double val, 
+    bool do_double(double val, 
                          semantic_tag,
                          const ser_context&,
                          std::error_code&) override
@@ -322,7 +322,7 @@ private:
         return true;
     }
 
-    bool do_int64_value(int64_t val, 
+    bool do_int64(int64_t val, 
                         semantic_tag, 
                         const ser_context&,
                         std::error_code&) override
@@ -395,7 +395,7 @@ private:
         return true;
     }
 
-    bool do_uint64_value(uint64_t val, 
+    bool do_uint64(uint64_t val, 
                          semantic_tag, 
                          const ser_context&,
                          std::error_code&) override
@@ -433,7 +433,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool val, semantic_tag, const ser_context&, std::error_code&) override
+    bool do_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
     {
         // true and false
         result_.push_back(static_cast<uint8_t>(val ? jsoncons::msgpack::detail::msgpack_format ::true_cd : jsoncons::msgpack::detail::msgpack_format ::false_cd));

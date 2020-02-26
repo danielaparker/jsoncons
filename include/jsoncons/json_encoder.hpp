@@ -590,7 +590,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag, const ser_context&, std::error_code&) override
+    bool do_null(semantic_tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty()) 
         {
@@ -611,7 +611,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
+    bool do_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty()) 
         {
@@ -644,7 +644,7 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const byte_string_view& b, 
+    bool do_byte_string(const byte_string_view& b, 
                               semantic_tag tag,
                               const ser_context&,
                               std::error_code&) override
@@ -717,7 +717,7 @@ private:
         return true;
     }
 
-    bool do_double_value(double value, 
+    bool do_double(double value, 
                          semantic_tag,
                          const ser_context& context,
                          std::error_code& ec) override
@@ -745,7 +745,7 @@ private:
                 }
                 else if (options_.enable_nan_to_str())
                 {
-                    do_string_value(options_.nan_to_str(), semantic_tag::none, context, ec);
+                    do_string(options_.nan_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -762,7 +762,7 @@ private:
                 }
                 else if (options_.enable_inf_to_str())
                 {
-                    do_string_value(options_.inf_to_str(), semantic_tag::none, context, ec);
+                    do_string(options_.inf_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -779,7 +779,7 @@ private:
                 }
                 else if (options_.enable_neginf_to_str())
                 {
-                    do_string_value(options_.neginf_to_str(), semantic_tag::none, context, ec);
+                    do_string(options_.neginf_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -798,7 +798,7 @@ private:
         return true;
     }
 
-    bool do_int64_value(int64_t value, 
+    bool do_int64(int64_t value, 
                         semantic_tag,
                         const ser_context&,
                         std::error_code&) override
@@ -820,7 +820,7 @@ private:
         return true;
     }
 
-    bool do_uint64_value(uint64_t value, 
+    bool do_uint64(uint64_t value, 
                          semantic_tag, 
                          const ser_context&,
                          std::error_code&) override
@@ -842,7 +842,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool value, semantic_tag, const ser_context&, std::error_code&) override
+    bool do_bool(bool value, semantic_tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty()) 
         {
@@ -1148,7 +1148,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag, const ser_context&, std::error_code&) override
+    bool do_null(semantic_tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1215,7 +1215,7 @@ private:
         }
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
+    bool do_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1243,7 +1243,7 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const byte_string_view& b, 
+    bool do_byte_string(const byte_string_view& b, 
                               semantic_tag tag,
                               const ser_context&,
                               std::error_code&) override
@@ -1309,7 +1309,7 @@ private:
         return true;
     }
 
-    bool do_double_value(double value, 
+    bool do_double(double value, 
                          semantic_tag,
                          const ser_context& context,
                          std::error_code& ec) override
@@ -1329,7 +1329,7 @@ private:
                 }
                 else if (options_.enable_nan_to_str())
                 {
-                    do_string_value(options_.nan_to_str(), semantic_tag::none, context, ec);
+                    do_string(options_.nan_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -1344,7 +1344,7 @@ private:
                 }
                 else if (options_.enable_inf_to_str())
                 {
-                    do_string_value(options_.inf_to_str(), semantic_tag::none, context, ec);
+                    do_string(options_.inf_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -1359,7 +1359,7 @@ private:
                 }
                 else if (options_.enable_neginf_to_str())
                 {
-                    do_string_value(options_.neginf_to_str(), semantic_tag::none, context, ec);
+                    do_string(options_.neginf_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -1379,7 +1379,7 @@ private:
         return true;
     }
 
-    bool do_int64_value(int64_t value, 
+    bool do_int64(int64_t value, 
                         semantic_tag,
                         const ser_context&,
                         std::error_code&) override
@@ -1396,7 +1396,7 @@ private:
         return true;
     }
 
-    bool do_uint64_value(uint64_t value, 
+    bool do_uint64(uint64_t value, 
                          semantic_tag, 
                          const ser_context&,
                          std::error_code&) override
@@ -1413,7 +1413,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool value, semantic_tag, const ser_context&, std::error_code&) override
+    bool do_bool(bool value, semantic_tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {

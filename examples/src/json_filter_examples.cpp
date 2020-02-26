@@ -30,7 +30,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& s, 
+    bool do_string(const string_view_type& s, 
                          semantic_tag tag,
                          const ser_context& context,
                          std::error_code&) override
@@ -100,8 +100,8 @@ void change_member_name_example()
     json_stream_encoder encoder(std::cout);
 
     // Filters can be chained
-    rename_object_member_filter filter2("fifth", "fourth", encoder);
-    rename_object_member_filter filter1("fourth", "third", filter2);
+    rename_object_key_filter filter2("fifth", "fourth", encoder);
+    rename_object_key_filter filter1("fourth", "third", filter2);
 
     // A filter can be passed to any function that takes
     // a json_content_handler ...

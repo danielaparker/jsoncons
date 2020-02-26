@@ -1559,8 +1559,8 @@ derived classes cannot be distinguished in this way,
 you can introduce extra members. The convenience
 macros `JSONCONS_N_MEMBER_TRAITS`, `JSONCONS_ALL_MEMBER_TRAITS`,
 `JSONCONS_TPL_N_MEMBER_TRAITS`, `JSONCONS_TPL_ALL_MEMBER_TRAITS`,
-`JSONCONS_N_MEMBER_TRAITS_NAMED`, `JSONCONS_ALL_MEMBER_TRAITS_NAMED`,
-`JSONCONS_TPL_N_MEMBER_TRAITS_NAMED`, and `JSONCONS_TPL_ALL_MEMBER_TRAITS_NAMED`
+`JSONCONS_N_MEMBER_NAMED_TRAITS`, `JSONCONS_ALL_MEMBER_NAMED_TRAITS`,
+`JSONCONS_TPL_N_MEMBER_NAMED_TRAITS`, and `JSONCONS_TPL_ALL_MEMBER_NAMED_TRAITS`
 allow you to have `const` or `static const` data members that are serialized and that 
 particpate in the type selection strategy during deserialization. 
 
@@ -2210,7 +2210,7 @@ Output:
 
 #### Search for and repace an object member key
 
-You can rename object members with the built in filter [rename_object_member_filter](ref/rename_object_member_filter.md)
+You can rename object members with the built in filter [rename_object_key_filter](ref/rename_object_key_filter.md)
 
 ```c++
 #include <sstream>
@@ -2226,8 +2226,8 @@ int main()
     json_stream_encoder encoder(std::cout);
 
     // Filters can be chained
-    rename_object_member_filter filter2("fifth", "fourth", encoder);
-    rename_object_member_filter filter1("fourth", "third", filter2);
+    rename_object_key_filter filter2("fifth", "fourth", encoder);
+    rename_object_key_filter filter1("fourth", "third", filter2);
 
     // A filter can be passed to any function that takes a json_content_handler ...
     std::cout << "(1) ";

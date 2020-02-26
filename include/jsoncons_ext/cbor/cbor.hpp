@@ -76,7 +76,7 @@ encode_cbor(const T& val,
             std::error_code& ec)
 {
     cbor_stream_encoder encoder(os, options);
-    ser_traits<T>::encode(val, encoder, json(), ec);
+    ser_traits<T>::serialize(val, encoder, json(), ec);
 }
 
 template<class T>
@@ -84,7 +84,7 @@ typename std::enable_if<!is_basic_json_class<T>::value, void>::type
 encode_cbor(const T& val, std::vector<uint8_t>& v, const cbor_encode_options& options, std::error_code& ec)
 {
     cbor_bytes_encoder encoder(v, options);
-    ser_traits<T>::encode(val, encoder, json(), ec);
+    ser_traits<T>::serialize(val, encoder, json(), ec);
 }
 
 template<class T>
@@ -118,7 +118,7 @@ decode_cbor(const std::vector<uint8_t>& v)
 {
     cbor_bytes_cursor cursor(v);
     std::error_code ec;
-    T val = ser_traits<T>::decode(cursor, json(), ec);
+    T val = deser_traits<T>::deserialize(cursor, json(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -143,7 +143,7 @@ decode_cbor(std::istream& is)
 {
     cbor_stream_cursor cursor(is);
     std::error_code ec;
-    T val = ser_traits<T>::decode(cursor, json(), ec);
+    T val = deser_traits<T>::deserialize(cursor, json(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));

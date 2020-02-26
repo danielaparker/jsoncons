@@ -131,6 +131,24 @@ TEST_CASE("test_byte_string_as_vector")
     CHECK('l' == bytes[3]);
     CHECK('o' == bytes[4]);
 }
+
+TEST_CASE("jsoncons::json_type_traits<optional>")
+{
+    std::vector<jsoncons::optional<int>> v = { 0,1,jsoncons::optional<int>{} };
+    json j = v;
+    std::cout << j << "\n";
+
+    REQUIRE(j.size() == 3);
+    CHECK(j[0].as<int>() == 0);
+    CHECK(j[1].as<int>() == 1);
+    j[2].is_null();
+
+    CHECK(j[0].is<jsoncons::optional<int>>());
+    CHECK_FALSE(j[0].is<jsoncons::optional<double>>());
+    CHECK(j[1].is<jsoncons::optional<int>>());
+    CHECK_FALSE(j[1].is<jsoncons::optional<double>>());
+    CHECK(j[2].is<jsoncons::optional<int>>()); // null can be any optinal
+}
 /*
 TEST_CASE("test_own_vector")
 {

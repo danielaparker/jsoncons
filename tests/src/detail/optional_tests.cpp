@@ -10,6 +10,29 @@ using jsoncons::json;
 
 TEST_CASE("optional constructor tests")
 {
+    std::string input = R"(
+    [
+        {
+            "enrollmentNo" : 100,
+            "firstName" : "Tom",
+            "lastName" : "Cochrane",
+            "mark" : 55              
+        },
+        {
+            "enrollmentNo" : 101,
+            "firstName" : "Catherine",
+            "lastName" : "Smith",
+            "mark" : 95
+        },
+        {
+            "enrollmentNo" : 102,
+            "firstName" : "William",
+            "lastName" : "Skeleton",
+            "mark" : 60              
+        }
+    ]
+    )";
+
     SECTION("optional<T>()")
     {
         optional<int> x;
@@ -18,30 +41,8 @@ TEST_CASE("optional constructor tests")
     }
     SECTION("optional<T>(json)")
     {
-        std::string input = R"(
-        [
-            {
-                "enrollmentNo" : 100,
-                "firstName" : "Tom",
-                "lastName" : "Cochrane",
-                "mark" : 55              
-            },
-            {
-                "enrollmentNo" : 101,
-                "firstName" : "Catherine",
-                "lastName" : "Smith",
-                "mark" : 95
-            },
-            {
-                "enrollmentNo" : 102,
-                "firstName" : "William",
-                "lastName" : "Skeleton",
-                "mark" : 60              
-            }
-        ]
-        )";
         json j = json::parse(input);
-        optional<json> x(j);
+        optional<json> x{j};
         CHECK(x.has_value());
         bool b(x);
         CHECK(b);
@@ -61,6 +62,33 @@ TEST_CASE("optional constructor tests")
         REQUIRE(cref2.is_object());
         REQUIRE(cref2.size() == 4);
         CHECK(cref2["firstName"].as<std::string>() == std::string("Catherine"));
+    }
+    SECTION("optional<T>(int64_t) from const")
+    {
+        const int64_t val = 10;
+        optional<int64_t> x{val};
+        CHECK(x.has_value());
+        bool b(x);
+        CHECK(b);
+        optional<int64_t> y;
+        y = val;
+    }
+    SECTION("optional<T>(const optional<T>&)")
+    {
+        optional<int64_t> x(10);
+        optional<int64_t> y(x);
+        CHECK(y.has_value());
+        bool b(y);
+        CHECK(b);
+    }
+
+    SECTION("optional<T>(const optional<T>&) from const")
+    {
+        const optional<int64_t> x(10);
+        optional<int64_t> y(x);
+        CHECK(y.has_value());
+        bool b(y);
+        CHECK(b);
     }
 }
 
@@ -130,3 +158,4 @@ TEST_CASE("optional&& assignment tests")
         CHECK_FALSE(a.has_value());
     }
 }
+

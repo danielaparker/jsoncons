@@ -126,7 +126,7 @@ namespace jsoncons {
                         const ser_context& context=null_ser_context()) 
         {
             std::error_code ec;
-            bool more = do_null_value(tag, context, ec);
+            bool more = do_null(tag, context, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
@@ -139,7 +139,7 @@ namespace jsoncons {
                         const ser_context& context=null_ser_context()) 
         {
             std::error_code ec;
-            bool more = do_bool_value(value, tag, context, ec);
+            bool more = do_bool(value, tag, context, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
@@ -152,7 +152,7 @@ namespace jsoncons {
                           const ser_context& context=null_ser_context()) 
         {
             std::error_code ec;
-            bool more = do_string_value(value, tag, context, ec);
+            bool more = do_string(value, tag, context, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
@@ -165,7 +165,7 @@ namespace jsoncons {
                                const ser_context& context=null_ser_context())
         {
             std::error_code ec;
-            bool more = do_byte_string_value(b, tag, context, ec);
+            bool more = do_byte_string(b, tag, context, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
@@ -185,7 +185,7 @@ namespace jsoncons {
                           const ser_context& context=null_ser_context())
         {
             std::error_code ec;
-            bool more = do_uint64_value(value, tag, context, ec);
+            bool more = do_uint64(value, tag, context, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
@@ -198,7 +198,7 @@ namespace jsoncons {
                          const ser_context& context=null_ser_context())
         {
             std::error_code ec;
-            bool more = do_int64_value(value, tag, context, ec);
+            bool more = do_int64(value, tag, context, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
@@ -211,7 +211,7 @@ namespace jsoncons {
                         const ser_context& context=null_ser_context())
         {
             std::error_code ec;
-            bool more = do_half_value(value, tag, context, ec);
+            bool more = do_half(value, tag, context, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
@@ -224,7 +224,7 @@ namespace jsoncons {
                           const ser_context& context=null_ser_context())
         {
             std::error_code ec;
-            bool more = do_double_value(value, tag, context, ec);
+            bool more = do_double(value, tag, context, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
@@ -276,7 +276,7 @@ namespace jsoncons {
                         const ser_context& context,
                         std::error_code& ec) 
         {
-            return do_null_value(tag, context, ec);
+            return do_null(tag, context, ec);
         }
 
         bool bool_value(bool value, 
@@ -284,7 +284,7 @@ namespace jsoncons {
                         const ser_context& context,
                         std::error_code& ec) 
         {
-            return do_bool_value(value, tag, context, ec);
+            return do_bool(value, tag, context, ec);
         }
 
         bool string_value(const string_view_type& value, 
@@ -292,7 +292,7 @@ namespace jsoncons {
                           const ser_context& context,
                           std::error_code& ec) 
         {
-            return do_string_value(value, tag, context, ec);
+            return do_string(value, tag, context, ec);
         }
 
         bool byte_string_value(const byte_string_view& b, 
@@ -300,7 +300,7 @@ namespace jsoncons {
                                const ser_context& context,
                                std::error_code& ec)
         {
-            return do_byte_string_value(b, tag, context, ec);
+            return do_byte_string(b, tag, context, ec);
         }
 
         bool byte_string_value(const uint8_t* p, std::size_t size, 
@@ -316,7 +316,7 @@ namespace jsoncons {
                           const ser_context& context,
                           std::error_code& ec)
         {
-            return do_uint64_value(value, tag, context, ec);
+            return do_uint64(value, tag, context, ec);
         }
 
         bool int64_value(int64_t value, 
@@ -324,7 +324,7 @@ namespace jsoncons {
                          const ser_context& context,
                          std::error_code& ec)
         {
-            return do_int64_value(value, tag, context, ec);
+            return do_int64(value, tag, context, ec);
         }
 
         bool half_value(uint16_t value, 
@@ -332,7 +332,7 @@ namespace jsoncons {
                         const ser_context& context,
                         std::error_code& ec)
         {
-            return do_half_value(value, tag, context, ec);
+            return do_half(value, tag, context, ec);
         }
 
         bool double_value(double value, 
@@ -340,7 +340,7 @@ namespace jsoncons {
                           const ser_context& context,
                           std::error_code& ec)
         {
-            return do_double_value(value, tag, context, ec);
+            return do_double(value, tag, context, ec);
         }
 
         template <class T>
@@ -608,50 +608,50 @@ namespace jsoncons {
                              const ser_context& context, 
                              std::error_code&) = 0;
 
-        virtual bool do_null_value(semantic_tag tag, 
-                                   const ser_context& context, 
-                                   std::error_code& ec) = 0;
+        virtual bool do_null(semantic_tag tag, 
+                             const ser_context& context, 
+                             std::error_code& ec) = 0;
 
-        virtual bool do_bool_value(bool value, 
-                                   semantic_tag tag, 
-                                   const ser_context& context, 
-                                   std::error_code&) = 0;
+        virtual bool do_bool(bool value, 
+                             semantic_tag tag, 
+                             const ser_context& context, 
+                             std::error_code&) = 0;
 
-        virtual bool do_string_value(const string_view_type& value, 
-                                     semantic_tag tag, 
-                                     const ser_context& context, 
-                                     std::error_code& ec) = 0;
+        virtual bool do_string(const string_view_type& value, 
+                               semantic_tag tag, 
+                               const ser_context& context, 
+                               std::error_code& ec) = 0;
 
-        virtual bool do_byte_string_value(const byte_string_view& value, 
-                                          semantic_tag tag, 
-                                          const ser_context& context,
-                                          std::error_code& ec) = 0;
-
-        virtual bool do_uint64_value(uint64_t value, 
-                                     semantic_tag tag, 
-                                     const ser_context& context,
-                                     std::error_code& ec) = 0;
-
-        virtual bool do_int64_value(int64_t value, 
-                                    semantic_tag tag,
+        virtual bool do_byte_string(const byte_string_view& value, 
+                                    semantic_tag tag, 
                                     const ser_context& context,
                                     std::error_code& ec) = 0;
 
-        virtual bool do_half_value(uint16_t value, 
-                                   semantic_tag tag,
-                                   const ser_context& context,
-                                   std::error_code& ec)
+        virtual bool do_uint64(uint64_t value, 
+                               semantic_tag tag, 
+                               const ser_context& context,
+                               std::error_code& ec) = 0;
+
+        virtual bool do_int64(int64_t value, 
+                              semantic_tag tag,
+                              const ser_context& context,
+                              std::error_code& ec) = 0;
+
+        virtual bool do_half(uint16_t value, 
+                             semantic_tag tag,
+                             const ser_context& context,
+                             std::error_code& ec)
         {
-            return do_double_value(jsoncons::detail::decode_half(value),
-                                   tag,
-                                   context,
-                                   ec);
+            return do_double(jsoncons::detail::decode_half(value),
+                             tag,
+                             context,
+                             ec);
         }
 
-        virtual bool do_double_value(double value, 
-                                     semantic_tag tag,
-                                     const ser_context& context,
-                                     std::error_code& ec) = 0;
+        virtual bool do_double(double value, 
+                               semantic_tag tag,
+                               const ser_context& context,
+                               std::error_code& ec) = 0;
 
         virtual bool do_typed_array(const span<const uint8_t>& s, 
                                     semantic_tag tag,
@@ -852,7 +852,7 @@ namespace jsoncons {
                 more = do_begin_array(shape.size(), tag, context, ec);
                 for (auto it = shape.begin(); more && it != shape.end(); ++it)
                 {
-                    do_uint64_value(*it, semantic_tag::none, context, ec);
+                    do_uint64(*it, semantic_tag::none, context, ec);
                 }
                 if (more)
                 {
@@ -867,7 +867,6 @@ namespace jsoncons {
         {
             return do_end_array(context, ec);
         }
-
     };
 
     template <class CharT>
@@ -933,7 +932,7 @@ namespace jsoncons {
             return parse_more_;
         }
 
-        bool do_null_value(semantic_tag, const ser_context&, std::error_code& ec) override
+        bool do_null(semantic_tag, const ser_context&, std::error_code& ec) override
         {
             if (ec_)
             {
@@ -942,7 +941,7 @@ namespace jsoncons {
             return parse_more_;
         }
 
-        bool do_string_value(const string_view_type&, semantic_tag, const ser_context&, std::error_code& ec) override
+        bool do_string(const string_view_type&, semantic_tag, const ser_context&, std::error_code& ec) override
         {
             if (ec_)
             {
@@ -951,10 +950,7 @@ namespace jsoncons {
             return parse_more_;
         }
 
-        bool do_byte_string_value(const byte_string_view&,
-                                  semantic_tag, 
-                                  const ser_context&,
-                                  std::error_code& ec) override
+        bool do_byte_string(const byte_string_view&, semantic_tag, const ser_context&, std::error_code& ec) override
         {
             if (ec_)
             {
@@ -963,10 +959,7 @@ namespace jsoncons {
             return parse_more_;
         }
 
-        bool do_int64_value(int64_t, 
-                            semantic_tag, 
-                            const ser_context&,
-                            std::error_code& ec) override
+        bool do_uint64(uint64_t, semantic_tag, const ser_context&, std::error_code& ec) override
         {
             if (ec_)
             {
@@ -975,10 +968,7 @@ namespace jsoncons {
             return parse_more_;
         }
 
-        bool do_uint64_value(uint64_t, 
-                             semantic_tag, 
-                             const ser_context&,
-                             std::error_code& ec) override
+        bool do_int64(int64_t, semantic_tag, const ser_context&, std::error_code& ec) override
         {
             if (ec_)
             {
@@ -987,10 +977,7 @@ namespace jsoncons {
             return parse_more_;
         }
 
-        bool do_double_value(double, 
-                             semantic_tag,
-                             const ser_context&,
-                             std::error_code& ec) override
+        bool do_half(uint16_t, semantic_tag, const ser_context&, std::error_code& ec) override
         {
             if (ec_)
             {
@@ -999,7 +986,16 @@ namespace jsoncons {
             return parse_more_;
         }
 
-        bool do_bool_value(bool, semantic_tag, const ser_context&, std::error_code& ec) override
+        bool do_double(double, semantic_tag, const ser_context&, std::error_code& ec) override
+        {
+            if (ec_)
+            {
+                ec = ec_;
+            }
+            return parse_more_;
+        }
+
+        bool do_bool(bool, semantic_tag, const ser_context&, std::error_code& ec) override
         {
             if (ec_)
             {
