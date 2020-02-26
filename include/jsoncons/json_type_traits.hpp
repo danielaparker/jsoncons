@@ -879,7 +879,7 @@ namespace detail
 
         static std::shared_ptr<ValueType> as(const Json& j) 
         {
-            return std::make_shared<ValueType>(j.as<ValueType>());
+            return std::make_shared<ValueType>(j.template as<ValueType>());
         }
 
         static Json to_json(const std::shared_ptr<ValueType>& ptr) 
@@ -902,20 +902,25 @@ namespace detail
                                                     !std::is_polymorphic<ValueType>::value
     >::type>
     {
-        static bool is(const Json& j) noexcept {
+        static bool is(const Json& j) noexcept 
+        {
             return j.is_null() || j.template is<ValueType>();
         }
 
-        static std::unique_ptr<ValueType> as(const Json& j) {
-            return jsoncons::make_unique<ValueType>(j.as<ValueType>());
+        static std::unique_ptr<ValueType> as(const Json& j) 
+        {
+            return jsoncons::make_unique<ValueType>(j.template as<ValueType>());
         }
 
-        static Json to_json(const std::unique_ptr<ValueType>& ptr) {
-            if (ptr.get() != nullptr) {
+        static Json to_json(const std::unique_ptr<ValueType>& ptr) 
+        {
+            if (ptr.get() != nullptr) 
+            {
                 Json j(*ptr);
                 return j;
             }
-            else {
+            else 
+            {
                 return Json::null();
             }
         }
