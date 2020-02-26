@@ -220,178 +220,180 @@ JSONCONS_POLYMORPHIC_TRAITS(ns::Foo, ns::Bar, ns::Baz)
 JSONCONS_N_MEMBER_TRAITS(ns::MetaDataReplyTest, 2, status, payload, description)
 #endif
 
-using namespace jsoncons;
+namespace {
+    using namespace jsoncons;
 
 #if defined(JSONCONS_HAS_STD_OPTIONAL)
-static void json_type_traits_optional_examples()
-{
-    std::string input1 = R"({
-      "status": "OK",
-      "payload": "Modified",
-      "description": "TEST"
-    })";
-    std::string input2 = R"({
-      "status": "OK",
-      "payload": "Modified"
-    })";
+    void json_type_traits_optional_examples()
+    {
+        std::string input1 = R"({
+          "status": "OK",
+          "payload": "Modified",
+          "description": "TEST"
+        })";
+        std::string input2 = R"({
+          "status": "OK",
+          "payload": "Modified"
+        })";
 
-    auto val1 = decode_json<ns::MetaDataReplyTest>(input1);
-    assert(val1.GetStatus() == "OK");
-    assert(val1.GetPayload() == "Modified");
-    assert(val1.GetDescription());
-    assert(val1.GetDescription() == "TEST");
+        auto val1 = decode_json<ns::MetaDataReplyTest>(input1);
+        assert(val1.GetStatus() == "OK");
+        assert(val1.GetPayload() == "Modified");
+        assert(val1.GetDescription());
+        assert(val1.GetDescription() == "TEST");
 
-    auto val2 = decode_json<ns::MetaDataReplyTest>(input2);
-    assert(val2.GetStatus() == "OK");
-    assert(val2.GetPayload() == "Modified");
-    assert(!val2.GetDescription());
+        auto val2 = decode_json<ns::MetaDataReplyTest>(input2);
+        assert(val2.GetStatus() == "OK");
+        assert(val2.GetPayload() == "Modified");
+        assert(!val2.GetDescription());
 
-    std::string output1;
-    std::string output2;
+        std::string output1;
+        std::string output2;
 
-    encode_json(val2,output2,indenting::indent);
-    encode_json(val1,output1,indenting::indent);
+        encode_json(val2,output2,indenting::indent);
+        encode_json(val1,output1,indenting::indent);
 
-    std::cout << "(1)\n";
-    std::cout << output1 << "\n\n";
+        std::cout << "(1)\n";
+        std::cout << output1 << "\n\n";
 
-    std::cout << "(2)\n";
-    std::cout << output2 << "\n\n";
-}
+        std::cout << "(2)\n";
+        std::cout << output2 << "\n\n";
+    }
 #endif
 
-static void json_type_traits_book_examples()
-{
-    const std::string input = R"(
+    void json_type_traits_book_examples()
+    {
+        const std::string input = R"(
+        [
+            {
+                "category" : "fiction",
+                "author" : "Haruki Murakami",
+                "title" : "Kafka on the Shore",
+                "price" : 25.17
+            },
+            {
+                "category" : "biography",
+                "author" : "Robert A. Caro",
+                "title" : "The Path to Power: The Years of Lyndon Johnson I",
+                "price" : 16.99
+            }
+        ]
+        )";
+
+        std::cout << "(1)\n\n";
+        auto books1 = decode_json<std::vector<ns::Book1>>(input);
+        for (const auto& item : books1)
+        {
+            switch(item.category)
+            {
+                case ns::BookCategory::fiction: std::cout << "fiction, "; break;
+                case ns::BookCategory::biography: std::cout << "biography, "; break;
+            }
+            std::cout << item.author << ", " 
+                      << item.title << ", " 
+                      << item.price << "\n";
+        }
+        std::cout << "\n";
+        encode_json(books1, std::cout, indenting::indent);
+        std::cout << "\n\n";
+
+        std::cout << "(2)\n\n";
+        auto books2 = decode_json<std::vector<ns::Book2>>(input);
+        for (const auto& item : books2)
+        {
+            switch(item.get_category())
+            {
+                case ns::BookCategory::fiction: std::cout << "fiction, "; break;
+                case ns::BookCategory::biography: std::cout << "biography, "; break;
+            }
+            std::cout << item.get_author() << ", " 
+                      << item.get_title() << ", " 
+                      << item.get_price() << "\n";
+        }
+        std::cout << "\n";
+        encode_json(books2, std::cout, indenting::indent);
+        std::cout << "\n\n";
+
+        std::cout << "(3)\n\n";
+        auto books3 = decode_json<std::vector<ns::Book3>>(input);
+        for (const auto& item : books3)
+        {
+            switch(item.category())
+            {
+                case ns::BookCategory::fiction: std::cout << "fiction, "; break;
+                case ns::BookCategory::biography: std::cout << "biography, "; break;
+            }
+            std::cout << item.author() << ", " 
+                      << item.title() << ", " 
+                      << item.price() << "\n";
+        }
+        std::cout << "\n";
+        encode_json(books3, std::cout, indenting::indent);
+        std::cout << "\n\n";
+    }
+
+    void employee_polymorphic_example()
+    {
+        std::string input = R"(
     [
         {
-            "category" : "fiction",
-            "author" : "Haruki Murakami",
-            "title" : "Kafka on the Shore",
-            "price" : 25.17
+            "firstName": "John",
+            "hours": 1000,
+            "lastName": "Smith",
+            "wage": 40.0
         },
         {
-            "category" : "biography",
-            "author" : "Robert A. Caro",
-            "title" : "The Path to Power: The Years of Lyndon Johnson I",
-            "price" : 16.99
+            "baseSalary": 30000.0,
+            "commission": 0.25,
+            "firstName": "Jane",
+            "lastName": "Doe",
+            "sales": 1000
         }
     ]
-    )";
+        )"; 
 
-    std::cout << "(1)\n\n";
-    auto books1 = decode_json<std::vector<ns::Book1>>(input);
-    for (const auto& item : books1)
-    {
-        switch(item.category)
+        auto v = decode_json<std::vector<std::unique_ptr<ns::Employee>>>(input);
+
+        std::cout << "(1)\n";
+        for (const auto& p : v)
         {
-            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
-            case ns::BookCategory::biography: std::cout << "biography, "; break;
+            std::cout << p->firstName() << " " << p->lastName() << ", " << p->calculatePay() << "\n";
         }
-        std::cout << item.author << ", " 
-                  << item.title << ", " 
-                  << item.price << "\n";
-    }
-    std::cout << "\n";
-    encode_json(books1, std::cout, indenting::indent);
-    std::cout << "\n\n";
 
-    std::cout << "(2)\n\n";
-    auto books2 = decode_json<std::vector<ns::Book2>>(input);
-    for (const auto& item : books2)
+        std::cout << "\n(2)\n";
+        encode_json(v, std::cout, indenting::indent);
+
+        std::cout << "\n\n(3)\n";
+        json j(v);
+        std::cout << pretty_print(j) << "\n\n";
+    }
+
+    void foo_bar_baz_example()
     {
-        switch(item.get_category())
+        std::vector<std::unique_ptr<ns::Foo>> u;
+        u.emplace_back(new ns::Bar());
+        u.emplace_back(new ns::Baz());
+
+        std::string buffer;
+        encode_json(u, buffer);
+        std::cout << "(1)\n" << buffer << "\n\n";
+
+        auto v = decode_json<std::vector<std::unique_ptr<ns::Foo>>>(buffer);
+
+        std::cout << "(2)\n";
+        for (const auto& ptr : v)
         {
-            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
-            case ns::BookCategory::biography: std::cout << "biography, "; break;
+            if (dynamic_cast<ns::Bar*>(ptr.get()))
+            {
+                std::cout << "A bar\n";
+            }
+            else if (dynamic_cast<ns::Baz*>(ptr.get()))
+            {
+                std::cout << "A baz\n";
+            } 
         }
-        std::cout << item.get_author() << ", " 
-                  << item.get_title() << ", " 
-                  << item.get_price() << "\n";
     }
-    std::cout << "\n";
-    encode_json(books2, std::cout, indenting::indent);
-    std::cout << "\n\n";
-
-    std::cout << "(3)\n\n";
-    auto books3 = decode_json<std::vector<ns::Book3>>(input);
-    for (const auto& item : books3)
-    {
-        switch(item.category())
-        {
-            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
-            case ns::BookCategory::biography: std::cout << "biography, "; break;
-        }
-        std::cout << item.author() << ", " 
-                  << item.title() << ", " 
-                  << item.price() << "\n";
-    }
-    std::cout << "\n";
-    encode_json(books3, std::cout, indenting::indent);
-    std::cout << "\n\n";
-}
-
-void employee_polymorphic_example()
-{
-    std::string input = R"(
-[
-    {
-        "firstName": "John",
-        "hours": 1000,
-        "lastName": "Smith",
-        "wage": 40.0
-    },
-    {
-        "baseSalary": 30000.0,
-        "commission": 0.25,
-        "firstName": "Jane",
-        "lastName": "Doe",
-        "sales": 1000
-    }
-]
-    )"; 
-
-    auto v = decode_json<std::vector<std::unique_ptr<ns::Employee>>>(input);
-
-    std::cout << "(1)\n";
-    for (const auto& p : v)
-    {
-        std::cout << p->firstName() << " " << p->lastName() << ", " << p->calculatePay() << "\n";
-    }
-
-    std::cout << "\n(2)\n";
-    encode_json(v, std::cout, indenting::indent);
-
-    std::cout << "\n\n(3)\n";
-    json j(v);
-    std::cout << pretty_print(j) << "\n\n";
-}
-
-void foo_bar_baz_example()
-{
-    std::vector<std::unique_ptr<ns::Foo>> u;
-    u.emplace_back(new ns::Bar());
-    u.emplace_back(new ns::Baz());
-
-    std::string buffer;
-    encode_json(u, buffer);
-    std::cout << "(1)\n" << buffer << "\n\n";
-
-    auto v = decode_json<std::vector<std::unique_ptr<ns::Foo>>>(buffer);
-
-    std::cout << "(2)\n";
-    for (const auto& ptr : v)
-    {
-        if (dynamic_cast<ns::Bar*>(ptr.get()))
-        {
-            std::cout << "A bar\n";
-        }
-        else if (dynamic_cast<ns::Baz*>(ptr.get()))
-        {
-            std::cout << "A baz\n";
-        } 
-    }
-}
+} // annonymous
 
 void json_traits_macros_examples()
 {

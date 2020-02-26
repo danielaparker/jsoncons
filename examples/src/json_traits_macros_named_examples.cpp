@@ -115,95 +115,98 @@ JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS(ns::Book4,(getCategory,setCategory,"Cate
                                                        (getTitle,setTitle,"Title"),
                                                        (getPrice,setPrice,"Price"))
 
-using namespace jsoncons;
+namespace {
 
-static void json_type_traits_book_examples()
-{
-    const std::string input = R"(
-    [
-        {
-            "Category" : "Fiction",
-            "Author" : "Haruki Murakami",
-            "Title" : "Kafka on the Shore",
-            "Price" : 25.17
-        },
-        {
-            "Category" : "Biography",
-            "Author" : "Robert A. Caro",
-            "Title" : "The Path to Power: The Years of Lyndon Johnson I",
-            "Price" : 16.99
-        }
-    ]
-    )";
+    using namespace jsoncons;
 
-    std::cout << "(1)\n\n";
-    auto books1 = decode_json<std::vector<ns::Book1>>(input);
-    for (const auto& item : books1)
+    void json_type_traits_book_examples()
     {
-        switch(item.category)
-        {
-            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
-            case ns::BookCategory::biography: std::cout << "biography, "; break;
-        }
-        std::cout << item.author << ", " 
-                  << item.title << ", " 
-                  << item.price << "\n";
-    }
-    std::cout << "\n";
-    encode_json(books1, std::cout, indenting::indent);
-    std::cout << "\n\n";
+        const std::string input = R"(
+        [
+            {
+                "Category" : "Fiction",
+                "Author" : "Haruki Murakami",
+                "Title" : "Kafka on the Shore",
+                "Price" : 25.17
+            },
+            {
+                "Category" : "Biography",
+                "Author" : "Robert A. Caro",
+                "Title" : "The Path to Power: The Years of Lyndon Johnson I",
+                "Price" : 16.99
+            }
+        ]
+        )";
 
-    std::cout << "(2)\n\n";
-    auto books2 = decode_json<std::vector<ns::Book2>>(input);
-    for (const auto& item : books2)
-    {
-        switch(item.category())
+        std::cout << "(1)\n\n";
+        auto books1 = decode_json<std::vector<ns::Book1>>(input);
+        for (const auto& item : books1)
         {
-            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
-            case ns::BookCategory::biography: std::cout << "biography, "; break;
+            switch(item.category)
+            {
+                case ns::BookCategory::fiction: std::cout << "fiction, "; break;
+                case ns::BookCategory::biography: std::cout << "biography, "; break;
+            }
+            std::cout << item.author << ", " 
+                      << item.title << ", " 
+                      << item.price << "\n";
         }
-        std::cout << item.author() << ", " 
-                  << item.title() << ", " 
-                  << item.price() << "\n";
-    }
-    std::cout << "\n";
-    encode_json(books2, std::cout, indenting::indent);
-    std::cout << "\n\n";
+        std::cout << "\n";
+        encode_json(books1, std::cout, indenting::indent);
+        std::cout << "\n\n";
 
-    std::cout << "(3)\n\n";
-    auto books3 = decode_json<std::vector<ns::Book3>>(input);
-    for (const auto& item : books3)
-    {
-        switch(item.category())
+        std::cout << "(2)\n\n";
+        auto books2 = decode_json<std::vector<ns::Book2>>(input);
+        for (const auto& item : books2)
         {
-            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
-            case ns::BookCategory::biography: std::cout << "biography, "; break;
+            switch(item.category())
+            {
+                case ns::BookCategory::fiction: std::cout << "fiction, "; break;
+                case ns::BookCategory::biography: std::cout << "biography, "; break;
+            }
+            std::cout << item.author() << ", " 
+                      << item.title() << ", " 
+                      << item.price() << "\n";
         }
-        std::cout << item.author() << ", " 
-                  << item.title() << ", " 
-                  << item.price() << "\n";
-    }
-    std::cout << "\n";
-    encode_json(books3, std::cout, indenting::indent);
-    std::cout << "\n\n";
+        std::cout << "\n";
+        encode_json(books2, std::cout, indenting::indent);
+        std::cout << "\n\n";
 
-    std::cout << "(4)\n\n";
-    auto books4 = decode_json<std::vector<ns::Book4>>(input);
-    for (const auto& item : books4)
-    {
-        switch(item.getCategory())
+        std::cout << "(3)\n\n";
+        auto books3 = decode_json<std::vector<ns::Book3>>(input);
+        for (const auto& item : books3)
         {
-            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
-            case ns::BookCategory::biography: std::cout << "biography, "; break;
+            switch(item.category())
+            {
+                case ns::BookCategory::fiction: std::cout << "fiction, "; break;
+                case ns::BookCategory::biography: std::cout << "biography, "; break;
+            }
+            std::cout << item.author() << ", " 
+                      << item.title() << ", " 
+                      << item.price() << "\n";
         }
-        std::cout << item.getAuthor() << ", " 
-                  << item.getTitle() << ", " 
-                  << item.getPrice() << "\n";
+        std::cout << "\n";
+        encode_json(books3, std::cout, indenting::indent);
+        std::cout << "\n\n";
+
+        std::cout << "(4)\n\n";
+        auto books4 = decode_json<std::vector<ns::Book4>>(input);
+        for (const auto& item : books4)
+        {
+            switch(item.getCategory())
+            {
+                case ns::BookCategory::fiction: std::cout << "fiction, "; break;
+                case ns::BookCategory::biography: std::cout << "biography, "; break;
+            }
+            std::cout << item.getAuthor() << ", " 
+                      << item.getTitle() << ", " 
+                      << item.getPrice() << "\n";
+        }
+        std::cout << "\n";
+        encode_json(books4, std::cout, indenting::indent);
+        std::cout << "\n\n";
     }
-    std::cout << "\n";
-    encode_json(books4, std::cout, indenting::indent);
-    std::cout << "\n\n";
-}
+} // namespace
 
 void json_traits_macros_named_examples()
 {

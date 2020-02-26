@@ -1068,7 +1068,7 @@ public:
                                 ec = jmespath_errc::function_name_not_found;
                                 return Json::null();
                             }
-                            key_selector_stack_.back() = key_selector(make_unique<function_selector>(it->second));
+                            key_selector_stack_.emplace_back(make_unique<function_selector>(it->second));
                             structure_offset_stack_.push_back(key_selector_stack_.size());
                             key_selector_stack_.emplace_back(make_unique<compound_expression>());
                             state_stack_.back() = path_state::arg_or_right_paren;
