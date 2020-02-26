@@ -136,18 +136,58 @@ TEST_CASE("jsoncons::json_type_traits<optional>")
 {
     std::vector<jsoncons::optional<int>> v = { 0,1,jsoncons::optional<int>{} };
     json j = v;
-    std::cout << j << "\n";
 
     REQUIRE(j.size() == 3);
     CHECK(j[0].as<int>() == 0);
     CHECK(j[1].as<int>() == 1);
-    j[2].is_null();
+    CHECK(j[2].is_null());
 
     CHECK(j[0].is<jsoncons::optional<int>>());
     CHECK_FALSE(j[0].is<jsoncons::optional<double>>());
     CHECK(j[1].is<jsoncons::optional<int>>());
     CHECK_FALSE(j[1].is<jsoncons::optional<double>>());
     CHECK(j[2].is<jsoncons::optional<int>>()); // null can be any optinal
+}
+
+TEST_CASE("jsoncons::json_type_traits<shared_ptr>")
+{
+    std::vector<std::shared_ptr<std::string>> v = {std::make_shared<std::string>("Hello"), 
+                                                   std::make_shared<std::string>("World"),
+                                                   std::shared_ptr<std::string>()};
+    json j{v};
+
+    REQUIRE(j.size() == 3);
+    CHECK(j[0].as<std::string>() == std::string("Hello"));
+    CHECK(j[1].as<std::string>() == std::string("World"));
+    CHECK(j[2].is_null());
+
+    CHECK(j[0].is<std::shared_ptr<std::string>>());
+    CHECK_FALSE(j[0].is<std::shared_ptr<int>>());
+    CHECK(j[1].is<std::shared_ptr<std::string>>());
+    CHECK_FALSE(j[1].is<std::shared_ptr<int>>());
+    CHECK(j[2].is<std::shared_ptr<std::string>>());
+}
+
+TEST_CASE("jsoncons::json_type_traits<unique_ptr>")
+{
+    std::vector<std::unique_ptr<std::string>> v;
+    
+    v.emplace_back(jsoncons::make_unique<std::string>("Hello"));
+    v.emplace_back(jsoncons::make_unique<std::string>("World"));
+    v.emplace_back(std::unique_ptr<std::string>());
+
+    json j{ v };
+
+    REQUIRE(j.size() == 3);
+    CHECK(j[0].as<std::string>() == std::string("Hello"));
+    CHECK(j[1].as<std::string>() == std::string("World"));
+    CHECK(j[2].is_null());
+
+    CHECK(j[0].is<std::unique_ptr<std::string>>());
+    CHECK_FALSE(j[0].is<std::unique_ptr<int>>());
+    CHECK(j[1].is<std::unique_ptr<std::string>>());
+    CHECK_FALSE(j[1].is<std::unique_ptr<int>>());
+    CHECK(j[2].is<std::unique_ptr<std::string>>());
 }
 /*
 TEST_CASE("test_own_vector")
