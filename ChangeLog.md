@@ -3,8 +3,15 @@ master
 
 Changes:
 
-- The name `basic_rename_object_member_filter` has been deprecated and renamed to 
-`basic_rename_object_key_filter` 
+- The name `rename_object_member_filter` has been deprecated and renamed to 
+`rename_object_key_filter`
+ 
+Enhancements:
+ 
+-  New json_type_traits specialization for `std::shared_ptr<T>` for `T` that is not a polymorphic class,
+i.e., does not have any virtual functions 
+
+-  New json_type_traits specialization for `std::unique_ptr<T>` for `T` that is not a polymorphic class  
 
 v0.145.2
 --------
