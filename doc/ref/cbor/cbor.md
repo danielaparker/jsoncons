@@ -104,6 +104,13 @@ CBOR data item|CBOR tag                                         | jsoncons data 
 
 ## Examples
 
+[Working with CBOR data](#A1)  
+[Encode and decode of a large typed array](#A2)  
+[CBOR and basic_json](#A3)  
+[Query CBOR with JSONPath](#A4)  
+
+<div id="A1"/> 
+
 ### Working with CBOR data
 
 For the examples below you need to include some header files and initialize a buffer of CBOR data:
@@ -357,6 +364,8 @@ string_value: 0x3p-1 (bigfloat)
 string_value: 1.23456789012345678901234567890 (bigdec)
 ```
 
+<div id="A2"/> 
+
 ### Encode and decode of a large typed array
 
 ```c++
@@ -405,6 +414,8 @@ first 19 bytes:
 
 d8 55 5a 03 93 87 00 00 00 00 00 00 00 80 3f 00 00 00 40
 ```
+
+<div id="A3"/> 
 
 ### CBOR and basic_json
 
@@ -482,6 +493,8 @@ Marilyn C, 0.9
 
 (3) Marilyn C
 ```
+
+<div id="A4"/> 
 
 ### Query CBOR with JSONPath
 ```c++
