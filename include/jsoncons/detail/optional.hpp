@@ -60,7 +60,7 @@ namespace detail
         
         // copy constructors
         optional(const optional<T>& other)
-            : has_value_(false)
+            : has_value_(false), dummy_{}
         {
             if (other)
             {
@@ -76,7 +76,7 @@ namespace detail
                                           !is_constructible_or_convertible_from_optional<T,U>::value &&
                                           std::is_copy_constructible<typename std::decay<U>::type>::value,int>::type = 0>
         optional(const optional<U>& other)
-            : has_value_(false)
+            : has_value_(false), dummy_{}
         {
             if (other)
             {
@@ -91,7 +91,7 @@ namespace detail
                                           !is_constructible_or_convertible_from_optional<T,U>::value &&
                                           std::is_copy_constructible<typename std::decay<U>::type>::value,int>::type = 0>
         explicit optional(const optional<U>& other)
-            : has_value_(false)
+            : has_value_(false), dummy_{}
         {
             if (other)
             {
@@ -103,7 +103,7 @@ namespace detail
         template <class T2 = T>
         optional(optional<T>&& other,
                  typename std::enable_if<std::is_move_constructible<typename std::decay<T2>::type>::value>::type* = 0)
-            : has_value_(false)
+            : has_value_(false), dummy_{}
        {
             if (other)
             {
