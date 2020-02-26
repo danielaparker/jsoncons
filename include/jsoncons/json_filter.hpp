@@ -147,7 +147,7 @@ private:
 };
 
 template <class CharT>
-class basic_rename_object_member_filter : public basic_json_filter<CharT>
+class basic_rename_object_key_filter : public basic_json_filter<CharT>
 {
 public:
     using typename basic_json_filter<CharT>::string_view_type;
@@ -156,7 +156,7 @@ private:
     std::basic_string<CharT> name_;
     std::basic_string<CharT> new_name_;
 public:
-    basic_rename_object_member_filter(const std::basic_string<CharT>& name,
+    basic_rename_object_key_filter(const std::basic_string<CharT>& name,
                              const std::basic_string<CharT>& new_name,
                              basic_json_content_handler<CharT>& handler)
         : basic_json_filter<CharT>(handler), 
@@ -466,16 +466,18 @@ json_content_handler_adaptor<From,To> make_json_content_handler_adaptor(To& to)
 
 typedef basic_json_filter<char> json_filter;
 typedef basic_json_filter<wchar_t> wjson_filter;
-typedef basic_rename_object_member_filter<char> rename_object_member_filter;
-typedef basic_rename_object_member_filter<wchar_t> wrename_object_member_filter;
+typedef basic_rename_object_key_filter<char> rename_object_key_filter;
+typedef basic_rename_object_key_filter<wchar_t> wrename_object_key_filter;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template <class CharT>
 using basic_json_content_filter = basic_json_filter<CharT>;
 JSONCONS_DEPRECATED_MSG("Instead, use json_filter") typedef basic_json_filter<char> json_content_filter;
 JSONCONS_DEPRECATED_MSG("Instead, use wjson_filter") typedef basic_json_filter<wchar_t> wjson_content_filter;
-JSONCONS_DEPRECATED_MSG("Instead, use rename_object_member_filter") typedef basic_rename_object_member_filter<char> rename_name_filter;
-JSONCONS_DEPRECATED_MSG("Instead, use wrename_object_member_filter") typedef basic_rename_object_member_filter<wchar_t> wrename_name_filter;
+JSONCONS_DEPRECATED_MSG("Instead, use rename_object_key_filter") typedef basic_rename_object_key_filter<char> rename_name_filter;
+JSONCONS_DEPRECATED_MSG("Instead, use wrename_object_key_filter") typedef basic_rename_object_key_filter<wchar_t> wrename_name_filter;
+JSONCONS_DEPRECATED_MSG("Instead, use rename_object_key_filter") typedef basic_rename_object_key_filter<char> rename_object_member_filter;
+JSONCONS_DEPRECATED_MSG("Instead, use wrename_object_key_filter") typedef basic_rename_object_key_filter<wchar_t> wrename_object_member_filter;
 #endif
 
 }

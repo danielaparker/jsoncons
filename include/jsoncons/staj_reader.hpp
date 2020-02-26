@@ -1086,20 +1086,11 @@ private:
     }
 
     bool do_byte_string(const byte_string_view& s, 
-                              semantic_tag tag,
-                              const ser_context& context,
-                              std::error_code&) override
-    {
-        event_ = basic_staj_event<CharT>(s, staj_event_type::byte_string_value, tag);
-        return !filter_(event_, context);
-    }
-
-    bool do_int64(int64_t value, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code&) override
     {
-        event_ = basic_staj_event<CharT>(value, tag);
+        event_ = basic_staj_event<CharT>(s, staj_event_type::byte_string_value, tag);
         return !filter_(event_, context);
     }
 
@@ -1112,10 +1103,28 @@ private:
         return !filter_(event_, context);
     }
 
+    bool do_int64(int64_t value, 
+                  semantic_tag tag,
+                  const ser_context& context,
+                  std::error_code&) override
+    {
+        event_ = basic_staj_event<CharT>(value, tag);
+        return !filter_(event_, context);
+    }
+
+    bool do_half(uint16_t value, 
+                 semantic_tag tag,
+                 const ser_context& context,
+                 std::error_code& ec) override
+    {
+        event_ = basic_staj_event<CharT>(half_arg, value, tag);
+        return !filter_(event_, context);
+    }
+
     bool do_double(double value, 
-                         semantic_tag tag, 
-                         const ser_context& context,
-                         std::error_code&) override
+                   semantic_tag tag, 
+                   const ser_context& context,
+                   std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
         return !filter_(event_, context);

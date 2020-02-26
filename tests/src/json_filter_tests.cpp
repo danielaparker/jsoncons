@@ -111,7 +111,7 @@ TEST_CASE("test_filter2")
 
     name_fix_up_filter filter2(encoder);
 
-    rename_object_member_filter filter1("email","email2",filter2);
+    rename_object_key_filter filter1("email","email2",filter2);
 
     json_reader reader(is, filter1);
     reader.read_next();
@@ -148,7 +148,7 @@ TEST_CASE("test_rename_name")
 
     std::stringstream ss;
     json_stream_encoder encoder(ss);
-    rename_object_member_filter filter("price","price2",encoder);
+    rename_object_key_filter filter("price","price2",encoder);
     j.dump(filter);
 
     json j2 = json::parse(ss);
@@ -161,8 +161,8 @@ TEST_CASE("test_chained_filters")
 
     json_decoder<ojson> decoder;
 
-    rename_object_member_filter filter2("fifth", "fourth", decoder);
-    rename_object_member_filter filter1("fourth", "third", filter2);
+    rename_object_key_filter filter2("fifth", "fourth", decoder);
+    rename_object_key_filter filter1("fourth", "third", filter2);
 
     j.dump(filter1);
     ojson j2 = decoder.get_result();

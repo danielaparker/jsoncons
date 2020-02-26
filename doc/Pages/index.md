@@ -667,7 +667,7 @@ produces
 <div id="A7"/>
 ### Filters
 
-You can rename object member names with the built in filter [rename_object_member_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/rename_object_member_filter.md)
+You can rename object member names with the built in filter [rename_object_key_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/rename_object_key_filter.md)
 
 ```c++
 #include <sstream>
@@ -683,8 +683,8 @@ int main()
     json_stream_encoder encoder(std::cout);
 
     // Filters can be chained
-    rename_object_member_filter filter2("fifth", "fourth", encoder);
-    rename_object_member_filter filter1("fourth", "third", filter2);
+    rename_object_key_filter filter2("fifth", "fourth", encoder);
+    rename_object_key_filter filter1("fourth", "third", filter2);
 
     // A filter can be passed to any function that takes
     // a json_content_handler ...

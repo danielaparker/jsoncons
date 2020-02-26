@@ -1,3 +1,11 @@
+master
+------
+
+Changes:
+
+- The name `basic_rename_object_member_filter` has been deprecated and renamed to 
+`basic_rename_object_key_filter` 
+
 v0.145.2
 --------
 

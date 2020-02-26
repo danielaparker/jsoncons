@@ -31,7 +31,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 [json_decoder](ref/json_decoder.md)  
 
 [basic_json_filter](ref/basic_json_filter.md)  
-[rename_object_member_filter](ref/rename_object_member_filter.md)  
+[rename_object_key_filter](ref/rename_object_key_filter.md)  
 
 ### Extensions
 
