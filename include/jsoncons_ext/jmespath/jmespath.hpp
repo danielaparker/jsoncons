@@ -47,7 +47,16 @@ struct slice
     {
     }
 
-    slice& operator=(const slice&) = default;
+    slice& operator=(const slice& rhs) 
+    {
+        if (this != &rhs)
+        {
+            start_ = rhs.start_;
+            end_ = rhs.end_;
+            step_ = rhs.step_;
+        }
+        return *this;
+    }
 
     int64_t get_start(std::size_t size) const
     {
