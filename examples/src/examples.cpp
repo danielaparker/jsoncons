@@ -423,8 +423,6 @@ int main()
 
         run_csv_examples();
 
-        run_cbor_typed_array_examples();
-
         byte_string_examples();
 
         json_constructor_examples();
@@ -438,6 +436,8 @@ int main()
         json_accessor_examples();
 
         json_traits_macros_examples();
+
+        run_cbor_typed_array_examples();
     }
     catch (const std::exception& e)
     {
