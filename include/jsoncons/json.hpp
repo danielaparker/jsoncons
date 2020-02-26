@@ -8,7 +8,8 @@
 #define JSONCONS_JSON_HPP
 
 #include <jsoncons/basic_json.hpp>
-#include <jsoncons/encode_decode_json.hpp>
+#include <jsoncons/encode_json.hpp>
+#include <jsoncons/decode_json.hpp>
 #include <jsoncons/json_traits_macros.hpp>
 #include <jsoncons/json_traits_macros_deprecated.hpp>
 #include <jsoncons/staj_iterator.hpp>
