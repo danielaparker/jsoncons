@@ -35,7 +35,7 @@ decode_csv(const std::basic_string<CharT>& s, const basic_csv_decode_options<Cha
 {
     basic_csv_cursor<CharT> cursor(s, options);
     std::error_code ec;
-    T val = ser_traits<T>::decode(cursor, basic_json<CharT>(), ec);
+    T val = deser_traits<T>::deserialize(cursor, basic_json<CharT>(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -62,7 +62,7 @@ decode_csv(std::basic_istream<CharT>& is, const basic_csv_decode_options<CharT>&
 {
     basic_csv_cursor<CharT> cursor(is, options);
     std::error_code ec;
-    T val = ser_traits<T>::decode(cursor, basic_json<CharT>(), ec);
+    T val = deser_traits<T>::deserialize(cursor, basic_json<CharT>(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -87,7 +87,7 @@ encode_csv(const T& val, std::basic_string<CharT>& s, const basic_csv_encode_opt
     typedef CharT char_type;
     basic_csv_encoder<char_type,jsoncons::string_sink<std::basic_string<char_type>>> encoder(s,options);
     std::error_code ec;
-    ser_traits<T>::encode(val, encoder, json(), ec);
+    ser_traits<T>::serialize(val, encoder, json(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec));
@@ -110,7 +110,7 @@ encode_csv(const T& val, std::basic_ostream<CharT>& os, const basic_csv_encode_o
     typedef CharT char_type;
     basic_csv_encoder<char_type,jsoncons::stream_sink<char_type>> encoder(os,options);
     std::error_code ec;
-    ser_traits<T>::encode(val, encoder, json(), ec);
+    ser_traits<T>::serialize(val, encoder, json(), ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec));

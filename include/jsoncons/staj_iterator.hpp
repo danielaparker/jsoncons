@@ -334,7 +334,7 @@ void staj_array_iterator<Json,T>::next()
         if (!done())
         {
             std::error_code ec;
-            value_ = ser_traits<T>::decode(*reader_, Json(), ec);
+            value_ = deser_traits<T>::deserialize(*reader_, Json(), ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, reader_->context().line(), reader_->context().column()));
@@ -355,7 +355,7 @@ void staj_array_iterator<Json,T>::next(std::error_code& ec)
         }
         if (!done())
         {
-            value_ = ser_traits<T>::decode(*reader_, Json(), ec);
+            value_ = deser_traits<T>::deserialize(*reader_, Json(), ec);
         }
     }
 }
@@ -372,7 +372,7 @@ void staj_object_iterator<Json,T>::next()
         if (!done())
         {
             std::error_code ec;
-            key_value_ = value_type(std::move(key),ser_traits<T>::decode(*reader_, Json(), ec));
+            key_value_ = value_type(std::move(key),deser_traits<T>::deserialize(*reader_, Json(), ec));
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, reader_->context().line(), reader_->context().column()));
@@ -400,7 +400,7 @@ void staj_object_iterator<Json,T>::next(std::error_code& ec)
         }
         if (!done())
         {
-            key_value_ = value_type(std::move(key),ser_traits<T>::decode(*reader_, Json(), ec));
+            key_value_ = value_type(std::move(key),deser_traits<T>::deserialize(*reader_, Json(), ec));
         }
     }
 }
