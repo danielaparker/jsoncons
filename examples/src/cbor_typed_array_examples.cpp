@@ -99,9 +99,9 @@ void encode_decode_large_typed_array()
   0xd8,0x55 -- Tag 85 (float32 little endian Typed Array)
   0x5a - byte string (four-byte uint32_t for n, and then  n bytes follow)
     03 93 87 00 -- 60000000
-      00 00 00 00 -- 0.0
-      00 00 80 3f -- 1.0
-      00 00 00 40 -- 3.0
+      00 00 00 00 -- 0.0f
+      00 00 80 3f -- 1.0f
+      00 00 00 40 -- 2.0f
 */
     auto y = cbor::decode_cbor<std::vector<float>>(buf);
 
