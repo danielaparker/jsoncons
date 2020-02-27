@@ -7,8 +7,10 @@ Changes:
 `rename_object_key_filter`
 
 - The `json_content_handler` public function `name` has been deprecated and renamed to `key`.
+Rationale: in the future we'll likely support overloads for non-string keys for binary formats
 
 - The `json_content_handler` private virtual function `do_name` has been removed and replaced with `do_key`.
+Rationale: in the future we'll likely support overloads for non-string keys for binary formats
   
 Enhancements:
  
