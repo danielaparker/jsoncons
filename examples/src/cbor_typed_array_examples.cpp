@@ -298,7 +298,7 @@ void read_to_cbor_content_handler()
     std::cout << "\n";
 }
 
-} // annonymous
+} // namespace
 
 void run_cbor_typed_array_examples()
 {
