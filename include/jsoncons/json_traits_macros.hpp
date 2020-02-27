@@ -238,6 +238,16 @@ namespace jsoncons \
             val = j.at(name).template as<U>(); \
         } \
         template <class U> \
+        static void set_json_member(const string_view_type& name, const std::shared_ptr<U>& val, Json& j) \
+        { \
+            if (val) set_json_member(name, val.value(), j); \
+        } \
+        template <class U> \
+        static void set_json_member(const string_view_type& name, const std::unique_ptr<U>& val, Json& j) \
+        { \
+            if (val) set_json_member(name, val.value(), j); \
+        } \
+        template <class U> \
         static void set_json_member(const string_view_type& name, const jsoncons::optional<U>& val, Json& j) \
         { \
             if (val) set_json_member(name, val.value(), j); \
@@ -331,6 +341,16 @@ namespace jsoncons \
         static void set_member(std::false_type, const Json& j, const string_view_type& name, U& val) \
         { \
             val = j.at(name).template as<U>(); \
+        } \
+        template <class U> \
+        static void set_json_member(const string_view_type& name, const std::shared_ptr<U>& val, Json& j) \
+        { \
+            if (val) set_json_member(name, val.value(), j); \
+        } \
+        template <class U> \
+        static void set_json_member(const string_view_type& name, const std::unique_ptr<U>& val, Json& j) \
+        { \
+            if (val) set_json_member(name, val.value(), j); \
         } \
         template <class U> \
         static void set_json_member(const string_view_type& name, const jsoncons::optional<U>& val, Json& j) \
@@ -757,6 +777,16 @@ namespace jsoncons \
             return ajson; \
         } \
         template <class U> \
+        static void set_json_member(const string_view_type& name, const std::shared_ptr<U>& val, Json& j) \
+        { \
+            if (val) set_json_member(name, val.value(), j); \
+        } \
+        template <class U> \
+        static void set_json_member(const string_view_type& name, const std::unique_ptr<U>& val, Json& j) \
+        { \
+            if (val) set_json_member(name, val.value(), j); \
+        } \
+        template <class U> \
         static void set_json_member(const string_view_type& name, const jsoncons::optional<U>& val, Json& j) \
         { \
             if (val) set_json_member(name, val.value(), j); \
@@ -840,6 +870,16 @@ namespace jsoncons \
             Json ajson(json_object_arg, semantic_tag::none, alloc); \
             JSONCONS_VARIADIC_REP_N(ToJ,,,, __VA_ARGS__) \
             return ajson; \
+        } \
+        template <class U> \
+        static void set_json_member(const string_view_type& name, const std::shared_ptr<U>& val, Json& j) \
+        { \
+            if (val) set_json_member(name, val.value(), j); \
+        } \
+        template <class U> \
+        static void set_json_member(const string_view_type& name, const std::unique_ptr<U>& val, Json& j) \
+        { \
+            if (val) set_json_member(name, val.value(), j); \
         } \
         template <class U> \
         static void set_json_member(const string_view_type& name, const jsoncons::optional<U>& val, Json& j) \
