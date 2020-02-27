@@ -42,7 +42,7 @@ which inherits from [std::false_type](http://www.cplusplus.com/reference/type_tr
 This traits class may be specialized for a user-defined type with member constant `value` equal `true`
 to inform the `jsoncons` library that the type is already specialized.  
 
-### Specializations
+### jsoncons specializations
 
 `T`|`j.is<T>()`|`j.as<T>()`|j is assignable from `T`
 --------|-----------|--------------|---
@@ -54,25 +54,31 @@ to inform the `jsoncons` library that the type is already specialized.
 `integral types`|`true` if `j.is_int64()` or `j.is_uint64()` and value is in range, otherwise `false`|j numeric value cast to `T`|<em>&#x2713;</em>
 `floating point types`|`true` if j.is_double() and value is in range, otherwise `false`|j numeric value cast to `T`|<em>&#x2713;</em>
 `std::basic_string<CharT>`<sup>1</sup>|`true` if `j.is<std::basic_string<CharT>>()`, otherwise `false`|j.as<std::basic_string<CharT>>|<em>&#x2713;</em>
-`jsoncons::basic_string_view<CharT>`<sup>1</sup>|`true` if `j.is<jsoncons::basic_string_view<CharT>>()`, otherwise `false`|j.as<std::basic_string_view<CharT>>|<em>&#x2713;</em>
+`jsoncons::basic_string_view<CharT>`<sup>1</sup><sup>,2</sup>|`true` if `j.is<jsoncons::basic_string_view<CharT>>()`, otherwise `false`|j.as<std::basic_string_view<CharT>>|<em>&#x2713;</em>
 STL sequence container (other than string) e.g. std::vector|`true` if array and each value is assignable to a `Json` value, otherwise `false`|if array and each value is convertible to `value_type`, as container, otherwise throws|<em>&#x2713;</em>
 STL associative container e.g. `std::map<K,U>`|`true` if object and each `mapped_type` is assignable to `Json`, otherwise `false`|if object and each member value is convertible to `mapped_type`, as container|<em>&#x2713;</em>
 `std::tuple<Args...>`|`true` if `j.is_array()` and each array element is assignable to the corresponding `tuple` element, otherwise false|tuple with array elements converted to tuple elements|<em>&#x2713;</em>
 `std::pair<U,V>`|`true` if `j.is_array()` and `j.size()==2` and each array element is assignable to the corresponding pair element, otherwise false|pair with array elements converted to pair elements|<em>&#x2713;</em>
-`std::shared_ptr<U>`<sup>2</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty shared_ptr if `j.is_null()`, otherwise `make_shared(j.as<U>())`|<em>&#x2713;</em>
-`std::unique_ptr<U>`<sup>3</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty unique_ptr if `j.is_null()`, otherwise `make_unique(j.as<U>())`|<em>&#x2713;</em>
-`jsoncons::optional<U>`<sup>4</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty `std::optional<U>` if `j.is_null()`, otherwise `std::optional<U>(j.as<U>())`|<em>&#x2713;</em>
+`std::shared_ptr<U>`<sup>3</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty shared_ptr if `j.is_null()`, otherwise `make_shared(j.as<U>())`|<em>&#x2713;</em>
+`std::unique_ptr<U>`<sup>4</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty unique_ptr if `j.is_null()`, otherwise `make_unique(j.as<U>())`|<em>&#x2713;</em>
+`jsoncons::optional<U>`<sup>5</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty `std::optional<U>` if `j.is_null()`, otherwise `std::optional<U>(j.as<U>())`|<em>&#x2713;</em>
   
 1. For `CharT` `char` or `wchar_t`.
-2. Defined if `U` is not a polymorphic class, i.e., does not have any virtual functions.  
-3. Defined if `U` is not a polymorphic class, i.e., does not have any virtual functions.   
-4. `jsoncons::optional<U>` is typedef'ed to [std::optional<U>](https://en.cppreference.com/w/cpp/utility/optional) if 
+2. `jsoncons::basic_string_view<CharT>` is typedef'ed to [std::basic_string_view<CharT>](https://en.cppreference.com/w/cpp/utility/optional) if 
+jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_STRING_VIEW` is defined.  
+3. Defined if `U` is not a polymorphic class, i.e., does not have any virtual functions.  
+4. Defined if `U` is not a polymorphic class, i.e., does not have any virtual functions.   
+5. `jsoncons::optional<U>` is typedef'ed to [std::optional<U>](https://en.cppreference.com/w/cpp/utility/optional) if 
 jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_OPTIONAL` is defined.  
 
 ### Convenience Macros
 
 The `jsoncons` library provides a number of macros that can be used to generate the code to specialize `json_type_traits`
 for a user-defined class.
+
+Macro names include qualifiers `_ALL_` or `_N_` to indicate that the generated traits require all
+members be present in the JSON, or a specified number be present. For non-mandatory members, the generated 
+traits `to_json` function will exclude altogether empty values for `std::shared_ptr`, `std::unique_ptr` and std::optional`.
 
 ```c++
 JSONCONS_N_MEMBER_TRAITS(class_name,num_mandatory,
