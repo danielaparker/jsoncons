@@ -292,5 +292,15 @@
                 "result" : [{"Key": "logs/baz","Size": 329},{"Key": "logs/aa","Size": 308},{"Key": "logs/qux","Size": 297},{"Key": "logs/bar","Size": 604},{"Key": "logs/foo","Size": 647},{"Key": "logs/bb","Size": 303}]
             }
         ]
+    },
+    {
+        "given" : {"locations": [{"name": "Seattle", "state": "WA"},{"name": "New York", "state": "NY"},{"name": "Bellevue", "state": "WA"},{"name": "Olympia", "state": "WA"}]},
+        "cases" : [ 
+            {
+                "annotation" : "Pipe",
+                "expression" : "locations[?state == 'WA'].name | sort(@)[-2:] | {WashingtonCities: join(', ', @)}",
+                "result" : {"WashingtonCities": "Olympia, Seattle"}
+            }
+        ]
     }
 ]

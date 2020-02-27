@@ -52,8 +52,18 @@ struct slice
         if (this != &rhs)
         {
             start_ = rhs.start_;
-            end_.reset();
             end_ = rhs.end_;
+            step_ = rhs.step_;
+        }
+        return *this;
+    }
+
+    slice& operator=(slice&& rhs) 
+    {
+        if (this != &rhs)
+        {
+            start_ = rhs.start_;
+            end_ = std::move(rhs.end_);
             step_ = rhs.step_;
         }
         return *this;
