@@ -14,16 +14,6 @@ template <class T, class CharT>
 T decode_json(const std::basic_string<CharT>& s,
               const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>()); // (2)
 
-
-template <class T, class CharT, class ImplementationPolicy, class Allocator>
-T decode_json(std::basic_istream<CharT>& is,
-              const basic_json_decode_options<CharT>& options,
-              const basic_json<CharT,ImplementationPolicy,Allocator>& context_j); // (3)
-
-template <class T, class CharT, class ImplementationPolicy, class Allocator>
-T decode_json(const std::basic_string<CharT>& s,
-              const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
-              const basic_json<CharT,ImplementationPolicy,Allocator>& context_j); // (4)
 ```
 
 (1) Reads a JSON string value into a type T if T is an instantiation of [basic_json](../basic_json.md) 
@@ -33,7 +23,6 @@ or if T supports [json_type_traits](../json_type_traits.md).
 or if T supports [json_type_traits](../json_type_traits.md).
 
 Functions (1)-(2) perform encodings using the default json type `basic_json<CharT>`.
-Functions (3)-(4) are the same but perform encodings using the supplied `basic_json`.
 
 ### Examples
 
