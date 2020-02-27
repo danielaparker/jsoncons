@@ -48,7 +48,7 @@ using jsoncons::detail::optional;
 namespace jsoncons {
 using std::optional;
 }
-#endif // !defined(JSONCONS_HAS_OPTIONAL)
+#endif // !defined(JSONCONS_HAS_STD_OPTIONAL)
 
 #if !defined(JSONCONS_HAS_STD_ENDIAN)
 #include <jsoncons/detail/endian.hpp>

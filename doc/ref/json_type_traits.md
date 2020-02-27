@@ -58,7 +58,9 @@ STL sequence container (other than string) e.g. std::vector|`true` if array and 
 STL associative container e.g. std::map|`true` if object and each `mapped_type` is assignable to `Json`, otherwise `false`|if object and each member value is convertible to `mapped_type`, as container|<em>&#x2713;</em>
 `std::tuple`|`true` if `j.is_array()` and each array element is assignable to the corresponding `tuple` element, otherwise false|tuple with array elements converted to tuple elements|<em>&#x2713;</em>
 `std::pair`|`true` if `j.is_array()` and `j.size()==2` and each array element is assignable to the corresponding pair element, otherwise false|pair with array elements converted to pair elements|<em>&#x2713;</em>
-`jsoncons::optional<T>`<sup>1</sup>|`true` if `j.is_null()` or `j` is convertible as `T`|`std::optional<T>()` if `j.is_null()`, otherwise `std::optional<T>(j.as<T>())`|<em>&#x2713;</em>
+`jsoncons::optional<T>` <sup>1</sup>|`true` if `j.is_null()` or `j` is convertible as `T`|`std::optional<T>()` if `j.is_null()`, otherwise `std::optional<T>(j.as<T>())`|<em>&#x2713;</em>
+
+<sup>1</sup>. `jsoncons::optional<T>` is typedef'ed to [std::optional<T>](https://en.cppreference.com/w/cpp/utility/optional) if `JSONCONS_HAS_STD_OPTIONAL` is defined. 
 
 ### Convenience Macros
 
