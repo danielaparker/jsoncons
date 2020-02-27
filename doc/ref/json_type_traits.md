@@ -1,6 +1,6 @@
 ### jsoncons::json_type_traits
 
-__`jsoncons/json_type_traits.hpp`__
+__Header:__ `jsoncons/json_type_traits.hpp`
 
 `json_type_traits` defines a compile time template based interface for accessing and modifying `basic_json` values.
 
