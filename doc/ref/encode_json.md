@@ -175,7 +175,7 @@ int main()
     json_stream_encoder encoder(std::cout);
 
     encoder.begin_object();
-    encoder.name("Employees");
+    encoder.key("Employees");
     encode_json(employees, encoder);
     encoder.end_object();
     encoder.flush();
@@ -212,7 +212,7 @@ int main()
     json_compressed_stream_encoder encoder(std::cout);
 
     encoder.begin_object();
-    encoder.name("Employees");
+    encoder.key("Employees");
     encode_json(employees, encoder);
     encoder.end_object();
     encoder.flush();

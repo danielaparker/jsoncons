@@ -712,7 +712,7 @@ private:
                     more_ = false;
                     return;
                 }
-                more_ = handler.name(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
+                more_ = handler.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::byte_string:
@@ -724,7 +724,7 @@ private:
                 }
                 text_buffer_.clear();
                 encode_base64url(bytes_buffer_.begin(),bytes_buffer_.end(),text_buffer_);
-                more_ = handler.name(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
+                more_ = handler.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
@@ -756,14 +756,14 @@ private:
                     {
                         case jsoncons::cbor::detail::cbor_major_type::text_string:
                         {
-                            more_ = handler.name(basic_string_view<char>(val.s.data(),val.s.length()), *this);
+                            more_ = handler.key(basic_string_view<char>(val.s.data(),val.s.length()), *this);
                             break;
                         }
                         case jsoncons::cbor::detail::cbor_major_type::byte_string:
                         {
                             text_buffer_.clear();
                             encode_base64url(val.bytes.begin(),val.bytes.end(),text_buffer_);
-                            more_ = handler.name(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
+                            more_ = handler.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
                             break;
                         }
                         default:
@@ -790,7 +790,7 @@ private:
                     more_ = false;
                     return;
                 }
-                more_ = handler.name(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
+                more_ = handler.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
             }
         }
     }

@@ -2700,7 +2700,7 @@ private:
         switch (parent())
         {
         case json_parse_state::member_name:
-            more_ = handler.name(sv, *this, ec);
+            more_ = handler.key(sv, *this, ec);
             state_ = pop_state();
             state_ = json_parse_state::expect_colon;
             break;

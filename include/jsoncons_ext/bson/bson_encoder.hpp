@@ -167,7 +167,7 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const ser_context&, std::error_code&) override
+    bool do_key(const string_view_type& name, const ser_context&, std::error_code&) override
     {
         stack_.back().member_offset(buffer_.size());
         buffer_.push_back(0x00); // reserve space for code

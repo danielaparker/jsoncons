@@ -289,7 +289,7 @@ namespace detail {
                     case cached_state::name:
                         if (column_index_ < column_names_.size())
                         {
-                            more = handler.name(column_names_[column_index_], null_ser_context());
+                            more = handler.key(column_names_[column_index_], null_ser_context());
                             state_ = cached_state::begin_array;
                         }
                         else
@@ -368,7 +368,7 @@ namespace detail {
             return true;
         }
 
-        bool do_name(const string_view_type&, const ser_context&, std::error_code& ec) override
+        bool do_key(const string_view_type&, const ser_context&, std::error_code& ec) override
         {
             ec = csv_errc::invalid_parse_state;
             return false;
@@ -1324,7 +1324,7 @@ private:
                     {
                         if (column_index_ < column_names_.size() + offset_)
                         {
-                            more_ = handler_->name(column_names_[column_index_ - offset_], *this, ec);
+                            more_ = handler_->key(column_names_[column_index_ - offset_], *this, ec);
                         }
                     }
                 }

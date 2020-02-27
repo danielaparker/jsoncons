@@ -92,11 +92,11 @@ private:
         return to_handler_.end_array(context, ec);
     }
 
-    bool do_name(const string_view_type& name,
+    bool do_key(const string_view_type& name,
                  const ser_context& context,
                  std::error_code& ec) override
     {
-        return to_handler_.name(name, context, ec);
+        return to_handler_.key(name, context, ec);
     }
 
     bool do_string(const string_view_type& value,
@@ -165,17 +165,17 @@ public:
     }
 
 private:
-    bool do_name(const string_view_type& name,
+    bool do_key(const string_view_type& name,
                  const ser_context& context,
                  std::error_code& ec) override
     {
         if (name == name_)
         {
-            return this->to_handler().name(new_name_,context, ec);
+            return this->to_handler().key(new_name_,context, ec);
         }
         else
         {
-            return this->to_handler().name(name,context,ec);
+            return this->to_handler().key(name,context,ec);
         }
     }
 };
@@ -257,7 +257,7 @@ private:
         return to_handler_->end_array(context, ec);
     }
 
-    bool do_name(const string_view_type& name,
+    bool do_key(const string_view_type& name,
                  const ser_context& context,
                  std::error_code& ec) override
     {
@@ -267,7 +267,7 @@ private:
         {
             ec = result.ec;
         }
-        return to_handler().name(target, context, ec);
+        return to_handler().key(target, context, ec);
     }
 
     bool do_string(const string_view_type& value,

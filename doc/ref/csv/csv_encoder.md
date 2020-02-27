@@ -66,7 +66,7 @@ and uses the specified [csv options](basic_csv_options.md).
 
     bool end_array(const ser_context& context=null_ser_context()); // (6)
 
-    bool name(const string_view_type& name, 
+    bool key(const string_view_type& name, 
               const ser_context& context=null_ser_context()); // (7)
 
     bool null_value(semantic_tag tag = semantic_tag::none,
@@ -124,7 +124,7 @@ and uses the specified [csv options](basic_csv_options.md).
     bool end_array(const ser_context& context, 
                    std::error_code& ec); // (21)
 
-    bool name(const string_view_type& name, 
+    bool key(const string_view_type& name, 
               const ser_context& context, 
               std::error_code& ec); // (22)
 

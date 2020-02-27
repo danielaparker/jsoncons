@@ -216,7 +216,7 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const ser_context&, std::error_code&) override
+    bool do_key(const string_view_type& name, const ser_context&, std::error_code&) override
     {
         name_ = key_type(name.data(),name.length(),string_allocator_);
         return true;

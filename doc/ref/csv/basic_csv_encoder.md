@@ -66,7 +66,7 @@ and uses the specified [csv options](basic_csv_options.md).
 
     bool end_array(const ser_context& context=null_ser_context()); 
 
-    bool name(const string_view_type& name, 
+    bool key(const string_view_type& name, 
               const ser_context& context=null_ser_context()); 
 
     bool string_value(const string_view_type& value, 

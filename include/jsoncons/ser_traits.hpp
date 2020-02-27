@@ -154,7 +154,7 @@ namespace jsoncons {
             }
             for (auto it = std::begin(val); it != std::end(val); ++it)
             {
-                encoder.name(it->first);
+                encoder.key(it->first);
                 ser_traits<mapped_type>::serialize(it->second, encoder, context_j, ec);
             }
             encoder.end_object(null_ser_context(), ec);
@@ -192,7 +192,7 @@ namespace jsoncons {
             {
                 std::basic_string<typename Json::char_type> s;
                 jsoncons::detail::print_integer(it->first,s);
-                encoder.name(s);
+                encoder.key(s);
                 ser_traits<mapped_type>::serialize(it->second, encoder, context_j, ec);
             }
             encoder.end_object(null_ser_context(), ec);

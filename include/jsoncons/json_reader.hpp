@@ -77,7 +77,7 @@ private:
         return other_handler_.end_array(context, ec);
     }
 
-    bool do_name(const string_view_type& name, const ser_context& context, std::error_code& ec) override
+    bool do_key(const string_view_type& name, const ser_context& context, std::error_code& ec) override
     {
         std::basic_string<CharT> target;
         auto result = unicons::convert(
@@ -87,7 +87,7 @@ private:
         {
             JSONCONS_THROW(ser_error(result.ec,context.line(),context.column()));
         }
-        return other_handler_.name(target, context, ec);
+        return other_handler_.key(target, context, ec);
     }
 
     bool do_string(const string_view_type& value, semantic_tag tag, const ser_context& context, std::error_code& ec) override

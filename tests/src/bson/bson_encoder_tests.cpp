@@ -18,7 +18,7 @@ TEST_CASE("serialize object to bson")
     bson::bson_bytes_encoder encoder(v);
 
     encoder.begin_object();
-    encoder.name("null");
+    encoder.key("null");
     encoder.null_value();
     encoder.end_object();
     encoder.flush();
@@ -128,21 +128,21 @@ TEST_CASE("serialize to bson")
         bson::bson_bytes_encoder encoder(v);
 
         encoder.begin_object();
-        encoder.name("0");
+        encoder.key("0");
         encoder.int64_value((std::numeric_limits<int64_t>::max)());
-        encoder.name("1");
+        encoder.key("1");
         encoder.uint64_value((uint64_t)(std::numeric_limits<int64_t>::max)());
-        encoder.name("2");
+        encoder.key("2");
         encoder.double_value((std::numeric_limits<double>::max)());
-        encoder.name("3");
+        encoder.key("3");
         encoder.bool_value(true);
-        encoder.name("4");
+        encoder.key("4");
         encoder.bool_value(false);
-        encoder.name("5");
+        encoder.key("5");
         encoder.null_value();
-        encoder.name("6");
+        encoder.key("6");
         encoder.string_value("Pussy cat");
-        encoder.name("7");
+        encoder.key("7");
         encoder.byte_string_value(byte_string({'h','i','s','s'}));
         encoder.end_object();
         encoder.flush();
@@ -193,9 +193,9 @@ TEST_CASE("serialize to bson")
         bson::bson_bytes_encoder encoder(v);
 
         encoder.begin_object();
-        encoder.name("a");
+        encoder.key("a");
         encoder.begin_object();
-        encoder.name("0");
+        encoder.key("0");
         encoder.int64_value((std::numeric_limits<int64_t>::max)());
         encoder.end_object();
         encoder.end_object();
@@ -223,7 +223,7 @@ TEST_CASE("serialize to bson")
 
         encoder.begin_array();
         encoder.begin_object();
-        encoder.name("0");
+        encoder.key("0");
         encoder.int64_value((std::numeric_limits<int64_t>::max)());
         encoder.end_object();
         encoder.end_array();

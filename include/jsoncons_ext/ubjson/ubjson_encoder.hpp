@@ -183,7 +183,7 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const ser_context&, std::error_code& ec) override
+    bool do_key(const string_view_type& name, const ser_context&, std::error_code& ec) override
     {
         auto sink = unicons::validate(name.begin(), name.end());
         if (sink.ec != unicons::conv_errc())

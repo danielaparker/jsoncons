@@ -63,7 +63,7 @@ Returns a reference to the JSON handler that sends json events to the destinatio
 
     bool end_array(const ser_context& context=null_ser_context()); // (7)
 
-    bool name(const string_view_type& name, 
+    bool key(const string_view_type& name, 
               const ser_context& context=null_ser_context()); // (8)
 
     bool null_value(semantic_tag tag = semantic_tag::none,
@@ -121,7 +121,7 @@ Returns a reference to the JSON handler that sends json events to the destinatio
     bool end_array(const ser_context& context, 
                    std::error_code& ec); // (22)
 
-    bool name(const string_view_type& name, 
+    bool key(const string_view_type& name, 
               const ser_context& context, 
               std::error_code& ec); // (23)
 
@@ -373,7 +373,7 @@ Throws a [ser_error](ser_error.md) on parse errors.
     virtual bool do_end_array(const ser_context& context, 
                               std::error_code& ec) = 0; // (7)
 
-    virtual bool do_name(const string_view_type& name, 
+    virtual bool do_key(const string_view_type& name, 
                          const ser_context& context, 
                          std::error_code&) = 0; // (8)
 
@@ -649,14 +649,14 @@ public:
     }
 
 private:
-    bool do_name(const string_view_type& name, 
+    bool do_key(const string_view_type& name, 
                  const ser_context& context,
                  std::error_code&) override
     {
         member_name_ = name;
         if (member_name_ != "name")
         {
-            this->to_handler().name(name, context);
+            this->to_handler().key(name, context);
         }
         return true;
     }
@@ -669,12 +669,12 @@ private:
         {
             std::size_t end_first = val.find_first_of(" \t");
             std::size_t start_last = val.find_first_not_of(" \t", end_first);
-            this->to_handler().name("first-name", context);
+            this->to_handler().key("first-name", context);
             string_view_type first = val.substr(0, end_first);
             this->to_handler().value(first, context);
             if (start_last != string_view_type::npos)
             {
-                this->to_handler().name("last-name", context);
+                this->to_handler().key("last-name", context);
                 string_view_type last = val.substr(start_last);
                 this->to_handler().value(last, context);
             }

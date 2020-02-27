@@ -744,7 +744,7 @@ private:
             ec = ubjson_errc::invalid_utf8_text_string;
             return;
         }
-        more_ = handler.name(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
+        more_ = handler.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
     }
 };
 

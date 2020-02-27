@@ -5378,7 +5378,7 @@ private:
                 const object& o = object_value();
                 for (const_object_iterator it = o.begin(); more && it != o.end(); ++it)
                 {
-                    handler.name(string_view_type((it->key()).data(),it->key().length()), context, ec);
+                    handler.key(string_view_type((it->key()).data(),it->key().length()), context, ec);
                     it->value().dump_noflush(handler, ec);
                 }
                 if (more)

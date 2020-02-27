@@ -1061,7 +1061,7 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_name(const string_view_type& name, const ser_context& context, std::error_code&) override
+    bool do_key(const string_view_type& name, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(name, staj_event_type::name);
         return !filter_(event_, context);
@@ -1297,7 +1297,7 @@ bool staj_to_saj_event(const basic_staj_event<CharT>& ev,
         case staj_event_type::end_object:
             return handler.end_object(context, ec);
         case staj_event_type::name:
-            return handler.name(ev.template get<jsoncons::basic_string_view<CharT>>(), context);
+            return handler.key(ev.template get<jsoncons::basic_string_view<CharT>>(), context);
         case staj_event_type::string_value:
             return handler.string_value(ev.template get<basic_string_view<CharT>>(), ev.tag(), context);
         case staj_event_type::byte_string_value:

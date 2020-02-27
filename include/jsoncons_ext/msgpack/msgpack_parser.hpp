@@ -609,7 +609,7 @@ private:
                 ec = msgpack_errc::invalid_utf8_text_string;
                 return;
             }
-            more_ = handler.name(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
+            more_ = handler.key(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
         }
         else
         {
@@ -641,7 +641,7 @@ private:
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    more_ = handler.name(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
+                    more_ = handler.key(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
                     break;
                 }
 
@@ -665,7 +665,7 @@ private:
                         return;
                     }
 
-                    more_ = handler.name(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
+                    more_ = handler.key(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
                     break;
                 }
 
@@ -689,7 +689,7 @@ private:
                         return;
                     }
 
-                    more_ = handler.name(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
+                    more_ = handler.key(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
                     break;
                 }
             }
