@@ -11,7 +11,8 @@ std::cout << "Has std::optional" << "\n";
 std::optional<int64_t> end{};
 std::optional<int64_t> end2{};
 
-end = end2;
+end = std::optional<int64_t>();
+
 #else
 std::cout << "Hasn't std::optional" << "\n";
 #endif
