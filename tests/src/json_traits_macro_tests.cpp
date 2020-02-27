@@ -493,8 +493,10 @@ JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
 JSONCONS_ALL_MEMBER_TRAITS(ns::hiking_reputon, rater, assertion, rated, rating)
 JSONCONS_ALL_MEMBER_TRAITS(ns::hiking_reputation, application, reputons)
 
-JSONCONS_N_MEMBER_TRAITS(ns::smart_pointer_and_optional_test1,6,field1,field2,field3,field4,field5,field6,
-                                                          field7,field8,field9,field10,field11,field12)
+// Declare the traits, first 6 members mandatory, last 6 non-mandatory
+JSONCONS_N_MEMBER_TRAITS(ns::smart_pointer_and_optional_test1,6,
+                         field1,field2,field3,field4,field5,field6,
+                         field7,field8,field9,field10,field11,field12)
 
 void test_is_json_type_traits_declared(std::true_type)
 {

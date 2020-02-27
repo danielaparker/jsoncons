@@ -700,7 +700,7 @@ namespace ns {
 
 } // namespace ns
 
-// Declare the traits with the first 6 members mandatory, the last 6 non-mandatory
+// Declare the traits, first 6 members mandatory, last 6 non-mandatory
 JSONCONS_N_MEMBER_TRAITS(ns::smart_pointer_and_optional_test,6,
                          field1,field2,field3,field4,field5,field6,
                          field7,field8,field9,field10,field11,field12)
