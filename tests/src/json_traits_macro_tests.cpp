@@ -450,7 +450,7 @@ namespace json_type_traits_macro_tests
         };
     };
 
-    struct pointer_and_optional_test1
+    struct smart_pointer_and_optional_test1
     {
         std::shared_ptr<std::string> field1;
         std::unique_ptr<std::string> field2;
@@ -493,7 +493,7 @@ JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
 JSONCONS_ALL_MEMBER_TRAITS(ns::hiking_reputon, rater, assertion, rated, rating)
 JSONCONS_ALL_MEMBER_TRAITS(ns::hiking_reputation, application, reputons)
 
-JSONCONS_N_MEMBER_TRAITS(ns::pointer_and_optional_test1,6,field1,field2,field3,field4,field5,field6,
+JSONCONS_N_MEMBER_TRAITS(ns::smart_pointer_and_optional_test1,6,field1,field2,field3,field4,field5,field6,
                                                           field7,field8,field9,field10,field11,field12)
 
 void test_is_json_type_traits_declared(std::true_type)
@@ -1191,7 +1191,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS pointer and optional test")
 {
     SECTION("test 1")
     {
-        ns::pointer_and_optional_test1 val;
+        ns::smart_pointer_and_optional_test1 val;
         val.field1 = std::make_shared<std::string>("Field 1"); 
         val.field2 = jsoncons::make_unique<std::string>("Field 2"); 
         val.field3 = "Field 3";

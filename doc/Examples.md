@@ -24,13 +24,14 @@
 [Serialize with the C++ member names of the class](#G1)  
 [Serialize with provided names using the `_NAMED_` macros](#G2)  
 [Serialize non-mandatory std::optional values using the convenience macros](#G3)  
-[Serialize a templated class with the `_TPL_` macros](#G4)  
-[Specialize json_type_traits explicitly](#G5)  
-[Mapping to C++ data structures with and without defaults allowed](#G6)  
-[An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_GETTER_CTOR_TRAITS](#G7)  
-[Serialize a polymorphic type based on the presence of members](#G8)  
-[Ensuring type selection is possible](#G9)  
-[Convert JSON numbers to/from boost multiprecision numbers](#G10)
+[An example with std::shared_ptr and std::unique_ptr](#G4)  
+[Serialize a templated class with the `_TPL_` macros](#G5)  
+[Specialize json_type_traits explicitly](#G6)  
+[Mapping to C++ data structures with and without defaults allowed](#G7)  
+[An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_GETTER_CTOR_TRAITS](#G8)  
+[Serialize a polymorphic type based on the presence of members](#G9)  
+[Ensuring type selection is possible](#G10)  
+[Convert JSON numbers to/from boost multiprecision numbers](#G11)
 
 ### Construct
 
@@ -997,6 +998,64 @@ Output:
 
 <div id="G4"/>
 
+#### An example with std::shared_ptr and std::unique_ptr
+
+```c++
+namespace ns {
+
+    struct smart_pointer_test
+    {
+        std::shared_ptr<std::string> field1;
+        std::unique_ptr<std::string> field2;
+        std::shared_ptr<std::string> field3;
+        std::unique_ptr<std::string> field4;
+        std::shared_ptr<std::string> field5;
+        std::unique_ptr<std::string> field6;
+        std::shared_ptr<std::string> field7;
+        std::unique_ptr<std::string> field8;
+    };
+
+} // namespace ns
+
+// Declare the traits, first 4 members mandatory, last 4 non-mandatory
+JSONCONS_N_MEMBER_TRAITS(ns::smart_pointer_test,4,field1,field2,field3,field4,field5,field6,field7,field8)
+
+int main()
+{
+    ns::smart_pointer_test val;
+    val.field1 = std::make_shared<std::string>("Field 1"); 
+    val.field2 = jsoncons::make_unique<std::string>("Field 2"); 
+    val.field3 = std::shared_ptr<std::string>(nullptr);
+    val.field4 = std::unique_ptr<std::string>(nullptr);
+    val.field5 = std::make_shared<std::string>("Field 5"); 
+    val.field6 = jsoncons::make_unique<std::string>("Field 6"); 
+    val.field7 = std::shared_ptr<std::string>(nullptr);
+    val.field8 = std::unique_ptr<std::string>(nullptr);
+
+    std::string buf;
+    encode_json(val, buf);
+
+    json j = decode_json<json>(buf);
+    assert(j.contains("field1"));
+    assert(j.contains("field2"));
+    assert(j.contains("field3"));
+    assert(j.contains("field4"));
+    assert(j.contains("field5"));
+    assert(j.contains("field6"));
+    assert(!j.contains("field7"));
+    assert(!j.contains("field8"));
+
+    assert(j["field1"].as<std::string>() == std::string("Field 1"));
+    assert(j["field2"].as<std::string>() == std::string("Field 2"));
+    assert(j["field3"].is_null());
+    assert(j["field4"].is_null());
+    assert(j["field5"].as<std::string>() == std::string("Field 5"));
+    assert(j["field6"].as<std::string>() == std::string("Field 6"));
+}
+```
+
+<div id="G5"/>
+
 #### Serialize a templated class with the `_TPL_` macros
 
 ```c++
@@ -1042,7 +1101,7 @@ int main()
 }
 ```
 
-<div id="G5"/>
+<div id="G6"/>
 
 #### Specialize json_type_traits explicitly
 
@@ -1168,7 +1227,7 @@ Charles Bukowski, Pulp, 22.48
 ]
 ```
 
-<div id="G6"/>
+<div id="G7"/>
 
 #### Mapping to C++ data structures with and without defaults allowed
 
@@ -1245,7 +1304,7 @@ instead. This will cause an exception to be thrown with the message
 Key 'ssn' not found
 ```
 
-<div id="G7"/>
+<div id="G8"/>
 
 #### An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_GETTER_CTOR_TRAITS
 
@@ -1361,7 +1420,7 @@ Output:
 }
 ```
 
-<div id="G8"/>
+<div id="G9"/>
 
 #### Serialize a polymorphic type based on the presence of members
 
@@ -1547,7 +1606,7 @@ Jane Doe, 30250
 ]
 ```
 
-<div id="G9"/>
+<div id="G10"/>
 
 #### Ensuring type selection is possible
 
@@ -1628,7 +1687,7 @@ A bar
 A baz
 ```
 
-<div id="G10"/>
+<div id="G11"/>
 
 #### Convert JSON numbers to/from boost multiprecision numbers
 
