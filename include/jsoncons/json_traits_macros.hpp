@@ -240,17 +240,17 @@ namespace jsoncons \
         template <class U> \
         static void set_json_member(const string_view_type& name, const std::shared_ptr<U>& val, Json& j) \
         { \
-            if (val) set_json_member(name, val.value(), j); \
+            if (val) j.try_emplace(name, val); \
         } \
         template <class U> \
         static void set_json_member(const string_view_type& name, const std::unique_ptr<U>& val, Json& j) \
         { \
-            if (val) set_json_member(name, val.value(), j); \
+            if (val) j.try_emplace(name, val); \
         } \
         template <class U> \
         static void set_json_member(const string_view_type& name, const jsoncons::optional<U>& val, Json& j) \
         { \
-            if (val) set_json_member(name, val.value(), j); \
+            if (val) j.try_emplace(name, val); \
         } \
         template <class U> \
         static void set_json_member(const string_view_type& name, const U& val, Json& j) \
@@ -345,17 +345,17 @@ namespace jsoncons \
         template <class U> \
         static void set_json_member(const string_view_type& name, const std::shared_ptr<U>& val, Json& j) \
         { \
-            if (val) set_json_member(name, val.value(), j); \
+            if (val) j.try_emplace(name, val); \
         } \
         template <class U> \
         static void set_json_member(const string_view_type& name, const std::unique_ptr<U>& val, Json& j) \
         { \
-            if (val) set_json_member(name, val.value(), j); \
+            if (val) j.try_emplace(name, val); \
         } \
         template <class U> \
         static void set_json_member(const string_view_type& name, const jsoncons::optional<U>& val, Json& j) \
         { \
-            if (val) set_json_member(name, val.value(), j); \
+            if (val) j.try_emplace(name, val); \
         } \
         template <class U> \
         static void set_json_member(const string_view_type& name, const U& val, Json& j) \
@@ -779,17 +779,17 @@ namespace jsoncons \
         template <class U> \
         static void set_json_member(const string_view_type& name, const std::shared_ptr<U>& val, Json& j) \
         { \
-            if (val) set_json_member(name, val.value(), j); \
+            if (val) j.try_emplace(name, val); \
         } \
         template <class U> \
         static void set_json_member(const string_view_type& name, const std::unique_ptr<U>& val, Json& j) \
         { \
-            if (val) set_json_member(name, val.value(), j); \
+            if (val) j.try_emplace(name, val); \
         } \
         template <class U> \
         static void set_json_member(const string_view_type& name, const jsoncons::optional<U>& val, Json& j) \
         { \
-            if (val) set_json_member(name, val.value(), j); \
+            if (val) j.try_emplace(name, val); \
         } \
         template <class U> \
         static void set_json_member(const string_view_type& name, const U& val, Json& j) \
@@ -874,17 +874,17 @@ namespace jsoncons \
         template <class U> \
         static void set_json_member(const string_view_type& name, const std::shared_ptr<U>& val, Json& j) \
         { \
-            if (val) set_json_member(name, val.value(), j); \
+            if (val) j.try_emplace(name, val); \
         } \
         template <class U> \
         static void set_json_member(const string_view_type& name, const std::unique_ptr<U>& val, Json& j) \
         { \
-            if (val) set_json_member(name, val.value(), j); \
+            if (val) j.try_emplace(name, val); \
         } \
         template <class U> \
         static void set_json_member(const string_view_type& name, const jsoncons::optional<U>& val, Json& j) \
         { \
-            if (val) set_json_member(name, val.value(), j); \
+            if (val) j.try_emplace(name, val); \
         } \
         template <class U> \
         static void set_json_member(const string_view_type& name, const U& val, Json& j) \

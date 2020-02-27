@@ -449,6 +449,22 @@ namespace json_type_traits_macro_tests
             return !(lhs == rhs);
         };
     };
+
+    struct pointer_and_optional_test1
+    {
+        std::shared_ptr<std::string> field1;
+        std::unique_ptr<std::string> field2;
+        jsoncons::optional<std::string> field3;
+        std::shared_ptr<std::string> field4;
+        std::unique_ptr<std::string> field5;
+        jsoncons::optional<std::string> field6;
+        std::shared_ptr<std::string> field7;
+        std::unique_ptr<std::string> field8;
+        jsoncons::optional<std::string> field9;
+        std::shared_ptr<std::string> field10;
+        std::unique_ptr<std::string> field11;
+        jsoncons::optional<std::string> field12;
+    };
 } // namespace json_type_traits_macro_tests
  
 namespace ns = json_type_traits_macro_tests;
@@ -476,6 +492,9 @@ JSONCONS_N_GETTER_SETTER_TRAITS(ns::book3c, get, set, 2, Author, Title, Price, I
 JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
 JSONCONS_ALL_MEMBER_TRAITS(ns::hiking_reputon, rater, assertion, rated, rating)
 JSONCONS_ALL_MEMBER_TRAITS(ns::hiking_reputation, application, reputons)
+
+JSONCONS_N_MEMBER_TRAITS(ns::pointer_and_optional_test1,6,field1,field2,field3,field4,field5,field6,
+                                                          field7,field8,field9,field10,field11,field12)
 
 void test_is_json_type_traits_declared(std::true_type)
 {
@@ -1168,3 +1187,49 @@ TEST_CASE("hiking_reputation")
     }
 }
 
+TEST_CASE("JSONCONS_N_MEMBER_TRAITS pointer and optional test")
+{
+    SECTION("test 1")
+    {
+        ns::pointer_and_optional_test1 val;
+        val.field1 = std::make_shared<std::string>("Field 1"); 
+        val.field2 = jsoncons::make_unique<std::string>("Field 2"); 
+        val.field3 = "Field 3";
+        val.field4 = std::shared_ptr<std::string>(nullptr);
+        val.field5 = std::unique_ptr<std::string>(nullptr);
+        val.field6 = jsoncons::optional<std::string>();
+        val.field7 = std::make_shared<std::string>("Field 7"); 
+        val.field8 = jsoncons::make_unique<std::string>("Field 8"); 
+        val.field9 = "Field 9";
+        val.field10 = std::shared_ptr<std::string>(nullptr);
+        val.field11 = std::unique_ptr<std::string>(nullptr);
+        val.field12 = jsoncons::optional<std::string>();
+
+        std::string buf;
+        encode_json(val, buf);
+
+        json j = decode_json<json>(buf);
+        CHECK(j.contains("field1"));
+        CHECK(j.contains("field2"));
+        CHECK(j.contains("field3"));
+        CHECK(j.contains("field4"));
+        CHECK(j.contains("field5"));
+        CHECK(j.contains("field6"));
+        CHECK(j.contains("field7"));
+        CHECK(j.contains("field8"));
+        CHECK(j.contains("field9"));
+        CHECK_FALSE(j.contains("field10"));
+        CHECK_FALSE(j.contains("field11"));
+        CHECK_FALSE(j.contains("field12"));
+
+        CHECK(j["field1"].as<std::string>() == std::string("Field 1"));
+        CHECK(j["field2"].as<std::string>() == std::string("Field 2"));
+        CHECK(j["field3"].as<std::string>() == std::string("Field 3"));
+        CHECK(j["field4"].is_null());
+        CHECK(j["field5"].is_null());
+        CHECK(j["field6"].is_null());
+        CHECK(j["field7"].as<std::string>() == std::string("Field 7"));
+        CHECK(j["field8"].as<std::string>() == std::string("Field 8"));
+        CHECK(j["field9"].as<std::string>() == std::string("Field 9"));
+    }
+}

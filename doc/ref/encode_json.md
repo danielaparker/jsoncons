@@ -31,6 +31,25 @@ void encode_json(const T& val,
 template <class T, class CharT>
 void encode_json(const T& val, 
                  basic_json_content_handler<CharT>& encoder); // (5)
+
+template <class T, class CharT, class ImplementationPolicy, class Allocator>
+void encode_json(const T& val,
+                 std::basic_string<CharT>& s, 
+                 const basic_json_encode_options<CharT>& options, 
+                 indenting line_indent,
+                 const basic_json<CharT,ImplementationPolicy,Allocator>& context_j); // (6)
+
+template <class T, class CharT, class ImplementationPolicy, class Allocator>
+void encode_json(const T& val,
+                 std::basic_ostream<CharT>& os, 
+                 const basic_json_encode_options<CharT>& options, 
+                 indenting line_indent,
+                 const basic_json<CharT,ImplementationPolicy,Allocator>& context_j); // (7)
+
+template <class T, class CharT, class ImplementationPolicy, class Allocator>
+void encode_json(const T& val,
+                 basic_json_content_handler<CharT>& encoder,
+                 const basic_json<CharT, ImplementationPolicy, Allocator>& context_j); // (8)
 ```
 
 (1) Encode `val` to string with the specified line indenting.
@@ -42,6 +61,20 @@ void encode_json(const T& val,
 (4) Encode `val` to output stream with the specified options and line indenting.
 
 (5) Convert `val` to json events and stream through content handler.
+
+(6) Encode `val` to string with the specified options and line indenting,
+    using the context object `context_j` as a prototype when encoding requires
+    a temporary `basic_json` value.
+
+(7) Encode `val` to output stream with the specified options and line indenting,
+    using the context object `context_j` as a prototype when encoding requires
+    a temporary `basic_json` value.
+
+(8) Convert `val` to json events and stream through content handler,
+    using the context object `context_j` as a prototype when encoding requires
+    a temporary `basic_json` value.
+
+Functions (6)-(8) only participate in overload resolution if `T` is not a `basic_json` type.  
 
 #### Parameters
 
