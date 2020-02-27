@@ -51,21 +51,23 @@ to inform the `jsoncons` library that the type is already specialized.
 `Json::array`|`true` if `j.is_array()`, otherwise `false`|Compile-time error|<em>&#x2713;</em>
 `bool`|`true` if `j.is_bool()`, otherwise `false`|as `bool`|<em>&#x2713;</em>
 `null_type`|`true` if `j.is_null()`, otherwise `false`|`null_type()` value if j.is_null(), otherwise throws|<em>&#x2713;</em>
-`const char_type*`|`true` if string, otherwise `false`|as `const char_type*`|<em>&#x2713;</em>
-`char_type*`|`true` if `j.is_string()`, otherwise `false`|Compile-time error|<em>&#x2713;</em>
 `integral types`|`true` if `j.is_int64()` or `j.is_uint64()` and value is in range, otherwise `false`|j numeric value cast to `T`|<em>&#x2713;</em>
 `floating point types`|`true` if j.is_double() and value is in range, otherwise `false`|j numeric value cast to `T`|<em>&#x2713;</em>
-`string`|`true` if j.is_string(), otherwise `false`|as string|<em>&#x2713;</em>
+`std::basic_string<CharT>`<sup>1</sup>|`true` if `j.is<std::basic_string<CharT>>()`, otherwise `false`|j.as<std::basic_string<CharT>>|<em>&#x2713;</em>
+`jsoncons::basic_string_view<CharT>`<sup>1</sup>|`true` if `j.is<jsoncons::basic_string_view<CharT>>()`, otherwise `false`|j.as<std::basic_string_view<CharT>>|<em>&#x2713;</em>
 STL sequence container (other than string) e.g. std::vector|`true` if array and each value is assignable to a `Json` value, otherwise `false`|if array and each value is convertible to `value_type`, as container, otherwise throws|<em>&#x2713;</em>
-STL associative container e.g. std::map|`true` if object and each `mapped_type` is assignable to `Json`, otherwise `false`|if object and each member value is convertible to `mapped_type`, as container|<em>&#x2713;</em>
-`std::tuple`|`true` if `j.is_array()` and each array element is assignable to the corresponding `tuple` element, otherwise false|tuple with array elements converted to tuple elements|<em>&#x2713;</em>
-`std::pair`|`true` if `j.is_array()` and `j.size()==2` and each array element is assignable to the corresponding pair element, otherwise false|pair with array elements converted to pair elements|<em>&#x2713;</em>
-`std::shared_ptr<U>`||
-`std::unique_ptr<U>`||
-`jsoncons::optional<U>`<sup>1</sup>|`true` if `j.is_null()` or `j` is convertible as `U`|`std::optional<U>()` if `j.is_null()`, otherwise `std::optional<U>(j.as<U>())`|<em>&#x2713;</em>
+STL associative container e.g. `std::map<K,U>`|`true` if object and each `mapped_type` is assignable to `Json`, otherwise `false`|if object and each member value is convertible to `mapped_type`, as container|<em>&#x2713;</em>
+`std::tuple<Args...>`|`true` if `j.is_array()` and each array element is assignable to the corresponding `tuple` element, otherwise false|tuple with array elements converted to tuple elements|<em>&#x2713;</em>
+`std::pair<U,V>`|`true` if `j.is_array()` and `j.size()==2` and each array element is assignable to the corresponding pair element, otherwise false|pair with array elements converted to pair elements|<em>&#x2713;</em>
+`std::shared_ptr<U>`<sup>2</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty shared_ptr if `j.is_null()`, otherwise `make_shared(j.as<U>())`|<em>&#x2713;</em>
+`std::unique_ptr<U>`<sup>3</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty unique_ptr if `j.is_null()`, otherwise `make_unique(j.as<U>())`|<em>&#x2713;</em>
+`jsoncons::optional<U>`<sup>4</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty `std::optional<U>` if `j.is_null()`, otherwise `std::optional<U>(j.as<U>())`|<em>&#x2713;</em>
   
-1. `jsoncons::optional<T>` is typedef'ed to [std::optional<T>](https://en.cppreference.com/w/cpp/utility/optional) if 
-jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_OPTIONAL` is defined.
+1. For `CharT` `char` or `wchar_t`.
+2. Defined if `U` that is not a polymorphic class, i.e., does not have any virtual functions.  
+3. Defined if `U` that is not a polymorphic class, i.e., does not have any virtual functions.   
+4. `jsoncons::optional<U>` is typedef'ed to [std::optional<U>](https://en.cppreference.com/w/cpp/utility/optional) if 
+jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_OPTIONAL` is defined.  
 
 ### Convenience Macros
 
