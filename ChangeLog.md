@@ -13,6 +13,10 @@ i.e., does not have any virtual functions
 
 -  New json_type_traits specialization for `std::unique_ptr<T>` for `T` that is not a polymorphic class  
 
+- For the `_N_` convenience macros that allow some non-mandatory members, the generated 
+traits `to_json` function will exclude altogether empty values for `std::shared_ptr` and `std::unique_ptr`,
+as they currently do for `std::optional`.
+
 v0.145.2
 --------
 

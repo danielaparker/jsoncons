@@ -78,7 +78,7 @@ for a user-defined class.
 
 Macro names include qualifiers `_ALL_` or `_N_` to indicate that the generated traits require all
 members be present in the JSON, or a specified number be present. For non-mandatory members, the generated 
-traits `to_json` function will exclude altogether empty values for `std::shared_ptr`, `std::unique_ptr` and std::optional`.
+traits `to_json` function will exclude altogether empty values for `std::shared_ptr`, `std::unique_ptr` and `std::optional`.
 
 ```c++
 JSONCONS_N_MEMBER_TRAITS(class_name,num_mandatory,
