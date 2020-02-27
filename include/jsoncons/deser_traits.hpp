@@ -27,10 +27,10 @@ namespace jsoncons {
     {
         template <class Json>
         static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
-                        const Json& context_j, 
-                        std::error_code& ec)
+                             json_decoder<Json>& decoder, 
+                             std::error_code& ec)
         {
-            json_decoder<Json> decoder(context_j.get_allocator());
+            decoder.reset();
             reader.read(decoder, ec);
             return decoder.get_result().template as<T>();
         }
@@ -50,8 +50,8 @@ namespace jsoncons {
 
         template <class Json>
         static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
-                        const Json& context_j, 
-                        std::error_code& ec)
+                             json_decoder<Json>& decoder, 
+                             std::error_code& ec)
         {
             T v;
 
@@ -63,7 +63,7 @@ namespace jsoncons {
             reader.next(ec);
             while (reader.current().event_type() != staj_event_type::end_array && !ec)
             {
-                v.push_back(deser_traits<value_type>::deserialize(reader, context_j, ec));
+                v.push_back(deser_traits<value_type>::deserialize(reader, decoder, ec));
                 reader.next(ec);
             }
             return v;
@@ -188,8 +188,8 @@ namespace jsoncons {
 
         template <class Json>
         static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
-                        const Json&, 
-                        std::error_code& ec)
+                             json_decoder<Json>&, 
+                             std::error_code& ec)
         {
             T v;
 
@@ -214,8 +214,8 @@ namespace jsoncons {
 
         template <class Json>
         static std::array<T, N> deserialize(basic_staj_reader<typename Json::char_type>& reader, 
-                                       const Json& context_j, 
-                                       std::error_code& ec)
+                                            json_decoder<Json>& decoder, 
+                                            std::error_code& ec)
         {
             std::array<T,N> v;
             v.fill(T{});
@@ -226,7 +226,7 @@ namespace jsoncons {
             reader.next(ec);
             for (std::size_t i = 0; i < N && reader.current().event_type() != staj_event_type::end_array && !ec; ++i)
             {
-                v[i] = deser_traits<value_type>::deserialize(reader, context_j, ec);
+                v[i] = deser_traits<value_type>::deserialize(reader, decoder, ec);
                 reader.next(ec);
             }
             return v;
@@ -248,8 +248,8 @@ namespace jsoncons {
 
         template <class Json>
         static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
-                        const Json& context_j, 
-                        std::error_code& ec)
+                             json_decoder<Json>& decoder, 
+                             std::error_code& ec)
         {
             T val;
             if (reader.current().event_type() != staj_event_type::begin_object)
@@ -268,7 +268,7 @@ namespace jsoncons {
                 }
                 auto key = reader.current(). template get<key_type>();
                 reader.next(ec);
-                val.emplace(std::move(key),deser_traits<mapped_type>::deserialize(reader, context_j, ec));
+                val.emplace(std::move(key),deser_traits<mapped_type>::deserialize(reader, decoder, ec));
                 reader.next(ec);
             }
             return val;
@@ -288,8 +288,8 @@ namespace jsoncons {
 
         template <class Json>
         static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
-                        const Json& context_j, 
-                        std::error_code& ec)
+                             json_decoder<Json>& decoder, 
+                             std::error_code& ec)
         {
             T val;
             if (reader.current().event_type() != staj_event_type::begin_object)
@@ -309,7 +309,7 @@ namespace jsoncons {
                 auto s = reader.current().template get<basic_string_view<typename Json::char_type>>();
                 auto key = jsoncons::detail::to_integer<key_type>(s.data(), s.size()); 
                 reader.next(ec);
-                val.emplace(key.value(),deser_traits<mapped_type>::deserialize(reader, context_j, ec));
+                val.emplace(key.value(),deser_traits<mapped_type>::deserialize(reader, decoder, ec));
                 reader.next(ec);
             }
             return val;

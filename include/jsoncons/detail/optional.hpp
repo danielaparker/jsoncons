@@ -16,7 +16,7 @@
 namespace jsoncons 
 { 
 namespace detail 
-{
+{ 
     template <typename T>
     class optional;
 
@@ -377,15 +377,13 @@ namespace detail
     template <class T1, class T2>
     constexpr bool operator==(const optional<T1>& lhs, const optional<T2>& rhs) 
     {
-        const bool lhs_has_value = lhs.has_value();
-        return lhs_has_value == rhs.has_value() && (!lhs_has_value || *lhs == *rhs);
+        return lhs.has_value() == rhs.has_value() && (!lhs.has_value() || *lhs == *rhs);
     }
 
     template <class T1, class T2>
     constexpr bool operator!=(const optional<T1>& lhs, const optional<T2>& rhs) 
     {
-        const bool lhs_has_value = lhs.has_value();
-        return lhs_has_value != rhs.has_value() || (lhs_has_value && *lhs != *rhs);
+        return lhs.has_value() != rhs.has_value() || (lhs.has_value() && *lhs != *rhs);
     }
 
     template <class T1, class T2>

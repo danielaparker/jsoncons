@@ -106,6 +106,13 @@ public:
         structure_stack_.emplace_back(structure_type::root_t, 0);
     }
 
+    void reset()
+    {
+        is_valid_ = false;
+        structure_stack_.clear();
+        structure_stack_.emplace_back(structure_type::root_t, 0);
+    }
+
     bool is_valid() const
     {
         return is_valid_;

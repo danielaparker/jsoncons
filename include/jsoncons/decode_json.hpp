@@ -37,7 +37,8 @@ namespace jsoncons {
     {
         basic_json_cursor<CharT> cursor(s, options);
         std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, basic_json<CharT>(), ec);
+        jsoncons::json_decoder<basic_json<CharT>> decoder;
+        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -63,7 +64,9 @@ namespace jsoncons {
     {
         basic_json_cursor<CharT> cursor(is, options);
         std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, basic_json<CharT>(), ec);
+
+        json_decoder<basic_json<CharT>> decoder{};
+        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -77,7 +80,8 @@ namespace jsoncons {
     {
         basic_json_cursor<CharT> cursor(s, options);
         std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, context_j, ec);
+        json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> decoder(context_j.get_allocator());
+        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -92,7 +96,8 @@ namespace jsoncons {
     {
         basic_json_cursor<CharT> cursor(is, options);
         std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, context_j, ec);
+        json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> decoder(context_j.get_allocator());
+        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -109,7 +114,8 @@ namespace jsoncons {
     {
         basic_json_cursor<CharT> cursor(s, options);
         std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, context_j, ec);
+        json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> decoder(context_j.get_allocator());
+        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -125,7 +131,8 @@ namespace jsoncons {
     {
         basic_json_cursor<CharT> cursor(is, options);
         std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, context_j, ec);
+        json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> decoder(context_j.get_allocator());
+        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
