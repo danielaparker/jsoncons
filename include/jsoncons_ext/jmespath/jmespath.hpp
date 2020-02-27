@@ -52,7 +52,7 @@ struct slice
         if (this != &rhs)
         {
             start_ = rhs.start_;
-            end_ = rhs.end_;
+            end_ = rhs.end_ ? rhs.end_ : jsoncons::optional<int64_t>();
             step_ = rhs.step_;
         }
         return *this;

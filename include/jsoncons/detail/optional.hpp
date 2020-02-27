@@ -350,7 +350,6 @@ namespace detail
             {
                 value_.~T();
                 has_value_ = false;
-                dummy_ = char();
             }
         }
 
