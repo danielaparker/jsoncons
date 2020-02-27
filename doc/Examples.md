@@ -907,6 +907,10 @@ The output for (2), (3) and (4) is the same.
 This example assumes C++17 language support for `std::optional`.
 Lacking that, you can use `jsoncons::optional`.
 
+Macro names include qualifiers `_ALL_` or `_N_` to indicate that the generated traits require all
+members be present in the JSON, or a specified number be present. For non-mandatory members, the generated 
+traits `to_json` function will exclude altogether empty values for `std::optional`.
+
 ```c++
 #include <cassert>
 #include <jsoncons/json.hpp>
@@ -999,6 +1003,9 @@ Output:
 <div id="G4"/>
 
 #### An example with std::shared_ptr and std::unique_ptr
+
+For non-mandatory members, the generated traits `to_json` function will exclude altogether empty values 
+for `std::shared_ptr` and `std::unique_ptr`.
 
 ```c++
 namespace ns {
