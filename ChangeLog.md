@@ -5,7 +5,11 @@ Changes:
 
 - The name `rename_object_member_filter` has been deprecated and renamed to 
 `rename_object_key_filter`
- 
+
+- The `json_content_handler` public function `name` has been deprecated and renamed to `key`.
+
+- The `json_content_handler` private virtual function `do_name` has been removed and replaced with `do_key`.
+  
 Enhancements:
  
 -  New json_type_traits specialization for `std::shared_ptr<T>` for `T` that is not a polymorphic class,
@@ -14,8 +18,8 @@ i.e., does not have any virtual functions
 -  New json_type_traits specialization for `std::unique_ptr<T>` for `T` that is not a polymorphic class  
 
 - For the `_N_` convenience macros that allow some non-mandatory members, the generated 
-traits `to_json` function will exclude altogether empty values for `std::shared_ptr` and `std::unique_ptr`,
-as they currently do for `std::optional`.
+traits `to_json` function will exclude altogether empty values for `std::shared_ptr` 
+and `std::unique_ptr` non-mandatory members, as they do currently for `std::optional`.
 
 v0.145.2
 --------
