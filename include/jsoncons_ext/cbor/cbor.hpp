@@ -117,8 +117,10 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_cbor(const std::vector<uint8_t>& v)
 {
     cbor_bytes_cursor cursor(v);
+    jsoncons::json_decoder<json> decoder;
+
     std::error_code ec;
-    T val = deser_traits<T>::deserialize(cursor, json(), ec);
+    T val = deser_traits<T>::deserialize(cursor, decoder, ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -142,8 +144,10 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_cbor(std::istream& is)
 {
     cbor_stream_cursor cursor(is);
+    jsoncons::json_decoder<T> decoder;
+
     std::error_code ec;
-    T val = deser_traits<T>::deserialize(cursor, json(), ec);
+    T val = deser_traits<T>::deserialize(cursor, decoder, ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));

@@ -34,8 +34,10 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_csv(const std::basic_string<CharT>& s, const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
 {
     basic_csv_cursor<CharT> cursor(s, options);
+    jsoncons::json_decoder<basic_json<CharT>> decoder;
+
     std::error_code ec;
-    T val = deser_traits<T>::deserialize(cursor, basic_json<CharT>(), ec);
+    T val = deser_traits<T>::deserialize(cursor, decoder, ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -61,8 +63,10 @@ typename std::enable_if<!is_basic_json_class<T>::value,T>::type
 decode_csv(std::basic_istream<CharT>& is, const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
 {
     basic_csv_cursor<CharT> cursor(is, options);
+    jsoncons::json_decoder<basic_json<CharT>> decoder;
+
     std::error_code ec;
-    T val = deser_traits<T>::deserialize(cursor, basic_json<CharT>(), ec);
+    T val = deser_traits<T>::deserialize(cursor, decoder, ec);
     if (ec)
     {
         JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
