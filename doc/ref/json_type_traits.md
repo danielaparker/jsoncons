@@ -1,6 +1,8 @@
 ### jsoncons::json_type_traits
 
-`#include <jsoncons/json_type_traits.hpp>`
+```c++
+#include <jsoncons/json_type_traits.hpp>
+```
 
 <br>
 

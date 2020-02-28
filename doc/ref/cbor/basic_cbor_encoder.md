@@ -1,8 +1,8 @@
 ### jsoncons::cbor::basic_cbor_encoder
 
-__`jsoncons_ext/cbor/cbor_encoder.hpp`__
-
 ```c++
+#include <jsoncons_ext/cbor/cbor_encoder.hpp>
+
 template<
     class Sink>
 > class basic_cbor_encoder final : public json_content_handler

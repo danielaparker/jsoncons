@@ -1,8 +1,8 @@
 ### jsoncons::half_arg
 
-__`jsoncons/tag_type.hpp`__
-
 ```c++
+#include <jsoncons/tag_type.hpp>
+
 constexpr half_arg_t half_arg{};
 ```
 

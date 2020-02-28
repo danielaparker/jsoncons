@@ -1,8 +1,8 @@
 ### jsoncons::ubjson::basic_ubjson_cursor
 
-__`jsoncons_ext/ubjson/ubjson_cursor.hpp`__
-
 ```c++
+#include <jsoncons_ext/ubjson/ubjson_cursor.hpp>
+
 template<
     class Src=jsoncons::bin_stream_source,
     class Allocator=std::allocator<char>>

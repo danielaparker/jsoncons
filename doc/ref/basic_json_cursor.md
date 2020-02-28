@@ -1,8 +1,8 @@
 ### jsoncons::basic_json_cursor
 
-__`jsoncons/json_cursor.hpp`__
-
 ```c++
+#include <jsoncons/json_cursor.hpp>
+
 template<
     class CharT,
     class Src=jsoncons::stream_source<CharT>,

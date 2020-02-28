@@ -1,8 +1,8 @@
 ### jsoncons::basic_json_reader
 
-__`jsoncons/json_reader.hpp`__
-
 ```c++
+#include <jsoncons/json_reader.hpp>
+
 template<
     class CharT,
     class Src=jsoncons::stream_source<CharT>,

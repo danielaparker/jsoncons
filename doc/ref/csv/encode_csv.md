@@ -1,10 +1,10 @@
 ### jsoncons::csv::encode_csv
 
-__`jsoncons_ext/csv/csv.hpp`__
-
 Encodes a C++ data structure into the CSV data format.
 
 ```c++
+#include <jsoncons_ext/csv/csv.hpp>
+
 template <class T,class CharT>
 void encode_csv(const T& val, 
                 std::basic_string<CharT>& s, 

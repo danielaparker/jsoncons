@@ -1,8 +1,8 @@
 ### jsoncons::jsonpatch::apply_patch
 
-__`jsoncons_ext/jsonpatch/jsonpatch.hpp`__
-
 ```c++
+#include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
+
 template <class Json>
 void apply_patch(Json& target, const Json& patch); // (1)
 

@@ -1,8 +1,8 @@
 ### jsoncons::msgpack::basic_msgpack_cursor
 
-__`jsoncons_ext/msgpack/msgpack_cursor.hpp`__
-
 ```c++
+#include <jsoncons_ext/msgpack/msgpack_cursor.hpp>
+
 template<
     class Src=jsoncons::bin_stream_source,
     class Allocator=std::allocator<char>>

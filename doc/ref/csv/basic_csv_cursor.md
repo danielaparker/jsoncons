@@ -1,8 +1,8 @@
 ### jsoncons::csv::basic_csv_cursor
 
-__`jsoncons_ext/csv/csv_cursor.hpp`__
-
 ```c++
+#include <jsoncons_ext/csv/csv_cursor.hpp>
+
 template<
     class CharT,
     class Src=jsoncons::stream_source<CharT>,

@@ -1,8 +1,8 @@
 ### jsoncons::basic_json_content_handler
 
-__`jsoncons/json_content_handler.hpp`__
-
 ```c++
+#include <jsoncons/json_content_handler.hpp>
+
 template <
     class CharT
 > class basic_json_content_handler

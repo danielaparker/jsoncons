@@ -1,10 +1,10 @@
 ### jsoncons::jsonpath::json_replace
 
-__`jsoncons_ext/jsonpath/json_query.hpp`__
-
 Searches for all values that match a JSONPath expression and replaces them with the specified value
 
 ```c++
+#include <jsoncons_ext/jsonpath/json_query.hpp>
+
 template<class Json, class T>
 void json_replace(Json& root, 
                   const typename Json::string_view_type& path, 

@@ -1,8 +1,8 @@
 ### jsoncons::json_type
 
-__`jsoncons/json_type.hpp`__
-
 ```c++
+#include <jsoncons/json_type.hpp>
+
 enum class json_type : uint8_t 
 {
     null_value,

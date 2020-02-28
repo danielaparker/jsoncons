@@ -1,8 +1,8 @@
 ### jsoncons::bson::basic_bson_encoder
 
-__`jsoncons_ext/bson/bson_encoder.hpp`__
-
 ```c++
+#include <jsoncons_ext/bson/bson_encoder.hpp>
+
 template<
     class Sink>
 > class basic_bson_encoder : public jsoncons::json_content_handler

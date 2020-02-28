@@ -1,6 +1,10 @@
 ### jsoncons::json_errc
 
-__`jsoncons/json_error.hpp`__
+```c++
+#include <jsoncons/json_error.hpp>
+```
+
+<br>
 
 The constant integer values scoped by `jsoncons::json_errc` define the values for json text error codes.
 

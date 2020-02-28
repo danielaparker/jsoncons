@@ -1,8 +1,8 @@
 ### jsoncons::msgpack::basic_msgpack_encoder
 
-__`jsoncons_ext/msgpack/msgpack_encoder.hpp`__
-
 ```c++
+#include <jsoncons_ext/msgpack/msgpack_encoder.hpp>
+
 template<
     class Sink>
 > class basic_msgpack_encoder : public jsoncons::json_content_handler

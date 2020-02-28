@@ -1,8 +1,8 @@
 ### jsoncons::csv::basic_csv_reader
 
-__`jsoncons_ext/csv/csv_reader.hpp`__
-
 ```c++
+#include <jsoncons_ext/csv/csv_reader.hpp>
+
 template<
     class CharT,
     class Src=jsoncons::stream_source<CharT>,
