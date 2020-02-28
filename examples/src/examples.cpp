@@ -435,9 +435,9 @@ int main()
 
         json_accessor_examples();
 
-        json_traits_macros_examples();
-
         run_cbor_typed_array_examples();
+
+        json_traits_macros_examples();
     }
     catch (const std::exception& e)
     {

@@ -711,46 +711,52 @@ using namespace jsoncons; // for convenience
 
 int main()
 {
-        ns::smart_pointer_and_optional_test1 val;
-        val.field1 = std::make_shared<std::string>("Field 1"); 
-        val.field2 = jsoncons::make_unique<std::string>("Field 2"); 
-        val.field3 = "Field 3";
-        val.field4 = std::shared_ptr<std::string>(nullptr);
-        val.field5 = std::unique_ptr<std::string>(nullptr);
-        val.field6 = std::optional<std::string>();
-        val.field7 = std::make_shared<std::string>("Field 7"); 
-        val.field8 = jsoncons::make_unique<std::string>("Field 8"); 
-        val.field9 = "Field 9";
-        val.field10 = std::shared_ptr<std::string>(nullptr);
-        val.field11 = std::unique_ptr<std::string>(nullptr);
-        val.field12 = std::optional<std::string>();
+    ns::smart_pointer_and_optional_test val;
+    val.field1 = std::make_shared<std::string>("Field 1"); 
+    val.field2 = jsoncons::make_unique<std::string>("Field 2"); 
+    val.field3 = "Field 3";
+    val.field4 = std::shared_ptr<std::string>(nullptr);
+    val.field5 = std::unique_ptr<std::string>(nullptr);
+    val.field6 = std::optional<std::string>();
+    val.field7 = std::make_shared<std::string>("Field 7"); 
+    val.field8 = jsoncons::make_unique<std::string>("Field 8"); 
+    val.field9 = "Field 9";
+    val.field10 = std::shared_ptr<std::string>(nullptr);
+    val.field11 = std::unique_ptr<std::string>(nullptr);
+    val.field12 = std::optional<std::string>();
 
-        std::string buf;
-        encode_json(val, buf);
+    std::string buf;
+    encode_json(val, buf, indenting::indent);
+    std::cout << buf << "\n";
 
-        json j = decode_json<json>(buf);
-        assert(j.contains("field1"));
-        assert(j.contains("field2"));
-        assert(j.contains("field3"));
-        assert(j.contains("field4"));
-        assert(j.contains("field5"));
-        assert(j.contains("field6"));
-        assert(j.contains("field7"));
-        assert(j.contains("field8"));
-        assert(j.contains("field9"));
-        CHECK(!j.contains("field10"));
-        CHECK(!j.contains("field11"));
-        CHECK(!j.contains("field12"));
+    auto other = decode_json<ns::smart_pointer_and_optional_test>(buf);
 
-        assert(j["field1"].as<std::string>() == std::string("Field 1"));
-        assert(j["field2"].as<std::string>() == std::string("Field 2"));
-        assert(j["field3"].as<std::string>() == std::string("Field 3"));
-        assert(j["field4"].is_null());
-        assert(j["field5"].is_null());
-        assert(j["field6"].is_null());
-        assert(j["field7"].as<std::string>() == std::string("Field 7"));
-        assert(j["field8"].as<std::string>() == std::string("Field 8"));
-        assert(j["field9"].as<std::string>() == std::string("Field 9"));
+    assert(*other.field1 == *val.field1);
+    assert(*other.field2 == *val.field2);
+    assert(*other.field3 == *val.field3);
+    assert(!other.field4);
+    assert(!other.field5);
+    assert(!other.field6);
+    assert(*other.field7 == *val.field7);
+    assert(*other.field8 == *val.field8);
+    assert(*other.field9 == *val.field9);
+    assert(!other.field10);
+    assert(!other.field11);
+    assert(!other.field12);
+}
+```
+Output:
+```
+{
+    "field1": "Field 1",
+    "field2": "Field 2",
+    "field3": "Field 3",
+    "field4": null,
+    "field5": null,
+    "field6": null,
+    "field7": "Field 7",
+    "field8": "Field 8",
+    "field9": "Field 9"
 }
 ```
 

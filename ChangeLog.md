@@ -1,3 +1,9 @@
+v0.146.1
+--------
+
+Fixed issue with `json_type_traits` specializations of `std::shared_ptr<T>` and 
+`std::unique_ptr<T>` when converting from JSON null.
+
 v0.146.0
 --------
 

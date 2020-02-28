@@ -879,7 +879,7 @@ namespace detail
 
         static std::shared_ptr<ValueType> as(const Json& j) 
         {
-            return std::make_shared<ValueType>(j.template as<ValueType>());
+            return j.is_null() ? std::shared_ptr<ValueType>(nullptr) : std::make_shared<ValueType>(j.template as<ValueType>());
         }
 
         static Json to_json(const std::shared_ptr<ValueType>& ptr) 
@@ -909,7 +909,7 @@ namespace detail
 
         static std::unique_ptr<ValueType> as(const Json& j) 
         {
-            return jsoncons::make_unique<ValueType>(j.template as<ValueType>());
+            return j.is_null() ? std::unique_ptr<ValueType>(nullptr) : jsoncons::make_unique<ValueType>(j.template as<ValueType>());
         }
 
         static Json to_json(const std::unique_ptr<ValueType>& ptr) 

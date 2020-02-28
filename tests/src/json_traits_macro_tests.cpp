@@ -1208,7 +1208,8 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS pointer and optional test")
         val.field12 = jsoncons::optional<std::string>();
 
         std::string buf;
-        encode_json(val, buf);
+        encode_json(val, buf, indenting::indent);
+        //std::cout << buf << "\n";
 
         json j = decode_json<json>(buf);
         CHECK(j.contains("field1"));
@@ -1233,5 +1234,20 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS pointer and optional test")
         CHECK(j["field7"].as<std::string>() == std::string("Field 7"));
         CHECK(j["field8"].as<std::string>() == std::string("Field 8"));
         CHECK(j["field9"].as<std::string>() == std::string("Field 9"));
+
+        auto other = decode_json<ns::smart_pointer_and_optional_test1>(buf);
+
+        CHECK(*other.field1 == *val.field1);
+        CHECK(*other.field2 == *val.field2);
+        CHECK(*other.field3 == *val.field3);
+        CHECK_FALSE(other.field4);
+        CHECK_FALSE(other.field5);
+        CHECK_FALSE(other.field6);
+        CHECK(*other.field7 == *val.field7);
+        CHECK(*other.field8 == *val.field8);
+        CHECK(*other.field9 == *val.field9);
+        CHECK_FALSE(other.field10);
+        CHECK_FALSE(other.field11);
+        CHECK_FALSE(other.field12);
     }
 }

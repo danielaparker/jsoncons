@@ -1051,24 +1051,31 @@ int main()
     val.field8 = std::unique_ptr<std::string>(nullptr);
 
     std::string buf;
-    encode_json(val, buf);
+    encode_json(val, buf, indenting::indent);
 
-    json j = decode_json<json>(buf);
-    assert(j.contains("field1"));
-    assert(j.contains("field2"));
-    assert(j.contains("field3"));
-    assert(j.contains("field4"));
-    assert(j.contains("field5"));
-    assert(j.contains("field6"));
-    assert(!j.contains("field7"));
-    assert(!j.contains("field8"));
+    std::cout << buf << "\n";
 
-    assert(j["field1"].as<std::string>() == std::string("Field 1"));
-    assert(j["field2"].as<std::string>() == std::string("Field 2"));
-    assert(j["field3"].is_null());
-    assert(j["field4"].is_null());
-    assert(j["field5"].as<std::string>() == std::string("Field 5"));
-    assert(j["field6"].as<std::string>() == std::string("Field 6"));
+    auto other = decode_json<ns::smart_pointer_test>(buf);
+
+    assert(*other.field1 == *val.field1);
+    assert(*other.field2 == *val.field2);
+    assert(!other.field3);
+    assert(!other.field4);
+    assert(*other.field5 == *val.field5);
+    assert(*other.field6 == *val.field6);
+    assert(!other.field7);
+    assert(!other.field8);
+}
+```
+Output:
+```
+{
+    "field1": "Field 1",
+    "field2": "Field 2",
+    "field3": null,
+    "field4": null,
+    "field5": "Field 5",
+    "field6": "Field 6"
 }
 ```
 
