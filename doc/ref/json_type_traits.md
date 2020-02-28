@@ -66,11 +66,11 @@ STL associative container e.g. `std::map<K,U>`|`true` if object and each `mapped
 `jsoncons::optional<U>`<sup>5</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty `std::optional<U>` if `j.is_null()`, otherwise `std::optional<U>(j.as<U>())`|<em>&#x2713;</em>
   
 1. For `CharT` `char` or `wchar_t`.
-2. `jsoncons::basic_string_view<CharT>` is typedef'ed to [std::basic_string_view<CharT>](https://en.cppreference.com/w/cpp/utility/optional) if 
+2. `jsoncons::basic_string_view<CharT>` is aliased to [std::basic_string_view<CharT>](https://en.cppreference.com/w/cpp/utility/optional) if 
 jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_STRING_VIEW` is defined.  
 3. Defined if `U` is not a polymorphic class, i.e., does not have any virtual functions.  
 4. Defined if `U` is not a polymorphic class, i.e., does not have any virtual functions.   
-5. `jsoncons::optional<U>` is typedef'ed to [std::optional<U>](https://en.cppreference.com/w/cpp/utility/optional) if 
+5. `jsoncons::optional<U>` is aliased to [std::optional<U>](https://en.cppreference.com/w/cpp/utility/optional) if 
 jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_OPTIONAL` is defined.  
 
 ### Convenience Macros

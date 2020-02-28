@@ -904,8 +904,12 @@ The output for (2), (3) and (4) is the same.
 
 #### Serialize non-mandatory std::optional values using the convenience macros
 
-This example assumes C++17 language support for `std::optional`.
-Lacking that, you can use `jsoncons::optional`.
+The jsoncons library includes a `json_typed_traits` specialization for 
+`jsoncons::optional<T>` if `T` is also specialized. `jsoncons::optional<T>` is aliased to 
+[std::optional<T>](https://en.cppreference.com/w/cpp/utility/optional) if 
+jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_OPTIONAL` is defined.  
+An empty `jsoncons::optional<T>` value correspond to JSON null.
+This example assumes C++17 language support (otherwise substitute `jsoncons::optional`.)
 
 Macro names include qualifiers `_ALL_` or `_N_` to indicate that the generated traits require all
 members be present in the JSON, or a specified number be present. For non-mandatory members, the generated 
@@ -1004,7 +1008,14 @@ Output:
 
 #### An example with std::shared_ptr and std::unique_ptr
 
-For non-mandatory members, the generated traits `to_json` function will exclude altogether empty values 
+The jsoncons library includes `json_typed_traits` specializations for 
+`std::shared_ptr<T>` and `std::unique_ptr<T>` if `T` is not a [polymorphic class](https://en.cppreference.com/w/cpp/language/object#Polymorphic_objects), 
+i.e., does not have any virtual functions, and if `T` is also specialized. In addition, users can specialize `json_typed_traits`
+for polymorphic classes using the convenience macro `JSONCONS_POLYMORPHIC_TRAITS`, or by specializing `json_type_traits` explicitly.
+Empty `std::shared_ptr<T>` and `std::unique_ptr<T>` values correspond to JSON null.
+
+The convenience macros whose names include the qualifier `_N_` do not require all members to be present in the JSON.
+For these, the generated traits `to_json` function will exclude altogether empty values 
 for `std::shared_ptr` and `std::unique_ptr`.
 
 ```c++
