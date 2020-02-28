@@ -178,9 +178,9 @@ namespace ns {
 
 // Declare the traits. Specify which data members need to be serialized.
 
-JSONCONS_ENUM_TRAITS_DECL(ns::hiking_experience, beginner, intermediate, advanced)
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputon, rater, assertion, rated, rating)
-JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL(ns::hiking_reputation, application, reputons)
+JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
+JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputon, rater, assertion, rated, rating)
+JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputation, application, reputons)
 
 int main()
 {
@@ -218,13 +218,13 @@ Marilyn C, 0.9
     ]
 }
 ```
-This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS_DECL`
-and `JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL` to specialize the 
+This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS`
+and `JSONCONS_ALL_GETTER_CTOR_TRAITS` to specialize the 
 [json_type_traits](doc/ref/json_type_traits.md) for the enum type
 `ns::hiking_experience` and the classes `ns::hiking_reputon` and 
 `ns::hiking_reputation`.
-The macro `JSONCONS_ENUM_TRAITS_DECL` generates the code from
-the enum values, and the macro `JSONCONS_ALL_GETTER_CTOR_TRAITS_DECL` 
+The macro `JSONCONS_ENUM_TRAITS` generates the code from
+the enum values, and the macro `JSONCONS_ALL_GETTER_CTOR_TRAITS` 
 generates the code from the getter functions and a constructor. 
 These macro declarations must be placed outside any namespace blocks.
 
@@ -277,7 +277,7 @@ int main()
                 std::cout << event.event_type() << ": " << event.get<double>() << "\n";
                 break;
             default:
-                std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";;
+                std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
                 break;
         }
     }    
@@ -667,7 +667,7 @@ produces
 <div id="A7"/>
 ### Filters
 
-You can rename object member names with the built in filter [rename_object_member_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/rename_object_member_filter.md)
+You can rename object member names with the built in filter [rename_object_key_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/rename_object_key_filter.md)
 
 ```c++
 #include <sstream>
@@ -683,8 +683,8 @@ int main()
     json_stream_encoder encoder(std::cout);
 
     // Filters can be chained
-    rename_object_member_filter filter2("fifth", "fourth", encoder);
-    rename_object_member_filter filter1("fourth", "third", filter2);
+    rename_object_key_filter filter2("fifth", "fourth", encoder);
+    rename_object_key_filter filter1("fourth", "third", filter2);
 
     // A filter can be passed to any function that takes
     // a json_content_handler ...
