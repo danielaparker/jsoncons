@@ -1,6 +1,8 @@
 ### jsoncons::jsonpointer::contains
 
-__`jsoncons_ext/jsonpointer/jsonpointer.hpp`__
+`#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>`
+
+<br>
 
 Returns `true` if the json doc contains the given JSON Pointer, otherwise `false'
 

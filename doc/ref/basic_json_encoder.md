@@ -1,8 +1,8 @@
 ### jsoncons::basic_json_encoder
 
-__`jsoncons/json_encoder.hpp`__
-
 ```c++
+#include <jsoncons/json_encoder.hpp>
+
 template<
     class CharT,
     class Sink>
