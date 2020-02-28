@@ -904,7 +904,7 @@ The output for (2), (3) and (4) is the same.
 
 #### Serialize non-mandatory std::optional values using the convenience macros
 
-The jsoncons library includes a `json_type_traits` specialization for 
+The jsoncons library includes a [json_type_traits](ref/json_type_traits.md) specialization for 
 `jsoncons::optional<T>` if `T` is also specialized. `jsoncons::optional<T>` is aliased to 
 [std::optional<T>](https://en.cppreference.com/w/cpp/utility/optional) if 
 jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_OPTIONAL` is defined.  
@@ -1008,7 +1008,7 @@ Output:
 
 #### An example with std::shared_ptr and std::unique_ptr
 
-The jsoncons library includes `json_type_traits` specializations for 
+The jsoncons library includes [json_type_traits](ref/json_type_traits.md) specializations for 
 `std::shared_ptr<T>` and `std::unique_ptr<T>` if `T` is not a [polymorphic class](https://en.cppreference.com/w/cpp/language/object#Polymorphic_objects), 
 i.e., does not have any virtual functions, and if `T` is also specialized. In addition, users can specialize `json_type_traits`
 for polymorphic classes using the convenience macro `JSONCONS_POLYMORPHIC_TRAITS`, or by specializing `json_type_traits` explicitly.
@@ -1328,7 +1328,7 @@ Key 'ssn' not found
 
 This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS`
 and `JSONCONS_ALL_GETTER_CTOR_TRAITS` to specialize the 
-[json_type_traits](doc/ref/json_type_traits.md) for the enum type
+[json_type_traits](ref/json_type_traits.md) for the enum type
 `ns::hiking_experience` and the classes `ns::hiking_reputon` and 
 `ns::hiking_reputation`.
 The macro `JSONCONS_ENUM_TRAITS` generates the code from
@@ -1443,7 +1443,7 @@ Output:
 #### Serialize a polymorphic type based on the presence of members
 
 This example uses the convenience macro `JSONCONS_N_GETTER_CTOR_TRAITS`
-to generate the `json_type_traits` boilerplate for the `HourlyEmployee` and `CommissionedEmployee` 
+to generate the [json_type_traits](ref/json_type_traits.md) boilerplate for the `HourlyEmployee` and `CommissionedEmployee` 
 derived classes, and `JSONCONS_POLYMORPHIC_TRAITS` to generate the `json_type_traits` boilerplate
 for `std::shared_ptr<Employee>` and `std::unique_ptr<Employee>`. The type selection strategy is based
 on the presence of mandatory members, in particular, to the `firstName`, `lastName`, and `wage` members of an
