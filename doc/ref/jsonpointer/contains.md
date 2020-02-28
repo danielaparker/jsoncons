@@ -1,12 +1,8 @@
 ### jsoncons::jsonpointer::contains
 
-`#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>`
-
-<br>
-
-Returns `true` if the json doc contains the given JSON Pointer, otherwise `false'
-
 ```c++
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
 template<class Json>
 bool contains(const Json& doc, const typename Json::string_view_type& path);
 ```

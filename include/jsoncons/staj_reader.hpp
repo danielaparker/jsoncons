@@ -18,7 +18,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/bignum.hpp>
-#include <jsoncons/parse_error_handler.hpp>
+#include <jsoncons/json_parser.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/detail/print_number.hpp>
