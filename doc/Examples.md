@@ -904,7 +904,7 @@ The output for (2), (3) and (4) is the same.
 
 #### Serialize non-mandatory std::optional values using the convenience macros
 
-The jsoncons library includes a `json_typed_traits` specialization for 
+The jsoncons library includes a `json_type_traits` specialization for 
 `jsoncons::optional<T>` if `T` is also specialized. `jsoncons::optional<T>` is aliased to 
 [std::optional<T>](https://en.cppreference.com/w/cpp/utility/optional) if 
 jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_OPTIONAL` is defined.  
@@ -1008,9 +1008,9 @@ Output:
 
 #### An example with std::shared_ptr and std::unique_ptr
 
-The jsoncons library includes `json_typed_traits` specializations for 
+The jsoncons library includes `json_type_traits` specializations for 
 `std::shared_ptr<T>` and `std::unique_ptr<T>` if `T` is not a [polymorphic class](https://en.cppreference.com/w/cpp/language/object#Polymorphic_objects), 
-i.e., does not have any virtual functions, and if `T` is also specialized. In addition, users can specialize `json_typed_traits`
+i.e., does not have any virtual functions, and if `T` is also specialized. In addition, users can specialize `json_type_traits`
 for polymorphic classes using the convenience macro `JSONCONS_POLYMORPHIC_TRAITS`, or by specializing `json_type_traits` explicitly.
 Empty `std::shared_ptr<T>` and `std::unique_ptr<T>` values correspond to JSON null.
 
@@ -1126,7 +1126,7 @@ int main()
 jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](doc/ref/decode_json.md) 
 and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
-[json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
+[json_type_traits](ref/json_type_traits.md) 
 defined. The standard library containers are already supported, 
 and your own types will be supported too if you specialize `json_type_traits`
 in the `jsoncons` namespace. 
