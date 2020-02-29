@@ -80,9 +80,9 @@ namespace jsoncons {
                 const std::basic_string<CharT>& s,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
     {
-        json_decoder<T> decoder(temp_alloc);
+        json_decoder<T,TempAllocator> decoder(temp_alloc);
 
-        basic_json_reader<CharT, string_source<CharT>> reader(s, decoder, options);
+        basic_json_reader<CharT, string_source<CharT>,TempAllocator> reader(s, decoder, options, temp_alloc);
         reader.read();
         return decoder.get_result();
     }
@@ -111,9 +111,9 @@ namespace jsoncons {
                 std::basic_istream<CharT>& is,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
     {
-        json_decoder<T> decoder(temp_alloc);
+        json_decoder<T,TempAllocator> decoder(temp_alloc);
 
-        basic_json_reader<CharT, string_source<CharT>> reader(is, decoder, options);
+        basic_json_reader<CharT, string_source<CharT>,TempAllocator> reader(s, decoder, options, temp_alloc);
         reader.read();
         return decoder.get_result();
     }
