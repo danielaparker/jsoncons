@@ -1011,9 +1011,9 @@ Output:
 
 The jsoncons library includes [json_type_traits](ref/json_type_traits.md) specializations for 
 `std::shared_ptr<T>` and `std::unique_ptr<T>` if `T` is not a [polymorphic class](https://en.cppreference.com/w/cpp/language/object#Polymorphic_objects), 
-i.e., does not have any virtual functions, and if `T` is also specialized. Users can implement `json_type_traits` for `std::shared_ptr` and `std::unique_ptr`
+i.e., does not have any virtual functions, and if `T` is also specialized. Empty `std::shared_ptr<T>` and `std::unique_ptr<T>` values correspond to JSON null.
+In addition, users can implement `json_type_traits` for `std::shared_ptr` and `std::unique_ptr`
 with polymorphic classes using the convenience macro `JSONCONS_POLYMORPHIC_TRAITS`, or by specializing `json_type_traits` explicitly.
-Empty `std::shared_ptr<T>` and `std::unique_ptr<T>` values correspond to JSON null.
 
 The convenience macros whose names include the qualifier `_N_` do not require all members to be present in the JSON.
 For these, the generated traits `to_json` function will exclude altogether empty values 
