@@ -25,9 +25,9 @@ namespace jsoncons {
     template <class T, class Enable = void>
     struct deser_traits
     {
-        template <class Json>
+        template <class Json,class TempAllocator>
         static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
-                             json_decoder<Json>& decoder, 
+                             json_decoder<Json,TempAllocator>& decoder, 
                              std::error_code& ec)
         {
             decoder.reset();
@@ -48,9 +48,9 @@ namespace jsoncons {
     {
         typedef typename T::value_type value_type;
 
-        template <class Json>
+        template <class Json,class TempAllocator>
         static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
-                             json_decoder<Json>& decoder, 
+                             json_decoder<Json,TempAllocator>& decoder, 
                              std::error_code& ec)
         {
             T v;
@@ -186,9 +186,9 @@ namespace jsoncons {
     {
         typedef typename T::value_type value_type;
 
-        template <class Json>
+        template <class Json,class TempAllocator>
         static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
-                             json_decoder<Json>&, 
+                             json_decoder<Json,TempAllocator>&, 
                              std::error_code& ec)
         {
             T v;
@@ -212,9 +212,9 @@ namespace jsoncons {
     {
         typedef typename std::array<T,N>::value_type value_type;
 
-        template <class Json>
+        template <class Json,class TempAllocator>
         static std::array<T, N> deserialize(basic_staj_reader<typename Json::char_type>& reader, 
-                                            json_decoder<Json>& decoder, 
+                                            json_decoder<Json,TempAllocator>& decoder, 
                                             std::error_code& ec)
         {
             std::array<T,N> v;
@@ -246,9 +246,9 @@ namespace jsoncons {
         typedef typename T::value_type value_type;
         typedef typename T::key_type key_type;
 
-        template <class Json>
+        template <class Json,class TempAllocator>
         static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
-                             json_decoder<Json>& decoder, 
+                             json_decoder<Json,TempAllocator>& decoder, 
                              std::error_code& ec)
         {
             T val;
@@ -286,9 +286,9 @@ namespace jsoncons {
         typedef typename T::value_type value_type;
         typedef typename T::key_type key_type;
 
-        template <class Json>
+        template <class Json,class TempAllocator>
         static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
-                             json_decoder<Json>& decoder, 
+                             json_decoder<Json,TempAllocator>& decoder, 
                              std::error_code& ec)
         {
             T val;

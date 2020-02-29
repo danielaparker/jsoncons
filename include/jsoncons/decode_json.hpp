@@ -73,13 +73,13 @@ namespace jsoncons {
         }
         return val;
     }
-    template <class T, class CharT, class ImplementationPolicy, class Allocator>
-    T decode_json(const std::basic_string<CharT>& s,
-                  const basic_json_decode_options<CharT>& options,
-                  const basic_json<CharT,ImplementationPolicy,Allocator>& context_j)
+    template <class T,class CharT,class TempAllocator>
+    T decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+                  const std::basic_string<CharT>& s,
+                  const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
     {
-        basic_json_cursor<CharT> cursor(s, options);
-        json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> decoder(context_j.get_allocator());
+        basic_json_cursor<CharT,stream_source<CharT>,TempAllocator> cursor(s, options);
+        json_decoder<basic_json<CharT,sorted_policy,TempAllocator>> decoder(temp_alloc);
 
         std::error_code ec;
         T val = deser_traits<T>::deserialize(cursor, decoder, ec);
@@ -90,13 +90,13 @@ namespace jsoncons {
         return val;
     }
 
-    template <class T, class CharT, class ImplementationPolicy, class Allocator>
-    T decode_json(std::basic_istream<CharT>& is,
-                  const basic_json_decode_options<CharT>& options,
-                  const basic_json<CharT,ImplementationPolicy,Allocator>& context_j)
+    template <class T,class CharT,class TempAllocator>
+    T decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+                  std::basic_istream<CharT>& is,
+                  const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
     {
-        basic_json_cursor<CharT> cursor(is, options);
-        json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> decoder(context_j.get_allocator());
+        basic_json_cursor<CharT,stream_source<CharT>,TempAllocator> cursor(is, options);
+        json_decoder<basic_json<CharT,sorted_policy,TempAllocator>> decoder(temp_alloc);
 
         std::error_code ec;
         T val = deser_traits<T>::deserialize(cursor, decoder, ec);

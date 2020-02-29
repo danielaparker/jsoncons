@@ -78,17 +78,17 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Src,class WorkAllocator=std::allocator<char>>
+template <class Src,class TempAllocator=std::allocator<char>>
 class basic_cbor_parser : public ser_context
 {
     typedef char char_type;
     typedef std::char_traits<char> char_traits_type;
-    typedef WorkAllocator work_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<uint64_t> tag_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<stringref_map> stringref_map_allocator_type;
+    typedef TempAllocator temp_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint64_t> tag_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<stringref_map> stringref_map_allocator_type;
 
     typedef std::basic_string<char_type,char_traits_type,char_allocator_type> string_type;
 
@@ -99,7 +99,7 @@ class basic_cbor_parser : public ser_context
 
     std::bitset<num_of_tags> other_tags_;
 
-    work_allocator_type alloc_;
+    temp_allocator_type alloc_;
     Src source_;
     bool more_;
     bool done_;
@@ -134,9 +134,9 @@ class basic_cbor_parser : public ser_context
 
     struct read_byte_string_from_source
     {
-        basic_cbor_parser<Src,WorkAllocator>* source;
+        basic_cbor_parser<Src,TempAllocator>* source;
 
-        read_byte_string_from_source(basic_cbor_parser<Src,WorkAllocator>* source)
+        read_byte_string_from_source(basic_cbor_parser<Src,TempAllocator>* source)
             : source(source)
         {
         }
@@ -150,7 +150,7 @@ class basic_cbor_parser : public ser_context
 public:
     template <class Source>
     basic_cbor_parser(Source&& source,
-                      const WorkAllocator alloc=WorkAllocator())
+                      const TempAllocator alloc=TempAllocator())
        : alloc_(alloc),
          source_(std::forward<Source>(source)),
          more_(true), 

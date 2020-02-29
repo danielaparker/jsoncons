@@ -18,7 +18,7 @@
 
 namespace jsoncons {
 
-template <class Json,class WorkAllocator=std::allocator<char>>
+template <class Json,class TempAllocator=std::allocator<char>>
 class json_decoder final : public basic_json_content_handler<typename Json::char_type>
 {
 public:
@@ -67,9 +67,9 @@ private:
 
     };
 
-    typedef WorkAllocator work_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<stack_item> stack_item_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<structure_info> structure_info_allocator_type;
+    typedef TempAllocator temp_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<stack_item> stack_item_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<structure_info> structure_info_allocator_type;
  
     json_string_allocator string_allocator_;
     json_byte_allocator_type byte_allocator_;
@@ -86,14 +86,32 @@ private:
     bool is_valid_;
 
 public:
-    json_decoder(const result_allocator_type& rallocator = result_allocator_type(), 
-                 const work_allocator_type& wallocator = work_allocator_type())
-        : string_allocator_(rallocator),
-          byte_allocator_(rallocator),
-          object_allocator_(rallocator),
-          array_allocator_(rallocator),
-          stack_item_allocator_(wallocator),
-          size_t_allocator_(wallocator),
+    json_decoder(const temp_allocator_type& temp_alloc = temp_allocator_type())
+        : string_allocator_(result_allocator_type()),
+          byte_allocator_(result_allocator_type()),
+          object_allocator_(result_allocator_type()),
+          array_allocator_(result_allocator_type()),
+          stack_item_allocator_(temp_alloc),
+          size_t_allocator_(temp_alloc),
+          result_(),
+          name_(string_allocator_),
+          item_stack_(stack_item_allocator_),
+          structure_stack_(size_t_allocator_),
+          is_valid_(false) 
+
+    {
+        item_stack_.reserve(1000);
+        structure_stack_.reserve(100);
+        structure_stack_.emplace_back(structure_type::root_t, 0);
+    }
+    json_decoder(const result_allocator_type& result_alloc, 
+                 const temp_allocator_type& temp_alloc)
+        : string_allocator_(result_alloc),
+          byte_allocator_(result_alloc),
+          object_allocator_(result_alloc),
+          array_allocator_(result_alloc),
+          stack_item_allocator_(temp_alloc),
+          size_t_allocator_(temp_alloc),
           result_(),
           name_(string_allocator_),
           item_stack_(stack_item_allocator_),
