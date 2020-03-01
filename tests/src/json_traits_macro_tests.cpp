@@ -529,6 +529,17 @@ namespace
 
         bool operator==(const MyAlloc&) const { return true; }
         bool operator!=(const MyAlloc&) const { return false; }
+
+        template<typename U>
+        struct rebind
+        {
+            typedef MyAlloc<U> other;
+        };
+        typedef T* pointer;
+        typedef const T* const_pointer;
+        typedef T& reference;
+        typedef const T& const_reference;
+        typedef std::ptrdiff_t difference_type;
     };
     //template <class U>
     //using MyAlloc = std::allocator<U>;
