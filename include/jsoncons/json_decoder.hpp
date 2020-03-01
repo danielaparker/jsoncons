@@ -27,13 +27,8 @@ public:
 
     typedef typename Json::key_value_type key_value_type;
     typedef typename Json::key_type key_type;
-    typedef typename Json::array array;
-    typedef typename Json::object object;
     typedef typename Json::allocator_type result_allocator_type;
-    typedef typename key_type::allocator_type json_string_allocator;
-    typedef typename array::allocator_type json_array_allocator;
-    typedef typename object::allocator_type json_object_allocator;
-    typedef typename std::allocator_traits<result_allocator_type>:: template rebind_alloc<uint8_t> json_byte_allocator_type;
+    typedef TempAllocator temp_allocator_type;
 private:
     struct stack_item
     {
@@ -67,8 +62,6 @@ private:
 
     };
 
-    typedef typename Json::allocator_type result_allocator_type;
-    typedef TempAllocator temp_allocator_type;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<stack_item> stack_item_allocator_type;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<structure_info> structure_info_allocator_type;
  
