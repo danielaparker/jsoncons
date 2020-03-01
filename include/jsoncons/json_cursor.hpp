@@ -57,11 +57,13 @@ public:
     template <class Source>
     basic_json_cursor(Source&& source, 
                       const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
-                      std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing())
+                      std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
+                      const allocator_type& alloc = allocator_type())
         : basic_json_cursor(std::forward<Source>(source), 
-                                 accept,
-                                 options,
-                                 err_handler)
+                            accept,
+                            options,
+                            err_handler,
+                            alloc)
     {
     }
 
@@ -70,10 +72,12 @@ public:
                       std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                       const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
                       std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
+                      const allocator_type& alloc = allocator_type(),
                       typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : event_handler_(filter),
-         parser_(options,err_handler),
+         parser_(options,err_handler,alloc),
          source_(source),
+         buffer_(alloc),
          buffer_length_(default_max_buffer_length),
          eof_(false),
          begin_(true)
@@ -90,9 +94,11 @@ public:
                       std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                       const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
                       std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
+                      const allocator_type& alloc = allocator_type(),
                       typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : event_handler_(filter),
-         parser_(options,err_handler),
+         parser_(options, err_handler, alloc),
+         buffer_(alloc),
          buffer_length_(0),
          eof_(false),
          begin_(false)

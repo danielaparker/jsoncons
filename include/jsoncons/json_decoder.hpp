@@ -163,7 +163,7 @@ private:
             item_stack_.clear();
             is_valid_ = false;
         }
-        item_stack_.emplace_back(std::forward<key_type>(name_), object(object_allocator_), tag);
+        item_stack_.emplace_back(std::forward<key_type>(name_), json_object_arg, tag, object_allocator_);
         structure_stack_.emplace_back(structure_type::object_t, item_stack_.size()-1);
         return true;
     }
@@ -201,7 +201,7 @@ private:
             item_stack_.clear();
             is_valid_ = false;
         }
-        item_stack_.emplace_back(std::forward<key_type>(name_), array(array_allocator_), tag);
+        item_stack_.emplace_back(std::forward<key_type>(name_), json_array_arg, tag, array_allocator_);
         structure_stack_.emplace_back(structure_type::array_t, item_stack_.size()-1);
         return true;
     }
