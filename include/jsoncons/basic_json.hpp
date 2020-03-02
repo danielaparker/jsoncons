@@ -5237,7 +5237,7 @@ public:
 
     range<object_iterator> object_range()
     {
-        static const basic_json empty_object(json_object_arg);
+        static basic_json empty_object = object();
         switch (var_.storage())
         {
         case storage_kind::empty_object_value:
@@ -5251,7 +5251,7 @@ public:
 
     range<const_object_iterator> object_range() const
     {
-        static const basic_json empty_object = basic_json();
+        static basic_json empty_object = object();
         switch (var_.storage())
         {
         case storage_kind::empty_object_value:
