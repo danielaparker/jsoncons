@@ -186,7 +186,7 @@ namespace jsoncons {
     private:
         using iterator_types = sequence_iterator_types<value_type, 
                                                        difference_type,
-                                                       typename std::conditional<std::is_const<typename std::remove_pointer<pointer>::type>::value,value_type*,pointer>::type, 
+                                                       typename std::conditional<std::is_const<typename std::remove_pointer<pointer>::type>::value,typename std::add_pointer<value_type>::type,pointer>::type, 
                                                        typename std::conditional<std::is_const<typename std::remove_pointer<pointer>::type>::value,value_type&,reference>::type>; 
 
     public:
@@ -632,7 +632,7 @@ namespace jsoncons {
         {
             auto pos2 = iterator_to_container_iterator(pos);
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
-            iterator it = elements_.begin() + (pos2 - elements_.begin());
+            auto it = elements_.begin() + (pos2 - elements_.begin());
             elements_.erase(it);
     #else
             elements_.erase(pos2);
@@ -644,8 +644,8 @@ namespace jsoncons {
             auto first2 = iterator_to_container_iterator(first)             ;
             auto last2 = iterator_to_container_iterator(last)             ;
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
-            iterator it1 = elements_.begin() + (first2 - elements_.begin());
-            iterator it2 = elements_.begin() + (last2 - elements_.begin());
+            auto it1 = elements_.begin() + (first2 - elements_.begin());
+            auto it2 = elements_.begin() + (last2 - elements_.begin());
             elements_.erase(it1,it2);
     #else
             elements_.erase(first2,last2);
@@ -678,7 +678,7 @@ namespace jsoncons {
         {
             auto pos2 = iterator_to_container_iterator(pos);
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
-            iterator it = elements_.begin() + (pos2 - elements_.begin());
+            auto it = elements_.begin() + (pos2 - elements_.begin());
             return container_iterator_to_iterator(elements_.emplace(it, std::forward<T>(value)));
     #else
             return container_iterator_to_iterator(elements_.emplace(pos2, std::forward<T>(value)));
@@ -690,7 +690,7 @@ namespace jsoncons {
         {
             auto pos2 = iterator_to_container_iterator(pos);
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
-            iterator it = elements_.begin() + (pos2 - elements_.begin());
+            auto it = elements_.begin() + (pos2 - elements_.begin());
             return container_iterator_to_iterator(elements_.emplace(it, std::forward<T>(value), get_allocator()));
     #else
             return container_iterator_to_iterator(elements_.emplace(pos2, std::forward<T>(value), get_allocator()));
@@ -704,7 +704,7 @@ namespace jsoncons {
             auto first2 = iterator_to_container_iterator(first)             ;
             auto last2 = iterator_to_container_iterator(last)             ;
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
-            iterator it = elements_.begin() + (pos2 - elements_.begin());
+            auto it = elements_.begin() + (pos2 - elements_.begin());
             elements_.insert(it, first2, last2);
             return container_iterator_to_iterator(first2 == last2 ? it : it + 1);
     #else
