@@ -33,7 +33,7 @@ public:
 private:
     basic_staj_event_handler<char> event_handler_;
 
-    basic_msgpack_parser<Src> parser_;
+    basic_msgpack_parser<Src,Allocator> parser_;
     bool eof_;
 
     // Noncopyable and nonmoveable
@@ -44,8 +44,9 @@ public:
     typedef string_view string_view_type;
 
     template <class Source>
-    basic_msgpack_cursor(Source&& source)
-       : parser_(std::forward<Source>(source)),
+    basic_msgpack_cursor(Source&& source,
+                         const allocator_type& alloc = allocator_type())
+       : parser_(std::forward<Source>(source), alloc),
          eof_(false)
     {
         if (!done())
@@ -56,9 +57,10 @@ public:
 
     template <class Source>
     basic_msgpack_cursor(Source&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter)
+                         std::function<bool(const staj_event&, const ser_context&)> filter,
+                         const allocator_type& alloc = allocator_type())
        : event_handler_(filter),
-         parser_(std::forward<Source>(source)), 
+         parser_(std::forward<Source>(source), alloc), 
          eof_(false)
     {
         if (!done())
@@ -70,9 +72,10 @@ public:
     // Constructors that set parse error codes
 
     template <class Source>
-    basic_msgpack_cursor(Source&& source, 
-                      std::error_code& ec)
-       : parser_(std::forward<Source>(source)),
+    basic_msgpack_cursor(Source&& source,
+                         const allocator_type& alloc, 
+                         std::error_code& ec)
+       : parser_(std::forward<Source>(source), alloc),
          eof_(false)
     {
         if (!done())
@@ -83,10 +86,11 @@ public:
 
     template <class Source>
     basic_msgpack_cursor(Source&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter, 
+                      std::function<bool(const staj_event&, const ser_context&)> filter,
+                      const allocator_type& alloc, 
                       std::error_code& ec)
        : event_handler_(filter),
-         parser_(std::forward<Source>(source)), 
+         parser_(std::forward<Source>(source), alloc), 
          eof_(false)
     {
         if (!done())

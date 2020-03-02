@@ -1,7 +1,7 @@
 // Copyright 2018 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
+ 
 // See https://github.com/danielaparker/jsoncons for latest version
 
 #ifndef JSONCONS_CSV_CSV_CURSOR_HPP
@@ -58,11 +58,13 @@ public:
     template <class Source>
     basic_csv_cursor(Source&& source, 
                      const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
-                     std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing())
+                     std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
+                      const allocator_type& alloc = allocator_type())
         : basic_csv_cursor(std::forward<Source>(source), 
                            accept,
                            options,
-                           err_handler)
+                           err_handler,
+                           alloc)
     {
     }
 
@@ -71,10 +73,12 @@ public:
                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                      const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
                      std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
+                     const allocator_type& alloc = allocator_type(),
                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : event_handler_(filter),
-         parser_(options,err_handler),
+         parser_(options,err_handler,alloc),
          source_(source),
+         buffer_(alloc),
          buffer_length_(default_max_buffer_length),
          eof_(false),
          begin_(true)
@@ -91,9 +95,11 @@ public:
                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                      const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
                      std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
+                     const allocator_type& alloc = allocator_type(),
                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : event_handler_(filter),
-         parser_(options,err_handler),
+         parser_(options,err_handler,alloc),
+         buffer_(alloc),
          buffer_length_(0),
          eof_(false),
          begin_(false)
@@ -115,11 +121,12 @@ public:
 
     // Constructors that set parse error codes
     template <class Source>
-    basic_csv_cursor(Source&& source, std::error_code& ec)
+    basic_csv_cursor(Source&& source, const allocator_type& alloc, std::error_code& ec)
         : basic_csv_cursor(std::forward<Source>(source),
                            accept,
                            basic_csv_decode_options<CharT>(),
                            default_csv_parsing(),
+                           alloc,
                            ec)
     {
     }
@@ -127,11 +134,13 @@ public:
     template <class Source>
     basic_csv_cursor(Source&& source, 
                      const basic_csv_decode_options<CharT>& options,
+                     const allocator_type& alloc,
                      std::error_code& ec)
         : basic_csv_cursor(std::forward<Source>(source),
                            accept,
                            options,
                            default_csv_parsing(),
+                           alloc,
                            ec)
     {
     }
@@ -139,11 +148,13 @@ public:
     template <class Source>
     basic_csv_cursor(Source&& source,
                            std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
+                           const allocator_type& alloc,
                            std::error_code& ec)
         : basic_csv_cursor(std::forward<Source>(source),
                            filter,
                            basic_csv_decode_options<CharT>(),
                            default_csv_parsing(),
+                           alloc,
                            ec)
     {
     }
@@ -152,11 +163,13 @@ public:
     basic_csv_cursor(Source&& source, 
                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                      const basic_csv_decode_options<CharT>& options,
+                     const allocator_type& alloc,
                      std::error_code& ec)
         : basic_csv_cursor(std::forward<Source>(source),
                            filter,
                            options,
                            default_csv_parsing(),
+                           alloc,
                            ec)
     {
     }
@@ -166,12 +179,14 @@ public:
                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
+                     const allocator_type& alloc,
                      std::error_code& ec,
                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : event_handler_(filter),
-         parser_(options,err_handler),
+         parser_(options,err_handler,alloc),
          source_(source),
          eof_(false),
+         buffer_(alloc),
          buffer_length_(default_max_buffer_length),
          begin_(true)
     {
@@ -187,11 +202,13 @@ public:
                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
+                     const allocator_type& alloc,
                      std::error_code& ec,
                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : event_handler_(filter),
-         parser_(err_handler),
+         parser_(options,err_handler,alloc),
          eof_(false),
+         buffer_(alloc),
          buffer_length_(0),
          begin_(false)
     {

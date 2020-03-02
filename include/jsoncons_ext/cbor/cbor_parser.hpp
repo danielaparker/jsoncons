@@ -78,12 +78,12 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Src,class TempAllocator=std::allocator<char>>
+template <class Src,class Allocator=std::allocator<char>>
 class basic_cbor_parser : public ser_context
 {
     typedef char char_type;
     typedef std::char_traits<char> char_traits_type;
-    typedef TempAllocator temp_allocator_type;
+    typedef Allocator temp_allocator_type;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint64_t> tag_allocator_type;
@@ -134,9 +134,9 @@ class basic_cbor_parser : public ser_context
 
     struct read_byte_string_from_source
     {
-        basic_cbor_parser<Src,TempAllocator>* source;
+        basic_cbor_parser<Src,Allocator>* source;
 
-        read_byte_string_from_source(basic_cbor_parser<Src,TempAllocator>* source)
+        read_byte_string_from_source(basic_cbor_parser<Src,Allocator>* source)
             : source(source)
         {
         }
@@ -150,7 +150,7 @@ class basic_cbor_parser : public ser_context
 public:
     template <class Source>
     basic_cbor_parser(Source&& source,
-                      const TempAllocator alloc=TempAllocator())
+                      const Allocator alloc=Allocator())
        : alloc_(alloc),
          source_(std::forward<Source>(source)),
          more_(true), 
