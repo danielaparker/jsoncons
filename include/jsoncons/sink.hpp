@@ -30,7 +30,7 @@ public:
     typedef std::basic_ostream<CharT> output_type;
 
 private:
-    static const size_t default_buffer_length = 16384;
+    static constexpr size_t default_buffer_length = 16384;
 
     std::basic_ostream<CharT>* os_;
     std::vector<CharT> buffer_;
@@ -112,7 +112,7 @@ public:
     typedef uint8_t value_type;
     typedef std::basic_ostream<char> output_type;
 private:
-    static const size_t default_buffer_length = 16384;
+    static constexpr size_t default_buffer_length = 16384;
 
     std::basic_ostream<char>* os_;
     std::vector<uint8_t> buffer_;

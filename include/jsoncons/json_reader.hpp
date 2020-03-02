@@ -158,7 +158,7 @@ public:
 private:
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
 
-    static const size_t default_max_buffer_length = 16384;
+    static constexpr size_t default_max_buffer_length = 16384;
 
     basic_default_json_content_handler<CharT> default_content_handler_;
 

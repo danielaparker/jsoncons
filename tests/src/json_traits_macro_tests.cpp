@@ -1159,16 +1159,15 @@ TEST_CASE("hiking_reputation")
     SECTION("4")
     {
         std::string s;
-        encode_json(val, s, json_options(), indenting::no_indent, ojson());
-        auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_arg, MyAlloc<char>(1),
-                                                       s, json_options());
+        encode_json(val, s, json_options(), indenting::no_indent);
+        auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_arg, MyAlloc<char>(1), s);
         CHECK(val2 == val);
     }
 
     SECTION("5")
     {
         std::string s;
-        encode_json(val, s, json_options(), indenting::indent, ojson());
+        encode_json(val, s, json_options(), indenting::indent);
         auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_arg, MyAlloc<char>(1),
                                                        s, json_options());
         CHECK(val2 == val);
@@ -1178,7 +1177,7 @@ TEST_CASE("hiking_reputation")
     {
         std::string s;
         json_options options;
-        encode_json(val, s, options, indenting::indent, ojson());
+        encode_json(val, s, options, indenting::indent);
         auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_arg, MyAlloc<char>(1),
                                                        s, options);
         CHECK(val2 == val);
@@ -1212,7 +1211,7 @@ TEST_CASE("hiking_reputation")
     SECTION("os 4")
     {
         std::stringstream os;
-        encode_json(val, os, json_options(), indenting::no_indent, ojson());
+        encode_json(val, os, json_options(), indenting::no_indent);
         auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_arg, MyAlloc<char>(1),
                                                        os, json_options());
         CHECK(val2 == val);
@@ -1221,7 +1220,7 @@ TEST_CASE("hiking_reputation")
     SECTION("os 5")
     {
         std::stringstream os;
-        encode_json(val, os, json_options(), indenting::indent, ojson());
+        encode_json(val, os, json_options(), indenting::indent);
         auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_arg, MyAlloc<char>(1),
                                                        os, json_options());
         CHECK(val2 == val);
@@ -1231,7 +1230,7 @@ TEST_CASE("hiking_reputation")
     {
         std::stringstream os;
         json_options options;
-        encode_json(val, os, options, indenting::indent, ojson());
+        encode_json(val, os, options, indenting::indent);
         auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_arg, MyAlloc<char>(1),
                                                        os, options);
         CHECK(val2 == val);

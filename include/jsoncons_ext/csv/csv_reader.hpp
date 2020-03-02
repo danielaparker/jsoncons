@@ -56,7 +56,7 @@ class basic_csv_reader
     std::vector<CharT, char_allocator_type> buffer_;
 public:
     // Structural characters
-    static const size_t default_max_buffer_length = 16384;
+    static constexpr size_t default_max_buffer_length = 16384;
     //!  Parse an input stream of CSV text into a json object
     /*!
       \param is The input stream to read from

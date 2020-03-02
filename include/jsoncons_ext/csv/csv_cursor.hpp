@@ -33,7 +33,7 @@ public:
     typedef CharT char_type;
     typedef Allocator allocator_type;
 private:
-    static const size_t default_max_buffer_length = 16384;
+    static constexpr size_t default_max_buffer_length = 16384;
 
     basic_staj_event_handler<CharT> event_handler_;
 
