@@ -2881,12 +2881,12 @@ public:
 
     variant var_;
 
-    constexpr basic_json() 
+    basic_json() 
         : var_(semantic_tag::none)
     {
     }
 
-    constexpr basic_json(semantic_tag tag) 
+    basic_json(semantic_tag tag) 
         : var_(tag)
     {
     }
@@ -3033,24 +3033,24 @@ public:
     {
     }
 
-    constexpr basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none)
+    basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none)
         : var_(half_arg, value, tag)
     {
     }
 
-    constexpr basic_json(double val, semantic_tag tag)
+    basic_json(double val, semantic_tag tag)
         : var_(val, tag)
     {
     }
 
     template <class Unsigned>
-    constexpr basic_json(Unsigned val, semantic_tag tag, typename std::enable_if<std::is_integral<Unsigned>::value && !std::is_signed<Unsigned>::value>::type* = 0)
+    basic_json(Unsigned val, semantic_tag tag, typename std::enable_if<std::is_integral<Unsigned>::value && !std::is_signed<Unsigned>::value>::type* = 0)
         : var_(static_cast<uint64_t>(val), tag)
     {
     }
 
     template <class Signed>
-    constexpr basic_json(Signed val, semantic_tag tag, typename std::enable_if<std::is_integral<Signed>::value && std::is_signed<Signed>::value>::type* = 0)
+    basic_json(Signed val, semantic_tag tag, typename std::enable_if<std::is_integral<Signed>::value && std::is_signed<Signed>::value>::type* = 0)
         : var_(static_cast<int64_t>(val), tag)
     {
     }
@@ -3065,12 +3065,12 @@ public:
     {
     }
 
-    constexpr basic_json(null_type val, semantic_tag tag)
+    basic_json(null_type val, semantic_tag tag)
         : var_(val, tag)
     {
     }
 
-    constexpr basic_json(bool val, semantic_tag tag)
+    basic_json(bool val, semantic_tag tag)
         : var_(val, tag)
     {
     }
