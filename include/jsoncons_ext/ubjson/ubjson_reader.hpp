@@ -20,7 +20,7 @@
 
 namespace jsoncons { namespace ubjson {
 
-template <class Src,class TempAllocator=std::allocator<char>>
+template <class Src,class Allocator=std::allocator<char>>
 class basic_ubjson_reader : public ser_context
 {
     basic_ubjson_parser<Src,Allocator> parser_;

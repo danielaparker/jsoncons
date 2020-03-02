@@ -10,6 +10,49 @@
 #include <ctime>
 #include <cstdint>
 
+namespace 
+{
+    template <class T>
+    struct MyAlloc
+    {
+        using value_type = T;
+        using size_type = std::size_t;
+        using propagate_on_container_move_assignment = std::true_type;
+
+        MyAlloc() = default;
+        MyAlloc(int) {}
+
+        template< class U >
+        MyAlloc(const MyAlloc<U>&) noexcept {}
+
+        T* allocate(size_type n)
+        {
+            return static_cast<T*>(::operator new(n * sizeof(T)));
+        }
+
+        void deallocate(T* ptr, size_type) noexcept
+        {
+            ::operator delete(ptr);
+        }
+
+        bool operator==(const MyAlloc&) const { return true; }
+        bool operator!=(const MyAlloc&) const { return false; }
+
+        template<typename U>
+        struct rebind
+        {
+            typedef MyAlloc<U> other;
+        };
+        typedef T* pointer;
+        typedef const T* const_pointer;
+        typedef T& reference;
+        typedef const T& const_reference;
+        typedef std::ptrdiff_t difference_type;
+    };
+    //template <class U>
+    //using MyAlloc = std::allocator<U>;
+} // namespace
+
 using namespace jsoncons;
 
 TEST_CASE("encode and decode json")
@@ -74,6 +117,23 @@ TEST_CASE("convert_vector_test")
     jsoncons::encode_json(v,s);
 
     auto result = jsoncons::decode_json<std::vector<double>>(s);
+
+    REQUIRE(v.size() == result.size());
+    for (std::size_t i = 0; i < result.size(); ++i)
+    {
+        CHECK(v[i] == result[i]);
+    }
+}
+
+TEST_CASE("convert_vector_test")
+{
+    std::vector<double> v = {1,2,3,4,5,6};
+
+    std::string s;
+    jsoncons::encode_json(v,s);
+
+    auto result = jsoncons::decode_json<std::vector<double>>(
+        temp_allocator_arg, MyAlloc<char>(1), s);
 
     REQUIRE(v.size() == result.size());
     for (std::size_t i = 0; i < result.size(); ++i)
