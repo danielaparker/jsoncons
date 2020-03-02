@@ -718,7 +718,7 @@ namespace jsoncons {
         {
             auto pos2 = iterator_to_container_iterator(pos);
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
-            auto it = elements_.begin() + (pos2 - begin());
+            auto it = elements_.begin() + (pos2 - elements_.begin());
             return container_iterator_to_iterator(elements_.emplace(it, std::forward<Args>(args)...));
     #else
             return container_iterator_to_iterator(elements_.emplace(pos2, std::forward<Args>(args)...));
