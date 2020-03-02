@@ -4654,7 +4654,7 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use parse(parse(const string_view_type&, std::function<bool(json_errc,const ser_context&)>)")
-    static basic_json parse_string(const string_view_type& s, std::function<bool(json_errc,const ser_context&)> err_handler)
+    static const basic_json parse_string(const string_view_type& s, std::function<bool(json_errc,const ser_context&)> err_handler)
     {
         return parse(s,err_handler);
     }
@@ -5237,7 +5237,7 @@ public:
 
     range<object_iterator> object_range()
     {
-        static basic_json empty_object = object();
+        static const basic_json empty_object = object();
         switch (var_.storage())
         {
         case storage_kind::empty_object_value:
