@@ -87,7 +87,7 @@ public:
     template <class Source>
     basic_ubjson_cursor(Source&& source,
                         std::function<bool(const staj_event&, const ser_context&)> filter,
-                        const allocator_type& alloc = allocator_type(), 
+                        const allocator_type& alloc, 
                         std::error_code& ec)
        : event_handler_(filter),
          parser_(std::forward<Source>(source), alloc), 
