@@ -507,7 +507,7 @@ private:
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<std::vector<string_type,string_allocator_type>> string_vector_allocator_type;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<csv_parse_state> csv_parse_state_allocator_type;
 
-    static const int default_depth = 3;
+    static constexpr int default_depth = 3;
 
     temp_allocator_type alloc_;
     csv_parse_state state_;

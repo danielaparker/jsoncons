@@ -2875,13 +2875,18 @@ public:
 
     static const basic_json& null()
     {
-        static basic_json a_null = basic_json(null_type(), semantic_tag::none);
+        static const basic_json a_null = basic_json(null_type(), semantic_tag::none);
         return a_null;
     }
 
     variant var_;
 
-    constexpr basic_json(semantic_tag tag = semantic_tag::none) 
+    constexpr basic_json() 
+        : var_(semantic_tag::none)
+    {
+    }
+
+    constexpr basic_json(semantic_tag tag) 
         : var_(tag)
     {
     }
@@ -5246,7 +5251,7 @@ public:
 
     range<const_object_iterator> object_range() const
     {
-        static const basic_json empty_object = object();
+        static const basic_json empty_object = basic_json();
         switch (var_.storage())
         {
         case storage_kind::empty_object_value:

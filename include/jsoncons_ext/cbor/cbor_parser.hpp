@@ -1485,14 +1485,14 @@ private:
 
     static jsoncons::cbor::detail::cbor_major_type get_major_type(uint8_t type)
     {
-        static const uint8_t major_type_shift = 0x05;
+        static constexpr uint8_t major_type_shift = 0x05;
         uint8_t value = type >> major_type_shift;
         return static_cast<jsoncons::cbor::detail::cbor_major_type>(value);
     }
 
     static uint8_t get_additional_information_value(uint8_t type)
     {
-        static const uint8_t additional_information_mask = (1U << 5) - 1;
+        static constexpr uint8_t additional_information_mask = (1U << 5) - 1;
         uint8_t value = type & additional_information_mask;
         return value;
     }
