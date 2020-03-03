@@ -2079,7 +2079,7 @@ namespace jsoncons {
             if (hint2 == members_.end())
             {
                 auto result = try_emplace(key, std::forward<Args>(args)...);
-                return from_container_iterator(result.first);
+                return result.first;
             }
             else
             {
