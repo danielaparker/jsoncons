@@ -1173,7 +1173,7 @@ namespace jsoncons {
             return std::make_pair(from_container_iterator(it),inserted);
         }
 
-        template <class A=allocator_type, class ... Args>
+        template <class ... Args>
         iterator try_emplace(iterator hint, const string_view_type& name, Args&&... args)
         {
             return from_container_iterator(try_emplace(to_container_iterator(hint),name,std::forward<Args>(args)...));
@@ -1181,7 +1181,7 @@ namespace jsoncons {
 
         // insert_or_assign
 
-        template <class T, class A=allocator_type>
+        template <class T>
         iterator insert_or_assign(iterator hint, const string_view_type& name, T&& value)
         {
             return from_container_iterator(insert_or_assign(to_container_iterator(hint), name, std::forward<T>(value)));
@@ -1887,12 +1887,6 @@ namespace jsoncons {
             }
         }
 
-        template <class T>
-        iterator insert_or_assign(iterator hint, const string_view_type& key, T&& value)
-        {
-            return from_container_iterator(insert_or_assign(to_container_iterator(hint), key, std::forward<T>(value)));
-        }
-
         // merge
 
         void merge(const json_object& source)
@@ -2031,6 +2025,12 @@ namespace jsoncons {
             }
         }
 
+        template <class T>
+        iterator insert_or_assign(iterator hint, const string_view_type& key, T&& value)
+        {
+            return from_container_iterator(insert_or_assign(to_container_iterator(hint), key, std::forward<T>(value)));
+        }
+
         // try_emplace
 
         template <class A=allocator_type, class... Args>
@@ -2070,64 +2070,10 @@ namespace jsoncons {
             }
         }
      
-        template <class A=allocator_type, class ... Args>
-        typename std::enable_if<is_stateless<A>::value,iterator>::type
-        try_emplace(iterator hint, const string_view_type& key, Args&&... args)
+        template <class ... Args>
+        iterator try_emplace(iterator hint, const string_view_type& key, Args&&... args)
         {
-            auto hint2 = to_container_iterator(hint);
-
-            if (hint2 == members_.end())
-            {
-                auto result = try_emplace(key, std::forward<Args>(args)...);
-                return result.first;
-            }
-            else
-            {
-                std::size_t pos = hint2 - members_.begin();
-                auto result = insert_index_entry(key, pos);
-
-                if (result.second)
-                {
-                    auto it = members_.emplace(hint2, key_type(key.begin(), key.end()), std::forward<Args>(args)...);
-                    return it;
-                }
-                else
-                {
-                    auto it = members_.begin() + result.first;
-                    return it;
-                }
-            }
-        }
-
-        template <class A=allocator_type, class ... Args>
-        typename std::enable_if<!is_stateless<A>::value,iterator>::type
-        try_emplace(iterator hint, const string_view_type& key, Args&&... args)
-        {
-            auto hint2 = to_container_iterator(hint);
-
-            if (hint2 == members_.end())
-            {
-                auto result = try_emplace(key, std::forward<Args>(args)...);
-                return from_container_iterator(result.first);
-            }
-            else
-            {
-                std::size_t pos = hint2 - members_.begin();
-                auto result = insert_index_entry(key, pos);
-
-                if (result.second)
-                {
-                    auto it = members_.emplace(hint2, 
-                                               key_type(key.begin(),key.end(), get_allocator()), 
-                                               std::forward<Args>(args)...);
-                    return it;
-                }
-                else
-                {
-                    auto it = members_.begin() + result.first;
-                    return it;
-                }
-            }
+            return from_container_iterator(try_emplace(to_container_iterator(hint),key,std::forward<Args>(args)...));
         }
 
         bool operator==(const json_object& rhs) const
