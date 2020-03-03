@@ -61,7 +61,7 @@ public:
                      std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
                       const allocator_type& alloc = allocator_type())
         : basic_csv_cursor(std::forward<Source>(source), 
-                           accept,
+                           accept_all,
                            options,
                            err_handler,
                            alloc)
@@ -121,12 +121,12 @@ public:
 
     // Constructors that set parse error codes
     template <class Source>
-    basic_csv_cursor(Source&& source, const allocator_type& alloc, std::error_code& ec)
-        : basic_csv_cursor(std::forward<Source>(source),
-                           accept,
+    basic_csv_cursor(Source&& source, std::error_code& ec)
+        : basic_csv_cursor(std::allocator_arg, allocator_type(),
+                           std::forward<Source>(source),
+                           accept_all,
                            basic_csv_decode_options<CharT>(),
                            default_csv_parsing(),
-                           alloc,
                            ec)
     {
     }
@@ -134,27 +134,25 @@ public:
     template <class Source>
     basic_csv_cursor(Source&& source, 
                      const basic_csv_decode_options<CharT>& options,
-                     const allocator_type& alloc,
                      std::error_code& ec)
-        : basic_csv_cursor(std::forward<Source>(source),
-                           accept,
+        : basic_csv_cursor(std::allocator_arg, allocator_type(),
+                           std::forward<Source>(source),
+                           accept_all,
                            options,
                            default_csv_parsing(),
-                           alloc,
                            ec)
     {
     }
 
     template <class Source>
     basic_csv_cursor(Source&& source,
-                           std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                           const allocator_type& alloc,
-                           std::error_code& ec)
-        : basic_csv_cursor(std::forward<Source>(source),
+                     std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
+                     std::error_code& ec)
+        : basic_csv_cursor(std::allocator_arg, allocator_type(),
+                           std::forward<Source>(source),
                            filter,
                            basic_csv_decode_options<CharT>(),
                            default_csv_parsing(),
-                           alloc,
                            ec)
     {
     }
@@ -163,23 +161,22 @@ public:
     basic_csv_cursor(Source&& source, 
                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                      const basic_csv_decode_options<CharT>& options,
-                     const allocator_type& alloc,
                      std::error_code& ec)
-        : basic_csv_cursor(std::forward<Source>(source),
+        : basic_csv_cursor(std::allocator_arg, allocator_type(),
+                           std::forward<Source>(source),
                            filter,
                            options,
                            default_csv_parsing(),
-                           alloc,
                            ec)
     {
     }
 
     template <class Source>
-    basic_csv_cursor(Source&& source, 
+    basic_csv_cursor(std::allocator_arg_t, const allocator_type& alloc, 
+                     Source&& source, 
                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
-                     const allocator_type& alloc,
                      std::error_code& ec,
                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : event_handler_(filter),
@@ -198,11 +195,11 @@ public:
     }
 
     template <class Source>
-    basic_csv_cursor(Source&& source, 
+    basic_csv_cursor(std::allocator_arg_t, const allocator_type& alloc, 
+                     Source&& source, 
                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
-                     const allocator_type& alloc,
                      std::error_code& ec,
                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : event_handler_(filter),
@@ -283,7 +280,7 @@ public:
         read_next(ec);
     }
 
-    static bool accept(const basic_staj_event<CharT>&, const ser_context&) 
+    static bool accept_all(const basic_staj_event<CharT>&, const ser_context&) 
     {
         return true;
     }

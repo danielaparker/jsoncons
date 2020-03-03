@@ -29,10 +29,12 @@ template<class Src=jsoncons::bin_stream_source,class Allocator=std::allocator<ch
 class basic_cbor_cursor : public basic_staj_reader<char>, private virtual ser_context
 {
 public:
+    typedef Src source_type;
+    typedef char char_type;
     typedef Allocator allocator_type;
 private:
     basic_cbor_parser<Src,Allocator> parser_;
-    basic_staj_event_handler<char> event_handler_;
+    basic_staj_event_handler<char_type> event_handler_;
     bool eof_;
 
     // Noncopyable and nonmoveable
@@ -71,22 +73,25 @@ public:
     // Constructors that set parse error codes
 
     template <class Source>
-    basic_cbor_cursor(Source&& source,
-                      const allocator_type& alloc, 
-                      std::error_code& ec)
-       : parser_(std::forward<Source>(source), alloc),
-         eof_(false)
+    basic_cbor_cursor(Source&& source, std::error_code& ec)
+        : basic_cbor_cursor(std::allocator_arg, allocator_type(),
+                            std::forward<Source>(source), accept_all, ec)
     {
-        if (!done())
-        {
-            next(ec);
-        }
     }
 
     template <class Source>
     basic_cbor_cursor(Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter,
-                      const allocator_type& alloc, 
+                      std::error_code& ec)
+        : basic_cbor_cursor(std::allocator_arg, allocator_type(),
+                            std::forward<Source>(source), filter, ec)
+    {
+    }
+
+    template <class Source>
+    basic_cbor_cursor(std::allocator_arg_t, const allocator_type& alloc, 
+                      Source&& source,
+                      std::function<bool(const staj_event&, const ser_context&)> filter,
                       std::error_code& ec)
        : parser_(std::forward<Source>(source), alloc), 
          event_handler_(filter),
@@ -108,12 +113,12 @@ public:
         return event_handler_.is_typed_array();
     }
 
-    const basic_staj_event<char>& current() const override
+    const basic_staj_event<char_type>& current() const override
     {
         return event_handler_.event();
     }
 
-    void read(basic_json_content_handler<char>& handler) override
+    void read(basic_json_content_handler<char_type>& handler) override
     {
         std::error_code ec;
         read(handler, ec);
@@ -123,7 +128,7 @@ public:
         }
     }
 
-    void read(basic_json_content_handler<char>& handler,
+    void read(basic_json_content_handler<char_type>& handler,
               std::error_code& ec) override
     {
         if (!event_handler_.dump(handler, *this, ec))
@@ -165,7 +170,7 @@ public:
         }
     }
 
-    void read_next(basic_json_content_handler<char>& handler, std::error_code& ec)
+    void read_next(basic_json_content_handler<char_type>& handler, std::error_code& ec)
     {
         parser_.restart();
         while (!parser_.stopped())
@@ -195,20 +200,24 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_content_handler<char>&)")
-    void read_to(basic_json_content_handler<char>& handler)
+    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_content_handler<char_type>&)")
+    void read_to(basic_json_content_handler<char_type>& handler)
     {
         read(handler);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_content_handler<char>&, std::error_code&)")
-    void read_to(basic_json_content_handler<char>& handler,
+    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_content_handler<char_type>&, std::error_code&)")
+    void read_to(basic_json_content_handler<char_type>& handler,
                  std::error_code& ec) 
     {
         read(handler, ec);
     }
 #endif
 private:
+    static bool accept_all(const basic_staj_event<char_type>&, const ser_context&) 
+    {
+        return true;
+    }
 };
 
 typedef basic_cbor_cursor<jsoncons::bin_stream_source> cbor_stream_cursor;

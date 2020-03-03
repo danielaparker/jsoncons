@@ -58,7 +58,7 @@ public:
                       std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
                       const allocator_type& alloc = allocator_type())
         : basic_json_cursor(std::forward<Source>(source), 
-                            accept,
+                            accept_all,
                             options,
                             err_handler,
                             alloc)
@@ -121,7 +121,7 @@ public:
     basic_json_cursor(Source&& source,
                       std::error_code& ec)
         : basic_json_cursor(std::forward<Source>(source),
-                                 accept,
+                                 accept_all,
                                  basic_json_decode_options<CharT>(),
                                  default_json_parsing(),
                                  ec)
@@ -133,7 +133,7 @@ public:
                       const basic_json_decode_options<CharT>& options,
                       std::error_code& ec)
         : basic_json_cursor(std::forward<Source>(source),
-                                 accept,
+                                 accept_all,
                                  options,
                                  default_json_parsing(),
                                  ec)
@@ -290,7 +290,7 @@ public:
         read_next(ec);
     }
 
-    static bool accept(const basic_staj_event<CharT>&, const ser_context&) 
+    static bool accept_all(const basic_staj_event<CharT>&, const ser_context&) 
     {
         return true;
     }
