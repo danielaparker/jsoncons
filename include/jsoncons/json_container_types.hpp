@@ -1750,11 +1750,11 @@ namespace jsoncons {
                                         [&](std::size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
             if (it != index_.end() && members_.at(*it).key() == name)
             {
-                return members_.begin() + *it;
+                return from_container_iterator(members_.begin() + *it);
             }
             else
             {
-                return members_.end();
+                return end();
             }
         }
 
