@@ -983,7 +983,7 @@ namespace jsoncons {
         {
             auto pos2 = to_container_iterator(pos);
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
-            iterator it = members_.begin() + (pos2 - members_.begin());
+            auto it = members_.begin() + (pos2 - members_.begin());
             members_.erase(it);
     #else
             members_.erase(pos2);
@@ -995,8 +995,8 @@ namespace jsoncons {
             auto first2 = to_container_iterator(first)             ;
             auto last2 = to_container_iterator(last)             ;
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
-            iterator it1 = members_.begin() + (first2 - members_.begin());
-            iterator it2 = members_.begin() + (last2 - members_.begin());
+            auto it1 = members_.begin() + (first2 - members_.begin());
+            auto it2 = members_.begin() + (last2 - members_.begin());
             members_.erase(it1,it2);
     #else
             members_.erase(first2,last2);
@@ -1771,8 +1771,8 @@ namespace jsoncons {
                 erase_index_entries(pos1,pos2);
 
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
-                iterator it1 = members_.begin() + (first2 - members_.begin());
-                iterator it2 = members_.begin() + (last2 - members_.begin());
+                auto it1 = members_.begin() + (first2 - members_.begin());
+                auto it2 = members_.begin() + (last2 - members_.begin());
                 members_.erase(it1,it2);
     #else
                 members_.erase(first2,last2);
@@ -1791,7 +1791,7 @@ namespace jsoncons {
 
                 erase_index_entries(pos1, pos2);
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
-                iterator it = members_.begin() + (pos - members_.begin());
+                auto it = members_.begin() + (pos - members_.begin());
                 members_.erase(it);
     #else
                 members_.erase(pos);
