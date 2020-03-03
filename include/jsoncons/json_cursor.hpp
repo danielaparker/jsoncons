@@ -158,10 +158,10 @@ public:
                       const basic_json_decode_options<CharT>& options,
                       std::error_code& ec)
         : basic_json_cursor(std::forward<Source>(source),
-                                 filter,
-                                 options,
-                                 default_json_parsing(),
-                                 ec)
+                            filter,
+                            options,
+                            default_json_parsing(),
+                            ec)
     {
     }
 
@@ -172,10 +172,28 @@ public:
                       std::function<bool(json_errc,const ser_context&)> err_handler,
                       std::error_code& ec,
                       typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
+        : basic_json_cursor(std::allocator_arg, allocator_type(), 
+                            std::forward<Source>(source),
+                            filter,
+                            options,
+                            err_handler,
+                            ec)
+    {
+    }
+
+    template <class Source>
+    basic_json_cursor(std::allocator_arg_t, const Allocator& alloc,
+                      Source&& source, 
+                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
+                      const basic_json_decode_options<CharT>& options,
+                      std::function<bool(json_errc,const ser_context&)> err_handler,
+                      std::error_code& ec,
+                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : event_handler_(filter),
-         parser_(options,err_handler),
+         parser_(options,err_handler,alloc),
          source_(source),
          eof_(false),
+         buffer_(alloc),
          buffer_length_(default_max_buffer_length),
          begin_(true)
     {
@@ -187,15 +205,17 @@ public:
     }
 
     template <class Source>
-    basic_json_cursor(Source&& source, 
+    basic_json_cursor(std::allocator_arg_t, const Allocator& alloc,
+                      Source&& source, 
                       std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                       const basic_json_decode_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler,
                       std::error_code& ec,
                       typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : event_handler_(filter),
-         parser_(options,err_handler),
+         parser_(options, err_handler, alloc),
          eof_(false),
+         buffer_(alloc),
          buffer_length_(0),
          begin_(false)
     {
