@@ -41,7 +41,7 @@ namespace jsoncons {
 
 struct sorted_policy 
 {
-    static constexpr bool preserve_order = false;
+    using key_order = sort_key_order;
 
     template <class T,class Allocator>
     using sequence_container_type = std::vector<T,Allocator>;
@@ -54,7 +54,7 @@ struct sorted_policy
 
 struct preserve_order_policy : public sorted_policy
 {
-    static constexpr bool preserve_order = true;
+    using key_order = preserve_key_order;
 };
 
 template <typename IteratorT>

@@ -446,6 +446,16 @@ namespace jsoncons {
         }
     };
 
+    struct sort_key_order
+    {
+        explicit sort_key_order() = default; 
+    };
+
+    struct preserve_key_order
+    {
+        explicit preserve_key_order() = default; 
+    };
+
     template <class KeyT,class Json,class Enable = void>
     class json_object
     {
@@ -453,7 +463,7 @@ namespace jsoncons {
 
     // Sort keys
     template <class KeyT,class Json>
-    class json_object<KeyT,Json,typename std::enable_if<!Json::implementation_policy::preserve_order>::type> : 
+    class json_object<KeyT,Json,typename std::enable_if<std::is_same<typename Json::implementation_policy::key_order,sort_key_order>::value>::type> : 
         public allocator_holder<typename Json::allocator_type>
     {
     public:
@@ -1168,7 +1178,7 @@ namespace jsoncons {
 
     // Preserve order
     template <class KeyT,class Json>
-    class json_object<KeyT,Json,typename std::enable_if<Json::implementation_policy::preserve_order>::type> :
+    class json_object<KeyT,Json,typename std::enable_if<std::is_same<typename Json::implementation_policy::key_order,preserve_key_order>::value>::type> : 
         public allocator_holder<typename Json::allocator_type>
     {
     public:
