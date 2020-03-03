@@ -5237,11 +5237,10 @@ public:
 
     range<object_iterator> object_range()
     {
-        static basic_json empty_object = object();
         switch (var_.storage())
         {
         case storage_kind::empty_object_value:
-            return range<object_iterator>(empty_object.object_range().begin(), empty_object.object_range().end());
+            return range<object_iterator>(object_iterator(), object_iterator());
         case storage_kind::object_value:
             return range<object_iterator>(object_value().begin(),object_value().end());
         default:
@@ -5251,11 +5250,10 @@ public:
 
     range<const_object_iterator> object_range() const
     {
-        static basic_json empty_object = object();
         switch (var_.storage())
         {
         case storage_kind::empty_object_value:
-            return range<const_object_iterator>(empty_object.object_range().begin(), empty_object.object_range().end());
+            return range<const_object_iterator>(const_object_iterator(), const_object_iterator());
         case storage_kind::object_value:
             return range<const_object_iterator>(object_value().begin(),object_value().end());
         default:
