@@ -1037,7 +1037,7 @@ namespace jsoncons {
                 std::size_t count = std::distance(first,last);
                 members_.reserve(members_.size() + count);
 
-                auto it = find(convert(*first).key());
+                auto it = to_container_iterator(find(convert(*first).key()));
                 if (it != members_.end())
                 {
                     for (auto s = first; s != last; ++s)
@@ -1783,7 +1783,7 @@ namespace jsoncons {
 
         void erase(const string_view_type& name) 
         {
-            auto pos = find(name);
+            auto pos = to_container_iterator(find(name));
             if (pos != members_.end())
             {
                 std::size_t pos1 = pos - members_.begin();
@@ -1909,7 +1909,7 @@ namespace jsoncons {
             auto end = std::make_move_iterator(source.members_.end());
             for (; it != end; ++it)
             {
-                auto pos = find(it->key());
+                auto pos = to_container_iterator(find(it->key()));
                 if (pos == members_.end())
                 {
                     try_emplace(it->key(),std::move(it->value()));
