@@ -66,7 +66,7 @@ public:
     }
 };
 
-typedef basic_ubjson_reader<jsoncons::bin_stream_source> ubjson_stream_reader;
+typedef basic_ubjson_reader<jsoncons::binary_stream_source> ubjson_stream_reader;
 
 typedef basic_ubjson_reader<jsoncons::bytes_source> ubjson_bytes_reader;
 

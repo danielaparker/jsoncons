@@ -4,7 +4,7 @@
 #include <jsoncons_ext/ubjson/ubjson_cursor.hpp>
 
 template<
-    class Src=jsoncons::bin_stream_source,
+    class Src=jsoncons::binary_stream_source,
     class Allocator=std::allocator<char>>
 class basic_ubjson_cursor;
 ```
@@ -19,7 +19,7 @@ Typedefs for common sources are provided:
 
 Type                |Definition
 --------------------|------------------------------
-ubjson_stream_cursor  |basic_ubjson_cursor<jsoncons::bin_stream_source>
+ubjson_stream_cursor  |basic_ubjson_cursor<jsoncons::binary_stream_source>
 ubjson_bytes_cursor   |basic_ubjson_cursor<jsoncons::bytes_source>
 
 ### Implemented interfaces
@@ -29,24 +29,32 @@ ubjson_bytes_cursor   |basic_ubjson_cursor<jsoncons::bytes_source>
 #### Constructors
 
     template <class Source>
-    basic_ubjson_cursor(Source&& source); // (1)
+    basic_ubjson_cursor(Source&& source,
+                        const Allocator& alloc = Allocator()); // (1)
 
     template <class Source>
     basic_ubjson_cursor(Source&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter); // (2)
+                        std::function<bool(const staj_event&, const ser_context&)> filter,
+                        const Allocator& alloc = Allocator()); // (2)
 
     template <class Source>
     basic_ubjson_cursor(Source&& source, std::error_code& ec); // (3)
 
     template <class Source>
     basic_ubjson_cursor(Source&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter, 
-                      std::error_code& ec); // (4)
+                        std::function<bool(const staj_event&, const ser_context&)> filter, 
+                        std::error_code& ec); // (4)
 
-Constructor3 (1)-(2) read from a buffer or stream source and throw a 
+    template <class Source>
+    basic_ubjson_cursor(std::allocator_arg_t, const Allocator& alloc, 
+                        Source&& source,
+                        std::function<bool(const staj_event&, const ser_context&)> filter,
+                        std::error_code& ec); // (5)
+
+Constructors (1)-(2) read from a buffer or stream source and throw a 
 [ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
 
-Constructor3 (3)-(4) read from a buffer or stream source and set `ec`
+Constructors (3)-(5) read from a buffer or stream source and set `ec`
 if a parsing error is encountered while processing the initial event.
 
 Note: It is the programmer's responsibility to ensure that `basic_ubjson_cursor` does not outlive any source passed in the constuctor, 

@@ -67,7 +67,7 @@ public:
     }
 };
 
-typedef basic_msgpack_reader<jsoncons::bin_stream_source> msgpack_stream_reader;
+typedef basic_msgpack_reader<jsoncons::binary_stream_source> msgpack_stream_reader;
 
 typedef basic_msgpack_reader<jsoncons::bytes_source> msgpack_bytes_reader;
 

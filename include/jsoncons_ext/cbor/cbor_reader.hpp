@@ -67,7 +67,7 @@ public:
     }
 };
 
-typedef basic_cbor_reader<jsoncons::bin_stream_source> cbor_stream_reader;
+typedef basic_cbor_reader<jsoncons::binary_stream_source> cbor_stream_reader;
 
 typedef basic_cbor_reader<jsoncons::bytes_source> cbor_bytes_reader;
 

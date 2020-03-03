@@ -25,7 +25,7 @@
 namespace jsoncons { 
 namespace cbor {
 
-template<class Src=jsoncons::bin_stream_source,class Allocator=std::allocator<char>>
+template<class Src=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
 class basic_cbor_cursor : public basic_staj_reader<char>, private virtual ser_context
 {
 public:
@@ -46,7 +46,7 @@ public:
 
     template <class Source>
     basic_cbor_cursor(Source&& source,
-                      const allocator_type& alloc = allocator_type())
+                      const Allocator& alloc = Allocator())
        : parser_(std::forward<Source>(source), alloc), 
          eof_(false)
     {
@@ -59,7 +59,7 @@ public:
     template <class Source>
     basic_cbor_cursor(Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter,
-                      const allocator_type& alloc = allocator_type())
+                      const Allocator& alloc = Allocator())
        : parser_(std::forward<Source>(source), alloc), 
          event_handler_(filter), 
          eof_(false)
@@ -74,7 +74,7 @@ public:
 
     template <class Source>
     basic_cbor_cursor(Source&& source, std::error_code& ec)
-        : basic_cbor_cursor(std::allocator_arg, allocator_type(),
+        : basic_cbor_cursor(std::allocator_arg, Allocator(),
                             std::forward<Source>(source), accept_all, ec)
     {
     }
@@ -83,13 +83,13 @@ public:
     basic_cbor_cursor(Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter,
                       std::error_code& ec)
-        : basic_cbor_cursor(std::allocator_arg, allocator_type(),
+        : basic_cbor_cursor(std::allocator_arg, Allocator(),
                             std::forward<Source>(source), filter, ec)
     {
     }
 
     template <class Source>
-    basic_cbor_cursor(std::allocator_arg_t, const allocator_type& alloc, 
+    basic_cbor_cursor(std::allocator_arg_t, const Allocator& alloc, 
                       Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter,
                       std::error_code& ec)
@@ -220,7 +220,7 @@ private:
     }
 };
 
-typedef basic_cbor_cursor<jsoncons::bin_stream_source> cbor_stream_cursor;
+typedef basic_cbor_cursor<jsoncons::binary_stream_source> cbor_stream_cursor;
 typedef basic_cbor_cursor<jsoncons::bytes_source> cbor_bytes_cursor;
 
 } // namespace cbor

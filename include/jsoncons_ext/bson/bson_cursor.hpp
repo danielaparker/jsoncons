@@ -25,7 +25,7 @@
 namespace jsoncons { 
 namespace bson {
 
-template<class Src=jsoncons::bin_stream_source,class Allocator=std::allocator<char>>
+template<class Src=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
 class basic_bson_cursor : public basic_staj_reader<char>, private virtual ser_context
 {
 public:
@@ -47,7 +47,7 @@ public:
 
     template <class Source>
     basic_bson_cursor(Source&& source,
-                      const allocator_type& alloc = allocator_type())
+                      const Allocator& alloc = Allocator())
        : parser_(std::forward<Source>(source), alloc),
          eof_(false)
     {
@@ -60,7 +60,7 @@ public:
     template <class Source>
     basic_bson_cursor(Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter,
-                      const allocator_type& alloc = allocator_type())
+                      const Allocator& alloc = Allocator())
        : parser_(std::forward<Source>(source), alloc), 
          event_handler_(filter),
          eof_(false)
@@ -76,7 +76,7 @@ public:
     template <class Source>
     basic_bson_cursor(Source&& source,
                       std::error_code& ec)
-        : basic_bson_cursor(std::allocator_arg, allocator_type(),
+        : basic_bson_cursor(std::allocator_arg, Allocator(),
                             std::forward<Source>(source), accept_all, ec)
     {
     }
@@ -85,13 +85,13 @@ public:
     basic_bson_cursor(Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter,
                       std::error_code& ec)
-       : basic_bson_cursor(std::allocator_arg, allocator_type(), 
+       : basic_bson_cursor(std::allocator_arg, Allocator(), 
                            std::forward<Source>(source), filter, ec)
     {
     }
 
     template <class Source>
-    basic_bson_cursor(std::allocator_arg_t, const allocator_type& alloc, 
+    basic_bson_cursor(std::allocator_arg_t, const Allocator& alloc, 
                       Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter, 
                       std::error_code& ec)
@@ -206,7 +206,7 @@ private:
     }
 };
 
-typedef basic_bson_cursor<jsoncons::bin_stream_source> bson_stream_cursor;
+typedef basic_bson_cursor<jsoncons::binary_stream_source> bson_stream_cursor;
 typedef basic_bson_cursor<jsoncons::bytes_source> bson_bytes_cursor;
 
 } // namespace bson
