@@ -24,297 +24,6 @@
 
 namespace jsoncons {
 
-    template <class ValueType, class DifferenceType, class Pointer, class Reference>
-    struct sequence_iterator_types 
-    {
-        using value_type      = ValueType;
-        using difference_type = DifferenceType;
-        using pointer         = Pointer;
-        using reference       = Reference;
-    };
-
-    // iterator for mutable sequence
-    template <class ContainerTypes>
-    class sequence_iterator 
-    { 
-        template <class Cont>
-        friend class const_sequence_iterator;
-
-        using Ptr = typename ContainerTypes::pointer;
-        Ptr ptr_; 
-    public:
-        using iterator_category = std::random_access_iterator_tag;
-
-        using value_type = typename ContainerTypes::value_type;
-        using difference_type = typename ContainerTypes::difference_type;
-        using pointer = typename ContainerTypes::pointer;
-        using reference = typename ContainerTypes::reference;
-    public:
-        sequence_iterator() : ptr_() 
-        { 
-        }
-
-        sequence_iterator(Ptr ptr) : ptr_(ptr) 
-        {
-        }
-
-        sequence_iterator(const sequence_iterator&) = default;
-        sequence_iterator(sequence_iterator&&) = default;
-        sequence_iterator& operator=(const sequence_iterator&) = default;
-        sequence_iterator& operator=(sequence_iterator&&) = default;
-
-        reference operator*() const 
-        {
-            return *ptr_;
-        }
-
-        pointer operator->() const 
-        {
-            return ptr_;
-        }
-
-        sequence_iterator& operator++() 
-        {
-            ++ptr_;
-            return *this;
-        }
-
-        sequence_iterator operator++(int) 
-        {
-            sequence_iterator temp = *this;
-            ++*this;
-            return temp;
-        }
-
-        sequence_iterator& operator--() 
-        {
-            --ptr_;
-            return *this;
-        }
-
-        sequence_iterator operator--(int) 
-        {
-            sequence_iterator temp = *this;
-            --*this;
-            return temp;
-        }
-
-        sequence_iterator& operator+=(const difference_type offset) 
-        {
-            ptr_ += offset;
-            return *this;
-        }
-
-        sequence_iterator operator+(const difference_type offset) const 
-        {
-            sequence_iterator temp = *this;
-            return temp += offset;
-        }
-
-        sequence_iterator& operator-=(const difference_type offset) 
-        {
-            return *this += -offset;
-        }
-
-        sequence_iterator operator-(const difference_type offset) const 
-        {
-            sequence_iterator temp = *this;
-            return temp -= offset;
-        }
-
-        difference_type operator-(const sequence_iterator& rhs) const 
-        {
-            return ptr_ - rhs.ptr_;
-        }
-
-        reference operator[](const difference_type offset) const 
-        {
-            return *(*this + offset);
-        }
-
-        bool operator==(const sequence_iterator& rhs) const 
-        {
-            return ptr_ == rhs.ptr_;
-        }
-
-        bool operator!=(const sequence_iterator& rhs) const 
-        {
-            return !(*this == rhs);
-        }
-
-        bool operator<(const sequence_iterator& rhs) const 
-        {
-            return ptr_ < rhs.ptr_;
-        }
-
-        bool operator>(const sequence_iterator& rhs) const 
-        {
-            return rhs < *this;
-        }
-
-        bool operator<=(const sequence_iterator& rhs) const 
-        {
-            return !(rhs < *this);
-        }
-
-        bool operator>=(const sequence_iterator& rhs) const 
-        {
-            return !(*this < rhs);
-        }
-
-        inline 
-        friend sequence_iterator<ContainerTypes> operator+(
-            difference_type offset, sequence_iterator<ContainerTypes> next) 
-        {
-            return next += offset;
-        }
-    };
-
-    // iterator for immutable sequence
-    template <class ContainerTypes>
-    class const_sequence_iterator 
-    { 
-        using Ptr = typename ContainerTypes::pointer;
-        Ptr ptr_; 
-    public:
-        using iterator_category = std::random_access_iterator_tag;
-
-        using value_type = typename ContainerTypes::value_type;
-        using difference_type = typename ContainerTypes::difference_type;
-        using pointer = typename ContainerTypes::pointer;
-        using reference = typename ContainerTypes::reference;
-    private:
-        using iterator_types = sequence_iterator_types<value_type, 
-                                                       difference_type,
-                                                       typename std::conditional<std::is_const<typename std::remove_pointer<pointer>::type>::value,typename std::add_pointer<value_type>::type,pointer>::type, 
-                                                       typename std::conditional<std::is_const<typename std::remove_pointer<pointer>::type>::value,value_type&,reference>::type>; 
-
-    public:
-        const_sequence_iterator() : ptr_() 
-        { 
-        }
-
-        const_sequence_iterator(Ptr ptr) : ptr_(ptr) 
-        {
-        }
-
-        const_sequence_iterator(const const_sequence_iterator&) = default;
-        const_sequence_iterator(const_sequence_iterator&&) = default;
-        const_sequence_iterator& operator=(const const_sequence_iterator&) = default;
-        const_sequence_iterator& operator=(const_sequence_iterator&&) = default;
-
-        const_sequence_iterator(const sequence_iterator<iterator_types>& iter)
-            : ptr_(iter.ptr_)
-        {
-        }
-
-        reference operator*() const 
-        {
-            return *ptr_;
-        }
-
-        pointer operator->() const 
-        {
-            return ptr_;
-        }
-
-        const_sequence_iterator& operator++() 
-        {
-            ++ptr_;
-            return *this;
-        }
-
-        const_sequence_iterator operator++(int) 
-        {
-            const_sequence_iterator temp = *this;
-            ++*this;
-            return temp;
-        }
-
-        const_sequence_iterator& operator--() 
-        {
-            --ptr_;
-            return *this;
-        }
-
-        const_sequence_iterator operator--(int) 
-        {
-            const_sequence_iterator temp = *this;
-            --*this;
-            return temp;
-        }
-
-        const_sequence_iterator& operator+=(const difference_type offset) 
-        {
-            ptr_ += offset;
-            return *this;
-        }
-
-        const_sequence_iterator operator+(const difference_type offset) const 
-        {
-            const_sequence_iterator temp = *this;
-            return temp += offset;
-        }
-
-        const_sequence_iterator& operator-=(const difference_type offset) 
-        {
-            return *this += -offset;
-        }
-
-        const_sequence_iterator operator-(const difference_type offset) const 
-        {
-            const_sequence_iterator temp = *this;
-            return temp -= offset;
-        }
-
-        difference_type operator-(const const_sequence_iterator& rhs) const 
-        {
-            return ptr_ - rhs.ptr_;
-        }
-
-        reference operator[](const difference_type offset) const 
-        {
-            return *(*this + offset);
-        }
-
-        bool operator==(const const_sequence_iterator& rhs) const 
-        {
-            return ptr_ == rhs.ptr_;
-        }
-
-        bool operator!=(const const_sequence_iterator& rhs) const 
-        {
-            return !(*this == rhs);
-        }
-
-        bool operator<(const const_sequence_iterator& rhs) const 
-        {
-            return ptr_ < rhs.ptr_;
-        }
-
-        bool operator>(const const_sequence_iterator& rhs) const 
-        {
-            return rhs < *this;
-        }
-
-        bool operator<=(const const_sequence_iterator& rhs) const 
-        {
-            return !(rhs < *this);
-        }
-
-        bool operator>=(const const_sequence_iterator& rhs) const 
-        {
-            return !(*this < rhs);
-        }
-
-        inline 
-        friend const_sequence_iterator<ContainerTypes> operator+(
-            difference_type offset, const_sequence_iterator<ContainerTypes> next) 
-        {
-            return next += offset;
-        }
-    };
-
     // json_array
 
     template <class Json>
@@ -759,34 +468,18 @@ namespace jsoncons {
     public:
         typedef typename Json::allocator_type allocator_type;
         typedef KeyT key_type;
-        typedef key_value<KeyT,Json> value_type;
-    private:
-        typedef typename Json::implementation_policy implementation_policy;
-        typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> key_value_allocator_type;
-        using container_type = typename implementation_policy::template sequence_container_type<value_type,key_value_allocator_type>;
-    public:
+        typedef key_value<KeyT,Json> key_value_type;
         typedef typename Json::char_type char_type;
         typedef typename Json::string_view_type string_view_type;
-        using difference_type = typename container_type::difference_type;
-        using pointer = typename container_type::pointer;
-        using const_pointer = typename container_type::const_pointer;
-        using reference = value_type&;
-        using const_reference = const value_type&;
     private:
-        using iterator_types = sequence_iterator_types<value_type, 
-                                                       difference_type,
-                                                       pointer, 
-                                                       reference>; 
+        typedef typename Json::implementation_policy implementation_policy;
+        typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type> key_value_allocator_type;
+        using key_value_container_type = typename implementation_policy::template sequence_container_type<key_value_type,key_value_allocator_type>;
 
-        using const_iterator_types = sequence_iterator_types<value_type, 
-                                                             difference_type,
-                                                             const_pointer, 
-                                                             const_reference>; 
-
-        container_type members_;
+        key_value_container_type members_;
     public:
-        typedef sequence_iterator<iterator_types> iterator;
-        typedef const_sequence_iterator<const_iterator_types> const_iterator;
+        typedef typename key_value_container_type::iterator iterator;
+        typedef typename key_value_container_type::const_iterator const_iterator;
 
         using allocator_holder<allocator_type>::get_allocator;
 
@@ -833,9 +526,9 @@ namespace jsoncons {
                 members_.emplace_back(get_key_value<KeyT,Json>()(*s));
             }
             std::stable_sort(members_.begin(),members_.end(),
-                             [](const value_type& a, const value_type& b) -> bool {return a.key().compare(b.key()) < 0;});
+                             [](const key_value_type& a, const key_value_type& b) -> bool {return a.key().compare(b.key()) < 0;});
             auto it = std::unique(members_.begin(), members_.end(),
-                                  [](const value_type& a, const value_type& b) -> bool { return !(a.key().compare(b.key()));});
+                                  [](const key_value_type& a, const key_value_type& b) -> bool { return !(a.key().compare(b.key()));});
             members_.erase(it, members_.end());
         }
 
@@ -852,9 +545,9 @@ namespace jsoncons {
                 members_.emplace_back(get_key_value<KeyT,Json>()(*s));
             }
             std::stable_sort(members_.begin(),members_.end(),
-                             [](const value_type& a, const value_type& b) -> bool {return a.key().compare(b.key()) < 0;});
+                             [](const key_value_type& a, const key_value_type& b) -> bool {return a.key().compare(b.key()) < 0;});
             auto it = std::unique(members_.begin(), members_.end(),
-                                  [](const value_type& a, const value_type& b) -> bool { return !(a.key().compare(b.key()));});
+                                  [](const key_value_type& a, const key_value_type& b) -> bool { return !(a.key().compare(b.key()));});
             members_.erase(it, members_.end());
         }
 
@@ -877,22 +570,22 @@ namespace jsoncons {
 
         iterator begin()
         {
-            return iterator(members_.data());
+            return members_.begin();
         }
 
         iterator end()
         {
-            return iterator(members_.data() + members_.size());
+            return members_.end();
         }
 
         const_iterator begin() const
         {
-            return const_iterator(members_.data());
+            return members_.begin();
         }
 
         const_iterator end() const
         {
-            return const_iterator(members_.data() + members_.size());
+            return members_.end();
         }
 
         std::size_t size() const {return members_.size();}
@@ -933,48 +626,45 @@ namespace jsoncons {
         iterator find(const string_view_type& name) noexcept
         {
             auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                       [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                       [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
             auto result = (it != members_.end() && it->key() == name) ? it : members_.end();
-            return from_container_iterator(result);
+            return result;
         }
 
         const_iterator find(const string_view_type& name) const noexcept
         {
             auto it = std::lower_bound(members_.begin(),members_.end(), 
                                        name, 
-                                       [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});
+                                       [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});
             auto result = (it != members_.end() && it->key() == name) ? it : members_.end();
-            return from_container_iterator(result);
+            return result;
         }
 
         void erase(const_iterator pos) 
         {
-            auto pos2 = to_container_iterator(pos);
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
-            auto it = members_.begin() + (pos2 - members_.begin());
+            iterator it = members_.begin() + (pos - members_.begin());
             members_.erase(it);
     #else
-            members_.erase(pos2);
+            members_.erase(pos);
     #endif
         }
 
         void erase(const_iterator first, const_iterator last) 
         {
-            auto first2 = to_container_iterator(first)             ;
-            auto last2 = to_container_iterator(last)             ;
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
-            auto it1 = members_.begin() + (first2 - members_.begin());
-            auto it2 = members_.begin() + (last2 - members_.begin());
+            iterator it1 = members_.begin() + (first - members_.begin());
+            iterator it2 = members_.begin() + (last - members_.begin());
             members_.erase(it1,it2);
     #else
-            members_.erase(first2,last2);
+            members_.erase(first,last);
     #endif
         }
 
         void erase(const string_view_type& name) 
         {
             auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                       [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                       [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
             if (it != members_.end() && it->key() == name)
             {
                 members_.erase(it);
@@ -991,9 +681,9 @@ namespace jsoncons {
                 members_.emplace_back(convert(*s));
             }
             std::stable_sort(members_.begin(),members_.end(),
-                             [](const value_type& a, const value_type& b) -> bool {return a.key().compare(b.key()) < 0;});
+                             [](const key_value_type& a, const key_value_type& b) -> bool {return a.key().compare(b.key()) < 0;});
             auto it = std::unique(members_.begin(), members_.end(),
-                                  [](const value_type& a, const value_type& b) -> bool { return !(a.key().compare(b.key()));});
+                                  [](const key_value_type& a, const key_value_type& b) -> bool { return !(a.key().compare(b.key()));});
             members_.erase(it, members_.end());
         }
 
@@ -1005,7 +695,7 @@ namespace jsoncons {
                 std::size_t count = std::distance(first,last);
                 members_.reserve(members_.size() + count);
 
-                auto it = to_container_iterator(find(convert(*first).key()));
+                auto it = find(convert(*first).key());
                 if (it != members_.end())
                 {
                     for (auto s = first; s != last; ++s)
@@ -1031,7 +721,7 @@ namespace jsoncons {
         {
             bool inserted;
             auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                       [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                       [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
             if (it == members_.end())
             {
                 members_.emplace_back(key_type(name.begin(),name.end()), 
@@ -1051,7 +741,7 @@ namespace jsoncons {
                                             std::forward<T>(value));
                 inserted = true;
             }
-            return std::make_pair(from_container_iterator(it),inserted);
+            return std::make_pair(it,inserted);
         }
 
         template <class T, class A=allocator_type>
@@ -1060,7 +750,7 @@ namespace jsoncons {
         {
             bool inserted;
             auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                       [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                       [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
             if (it == members_.end())
             {
                 members_.emplace_back(key_type(name.begin(),name.end(), get_allocator()), 
@@ -1080,7 +770,7 @@ namespace jsoncons {
                                             std::forward<T>(value),get_allocator());
                 inserted = true;
             }
-            return std::make_pair(from_container_iterator(it),inserted);
+            return std::make_pair(it,inserted);
         }
 
         // try_emplace
@@ -1091,7 +781,7 @@ namespace jsoncons {
         {
             bool inserted;
             auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                       [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                       [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
             if (it == members_.end())
             {
                 members_.emplace_back(key_type(name.begin(),name.end()), 
@@ -1110,7 +800,7 @@ namespace jsoncons {
                                             std::forward<Args>(args)...);
                 inserted = true;
             }
-            return std::make_pair(from_container_iterator(it),inserted);
+            return std::make_pair(it,inserted);
         }
 
         template <class A=allocator_type, class... Args>
@@ -1119,7 +809,7 @@ namespace jsoncons {
         {
             bool inserted;
             auto it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                       [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                       [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
             if (it == members_.end())
             {
                 members_.emplace_back(key_type(name.begin(),name.end(), get_allocator()), 
@@ -1138,207 +828,95 @@ namespace jsoncons {
                                             std::forward<Args>(args)...);
                 inserted = true;
             }
-            return std::make_pair(from_container_iterator(it),inserted);
+            return std::make_pair(it,inserted);
         }
 
-        template <class ... Args>
-        iterator try_emplace(iterator hint, const string_view_type& name, Args&&... args)
+        template <class A=allocator_type, class ... Args>
+        typename std::enable_if<is_stateless<A>::value,iterator>::type 
+        try_emplace(iterator hint, const string_view_type& name, Args&&... args)
         {
-            return from_container_iterator(try_emplace(to_container_iterator(hint),name,std::forward<Args>(args)...));
-        }
+            iterator it = hint;
 
-        // insert_or_assign
-
-        template <class T>
-        iterator insert_or_assign(iterator hint, const string_view_type& name, T&& value)
-        {
-            return from_container_iterator(insert_or_assign(to_container_iterator(hint), name, std::forward<T>(value)));
-        }
-
-        // merge
-
-        void merge(const json_object& source)
-        {
-            for (auto it = source.begin(); it != source.end(); ++it)
-            {
-                try_emplace(it->key(),it->value());
-            }
-        }
-
-        void merge(json_object&& source)
-        {
-            auto it = std::make_move_iterator(source.begin());
-            auto end = std::make_move_iterator(source.end());
-            for (; it != end; ++it)
-            {
-                auto pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
-                                            [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});   
-                if (pos == members_.end() )
-                {
-                    members_.emplace_back(*it);
-                }
-                else if (it->key() != pos->key())
-                {
-                    members_.emplace(pos,*it);
-                }
-            }
-        }
-
-        void merge(iterator hint, const json_object& source)
-        {
-            auto hint2 = to_container_iterator(hint);
-            for (auto it = source.begin(); it != source.end(); ++it)
-            {
-                hint2 = try_emplace(hint2, it->key(),it->value());
-            }
-        }
-
-        void merge(iterator hint, json_object&& source)
-        {
-            auto hint2 = to_container_iterator(hint);
-
-            auto it = std::make_move_iterator(source.begin());
-            auto end = std::make_move_iterator(source.end());
-            for (; it != end; ++it)
-            {
-                iterator pos;
-                if (hint2 != members_.end() && hint2->key() <= it->key())
-                {
-                    pos = std::lower_bound(hint2,members_.end(), it->key(), 
-                                          [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
-                }
-                else
-                {
-                    pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
-                                          [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
-                }
-                if (pos == members_.end() )
-                {
-                    members_.emplace_back(*it);
-                    hint2 = members_.begin() + (members_.size() - 1);
-                }
-                else if (it->key() != pos->key())
-                {
-                    hint2 = members_.emplace(pos,*it);
-                }
-            }
-        }
-
-        // merge_or_update
-
-        void merge_or_update(const json_object& source)
-        {
-            for (auto it = source.begin(); it != source.end(); ++it)
-            {
-                insert_or_assign(it->key(),it->value());
-            }
-        }
-
-        void merge_or_update(json_object&& source)
-        {
-            auto it = std::make_move_iterator(source.begin());
-            auto end = std::make_move_iterator(source.end());
-            for (; it != end; ++it)
-            {
-                auto pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
-                                            [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});   
-                if (pos == members_.end() )
-                {
-                    members_.emplace_back(*it);
-                }
-                else 
-                {
-                    pos->value(it->value());
-                }
-            }
-        }
-
-        void merge_or_update(iterator hint, const json_object& source)
-        {
-            auto hint2 = to_container_iterator(hint);
-            for (auto it = source.begin(); it != source.end(); ++it)
-            {
-                hint2 = insert_or_assign(hint2, it->key(),it->value());
-            }
-        }
-
-        void merge_or_update(iterator hint, json_object&& source)
-        {
-            auto hint2 = to_container_iterator(hint);
-            auto it = std::make_move_iterator(source.begin());
-            auto end = std::make_move_iterator(source.end());
-            for (; it != end; ++it)
-            {
-                iterator pos;
-                if (hint2 != members_.end() && hint2->key() <= it->key())
-                {
-                    pos = std::lower_bound(hint2,members_.end(), it->key(), 
-                                          [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
-                }
-                else
-                {
-                    pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
-                                          [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
-                }
-                if (pos == members_.end() )
-                {
-                    members_.emplace_back(*it);
-                    hint2 = members_.begin() + (members_.size() - 1);
-                }
-                else 
-                {
-                    pos->value(it->value());
-                    hint2 = pos;
-                }
-            }
-        }
-
-        bool operator==(const json_object& rhs) const
-        {
-            return members_ == rhs.members_;
-        }
-
-        bool operator<(const json_object& rhs) const
-        {
-            return members_ < rhs.members_;
-        }
-    private:
-        json_object& operator=(const json_object&) = delete;
-
-        typename container_type::iterator to_container_iterator(iterator it)
-        {
-            return members_.begin() + (it - begin());
-        }
-
-        typename container_type::const_iterator to_container_iterator(const_iterator it) const
-        {
-            return members_.begin() + (it - begin());
-        }
-
-        iterator from_container_iterator(typename container_type::iterator it)
-        {
-            return iterator(members_.data() + (it - members_.begin()));
-        }
-
-        const_iterator from_container_iterator(typename container_type::const_iterator it) const
-        {
-            return const_iterator(members_.data() + (it - members_.begin()));
-        }
-
-        template <class T, class A=allocator_type>
-        typename std::enable_if<is_stateless<A>::value,typename container_type::iterator>::type 
-        insert_or_assign(typename container_type::iterator hint, const string_view_type& name, T&& value)
-        {
-            typename container_type::iterator it;
             if (hint != members_.end() && hint->key() <= name)
             {
                 it = std::lower_bound(hint,members_.end(), name, 
-                                      [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                      [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
             }
             else
             {
                 it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                      [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                      [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+            }
+
+            if (it == members_.end())
+            {
+                members_.emplace_back(key_type(name.begin(),name.end()), 
+                                            std::forward<Args>(args)...);
+                it = members_.begin() + (members_.size() - 1);
+            }
+            else if (it->key() == name)
+            {
+            }
+            else
+            {
+                it = members_.emplace(it,
+                                            key_type(name.begin(),name.end()),
+                                            std::forward<Args>(args)...);
+            }
+
+            return it;
+        }
+
+        template <class A=allocator_type, class ... Args>
+        typename std::enable_if<!is_stateless<A>::value,iterator>::type 
+        try_emplace(iterator hint, const string_view_type& name, Args&&... args)
+        {
+            iterator it = hint;
+            if (hint != members_.end() && hint->key() <= name)
+            {
+                it = std::lower_bound(hint,members_.end(), name, 
+                                      [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+            }
+            else
+            {
+                it = std::lower_bound(members_.begin(),members_.end(), name, 
+                                      [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+            }
+
+            if (it == members_.end())
+            {
+                members_.emplace_back(key_type(name.begin(),name.end(), get_allocator()), 
+                                            std::forward<Args>(args)...);
+                it = members_.begin() + (members_.size() - 1);
+            }
+            else if (it->key() == name)
+            {
+            }
+            else
+            {
+                it = members_.emplace(it,
+                                            key_type(name.begin(),name.end(), get_allocator()),
+                                            std::forward<Args>(args)...);
+            }
+            return it;
+        }
+
+        // insert_or_assign
+
+        template <class T, class A=allocator_type>
+        typename std::enable_if<is_stateless<A>::value,iterator>::type 
+        insert_or_assign(iterator hint, const string_view_type& name, T&& value)
+        {
+            iterator it;
+            if (hint != members_.end() && hint->key() <= name)
+            {
+                it = std::lower_bound(hint,members_.end(), name, 
+                                      [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+            }
+            else
+            {
+                it = std::lower_bound(members_.begin(),members_.end(), name, 
+                                      [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
             }
 
             if (it == members_.end())
@@ -1361,19 +939,19 @@ namespace jsoncons {
         }
 
         template <class T, class A=allocator_type>
-        typename std::enable_if<!is_stateless<A>::value,typename container_type::iterator>::type 
-        insert_or_assign(typename container_type::iterator hint, const string_view_type& name, T&& value)
+        typename std::enable_if<!is_stateless<A>::value,iterator>::type 
+        insert_or_assign(iterator hint, const string_view_type& name, T&& value)
         {
-            typename container_type::iterator it;
+            iterator it;
             if (hint != members_.end() && hint->key() <= name)
             {
                 it = std::lower_bound(hint,members_.end(), name, 
-                                      [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                      [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
             }
             else
             {
                 it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                      [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                                      [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
             }
 
             if (it == members_.end())
@@ -1395,75 +973,150 @@ namespace jsoncons {
             return it;
         }
 
-        template <class A=allocator_type, class ... Args>
-        typename std::enable_if<is_stateless<A>::value,typename container_type::iterator>::type 
-        try_emplace(typename container_type::iterator hint, const string_view_type& name, Args&&... args)
+        // merge
+
+        void merge(const json_object& source)
         {
-            typename container_type::iterator it = hint;
-
-            if (hint != members_.end() && hint->key() <= name)
+            for (auto it = source.begin(); it != source.end(); ++it)
             {
-                it = std::lower_bound(hint,members_.end(), name, 
-                                      [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                try_emplace(it->key(),it->value());
             }
-            else
-            {
-                it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                      [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
-            }
-
-            if (it == members_.end()) 
-            {
-                members_.emplace_back(key_type(name.begin(),name.end()), 
-                                            std::forward<Args>(args)...);
-                it = members_.begin() + (members_.size() - 1);
-            }
-            else if (it->key() == name)
-            {
-            }
-            else
-            {
-                it = members_.emplace(it,
-                                            key_type(name.begin(),name.end()),
-                                            std::forward<Args>(args)...);
-            }
-
-            return it;
         }
 
-        template <class A=allocator_type, class ... Args>
-        typename std::enable_if<!is_stateless<A>::value,typename container_type::iterator>::type 
-        try_emplace(typename container_type::iterator hint, const string_view_type& name, Args&&... args)
+        void merge(json_object&& source)
         {
-            typename container_type::iterator it = hint;
-            if (hint != members_.end() && hint->key() <= name)
+            auto it = std::make_move_iterator(source.begin());
+            auto end = std::make_move_iterator(source.end());
+            for (; it != end; ++it)
             {
-                it = std::lower_bound(hint,members_.end(), name, 
-                                      [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                auto pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
+                                            [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});   
+                if (pos == members_.end() )
+                {
+                    members_.emplace_back(*it);
+                }
+                else if (it->key() != pos->key())
+                {
+                    members_.emplace(pos,*it);
+                }
             }
-            else
-            {
-                it = std::lower_bound(members_.begin(),members_.end(), name, 
-                                      [](const value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
-            }
-
-            if (it == members_.end())
-            {
-                members_.emplace_back(key_type(name.begin(),name.end(), get_allocator()), 
-                                            std::forward<Args>(args)...);
-                it = members_.begin() + (members_.size() - 1);
-            }
-            else if (it->key() == name)
-            {
-            }
-            else
-            {
-                it = members_.emplace(it,
-                                            key_type(name.begin(),name.end(), get_allocator()),
-                                            std::forward<Args>(args)...);
-            }
-            return it;
         }
+
+        void merge(iterator hint, const json_object& source)
+        {
+            for (auto it = source.begin(); it != source.end(); ++it)
+            {
+                hint = try_emplace(hint, it->key(),it->value());
+            }
+        }
+
+        void merge(iterator hint, json_object&& source)
+        {
+            auto it = std::make_move_iterator(source.begin());
+            auto end = std::make_move_iterator(source.end());
+            for (; it != end; ++it)
+            {
+                iterator pos;
+                if (hint != members_.end() && hint->key() <= it->key())
+                {
+                    pos = std::lower_bound(hint,members_.end(), it->key(), 
+                                          [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                }
+                else
+                {
+                    pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
+                                          [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                }
+                if (pos == members_.end() )
+                {
+                    members_.emplace_back(*it);
+                    hint = members_.begin() + (members_.size() - 1);
+                }
+                else if (it->key() != pos->key())
+                {
+                    hint = members_.emplace(pos,*it);
+                }
+            }
+        }
+
+        // merge_or_update
+
+        void merge_or_update(const json_object& source)
+        {
+            for (auto it = source.begin(); it != source.end(); ++it)
+            {
+                insert_or_assign(it->key(),it->value());
+            }
+        }
+
+        void merge_or_update(json_object&& source)
+        {
+            auto it = std::make_move_iterator(source.begin());
+            auto end = std::make_move_iterator(source.end());
+            for (; it != end; ++it)
+            {
+                auto pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
+                                            [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});   
+                if (pos == members_.end() )
+                {
+                    members_.emplace_back(*it);
+                }
+                else 
+                {
+                    pos->value(it->value());
+                }
+            }
+        }
+
+        void merge_or_update(iterator hint, const json_object& source)
+        {
+            for (auto it = source.begin(); it != source.end(); ++it)
+            {
+                hint = insert_or_assign(hint, it->key(),it->value());
+            }
+        }
+
+        void merge_or_update(iterator hint, json_object&& source)
+        {
+            auto it = std::make_move_iterator(source.begin());
+            auto end = std::make_move_iterator(source.end());
+            for (; it != end; ++it)
+            {
+                iterator pos;
+                if (hint != members_.end() && hint->key() <= it->key())
+                {
+                    pos = std::lower_bound(hint,members_.end(), it->key(), 
+                                          [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                }
+                else
+                {
+                    pos = std::lower_bound(members_.begin(),members_.end(), it->key(), 
+                                          [](const key_value_type& a, const string_view_type& k) -> bool {return string_view_type(a.key()).compare(k) < 0;});        
+                }
+                if (pos == members_.end() )
+                {
+                    members_.emplace_back(*it);
+                    hint = members_.begin() + (members_.size() - 1);
+                }
+                else 
+                {
+                    pos->value(it->value());
+                    hint = pos;
+                }
+            }
+        }
+
+        bool operator==(const json_object& rhs) const
+        {
+            return members_ == rhs.members_;
+        }
+
+        bool operator<(const json_object& rhs) const
+        {
+            return members_ < rhs.members_;
+        }
+    private:
+        json_object& operator=(const json_object&) = delete;
     };
 
     // Preserve order
@@ -1473,38 +1126,22 @@ namespace jsoncons {
     {
     public:
         typedef typename Json::allocator_type allocator_type;
+        typedef typename Json::char_type char_type;
         typedef KeyT key_type;
-        typedef key_value<KeyT,Json> value_type;
+        typedef typename Json::string_view_type string_view_type;
+        typedef key_value<KeyT,Json> key_value_type;
     private:
         typedef typename Json::implementation_policy implementation_policy;
-        typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> key_value_allocator_type;
-        using container_type = typename implementation_policy::template sequence_container_type<value_type,key_value_allocator_type>;
+        typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type> key_value_allocator_type;
+        using key_value_container_type = typename implementation_policy::template sequence_container_type<key_value_type,key_value_allocator_type>;
         typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::size_t> index_allocator_type;
         using index_container_type = typename implementation_policy::template sequence_container_type<std::size_t,index_allocator_type>;
-    public:
-        typedef typename Json::char_type char_type;
-        typedef typename Json::string_view_type string_view_type;
-        using difference_type = typename container_type::difference_type;
-        using pointer = typename container_type::pointer;
-        using const_pointer = typename container_type::const_pointer;
-        using reference = value_type&;
-        using const_reference = const value_type&;
-    private:
-        using iterator_types = sequence_iterator_types<value_type, 
-                                                       difference_type,
-                                                       pointer, 
-                                                       reference>; 
 
-        using const_iterator_types = sequence_iterator_types<value_type, 
-                                                             difference_type,
-                                                             const_pointer, 
-                                                             const_reference>; 
-    private:
-        container_type members_;
+        key_value_container_type members_;
         index_container_type index_;
     public:
-        typedef sequence_iterator<iterator_types> iterator;
-        typedef const_sequence_iterator<const_iterator_types> const_iterator;
+        typedef typename key_value_container_type::iterator iterator;
+        typedef typename key_value_container_type::const_iterator const_iterator;
 
         using allocator_holder<allocator_type>::get_allocator;
 
@@ -1640,22 +1277,22 @@ namespace jsoncons {
 
         iterator begin()
         {
-            return iterator(members_.data());
+            return members_.begin();
         }
 
         iterator end()
         {
-            return iterator(members_.data() + members_.size());
+            return members_.end();
         }
 
         const_iterator begin() const
         {
-            return const_iterator(members_.data());
+            return members_.begin();
         }
 
         const_iterator end() const
         {
-            return const_iterator(members_.data() + members_.size());
+            return members_.end();
         }
 
         std::size_t size() const {return members_.size();}
@@ -1704,11 +1341,11 @@ namespace jsoncons {
                                         [&](std::size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
             if (it != index_.end() && members_.at(*it).key() == name)
             {
-                return from_container_iterator(members_.begin() + *it);
+                return members_.begin() + *it;
             }
             else
             {
-                return from_container_iterator(members_.end());
+                return members_.end();
             }
         }
 
@@ -1718,32 +1355,29 @@ namespace jsoncons {
                                         [&](std::size_t i, const string_view_type& k) -> bool {return string_view_type(members_.at(i).key()).compare(k) < 0;});        
             if (it != index_.end() && members_.at(*it).key() == name)
             {
-                return from_container_iterator(members_.begin() + *it);
+                return members_.begin() + *it;
             }
             else
             {
-                return end();
+                return members_.end();
             }
         }
 
         void erase(const_iterator first, const_iterator last) 
         {
-            auto first2 = to_container_iterator(first)             ;
-            auto last2 = to_container_iterator(last)             ;
-
-            std::size_t pos1 = first2 == members_.end() ? members_.size() : first2 - members_.begin();
-            std::size_t pos2 = last2 == members_.end() ? members_.size() : last2 - members_.begin();
+            std::size_t pos1 = first == members_.end() ? members_.size() : first - members_.begin();
+            std::size_t pos2 = last == members_.end() ? members_.size() : last - members_.begin();
 
             if (pos1 < members_.size() && pos2 <= members_.size())
             {
                 erase_index_entries(pos1,pos2);
 
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
-                auto it1 = members_.begin() + (first2 - members_.begin());
-                auto it2 = members_.begin() + (last2 - members_.begin());
+                iterator it1 = members_.begin() + (first - members_.begin());
+                iterator it2 = members_.begin() + (last - members_.begin());
                 members_.erase(it1,it2);
     #else
-                members_.erase(first2,last2);
+                members_.erase(first,last);
     #endif
                 //build_index();
             }
@@ -1751,7 +1385,7 @@ namespace jsoncons {
 
         void erase(const string_view_type& name) 
         {
-            auto pos = to_container_iterator(find(name));
+            auto pos = find(name);
             if (pos != members_.end())
             {
                 std::size_t pos1 = pos - members_.begin();
@@ -1759,7 +1393,7 @@ namespace jsoncons {
 
                 erase_index_entries(pos1, pos2);
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
-                auto it = members_.begin() + (pos - members_.begin());
+                iterator it = members_.begin() + (pos - members_.begin());
                 members_.erase(it);
     #else
                 members_.erase(pos);
@@ -1825,13 +1459,13 @@ namespace jsoncons {
             {
                 members_.emplace_back(key_type(name.begin(), name.end()), std::forward<T>(value));
                 auto it = members_.begin() + result.first;
-                return std::make_pair(from_container_iterator(it),true);
+                return std::make_pair(it,true);
             }
             else
             {
                 auto it = members_.begin() + result.first;
                 it->value(Json(std::forward<T>(value)));
-                return std::make_pair(from_container_iterator(it),false);
+                return std::make_pair(it,false);
             }
         }
 
@@ -1845,13 +1479,71 @@ namespace jsoncons {
                 members_.emplace_back(key_type(name.begin(),name.end(),get_allocator()), 
                                       std::forward<T>(value),get_allocator());
                 auto it = members_.begin() + result.first;
-                return std::make_pair(from_container_iterator(it),true);
+                return std::make_pair(it,true);
             }
             else
             {
                 auto it = members_.begin() + result.first;
                 it->value(Json(std::forward<T>(value),get_allocator()));
-                return std::make_pair(from_container_iterator(it),false);
+                return std::make_pair(it,false);
+            }
+        }
+
+        template <class A=allocator_type, class T>
+        typename std::enable_if<is_stateless<A>::value,iterator>::type 
+        insert_or_assign(iterator hint, const string_view_type& key, T&& value)
+        {
+            if (hint == members_.end())
+            {
+                auto result = insert_or_assign(key, std::forward<T>(value));
+                return result.first;
+            }
+            else
+            {
+                std::size_t pos = hint - members_.begin();
+                auto result = insert_index_entry(key,pos);
+
+                if (result.second)
+                {
+                    auto it = members_.emplace(hint, key_type(key.begin(), key.end()), std::forward<T>(value));
+                    return it;
+                }
+                else
+                {
+                    auto it = members_.begin() + result.first;
+                    it->value(Json(std::forward<T>(value)));
+                    return it;
+                }
+            }
+        }
+
+        template <class A=allocator_type, class T>
+        typename std::enable_if<!is_stateless<A>::value,iterator>::type 
+        insert_or_assign(iterator hint, const string_view_type& key, T&& value)
+        {
+            if (hint == members_.end())
+            {
+                auto result = insert_or_assign(key, std::forward<T>(value));
+                return result.first;
+            }
+            else
+            {
+                std::size_t pos = hint - members_.begin();
+                auto result = insert_index_entry(key,pos);
+
+                if (result.second)
+                {
+                    auto it = members_.emplace(hint, 
+                                               key_type(key.begin(),key.end(),get_allocator()), 
+                                               std::forward<T>(value),get_allocator());
+                    return it;
+                }
+                else
+                {
+                    auto it = members_.begin() + result.first;
+                    it->value(Json(std::forward<T>(value),get_allocator()));
+                    return it;
+                }
             }
         }
 
@@ -1867,12 +1559,12 @@ namespace jsoncons {
 
         void merge(json_object&& source)
         {
-            auto it = std::make_move_iterator(source.members_.begin());
-            auto end = std::make_move_iterator(source.members_.end());
+            auto it = std::make_move_iterator(source.begin());
+            auto end = std::make_move_iterator(source.end());
             for (; it != end; ++it)
             {
-                auto pos = to_container_iterator(find(it->key()));
-                if (pos == members_.end())
+                auto pos = find(it->key());
+                if (pos == members_.end() )
                 {
                     try_emplace(it->key(),std::move(it->value()));
                 }
@@ -1881,43 +1573,41 @@ namespace jsoncons {
 
         void merge(iterator hint, const json_object& source)
         {
-            auto hint2 = to_container_iterator(hint);
-            std::size_t pos = hint2 - members_.begin();
+            std::size_t pos = hint - members_.begin();
             for (auto it = source.begin(); it != source.end(); ++it)
             {
-                hint2 = try_emplace(hint2, it->key(),it->value());
-                std::size_t newpos = hint2 - members_.begin();
+                hint = try_emplace(hint, it->key(),it->value());
+                std::size_t newpos = hint - members_.begin();
                 if (newpos == pos)
                 {
-                    ++hint2;
-                    pos = hint2 - members_.begin();
+                    ++hint;
+                    pos = hint - members_.begin();
                 }
                 else
                 {
-                    hint2 = members_.begin() + pos;
+                    hint = members_.begin() + pos;
                 }
             }
         }
 
         void merge(iterator hint, json_object&& source)
         {
-            auto hint2 = to_container_iterator(hint);
-            std::size_t pos = hint2 - members_.begin();
+            std::size_t pos = hint - members_.begin();
 
             auto it = std::make_move_iterator(source.begin());
             auto end = std::make_move_iterator(source.end());
             for (; it != end; ++it)
             {
-                hint2 = try_emplace(hint2, it->key(), std::move(it->value()));
-                std::size_t newpos = hint2 - members_.begin();
+                hint = try_emplace(hint, it->key(), std::move(it->value()));
+                std::size_t newpos = hint - members_.begin();
                 if (newpos == pos)
                 {
-                    ++hint2;
-                    pos = hint2 - members_.begin();
+                    ++hint;
+                    pos = hint - members_.begin();
                 }
                 else
                 {
-                    hint2 = members_.begin() + pos;
+                    hint = members_.begin() + pos;
                 }
             }
         }
@@ -1934,12 +1624,12 @@ namespace jsoncons {
 
         void merge_or_update(json_object&& source)
         {
-            auto it = std::make_move_iterator(source.members_.begin());
-            auto end = std::make_move_iterator(source.members_.end());
+            auto it = std::make_move_iterator(source.begin());
+            auto end = std::make_move_iterator(source.end());
             for (; it != end; ++it)
             {
-                typename container_type::iterator pos = to_container_iterator(find(it->key()));
-                if (pos == members_.end())
+                auto pos = find(it->key());
+                if (pos == members_.end() )
                 {
                     insert_or_assign(it->key(),std::move(it->value()));
                 }
@@ -1952,51 +1642,42 @@ namespace jsoncons {
 
         void merge_or_update(iterator hint, const json_object& source)
         {
-            auto hint2 = to_container_iterator(hint);
-            std::size_t pos = hint2 - members_.begin();
+            std::size_t pos = hint - members_.begin();
             for (auto it = source.begin(); it != source.end(); ++it)
             {
-                hint2 = insert_or_assign(hint2, it->key(),it->value());
-                std::size_t newpos = hint2 - members_.begin();
+                hint = insert_or_assign(hint, it->key(),it->value());
+                std::size_t newpos = hint - members_.begin();
                 if (newpos == pos)
                 {
-                    ++hint2;
-                    pos = hint2 - members_.begin();
+                    ++hint;
+                    pos = hint - members_.begin();
                 }
                 else
                 {
-                    hint2 = members_.begin() + pos;
+                    hint = members_.begin() + pos;
                 }
             }
         }
 
         void merge_or_update(iterator hint, json_object&& source)
         {
-            auto hint2 = to_container_iterator(hint);
-
-            std::size_t pos = hint2 - members_.begin();
+            std::size_t pos = hint - members_.begin();
             auto it = std::make_move_iterator(source.begin());
             auto end = std::make_move_iterator(source.end());
             for (; it != end; ++it)
             {
-                hint2 = insert_or_assign(hint2, it->key(),std::move(it->value()));
-                std::size_t newpos = hint2 - members_.begin();
+                hint = insert_or_assign(hint, it->key(),std::move(it->value()));
+                std::size_t newpos = hint - members_.begin();
                 if (newpos == pos)
                 {
-                    ++hint2;
-                    pos = hint2 - members_.begin();
+                    ++hint;
+                    pos = hint - members_.begin();
                 }
                 else
                 {
-                    hint2 = members_.begin() + pos;
+                    hint = members_.begin() + pos;
                 }
             }
-        }
-
-        template <class T>
-        iterator insert_or_assign(iterator hint, const string_view_type& key, T&& value)
-        {
-            return from_container_iterator(insert_or_assign(to_container_iterator(hint), key, std::forward<T>(value)));
         }
 
         // try_emplace
@@ -2010,12 +1691,12 @@ namespace jsoncons {
             {
                 members_.emplace_back(key_type(name.begin(), name.end()), std::forward<Args>(args)...);
                 auto it = members_.begin() + result.first;
-                return std::make_pair(from_container_iterator(it),true);
+                return std::make_pair(it,true);
             }
             else
             {
                 auto it = members_.begin() + result.first;
-                return std::make_pair(from_container_iterator(it),false);
+                return std::make_pair(it,false);
             }
         }
 
@@ -2029,19 +1710,69 @@ namespace jsoncons {
                 members_.emplace_back(key_type(key.begin(),key.end(), get_allocator()), 
                                       std::forward<Args>(args)...);
                 auto it = members_.begin() + result.first;
-                return std::make_pair(from_container_iterator(it),true);
+                return std::make_pair(it,true);
             }
             else
             {
                 auto it = members_.begin() + result.first;
-                return std::make_pair(from_container_iterator(it),false);
+                return std::make_pair(it,false);
             }
         }
      
-        template <class ... Args>
-        iterator try_emplace(iterator hint, const string_view_type& key, Args&&... args)
+        template <class A=allocator_type, class ... Args>
+        typename std::enable_if<is_stateless<A>::value,iterator>::type
+        try_emplace(iterator hint, const string_view_type& key, Args&&... args)
         {
-            return from_container_iterator(try_emplace(to_container_iterator(hint),key,std::forward<Args>(args)...));
+            if (hint == members_.end())
+            {
+                auto result = try_emplace(key, std::forward<Args>(args)...);
+                return result.first;
+            }
+            else
+            {
+                std::size_t pos = hint - members_.begin();
+                auto result = insert_index_entry(key, pos);
+
+                if (result.second)
+                {
+                    auto it = members_.emplace(hint, key_type(key.begin(), key.end()), std::forward<Args>(args)...);
+                    return it;
+                }
+                else
+                {
+                    auto it = members_.begin() + result.first;
+                    return it;
+                }
+            }
+        }
+
+        template <class A=allocator_type, class ... Args>
+        typename std::enable_if<!is_stateless<A>::value,iterator>::type
+        try_emplace(iterator hint, const string_view_type& key, Args&&... args)
+        {
+            if (hint == members_.end())
+            {
+                auto result = try_emplace(key, std::forward<Args>(args)...);
+                return result.first;
+            }
+            else
+            {
+                std::size_t pos = hint - members_.begin();
+                auto result = insert_index_entry(key, pos);
+
+                if (result.second)
+                {
+                    auto it = members_.emplace(hint, 
+                                               key_type(key.begin(),key.end(), get_allocator()), 
+                                               std::forward<Args>(args)...);
+                    return it;
+                }
+                else
+                {
+                    auto it = members_.begin() + result.first;
+                    return it;
+                }
+            }
         }
 
         bool operator==(const json_object& rhs) const
@@ -2138,140 +1869,6 @@ namespace jsoncons {
         }
 
         json_object& operator=(const json_object&) = delete;
-
-        typename container_type::iterator to_container_iterator(iterator it)
-        {
-            return members_.begin() + (it - begin());
-        }
-
-        typename container_type::const_iterator to_container_iterator(const_iterator it) const
-        {
-            return members_.begin() + (it - begin());
-        }
-
-        iterator from_container_iterator(typename container_type::iterator it)
-        {
-            return iterator(members_.data() + (it - members_.begin()));
-        }
-
-        const_iterator from_container_iterator(typename container_type::const_iterator it) const
-        {
-            return const_iterator(members_.data() + (it - members_.begin()));
-        }
-
-        template <class A=allocator_type, class T>
-        typename std::enable_if<is_stateless<A>::value,typename container_type::iterator>::type 
-        insert_or_assign(typename container_type::iterator hint, const string_view_type& key, T&& value)
-        {
-            if (hint == members_.end())
-            {
-                auto result = insert_or_assign(key, std::forward<T>(value));
-                return to_container_iterator(result.first);
-            }
-            else
-            {
-                std::size_t pos = hint - members_.begin();
-                auto result = insert_index_entry(key,pos);
-
-                if (result.second)
-                {
-                    auto it = members_.emplace(hint, key_type(key.begin(), key.end()), std::forward<T>(value));
-                    return it;
-                }
-                else
-                {
-                    auto it = members_.begin() + result.first;
-                    it->value(Json(std::forward<T>(value)));
-                    return it;
-                }
-            }
-        }
-
-        template <class A=allocator_type, class T>
-        typename std::enable_if<!is_stateless<A>::value,typename container_type::iterator>::type 
-        insert_or_assign(typename container_type::iterator hint, const string_view_type& key, T&& value)
-        {
-            if (hint == members_.end())
-            {
-                auto result = insert_or_assign(key, std::forward<T>(value));
-                return result.first;
-            }
-            else
-            {
-                std::size_t pos = hint - members_.begin();
-                auto result = insert_index_entry(key,pos);
-
-                if (result.second)
-                {
-                    auto it = members_.emplace(hint, 
-                                               key_type(key.begin(),key.end(),get_allocator()), 
-                                               std::forward<T>(value),get_allocator());
-                    return it;
-                }
-                else
-                {
-                    auto it = members_.begin() + result.first;
-                    it->value(Json(std::forward<T>(value),get_allocator()));
-                    return it;
-                }
-            }
-        }
-
-        template <class A=allocator_type, class ... Args>
-        typename std::enable_if<is_stateless<A>::value,typename container_type::iterator>::type
-        try_emplace(typename container_type::iterator hint, const string_view_type& key, Args&&... args)
-        {
-            if (hint == members_.end())
-            {
-                auto result = try_emplace(key, std::forward<Args>(args)...);
-                return to_container_iterator(result.first);
-            }
-            else
-            {
-                std::size_t pos = hint - members_.begin();
-                auto result = insert_index_entry(key, pos);
-
-                if (result.second)
-                {
-                    auto it = members_.emplace(hint, key_type(key.begin(), key.end()), std::forward<Args>(args)...);
-                    return it;
-                }
-                else
-                {
-                    auto it = members_.begin() + result.first;
-                    return it;
-                }
-            }
-        }
-
-        template <class A=allocator_type, class ... Args>
-        typename std::enable_if<!is_stateless<A>::value,typename container_type::iterator>::type
-        try_emplace(typename container_type::iterator hint, const string_view_type& key, Args&&... args)
-        {
-            if (hint == members_.end())
-            {
-                auto result = try_emplace(key, std::forward<Args>(args)...);
-                return result.first;
-            }
-            else
-            {
-                std::size_t pos = hint - members_.begin();
-                auto result = insert_index_entry(key, pos);
-
-                if (result.second)
-                {
-                    auto it = members_.emplace(hint, 
-                                               key_type(key.begin(),key.end(), get_allocator()), 
-                                               std::forward<Args>(args)...);
-                    return it;
-                }
-                else
-                {
-                    auto it = members_.begin() + result.first;
-                    return it;
-                }
-            }
-        }
     };
 
 } // namespace jsoncons
