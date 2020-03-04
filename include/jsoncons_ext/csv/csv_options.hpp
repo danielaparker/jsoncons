@@ -733,7 +733,7 @@ public:
     using basic_csv_encode_options<CharT>::line_delimiter;
     using basic_csv_encode_options<CharT>::quote_style;
 
-    static const size_t default_indent = 4;
+    static constexpr size_t default_indent = 4;
 
 //  Constructors
 

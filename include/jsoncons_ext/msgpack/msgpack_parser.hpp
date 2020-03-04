@@ -37,15 +37,15 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Src,class WorkAllocator=std::allocator<char>>
+template <class Src,class TempAllocator=std::allocator<char>>
 class basic_msgpack_parser : public ser_context
 {
     typedef char char_type;
     typedef std::char_traits<char> char_traits_type;
-    typedef WorkAllocator work_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
+    typedef TempAllocator temp_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
 
     Src source_;
     bool more_;
@@ -55,7 +55,7 @@ class basic_msgpack_parser : public ser_context
 public:
     template <class Source>
     basic_msgpack_parser(Source&& source,
-                         const WorkAllocator alloc=WorkAllocator())
+                         const TempAllocator alloc=TempAllocator())
        : source_(std::forward<Source>(source)),
          more_(true), 
          done_(false),

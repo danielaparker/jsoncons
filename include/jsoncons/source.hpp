@@ -20,725 +20,729 @@
 
 namespace jsoncons { 
 
-template <class CharT>
-class basic_null_istream : public std::basic_istream<CharT>
-{
-    class null_buffer : public std::basic_streambuf<CharT>
+    template <class CharT>
+    class basic_null_istream : public std::basic_istream<CharT>
+    {
+        class null_buffer : public std::basic_streambuf<CharT>
+        {
+        public:
+            using typename std::basic_streambuf<CharT>::int_type;
+            using typename std::basic_streambuf<CharT>::traits_type;
+
+            null_buffer() = default;
+            null_buffer(const null_buffer&) = default;
+            null_buffer& operator=(const null_buffer&) = default;
+
+            int_type overflow( int_type ch = traits_type::eof() ) override
+            {
+                return ch;
+            }
+        } nb_;
+    public:
+        basic_null_istream()
+          : std::basic_istream<CharT>(&nb_)
+        {
+        }
+        basic_null_istream(basic_null_istream&&) = default;
+
+        basic_null_istream& operator=(basic_null_istream&&) = default;
+    };
+
+    // text sources
+
+    template <class CharT>
+    class stream_source 
     {
     public:
-        using typename std::basic_streambuf<CharT>::int_type;
-        using typename std::basic_streambuf<CharT>::traits_type;
+        typedef CharT value_type;
+        typedef std::char_traits<CharT> traits_type;
+    private:
+        basic_null_istream<CharT> null_is_;
+        std::basic_istream<CharT>* is_;
+        std::basic_streambuf<CharT>* sbuf_;
+        std::size_t position_;
 
-        null_buffer() = default;
-        null_buffer(const null_buffer&) = default;
-        null_buffer& operator=(const null_buffer&) = default;
-
-        int_type overflow( int_type ch = traits_type::eof() ) override
+        // Noncopyable 
+        stream_source(const stream_source&) = delete;
+        stream_source& operator=(const stream_source&) = delete;
+    public:
+        stream_source()
+            : is_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0)
         {
-            return ch;
         }
-    } nb_;
-public:
-    basic_null_istream()
-      : std::basic_istream<CharT>(&nb_)
-    {
-    }
-    basic_null_istream(basic_null_istream&&) = default;
 
-    basic_null_istream& operator=(basic_null_istream&&) = default;
-};
-
-// text sources
-
-template <class CharT>
-class stream_source 
-{
-public:
-    typedef CharT value_type;
-    typedef std::char_traits<CharT> traits_type;
-private:
-    basic_null_istream<CharT> null_is_;
-    std::basic_istream<CharT>* is_;
-    std::basic_streambuf<CharT>* sbuf_;
-    std::size_t position_;
-
-    // Noncopyable 
-    stream_source(const stream_source&) = delete;
-    stream_source& operator=(const stream_source&) = delete;
-public:
-    stream_source()
-        : is_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0)
-    {
-    }
-
-    stream_source(std::basic_istream<CharT>& is)
-        : is_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0)
-    {
-    }
-
-    stream_source(stream_source&& other) noexcept
-    {
-        std::swap(is_,other.is_);
-        std::swap(sbuf_,other.sbuf_);
-        std::swap(position_,other.position_);
-    }
-
-    ~stream_source()
-    {
-    }
-
-    stream_source& operator=(stream_source&& other) noexcept
-    {
-        std::swap(is_,other.is_);
-        std::swap(sbuf_,other.sbuf_);
-        std::swap(position_,other.position_);
-        return *this;
-    }
-
-    bool eof() const
-    {
-        return is_->eof();  
-    }
-
-    bool is_error() const
-    {
-        return is_->bad();  
-    }
-
-    std::size_t position() const
-    {
-        return position_;
-    }
-
-    std::size_t get(value_type& c)
-    {
-        JSONCONS_TRY
+        stream_source(std::basic_istream<CharT>& is)
+            : is_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0)
         {
-            int val = sbuf_->sbumpc();
-            if (!(val == traits_type::eof()))
+        }
+
+        stream_source(stream_source&& other) noexcept
+        {
+            std::swap(is_,other.is_);
+            std::swap(sbuf_,other.sbuf_);
+            std::swap(position_,other.position_);
+        }
+
+        ~stream_source()
+        {
+        }
+
+        stream_source& operator=(stream_source&& other) noexcept
+        {
+            std::swap(is_,other.is_);
+            std::swap(sbuf_,other.sbuf_);
+            std::swap(position_,other.position_);
+            return *this;
+        }
+
+        bool eof() const
+        {
+            return is_->eof();  
+        }
+
+        bool is_error() const
+        {
+            return is_->bad();  
+        }
+
+        std::size_t position() const
+        {
+            return position_;
+        }
+
+        std::size_t get(value_type& c)
+        {
+            JSONCONS_TRY
             {
-                c = (value_type)val;
-                ++position_;
-                return 1;
+                int val = sbuf_->sbumpc();
+                if (!(val == traits_type::eof()))
+                {
+                    c = (value_type)val;
+                    ++position_;
+                    return 1;
+                }
+                else
+                {
+                    is_->clear(is_->rdstate() | std::ios::eofbit);
+                    return 0;
+                }
             }
-            else
+            JSONCONS_CATCH(const std::exception&)     
             {
-                is_->clear(is_->rdstate() | std::ios::eofbit);
+                is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
                 return 0;
             }
         }
-        JSONCONS_CATCH(const std::exception&)     
-        {
-            is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
-            return 0;
-        }
-    }
 
-    int get()
-    {
-        JSONCONS_TRY
+        int get()
         {
-            int c = sbuf_->sbumpc();
-            if (c == traits_type::eof())
-            {
-                is_->clear(is_->rdstate() | std::ios::eofbit);
-            }
-            else
-            {
-                ++position_;
-            }
-            return c;
-        }
-        JSONCONS_CATCH(const std::exception&)     
-        {
-            is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
-            return traits_type::eof();
-        }
-    }
-
-    void ignore(std::size_t count)
-    {
-        JSONCONS_TRY
-        {
-            for (std::size_t i = 0; i < count; ++i)
+            JSONCONS_TRY
             {
                 int c = sbuf_->sbumpc();
                 if (c == traits_type::eof())
                 {
                     is_->clear(is_->rdstate() | std::ios::eofbit);
-                    return;
                 }
                 else
                 {
                     ++position_;
                 }
+                return c;
+            }
+            JSONCONS_CATCH(const std::exception&)     
+            {
+                is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                return traits_type::eof();
             }
         }
-        JSONCONS_CATCH(const std::exception&)     
-        {
-            is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
-        }
-    }
 
-    int peek() 
-    {
-        JSONCONS_TRY
+        void ignore(std::size_t count)
         {
-            int c = sbuf_->sgetc();
-            if (c == traits_type::eof())
+            JSONCONS_TRY
             {
-                is_->clear(is_->rdstate() | std::ios::eofbit);
+                for (std::size_t i = 0; i < count; ++i)
+                {
+                    int c = sbuf_->sbumpc();
+                    if (c == traits_type::eof())
+                    {
+                        is_->clear(is_->rdstate() | std::ios::eofbit);
+                        return;
+                    }
+                    else
+                    {
+                        ++position_;
+                    }
+                }
             }
-            return c;
-        }
-        JSONCONS_CATCH(const std::exception&)     
-        {
-            is_->clear(is_->rdstate() | std::ios::badbit);
-            return traits_type::eof();
-        }
-    }
-
-    std::size_t read(value_type* p, std::size_t length)
-    {
-        JSONCONS_TRY
-        {
-            std::streamsize count = sbuf_->sgetn(p, length); // never negative
-            if (static_cast<std::size_t>(count) < length)
+            JSONCONS_CATCH(const std::exception&)     
             {
-                is_->clear(is_->rdstate() | std::ios::eofbit);
+                is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
             }
-            position_ += length;
-            return static_cast<std::size_t>(count);
         }
-        JSONCONS_CATCH(const std::exception&)     
-        {
-            is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
-            return 0;
-        }
-    }
 
-    template <class OutputIt>
-    typename std::enable_if<!std::is_same<OutputIt,value_type*>::value,size_t>::type
-    read(OutputIt p, std::size_t length)
-    {
-        std::size_t count = 0;
-        JSONCONS_TRY
+        int peek() 
         {
-            for (count = 0; count < length; ++count)
+            JSONCONS_TRY
             {
-                int c = sbuf_->sbumpc();
+                int c = sbuf_->sgetc();
                 if (c == traits_type::eof())
                 {
                     is_->clear(is_->rdstate() | std::ios::eofbit);
-                    return count;
                 }
-                else
+                return c;
+            }
+            JSONCONS_CATCH(const std::exception&)     
+            {
+                is_->clear(is_->rdstate() | std::ios::badbit);
+                return traits_type::eof();
+            }
+        }
+
+        std::size_t read(value_type* p, std::size_t length)
+        {
+            JSONCONS_TRY
+            {
+                std::streamsize count = sbuf_->sgetn(p, length); // never negative
+                if (static_cast<std::size_t>(count) < length)
                 {
-                    ++position_;
+                    is_->clear(is_->rdstate() | std::ios::eofbit);
                 }
-                *p++ = (value_type)c;
+                position_ += length;
+                return static_cast<std::size_t>(count);
             }
-            return count;
-        }
-        JSONCONS_CATCH(const std::exception&)     
-        {
-            is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
-            return count;
-        }
-    }
-};
-
-// string_source
-
-template <class CharT, class T, class Enable=void>
-struct is_string_sourceable : std::false_type {};
-
-template <class CharT, class T>
-struct is_string_sourceable<CharT,T,typename std::enable_if<std::is_same<typename T::value_type, CharT>::value>::type> : std::true_type {};
-
-template <class CharT>
-class string_source 
-{
-public:
-    typedef CharT value_type;
-    typedef std::char_traits<CharT> traits_type;
-    typedef jsoncons::basic_string_view<value_type> string_view_type;
-private:
-    const value_type* data_;
-    const value_type* input_ptr_;
-    const value_type* input_end_;
-    bool eof_;
-
-    // Noncopyable 
-    string_source(const string_source&) = delete;
-    string_source& operator=(const string_source&) = delete;
-public:
-    string_source()
-        : data_(nullptr), input_ptr_(nullptr), input_end_(nullptr), eof_(true)  
-    {
-    }
-
-    template <class Source>
-    string_source(const Source& s,
-                  typename std::enable_if<is_string_sourceable<value_type,typename std::decay<Source>::type>::value>::type* = 0)
-        : data_(s.data()), input_ptr_(s.data()), input_end_(s.data()+s.size()), eof_(s.size() == 0)
-    {
-    }
-
-    string_source(const value_type* data, std::size_t size)
-        : data_(data), input_ptr_(data), input_end_(data+size), eof_(size == 0)  
-    {
-    }
-
-    string_source(string_source&& val) 
-        : data_(nullptr), input_ptr_(nullptr), input_end_(nullptr), eof_(true)
-    {
-        std::swap(data_,val.data_);
-        std::swap(input_ptr_,val.input_ptr_);
-        std::swap(input_end_,val.input_end_);
-        std::swap(eof_,val.eof_);
-    }
-
-    string_source& operator=(string_source&& val)
-    {
-        std::swap(data_,val.data_);
-        std::swap(input_ptr_,val.input_ptr_);
-        std::swap(input_end_,val.input_end_);
-        std::swap(eof_,val.eof_);
-        return *this;
-    }
-
-    bool eof() const
-    {
-        return eof_;  
-    }
-
-    bool is_error() const
-    {
-        return false;  
-    }
-
-    std::size_t position() const
-    {
-        return (input_ptr_ - data_)/sizeof(value_type) + 1;
-    }
-
-    std::size_t get(value_type& c)
-    {
-        if (input_ptr_ < input_end_)
-        {
-            c = *input_ptr_++;
-            return 1;
-        }
-        else
-       {
-            eof_ = true;
-            input_ptr_ = input_end_;
-            return 0;
-        }
-    }
-
-    int get()
-    {
-        if (input_ptr_ < input_end_)
-        {
-            return *input_ptr_++;
-        }
-        else
-       {
-            eof_ = true;
-            input_ptr_ = input_end_;
-            return traits_type::eof();
-        }
-    }
-
-    void ignore(std::size_t count)
-    {
-        std::size_t len;
-        if ((std::size_t)(input_end_ - input_ptr_) < count)
-        {
-            len = input_end_ - input_ptr_;
-            eof_ = true;
-        }
-        else
-        {
-            len = count;
-        }
-        input_ptr_ += len;
-    }
-
-    int peek() 
-    {
-        return input_ptr_ < input_end_ ? *input_ptr_ : traits_type::eof();
-    }
-
-    std::size_t read(value_type* p, std::size_t length)
-    {
-        std::size_t len;
-        if ((std::size_t)(input_end_ - input_ptr_) < length)
-        {
-            len = input_end_ - input_ptr_;
-            eof_ = true;
-        }
-        else
-        {
-            len = length;
-        }
-        std::memcpy(p, input_ptr_, len*sizeof(value_type));
-        input_ptr_  += len;
-        return len;
-    }
-
-    template <class OutputIt>
-    typename std::enable_if<!std::is_same<OutputIt,value_type*>::value,size_t>::type
-    read(OutputIt d_first, std::size_t count)
-    {
-        std::size_t len;
-        if ((std::size_t)(input_end_ - input_ptr_) < count)
-        {
-            len = input_end_ - input_ptr_;
-            eof_ = true;
-        }
-        else
-        {
-            len = count;
-        }
-        for (std::size_t i = 0; i < len; ++i)
-        {
-            *d_first++ = *input_ptr_++;
-        }
-        return len;
-    }
-};
-
-// binary sources
-
-class bin_stream_source 
-{
-public:
-    typedef uint8_t value_type;
-    typedef byte_traits traits_type;
-private:
-    basic_null_istream<char> null_is_;
-    std::istream* is_;
-    std::streambuf* sbuf_;
-    std::size_t position_;
-
-    // Noncopyable 
-    bin_stream_source(const bin_stream_source&) = delete;
-    bin_stream_source& operator=(const bin_stream_source&) = delete;
-public:
-    bin_stream_source()
-        : is_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0)
-    {
-    }
-
-    bin_stream_source(std::istream& is)
-        : is_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0)
-    {
-    }
-
-    bin_stream_source(bin_stream_source&& other) noexcept
-    {
-        std::swap(is_,other.is_);
-        std::swap(sbuf_,other.sbuf_);
-        std::swap(position_,other.position_);
-    }
-
-    ~bin_stream_source()
-    {
-    }
-
-    bin_stream_source& operator=(bin_stream_source&& other) noexcept
-    {
-        std::swap(is_,other.is_);
-        std::swap(sbuf_,other.sbuf_);
-        std::swap(position_,other.position_);
-        return *this;
-    }
-
-    bool eof() const
-    {
-        return is_->eof();  
-    }
-
-    bool is_error() const
-    {
-        return is_->bad();  
-    }
-
-    std::size_t position() const
-    {
-        return position_;
-    }
-
-    std::size_t get(value_type& c)
-    {
-        JSONCONS_TRY
-        {
-            int val = sbuf_->sbumpc();
-            if (!(val == traits_type::eof()))
+            JSONCONS_CATCH(const std::exception&)     
             {
-                c = (value_type)val;
-                ++position_;
-                return 1;
-            }
-            else
-            {
-                is_->clear(is_->rdstate() | std::ios::eofbit);
+                is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
                 return 0;
             }
         }
-        JSONCONS_CATCH(const std::exception&)     
-        {
-            is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
-            return 0;
-        }
-    }
 
-    int get()
-    {
-        JSONCONS_TRY
+        template <class OutputIt>
+        typename std::enable_if<!std::is_same<OutputIt,value_type*>::value,size_t>::type
+        read(OutputIt p, std::size_t length)
         {
-            int c = sbuf_->sbumpc();
-            if (c == traits_type::eof())
+            std::size_t count = 0;
+            JSONCONS_TRY
             {
-                is_->clear(is_->rdstate() | std::ios::eofbit);
+                for (count = 0; count < length; ++count)
+                {
+                    int c = sbuf_->sbumpc();
+                    if (c == traits_type::eof())
+                    {
+                        is_->clear(is_->rdstate() | std::ios::eofbit);
+                        return count;
+                    }
+                    else
+                    {
+                        ++position_;
+                    }
+                    *p++ = (value_type)c;
+                }
+                return count;
+            }
+            JSONCONS_CATCH(const std::exception&)     
+            {
+                is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                return count;
+            }
+        }
+    };
+
+    // string_source
+
+    template <class CharT, class T, class Enable=void>
+    struct is_string_sourceable : std::false_type {};
+
+    template <class CharT, class T>
+    struct is_string_sourceable<CharT,T,typename std::enable_if<std::is_same<typename T::value_type, CharT>::value>::type> : std::true_type {};
+
+    template <class CharT>
+    class string_source 
+    {
+    public:
+        typedef CharT value_type;
+        typedef std::char_traits<CharT> traits_type;
+        typedef jsoncons::basic_string_view<value_type> string_view_type;
+    private:
+        const value_type* data_;
+        const value_type* input_ptr_;
+        const value_type* input_end_;
+        bool eof_;
+
+        // Noncopyable 
+        string_source(const string_source&) = delete;
+        string_source& operator=(const string_source&) = delete;
+    public:
+        string_source()
+            : data_(nullptr), input_ptr_(nullptr), input_end_(nullptr), eof_(true)  
+        {
+        }
+
+        template <class Source>
+        string_source(const Source& s,
+                      typename std::enable_if<is_string_sourceable<value_type,typename std::decay<Source>::type>::value>::type* = 0)
+            : data_(s.data()), input_ptr_(s.data()), input_end_(s.data()+s.size()), eof_(s.size() == 0)
+        {
+        }
+
+        string_source(const value_type* data, std::size_t size)
+            : data_(data), input_ptr_(data), input_end_(data+size), eof_(size == 0)  
+        {
+        }
+
+        string_source(string_source&& val) 
+            : data_(nullptr), input_ptr_(nullptr), input_end_(nullptr), eof_(true)
+        {
+            std::swap(data_,val.data_);
+            std::swap(input_ptr_,val.input_ptr_);
+            std::swap(input_end_,val.input_end_);
+            std::swap(eof_,val.eof_);
+        }
+
+        string_source& operator=(string_source&& val)
+        {
+            std::swap(data_,val.data_);
+            std::swap(input_ptr_,val.input_ptr_);
+            std::swap(input_end_,val.input_end_);
+            std::swap(eof_,val.eof_);
+            return *this;
+        }
+
+        bool eof() const
+        {
+            return eof_;  
+        }
+
+        bool is_error() const
+        {
+            return false;  
+        }
+
+        std::size_t position() const
+        {
+            return (input_ptr_ - data_)/sizeof(value_type) + 1;
+        }
+
+        std::size_t get(value_type& c)
+        {
+            if (input_ptr_ < input_end_)
+            {
+                c = *input_ptr_++;
+                return 1;
+            }
+            else
+           {
+                eof_ = true;
+                input_ptr_ = input_end_;
+                return 0;
+            }
+        }
+
+        int get()
+        {
+            if (input_ptr_ < input_end_)
+            {
+                return *input_ptr_++;
+            }
+            else
+           {
+                eof_ = true;
+                input_ptr_ = input_end_;
+                return traits_type::eof();
+            }
+        }
+
+        void ignore(std::size_t count)
+        {
+            std::size_t len;
+            if ((std::size_t)(input_end_ - input_ptr_) < count)
+            {
+                len = input_end_ - input_ptr_;
+                eof_ = true;
             }
             else
             {
-                ++position_;
+                len = count;
             }
-            return c;
+            input_ptr_ += len;
         }
-        JSONCONS_CATCH(const std::exception&)     
-        {
-            is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
-            return traits_type::eof();
-        }
-    }
 
-    void ignore(std::size_t count)
-    {
-        JSONCONS_TRY
+        int peek() 
         {
-            for (std::size_t i = 0; i < count; ++i)
+            return input_ptr_ < input_end_ ? *input_ptr_ : traits_type::eof();
+        }
+
+        std::size_t read(value_type* p, std::size_t length)
+        {
+            std::size_t len;
+            if ((std::size_t)(input_end_ - input_ptr_) < length)
+            {
+                len = input_end_ - input_ptr_;
+                eof_ = true;
+            }
+            else
+            {
+                len = length;
+            }
+            std::memcpy(p, input_ptr_, len*sizeof(value_type));
+            input_ptr_  += len;
+            return len;
+        }
+
+        template <class OutputIt>
+        typename std::enable_if<!std::is_same<OutputIt,value_type*>::value,size_t>::type
+        read(OutputIt d_first, std::size_t count)
+        {
+            std::size_t len;
+            if ((std::size_t)(input_end_ - input_ptr_) < count)
+            {
+                len = input_end_ - input_ptr_;
+                eof_ = true;
+            }
+            else
+            {
+                len = count;
+            }
+            for (std::size_t i = 0; i < len; ++i)
+            {
+                *d_first++ = *input_ptr_++;
+            }
+            return len;
+        }
+    };
+
+    // binary sources
+
+    class binary_stream_source 
+    {
+    public:
+        typedef uint8_t value_type;
+        typedef byte_traits traits_type;
+    private:
+        basic_null_istream<char> null_is_;
+        std::istream* is_;
+        std::streambuf* sbuf_;
+        std::size_t position_;
+
+        // Noncopyable 
+        binary_stream_source(const binary_stream_source&) = delete;
+        binary_stream_source& operator=(const binary_stream_source&) = delete;
+    public:
+        binary_stream_source()
+            : is_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0)
+        {
+        }
+
+        binary_stream_source(std::istream& is)
+            : is_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0)
+        {
+        }
+
+        binary_stream_source(binary_stream_source&& other) noexcept
+        {
+            std::swap(is_,other.is_);
+            std::swap(sbuf_,other.sbuf_);
+            std::swap(position_,other.position_);
+        }
+
+        ~binary_stream_source()
+        {
+        }
+
+        binary_stream_source& operator=(binary_stream_source&& other) noexcept
+        {
+            std::swap(is_,other.is_);
+            std::swap(sbuf_,other.sbuf_);
+            std::swap(position_,other.position_);
+            return *this;
+        }
+
+        bool eof() const
+        {
+            return is_->eof();  
+        }
+
+        bool is_error() const
+        {
+            return is_->bad();  
+        }
+
+        std::size_t position() const
+        {
+            return position_;
+        }
+
+        std::size_t get(value_type& c)
+        {
+            JSONCONS_TRY
+            {
+                int val = sbuf_->sbumpc();
+                if (!(val == traits_type::eof()))
+                {
+                    c = (value_type)val;
+                    ++position_;
+                    return 1;
+                }
+                else
+                {
+                    is_->clear(is_->rdstate() | std::ios::eofbit);
+                    return 0;
+                }
+            }
+            JSONCONS_CATCH(const std::exception&)     
+            {
+                is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                return 0;
+            }
+        }
+
+        int get()
+        {
+            JSONCONS_TRY
             {
                 int c = sbuf_->sbumpc();
                 if (c == traits_type::eof())
                 {
                     is_->clear(is_->rdstate() | std::ios::eofbit);
-                    return;
                 }
                 else
                 {
                     ++position_;
                 }
+                return c;
+            }
+            JSONCONS_CATCH(const std::exception&)     
+            {
+                is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                return traits_type::eof();
             }
         }
-        JSONCONS_CATCH(const std::exception&)     
-        {
-            is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
-        }
-    }
 
-    int peek() 
-    {
-        JSONCONS_TRY
+        void ignore(std::size_t count)
         {
-            int c = sbuf_->sgetc();
-            if (c == traits_type::eof())
+            JSONCONS_TRY
             {
-                is_->clear(is_->rdstate() | std::ios::eofbit);
+                for (std::size_t i = 0; i < count; ++i)
+                {
+                    int c = sbuf_->sbumpc();
+                    if (c == traits_type::eof())
+                    {
+                        is_->clear(is_->rdstate() | std::ios::eofbit);
+                        return;
+                    }
+                    else
+                    {
+                        ++position_;
+                    }
+                }
             }
-            return c;
-        }
-        JSONCONS_CATCH(const std::exception&)     
-        {
-            is_->clear(is_->rdstate() | std::ios::badbit);
-            return traits_type::eof();
-        }
-    }
-
-    template <class OutputIt>
-    std::size_t read(OutputIt p, std::size_t length)
-    {
-        std::size_t count = 0;
-        JSONCONS_TRY
-        {
-            for (count = 0; count < length; ++count)
+            JSONCONS_CATCH(const std::exception&)     
             {
-                int c = sbuf_->sbumpc();
+                is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+            }
+        }
+
+        int peek() 
+        {
+            JSONCONS_TRY
+            {
+                int c = sbuf_->sgetc();
                 if (c == traits_type::eof())
                 {
                     is_->clear(is_->rdstate() | std::ios::eofbit);
-                    return count;
                 }
-                else
-                {
-                    ++position_;
-                }
-                *p++ = (value_type)c;
+                return c;
             }
-            return count;
+            JSONCONS_CATCH(const std::exception&)     
+            {
+                is_->clear(is_->rdstate() | std::ios::badbit);
+                return traits_type::eof();
+            }
         }
-        JSONCONS_CATCH(const std::exception&)     
+
+        template <class OutputIt>
+        std::size_t read(OutputIt p, std::size_t length)
         {
-            is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
-            return count;
+            std::size_t count = 0;
+            JSONCONS_TRY
+            {
+                for (count = 0; count < length; ++count)
+                {
+                    int c = sbuf_->sbumpc();
+                    if (c == traits_type::eof())
+                    {
+                        is_->clear(is_->rdstate() | std::ios::eofbit);
+                        return count;
+                    }
+                    else
+                    {
+                        ++position_;
+                    }
+                    *p++ = (value_type)c;
+                }
+                return count;
+            }
+            JSONCONS_CATCH(const std::exception&)     
+            {
+                is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                return count;
+            }
         }
-    }
-};
+    };
 
-template <class T, class Enable=void>
-struct is_bytes_sourceable : std::false_type {};
+    template <class T, class Enable=void>
+    struct is_bytes_sourceable : std::false_type {};
 
-template <class T>
-struct is_bytes_sourceable<T,typename std::enable_if<std::is_same<typename T::value_type,uint8_t>::value>::type> : std::true_type {};
+    template <class T>
+    struct is_bytes_sourceable<T,typename std::enable_if<std::is_same<typename T::value_type,uint8_t>::value>::type> : std::true_type {};
 
-class bytes_source 
-{
-public:
-    typedef uint8_t value_type;
-    typedef byte_traits traits_type;
-private:
-    const value_type* data_;
-    const value_type* input_ptr_;
-    const value_type* input_end_;
-    bool eof_;
-
-    // Noncopyable 
-    bytes_source(const bytes_source&) = delete;
-    bytes_source& operator=(const bytes_source&) = delete;
-public:
-    bytes_source()
-        : data_(nullptr), input_ptr_(nullptr), input_end_(nullptr), eof_(true)  
+    class bytes_source 
     {
-    }
+    public:
+        typedef uint8_t value_type;
+        typedef byte_traits traits_type;
+    private:
+        const value_type* data_;
+        const value_type* input_ptr_;
+        const value_type* input_end_;
+        bool eof_;
 
-    bytes_source(const span<const value_type>& s)
-        : data_(s.data()), 
-          input_ptr_(s.data()), 
-          input_end_(s.data()+s.size()), 
-          eof_(s.size() == 0)
-    {
-    }
-
-    bytes_source(const value_type* data, std::size_t size)
-        : data_(data), 
-          input_ptr_(data), 
-          input_end_(data+size), 
-          eof_(size == 0)  
-    {
-    }
-
-    bytes_source(bytes_source&&) = default;
-
-    bytes_source& operator=(bytes_source&&) = default;
-
-    bool eof() const
-    {
-        return eof_;  
-    }
-
-    bool is_error() const
-    {
-        return false;  
-    }
-
-    std::size_t position() const
-    {
-        return input_ptr_ - data_ + 1;
-    }
-
-    std::size_t get(value_type& c)
-    {
-        if (input_ptr_ < input_end_)
+        // Noncopyable 
+        bytes_source(const bytes_source&) = delete;
+        bytes_source& operator=(const bytes_source&) = delete;
+    public:
+        bytes_source()
+            : data_(nullptr), input_ptr_(nullptr), input_end_(nullptr), eof_(true)  
         {
-            c = *input_ptr_++;
-            return 1;
         }
-        else
-       {
-            eof_ = true;
-            input_ptr_ = input_end_;
-            return 0;
-        }
-    }
 
-    int get()
-    {
-        if (input_ptr_ < input_end_)
+        bytes_source(const span<const value_type>& s)
+            : data_(s.data()), 
+              input_ptr_(s.data()), 
+              input_end_(s.data()+s.size()), 
+              eof_(s.size() == 0)
         {
-            return *input_ptr_++;
         }
-        else
-       {
-            eof_ = true;
-            input_ptr_ = input_end_;
-            return traits_type::eof();
-        }
-    }
 
-    void ignore(std::size_t count)
-    {
-        std::size_t len;
-        if ((std::size_t)(input_end_ - input_ptr_) < count)
+        bytes_source(const value_type* data, std::size_t size)
+            : data_(data), 
+              input_ptr_(data), 
+              input_end_(data+size), 
+              eof_(size == 0)  
         {
-            len = input_end_ - input_ptr_;
-            eof_ = true;
         }
-        else
-        {
-            len = count;
-        }
-        input_ptr_ += len;
-    }
 
-    int peek() 
-    {
-        return input_ptr_ < input_end_ ? *input_ptr_ : traits_type::eof();
-    }
+        bytes_source(bytes_source&&) = default;
 
-    std::size_t read(value_type* p, std::size_t length)
-    {
-        std::size_t len;
-        if ((std::size_t)(input_end_ - input_ptr_) < length)
-        {
-            len = input_end_ - input_ptr_;
-            eof_ = true;
-        }
-        else
-        {
-            len = length;
-        }
-        std::memcpy(p, input_ptr_, len);
-        input_ptr_  += len;
-        return len;
-    }
+        bytes_source& operator=(bytes_source&&) = default;
 
-    template <class OutputIt>
-    typename std::enable_if<!std::is_same<OutputIt,value_type*>::value,size_t>::type
-    read(OutputIt d_first, std::size_t count)
-    {
-        std::size_t len;
-        if ((std::size_t)(input_end_ - input_ptr_) < count)
+        bool eof() const
         {
-            len = input_end_ - input_ptr_;
-            eof_ = true;
+            return eof_;  
         }
-        else
-        {
-            len = count;
-        }
-        for (std::size_t i = 0; i < len; ++i)
-        {
-            *d_first++ = *input_ptr_++;
-        }
-        return len;
-    }
-};
 
-}
+        bool is_error() const
+        {
+            return false;  
+        }
+
+        std::size_t position() const
+        {
+            return input_ptr_ - data_ + 1;
+        }
+
+        std::size_t get(value_type& c)
+        {
+            if (input_ptr_ < input_end_)
+            {
+                c = *input_ptr_++;
+                return 1;
+            }
+            else
+           {
+                eof_ = true;
+                input_ptr_ = input_end_;
+                return 0;
+            }
+        }
+
+        int get()
+        {
+            if (input_ptr_ < input_end_)
+            {
+                return *input_ptr_++;
+            }
+            else
+           {
+                eof_ = true;
+                input_ptr_ = input_end_;
+                return traits_type::eof();
+            }
+        }
+
+        void ignore(std::size_t count)
+        {
+            std::size_t len;
+            if ((std::size_t)(input_end_ - input_ptr_) < count)
+            {
+                len = input_end_ - input_ptr_;
+                eof_ = true;
+            }
+            else
+            {
+                len = count;
+            }
+            input_ptr_ += len;
+        }
+
+        int peek() 
+        {
+            return input_ptr_ < input_end_ ? *input_ptr_ : traits_type::eof();
+        }
+
+        std::size_t read(value_type* p, std::size_t length)
+        {
+            std::size_t len;
+            if ((std::size_t)(input_end_ - input_ptr_) < length)
+            {
+                len = input_end_ - input_ptr_;
+                eof_ = true;
+            }
+            else
+            {
+                len = length;
+            }
+            std::memcpy(p, input_ptr_, len);
+            input_ptr_  += len;
+            return len;
+        }
+
+        template <class OutputIt>
+        typename std::enable_if<!std::is_same<OutputIt,value_type*>::value,size_t>::type
+        read(OutputIt d_first, std::size_t count)
+        {
+            std::size_t len;
+            if ((std::size_t)(input_end_ - input_ptr_) < count)
+            {
+                len = input_end_ - input_ptr_;
+                eof_ = true;
+            }
+            else
+            {
+                len = count;
+            }
+            for (std::size_t i = 0; i < len; ++i)
+            {
+                *d_first++ = *input_ptr_++;
+            }
+            return len;
+        }
+    };
+
+    #if !defined(JSONCONS_NO_DEPRECATED)
+    typedef binary_stream_source bin_stream_source;
+    #endif
+
+} // namespace jsoncons
 
 #endif

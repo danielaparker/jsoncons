@@ -17,6 +17,13 @@ struct null_type
     explicit null_type() = default; 
 };
 
+struct temp_allocator_arg_t
+{
+    explicit temp_allocator_arg_t() = default; 
+};
+
+constexpr temp_allocator_arg_t temp_allocator_arg{};
+
 struct half_arg_t
 {
     explicit half_arg_t() = default; 

@@ -21,16 +21,16 @@
 
 namespace jsoncons { namespace msgpack {
 
-template <class Src,class WorkAllocator=std::allocator<char>>
+template <class Src,class Allocator=std::allocator<char>>
 class basic_msgpack_reader : public ser_context
 {
-    basic_msgpack_parser<Src,WorkAllocator> parser_;
+    basic_msgpack_parser<Src,Allocator> parser_;
     json_content_handler& handler_;
 public:
     template <class Source>
     basic_msgpack_reader(Source&& source, 
                          json_content_handler& handler,
-                         const WorkAllocator alloc=WorkAllocator())
+                         const Allocator alloc=Allocator())
        : parser_(std::forward<Source>(source), alloc),
          handler_(handler)
     {
@@ -67,7 +67,7 @@ public:
     }
 };
 
-typedef basic_msgpack_reader<jsoncons::bin_stream_source> msgpack_stream_reader;
+typedef basic_msgpack_reader<jsoncons::binary_stream_source> msgpack_stream_reader;
 
 typedef basic_msgpack_reader<jsoncons::bytes_source> msgpack_bytes_reader;
 
