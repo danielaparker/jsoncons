@@ -35,7 +35,7 @@ namespace jsoncons {
     decode_json(const std::basic_string<CharT>& s,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
     {
-        basic_json_cursor<CharT> cursor(s, options);
+        basic_json_cursor<CharT,string_source<CharT>> cursor(s, options, default_json_parsing());
         jsoncons::json_decoder<basic_json<CharT>> decoder;
         std::error_code ec;
         T val = deser_traits<T>::deserialize(cursor, decoder, ec);
@@ -62,7 +62,7 @@ namespace jsoncons {
     decode_json(std::basic_istream<CharT>& is,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
     {
-        basic_json_cursor<CharT> cursor(is, options);
+        basic_json_cursor<CharT> cursor(is, options, default_json_parsing());
         json_decoder<basic_json<CharT>> decoder{};
 
         std::error_code ec;
@@ -73,13 +73,30 @@ namespace jsoncons {
         }
         return val;
     }
-    template <class T, class CharT, class ImplementationPolicy, class Allocator>
-    T decode_json(const std::basic_string<CharT>& s,
-                  const basic_json_decode_options<CharT>& options,
-                  const basic_json<CharT,ImplementationPolicy,Allocator>& context_j)
+
+    // With leading allocator parameter
+
+    template <class T,class CharT,class TempAllocator>
+    typename std::enable_if<is_basic_json_class<T>::value,T>::type
+    decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+                const std::basic_string<CharT>& s,
+                const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
     {
-        basic_json_cursor<CharT> cursor(s, options);
-        json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> decoder(context_j.get_allocator());
+        json_decoder<T,TempAllocator> decoder(temp_alloc);
+
+        basic_json_reader<CharT, string_source<CharT>,TempAllocator> reader(s, decoder, options, temp_alloc);
+        reader.read();
+        return decoder.get_result();
+    }
+
+    template <class T,class CharT,class TempAllocator>
+    typename std::enable_if<!is_basic_json_class<T>::value,T>::type
+    decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+                const std::basic_string<CharT>& s,
+                const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
+    {
+        basic_json_cursor<CharT,string_source<CharT>,TempAllocator> cursor(s, options, default_json_parsing(), temp_alloc);
+        json_decoder<basic_json<CharT,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
 
         std::error_code ec;
         T val = deser_traits<T>::deserialize(cursor, decoder, ec);
@@ -90,13 +107,27 @@ namespace jsoncons {
         return val;
     }
 
-    template <class T, class CharT, class ImplementationPolicy, class Allocator>
-    T decode_json(std::basic_istream<CharT>& is,
-                  const basic_json_decode_options<CharT>& options,
-                  const basic_json<CharT,ImplementationPolicy,Allocator>& context_j)
+    template <class T,class CharT,class TempAllocator>
+    typename std::enable_if<is_basic_json_class<T>::value,T>::type
+    decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+                std::basic_istream<CharT>& is,
+                const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
     {
-        basic_json_cursor<CharT> cursor(is, options);
-        json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> decoder(context_j.get_allocator());
+        json_decoder<T,TempAllocator> decoder(temp_alloc);
+
+        basic_json_reader<CharT, stream_source<CharT>,TempAllocator> reader(is, decoder, options, temp_alloc);
+        reader.read();
+        return decoder.get_result();
+    }
+
+    template <class T,class CharT,class TempAllocator>
+    typename std::enable_if<!is_basic_json_class<T>::value,T>::type
+    decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+                std::basic_istream<CharT>& is,
+                const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
+    {
+        basic_json_cursor<CharT,stream_source<CharT>,TempAllocator> cursor(is, options, default_json_parsing(), temp_alloc);
+        json_decoder<basic_json<CharT,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc,temp_alloc);
 
         std::error_code ec;
         T val = deser_traits<T>::deserialize(cursor, decoder, ec);
@@ -106,44 +137,6 @@ namespace jsoncons {
         }
         return val;
     }
-
-    #if !defined(JSONCONS_NO_DEPRECATED)
-    template <class T, class CharT, class ImplementationPolicy, class Allocator>
-    JSONCONS_DEPRECATED_MSG("Instead, use decode_json(const std::basic_string<CharT>&, const basic_json_decode_options<CharT>&, const basic_json<CharT,ImplementationPolicy,Allocator>&)")
-    T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context_j,
-                  const std::basic_string<CharT>& s,
-                  const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
-    {
-        basic_json_cursor<CharT> cursor(s, options);
-        json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> decoder(context_j.get_allocator());
-
-        std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
-        if (ec)
-        {
-            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
-        }
-        return val;
-    }
-
-    template <class T, class CharT, class ImplementationPolicy, class Allocator>
-    JSONCONS_DEPRECATED_MSG("Instead, use decode_json(const std::basic_istream<CharT>&, const basic_json_decode_options<CharT>&, const basic_json<CharT,ImplementationPolicy,Allocator>&)")
-    T decode_json(const basic_json<CharT,ImplementationPolicy,Allocator>& context_j,
-                  std::basic_istream<CharT>& is,
-                  const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
-    {
-        basic_json_cursor<CharT> cursor(is, options);
-        json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> decoder(context_j.get_allocator());
-
-        std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
-        if (ec)
-        {
-            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
-        }
-        return val;
-    }
-    #endif
 
 } // jsoncons
 

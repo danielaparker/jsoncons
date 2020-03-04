@@ -706,8 +706,8 @@ integer_from_json(const CharT* s, std::size_t length)
     const CharT* end = s + length; 
     if (*s == '-')
     {
-        static const T min_value = (std::numeric_limits<T>::lowest)();
-        static const T min_value_div_10 = min_value / 10;
+        static constexpr T min_value = (std::numeric_limits<T>::lowest)();
+        static constexpr T min_value_div_10 = min_value / 10;
         ++s;
         for (; s < end; ++s)
         {
@@ -727,8 +727,8 @@ integer_from_json(const CharT* s, std::size_t length)
     }
     else
     {
-        static const T max_value = (std::numeric_limits<T>::max)();
-        static const T max_value_div_10 = max_value / 10;
+        static constexpr T max_value = (std::numeric_limits<T>::max)();
+        static constexpr T max_value_div_10 = max_value / 10;
         for (; s < end; ++s)
         {
             T x = static_cast<T>(*s) - static_cast<T>('0');
@@ -767,8 +767,8 @@ integer_from_json(const CharT* s, std::size_t length)
     const CharT* end = s + length; 
     if (*s == '-')
     {
-        static const T min_value = (std::numeric_limits<T>::lowest)();
-        static const T min_value_div_10 = min_value / 10;
+        static constexpr T min_value = (std::numeric_limits<T>::lowest)();
+        static constexpr T min_value_div_10 = min_value / 10;
         ++s;
         for (; s < end; ++s)
         {
@@ -788,8 +788,8 @@ integer_from_json(const CharT* s, std::size_t length)
     }
     else
     {
-        static const T max_value = (std::numeric_limits<T>::max)();
-        static const T max_value_div_10 = max_value / 10;
+        static constexpr T max_value = (std::numeric_limits<T>::max)();
+        static constexpr T max_value_div_10 = max_value / 10;
         for (; s < end; ++s)
         {
             T x = static_cast<T>(*s) - static_cast<T>('0');
@@ -823,8 +823,8 @@ base16_to_integer(const CharT* s, std::size_t length)
     const CharT* end = s + length; 
     if (*s == '-')
     {
-        static const T min_value = (std::numeric_limits<T>::lowest)();
-        static const T min_value_div_16 = min_value / 16;
+        static constexpr T min_value = (std::numeric_limits<T>::lowest)();
+        static constexpr T min_value_div_16 = min_value / 16;
         ++s;
         for (; s < end; ++s)
         {
@@ -858,8 +858,8 @@ base16_to_integer(const CharT* s, std::size_t length)
     }
     else
     {
-        static const T max_value = (std::numeric_limits<T>::max)();
-        static const T max_value_div_16 = max_value / 16;
+        static constexpr T max_value = (std::numeric_limits<T>::max)();
+        static constexpr T max_value_div_16 = max_value / 16;
         for (; s < end; ++s)
         {
             CharT c = *s;
@@ -905,8 +905,8 @@ base16_to_integer(const CharT* s, std::size_t length)
     T n = 0;
     const CharT* end = s + length; 
 
-    static const T max_value = (std::numeric_limits<T>::max)();
-    static const T max_value_div_16 = max_value / 16;
+    static constexpr T max_value = (std::numeric_limits<T>::max)();
+    static constexpr T max_value_div_16 = max_value / 16;
     for (; s < end; ++s)
     {
         CharT c = *s;

@@ -41,7 +41,7 @@ namespace jsoncons {
 
 struct sorted_policy 
 {
-    static constexpr bool preserve_order = false;
+    using key_order = sort_key_order;
 
     template <class T,class Allocator>
     using sequence_container_type = std::vector<T,Allocator>;
@@ -54,7 +54,7 @@ struct sorted_policy
 
 struct preserve_order_policy : public sorted_policy
 {
-    static constexpr bool preserve_order = true;
+    using key_order = preserve_key_order;
 };
 
 template <typename IteratorT>
@@ -2875,13 +2875,18 @@ public:
 
     static const basic_json& null()
     {
-        static basic_json a_null = basic_json(null_type(), semantic_tag::none);
+        static const basic_json a_null = basic_json(null_type(), semantic_tag::none);
         return a_null;
     }
 
     variant var_;
 
-    constexpr basic_json(semantic_tag tag = semantic_tag::none) 
+    basic_json() 
+        : var_(semantic_tag::none)
+    {
+    }
+
+    basic_json(semantic_tag tag) 
         : var_(tag)
     {
     }
@@ -3028,24 +3033,24 @@ public:
     {
     }
 
-    constexpr basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none)
+    basic_json(half_arg_t, uint16_t value, semantic_tag tag = semantic_tag::none)
         : var_(half_arg, value, tag)
     {
     }
 
-    constexpr basic_json(double val, semantic_tag tag)
+    basic_json(double val, semantic_tag tag)
         : var_(val, tag)
     {
     }
 
     template <class Unsigned>
-    constexpr basic_json(Unsigned val, semantic_tag tag, typename std::enable_if<std::is_integral<Unsigned>::value && !std::is_signed<Unsigned>::value>::type* = 0)
+    basic_json(Unsigned val, semantic_tag tag, typename std::enable_if<std::is_integral<Unsigned>::value && !std::is_signed<Unsigned>::value>::type* = 0)
         : var_(static_cast<uint64_t>(val), tag)
     {
     }
 
     template <class Signed>
-    constexpr basic_json(Signed val, semantic_tag tag, typename std::enable_if<std::is_integral<Signed>::value && std::is_signed<Signed>::value>::type* = 0)
+    basic_json(Signed val, semantic_tag tag, typename std::enable_if<std::is_integral<Signed>::value && std::is_signed<Signed>::value>::type* = 0)
         : var_(static_cast<int64_t>(val), tag)
     {
     }
@@ -3060,12 +3065,12 @@ public:
     {
     }
 
-    constexpr basic_json(null_type val, semantic_tag tag)
+    basic_json(null_type val, semantic_tag tag)
         : var_(val, tag)
     {
     }
 
-    constexpr basic_json(bool val, semantic_tag tag)
+    basic_json(bool val, semantic_tag tag)
         : var_(val, tag)
     {
     }
@@ -4649,7 +4654,7 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use parse(parse(const string_view_type&, std::function<bool(json_errc,const ser_context&)>)")
-    static basic_json parse_string(const string_view_type& s, std::function<bool(json_errc,const ser_context&)> err_handler)
+    static const basic_json parse_string(const string_view_type& s, std::function<bool(json_errc,const ser_context&)> err_handler)
     {
         return parse(s,err_handler);
     }
@@ -5232,11 +5237,10 @@ public:
 
     range<object_iterator> object_range()
     {
-        static basic_json empty_object = object();
         switch (var_.storage())
         {
         case storage_kind::empty_object_value:
-            return range<object_iterator>(empty_object.object_range().begin(), empty_object.object_range().end());
+            return range<object_iterator>(object_iterator(), object_iterator());
         case storage_kind::object_value:
             return range<object_iterator>(object_value().begin(),object_value().end());
         default:
@@ -5246,11 +5250,10 @@ public:
 
     range<const_object_iterator> object_range() const
     {
-        static const basic_json empty_object = object();
         switch (var_.storage())
         {
         case storage_kind::empty_object_value:
-            return range<const_object_iterator>(empty_object.object_range().begin(), empty_object.object_range().end());
+            return range<const_object_iterator>(const_object_iterator(), const_object_iterator());
         case storage_kind::object_value:
             return range<const_object_iterator>(object_value().begin(),object_value().end());
         default:

@@ -358,8 +358,8 @@ public:
     using typename super_type::char_type;
     using typename super_type::string_type;
 
-    static const uint8_t indent_size_default = 4;
-    static const size_t line_length_limit_default = 120;
+    static constexpr uint8_t indent_size_default = 4;
+    static constexpr size_t line_length_limit_default = 120;
 protected:
     bool escape_all_non_ascii_:1;
     bool escape_solidus_:1;
