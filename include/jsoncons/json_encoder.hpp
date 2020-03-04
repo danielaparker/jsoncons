@@ -22,7 +22,7 @@
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/sink.hpp>
-#include <jsoncons/detail/print_number.hpp>
+#include <jsoncons/detail/write_number.hpp>
 
 namespace jsoncons { namespace detail {
 template <class CharT, class Sink>
@@ -289,7 +289,7 @@ private:
 
     const basic_json_encode_options<CharT> options_;
 
-    jsoncons::detail::print_double fp_;
+    jsoncons::detail::write_double fp_;
 
     Sink result_;
 
@@ -814,7 +814,7 @@ private:
                 break_line();
             }
         }
-        std::size_t length = jsoncons::detail::print_integer(value, result_);
+        std::size_t length = jsoncons::detail::write_integer(value, result_);
         column_ += length;
         end_value();
         return true;
@@ -836,7 +836,7 @@ private:
                 break_line();
             }
         }
-        std::size_t length = jsoncons::detail::print_uinteger(value, result_);
+        std::size_t length = jsoncons::detail::write_uinteger(value, result_);
         column_ += length;
         end_value();
         return true;
@@ -1046,7 +1046,7 @@ private:
     const basic_json_encode_options<CharT> options_;
 
     std::vector<encoding_context> stack_;
-    jsoncons::detail::print_double fp_;
+    jsoncons::detail::write_double fp_;
     Sink result_;
 
     // Noncopyable and nonmoveable
@@ -1388,7 +1388,7 @@ private:
         {
             result_.push_back(',');
         }
-        jsoncons::detail::print_integer(value, result_);
+        jsoncons::detail::write_integer(value, result_);
         if (!stack_.empty())
         {
             stack_.back().increment_count();
@@ -1405,7 +1405,7 @@ private:
         {
             result_.push_back(',');
         }
-        jsoncons::detail::print_uinteger(value, result_);
+        jsoncons::detail::write_uinteger(value, result_);
         if (!stack_.empty())
         {
             stack_.back().increment_count();

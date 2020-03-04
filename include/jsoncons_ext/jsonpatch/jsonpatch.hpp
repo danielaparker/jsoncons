@@ -117,7 +117,7 @@ namespace detail {
             {
                 std::basic_string<char_type> ss(path); 
                 ss.push_back('/');
-                jsoncons::detail::print_integer(i,ss);
+                jsoncons::detail::write_integer(i,ss);
                 auto temp_diff = from_diff(source[i],target[i],ss);
                 result.insert(result.array_range().end(),temp_diff.array_range().begin(),temp_diff.array_range().end());
             }
@@ -126,7 +126,7 @@ namespace detail {
             {
                 std::basic_string<char_type> ss(path); 
                 ss.push_back('/');
-                jsoncons::detail::print_integer(i,ss);
+                jsoncons::detail::write_integer(i,ss);
                 Json val = typename Json::object();
                 val.insert_or_assign(op_literal<char_type>(), remove_literal<char_type>());
                 val.insert_or_assign(path_literal<char_type>(), ss);
@@ -139,7 +139,7 @@ namespace detail {
                 const auto& a = target[i];
                 std::basic_string<char_type> ss(path); 
                 ss.push_back('/');
-                jsoncons::detail::print_integer(i,ss);
+                jsoncons::detail::write_integer(i,ss);
                 Json val = typename Json::object();
                 val.insert_or_assign(op_literal<char_type>(), add_literal<char_type>());
                 val.insert_or_assign(path_literal<char_type>(), ss);

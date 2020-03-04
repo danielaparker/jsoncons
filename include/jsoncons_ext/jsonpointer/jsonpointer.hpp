@@ -18,7 +18,7 @@
 #include <type_traits> // std::enable_if, std::true_type
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
-#include <jsoncons/detail/print_number.hpp>
+#include <jsoncons/detail/write_number.hpp>
 
 namespace jsoncons { namespace jsonpointer {
 
