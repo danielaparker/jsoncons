@@ -885,11 +885,19 @@ public:
 
         storage_kind storage() const
         {
+            // It is legal to access 'common_stor_.ext_type_' even though 
+            // common_stor_ is not the active member of the union because 'ext_type_' 
+            // is a part of the common initial sequence of all union members
+            // as defined in 11.4-25 of the Standard.
             return to_storage(common_stor_.ext_type_);
         }
 
         semantic_tag tag() const
         {
+            // It is legal to access 'common_stor_.ext_type_' even though 
+            // common_stor_ is not the active member of the union because 'ext_type_' 
+            // is a part of the common initial sequence of all union members
+            // as defined in 11.4-25 of the Standard.
             return to_tag(common_stor_.ext_type_);
         }
 
