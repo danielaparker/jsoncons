@@ -14,6 +14,14 @@ T decode_cbor(const std::vector<uint8_t>& v); // (1)
 
 template<class T>
 T decode_cbor(std::istream& is); // (2)
+
+template<class T,class TempAllocator>
+T decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+              const std::vector<uint8_t>& v); // (3)
+
+template<class T,class TempAllocator>
+T decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+              std::istream& is); // (4)
 ```
 
 (1) Reads a CBOR bytes buffer into a type T if T is an instantiation of [basic_json](../basic_json.md) 
