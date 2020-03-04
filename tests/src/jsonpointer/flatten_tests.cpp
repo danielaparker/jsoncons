@@ -56,7 +56,7 @@ TEST_CASE("flatten test")
         CHECK(result["/reputons/1/rater"].as<std::string>() == std::string("HikingAsylum"));
         CHECK(result["/reputons/1/rating"].as<double>() == Approx(0.75).epsilon(0.0000001));
 
-        std::cout << pretty_print(result) << "\n";
+        //std::cout << pretty_print(result) << "\n";
     }
 }
 

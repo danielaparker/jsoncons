@@ -977,8 +977,8 @@ enum class pointer_state
     Json flatten(const Json& value)
     {
         Json result;
-        std::basic_string<typename Json::char_type> reference_string;
-        flatten(reference_string, value, result);
+        std::basic_string<typename Json::char_type> parent_key;
+        flatten(parent_key, value, result);
         return result;
     }
 

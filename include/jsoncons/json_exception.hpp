@@ -17,15 +17,8 @@ namespace jsoncons {
 
 // json_exception
 
-class json_exception 
-{
-public:
-    virtual ~json_exception() = default;
-    virtual const char* what() const noexcept = 0;
-};
-
 template <class Base>
-class json_runtime_error : public Base, public virtual json_exception
+class json_runtime_error : public Base
 {
 public:
     json_runtime_error(const std::string& s) noexcept
@@ -43,7 +36,7 @@ private:
     std::string message_;
 };
 
-class key_not_found : public std::out_of_range, public virtual json_exception
+class key_not_found : public std::out_of_range
 {
 public:
     template <class CharT>
@@ -66,7 +59,7 @@ private:
     std::string buffer_;
 };
 
-class not_an_object : public std::runtime_error, public virtual json_exception
+class not_an_object : public std::runtime_error
 {
 public:
     template <class CharT>
@@ -89,7 +82,7 @@ private:
     std::string buffer_;
 };
 
-class ser_error : public std::system_error, public virtual json_exception
+class ser_error : public std::system_error
 {
 public:
     ser_error(std::error_code ec)

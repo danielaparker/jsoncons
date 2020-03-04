@@ -82,7 +82,7 @@ namespace std {
 
 namespace jsoncons { namespace jsonpatch {
 
-    class jsonpatch_error : public std::system_error, public virtual json_exception
+    class jsonpatch_error : public std::system_error
     {
     public:
         jsonpatch_error(const std::error_code& ec)
@@ -93,11 +93,6 @@ namespace jsoncons { namespace jsonpatch {
         jsonpatch_error(const jsonpatch_error& other) = default;
 
         jsonpatch_error(jsonpatch_error&& other) = default;
-
-        const char* what() const noexcept override
-        {
-            return this->code().message().c_str();
-        }
 
         jsonpatch_error& operator=(const jsonpatch_error& e) = default;
         jsonpatch_error& operator=(jsonpatch_error&& e) = default;
