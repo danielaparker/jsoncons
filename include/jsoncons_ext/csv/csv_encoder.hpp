@@ -9,7 +9,6 @@
 
 #include <array> // std::array
 #include <string>
-#include <sstream>
 #include <vector>
 #include <ostream>
 #include <utility> // std::move

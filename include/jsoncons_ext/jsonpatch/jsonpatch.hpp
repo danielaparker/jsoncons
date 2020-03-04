@@ -8,7 +8,6 @@
 #define JSONCONS_JSONPOINTER_JSONPATCH_HPP
 
 #include <string>
-#include <sstream>
 #include <vector> 
 #include <memory>
 #include <algorithm> // std::min
