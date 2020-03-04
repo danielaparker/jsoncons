@@ -29,17 +29,19 @@ write_integer(Integer value, Result& result)
     typedef typename Result::value_type char_type;
     typedef typename std::make_unsigned<Integer>::type unsigned_type;
 
-    std::size_t count = 0;
-
     char_type buf[255];
     unsigned_type u = (value < 0) ? static_cast<unsigned_type>(-value) : static_cast<unsigned_type>(value);
     char_type *p = buf;
+    const char_type* last = buf+255;
+
     do
     {
         *p++ = static_cast<char_type>(48 + u % 10);
     }
-    while (u /= 10);
-    count += (p - buf);
+    while ((u /= 10) && (p < last));
+    JSONCONS_ASSERT(p != last);
+
+    std::size_t count = (p - buf);
     if (value < 0)
     {
         result.push_back('-');
@@ -59,16 +61,17 @@ write_integer(Integer value, Result& result)
 {
     typedef typename Result::value_type char_type;
 
-    std::size_t count = 0;
-
     char_type buf[255];
     char_type *p = buf;
+    const char_type* last = buf+255;
     do
     {
         *p++ = static_cast<char_type>(48 + value % 10);
     }
-    while (value /= 10);
-    count += (p - buf);
+    while ((value /= 10) && (p < last));
+    JSONCONS_ASSERT(p != last);
+
+    std::size_t count = (p - buf);
     while (--p >= buf)
     {
         result.push_back(*p);
