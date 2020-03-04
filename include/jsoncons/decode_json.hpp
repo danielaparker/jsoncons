@@ -74,6 +74,8 @@ namespace jsoncons {
         return val;
     }
 
+    // With leading allocator parameter
+
     template <class T,class CharT,class TempAllocator>
     typename std::enable_if<is_basic_json_class<T>::value,T>::type
     decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
@@ -113,7 +115,7 @@ namespace jsoncons {
     {
         json_decoder<T,TempAllocator> decoder(temp_alloc);
 
-        basic_json_reader<CharT, string_source<CharT>,TempAllocator> reader(is, decoder, options, temp_alloc);
+        basic_json_reader<CharT, stream_source<CharT>,TempAllocator> reader(is, decoder, options, temp_alloc);
         reader.read();
         return decoder.get_result();
     }

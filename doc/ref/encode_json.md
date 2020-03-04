@@ -4,7 +4,7 @@ Encode a C++ data structure to a JSON formatted string or stream. `encode_json` 
 have [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) defined.
 
 ```c++
-#include <jsoncons/json.hpp>
+#include <jsoncons/encode_json.hpp>
 
 template <class T, class CharT>
 void encode_json(const T& val, 

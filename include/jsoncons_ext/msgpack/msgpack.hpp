@@ -18,133 +18,174 @@
 #include <jsoncons_ext/msgpack/msgpack_reader.hpp>
 #include <jsoncons_ext/msgpack/msgpack_cursor.hpp>
 
-namespace jsoncons { namespace msgpack {
+namespace jsoncons { 
+namespace msgpack {
 
-// encode_msgpack
+    // encode_msgpack
 
-template<class T>
-typename std::enable_if<is_basic_json_class<T>::value,void>::type 
-encode_msgpack(const T& j, std::vector<uint8_t>& v)
-{
-    typedef typename T::char_type char_type;
-    msgpack_bytes_encoder encoder(v);
-    auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
-    j.dump(adaptor);
-}
-
-template<class T>
-typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
-encode_msgpack(const T& val, std::vector<uint8_t>& v)
-{
-    msgpack_bytes_encoder encoder(v);
-    std::error_code ec;
-    ser_traits<T>::serialize(val, encoder, json(), ec);
-    if (ec)
+    template<class T>
+    typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+    encode_msgpack(const T& j, std::vector<uint8_t>& v)
     {
-        JSONCONS_THROW(ser_error(ec));
+        typedef typename T::char_type char_type;
+        msgpack_bytes_encoder encoder(v);
+        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        j.dump(adaptor);
     }
-}
 
-template<class T>
-typename std::enable_if<is_basic_json_class<T>::value,void>::type 
-encode_msgpack(const T& j, std::ostream& os)
-{
-    typedef typename T::char_type char_type;
-    msgpack_stream_encoder encoder(os);
-    auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
-    j.dump(adaptor);
-}
-
-template<class T>
-typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
-encode_msgpack(const T& val, std::ostream& os)
-{
-    msgpack_stream_encoder encoder(os);
-    std::error_code ec;
-    ser_traits<T>::serialize(val, encoder, json(), ec);
-    if (ec)
+    template<class T>
+    typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+    encode_msgpack(const T& val, std::vector<uint8_t>& v)
     {
-        JSONCONS_THROW(ser_error(ec));
+        msgpack_bytes_encoder encoder(v);
+        std::error_code ec;
+        ser_traits<T>::serialize(val, encoder, json(), ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec));
+        }
     }
-}
 
-// decode_msgpack
-
-template<class T>
-typename std::enable_if<is_basic_json_class<T>::value,T>::type 
-decode_msgpack(const std::vector<uint8_t>& v)
-{
-    jsoncons::json_decoder<T> decoder;
-    auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
-    basic_msgpack_reader<jsoncons::bytes_source> reader(v, adaptor);
-    std::error_code ec;
-    reader.read(ec);
-    if (ec)
+    template<class T>
+    typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+    encode_msgpack(const T& j, std::ostream& os)
     {
-        JSONCONS_THROW(ser_error(ec,reader.line(),reader.column()));
+        typedef typename T::char_type char_type;
+        msgpack_stream_encoder encoder(os);
+        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        j.dump(adaptor);
     }
-    return decoder.get_result();
-}
 
-template<class T>
-typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
-decode_msgpack(const std::vector<uint8_t>& v)
-{
-    msgpack_bytes_cursor cursor(v);
-    jsoncons::json_decoder<json> decoder;
-
-    std::error_code ec;
-    T val = deser_traits<T>::deserialize(cursor, decoder, ec);
-    if (ec)
+    template<class T>
+    typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+    encode_msgpack(const T& val, std::ostream& os)
     {
-        JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+        msgpack_stream_encoder encoder(os);
+        std::error_code ec;
+        ser_traits<T>::serialize(val, encoder, json(), ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec));
+        }
     }
-    return val;
-}
 
-template<class T>
-typename std::enable_if<is_basic_json_class<T>::value,T>::type 
-decode_msgpack(std::istream& is)
-{
-    jsoncons::json_decoder<T> decoder;
-    auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
-    msgpack_stream_reader reader(is, adaptor);
-    std::error_code ec;
-    reader.read(ec);
-    if (ec)
+    // decode_msgpack
+
+    template<class T>
+    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+    decode_msgpack(const std::vector<uint8_t>& v)
     {
-        JSONCONS_THROW(ser_error(ec,reader.line(),reader.column()));
+        jsoncons::json_decoder<T> decoder;
+        auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
+        basic_msgpack_reader<jsoncons::bytes_source> reader(v, adaptor);
+        reader.read();
+        return decoder.get_result();
     }
-    return decoder.get_result();
-}
 
-template<class T>
-typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
-decode_msgpack(std::istream& is)
-{
-    msgpack_stream_cursor cursor(is);
-    jsoncons::json_decoder<json> decoder;
-
-    std::error_code ec;
-    T val = deser_traits<T>::deserialize(cursor, decoder, ec);
-    if (ec)
+    template<class T>
+    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+    decode_msgpack(const std::vector<uint8_t>& v)
     {
-        JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
-    }
-    return val;
-}
-  
-#if !defined(JSONCONS_NO_DEPRECATED)
-template<class Json>
-JSONCONS_DEPRECATED_MSG("Instead, use encode_msgpack(const T&, std::vector<uint8_t>&")
-std::vector<uint8_t> encode_msgpack(const Json& j)
-{
-    std::vector<uint8_t> v;
-    encode_msgpack(j, v);
-    return v;
-}
-#endif
+        basic_msgpack_cursor<bytes_source> cursor(v);
+        json_decoder<basic_json<char,sorted_policy>> decoder();
 
-}}
+        std::error_code ec;
+        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+        }
+        return val;
+    }
+
+    template<class T>
+    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+    decode_msgpack(std::istream& is)
+    {
+        jsoncons::json_decoder<T> decoder;
+        auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
+        msgpack_stream_reader reader(is, adaptor);
+        reader.read();
+        return decoder.get_result();
+    }
+
+    template<class T>
+    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+    decode_msgpack(std::istream& is)
+    {
+        basic_msgpack_cursor<binary_stream_source> cursor(is);
+        json_decoder<basic_json<char,sorted_policy>> decoder();
+
+        std::error_code ec;
+        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+        }
+        return val;
+    }
+
+    // With leading allocator parameter
+
+    template<class T,class TempAllocator>
+    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+    decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+                   const std::vector<uint8_t>& v)
+    {
+        json_decoder<T,TempAllocator> decoder(temp_alloc);
+        auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
+        basic_msgpack_reader<jsoncons::bytes_source,TempAllocator> reader(v, adaptor, temp_alloc);
+        reader.read();
+        return decoder.get_result();
+    }
+
+    template<class T,class TempAllocator>
+    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+    decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+                   const std::vector<uint8_t>& v)
+    {
+        basic_msgpack_cursor<bytes_source,TempAllocator> cursor(v, temp_alloc);
+        json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
+
+        std::error_code ec;
+        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+        }
+        return val;
+    }
+
+    template<class T,class TempAllocator>
+    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+    decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+                   std::istream& is)
+    {
+        json_decoder<T,TempAllocator> decoder(temp_alloc);
+        auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
+        basic_msgpack_reader<jsoncons::binary_stream_source,TempAllocator> reader(is, adaptor, temp_alloc);
+        reader.read();
+        return decoder.get_result();
+    }
+
+    template<class T,class TempAllocator>
+    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+    decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+                   std::istream& is)
+    {
+        basic_msgpack_cursor<binary_stream_source,TempAllocator> cursor(is, temp_alloc);
+        json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
+
+        std::error_code ec;
+        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+        }
+        return val;
+    }
+
+} // msgpack
+} // jsoncons
 
 #endif

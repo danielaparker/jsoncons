@@ -740,7 +740,7 @@ namespace jsoncons {
     };
 
     #if !defined(JSONCONS_NO_DEPRECATED)
-    typeded binary_stream_source bin_stream_source;
+    typedef binary_stream_source bin_stream_source;
     #endif
 
 } // namespace jsoncons
