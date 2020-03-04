@@ -2,7 +2,7 @@
 // Distributed under Boost license
 
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/detail/print_number.hpp>
+#include <jsoncons/detail/write_number.hpp>
 #include <catch/catch.hpp>
 #include <iostream>
 #include <cstdio>

@@ -8,7 +8,6 @@
 #define JSONCONS_JSONPOINTER_JSONPOINTER_HPP
 
 #include <string>
-#include <sstream>
 #include <vector>
 #include <memory>
 #include <iostream>
@@ -18,7 +17,7 @@
 #include <type_traits> // std::enable_if, std::true_type
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
-#include <jsoncons/detail/print_number.hpp>
+#include <jsoncons/detail/write_number.hpp>
 
 namespace jsoncons { namespace jsonpointer {
 
@@ -867,24 +866,25 @@ void replace(J& root, const typename J::string_view_type& path, const J& value, 
     evaluator.replace(root, path, value, ec);
 }
 
-template <class String>
-void escape(const String& s, std::basic_ostringstream<typename String::value_type>& os)
+template <class String,class Result>
+typename std::enable_if<std::is_convertible<typename String::value_type,typename Result::value_type>::value>::type
+escape(const String& s, Result& result)
 {
     for (auto c : s)
     {
         if (c == '~')
         {
-            os.put('~');
-            os.put('0');
+            result.push_back('~');
+            result.push_back('0');
         }
         else if (c == '/')
         {
-            os.put('~');
-            os.put('1');
+            result.push_back('~');
+            result.push_back('1');
         }
         else
         {
-            os.put(c);
+            result.push_back(c);
         }
     }
 }

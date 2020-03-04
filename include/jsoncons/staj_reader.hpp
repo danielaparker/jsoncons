@@ -21,7 +21,7 @@
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/sink.hpp>
-#include <jsoncons/detail/print_number.hpp>
+#include <jsoncons/detail/write_number.hpp>
 
 namespace jsoncons {
 
@@ -223,19 +223,19 @@ public:
         case staj_event_type::int64_value:
         {
             jsoncons::string_sink<T> sink(s);
-            jsoncons::detail::print_integer(value_.int64_value_, sink);
+            jsoncons::detail::write_integer(value_.int64_value_, sink);
             break;
         }
         case staj_event_type::uint64_value:
         {
             jsoncons::string_sink<T> sink(s);
-            jsoncons::detail::print_uinteger(value_.uint64_value_, sink);
+            jsoncons::detail::write_integer(value_.uint64_value_, sink);
             break;
         }
         case staj_event_type::half_value:
         {
             jsoncons::string_sink<T> sink(s);
-            jsoncons::detail::print_double f{float_chars_format::general,0};
+            jsoncons::detail::write_double f{float_chars_format::general,0};
             double x = jsoncons::detail::decode_half(value_.half_value_);
             f(x, sink);
             break;
@@ -243,7 +243,7 @@ public:
         case staj_event_type::double_value:
         {
             jsoncons::string_sink<T> sink(s);
-            jsoncons::detail::print_double f{float_chars_format::general,0};
+            jsoncons::detail::write_double f{float_chars_format::general,0};
             f(value_.double_value_, sink);
             break;
         }

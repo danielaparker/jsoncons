@@ -666,7 +666,7 @@ namespace detail {
             for (const auto& item : val)
             {
                 typename Json::key_type key;
-                jsoncons::detail::print_integer(item.first,key);
+                jsoncons::detail::write_integer(item.first,key);
                 j.try_emplace(key, item.second);
             }
             return j;
@@ -679,7 +679,7 @@ namespace detail {
             for (const auto& item : val)
             {
                 typename Json::key_type key{alloc};
-                jsoncons::detail::print_integer(item.first,key);
+                jsoncons::detail::write_integer(item.first,key);
                 j.try_emplace(key, item.second, alloc);
             }
             return j;

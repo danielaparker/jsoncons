@@ -9,7 +9,6 @@
 
 #include <array> // std::array
 #include <string>
-#include <sstream>
 #include <vector>
 #include <ostream>
 #include <utility> // std::move
@@ -18,7 +17,7 @@
 #include <limits> // std::numeric_limits
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/detail/print_number.hpp>
+#include <jsoncons/detail/write_number.hpp>
 #include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons/sink.hpp>
 
@@ -91,7 +90,7 @@ private:
     Sink result_;
     const basic_csv_encode_options<CharT> options_;
     std::vector<stack_item> stack_;
-    jsoncons::detail::print_double fp_;
+    jsoncons::detail::write_double fp_;
     std::vector<string_type,string_allocator_type> strings_buffer_;
 
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> buffered_line_;
@@ -802,9 +801,7 @@ private:
     {
         begin_value(sink);
 
-        std::basic_ostringstream<CharT> ss;
-        ss << val;
-        sink.append(ss.str().data(),ss.str().length());
+        jsoncons::detail::write_integer(val,sink);
 
         end_value();
     }
@@ -814,9 +811,7 @@ private:
     {
         begin_value(sink);
 
-        std::basic_ostringstream<CharT> ss;
-        ss << val;
-        sink.append(ss.str().data(),ss.str().length());
+        jsoncons::detail::write_integer(val,sink);
 
         end_value();
     }
