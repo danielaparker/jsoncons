@@ -53,8 +53,8 @@ namespace detail {
         }
         constexpr basic_string_view(const basic_string_view& other) noexcept = default;
 
-        template <class Allocator>
-        basic_string_view(const std::basic_string<CharT,Traits,Allocator>& s)
+        template <class Tr, class Allocator>
+        basic_string_view(const std::basic_string<CharT,Tr,Allocator>& s) noexcept
             : data_(s.data()), length_(s.length())
         {
         }
