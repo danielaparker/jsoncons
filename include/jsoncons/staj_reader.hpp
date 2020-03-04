@@ -229,7 +229,7 @@ public:
         case staj_event_type::uint64_value:
         {
             jsoncons::string_sink<T> sink(s);
-            jsoncons::detail::write_uinteger(value_.uint64_value_, sink);
+            jsoncons::detail::write_integer(value_.uint64_value_, sink);
             break;
         }
         case staj_event_type::half_value:

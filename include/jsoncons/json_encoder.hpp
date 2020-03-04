@@ -836,7 +836,7 @@ private:
                 break_line();
             }
         }
-        std::size_t length = jsoncons::detail::write_uinteger(value, result_);
+        std::size_t length = jsoncons::detail::write_integer(value, result_);
         column_ += length;
         end_value();
         return true;
@@ -1405,7 +1405,7 @@ private:
         {
             result_.push_back(',');
         }
-        jsoncons::detail::write_uinteger(value, result_);
+        jsoncons::detail::write_integer(value, result_);
         if (!stack_.empty())
         {
             stack_.back().increment_count();

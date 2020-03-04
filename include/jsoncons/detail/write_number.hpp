@@ -22,15 +22,17 @@ namespace jsoncons { namespace detail {
 
 // write_integer
 
-template<class Result>
-size_t write_integer(int64_t value, Result& result)
+template<class Integer,class Result>
+typename std::enable_if<std::is_integral<Integer>::value && std::is_signed<Integer>::value,std::size_t>::type
+write_integer(Integer value, Result& result)
 {
     typedef typename Result::value_type char_type;
+    typedef typename std::make_unsigned<Integer>::type unsigned_type;
 
     std::size_t count = 0;
 
     char_type buf[255];
-    uint64_t u = (value < 0) ? static_cast<uint64_t>(-value) : static_cast<uint64_t>(value);
+    unsigned_type u = (value < 0) ? static_cast<unsigned_type>(-value) : static_cast<unsigned_type>(value);
     char_type *p = buf;
     do
     {
@@ -51,10 +53,9 @@ size_t write_integer(int64_t value, Result& result)
     return count;
 }
 
-// write_uinteger
-
-template<class Result>
-size_t write_uinteger(uint64_t value, Result& result)
+template<class Integer,class Result>
+typename std::enable_if<std::is_integral<Integer>::value && !std::is_signed<Integer>::value,std::size_t>::type
+write_integer(Integer value, Result& result)
 {
     typedef typename Result::value_type char_type;
 
@@ -74,8 +75,6 @@ size_t write_uinteger(uint64_t value, Result& result)
     }
     return count;
 }
-
-// write_integer
 
 template<class Result>
 size_t integer_to_hex_string(int64_t value, Result& result)
@@ -106,7 +105,7 @@ size_t integer_to_hex_string(int64_t value, Result& result)
     return count;
 }
 
-// write_uinteger
+// write_integer
 
 template<class Result>
 size_t uinteger_to_hex_string(uint64_t value, Result& result)

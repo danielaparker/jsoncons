@@ -1266,7 +1266,7 @@ private:
                 {
                     return s;
                 }
-                jsoncons::detail::write_uinteger(val, s);
+                jsoncons::detail::write_integer(val, s);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
