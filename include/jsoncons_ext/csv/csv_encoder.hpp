@@ -802,9 +802,7 @@ private:
     {
         begin_value(sink);
 
-        std::basic_ostringstream<CharT> ss;
-        ss << val;
-        sink.append(ss.str().data(),ss.str().length());
+        jsoncons::detail::write_integer(val,sink);
 
         end_value();
     }
@@ -814,9 +812,7 @@ private:
     {
         begin_value(sink);
 
-        std::basic_ostringstream<CharT> ss;
-        ss << val;
-        sink.append(ss.str().data(),ss.str().length());
+        jsoncons::detail::write_integer(val,sink);
 
         end_value();
     }
