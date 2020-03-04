@@ -87,7 +87,7 @@ namespace ubjson {
     decode_ubjson(const std::vector<uint8_t>& v)
     {
         basic_ubjson_cursor<bytes_source> cursor(v);
-        json_decoder<basic_json<char,sorted_policy>> decoder();
+        json_decoder<basic_json<char,sorted_policy>> decoder{};
 
         std::error_code ec;
         T val = deser_traits<T>::deserialize(cursor, decoder, ec);
@@ -114,7 +114,7 @@ namespace ubjson {
     decode_ubjson(std::istream& is)
     {
         basic_ubjson_cursor<binary_stream_source> cursor(is);
-        json_decoder<basic_json<char,sorted_policy>> decoder();
+        json_decoder<basic_json<char,sorted_policy>> decoder{};
 
         std::error_code ec;
         T val = deser_traits<T>::deserialize(cursor, decoder, ec);
