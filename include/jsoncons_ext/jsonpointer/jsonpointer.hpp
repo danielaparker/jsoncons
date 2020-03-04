@@ -889,6 +889,31 @@ void escape(const String& s, std::basic_ostringstream<typename String::value_typ
     }
 }
 
+template <class CharT>
+std::basic_string<CharT> escape(const basic_string_view<CharT>& s)
+{
+    std::basic_string<CharT> result;
+
+    for (auto c : s)
+    {
+        if (c == '~')
+        {
+            result.push_back('~');
+            result.push_back('0');
+        }
+        else if (c == '/')
+        {
+            result.push_back('~');
+            result.push_back('1');
+        }
+        else
+        {
+            result.push_back(c);
+        }
+    }
+    return result;
+}
+
 }}
 
 #endif

@@ -11,13 +11,17 @@
 #include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-namespace jsoncons { namespace jsonpointer {
+namespace jsoncons { 
+namespace jsonpointer {
 
-template<class J>
-void flatten(const std::basic_string<typename J::char_type>& reference_string,
-             const J& value,
-             J& result)
+    template<class Json>
+    void flatten(const std::basic_string<typename Json::char_type>& reference_string,
+                 const Json& value,
+                 Json& result)
     {
+        using char_type = typename Json::char_type;
+        using string_type = std::basic_string<char_type>;
+
         switch (value.type())
         {
             case json_type::array_value:
@@ -25,33 +29,35 @@ void flatten(const std::basic_string<typename J::char_type>& reference_string,
                 if (value.empty())
                 {
                     // flatten empty array as null
-                    result[reference_string] = J::null();
+                    result[reference_string] = Json::null();
                 }
                 else
                 {
                     // iterate array and use index as reference string
                     for (std::size_t i = 0; i < value.size(); ++i)
                     {
-                        flatten(reference_string + "/" + std::to_string(i),
-                                value.at(i), result);
+                        string_type s(reference_string);
+                        s.push_back('/');
+                        jsoncons::detail::print_integer(i,s);
+                        flatten(s, value.at(i), result);
                     }
                 }
                 break;
             }
 
-            case json_value::object:
+            case json_type::object_value:
             {
                 if (value.empty())
                 {
                     // flatten empty object as null
-                    result[reference_string] = J::null();
+                    result[reference_string] = Json::null();
                 }
                 else
                 {
                     // iterate object and use keys as reference string
                     for (const auto& element : value.object_range())
                     {
-                        flatten(reference_string + "/" + escape(element.first), element.second, result);
+                        flatten(reference_string + "/" + escape(basic_string_view<char_type>(element.key().data(),element.key().size())), element.value(), result);
                     }
                 }
                 break;
@@ -74,15 +80,15 @@ void flatten(const std::basic_string<typename J::char_type>& reference_string,
     @throw type_error.315  if object values are not primitive
     @throw type_error.313  if value cannot be unflattened
     */
-    static J
-    unflatten(const J& value)
+    static Json
+    unflatten(const Json& value)
     {
         if (JSON_HEDLEY_UNLIKELY(not value.is_object()))
         {
             JSON_THROW(detail::type_error::create(314, "only objects can be unflattened"));
         }
 
-        J result;
+        Json result;
 
         // iterate the JSON object values
         for (const auto& element : *value.m_value.object)
@@ -102,6 +108,17 @@ void flatten(const std::basic_string<typename J::char_type>& reference_string,
         return result;
     }
 #endif
-}}
+
+    template<class Json>
+    Json flatten(const Json& value)
+    {
+        Json result;
+        std::basic_string<typename Json::char_type> reference_string;
+        flatten(reference_string, value, result);
+        return result;
+    }
+
+} // namespace jsonpointer
+} // namespace jsoncons
 
 #endif

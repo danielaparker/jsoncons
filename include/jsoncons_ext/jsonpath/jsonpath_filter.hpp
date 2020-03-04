@@ -939,20 +939,10 @@ struct PathConstructor
 
     string_type operator()(const string_type& path, std::size_t index) const
     {
-        char_type buf[255];
-        char_type* p = buf;
-        do
-        {
-            *p++ = static_cast<char_type>(48 + index % 10);
-        } while (index /= 10);
-
         string_type s;
         s.append(path);
         s.push_back('[');
-        while (--p >= buf)
-        {
-            s.push_back(*p);
-        }
+        jsoncons::detail::print_integer(index,s);
         s.push_back(']');
         return s;
     }
