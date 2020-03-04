@@ -262,7 +262,7 @@ namespace jsoncons {
     public:
         typedef CharT value_type;
         typedef std::char_traits<CharT> traits_type;
-        typedef jsoncons::basic_string_view<value_type> string_view_type;
+        typedef basic_string_view<value_type> string_view_type;
     private:
         const value_type* data_;
         const value_type* input_ptr_;

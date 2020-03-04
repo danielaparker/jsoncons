@@ -134,7 +134,7 @@ public:
          begin_(false),
          buffer_(alloc)
     {
-        basic_string_view<CharT> sv(std::forward<Source>(source));
+        jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
         auto result = unicons::skip_bom(sv.begin(), sv.end());
         if (result.ec != unicons::encoding_errc())
         {
