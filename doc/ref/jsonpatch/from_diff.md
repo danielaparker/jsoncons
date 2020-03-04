@@ -26,13 +26,13 @@ namespace jp = jsoncons::jsonpatch;
 
 int main()
 {
-    jsoncons::json source = R"(
+    json source = json::parse(R"(
         {"/": 9, "foo": "bar"}
-    )"_json;
+    )");
 
-    jsoncons::json target = R"(
+    json target = json::parse(R"(
         { "baz":"qux", "foo": [ "bar", "baz" ]}
-    )"_json;
+    )");
 
     auto patch = jp::from_diff(source, target);
 

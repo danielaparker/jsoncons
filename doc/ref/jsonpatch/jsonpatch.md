@@ -28,18 +28,18 @@ int main()
 {
     // Apply a JSON Patch
 
-    json doc = R"(
+    json doc = json::parse(R"(
         { "foo": "bar"}
-    )"_json;
+    )");
 
     json doc2 = doc;
 
-    json patch = R"(
+    json patch = json::parse(R"(
         [
             { "op": "add", "path": "/baz", "value": "qux" },
             { "op": "add", "path": "/foo", "value": [ "bar", "baz" ] }
         ]
-    )"_json;
+    )");
 
     std::error_code ec;
     jsonpatch::apply_patch(doc, patch, ec);

@@ -35,16 +35,16 @@ namespace jp = jsoncons::jsonpatch;
 
 int main()
 {
-    jsoncons::json target = R"(
+    json doc = json::parse(R"(
         { "foo": "bar"}
-    )"_json;
+    )");
 
-    jsoncons::json patch = R"(
+    json patch = json::parse(R"(
         [
             { "op": "add", "path": "/baz", "value": "qux" },
             { "op": "add", "path": "/foo", "value": [ "bar", "baz" ] }
         ]
-    )"_json;
+    )");
 
     std::error_code ec;
     jp::apply_patch(target,patch,ec);
@@ -71,17 +71,17 @@ namespace jp = jsoncons::jsonpatch;
 
 int main()
 {
-    jsoncons::json target = R"(
+    json target = json::parse(R"(
         { "foo": "bar"}
-    )"_json;
+    )");
 
-    jsoncons::json patch = R"(
+    json patch = json::parse(R"(
         [
             { "op": "add", "path": "/baz", "value": "qux" },
             { "op": "add", "path": "/foo", "value": [ "bar", "baz" ] },
             { "op": "add", "path": "/baz/bat", "value": "qux" } // nonexistent target
         ]
-    )"_json;
+    )");
 
     std::error_code ec;
     jp::apply_patch(target, patch, ec);

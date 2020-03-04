@@ -389,8 +389,6 @@ int main()
 
         comment_example();
 
-        jsonpatch_examples();
-
         max_nesting_path_example();
 
         get_example();
@@ -438,6 +436,8 @@ int main()
         run_cbor_typed_array_examples();
 
         json_traits_macros_examples();
+
+        jsonpatch_examples();
     }
     catch (const std::exception& e)
     {

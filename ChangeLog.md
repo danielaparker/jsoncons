@@ -1,3 +1,14 @@
+master
+------
+
+Enhancements
+
+- Added jsonpointer function `flatten` to flatten a json object or array into a single depth object of JSONPointer-value pairs.
+
+- Added overload with leading `temp_allocator_arg_t` parameter to `decode_json`, `decode_bson`, `decode_csv`,
+`decode_cbor`, `decode_msgpack` and `decode_ubjson`, which allows the user to supply a custom allocator 
+that deserialization will use for temporary work areas.
+
 v0.146.1
 --------
 

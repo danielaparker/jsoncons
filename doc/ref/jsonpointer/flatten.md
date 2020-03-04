@@ -12,7 +12,7 @@ Flattens a json object or array into a single depth object of JSONPointer-value 
 
 #### Return value
 
-json object
+A flattened json object of JSONPointer-value pairs
 
 ### Examples
 
