@@ -16,6 +16,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/bson/bson_encoder.hpp>
 #include <jsoncons_ext/bson/bson_reader.hpp>
+#include <jsoncons_ext/bson/bson_cursor.hpp>
 
 namespace jsoncons { 
 namespace bson {
