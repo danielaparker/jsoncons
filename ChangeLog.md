@@ -1,5 +1,14 @@
-v0.147.0
+master
 --------
+
+Defect fixes:
+
+- The convenience macros `JSONCONS_N_GETTER_CTOR_TRAITS` and `JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS` 
+  were overlooked when adding support for-non mandatory members to be omitted altogether from the
+  serialized JSON. This has been fixed.
+
+- Fixed an issue with the `jsonpath_error` class implementation of `what()`, possibly related to
+  issue #212 
 
 Enhancements
 

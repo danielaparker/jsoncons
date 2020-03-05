@@ -121,12 +121,15 @@ namespace json_type_traits_macro_tests
         std::string title_;
         double price_;
         std::string isbn_;
+        jsoncons::optional<std::string> publisher_; 
     public:
         book2b(const std::string& author,
               const std::string& title,
               double price,
-              const std::string& isbn)
-            : author_(author), title_(title), price_(price), isbn_(isbn)
+              const std::string& isbn,
+              const jsoncons::optional<std::string>& publisher)
+            : author_(author), title_(title), price_(price), isbn_(isbn),
+              publisher_(publisher)
         {
         }
 
@@ -153,6 +156,11 @@ namespace json_type_traits_macro_tests
         const std::string& isbn() const
         {
             return isbn_;
+        }
+
+        const jsoncons::optional<std::string>& publisher() const
+        {
+            return publisher_;
         }
     };
 
@@ -475,7 +483,7 @@ JSONCONS_N_MEMBER_TRAITS(ns::book1b,3,author,title,price,isbn)
 JSONCONS_N_MEMBER_TRAITS(ns::book1c,3,author,title,price,isbn)
 
 JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::book2a, author, title, price)
-JSONCONS_N_GETTER_CTOR_TRAITS(ns::book2b, 2, author, title, price, isbn)
+JSONCONS_N_GETTER_CTOR_TRAITS(ns::book2b, 2, author, title, price, isbn, publisher)
 JSONCONS_TPL_ALL_MEMBER_TRAITS(1,ns::MyStruct,typeContent,someString)
 JSONCONS_TPL_ALL_MEMBER_TRAITS(1,ns::MyStruct2,typeContent,someString)
 JSONCONS_TPL_ALL_GETTER_CTOR_TRAITS(1,ns::MyStruct3,typeContent,someString)
@@ -543,8 +551,6 @@ namespace
         typedef const T& const_reference;
         typedef std::ptrdiff_t difference_type;
     };
-    //template <class U>
-    //using MyAlloc = std::allocator<U>;
 } // namespace
 
 TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
@@ -721,7 +727,7 @@ TEST_CASE("JSONCONS_N_GETTER_CTOR_TRAITS tests")
 
     SECTION("to_json")
     {
-        ns::book2b book(an_author,a_title,a_price,an_isbn);
+        ns::book2b book(an_author,a_title,a_price,an_isbn,jsoncons::optional<std::string>());
 
         json j(book);
 
@@ -757,6 +763,22 @@ TEST_CASE("JSONCONS_N_GETTER_CTOR_TRAITS tests")
         CHECK(book.title() == a_title);
         CHECK(book.price() == double());
         CHECK(book.isbn() == std::string());
+    }
+
+    SECTION("encode_json")
+    {
+        ns::book2b book(an_author, a_title, a_price, an_isbn, jsoncons::optional<std::string>());
+
+        std::string buffer;
+        encode_json(book, buffer, indenting::indent);
+
+        json j = json::parse(buffer);
+
+        CHECK(j["author"].as<std::string>() == an_author);
+        CHECK(j["title"].as<std::string>() == a_title);
+        CHECK(j["price"].as<double>() == Approx(a_price).epsilon(0.001));
+        CHECK(j["isbn"].as<std::string>() == an_isbn);
+        CHECK_FALSE(j.contains("publisher"));
     }
 }
 
