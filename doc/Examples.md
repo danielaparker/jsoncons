@@ -23,11 +23,11 @@
 
 [Serialize with the C++ member names of the class](#G1)  
 [Serialize with provided names using the `_NAMED_` macros](#G2)  
+[Mapping to C++ data structures with and without defaults allowed](#G7)  
 [Serialize non-mandatory std::optional values using the convenience macros](#G3)  
 [An example with std::shared_ptr and std::unique_ptr](#G4)  
 [Serialize a templated class with the `_TPL_` macros](#G5)  
 [Specialize json_type_traits explicitly](#G6)  
-[Mapping to C++ data structures with and without defaults allowed](#G7)  
 [An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_GETTER_CTOR_TRAITS](#G8)  
 [Serialize a polymorphic type based on the presence of members](#G9)  
 [Ensuring type selection is possible](#G10)  
@@ -1257,9 +1257,11 @@ Charles Bukowski, Pulp, 22.48
 
 #### Mapping to C++ data structures with and without defaults allowed
 
-The macros `JSONCONS_N_MEMBER_TRAITS` and `JSONCONS_ALL_MEMBER_TRAITS` both generate
+`JSONCONS_N_MEMBER_TRAITS` and `JSONCONS_ALL_MEMBER_TRAITS` both generate
 the code to specialize `json_type_traits` from member data. The difference is that `JSONCONS_N_MEMBER_TRAITS`
 does not require all member names to be present in the JSON data, while `JSONCONS_ALL_MEMBER_TRAITS` does.
+More generaly, the qualifier _N_ in the macro name indicates that only a specified number of members
+must be present in the JSON.
 
 ```c++
 #include <iostream>
