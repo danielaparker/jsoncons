@@ -18,10 +18,13 @@ Member type                         |Definition
 
 #### Constructors
 
-    json_decoder(const temp_allocator_type& temp_alloc = temp_allocator_type())
+    json_decoder(const temp_allocator_type& temp_alloc); // (1)
 
-    json_decoder(const result_allocator_type& result_alloc, 
-                 const temp_allocator_type& temp_alloc)
+    json_decoder(result_allocator_arg_t, const result_allocator_type& result_alloc, 
+                 const temp_allocator_type& temp_alloc); // (2)
+
+    json_decoder(result_allocator_arg_t, const result_allocator_type& result_alloc, 
+                 const temp_allocator_type& temp_alloc); // (3)
 
 #### Member functions
 

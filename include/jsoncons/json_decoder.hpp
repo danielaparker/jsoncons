@@ -104,7 +104,29 @@ public:
         structure_stack_.reserve(100);
         structure_stack_.emplace_back(structure_type::root_t, 0);
     }
-    json_decoder(const result_allocator_type& result_alloc, 
+
+    json_decoder(result_allocator_arg_t,
+                 const result_allocator_type& result_alloc)
+        : string_allocator_(result_alloc),
+          byte_allocator_(result_alloc),
+          object_allocator_(result_alloc),
+          array_allocator_(result_alloc),
+          stack_item_allocator_(),
+          size_t_allocator_(),
+          result_(),
+          name_(string_allocator_),
+          item_stack_(),
+          structure_stack_(),
+          is_valid_(false) 
+
+    {
+        item_stack_.reserve(1000);
+        structure_stack_.reserve(100);
+        structure_stack_.emplace_back(structure_type::root_t, 0);
+    }
+
+    json_decoder(result_allocator_arg_t,
+                 const result_allocator_type& result_alloc, 
                  const temp_allocator_type& temp_alloc)
         : string_allocator_(result_alloc),
           byte_allocator_(result_alloc),
