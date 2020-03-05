@@ -21,7 +21,6 @@ Returns a JSON Patch.
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
-using namespace jsoncons::literals;
 namespace jp = jsoncons::jsonpatch;
 
 int main()
