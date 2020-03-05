@@ -14,23 +14,19 @@ using namespace jsoncons;
 TEST_CASE("test_heap_only_string")
 {
     std::string input = "Hello World";
-    auto s = jsoncons::detail::heap_only_string_factory<char, std::allocator<char>>::create(input.data(), input.size());
+    jsoncons::detail::heap_only_string_wrapper<char, std::allocator<char>> s(input.data(), input.size(), std::allocator<char>());
 
     //std::cout << s->c_str() << std::endl;
-    CHECK(input == std::string(s->c_str()));
-
-    jsoncons::detail::heap_only_string_factory<char,std::allocator<char>>::destroy(s);
+    CHECK(input == std::string(s.c_str()));
 }
 
 TEST_CASE("test_heap_only_string_wchar_t")
 {
     std::wstring input = L"Hello World";
-    auto s = jsoncons::detail::heap_only_string_factory<wchar_t, std::allocator<wchar_t>>::create(input.data(), input.size());
+    jsoncons::detail::heap_only_string_wrapper<wchar_t, std::allocator<wchar_t>> s(input.data(), input.size(), std::allocator<wchar_t>());
 
     //std::wcout << s->c_str() << std::endl;
 
-    CHECK(input == std::wstring(s->c_str()));
-
-    jsoncons::detail::heap_only_string_factory<wchar_t,std::allocator<wchar_t>>::destroy(s);
+    CHECK(input == std::wstring(s.c_str()));
 }
 
