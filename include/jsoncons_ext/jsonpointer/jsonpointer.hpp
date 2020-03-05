@@ -915,9 +915,9 @@ enum class pointer_state
     }
 
     template<class Json>
-    void flatten(const jsoncons::basic_string_view<typename Json::char_type>& parent_key,
-                 const Json& parent_value,
-                 Json& result)
+    void flatten_(const std::basic_string<typename Json::char_type>& parent_key,
+                  const Json& parent_value,
+                  Json& result)
     {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type>;
@@ -938,7 +938,7 @@ enum class pointer_state
                         string_type key(parent_key);
                         key.push_back('/');
                         jsoncons::detail::write_integer(i,key);
-                        flatten(key, parent_value.at(i), result);
+                        flatten_(key, parent_value.at(i), result);
                     }
                 }
                 break;
@@ -958,7 +958,7 @@ enum class pointer_state
                         string_type key(parent_key);
                         key.push_back('/');
                         escape(jsoncons::basic_string_view<char_type>(item.key().data(),item.key().size()), key);
-                        flatten(key, item.value(), result);
+                        flatten_(key, item.value(), result);
                     }
                 }
                 break;
@@ -978,7 +978,7 @@ enum class pointer_state
     {
         Json result;
         std::basic_string<typename Json::char_type> parent_key;
-        flatten(parent_key, value, result);
+        flatten_(parent_key, value, result);
         return result;
     }
 
