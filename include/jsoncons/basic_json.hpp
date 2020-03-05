@@ -376,67 +376,59 @@ public:
         public:
             uint8_t ext_type_;
         private:
-            typedef typename jsoncons::detail::heap_only_string_factory<char_type, Allocator>::string_pointer pointer;
-
-            pointer ptr_;
+            jsoncons::detail::heap_only_string_wrapper<char_type,Allocator> s_;
         public:
 
             long_string_storage(semantic_tag tag, const char_type* data, std::size_t length, const Allocator& a)
-                : ext_type_(from_storage_and_tag(storage_kind::long_string_value, tag))
+                : ext_type_(from_storage_and_tag(storage_kind::long_string_value, tag)),
+                  s_(data, length, a)
             {
-                ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(data,length,a);
             }
 
             long_string_storage(const long_string_storage& val)
-                : ext_type_(val.ext_type_)
+                : ext_type_(val.ext_type_), s_(val.s_)
             {
-                ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),val.get_allocator());
             }
 
             long_string_storage(long_string_storage&& val) noexcept
                 : ext_type_(val.ext_type_), 
-                  ptr_(nullptr)
+                  s_(nullptr)
             {
-                std::swap(val.ptr_,ptr_);
+                swap(val);
             }
 
             long_string_storage(const long_string_storage& val, const Allocator& a)
-                : ext_type_(val.ext_type_)
+                : ext_type_(val.ext_type_), s_(val.s_, a)
             {
-                ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),a);
             }
 
             ~long_string_storage()
             {
-                if (ptr_ != nullptr)
-                {
-                    jsoncons::detail::heap_only_string_factory<char_type,Allocator>::destroy(ptr_);
-                }
             }
 
             void swap(long_string_storage& val) noexcept
             {
-                std::swap(val.ptr_,ptr_);
+                s_.swap(val.s_);
             }
 
             const char_type* data() const
             {
-                return ptr_->data();
+                return s_.data();
             }
 
             const char_type* c_str() const
             {
-                return ptr_->c_str();
+                return s_.c_str();
             }
 
             std::size_t length() const
             {
-                return ptr_->length();
+                return s_.length();
             }
 
             allocator_type get_allocator() const
             {
-                return ptr_->get_allocator();
+                return s_.get_allocator();
             }
         };
 

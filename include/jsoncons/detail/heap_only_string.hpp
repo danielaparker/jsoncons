@@ -150,6 +150,70 @@ public:
     }
 };
 
+template <class CharT,class Allocator>
+class heap_only_string_wrapper
+{
+    typedef CharT char_type;
+    typedef typename jsoncons::detail::heap_only_string_factory<CharT, Allocator>::string_pointer pointer;
+
+    pointer ptr_;
+public:
+    heap_only_string_wrapper() = default;
+
+    heap_only_string_wrapper(pointer ptr)
+        : ptr_(ptr)
+    {
+    }
+
+    heap_only_string_wrapper(const char_type* data, std::size_t length, const Allocator& a) 
+    {
+        ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(data,length,a);
+    }
+
+    heap_only_string_wrapper(const heap_only_string_wrapper& val) 
+    {
+        ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),val.get_allocator());
+    }
+
+    heap_only_string_wrapper(const heap_only_string_wrapper& val, const Allocator& a) 
+    {
+        ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),a);
+    }
+
+    ~heap_only_string_wrapper()
+    {
+        if (ptr_ != nullptr)
+        {
+            jsoncons::detail::heap_only_string_factory<char_type,Allocator>::destroy(ptr_);
+        }
+    }
+
+    void swap(heap_only_string_wrapper& other) noexcept
+    {
+        std::swap(ptr_,other.ptr_);
+    }
+
+    const char_type* data() const
+    {
+        return ptr_->data();
+    }
+
+    const char_type* c_str() const
+    {
+        return ptr_->c_str();
+    }
+
+    std::size_t length() const
+    {
+        return ptr_->length();
+    }
+
+    Allocator get_allocator() const
+    {
+        return ptr_->get_allocator();
+    }
+};
+
 
 }}
 
