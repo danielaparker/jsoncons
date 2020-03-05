@@ -17,6 +17,19 @@
 
 namespace jsoncons { namespace detail {
 
+// From boost 1_71
+template <class T, class U>
+T launder_cast(U* u)
+{
+#if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606
+    return std::launder(reinterpret_cast<T>(u));
+#elif defined(__GNUC__) &&  (__GNUC__ * 100 + __GNUC_MINOR__) > 800
+    return __builtin_launder(reinterpret_cast<T>(u));
+#else
+    return reinterpret_cast<T>(u);
+#endif
+}
+
 template <class Allocator>
 class heap_only_string_base
 {
@@ -183,7 +196,7 @@ private:
         char* storage = to_plain_pointer(ptr);
         string_type* ps = new(storage)heap_only_string<char_type,Allocator>(byte_alloc);
 
-        auto psa = reinterpret_cast<string_storage*>(storage); 
+        auto psa = launder_cast<string_storage*>(storage); 
 
         CharT* p = new(&psa->c)char_type[length + 1];
         std::memcpy(p, s, length*sizeof(char_type));
@@ -197,7 +210,7 @@ private:
     {
         string_type* rawp = to_plain_pointer(ptr);
 
-        char* p = reinterpret_cast<char*>(rawp);
+        char* p = launder_cast<char*>(rawp);
 
         std::size_t mem_size = aligned_size(ptr->length_*sizeof(char_type));
         byte_allocator_type byte_alloc(ptr->get_allocator());
