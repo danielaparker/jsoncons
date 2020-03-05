@@ -44,6 +44,9 @@ template <class CharT,class Allocator>
 class heap_only_string_factory;
 
 template <class CharT, class Allocator>
+class heap_only_string_wrapper;
+
+template <class CharT, class Allocator>
 class heap_only_string : public heap_only_string_base<Allocator>
 {
     typedef typename std::allocator_traits<Allocator>::template rebind_alloc<CharT> allocator_type;  
@@ -51,12 +54,12 @@ class heap_only_string : public heap_only_string_base<Allocator>
     typedef typename allocator_traits_type::pointer pointer;
 
     friend class heap_only_string_factory<CharT, Allocator>;
+    friend class heap_only_string_wrapper<CharT, Allocator>;
 
 	pointer p_;
 	size_t length_;
 public:
     typedef CharT char_type;
-    typedef heap_only_string<CharT,Allocator> value_type;
 
     ~heap_only_string() {}
 
@@ -89,38 +92,87 @@ private:
 
 };
 
-template <class CharT, class Allocator>
-class heap_only_string_factory
+template <class CharT,class Allocator>
+class heap_only_string_wrapper
 {
     typedef CharT char_type;
     typedef typename std::allocator_traits<Allocator>::template rebind_alloc<char> byte_allocator_type;  
-    typedef std::allocator_traits<byte_allocator_type> byte_allocator_traits_type;
-    typedef typename byte_allocator_traits_type::pointer byte_pointer;
-    typedef typename heap_only_string<CharT,Allocator>::pointer pointer;
-public:
+    typedef typename std::allocator_traits<byte_allocator_type>::pointer byte_pointer;
 
     typedef typename std::allocator_traits<Allocator>::template rebind_alloc<heap_only_string<CharT,Allocator>> string_allocator_type;  
-    typedef std::allocator_traits<string_allocator_type> string_allocator_traits_type;
-    typedef typename string_allocator_traits_type::pointer string_pointer;
+    typedef typename std::allocator_traits<string_allocator_type>::pointer string_pointer;
 
-    typedef heap_only_string<char_type,Allocator>* raw_string_pointer_type;
- 
+    typedef heap_only_string<CharT,Allocator> string_type;
+
     struct string_storage
     {
-        heap_only_string<CharT,Allocator> data;
+        string_type data;
         char_type c[1];
     };
     typedef typename std::aligned_storage<sizeof(string_storage), alignof(string_storage)>::type storage_kind;
 
+    string_pointer ptr_;
+public:
+    heap_only_string_wrapper() = default;
+
+    heap_only_string_wrapper(string_pointer ptr)
+        : ptr_(ptr)
+    {
+    }
+
+    heap_only_string_wrapper(const char_type* data, std::size_t length, const Allocator& a) 
+    {
+        ptr_ = create(data,length,a);
+    }
+
+    heap_only_string_wrapper(const heap_only_string_wrapper& val) 
+    {
+        ptr_ = create(val.data(),val.length(),val.get_allocator());
+    }
+
+    heap_only_string_wrapper(const heap_only_string_wrapper& val, const Allocator& a) 
+    {
+        ptr_ = create(val.data(),val.length(),a);
+    }
+
+    ~heap_only_string_wrapper()
+    {
+        if (ptr_ != nullptr)
+        {
+            destroy(ptr_);
+        }
+    }
+
+    void swap(heap_only_string_wrapper& other) noexcept
+    {
+        std::swap(ptr_,other.ptr_);
+    }
+
+    const char_type* data() const
+    {
+        return ptr_->data();
+    }
+
+    const char_type* c_str() const
+    {
+        return ptr_->c_str();
+    }
+
+    std::size_t length() const
+    {
+        return ptr_->length();
+    }
+
+    Allocator get_allocator() const
+    {
+        return ptr_->get_allocator();
+    }
+private:
     static size_t aligned_size(std::size_t n)
     {
         return sizeof(storage_kind) + n;
     }
-public:
-    static string_pointer create(const char_type* s, std::size_t length)
-    {
-        return create(s, length, Allocator());
-    }
+
     static string_pointer create(const char_type* s, std::size_t length, const Allocator& alloc)
     {
         std::size_t mem_size = aligned_size(length*sizeof(char_type));
@@ -129,21 +181,24 @@ public:
         byte_pointer ptr = byte_alloc.allocate(mem_size);
 
         char* storage = to_plain_pointer(ptr);
-        raw_string_pointer_type ps = new(storage)heap_only_string<char_type,Allocator>(byte_alloc);
+        string_type* ps = new(storage)heap_only_string<char_type,Allocator>(byte_alloc);
+
         auto psa = reinterpret_cast<string_storage*>(storage); 
 
         CharT* p = new(&psa->c)char_type[length + 1];
         std::memcpy(p, s, length*sizeof(char_type));
         p[length] = 0;
-        ps->p_ = std::pointer_traits<pointer>::pointer_to(*p);
+        ps->p_ = std::pointer_traits<typename string_type::pointer>::pointer_to(*p);
         ps->length_ = length;
         return std::pointer_traits<string_pointer>::pointer_to(*ps);
     }
 
     static void destroy(string_pointer ptr)
     {
-        raw_string_pointer_type rawp = to_plain_pointer(ptr);
+        string_type* rawp = to_plain_pointer(ptr);
+
         char* p = reinterpret_cast<char*>(rawp);
+
         std::size_t mem_size = aligned_size(ptr->length_*sizeof(char_type));
         byte_allocator_type byte_alloc(ptr->get_allocator());
         byte_alloc.deallocate(p,mem_size);
