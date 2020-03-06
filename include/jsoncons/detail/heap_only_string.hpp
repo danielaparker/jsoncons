@@ -21,7 +21,7 @@ namespace jsoncons { namespace detail {
 template <class T, class U>
 T launder_cast(U* u)
 {
-#if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606
+#if defined(JSONCONS_HAS_STD_LAUNDER)
     #include <new>
     return std::launder(reinterpret_cast<T>(u));
 #else

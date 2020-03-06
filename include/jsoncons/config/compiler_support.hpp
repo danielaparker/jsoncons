@@ -99,56 +99,63 @@
 #define JSONCONS_HAS_FOPEN_S
 #endif
 
-// Follows boost 1_71
-#if !defined(JSONCONS_HAS_STD_STRING_VIEW)
+#if !defined(JSONCONS_HAS_2017)
 #  if defined(__clang__)
 #   if (__cplusplus >= 201703)
-#    if __has_include(<string_view>)
-#     define JSONCONS_HAS_STD_STRING_VIEW 1
-#    endif // __has_include(<string_view>)
+#     define JSONCONS_HAS_2017 1
 #   endif // (__cplusplus >= 201703)
 #  endif // defined(__clang__)
 #  if defined(__GNUC__)
 #   if (__GNUC__ >= 7)
 #    if (__cplusplus >= 201703)
-#     define JSONCONS_HAS_STD_STRING_VIEW 1
+#     define JSONCONS_HAS_2017 1
 #    endif // (__cplusplus >= 201703)
 #   endif // (__GNUC__ >= 7)
 #  endif // defined(__GNUC__)
 #  if defined(_MSC_VER)
 #   if (_MSC_VER >= 1910 && _MSVC_LANG >= 201703)
-#    define JSONCONS_HAS_STD_STRING_VIEW 1
+#    define JSONCONS_HAS_2017 1
 #   endif // (_MSC_VER >= 1910 && MSVC_LANG >= 201703)
 #  endif // defined(_MSC_VER)
+#endif
+
+#if !defined(JSONCONS_HAS_STD_STRING_VIEW)
+#  if (defined JSONCONS_HAS_2017)
+#    if defined(__clang__)
+#      if __has_include(<string_view>)
+#        define JSONCONS_HAS_STD_STRING_VIEW 1
+#     endif // __has_include(<string_view>)
+#   else
+#      define JSONCONS_HAS_STD_STRING_VIEW 1
+#   endif 
+#  endif // defined(JSONCONS_HAS_2017)
 #endif // !defined(JSONCONS_HAS_STD_STRING_VIEW)
 
 #if !defined(JSONCONS_HAS_STD_OPTIONAL)
-#  if defined(__clang__)
-#   if (__cplusplus >= 201703)
-#    if __has_include(<string_view>)
-#     define JSONCONS_HAS_STD_OPTIONAL 1
-#    endif // __has_include(<string_view>)
-#   endif // (__cplusplus >= 201703)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
-#   if (__GNUC__ >= 7)
-#    if (__cplusplus >= 201703)
-#     define JSONCONS_HAS_STD_OPTIONAL 1
-#    endif // (__cplusplus >= 201703)
-#   endif // (__GNUC__ >= 7)
-#  endif // defined(__GNUC__)
-#  if defined(_MSC_VER)
-#   if (_MSC_VER >= 1910 && _MSVC_LANG >= 201703)
-#    define JSONCONS_HAS_STD_OPTIONAL 1
-#   endif // (_MSC_VER >= 1910 && MSVC_LANG >= 201703)
-#  endif // defined(_MSC_VER)
+#  if (defined JSONCONS_HAS_2017)
+#    if defined(__clang__)
+#      if __has_include(<optional>)
+#        define JSONCONS_HAS_STD_OPTIONAL 1
+#     endif // __has_include(<string_view>)
+#   else
+#      define JSONCONS_HAS_STD_OPTIONAL 1
+#   endif 
+#  endif // defined(JSONCONS_HAS_2017)
 #endif // !defined(JSONCONS_HAS_STD_OPTIONAL)
+
+#if !defined(JSONCONS_HAS_STD_LAUNDER)
+#  if (defined JSONCONS_HAS_2017)
+#    if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606
+#      define JSONCONS_HAS_STD_LAUNDER 1
+#    endif // 
+#  endif // defined(JSONCONS_HAS_2017)
+#endif // !defined(JSONCONS_HAS_STD_LAUNDER)
 
 #if (!defined(JSONCONS_NO_EXCEPTIONS))
 // Check if exceptions are disabled.
-#if defined( __cpp_exceptions) && __cpp_exceptions == 0
-# define JSONCONS_NO_EXCEPTIONS 1
-#endif
+#  if defined( __cpp_exceptions) && __cpp_exceptions == 0
+#   define JSONCONS_NO_EXCEPTIONS 1
+#  endif
 #endif
 
 #if !defined(JSONCONS_NO_EXCEPTIONS)
