@@ -413,8 +413,6 @@ int main()
 
         run_cbor_examples();
 
-        readme_examples();
-
         type_extensibility_examples();
 
         json_reader_examples();
@@ -438,6 +436,8 @@ int main()
         json_traits_macros_examples();
 
         jsonpatch_examples();
+
+        readme_examples();
     }
     catch (const std::exception& e)
     {

@@ -26,7 +26,8 @@ namespace readme
                    "rater": "HikingAsylum",
                    "assertion": "advanced",
                    "rated": "Marilyn C",
-                   "rating": 0.90
+                   "rating": 0.90,
+                   "confidence": 0.99
                  }
                ]
             }
@@ -70,7 +71,8 @@ namespace readme
                    "rater": "HikingAsylum",
                    "assertion": "advanced",
                    "rated": "Marilyn C",
-                   "rating": 0.90
+                   "rating": 0.90,
+                   "confidence": 0.99
                  }
                ]
             }
@@ -104,7 +106,8 @@ namespace readme
                    "rater": "HikingAsylum",
                    "assertion": "advanced",
                    "rated": "Marilyn C",
-                   "rating": 0.90
+                   "rating": 0.90,
+                   "confidence": 0.99
                  }
                ]
             }
