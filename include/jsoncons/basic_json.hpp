@@ -37,6 +37,172 @@
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/detail/heap_only_string.hpp>
 
+namespace jsoncons { 
+namespace detail {
+    template <class Iterator>
+    class random_access_iterator_wrapper 
+    { 
+        Iterator it_; 
+        bool has_value_;
+
+        template <class Iter> 
+        friend class random_access_iterator_wrapper;
+    public:
+        using iterator_category = std::random_access_iterator_tag;
+
+        using value_type = typename std::iterator_traits<Iterator>::value_type;
+        using difference_type = typename std::iterator_traits<Iterator>::difference_type;
+        using pointer = typename std::iterator_traits<Iterator>::pointer;
+        using reference = typename std::iterator_traits<Iterator>::reference;
+    public:
+        random_access_iterator_wrapper() : it_(), has_value_(false) 
+        { 
+        }
+
+        random_access_iterator_wrapper(Iterator ptr) : it_(ptr), has_value_(true)  
+        {
+        }
+
+        random_access_iterator_wrapper(const random_access_iterator_wrapper&) = default;
+        random_access_iterator_wrapper(random_access_iterator_wrapper&&) = default;
+        random_access_iterator_wrapper& operator=(const random_access_iterator_wrapper&) = default;
+        random_access_iterator_wrapper& operator=(random_access_iterator_wrapper&&) = default;
+
+        template <class Iter>
+        random_access_iterator_wrapper(const random_access_iterator_wrapper<Iter>& other,
+                                       typename std::enable_if<std::is_convertible<Iter,Iterator>::value>::type* = 0)
+            : it_(other.it_), has_value_(true)
+        {
+        }
+
+        operator Iterator() const
+        { 
+            return it_; 
+        }
+
+        reference operator*() const 
+        {
+            return *it_;
+        }
+
+        Iterator operator->() const 
+        {
+            return it_;
+        }
+
+        random_access_iterator_wrapper& operator++() 
+        {
+            ++it_;
+            return *this;
+        }
+
+        random_access_iterator_wrapper operator++(int) 
+        {
+            random_access_iterator_wrapper temp = *this;
+            ++*this;
+            return temp;
+        }
+
+        random_access_iterator_wrapper& operator--() 
+        {
+            --it_;
+            return *this;
+        }
+
+        random_access_iterator_wrapper operator--(int) 
+        {
+            random_access_iterator_wrapper temp = *this;
+            --*this;
+            return temp;
+        }
+
+        random_access_iterator_wrapper& operator+=(const difference_type offset) 
+        {
+            it_ += offset;
+            return *this;
+        }
+
+        random_access_iterator_wrapper operator+(const difference_type offset) const 
+        {
+            random_access_iterator_wrapper temp = *this;
+            return temp += offset;
+        }
+
+        random_access_iterator_wrapper& operator-=(const difference_type offset) 
+        {
+            return *this += -offset;
+        }
+
+        random_access_iterator_wrapper operator-(const difference_type offset) const 
+        {
+            random_access_iterator_wrapper temp = *this;
+            return temp -= offset;
+        }
+
+        difference_type operator-(const random_access_iterator_wrapper& rhs) const 
+        {
+            return it_ - rhs.it_;
+        }
+
+        reference operator[](const difference_type offset) const 
+        {
+            return *(*this + offset);
+        }
+
+        bool operator==(const random_access_iterator_wrapper& rhs) const 
+        {
+            if (!has_value_ || !rhs.has_value_)
+            {
+                return has_value_ == rhs.has_value_ ? true : false;
+            }
+            else
+            {
+                return it_ == rhs.it_;
+            }
+        }
+
+        bool operator!=(const random_access_iterator_wrapper& rhs) const 
+        {
+            return !(*this == rhs);
+        }
+
+        bool operator<(const random_access_iterator_wrapper& rhs) const 
+        {
+            if (!has_value_ || !rhs.has_value_)
+            {
+                return has_value_ == rhs.has_value_ ? false :(has_value_ ? false : true);
+            }
+            else
+            {
+                return it_ < rhs.it_;
+            }
+        }
+
+        bool operator>(const random_access_iterator_wrapper& rhs) const 
+        {
+            return rhs < *this;
+        }
+
+        bool operator<=(const random_access_iterator_wrapper& rhs) const 
+        {
+            return !(rhs < *this);
+        }
+
+        bool operator>=(const random_access_iterator_wrapper& rhs) const 
+        {
+            return !(*this < rhs);
+        }
+
+        inline 
+        friend random_access_iterator_wrapper<Iterator> operator+(
+            difference_type offset, random_access_iterator_wrapper<Iterator> next) 
+        {
+            return next += offset;
+        }
+    };
+} // namespace detail
+} // namespace jsoncons
+
 namespace jsoncons {
 
 struct sorted_policy 
@@ -138,8 +304,8 @@ public:
 
     typedef json_object<key_type,basic_json> object;
 
-    typedef typename object::iterator object_iterator;
-    typedef typename object::const_iterator const_object_iterator;
+    typedef jsoncons::detail::random_access_iterator_wrapper<typename object::iterator> object_iterator;
+    typedef jsoncons::detail::random_access_iterator_wrapper<typename object::const_iterator> const_object_iterator;
     typedef typename array::iterator array_iterator;
     typedef typename array::const_iterator const_array_iterator;
 
