@@ -143,14 +143,6 @@
 #  endif // defined(JSONCONS_HAS_2017)
 #endif // !defined(JSONCONS_HAS_STD_OPTIONAL)
 
-#if !defined(JSONCONS_HAS_STD_LAUNDER)
-#  if (defined JSONCONS_HAS_2017)
-#    if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606
-#      define JSONCONS_HAS_STD_LAUNDER 1
-#    endif // 
-#  endif // defined(JSONCONS_HAS_2017)
-#endif // !defined(JSONCONS_HAS_STD_LAUNDER)
-
 #if (!defined(JSONCONS_NO_EXCEPTIONS))
 // Check if exceptions are disabled.
 #  if defined( __cpp_exceptions) && __cpp_exceptions == 0
