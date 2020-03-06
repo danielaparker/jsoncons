@@ -157,8 +157,7 @@ namespace ns {
         hiking_experience assertion_;
         std::string rated_;
         double rating_;
-        //This example assumes C++17 language support (otherwise substitute `jsoncons::optional`.)
-        std::optional<double> confidence_; // assumes C++17
+        std::optional<double> confidence_; // assumes C++17, otherwise use jsoncons::optional
         std::optional<uint64_t> expires_;
     public:
         hiking_reputon(const std::string& rater,
