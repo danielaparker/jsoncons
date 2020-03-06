@@ -692,6 +692,7 @@ public:
                                 buffer.clear();
                             }
                             slice.start_ = 0;
+                            buffer.clear();
 
                             state_stack_.back().state = path_state::wildcard_or_rpath_or_slice_or_filter;
                             ++p_;
@@ -1075,6 +1076,7 @@ public:
                             apply_selectors(resources);
                             buffer.clear();
                             slice.start_ = 0;
+                            buffer.clear();
                             state_stack_.pop_back();
                             break;
                         case '.':
@@ -1429,19 +1431,20 @@ public:
                     {
                         case '-':
                             slice.is_end_positive = false;
+                            buffer.clear();
                             state_stack_.back().state = path_state::slice_end;
                             ++p_;
                             ++column_;
                             break;
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                             slice.is_end_defined = true;
+                            buffer.clear();
                             slice.end_ = static_cast<std::size_t>(*p_-'0');
                             state_stack_.back().state = path_state::slice_end;
                             ++p_;
                             ++column_;
                             break;
                         case ':':
-                            slice.step_ = 0;
                             state_stack_.back().state = path_state::slice_step;
                             ++p_;
                             ++column_;
@@ -1460,6 +1463,7 @@ public:
                     switch (*p_)
                     {
                         case ':':
+                            buffer.clear();
                             slice.step_ = 0;
                             state_stack_.back().state = path_state::slice_step;
                             ++p_;
@@ -1490,14 +1494,14 @@ public:
                     switch (*p_)
                     {
                         case '-':
-                            slice.is_step_positive = false;
-                            slice.step_ = 0;
+                            buffer.clear();
                             state_stack_.back().state = path_state::slice_step2;
+                            buffer.push_back(*p_);
                             ++p_;
                             ++column_;
                             break;
                         default:
-                            slice.step_ = 0;
+                            buffer.clear();
                             state_stack_.back().state = path_state::slice_step2;
                             break;
                     }
@@ -1506,20 +1510,25 @@ public:
                     switch (*p_)
                     {
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                            slice.step_ = slice.step_*10 + static_cast<std::size_t>(*p_-'0');
+                            buffer.push_back(*p_);
                             ++p_;
                             ++column_;
                             break;
                         case ',':
                         case ']':
-                            if (slice.step_ == 0)
+                        {
+                            auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
+                            if (!r || r.value() == 0)
                             {
                                 ec = jsonpath_errc::expected_slice_step;
                                 return;
                             }
+                            slice.is_step_positive = (r.value() >= 0) ? true : false;
+                            slice.step_ = (r.value() >= 0) ? static_cast<std::size_t>(r.value()) : static_cast<std::size_t>(-r.value());
                             selectors_.push_back(jsoncons::make_unique<array_slice_selector>(slice));
                             state_stack_.pop_back();
                             break;
+                        }
                         default:
                             ec = jsonpath_errc::expected_minus_or_digit_or_comma_or_right_bracket;
                             return;
