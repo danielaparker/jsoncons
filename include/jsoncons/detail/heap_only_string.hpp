@@ -195,7 +195,7 @@ private:
         char* storage = to_plain_pointer(ptr);
         string_type* ps = new(storage)heap_only_string<char_type,Allocator>(byte_alloc);
 
-        auto psa = launder_cast<string_storage*>(storage); 
+        auto psa = reinterpret_cast<string_storage*>(storage); 
 
         CharT* p = new(&psa->c)char_type[length + 1];
         std::memcpy(p, s, length*sizeof(char_type));
@@ -209,7 +209,7 @@ private:
     {
         string_type* rawp = to_plain_pointer(ptr);
 
-        char* p = launder_cast<char*>(rawp);
+        char* p = reinterpret_cast<char*>(rawp);
 
         std::size_t mem_size = aligned_size(ptr->length_*sizeof(char_type));
         byte_allocator_type byte_alloc(ptr->get_allocator());
