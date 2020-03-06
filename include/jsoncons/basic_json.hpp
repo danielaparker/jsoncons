@@ -3578,7 +3578,7 @@ public:
         case storage_kind::object_value:
             {
                 const_object_iterator it = object_value().find(key);
-                return it != object_range().end();
+                return it != object_value().end();
             }
             break;
         default:
@@ -3593,12 +3593,12 @@ public:
         case storage_kind::object_value:
             {
                 auto it = object_value().find(name);
-                if (it == object_range().end())
+                if (it == object_value().end())
                 {
                     return 0;
                 }
                 std::size_t count = 0;
-                while (it != object_range().end()&& it->key() == name)
+                while (it != object_value().end()&& it->key() == name)
                 {
                     ++count;
                     ++it;
@@ -4059,7 +4059,7 @@ public:
         case storage_kind::object_value:
             {
                 auto it = object_value().find(name);
-                if (it == object_range().end())
+                if (it == object_value().end())
                 {
                     JSONCONS_THROW(key_not_found(name.data(),name.length()));
                 }
@@ -4106,7 +4106,7 @@ public:
         case storage_kind::object_value:
             {
                 auto it = object_value().find(name);
-                if (it == object_range().end())
+                if (it == object_value().end())
                 {
                     JSONCONS_THROW(key_not_found(name.data(),name.length()));
                 }
@@ -4196,7 +4196,7 @@ public:
         case storage_kind::object_value:
             {
                 const_object_iterator it = object_value().find(name);
-                if (it != object_range().end())
+                if (it != object_value().end())
                 {
                     return it->value();
                 }
@@ -4229,7 +4229,7 @@ public:
         case storage_kind::object_value:
             {
                 const_object_iterator it = object_value().find(name);
-                if (it != object_range().end())
+                if (it != object_value().end())
                 {
                     return it->value().template as<T>();
                 }
@@ -4721,7 +4721,7 @@ public:
         case storage_kind::object_value:
             {
                 const_object_iterator it = object_value().find(name);
-                if (it != object_range().end())
+                if (it != object_value().end())
                 {
                     return it->value().template as<T>();
                 }
@@ -4750,7 +4750,7 @@ public:
         case storage_kind::object_value:
             {
                 const_object_iterator it = object_value().find(name);
-                if (it != object_range().end())
+                if (it != object_value().end())
                 {
                     return it->value().template as<T>();
                 }
@@ -5142,7 +5142,7 @@ public:
         case storage_kind::object_value:
             {
                 const_object_iterator it = object_value().find(name);
-                if (it != object_range().end())
+                if (it != object_value().end())
                 {
                     return it->value();
                 }
@@ -5170,7 +5170,7 @@ public:
         case storage_kind::object_value:
             {
                 const_object_iterator it = object_value().find(name);
-                return it != object_range().end() ? it->value() : a_null;
+                return it != object_value().end() ? it->value() : a_null;
             }
         default:
             {
@@ -5283,7 +5283,7 @@ public:
         case storage_kind::object_value:
             {
                 const_object_iterator it = object_value().find(name);
-                return it != object_range().end();
+                return it != object_value().end();
             }
             break;
         default:
