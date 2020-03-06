@@ -39,13 +39,21 @@
 
 namespace jsoncons { 
 namespace detail {
+
+    template <class Iterator,class Enable = void>
+    class random_access_iterator_wrapper
+    {
+    };
+
     template <class Iterator>
-    class random_access_iterator_wrapper 
+    class random_access_iterator_wrapper<Iterator,
+             typename std::enable_if<std::is_same<typename std::iterator_traits<Iterator>::iterator_category, 
+                                                  std::random_access_iterator_tag>::value>::type> 
     { 
         Iterator it_; 
         bool has_value_;
 
-        template <class Iter> 
+        template <class Iter,class Enable> 
         friend class random_access_iterator_wrapper;
     public:
         using iterator_category = std::random_access_iterator_tag;
