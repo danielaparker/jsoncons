@@ -67,7 +67,7 @@ namespace detail {
         { 
         }
 
-        random_access_iterator_wrapper(Iterator ptr) : it_(ptr), has_value_(true)  
+        explicit random_access_iterator_wrapper(Iterator ptr) : it_(ptr), has_value_(true)  
         {
         }
 
@@ -3585,7 +3585,7 @@ public:
         {
         case storage_kind::object_value:
             {
-                const_object_iterator it = object_value().find(key);
+                auto it = object_value().find(key);
                 return it != object_value().end();
             }
             break;
@@ -4169,7 +4169,7 @@ public:
         case storage_kind::empty_object_value:
             return object_range().end();
         case storage_kind::object_value:
-            return object_value().find(name);
+            return object_iterator(object_value().find(name));
         default:
             {
                 JSONCONS_THROW(not_an_object(name.data(),name.length()));
@@ -4184,7 +4184,7 @@ public:
         case storage_kind::empty_object_value:
             return object_range().end();
         case storage_kind::object_value:
-            return object_value().find(name);
+            return const_object_iterator(object_value().find(name));
         default:
             {
                 JSONCONS_THROW(not_an_object(name.data(),name.length()));
@@ -4203,7 +4203,7 @@ public:
             }
         case storage_kind::object_value:
             {
-                const_object_iterator it = object_value().find(name);
+                auto it = object_value().find(name);
                 if (it != object_value().end())
                 {
                     return it->value();
@@ -4236,7 +4236,7 @@ public:
             }
         case storage_kind::object_value:
             {
-                const_object_iterator it = object_value().find(name);
+                auto it = object_value().find(name);
                 if (it != object_value().end())
                 {
                     return it->value().template as<T>();
@@ -4367,7 +4367,10 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_kind::object_value:
-            return object_value().insert_or_assign(name, std::forward<T>(val));
+        {
+            auto result = object_value().insert_or_assign(name, std::forward<T>(val));
+            return std::make_pair(object_iterator(result.first), result.second);
+        }
         default:
             {
                 JSONCONS_THROW(not_an_object(name.data(),name.length()));
@@ -4384,7 +4387,10 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_kind::object_value:
-            return object_value().try_emplace(name, std::forward<Args>(args)...);
+        {
+            auto result = object_value().try_emplace(name, std::forward<Args>(args)...);
+            return std::make_pair(object_iterator(result.first),result.second);
+        }
         default:
             {
                 JSONCONS_THROW(not_an_object(name.data(),name.length()));
@@ -4728,7 +4734,7 @@ public:
             }
         case storage_kind::object_value:
             {
-                const_object_iterator it = object_value().find(name);
+                auto it = object_value().find(name);
                 if (it != object_value().end())
                 {
                     return it->value().template as<T>();
@@ -4757,7 +4763,7 @@ public:
             }
         case storage_kind::object_value:
             {
-                const_object_iterator it = object_value().find(name);
+                auto it = object_value().find(name);
                 if (it != object_value().end())
                 {
                     return it->value().template as<T>();
@@ -5149,7 +5155,7 @@ public:
             }
         case storage_kind::object_value:
             {
-                const_object_iterator it = object_value().find(name);
+                auto it = object_value().find(name);
                 if (it != object_value().end())
                 {
                     return it->value();
@@ -5177,7 +5183,7 @@ public:
             return a_null;
         case storage_kind::object_value:
             {
-                const_object_iterator it = object_value().find(name);
+                auto it = object_value().find(name);
                 return it != object_value().end() ? it->value() : a_null;
             }
         default:
@@ -5290,7 +5296,7 @@ public:
         {
         case storage_kind::object_value:
             {
-                const_object_iterator it = object_value().find(name);
+                auto it = object_value().find(name);
                 return it != object_value().end();
             }
             break;
@@ -5555,7 +5561,7 @@ private:
             {
                 bool more = handler.begin_object(size(), var_.tag(), context, ec);
                 const object& o = object_value();
-                for (const_object_iterator it = o.begin(); more && it != o.end(); ++it)
+                for (auto it = o.begin(); more && it != o.end(); ++it)
                 {
                     handler.key(string_view_type((it->key()).data(),it->key().length()), context, ec);
                     it->value().dump_noflush(handler, ec);
