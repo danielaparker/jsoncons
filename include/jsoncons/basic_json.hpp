@@ -4408,7 +4408,8 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_kind::object_value:
-            return object_value().merge(source.object_value());
+            object_value().merge(source.object_value());
+            break;
         default:
             {
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
@@ -4424,7 +4425,8 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_kind::object_value:
-            return object_value().merge(std::move(source.object_value()));
+            object_value().merge(std::move(source.object_value()));
+            break;
         default:
             {
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
@@ -4440,7 +4442,8 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_kind::object_value:
-            return object_value().merge(hint, source.object_value());
+            object_value().merge(hint, source.object_value());
+            break;
         default:
             {
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
@@ -4456,7 +4459,8 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_kind::object_value:
-            return object_value().merge(hint, std::move(source.object_value()));
+            object_value().merge(hint, std::move(source.object_value()));
+            break;
         default:
             {
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge a value that is not an object"));
@@ -4474,7 +4478,8 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_kind::object_value:
-            return object_value().merge_or_update(source.object_value());
+            object_value().merge_or_update(source.object_value());
+            break;
         default:
             {
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge or update a value that is not an object"));
@@ -4490,7 +4495,8 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_kind::object_value:
-            return object_value().merge_or_update(std::move(source.object_value()));
+            object_value().merge_or_update(std::move(source.object_value()));
+            break;
         default:
             {
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge or update a value that is not an object"));
@@ -4506,7 +4512,8 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_kind::object_value:
-            return object_value().merge_or_update(hint, source.object_value());
+            object_value().merge_or_update(hint, source.object_value());
+            break;
         default:
             {
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge or update a value that is not an object"));
@@ -4522,7 +4529,8 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_kind::object_value:
-            return object_value().merge_or_update(hint, std::move(source.object_value()));
+            object_value().merge_or_update(hint, std::move(source.object_value()));
+            break;
         default:
             {
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to merge or update a value that is not an object"));
@@ -4539,7 +4547,7 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_kind::object_value:
-            return object_value().insert_or_assign(hint, name, std::forward<T>(val));
+            return object_iterator(object_value().insert_or_assign(hint, name, std::forward<T>(val)));
         default:
             {
                 JSONCONS_THROW(not_an_object(name.data(),name.length()));
@@ -4556,7 +4564,7 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case storage_kind::object_value:
-            return object_value().try_emplace(hint, name, std::forward<Args>(args)...);
+            return object_iterator(object_value().try_emplace(hint, name, std::forward<Args>(args)...));
         default:
             {
                 JSONCONS_THROW(not_an_object(name.data(),name.length()));
@@ -4601,7 +4609,7 @@ public:
         {
         case storage_kind::empty_object_value:
         case storage_kind::object_value:
-            return object_value().insert(first, last, get_key_value<key_type,basic_json>());
+            object_value().insert(first, last, get_key_value<key_type,basic_json>());
             break;
         default:
             {
@@ -4617,7 +4625,7 @@ public:
         {
         case storage_kind::empty_object_value:
         case storage_kind::object_value:
-            return object_value().insert(tag, first, last, get_key_value<key_type,basic_json>());
+            object_value().insert(tag, first, last, get_key_value<key_type,basic_json>());
             break;
         default:
             {
