@@ -5408,7 +5408,8 @@ public:
         case storage_kind::empty_object_value:
             return range<object_iterator>(object_iterator(), object_iterator());
         case storage_kind::object_value:
-            return range<object_iterator>(object_value().begin(),object_value().end());
+            return range<object_iterator>(object_iterator(object_value().begin()),
+                                          object_iterator(object_value().end()));
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an object"));
         }
@@ -5421,7 +5422,8 @@ public:
         case storage_kind::empty_object_value:
             return range<const_object_iterator>(const_object_iterator(), const_object_iterator());
         case storage_kind::object_value:
-            return range<const_object_iterator>(object_value().begin(),object_value().end());
+            return range<const_object_iterator>(const_object_iterator(object_value().begin()),
+                                                const_object_iterator(object_value().end()));
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an object"));
         }
