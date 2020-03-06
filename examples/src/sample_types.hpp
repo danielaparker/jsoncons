@@ -197,11 +197,9 @@ namespace jsoncons {
 JSONCONS_ALL_MEMBER_NAMED_TRAITS(ns::bond, (principal,"notional"), (maturity,"maturityDate"), (coupon,"couponRate"), (period,"frequency"))
 
 JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
-
 // First four members listed are mandatory, confidence and expires are optional
 JSONCONS_N_GETTER_CTOR_TRAITS(ns::hiking_reputon, 4, rater, assertion, rated, rating, 
                               confidence, expires)
-
 // All members are mandatory
 JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputation, application, reputons)
 
