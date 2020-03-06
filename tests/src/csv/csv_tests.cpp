@@ -1538,7 +1538,8 @@ TEST_CASE("csv_reader constructors")
         options.assume_header(true)
                .mapping(csv::mapping_kind::n_objects);
 
-        json_decoder<my_json,FreelistAllocator<char>> decoder(my_allocator,my_allocator);
+        json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, my_allocator,
+                                                              my_allocator);
         csv::basic_csv_reader<char,stream_source<char>,FreelistAllocator<char>> reader(input, decoder, options, my_allocator);
         reader.read();
 
