@@ -70,7 +70,7 @@ namespace detail {
 
         template <class Iter>
         random_access_iterator_wrapper(const random_access_iterator_wrapper<Iter>& other,
-                                       typename std::enable_if<std::is_convertible<Iter,Iterator>::value>::type* = 0)
+                                       typename std::enable_if<!std::is_same<Iter,Iterator>::value && std::is_convertible<Iter,Iterator>::value>::type* = 0)
             : it_(other.it_), has_value_(true)
         {
         }
