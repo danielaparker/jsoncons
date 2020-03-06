@@ -59,7 +59,8 @@ std::string data = R"(
            "rater": "HikingAsylum",
            "assertion": "advanced",
            "rated": "Marilyn C",
-           "rating": 0.90
+           "rating": 0.90,
+           "confidence": 0.99
          }
        ]
     }
@@ -83,43 +84,55 @@ int main()
     // Parse the string of data into a json value
     json j = json::parse(data);
 
-    // Pretty print
-    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
-
     // Does object member reputons exist?
-    std::cout << "(2) " << std::boolalpha << j.contains("reputons") << "\n\n";
+    std::cout << "(1) " << std::boolalpha << j.contains("reputons") << "\n\n";
 
-    // Get a reference to reputons array value
+    // Get a reference to reputons array 
     const json& v = j["reputons"]; 
 
-    // Iterate over reputons array value
-    std::cout << "(3)\n";
+    // Iterate over reputons array 
+    std::cout << "(2)\n";
     for (const auto& item : v.array_range())
     {
         // Access rated as string and rating as double
         std::cout << item["rated"].as<std::string>() << ", " << item["rating"].as<double>() << "\n";
     }
+    std::cout << "\n";
+
+    // Select all "rated" with JSONPath
+    std::cout << "(3)\n";
+    json result = jsonpath::json_query(j,"$..rated");
+    std::cout << pretty_print(result) << "\n\n";
+
+    // Serialize back to JSON
+    std::cout << "(4)\n" << pretty_print(j) << "\n\n";
 }
 ```
 Output:
 ```
-(1)
+(1) true
+
+(2)
+Marilyn C, 0.9
+
+(3)
+[
+    "Marilyn C"
+]
+
+(4)
 {
     "application": "hiking",
     "reputons": [
         {
             "assertion": "advanced",
+            "confidence": 0.99,
             "rated": "Marilyn C",
             "rater": "HikingAsylum",
             "rating": 0.9
         }
     ]
 }
-
-(2) true
-
-(3)
-Marilyn C, 0.9
 ```
 
 #### As a strongly typed C++ data structure
@@ -144,12 +157,18 @@ namespace ns {
         hiking_experience assertion_;
         std::string rated_;
         double rating_;
+        //This example assumes C++17 language support (otherwise substitute `jsoncons::optional`.)
+        std::optional<double> confidence_; // assumes C++17
+        std::optional<uint64_t> expires_;
     public:
         hiking_reputon(const std::string& rater,
                        hiking_experience assertion,
                        const std::string& rated,
-                       double rating)
-            : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating)
+                       double rating,
+                       const std::optional<double>& confidence = std::optional<double>(),
+                       const std::optional<uint64_t>& expires = std::optional<uint64_t>())
+            : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating),
+              confidence_(confidence), expires_(expires)
         {
         }
 
@@ -157,6 +176,8 @@ namespace ns {
         hiking_experience assertion() const {return assertion_;}
         const std::string& rated() const {return rated_;}
         double rating() const {return rating_;}
+        std::optional<double> confidence() const {return confidence_;}
+        std::optional<uint64_t> expires() const {return expires_;}
     };
 
     class hiking_reputation
@@ -179,7 +200,7 @@ namespace ns {
 // Declare the traits. Specify which data members need to be serialized.
 
 JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
-JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputon, rater, assertion, rated, rating)
+JSONCONS_N_GETTER_CTOR_TRAITS(ns::hiking_reputon, 4, rater, assertion, rated, rating, confidence, expires)
 JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputation, application, reputons)
 
 int main()
@@ -211,6 +232,7 @@ Marilyn C, 0.9
     "reputons": [
         {
             "assertion": "advanced",
+            "confidence": 0.99,
             "rated": "Marilyn C",
             "rater": "HikingAsylum",
             "rating": 0.9
@@ -285,6 +307,7 @@ int main()
 ```
 Output:
 ```
+Marilyn C
 begin_object
 name: application
 string_value: hiking
@@ -299,6 +322,8 @@ name: rated
 string_value: Marilyn C
 name: rating
 double_value: 0.9
+name: confidence
+double_value: 0.99
 end_object
 end_array
 end_object
