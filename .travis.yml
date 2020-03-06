@@ -151,6 +151,17 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-6.0
+          packages:
+            - clang-7.0
+            - g++-7
+      env: COMPILER=clang VERSION=7.0 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" 
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-7
           packages:
             - clang-7
@@ -206,6 +217,31 @@ matrix:
       osx_image: xcode9.4
       compiler: clang
       env: CXXFLAGS="-std=c++11"
+
+    - os: osx
+      osx_image: xcode10
+      compiler: clang
+      env: CXXFLAGS="-std=c++11"
+
+    - os: osx
+      osx_image: xcode10.1
+      compiler: clang
+      env: CXXFLAGS="-std=c++14"
+
+    - os: osx
+      osx_image: xcode10.2
+      compiler: clang
+      env: CXXFLAGS="-std=c++17"
+
+    - os: osx
+      osx_image: xcode11.2
+      compiler: clang
+      env: CXXFLAGS="-std=c++11"
+
+    - os: osx
+      osx_image: xcode11.2
+      compiler: clang
+      env: CXXFLAGS="-std=c++17"
 
 before_install:
     - |
