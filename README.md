@@ -51,26 +51,6 @@ cpp can get from languages with reflection behavior for serialization/deserializ
 
 _"really good"_ _"awesome project"_ _"very solid and very dependable"_ _"amazing work"_ _"Your repo rocks!!!!!"_
 
-## Supported compilers
-
-jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It is tested in continuous integration on [AppVeyor](https://ci.appveyor.com/project/danielaparker/jsoncons), [Travis](https://travis-ci.org/danielaparker/jsoncons), and [doozer](https://doozer.io/).
-
-| Compiler                | Version                   |Architecture | Operating System  | Notes |
-|-------------------------|---------------------------|-------------|-------------------|-------|
-| Microsoft Visual Studio | vs2015 (MSVC 19.0.24241.7)| x86,x64     | Windows 10        |       |
-|                         | vs2017                    | x86,x64     | Windows 10        |       |
-|                         | vs2019                    | x86,x64     | Windows 10        |       |
-| g++                     | 4.8 and above             | x64         | Ubuntu            |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
-|                         | 4.8.5                     | x64         | CentOS 7.6        |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
-|                         | 6.3.1 (Red Hat 6.3.1-1)   | x64         | Fedora release 24 |       |
-|                         | 4.9.2                     | i386        | Debian 8          |       |
-| clang                   | 3.8 and above             | x64         | Ubuntu            |       |
-| clang xcode             | 6.4 and above             | x64         | OSX               |       |
-
-It is also cross compiled for ARMv8-A architecture on Travis using clang and executed using the emulator qemu. 
-
-[UndefinedBehaviorSanitizer (UBSan)](http://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html) diagnostics are enabled for selected gcc and clang builds.
-
 ## Get jsoncons
 
 You can use the [vcpkg](https://github.com/Microsoft/vcpkg) platform library manager to install the [jsoncons package](https://github.com/microsoft/vcpkg/tree/master/ports/jsoncons).
@@ -941,7 +921,25 @@ foo,UHVzcw,-18446744073709551617
 bar,UHVzcw==,273.15
 ```
 
-<div id="E5"/> 
+## Supported compilers
+
+jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It is tested in continuous integration on [AppVeyor](https://ci.appveyor.com/project/danielaparker/jsoncons), [Travis](https://travis-ci.org/danielaparker/jsoncons), and [doozer](https://doozer.io/).
+
+| Compiler                | Version                   |Architecture | Operating System  | Notes |
+|-------------------------|---------------------------|-------------|-------------------|-------|
+| Microsoft Visual Studio | vs2015 (MSVC 19.0.24241.7)| x86,x64     | Windows 10        |       |
+|                         | vs2017                    | x86,x64     | Windows 10        |       |
+|                         | vs2019                    | x86,x64     | Windows 10        |       |
+| g++                     | 4.8 and above             | x64         | Ubuntu            |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
+|                         | 4.8.5                     | x64         | CentOS 7.6        |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
+|                         | 6.3.1 (Red Hat 6.3.1-1)   | x64         | Fedora release 24 |       |
+|                         | 4.9.2                     | i386        | Debian 8          |       |
+| clang                   | 3.8 and above             | x64         | Ubuntu            |       |
+| clang xcode             | 6.4 and above             | x64         | OSX               |       |
+
+It is also cross compiled for ARMv8-A architecture on Travis using clang and executed using the emulator qemu. 
+
+[UndefinedBehaviorSanitizer (UBSan)](http://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html) diagnostics are enabled for selected gcc and clang builds.
 
 ## Building the test suite and examples with CMake
 
