@@ -24,57 +24,67 @@
 
 namespace jsoncons { namespace jsonpath {
 
-struct array_slice
+struct slice
 {
-    std::size_t start_;
-    bool is_start_positive;
-    std::size_t end_;
-    bool is_end_positive;
-    bool is_end_defined;
-    std::size_t step_;
-    bool is_step_positive;
+    int64_t start_;
+    jsoncons::optional<int64_t> end_;
+    int64_t step_;
 
-    array_slice()
-        : start_(0), is_start_positive(true), 
-          end_(0), is_end_positive(true), is_end_defined(false), 
-          step_(1), is_step_positive(true)
+    slice()
+        : start_(0), end_(), step_(1)
     {
     }
 
-    array_slice(std::size_t start, bool is_start_positive, 
-                std::size_t end, bool is_end_positive, bool is_end_defined,
-                std::size_t step, bool is_step_positive)
-        : start_(start), is_start_positive(is_start_positive), 
-          end_(end), is_end_positive(is_end_positive), is_end_defined(is_end_defined), 
-          step_(step), is_step_positive(is_step_positive)
+    slice(int64_t start, const jsoncons::optional<int64_t>& end, int64_t step) 
+        : start_(start), end_(end), step_(step)
     {
     }
 
-    std::size_t get_start(std::size_t size) const
+    slice(const slice& other)
+        : start_(other.start_), end_(other.end_), step_(other.step_)
     {
-        return is_start_positive ? start_ : size - start_;
     }
 
-    std::size_t get_end(std::size_t size) const
+    slice& operator=(const slice& rhs) 
     {
-        if (is_end_defined)
+        if (this != &rhs)
         {
-            return is_end_positive ? end_ : size - end_;
+            start_ = rhs.start_;
+            if (rhs.end_)
+            {
+                end_ = rhs.end_;
+            }
+            else
+            {
+                end_.reset();
+            }
+            step_ = rhs.step_;
+        }
+        return *this;
+    }
+
+    int64_t get_start(std::size_t size) const
+    {
+        return start_ >= 0 ? start_ : (static_cast<int64_t>(size) + start_);
+    }
+
+    int64_t get_end(std::size_t size) const
+    {
+        if (end_)
+        {
+            auto len = end_.value() >= 0 ? end_.value() : (static_cast<int64_t>(size) - end_.value());
+            return len <= static_cast<int64_t>(size) ? len : static_cast<int64_t>(size);
         }
         else
         {
-            return size;
+            return static_cast<int64_t>(size);
         }
     }
 
-    std::size_t step() const
+    int64_t step() const
     {
-        return step_;
+        return step_; // Allow negative
     }
-
-    array_slice(const array_slice&) = default;
-
-    array_slice& operator=(const array_slice&) = default;
 };
 
 enum class result_type {value,path};
@@ -405,13 +415,13 @@ class jsonpath_evaluator : public ser_context
         }
     };
 
-    class array_slice_selector final : public selector_base
+    class slice_selector final : public selector_base
     {
     private:
-        array_slice slice_;
+        slice slice_;
     public:
-        array_slice_selector(const array_slice& slice)
-            : slice_(slice) 
+        slice_selector(const slice& a_slice)
+            : slice_(a_slice) 
         {
         }
 
@@ -419,46 +429,31 @@ class jsonpath_evaluator : public ser_context
                     const string_type& path, reference val,
                     node_set& nodes) override
         {
-            if (slice_.is_step_positive)
-            {
-                end_array_slice1(path, val, nodes);
-            }
-            else
-            {
-                end_array_slice2(path, val, nodes);
-            }
-        }
-
-        void end_array_slice1(const string_type& path, reference val, node_set& nodes)
-        {
             if (val.is_array())
             {
-                std::size_t start = slice_.get_start(val.size());
-                std::size_t end = slice_.get_end(val.size());
-                for (std::size_t j = start; j < end; j += slice_.step())
+                auto start = slice_.get_start(val.size());
+                auto end = slice_.get_end(val.size());
+                auto step = slice_.step();
+                if (step >= 0)
                 {
-                    if (j < val.size())
+                    for (int64_t j = start; j < end; j += step)
                     {
-                        nodes.emplace_back(PathCons()(path,j),std::addressof(val[j]));
+                        std::size_t uj = static_cast<std::size_t>(j);
+                        if (uj < val.size())
+                        {
+                            nodes.emplace_back(PathCons()(path,uj),std::addressof(val[uj]));
+                        }
                     }
                 }
-            }
-        }
-
-        void end_array_slice2(const string_type& path, reference val, node_set& nodes)
-        {
-            if (val.is_array())
-            {
-                std::size_t start = slice_.get_start(val.size());
-                std::size_t end = slice_.get_end(val.size());
-
-                std::size_t j = end + slice_.step() - 1;
-                while (j > (start+slice_.step()-1))
+                else
                 {
-                    j -= slice_.step();
-                    if (j < val.size())
+                    for (int64_t j = end-1; j >= start; j += step)
                     {
-                        nodes.emplace_back(PathCons()(path,j),std::addressof(val[j]));
+                        std::size_t uj = static_cast<std::size_t>(j);
+                        if (uj < val.size())
+                        {
+                            nodes.emplace_back(PathCons()(path,uj),std::addressof(val[uj]));
+                        }
                     }
                 }
             }
@@ -624,7 +619,7 @@ public:
         v.emplace_back(std::move(s),std::addressof(root));
         stack_.push_back(v);
 
-        array_slice slice;
+        slice a_slice;
 
         while (p_ < end_input_)
         {
@@ -691,7 +686,7 @@ public:
                                 apply_selectors(resources);
                                 buffer.clear();
                             }
-                            slice.start_ = 0;
+                            a_slice.start_ = 0;
                             buffer.clear();
 
                             state_stack_.back().state = path_state::wildcard_or_rpath_or_slice_or_filter;
@@ -1075,7 +1070,7 @@ public:
                             selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
                             apply_selectors(resources);
                             buffer.clear();
-                            slice.start_ = 0;
+                            a_slice.start_ = 0;
                             buffer.clear();
                             state_stack_.pop_back();
                             break;
@@ -1198,7 +1193,7 @@ public:
                             break;                   
                         }
                         case ':':
-                            slice = array_slice();
+                            a_slice = slice{};
                             buffer.clear();
                             state_stack_.back().state = path_state::comma_or_right_bracket;
                             state_stack_.emplace_back(path_state::slice_end_or_end_step, state_stack_.back());
@@ -1224,7 +1219,7 @@ public:
                             ++column_;
                             break;
                         default:
-                            slice = array_slice();
+                            a_slice = slice();
                             buffer.clear();
                             buffer.push_back(*p_);
                             state_stack_.back().state = path_state::comma_or_right_bracket;
@@ -1245,8 +1240,7 @@ public:
                                 ec = jsonpath_errc::expected_slice_start;
                                 return;
                             }
-                            slice.is_start_positive = (r.value() >= 0) ? true : false;
-                            slice.start_ = (r.value() >= 0) ? static_cast<std::size_t>(r.value()) : static_cast<std::size_t>(-r.value());
+                            a_slice.start_ = r.value();
                             state_stack_.back().state = path_state::slice_end_or_end_step;
                             ++p_;
                             ++column_;
@@ -1437,7 +1431,6 @@ public:
                             ++column_;
                             break;
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                            slice.is_end_defined = true;
                             buffer.clear();
                             buffer.push_back(*p_);
                             state_stack_.back().state = path_state::slice_end;
@@ -1452,7 +1445,7 @@ public:
                         case ',':
                         case ']':
                         {
-                            selectors_.push_back(jsoncons::make_unique<array_slice_selector>(slice));
+                            selectors_.push_back(jsoncons::make_unique<slice_selector>(a_slice));
                             state_stack_.pop_back();
                             break;
                         }
@@ -1466,28 +1459,20 @@ public:
                     {
                         case ':':
                         {
-                            if (!slice.is_end_defined)
-                            {
-                                ec = jsonpath_errc::expected_slice_end;
-                                return;
-                            }
                             auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
                             if (!r || r.value() == 0)
                             {
                                 ec = jsonpath_errc::expected_slice_step;
                                 return;
                             }
-                            slice.is_end_positive = (r.value() >= 0) ? true : false;
-                            slice.end_ = (r.value() >= 0) ? static_cast<std::size_t>(r.value()) : static_cast<std::size_t>(-r.value());
+                            a_slice.end_ = jsoncons::optional<int64_t>(r.value());
                             buffer.clear();
-                            slice.step_ = 0;
                             state_stack_.back().state = path_state::slice_step;
                             ++p_;
                             ++column_;
                             break;
                         }
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                            slice.is_end_defined = true;
                             buffer.push_back(*p_);
                             ++p_;
                             ++column_;
@@ -1495,20 +1480,14 @@ public:
                         case ',':
                         case ']':
                         {
-                            if (!slice.is_end_defined)
-                            {
-                                ec = jsonpath_errc::expected_slice_end;
-                                return;
-                            }
                             auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
                             if (!r || r.value() == 0)
                             {
                                 ec = jsonpath_errc::expected_slice_step;
                                 return;
                             }
-                            slice.is_end_positive = (r.value() >= 0) ? true : false;
-                            slice.end_ = (r.value() >= 0) ? static_cast<std::size_t>(r.value()) : static_cast<std::size_t>(-r.value());
-                            selectors_.push_back(jsoncons::make_unique<array_slice_selector>(slice));
+                            a_slice.end_ = jsoncons::optional<int64_t>(r.value());
+                            selectors_.push_back(jsoncons::make_unique<slice_selector>(a_slice));
                             state_stack_.pop_back();
                             break;
                         }
@@ -1550,9 +1529,8 @@ public:
                                 ec = jsonpath_errc::expected_slice_step;
                                 return;
                             }
-                            slice.is_step_positive = (r.value() >= 0) ? true : false;
-                            slice.step_ = (r.value() >= 0) ? static_cast<std::size_t>(r.value()) : static_cast<std::size_t>(-r.value());
-                            selectors_.push_back(jsoncons::make_unique<array_slice_selector>(slice));
+                            a_slice.step_ = r.value();
+                            selectors_.push_back(jsoncons::make_unique<slice_selector>(a_slice));
                             state_stack_.pop_back();
                             break;
                         }

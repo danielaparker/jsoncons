@@ -359,7 +359,6 @@ TEST_CASE("jsonpath store tests")
         CHECK(result7[0] == store["store"]["book"][2]);
         CHECK(result7[1] == store["store"]["book"][3]);
     }
-
     SECTION("test_jsonpath_filter1")
     {
         json book_list = store["store"]["book"];
@@ -839,11 +838,9 @@ TEST_CASE("jsonpath store tests")
 
         CHECK(result == expected);
     }
-
 }
 
 // store tests
-
 TEST_CASE("test_jsonpath_last_of_two_arrays")
 {
     json val = json::parse(R"(
