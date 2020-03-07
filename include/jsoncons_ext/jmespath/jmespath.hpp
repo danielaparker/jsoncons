@@ -67,7 +67,7 @@ struct slice
 
     int64_t get_start(std::size_t size) const
     {
-        return start_ >= 0 ? start_ : (static_cast<int64_t>(size) - start_);
+        return start_ >= 0 ? start_ : (static_cast<int64_t>(size) + start_);
     }
 
     int64_t get_end(std::size_t size) const
