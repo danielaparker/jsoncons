@@ -943,7 +943,7 @@ namespace detail
         
         static Json to_json(const jsoncons::optional<T>& val)
         {
-            return val.has_value() ? Json(val.value()) : Json::null();
+            return val.has_value() ? Json(*val) : Json::null();
         }
     };
 
