@@ -1462,7 +1462,7 @@ public:
                             auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
                             if (!r || r.value() == 0)
                             {
-                                ec = jsonpath_errc::expected_slice_step;
+                                ec = jsonpath_errc::expected_slice_end;
                                 return;
                             }
                             a_slice.end_ = jsoncons::optional<int64_t>(r.value());
@@ -1483,7 +1483,7 @@ public:
                             auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
                             if (!r || r.value() == 0)
                             {
-                                ec = jsonpath_errc::expected_slice_step;
+                                ec = jsonpath_errc::expected_slice_end;
                                 return;
                             }
                             a_slice.end_ = jsoncons::optional<int64_t>(r.value());
