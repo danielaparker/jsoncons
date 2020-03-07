@@ -1,4 +1,4 @@
-master
+v0.147.0
 --------
 
 Defect fixes:
@@ -8,7 +8,7 @@ Defect fixes:
   serialized JSON. This has been fixed.
 
 - Fixed an issue with the `jsonpath_error` class implementation of `what()`, possibly related to
-  issue #212 
+  [issue #212 ](https://github.com/danielaparker/jsoncons/issues/212)
 
 Enhancements
 
