@@ -101,7 +101,7 @@ public:
 
     const T& operator*() const
     {
-        return value_.value();
+        return *value_;
     }
 
     const T* operator->() const
@@ -252,7 +252,7 @@ public:
 
     const value_type& operator*() const
     {
-        return key_value_.value();
+        return *key_value_;
     }
 
     const value_type* operator->() const

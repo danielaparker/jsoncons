@@ -1872,7 +1872,13 @@ TEST_CASE("jsonpath intersection tests")
         json root = json::parse(input);
 
         json result = jsonpath::json_query(root,"$..[?(@.'Bid')][?(@.'Ask')]");
-        std::cout << "result: " << result << "\n";
+
+        json expected = json::parse(R"(
+        [{"Ask":"200","Bid":"100","Last":"300"},{"Ask":"220","Bid":"110"}]
+        )");
+
+        CHECK(result == expected);
+        //std::cout << "result: " << result << "\n";
     }
 }
 
