@@ -1641,7 +1641,7 @@ Jane Doe, 30250
 When deserializing a polymorphic type, jsoncons needs to know how
 to convert a json value to the proper derived class. In the Employee
 example above, the type selection strategy is based
-on the presence of members in the derived classes. If
+on the presence of mandatory members in the derived classes. If
 derived classes cannot be distinguished in this way, 
 you can introduce extra members. The convenience
 macros `JSONCONS_N_MEMBER_TRAITS`, `JSONCONS_ALL_MEMBER_TRAITS`,
