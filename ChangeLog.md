@@ -1,16 +1,16 @@
 v0.147.0
 --------
 
-Defect fixes:
+Fixed bugs:
 
-- The convenience macros `JSONCONS_N_GETTER_CTOR_TRAITS` and `JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS` 
-  were overlooked when adding support for-non mandatory members to be omitted altogether from the
-  serialized JSON. This has been fixed.
-
-- Fixed an issue with the `jsonpath_error` class implementation of `what()`, possibly related to
+- Fixed an issue with the `jsonpath_error` class implementation of `what()`, likely related to
   [issue #212 ](https://github.com/danielaparker/jsoncons/issues/212)
 
 Enhancements
+
+- Added support to the convenience macros `JSONCONS_N_GETTER_CTOR_TRAITS` and `JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS` 
+  for-non mandatory members to be omitted altogether from the serialized JSON. These macros had been overlooked
+  when this feature was added to the `_N_` macros in v0.146.0.
 
 - Added jsonpointer function `flatten` to flatten a json object or array into a single depth object of JSONPointer-value pairs.
 
