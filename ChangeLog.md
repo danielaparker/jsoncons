@@ -3,7 +3,7 @@ v0.147.0
 
 Fixed bugs:
 
-- Fixed an issue with the `jsonpath_error` class implementation of `what()`, likely related to
+- Fixed an issue with the `jsonpatch_error` class implementation of `what()`, likely related to
   [issue #212 ](https://github.com/danielaparker/jsoncons/issues/212)
 
 Enhancements
