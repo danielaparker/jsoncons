@@ -98,8 +98,8 @@ JSONCONS_TPL_ALL_MEMBER_TRAITS(num_template_params,
                                member_name0,member_name1,...) // (4)
 
 JSONCONS_N_MEMBER_NAMED_TRAITS(class_name,num_mandatory,
-                               (member_name0,"name0"),
-                               (member_name1,"name1")...) // (5)
+                               (member_name0,serialized_name0),
+                               (member_name1,serialized_name1)...) // (5)
 
 JSONCONS_ALL_MEMBER_NAMED_TRAITS(class_name,
                                  (member_name0,serialized_name0),
