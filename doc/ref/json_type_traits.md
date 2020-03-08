@@ -206,7 +206,7 @@ class MyClass
 };
 ```
 
-(3)-(4) and (7)-(8) generate the code to specialize `json_type_traits` from the member data of a class template. 
+(3)-(4) generate the code to specialize `json_type_traits` from the member data of a class template. 
 
 (5)-(8) generate the code to specialize `json_type_traits` from the member data of a class
 and will serialize to the provided names. The sequence of `(member_nameN,serialized_nameN)`
