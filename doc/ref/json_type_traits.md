@@ -102,24 +102,24 @@ JSONCONS_N_MEMBER_NAMED_TRAITS(class_name,num_mandatory,
                                (member_name1,"name1")...) // (5)
 
 JSONCONS_ALL_MEMBER_NAMED_TRAITS(class_name,
-                                 (member_name0,"serialized_name0"),
-                                 (member_name1,"serialized_name1")...) // (6)
+                                 (member_name0,serialized_name0),
+                                 (member_name1,serialized_name1)...) // (6)
 
 JSONCONS_TPL_N_MEMBER_NAMED_TRAITS(num_template_params,
                                    class_name,num_mandatory,
-                                   (member_name0,"serialized_name0"),
-                                   (member_name1,"serialized_name1")...) // (7)
+                                   (member_name0,serialized_name0),
+                                   (member_name1,serialized_name1)...) // (7)
 
 JSONCONS_TPL_ALL_MEMBER_NAMED_TRAITS(num_template_params,
                                      class_name,
-                                     (member_name0,"serialized_name0"),
-                                     (member_name1,"serialized_name1")...) // (8)
+                                     (member_name0,serialized_name0),
+                                     (member_name1,serialized_name1)...) // (8)
 
 JSONCONS_ENUM_TRAITS(enum_name,identifier0,identifier1,...) // (9)
 
 JSONCONS_ENUM_NAMED_TRAITS(enum_name,
-                           (identifier0,"serialized_name0"),
-                           (identifier1,"serialized_name1")...) // (10)
+                           (identifier0,serialized_name0),
+                           (identifier1,serialized_name1)...) // (10)
 
 JSONCONS_N_GETTER_CTOR_TRAITS(class_name,num_mandatory,
                               getter_name0,
@@ -137,22 +137,22 @@ JSONCONS_TPL_ALL_GETTER_CTOR_TRAITS(num_template_params,
                                     getter_name0,getter_name1,...) // (14)
 
 JSONCONS_N_GETTER_CTOR_NAMED_TRAITS(class_name,num_mandatory,
-                                    (getter_name0,"serialized_name0"),
-                                    (getter_name1,"serialized_name1")...) // (15)
+                                    (getter_name0,serialized_name0),
+                                    (getter_name1,serialized_name1)...) // (15)
 
 JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS(class_name,
-                                      (getter_name0,"serialized_name0"),
-                                      (getter_name1,"serialized_name1")...) // (16)
+                                      (getter_name0,serialized_name0),
+                                      (getter_name1,serialized_name1)...) // (16)
 
 JSONCONS_TPL_N_GETTER_CTOR_NAMED_TRAITS(num_template_params,
                                         class_name,num_mandatory,
-                                        (getter_name0,"serialized_name0"),
-                                        (getter_name1,"serialized_name1")...) // (17)
+                                        (getter_name0,serialized_name0),
+                                        (getter_name1,serialized_name1)...) // (17)
 
 JSONCONS_TPL_ALL_GETTER_CTOR_NAMED_TRAITS(num_template_params,
                                           class_name,
-                                          (getter_name0,"serialized_name0"),
-                                          (getter_name1,"serialized_name1")...) // (18)
+                                          (getter_name0,serialized_name0),
+                                          (getter_name1,serialized_name1)...) // (18)
 
 JSONCONS_N_GETTER_SETTER_TRAITS(class_name,get_prefix,set_prefix,num_mandatory,
                                 property_name0,property_name1,...) // (19)
@@ -169,22 +169,22 @@ JSONCONS_TPL_ALL_GETTER_SETTER_TRAITS(num_template_params,
                                       property_name0,property_name1,...) // (22)
 
 JSONCONS_N_GETTER_SETTER_NAMED_TRAITS(class_name,num_mandatory,
-                                      (getter_name0,setter_name0,"serialized_name0"),
-                                      (getter_name1,setter_name1,"serialized_name1")...) // (23)
+                                      (getter_name0,setter_name0,serialized_name0),
+                                      (getter_name1,setter_name1,serialized_name1)...) // (23)
 
 JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS(class_name,
-                                        (getter_name0,setter_name0,"serialized_name0"),
-                                        (getter_name1,setter_name1,"serialized_name1")...) // (24)
+                                        (getter_name0,setter_name0,serialized_name0),
+                                        (getter_name1,setter_name1,serialized_name1)...) // (24)
 
 JSONCONS_TPL_N_GETTER_SETTER_NAMED_TRAITS(num_template_params,
                                           class_name,num_mandatory,
-                                          (getter_name0,setter_name0,"serialized_name0"),
-                                          (getter_name1,setter_name1,"serialized_name1")...) // (25)
+                                          (getter_name0,setter_name0,serialized_name0),
+                                          (getter_name1,setter_name1,serialized_name1)...) // (25)
 
 JSONCONS_TPL_ALL_GETTER_SETTER_NAMED_TRAITS(num_template_params,
                                             class_name,
-                                            (getter_name0,setter_name0,"serialized_name0"),
-                                            (getter_name1,setter_name1,"serialized_name1")...) // (26)
+                                            (getter_name0,setter_name0,serialized_name0),
+                                            (getter_name1,setter_name1,serialized_name1)...) // (26)
 
 JSONCONS_POLYMORPHIC_TRAITS(base_class_name,derived_class_name0,derived_class_name1,...) // (27)
 ```
@@ -230,8 +230,8 @@ require that all member names be present in the JSON. (21)-(22) generate the cod
 from the getter and setter functions of a class template.
 
 (23)-(26) generate the code to specialize `json_type_traits` from the getter and setter functions of a
-class, and will serialize to the provided names. The sequence of (getter_nameN,setter_nameN,nameN)
-triples declares the get and set functions and serialized name for each of the class properties
+class, and will serialize to the provided names. The sequence of (getter_nameN,setter_nameN,serialized_nameN)
+triples declares the get and set functions and serialized name for each of the class members
 that are part of the sequence. When decoding to a C++ data structure, 
 (23) and (25) require that the first `num_mandatory` member names be present in the JSON,
 the rest can have default values. (24) and (26), however, 
@@ -255,10 +255,10 @@ in the derived classes.
 `member_nameN` - the name of a class data member. Class data members are normally modifiable, but may be `const` or
 `static const`, `const` or `static const` data members are one-way serialized.  
 `getter_nameN` - the getter for a class data member  
-`(identifierN,"serialized_nameN")` - an enum identifier and corresponding JSON name  
-`(getter_nameN,"serialized_nameN")` - the getter for a class data member and corresponding JSON name  
+`(identifierN,serialized_nameN)` - an enum identifier and corresponding JSON name  
+`(getter_nameN,serialized_nameN)` - the getter for a class data member and corresponding JSON name  
 `property_nameN` - the name of a class getter or setter stripped of its get or set prefix.  
-`(getter_nameN,setter_nameN,"serialized_nameN")` - the getter and setter for a class data member, and corresponding JSON name  
+`(getter_nameN,setter_nameN,serialized_nameN)` - the getter and setter for a class data member, and corresponding JSON name  
 `base_class_name` - the name of a base class  
 `derived_class_nameN` - a class that is derived from the base class,
 and that has a `json_type_traits<Json,derived_class_nameN>` specialization.  
