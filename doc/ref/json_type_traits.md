@@ -193,7 +193,7 @@ JSONCONS_POLYMORPHIC_TRAITS(base_class_name,derived_class_name0,derived_class_na
 (1)-(4) will serialize to the stringified member names, (5)-(8) will serialize to the provided names. 
 When decoding to a C++ data structure, 
 (1), (3), (5) and (7) require that the first `num_mandatory` member names be present in the JSON,
-the rest can have default values. (2), (4), (6) and (8), however, 
+the rest can have default values. (2), (4), (6) and (8) 
 require that all member names be present in the JSON. The class must have a default constructor.
 If the member data or default constructor are private, the macro `JSONCONS_TYPE_TRAITS_FRIEND`
 will make them accessible to `json_type_traits`, used so
@@ -215,7 +215,7 @@ class MyClass
 and will serialize to the stringified property names.. 
 When decoding to a C++ data structure, 
 (11) and (13) require that the first `num_mandatory` member names be present in the JSON,
-the rest can have default values. (12) and (14), however, 
+the rest can have default values. (12) and (14) 
 require that all member names be present in the JSON. The class must have a constructor such that the return types 
 of the get functions are convertible to its parameters, taken in order. 
 
@@ -225,7 +225,7 @@ pairs declares the get functions and serialized name for each of the class prope
 that are part of the sequence. 
 When decoding to a C++ data structure, 
 (15) and (17) require that the first `num_mandatory` member names be present in the JSON,
-the rest can have default values. (16) and (18), however, 
+the rest can have default values. (16) and (18) 
 require that all member names be present in the JSON. The class must have a constructor such that the return types 
 of the get functions are convertible to its parameters, taken in order. 
 (17)-(18) generate the code to specialize `json_type_traits` from the get functions and a constructor of a
@@ -235,7 +235,7 @@ class template.
 class, and will serialize to the stringified property names. The get and set function names are
 formed from the concatenation of `get_prefix` and `set_prefix` with property name.
 (19) and (21) require that the first `num_mandatory` member names be present in the JSON,
-the rest can have default values. (20) and (22), however, 
+the rest can have default values. (20) and (22) 
 require that all member names be present in the JSON. (21)-(22) generate the code to specialize `json_type_traits` 
 from the get and set functions of a class template.
 
@@ -244,7 +244,7 @@ class, and will serialize to the provided names. The sequence of `(getter_nameN,
 triples declares the get and set functions and serialized name for each of the class properties
 that are part of the sequence. When decoding to a C++ data structure, 
 (23) and (25) require that the first `num_mandatory` member names be present in the JSON,
-the rest can have default values. (24) and (26), however, 
+the rest can have default values. (24) and (26) 
 require that all member names be present in the JSON. The class must have a default constructor. 
 (25)-(26) generate the code to specialize `json_type_traits` from the get and set functions of a
 class template.
