@@ -1343,7 +1343,7 @@ and `JSONCONS_ALL_GETTER_CTOR_TRAITS` to specialize the
 `ns::hiking_reputation`.
 The macro `JSONCONS_ENUM_TRAITS` generates the code from
 the enum values, and the macro `JSONCONS_ALL_GETTER_CTOR_TRAITS` 
-generates the code from the getter functions and a constructor. 
+generates the code from the get functions and a constructor. 
 These macro declarations must be placed outside any namespace blocks.
 
 ```c++

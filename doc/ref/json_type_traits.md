@@ -211,32 +211,42 @@ class MyClass
 (9)-(10) generate the code to specialize `json_type_traits` from the identifiers of an enumeration.
 (9) will serialize to the stringified identifier names, (10) will serialize to the provided names. 
 
-(11)-(18) generate the code to specialize `json_type_traits` from the getter functions and a constructor of a class. 
-(11)-(14) will serialize to the stringified getter names, (15)-(18) will serialize to the provided names. 
+(11)-(14) generate the code to specialize `json_type_traits` from the get functions and a constructor of a class, 
+and will serialize to the stringified property names.. 
 When decoding to a C++ data structure, 
-(11), (13), (15) and (17) require that the first `num_mandatory` member names be present in the JSON,
-the rest can have default values. (12), (14), (16) and (18), however, 
+(11) and (13) require that the first `num_mandatory` member names be present in the JSON,
+the rest can have default values. (12) and (14), however, 
 require that all member names be present in the JSON. The class must have a constructor such that the return types 
-of the getter functions are convertible to its parameters, taken in order. 
-(21)-(22) and (25)-(26) generate the code to specialize `json_type_traits` from the getter functions and a constructor of a
+of the get functions are convertible to its parameters, taken in order. 
+
+(15)-(18) generate the code to specialize `json_type_traits` from the get functions and a constructor of a class,
+and will serialize to the provided names. The sequence of (getter_nameN,serialized_nameN)
+pairs declares the get functions and serialized name for each of the class properties
+that are part of the sequence. 
+When decoding to a C++ data structure, 
+(15) and (17) require that the first `num_mandatory` member names be present in the JSON,
+the rest can have default values. (16) and (18), however, 
+require that all member names be present in the JSON. The class must have a constructor such that the return types 
+of the get functions are convertible to its parameters, taken in order. 
+(17)-(18) generate the code to specialize `json_type_traits` from the get functions and a constructor of a
 class template.  
 
-(19)-(22) generate the code to specialize `json_type_traits` from the getter and setter functions of a
-class, and will serialize to the stringified property names. The getter and setter function names are
+(19)-(22) generate the code to specialize `json_type_traits` from the get and set functions of a
+class, and will serialize to the stringified property names. The get and set function names are
 formed from the concatenation of `get_prefix` and `set_prefix` with property name.
 (19) and (21) require that the first `num_mandatory` member names be present in the JSON,
 the rest can have default values. (20) and (22), however, 
 require that all member names be present in the JSON. (21)-(22) generate the code to specialize `json_type_traits` 
-from the getter and setter functions of a class template.
+from the get and set functions of a class template.
 
-(23)-(26) generate the code to specialize `json_type_traits` from the getter and setter functions of a
+(23)-(26) generate the code to specialize `json_type_traits` from the get and set functions of a
 class, and will serialize to the provided names. The sequence of (getter_nameN,setter_nameN,serialized_nameN)
-triples declares the get and set functions and serialized name for each of the class members
+triples declares the get and set functions and serialized name for each of the class properties
 that are part of the sequence. When decoding to a C++ data structure, 
 (23) and (25) require that the first `num_mandatory` member names be present in the JSON,
 the rest can have default values. (24) and (26), however, 
 require that all member names be present in the JSON. The class must have a default constructor. 
-(25)-(26) generate the code to specialize `json_type_traits` from the getter and setter functions of a
+(25)-(26) generate the code to specialize `json_type_traits` from the get and set functions of a
 class template.
 
 (27) generates the code to specialize `json_type_traits` for `std::shared_ptr<base_class>` and `std::unique_ptr<base_class>`.
