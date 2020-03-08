@@ -193,7 +193,7 @@ JSONCONS_POLYMORPHIC_TRAITS(base_class_name,derived_class_name0,derived_class_na
 ```
 
 (1)-(4) generate the code to specialize `json_type_traits` from the member data of a class and 
-serializes to the stringified member names. 
+serialize to the stringified member names. 
 When decoding to a C++ data structure, 
 (1) and (3) require that the first `num_mandatory` member names be present in the JSON,
 the rest can have default values. (2) and (4)
