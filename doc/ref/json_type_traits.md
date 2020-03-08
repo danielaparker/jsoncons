@@ -189,11 +189,11 @@ JSONCONS_TPL_ALL_GETTER_SETTER_NAMED_TRAITS(num_template_params,
 JSONCONS_POLYMORPHIC_TRAITS(base_class_name,derived_class_name0,derived_class_name1,...) // (27)
 ```
 
-(1)-(8) generate the code to specialize `json_type_traits` from the member data of a class. 
-(1)-(4) will serialize to the stringified member names, (5)-(8) will serialize to the provided names. 
+(1)-(4) generate the code to specialize `json_type_traits` from the member data of a class and 
+will serialize to the stringified member names. 
 When decoding to a C++ data structure, 
-(1), (3), (5) and (7) require that the first `num_mandatory` member names be present in the JSON,
-the rest can have default values. (2), (4), (6) and (8) 
+(1) and (3) require that the first `num_mandatory` member names be present in the JSON,
+the rest can have default values. (2) and (4)
 require that all member names be present in the JSON. The class must have a default constructor.
 If the member data or default constructor are private, the macro `JSONCONS_TYPE_TRAITS_FRIEND`
 will make them accessible to `json_type_traits`, used so
@@ -207,6 +207,18 @@ class MyClass
 ```
 
 (3)-(4) and (7)-(8) generate the code to specialize `json_type_traits` from the member data of a class template. 
+
+(5)-(8) generate the code to specialize `json_type_traits` from the member data of a class
+and will serialize to the provided names. The sequence of `(member_nameN,serialized_nameN)`
+pairs declares the member name and serialized name for each of the class members
+that are part of the sequence.
+When decoding to a C++ data structure, 
+(5) and (7) require that the first `num_mandatory` member names be present in the JSON,
+the rest can have default values. (6) and (8) 
+require that all member names be present in the JSON. The class must have a default constructor.
+If the member data or default constructor are private, the macro `JSONCONS_TYPE_TRAITS_FRIEND`
+will make them accessible to `json_type_traits`.
+(7)-(8) generate the code to specialize `json_type_traits` from the member data of a class template. 
 
 (9)-(10) generate the code to specialize `json_type_traits` from the identifiers of an enumeration.
 (9) will serialize to the stringified identifier names, (10) will serialize to the provided names. 
