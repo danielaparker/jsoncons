@@ -240,6 +240,8 @@ When decoding to a C++ data structure,
 the rest can have default values. (12) and (14) 
 require that all member names be present in the JSON. The class must have a constructor such that the return types 
 of the get functions are convertible to its parameters, taken in order. 
+(13)-(14) generate the code to specialize `json_type_traits` from the get functions and a constructor of a
+class template.  
 
 (15)-(18) generate the code to specialize `json_type_traits` from the get functions and a constructor of a class,
 and serialize to the provided names. The sequence of `(getter_nameN,serialized_nameN)`
