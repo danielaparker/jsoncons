@@ -210,7 +210,7 @@ public:
     }
 
     template<class T, class CharT_ = CharT>
-    typename std::enable_if<jsoncons::detail::is_string_like<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
+    typename std::enable_if<jsoncons::detail::is_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
         get() const
     {
         T s;

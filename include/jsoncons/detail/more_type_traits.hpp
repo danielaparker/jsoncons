@@ -82,6 +82,19 @@ namespace detail {
         return (ptr);
     }  
 
+    // is_character
+
+    template <class T, class Enable=void>
+    struct is_character : std::false_type {};
+
+    template <class T>
+    struct is_character<T, 
+           typename std::enable_if<std::is_same<T,char>::value ||
+                                   std::is_same<T,wchar_t>::value ||
+                                   std::is_same<T,char16_t>::value ||
+                                   std::is_same<T,char32_t>::value
+    >::type> : std::true_type {};
+
     // has_char_traits_member_type
 
     template <class T, class Enable=void>
@@ -93,14 +106,17 @@ namespace detail {
     >::type> : std::true_type {};
 
 
-    // is_string_like
+    // is_string
 
     template <class T, class Enable=void>
-    struct is_string_like : std::false_type {};
+    struct is_string : std::false_type {};
 
     template <class T>
-    struct is_string_like<T, 
-                          typename std::enable_if<has_char_traits_member_type<T>::value && !std::is_void<decltype(T::npos)>::value && !std::is_void<typename T::allocator_type>::value
+    struct is_string<T, 
+                     typename std::enable_if<is_character<typename T::value_type>::value &&
+                                             has_char_traits_member_type<T>::value && 
+                                             !std::is_void<decltype(T::npos)>::value && 
+                                             !std::is_void<typename T::allocator_type>::value
     >::type> : std::true_type {};
 
     // is_string_view_like
@@ -110,7 +126,7 @@ namespace detail {
 
     template <class T>
     struct is_string_view_like<T, 
-                          typename std::enable_if<has_char_traits_member_type<T>::value && !std::is_void<decltype(T::npos)>::value && !is_string_like<T>::value
+                          typename std::enable_if<has_char_traits_member_type<T>::value && !std::is_void<decltype(T::npos)>::value && !is_string<T>::value
     >::type> : std::true_type {};
 
     // is_integer_like
