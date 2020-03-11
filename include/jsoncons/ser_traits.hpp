@@ -26,32 +26,32 @@ namespace jsoncons {
     template <class T, class Enable = void>
     struct ser_traits
     {
-        template <class Json>
+        template <class CharT,class Json>
         static void serialize(const T& val, 
-                           basic_json_content_handler<typename Json::char_type>& encoder,
-                           const Json& context_j, 
-                           std::error_code& ec)
+                              basic_json_content_handler<CharT>& encoder,
+                              const Json& context_j, 
+                              std::error_code& ec)
         {
             serialize(std::integral_constant<bool, is_stateless<typename Json::allocator_type>::value>(),
                       val, encoder, context_j, ec);
         }
     private:
-        template <class Json>
+        template <class CharT,class Json>
         static void serialize(std::true_type,
-                           const T& val, 
-                           basic_json_content_handler<typename Json::char_type>& encoder,
-                           const Json& /*context_j*/, 
-                           std::error_code& ec)
+                              const T& val, 
+                              basic_json_content_handler<CharT>& encoder,
+                              const Json& /*context_j*/, 
+                              std::error_code& ec)
         {
             auto j = json_type_traits<Json,T>::to_json(val);
             j.dump(encoder, ec);
         }
-        template <class Json>
+        template <class CharT,class Json>
         static void serialize(std::false_type, 
-                           const T& val, 
-                           basic_json_content_handler<typename Json::char_type>& encoder,
-                           const Json& context_j, 
-                           std::error_code& ec)
+                              const T& val, 
+                              basic_json_content_handler<CharT>& encoder,
+                              const Json& context_j, 
+                              std::error_code& ec)
         {
             auto j = json_type_traits<Json,T>::to_json(val, context_j.get_allocator());
             j.dump(encoder, ec);
@@ -70,9 +70,9 @@ namespace jsoncons {
     {
         typedef typename T::value_type value_type;
 
-        template <class Json>
+        template <class CharT,class Json>
         static void serialize(const T& val, 
-                              basic_json_content_handler<typename Json::char_type>& encoder, 
+                              basic_json_content_handler<CharT>& encoder, 
                               const Json& context_j, 
                               std::error_code& ec)
         {
@@ -95,9 +95,9 @@ namespace jsoncons {
     {
         typedef typename T::value_type value_type;
 
-        template <class Json>
+        template <class CharT,class Json>
         static void serialize(const T& val, 
-                              json_content_handler& encoder, 
+                              basic_json_content_handler<CharT>& encoder, 
                               const Json&,
                               std::error_code& ec)
         {
@@ -112,9 +112,9 @@ namespace jsoncons {
     {
         typedef typename std::array<T,N>::value_type value_type;
 
-        template <class Json>
+        template <class CharT,class Json>
         static void serialize(const std::array<T, N>& val, 
-                           basic_json_content_handler<typename Json::char_type>& encoder, 
+                           basic_json_content_handler<CharT>& encoder, 
                            const Json& context_j, 
                            std::error_code& ec)
         {
@@ -141,9 +141,9 @@ namespace jsoncons {
         typedef typename T::value_type value_type;
         typedef typename T::key_type key_type;
 
-        template <class Json>
+        template <class CharT,class Json>
         static void serialize(const T& val, 
-                              basic_json_content_handler<typename Json::char_type>& encoder, 
+                              basic_json_content_handler<CharT>& encoder, 
                               const Json& context_j, 
                               std::error_code& ec)
         {
@@ -177,9 +177,9 @@ namespace jsoncons {
         typedef typename T::value_type value_type;
         typedef typename T::key_type key_type;
 
-        template <class Json>
+        template <class CharT,class Json>
         static void serialize(const T& val, 
-                              basic_json_content_handler<typename Json::char_type>& encoder, 
+                              basic_json_content_handler<CharT>& encoder, 
                               const Json& context_j, 
                               std::error_code& ec)
         {
