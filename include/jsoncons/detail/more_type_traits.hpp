@@ -90,9 +90,7 @@ namespace detail {
     template <class T>
     struct is_character<T, 
            typename std::enable_if<std::is_same<T,char>::value ||
-                                   std::is_same<T,wchar_t>::value ||
-                                   std::is_same<T,char16_t>::value ||
-                                   std::is_same<T,char32_t>::value
+                                   std::is_same<T,wchar_t>::value
     >::type> : std::true_type {};
 
     // has_char_traits_member_type
