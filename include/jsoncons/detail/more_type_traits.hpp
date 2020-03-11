@@ -119,14 +119,16 @@ namespace detail {
                                              !std::is_void<typename T::allocator_type>::value
     >::type> : std::true_type {};
 
-    // is_string_view_like
+    // is_string_view
 
     template <class T, class Enable=void>
-    struct is_string_view_like : std::false_type {};
+    struct is_string_view : std::false_type {};
 
     template <class T>
-    struct is_string_view_like<T, 
-                          typename std::enable_if<has_char_traits_member_type<T>::value && !std::is_void<decltype(T::npos)>::value && !is_string<T>::value
+    struct is_string_view<T, 
+                          typename std::enable_if<is_character<typename T::value_type>::value &&
+                                                  has_char_traits_member_type<T>::value && 
+                                                  !std::is_void<decltype(T::npos)>::value && !is_string<T>::value
     >::type> : std::true_type {};
 
     // is_integer_like

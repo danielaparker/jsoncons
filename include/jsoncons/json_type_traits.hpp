@@ -106,28 +106,6 @@ namespace detail {
         typename std::enable_if<!is_json_type_traits_unspecialized<Json,T>::value
     >::type> : std::true_type {};
 
-    // is_compatible_string_type
-    template<class Json, class T, class Enable=void>
-    struct is_compatible_string_type : std::false_type {};
-
-    template<class Json, class T>
-    struct is_compatible_string_type<Json,T, 
-        typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-        jsoncons::detail::is_string<T>::value && 
-        !is_json_type_traits_unspecialized<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
-    >::type> : std::true_type {};
-
-    // is_compatible_string_view_type
-    template<class Json, class T, class Enable=void>
-    struct is_compatible_string_view_type : std::false_type {};
-
-    template<class Json, class T>
-    struct is_compatible_string_view_type<Json,T, 
-        typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-        jsoncons::detail::is_string_view_like<T>::value && 
-        !is_json_type_traits_unspecialized<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
-    >::type> : std::true_type {};
-
     // is_compatible_array_type
     template<class Json, class T, class Enable=void>
     struct is_compatible_array_type : std::false_type {};
@@ -586,7 +564,9 @@ namespace detail {
 
     template<class Json, typename T>
     struct json_type_traits<Json, T, 
-                            typename std::enable_if<!is_json_type_traits_declared<T>::value && jsoncons::detail::is_compatible_string_view_type<Json,T>::value>::type>
+                            typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+                                                    jsoncons::detail::is_string_view<T>::value &&
+                                                    std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
     {
         typedef typename Json::allocator_type allocator_type;
 
