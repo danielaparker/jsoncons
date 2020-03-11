@@ -40,3 +40,29 @@ TEST_CASE("json_type_traits string tests")
     }
 }
 
+TEST_CASE("json_type_traits vector of string tests")
+{
+    SECTION("test 1")
+    {
+        std::vector<std::string> v = {"foo","bar","baz"};
+
+        std::wstring buf;
+        encode_json(v,buf);
+
+        auto v2 = decode_json<std::vector<std::string>>(buf);
+
+        CHECK(v2 == v);
+    }
+    SECTION("test 2")
+    {
+        std::vector<std::wstring> v = {L"foo",L"bar",L"baz"};
+
+        std::string buf;
+        encode_json(v,buf);
+
+        auto v2 = decode_json<std::vector<std::wstring>>(buf);
+
+        CHECK(v2 == v);
+    }
+}
+
