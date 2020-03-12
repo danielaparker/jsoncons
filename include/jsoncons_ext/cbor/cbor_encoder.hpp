@@ -45,9 +45,6 @@ private:
     using string_type = std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>;
     using byte_string_type = basic_byte_string<byte_allocator_type>;
 
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,size_t>> string_size_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const byte_string_type,size_t>> byte_string_size_allocator_type;
-
     struct stack_item
     {
         cbor_container_type type_;
@@ -80,34 +77,43 @@ private:
         }
 
     };
-    std::vector<stack_item> stack_;
+
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,size_t>> string_size_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const byte_string_type,size_t>> byte_string_size_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<stack_item> stack_item_allocator_type;
+
     Sink result_;
     const cbor_encode_options options_;
     allocator_type alloc_;
 
-    // Noncopyable and nonmoveable
-    basic_cbor_encoder(const basic_cbor_encoder&) = delete;
-    basic_cbor_encoder& operator=(const basic_cbor_encoder&) = delete;
-
+    std::vector<stack_item,stack_item_allocator_type> stack_;
     std::map<string_type,size_t,std::less<string_type>,string_size_allocator_type> stringref_map_;
     std::map<byte_string_type,size_t,std::less<byte_string_type>,byte_string_size_allocator_type> bytestringref_map_;
     std::size_t next_stringref_ = 0;
+
+    // Noncopyable and nonmoveable
+    basic_cbor_encoder(const basic_cbor_encoder&) = delete;
+    basic_cbor_encoder& operator=(const basic_cbor_encoder&) = delete;
 public:
     explicit basic_cbor_encoder(sink_type sink, 
                                 const allocator_type& alloc = allocator_type())
        : result_(std::move(sink)), 
          options_(cbor_encode_options()), 
          alloc_(alloc),
-         stringref_map_(alloc),
+         stack_(alloc)
+#if !defined(JSONCONS_NO_MAP_TAKING_ALLOCATOR) 
+         , stringref_map_(alloc),
          bytestringref_map_(alloc)
     {
     }
+#endif
     basic_cbor_encoder(sink_type sink, 
                        const cbor_encode_options& options, 
                        const allocator_type& alloc = allocator_type())
        : result_(std::move(sink)), 
          options_(options), 
-         alloc_(alloc)
+         alloc_(alloc),
+         stack_(alloc)
 #if !defined(JSONCONS_NO_MAP_TAKING_ALLOCATOR) 
          , stringref_map_(alloc),
          bytestringref_map_(alloc)
